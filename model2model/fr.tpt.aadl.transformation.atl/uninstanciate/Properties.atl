@@ -1,0 +1,226 @@
+-- @nsURI AADLI=http:///AADL2/instance
+
+module Properties;
+
+-- TODO
+--  ClassifierValue property kind
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+
+-------------------------
+-- PROPERTIES
+-------------------------
+lazy rule PropertyAssociation {
+	from
+		p : AADLI!PropertyAssociation
+	to
+		p2 : AADLBA!PropertyAssociation (
+			property <- p.property.debug('  property'),
+			constant <- p.constant,
+			append <- p.append,
+			ownedValue <- p.ownedValue->collect(e|thisModule.ModalPropertyValue(e).debug('  value'))
+		)
+}
+
+lazy rule ModalPropertyValue {
+	from
+		v : AADLI!ModalPropertyValue 
+	to
+		v2 : AADLBA!ModalPropertyValue (
+			ownedValue <- thisModule.PropertyExpression(v.ownedValue)
+	)
+	do { v2; }
+}
+
+
+lazy abstract rule PropertyExpression {
+	from
+		l : AADLI!PropertyExpression
+	to
+		l2 : AADLBA!PropertyExpression
+	do { l2; }
+}
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------
+--  RULES FOR KINDS OF PROPERTY VALUES
+-------------------------------------------------------------------------------------
+
+lazy rule ListValue extends PropertyExpression {
+	from
+		l : AADLI!ListValue
+	to
+		l2 : AADLBA!ListValue (
+			ownedListElement <- l.ownedListElement->collect(e|thisModule.PropertyExpression(e))
+		)
+	do { l2; }
+}
+
+lazy rule Operation extends PropertyExpression {
+	from
+		l : AADLI!Operation
+	to
+		l2 : AADLBA!Operation (
+			op <- l.op,
+			ownedPropertyExpressions <- l.ownedPropertyExpressions->collect(pe|thisModule.PropertyExpression(pe))
+		)
+	do { l2; }
+}
+
+lazy rule BooleanLiteral extends PropertyExpression {
+	from
+		l : AADLI!BooleanLiteral
+	to
+		l2 : AADLBA!BooleanLiteral (isValue <- l.isValue)
+	do { l2; }
+}
+
+lazy rule ClassifierValue extends PropertyExpression {
+	from
+		l : AADLI!ClassifierValue
+	to
+		l2 : AADLBA!ClassifierValue(classifier <- l.classifier)
+	do { l2; }
+}
+
+--rule ClassifierValue {
+--	from
+--		c : AADLI!ClassifierValue
+--	to
+--		type : AADLBA!ClassifierValue (classifier <- c.classifier)
+--	do
+--	{
+--		if (c.classifier.oclIsKindOf(AADLI!SubprogramClassifier))
+--		{
+--			--type.classifier <- thisModule.Element_Subprogram(c.classifier, this);
+--			c.classifier.debug('!!! NOT HANDLED SubprogramClassifierValue !!!');
+--		}
+--		else if (c.classifier.oclIsKindOf(AADLI!DataClassifier))
+--		{
+--			c.classifier.debug('!!! NOT HANDLED DataClassifierValue !!!');
+--		}
+--		else
+--		{
+--			type.classifier <- c.classifier;
+--		}
+--	}		
+--}
+
+lazy rule ComputedValue extends PropertyExpression {
+	from
+		l : AADLI!ComputedValue
+	to
+		l2 : AADLBA!ComputedValue (function <- l.function)
+	do { l2; }
+}
+
+lazy rule PropertyConstant extends PropertyExpression {
+	from
+		l : AADLI!PropertyConstant
+	to
+		l2 : AADLBA!PropertyConstant (constantValue <- l.constantValue) -- not containment
+	do { l2; }
+}
+
+lazy rule NamedValue extends PropertyExpression {
+	from
+		l : AADLI!NamedValue
+	to
+		l2 : AADLBA!NamedValue (namedValue <- l.namedValue)
+	do { l2; }
+}
+
+lazy rule ReferenceValue extends PropertyExpression {
+	from
+		l : AADLI!ReferenceValue
+	using
+	{
+		ref : AADLI!Subcomponent = l.containmentPathElement->first().namedElement;
+			
+		o : AADLI!ComponentInstance = l.getOwnerComponent();
+		subi : AADLI!ComponentInstance = o.componentInstance->any(subc|subc.name=ref.name);
+		sub : AADLBA!Subcomponent = thisModule.resolveTemp(subi,'sub');
+	}
+	to
+		l2 : AADLBA!ReferenceValue (containmentPathElement <- Sequence {cpe}),
+		cpe : AADLBA!ContainmentPathElement (namedElement <- sub)
+	do { 
+		ref.debug('REF');
+		sub.debug('SUB');
+		l2;
+	}
+}
+
+lazy rule InstanceReferenceValue extends PropertyExpression {
+	from
+		l : AADLI!InstanceReferenceValue
+	to
+		l2 : AADLBA!ReferenceValue (containmentPathElement <- Sequence {path1,path2}),
+		path1 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.eContainer().getSubcomponentImg()),
+		path2 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.getSubcomponentImg())
+	do { l2; }
+}
+
+lazy rule IntegerLiteral extends PropertyExpression{	
+	from
+		l : AADLI!IntegerLiteral
+	to
+		l2 : AADLBA!IntegerLiteral (
+			--unit <- thisModule.PropertyExpression(l.unit),
+			unit <- l.unit,
+			value <- l.value,
+			base <- l.base)
+	do { l2; }
+}
+
+lazy rule RealLiteral extends PropertyExpression {
+	from
+		l : AADLI!RealLiteral
+	to
+		l2 : AADLBA!RealLiteral (
+			valueString <- l.valueString,
+			--unit <- thisModule.PropertyExpression(l.unit),
+			unit <- l.unit,
+			value <- l.value)
+	do { l2; }
+}
+
+lazy rule RangeValue extends PropertyExpression {
+	from
+		l : AADLI!RangeValue
+	to
+		l2 : AADLBA!RangeValue (
+			minimum <- thisModule.PropertyExpression(l.minimum), 
+			maximum <- thisModule.PropertyExpression(l.maximum), 
+			delta <- l.delta
+		)
+	do { l2; }
+}
+
+lazy rule StringLiteral extends PropertyExpression {
+	from
+		l : AADLI!StringLiteral
+	to
+		l2 : AADLBA!StringLiteral (value <- l.value)
+	do { l2; }
+}
+
+lazy rule UnitLiteral extends PropertyExpression {
+	from
+		l : AADLI!UnitLiteral
+	to
+		l2 : AADLBA!UnitLiteral (name <- l.name)
+	do { l2; }
+}

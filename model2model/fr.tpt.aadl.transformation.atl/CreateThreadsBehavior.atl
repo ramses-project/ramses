@@ -1,0 +1,110 @@
+-- @path AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+
+module CreateThreadsBehavior;
+create OUT : AADLBA 	from 	IN : AADLBA,
+								AADL_RUNTIME: AADLBA,
+								HOOKS: ATLHOOKS;
+
+uses Services;
+
+
+rule createThreadBehavior(threadImpl: AADLBA!ThreadImplementation)
+{
+	to
+		behvior_annex : AADLBA!BehaviorAnnex (
+            name <- 'behavior_specification',
+            behaviorStates <- Sequence{initialState, mainState, finalState},
+            behaviorTransitions <- Sequence{initTransition,mainTransition,finalTransition} 
+        ),
+		initialStateId : AADLBA!Identifier (baRef <- initialState, id <- 'init_state' ),
+		mainStateId : AADLBA!Identifier (baRef <- mainState, id <- 'main_state' ),
+		finalStateId : AADLBA!Identifier (baRef <- finalState, id <- 'final_state' ),
+		initialState: AADLBA!BehaviorState
+		(
+	    	identifierOwned <- initialStateId,
+	    	initial <- true,
+	    	complete <- false,
+	    	final <- false,
+			sourceInTrans <- Sequence{initTransition}
+		),
+		mainState: AADLBA!BehaviorState
+		(
+	    	identifierOwned <- mainStateId,
+	    	initial <- false,
+	    	complete <- false,
+	    	final <- false,
+			sourceInTrans <- Sequence{mainTransition,finalTransition}
+		),
+		finalState: AADLBA!BehaviorState
+		(
+	    	identifierOwned <- finalStateId,
+	    	initial <- false,
+	    	complete <- false,
+	    	final <- false			
+		),
+		
+		initialStateIdInitTr : AADLBA!Identifier (baRef <- initialState, id <- 'init_state' ),
+		mainStateIdInitTr : AADLBA!Identifier (baRef <- mainState, id <- 'main_state' ),
+		initTransition: AADLBA!BehaviorTransition 
+		( 
+			baRef <- initTransitionId,
+		    transitionIdentifier <- initTransitionId,
+		    sourceStateIdentifiers <- Sequence{initialStateIdInitTr},
+		    destinationStateIdentifier <- mainStateIdInitTr--,
+		    --behaviorActionBlockOwned <- initActionBlock
+		),
+		
+		mainStateIdSrcTr : AADLBA!Identifier (baRef <- mainState, id <- 'main_state' ),
+		mainStateIdDstTr : AADLBA!Identifier (baRef <- mainState, id <- 'main_state' ),
+		mainTransition: AADLBA!BehaviorTransition 
+		(
+		    transitionIdentifier <- mainTransitionId,
+		    sourceStateIdentifiers <- Sequence{mainStateIdSrcTr},
+		    destinationStateIdentifier <- mainStateIdDstTr,
+		    behaviorActionBlockOwned <- mainActionBlock
+		),
+		
+		mainStateIdFiniTr : AADLBA!Identifier (baRef <- mainState, id <- 'main_state' ),
+		finalStateIdFiniTr : AADLBA!Identifier (baRef <- finalState, id <- 'final_state' ),
+		finalTransition: AADLBA!BehaviorTransition 
+		(
+		    transitionIdentifier <- finalTransitionId,
+		    sourceStateIdentifiers <- Sequence{mainStateIdFiniTr},
+		    destinationStateIdentifier <- finalStateIdFiniTr--,
+		    --behaviorActionBlockOwned <- finalActionBlock
+		),
+		initActionBlock : AADLBA!BehaviorActionBlock
+		(
+		),
+		mainActionBlock : AADLBA!BehaviorActionBlock
+		(
+			behaviorActionsOwned<-mainActionSequence
+		),
+		mainActionSequence: AADLBA!BehaviorActionSequence
+		(
+			behaviorActions <- threadImpl.getOwnedSubprogramCallSequences().get(0).generateSubprogramCallActionSequence()
+		),
+		finalActionBlock : AADLBA!BehaviorActionBlock
+		(
+		),
+		initTransitionId: AADLBA!Identifier (baRef <- initialState, id <- 'init_transition' ),
+		mainTransitionId: AADLBA!Identifier (baRef <- mainState, id <- 'main_transition' ),
+		finalTransitionId: AADLBA!Identifier (baRef <- finalState, id <- 'final_transition' )
+	do
+	{
+		threadImpl.getOwnedAnnexSubclauses().add(behvior_annex);
+		if (not threadImpl.isDeclared())
+		{
+			threadImpl.debug('  declare implementation');
+			thisModule.public().getOwnedClassifiers().add(threadImpl);
+		}
+		--ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().resolveBANames(behvior_annex);
+	}
+}
+
+
+
+helper context AADLBA!SubprogramCallSequence def : generateSubprogramCallActionSequence(): Sequence(AADLBA!SubprogramCallAction) = 
+			self.ownedCallSpecification->collect(e|thisModule.generateSubprogramCallActionFromCallSpecication(e));
+

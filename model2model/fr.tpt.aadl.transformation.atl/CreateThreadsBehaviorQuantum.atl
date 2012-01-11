@@ -1,0 +1,501 @@
+-- @nsURI AADLI=http:///AADL2/instance
+
+module CreateThreadsBehaviorQuantum;
+
+create 
+	OUT 				   : AADLBA
+from 
+	IN 					   : AADLI,
+	BASE_TYPES			   : AADLBA,
+	AADL_RUNTIME		   : AADLBA,
+	DATA_MODEL			   : AADLBA,
+	SCHEDULER_CONSTANTS	   : AADLBA,
+	SCHEDULER_REALIZATIONS : AADLBA,
+	SCHEDULER_RUNTIME	   : AADLBA;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses FHSHelpers;
+uses AADLRuntimeHelpers;
+uses Services;
+
+unique lazy rule ThreadType {
+ from 
+ 	type : AADLI!ThreadType
+ to 
+ 	typeImg : AADLBA!ThreadType (
+ 	 name <- type.name,
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
+	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
+	 ownedEventPort <- Sequence{execute}->union(type.ownedEventPort->collect(e|thisModule.EventPort(e)))
+ 	),
+	execute  : AADLBA!EventPort (name <- 'execute', direction <- 'in')
+}
+
+unique lazy rule ThreadImplementation {
+ from
+    typeImg 		: AADLBA!ThreadType,
+ 	impl			: AADLI!ThreadImplementation
+ using
+ {
+ 	execute  : AADLBA!EventPort = typeImg.ownedEventPort->any(p|p.name='execute');
+ }
+ to 
+ 	implImg 		: AADLBA!ThreadImplementation (
+ 		name 						<- impl.name,
+		ownedRealization 			<- thisModule.Realization(typeImg, implImg),
+		ownedSubprogramSubcomponent <- impl.getSubcomponentsInstances('subprogram'),
+		ownedSubprogramCallSequence <- Sequence {thisModule.CallSequence(impl,implImg)},
+		ownedDataSubcomponent 		<- impl.getSubcomponentsInstances('data')->union(Sequence{fIndex,functions_wcet}),
+		ownedPortConnection			<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co)),
+		ownedParameterConnection	<- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co)),
+		ownedAnnexSubclause 		<- Sequence {behavior}
+	),
+	
+	fIndex			: AADLBA!DataSubcomponent (
+    	name						<- 'f_index',
+		dataSubcomponentType		<- 'Integer'.asBaseType(),
+		ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',fIndexInit)}
+    ),
+	
+	fIndexInit : AADLBA!IntegerLiteral (
+		value						<- 0.longValue()
+	),
+	
+	functions_wcet  : AADLBA!DataSubcomponent (
+		name						<- 'f_wcet',
+		dataSubcomponentType		<- 'Float'.asBaseType(),
+		ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation(
+													'Data_Representation',
+													'DATA_MODEL',
+													'Array'.asEnumeration('DATA_MODEL').asNamedValue()),
+													
+												 thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													functions_wcet_value)
+									   }
+	),
+	
+	functions_wcet_value : AADLBA!ListValue (
+		ownedListElement			<- impl.ownedSubprogramCallSequence->first().wcetList()
+	),
+	
+	
+	behavior 	 	: AADLBA!BehaviorAnnex (
+		name						<- 'behavior_specification',
+		aadlRef						<- implImg,
+		behaviorVariables			<- Sequence{'t0','t1','qremaining_time'}->collect(s|thisModule.CreateIntegerVariable(s))
+										->union(implImg.createBAVariablesForSpgParameters()),
+											
+		behaviorStates 				<- Sequence {stateInit, 	stateStartQ,	stateExecute, 
+												 stateConsume, 	stateContinue, 	stateTerminate},
+											 
+		behaviorTransitions			<- Sequence {trInit_StartQ, trStartQ_Execute}
+										->union(implImg.callSequence().ownedCallSpecification
+											->collect(c|thisModule.CreateTransition_trExecute_Consume(behavior,stateExecute,stateConsume,fIndex,c)))
+										->union(Sequence{trCons_Continue,trCont_Execute,trCont_StartQ})
+	),
+	
+	stateInit 	 	: AADLBA!BehaviorState (
+		identifiers 				<- thisModule.CreateIdentifier('stInit', stateInit),
+		aadlRef						<- behavior,
+		initial 					<- true, 
+		complete 					<- false,
+		final 						<- false
+	),
+	
+	stateStartQ 	: AADLBA!BehaviorState (
+		identifiers 				<- thisModule.CreateIdentifier('stStartQ', stateStartQ),
+		aadlRef						<- behavior,
+		initial 					<- false, 
+		complete 					<- false, 
+		final 						<- false
+	),
+	
+	stateExecute 	: AADLBA!BehaviorState (
+		identifiers 				<- thisModule.CreateIdentifier('stExecute', stateExecute),
+		aadlRef						<- behavior,
+		initial 					<- false, 
+		complete 					<- false, 
+		final 						<- false
+	),
+	
+	stateConsume 	: AADLBA!BehaviorState (
+		identifiers 				<- thisModule.CreateIdentifier('stConsume', stateConsume),
+		aadlRef						<- behavior,
+		initial 					<- false, 
+		complete 					<- false, 
+		final 						<- false
+	),
+	
+	stateContinue 	: AADLBA!BehaviorState (
+		identifiers 				<- thisModule.CreateIdentifier('stContinue', stateContinue),
+		aadlRef						<- behavior,
+		initial 					<- false, 
+		complete 					<- false, 
+		final 						<- false
+	),
+	
+	stateTerminate  : AADLBA!BehaviorState (
+		identifiers 				<- thisModule.CreateIdentifier('stateTerminate', stateTerminate),
+		aadlRef						<- behavior,
+		initial 					<- false, 
+		complete 					<- false, 
+		final 						<- true
+	),
+	
+	trInit_StartQ		: AADLBA!BehaviorTransition (
+		aadlRef						<- behavior,
+		transitionIdentifier		<- thisModule.CreateIdentifier('Initialization', trInit_StartQ),
+		sourceStateIdentifiers  	<- Sequence {stateInit.cloneIdentifier()},
+		destinationStateIdentifier 	<- stateStartQ.cloneIdentifier(),
+		behaviorConditionOwned      <- trInit_StartQ_Cond,
+		behaviorActionBlockOwned    <- thisModule.CreateActionBlock_trInit_StartQ(typeImg,behavior)
+	),
+	
+	trInit_StartQ_Cond  : AADLBA!DispatchCondition (
+		dispatchTriggerConditionOwned <- thisModule.CreateIdentifier(execute.name,execute)
+	),
+	
+	trStartQ_Execute	: AADLBA!BehaviorTransition (
+		aadlRef						<- behavior,
+		transitionIdentifier		<- thisModule.CreateIdentifier('Quantum_Start', trStartQ_Execute),
+		sourceStateIdentifiers  	<- Sequence {stateStartQ.cloneIdentifier()},
+		destinationStateIdentifier 	<- stateExecute.cloneIdentifier(),
+		behaviorActionBlockOwned   	<- thisModule.CreateActionBlock_trStartQ_Execute(behavior)
+	),
+	
+	trCons_Continue : AADLBA!BehaviorTransition (
+		aadlRef						<- behavior,
+		transitionIdentifier		<- thisModule.CreateIdentifier('trConsume_Continue', trCons_Continue),
+		sourceStateIdentifiers  	<- Sequence {stateConsume.cloneIdentifier()},
+		destinationStateIdentifier 	<- stateContinue.cloneIdentifier(),
+		behaviorActionBlockOwned   	<- thisModule.CreateActionBlock_trConsume_Continue(behavior,trCons_Continue,fIndex,
+											implImg.callSequence().ownedCallSpecification->size())
+	),
+	
+	trCont_Execute : AADLBA!BehaviorTransition (
+		aadlRef						<- behavior,
+		transitionIdentifier		<- thisModule.CreateIdentifier('Continue', trCont_Execute),
+		sourceStateIdentifiers  	<- Sequence {stateContinue.cloneIdentifier()},
+		destinationStateIdentifier 	<- stateExecute.cloneIdentifier(),
+		behaviorConditionOwned		<- thisModule.CreateCondition_Continue (behavior, functions_wcet, fIndex)
+	),
+	
+	trCont_StartQ : AADLBA!BehaviorTransition (
+		aadlRef						<- behavior,
+		transitionIdentifier		<- thisModule.CreateIdentifier('trCont_StartQ', trCont_Execute),
+		sourceStateIdentifiers  	<- Sequence {stateContinue.cloneIdentifier()},
+		destinationStateIdentifier 	<- stateStartQ.cloneIdentifier(),
+		behaviorConditionOwned		<- thisModule.CreateCondition_Wait (behavior, functions_wcet, fIndex),
+		behaviorActionBlockOwned	<- thisModule.CreateActionBlock_Wait()
+	)
+	
+	do { implImg; }
+}
+
+helper context AADLBA!SubprogramCallSequence def : wcetList() : Sequence(AADLBA!StringLiteral) =
+	self.ownedCallSpecification->collect(call|call.calledSubprogram.ownedPropertyAssociation
+												->any(a|a.property.name='Compute_Execution_Time'))
+												->collect(a|a.ownedValue->first()
+													.ownedValue.maximum.value.toString().asLiteral())
+;
+
+rule CreateActionBlock_trInit_StartQ (typeImg				: AADLBA!ThreadType,
+									  behavior              : AADLBA!BehaviorAnnex){
+  using
+  {
+  	initSpg : AADLBA!Subprogram = typeImg.getInitializeEntrypoint();
+    awaitDispatch  : AADLBA!Subprogram = thisModule.getRuntimeSubprogram('Await_Dispatch');
+  }
+  to
+    actionBlock			: AADLBA!BehaviorActionBlock (
+    	behaviorActionsOwned		<- actionSeq
+    ),
+	actionSeq   		: AADLBA!BehaviorActionSequence (
+		behaviorActions				<- Sequence {callInit,awaitDispatchCall}
+	),
+	
+	
+	callInit			: AADLBA!SubprogramCallAction (
+		subprogramNames				<- Sequence {initName},
+		subprogramReference			<- initRef
+	),
+	initName		    : AADLBA!Name (
+		identifierOwned 			<- thisModule.CreateIdentifier(initSpg.name, initSpg)
+	),
+	initRef		        : AADLBA!UniqueComponentClassifierReference (
+		aadlRef 					<- initSpg
+	),
+	
+	awaitDispatchCall	: AADLBA!SubprogramCallAction (
+		subprogramNames				<- Sequence {subprogramName},
+		subprogramReference			<- subprogramRef
+	),
+	subprogramName		: AADLBA!Name (
+		identifierOwned 			<- thisModule.CreateIdentifier(awaitDispatch.name, awaitDispatch)
+	),
+	subprogramRef		: AADLBA!UniqueComponentClassifierReference (
+		aadlRef 					<- awaitDispatch
+	)
+  do { actionBlock; }
+}
+
+rule CreateActionBlock_trStartQ_Execute (behavior     		: AADLBA!BehaviorAnnex){
+  to
+    actionBlock 		: AADLBA!BehaviorActionBlock (
+		behaviorActionsOwned 		<- actionSeq
+	),
+	actionSeq   		: AADLBA!BehaviorActionSequence (
+		behaviorActions				<- Sequence {thisModule.CreateAction_CurrentTime(behavior,'t0')}
+	)
+  do { actionBlock; }
+}
+
+rule CreateActionBlock_trConsume_Continue (behavior     : AADLBA!BehaviorAnnex,
+									  trCons_Continue	: AADLBA!BehaviorTransition,
+									  fIndex : AADLBA!DataSubcomponent,
+									  fCount : Integer) {
+  using
+  {
+  	t0 : AADLBA!BehaviorVariable = behavior.behaviorVariables->any(v|v.getName()='t0');
+  	t1 : AADLBA!BehaviorVariable = behavior.behaviorVariables->any(v|v.getName()='t1');
+  	qremaining_time : AADLBA!BehaviorVariable = behavior.behaviorVariables->any(v|v.getName()='qremaining_time');
+    qvalue : AADLBA!AadlInteger = thisModule.getQuantumConstant();
+  }
+  to
+  	actionBlock 		: AADLBA!BehaviorActionBlock (
+		behaviorActionsOwned 		<- actionSeq
+	),
+	actionSeq   		: AADLBA!BehaviorActionSequence (
+		behaviorActions				<- Sequence {fIndexAction,
+												 thisModule.CreateAction_CurrentTime(behavior,'t1'),
+												 availableTimeAction}
+	),
+	
+	fIndexAction: AADLBA!AssignmentAction (
+		targetOwned 				<- fIndexActionLeft,
+		valueExpressionOwned		<- fIndexActionRight
+	),
+	
+	fIndexActionLeft		: AADLBA!Name (
+		identifierOwned 			<- thisModule.CreateIdentifier(fIndex.name, fIndex)
+	),
+	
+	fIndexActionRight		: AADLBA!ValueExpression (
+		relations					<- Sequence {fIndexActionRightRel}
+	),
+	
+	fIndexActionRightRel	: AADLBA!Relation (
+		simpleExpressionOwned		<- fIndexActionRightSE
+	),
+	
+	fIndexActionRightSE 	: AADLBA!SimpleExpression (
+		terms						<- Sequence {fIndexActionRightTerm}
+	),
+	
+	fIndexActionRightTerm  : AADLBA!Term (
+		multiplyingOperators		<- Sequence{'mod'},
+		factors						<- Sequence {fIndexIncrementActionF,thisModule.IntegerAsFactor(fCount)}
+	),
+	
+	fIndexIncrementActionF : AADLBA!Factor (
+		valueOwned					<- fIndexIncrementAction
+	),
+	
+	fIndexIncrementAction  : AADLBA!ValueExpression (
+		relations					<- Sequence {fIndexIncrementActionRel}
+	),
+	
+	fIndexIncrementActionRel : AADLBA!Relation (
+		simpleExpressionOwned		<- fIndexIncrementActionSE
+	),
+	
+	fIndexIncrementActionSE  : AADLBA!SimpleExpression (
+		binaryAddingOperators		<- Sequence{'+'},
+		terms						<- Sequence {thisModule.ReferenceAsTerm(fIndex,OclUndefined), thisModule.IntegerAsTerm(1)}
+	),
+	
+	
+	
+	availableTimeAction: AADLBA!AssignmentAction (
+		targetOwned 				<- availableTimeActionLeft,
+		valueExpressionOwned		<- availableTimeActionRight
+	),
+	
+	availableTimeActionLeft	: AADLBA!Name (
+		identifierOwned 			<- thisModule.CreateIdentifier(qremaining_time.getName(), qremaining_time)
+	),
+	
+	availableTimeActionRight		: AADLBA!ValueExpression (
+		relations					<- Sequence {availableTimeActionRightRel}
+	),
+	
+	availableTimeActionRightRel	: AADLBA!Relation (
+		simpleExpressionOwned		<- availableTimeActionRightSE
+	),
+	
+	availableTimeActionRightSE 	: AADLBA!SimpleExpression (
+		terms						<- Sequence {thisModule.ReferenceAsTerm(qvalue,OclUndefined),
+												 thisModule.ReferenceAsTerm(t1,OclUndefined), 
+												 thisModule.ReferenceAsTerm(t0,OclUndefined)},
+		binaryAddingOperators		<- Sequence {'-','+'}
+	)
+	
+  do {actionBlock;}
+}
+
+rule CreateActionBlock_Wait(typeImg : AADLBA!ThreadType) {
+  using
+  {
+  	awaitDispatch  : AADLBA!Subprogram = thisModule.getRuntimeSubprogram('Await_Dispatch');
+  }
+  to
+	actionBlock 		: AADLBA!BehaviorActionBlock (
+		behaviorActionsOwned 		<- actionSeq
+	),
+	actionSeq   		: AADLBA!BehaviorActionSequence (
+		behaviorActions				<- Sequence {awaitDispatchCall}
+	),
+	awaitDispatchCall	: AADLBA!SubprogramCallAction (
+		subprogramNames				<- Sequence {subprogramName},
+		subprogramReference			<- subprogramRef
+	),
+	subprogramName		: AADLBA!Name (
+		identifierOwned 			<- thisModule.CreateIdentifier(awaitDispatch.name, awaitDispatch)
+	),
+	subprogramRef		: AADLBA!UniqueComponentClassifierReference (
+		aadlRef 					<- awaitDispatch
+	)
+  do { actionBlock; }
+}
+
+rule CreateAction_CurrentTime(behavior     : AADLBA!BehaviorAnnex,
+							 timeRef 	  : String){
+  using
+  {
+  	tRef : AADLBA!BehaviorVariable = behavior.behaviorVariables->any(v|v.getName()=timeRef);
+  }
+  to
+    callAction			: AADLBA!SubprogramCallAction (
+		subprogramNames				<- Sequence {subprogramName},
+		subprogramReference			<- subprogramRef,
+		parameterLabels				<- Sequence { thisModule.CreateBAName(timeRef, tRef) }
+										
+	),
+	
+	subprogramName		: AADLBA!Name (
+		identifierOwned 			<- thisModule.CreateIdentifier(thisModule.CurrentTimeSpg().name, thisModule.CurrentTimeSpg())
+	),
+	
+	subprogramRef		: AADLBA!UniqueComponentClassifierReference (
+		aadlRef 					<- thisModule.CurrentTimeSpg()
+	)
+  do { callAction; }
+}
+
+rule CreateTransition_trExecute_Consume ( behavior     : AADLBA!BehaviorAnnex,
+										  stateExecute : AADLBA!BehaviorState, 
+										  stateConsume : AADLBA!BehaviorState,
+										  fIndex 	   : AADLBA!DataSubcomponent,
+										  call 		   : AADLBA!SubprogramCall) {
+ using
+ {
+ 	seq : AADLBA!SubprogramCallSequence = call.eContainer();
+ 	owner : AADLBA!ComponentImplementation = seq.eContainer();
+ 	indexValue : Integer = seq.ownedCallSpecification->indexOf(call);
+ }
+ to
+	trExecute_Consume 	: AADLBA!BehaviorTransition (
+		aadlRef 					<- behavior,
+		transitionIdentifier    	<- thisModule.CreateIdentifier(call.name, trExecute_Consume),
+		sourceStateIdentifiers  	<- Sequence {thisModule.CreateIdentifier('stExecute', stateExecute)},
+		destinationStateIdentifier 	<- thisModule.CreateIdentifier('stConsume', stateConsume),
+		behaviorActionBlockOwned	<- actionBlock,
+		behaviorConditionOwned		<- condFunction
+	),
+	
+	condFunction		: AADLBA!ValueExpression (
+		relations 					<- Sequence {condFunctionRel}
+	),
+	
+	condFunctionRel		: AADLBA!Relation (
+		simpleExpressionOwned 		<- fIndex.asBehaviorExpression(OclUndefined),
+		relationalOperatorOwned 	<- 'Equal',
+		simpleExpressionSdOwned		<- indexValue.asBehaviorExpression()
+	),
+	
+	
+	actionBlock 		: AADLBA!BehaviorActionBlock (
+		behaviorActionsOwned 		<- actionSeq
+	),
+	
+	actionSeq   		: AADLBA!BehaviorActionSequence (
+		behaviorActions				<- Sequence {thisModule.CreateAction_SubprogramCall(behavior,call)}
+	)
+	
+ do 
+ {
+ 	call.calledSubprogram.ownedParameter->collect(p|behavior.getBehaviorVariableForParameter(owner, call, p))
+	->select(v|not v.oclIsUndefined())->collect(v|v.getName()).debug('  create SubprogramCallAction '.concat(call.calledSubprogram.name));
+ 	
+ 	trExecute_Consume; 
+ }
+}
+
+
+
+rule CreateCondition_Continue (behavior 			: AADLBA!BehaviorAnnex,
+							  functions_wcet	: AADLBA!DataSubcomponent,
+							  fIndex			: AADLBA!DataSubcomponent) {
+	
+ using
+ {
+ 	qremaining_time : AADLBA!BehaviorVariable = behavior.behaviorVariables->any(v|v.getName()='qremaining_time');
+ }
+ to
+	condition			: AADLBA!ValueExpression (
+		relations					<- Sequence {firstCondition, secondCondition},
+		logicalOperators			<- Sequence {'and'}
+	),
+	
+	firstCondition		: AADLBA!Relation (
+		simpleExpressionOwned 		<- fIndex.asBehaviorExpression(OclUndefined),
+		relationalOperatorOwned 	<- 'GreaterThan',
+		simpleExpressionSdOwned		<- 0.asBehaviorExpression()),
+	
+	secondCondition		: AADLBA!Relation (
+		simpleExpressionOwned 		<- qremaining_time.asBehaviorExpression(OclUndefined),
+		relationalOperatorOwned 	<- 'GreaterThan',
+		simpleExpressionSdOwned		<- functions_wcet.asBehaviorExpression(thisModule.CreateName(fIndex.getName(),fIndex))
+	)
+ do { condition; }
+}
+
+rule CreateCondition_Wait ( behavior 			: AADLBA!BehaviorAnnex,
+							  functions_wcet	: AADLBA!DataSubcomponent,
+							  fIndex			: AADLBA!DataSubcomponent) {
+	
+ using
+ {
+ 	qremaining_time : AADLBA!BehaviorVariable = behavior.behaviorVariables->any(v|v.getName()='qremaining_time');
+ }
+ to
+	condition			: AADLBA!ValueExpression (
+		relations					<- Sequence {firstCondition, secondCondition},
+		logicalOperators			<- Sequence {'or'}
+	),
+	
+	firstCondition		: AADLBA!Relation (
+		simpleExpressionOwned 		<- fIndex.asBehaviorExpression(OclUndefined),
+		relationalOperatorOwned 	<- 'Equal',
+		simpleExpressionSdOwned		<- 0.asBehaviorExpression()),
+	
+	secondCondition		: AADLBA!Relation (
+		simpleExpressionOwned 		<- qremaining_time.asBehaviorExpression(OclUndefined),
+		relationalOperatorOwned 	<- 'LessOrEqualThan',
+		simpleExpressionSdOwned		<- functions_wcet.asBehaviorExpression(thisModule.CreateName(fIndex.getName(),fIndex))
+	)
+ do { condition; }
+}

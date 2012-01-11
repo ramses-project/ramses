@@ -1,0 +1,135 @@
+-- @nsURI AADLI=http:///AADL2/instance
+
+module ConfigureScheduler;
+
+create 
+	OUT 					: AADLBA
+from 
+	IN 						: AADLI,
+	BASE_TYPES				: AADLBA,
+	AADL_RUNTIME			: AADLBA,
+	DATA_MODEL				: AADLBA,
+	SCHEDULER_FHS			: AADLBA,
+	SCHEDULER_RUNTIME		: AADLBA,
+	SCHEDULER_REALIZATIONS  : AADLBA;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses FHSHelpers;
+uses AADLRuntimeHelpers;
+uses Services;
+
+rule Processor_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #processor)
+	to
+		sub : AADLBA!ProcessorSubcomponent(
+			name <- c.name,
+			processorSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation 			<- c.mapOwnedPropertyAssociationList()
+												->union(Sequence{implementedAs})
+	),
+	
+	implementedAs : AADLBA!PropertyAssociation (
+		property							<- thisModule.getProperty('Implemented_As'),
+		ownedValue							<- Sequence {mpv}
+	),
+	mpv			   : AADLBA!ModalPropertyValue (
+		ownedValue							<- implClassifier
+	),
+	implClassifier : AADLBA!ClassifierValue (
+		classifier							<- thisModule.CreateSchedulerSystem(c, 'FixedTimeline')
+	)
+}
+
+rule VirtualProcessor_Instance {
+  from
+	c : AADLI!ComponentInstance (c.category.toString() = 'virtual processor')
+  to
+	sub : AADLBA!VirtualProcessorSubcomponent (
+		name 								<- c.name,
+		virtualProcessorSubcomponentType 	<- c.createOrSetTypeAndImplementation(),
+		ownedPropertyAssociation 			<- c.mapOwnedPropertyAssociationList()
+												->union(Sequence{implementedAs})
+	),
+	
+	implementedAs : AADLBA!PropertyAssociation (
+		property							<- thisModule.getProperty('Implemented_As'),
+		ownedValue							<- Sequence {mpv}
+	),
+	mpv			   : AADLBA!ModalPropertyValue (
+		ownedValue							<- implClassifier
+	),
+	implClassifier : AADLBA!ClassifierValue (
+		classifier							<- thisModule.CreateSchedulerSystem(c,OclUndefined)
+	)
+}
+
+lazy rule CreateSchedulerSystem {
+  from
+  	c : AADLI!ComponentInstance,
+	defaultPolicy : String
+  using
+  {
+  	sysName : String = c.eContainer().name.concat('_').concat(c.name);
+  }
+  to
+	sysImpl 		: AADLBA!SystemImplementation (
+		name 								<- sysName.concat('.impl'),
+		ownedRealization 					<- thisModule.Realization(sysType, sysImpl),
+		ownedSubprogramSubcomponent			<- Sequence {scheduler,election,oobw},
+		ownedDataSubcomponent				<- Sequence {control,tasksInfo,qtick}
+	),
+  	sysType 		: AADLBA!SystemType (
+		name 								<- sysName
+	),
+	scheduler 		: AADLBA!SubprogramSubcomponent (
+		name								<- 'Scheduler',
+		subprogramSubcomponentType			<- c.getSchedulingSubprogram()
+	),
+	
+	control  		: AADLBA!DataSubcomponent (
+		name								<- 'Control',
+		dataSubcomponentType				<- AADLBA!Data->allInstancesFrom('SCHEDULER_RUNTIME')
+													->any(d|d.name='Scheduler_Internal_Control.impl')
+	),
+	
+	tasksInfo		: AADLBA!DataSubcomponent (
+		name								<- 'TasksInfo',
+		dataSubcomponentType				<- AADLBA!Data->allInstancesFrom('SCHEDULER_RUNTIME')
+													->any(d|d.name='Scheduling_Struct.impl')
+	),
+	
+	qtick 			: AADLBA!DataSubcomponent (
+		name								<- 'QTick',
+		dataSubcomponentType				<- AADLBA!Data->allInstancesFrom('BASE_TYPES')
+													->any(d|d.name='Integer')
+	),
+	
+	
+	
+	election 		: AADLBA!SubprogramSubcomponent (
+		name								<- 'Election',
+		subprogramSubcomponentType			<- if (c.getSchedulingProtocol().oclIsUndefined()) then
+													defaultPolicy.asSchedulingProtocolSubprogram()
+											   else
+											   		c.getSchedulingProtocol().asSchedulingProtocolSubprogram()
+											   endif
+	),
+	
+	oobw		    : AADLBA!SubprogramSubcomponent (
+		name								<- 'OOBW'
+		--subprogramSubcomponentType			<- AADLBA!Subprogram->allInstancesFrom('SCHEDULER_REALIZATIONS')
+		--										->any(d|d.name='Ignore_Out_Of_Budget')
+	)
+  do
+  {
+	sysType.debug('  declare type');
+	thisModule.public().getOwnedClassifiers().add(sysType);
+		
+	sysImpl.debug('  declare implementation');
+	thisModule.public().getOwnedClassifiers().add(sysImpl);
+	
+	sysImpl;
+  }
+}

@@ -1,0 +1,223 @@
+-- @nsURI AADLI=http:///AADL2/instance
+
+module Implementations;
+
+-- TODO
+--  ClassifierValue property kind
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+
+rule Implementation (c : AADLI!ComponentInstance,
+					 impl : AADLI!ComponentImplementation, 
+					 typeImg : AADLBA!ComponentType){
+	using
+	{
+		implImg : AADLBA!ComponentImplementation = OclUndefined;
+	}
+	do
+	{
+		if (not impl.oclIsUndefined())
+		{
+			if (impl.oclIsKindOf(AADLI!BusImplementation)) { implImg <- thisModule.BusImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!VirtualBusImplementation)) { implImg <- thisModule.VirtualBusImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!DeviceImplementation)) { implImg <- thisModule.DeviceImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!ProcessorImplementation)) { implImg <- thisModule.ProcessorImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!VirtualProcessorImplementation)) { implImg <- thisModule.VirtualProcessorImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!MemoryImplementation)) { implImg <- thisModule.MemoryImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!ProcessImplementation)) { implImg <- thisModule.ProcessImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!ThreadGroupImplementation)) { implImg <- thisModule.ThreadGroupImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!ThreadImplementation)) { implImg <- thisModule.ThreadImplementation(c,typeImg, impl); }
+			else if (impl.oclIsKindOf(AADLI!SubprogramImplementation)) { implImg <- thisModule.SubprogramImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!DataImplementation)) { implImg <- thisModule.DataImplementation(typeImg,impl); }
+			
+			if (not implImg.isDeclared())
+			{
+				implImg.debug('  declare implementation');
+				thisModule.public().getOwnedClassifiers().add(implImg);
+			}
+			else
+			{
+				implImg.debug('  previously declared implementation');
+			}
+			implImg;
+		}
+	}
+}
+
+unique lazy rule Realization {
+	from
+		typeImg : AADLBA!ComponentType, 
+		implImg : AADLBA!ComponentImplementation
+	to
+		realization : AADLBA!Realization (implemented <- typeImg)
+}
+
+unique lazy rule BusImplementation {
+ from
+    typeImg : AADLBA!BusType,
+ 	impl : AADLI!BusImplementation
+ to
+ 	implImg : AADLBA!BusImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedVirtualBusSubcomponent <- impl.getSubcomponentsInstances('virtual bus')
+ 	)
+}
+
+unique lazy rule VirtualBusImplementation {
+ from
+    typeImg : AADLBA!VirtualBusType,
+ 	impl : AADLI!VirtualBusImplementation
+ to
+ 	implImg : AADLBA!VirtualBusImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedVirtualBusSubcomponent <- impl.getSubcomponentsInstances('virtual bus')
+ 	)
+}
+
+unique lazy rule DeviceImplementation {
+ from 
+	typeImg : AADLBA!DeviceType,
+ 	impl : AADLI!DeviceImplementation
+ to 
+ 	implImg : AADLBA!DeviceImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedBusSubcomponent <- impl.getSubcomponentsInstances('bus'),
+		ownedVirtualBusSubcomponent <- impl.getSubcomponentsInstances('virtual bus')
+ 	)
+}
+
+unique lazy rule ProcessorImplementation {
+ from 
+	typeImg : AADLBA!ProcessorType,
+ 	impl : AADLI!ProcessorImplementation
+ to 
+ 	implImg : AADLBA!ProcessorImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
+		ownedBusSubcomponent <- impl.getSubcomponentsInstances('bus'),
+		ownedVirtualBusSubcomponent <- impl.getSubcomponentsInstances('virtual bus')
+ 	)
+	do
+	{
+		implImg.ownedVirtualProcessorSubcomponent.debug('VP SUBS');
+		implImg;
+	}
+}
+unique lazy rule VirtualProcessorImplementation {
+ from 
+	typeImg : AADLBA!VirtualProcessorType,
+ 	impl : AADLI!VirtualProcessorImplementation
+ to 
+ 	implImg : AADLBA!VirtualProcessorImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
+		ownedVirtualBusSubcomponent <- impl.getSubcomponentsInstances('virtual bus')
+	)
+}
+
+unique lazy rule MemoryImplementation {
+ from 
+	typeImg : AADLBA!MemoryType,
+ 	impl : AADLI!MemoryImplementation
+ to 
+ 	implImg : AADLBA!MemoryImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedMemorySubcomponent <- impl.getSubcomponentsInstances('memory')
+	)
+}
+
+unique lazy rule ProcessImplementation {
+ from
+    typeImg : AADLBA!ProcessType,
+ 	impl : AADLI!ProcessImplementation
+ to 
+ 	implImg : AADLBA!ProcessImplementation (
+ 		name 							<- impl.name,
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('thread group'),
+		ownedThreadSubcomponent 		<- impl.getSubcomponentsInstances('thread'),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
+		ownedPortConnection				<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,implImg)),
+		ownedAccessConnection			<- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co))
+	)
+}
+
+unique lazy rule ThreadGroupImplementation {
+ from
+    typeImg : AADLBA!ThreadGroupType,
+ 	impl : AADLI!ThreadGroupImplementation 
+ to 
+ 	implImg : AADLBA!ThreadGroupImplementation (
+ 		name <- impl.name,
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		ownedThreadGroupSubcomponent	<- impl.getSubcomponentsInstances('thread group'),
+		ownedThreadSubcomponent 		<- impl.getSubcomponentsInstances('thread'),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
+	)
+}
+
+unique lazy rule ThreadImplementation {
+ from 
+    c : AADLI!ComponentInstance,
+ 	typeImg : AADLBA!ThreadType,
+ 	impl : AADLI!ThreadImplementation
+ to 
+ 	implImg : AADLBA!ThreadImplementation (
+ 		name <- c.uniqueName().concat('.impl'),
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
+		ownedSubprogramCallSequence 	<- Sequence {thisModule.CallSequence(impl,implImg)},
+		ownedPortConnection				<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,implImg)),
+		ownedParameterConnection		<- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co,implImg))
+	)
+}
+unique lazy rule SubprogramImplementation {
+ from
+    typeImg : AADLBA!SubprogramType,
+ 	impl : AADLI!SubprogramImplementation 
+ to 
+ 	implImg : AADLBA!SubprogramImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedPropertyAssociation <- impl.mapOwnedPropertyAssociationList(),
+		ownedSubprogramCallSequence <- Sequence {thisModule.CallSequence(impl,implImg)}
+	)
+}
+
+lazy rule DataImplementation {
+  from
+    typeImg : AADLBA!DataType,
+ 	impl : AADLI!DataImplementation 
+ to 
+ 	implImg : AADLBA!DataImplementation (
+ 		name <- impl.name,
+		ownedRealization <- thisModule.Realization(typeImg, implImg),
+		ownedPropertyAssociation <- impl.mapOwnedPropertyAssociationList(),
+		ownedDataSubcomponent <- impl.ownedDataSubcomponent->collect(s|thisModule.DataSubcomponent(s))
+	)
+}
+
+lazy rule DataSubcomponent {
+ from
+   sub : AADLI!DataSubcomponent
+ to
+   sub2 : AADLBA!DataSubcomponent (
+   		name <- sub.name,
+		dataSubcomponentType <- sub.dataSubcomponentType.mapClassifier()
+   )
+}
