@@ -1,0 +1,21 @@
+package Scheduler_Realizations
+public
+
+with Scheduler_Interfaces;
+
+subprogram RMS extends Scheduler_Interfaces::Task_Election
+end RMS;
+
+subprogram FP extends Scheduler_Interfaces::Task_Election
+end FP;
+
+subprogram FixedTimeline extends Scheduler_Interfaces::Task_Election
+end FixedTimeline;
+
+subprogram Ignore_Out_Of_Budget extends Scheduler_Interfaces::Out_Of_Budget_Wrapper
+end Ignore_Out_Of_Budget;
+
+subprogram Default_Thread_Init
+end Default_Thread_Init;
+
+end Scheduler_Realizations;

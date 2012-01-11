@@ -1,0 +1,37 @@
+
+-------------
+-- INSTALL
+-------------
+
+To create the .jar file from which the transformation can
+be launched in a command line mode, right-click on the project 
+"fr.tpt.transformation.launch.cl", then click on "Export..." select
+"Java->Runnable JAR file" and click on "Next".
+
+select "ATLTransfoLauncher" as the "Launch configuration", and give the
+location of the .jar file you want to create.
+
+In section
+"Library handling:"
+select
+ - Package required libraries into generated JAR
+
+click on "Finish"
+
+-------------
+-- RUN
+-------------
+
+In your console, change directory to the place you generated the .jar file.
+
+Then execute "java -jar <executable_jar>.jar <asm_file_path> <input_file_path> <output_file_path>"
+where 	<executable_jar>.jar is the executable file created in the INSTALL section;
+		asm_file_path is the absolute or relative path to the .asm file compiled from the .atl file
+		input_file_path is the absolute or relative path to the .aaxl2 file is the input aadl model
+		output_file_path  is the absolute or relative path where the output model will be generated as a .aaxl2 file
+		
+-------------
+-- TODO
+-------------
+
+manage set of transformation files and sets of input files...

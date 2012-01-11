@@ -1,0 +1,21 @@
+Different configurations of transformations:
+
+	No superimposition
+	
+test Uninstanciate.atl
+-m test/test1.aadl2 -s node.impl -o test/result/ -i test/ -d ../../model2model/fr.tpt.aadl.transformation.atl/
+
+	Superimposition
+
+test Uninstanciate.atl superimposed with ExpandThreadsPorts.atl
+-m test/test1.aadl2 -s node.impl -t ExpandThreadsPorts.asm -o test/result/ -i test/ -d ../../model2model/fr.tpt.aadl.transformation.atl/
+
+	Refining mode without superimposition
+
+test Uninstanciate.atl refined with ChangeThreadsDispatchProtocol.atl
+-m test/test1.aadl2 -s node.impl -o test/result/ -i test/ -p ChangeThreadsDispatchProtocol.asm -d ${workspace_loc}/fr.tpt.aadl.transformation.atl/
+
+	Refining mode with superimposition
+	
+test Uninstanciate.atl superimposed with ExpandThreadsPorts.atl refined with ChangeThreadsDispatchProtocol.atl
+-m test/test1.aadl2 -s node.impl -o test/result/ -i test/ -t ExpandThreadsPorts.asm -p ChangeThreadsDispatchProtocol.asm -d ${workspace_loc}/fr.tpt.aadl.transformation.atl/

@@ -1,0 +1,94 @@
+-- @nsURI AADLI=http:///AADL2/instance
+
+module PropertiesTools;
+
+create 
+	OUT 				   : AADLBA
+from 
+	IN 					   : AADLI,
+	BASE_TYPES			   : AADLBA,
+	AADL_RUNTIME		   : AADLBA,
+	DATA_MODEL			   : AADLBA,
+	SCHEDULER_CONSTANTS	   : AADLBA,
+	SCHEDULER_REALIZATIONS : AADLBA,
+	SCHEDULER_RUNTIME	   : AADLBA;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses FHSHelpers;
+uses AADLRuntimeHelpers;
+uses Services;
+
+helper context String def : asBaseType() : AADLBA!Classifier =
+	AADLBA!Classifier->allInstancesFrom('BASE_TYPES')->any(c|c.name=self)
+;
+
+helper context String def : asDataType(model: String) : AADLBA!Classifier =
+	AADLBA!Classifier->allInstancesFrom(model)->any(c|c.name=self)
+;
+
+helper context String def : asSubprogramType(model: String) : AADLBA!Classifier =
+	AADLBA!Classifier->allInstancesFrom(model)->any(c|c.name=self)
+;
+
+helper context String def : asProperty(model : String) : AADLBA!Property =
+	AADLBA!Property->allInstancesFrom(model)->any(p|p.name=self)
+;
+
+helper context String def : asEnumeration(model : String) : AADLBA!EnumerationLiteral =
+	AADLBA!EnumerationLiteral->allInstancesFrom(model)->any(e|e.name=self)
+;
+
+helper def : getProperty(propertyName : String) : AADLBA!Property =
+	AADLBA!PropertySet->allInstances()->collect(ps|ps.ownedProperty)
+						->flatten()->any(p|p.name=propertyName)
+;
+
+helper context AADLBA!NamedElement def : getPropertyAssociation(propertyType : String) : AADLBA!PropertyAssociation =
+	let propertyAssociations : Sequence(AADLBA!PropertyAssociation) = self.ownedPropertyAssociation.debug(self.name+' available property associations') in
+	propertyAssociations->select(p | p.isIdentifiedPropertyAssociation(propertyType.toLower())=true)->first();
+	
+helper context AADLBA!NamedElement def : getModalPropertyValue(propertyType : String) : AADLBA!ModalPropertyValue =
+	if(not self.getPropertyAssociation(propertyType).oclIsUndefined()) then
+		self.getPropertyAssociation(propertyType).ownedValue->first()
+	else
+		if(self.oclIsTypeOf(AADLBA!ComponentImplementation)) then
+			self.type.getPropertyAssociation(propertyType).ownedValue->first()
+		else
+			OclUndefined
+		endif
+	endif
+;
+
+helper context AADLBA!PropertyAssociation def : isIdentifiedPropertyAssociation(identifier:String): Boolean =
+	if(self.property.oclIsUndefined() or self.property.name.oclIsUndefined()) then
+		false.debug('UNDEFINED OF UNAMED')
+	else 
+		if (self.property.name.toLower() = identifier.toLower()) then
+			true.debug('IN PROPERTYASSOCIATION IDENTIFICATION')
+		else
+			false.debug('NOT IDENTIFIED')
+		endif
+	endif;
+
+rule CreatePropertyAssociation (propertyName : String, model : String, value : AADLBA!PropertyExpression) {
+	to
+		p : AADLBA!PropertyAssociation (
+			property <- propertyName.asProperty(model),
+			ownedValue <- Sequence {mpv}
+		),
+		
+		mpv : AADLBA!ModalPropertyValue (
+			ownedValue <- value
+		)
+	do { p; }
+}
+
+rule CreateStringLiteralPropertyExpression (value : String) {
+	to
+		pr : AADLBA!StringLiteral(value<-value)
+	do
+	{
+		pr;
+	}
+}

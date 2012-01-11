@@ -1,0 +1,141 @@
+library AADLICopyHelpers;
+
+helper context AADLI!Subcomponent def : getType() : AADLI!ComponentType =
+	self.getClassifier().getOwnedRealization().implemented
+;
+
+
+helper context AADLI!ComponentInstance def : getType() : AADLI!ComponentType =
+	if (self.getSubcomponent().getClassifier().oclIsKindOf(AADLI!ComponentType)) then
+		self.getSubcomponent().getClassifier()
+	else
+		self.getSubcomponent().getClassifier().getOwnedRealization().implemented
+	endif
+;
+
+helper context AADLI!ComponentInstance def : getImpl() : AADLI!ComponentImplementation =
+	if (self.category = #system) then
+		thisModule.resolveTemp(self, 'impl')
+	else
+		if (self.getSubcomponent().getClassifier().oclIsKindOf(AADLI!ComponentImplementation)) then
+			self.getSubcomponent().getClassifier()
+		else
+			OclUndefined
+		endif
+	endif
+;
+
+helper context AADLI!ComponentInstance def : uniqueName() : String =
+	if (self.eContainer().oclIsKindOf(AADLI!SystemInstance)) then
+		self.name
+	else
+		self.eContainer().uniqueName().concat('_').concat(self.name)
+	endif
+;
+
+helper context AADLI!Element def : getOwnerComponent() : AADLI!ComponentInstance =
+	if (self.eContainer().oclIsKindOf(AADLI!ComponentInstance)) then
+		self.eContainer()
+	else
+		self.eContainer().getOwnerComponent()
+	endif
+;
+
+helper context AADLI!ComponentInstance def : owner() : AADLI!ComponentInstance =
+	self.eContainer()
+;
+
+helper context AADLI!ComponentInstance def : ownerImplImg() : AADLBA!ComponentImplementation = 
+	if (self.eContainer().category = #system) then
+		thisModule.resolveTemp(self.eContainer(), 'impl')
+	else
+		thisModule.resolveTemp(self.eContainer(), 'sub').getSubcomponentType()
+	endif
+;
+
+helper context AADLI!ComponentInstance def : ownerTypeImg() : AADLBA!ComponentImplementation = 
+	self.ownerImplImg().getOwnedRealization().implemented
+;
+
+helper context AADLI!ComponentType def : getImage() : AADLBA!ComponentType =
+	thisModule.resolveTemp(self, 'typeImg')
+;
+
+helper context AADLI!ComponentInstance def : getSubcomponentImg() : AADLBA!Subcomponent =
+	thisModule.resolveTemp(self, 'sub')
+;
+
+helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(category : String) : Sequence(AADLI!ComponentInstance) =
+	AADLI!ComponentInstance->allInstances()->any(c|c.getImpl()=self).componentInstance
+	                        ->select(c|c.category.toString()=category)
+;
+
+helper context AADLI!ConnectedElement def : getConnContextImg(owner : AADLBA!ComponentImplementation) : AADLBA!Context =
+	if (self.context.oclIsUndefined()) then
+		OclUndefined
+	else
+		if (self.context.oclIsKindOf(AADLI!SubprogramCall)) then
+			owner.callSequence().ownedCallSpecification->any(call|call.name = self.context.name)
+		else
+			-- can return OclUndefined if the subcomponent is not yet mapped
+			owner.getAllSubcomponents()->any(s|s.name = self.context.name)
+		endif
+	endif
+; 
+
+
+helper context AADLI!ConnectedElement def : getConnFeatureImg(owner : AADLBA!ComponentImplementation) : AADLBA!Feature =
+	if (self.context.oclIsUndefined()) then
+		owner.getType().getOwnedFeatures()->any(f|f.name=self.connectionEnd.name)
+	else 
+		if (self.getConnContextImg(owner).oclIsUndefined()) then
+		    -- subcomponent is not yet mapped: feature cannot be resolved yet
+			OclUndefined
+		else 
+			if (self.getConnContextImg(owner).oclIsKindOf(AADLBA!SubprogramCall)) then
+				self.getConnContextImg(owner).calledSubprogram.ownedParameter->any(p|p.name=self.connectionEnd.name)
+			else
+				-- subcomponent is mapped: feature is accessible
+				self.getConnContextImg(owner).getType().getOwnedFeatures()->any(f|f.name=self.connectionEnd.name)
+			endif
+		endif
+	endif
+;
+
+
+helper context AADLI!ComponentImplementation def : callSequenceFromImpl() : AADLI!SubprogramCallSequence =
+	self.ownedElement->any(e|e.oclIsKindOf(AADLI!SubprogramCallSequence))
+;
+
+helper context AADLI!SubprogramCallSequence def : getAllOutParameters() : Sequence(AADLI!Parameter) =
+	self.ownedCallSpecification->collect(c|c.calledSubprogram.ownedParameter)->flatten()->select(p|p.direction=#out)
+;
+
+
+helper context AADLI!Feature def : mapClassifier() : AADLBA!DataClassifier =
+	if (self.dataFeatureClassifier.oclIsKindOf(AADLI!DataImplementation)) then
+		thisModule.Implementation(OclUndefined,self.dataFeatureClassifier, thisModule.Type(OclUndefined,self.dataFeatureClassifier.getType()))
+	else
+		thisModule.Type(OclUndefined,self.dataFeatureClassifier)
+	endif
+;
+
+helper context AADLI!DataClassifier def : mapClassifier() : AADLBA!DataClassifier =
+	if (self.oclIsKindOf(AADLI!DataImplementation)) then
+		thisModule.Implementation(OclUndefined,self, thisModule.Type(OclUndefined,self.getType()))
+	else
+		thisModule.Type(OclUndefined,self)
+	endif
+;
+
+helper context AADLI!ComponentInstance def : createOrSetTypeAndImplementation() : AADLBA!ComponentClassifier =
+	if (self.getImpl().oclIsUndefined()) then
+	   thisModule.Type(self,self.getType())
+	else
+	   thisModule.Implementation(self,self.getImpl(), thisModule.Type(self,self.getType()))
+	endif
+;
+
+helper context AADLI!NamedElement def : mapOwnedPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
+	self.ownedPropertyAssociation->collect (e|thisModule.PropertyAssociation (e))
+;
