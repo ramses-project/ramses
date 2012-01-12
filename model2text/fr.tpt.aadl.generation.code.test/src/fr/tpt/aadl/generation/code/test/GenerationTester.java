@@ -10,7 +10,7 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.PublicPackageSection ;
 
-import fr.tpt.aadl.generation.code.AadlToCUnparser ;
+import fr.tpt.aadl.c.unparser.AadlToCUnparser ;
 import fr.tpt.aadl.model.transformation.cli.StaticServiceRegistry ;
 import fr.tpt.aadl.toolsuite.core.ToolSuiteLauncher ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;

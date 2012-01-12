@@ -30,7 +30,7 @@ import org.osate.aadl2.parsesupport.LocationReference ;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver ;
-import fr.tpt.aadl.generation.code.GenerationUtils ;
+import fr.tpt.aadl.c.unparser.GenerationUtils ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.transformation.ATLTransfoLauncher ;
 import fr.tpt.aadl.resources.manager.PredefinedPackagesManager ;

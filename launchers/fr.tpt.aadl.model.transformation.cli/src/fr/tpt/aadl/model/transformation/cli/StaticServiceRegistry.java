@@ -11,12 +11,12 @@ import org.osate.annexsupport.AnnexUnparser ;
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction ;
 import fr.tpt.aadl.annex.behavior.AadlBaResolver ;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction ;
+import fr.tpt.aadl.c.unparser.annex.behavior.AadlBaToCUnparserAction ;
 import fr.tpt.aadl.launch.WCETAnalysis ;
 import fr.tpt.aadl.transformation.ATLTransfoLauncher ;
 import fr.tpt.aadl.toolsuite.support.analysis.Analyzer ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.generator.Generator ;
-import fr.tpt.aadl.generation.code.annex.behavior.AadlBaToCUnparserAction ;
 
 public class StaticServiceRegistry implements ServiceRegistry
 {

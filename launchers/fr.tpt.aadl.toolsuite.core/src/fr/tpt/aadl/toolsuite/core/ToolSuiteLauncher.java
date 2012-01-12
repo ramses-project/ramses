@@ -25,10 +25,8 @@ import org.osate.aadl2.PublicPackageSection ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.instance.SystemInstance ;
 
-import fr.tpt.aadl.generation.code.AadlToCUnparser ;
-import fr.tpt.aadl.generation.code.GenerationUtils ;
-import fr.tpt.aadl.generation.makefile.pok.AadlToMakefileUnparser ;
-import fr.tpt.aadl.generation.makefile.pok.GenerateMakefile ;
+import fr.tpt.aadl.c.unparser.AadlToCUnparser ;
+import fr.tpt.aadl.c.unparser.GenerationUtils ;
 import fr.tpt.aadl.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.resources.manager.PredefinedPackagesManager ;
 import fr.tpt.aadl.resources.manager.PredefinedPropertiesManager ;
@@ -37,6 +35,8 @@ import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.toolsuite.support.generator.Generator ;
 import fr.tpt.aadl.toolsuite.support.generator.GeneratorParameter ;
+import fr.tpt.pok.makefile.generator.AadlToMakefileUnparser ;
+import fr.tpt.pok.makefile.generator.GenerateMakefile ;
 
 public class ToolSuiteLauncher
 {
