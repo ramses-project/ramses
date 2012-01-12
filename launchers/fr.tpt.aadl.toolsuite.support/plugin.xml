@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.4"?>
-<plugin>
-   <extension-point id="analyzer" name="TPT AADL analyzer" schema="schema/analyzer.exsd"/>
-   <extension-point id="generator" name="TPT AADL generator" schema="schema/generator.exsd"/>
-
-</plugin>

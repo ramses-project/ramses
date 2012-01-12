@@ -1,7 +1,0 @@
-library AADLCopyHelpers;
-
-helper def : public() : AADLBA!PublicPackageSection = AADLBA!PublicPackageSection->allInstancesFrom('OUT')->first();
-
-helper context AADLBA!NamedElement def : isDeclared() : Boolean =
-	thisModule.public().getOwnedClassifiers()->includes(self)
-;
