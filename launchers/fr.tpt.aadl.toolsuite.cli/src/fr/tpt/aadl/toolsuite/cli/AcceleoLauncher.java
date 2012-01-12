@@ -18,7 +18,7 @@ import com.martiansoftware.jsap.JSAPException ;
 import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.Switch ;
 
-import fr.tpt.pok.makefile.generator.GenerateMakefile ;
+import fr.tpt.aadl.pok.makefile.generator.GenerateMakefile ;
 
 /**
  * Entry point of the 'GenerateMakefile' generation module.

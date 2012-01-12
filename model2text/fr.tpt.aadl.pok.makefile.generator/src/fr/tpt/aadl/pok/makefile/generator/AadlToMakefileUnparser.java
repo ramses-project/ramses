@@ -1,4 +1,4 @@
-package fr.tpt.pok.makefile.generator ;
+package fr.tpt.aadl.pok.makefile.generator ;
 
 import java.io.BufferedWriter ;
 import java.io.File ;

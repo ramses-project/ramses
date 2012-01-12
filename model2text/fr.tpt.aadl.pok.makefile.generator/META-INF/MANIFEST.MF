@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Acceleo Pok Module Runtime Plug-in
-Bundle-SymbolicName: fr.tpt.pok.makefile.generator
+Bundle-SymbolicName: fr.tpt.aadl.pok.makefile.generator
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: fr.tpt.pok.makefile.generator.Activator
+Bundle-Activator: fr.tpt.aadl.pok.makefile.generator.Activator
 Bundle-Vendor: Eclipse Modeling Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore,
@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
-Export-Package: fr.tpt.pok.makefile.generator
+Export-Package: fr.tpt.aadl.pok.makefile.generator
 Import-Package: fr.tpt.aadl.c.unparser,
  org.osate.aadl2.modelsupport.modeltraversal
 

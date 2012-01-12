@@ -2,7 +2,7 @@
  * @author Etienne Borde
  */
 
-package fr.tpt.pok.makefile.generator ;
+package fr.tpt.aadl.pok.makefile.generator ;
 
 import java.util.ArrayList ;
 import java.util.List ;

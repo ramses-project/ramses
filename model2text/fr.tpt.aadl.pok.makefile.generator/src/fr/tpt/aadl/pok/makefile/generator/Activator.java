@@ -8,7 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
-package fr.tpt.pok.makefile.generator ;
+package fr.tpt.aadl.pok.makefile.generator ;
 
 import org.eclipse.core.runtime.Plugin ;
 import org.osgi.framework.BundleContext ;

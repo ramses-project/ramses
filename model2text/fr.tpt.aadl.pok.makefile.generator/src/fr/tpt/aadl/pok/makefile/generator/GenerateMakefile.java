@@ -8,7 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *******************************************************************************/
-package fr.tpt.pok.makefile.generator;
+package fr.tpt.aadl.pok.makefile.generator;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class GenerateMakefile extends AbstractAcceleoGenerator {
      *
      * @generated
      */
-    public static final String MODULE_FILE_NAME = "/fr/tpt/pok/makefile/generator/GenerateMakefile";
+    public static final String MODULE_FILE_NAME = "/fr/tpt/aadl/pok/makefile/generator/GenerateMakefile";
     
     /**
      * The name of the templates that are to be generated.
