@@ -1,14 +1,8 @@
 package fr.tpt.aadl.c.unparser ;
 
-import java.util.ArrayList ;
-import java.util.Iterator ;
-import java.util.List ;
-
-import org.eclipse.emf.common.util.AbstractEnumerator ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.Comment ;
 import org.osate.aadl2.Element ;
-import org.osate.aadl2.modelsupport.AadlConstants ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 
 public class AadlToCSwitchProcess
@@ -84,5 +78,4 @@ public class AadlToCSwitchProcess
   {
     unparserContent.decrementIndent() ;
   }
-
 }

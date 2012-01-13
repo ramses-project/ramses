@@ -5,7 +5,6 @@ import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
 import java.util.ArrayList ;
-import java.util.Collection ;
 import java.util.HashMap ;
 import java.util.HashSet ;
 import java.util.Iterator ;
@@ -34,6 +33,7 @@ import fr.tpt.aadl.c.unparser.annex.behavior.AadlBaToCUnparserAction ;
 public class AadlToCUnparser extends AadlProcessingSwitch
 {
 
+///*
   private final String TYPE_HEADER = "#ifndef __GENERATED_GTYPES_H__\n"
         + "#define __GENERATED_GTYPES_H__\n" ;
 
@@ -41,7 +41,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         "#ifndef __GENERATED_SUBPROGRAMS_H__\n"
               + "#define __GENERATED_SUBPROGRAMS_H__\n"
               + "#include \"gtypes.h\"\n" ;
-
+//*/
+  
   private final String ACTIVITY_HEADER = "#ifndef __GENERATED_ACTIVITY_H__\n"
         + "#define __GENERATED_ACTIVITY_H__\n" + "#include \"subprograms.h\"\n" ;
 
@@ -663,86 +664,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
 
-      public String casePrivatePackageSection(PrivatePackageSection object)
-      {
-        return null ;
-      }
-
-      public String casePublicPackageSection(PublicPackageSection object)
-      {
-        processEList(object.getOwnedClassifiers()) ;
-        return null ;
-      }
-
-      public String casePackageSection(PackageSection object)
-      {
-        return DONE ;
-      }
-
-      public String casePackageRename(PackageRename object)
-      {
-        return DONE ;
-      }
-
-      public String caseComponentTypeRename(ComponentTypeRename object)
-      {
-        return DONE ;
-      }
-
-      public String caseFeatureGroupTypeRename(FeatureGroupTypeRename object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * outputs the content of a component implementation It picks up
-       * after the superclass case. It returns done as processing is
-       * complete.
-       */
-      public String caseComponentImplementation(ComponentImplementation object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Add the common part of component types
-       */
-      public String caseComponentType(ComponentType object)
-      {
-        return DONE ;
-      }
-
-      public String caseMode(Mode object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * unparse mode transitions
-       */
-      public String caseModeTransition(ModeTransition object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Does the bulk of subcomponent declarations
-       */
-      public String caseSubcomponent(Subcomponent object)
-      {
-        return DONE ;
-      }
-
-      public String caseArrayDimension(ArrayDimension object)
-      {
-        return DONE ;
-      }
-
-      public String caseArraySize(ArraySize object)
-      {
-        return DONE ;
-      }
-
       /**
        * unparses annex library
        *
@@ -858,30 +779,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
 
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseBusImplementation(BusImplementation object)
-      {
-        return null ;
-      }
-
-      public String caseBusSubcomponent(BusSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseBusType(BusType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
       public String caseDataImplementation(DataImplementation object)
       {
         currentHUnparser = cDataTypeHeaderFileCode ;
@@ -890,10 +787,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return null ;
       }
 
-      /**
-       * Fills in identifier & category name lets super class fill in the
-       * rest.
-       */
       public String caseDataSubcomponent(DataSubcomponent object)
       {
         AadlToCSwitchProcess unparser ;
@@ -935,56 +828,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return null ;
       }
 
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseDeviceImplementation(DeviceImplementation object)
-      {
-        return null ;
-      }
-
-      public String caseDeviceSubcomponent(DeviceSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseDeviceType(DeviceType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseMemoryImplementation(MemoryImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseMemorySubcomponent(MemorySubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseMemoryType(MemoryType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
       public String caseProcessImplementation(ProcessImplementation object)
       {
+//        /*
         StringBuilder sb = new StringBuilder() ;
         
         // And set some static flags.
@@ -1151,103 +997,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         cMainFileCode.addOutputNewline("  return (0);") ;
         cMainFileCode.addOutputNewline("}") ;
         cMainFileCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
+//        */
+        
         return null ;
       }
 
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualProcessorImplementation(VirtualProcessorImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualProcessorSubcomponent(VirtualProcessorSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualProcessorType(VirtualProcessorType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualBusImplementation(VirtualBusImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualBusSubcomponent(VirtualBusSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualBusType(VirtualBusType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseAbstractImplementation(AbstractImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseAbstractSubcomponent(AbstractSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseAbstractType(AbstractType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseProcessorImplementation(ProcessorImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
       public String caseProcessorSubcomponent(ProcessorSubcomponent object)
       {
         generateDeploymentHeader(object) ;
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseProcessorType(ProcessorType object)
-      {
         return null ;
       }
 
@@ -1261,66 +1018,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
 
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseProcessType(ProcessType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSystemImplementation(SystemImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in identifier & category name lets super class fill in the
-       * rest.
-       */
-      public String caseSystemSubcomponent(SystemSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSystemType(SystemType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseThreadGroupImplementation(ThreadGroupImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseThreadGroupSubcomponent(ThreadGroupSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseThreadGroupType(ThreadGroupType object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
       public String caseThreadImplementation(ThreadImplementation object)
       {
         process(object.getType()) ;
@@ -1355,19 +1052,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return null ;
       }
 
-      /**
-       * Fills in identifier & category name lets super class fill in the
-       * rest.
-       */
       public String caseThreadSubcomponent(ThreadSubcomponent object)
       {
         process(object.getComponentImplementation()) ;
         return null ;
       }
 
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
       public String caseThreadType(ThreadType object)
       {
         if(processedTypes.contains(object))
@@ -1388,286 +1078,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
 
         return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSubprogramImplementation(SubprogramImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSubprogramType(SubprogramType object)
-      {
-        return null ;
-      }
-
-      public String caseSubprogramSubcomponent(SubprogramSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSubprogramGroupImplementation(SubprogramGroupImplementation object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSubprogramGroupType(SubprogramGroupType object)
-      {
-        return null ;
-      }
-
-      public String caseSubprogramGroupSubcomponent(SubprogramGroupSubcomponent object)
-      {
-        return null ;
-      }
-
-      /**
-       * Prototypes
-       */
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSubprogramPrototype(SubprogramPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSystemPrototype(SystemPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseAbstractPrototype(AbstractPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseProcessPrototype(ProcessPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseThreadGroupPrototype(ThreadGroupPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseThreadPrototype(ThreadPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseProcessorPrototype(ProcessorPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseMemoryPrototype(MemoryPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseBusPrototype(BusPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseDevicePrototype(DevicePrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualProcessorPrototype(VirtualProcessorPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseVirtualBusPrototype(VirtualBusPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Fills in category name lets super class fill in the rest.
-       */
-      public String caseSubprogramGroupPrototype(SubprogramGroupPrototype object)
-      {
-        return null ;
-      }
-
-      /**
-       * Does the bulk of prototype declarations
-       */
-      public String caseComponentPrototype(ComponentPrototype object)
-      {
-        return DONE ;
-      }
-
-      public String caseFeatureGroupPrototype(FeatureGroupPrototype object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Does the bulk of feature prototype declarations
-       */
-      public String caseFeaturePrototype(FeaturePrototype object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Does the  prototype binding
-       */
-      public String caseComponentPrototypeBinding(ComponentPrototypeBinding object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Does the  prototype actual
-       */
-      public String caseComponentPrototypeActual(ComponentPrototypeActual object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Does the  feature group prototype binding
-       */
-      public String caseFeatureGroupPrototypeBinding(FeatureGroupPrototypeBinding object)
-      {
-        return DONE ;
-      }
-
-      public String caseFeatureGroupPrototypeActual(FeatureGroupPrototypeActual object)
-      {
-        FeatureType sct = object.getFeatureType() ;
-        return DONE ;
-      }
-
-      /**
-       * Does the  feature prototype binding
-       */
-      public String caseFeaturePrototypeBinding(FeaturePrototypeBinding object)
-      {
-        return DONE ;
-      }
-
-      public String casePortSpecification(PortSpecification object)
-      {
-        return DONE ;
-      }
-
-      public String caseAccessSpecification(AccessSpecification object)
-      {
-        return DONE ;
-      }
-
-      public String caseFeaturePrototypeReference(FeaturePrototypeReference object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * call sequence processing.
-       */
-      public String caseSubprogramCallSequence(SubprogramCallSequence object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * subprogram call processing.
-       */
-      public String caseSubprogramCall(SubprogramCall object)
-      {
-        return DONE ;
-      }
-
-      public String caseProcessorCall(ProcessorCall object)
-      {
-        return DONE ;
-      }
-
-      public String casePortConnection(PortConnection object)
-      {
-        return DONE ;
-      }
-
-      public String caseFeatureGroupConnection(FeatureGroupConnection object)
-      {
-        return DONE ;
-      }
-
-      public String caseParameterConnection(ParameterConnection object)
-      {
-        return DONE ;
-      }
-
-      public String caseAccessConnection(AccessConnection object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * bus access
-       */
-      public String caseBusAccess(BusAccess object)
-      {
-        return DONE ;
-      }
-
-      /**
-       *  subprogram access
-       */
-      public String caseSubprogramAccess(SubprogramAccess object)
-      {
-        return DONE ;
       }
 
       /**
@@ -1712,271 +1122,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
 
         currentCUnparser.addOutputNewline(";") ;
-        return DONE ;
-      }
-
-      public String caseDataPort(DataPort object)
-      {
-        return null ;
-      }
-
-      /**
-       * Does the name and category. Port handles the rest
-       */
-      public String caseEventDataPort(EventDataPort object)
-      {
-        return null ;
-      }
-
-      /**
-       * Does the name and category. Port handles the rest
-       */
-      public String caseEventPort(EventPort object)
-      {
-        return null ;
-      }
-
-      /**
-       * Does the common part of port
-       */
-      public String casePort(Port object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Does the parameter
-       */
-      public String caseParameter(Parameter object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Does the port group
-       */
-      public String caseFeatureGroup(FeatureGroup object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Add the common part of component types
-       */
-      public String caseFeatureGroupType(FeatureGroupType object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Handles all provides, requires, and parameters
-       */
-      public String caseAbstractFeature(AbstractFeature object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Handles flow  spec
-       */
-      public String caseFlowSpecification(FlowSpecification object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Handles flow implementation
-       */
-      public String caseFlowImplementation(FlowImplementation object)
-      {
-        return DONE ;
-      }
-
-      /**
-       * Handles flow ETEF
-       */
-      public String caseEndToEndFlow(EndToEndFlow object)
-      {
-        return DONE ;
-      }
-
-      public String casePropertySet(PropertySet object)
-      {
-        return DONE ;
-      }
-
-      public String caseAadlBoolean(AadlBoolean object)
-      {
-        return DONE ;
-      }
-
-      public String caseAadlString(AadlString object)
-      {
-        return DONE ;
-      }
-
-      public String caseAadlInteger(AadlInteger object)
-      {
-        return DONE ;
-      }
-
-      public String caseAadlReal(AadlReal object)
-      {
-        return DONE ;
-      }
-
-      public String caseEnumerationType(EnumerationType object)
-      {
-        return DONE ;
-      }
-
-      public String caseUnitsType(UnitsType object)
-      {
-        return DONE ;
-      }
-
-      public String caseEnumerationLiteral(EnumerationLiteral object)
-      {
-        return DONE ;
-      }
-
-      public String caseUnitLiteral(UnitLiteral object)
-      {
-        return DONE ;
-      }
-
-      public String caseReferenceType(ReferenceType object)
-      {
-        return DONE ;
-      }
-
-      public String caseReferenceValue(ReferenceValue object)
-      {
-        return DONE ;
-      }
-
-      public String caseClassifierType(ClassifierType object)
-      {
-        return DONE ;
-      }
-
-      public String caseClassifierValue(ClassifierValue object)
-      {
-        return DONE ;
-      }
-
-      public String caseMetaclassReference(MetaclassReference object)
-      {
-        return DONE ;
-      }
-
-      public String caseModalPropertyValue(ModalPropertyValue object)
-      {
-        return DONE ;
-      }
-
-      public String casePropertyAssociation(PropertyAssociation object)
-      {
-        return DONE ;
-      }
-
-      public String caseContainedNamedElement(ContainedNamedElement object)
-      {
-        return DONE ;
-      }
-
-      public String caseContainmentPathElement(ContainmentPathElement object)
-      {
-        return DONE ;
-      }
-
-      public String casePropertyConstant(PropertyConstant object)
-      {
-        return DONE ;
-      }
-
-      public String caseProperty(Property object)
-      {
-        return DONE ;
-      }
-
-      public String caseBasicProperty(BasicProperty object)
-      {
-        return DONE ;
-      }
-
-      public String caseListType(ListType object)
-      {
-        return DONE ;
-      }
-
-      public String caseListValue(ListValue object)
-      {
-        return DONE ;
-      }
-
-      public String caseOperation(Operation object)
-      {
-        return DONE ;
-      }
-
-      public String caseBooleanLiteral(BooleanLiteral object)
-      {
-        return DONE ;
-      }
-
-      public String caseStringLiteral(StringLiteral object)
-      {
-        return DONE ;
-      }
-
-      public String caseNumberValue(NumberValue object)
-      {
-        return DONE ;
-      }
-
-      public String caseNamedValue(NamedValue object)
-      {
-        return DONE ;
-      }
-
-      public String caseRangeType(RangeType object)
-      {
-        return DONE ;
-      }
-
-      public String caseRangeValue(RangeValue object)
-      {
-        return DONE ;
-      }
-
-      public String caseArrayRange(ArrayRange object)
-      {
-        if(object == null)
-        {
-          return DONE ;
-        }
-
-        return DONE ;
-      }
-
-      public String caseNumericRange(NumericRange object)
-      {
-        return DONE ;
-      }
-
-      public String caseRecordType(RecordType object)
-      {
-        return DONE ;
-      }
-
-      public String caseRecordValue(RecordValue object)
-      {
-        return DONE ;
-      }
-
-      public String caseBasicPropertyAssociation(BasicPropertyAssociation object)
-      {
         return DONE ;
       }
     } ;
@@ -2374,8 +1519,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     
     return result ;
   }
-  
-  // Returns blackboard names list.
+///*  
   private void generateDeploymentHeader(ProcessImplementation processImpl)
   {
     List<ThreadSubcomponent> bindedThreads =
@@ -2457,4 +1601,5 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       cDeploymentFileCode.addOutputNewline(sb.toString()) ;
     }
   }
+//*/  
 }

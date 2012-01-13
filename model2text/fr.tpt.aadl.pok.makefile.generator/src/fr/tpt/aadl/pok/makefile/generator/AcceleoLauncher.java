@@ -1,4 +1,4 @@
-package fr.tpt.aadl.toolsuite.cli ;
+package fr.tpt.aadl.pok.makefile.generator ;
 
 /*
  * @author Etienne Borde
@@ -12,11 +12,13 @@ import java.util.List ;
 import org.eclipse.emf.common.util.BasicMonitor ;
 import org.eclipse.emf.common.util.URI ;
 
+/*
 import com.martiansoftware.jsap.FlaggedOption ;
 import com.martiansoftware.jsap.JSAP ;
 import com.martiansoftware.jsap.JSAPException ;
 import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.Switch ;
+*/
 
 import fr.tpt.aadl.pok.makefile.generator.GenerateMakefile ;
 
@@ -30,8 +32,12 @@ public class AcceleoLauncher
 
   public static void main(String[] args)
   {
+    /*
+    
     try
     {
+     
+      
       // model / Acceleo template names / Acceleo module file / output folder
       JSAP jsap = new JSAP() ;
       FlaggedOption model =
@@ -61,6 +67,8 @@ public class AcceleoLauncher
               new GenerateMakefile(modelURI, folder, arguments) ;
         makefileGenerator.doGenerate(new BasicMonitor()) ;
       }
+      
+      
     }
     catch(JSAPException e)
     {
@@ -72,5 +80,7 @@ public class AcceleoLauncher
       // TODO Auto-generated catch block
       e.printStackTrace() ;
     }
+    
+    */
   }
 }

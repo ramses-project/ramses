@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Acceleo Pok Module Runtime Plug-in
 Bundle-SymbolicName: fr.tpt.aadl.pok.makefile.generator
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.5.0
 Bundle-Activator: fr.tpt.aadl.pok.makefile.generator.Activator
 Bundle-Vendor: Eclipse Modeling Project
 Require-Bundle: org.eclipse.core.runtime,

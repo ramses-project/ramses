@@ -11,10 +11,13 @@ import fr.tpt.aadl.toolsuite.support.plugins.NamedPlugin ;
 public interface Generator extends NamedPlugin
 {
   public Resource doGeneration(Resource inputResource,
-                               Map<String, Resource> propertySets,
+                               Map<String, Resource> standardPropertySets,
                                List<File> transformationFileName,
-                               String dataTargetfilepath)
-        throws Exception ;
+                               String dataTargetfilepath,
+                               String transformationDir,
+                               List<File> postTransformationFiles,
+                               Resource baseTypes,
+                               File target_directory) throws GenerationException ;
 
   public void setParameters(Map<GeneratorParameter, String> parameters)
         throws Exception ;

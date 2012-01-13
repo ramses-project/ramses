@@ -19,7 +19,8 @@ import fr.tpt.aadl.toolsuite.core.ToolSuiteLauncher ;
 import fr.tpt.aadl.toolsuite.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.transformation.ATLTransfoLauncher ;
+
+import fr.tpt.aadl.pok.generator.PokGenerator ;
 
 public class ToolSuiteLauncherCommand
 {
@@ -323,7 +324,7 @@ public class ToolSuiteLauncherCommand
     /********************* TODO TRANSFORMATION SWITCH ***********************/
     // Temporary
     String[] transformationToPerform = new String[]
-    {ATLTransfoLauncher.TRANSFORMATION_NAME} ;
+    {PokGenerator.GENERATOR_NAME} ;
     /************************************************************************/
     JSAPResult transfoConfig = jsapTransfo.parse(args) ;
     boolean helpOnly = transfoConfig.getBoolean(HELP_ONLY_OPTION_ID) ;

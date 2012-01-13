@@ -40,20 +40,13 @@ import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage ;
 import fr.tpt.aadl.instantiation.StandAloneInstantiator ;
 
 import fr.tpt.aadl.resources.manager.PredefinedPackagesManager ;
-import fr.tpt.aadl.toolsuite.support.plugins.NamedPlugin ;
-import fr.tpt.aadl.toolsuite.support.generator.Generator ;
-import fr.tpt.aadl.toolsuite.support.generator.GeneratorParameter ;
 
 import fr.tpt.aadl.transformation.hooks.ATLHooks.ATLHooksFactory ;
 import fr.tpt.aadl.transformation.hooks.ATLHooks.ATLHooksPackage ;
 import fr.tpt.aadl.transformation.hooks.ATLHooks.HookAccess ;
 
-public class ATLTransfoLauncher implements NamedPlugin, Generator
+public class ATLTransfoLauncher
 {
-
-  public final static String TRANSFORMATION_NAME = "ATLTransformation" ;
-  public final static String PLUGIN_NAME = "AADL-Toolsuite-ATL-Transformation" ;
-  public final static String PLUGIN_ID = "fr.tpt.aadl.atl.transformation" ;
 
   private static File transformationDir = null ;
 
@@ -102,28 +95,6 @@ public class ATLTransfoLauncher implements NamedPlugin, Generator
     return ATLTransfoLauncher.transformationDir ;
   }
 
-  @Override
-  public Resource doGeneration(Resource inputResource,
-                               Map<String, Resource> propertySets,
-                               List<File> transformationFileName,
-                               String dataTargetfilepath)
-        throws FileNotFoundException, IOException, ATLCoreException, Exception
-  {
-    if(ATLTransfoLauncher.transformationDir == null)
-      throw new Exception(
-            "Illegal initialization of ATL transformation launcher: "
-                  + "directory containing .asm files is undefined") ;
-
-    this.transformationFilepath = transformationFileName ;
-
-    if(dataTargetfilepath != "")
-    {
-      ATLTransfoLauncher.dataTargetfilepath = dataTargetfilepath ;
-    }
-
-    return doTransformation(inputResource, propertySets) ;
-  }
-
   private void initTransformation(File transformationDir)
         throws ATLCoreException
   {
@@ -153,8 +124,29 @@ public class ATLTransfoLauncher implements NamedPlugin, Generator
     injector.inject(ATLHookMetamodel, ATLHOOKS_MM_URI) ;
   }
 
+  public Resource doGeneration(Resource inputResource,
+                               Map<String, Resource> propertySets,
+                               List<File> transformationFileName,
+                               String dataTargetfilepath)
+        throws FileNotFoundException, IOException, ATLCoreException, Exception
+  {
+    if(ATLTransfoLauncher.transformationDir == null)
+      throw new Exception(
+            "Illegal initialization of ATL transformation launcher: "
+                  + "directory containing .asm files is undefined") ;
+
+    this.transformationFilepath = transformationFileName ;
+
+    if(dataTargetfilepath != "")
+    {
+      ATLTransfoLauncher.dataTargetfilepath = dataTargetfilepath ;
+    }
+
+    return doTransformation(inputResource, propertySets) ;
+  }
+  
   private Resource doTransformation(Resource inputResource,
-                                    Map<String, Resource> propertySets)
+                                   Map<String, Resource> propertySets)
         throws FileNotFoundException, IOException, ATLCoreException
   {
     boolean workingWithInstances =
@@ -332,25 +324,7 @@ public class ATLTransfoLauncher implements NamedPlugin, Generator
     }
   }
 
-  @Override
-  public String getRegistryName()
-  {
-    return TRANSFORMATION_NAME ;
-  }
-
-  @Override
-  public String getPluginName()
-  {
-    return ATLTransfoLauncher.PLUGIN_NAME ;
-  }
-
-  @Override
-  public String getPluginId()
-  {
-    return ATLTransfoLauncher.PLUGIN_ID ;
-  }
-
-  private void setGenerationPathDirectory(File transformationDir)
+  public void setGenerationPathDirectory(File transformationDir)
         throws ATLCoreException, Exception
   {
     ATLTransfoLauncher.transformationDir = transformationDir ;
@@ -366,23 +340,5 @@ public class ATLTransfoLauncher implements NamedPlugin, Generator
                   predefinedPackagesManager.getPackagesNotFound()) ;
 
     this.initTransformation(transformationDir) ;
-  }
-
-  @Override
-  public void setParameters(Map<GeneratorParameter, String> parameters)
-        throws Exception
-  {
-    String directory = parameters.get(GeneratorParameter.GENERATION_PATH) ;
-
-    if(directory == null || directory.isEmpty())
-    {
-      throw new Exception(GeneratorParameter.GENERATION_PATH.literal +
-            " is not set.") ;
-    }
-    else
-    {
-      File generatorDirectory = new File(directory) ;
-      this.setGenerationPathDirectory(generatorDirectory) ;
-    }
   }
 }

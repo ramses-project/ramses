@@ -6,8 +6,7 @@ public enum GeneratorParameter
 
   public String literal ;
 
-  private GeneratorParameter(
-                             String literal)
+  private GeneratorParameter(String literal)
   {
     this.literal = literal ;
   }

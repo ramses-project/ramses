@@ -2,8 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Unparser
 Bundle-SymbolicName: fr.tpt.aadl.pok.c.unparser
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.5.0
 Bundle-Activator: fr.tpt.aadl.pok.c.unparser.Activator
-Require-Bundle: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf;bundle-version="2.6.0",
+ org.osate.aadl2;bundle-version="1.0.0",
+ fr.tpt.aadl.c.unparser;bundle-version="0.5.0",
+ fr.tpt.aadl.propertiesutil;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
