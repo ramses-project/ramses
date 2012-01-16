@@ -839,6 +839,26 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         
         processEList(object.getOwnedThreadSubcomponents()) ;
         
+        // *** Generate deployment.c ***
+        if(false == _dataAccessMapping.isEmpty())
+        {
+          // XXX performance to be improved.
+          // Removes duplicates.
+          Set<String> dataComponentNames = new HashSet<String>(_dataAccessMapping.
+                                                                      values());
+          
+          StringBuilder sb = new StringBuilder() ;
+
+          for(String name : dataComponentNames)
+          {
+            sb.append("uint8_t ") ;
+            sb.append(name) ;
+            sb.append(';') ;
+          }
+
+          _deploymentImplCode.addOutputNewline(sb.toString()) ;
+        }
+
         return DONE ;
       }
       
