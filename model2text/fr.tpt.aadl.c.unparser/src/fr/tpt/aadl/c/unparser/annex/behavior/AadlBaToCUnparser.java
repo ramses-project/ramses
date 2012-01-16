@@ -11,8 +11,6 @@ import java.util.Map ;
 
 import org.eclipse.emf.common.util.AbstractEnumerator ;
 import org.eclipse.emf.common.util.EList ;
-import org.eclipse.emf.ecore.EClass ;
-import org.eclipse.ui.internal.handlers.WizardHandler.New ;
 import org.osate.aadl2.AccessType ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.Classifier ;
@@ -32,7 +30,6 @@ import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.modelsupport.AadlConstants ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage ;
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence ;
@@ -83,7 +80,6 @@ import fr.tpt.aadl.annex.behavior.aadlba.PortFreshValue ;
 import fr.tpt.aadl.annex.behavior.aadlba.PortSendAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.Relation ;
 import fr.tpt.aadl.annex.behavior.aadlba.RelationalOperator ;
-import fr.tpt.aadl.annex.behavior.aadlba.SharedDataAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression ;
 import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.Term ;
@@ -92,16 +88,13 @@ import fr.tpt.aadl.annex.behavior.aadlba.TimeoutCatch ;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryBooleanOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryNumericOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.UnlockAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.Value ;
 import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression ;
 import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement ;
 import fr.tpt.aadl.annex.behavior.aadlba.util.AadlBaSwitch ;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
 import fr.tpt.aadl.annex.behavior.unparser.AadlBaUnparser ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
-import fr.tpt.aadl.c.unparser.AadlToCSwitchProcess ;
 import fr.tpt.aadl.c.unparser.GenerationUtils ;
 import fr.tpt.aadl.resources.manager.PredefinedPropertiesManager ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
@@ -111,57 +104,51 @@ import fr.tpt.aadl.util.properties.PropertyUtils ;
 public class AadlBaToCUnparser extends AadlBaUnparser
 {
 
-  private Map<DataAccess, String> _blackboardNames ;
+  protected Map<DataAccess, String> _dataAccessMapping = null ;
+  protected UnparseText _cFileContent = null ;
+  protected UnparseText _headerFileContent = null ;
+  protected List<String> _additionalHeaders = new ArrayList<String>() ;
   
   public AadlBaToCUnparser(AnnexSubclause subclause,
                            String indent,
-                           Map<DataAccess, String> blackboardNames)
+                           Map<DataAccess, String> dataAccessMapping)
   {
     super(subclause, indent) ;
-    _blackboardNames = blackboardNames ;
-    cFileContent = new UnparseText() ;
-    headerFileContent = new UnparseText() ;
+    _dataAccessMapping = dataAccessMapping ;
   }
 
   public AadlBaToCUnparser()
   {
     super() ;
-    cFileContent = new UnparseText() ;
-    headerFileContent = new UnparseText() ;
   }
 
-  public void setBlackboardNames(Map<DataAccess, String> blackboardNames)
+  public void setDataAccessMapping(Map<DataAccess, String> dataAccessMapping)
   {
-    _blackboardNames = blackboardNames ;
+    _dataAccessMapping = dataAccessMapping ;
   }
   
   public String getCContent()
   {
-    return cFileContent.getParseOutput() ;
+    return _cFileContent.getParseOutput() ;
   }
 
   public String getHContent()
   {
-    return headerFileContent.getParseOutput() ;
+    return _headerFileContent.getParseOutput() ;
   }
-
-  protected UnparseText cFileContent ;
-  protected UnparseText headerFileContent ;
-
-  List<String> additionalHeaders = new ArrayList<String>() ;
 
   public List<String> getAdditionalHeaders()
   {
-    return additionalHeaders ;
+    return _additionalHeaders ;
   }
 
   public void processEList(UnparseText aadlText,
-                           EList list,
+                           EList<?> list,
                            String separator)
   {
     boolean first = true ;
 
-    for(Iterator it = list.iterator() ; it.hasNext() ;)
+    for(Iterator<?> it = list.iterator() ; it.hasNext() ;)
     {
       if(!first)
       {
@@ -218,7 +205,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       {
         if(s.endsWith(".h"))
         {
-          additionalHeaders.add(s) ;
+          _additionalHeaders.add(s) ;
           return true ;
         }
       }
@@ -356,55 +343,58 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseBehaviorAnnex(BehaviorAnnex object)
       {
+        _cFileContent = new UnparseText() ;
+        _headerFileContent = new UnparseText() ;
+        
         BehaviorAnnex ba = (BehaviorAnnex) object ;
         NamedElement aadlComponent = (NamedElement) ba.eContainer() ;
         String aadlComponentCId =
               GenerationUtils.getGenerationCIdentifier(aadlComponent
                     .getQualifiedName()) ;
-        cFileContent.addOutputNewline(aadlComponentCId +
+        _cFileContent.addOutputNewline(aadlComponentCId +
               "_BA_State_t current_state = " + aadlComponentCId + "_" +
               AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
-        cFileContent.addOutputNewline("char final = 0;") ;
-        processEList(cFileContent, ba.getBehaviorVariables()) ;
-        cFileContent.addOutputNewline("while(final != 1)") ;
-        cFileContent.addOutputNewline("{") ;
-        cFileContent.incrementIndent() ;
-        cFileContent.addOutputNewline("switch(current_state)") ;
-        cFileContent.addOutputNewline("{") ;
-        cFileContent.incrementIndent() ;
-        headerFileContent.addOutputNewline("typedef enum {") ;
-        headerFileContent.incrementIndent() ;
+        _cFileContent.addOutputNewline("char final = 0;") ;
+        processEList(_cFileContent, ba.getBehaviorVariables()) ;
+        _cFileContent.addOutputNewline("while(final != 1)") ;
+        _cFileContent.addOutputNewline("{") ;
+        _cFileContent.incrementIndent() ;
+        _cFileContent.addOutputNewline("switch(current_state)") ;
+        _cFileContent.addOutputNewline("{") ;
+        _cFileContent.incrementIndent() ;
+        _headerFileContent.addOutputNewline("typedef enum {") ;
+        _headerFileContent.incrementIndent() ;
 
         for(BehaviorState state : ba.getBehaviorStates())
         {
           if(state.getSourceInTrans().isEmpty() == false)
           {
-            cFileContent.addOutputNewline("case " + aadlComponentCId + "_" +
+            _cFileContent.addOutputNewline("case " + aadlComponentCId + "_" +
                   state.getIdentifierOwned().getId() + ":") ;
-            processEList(cFileContent, state.getSourceInTrans()) ;
+            processEList(_cFileContent, state.getSourceInTrans()) ;
           }
 
-          aadlbaText = headerFileContent ;
+          aadlbaText = _headerFileContent ;
           caseIdentifier(state.getIdentifierOwned()) ;
 
           if(ba.getBehaviorStates().indexOf(state) < ba.getBehaviorStates()
                 .size() - 1)
           {
-            headerFileContent.addOutput(",") ;
+            _headerFileContent.addOutput(",") ;
           }
 
-          headerFileContent.addOutputNewline("") ;
+          _headerFileContent.addOutputNewline("") ;
         }
 
-        headerFileContent.decrementIndent() ;
-        headerFileContent.addOutputNewline("} " + aadlComponentCId +
+        _headerFileContent.decrementIndent() ;
+        _headerFileContent.addOutputNewline("} " + aadlComponentCId +
               "_BA_State_t;") ;
-        headerFileContent.addOutputNewline("") ;
-        cFileContent.decrementIndent() ;
-        cFileContent.addOutputNewline("}") ;
-        cFileContent.decrementIndent() ;
-        cFileContent.addOutputNewline("}") ;
-        cFileContent.addOutputNewline("") ;
+        _headerFileContent.addOutputNewline("") ;
+        _cFileContent.decrementIndent() ;
+        _cFileContent.addOutputNewline("}") ;
+        _cFileContent.decrementIndent() ;
+        _cFileContent.addOutputNewline("}") ;
+        _cFileContent.addOutputNewline("") ;
         return DONE ;
       }
 
@@ -420,7 +410,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           process(d) ;
           GenerationUtils.getInitialValue(object
                 .getDataUniqueComponentClassifierReference()) ;
-          cFileContent.addOutputNewline("") ;
+          _cFileContent.addOutputNewline("") ;
         }
 
         return DONE ;
@@ -432,9 +422,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseDeclarator(Declarator object)
       {
         //FIXME : TODO : update location reference
-        cFileContent.addOutput(" " + object.getIdentifierOwned().getId()) ;
+        _cFileContent.addOutput(" " + object.getIdentifierOwned().getId()) ;
         caseArraySize(object.getArraySizes()) ;
-        cFileContent.addOutput(";") ;
+        _cFileContent.addOutput(";") ;
         return DONE ;
       }
 
@@ -446,14 +436,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         //FIXME : TODO : update location reference
         for(IntegerValueConstant ivc : arraySizes)
         {
-          cFileContent.addOutput("[") ;
+          _cFileContent.addOutput("[") ;
 
           if(ivc instanceof BehaviorPropertyConstant)
           {
             PropertyConstant pc =
                   (PropertyConstant) ((BehaviorPropertyConstant) ivc)
                         .getAadlRef() ;
-            cFileContent.addOutput(Long.toString(((IntegerLiteral) pc
+            _cFileContent.addOutput(Long.toString(((IntegerLiteral) pc
                   .getConstantValue()).getValue())) ;
           }
           else
@@ -461,7 +451,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             process(ivc) ;
           }
 
-          cFileContent.addOutput("]") ;
+          _cFileContent.addOutput("]") ;
         }
 
         return DONE ;
@@ -500,16 +490,16 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         String aadlComponentCId =
               GenerationUtils.getGenerationCIdentifier(aadlComponent
                     .getQualifiedName()) ;
-        cFileContent.addOutputNewline("current_state = " + aadlComponentCId +
+        _cFileContent.addOutputNewline("current_state = " + aadlComponentCId +
               "_" + object.getIdentifierOwned().getId() + ";") ;
         //if (object.isComplete())
 
         if(object.isFinal())
         {
-          cFileContent.addOutputNewline("final = 1;") ;
+          _cFileContent.addOutputNewline("final = 1;") ;
         }
 
-        cFileContent.addOutputNewline("break;") ;
+        _cFileContent.addOutputNewline("break;") ;
         return DONE ;
       }
 
@@ -567,45 +557,45 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseBehaviorTransition(BehaviorTransition object)
       {
         //FIXME : TODO : update location reference
-        aadlbaText = cFileContent ;
+        aadlbaText = _cFileContent ;
         Identifier tid = object.getTransitionIdentifier() ;
         Numeral num = object.getBehaviorTransitionPriority() ;
 
         if(tid != null)
         {
-          cFileContent.addOutput("// Transition id: ") ;
+          _cFileContent.addOutput("// Transition id: ") ;
           process(tid) ;
 
           if(num != null) // numeral
           {
-            cFileContent.addOutput(" -- Priority " +
+            _cFileContent.addOutput(" -- Priority " +
                   String.valueOf(num.getValue())) ;
           }
 
-          cFileContent.addOutputNewline("") ;
+          _cFileContent.addOutputNewline("") ;
         }
 
         if(object.getBehaviorConditionOwned() != null)
         {
           if(object.getBehaviorConditionOwned() instanceof Otherwise)
           {
-            cFileContent.addOutput("else") ;
+            _cFileContent.addOutput("else") ;
             process(object.getBehaviorConditionOwned()) ;
           }
           else
           {
-            cFileContent.addOutput("if(") ;
+            _cFileContent.addOutput("if(") ;
             process(object.getBehaviorConditionOwned()) ;
-            cFileContent.addOutputNewline(")") ;
+            _cFileContent.addOutputNewline(")") ;
           }
         }
         else
         {
-          cFileContent.addOutputNewline("if(1) // no execution condition") ;
+          _cFileContent.addOutputNewline("if(1) // no execution condition") ;
         }
 
-        cFileContent.addOutputNewline("{") ;
-        cFileContent.incrementIndent() ;
+        _cFileContent.addOutputNewline("{") ;
+        _cFileContent.incrementIndent() ;
 
         if(object.getBehaviorActionBlockOwned() != null)
         {
@@ -614,8 +604,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         process((BehaviorState) object.getDestinationStateIdentifier()
               .getBaRef()) ;
-        cFileContent.decrementIndent() ;
-        cFileContent.addOutputNewline("}") ;
+        _cFileContent.decrementIndent() ;
+        _cFileContent.addOutputNewline("}") ;
         return DONE ;
       }
 
@@ -627,7 +617,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseOtherwise(Otherwise object)
       {
-        cFileContent.addOutputNewline(" //otherwise") ;
+        _cFileContent.addOutputNewline(" //otherwise") ;
         return DONE ;
       }
 
@@ -678,7 +668,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseBehaviorActionSequence(BehaviorActionSequence object)
       {
-        processEList(cFileContent, object.getBehaviorActions()) ;
+        processEList(_cFileContent, object.getBehaviorActions()) ;
         return DONE ;
       }
 
@@ -703,26 +693,26 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           if(first)
           {
             first = false ;
-            cFileContent.addOutput("if (") ;
+            _cFileContent.addOutput("if (") ;
           }
           else
           {
-            cFileContent.addOutput("elsif (") ;
+            _cFileContent.addOutput("elsif (") ;
           }
 
           process(ve) ;
-          cFileContent.addOutput(") ") ;
-          cFileContent.addOutputNewline("{") ;
+          _cFileContent.addOutput(") ") ;
+          _cFileContent.addOutputNewline("{") ;
           process(lba.get(lve.indexOf(ve))) ;
-          cFileContent.addOutputNewline("}") ;
+          _cFileContent.addOutputNewline("}") ;
         }
 
         if(object.isHasElse())
         {
-          cFileContent.addOutput("else ") ;
-          cFileContent.addOutputNewline("{") ;
+          _cFileContent.addOutput("else ") ;
+          _cFileContent.addOutputNewline("{") ;
           process(lba.get(lba.size() - 1)) ;
-          cFileContent.addOutputNewline("}") ;
+          _cFileContent.addOutputNewline("}") ;
         }
 
         return DONE ;
@@ -769,18 +759,18 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           IntegerRange range = (IntegerRange) set ;
           String lowerRangeValue = this.toInteger(range.getLowerIntegerValue()) ;
           String upperRangeValue = this.toInteger(range.getUpperIntegerValue()) ;
-          cFileContent.addOutputNewline("int iter=0;") ;
-          cFileContent.addOutputNewline("for (iter=" + lowerRangeValue +
+          _cFileContent.addOutputNewline("int iter=0;") ;
+          _cFileContent.addOutputNewline("for (iter=" + lowerRangeValue +
                 ";iter<=" + upperRangeValue + ";iter++)") ;
-          cFileContent.addOutputNewline("{") ;
-          cFileContent.incrementIndent() ;
+          _cFileContent.addOutputNewline("{") ;
+          _cFileContent.incrementIndent() ;
           process(object.getDataUniqueComponentClassifierReference()) ;
-          cFileContent.addOutput(" ") ;
+          _cFileContent.addOutput(" ") ;
           process(object.getElementIdentifier()) ;
-          cFileContent.addOutputNewline(" = iter;") ;
+          _cFileContent.addOutputNewline(" = iter;") ;
           process(object.getBehaviorActionsOwned()) ;
-          cFileContent.decrementIndent() ;
-          cFileContent.addOutputNewline("}") ;
+          _cFileContent.decrementIndent() ;
+          _cFileContent.addOutputNewline("}") ;
         }
 
         if(set instanceof DataComponentReference)
@@ -803,36 +793,36 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           for(int i = 0 ; i < numberOfLoop ; i++)
           {
             String iteratorID = "iter" + Integer.toString(i) ;
-            cFileContent.addOutputNewline("int " + iteratorID + "=0;") ;
-            cFileContent.addOutputNewline("for (" + iteratorID + "=0;" +
+            _cFileContent.addOutputNewline("int " + iteratorID + "=0;") ;
+            _cFileContent.addOutputNewline("for (" + iteratorID + "=0;" +
                   iteratorID + "<" +
                   Long.toString(dataReferenceTypeHolder.dimension_sizes[i]) +
                   ";" + iteratorID + "++)") ;
-            cFileContent.addOutputNewline("{") ;
-            cFileContent.incrementIndent() ;
+            _cFileContent.addOutputNewline("{") ;
+            _cFileContent.incrementIndent() ;
           }
 
           process(object.getDataUniqueComponentClassifierReference()) ;
-          cFileContent.addOutput(" ") ;
+          _cFileContent.addOutput(" ") ;
           process(object.getElementIdentifier()) ;
-          cFileContent.addOutput(" = ") ;
+          _cFileContent.addOutput(" = ") ;
           process(object.getElementValuesOwned()) ;
 
           for(int i = 0 ; i < numberOfLoop ; i++)
           {
             String iteratorID = "iter" + Integer.toString(i) ;
-            cFileContent.addOutput("[") ;
-            cFileContent.addOutput(iteratorID) ;
-            cFileContent.addOutput("]") ;
+            _cFileContent.addOutput("[") ;
+            _cFileContent.addOutput(iteratorID) ;
+            _cFileContent.addOutput("]") ;
           }
 
-          cFileContent.addOutputNewline(";") ;
+          _cFileContent.addOutputNewline(";") ;
           process(object.getBehaviorActionsOwned()) ;
 
           for(int i = 0 ; i < numberOfLoop ; i++)
           {
-            cFileContent.decrementIndent() ;
-            cFileContent.addOutputNewline("}") ;
+            _cFileContent.decrementIndent() ;
+            _cFileContent.addOutputNewline("}") ;
           }
         }
 
@@ -857,14 +847,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseWhileStatement(WhileOrDoUntilStatement object)
       {
         //FIXME : TODO : update location reference
-        cFileContent.addOutput("while (") ;
+        _cFileContent.addOutput("while (") ;
         process(object.getLogicalValueExpression()) ;
-        cFileContent.addOutputNewline(")") ;
-        cFileContent.addOutputNewline("{") ;
-        cFileContent.incrementIndent() ;
+        _cFileContent.addOutputNewline(")") ;
+        _cFileContent.addOutputNewline("{") ;
+        _cFileContent.incrementIndent() ;
         process(object.getBehaviorActionsOwned()) ;
-        cFileContent.decrementIndent() ;
-        cFileContent.addOutputNewline("}") ;
+        _cFileContent.decrementIndent() ;
+        _cFileContent.addOutputNewline("}") ;
         return DONE ;
       }
 
@@ -874,15 +864,15 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseDoUntilStatement(WhileOrDoUntilStatement object)
       {
         //FIXME : TODO : update location reference
-        cFileContent.addOutputNewline("do") ;
-        cFileContent.addOutputNewline("{") ;
-        cFileContent.incrementIndent() ;
+        _cFileContent.addOutputNewline("do") ;
+        _cFileContent.addOutputNewline("{") ;
+        _cFileContent.incrementIndent() ;
         process(object.getBehaviorActionsOwned()) ;
-        cFileContent.decrementIndent() ;
-        cFileContent.addOutputNewline("}") ;
-        cFileContent.addOutput("while (") ;
+        _cFileContent.decrementIndent() ;
+        _cFileContent.addOutputNewline("}") ;
+        _cFileContent.addOutput("while (") ;
         process(object.getLogicalValueExpression()) ;
-        cFileContent.addOutputNewline(")") ;
+        _cFileContent.addOutputNewline(")") ;
         return DONE ;
       }
 
@@ -911,19 +901,19 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       {
         //FIXME : TODO : update location reference
         process(object.getTargetOwned()) ;
-        cFileContent.addOutput(" = ") ;
+        _cFileContent.addOutput(" = ") ;
 
         if(object.isAny())
         // TODO: throw new Exception
         {
-          cFileContent.addOutput("") ;
+          _cFileContent.addOutput("") ;
         }
         else
         {
           process(object.getValueExpressionOwned()) ;
         }
 
-        cFileContent.addOutputNewline(";") ;
+        _cFileContent.addOutputNewline(";") ;
         return DONE ;
       }
 
@@ -953,9 +943,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         //FIXME : TODO : update location reference
         for(IntegerValue iv : object)
         {
-          cFileContent.addOutput("[") ;
+          _cFileContent.addOutput("[") ;
           process(iv) ;
-          cFileContent.addOutput("]") ;
+          _cFileContent.addOutput("]") ;
         }
 
         return DONE ;
@@ -998,7 +988,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         }
         else if(object.isSetSubprogramNames())
         {
-          processEList(cFileContent, object.getSubprogramNames(), "_") ;
+          processEList(_cFileContent, object.getSubprogramNames(), "_") ;
         }
         else
         {
@@ -1028,7 +1018,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           {
             if(object.isSetParameterLabels())
             {
-              cFileContent.addOutput(" (") ;
+              _cFileContent.addOutput(" (") ;
 
               for(ParameterLabel pl : object.getParameterLabels())
               {
@@ -1043,7 +1033,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   if(p.getDirection().equals(DirectionType.OUT) ||
                         p.getDirection().equals(DirectionType.IN_OUT))
                   {
-                    cFileContent.addOutput("&") ;
+                    _cFileContent.addOutput("&") ;
                   }
                   
                   process(pl) ;
@@ -1071,26 +1061,38 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
                     if(accessRight.equalsIgnoreCase("Read_Write"))
                     {
-                      cFileContent.addOutput("&") ;
+                      _cFileContent.addOutput("&") ;
                     }
                   }
                   
-                  // XXX missing condition to switch between blackboard, 
-                  // buffers or sampler
-                  String blackboardName = _blackboardNames.get(pl.getAadlRef());
+                  String name = null ;
                   
-                  cFileContent.addOutput(
-                          GenerationUtils.generateBlackboardId(blackboardName));
+                  // If a data access mapping is provided:
+                  // Transforms any data access into the right data subcomponent
+                  // 's name thanks to the given data access mapping.
+                  if(_dataAccessMapping != null)
+                  {
+                    name = _dataAccessMapping.get(pl.getAadlRef());
+                  }
+                  
+                  if (name != null)
+                  {
+                    _cFileContent.addOutput(name);
+                  }
+                  else // Otherwise, process parameter label as usual.
+                  {
+                    process(pl) ;
+                  }
                 }
 
                 if(object.getParameterLabels().indexOf(pl) != object
                       .getParameterLabels().size() - 1)
                 {
-                  cFileContent.addOutput(", ") ;
+                  _cFileContent.addOutput(", ") ;
                 }
               }
 
-              cFileContent.addOutputNewline(");") ;
+              _cFileContent.addOutputNewline(");") ;
             }
           }
         }
@@ -1098,9 +1100,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         {
           if(object.isSetParameterLabels())
           {
-            cFileContent.addOutput(" (") ;
-            processEList(cFileContent, object.getParameterLabels(), ", ") ;
-            cFileContent.addOutputNewline(");") ;
+            _cFileContent.addOutput(" (") ;
+            processEList(_cFileContent, object.getParameterLabels(), ", ") ;
+            _cFileContent.addOutputNewline(");") ;
           }
         }
 
@@ -1137,13 +1139,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
 
-      public String caseSharedDataAction(SharedDataAction object,
-                                         String token)
-      {
-        // TODO: throw new Exception
-        return DONE ;
-      }
-
       /**
        * Unparse behaviortime
        */
@@ -1171,13 +1166,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
 
-      public String casePortActionOrValue(Name object,
-                                          String token)
-      {
-        // TODO: throw new Exception
-        return DONE ;
-      }
-
       /**
        * Unparse booleanliteral
        */
@@ -1186,11 +1174,11 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         //FIXME : TODO : update location reference
         if(object.isValue())
         {
-          cFileContent.addOutput("'1'") ;
+          _cFileContent.addOutput("'1'") ;
         }
         else
         {
-          cFileContent.addOutput("'0'") ;
+          _cFileContent.addOutput("'0'") ;
         }
 
         return DONE ;
@@ -1202,19 +1190,19 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseBehaviorStringLiteral(BehaviorStringLiteral object)
       {
         //FIXME : TODO : update location reference
-        cFileContent.addOutput(object.getValue()) ;
+        _cFileContent.addOutput(object.getValue()) ;
         return DONE ;
       }
 
       public String caseBehaviorRealLiteral(BehaviorRealLiteral object)
       {
-        cFileContent.addOutput(String.valueOf(object.getValue())) ;
+        _cFileContent.addOutput(String.valueOf(object.getValue())) ;
         return DONE ;
       }
 
       public String caseBehaviorIntegerLiteral(BehaviorIntegerLiteral object)
       {
-        cFileContent.addOutput(Long.toString(object.getValue())) ;
+        _cFileContent.addOutput(Long.toString(object.getValue())) ;
         return DONE ;
       }
 
@@ -1234,7 +1222,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
           while(itRel.hasNext())
           {
-            cFileContent.addOutput(" " +
+            _cFileContent.addOutput(" " +
                   AadlBaToCUnparser.getTargetLanguageOperator(itOp.next()) +
                   " ") ;
             process(itRel.next()) ;
@@ -1254,7 +1242,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         if(object.getSimpleExpressionSdOwned() != null)
         {
-          cFileContent.addOutput(" " +
+          _cFileContent.addOutput(" " +
                 AadlBaToCUnparser.getTargetLanguageOperator(object
                       .getRelationalOperatorOwned()) + " ") ;
           process(object.getSimpleExpressionSdOwned()) ;
@@ -1271,7 +1259,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         //FIXME : TODO : update location reference
         if(object.isSetUnaryAddingOperatorOwned())
         {
-          cFileContent.addOutput(object.getUnaryAddingOperatorOwned()
+          _cFileContent.addOutput(object.getUnaryAddingOperatorOwned()
                 .getLiteral()) ;
         }
 
@@ -1285,7 +1273,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
           while(itTerm.hasNext())
           {
-            cFileContent.addOutput(" " + itOp.next().getLiteral() + " ") ;
+            _cFileContent.addOutput(" " + itOp.next().getLiteral() + " ") ;
             process(itTerm.next()) ;
           }
         }
@@ -1309,7 +1297,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
           while(itFact.hasNext())
           {
-            cFileContent.addOutput(" " +
+            _cFileContent.addOutput(" " +
                   AadlBaToCUnparser.getTargetLanguageOperator(itOp.next()) +
                   " ") ;
             process(itFact.next()) ;
@@ -1330,25 +1318,25 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         {
           if(object.isSetUnaryNumericOperatorOwned())
           {
-            cFileContent.addOutput(AadlBaToCUnparser
+            _cFileContent.addOutput(AadlBaToCUnparser
                   .getTargetLanguageOperator(object
                         .getUnaryNumericOperatorOwned())) ;
           }
           else if(object.isSetUnaryBooleanOperatorOwned())
           {
-            cFileContent.addOutput(AadlBaToCUnparser
+            _cFileContent.addOutput(AadlBaToCUnparser
                   .getTargetLanguageOperator(object
                         .getUnaryBooleanOperatorOwned())) ;
           }
 
-          cFileContent.addOutput("(") ;
+          _cFileContent.addOutput("(") ;
         }
 
         if(object.getValueOwned() instanceof ValueExpression)
         {
-          cFileContent.addOutput("(") ;
+          _cFileContent.addOutput("(") ;
           process(object.getValueOwned()) ;
-          cFileContent.addOutput(")") ;
+          _cFileContent.addOutput(")") ;
         }
         else
         {
@@ -1358,19 +1346,19 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         if(object.isSetUnaryNumericOperatorOwned() ||
               object.isSetUnaryBooleanOperatorOwned())
         {
-          cFileContent.addOutput(")") ;
+          _cFileContent.addOutput(")") ;
         }
 
         if(object.isSetBinaryNumericOperatorOwned())
         {
-          cFileContent.addOutput(" " +
+          _cFileContent.addOutput(" " +
                 object.getBinaryNumericOperatorOwned().getLiteral() + " ") ;
 
           if(object.getValueSdOwned() instanceof ValueExpression)
           {
-            cFileContent.addOutput("(") ;
+            _cFileContent.addOutput("(") ;
             process(object.getValueSdOwned()) ;
-            cFileContent.addOutput(")") ;
+            _cFileContent.addOutput(")") ;
           }
           else
           {
@@ -1383,7 +1371,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseComment(Comment object)
       {
-        cFileContent.addOutputNewline("// " + object.getBody()) ;
+        _cFileContent.addOutputNewline("// " + object.getBody()) ;
         return DONE ;
       }
     } ;
@@ -1391,18 +1379,17 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
   public void addIndent_C(String indent)
   {
-    while(cFileContent.getIndentString().length() < indent.length())
+    while(_cFileContent.getIndentString().length() < indent.length())
     {
-      cFileContent.incrementIndent() ;
+      _cFileContent.incrementIndent() ;
     }
   }
 
   public void addIndent_H(String indent)
   {
-    while(headerFileContent.getIndentString().length() < indent.length())
+    while(_headerFileContent.getIndentString().length() < indent.length())
     {
-      headerFileContent.incrementIndent() ;
+      _headerFileContent.incrementIndent() ;
     }
   }
-
 }

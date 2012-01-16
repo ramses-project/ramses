@@ -10,11 +10,13 @@ import java.util.Set ;
 
 import org.eclipse.emf.common.util.BasicEList ;
 import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.common.util.Enumerator ;
 import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.ContainedNamedElement ;
 import org.osate.aadl2.Data ;
+import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.Element ;
@@ -57,7 +59,24 @@ import fr.tpt.aadl.util.properties.PropertyUtils ;
 public class GenerationUtils
 {
  
-  public final static String BLACKBOARD_SUFFIX = "_id" ;
+  // public final static String BLACKBOARD_SUFFIX = "_id" ;
+  
+  public final static String THREAD_SUFFIX = "_Job" ;
+  
+  // Give file name, in upper case or not and with or without extension.
+  public static String generateHeaderInclusionGuard(String fileName)
+  {
+    fileName = fileName.toUpperCase() ;
+    fileName = fileName.replace('.', '_') ;
+    
+    StringBuilder result = new StringBuilder("#ifndef __GENERATED_") ;
+    result.append(fileName);
+    result.append("__\n#define __GENERATED_") ;
+    result.append(fileName) ;
+    result.append("__\n") ;
+    
+    return result.toString() ;
+  }
   
   public static String getGenerationCIdentifier(String id)
   {
@@ -463,8 +482,9 @@ public class GenerationUtils
     return "\n/******************************************************************************/\n" ;
   }
   
-  public static String generateBlackboardId(String blackboardName)
+/*  public static String generateBlackboardId(String blackboardName)
   {
     return blackboardName + BLACKBOARD_SUFFIX ;
   }
+*/
 }

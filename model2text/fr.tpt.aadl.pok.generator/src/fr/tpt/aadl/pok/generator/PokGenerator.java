@@ -161,7 +161,7 @@ public class PokGenerator implements NamedPlugin, Generator
           makefileGenerator.generateMakefile(ps, processorMakeFileDir) ;
           AadlToCUnparser generator_C = new AadlToCUnparser() ;
           generator_C.doProcess(ps) ;
-          generator_C.saveGeneratedKernelFiles(processorMakeFileDir) ;
+//          generator_C.saveGeneratedKernelFiles(processorMakeFileDir) ;
         }
 
         for(ProcessSubcomponent ps : si.getOwnedProcessSubcomponents())

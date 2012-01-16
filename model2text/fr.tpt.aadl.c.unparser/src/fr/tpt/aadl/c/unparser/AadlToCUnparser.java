@@ -16,9 +16,7 @@ import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.* ;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 import org.osate.aadl2.util.Aadl2Switch ;
-import org.osate.annexsupport.AnnexRegistry ;
 import org.osate.annexsupport.AnnexUnparser ;
-import org.osate.annexsupport.AnnexUnparserRegistry ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
@@ -33,7 +31,7 @@ import fr.tpt.aadl.c.unparser.annex.behavior.AadlBaToCUnparserAction ;
 public class AadlToCUnparser extends AadlProcessingSwitch
 {
 
-///*
+/*
   private final String TYPE_HEADER = "#ifndef __GENERATED_GTYPES_H__\n"
         + "#define __GENERATED_GTYPES_H__\n" ;
 
@@ -41,20 +39,23 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         "#ifndef __GENERATED_SUBPROGRAMS_H__\n"
               + "#define __GENERATED_SUBPROGRAMS_H__\n"
               + "#include \"gtypes.h\"\n" ;
-//*/
-  
+*/
+/*  
   private final String ACTIVITY_HEADER = "#ifndef __GENERATED_ACTIVITY_H__\n"
         + "#define __GENERATED_ACTIVITY_H__\n" + "#include \"subprograms.h\"\n" ;
 
   private final String DEPLOYMENT_HEADER =
         "#ifndef __GENERATED_DEPLOYMENT_H__\n"
               + "#define __GENERATED_DEPLOYMENT_H__\n" ;
+*/              
 
   // *************************************************************************
   // XXX Every static variables have to be reseted between partition files
   // generation => miss conception. This class has to be refactored.
   // *************************************************************************
 
+/*  
+  
   // POK's Additional features flags.
   private static boolean _consoleFound = false, _stdioFound = false,
         _stdlibFound = false ;
@@ -66,11 +67,49 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   private boolean _hasToAddBlackboardHeader = false,
         _hasToAddSamplingHeader = false ;
 
-  private final static String THREAD_SUFFIX = "_Job" ;
+*/
+  
+  //protected AadlToCSwitchProcess cMainFileCode ;
 
+  // gtype.c and .h
+  protected AadlToCSwitchProcess _gtypesImplCode ;
+  protected AadlToCSwitchProcess _gtypesHeaderCode ;
+
+  // subprogram.c and .h
+  protected AadlToCSwitchProcess _subprogramImplCode ;
+  protected AadlToCSwitchProcess _subprogramHeaderCode ;
+  
+  // activity.c and .h
+  protected AadlToCSwitchProcess _activityImplCode ;
+  protected AadlToCSwitchProcess _activityHeaderCode ;
+
+  // partition's deployment.c and .h
+  protected AadlToCSwitchProcess _deploymentImplCode ;
+  protected AadlToCSwitchProcess _deploymentHeaderCode ;
+
+  private AadlToCSwitchProcess _currentImplUnparser ;
+  private AadlToCSwitchProcess _currentHeaderUnparser ;
+
+  private static List<NamedElement> _delayedDataDeclarations =
+      new ArrayList<NamedElement>() ;
+
+  private Map<AadlToCSwitchProcess, Set<String>> _additionalHeaders =
+      new HashMap<AadlToCSwitchProcess, Set<String>>() ;
+
+  private List<NamedElement> _processedTypes = new ArrayList<NamedElement>() ;
+
+//private static Map<DataAccess, String> _blackboardNames ;
+  
+  private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
+  
+  // Map Data Access with their relative Data Subcomponent. Relations 
+  // are defined in the process implementation via connections.
+  private Map<DataAccess, String> _dataAccessMapping ;
+  
   public AadlToCUnparser()
   {
     super() ;
+/*
     cMainFileCode = new AadlToCSwitchProcess(this) ;
     cMainFileCode.addOutputNewline("#include \"activity.h\"") ;
     cMainFileCode.addOutputNewline("#include \"deployment.h\"") ;
@@ -78,111 +117,128 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     cMainFileCode.addOutputNewline("#include <arinc653/types.h>") ;
     cMainFileCode.addOutputNewline("#include <arinc653/process.h>") ;
     cMainFileCode.addOutputNewline("#include <arinc653/partition.h>") ;
-    cDataTypeFileCode = new AadlToCSwitchProcess(this) ;
-    cDataTypeFileCode.addOutputNewline("#include \"gtypes.h\"") ;
-    cDataTypeHeaderFileCode = new AadlToCSwitchProcess(this) ;
-    cSubprogramsFileCode = new AadlToCSwitchProcess(this) ;
-    cSubprogramsFileCode.addOutputNewline("#include \"subprograms.h\"") ;
-    cSubprogramsHeaderFileCode = new AadlToCSwitchProcess(this) ;
-    cActivityFileCode = new AadlToCSwitchProcess(this) ;
-    cActivityFileCode.addOutputNewline("#include \"activity.h\"") ;
-    cActivityHeaderFileCode = new AadlToCSwitchProcess(this) ;
-    cDeploymentHeaderFileCode = new AadlToCSwitchProcess(this) ;
-    cDeploymentFileCode = new AadlToCSwitchProcess(this) ;
-    cDeploymentFileCode.addOutputNewline("#include <arinc653/types.h>") ;
-    cDeploymentFileCode.addOutputNewline("#include \"deployment.h\"\n") ;
+*/    
+    _gtypesImplCode = new AadlToCSwitchProcess(this) ;
+    _gtypesImplCode.addOutputNewline("#include \"gtypes.h\"") ;
+    
+    _gtypesHeaderCode = new AadlToCSwitchProcess(this) ;
+//    _gtypesHeaderCode.addOutputNewline(MAIN_HEADER_INCLUSION) ;
+    
+    _subprogramImplCode = new AadlToCSwitchProcess(this) ;
+    _subprogramImplCode.addOutputNewline("#include \"subprograms.h\"") ;
+    
+    _subprogramHeaderCode = new AadlToCSwitchProcess(this) ;
+    
+    _subprogramHeaderCode.addOutputNewline("#include \"gtypes.h\"") ;    
+    
+    _activityImplCode = new AadlToCSwitchProcess(this) ;
+    _activityImplCode.addOutputNewline("#include \"activity.h\"") ;
+    
+    _activityHeaderCode = new AadlToCSwitchProcess(this) ;
+//    _activityHeaderCode.addOutputNewline(MAIN_HEADER_INCLUSION) ;
+    _activityHeaderCode.addOutputNewline("#include \"subprograms.h\"") ;
+        
+    _deploymentImplCode = new AadlToCSwitchProcess(this) ;
+    //_deploymentImplCode.addOutputNewline("#include <arinc653/types.h>") ;
+    _deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
+    
+    _deploymentHeaderCode = new AadlToCSwitchProcess(this) ;
+//    _deploymentHeaderCode.addOutputNewline(MAIN_HEADER_INCLUSION) ;
   }
-
-  protected AadlToCSwitchProcess cMainFileCode ;
-
-  protected AadlToCSwitchProcess cDataTypeFileCode ;
-  protected AadlToCSwitchProcess cDataTypeHeaderFileCode ;
-
-  protected AadlToCSwitchProcess cSubprogramsFileCode ;
-  protected AadlToCSwitchProcess cSubprogramsHeaderFileCode ;
-
-  protected AadlToCSwitchProcess cActivityFileCode ;
-  protected AadlToCSwitchProcess cActivityHeaderFileCode ;
-
-  protected AadlToCSwitchProcess cDeploymentFileCode ;
-  protected AadlToCSwitchProcess cDeploymentHeaderFileCode ;
-
-  private AadlToCSwitchProcess currentCUnparser ;
-  private AadlToCSwitchProcess currentHUnparser ;
-
-  private static List<NamedElement> delayedDataDeclarations =
-        new ArrayList<NamedElement>() ;
-
-  private Map<AadlToCSwitchProcess, Set<String>> additionalHeaders =
-        new HashMap<AadlToCSwitchProcess, Set<String>>() ;
-
-  private List<NamedElement> processedTypes = new ArrayList<NamedElement>() ;
+  /*
   
-  private static Map<DataAccess, String> _blackboardNames ;
+  
+  _activityHeaderCode.addOutputNewline(GenerationUtils.
+                                       generateHeaderInclusionGuard("activity.h")) ;
+  
+  _deploymentHeaderCode.addOutputNewline(GenerationUtils.
+                                         generateHeaderInclusionGuard("deployment.h")) ;
+                                         
+                                         */
 
   public void saveGeneratedFilesContent(File targetDirectory)
   {
-    currentHUnparser = cDataTypeHeaderFileCode ;
+    _currentHeaderUnparser = _gtypesHeaderCode ;
 
-    for(NamedElement ne : delayedDataDeclarations)
+    for(NamedElement ne : _delayedDataDeclarations)
     {
       getCTypeDeclarator(ne, false) ;
     }
 
-    cDataTypeHeaderFileCode.addOutputNewline("\n#endif\n") ;
-    cSubprogramsHeaderFileCode.addOutputNewline("\n#endif\n") ;
-    cActivityHeaderFileCode.addOutputNewline("\n#endif\n") ;
-    cDeploymentHeaderFileCode.addOutputNewline("\n#endif\n") ;
+    _gtypesHeaderCode.addOutputNewline("\n#endif\n") ;
+    _subprogramHeaderCode.addOutputNewline("\n#endif\n") ;
+    _activityHeaderCode.addOutputNewline("\n#endif\n") ;
+    _deploymentHeaderCode.addOutputNewline("\n#endif\n") ;
 
     try
     {
+      String headerGuard = null ;
+      
+      // gtypes.c
       FileWriter typesFile_C =
             new FileWriter(targetDirectory.getAbsolutePath() + "/gtypes.c") ;
-      String addTypeHeader_C = getAdditionalHeader(cDataTypeFileCode) ;
-      saveFile(typesFile_C, addTypeHeader_C + cDataTypeFileCode.getOutput()) ;
+      String addTypeHeader_C = getAdditionalHeader(_gtypesImplCode) ;
+      saveFile(typesFile_C, addTypeHeader_C, _gtypesImplCode.getOutput()) ;
+      
+      // gtypes.h
       FileWriter typesFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/gtypes.h") ;
-      String addTypeHeader_H = getAdditionalHeader(cDataTypeHeaderFileCode) ;
-      saveFile(typesFile_H, this.TYPE_HEADER + addTypeHeader_H +
-                     cDataTypeHeaderFileCode.getOutput()) ;
+      headerGuard = GenerationUtils.generateHeaderInclusionGuard("gtypes.h") ;
+      String addTypeHeader_H = getAdditionalHeader(_gtypesHeaderCode) ;
+      saveFile(typesFile_H, headerGuard, MAIN_HEADER_INCLUSION, addTypeHeader_H,
+               _gtypesHeaderCode.getOutput()) ;
+      
+      // subprogram.c
       FileWriter subprogramsFile_C =
             new FileWriter(targetDirectory.getAbsolutePath() + "/subprograms.c") ;
-      String addSubprogramHeader_C = getAdditionalHeader(cSubprogramsFileCode) ;
-      saveFile(subprogramsFile_C, addSubprogramHeader_C +
-                     cSubprogramsFileCode.getOutput()) ;
+      String addSubprogramHeader_C = getAdditionalHeader(_subprogramImplCode) ;
+      saveFile(subprogramsFile_C, addSubprogramHeader_C,
+                     _subprogramImplCode.getOutput()) ;
+      
+      // subprogram.h
       FileWriter subprogramsFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/subprograms.h") ;
-      String addSubprogramsHeader_H =
-            getAdditionalHeader(cSubprogramsHeaderFileCode) ;
-      saveFile(subprogramsFile_H, this.SUBPROGRAM_HEADER +
-                     addSubprogramsHeader_H +
-                     cSubprogramsHeaderFileCode.getOutput()) ;
+      headerGuard = GenerationUtils.generateHeaderInclusionGuard("subprograms.h");
+      String addSubprogramsHeader_H = getAdditionalHeader(_subprogramHeaderCode) ;
+      saveFile(subprogramsFile_H, headerGuard, addSubprogramsHeader_H,
+                     _subprogramHeaderCode.getOutput()) ;
+      
+      // activity.c     
       FileWriter activityFile_C =
             new FileWriter(targetDirectory.getAbsolutePath() + "/activity.c") ;
-      String addActivityHeader_C = getAdditionalHeader(cActivityFileCode) ;
-      saveFile(activityFile_C, addActivityHeader_C +
-                     cActivityFileCode.getOutput()) ;
+      String addActivityHeader_C = getAdditionalHeader(_activityImplCode) ;
+      saveFile(activityFile_C, addActivityHeader_C, _activityImplCode.getOutput()) ;
+      
+      // activity.h
       FileWriter activityFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/activity.h") ;
-      String addActivityHeader_H = getAdditionalHeader(cActivityHeaderFileCode) ;
-      saveFile(activityFile_H, this.ACTIVITY_HEADER + addActivityHeader_H +
-                     cActivityHeaderFileCode.getOutput()) ;
+      headerGuard = GenerationUtils.generateHeaderInclusionGuard("activity.h");
+      String addActivityHeader_H = getAdditionalHeader(_activityHeaderCode) ;
+      saveFile(activityFile_H, headerGuard, MAIN_HEADER_INCLUSION, 
+               addActivityHeader_H, _activityHeaderCode.getOutput()) ;
+      
+      // partition's deployment.c
       FileWriter deploymentFile_C =
             new FileWriter(targetDirectory.getAbsolutePath() + "/deployment.c") ;
-      String addDeploymentHeader_C = getAdditionalHeader(cDeploymentFileCode) ;
-      saveFile(deploymentFile_C, addDeploymentHeader_C +
-                     cDeploymentFileCode.getOutput()) ;
+      String addDeploymentHeader_C = getAdditionalHeader(_deploymentImplCode) ;
+      saveFile(deploymentFile_C, addDeploymentHeader_C,
+                     _deploymentImplCode.getOutput()) ;
+      
+      
+      // partition's deployment.h
       FileWriter deploymentFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/deployment.h") ;
-      String addDeploymentHeader_H =
-            getAdditionalHeader(cDeploymentHeaderFileCode) ;
-      saveFile(deploymentFile_H, this.DEPLOYMENT_HEADER + '\n' +
-                     addDeploymentHeader_H +
-                     cDeploymentHeaderFileCode.getOutput()) ;
+      headerGuard = GenerationUtils.generateHeaderInclusionGuard("deployment.h");
+      String addDeploymentHeader_H = getAdditionalHeader(_deploymentHeaderCode) ;
+      saveFile(deploymentFile_H, headerGuard, MAIN_HEADER_INCLUSION,
+               addDeploymentHeader_H, _deploymentHeaderCode.getOutput()) ;
+
+/*      
       FileWriter mainFile_C =
             new FileWriter(targetDirectory.getAbsolutePath() + "/main.c") ;
       String addMainHeader_C = getAdditionalHeader(cMainFileCode) ;
       saveFile(mainFile_C, addMainHeader_C + cMainFileCode.getOutput()) ;
+*/
     }
     catch(IOException e)
     {
@@ -195,9 +251,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   {
     StringBuffer res = new StringBuffer("") ;
 
-    if(additionalHeaders.containsKey(fileUnparser))
+    if(_additionalHeaders.containsKey(fileUnparser))
     {
-      Set<String> additionalTypeHeaders = additionalHeaders.get(fileUnparser) ;
+      Set<String> additionalTypeHeaders = _additionalHeaders.get(fileUnparser) ;
 
       for(String s : additionalTypeHeaders)
       {
@@ -209,14 +265,22 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   }
 
   private void saveFile(FileWriter file,
-                        String content)
+                        String ... content)
   {
     BufferedWriter output ;
-
+    StringBuilder sb = new StringBuilder() ;
+    
+    for(String s : content)
+    {
+      sb.append(s) ;
+    }
+    
     try
     {
       output = new BufferedWriter(file) ;
-      output.write(content) ;
+      
+      output.write(sb.toString()) ;
+      
       output.close() ;
     }
     catch(IOException e)
@@ -224,36 +288,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       // TODO Auto-generated catch block
       e.printStackTrace() ;
     }
-  }
-
-  public String getDataTypeCodeContent()
-  {
-    return cDataTypeFileCode.getOutput() ;
-  }
-
-  public String getDataTypeHeaderContent()
-  {
-    return cDataTypeHeaderFileCode.getOutput() ;
-  }
-
-  public String getSubprogramsFileCodeContent()
-  {
-    return cSubprogramsFileCode.getOutput() ;
-  }
-
-  public String getSubprogramsHeaderContent()
-  {
-    return cSubprogramsHeaderFileCode.getOutput() ;
-  }
-
-  public String getActivityCodeContent()
-  {
-    return cActivityFileCode.getOutput() ;
-  }
-
-  public String getActivityHeaderContent()
-  {
-    return cActivityHeaderFileCode.getOutput() ;
   }
 
   public boolean resolveExistingCodeDependencies(NamedElement object,
@@ -271,15 +305,15 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     {
       if(s.endsWith(".h"))
       {
-        if(additionalHeaders.containsKey(sourceTextDest) == false)
+        if(_additionalHeaders.containsKey(sourceTextDest) == false)
         {
           Set<String> l = new HashSet<String>() ;
           l.add(s) ;
-          additionalHeaders.put(sourceTextDest, l) ;
+          _additionalHeaders.put(sourceTextDest, l) ;
         }
         else
         {
-          additionalHeaders.get(sourceTextDest).add(s) ;
+          _additionalHeaders.get(sourceTextDest).add(s) ;
         }
 
         return true ;
@@ -326,41 +360,41 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     {
     // Simple types
       case BOOLEAN :
-        currentHUnparser.addOutputNewline("typedef char " + id + ";") ;
+        _currentHeaderUnparser.addOutputNewline("typedef char " + id + ";") ;
         break ;
       case CHARACTER :
       {
-        currentHUnparser.addOutput("typedef ") ;
-        currentHUnparser.addOutputNewline(numberRepresentationValue + " char " +
+        _currentHeaderUnparser.addOutput("typedef ") ;
+        _currentHeaderUnparser.addOutputNewline(numberRepresentationValue + " char " +
               id + ";") ;
         break ;
       }
       case FIXED :
         break ;
       case FLOAT :
-        currentHUnparser.addOutputNewline("typedef float " + id + ";") ;
+        _currentHeaderUnparser.addOutputNewline("typedef float " + id + ";") ;
         break ;
       case INTEGER :
       {
-        currentHUnparser.addOutput("typedef ") ;
-        currentHUnparser.addOutputNewline(numberRepresentationValue + " int " +
+        _currentHeaderUnparser.addOutput("typedef ") ;
+        _currentHeaderUnparser.addOutputNewline(numberRepresentationValue + " int " +
               id + ";") ;
         break ;
       }
       case STRING :
-        currentHUnparser.addOutputNewline("typedef char * " + id + ";") ;
+        _currentHeaderUnparser.addOutputNewline("typedef char * " + id + ";") ;
         break ;
       // Complex types
       case ENUM :
       {
         if(delayComplexTypes)
         {
-          delayedDataDeclarations.add(object) ;
+          _delayedDataDeclarations.add(object) ;
           break ;
         }
 
-        currentHUnparser.addOutputNewline("typedef enum " + id + " {") ;
-        currentHUnparser.incrementIndent() ;
+        _currentHeaderUnparser.addOutputNewline("typedef enum " + id + " {") ;
+        _currentHeaderUnparser.incrementIndent() ;
         List<String> stringifiedRepresentation = new ArrayList<String>() ;
         EList<PropertyExpression> dataRepresentation =
               AadlBaGetProperties
@@ -419,27 +453,27 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                   rep += "," ;
                 }
 
-                currentHUnparser.addOutputNewline(id + "_" +
+                _currentHeaderUnparser.addOutputNewline(id + "_" +
                       enumString.getValue() + rep) ;
               }
             }
           }
         }
 
-        currentHUnparser.decrementIndent() ;
-        currentHUnparser.addOutputNewline("} " + id + ";") ;
+        _currentHeaderUnparser.decrementIndent() ;
+        _currentHeaderUnparser.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case STRUCT :
       {
         if(delayComplexTypes)
         {
-          delayedDataDeclarations.add(object) ;
+          _delayedDataDeclarations.add(object) ;
           break ;
         }
 
-        currentHUnparser.addOutputNewline("typedef struct " + id + " {") ;
-        currentHUnparser.incrementIndent() ;
+        _currentHeaderUnparser.addOutputNewline("typedef struct " + id + " {") ;
+        _currentHeaderUnparser.incrementIndent() ;
         EList<PropertyExpression> elementNames =
               AadlBaGetProperties
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -482,7 +516,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 String type =
                       GenerationUtils.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
-                currentHUnparser.addOutputNewline(type +
+                _currentHeaderUnparser.addOutputNewline(type +
                       " " +
                       stringifiedElementNames.get(lv.getOwnedListElements()
                             .indexOf(v)) + ";") ;
@@ -491,20 +525,20 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
         }
 
-        currentHUnparser.decrementIndent() ;
-        currentHUnparser.addOutputNewline("} " + id + ";") ;
+        _currentHeaderUnparser.decrementIndent() ;
+        _currentHeaderUnparser.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case UNION :
       {
         if(delayComplexTypes)
         {
-          delayedDataDeclarations.add(object) ;
+          _delayedDataDeclarations.add(object) ;
           break ;
         }
 
-        currentHUnparser.addOutputNewline("typedef union " + id + " {") ;
-        currentHUnparser.incrementIndent() ;
+        _currentHeaderUnparser.addOutputNewline("typedef union " + id + " {") ;
+        _currentHeaderUnparser.incrementIndent() ;
         EList<PropertyExpression> elementNames =
               AadlBaGetProperties
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -547,7 +581,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 String type =
                       GenerationUtils.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
-                currentHUnparser.addOutputNewline(type +
+                _currentHeaderUnparser.addOutputNewline(type +
                       " " +
                       stringifiedElementNames.get(lv.getOwnedListElements()
                             .indexOf(v)) + ";") ;
@@ -556,13 +590,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
         }
 
-        currentHUnparser.decrementIndent() ;
-        currentHUnparser.addOutputNewline("}" + id + ";") ;
+        _currentHeaderUnparser.decrementIndent() ;
+        _currentHeaderUnparser.addOutputNewline("}" + id + ";") ;
         break ;
       }
       case ARRAY :
       {
-        currentHUnparser.addOutput("typedef ") ;
+        _currentHeaderUnparser.addOutput("typedef ") ;
         EList<PropertyExpression> baseType =
               AadlBaGetProperties
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -579,7 +613,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               if(v instanceof ClassifierValue)
               {
                 ClassifierValue cv = (ClassifierValue) v ;
-                currentHUnparser.addOutput(GenerationUtils
+                _currentHeaderUnparser.addOutput(GenerationUtils
                       .getGenerationCIdentifier(cv.getClassifier()
                             .getQualifiedName())) ;
               }
@@ -587,8 +621,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
         }
 
-        currentHUnparser.addOutput(" ") ;
-        currentHUnparser.addOutput(id) ;
+        _currentHeaderUnparser.addOutput(" ") ;
+        _currentHeaderUnparser.addOutput(id) ;
         EList<PropertyExpression> arrayDimensions =
               AadlBaGetProperties
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -604,28 +638,28 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             {
               if(v instanceof IntegerLiteral)
               {
-                currentHUnparser.addOutput("[") ;
+                _currentHeaderUnparser.addOutput("[") ;
                 IntegerLiteral dimension = (IntegerLiteral) v ;
-                currentHUnparser.addOutput(Long.toString(dimension.getValue())) ;
-                currentHUnparser.addOutput("]") ;
+                _currentHeaderUnparser.addOutput(Long.toString(dimension.getValue())) ;
+                _currentHeaderUnparser.addOutput("]") ;
               }
             }
           }
         }
 
-        currentHUnparser.addOutputNewline(";") ;
+        _currentHeaderUnparser.addOutputNewline(";") ;
         break ;
       }
       case UNKNOWN :
       {
         try
         {
-          currentHUnparser.addOutput("typedef ") ;
-          resolveExistingCodeDependencies(object, cDataTypeHeaderFileCode,
-                                          cDataTypeHeaderFileCode) ;
-          currentHUnparser.addOutput(" ") ;
-          currentHUnparser.addOutput(id) ;
-          currentHUnparser.addOutputNewline(";") ;
+          _currentHeaderUnparser.addOutput("typedef ") ;
+          resolveExistingCodeDependencies(object, _gtypesHeaderCode,
+                                          _gtypesHeaderCode) ;
+          _currentHeaderUnparser.addOutput(" ") ;
+          _currentHeaderUnparser.addOutput(id) ;
+          _currentHeaderUnparser.addOutputNewline(";") ;
         }
         catch(Exception e)
         {
@@ -645,14 +679,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       @Override
       public String caseDataType(DataType object)
       {
-        if(processedTypes.contains(object))
+        if(_processedTypes.contains(object))
         {
           return DONE ;
         }
 
-        processedTypes.add(object) ;
-        currentHUnparser = cDataTypeHeaderFileCode ;
-        cDataTypeHeaderFileCode.processComments(object) ;
+        _processedTypes.add(object) ;
+        _currentHeaderUnparser = _gtypesHeaderCode ;
+        _gtypesHeaderCode.processComments(object) ;
         getCTypeDeclarator((NamedElement) object, true) ;
         return DONE ;
       }
@@ -679,7 +713,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         if(unparser != null)
         {
-          unparser.unparseAnnexLibrary(al, currentCUnparser.getIndent()) ;
+          unparser.unparseAnnexLibrary(al, _currentImplUnparser.getIndent()) ;
         }
 
         return DONE ;
@@ -693,7 +727,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
        */
       public String caseDefaultAnnexLibrary(DefaultAnnexLibrary dal)
       {
-        String annexName = dal.getName() ;
         AnnexUnparser unparser =
               ServiceRegistryProvider.getServiceRegistry().getUnparser("*") ;
 
@@ -716,64 +749,36 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         AnnexUnparser unparser =
               ServiceRegistryProvider.getServiceRegistry()
                     .getUnparser(annexName) ;
-
-        if(unparser != null)
+        
+        // XXX May AadlBaToCUnparser have its own interface ???
+        if(unparser != null && unparser instanceof AadlBaToCUnparserAction )
         {
+          AadlBaToCUnparserAction baToCUnparserAction =
+                (AadlBaToCUnparserAction) unparser ;
+
+          AadlBaToCUnparser baToCUnparser =
+                (AadlBaToCUnparser) baToCUnparserAction.getUnparser() ;
           
-          if(unparser instanceof AadlBaToCUnparserAction)
-          {
-            ((AadlBaToCUnparserAction) unparser).
-                           createUnparser(_blackboardNames) ; 
-          }
+          baToCUnparser.setDataAccessMapping(_dataAccessMapping) ;
           
-          unparser.unparseAnnexSubclause(as, currentCUnparser.getIndent()) ;
+          baToCUnparserAction.unparseAnnexSubclause(as,
+                                             _currentImplUnparser.getIndent()) ;
+          
+          
+          
+          baToCUnparser.addIndent_C(_currentImplUnparser.getIndent()) ;
+          baToCUnparser.addIndent_H(_currentHeaderUnparser.getIndent()) ;
+          _currentImplUnparser.addOutput(baToCUnparser.getCContent()) ;
+          _currentHeaderUnparser.addOutput(baToCUnparser.getHContent()) ;
 
-          if(unparser instanceof AadlBaToCUnparserAction)
+          if(_additionalHeaders.get(_currentHeaderUnparser) == null)
           {
-            AadlBaToCUnparserAction baToCUnparserAction =
-                  (AadlBaToCUnparserAction) unparser ;
-
-            if(baToCUnparserAction.getUnparser() instanceof AadlBaToCUnparser)
-            {
-              AadlBaToCUnparser baToCUnparser =
-                    (AadlBaToCUnparser) baToCUnparserAction.getUnparser() ;
-              
-              baToCUnparser.addIndent_C(currentCUnparser.getIndent()) ;
-              baToCUnparser.addIndent_H(currentHUnparser.getIndent()) ;
-              currentCUnparser.addOutput(baToCUnparser.getCContent()) ;
-              currentHUnparser.addOutput(baToCUnparser.getHContent()) ;
-
-              if(additionalHeaders.get(currentHUnparser) == null)
-              {
-                Set<String> t = new HashSet<String>() ;
-                additionalHeaders.put(currentHUnparser, t) ;
-              }
-
-              additionalHeaders.get(currentHUnparser)
-                    .addAll(baToCUnparser.getAdditionalHeaders()) ;
-            }
+            Set<String> t = new HashSet<String>() ;
+            _additionalHeaders.put(_currentHeaderUnparser, t) ;
           }
-        }
 
-        return DONE ;
-      }
-
-      /**
-       * unparses defaultannex subclause
-       *
-       * @param das
-       *            DefaultAnnexSubclause object
-       */
-      public String caseDefaultAnnexSubclause(DefaultAnnexSubclause das)
-      {
-        AnnexUnparserRegistry registry =
-              (AnnexUnparserRegistry) AnnexRegistry
-                    .getRegistry(AnnexRegistry.ANNEX_UNPARSER_EXT_ID) ;
-        String annexName = das.getName() ;
-        AnnexUnparser unparser = registry.getAnnexUnparser("*") ;
-
-        if(unparser != null)
-        {
+          _additionalHeaders.get(_currentHeaderUnparser)
+                .addAll(baToCUnparser.getAdditionalHeaders()) ;
         }
 
         return DONE ;
@@ -781,8 +786,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
       public String caseDataImplementation(DataImplementation object)
       {
-        currentHUnparser = cDataTypeHeaderFileCode ;
-        cDataTypeHeaderFileCode.processComments(object) ;
+        _currentHeaderUnparser = _gtypesHeaderCode ;
+        _gtypesHeaderCode.processComments(object) ;
         getCTypeDeclarator((NamedElement) object, true) ;
         return null ;
       }
@@ -793,11 +798,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         if(object.getContainingComponentImpl() instanceof DataImplementation)
         {
-          unparser = currentHUnparser ;
+          unparser = _currentHeaderUnparser ;
         }
         else
         {
-          unparser = currentCUnparser ;
+          unparser = _currentImplUnparser ;
         }
 
         unparser.processComments(object) ;
@@ -805,7 +810,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         try
         {
-          resolveExistingCodeDependencies(dst, unparser, currentHUnparser) ;
+          resolveExistingCodeDependencies(dst, unparser, _currentHeaderUnparser) ;
         }
         catch(Exception e)
         {
@@ -819,18 +824,72 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         unparser.addOutput(GenerationUtils.getInitialValue(object)) ;
         unparser.addOutputNewline(";") ;
 
-        if(processedTypes.contains(object.getDataSubcomponentType()) == false)
+        if(_processedTypes.contains(object.getDataSubcomponentType()) == false)
         {
           process(object.getDataSubcomponentType()) ;
-          processedTypes.add(object.getDataSubcomponentType()) ;
+          _processedTypes.add(object.getDataSubcomponentType()) ;
         }
 
         return null ;
       }
-
+      
       public String caseProcessImplementation(ProcessImplementation object)
       {
-//        /*
+        _dataAccessMapping = buildDataAccessMapping(object) ;
+        
+        processEList(object.getOwnedThreadSubcomponents()) ;
+        
+        return DONE ;
+      }
+      
+      // Builds the data access mapping via the connections described in the
+      // process implementation.
+      private Map<DataAccess, String> buildDataAccessMapping(
+                                              ProcessImplementation processImpl)
+      {
+        Map<DataAccess, String> result = new HashMap<DataAccess, String>() ;
+        
+        EList<Subcomponent> subcmpts = processImpl.getAllSubcomponents() ;
+        
+        List<String> dataSubcomponentNames = new ArrayList<String>() ;
+        
+        // Fetches data subcomponent names.
+        for(Subcomponent s : subcmpts)
+        {
+          if(s instanceof DataSubcomponent)
+          {
+            dataSubcomponentNames.add(s.getName()) ;
+          }
+        }
+        
+        // Binds data subcomponent names with DataAcess objects.
+        // See process implementation's connections.
+        for(Connection connect : processImpl.getAllConnections())
+        {
+          if (connect instanceof AccessConnection &&
+             ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
+          {
+            DataSubcomponent destination =  (DataSubcomponent) connect.
+                                                           getAllDestination() ;
+            
+            if(AadlBaUtils.contains(destination.getName(), dataSubcomponentNames))
+            {
+              ConnectedElement source = (ConnectedElement) connect.getSource() ;
+              
+              DataAccess da = (DataAccess) source.getConnectionEnd() ;
+              
+              result.put(da, destination.getName()) ;
+            }
+          }
+        }
+        
+        return result ;
+      }
+      
+      /*      
+      public String caseProcessImplementation(ProcessImplementation object)
+      {
+       
         StringBuilder sb = new StringBuilder() ;
         
         // And set some static flags.
@@ -997,21 +1056,19 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         cMainFileCode.addOutputNewline("  return (0);") ;
         cMainFileCode.addOutputNewline("}") ;
         cMainFileCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
-//        */
+        
         
         return null ;
       }
-
+*/
+/*
       public String caseProcessorSubcomponent(ProcessorSubcomponent object)
       {
         generateDeploymentHeader(object) ;
         return null ;
       }
+*/
 
-      /**
-       * Fills in identifier & category name lets super class fill in the
-       * rest.
-       */
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
         process(object.getComponentImplementation()) ;
@@ -1021,33 +1078,33 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       public String caseThreadImplementation(ThreadImplementation object)
       {
         process(object.getType()) ;
-        cActivityFileCode.addOutput("void* ") ;
-        cActivityFileCode.addOutput(GenerationUtils
+        _activityImplCode.addOutput("void* ") ;
+        _activityImplCode.addOutput(GenerationUtils
               .getGenerationCIdentifier(object.getQualifiedName())) ;
-        cActivityFileCode.addOutputNewline(THREAD_SUFFIX + "()") ;
-        cActivityFileCode.addOutputNewline("{") ;
-        cActivityFileCode.incrementIndent() ;
+        _activityImplCode.addOutputNewline(GenerationUtils.THREAD_SUFFIX + "()") ;
+        _activityImplCode.addOutputNewline("{") ;
+        _activityImplCode.incrementIndent() ;
 
         for(DataSubcomponent d : object.getOwnedDataSubcomponents())
         {
           process(d) ;
         }
 
-        currentCUnparser = cActivityFileCode ;
-        currentHUnparser = cActivityHeaderFileCode ;
+        _currentImplUnparser = _activityImplCode ;
+        _currentHeaderUnparser = _activityHeaderCode ;
         
         for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
         {
           process(annex) ;
         }
 
-        cActivityFileCode.decrementIndent() ;
-        cActivityFileCode.addOutputNewline("}") ;
+        _activityImplCode.decrementIndent() ;
+        _activityImplCode.addOutputNewline("}") ;
         
-        cActivityHeaderFileCode.addOutput("void*  ") ;
-        cActivityHeaderFileCode.addOutput(GenerationUtils
+        _activityHeaderCode.addOutput("void*  ") ;
+        _activityHeaderCode.addOutput(GenerationUtils
               .getGenerationCIdentifier(object.getQualifiedName())) ;
-        cActivityHeaderFileCode.addOutputNewline(THREAD_SUFFIX + "();\n") ;
+        _activityHeaderCode.addOutputNewline(GenerationUtils.THREAD_SUFFIX + "();\n") ;
         
         return null ;
       }
@@ -1060,14 +1117,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
       public String caseThreadType(ThreadType object)
       {
-        if(processedTypes.contains(object))
+        if(_processedTypes.contains(object))
         {
           return null ;
         }
 
-        processedTypes.add(object) ;
-        currentHUnparser = cActivityHeaderFileCode ;
-        currentCUnparser = cActivityFileCode ;
+        _processedTypes.add(object) ;
+        _currentHeaderUnparser = _activityHeaderCode ;
+        _currentImplUnparser = _activityImplCode ;
 
         for(DataAccess d : object.getOwnedDataAccesses())
         {
@@ -1093,35 +1150,36 @@ public class AadlToCUnparser extends AadlProcessingSwitch
        */
       public String caseDataAccess(DataAccess object)
       {
-        currentCUnparser.addOutput("extern ") ;
+        _currentImplUnparser.addOutput("extern ") ;
         
-        String blackboardName = _blackboardNames.get(object) ;
+        String dataSubprogramName = _dataAccessMapping.get(object) ;
         
-        if(blackboardName != null)
+        if(dataSubprogramName != null)
         {
-          currentCUnparser.addOutput(GenerationUtils.generateBlackboardId(
-                                                             blackboardName));
+          _currentImplUnparser.addOutput(dataSubprogramName);
         }
         else
         {
           try
           {
             resolveExistingCodeDependencies(object.getDataFeatureClassifier(),
-                                           currentCUnparser, currentHUnparser) ;
+                                           _currentImplUnparser, _currentHeaderUnparser) ;
           }
           catch(Exception e)
           {
-            currentCUnparser.addOutput(GenerationUtils
+            _currentImplUnparser.addOutput(GenerationUtils
                   .getGenerationCIdentifier(object.getDataFeatureClassifier()
                         .getQualifiedName())) ;
           }
           
-          currentCUnparser.addOutput(" ") ;
-          currentCUnparser.addOutput(GenerationUtils
+          _currentImplUnparser.addOutput(" ") ;
+          _currentImplUnparser.addOutput(GenerationUtils
                 .getGenerationCIdentifier(object.getQualifiedName())) ;
         }
 
-        currentCUnparser.addOutputNewline(";") ;
+        _currentImplUnparser.addOutputNewline(";") ;
+        
+        
         return DONE ;
       }
     } ;
@@ -1132,6 +1190,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     AadlToCSwitchProcess.process(element) ;
   }
 
+/*  
   public void saveGeneratedKernelFiles(File processorMakeFileDir)
   {
     File f = new File(processorMakeFileDir.getAbsolutePath() + "/kernel") ;
@@ -1142,24 +1201,24 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
 
     FileWriter deployment_C ;
-    cDeploymentHeaderFileCode.addOutputNewline("\n#endif\n") ;
+    _deploymentHeaderCode.addOutputNewline("\n#endif\n") ;
 
     try
     {
       deployment_C =
             new FileWriter(processorMakeFileDir.getAbsolutePath() +
                   "/kernel/deployment.c") ;
-      String addDeploymentHeader_C = getAdditionalHeader(cDeploymentFileCode) ;
+      String addDeploymentHeader_C = getAdditionalHeader(_deploymentImplCode) ;
       saveFile(deployment_C, addDeploymentHeader_C +
-                     cDeploymentFileCode.getOutput()) ;
+                     _deploymentImplCode.getOutput()) ;
       FileWriter deployment_H =
             new FileWriter(processorMakeFileDir.getAbsolutePath() +
                   "/kernel/deployment.h") ;
       String addDeploymentHeader_H =
-            getAdditionalHeader(this.cDeploymentHeaderFileCode) ;
+            getAdditionalHeader(this._deploymentHeaderCode) ;
       saveFile(deployment_H, this.DEPLOYMENT_HEADER + '\n' +
                      addDeploymentHeader_H +
-                     cDeploymentHeaderFileCode.getOutput()) ;
+                     _deploymentHeaderCode.getOutput()) ;
     }
     catch(IOException e)
     {
@@ -1167,7 +1226,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       e.printStackTrace() ;
     }
   }
-
+*/
+/*
   void generateDeploymentHeader(ProcessorSubcomponent object)
   {
     // POK::Additional_Features => (libc_stdio,libc_stdlib,console);
@@ -1228,7 +1288,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       {
       }
     }
-
+    
     // TODO: the integer ID in this macro must be set carefully to respect the routing table
     // defined in deployment.c files in the generated code for a partition
     int id =
@@ -1239,8 +1299,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 Integer.toString(id)) ;
     // POK_GENERATED_CODE 1 always true in our usage context
     cDeploymentHeaderFileCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
-    /*Hum, ici je dirai que tu dois mettre ceci d�s que tu as des t�ches p�riodiques ou ordonnanceurs RR ou du statique.
-    L'endroit o� il g�n�re cette macro n'est pas encore super clair pour moi dans ocarina ...*/
+    //Hum, ici je dirai que tu dois mettre ceci d�s que tu as des t�ches p�riodiques ou ordonnanceurs RR ou du statique.
+    //L'endroit o� il g�n�re cette macro n'est pas encore super clair pour moi dans ocarina ...
     cDeploymentHeaderFileCode.addOutputNewline("#define POK_NEEDS_GETTICK 1") ;
     // POK_NEEDS_THREADS 1 always true in our usage context.
     cDeploymentHeaderFileCode.addOutputNewline("#define POK_NEEDS_THREADS 1") ;
@@ -1252,9 +1312,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
 
     cDeploymentHeaderFileCode.addOutputNewline("#define POK_NEEDS_SCHED 1") ;
-    /*  The maccro POK_CONFIG_NB_PARTITIONS indicates the amount of partitions in*/
-    /*   the current system.It corresponds to the amount of process components in */
-    /*  the system.*/
+    //  The maccro POK_CONFIG_NB_PARTITIONS indicates the amount of partitions in
+    //   the current system.It corresponds to the amount of process components in/
+    //  the system.
     List<ProcessSubcomponent> bindedProcess =
           GenerationUtils.getBindedProcesses(object) ;
     cDeploymentHeaderFileCode
@@ -1273,16 +1333,16 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             .getOwnedThreadSubcomponents().size())) ;
     }
 
-    /*  The maccro POK_CONFIG_NB_THREADS indicates the amount of threads used in */
-    /*  the kernel.It comprises the tasks for the partition and the main task of */
-    /*  each partition that initialize all ressources.*/
+    //  The maccro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
+    //  the kernel.It comprises the tasks for the partition and the main task of 
+    //  each partition that initialize all ressources.
     cDeploymentHeaderFileCode
           .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
                 Integer.toString(2 + bindedProcess.size() +
                       bindedThreads.size())) ;
-    /*  The maccro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of */
-    /*  threads in each partition we also add an additional process that */
-    /*  initialize all partition's entities (communication, threads, ...)*/
+    //  The maccro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of 
+    //  threads in each partition we also add an additional process that 
+    //  initialize all partition's entities (communication, threads, ...)
     cDeploymentHeaderFileCode
           .addOutput("#define POK_CONFIG_PARTITIONS_NTHREADS {") ;
 
@@ -1352,9 +1412,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           .addOutputNewline("#define POK_CONFIG_NB_LOCKOBJECTS 1") ;
     cDeploymentHeaderFileCode
           .addOutputNewline("#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS {1}") ;
-    /*  The maccro POK_CONFIG_PARTTITIONS_SIZE indicates the required amount of */
-    /*  memory for each partition.This value was deduced from the property */
-    /*  POK::Needed_Memory_Size of each process*/
+    //  The maccro POK_CONFIG_PARTTITIONS_SIZE indicates the required amount of 
+    //  memory for each partition.This value was deduced from the property 
+    //  POK::Needed_Memory_Size of each process
     // comes from property POK::Needed_Memory_Size => XXX Kbyte;
     List<Long> memorySizePerPartition = new ArrayList<Long>() ;
 
@@ -1473,7 +1533,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     cDeploymentHeaderFileCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
           Integer.toString(si.getOwnedProcessorSubcomponents().size())) ;
   }
-  
+*/ 
+/*
   //Populates blackboard list: pok_runtime::Blackboard_Id_Type data
   // subcomponent's names will be blackboard names.
   private Map<DataAccess, String> buildBlackboardMap(
@@ -1519,7 +1580,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     
     return result ;
   }
-///*  
+*/  
+/*  
   private void generateDeploymentHeader(ProcessImplementation processImpl)
   {
     List<ThreadSubcomponent> bindedThreads =
@@ -1601,5 +1663,5 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       cDeploymentFileCode.addOutputNewline(sb.toString()) ;
     }
   }
-//*/  
+*/  
 }
