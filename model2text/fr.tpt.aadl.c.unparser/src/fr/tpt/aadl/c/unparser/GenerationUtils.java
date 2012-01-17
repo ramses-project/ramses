@@ -7,45 +7,12 @@ import java.util.Iterator ;
 import java.util.List ;
 import java.util.Collections ;
 import java.util.Set ;
+import java.lang.System ;
 
-import org.eclipse.emf.common.util.BasicEList ;
 import org.eclipse.emf.common.util.EList ;
-import org.eclipse.emf.common.util.Enumerator ;
-import org.osate.aadl2.CallSpecification ;
-import org.osate.aadl2.ComponentCategory ;
-import org.osate.aadl2.ComponentType ;
-import org.osate.aadl2.ContainedNamedElement ;
-import org.osate.aadl2.Data ;
-import org.osate.aadl2.DataAccess ;
-import org.osate.aadl2.DataClassifier ;
-import org.osate.aadl2.DataSubcomponent ;
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.Feature ;
-import org.osate.aadl2.ListValue ;
-import org.osate.aadl2.ModalPropertyValue ;
-import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.Parameter ;
-import org.osate.aadl2.Port ;
-import org.osate.aadl2.ProcessImplementation ;
-import org.osate.aadl2.ProcessSubcomponent ;
-import org.osate.aadl2.ProcessorSubcomponent ;
-import org.osate.aadl2.Property ;
-import org.osate.aadl2.PropertyAssociation ;
-import org.osate.aadl2.PropertyExpression ;
-import org.osate.aadl2.ReferenceValue ;
-import org.osate.aadl2.StringLiteral ;
-import org.osate.aadl2.Subcomponent ;
-import org.osate.aadl2.SubprogramCall ;
-import org.osate.aadl2.SubprogramCallSequence ;
-import org.osate.aadl2.SubprogramImplementation ;
-import org.osate.aadl2.SubprogramType ;
-import org.osate.aadl2.SystemImplementation ;
-import org.osate.aadl2.ThreadImplementation ;
-import org.osate.aadl2.ThreadSubcomponent ;
-import org.osate.aadl2.VirtualProcessorSubcomponent ;
-import org.osate.aadl2.instance.ComponentInstance ;
-import org.osate.aadl2.instance.InstanceReferenceValue ;
-import org.osate.aadl2.modelsupport.UnparseText ;
+
+import org.osate.aadl2.* ;
+
 import org.eclipse.xtext.nodemodel.INode ;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
 
@@ -58,9 +25,6 @@ import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 public class GenerationUtils
 {
- 
-  // public final static String BLACKBOARD_SUFFIX = "_id" ;
-  
   public final static String THREAD_SUFFIX = "_Job" ;
   
   // Give file name, in upper case or not and with or without extension.
@@ -129,6 +93,7 @@ public class GenerationUtils
     }
   }
 
+  @SuppressWarnings("unused")
   public static String getInitialValue(Element e)
   {
     StringBuilder initialization = new StringBuilder() ;
@@ -479,12 +444,6 @@ public class GenerationUtils
 
   public static String generateSectionMark()
   {
-    return "\n/******************************************************************************/\n" ;
+    return "\n/******************************************************************************/" ;
   }
-  
-/*  public static String generateBlackboardId(String blackboardName)
-  {
-    return blackboardName + BLACKBOARD_SUFFIX ;
-  }
-*/
 }

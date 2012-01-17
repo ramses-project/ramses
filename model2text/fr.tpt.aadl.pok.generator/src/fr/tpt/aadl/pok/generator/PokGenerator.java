@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
 import org.osate.aadl2.Element ;
+import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
@@ -18,8 +19,10 @@ import org.osate.aadl2.SystemImplementation ;
 import fr.tpt.aadl.c.unparser.AadlToCUnparser ;
 import fr.tpt.aadl.c.unparser.GenerationUtils ;
 import fr.tpt.aadl.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.pok.c.unparser.AadlToPokCUnparser ;
+import fr.tpt.aadl.pok.c.unparser.CpuProperties ;
+import fr.tpt.aadl.pok.c.unparser.PokProperties ;
 import fr.tpt.aadl.pok.makefile.generator.AadlToMakefileUnparser ;
-import fr.tpt.aadl.resources.manager.PredefinedPackagesManager ;
 
 import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
 import fr.tpt.aadl.toolsuite.support.generator.Generator ;
@@ -139,6 +142,20 @@ public class PokGenerator implements NamedPlugin, Generator
           new File(target_directory + "/generated-code") ;
     generatedCodeDirectory.mkdir() ;
 
+
+/******************************************************************************/
+/* TODO:
+ * 
+ * _ PokGenerator contains the iteration logic for pok code generation. So 
+ *     _ PokGenerator have to create directories where files will be saved
+ *       without knowing which implementation language is used.
+ *     _ Iterate AADL-- tree so as to give to AadlToCUnparser and AadlToPokCUnparser
+ *       the AADL objects to unparse, without PokGenerator knowing which
+ *       implementation language is used.
+ *     _ generate the makefile the same way as above.
+ */
+/******************************************************************************/
+    
     while(iter.hasNext())
     {
       Element elt = (Element) iter.next() ;
@@ -151,6 +168,10 @@ public class PokGenerator implements NamedPlugin, Generator
         File makeFileDir = new File(target_directory + "/generated-code") ;
         makefileGenerator.generateMakefile(si, makeFileDir) ;
 
+        AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser();
+        
+        PokProperties pokProp = new PokProperties();
+        
         for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
         {
           // create directory with the processor subcomponent name
@@ -161,7 +182,12 @@ public class PokGenerator implements NamedPlugin, Generator
           makefileGenerator.generateMakefile(ps, processorMakeFileDir) ;
           AadlToCUnparser generator_C = new AadlToCUnparser() ;
           generator_C.doProcess(ps) ;
-//          generator_C.saveGeneratedKernelFiles(processorMakeFileDir) ;
+          
+          CpuProperties cpuProp = new CpuProperties();
+          
+          cpuProp = pokCUnparser.process(ps, new File(processorMakeFileDir +
+                                                      "/kernel/"));
+          pokProp.putCpuProperties(ps.getName(), cpuProp) ;
         }
 
         for(ProcessSubcomponent ps : si.getOwnedProcessSubcomponents())
@@ -180,6 +206,13 @@ public class PokGenerator implements NamedPlugin, Generator
           generator_C.doProcess(ps) ;
           generator_C.saveGeneratedFilesContent(processDirectory) ;
           makefileGenerator.generateMakefile(ps, processDirectory) ;
+          
+          CpuProperties cpuProp = null ;
+          cpuProp = pokProp.getCpuProperties(bindingProcessorName);
+          
+          ProcessImplementation processImpl = (ProcessImplementation)
+                                               ps.getComponentImplementation() ;
+          pokCUnparser.process(processImpl, processDirectory,cpuProp);
         }
       }
     }  

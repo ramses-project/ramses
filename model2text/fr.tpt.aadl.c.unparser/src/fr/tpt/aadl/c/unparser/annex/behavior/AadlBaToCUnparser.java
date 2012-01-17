@@ -14,7 +14,6 @@ import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AccessType ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.Classifier ;
-import org.osate.aadl2.Comment ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.Element ;
@@ -1368,12 +1367,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         return DONE ;
       }
-
+/*
       public String caseComment(Comment object)
       {
         _cFileContent.addOutputNewline("// " + object.getBody()) ;
         return DONE ;
       }
+*/
     } ;
   }
 

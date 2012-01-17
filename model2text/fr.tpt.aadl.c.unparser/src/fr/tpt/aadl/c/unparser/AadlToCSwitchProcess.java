@@ -17,8 +17,7 @@ public class AadlToCSwitchProcess
 
   private UnparseText unparserContent ;
 
-  public AadlToCSwitchProcess(
-                              AadlToCUnparser s)
+  public AadlToCSwitchProcess(AadlToCUnparser s)
   {
     unparserContent = new UnparseText() ;
     setAadlSwitch(s) ;

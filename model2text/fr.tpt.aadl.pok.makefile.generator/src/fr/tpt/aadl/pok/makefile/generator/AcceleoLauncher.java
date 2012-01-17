@@ -27,6 +27,7 @@ import fr.tpt.aadl.pok.makefile.generator.GenerateMakefile ;
  *
  * @generated
  */
+@SuppressWarnings("all")
 public class AcceleoLauncher
 {
 

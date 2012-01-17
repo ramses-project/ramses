@@ -1,124 +1,396 @@
 package fr.tpt.aadl.pok.c.unparser;
 
+import java.io.BufferedWriter ;
+import java.io.File ;
+import java.io.FileWriter ;
+import java.io.IOException ;
 import java.util.ArrayList ;
-import java.util.HashMap ;
-import java.util.HashSet ;
 import java.util.List ;
-import java.util.Map ;
-import java.util.Set ;
 
 import org.eclipse.emf.common.util.EList ;
-import org.osate.aadl2.AccessCategory ;
-import org.osate.aadl2.AccessConnection ;
-import org.osate.aadl2.ConnectedElement ;
-import org.osate.aadl2.Connection ;
-import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.ProcessImplementation ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.Subcomponent ;
+import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
+import org.osate.aadl2.VirtualProcessorSubcomponent ;
 
-import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.c.unparser.AadlToCSwitchProcess ;
 import fr.tpt.aadl.c.unparser.GenerationUtils ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 public class AadlToPokCUnparser
 {
-
-}
-
-/*
-
-  // POK's Additional features flags.
-  private static boolean _consoleFound = false, _stdioFound = false,
-        _stdlibFound = false ;
-
-  // POK config stacks size.
-  private static long _requiredStackSize = 0 ;
-
-  // POK partition's main.c flags.
-  private boolean _hasToAddBlackboardHeader = false,
-        _hasToAddSamplingHeader = false ;
-
-protected AadlToCSwitchProcess cMainFileCode ;
-
-
-  public AadlToCUnparser()
+  private final static int DEFAULT_REQUIRED_STACK_SIZE = 16384 ;
+  
+  // TODO: factorization with ATL transformation into a naming class or enum. 
+  public final static String BLACKBOARD_AADL_TYPE = 
+                                             "pok_runtime::Blackboard_Id_Type" ;
+  
+  public CpuProperties process(ProcessorSubcomponent processor,
+                               File processorDirectory)
   {
-    cMainFileCode = new AadlToCSwitchProcess(this) ;
-    cMainFileCode.addOutputNewline("#include \"activity.h\"") ;
-    cMainFileCode.addOutputNewline("#include \"deployment.h\"") ;
-    // XXX Is there any condition for the generation of theses directives ?
-    cMainFileCode.addOutputNewline("#include <arinc653/types.h>") ;
-    cMainFileCode.addOutputNewline("#include <arinc653/process.h>") ;
-    cMainFileCode.addOutputNewline("#include <arinc653/partition.h>") ;
-
-
-
-private static Map<DataAccess, String> _blackboardNames ;
-
-      public String caseProcessorSubcomponent(ProcessorSubcomponent object)
-      {
-        generateDeploymentHeader(object) ;
-        return null ;
-      }
-
-public void saveGeneratedKernelFiles(File processorMakeFileDir)
-  {
-    File f = new File(processorMakeFileDir.getAbsolutePath() + "/kernel") ;
-
-    if(f.exists() == false)
-    {
-      f.mkdir() ;
-    }
-
-    FileWriter deployment_C ;
-    _deploymentHeaderCode.addOutputNewline("\n#endif\n") ;
-
+    CpuProperties result = new CpuProperties() ;
+    
+    // Generate deployment.h
+    AadlToCSwitchProcess deploymentHeaderCode = new AadlToCSwitchProcess(null) ;
+    generateDeploymentHeader(processor, deploymentHeaderCode, result) ;
+    
+    // Generate deployment.c
+    AadlToCSwitchProcess deploymentImplCode = new AadlToCSwitchProcess(null) ;
+    generateDeploymentImpl(processor, deploymentImplCode, result) ;
+    
     try
     {
-      deployment_C =
-            new FileWriter(processorMakeFileDir.getAbsolutePath() +
-                  "/kernel/deployment.c") ;
-      String addDeploymentHeader_C = getAdditionalHeader(_deploymentImplCode) ;
-      saveFile(deployment_C, addDeploymentHeader_C +
-                     _deploymentImplCode.getOutput()) ;
-      FileWriter deployment_H =
-            new FileWriter(processorMakeFileDir.getAbsolutePath() +
-                  "/kernel/deployment.h") ;
-      String addDeploymentHeader_H =
-            getAdditionalHeader(this._deploymentHeaderCode) ;
-      saveFile(deployment_H, this.DEPLOYMENT_HEADER + '\n' +
-                     addDeploymentHeader_H +
-                     _deploymentHeaderCode.getOutput()) ;
+      saveFile(processorDirectory, "deployment.h",
+               deploymentHeaderCode.getOutput()) ;
+      
+      saveFile(processorDirectory, "deployment.c",
+               deploymentImplCode.getOutput()) ;
     }
     catch(IOException e)
     {
-      // TODO Auto-generated catch block
+      // TODO : error message to handle.
+      e.printStackTrace() ;
+    }
+    return result ;
+  }
+  
+  public void process(ProcessImplementation process, File processDirectory,
+                      CpuProperties cpuProp)
+  {
+    PartitionProperties pp ;
+    
+    // Generate main.h
+    AadlToCSwitchProcess mainHeaderCode = new AadlToCSwitchProcess(null) ;
+    pp = generateMainHeader(process, mainHeaderCode, cpuProp) ;
+    
+    // Generate main.c
+    AadlToCSwitchProcess mainImplCode = new AadlToCSwitchProcess(null) ;
+    generateMainImpl(process, mainImplCode, pp) ;
+    
+    try
+    {
+      saveFile(processDirectory, "main.h",
+               mainHeaderCode.getOutput()) ;
+      
+      saveFile(processDirectory, "main.c",
+               mainImplCode.getOutput()) ;
+    }
+    catch(IOException e)
+    {
+      // TODO : error message to handle.
       e.printStackTrace() ;
     }
   }
-
-
-
-FROM save generated files
-
-      FileWriter mainFile_C =
-            new FileWriter(targetDirectory.getAbsolutePath() + "/main.c") ;
-      String addMainHeader_C = getAdditionalHeader(cMainFileCode) ;
-      saveFile(mainFile_C, addMainHeader_C + cMainFileCode.getOutput()) ;
-
-
-  void generateDeploymentHeader(ProcessorSubcomponent object)
+  
+  private void generateMainImpl(ProcessImplementation process,
+                                AadlToCSwitchProcess mainImplCode,
+                                PartitionProperties pp)
   {
+    StringBuilder sb = new StringBuilder() ;
+    
+    EList<ThreadSubcomponent> lthreads =
+                                         process.getOwnedThreadSubcomponents() ;
+    
+    // Files included.
+    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtils
+                                  .generateSectionTitle("INCLUSION")) ;
+    
+    mainImplCode.addOutputNewline("#include \"main.h\"") ;
+    mainImplCode.addOutputNewline("#include \"activity.h\"") ;
+    
+    //Generate global variables.
+    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtils
+          .generateSectionTitle("GLOBAL VARIABLES")) ;
+    
+    if(false == lthreads.isEmpty())
+    {
+      mainImplCode
+            .addOutputNewline("PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];") ;
+    }
+
+    if(false == pp.blackboardNames.isEmpty())
+    {
+      // Generate blackboards names array.
+      sb.append("char* pok_blackboards_names[POK_CONFIG_NB_BLACKBOARDS] = {") ;
+
+      for(String name : pp.blackboardNames)
+      {
+        sb.append('\"') ;
+        sb.append(name) ;
+        sb.append('\"') ;
+      }
+
+      sb.append("};") ;
+      mainImplCode.addOutputNewline(sb.toString()) ;
+      // Generate external variable (declared in deployment.c).
+      sb.setLength(0) ; // Reset string builder.
+
+      for(String name : pp.blackboardNames)
+      {
+        sb.append("extern BLACKBOARD_ID_TYPE ") ;
+        sb.append(name) ;
+        sb.append(";\n") ;
+      }
+
+      mainImplCode.addOutput(sb.toString()) ;
+      sb.setLength(0) ; // Reset string builder.
+    }
+
+    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtils
+          .generateSectionTitle("MAIN")) ;
+    mainImplCode.addOutputNewline("int main ()") ;
+    mainImplCode.addOutputNewline("{") ;
+    mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
+    mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
+    // For each declared thread
+    // Zero stands for ARINC's IDL thread.
+    int threadIndex = 1 ;
+
+    for(ThreadSubcomponent t : lthreads)
+    {
+      ThreadImplementation timpl =
+            (ThreadImplementation) t.getComponentImplementation() ;
+      mainImplCode.addOutput("  tattr.ENTRY_POINT = ") ;
+      mainImplCode.addOutput(GenerationUtils
+            .getGenerationCIdentifier(timpl.getQualifiedName())) ;
+      mainImplCode.addOutputNewline(GenerationUtils.THREAD_SUFFIX + ';') ;
+      String period = null ;
+      String deadline = null ;
+      String timeCapacity = null ;
+
+      try
+      {
+        long value = PropertyUtils.getIntValue(t, "Period") ;
+        period = Long.toString(value) ;
+      }
+      catch(Exception e)
+      {
+        period = null ;
+      }
+
+      // If period is not set, don't generate.
+      if(period != null)
+      {
+        mainImplCode.addOutput("  tattr.PERIOD = ") ;
+        mainImplCode.addOutputNewline(period + ';') ;
+      }
+
+      try
+      {
+        long value = PropertyUtils.getIntValue(t, "Deadline") ;
+        deadline = Long.toString(value) ;
+      }
+      catch(Exception e)
+      {
+        // If deadline is not set, use period instead.
+        deadline = period ;
+      }
+
+      // If period and deadline are not set , don't generate.
+      if(deadline != null)
+      {
+        mainImplCode.addOutput("  tattr.DEADLINE = ") ;
+        mainImplCode.addOutputNewline(deadline + ';') ;
+      }
+
+      try
+      {
+        float value =
+              PropertyUtils.getMaxRangeValue(t, "Compute_Execution_Time") ;
+        timeCapacity = Integer.toString((int) value) ;
+      }
+      catch(Exception e)
+      {
+        timeCapacity = null ;
+      }
+
+      // If compute execution time is not set, don't generate.
+      if(timeCapacity != null)
+      {
+        mainImplCode.addOutput("  tattr.TIME_CAPACITY = ") ;
+        mainImplCode.addOutputNewline(timeCapacity + ';') ;
+      }
+
+      mainImplCode
+            .addOutput("  CREATE_PROCESS (&(tattr), &(arinc_threads[") ;
+      mainImplCode.addOutput(Integer.toString(threadIndex)) ;
+      mainImplCode.addOutputNewline("]), &(ret));") ;
+      threadIndex++ ;
+    }
+
+    // For each blackboard
+    for(String name : pp.blackboardNames)
+    {
+      mainImplCode.addOutput("  CREATE_BLACKBOARD (\"") ;
+      mainImplCode.addOutput(name) ;
+      mainImplCode.addOutput("\", sizeof (int), &(") ;
+      mainImplCode.addOutput(name);
+      mainImplCode.addOutputNewline("), &(ret));") ;
+    }
+
+    mainImplCode
+          .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
+    mainImplCode.addOutputNewline("  return (0);") ;
+    mainImplCode.addOutputNewline("}") ;
+    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
+  }
+
+  private void findCommunicationMechanism(ProcessImplementation process,
+                                          PartitionProperties pp)
+  {
+    EList<Subcomponent> subcmpts = process.getAllSubcomponents() ;
+    
+    for(Subcomponent s : subcmpts)
+    {
+      if(s instanceof DataSubcomponent)
+      {
+        if(s.getClassifier().getQualifiedName()
+                                        .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
+        {
+          pp.blackboardNames.add(s.getName()) ;
+        }
+        // TODO: else buffers, samples, etc.
+      }
+    }
+  }
+  
+  private PartitionProperties generateMainHeader(ProcessImplementation process,
+                                            AadlToCSwitchProcess mainHeaderCode,
+                                            CpuProperties cpuProp)
+  {
+    PartitionProperties result = new PartitionProperties() ;
+    
+    findCommunicationMechanism(process, result) ;
+    
+    List<ThreadSubcomponent> bindedThreads =
+                                         process.getOwnedThreadSubcomponents() ;
+    
+    String guard = GenerationUtils.generateHeaderInclusionGuard("main.h") ;
+    mainHeaderCode.addOutputNewline(guard) ;
+    
+    /**** #DEFINE ****/
+
+    mainHeaderCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
+
+    if(cpuProp.consoleFound == true)
+    {
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
+    }
+
+    if(cpuProp.stdioFound == true)
+    {
+      mainHeaderCode
+            .addOutputNewline("#define POK_NEEDS_LIBC_STDIO 1") ;
+    }
+
+    if(cpuProp.stdlibFound == true)
+    {
+      mainHeaderCode
+            .addOutputNewline("#define POK_NEEDS_LIBC_STDLIB 1") ;
+    }
+    
+    mainHeaderCode
+          .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
+                Integer.toString(bindedThreads.size() + 1)) ;
+    
+    int blackboardNeeded = (result.blackboardNames.isEmpty()) ? 0 : 1 ;
+
+    if(false == result.blackboardNames.isEmpty())
+    {
+      mainHeaderCode
+            .addOutputNewline("#define POK_CONFIG_NB_BLACKBOARDS " +
+                  result.blackboardNames.size()) ;
+      mainHeaderCode
+            .addOutputNewline("#define POK_NEEDS_ARINC653_BLACKBOARD 1") ;
+    }
+
+    mainHeaderCode
+          .addOutputNewline("#define POK_NEEDS_BLACKBOARDS " + blackboardNeeded) ;
+
+    if(cpuProp.requiredStackSize != -1)
+    {
+      mainHeaderCode
+            .addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
+                  Long.toString(cpuProp.requiredStackSize)) ;
+    }
+
+    // XXX Is there any condition for the generation of theses directives ?
+    mainHeaderCode
+          .addOutputNewline("#define POK_NEEDS_ARINC653_TIME 1") ;
+    mainHeaderCode
+          .addOutputNewline("#define POK_NEEDS_ARINC653_PROCESS 1") ;
+    mainHeaderCode
+          .addOutputNewline("#define POK_NEEDS_ARINC653_PARTITION 1") ;
+
+    // XXX Is there any condition for the generation of POK_NEEDS_MIDDLEWARE ?
+    mainHeaderCode
+          .addOutputNewline("#define POK_NEEDS_MIDDLEWARE 1") ;
+    
+    /**** "#INCLUDE ****/
+    
+    // always files included:
+    mainHeaderCode.addOutputNewline("#include <arinc653/types.h>");
+    mainHeaderCode.addOutputNewline("#include <arinc653/process.h>");
+    mainHeaderCode.addOutputNewline("#include <arinc653/partition.h>");
+    
+    // conditioned files included:
+    
+    if(false == result.blackboardNames.isEmpty())
+    {
+      mainHeaderCode.addOutputNewline("#include <arinc653/blackboard.h>");
+    }
+    
+    mainHeaderCode.addOutputNewline("#endif") ;
+    
+    return result ;
+  }
+
+  private void saveFile(File directory,
+                        String fileName,
+                        String content) throws IOException
+  {
+    BufferedWriter output ;
+    
+    FileWriter file =
+          new FileWriter(directory.getAbsolutePath() + "/" + fileName) ;
+    
+    output = new BufferedWriter(file) ;
+    
+    output.write(content) ;
+    
+    output.close() ;
+  }
+  
+  private void generateDeploymentImpl(ProcessorSubcomponent processor,
+                                      AadlToCSwitchProcess deploymentImplCode,
+                                      CpuProperties cpuProp)
+  {
+    deploymentImplCode.addOutputNewline("#include <arinc653/types.h>") ;
+    deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
+  }
+  
+  private void generateDeploymentHeader(ProcessorSubcomponent processor,
+                                      AadlToCSwitchProcess deploymentHeaderCode,
+                                      CpuProperties cpuProp)
+  {
+    String guard = GenerationUtils.generateHeaderInclusionGuard("deployment.h");
+    
+    deploymentHeaderCode.addOutputNewline(guard) ;
+    
     // POK::Additional_Features => (libc_stdio,libc_stdlib,console);
     // this property is associated to virtual processors
     List<VirtualProcessorSubcomponent> bindedVPS =
           new ArrayList<VirtualProcessorSubcomponent>() ;
 
-    for(Subcomponent sub : object.getComponentImplementation()
+    for(Subcomponent sub : processor.getComponentImplementation()
           .getOwnedSubcomponents())
       if(sub instanceof VirtualProcessorSubcomponent)
       {
@@ -134,37 +406,43 @@ FROM save generated files
         additionalFeatures =
               PropertyUtils.getStringListValue(vps, "Additional_Features") ;
 
-        if(_consoleFound == false)
+//        if(pokProp.consoleFound == false)
         {
           for(String s : additionalFeatures)
+          {
             if(s.equalsIgnoreCase("console"))
             {
               // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
-              cDeploymentHeaderFileCode
+              deploymentHeaderCode
                     .addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
-              _consoleFound = true ;
+              cpuProp.consoleFound = true ;
               break ;
-            }
+            } 
+          }
         }
 
-        if(_stdioFound == false)
+//        if(_stdioFound == false)
         {
           for(String s : additionalFeatures)
+          {
             if(s.equalsIgnoreCase("libc_stdio"))
             {
-              _stdioFound = true ;
+              cpuProp.stdioFound = true ;
               break ;
             }
+          }
         }
 
-        if(_stdlibFound == false)
+//        if(_stdlibFound == false)
         {
           for(String s : additionalFeatures)
+          {
             if(s.equalsIgnoreCase("libc_stdlib"))
             {
-              _stdlibFound = true ;
+              cpuProp.stdlibFound = true ;
               break ;
             }
+          }
         }
       }
       catch(Exception e)
@@ -172,35 +450,35 @@ FROM save generated files
       }
     }
     
-    // TODO: the integer ID in this macro must be set carefully to respect the routing table
-    // defined in deployment.c files in the generated code for a partition
+    // TODO: the integer ID in this macro must be set carefully to respect the
+    // routing table defined in deployment.c files in the generated code for a
+    // partition.
     int id =
-          ((SystemImplementation) object.eContainer())
-                .getOwnedProcessorSubcomponents().indexOf(object) ;
-    cDeploymentHeaderFileCode
+          ((SystemImplementation) processor.eContainer())
+                .getOwnedProcessorSubcomponents().indexOf(processor) ;
+    deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_LOCAL_NODE " +
                 Integer.toString(id)) ;
     // POK_GENERATED_CODE 1 always true in our usage context
-    cDeploymentHeaderFileCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
-    //Hum, ici je dirai que tu dois mettre ceci d�s que tu as des t�ches p�riodiques ou ordonnanceurs RR ou du statique.
-    //L'endroit o� il g�n�re cette macro n'est pas encore super clair pour moi dans ocarina ...
-    cDeploymentHeaderFileCode.addOutputNewline("#define POK_NEEDS_GETTICK 1") ;
+    deploymentHeaderCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
+    
+    deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_GETTICK 1") ;
     // POK_NEEDS_THREADS 1 always true in our usage context.
-    cDeploymentHeaderFileCode.addOutputNewline("#define POK_NEEDS_THREADS 1") ;
+    deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_THREADS 1") ;
 
     if(bindedVPS.size() > 0)
     {
-      cDeploymentHeaderFileCode
+      deploymentHeaderCode
             .addOutputNewline("#define POK_NEEDS_PARTITIONS 1") ;
     }
 
-    cDeploymentHeaderFileCode.addOutputNewline("#define POK_NEEDS_SCHED 1") ;
-    //  The maccro POK_CONFIG_NB_PARTITIONS indicates the amount of partitions in
-    //   the current system.It corresponds to the amount of process components in/
-    //  the system.
+    deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED 1") ;
+    // The maccro POK_CONFIG_NB_PARTITIONS indicates the amount of partitions in
+    // the current system.It corresponds to the amount of process components in
+    // the system.
     List<ProcessSubcomponent> bindedProcess =
-          GenerationUtils.getBindedProcesses(object) ;
-    cDeploymentHeaderFileCode
+          GenerationUtils.getBindedProcesses(processor) ;
+    deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_NB_PARTITIONS " +
                 Integer.toString(bindedVPS.size())) ;
     List<ThreadSubcomponent> bindedThreads =
@@ -219,28 +497,28 @@ FROM save generated files
     //  The maccro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
     //  the kernel.It comprises the tasks for the partition and the main task of 
     //  each partition that initialize all ressources.
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
                 Integer.toString(2 + bindedProcess.size() +
                       bindedThreads.size())) ;
     //  The maccro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of 
     //  threads in each partition we also add an additional process that 
     //  initialize all partition's entities (communication, threads, ...)
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode
           .addOutput("#define POK_CONFIG_PARTITIONS_NTHREADS {") ;
 
     for(Integer i : threadNumberPerPartition)
     {
-      cDeploymentHeaderFileCode.addOutput(Integer.toString(i + 1)) ;
+      deploymentHeaderCode.addOutput(Integer.toString(i + 1)) ;
 
       if(threadNumberPerPartition.indexOf(i) != (threadNumberPerPartition
             .size() - 1))
       {
-        cDeploymentHeaderFileCode.addOutput(",") ;
+        deploymentHeaderCode.addOutput(",") ;
       }
     }
 
-    cDeploymentHeaderFileCode.addOutputNewline("}") ;
+    deploymentHeaderCode.addOutputNewline("}") ;
 
     try
     {
@@ -253,7 +531,7 @@ FROM save generated files
         if(requiredScheduler.equalsIgnoreCase("RR") && foundRR == false)
         {
           foundRR = true ;
-          cDeploymentHeaderFileCode
+          deploymentHeaderCode
                 .addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
         }
       }
@@ -262,8 +540,9 @@ FROM save generated files
     {
     }
 
-    // TODO: define POK_CONFIG_PARTITIONS_SCHEDULER: sched algo associated to each partition
-    cDeploymentHeaderFileCode
+    // TODO: define POK_CONFIG_PARTITIONS_SCHEDULER: sched algo associated to 
+    // each partition
+    deploymentHeaderCode
           .addOutput("#define POK_CONFIG_PARTITIONS_SCHEDULER {") ;
 
     try
@@ -274,12 +553,12 @@ FROM save generated files
 
         if(requiredScheduler.equalsIgnoreCase("RR"))
         {
-          cDeploymentHeaderFileCode.addOutput("POK_SCHED_RR") ;
+          deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
         }
 
         if(bindedVPS.indexOf(vps) != bindedVPS.size() - 1)
         {
-          cDeploymentHeaderFileCode.addOutput(",") ;
+          deploymentHeaderCode.addOutput(",") ;
         }
       }
     }
@@ -287,13 +566,13 @@ FROM save generated files
     {
     }
 
-    cDeploymentHeaderFileCode.addOutputNewline("}") ;
+    deploymentHeaderCode.addOutputNewline("}") ;
     // TODO: define lock objects for distributed use-case
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode
           .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_NB_LOCKOBJECTS 1") ;
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS {1}") ;
     //  The maccro POK_CONFIG_PARTTITIONS_SIZE indicates the required amount of 
     //  memory for each partition.This value was deduced from the property 
@@ -313,65 +592,64 @@ FROM save generated files
     {
     }
 
-    cDeploymentHeaderFileCode.addOutput("#define POK_CONFIG_PARTITIONS_SIZE {") ;
+    deploymentHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_SIZE {") ;
 
     for(Long l : memorySizePerPartition)
     {
-      cDeploymentHeaderFileCode.addOutput(Long.toString(l)) ;
+      deploymentHeaderCode.addOutput(Long.toString(l)) ;
 
       if(memorySizePerPartition.indexOf(l) != memorySizePerPartition.size() - 1)
       {
-        cDeploymentHeaderFileCode.addOutput(",") ;
+        deploymentHeaderCode.addOutput(",") ;
       }
     }
 
-    cDeploymentHeaderFileCode.addOutputNewline("}") ;
+    deploymentHeaderCode.addOutputNewline("}") ;
     List<Long> slotPerPartition =
-          PropertyUtils.getIntListValue(object, "Slots") ;
+          PropertyUtils.getIntListValue(processor, "Slots") ;
     // POK_CONFIG_SCHEDULING_SLOTS extracted from POK::Slots => (500 ms);
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode
           .addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
 
     for(Long l : slotPerPartition)
     {
-      cDeploymentHeaderFileCode.addOutput(Long.toString(l)) ;
+      deploymentHeaderCode.addOutput(Long.toString(l)) ;
 
       if(slotPerPartition.indexOf(l) != slotPerPartition.size() - 1)
       {
-        cDeploymentHeaderFileCode.addOutput(",") ;
+        deploymentHeaderCode.addOutput(",") ;
       }
     }
 
-    cDeploymentHeaderFileCode.addOutputNewline("}") ;
-    // Toujours d�fini � partir du proc impl POK::Slots_Allocation => ( reference (part1));
+    deploymentHeaderCode.addOutputNewline("}") ;
+    
     List<Subcomponent> slotsAllocation =
-          PropertyUtils.getSubcomponentList(object, "Slots_Allocation") ;
-    cDeploymentHeaderFileCode
+          PropertyUtils.getSubcomponentList(processor, "Slots_Allocation") ;
+    deploymentHeaderCode
           .addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
 
     for(Subcomponent sAllocation : slotsAllocation)
     {
       int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
-      cDeploymentHeaderFileCode.addOutput(Integer
+      deploymentHeaderCode.addOutput(Integer
             .toString(referencedComponentId)) ;
 
       if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
       {
-        cDeploymentHeaderFileCode.addOutput(",") ;
+        deploymentHeaderCode.addOutput(",") ;
       }
     }
 
-    cDeploymentHeaderFileCode.addOutputNewline("}") ;
-    // la pp slots de POK peut contenir une liste ... donc il faut compter
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode.addOutputNewline("}") ;
+    
+    deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
                 Integer.toString(slotPerPartition.size())) ;
-
-    // pp POK::Major_Frame => 1000 ms; dans proc impl
+    
     try
     {
-      Long majorFrame = PropertyUtils.getIntValue(object, "Major_Frame") ;
-      cDeploymentHeaderFileCode
+      Long majorFrame = PropertyUtils.getIntValue(processor, "Major_Frame") ;
+      deploymentHeaderCode
             .addOutputNewline("#define POK_CONFIG_SCHEDULING_MAJOR_FRAME " +
                   Long.toString(majorFrame)) ;
     }
@@ -390,352 +668,32 @@ FROM save generated files
       {
         try
         {
-          _requiredStackSize +=
+          cpuProp.requiredStackSize +=
                 PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
         }
         catch(Exception e)
         {
-          _requiredStackSize += 16384 ;
+          cpuProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
         }
       }
     }
 
-    cDeploymentHeaderFileCode
+    deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
-                Long.toString(_requiredStackSize)) ;
+                Long.toString(cpuProp.requiredStackSize)) ;
     // TODO: define buses for distributed use-case
-    cDeploymentHeaderFileCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0") ;
-    cDeploymentHeaderFileCode.addOutputNewline("typedef enum") ;
-    cDeploymentHeaderFileCode.addOutputNewline("{") ;
-    cDeploymentHeaderFileCode.incrementIndent() ;
-    cDeploymentHeaderFileCode.addOutputNewline("invalid_bus = 0") ;
-    cDeploymentHeaderFileCode.decrementIndent() ;
-    cDeploymentHeaderFileCode.addOutputNewline("} pok_bus_identifier_t;") ;
-    // enum�ration de la liste de "node"
-    SystemImplementation si = (SystemImplementation) object.eContainer() ;
-    cDeploymentHeaderFileCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
+    deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0") ;
+    deploymentHeaderCode.addOutputNewline("typedef enum") ;
+    deploymentHeaderCode.addOutputNewline("{") ;
+    deploymentHeaderCode.incrementIndent() ;
+    deploymentHeaderCode.addOutputNewline("invalid_bus = 0") ;
+    deploymentHeaderCode.decrementIndent() ;
+    deploymentHeaderCode.addOutputNewline("} pok_bus_identifier_t;") ;
+    
+    SystemImplementation si = (SystemImplementation) processor.eContainer() ;
+    deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
           Integer.toString(si.getOwnedProcessorSubcomponents().size())) ;
+    
+    deploymentHeaderCode.addOutputNewline("#endif");
   }
-
-
-  //Populates blackboard list: pok_runtime::Blackboard_Id_Type data
-  // subcomponent's names will be blackboard names.
-  private Map<DataAccess, String> buildBlackboardMap(
-                                              ProcessImplementation processImpl)
-  {
-    Map<DataAccess, String> result = new HashMap<DataAccess, String>() ;
-    
-    EList<Subcomponent> subcmpts = processImpl.getAllSubcomponents() ;
-    
-    List<String> blackboardNames = new ArrayList<String>() ;
-    
-    // Fetches blackboard names.
-    for(Subcomponent s : subcmpts)
-    {
-      if(s instanceof DataSubcomponent &&
-            s.getClassifier().getQualifiedName()
-                  .equalsIgnoreCase("pok_runtime::Blackboard_Id_Type"))
-      {
-        blackboardNames.add(s.getName()) ;
-      }
-    }
-    
-    // Binds blackboard names with DataAcess objects. See process' connections.
-    
-    for(Connection connect : processImpl.getAllConnections())
-    {
-      if (connect instanceof AccessConnection &&
-         ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
-      {
-        DataSubcomponent destination =  (DataSubcomponent) connect.
-                                                           getAllDestination() ;
-        
-        if(AadlBaUtils.contains(destination.getName(), blackboardNames))
-        {
-          ConnectedElement source = (ConnectedElement) connect.getSource() ;
-          
-          DataAccess da = (DataAccess) source.getConnectionEnd() ;
-          
-          result.put(da, destination.getName()) ;
-        }
-      }
-    }
-    
-    return result ;
-  }
-
-
-
-  private final String TYPE_HEADER = "#ifndef __GENERATED_GTYPES_H__\n"
-        + "#define __GENERATED_GTYPES_H__\n" ;
-
-  private final String SUBPROGRAM_HEADER =
-        "#ifndef __GENERATED_SUBPROGRAMS_H__\n"
-              + "#define __GENERATED_SUBPROGRAMS_H__\n"
-              + "#include \"gtypes.h\"\n" ;
-
-
-
-  Main.c :
-  
-public String caseProcessImplementation(ProcessImplementation object)
-      {
-       
-        StringBuilder sb = new StringBuilder() ;
-        
-        // And set some static flags.
-        // DEBUG
-        _blackboardNames = buildBlackboardMap(object) ;
-        
-        processEList(object.getOwnedThreadSubcomponents()) ;
-        EList<ThreadSubcomponent> lthreads =
-              object.getOwnedThreadSubcomponents() ;
-        // *** Generate deployment.h ***
-        generateDeploymentHeader(object) ;
-        
-        // XXX performance to be improved.
-        // Removes duplicates.
-        Set<String> blackboardNames = new HashSet<String>(_blackboardNames.values());
-
-        // *** Generate main.c ***
-
-        // Adds the header files.
-        if(true == _hasToAddBlackboardHeader)
-        {
-          cMainFileCode.addOutputNewline("#include <arinc653/blackboard.h>") ;
-        }
-
-        if(true == _hasToAddSamplingHeader)
-        {
-          cMainFileCode.addOutputNewline("#include <arinc653/sampling.h>") ;
-        }
-
-        //Generate global variables
-        cMainFileCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
-        cMainFileCode.addOutputNewline(GenerationUtils
-              .generateSectionTitle("GLOBAL VARIABLES")) ;
-
-        if(false == lthreads.isEmpty())
-        {
-          cMainFileCode
-                .addOutputNewline("PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];") ;
-        }
-
-        if(false == blackboardNames.isEmpty())
-        {
-          // Generate blackboards names array.
-          sb.append("char* pok_blackboards_names[POK_CONFIG_NB_BLACKBOARDS] = {") ;
-
-          for(String name : blackboardNames)
-          {
-            sb.append('\"') ;
-            sb.append(name) ;
-            sb.append('\"') ;
-          }
-
-          sb.append("};") ;
-          cMainFileCode.addOutputNewline(sb.toString()) ;
-          // Generate external variable (declared in deployment.c).
-          sb.setLength(0) ; // Reset string builder.
-
-          for(String name : blackboardNames)
-          {
-            sb.append("extern BLACKBOARD_ID_TYPE ") ;
-            sb.append(GenerationUtils.generateBlackboardId(name)) ;
-            sb.append(";\n") ;
-          }
-
-          cMainFileCode.addOutput(sb.toString()) ;
-          sb.setLength(0) ; // Reset string builder.
-        }
-
-        cMainFileCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
-        cMainFileCode.addOutputNewline(GenerationUtils
-              .generateSectionTitle("MAIN")) ;
-        cMainFileCode.addOutputNewline("int main ()") ;
-        cMainFileCode.addOutputNewline("{") ;
-        cMainFileCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
-        cMainFileCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
-        // For each declared thread
-        // Zero stands for ARINC's IDL thread.
-        int threadIndex = 1 ;
-
-        for(ThreadSubcomponent t : lthreads)
-        {
-          ThreadImplementation timpl =
-                (ThreadImplementation) t.getComponentImplementation() ;
-          cMainFileCode.addOutput("  tattr.ENTRY_POINT = ") ;
-          cMainFileCode.addOutput(GenerationUtils
-                .getGenerationCIdentifier(timpl.getQualifiedName())) ;
-          cMainFileCode.addOutputNewline(THREAD_SUFFIX + ';') ;
-          String period = null ;
-          String deadline = null ;
-          String timeCapacity = null ;
-
-          try
-          {
-            long value = PropertyUtils.getIntValue(t, "Period") ;
-            period = Long.toString(value) ;
-          }
-          catch(Exception e)
-          {
-            period = null ;
-          }
-
-          // If period is not set, don't generate.
-          if(period != null)
-          {
-            cMainFileCode.addOutput("  tattr.PERIOD = ") ;
-            cMainFileCode.addOutputNewline(period + ';') ;
-          }
-
-          try
-          {
-            long value = PropertyUtils.getIntValue(t, "Deadline") ;
-            deadline = Long.toString(value) ;
-          }
-          catch(Exception e)
-          {
-            // If deadline is not set, use period instead.
-            deadline = period ;
-          }
-
-          // If period and deadline are not set , don't generate.
-          if(deadline != null)
-          {
-            cMainFileCode.addOutput("  tattr.DEADLINE = ") ;
-            cMainFileCode.addOutputNewline(deadline + ';') ;
-          }
-
-          try
-          {
-            float value =
-                  PropertyUtils.getMaxRangeValue(t, "Compute_Execution_Time") ;
-            timeCapacity = Integer.toString((int) value) ;
-          }
-          catch(Exception e)
-          {
-            timeCapacity = null ;
-          }
-
-          // If compute execution time is not set, don't generate.
-          if(timeCapacity != null)
-          {
-            cMainFileCode.addOutput("  tattr.TIME_CAPACITY = ") ;
-            cMainFileCode.addOutputNewline(timeCapacity + ';') ;
-          }
-
-          cMainFileCode
-                .addOutput("  CREATE_PROCESS (&(tattr), &(arinc_threads[") ;
-          cMainFileCode.addOutput(Integer.toString(threadIndex)) ;
-          cMainFileCode.addOutputNewline("]), &(ret));") ;
-          threadIndex++ ;
-        }
-
-        // For each blackboard
-        for(String name : blackboardNames)
-        {
-          cMainFileCode.addOutput("  CREATE_BLACKBOARD (\"") ;
-          cMainFileCode.addOutput(name) ;
-          cMainFileCode.addOutput("\", sizeof (int), &(") ;
-          cMainFileCode.addOutput(GenerationUtils.generateBlackboardId(name));
-          cMainFileCode.addOutputNewline("), &(ret));") ;
-        }
-
-        cMainFileCode
-              .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
-        cMainFileCode.addOutputNewline("  return (0);") ;
-        cMainFileCode.addOutputNewline("}") ;
-        cMainFileCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
-        
-        
-        return null ;
-      }
-
-
-
-  private void generateDeploymentHeader(ProcessImplementation processImpl)
-  {
-    List<ThreadSubcomponent> bindedThreads =
-          processImpl.getOwnedThreadSubcomponents() ;
-    // *** generate deployment.h ****
-    cDeploymentHeaderFileCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
-
-    if(_consoleFound == true)
-    {
-      cDeploymentHeaderFileCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
-    }
-
-    if(_stdioFound == true)
-    {
-      cDeploymentHeaderFileCode
-            .addOutputNewline("#define POK_NEEDS_LIBC_STDIO 1") ;
-    }
-
-    if(_stdlibFound == true)
-    {
-      cDeploymentHeaderFileCode
-            .addOutputNewline("#define POK_NEEDS_LIBC_STDLIB 1") ;
-    }
-
-    cDeploymentHeaderFileCode
-          .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
-                Integer.toString(bindedThreads.size() + 1)) ;
-    
-    // XXX performance to be improved.
-    // Removes duplicates.
-    Set<String> blackboardNames = new HashSet<String>(_blackboardNames.values());
-    
-    int blackboardNeeded = (blackboardNames.isEmpty()) ? 0 : 1 ;
-
-    if(false == blackboardNames.isEmpty())
-    {
-      cDeploymentHeaderFileCode
-            .addOutputNewline("#define POK_CONFIG_NB_BLACKBOARDS " +
-                  blackboardNames.size()) ;
-      cDeploymentHeaderFileCode
-            .addOutputNewline("#define POK_NEEDS_ARINC653_BLACKBOARD 1") ;
-      _hasToAddBlackboardHeader = true ;
-    }
-
-    cDeploymentHeaderFileCode
-          .addOutputNewline("#define POK_NEEDS_BLACKBOARDS " + blackboardNeeded) ;
-
-    if(_requiredStackSize != 0)
-    {
-      cDeploymentHeaderFileCode
-            .addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
-                  Long.toString(_requiredStackSize)) ;
-    }
-
-    // XXX Is there any condition for the generation of theses directives ?
-    cDeploymentHeaderFileCode
-          .addOutputNewline("#define POK_NEEDS_ARINC653_TIME 1") ;
-    cDeploymentHeaderFileCode
-          .addOutputNewline("#define POK_NEEDS_ARINC653_PROCESS 1") ;
-    cDeploymentHeaderFileCode
-          .addOutputNewline("#define POK_NEEDS_ARINC653_PARTITION 1") ;
-
-    // XXX Is there any condition for the generation of POK_NEEDS_MIDDLEWARE ?
-    cDeploymentHeaderFileCode
-          .addOutputNewline("#define POK_NEEDS_MIDDLEWARE 1") ;
-
-    // *** Generate deployment.c ***
-    if(false == blackboardNames.isEmpty())
-    {
-      StringBuilder sb = new StringBuilder() ;
-
-      for(String name : blackboardNames)
-      {
-        sb.append("uint8_t ") ;
-        sb.append(GenerationUtils.generateBlackboardId(name)) ;
-        sb.append(';') ;
-      }
-
-      cDeploymentFileCode.addOutputNewline(sb.toString()) ;
-    }
-  }
-
-
-
-*/
+}
