@@ -676,12 +676,15 @@ public class PropertyUtils
   }
 
   public static List<Long> getIntListValue(ProcessorSubcomponent object,
-                                           String propertyName)
+                                           String propertyName) throws Exception
   {
     List<Long> res = new ArrayList<Long>() ;
     PropertyAssociation pa = findProperty(propertyName, object) ;
 
-    if(pa != null)
+    if(pa == null)
+        throw new Exception("Could not find property "+
+      		  propertyName+" on "+ object.getName() + " component.");
+    else
     {
       Property p = pa.getProperty() ;
 
@@ -710,7 +713,6 @@ public class PropertyUtils
         }
       }
     }
-
     return res ;
   }
 
