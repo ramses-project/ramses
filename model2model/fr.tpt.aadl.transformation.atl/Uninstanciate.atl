@@ -95,6 +95,17 @@ rule System_Instance {
 		realization : AADLBA!Realization (implemented <- type)
 }
 
+rule Memory_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #memory)
+	to
+		sub : AADLBA!MemorySubcomponent(
+			name <- c.name.debug('memory instance'),
+			memorySubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+}
+
 rule Bus_Instance {
 	from
 		c : AADLI!ComponentInstance (c.category = #bus)

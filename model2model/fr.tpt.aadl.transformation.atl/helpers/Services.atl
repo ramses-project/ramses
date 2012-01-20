@@ -22,3 +22,14 @@ helper context AADLBA!ComponentImplementation def: getComponentType(): AADLBA!Co
 
 helper def:getProgrammationLanguageIdentifier(identifier:String): String =
 	identifier.replaceAll('.','_').replaceAll('::','__');
+
+helper context AADLI!Port def : isThreadPort() : Boolean =
+	self.eContainer().oclIsTypeOf(AADLBA!ThreadType)
+;
+
+helper context AADLI!Port def : isProcessPort() : Boolean =
+	self.eContainer().oclIsTypeOf(AADLBA!ProcessType)
+;
+
+helper context AADLI!Port def : isDataOrEventDataPort() : Boolean =
+	(self.oclIsTypeOf(AADLI!EventDataPort) or self.oclIsTypeOf(AADLI!DataPort)); 

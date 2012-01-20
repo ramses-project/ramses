@@ -1,23 +1,23 @@
 package pok_runtime
 public
 
-data Blackboard_Name_Type
-properties
-  Programming_Properties::Source_Name => "BLACKBOARD_NAME_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
-end Blackboard_Name_Type;
-
-data Blackboard_Id_Type
-properties
-  Programming_Properties::Source_Name => "BLACKBOARD_ID_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
-end Blackboard_Id_Type;
+--------------------------------------------
+--------------------------------------------
+--               DATA TYPES               --
+--------------------------------------------
+--------------------------------------------
 
 data Message_Size_Type
 properties
   Programming_Properties::Source_Name => "MESSAGE_SIZE_TYPE";
   Programming_Properties::Source_Text => ("arinc653/types.h");
 end Message_Size_Type;
+
+data Message_Range_Type
+properties
+  Programming_Properties::Source_Name => "MESSAGE_RANGE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/types.h");
+end Message_Range_Type;
 
 data Return_Code_Type
 properties
@@ -36,6 +36,207 @@ properties
   Programming_Properties::Source_Name => "SYSTEM_TIME_TYPE";
   Programming_Properties::Source_Text => ("arinc653/types.h");
 end System_Time_Type;
+
+data Port_Direction_Type
+properties
+  Programming_Properties::Source_Name => "PORT_DIRECTION_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/types.h");
+end Port_Direction_Type;
+
+data Queuing_Discipline_Type
+properties
+  Programming_Properties::Source_Name => "QUEUING_DISCIPLINE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/types.h");
+end Queuing_Discipline_Type;
+
+--------------------------------------------
+--------------------------------------------
+--             QUEUEING PORT              --
+--------------------------------------------
+--------------------------------------------
+
+data Queuing_Port_Name_Type
+properties
+  Programming_Properties::Source_Name => "NAME_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Queuing_Port_Name_Type;
+
+data Queuing_Port_Id_Type
+properties
+  Programming_Properties::Source_Name => "APEX_INTEGER";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Queuing_Port_Id_Type;
+
+data Queuing_Port_Status_Type
+properties
+  Programming_Properties::Source_Name => "QUEUING_PORT_STATUS_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Queuing_Port_Status_Type;
+
+subprogram Create_Queuing_Port
+features
+  QUEUING_PORT_NAME: in parameter QUEUING_PORT_NAME_TYPE;
+  MAX_MESSAGE_SIZE: in parameter MESSAGE_SIZE_TYPE;
+  MAX_NB_MESSAGE: in parameter MESSAGE_RANGE_TYPE;
+  PORT_DIRECTION: in parameter PORT_DIRECTION_TYPE;
+  QUEUING_DISCIPLINE: in parameter QUEUING_DISCIPLINE_TYPE;
+  QUEUING_PORT_ID: out parameter QUEUING_PORT_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "CREATE_QUEUING_PORT";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Create_Queuing_Port;
+
+
+subprogram Send_Queuing_Message
+features
+  QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;};
+  MESSAGE_ADDR: in parameter MESSAGE_ADDR_TYPE;
+  LENGTH: in parameter MESSAGE_SIZE_TYPE;
+  TIME_OUT: in parameter SYSTEM_TIME_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "SEND_QUEUING_MESSAGE";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Send_Queuing_Message;
+
+subprogram Receive_Queuing_Message
+features
+  QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;};
+  TIME_OUT: in parameter SYSTEM_TIME_TYPE;
+  MESSAGE_ADDR: out parameter MESSAGE_ADDR_TYPE;
+  LENGTH: out parameter MESSAGE_SIZE_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "RECEIVE_QUEUING_MESSAGE";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Receive_Queuing_Message;
+
+subprogram Get_Queuing_Port_Id
+features
+  QUEUING_PORT_NAME: in parameter QUEUING_PORT_NAME_TYPE;
+  QUEUING_PORT_ID: out parameter QUEUING_PORT_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_QUEUING_PORT_ID";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Get_Queuing_Port_Id;
+
+subprogram Get_Queuing_Port_Status
+features
+  QUEUING_PORT_ID: in parameter QUEUING_PORT_ID_TYPE;
+  QUEUING_PORT_STATUS: out parameter QUEUING_PORT_STATUS_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_QUEUING_PORT_STATUS";
+  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+end Get_Queuing_Port_Status;
+
+--------------------------------------------
+--------------------------------------------
+--             SAMPLING PORT              --
+--------------------------------------------
+--------------------------------------------
+
+data Sampling_Port_Name_Type
+properties
+  Programming_Properties::Source_Name => "SAMPLING_PORT_NAME_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Sampling_Port_Name_Type;
+
+data Sampling_Port_Id_Type
+properties
+  Programming_Properties::Source_Name => "SAMPLING_PORT_ID_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Sampling_Port_Id_Type;
+
+data Validity_Type
+properties
+  Programming_Properties::Source_Name => "VALIDITY_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Validity_Type;
+
+data Sampling_Port_Status_Type
+properties
+  Programming_Properties::Source_Name => "SAMPLING_PORT_STATUS_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Sampling_Port_Status_Type;
+
+subprogram Create_Sampling_Port
+features
+  SAMPLING_PORT_NAME: in parameter SAMPLING_PORT_NAME_TYPE;
+  MAX_MESSAGE_SIZE: in parameter MESSAGE_SIZE_TYPE;
+  PORT_DIRECTION: in parameter PORT_DIRECTION_TYPE ;
+  REFRESH_PERIOD: in parameter SYSTEM_TIME_TYPE;
+  SAMPLING_PORT_ID: out parameter SAMPLING_PORT_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "CREATE_SAMPLING_PORT";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Create_Sampling_Port;
+ 
+subprogram Write_Sampling_Message
+features
+  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
+  MESSAGE_ADDR:  in parameter MESSAGE_ADDR_TYPE;
+  LENGTH:  in parameter MESSAGE_SIZE_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "WRITE_SAMPLING_MESSAGE";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Write_Sampling_Message;
+
+subprogram Read_Sampling_Message
+features
+  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
+  MESSAGE_ADDR:  in parameter MESSAGE_ADDR_TYPE;
+  LENGTH:  in parameter MESSAGE_SIZE_TYPE;
+  VALIDITY: out parameter VALIDITY_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "READ_SAMPLING_MESSAGE";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Read_Sampling_Message;
+
+subprogram Get_Sampling_Port_Id
+features
+  SAMPLING_PORT_NAME: in parameter SAMPLING_PORT_NAME_TYPE;
+  SAMPLING_PORT_ID: out parameter SAMPLING_PORT_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_SAMPLING_PORT_ID";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Get_Sampling_Port_Id;
+
+subprogram Get_Sampling_Port_Status
+features
+  SAMPLING_PORT_ID: in parameter SAMPLING_PORT_ID_TYPE;
+  SAMPLING_PORT_STATUS: out parameter SAMPLING_PORT_STATUS_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_SAMPLING_PORT_STATUS";
+  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+end Get_Sampling_Port_Status;
+
+
+
+--------------------------------------------
+--------------------------------------------
+--              BLACKBOARD                --
+--------------------------------------------
+--------------------------------------------
+
+data Blackboard_Name_Type
+properties
+  Programming_Properties::Source_Name => "BLACKBOARD_NAME_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+end Blackboard_Name_Type;
+
+data Blackboard_Id_Type
+properties
+  Programming_Properties::Source_Name => "BLACKBOARD_ID_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+end Blackboard_Id_Type;
 
 subprogram Periodic_Wait
 features

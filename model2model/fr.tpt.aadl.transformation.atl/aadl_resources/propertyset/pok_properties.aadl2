@@ -35,12 +35,12 @@ property set POK is
   Timeslice : Time applies to (virtual processor);
   -- DEPRECATED at this time
 
-  Major_Frame : Time applies to (processor);
+  Module_Major_Frame : Time applies to (processor);
 
   Scheduler : POK::Available_Schedulers
       applies to (processor, virtual processor);
 
-  Slots: list of Time applies to (processor);
+  Partition_Slots: list of Time applies to (processor);
     
   Slots_Allocation:  list of reference (virtual processor) applies to (processor);
   --  List available schedulers
