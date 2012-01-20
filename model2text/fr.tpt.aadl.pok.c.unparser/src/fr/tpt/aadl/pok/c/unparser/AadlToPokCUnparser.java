@@ -5,7 +5,10 @@ import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
 import java.util.ArrayList ;
+import java.util.HashSet ;
 import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.DataSubcomponent ;
@@ -19,10 +22,14 @@ import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 
 import fr.tpt.aadl.c.unparser.AadlToCSwitchProcess ;
-import fr.tpt.aadl.c.unparser.GenerationUtils ;
+import fr.tpt.aadl.c.unparser.GenerationUtilsC ;
+import fr.tpt.aadl.target.specific.generator.GeneratorUtils ;
+import fr.tpt.aadl.toolsuite.support.generator.AadlTargetUnparser ;
+import fr.tpt.aadl.toolsuite.support.generator.TargetProperties ;
+import fr.tpt.aadl.toolsuite.support.generator.TargetUnparserParameter ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
 
-public class AadlToPokCUnparser
+public class AadlToPokCUnparser implements AadlTargetUnparser
 {
   private final static int DEFAULT_REQUIRED_STACK_SIZE = 16384 ;
   
@@ -30,10 +37,10 @@ public class AadlToPokCUnparser
   public final static String BLACKBOARD_AADL_TYPE = 
                                              "pok_runtime::Blackboard_Id_Type" ;
   
-  public CpuProperties process(ProcessorSubcomponent processor,
-                               File processorDirectory)
+  public TargetProperties process(ProcessorSubcomponent processor,
+                                  File generatedFilePath)
   {
-    CpuProperties result = new CpuProperties() ;
+    PokProperties result = new PokProperties() ;
     
     // Generate deployment.h
     AadlToCSwitchProcess deploymentHeaderCode = new AadlToCSwitchProcess(null) ;
@@ -45,10 +52,10 @@ public class AadlToPokCUnparser
     
     try
     {
-      saveFile(processorDirectory, "deployment.h",
+      saveFile(generatedFilePath, "deployment.h",
                deploymentHeaderCode.getOutput()) ;
       
-      saveFile(processorDirectory, "deployment.c",
+      saveFile(generatedFilePath, "deployment.c",
                deploymentImplCode.getOutput()) ;
     }
     catch(IOException e)
@@ -59,14 +66,14 @@ public class AadlToPokCUnparser
     return result ;
   }
   
-  public void process(ProcessImplementation process, File processDirectory,
-                      CpuProperties cpuProp)
+  public void process(ProcessImplementation process, File generatedFilePath,
+                      TargetProperties tarProp)
   {
     PartitionProperties pp ;
     
     // Generate main.h
     AadlToCSwitchProcess mainHeaderCode = new AadlToCSwitchProcess(null) ;
-    pp = generateMainHeader(process, mainHeaderCode, cpuProp) ;
+    pp = generateMainHeader(process, mainHeaderCode, (PokProperties) tarProp);
     
     // Generate main.c
     AadlToCSwitchProcess mainImplCode = new AadlToCSwitchProcess(null) ;
@@ -74,10 +81,10 @@ public class AadlToPokCUnparser
     
     try
     {
-      saveFile(processDirectory, "main.h",
+      saveFile(generatedFilePath, "main.h",
                mainHeaderCode.getOutput()) ;
       
-      saveFile(processDirectory, "main.c",
+      saveFile(generatedFilePath, "main.c",
                mainImplCode.getOutput()) ;
     }
     catch(IOException e)
@@ -97,16 +104,16 @@ public class AadlToPokCUnparser
                                          process.getOwnedThreadSubcomponents() ;
     
     // Files included.
-    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
-    mainImplCode.addOutputNewline(GenerationUtils
+    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtilsC
                                   .generateSectionTitle("INCLUSION")) ;
     
     mainImplCode.addOutputNewline("#include \"main.h\"") ;
     mainImplCode.addOutputNewline("#include \"activity.h\"") ;
     
     //Generate global variables.
-    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
-    mainImplCode.addOutputNewline(GenerationUtils
+    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtilsC
           .generateSectionTitle("GLOBAL VARIABLES")) ;
     
     if(false == lthreads.isEmpty())
@@ -143,8 +150,8 @@ public class AadlToPokCUnparser
       sb.setLength(0) ; // Reset string builder.
     }
 
-    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
-    mainImplCode.addOutputNewline(GenerationUtils
+    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtilsC
           .generateSectionTitle("MAIN")) ;
     mainImplCode.addOutputNewline("int main ()") ;
     mainImplCode.addOutputNewline("{") ;
@@ -159,9 +166,9 @@ public class AadlToPokCUnparser
       ThreadImplementation timpl =
             (ThreadImplementation) t.getComponentImplementation() ;
       mainImplCode.addOutput("  tattr.ENTRY_POINT = ") ;
-      mainImplCode.addOutput(GenerationUtils
+      mainImplCode.addOutput(GenerationUtilsC
             .getGenerationCIdentifier(timpl.getQualifiedName())) ;
-      mainImplCode.addOutputNewline(GenerationUtils.THREAD_SUFFIX + ';') ;
+      mainImplCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + ';') ;
       String period = null ;
       String deadline = null ;
       String timeCapacity = null ;
@@ -240,7 +247,7 @@ public class AadlToPokCUnparser
           .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
     mainImplCode.addOutputNewline("  return (0);") ;
     mainImplCode.addOutputNewline("}") ;
-    mainImplCode.addOutputNewline(GenerationUtils.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
   }
 
   private void findCommunicationMechanism(ProcessImplementation process,
@@ -264,7 +271,7 @@ public class AadlToPokCUnparser
   
   private PartitionProperties generateMainHeader(ProcessImplementation process,
                                             AadlToCSwitchProcess mainHeaderCode,
-                                            CpuProperties cpuProp)
+                                            PokProperties pokProp)
   {
     PartitionProperties result = new PartitionProperties() ;
     
@@ -273,25 +280,25 @@ public class AadlToPokCUnparser
     List<ThreadSubcomponent> bindedThreads =
                                          process.getOwnedThreadSubcomponents() ;
     
-    String guard = GenerationUtils.generateHeaderInclusionGuard("main.h") ;
+    String guard = GenerationUtilsC.generateHeaderInclusionGuard("main.h") ;
     mainHeaderCode.addOutputNewline(guard) ;
     
     /**** #DEFINE ****/
 
     mainHeaderCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
 
-    if(cpuProp.consoleFound == true)
+    if(pokProp.consoleFound == true)
     {
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
     }
 
-    if(cpuProp.stdioFound == true)
+    if(pokProp.stdioFound == true)
     {
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_LIBC_STDIO 1") ;
     }
 
-    if(cpuProp.stdlibFound == true)
+    if(pokProp.stdlibFound == true)
     {
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_LIBC_STDLIB 1") ;
@@ -315,11 +322,11 @@ public class AadlToPokCUnparser
     mainHeaderCode
           .addOutputNewline("#define POK_NEEDS_BLACKBOARDS " + blackboardNeeded) ;
 
-    if(cpuProp.requiredStackSize != -1)
+    if(pokProp.requiredStackSize != -1)
     {
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
-                  Long.toString(cpuProp.requiredStackSize)) ;
+                  Long.toString(pokProp.requiredStackSize)) ;
     }
 
     // XXX Is there any condition for the generation of theses directives ?
@@ -371,7 +378,7 @@ public class AadlToPokCUnparser
   
   private void generateDeploymentImpl(ProcessorSubcomponent processor,
                                       AadlToCSwitchProcess deploymentImplCode,
-                                      CpuProperties cpuProp)
+                                      PokProperties pokProp)
   {
     deploymentImplCode.addOutputNewline("#include <arinc653/types.h>") ;
     deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
@@ -379,9 +386,9 @@ public class AadlToPokCUnparser
   
   private void generateDeploymentHeader(ProcessorSubcomponent processor,
                                       AadlToCSwitchProcess deploymentHeaderCode,
-                                      CpuProperties cpuProp)
+                                      PokProperties pokProp)
   {
-    String guard = GenerationUtils.generateHeaderInclusionGuard("deployment.h");
+    String guard = GenerationUtilsC.generateHeaderInclusionGuard("deployment.h");
     
     deploymentHeaderCode.addOutputNewline(guard) ;
     
@@ -415,7 +422,7 @@ public class AadlToPokCUnparser
               // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
               deploymentHeaderCode
                     .addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
-              cpuProp.consoleFound = true ;
+              pokProp.consoleFound = true ;
               break ;
             } 
           }
@@ -427,7 +434,7 @@ public class AadlToPokCUnparser
           {
             if(s.equalsIgnoreCase("libc_stdio"))
             {
-              cpuProp.stdioFound = true ;
+              pokProp.stdioFound = true ;
               break ;
             }
           }
@@ -439,7 +446,7 @@ public class AadlToPokCUnparser
           {
             if(s.equalsIgnoreCase("libc_stdlib"))
             {
-              cpuProp.stdlibFound = true ;
+              pokProp.stdlibFound = true ;
               break ;
             }
           }
@@ -477,7 +484,7 @@ public class AadlToPokCUnparser
     // the current system.It corresponds to the amount of process components in
     // the system.
     List<ProcessSubcomponent> bindedProcess =
-          GenerationUtils.getBindedProcesses(processor) ;
+          GeneratorUtils.getBindedProcesses(processor) ;
     deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_NB_PARTITIONS " +
                 Integer.toString(bindedVPS.size())) ;
@@ -668,19 +675,19 @@ public class AadlToPokCUnparser
       {
         try
         {
-          cpuProp.requiredStackSize +=
+          pokProp.requiredStackSize +=
                 PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
         }
         catch(Exception e)
         {
-          cpuProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
+          pokProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
         }
       }
     }
 
     deploymentHeaderCode
           .addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
-                Long.toString(cpuProp.requiredStackSize)) ;
+                Long.toString(pokProp.requiredStackSize)) ;
     // TODO: define buses for distributed use-case
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0") ;
     deploymentHeaderCode.addOutputNewline("typedef enum") ;
@@ -696,4 +703,15 @@ public class AadlToPokCUnparser
     
     deploymentHeaderCode.addOutputNewline("#endif");
   }
+
+  @Override
+  public void setParameters(Map<TargetUnparserParameter, Object> parameters)
+  {
+    throw new UnsupportedOperationException() ;
+  }
+}
+
+class PartitionProperties
+{
+  public Set<String> blackboardNames = new HashSet<String>() ;
 }

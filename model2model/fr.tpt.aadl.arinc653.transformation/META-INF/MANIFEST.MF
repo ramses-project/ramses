@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Generator
-Bundle-SymbolicName: fr.tpt.aadl.pok.generator
+Bundle-SymbolicName: fr.tpt.aadl.arinc653.transformation
 Bundle-Version: 0.5.0
-Bundle-Activator: fr.tpt.aadl.pok.generator.Activator
+Bundle-Activator: fr.tpt.aadl.arinc653.transformation.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf;bundle-version="2.6.0",
  org.osate.aadl2;bundle-version="1.0.0",
@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.pok.c.unparser;bundle-version="0.5.0",
  fr.tpt.aadl.pok.makefile.generator;bundle-version="0.5.0",
  fr.tpt.aadl.c.unparser;bundle-version="0.5.0",
- fr.tpt.aadl.atl.transformation;bundle-version="1.0.0"
+ fr.tpt.aadl.atl.transformation;bundle-version="1.0.0",
+ fr.tpt.aadl.target.specific.generator;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: fr.tpt.aadl.pok.generator
+Export-Package: fr.tpt.aadl.arinc653.transformation

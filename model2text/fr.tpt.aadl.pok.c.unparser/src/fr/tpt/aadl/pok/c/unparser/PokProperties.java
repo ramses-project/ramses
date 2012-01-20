@@ -1,21 +1,30 @@
 package fr.tpt.aadl.pok.c.unparser;
 
-import java.util.HashMap ;
-import java.util.Map ;
+import fr.tpt.aadl.toolsuite.support.generator.TargetProperties ;
 
-public class PokProperties
+public class PokProperties implements TargetProperties
 {
-  private Map<String, CpuProperties> _cpuMapping = 
-        new HashMap<String, CpuProperties>();
+  public boolean consoleFound = false ;
   
-  public CpuProperties getCpuProperties(String processorName)
+  public boolean stdioFound = false ;
+  
+  public boolean stdlibFound = false ;
+  
+  public int requiredStackSize = -1 ;
+  
+/*
+  private Map<ProcessImplementation, PartitionProperties> _partitionMapping = 
+                     new HashMap<ProcessImplementation, PartitionProperties>() ;
+
+  public PartitionProperties getPartitionProperties(ProcessImplementation process)
   {
-    return _cpuMapping.get(processorName) ;
+    return _partitionMapping.get(process) ;
   }
   
-  public void putCpuProperties(String processorName,
-                               CpuProperties cpuProp)
+  public void putPartitionProperties(ProcessImplementation process,
+                                     PartitionProperties partitionProp)
   {
-    _cpuMapping.put(processorName, cpuProp) ;
+    _partitionMapping.put(process, partitionProp) ;
   }
+*/
 }

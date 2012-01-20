@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.ui,
  fr.tpt.aadl.toolsuite.support;bundle-version="0.5.0",
  fr.tpt.aadl.annex.behavior,
  fr.tpt.aadl.propertiesutil;bundle-version="1.0.0",
- fr.tpt.aadl.instantiation;bundle-version="0.5.0"
+ fr.tpt.aadl.instantiation;bundle-version="0.5.0",
+ fr.tpt.aadl.target.specific.generator;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.c.unparser,

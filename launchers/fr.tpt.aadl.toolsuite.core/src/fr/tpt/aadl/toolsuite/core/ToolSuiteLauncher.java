@@ -12,8 +12,8 @@ import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.instance.SystemInstance ;
 
+import fr.tpt.aadl.arinc653.transformation.PokGenerator ;
 import fr.tpt.aadl.instantiation.StandAloneInstantiator ;
-import fr.tpt.aadl.pok.generator.PokGenerator ;
 import fr.tpt.aadl.resources.manager.PredefinedPackagesManager ;
 import fr.tpt.aadl.resources.manager.PredefinedPropertiesManager ;
 import fr.tpt.aadl.toolsuite.support.analysis.AnalysisResultException ;
@@ -49,9 +49,12 @@ public class ToolSuiteLauncher
   public void initializeTransformation(String[] transformationIdentifiers)
         throws Exception
   {
+    // DEBUG Temporary disable.
+    /*
     _transformationToPerform =
           initialize(transformationIdentifiers, _registry
                            .getAvailableTransformationNames()) ;
+     */
   }
 
   private List<String> initialize(String[] processNames,

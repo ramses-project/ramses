@@ -1,4 +1,4 @@
-package fr.tpt.aadl.pok.generator;
+package fr.tpt.aadl.target.specific.generator;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

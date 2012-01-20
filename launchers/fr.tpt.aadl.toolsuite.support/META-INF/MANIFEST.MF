@@ -12,11 +12,13 @@ Export-Package: fr.tpt.aadl.toolsuite.support,
  fr.tpt.aadl.toolsuite.support.generator,
  fr.tpt.aadl.toolsuite.support.plugins,
  fr.tpt.aadl.toolsuite.support.reporters,
- fr.tpt.aadl.toolsuite.support.services
+ fr.tpt.aadl.toolsuite.support.services,
+ fr.tpt.aadl.toolsuite.support.utils
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.ui;bundle-version="3.7.0",
  org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.modelsupport;bundle-version="1.0.0",
  org.osate.ui;bundle-version="1.0.0",
  org.osate.annexsupport;bundle-version="1.0.0",
- org.eclipse.m2m.atl.core;bundle-version="3.2.1"
+ org.eclipse.m2m.atl.core;bundle-version="3.2.1",
+ org.eclipse.xtext;bundle-version="2.1.1"

@@ -94,8 +94,10 @@ import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
 import fr.tpt.aadl.annex.behavior.unparser.AadlBaUnparser ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
-import fr.tpt.aadl.c.unparser.GenerationUtils ;
+import fr.tpt.aadl.c.unparser.GenerationUtilsC ;
 import fr.tpt.aadl.resources.manager.PredefinedPropertiesManager ;
+import fr.tpt.aadl.target.specific.generator.GeneratorUtils ;
+import fr.tpt.aadl.toolsuite.support.utils.Aadl2Utils ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 ;
@@ -348,7 +350,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         BehaviorAnnex ba = (BehaviorAnnex) object ;
         NamedElement aadlComponent = (NamedElement) ba.eContainer() ;
         String aadlComponentCId =
-              GenerationUtils.getGenerationCIdentifier(aadlComponent
+              GenerationUtilsC.getGenerationCIdentifier(aadlComponent
                     .getQualifiedName()) ;
         _cFileContent.addOutputNewline(aadlComponentCId +
               "_BA_State_t current_state = " + aadlComponentCId + "_" +
@@ -407,7 +409,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         {
           process(object.getDataUniqueComponentClassifierReference()) ;
           process(d) ;
-          GenerationUtils.getInitialValue(object
+          GeneratorUtils.getInitialValue(object
                 .getDataUniqueComponentClassifierReference()) ;
           _cFileContent.addOutputNewline("") ;
         }
@@ -487,7 +489,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         NamedElement aadlComponent =
               (NamedElement) object.eContainer().eContainer() ;
         String aadlComponentCId =
-              GenerationUtils.getGenerationCIdentifier(aadlComponent
+              GenerationUtilsC.getGenerationCIdentifier(aadlComponent
                     .getQualifiedName()) ;
         _cFileContent.addOutputNewline("current_state = " + aadlComponentCId +
               "_" + object.getIdentifierOwned().getId() + ";") ;
@@ -512,14 +514,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               object.getAadlRef() instanceof NamedElement)
         {
           NamedElement ne = (NamedElement) object.getAadlRef() ;
-          aadlbaText.addOutput(GenerationUtils.getGenerationCIdentifier(ne
+          aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(ne
                 .getQualifiedName())) ;
         }
         else if(object.getBaRef() != null &&
               object.getBaRef() instanceof NamedElement)
         {
           NamedElement ne = (NamedElement) object.getBaRef() ;
-          aadlbaText.addOutput(GenerationUtils.getGenerationCIdentifier(ne
+          aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(ne
                 .getQualifiedName())) ;
         }
         else
@@ -535,14 +537,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           {
             Classifier ne = (Classifier) e ;
             String r =
-                  GenerationUtils.getGenerationCIdentifier(ne
+                  GenerationUtilsC.getGenerationCIdentifier(ne
                         .getQualifiedName() +
                         "_" + object.getId()) ;
             aadlbaText.addOutput(r) ;
             return DONE ;
           }
 
-          aadlbaText.addOutput(GenerationUtils.getGenerationCIdentifier(object
+          aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(object
                 .getId())) ;
           return DONE ;
         }
@@ -1011,7 +1013,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             st = si.getType() ;
           }
 
-          List<Feature> ordereFeatureList = GenerationUtils.orderFeatures(st) ;
+          List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st) ;
 
           if(st != null)
           {

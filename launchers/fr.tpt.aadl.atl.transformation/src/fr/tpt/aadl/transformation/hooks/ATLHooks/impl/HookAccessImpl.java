@@ -30,8 +30,8 @@ import org.osate.aadl2.parsesupport.LocationReference ;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver ;
-import fr.tpt.aadl.c.unparser.GenerationUtils ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
+import fr.tpt.aadl.toolsuite.support.utils.Aadl2Utils ;
 import fr.tpt.aadl.transformation.ATLTransfoLauncher ;
 import fr.tpt.aadl.resources.manager.PredefinedPackagesManager ;
 import fr.tpt.aadl.transformation.hooks.ATLHooks.ATLHooksPackage ;
@@ -198,7 +198,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   public EList<Feature> orderFeatures(ComponentType cpt)
   {
     EList<Feature> res = new BasicEList<Feature>() ;
-    res.addAll(GenerationUtils.orderFeatures(cpt)) ;
+    res.addAll(Aadl2Utils.orderFeatures(cpt)) ;
     return res ;
   }
 
@@ -211,7 +211,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
                                     Element source)
   {
     INode node = NodeModelUtils.findActualNodeFor(source) ;
-    int offset = node.getOffset() ;
     int line = node.getStartLine() ;
     LocationReference lr =
           new LocationReference(source.eResource().getURI().lastSegment(), line) ;

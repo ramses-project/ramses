@@ -22,14 +22,4 @@
             type="atlhooks"
             class="fr.tpt.aadl.transformation.hooks.ATLHooks.util.ATLHooksResourceFactoryImpl"/>
    </extension>
-   <extension
-         point="fr.tpt.aadl.toolsuite.support.generator">
-      <transformation
-            class="fr.tpt.aadl.transformation.ATLTransfoLauncher"
-            id="fr.tpt.aadl.atl.transformation.transformation"
-            name="TPT ATL transformation"
-            transformationName="ATLTransformation">
-      </transformation>
-   </extension>
-
 </plugin>

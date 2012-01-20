@@ -17,6 +17,11 @@ import org.osate.aadl2.* ;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 import org.osate.aadl2.util.Aadl2Switch ;
 import org.osate.annexsupport.AnnexUnparser ;
+
+import fr.tpt.aadl.target.specific.generator.GeneratorUtils ;
+import fr.tpt.aadl.toolsuite.support.generator.AadlGenericUnparser ;
+import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
+import fr.tpt.aadl.toolsuite.support.generator.GenericUnparserParameter ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
@@ -24,22 +29,12 @@ import fr.tpt.aadl.annex.behavior.names.DataModelProperties ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaGetProperties ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
-import fr.tpt.aadl.c.unparser.GenerationUtils ;
+import fr.tpt.aadl.c.unparser.GenerationUtilsC ;
 import fr.tpt.aadl.c.unparser.annex.behavior.AadlBaToCUnparser ;
 import fr.tpt.aadl.c.unparser.annex.behavior.AadlBaToCUnparserAction ;
 
-/******************************************************************************/
-/* TODO:
- * 
- * _ transform treatments into generic:
- *     _ AadlToCSwitchProcess objects may not be instantiated at all moments.
- *     _ think OSEK use.
- *     _ verify if any pok tree iteration logic is left.
- *       
- */
-/******************************************************************************/
-
 public class AadlToCUnparser extends AadlProcessingSwitch
+                             implements AadlGenericUnparser
 {
   // gtype.c and .h
   protected AadlToCSwitchProcess _gtypesImplCode ;
@@ -130,7 +125,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       // gtypes.h
       FileWriter typesFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/gtypes.h") ;
-      headerGuard = GenerationUtils.generateHeaderInclusionGuard("gtypes.h") ;
+      headerGuard = GenerationUtilsC.generateHeaderInclusionGuard("gtypes.h") ;
       String addTypeHeader_H = getAdditionalHeader(_gtypesHeaderCode) ;
       saveFile(typesFile_H, headerGuard, addTypeHeader_H,
                _gtypesHeaderCode.getOutput()) ;
@@ -145,7 +140,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       // subprogram.h
       FileWriter subprogramsFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/subprograms.h") ;
-      headerGuard = GenerationUtils.generateHeaderInclusionGuard("subprograms.h");
+      headerGuard = GenerationUtilsC.generateHeaderInclusionGuard("subprograms.h");
       String addSubprogramsHeader_H = getAdditionalHeader(_subprogramHeaderCode) ;
       saveFile(subprogramsFile_H, headerGuard, addSubprogramsHeader_H,
                      _subprogramHeaderCode.getOutput()) ;
@@ -159,7 +154,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       // activity.h
       FileWriter activityFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/activity.h") ;
-      headerGuard = GenerationUtils.generateHeaderInclusionGuard("activity.h");
+      headerGuard = GenerationUtilsC.generateHeaderInclusionGuard("activity.h");
       String addActivityHeader_H = getAdditionalHeader(_activityHeaderCode) ;
       saveFile(activityFile_H, headerGuard,
                addActivityHeader_H, _activityHeaderCode.getOutput()) ;
@@ -175,7 +170,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       // partition's deployment.h
       FileWriter deploymentFile_H =
             new FileWriter(targetDirectory.getAbsolutePath() + "/deployment.h") ;
-      headerGuard = GenerationUtils.generateHeaderInclusionGuard("deployment.h");
+      headerGuard = GenerationUtilsC.generateHeaderInclusionGuard("deployment.h");
       String addDeploymentHeader_H = getAdditionalHeader(_deploymentHeaderCode) ;
       saveFile(deploymentFile_H, headerGuard, MAIN_HEADER_INCLUSION,
                addDeploymentHeader_H, _deploymentHeaderCode.getOutput()) ;
@@ -268,7 +263,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                                     boolean delayComplexTypes)
   {
     String id =
-          GenerationUtils.getGenerationCIdentifier(object.getQualifiedName()) ;
+          GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
     TypeHolder dataTypeHolder = null ;
 
     try
@@ -455,7 +450,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               {
                 ClassifierValue cv = (ClassifierValue) v ;
                 String type =
-                      GenerationUtils.getGenerationCIdentifier(cv
+                      GenerationUtilsC.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
                 _currentHeaderUnparser.addOutputNewline(type +
                       " " +
@@ -520,7 +515,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               {
                 ClassifierValue cv = (ClassifierValue) v ;
                 String type =
-                      GenerationUtils.getGenerationCIdentifier(cv
+                      GenerationUtilsC.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
                 _currentHeaderUnparser.addOutputNewline(type +
                       " " +
@@ -554,7 +549,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               if(v instanceof ClassifierValue)
               {
                 ClassifierValue cv = (ClassifierValue) v ;
-                _currentHeaderUnparser.addOutput(GenerationUtils
+                _currentHeaderUnparser.addOutput(GenerationUtilsC
                       .getGenerationCIdentifier(cv.getClassifier()
                             .getQualifiedName())) ;
               }
@@ -755,14 +750,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
         catch(Exception e)
         {
-          unparser.addOutput(GenerationUtils.getGenerationCIdentifier(dst
+          unparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(dst
                 .getQualifiedName())) ;
         }
 
         unparser.addOutput(" ") ;
-        unparser.addOutput(GenerationUtils.getGenerationCIdentifier(object
+        unparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object
               .getQualifiedName())) ;
-        unparser.addOutput(GenerationUtils.getInitialValue(object)) ;
+        unparser.addOutput(GeneratorUtils.getInitialValue(object)) ;
         unparser.addOutputNewline(";") ;
 
         if(_processedTypes.contains(object.getDataSubcomponentType()) == false)
@@ -857,9 +852,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       {
         process(object.getType()) ;
         _activityImplCode.addOutput("void* ") ;
-        _activityImplCode.addOutput(GenerationUtils
+        _activityImplCode.addOutput(GenerationUtilsC
               .getGenerationCIdentifier(object.getQualifiedName())) ;
-        _activityImplCode.addOutputNewline(GenerationUtils.THREAD_SUFFIX + "()") ;
+        _activityImplCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + "()") ;
         _activityImplCode.addOutputNewline("{") ;
         _activityImplCode.incrementIndent() ;
 
@@ -880,9 +875,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _activityImplCode.addOutputNewline("}") ;
         
         _activityHeaderCode.addOutput("void*  ") ;
-        _activityHeaderCode.addOutput(GenerationUtils
+        _activityHeaderCode.addOutput(GenerationUtilsC
               .getGenerationCIdentifier(object.getQualifiedName())) ;
-        _activityHeaderCode.addOutputNewline(GenerationUtils.THREAD_SUFFIX + "();\n") ;
+        _activityHeaderCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + "();\n") ;
         
         return null ;
       }
@@ -950,13 +945,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
           catch(Exception e)
           {
-            _currentImplUnparser.addOutput(GenerationUtils
+            _currentImplUnparser.addOutput(GenerationUtilsC
                   .getGenerationCIdentifier(object.getDataFeatureClassifier()
                         .getQualifiedName())) ;
           }
           
           _currentImplUnparser.addOutput(" ") ;
-          _currentImplUnparser.addOutput(GenerationUtils
+          _currentImplUnparser.addOutput(GenerationUtilsC
                 .getGenerationCIdentifier(object.getQualifiedName())) ;
         }
 
@@ -968,8 +963,17 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     } ;
   }
 
-  public void doProcess(Element element)
+  @Override
+  public void process(Element element, File generatedFilePath) 
+                                                    throws GenerationException
   {
     AadlToCSwitchProcess.process(element) ;
+    saveGeneratedFilesContent(generatedFilePath) ;
+  }
+
+  @Override
+  public void setParameters(Map<GenericUnparserParameter, Object> parameters)
+  {
+    throw new UnsupportedOperationException() ;
   }
 }

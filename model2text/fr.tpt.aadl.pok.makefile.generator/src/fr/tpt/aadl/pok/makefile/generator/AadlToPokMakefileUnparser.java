@@ -4,8 +4,12 @@ import java.io.BufferedWriter ;
 import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
+import java.util.Map ;
 
-import fr.tpt.aadl.c.unparser.GenerationUtils ;
+import fr.tpt.aadl.target.specific.generator.GeneratorUtils ;
+import fr.tpt.aadl.toolsuite.support.generator.BuilderGeneratorParameter ;
+import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
+import fr.tpt.aadl.toolsuite.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 import org.osate.aadl2.NamedElement ;
@@ -19,7 +23,8 @@ import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 import org.osate.aadl2.util.Aadl2Switch ;
 
-public class AadlToMakefileUnparser extends AadlProcessingSwitch
+public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
+                                    implements TargetBuilderGenerator
 {
 
   private UnparseText unparserContent ;
@@ -82,7 +87,7 @@ public class AadlToMakefileUnparser extends AadlProcessingSwitch
         unparserContent
               .addOutput("OBJS = main.o activity.o subprograms.o gtypes.o deployment.o ") ;
 
-        for(String cpuName : GenerationUtils.getListOfReferencedObjects(object))
+        for(String cpuName : GeneratorUtils.getListOfReferencedObjects(object))
         {
           unparserContent.addOutput(cpuName + " ") ;
         }
@@ -235,20 +240,23 @@ public class AadlToMakefileUnparser extends AadlProcessingSwitch
     saveMakefile(unparserContent, makeFile) ;
   }
 
-  public void generateMakefile(ProcessSubcomponent ps,
-                               File makeFile)
+  @Override
+  public void process(SystemImplementation system,
+                      File generatedFilePath)
+        throws GenerationException
   {
-    unparserContent = new UnparseText() ;
-    generateMakefile((NamedElement) ps, makeFile) ;
+    generateMakefile((NamedElement) system, generatedFilePath) ;
   }
 
-  public void generateMakefile(ProcessorSubcomponent ps,
-                               File makeFile)
+  @Override
+  public void process(ProcessorSubcomponent processor,
+                      File generatedFilePath)
+        throws GenerationException
   {
     unparserContent = new UnparseText() ;
-    generateMakefile((NamedElement) ps, makeFile) ;
+    generateMakefile((NamedElement) processor, generatedFilePath) ;
     kernelMakefileContent = new UnparseText() ;
-    File kernelDir = new File(makeFile.getAbsolutePath() + "/kernel") ;
+    File kernelDir = new File(generatedFilePath.getAbsolutePath() + "/kernel") ;
     kernelDir.mkdir() ;
     kernelMakefileContent
           .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/deployment.h") ;
@@ -269,9 +277,18 @@ public class AadlToMakefileUnparser extends AadlProcessingSwitch
     saveMakefile(kernelMakefileContent, kernelDir) ;
   }
 
-  public void generateMakefile(SystemImplementation ps,
-                               File makeFile)
+  @Override
+  public void process(ProcessSubcomponent process,
+                      File generatedFilePath)
+        throws GenerationException
   {
-    generateMakefile((NamedElement) ps, makeFile) ;
+    unparserContent = new UnparseText() ;
+    generateMakefile((NamedElement) process, generatedFilePath) ;
+  }
+
+  @Override
+  public void setParameters(Map<BuilderGeneratorParameter, Object> parameters)
+  {
+    throw new UnsupportedOperationException() ;
   }
 }

@@ -8,8 +8,6 @@ package fr.tpt.aadl.transformation.hooks.ATLHooks ;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.ParameterLabel ;
-import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction ;
 import fr.tpt.aadl.resources.manager.PredefinedPackagesManager ;
 
 import org.eclipse.emf.common.util.EList ;
@@ -19,15 +17,6 @@ import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
-import org.osate.aadl2.CallSpecification ;
-import org.osate.aadl2.CalledSubprogram ;
-import org.osate.aadl2.DataAccess ;
-import org.osate.aadl2.DataPort ;
-import org.osate.aadl2.DataSubcomponent ;
-import org.osate.aadl2.ParameterConnection ;
-import org.osate.aadl2.Subprogram ;
-import org.osate.aadl2.ParameterConnectionEnd ;
-import org.osate.aadl2.Parameter ;
 import org.osate.aadl2.ThreadImplementation ;
 
 /**
