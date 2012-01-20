@@ -48,12 +48,12 @@ public class AadlTargetSpecificCodeGenerator
   
   //  @Override
   public void generate(Resource inputResource,
-                           File target_directory) throws GenerationException
+                       File generatedFilePath) throws GenerationException
   {
     TreeIterator<EObject> iter = inputResource.getAllContents() ;
       
     File generatedCodeDirectory =
-          new File(target_directory + GENERATED_DIR_NAME) ;
+          new File(generatedFilePath + GENERATED_DIR_NAME) ;
     generatedCodeDirectory.mkdir() ;
 
     while(iter.hasNext())
@@ -63,7 +63,7 @@ public class AadlTargetSpecificCodeGenerator
       if(elt instanceof SystemImplementation)
       {
         SystemImplementation si = (SystemImplementation) elt ;
-        File generatedFileDir = new File(target_directory + GENERATED_DIR_NAME);
+        File generatedFileDir = new File(generatedFilePath + GENERATED_DIR_NAME);
         _targetBuilderGen.process(si, generatedFileDir) ;
         
         // XXX Have AadlGenericUnparser to unparse the SystemImplementation

@@ -13,6 +13,7 @@ import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.ListValue ;
+import org.osate.aadl2.MemorySubcomponent ;
 import org.osate.aadl2.ModalPropertyValue ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Parameter ;
@@ -308,5 +309,42 @@ public class GeneratorUtils
         }
       }
     }
+  }
+  
+  public static Subcomponent getDeloymentMemorySubcomponent(
+                                       ProcessSubcomponent aProcessSubcomponent)
+  {
+    PropertyAssociation aPropertyAssociation =
+          PropertyUtils.findProperty("Actual_Memory_Binding",
+                                     aProcessSubcomponent) ;
+
+    for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
+            .getOwnedValues())
+  {
+    if(aModalPropertyValue.getOwnedValue() instanceof ListValue)
+    {
+      ListValue list = (ListValue) aModalPropertyValue.getOwnedValue() ;
+
+      for(PropertyExpression pe : list.getOwnedListElements())
+      {
+        if(pe instanceof ReferenceValue)
+        {
+          ReferenceValue rv = (ReferenceValue) pe ;
+          NamedElement anElement =
+               rv.getContainmentPathElements().get(rv.getContainmentPathElements().
+                                                   size()-1).getNamedElement() ;
+
+          if(anElement instanceof MemorySubcomponent)
+          {
+            MemorySubcomponent ms = 
+                (MemorySubcomponent) anElement;
+            return ms;
+          }
+        }
+      }
+    }
+  }
+
+  return null ;
   }
 }

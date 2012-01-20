@@ -11,7 +11,6 @@ import java.util.Map ;
 import org.eclipse.emf.common.util.TreeIterator ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.osate.aadl2.Element ;
 import org.osate.aadl2.Property ;
 import org.osate.aadl2.PropertySet ;
 import org.osate.aadl2.StringLiteral ;
@@ -124,8 +123,6 @@ public class PredefinedPropertiesManager
 
     while(it.hasNext())
     {
-      Element el = (Element) it.next() ;
-
       if(it instanceof Property)
       {
         Property p = (Property) it ;

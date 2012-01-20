@@ -42,48 +42,31 @@ import java.io.ByteArrayInputStream ;
 import java.io.File ;
 import java.io.FileOutputStream ;
 import java.io.InputStream ;
-import java.io.OutputStream ;
 import java.util.Iterator ;
-import java.util.Properties ;
-import java.util.Vector ;
-
-import javax.swing.ProgressMonitor ;
 
 import org.eclipse.core.resources.IFile ;
-import org.eclipse.core.resources.IFolder ;
 import org.eclipse.core.resources.IResource ;
-import org.eclipse.core.resources.IWorkspaceRoot ;
 import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.IPath ;
-import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.core.runtime.Path ;
 import org.eclipse.emf.common.util.AbstractEnumerator ;
-import org.eclipse.emf.common.util.BasicEList ;
 import org.eclipse.emf.common.util.EList ;
-import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.URIConverter ;
-import org.eclipse.emf.ecore.resource.impl.URIConverterImpl ;
-import org.eclipse.emf.ecore.util.FeatureMap ;
-import org.osate.aadl2.* ;
-import org.osate.aadl2.instance.InstanceObject ;
-import org.osate.aadl2.modelsupport.AadlConstants ;
-import org.osate.aadl2.modelsupport.UnparseText ;
-import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
-import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitchWithProgress ;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
-import org.osate.aadl2.modelsupport.util.AadlUtil ;
-import org.osate.aadl2.util.Aadl2Switch ;
-import org.osate.annexsupport.AnnexRegistry ;
-import org.osate.annexsupport.AnnexUnparser ;
-import org.osate.annexsupport.AnnexUnparserRegistry ;
 import org.eclipse.xtext.AbstractRule ;
 import org.eclipse.xtext.nodemodel.BidiTreeIterator ;
 import org.eclipse.xtext.nodemodel.ILeafNode ;
 import org.eclipse.xtext.nodemodel.INode ;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.* ;
+import org.osate.aadl2.instance.InstanceObject ;
+import org.osate.aadl2.modelsupport.AadlConstants ;
+import org.osate.aadl2.modelsupport.UnparseText ;
+import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.aadl2.modelsupport.util.AadlUtil ;
+import org.osate.aadl2.util.Aadl2Switch ;
+import org.osate.annexsupport.AnnexUnparser ;
 
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
@@ -1622,9 +1605,9 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
        */
       public String caseDataAccess(DataAccess object)
       {
-        String d ;
         processComments(object) ;
-
+        /*
+        String d ;
         if(object.getKind() == AccessType.REQUIRED)
         {
           d = "requires" ;
@@ -1633,12 +1616,12 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         {
           d = "provides" ;
         }
-
+        */
         aadlText
               .addOutput((object.getRefined() == null
-                                                     ? (object.getName() + ": ")
-                                                     : (object.getRefined()
-                                                           .getName() + ": refined to ")) +
+                                              ? (object.getName() + ": ")
+                                              : (object.getRefined()
+                                                .getName() + ": refined to ")) +
                     " data access ") ;
         aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
                                                       object)) ;
@@ -2631,7 +2614,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    * @param list
    * @param separator
    */
-  public void processOptionalEList(EList list,
+  public void processOptionalEList(EList<?> list,
                                    String separator)
   {
     if(list.size() > 0)
@@ -2648,12 +2631,12 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    * @param list
    * @param separator
    */
-  public void processEList(EList list,
+  public void processEList(EList<?> list,
                            String separator)
   {
     boolean first = true ;
 
-    for(Iterator it = list.iterator() ; it.hasNext() ;)
+    for(Iterator<?> it = list.iterator() ; it.hasNext() ;)
     {
       if(!first)
       {
@@ -2693,13 +2676,13 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    * @param list
    * @param separator
    */
-  public void processRefEList(EList list,
+  public void processRefEList(EList<?> list,
                               String separator,
                               Element context)
   {
     boolean first = true ;
 
-    for(Iterator it = list.iterator() ; it.hasNext() ;)
+    for(Iterator<?> it = list.iterator() ; it.hasNext() ;)
     {
       if(!first)
       {
@@ -2821,7 +2804,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    * @param emptyOption
    *            shown with section name if empty list
    */
-  public void processOptionalSection(EList list,
+  public void processOptionalSection(EList<? extends Element> list,
                                      String sectionName,
                                      String emptyOption)
   {
@@ -2853,7 +2836,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    * @param emptyOption
    *            shown with section name if empty list
    */
-  public void processSection(EList list,
+  public void processSection(EList<? extends Element> list,
                              String sectionName,
                              Boolean doNone)
   {
@@ -2875,9 +2858,9 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     }
   }
 
-  public boolean hasDeclaredFeatures(EList ftl)
+  public boolean hasDeclaredFeatures(EList<?> ftl)
   {
-    for(Iterator it = ftl.iterator() ; it.hasNext() ;)
+    for(Iterator<?> it = ftl.iterator() ; it.hasNext() ;)
     {
       Feature f = (Feature) it.next() ;
       String n = f.getName() ;

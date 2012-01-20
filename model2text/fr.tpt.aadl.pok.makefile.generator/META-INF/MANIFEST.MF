@@ -20,10 +20,10 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.toolsuite.support;bundle-version="0.5.0",
  fr.tpt.aadl.propertiesutil;bundle-version="1.0.0",
  fr.tpt.aadl.target.specific.generator;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Export-Package: fr.tpt.aadl.pok.makefile.generator
 Import-Package: fr.tpt.aadl.c.unparser,
  org.osate.aadl2.modelsupport.modeltraversal
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 

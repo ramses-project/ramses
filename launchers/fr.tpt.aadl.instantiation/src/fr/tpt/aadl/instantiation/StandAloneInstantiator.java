@@ -26,7 +26,6 @@ import org.osate.aadl2.instantiation.InstantiateModel ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl ;
 import org.osate.aadl2.util.Aadl2ResourceImpl ;
-import org.osate.xtext.aadl2.util.AadlUnparser ;
 
 import com.google.inject.Injector ;
 

@@ -9,9 +9,9 @@ import fr.tpt.aadl.toolsuite.support.plugins.NamedPlugin ;
 
 public interface Generator extends NamedPlugin
 {
-  public Resource generate(Resource inputResource,
-                           Map<String, Resource> standardPropertySets,
-                           File generatedFilePath) throws GenerationException ;
+  public void generate(Resource inputResource,
+                       Map<String, Resource> standardPropertySets,
+                       File generatedFilePath) throws GenerationException ;
 
   public void setParameters(Map<GeneratorParameter, String> parameters)
         throws Exception ;

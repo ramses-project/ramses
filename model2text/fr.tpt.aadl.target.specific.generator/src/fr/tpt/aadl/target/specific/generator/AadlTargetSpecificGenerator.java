@@ -1,7 +1,6 @@
 package fr.tpt.aadl.target.specific.generator;
 
 import java.io.File ;
-import java.util.List ;
 import java.util.Map ;
 
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -16,7 +15,6 @@ public class AadlTargetSpecificGenerator implements Generator
   protected AadlToTargetSpecificAadl _targetTrans ;
   
   protected AadlTargetSpecificCodeGenerator _codeGen ;
-  
   
   @Override
   public String getRegistryName()
@@ -40,20 +38,21 @@ public class AadlTargetSpecificGenerator implements Generator
   }
 
   @Override
-  public Resource generate(Resource inputResource,
+  public void generate(Resource inputResource,
                            Map<String, Resource> standardPropertySets,
                            File generatedFilePath)
         throws GenerationException
   {
-    // TODO Auto-generated method stub
-    return null ;
+    Resource r = _targetTrans.transform(inputResource, standardPropertySets,
+                                        generatedFilePath) ;
+    
+    _codeGen.generate(r, generatedFilePath) ;
   }
 
   @Override
   public void setParameters(Map<GeneratorParameter, String> parameters)
         throws Exception
   {
-    // TODO Auto-generated method stub
-    
+    throw new UnsupportedOperationException() ;
   }
 }

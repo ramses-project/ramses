@@ -1,5 +1,10 @@
 package fr.tpt.aadl.pok.c.unparser;
 
+import java.util.HashMap ;
+import java.util.Map ;
+
+import org.osate.aadl2.ProcessImplementation ;
+
 import fr.tpt.aadl.toolsuite.support.generator.TargetProperties ;
 
 public class PokProperties implements TargetProperties
@@ -11,6 +16,11 @@ public class PokProperties implements TargetProperties
   public boolean stdlibFound = false ;
   
   public int requiredStackSize = -1 ;
+  
+  public Map<ProcessImplementation, Long> requiredStackSizePerPartition = 
+        new HashMap<ProcessImplementation, Long>();
+  public Map<ProcessImplementation, PartitionProperties> partitionProperties = 
+        new HashMap<ProcessImplementation, PartitionProperties>();
   
 /*
   private Map<ProcessImplementation, PartitionProperties> _partitionMapping = 
