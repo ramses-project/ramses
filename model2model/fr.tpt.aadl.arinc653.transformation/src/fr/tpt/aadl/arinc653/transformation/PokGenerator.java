@@ -13,6 +13,7 @@ import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.SystemInstance;
 
 import fr.tpt.aadl.c.unparser.AadlToCUnparser ;
 import fr.tpt.aadl.instantiation.StandAloneInstantiator ;
@@ -129,11 +130,18 @@ public class PokGenerator implements NamedPlugin
                                                   postTransformationFiles,
                                                   target_directory) ;
     
+    
+    File generatedCodeDirectory =
+            new File(target_directory + "/generated-code") ;
+      generatedCodeDirectory.mkdir() ;
+    SystemInstance rootInstance =  (SystemInstance) inputResource.getContents().get(0);
+    AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser();
+    pokCUnparser.process(rootInstance,
+    		generatedCodeDirectory);
+    
     TreeIterator<EObject> iter = expandedResult.getAllContents() ;
       
-    File generatedCodeDirectory =
-          new File(target_directory + "/generated-code") ;
-    generatedCodeDirectory.mkdir() ;
+    
 
 
 /******************************************************************************/
@@ -148,8 +156,6 @@ public class PokGenerator implements NamedPlugin
  *     _ generate the makefile the same way as above.
  */
 /******************************************************************************/
-    
-    AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser();
     
     while(iter.hasNext())
     {
@@ -168,17 +174,14 @@ public class PokGenerator implements NamedPlugin
           // create directory with the processor subcomponent name
           File processorFileDir =
                 new File(generatedFileDir + "/" + ps.getName()) ;
-          processorFileDir.mkdir() ;
+          if(!processorFileDir.isDirectory())
+        	processorFileDir.mkdir() ;
+          
           makefileGenerator.process(ps, processorFileDir) ;
           
           File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
           
-//          AadlToCUnparser generator_C = new AadlToCUnparser() ;
-//          generator_C.doProcess(ps) ;
-//          generator_C.saveGeneratedFilesContent(kernelFileDir) ;
-          
-          TargetProperties tarProp ;
-          tarProp = pokCUnparser.process(ps, kernelFileDir);
+          TargetProperties tarProp = pokCUnparser.process(ps, kernelFileDir);
           List<ProcessSubcomponent> ownedProcess = 
                                         GeneratorUtils.getBindedProcesses(ps) ;
           

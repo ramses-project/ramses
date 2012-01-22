@@ -201,17 +201,17 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       List<String> sourceText =
             PropertyUtils.getStringListValue(ne, "Source_Text") ;
       aadlbaText.addOutput(sourceName) ;
-
+      
       for(String s : sourceText)
       {
         if(s.endsWith(".h"))
         {
           _additionalHeaders.add(s) ;
-          return true ;
+          return true;
         }
       }
-
-      return false ;
+      throw new Exception("In component "+ne.getName()+": Source_Text " +
+      		"property should also reference a header (.h extension) file");
     }
     catch(Exception e)
     {
@@ -1017,15 +1017,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
           if(st != null)
           {
-            if(object.isSetParameterLabels())
-            {
-              _cFileContent.addOutput(" (") ;
+            _cFileContent.addOutput(" (") ;
 
-              for(ParameterLabel pl : object.getParameterLabels())
-              {
-                ParameterConnectionEnd pce =
-                      (ParameterConnectionEnd) ordereFeatureList.get(object
-                            .getParameterLabels().indexOf(pl)) ;
+            for(ParameterLabel pl : object.getParameterLabels())
+            {
+              ParameterConnectionEnd pce =
+                    (ParameterConnectionEnd) ordereFeatureList.get(object
+                          .getParameterLabels().indexOf(pl)) ;
 
                 if(pce instanceof Parameter)
                 {
@@ -1094,7 +1092,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               }
 
               _cFileContent.addOutputNewline(");") ;
-            }
           }
         }
         else

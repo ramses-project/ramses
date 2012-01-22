@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="GenerateMakefile" name="fr.tpt.aadl.pok.makefile.generator">
-    <property name="ECLIPSE_HOME" value="../../../../../../../eclipse"/>
-    <property name="ECLIPSE_WORKSPACE" value="../../../../../.."/>
+    <property name="ECLIPSE_HOME" value="../../../../../../../Install/indigo_X86_64b_v2"/>
+    <property name="ECLIPSE_WORKSPACE" value="../../../../../../../Documents/workspace"/>
 
     <!-- The classpath with only the dependencies used by the project -->
     <path id="fr.tpt.aadl.pok.makefile.generator.libraryclasspath">

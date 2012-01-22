@@ -1,3 +1,19 @@
+--
+--                              POK header
+-- 
+--  The following file is a part of the POK project. Any modification should
+--  be made according to the POK licence. You CANNOT use this file or a part
+--  of a file for your own project.
+-- 
+--  For more information on the POK licence, please see our LICENCE FILE
+--
+--  Please follow the coding guidelines described in doc/CODING_GUIDELINES
+--
+--                                      Copyright (c) 2007-2009 POK team
+--
+--  Created by julien on Thu Jan 15 23:34:13 2009
+--
+
 package test_blackboard
 public
 
@@ -27,9 +43,9 @@ subcomponents
 properties
    POK::Architecture => x86;
    POK::BSP => x86_qemu;
-   POK::Major_Frame => 1000 ms;
+   POK::Module_Major_Frame => 1000 ms;
    POK::Scheduler => static;
-   POK::Slots => (1000 ms);
+   POK::Partition_Slots => (1000 ms);
    POK::Slots_Allocation => (reference (part1));
 end ppc.impl;
 

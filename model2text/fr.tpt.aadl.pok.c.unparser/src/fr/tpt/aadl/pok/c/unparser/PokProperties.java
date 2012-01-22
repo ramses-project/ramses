@@ -15,7 +15,7 @@ public class PokProperties implements TargetProperties
   
   public boolean stdlibFound = false ;
   
-  public int requiredStackSize = -1 ;
+  public int requiredStackSize = 0 ;
   
   public Map<ProcessImplementation, Long> requiredStackSizePerPartition = 
         new HashMap<ProcessImplementation, Long>();

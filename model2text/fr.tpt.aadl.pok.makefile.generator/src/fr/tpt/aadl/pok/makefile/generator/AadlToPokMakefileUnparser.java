@@ -4,6 +4,7 @@ import java.io.BufferedWriter ;
 import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
+import java.util.List;
 import java.util.Map ;
 
 import fr.tpt.aadl.target.specific.generator.GeneratorUtils ;
@@ -29,6 +30,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
 
   private UnparseText unparserContent ;
   private UnparseText kernelMakefileContent ;
+  private List<ProcessSubcomponent> bindedProcess ;
 
   @Override
   protected void initSwitches()
@@ -137,6 +139,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
                       " process subcomponent " + object.getName()) ;
         }
 
+        bindedProcess =
+                GeneratorUtils.getBindedProcesses(object) ;
+        
         process(object.getComponentImplementation()) ;
         return DONE ;
       }
@@ -153,11 +158,10 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent.addOutputNewline("TARGET=$(shell pwd)/pok.elf") ;
         unparserContent.addOutput("PARTITIONS=") ;
 
-        for(VirtualProcessorSubcomponent virtProc : object
-              .getOwnedVirtualProcessorSubcomponents())
-        {
-          unparserContent.addOutput(virtProc.getName() + "/" +
-                virtProc.getName() + ".elf ") ;
+        for(ProcessSubcomponent part:bindedProcess)
+        { 
+          unparserContent.addOutput(part.getName() + "/" +
+        		  part.getName() + ".elf ") ;
         }
 
         unparserContent.addOutput("\n") ;
@@ -168,30 +172,27 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent.addOutputNewline("\t$(CD) kernel && $(MAKE)") ;
         unparserContent.addOutputNewline("partitions:") ;
 
-        for(VirtualProcessorSubcomponent virtProc : object
-              .getOwnedVirtualProcessorSubcomponents())
+        for(ProcessSubcomponent part:bindedProcess)
         {
-          unparserContent.addOutputNewline("\t$(CD) " + virtProc.getName() +
+          unparserContent.addOutputNewline("\t$(CD) " + part.getName() +
                 " && $(MAKE)") ;
         }
 
         unparserContent.addOutputNewline("clean: common-clean") ;
         unparserContent.addOutputNewline("\t$(CD) kernel && $(MAKE) clean") ;
 
-        for(VirtualProcessorSubcomponent virtProc : object
-              .getOwnedVirtualProcessorSubcomponents())
+        for(ProcessSubcomponent part:bindedProcess)
         {
-          unparserContent.addOutputNewline("\t$(CD) " + virtProc.getName() +
+          unparserContent.addOutputNewline("\t$(CD) " + part.getName() +
                 " && $(MAKE) clean") ;
         }
         
         unparserContent.addOutputNewline("distclean: clean") ;
         unparserContent.addOutputNewline("\t$(CD) kernel && $(MAKE) distclean") ;
 
-        for(VirtualProcessorSubcomponent virtProc : object
-              .getOwnedVirtualProcessorSubcomponents())
+        for(ProcessSubcomponent part:bindedProcess)
         {
-          unparserContent.addOutputNewline("\t$(CD) " + virtProc.getName() +
+          unparserContent.addOutputNewline("\t$(CD) " + part.getName() +
                 " && $(MAKE) distclean") ;
         }
         
@@ -263,7 +264,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
     kernelMakefileContent
           .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
     kernelMakefileContent.addOutputNewline("LO_TARGET = kernel.lo") ;
-    kernelMakefileContent.addOutputNewline("LO_OBJS =") ;
+    kernelMakefileContent.addOutputNewline("LO_OBJS = deployment.o routing.o") ;
     kernelMakefileContent.addOutputNewline("LO_DEPS = pok.lo") ;
     kernelMakefileContent
           .addOutputNewline("all: kernel copy-kernel $(LO_TARGET)") ;
