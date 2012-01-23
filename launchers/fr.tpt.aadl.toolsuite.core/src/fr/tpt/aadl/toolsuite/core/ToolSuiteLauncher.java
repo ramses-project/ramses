@@ -20,7 +20,6 @@ import fr.tpt.aadl.toolsuite.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
-import fr.tpt.aadl.toolsuite.support.generator.GeneratorParameter ;
 
 public class ToolSuiteLauncher
 {

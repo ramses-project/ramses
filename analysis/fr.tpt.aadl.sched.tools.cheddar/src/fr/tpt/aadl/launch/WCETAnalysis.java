@@ -11,7 +11,6 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import fr.tpt.aadl.sched.cheddar.CheddarOptions ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
 import fr.tpt.aadl.toolsuite.support.analysis.AbstractAnalyzer ;
-import fr.tpt.aadl.toolsuite.support.analysis.AnalyzerParameter ;
 
 public class WCETAnalysis extends AbstractAnalyzer
 {
@@ -61,10 +60,10 @@ public class WCETAnalysis extends AbstractAnalyzer
   }
 
   @Override
-  public void setParameters(Map<AnalyzerParameter, String> parameters)
+  public void setParameters(Map<String, String> parameters)
         throws Exception
   {
-    // Nothing to do.
+    throw new UnsupportedOperationException() ;
   }
 
   @Override

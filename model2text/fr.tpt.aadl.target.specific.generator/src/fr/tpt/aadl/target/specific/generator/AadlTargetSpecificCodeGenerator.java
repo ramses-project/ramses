@@ -17,7 +17,6 @@ import org.osate.aadl2.SystemImplementation ;
 
 import fr.tpt.aadl.toolsuite.support.generator.AadlGenericUnparser ;
 import fr.tpt.aadl.toolsuite.support.generator.AadlTargetUnparser ;
-import fr.tpt.aadl.toolsuite.support.generator.CodeGeneratorParameter ;
 import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
 import fr.tpt.aadl.toolsuite.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.toolsuite.support.generator.TargetProperties ;
@@ -41,7 +40,7 @@ public class AadlTargetSpecificCodeGenerator
     _targetBuilderGen = targetBuilderGen ;
   }
   
-  public void setParameters(Map<CodeGeneratorParameter, Object> parameters)
+  public void setParameters(Map<String, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }

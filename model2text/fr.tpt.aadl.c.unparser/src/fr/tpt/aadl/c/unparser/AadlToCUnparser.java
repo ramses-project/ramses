@@ -21,7 +21,6 @@ import org.osate.annexsupport.AnnexUnparser ;
 import fr.tpt.aadl.target.specific.generator.GeneratorUtils ;
 import fr.tpt.aadl.toolsuite.support.generator.AadlGenericUnparser ;
 import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
-import fr.tpt.aadl.toolsuite.support.generator.GenericUnparserParameter ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
@@ -972,7 +971,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   }
 
   @Override
-  public void setParameters(Map<GenericUnparserParameter, Object> parameters)
+  public void setParameters(Map<String, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }

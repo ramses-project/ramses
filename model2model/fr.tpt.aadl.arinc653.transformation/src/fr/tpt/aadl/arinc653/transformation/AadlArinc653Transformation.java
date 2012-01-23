@@ -10,7 +10,6 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import fr.tpt.aadl.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.toolsuite.support.generator.AadlToTargetSpecificAadl ;
 import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
-import fr.tpt.aadl.toolsuite.support.generator.TargetSpecificTransformationParameter ;
 import fr.tpt.aadl.transformation.ATLTransfoLauncher ;
 
 public class AadlArinc653Transformation implements
@@ -86,8 +85,7 @@ public class AadlArinc653Transformation implements
   }
 
   @Override
-  public void setParameters(Map<TargetSpecificTransformationParameter,
-                            Object> parameters)
+  public void setParameters(Map<String, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }

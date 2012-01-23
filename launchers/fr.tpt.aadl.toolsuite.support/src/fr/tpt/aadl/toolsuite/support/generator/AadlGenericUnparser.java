@@ -10,5 +10,5 @@ public interface AadlGenericUnparser
   public void process(Element element, File generatedFilePath) 
         throws GenerationException ;
   
-  public void setParameters(Map<GenericUnparserParameter, Object> parameters) ;
+  public void setParameters(Map<String, Object> parameters) ;
 }

@@ -13,6 +13,6 @@ public interface Generator extends NamedPlugin
                        Map<String, Resource> standardPropertySets,
                        File generatedFilePath) throws GenerationException ;
 
-  public void setParameters(Map<GeneratorParameter, String> parameters)
+  public void setParameters(Map<String, Object> parameters)
         throws Exception ;
 }

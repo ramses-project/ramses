@@ -21,5 +21,5 @@ public interface AadlTargetUnparser
   public void process(ProcessImplementation process, File generatedFilePath,
                       TargetProperties tarProp) throws GenerationException ;
   
-  public void setParameters(Map<TargetUnparserParameter, Object> parameters) ;
+  public void setParameters(Map<String, Object> parameters) ;
 }

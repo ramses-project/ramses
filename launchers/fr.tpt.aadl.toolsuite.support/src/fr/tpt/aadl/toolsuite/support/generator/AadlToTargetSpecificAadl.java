@@ -11,6 +11,5 @@ public interface AadlToTargetSpecificAadl
                             Map<String, Resource> standardPropertySets,
                             File generatedFilePath) throws GenerationException ;
   
-  public void setParameters(Map<TargetSpecificTransformationParameter,
-                            Object> parameters) ;
+  public void setParameters(Map<String, Object> parameters) ;
 }

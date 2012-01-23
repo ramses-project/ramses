@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map ;
 
 import fr.tpt.aadl.target.specific.generator.GeneratorUtils ;
-import fr.tpt.aadl.toolsuite.support.generator.BuilderGeneratorParameter ;
 import fr.tpt.aadl.toolsuite.support.generator.GenerationException ;
 import fr.tpt.aadl.toolsuite.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.util.properties.PropertyUtils ;
@@ -288,7 +287,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
   }
 
   @Override
-  public void setParameters(Map<BuilderGeneratorParameter, Object> parameters)
+  public void setParameters(Map<String, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }
