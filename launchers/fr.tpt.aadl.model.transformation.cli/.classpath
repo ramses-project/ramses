@@ -9,6 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.sched.tools.cheddar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.ui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.c.unparser"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.pok.c.unparser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.pok.generator"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

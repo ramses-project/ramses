@@ -13,7 +13,7 @@ import fr.tpt.aadl.annex.behavior.AadlBaResolver ;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction ;
 import fr.tpt.aadl.c.unparser.annex.behavior.AadlBaToCUnparserAction ;
 import fr.tpt.aadl.launch.WCETAnalysis ;
-import fr.tpt.aadl.pok.c.unparser.PokGeneratorFactory ;
+import fr.tpt.aadl.pok.generator.PokGeneratorFactory ;
 import fr.tpt.aadl.toolsuite.support.analysis.Analyzer ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.generator.Generator ;
@@ -44,8 +44,8 @@ public class StaticServiceRegistry implements ServiceRegistry
                    new AadlBaToCUnparserAction()) ;
     _analyzers.put(WCETAnalysis.ANALYZER_NAME, new WCETAnalysis()) ;
     
-//    Generator gen = PokGeneratorFactory.createPokGenerator(false) ;
-//    _gen.put(gen.getRegistryName(), gen) ;
+    Generator gen = PokGeneratorFactory.createPokGenerator(false) ;
+    _gen.put(gen.getRegistryName(), gen) ;
   }
 
   @Override

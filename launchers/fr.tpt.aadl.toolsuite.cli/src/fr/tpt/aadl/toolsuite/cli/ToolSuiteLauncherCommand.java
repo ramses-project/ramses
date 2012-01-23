@@ -15,12 +15,12 @@ import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
+import fr.tpt.aadl.pok.generator.PokGenerator ;
 import fr.tpt.aadl.toolsuite.core.ToolSuiteLauncher ;
 import fr.tpt.aadl.toolsuite.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
 
-import fr.tpt.aadl.arinc653.transformation.PokGenerator ;
 
 public class ToolSuiteLauncherCommand
 {

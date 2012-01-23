@@ -22,6 +22,4 @@ public interface AadlTargetUnparser
                       TargetProperties tarProp) throws GenerationException ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
-  
-  public String generatorName() ;
 }
