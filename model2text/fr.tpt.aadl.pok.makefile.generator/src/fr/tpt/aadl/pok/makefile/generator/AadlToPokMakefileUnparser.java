@@ -24,7 +24,7 @@ import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 import org.osate.aadl2.util.Aadl2Switch ;
 
 public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
-                                    implements TargetBuilderGenerator
+                                       implements TargetBuilderGenerator
 {
 
   private UnparseText unparserContent ;
@@ -287,7 +287,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
   }
 
   @Override
-  public void setParameters(Map<String, Object> parameters)
+  public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }

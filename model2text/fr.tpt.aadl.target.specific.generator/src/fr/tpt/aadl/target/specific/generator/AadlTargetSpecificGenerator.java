@@ -17,6 +17,13 @@ public class AadlTargetSpecificGenerator implements Generator
   
   protected String _registryName = null ;
   
+  public AadlTargetSpecificGenerator(AadlToTargetSpecificAadl targetTrans,
+                                     AadlTargetSpecificCodeGenerator codeGen)
+  {
+    _targetTrans = targetTrans ;
+    _codeGen = codeGen ;
+  }
+  
   public void setRegistryName(String registryName)
   {
     _registryName = registryName ;
@@ -55,7 +62,7 @@ public class AadlTargetSpecificGenerator implements Generator
   }
 
   @Override
-  public void setParameters(Map<String, Object> parameters)
+  public void setParameters(Map<Enum<?>, Object> parameters)
         throws Exception
   {
     throw new UnsupportedOperationException() ;

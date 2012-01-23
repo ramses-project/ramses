@@ -38,6 +38,8 @@ import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
 {
+  public static String POK_GENERATOR_NAME = "pok_generator" ;
+  
   private final static long DEFAULT_REQUIRED_STACK_SIZE = 16384 ;
   
   // TODO: factorization with ATL transformation into a naming class or enum. 
@@ -779,7 +781,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
 
   @Override
-  public void setParameters(Map<String, Object> parameters)
+  public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }
@@ -1110,6 +1112,12 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  routingImplCode.addOutput(",");
 	}
 	routingImplCode.addOutputNewline("};");
+  }
+
+  @Override
+  public String generatorName()
+  {
+    return POK_GENERATOR_NAME ;
   }
 }
 

@@ -21,5 +21,5 @@ public interface TargetBuilderGenerator
                       File generatedFilePath)
                             throws GenerationException ;
   
-  public void setParameters(Map<String, Object> parameters) ;
+  public void setParameters(Map<Enum<?>, Object> parameters) ;
 }

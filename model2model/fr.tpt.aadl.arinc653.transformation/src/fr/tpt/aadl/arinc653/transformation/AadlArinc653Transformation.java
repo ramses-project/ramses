@@ -85,7 +85,7 @@ public class AadlArinc653Transformation implements
   }
 
   @Override
-  public void setParameters(Map<String, Object> parameters)
+  public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }

@@ -13,6 +13,7 @@ import fr.tpt.aadl.annex.behavior.AadlBaResolver ;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction ;
 import fr.tpt.aadl.c.unparser.annex.behavior.AadlBaToCUnparserAction ;
 import fr.tpt.aadl.launch.WCETAnalysis ;
+import fr.tpt.aadl.pok.c.unparser.PokGeneratorFactory ;
 import fr.tpt.aadl.toolsuite.support.analysis.Analyzer ;
 import fr.tpt.aadl.toolsuite.support.services.ServiceRegistry ;
 import fr.tpt.aadl.toolsuite.support.generator.Generator ;
@@ -28,7 +29,7 @@ public class StaticServiceRegistry implements ServiceRegistry
         new HashMap<String, AnnexResolver>() ;
   private Map<String, Analyzer> _analyzers = new HashMap<String, Analyzer>() ;
 
-  private Map<String, Generator> _trans = new HashMap<String, Generator>() ;
+  private Map<String, Generator> _gen = new HashMap<String, Generator>() ;
 
   public StaticServiceRegistry()
         throws Exception
@@ -42,7 +43,9 @@ public class StaticServiceRegistry implements ServiceRegistry
     _unparsers.put(AadlBaToCUnparserAction.ANNEX_NAME,
                    new AadlBaToCUnparserAction()) ;
     _analyzers.put(WCETAnalysis.ANALYZER_NAME, new WCETAnalysis()) ;
-//    _trans.put(PokGenerator.GENERATOR_NAME, new PokGenerator()) ;
+    
+//    Generator gen = PokGeneratorFactory.createPokGenerator(false) ;
+//    _gen.put(gen.getRegistryName(), gen) ;
   }
 
   @Override
@@ -72,7 +75,7 @@ public class StaticServiceRegistry implements ServiceRegistry
   @Override
   public Set<String> getAvailableTransformationNames()
   {
-    return _trans.keySet() ;
+    return _gen.keySet() ;
   }
 
   @Override
@@ -81,9 +84,9 @@ public class StaticServiceRegistry implements ServiceRegistry
     return _analyzers.get(analyzerName) ;
   }
 
-  public Generator getTransformation(String TransformationName)
+  public Generator getGenerator(String TransformationName)
   {
-    return _trans.get(TransformationName) ;
+    return _gen.get(TransformationName) ;
   }
 
   @Override

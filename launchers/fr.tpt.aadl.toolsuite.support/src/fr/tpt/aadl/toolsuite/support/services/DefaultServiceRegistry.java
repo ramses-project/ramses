@@ -49,7 +49,7 @@ public class DefaultServiceRegistry implements ServiceRegistry
   }
 
   @Override
-  public Generator getTransformation(String name)
+  public Generator getGenerator(String name)
   {
     return null ;
   }

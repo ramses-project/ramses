@@ -33,7 +33,7 @@ public class OSGiServiceRegistry implements ServiceRegistry
   private Map<String, Analyzer> _analyzersRegistry =
         new HashMap<String, Analyzer>() ;
 
-  private Map<String, Generator> _transRegistry =
+  private Map<String, Generator> _genRegistry =
         new HashMap<String, Generator>() ;
 
   public OSGiServiceRegistry()
@@ -49,7 +49,7 @@ public class OSGiServiceRegistry implements ServiceRegistry
           (AnnexUnparserRegistry) AnnexRegistry
                 .getRegistry(AnnexRegistry.ANNEX_UNPARSER_EXT_ID) ;
     initialize(_analyzersRegistry, Names.ANALYSIS_EXT_ID) ;
-    initialize(_transRegistry, Names.TRANSFORMATION_EXT_ID) ;
+    initialize(_genRegistry, Names.TRANSFORMATION_EXT_ID) ;
   }
 
   @SuppressWarnings("all")
@@ -105,7 +105,7 @@ public class OSGiServiceRegistry implements ServiceRegistry
   @Override
   public Set<String> getAvailableTransformationNames()
   {
-    return _transRegistry.keySet() ;
+    return _genRegistry.keySet() ;
   }
 
   @Override
@@ -115,9 +115,9 @@ public class OSGiServiceRegistry implements ServiceRegistry
   }
 
   @Override
-  public Generator getTransformation(String TransformationName)
+  public Generator getGenerator(String generatorName)
   {
-    return _transRegistry.get(TransformationName) ;
+    return _genRegistry.get(generatorName) ;
   }
 
   @Override

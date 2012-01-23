@@ -49,5 +49,5 @@ public interface ServiceRegistry
 
   public Set<String> getAvailableTransformationNames() ;
 
-  public Generator getTransformation(String TransformationName) ;
+  public Generator getGenerator(String generator) ;
 }

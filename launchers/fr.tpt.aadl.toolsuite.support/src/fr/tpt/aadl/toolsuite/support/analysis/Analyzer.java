@@ -16,6 +16,6 @@ public interface Analyzer extends NamedPlugin
                               IProgressMonitor monitor)
         throws AnalysisResultException ;
 
-  public void setParameters(Map<String, String> parameters)
+  public void setParameters(Map<Enum<?>, String> parameters)
         throws Exception ;
 }
