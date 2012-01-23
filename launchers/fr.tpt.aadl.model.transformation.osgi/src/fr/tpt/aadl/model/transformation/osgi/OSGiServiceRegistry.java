@@ -103,7 +103,7 @@ public class OSGiServiceRegistry implements ServiceRegistry
   }
 
   @Override
-  public Set<String> getAvailableTransformationNames()
+  public Set<String> getAvailableGeneratorNames()
   {
     return _genRegistry.keySet() ;
   }

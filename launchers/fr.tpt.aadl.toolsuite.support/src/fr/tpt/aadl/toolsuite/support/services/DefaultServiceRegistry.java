@@ -37,7 +37,7 @@ public class DefaultServiceRegistry implements ServiceRegistry
   }
 
   @Override
-  public Set<String> getAvailableTransformationNames()
+  public Set<String> getAvailableGeneratorNames()
   {
     return new HashSet<String>(0) ;
   }

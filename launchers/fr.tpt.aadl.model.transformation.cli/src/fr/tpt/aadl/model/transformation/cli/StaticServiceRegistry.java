@@ -73,7 +73,7 @@ public class StaticServiceRegistry implements ServiceRegistry
   }
 
   @Override
-  public Set<String> getAvailableTransformationNames()
+  public Set<String> getAvailableGeneratorNames()
   {
     return _gen.keySet() ;
   }

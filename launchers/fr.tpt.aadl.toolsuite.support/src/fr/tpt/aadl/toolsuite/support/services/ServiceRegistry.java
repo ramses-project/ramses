@@ -47,7 +47,7 @@ public interface ServiceRegistry
 
   public Analyzer getAnalyzer(String analyzerName) ;
 
-  public Set<String> getAvailableTransformationNames() ;
+  public Set<String> getAvailableGeneratorNames() ;
 
   public Generator getGenerator(String generator) ;
 }
