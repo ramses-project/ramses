@@ -19,7 +19,8 @@ module Uninstanciate;
 create 
 	OUT 			: AADLBA
 from 
-	IN 				: AADLI;
+	IN 				: AADLI,
+	HOOKS			: ATLHOOKS;
 
 uses AADLCopyHelpers;
 uses AADLICopyHelpers;
@@ -93,6 +94,10 @@ rule System_Instance {
 			ownedPublicSection <- section
 		),
 		realization : AADLBA!Realization (implemented <- type)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(impl, s);
+	}
 }
 
 rule Memory_Instance {
@@ -104,6 +109,10 @@ rule Memory_Instance {
 			memorySubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 rule Bus_Instance {
@@ -115,6 +124,10 @@ rule Bus_Instance {
 			busSubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 rule Device_Instance {
@@ -126,6 +139,10 @@ rule Device_Instance {
 			deviceSubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 rule Processor_Instance {
@@ -137,6 +154,10 @@ rule Processor_Instance {
 			processorSubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 rule VirtualProcessor_Instance {
@@ -148,6 +169,10 @@ rule VirtualProcessor_Instance {
 			virtualProcessorSubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 rule Thread_Instance {
@@ -159,6 +184,10 @@ rule Thread_Instance {
 			threadSubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 rule Process_Instance {
@@ -170,6 +199,10 @@ rule Process_Instance {
 			processSubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 
@@ -184,6 +217,10 @@ rule Data_Instance {
 			dataSubcomponentType <- c.createOrSetTypeAndImplementation(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
 }
 
 -------------------------------------------------------------------------------------

@@ -61,6 +61,7 @@ unique lazy rule ThreadImplementation {
 	)
  do
  {
+	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(implImg, c);
  	implImg.getOwnedSubprogramCallSequences().add(thisModule.CallSequence(impl,implImg));
 	thisModule.addReturnCodeDataSubcomponent(implImg);
 	for(p in c.featureInstance->select(e|e.category=#dataPort and (e.direction.toString()='in' or e.direction=#inOut)))
@@ -173,14 +174,14 @@ unique lazy rule ThreadImplementation {
 				for(cnx in impl.getOwnedParameterConnections())
 				{
 					
-					if(cnx.destination.connectionEnd = p.feature)
+					if(cnx.source.connectionEnd = p.feature)
 					{
 						thisModule.addParameterConnection
 						(
 							implImg,
-							'transfer_'+p.feature.retreiveMessageAddress(implImg).name+'_to_'+cnx.source.getConnContextImg(implImg).name+'_'+cnx.source.getConnFeatureImg(implImg).name,
-							cnx.source.getConnFeatureImg(implImg),
-							cnx.source.getConnContextImg(implImg),
+							'transfer_'+p.feature.retreiveMessageAddress(implImg).name+'_to_'+cnx.destination.getConnContextImg(implImg).name+'_'+cnx.destination.getConnFeatureImg(implImg).name,
+							cnx.destination.getConnFeatureImg(implImg),
+							cnx.destination.getConnContextImg(implImg),
 							p.feature.retreiveMessageAddress(implImg)
 						);
 	
@@ -645,12 +646,44 @@ lazy rule addValidityDataSubcomponent
 	}
 }
 
+rule toStringLiteral(input: String)
+{
+	to
+		output : AADLBA!StringLiteral (value <- input)
+	do
+	{
+		output;
+	}
+}
+
+helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpression =
+	if(port.getModalPropertyValue('Timeout').oclIsUndefined())
+	then
+		OclUndefined
+	else
+		if(port.getModalPropertyValue('Timeout').ownedValue.value.oclIsUndefined())
+		then
+			OclUndefined
+		else
+			thisModule.toStringLiteral(port.getModalPropertyValue('Timeout').ownedValue.value.toString())
+		endif
+	endif
+;
+
 lazy rule addTimeOutSubcomponent
 {
 	from
 		implImg : AADLBA!ThreadImplementation,
 		port : AADLBA!Feature
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.getTimeOutInitValue(port);
+	}
 	to
+		lv: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{initValuePE.debug('!!!!!!!!!')}
+		),
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.name+'_TimeOut',
@@ -659,6 +692,10 @@ lazy rule addTimeOutSubcomponent
 	do
 	{
 		implImg.ownedDataSubcomponent.add(dataSubcomponent);
+		if(not initValuePE.oclIsUndefined())
+		{
+			dataSubcomponent.ownedPropertyAssociation.add(thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv));
+		}
 	}
 }
 

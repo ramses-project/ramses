@@ -91,7 +91,7 @@ end Create_Queuing_Port;
 subprogram Send_Queuing_Message
 features
   QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;};
-  MESSAGE_ADDR: in parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR: in out parameter MESSAGE_ADDR_TYPE;
   LENGTH: in parameter MESSAGE_SIZE_TYPE;
   TIME_OUT: in parameter SYSTEM_TIME_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
