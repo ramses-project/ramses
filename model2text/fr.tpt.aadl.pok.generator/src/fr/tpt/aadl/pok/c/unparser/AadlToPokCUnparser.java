@@ -919,81 +919,85 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	String guard = GenerationUtilsC.generateHeaderInclusionGuard("routing.h") ;
 	routingHeaderCode.addOutput(guard);
 	
-	int globalPortNb = routeProp.globalPort.size();
-	routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_GLOBAL_PORTS " +
-			Integer.toString(globalPortNb));
-	
-	List<FeatureInstance> locaPorts = getLocalPorts(processor, routeProp);
-	int localPortNb = locaPorts.size();
-	
-	routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_PORTS " +
-			Integer.toString(localPortNb));
+	if(routeProp.processPerProcessor.get(processor)!=null)
+	{
+	  int globalPortNb = routeProp.globalPort.size();
+	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_GLOBAL_PORTS " +
+			  Integer.toString(globalPortNb));
+		
+	  List<FeatureInstance> locaPorts = getLocalPorts(processor, routeProp);
+	  int localPortNb = locaPorts.size();
+	  
+	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_PORTS " +
+			  Integer.toString(localPortNb));
 
-    routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
-          Integer.toString(routeProp.processors.size())) ;
-	
-    routingHeaderCode.addOutputNewline("typedef enum") ;
-    routingHeaderCode.addOutputNewline("{") ;
-	routingHeaderCode.incrementIndent() ;
-	int idx=0;
-	for(ComponentInstance node : routeProp.processors)
-	{
-	  routingHeaderCode.addOutput(RoutingProperties.getComponentInstanceIdentifier(node)) ;
-	  routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-	  routingHeaderCode.addOutputNewline(",") ;
-	  idx++;
+	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
+			  Integer.toString(routeProp.processors.size())) ;
+
+	  routingHeaderCode.addOutputNewline("typedef enum") ;
+	  routingHeaderCode.addOutputNewline("{") ;
+	  routingHeaderCode.incrementIndent() ;
+	  int idx=0;
+	  for(ComponentInstance node : routeProp.processors)
+	  {
+		routingHeaderCode.addOutput(RoutingProperties.getComponentInstanceIdentifier(node)) ;
+		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+		routingHeaderCode.addOutputNewline(",") ;
+		idx++;
+	  }
+	  routingHeaderCode.decrementIndent() ;
+	  routingHeaderCode.addOutputNewline("} pok_node_identifier_t;") ;
+
+	  List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
+	  idx=0;
+
+	  routingHeaderCode.addOutputNewline("typedef enum") ;
+	  routingHeaderCode.addOutputNewline("{") ;
+	  routingHeaderCode.incrementIndent() ;
+	  for(FeatureInstance fi: localPorts)
+	  {
+		routingHeaderCode.addOutput(RoutingProperties.getFeatureLocalIdentifier(fi));
+		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+		routingHeaderCode.addOutputNewline(",") ;
+		idx++;
+	  }
+	  routingHeaderCode.addOutput("invalid_local_port");
+	  routingHeaderCode.addOutputNewline(" = "+Integer.toString(idx));
+	  routingHeaderCode.decrementIndent() ;
+	  routingHeaderCode.addOutputNewline("} pok_port_local_identifier_t;") ;
+
+	  idx=0;
+	  routingHeaderCode.addOutputNewline("typedef enum") ;
+	  routingHeaderCode.addOutputNewline("{") ;
+	  routingHeaderCode.incrementIndent() ;
+	  for(FeatureInstance fi: routeProp.globalPort)
+	  {
+		  routingHeaderCode.addOutput(RoutingProperties.getFeatureGlobalIdentifier(fi));
+		  routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+		  routingHeaderCode.addOutputNewline(",") ;
+		  idx++;
+	  }
+	  routingHeaderCode.decrementIndent() ;
+	  routingHeaderCode.addOutputNewline("} pok_port_identifier_t;") ;
+
+	  // TODO: define buses for distributed use-case
+	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0") ;
+	  idx=0;
+	  routingHeaderCode.addOutputNewline("typedef enum") ;
+	  routingHeaderCode.addOutputNewline("{") ;
+	  routingHeaderCode.incrementIndent() ;
+	  for(ComponentInstance bus:routeProp.buses)
+	  {
+		routingHeaderCode.addOutput(RoutingProperties.getComponentInstanceIdentifier(bus));
+		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+		routingHeaderCode.addOutputNewline(",") ;
+		idx++;
+	  }
+	  routingHeaderCode.addOutputNewline("invalid_bus = "+Integer.toString(idx)) ;
+	  routingHeaderCode.decrementIndent() ;
+	  routingHeaderCode.addOutputNewline("} pok_bus_identifier_t;") ;  
 	}
-	routingHeaderCode.decrementIndent() ;
-	routingHeaderCode.addOutputNewline("} pok_node_identifier_t;") ;
-	
-	List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
-	idx=0;
-	
-	routingHeaderCode.addOutputNewline("typedef enum") ;
-    routingHeaderCode.addOutputNewline("{") ;
-	routingHeaderCode.incrementIndent() ;
-	for(FeatureInstance fi: localPorts)
-	{
-	  routingHeaderCode.addOutput(RoutingProperties.getFeatureLocalIdentifier(fi));
-	  routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-	  routingHeaderCode.addOutputNewline(",") ;
-	  idx++;
-	}
-	routingHeaderCode.addOutput("invalid_local_port");
-	routingHeaderCode.addOutputNewline(" = "+Integer.toString(idx));
-	routingHeaderCode.decrementIndent() ;
-	routingHeaderCode.addOutputNewline("} pok_port_local_identifier_t;") ;
-	
-	idx=0;
-	routingHeaderCode.addOutputNewline("typedef enum") ;
-    routingHeaderCode.addOutputNewline("{") ;
-	routingHeaderCode.incrementIndent() ;
-	for(FeatureInstance fi: routeProp.globalPort)
-	{
-	  routingHeaderCode.addOutput(RoutingProperties.getFeatureGlobalIdentifier(fi));
-	  routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-	  routingHeaderCode.addOutputNewline(",") ;
-	  idx++;
-	}
-	routingHeaderCode.decrementIndent() ;
-	routingHeaderCode.addOutputNewline("} pok_port_identifier_t;") ;
-	
-	// TODO: define buses for distributed use-case
-	routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0") ;
-	idx=0;
-	routingHeaderCode.addOutputNewline("typedef enum") ;
-	routingHeaderCode.addOutputNewline("{") ;
-	routingHeaderCode.incrementIndent() ;
-	for(ComponentInstance bus:routeProp.buses)
-	{
-	  routingHeaderCode.addOutput(RoutingProperties.getComponentInstanceIdentifier(bus));
-	  routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-	  routingHeaderCode.addOutputNewline(",") ;
-	  idx++;
-	}
-	routingHeaderCode.addOutputNewline("invalid_bus = "+Integer.toString(idx)) ;
-	routingHeaderCode.decrementIndent() ;
-	routingHeaderCode.addOutputNewline("} pok_bus_identifier_t;") ;
+
 
 	routingHeaderCode.addOutputNewline("#endif");
   }
@@ -1006,6 +1010,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	routingImplCode.addOutputNewline("#include \"routing.h\"") ;
 	routingImplCode.addOutputNewline("#include \"middleware/port.h\"") ;
 	routingImplCode.addOutputNewline("#include <types.h>") ;
+	
+	if(routeProp.processPerProcessor.get(processor)==null)
+	  return;
+	
 	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
 	{
 	  // compute list of ports for each partition deployed on "processor"
