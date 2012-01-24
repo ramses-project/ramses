@@ -37,7 +37,7 @@
    		</actionSet>
     </extension>
  <extension
-       point="fr.tpt.aadl.toolsuite.support.analyzer">
+       point="fr.tpt.aadl.ramses.control.support.analyzer">
     <analyzer
           analysisName="WCETAnalysis"
           class="fr.tpt.aadl.launch.WCETAnalysis"

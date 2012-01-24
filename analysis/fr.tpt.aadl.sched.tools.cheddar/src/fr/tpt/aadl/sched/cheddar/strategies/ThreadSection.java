@@ -5,12 +5,12 @@ import java.util.HashMap ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.instance.ComponentInstance ;
 
+import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
+import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil.DispatchProtocol ;
 import fr.tpt.aadl.sched.cheddar.CheddarContext ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarAddressSpace ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarTask ;
-import fr.tpt.aadl.util.properties.AadlUtil ;
-import fr.tpt.aadl.util.properties.AadlUtil.DispatchProtocol ;
-import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 public class ThreadSection extends CheddarModelConversionPart<CheddarTask>
 {

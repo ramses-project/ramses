@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="fr.tpt.aadl.ramses.control.support" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="fr.tpt.aadl.ramses.control.support" id="generator" name="TPT AADL generator"/>
+      </appinfo>
+      <documentation>
+         The TPT AADL generator plugin transforms standard AADL resources into others formats. This generator extension point allows third-party plug-ins to define transformation for AADL resources.
+ 
+         The AADL-Ramses-CLI will use generator plug-ins to transform AADL resources by calling the generator upon the transformation name, given by command line options.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="generator" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="generator">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A unique identifier for this aadl transformation processor.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  A human-readable name for this aadl transformation processor.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="transformationName" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the transformation this generator can manage.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The fully qualified name of the class that implements &lt;code&gt;fr.tpt.aadl.toolsuite.support.Transformation&lt;/code&gt;.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":fr.tpt.aadl.toolsuite.support.transformation.Transformation"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         Plug-ins that want to extend this extension point must implement &lt;code&gt;fr.tpt.aadl.ramses.control.support.generator.Generator&lt;/code&gt;.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         AADL-Ramses-CLI
+ 
+Copyright © 2011 TELECOM ParisTech and CNRS
+
+TELECOM ParisTech/LTCI
+ 
+Authors: see AUTHORS
+
+This program is free software: you can redistribute it and/or modify 
+it under the terms of the Eclipse Public License as published by Eclipse,
+either version 1.0 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Eclipse Public License for more details.
+You should have received a copy of the Eclipse Public License
+along with this program.  If not, see 
+http://www.eclipse.org/org/documents/epl-v10.php
+      </documentation>
+   </annotation>
+
+</schema>

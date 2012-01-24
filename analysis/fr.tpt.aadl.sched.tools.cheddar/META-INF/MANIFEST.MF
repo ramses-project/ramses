@@ -1,11 +1,11 @@
 Bundle-SymbolicName: fr.tpt.aadl.sched.tools.cheddar;singleton=true
 Bundle-Version: 1.0.0
 Bundle-Name: AADL-Toolsuite-Scheduling-Cheddar
-Bundle-Vendor: TPT
+Bundle-Vendor: TELECOM Paristech
 Bundle-Activator: fr.tpt.aadl.launch.PluginActivator
 Require-Bundle: org.eclipse.ui;bundle-version="3.6.1",
  org.eclipse.core.runtime;bundle-version="3.6.0",
- fr.tpt.aadl.propertiesutil;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
  PropertiesExtractor;bundle-version="1.0.0",
  org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.instantiation;bundle-version="1.0.0",
@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.6.1",
  org.osate.pluginsupport;bundle-version="1.0.0",
  org.osate.ui;bundle-version="1.0.0",
  org.osate.workspace;bundle-version="1.0.0",
- fr.tpt.aadl.toolsuite.support;bundle-version="0.5.0"
+ fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
 Provide-Package: 
  fr.tpt.aadl.launch,
  fr.tpt.aadl.sched.cheddar,

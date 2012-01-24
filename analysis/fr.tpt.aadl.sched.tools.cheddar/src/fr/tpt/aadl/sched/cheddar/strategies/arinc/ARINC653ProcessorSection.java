@@ -8,10 +8,10 @@ import org.osate.aadl2.ReferenceValue ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import org.osate.aadl2.instance.ComponentInstance ;
 
+import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
 import fr.tpt.aadl.sched.cheddar.CheddarContext ;
 import fr.tpt.aadl.sched.cheddar.model.SchedulerPipeline ;
 import fr.tpt.aadl.sched.cheddar.strategies.ProcessorSection ;
-import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 public class ARINC653ProcessorSection extends ProcessorSection
 {

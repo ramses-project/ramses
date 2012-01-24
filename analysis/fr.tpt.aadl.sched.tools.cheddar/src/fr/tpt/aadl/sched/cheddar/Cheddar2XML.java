@@ -5,6 +5,7 @@ import org.jdom.Document ;
 import org.jdom.Element ;
 
 import fr.tpt.aadl.launch.PluginActivator ;
+import fr.tpt.aadl.ramses.util.workspace.XMLUtil ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarAddressSpace ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarElement ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarModel ;
@@ -12,7 +13,6 @@ import fr.tpt.aadl.sched.cheddar.model.CheddarProcessor ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarResource ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarTask ;
 import fr.tpt.aadl.sched.cheddar.model.ResourceUse ;
-import fr.tpt.aadl.util.workspace.XMLUtil ;
 
 public class Cheddar2XML
 {

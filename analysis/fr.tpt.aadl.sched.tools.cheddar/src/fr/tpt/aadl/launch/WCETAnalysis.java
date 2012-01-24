@@ -8,9 +8,9 @@ import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.instance.SystemOperationMode ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
+import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
 import fr.tpt.aadl.sched.cheddar.CheddarOptions ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
-import fr.tpt.aadl.toolsuite.support.analysis.AbstractAnalyzer ;
 
 public class WCETAnalysis extends AbstractAnalyzer
 {

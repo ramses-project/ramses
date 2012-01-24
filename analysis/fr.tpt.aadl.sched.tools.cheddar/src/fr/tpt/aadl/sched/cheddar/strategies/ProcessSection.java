@@ -8,12 +8,12 @@ import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.InstanceObject ;
 import org.osate.aadl2.instance.InstanceReferenceValue ;
 
+import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
 import fr.tpt.aadl.sched.cheddar.CheddarContext ;
 import fr.tpt.aadl.sched.cheddar.CheddarOptions ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarAddressSpace ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarElement ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarProcessor ;
-import fr.tpt.aadl.util.properties.PropertyUtils ;
 
 public class ProcessSection extends
                            CheddarModelConversionPart<CheddarAddressSpace>

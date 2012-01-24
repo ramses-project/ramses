@@ -10,7 +10,7 @@ import fr.tpt.aadl.flow.extraction.util.ComputationUtil ;
 import fr.tpt.aadl.flow.model.ExecutionGraph ;
 import fr.tpt.aadl.flow.model.RTAction ;
 import fr.tpt.aadl.flow.model.RTActionType ;
-import fr.tpt.aadl.util.properties.PropertyUtils ;
+import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
 
 public class ThreadSA extends CallSequenceAnalyzer
 {

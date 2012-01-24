@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-Name: Properties Extractor
 Bundle-SymbolicName: PropertiesExtractor;singleton=true
 Bundle-Version: 1.0.0
-Bundle-Vendor: TPT
+Bundle-Vendor: TELECOM Paristech
 Provide-Package: fr.tpt.aadl.flow,
  fr.tpt.aadl.flow.analysis.util,
  fr.tpt.aadl.flow.extraction,
@@ -14,7 +14,7 @@ Provide-Package: fr.tpt.aadl.flow,
  fr.tpt.aadl.flow.extraction.util,
  fr.tpt.aadl.flow.model,
  fr.tpt.aadl.flow.util
-Require-Bundle: fr.tpt.aadl.propertiesutil;bundle-version="1.0.0",
+Require-Bundle: fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
  org.eclipse.emf.common;bundle-version="2.6.0",
  org.eclipse.core.runtime;bundle-version="3.6.0",
  org.osate.aadl2;bundle-version="1.0.0",

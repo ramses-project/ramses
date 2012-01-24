@@ -10,10 +10,10 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.PublicPackageSection ;
 
-import fr.tpt.aadl.c.unparser.AadlToCUnparser ;
-import fr.tpt.aadl.model.transformation.cli.StaticServiceRegistry ;
-import fr.tpt.aadl.toolsuite.core.ToolSuiteLauncher ;
-import fr.tpt.aadl.toolsuite.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.cli.StaticServiceRegistry ;
+import fr.tpt.aadl.ramses.control.core.ToolSuiteLauncher ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.generator.c.AadlToCUnparser ;
 
 public class GenerationTester
 {
