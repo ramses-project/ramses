@@ -109,15 +109,62 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  private void generateMainImpl(ProcessImplementation process,
-                                AadlToCSwitchProcess mainImplCode,
-                                PartitionProperties pp)
+  //Generate global variables.
+  private void genMainGlobalVariables(EList<ThreadSubcomponent> lthreads,
+                               AadlToCSwitchProcess mainImplCode,
+                               PartitionProperties pp)
   {
-    StringBuilder sb = new StringBuilder() ;
+    // Preconditions
     
-    EList<ThreadSubcomponent> lthreads =
-                                         process.getOwnedThreadSubcomponents() ;
-    
+    if(false == lthreads.isEmpty() ||
+       false == pp.blackboardNames.isEmpty())
+    {
+      StringBuilder sb = new StringBuilder() ;
+      
+      mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
+      mainImplCode.addOutputNewline(GenerationUtilsC
+            .generateSectionTitle("GLOBAL VARIABLES")) ;
+      
+      if(false == lthreads.isEmpty())
+      {
+        mainImplCode
+              .addOutputNewline(
+                      "PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];") ;
+      }
+
+      if(false == pp.blackboardNames.isEmpty())
+      {
+        // Generate blackboards names array.
+        sb.append("char* pok_blackboards_names[POK_CONFIG_NB_BLACKBOARDS] = {") ;
+
+        for(String name : pp.blackboardNames)
+        {
+          sb.append('\"') ;
+          sb.append(name) ;
+          sb.append('\"') ;
+        }
+
+        sb.append("};") ;
+        mainImplCode.addOutputNewline(sb.toString()) ;
+        // Generate external variable (declared in deployment.c).
+        sb.setLength(0) ; // Reset string builder.
+
+        for(String name : pp.blackboardNames)
+        {
+          sb.append("extern BLACKBOARD_ID_TYPE ") ;
+          sb.append(name) ;
+          sb.append(";\n") ;
+        }
+
+        mainImplCode.addOutput(sb.toString()) ;
+      }
+
+      mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
+    }
+  }
+  
+  private void genMainFileIncluded(AadlToCSwitchProcess mainImplCode)
+  {
     // Files included.
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
     mainImplCode.addOutputNewline(GenerationUtilsC
@@ -125,129 +172,84 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     mainImplCode.addOutputNewline("#include \"main.h\"") ;
     mainImplCode.addOutputNewline("#include \"activity.h\"") ;
-    
-    //Generate global variables.
-    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
-    mainImplCode.addOutputNewline(GenerationUtilsC
-          .generateSectionTitle("GLOBAL VARIABLES")) ;
-    
-    if(false == lthreads.isEmpty())
+  }
+  
+  private void genMainThreadDeclaration(ThreadSubcomponent thread,
+                                        int threadIndex,
+                                        AadlToCSwitchProcess mainImplCode)
+  {
+    ThreadImplementation timpl =
+          (ThreadImplementation) thread.getComponentImplementation() ;
+    mainImplCode.addOutput("  tattr.ENTRY_POINT = ") ;
+    mainImplCode.addOutput(GenerationUtilsC
+          .getGenerationCIdentifier(timpl.getQualifiedName())) ;
+    mainImplCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + ';') ;
+    String period = null ;
+    String deadline = null ;
+    String timeCapacity = null ;
+
+    try
     {
-      mainImplCode
-            .addOutputNewline("PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];") ;
+      long value = PropertyUtils.getIntValue(thread, "Period") ;
+      period = Long.toString(value) ;
+    }
+    catch(Exception e)
+    {
+      period = null ;
     }
 
-    if(false == pp.blackboardNames.isEmpty())
+    // If period is not set, don't generate.
+    if(period != null)
     {
-      // Generate blackboards names array.
-      sb.append("char* pok_blackboards_names[POK_CONFIG_NB_BLACKBOARDS] = {") ;
-
-      for(String name : pp.blackboardNames)
-      {
-        sb.append('\"') ;
-        sb.append(name) ;
-        sb.append('\"') ;
-      }
-
-      sb.append("};") ;
-      mainImplCode.addOutputNewline(sb.toString()) ;
-      // Generate external variable (declared in deployment.c).
-      sb.setLength(0) ; // Reset string builder.
-
-      for(String name : pp.blackboardNames)
-      {
-        sb.append("extern BLACKBOARD_ID_TYPE ") ;
-        sb.append(name) ;
-        sb.append(";\n") ;
-      }
-
-      mainImplCode.addOutput(sb.toString()) ;
-      sb.setLength(0) ; // Reset string builder.
+      mainImplCode.addOutput("  tattr.PERIOD = ") ;
+      mainImplCode.addOutputNewline(period + ';') ;
     }
 
-    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
-    mainImplCode.addOutputNewline(GenerationUtilsC
-          .generateSectionTitle("MAIN")) ;
-    mainImplCode.addOutputNewline("int main ()") ;
-    mainImplCode.addOutputNewline("{") ;
-    mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
-    mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
-    // For each declared thread
-    // Zero stands for ARINC's IDL thread.
-    int threadIndex = 1 ;
-
-    for(ThreadSubcomponent t : lthreads)
+    try
     {
-      ThreadImplementation timpl =
-            (ThreadImplementation) t.getComponentImplementation() ;
-      mainImplCode.addOutput("  tattr.ENTRY_POINT = ") ;
-      mainImplCode.addOutput(GenerationUtilsC
-            .getGenerationCIdentifier(timpl.getQualifiedName())) ;
-      mainImplCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + ';') ;
-      String period = null ;
-      String deadline = null ;
-      String timeCapacity = null ;
-
-      try
-      {
-        long value = PropertyUtils.getIntValue(t, "Period") ;
-        period = Long.toString(value) ;
-      }
-      catch(Exception e)
-      {
-        period = null ;
-      }
-
-      // If period is not set, don't generate.
-      if(period != null)
-      {
-        mainImplCode.addOutput("  tattr.PERIOD = ") ;
-        mainImplCode.addOutputNewline(period + ';') ;
-      }
-
-      try
-      {
-        long value = PropertyUtils.getIntValue(t, "Deadline") ;
-        deadline = Long.toString(value) ;
-      }
-      catch(Exception e)
-      {
-        // If deadline is not set, use period instead.
-        deadline = period ;
-      }
-
-      // If period and deadline are not set , don't generate.
-      if(deadline != null)
-      {
-        mainImplCode.addOutput("  tattr.DEADLINE = ") ;
-        mainImplCode.addOutputNewline(deadline + ';') ;
-      }
-
-      try
-      {
-        float value =
-              PropertyUtils.getMaxRangeValue(t, "Compute_Execution_Time") ;
-        timeCapacity = Integer.toString((int) value) ;
-      }
-      catch(Exception e)
-      {
-        timeCapacity = null ;
-      }
-
-      // If compute execution time is not set, don't generate.
-      if(timeCapacity != null)
-      {
-        mainImplCode.addOutput("  tattr.TIME_CAPACITY = ") ;
-        mainImplCode.addOutputNewline(timeCapacity + ';') ;
-      }
-
-      mainImplCode
-            .addOutput("  CREATE_PROCESS (&(tattr), &(arinc_threads[") ;
-      mainImplCode.addOutput(Integer.toString(threadIndex)) ;
-      mainImplCode.addOutputNewline("]), &(ret));") ;
-      threadIndex++ ;
+      long value = PropertyUtils.getIntValue(thread, "Deadline") ;
+      deadline = Long.toString(value) ;
+    }
+    catch(Exception e)
+    {
+      // If deadline is not set, use period instead.
+      deadline = period ;
     }
 
+    // If period and deadline are not set , don't generate.
+    if(deadline != null)
+    {
+      mainImplCode.addOutput("  tattr.DEADLINE = ") ;
+      mainImplCode.addOutputNewline(deadline + ';') ;
+    }
+
+    try
+    {
+      float value =
+            PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
+      timeCapacity = Integer.toString((int) value) ;
+    }
+    catch(Exception e)
+    {
+      timeCapacity = null ;
+    }
+
+    // If compute execution time is not set, don't generate.
+    if(timeCapacity != null)
+    {
+      mainImplCode.addOutput("  tattr.TIME_CAPACITY = ") ;
+      mainImplCode.addOutputNewline(timeCapacity + ';') ;
+    }
+
+    mainImplCode
+          .addOutput("  CREATE_PROCESS (&(tattr), &(arinc_threads[") ;
+    mainImplCode.addOutput(Integer.toString(threadIndex)) ;
+    mainImplCode.addOutputNewline("]), &(ret));") ;
+  }
+  
+  private void genMainBlackboard(AadlToCSwitchProcess mainImplCode,
+                                 PartitionProperties pp)
+  {
     // For each blackboard
     for(String name : pp.blackboardNames)
     {
@@ -257,7 +259,52 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       mainImplCode.addOutput(name);
       mainImplCode.addOutputNewline("), &(ret));") ;
     }
-
+  }
+  
+  private void generateMainImpl(ProcessImplementation process,
+                                AadlToCSwitchProcess mainImplCode,
+                                PartitionProperties pp)
+  {
+    EList<ThreadSubcomponent> lthreads =
+                                         process.getOwnedThreadSubcomponents() ;
+    
+    // Included files.
+    genMainFileIncluded(mainImplCode) ;
+    
+    // Global files.
+    genMainGlobalVariables(lthreads, mainImplCode, pp);
+    
+    // main function declaration.
+    mainImplCode.addOutputNewline(GenerationUtilsC
+          .generateSectionTitle("MAIN")) ;
+    mainImplCode.addOutputNewline("int main ()") ;
+    mainImplCode.addOutputNewline("{") ;
+    mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
+    mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
+    
+    // For each declared thread
+    // Zero stands for ARINC's IDL thread.
+    int threadIndex = 1 ;
+    
+    // Thread declarations.
+    for(ThreadSubcomponent thread : lthreads)
+    {
+      genMainThreadDeclaration(thread, threadIndex, mainImplCode) ;
+      threadIndex++ ;
+    }
+    
+    // Blackboard declarations.
+    genMainBlackboard(mainImplCode, pp) ;
+    
+    // Queue declarations.
+    
+    for(String s : pp.queuingNames)
+    {
+      System.out.println("**********" + s) ;
+      
+      
+    }
+    
     mainImplCode
           .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
     mainImplCode.addOutputNewline("  return (0);") ;
