@@ -25,7 +25,9 @@ import org.osate.aadl2.DirectedFeature ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
 import org.osate.aadl2.DirectionType ;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.parsesupport.LocationReference ;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
@@ -67,25 +69,25 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   }
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected HookAccessImpl()
   {
-    super() ;
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return ATLHooksPackage.Literals.HOOK_ACCESS ;
-  }
+		return ATLHooksPackage.Literals.HOOK_ACCESS;
+	}
 
   /**
    * <!-- begin-user-doc -->
@@ -216,5 +218,21 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
           new LocationReference(source.eResource().getURI().lastSegment(), line) ;
     target.setLocationReference(lr) ;
   }
+
+		/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+  	private static Map<NamedElement, InstanceObject> _transformationTrace = new HashMap<NamedElement, InstanceObject>();
+  	
+	public void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance) {
+		_transformationTrace.put(targetDeclarative, sourceInstance);
+	}
+	
+	public static InstanceObject getTransformationTrace(NamedElement targetDeclarative)
+	{
+		return _transformationTrace.get(targetDeclarative);
+	}
 
 } //HookAccessImpl

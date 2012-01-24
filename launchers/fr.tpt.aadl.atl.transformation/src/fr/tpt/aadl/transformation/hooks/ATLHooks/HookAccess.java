@@ -17,7 +17,9 @@ import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.instance.InstanceObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -41,44 +43,52 @@ public interface HookAccess extends EObject
   void setPredefinedPackagesManager(PredefinedPackagesManager p) ;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model required="true" threadImplRequired="true"
-   * @generated
-   */
+	 * @model required="true" threadImplRequired="true"
+	 * @generated
+	 */
   BehaviorAnnex createBehaviorAnnex(ThreadImplementation threadImpl) ;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model featureRequired="true"
-   * @generated
-   */
+	 * @model featureRequired="true"
+	 * @generated
+	 */
   void setDirectionIn(DirectedFeature feature) ;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model baRequired="true"
-   * @generated
-   */
+	 * @model baRequired="true"
+	 * @generated
+	 */
   void resolveBANames(BehaviorAnnex ba) ;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model
-   * @generated
-   */
+	 * @model
+	 * @generated
+	 */
   EList<Feature> orderFeatures(ComponentType cpt) ;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model targetRequired="true" sourceRequired="true"
-   * @generated
-   */
+	 * @model targetRequired="true" sourceRequired="true"
+	 * @generated
+	 */
   void copyLocationReference(Element target,
                              Element source) ;
+
+		/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model targetDeclarativeRequired="true" sourceInstanceRequired="true"
+	 * @generated
+	 */
+	void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance);
 
 } // HookAccess

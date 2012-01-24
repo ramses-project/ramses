@@ -20,5 +20,9 @@
       <eParameters name="target" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Element"/>
       <eParameters name="source" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Element"/>
     </eOperations>
+    <eOperations name="addTransformationBackTrace" lowerBound="1">
+      <eParameters name="targetDeclarative" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//NamedElement"/>
+      <eParameters name="sourceInstance" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//InstanceObject"/>
+    </eOperations>
   </eClassifiers>
 </ecore:EPackage>

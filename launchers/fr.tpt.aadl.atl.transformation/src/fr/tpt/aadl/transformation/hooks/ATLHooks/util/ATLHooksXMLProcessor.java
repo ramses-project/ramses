@@ -26,34 +26,32 @@ public class ATLHooksXMLProcessor extends XMLProcessor
 {
 
   /**
-   * Public constructor to instantiate the helper.
-   * <!-- begin-user-doc -->
+	 * Public constructor to instantiate the helper.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public ATLHooksXMLProcessor()
   {
-    super((EPackage.Registry.INSTANCE)) ;
-    ATLHooksPackage.eINSTANCE.eClass() ;
-  }
+		super((EPackage.Registry.INSTANCE));
+		ATLHooksPackage.eINSTANCE.eClass();
+	}
 
   /**
-   * Register for "*" and "xml" file extensions the ATLHooksResourceFactoryImpl factory.
-   * <!-- begin-user-doc -->
+	 * Register for "*" and "xml" file extensions the ATLHooksResourceFactoryImpl factory.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected Map<String, Resource.Factory> getRegistrations()
   {
-    if(registrations == null)
-    {
-      super.getRegistrations() ;
-      registrations.put(XML_EXTENSION, new ATLHooksResourceFactoryImpl()) ;
-      registrations.put(STAR_EXTENSION, new ATLHooksResourceFactoryImpl()) ;
-    }
-
-    return registrations ;
-  }
+		if (registrations == null) {
+			super.getRegistrations();
+			registrations.put(XML_EXTENSION, new ATLHooksResourceFactoryImpl());
+			registrations.put(STAR_EXTENSION, new ATLHooksResourceFactoryImpl());
+		}
+		return registrations;
+	}
 
 } //ATLHooksXMLProcessor

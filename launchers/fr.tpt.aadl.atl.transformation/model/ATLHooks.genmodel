@@ -7,7 +7,7 @@
     testSuiteClass="fr.tpt.aadl.atl.transformation.hooks.ATLHooks.tests.ATLHooksAllTests"
     importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0" copyrightFields="false"
     editPluginID="fr.tpt.aadl.atl.transformation.edit" editorPluginID="fr.tpt.aadl.atl.transformation.editor"
-    usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../fr.tpt.aadl.annex.behavior/model/aadlba.genmodel#//aadlba">
+    usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../fr.tpt.aadl.annex.behavior/model/aadlba.genmodel#//aadlba ../../org.osate.aadl2/model/instance.genmodel#//instance">
   <foreignModel>ATLHooks.ecore</foreignModel>
   <genPackages prefix="ATLHooks" basePackage="fr.tpt.aadl.transformation.hooks" resource="XML"
       disposableProviderFactory="true" ecorePackage="ATLHooks.ecore#/">
@@ -27,6 +27,10 @@
       <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/copyLocationReference">
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/copyLocationReference/target"/>
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/copyLocationReference/source"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/addTransformationBackTrace">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/addTransformationBackTrace/targetDeclarative"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/addTransformationBackTrace/sourceInstance"/>
       </genOperations>
     </genClasses>
   </genPackages>
