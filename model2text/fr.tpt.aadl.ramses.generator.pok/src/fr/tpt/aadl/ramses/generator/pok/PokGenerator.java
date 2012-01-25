@@ -134,10 +134,11 @@ public class PokGenerator implements NamedPlugin
     File generatedCodeDirectory =
             new File(target_directory + "/generated-code") ;
       generatedCodeDirectory.mkdir() ;
-    SystemInstance rootInstance =  (SystemInstance) inputResource.getContents().get(0);
+//    SystemInstance rootInstance =  (SystemInstance) inputResource.getContents().get(0);
     AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser();
-    pokCUnparser.process(rootInstance,
-    		generatedCodeDirectory);
+    
+    
+//    pokCUnparser.process(rootInstance, generatedCodeDirectory);
     
     TreeIterator<EObject> iter = expandedResult.getAllContents() ;
       
@@ -168,7 +169,9 @@ public class PokGenerator implements NamedPlugin
               new AadlToPokMakefileUnparser() ;
         File generatedFileDir = new File(target_directory + GENERATED_DIR_NAME);
         makefileGenerator.process(si, generatedFileDir) ;
-
+        
+        TargetProperties tarProp = pokCUnparser.process(si, generatedFileDir) ;
+        
         for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
         {
           // create directory with the processor subcomponent name
@@ -181,7 +184,7 @@ public class PokGenerator implements NamedPlugin
           
           File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
           
-          TargetProperties tarProp = pokCUnparser.process(ps, kernelFileDir);
+          pokCUnparser.process(ps, kernelFileDir, tarProp);
           List<ProcessSubcomponent> ownedProcess = 
                                         GeneratorUtils.getBindedProcesses(ps) ;
           
@@ -196,9 +199,9 @@ public class PokGenerator implements NamedPlugin
             processC_Gen.process(process, processDirectory) ;
             makefileGenerator.process(process, processDirectory) ;
             
-            ProcessImplementation processImpl = (ProcessImplementation)
-                                          process.getComponentImplementation() ;
-            pokCUnparser.process(processImpl, processDirectory, tarProp);
+//            ProcessImplementation processImpl = (ProcessImplementation)
+//                                          process.getComponentImplementation() ;
+            pokCUnparser.process(process, processDirectory, tarProp);
           }
         }
       }

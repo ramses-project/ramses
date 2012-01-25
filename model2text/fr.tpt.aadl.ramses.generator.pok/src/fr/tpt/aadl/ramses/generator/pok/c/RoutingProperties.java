@@ -24,7 +24,9 @@ import fr.tpt.aadl.ramses.generator.c.GenerationUtilsC ;
 
 public class RoutingProperties implements TargetProperties {
 
-	public Set<FeatureInstance> globalPort = new HashSet<FeatureInstance>();
+	public PokProperties processorProp ;
+  
+  public Set<FeatureInstance> globalPort = new HashSet<FeatureInstance>();
 
 	public Set<ComponentInstance> processes = new HashSet<ComponentInstance>();
 
@@ -32,12 +34,14 @@ public class RoutingProperties implements TargetProperties {
 	
 	public Set<ComponentInstance> buses = new HashSet<ComponentInstance>();
 	
-	public Map<ComponentInstance, List<FeatureInstance>> portPerProcess = new HashMap<ComponentInstance, List<FeatureInstance>>();
+	public Map<ComponentInstance, List<FeatureInstance>> portPerProcess = 
+	                      new HashMap<ComponentInstance, List<FeatureInstance>>();
 
-	public Map<FeatureInstance, ComponentInstance> processorPort = new HashMap<FeatureInstance, ComponentInstance>();
+	public Map<FeatureInstance, ComponentInstance> processorPort = 
+	                            new HashMap<FeatureInstance, ComponentInstance>();
 
-	public Map<ComponentInstance, List<ComponentInstance>> processPerProcessor = new HashMap<ComponentInstance, List<ComponentInstance>>();
-	
+	public Map<ComponentInstance, List<ComponentInstance>> processPerProcessor =
+	                    new HashMap<ComponentInstance, List<ComponentInstance>>();
 	
 	public static String getFeatureLocalIdentifier(FeatureInstance fi)
 	{
@@ -104,7 +108,7 @@ public class RoutingProperties implements TargetProperties {
 		}
 	}
 
-	private boolean needsRoutage(FeatureInstance fi)
+	public static boolean needsRoutage(FeatureInstance fi)
 	{
 		boolean result = false;
 		if(fi.getCategory().equals(FeatureCategory.DATA_PORT)
@@ -129,7 +133,7 @@ public class RoutingProperties implements TargetProperties {
 		return result;
 	}
 	
-	private boolean areCollocated(FeatureInstance src, FeatureInstance dst)
+	public static boolean areCollocated(FeatureInstance src, FeatureInstance dst)
 	{
 		ComponentInstance srcProcess=null, dstProcess=null;
 		if(src.getContainingComponentInstance().getCategory()
@@ -145,7 +149,7 @@ public class RoutingProperties implements TargetProperties {
 		return srcProcess.equals(dstProcess);
 	}
 	
-	private List<FeatureInstance> getFeatureSources(FeatureInstance port)
+	public static List<FeatureInstance> getFeatureSources(FeatureInstance port)
 	{
 		// The parameter "port" must be port of a thread component
 		if(!port.getContainingComponentInstance().getCategory()
@@ -165,7 +169,7 @@ public class RoutingProperties implements TargetProperties {
 		return result;
 	}
 	
-	public List<FeatureInstance> getFeatureDestinations(FeatureInstance port)
+	public static List<FeatureInstance> getFeatureDestinations(FeatureInstance port)
 	{
 		// The parameter "port" must be port of a thread component
 		if(!port.getContainingComponentInstance().getCategory()

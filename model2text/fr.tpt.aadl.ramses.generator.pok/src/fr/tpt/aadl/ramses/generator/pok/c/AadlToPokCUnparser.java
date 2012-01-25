@@ -5,16 +5,22 @@ import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
 import java.util.ArrayList ;
+import java.util.HashMap ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Map ;
+import java.util.Map.Entry ;
 import java.util.Set ;
 
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.ConnectedElement ;
+import org.osate.aadl2.ConnectionEnd ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.Feature ;
 import org.osate.aadl2.MemorySubcomponent ;
+import org.osate.aadl2.Port ;
 import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
@@ -24,6 +30,8 @@ import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ConnectionInstance ;
+import org.osate.aadl2.instance.ConnectionReference ;
 import org.osate.aadl2.instance.FeatureCategory;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
@@ -34,6 +42,7 @@ import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.generator.c.AadlToCSwitchProcess ;
 import fr.tpt.aadl.ramses.generator.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generator.target.specific.GeneratorUtils ;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
@@ -50,19 +59,34 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   public final static String SAMPLING_AADL_TYPE =
                                           "pok_runtime::Sampling_Port_Id_Type" ;
   
-  public TargetProperties process(ProcessorSubcomponent processor,
-                                  File generatedFilePath) 
-                                        throws GenerationException
-  {
-    PokProperties result = new PokProperties() ;
+  public void process(ProcessorSubcomponent processor,
+                      File generatedFilePath,
+                      TargetProperties tarProp) 
+                                                     throws GenerationException
+  { 
+    PokProperties processorProp = new PokProperties() ;
+    ComponentInstance processorInst = (ComponentInstance) HookAccessImpl.
+                                             getTransformationTrace(processor) ;
+    RoutingProperties routing = (RoutingProperties) tarProp ;
+    
+    // Discard older processor properties !
+    routing.processorProp = processorProp ;
     
     // Generate deployment.h
     AadlToCSwitchProcess deploymentHeaderCode = new AadlToCSwitchProcess(null) ;
-    generateDeploymentHeader(processor, deploymentHeaderCode, result) ;
+    genDeploymentHeader(processor, deploymentHeaderCode, processorProp) ;
     
     // Generate deployment.c
     AadlToCSwitchProcess deploymentImplCode = new AadlToCSwitchProcess(null) ;
-    generateDeploymentImpl(processor, deploymentImplCode, result) ;
+    genDeploymentImpl(processor, deploymentImplCode, processorProp) ;
+    
+    // Generate routing.h
+    AadlToCSwitchProcess routingHeaderCode = new AadlToCSwitchProcess(null) ;
+    genRoutingHeader(processorInst, routingHeaderCode, routing) ;
+
+    // Generate routing.c
+    AadlToCSwitchProcess routingImplCode = new AadlToCSwitchProcess(null) ;
+    genRoutingImpl(processorInst, routingImplCode, routing) ;
     
     try
     {
@@ -71,28 +95,220 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       
       saveFile(generatedFilePath, "deployment.c",
                deploymentImplCode.getOutput()) ;
+      
+      saveFile(generatedFilePath, "routing.h", routingHeaderCode.getOutput()) ;
+
+      saveFile(generatedFilePath, "routing.c", routingImplCode.getOutput()) ;
     }
     catch(IOException e)
     {
       // TODO : error message to handle.
       e.printStackTrace() ;
     }
-    return result;
+  }
+  
+  private void blackboardHandler(FeatureInstance fi, PartitionProperties pp)
+  {
+    // XXX is it right ???    
+    String id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
+    
+    // TODO BIND THE TWO PORTS !!!! Otherwise see OR DO
+    
+    pp.blackboardNames.add(id) ;
+    
+    System.out.println("blackboard found : " + id) ;
+    
+    // OR DO :
+    /*
+    EList<Subcomponent> subcmpts = process.getAllSubcomponents() ;
+    
+    for(Subcomponent s : subcmpts)
+    {
+      if(s instanceof DataSubcomponent)
+      {
+      if(s.getClassifier().getQualifiedName()
+                                        .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
+        {
+          pp.blackboardNames.add(s.getName()) ;
+        }
+    */
     
   }
   
-  public void process(ProcessImplementation process, File generatedFilePath,
+  private void queueHandler(FeatureInstance fi, PartitionProperties pp)
+  {
+    ConnectionInstance ci = null ;
+    ConnectionReference cf = null ;
+    ConnectedElement c = null ;
+    
+    if(DirectionType.OUT == fi.getDirection())
+    {
+      ci = fi.getSrcConnectionInstances().get(0) ;
+      cf = ci.getConnectionReferences().get(0) ; 
+      c = (ConnectedElement)(cf.getConnection().getDestination()) ;
+    }
+    else
+    {
+      ci = fi.getDstConnectionInstances().get(0) ;
+      EList<ConnectionReference> crl = ci.getConnectionReferences() ;
+      cf = crl.get(crl.size() -1) ;
+      c = (ConnectedElement)(cf.getConnection()).getSource() ;
+    }
+    
+    Port p = (Port) c.getConnectionEnd() ;
+    pp.queue.add(p) ;
+  }
+  
+  private void genQueueMainImpl(PartitionProperties pp) throws Exception
+  {
+    // TODO How to generate queue id ?
+    String id = "" ;
+    
+    for(Port p : pp.queue)
+    {
+      System.out.println("port : " + p.getName()) ;
+            
+      if(DirectionType.OUT == p.getDirection())
+        System.out.println("Direction : SOURCE") ;
+      else
+        System.out.println("Direction : DESTINATION") ;
+      
+      System.out.println("Queue_Processing_Protocol : " + PropertyUtils.getEnumValue(p, "Queue_Processing_Protocol")) ;
+      
+      System.out.println("Queue_Size : " + PropertyUtils.getIntValue(p, "Queue_Size")) ;
+      
+      
+    }
+    
+    
+  }
+  
+  public void process(ProcessSubcomponent process, File generatedFilePath,
                       TargetProperties tarProp)
   {
-    PartitionProperties pp ;
+    PartitionProperties pp = new PartitionProperties();
+    RoutingProperties routing = (RoutingProperties) tarProp ;
+    // ****** WORK IN PROGRESS
+    
+    ProcessImplementation processImpl = (ProcessImplementation) 
+                                          process.getComponentImplementation() ;
+    
+    ComponentInstance processInst = (ComponentInstance) HookAccessImpl.
+                                               getTransformationTrace(process) ;
+    boolean needRoutage = false ;
+    
+    for(ComponentInstance ci : processInst.getComponentInstances())
+    {
+      if (ComponentCategory.THREAD != ci.getCategory())
+      {
+        continue ;
+      }
+      // else
+      
+      // Fetches thread's feature instances.
+      for (FeatureInstance fi : ci.getFeatureInstances())
+      {
+        FeatureCategory cat = fi.getCategory() ;
+        System.out.println("##### FEATURE INSTANCE : "+ fi.getName() + ", CAT : " + cat.getLiteral());
+        
+        if(FeatureCategory.DATA_PORT != cat &&
+           FeatureCategory.EVENT_PORT != cat &&
+           FeatureCategory.EVENT_DATA_PORT != cat)
+        {
+          continue ; 
+        }
+        // else
+        
+        needRoutage = RoutingProperties.needsRoutage(fi) ;
+        
+        switch(cat)
+        {
+          case DATA_PORT :
+          {
+            if(needRoutage)
+            {
+              pp.hasSampling = true ;
+              // samplingHandler() ;
+            }
+            else
+            {
+              pp.hasBlackboard = true ;
+//              blackboardHandler(fi, pp);
+            }
+            
+            break ;
+          }
+          
+          case EVENT_PORT :
+          {
+            if(needRoutage)
+            {
+              pp.hasQueue = true ;
+              // queueHandler() ;
+            }
+            else
+            {
+              pp.hasEvent = true ;
+              // eventHandler() ;
+            }
+            
+            break ;
+          }
+          
+          case EVENT_DATA_PORT :
+          {
+            if(needRoutage)
+            {
+              pp.hasQueue = true ;
+              queueHandler(fi, pp) ;
+            }
+            else
+            {
+              pp.hasBuffer = true ;
+              // bufferHandler() ;
+            }
+            
+            break ;
+          }
+          
+          default:
+          {
+            // Nothing to do.
+          }
+        }
+      }
+    }
+    
+    if(pp.hasBlackboard)
+    {
+      // blackboardHandler(fi, pp);
+    }
+    
+//    System.out.println("&&&&&&&&&&&&& FOR PROCESS INST : " + processInst.getName()) ;
+  System.out.println("***** FOR PROCESS SUB : " + process.getName()) ;
+  
+  System.out.println("hasBlackboard : " + pp.hasBlackboard) ;
+  System.out.println("hasQueue : " + pp.hasQueue) ;  
+    
+    try
+    {
+      genQueueMainImpl(pp) ;
+    }
+    catch(Exception e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+    // ******
     
     // Generate main.h
     AadlToCSwitchProcess mainHeaderCode = new AadlToCSwitchProcess(null) ;
-    pp = generateMainHeader(process, mainHeaderCode, (PokProperties) tarProp);
+    genMainHeader(processImpl, mainHeaderCode, routing.processorProp, pp);
     
     // Generate main.c
     AadlToCSwitchProcess mainImplCode = new AadlToCSwitchProcess(null) ;
-    generateMainImpl(process, mainImplCode, pp) ;
+    genMainImpl(processImpl, mainImplCode, pp) ;
     
     try
     {
@@ -247,8 +463,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainImplCode.addOutputNewline("]), &(ret));") ;
   }
   
-  private void genMainBlackboard(AadlToCSwitchProcess mainImplCode,
-                                 PartitionProperties pp)
+  private void genBlackboardMainImpl(AadlToCSwitchProcess mainImplCode,
+                                     PartitionProperties pp)
   {
     // For each blackboard
     for(String name : pp.blackboardNames)
@@ -261,9 +477,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  private void generateMainImpl(ProcessImplementation process,
-                                AadlToCSwitchProcess mainImplCode,
-                                PartitionProperties pp)
+  private void genMainImpl(ProcessImplementation process,
+                           AadlToCSwitchProcess mainImplCode,
+                           PartitionProperties pp)
   {
     EList<ThreadSubcomponent> lthreads =
                                          process.getOwnedThreadSubcomponents() ;
@@ -294,16 +510,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
     
     // Blackboard declarations.
-    genMainBlackboard(mainImplCode, pp) ;
-    
-    // Queue declarations.
-    
-    for(String s : pp.queuingNames)
-    {
-      System.out.println("**********" + s) ;
-      
-      
-    }
+    genBlackboardMainImpl(mainImplCode, pp) ;
     
     mainImplCode
           .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
@@ -311,7 +518,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainImplCode.addOutputNewline("}") ;
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
   }
-
+  
   private void findCommunicationMechanism(ProcessImplementation process,
                                           PartitionProperties pp)
   {
@@ -340,13 +547,14 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  private PartitionProperties generateMainHeader(ProcessImplementation process,
+  private PartitionProperties genMainHeader(ProcessImplementation process,
                                             AadlToCSwitchProcess mainHeaderCode,
-                                            PokProperties pokProp)
+                                            PokProperties processorProp,
+                                            PartitionProperties pp)
   {
-    PartitionProperties result = new PartitionProperties() ;
+//    PartitionProperties result = new PartitionProperties() ;
     
-    findCommunicationMechanism(process, result) ;
+//    findCommunicationMechanism(process, result) ;
     
     List<ThreadSubcomponent> bindedThreads =
                                          process.getOwnedThreadSubcomponents() ;
@@ -358,18 +566,18 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
     mainHeaderCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
 
-    if(pokProp.consoleFound == true)
+    if(processorProp.consoleFound == true)
     {
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
     }
 
-    if(pokProp.stdioFound == true)
+    if(processorProp.stdioFound == true)
     {
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_LIBC_STDIO 1") ;
     }
 
-    if(pokProp.stdlibFound == true)
+    if(processorProp.stdlibFound == true)
     {
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_LIBC_STDLIB 1") ;
@@ -379,13 +587,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
           .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
                 Integer.toString(bindedThreads.size() + 1)) ;
     
-    int blackboardNeeded = (result.blackboardNames.isEmpty()) ? 0 : 1 ;
+    int blackboardNeeded = (pp.blackboardNames.isEmpty()) ? 0 : 1 ;
 
-    if(false == result.blackboardNames.isEmpty())
+    if(false == pp.blackboardNames.isEmpty())
     {
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_BLACKBOARDS " +
-                  result.blackboardNames.size()) ;
+                  pp.blackboardNames.size()) ;
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_ARINC653_BLACKBOARD 1") ;
     }
@@ -394,19 +602,19 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       mainHeaderCode
           .addOutputNewline("#define POK_NEEDS_BLACKBOARDS " + blackboardNeeded) ;
     
-    int queuingNeeded = (result.queuingNames.isEmpty()) ? 0 : 1 ;
+    int queuingNeeded = 1 ; //(result.queuingNames.isEmpty()) ? 0 : 1 ;
     if(queuingNeeded>0)
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_QUEUEING " +
                                        queuingNeeded) ;
     
-    int samplingNeeded = (result.samplingNames.isEmpty()) ? 0 : 1 ;
+    int samplingNeeded = (pp.samplingNames.isEmpty()) ? 0 : 1 ;
     if(samplingNeeded>0)
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_SAMPLING " +
                                        samplingNeeded) ;
 
     mainHeaderCode
     	.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
-    			Long.toString(pokProp.requiredStackSizePerPartition.get(process)));
+    			Long.toString(processorProp.requiredStackSizePerPartition.get(process)));
     
     // XXX Is there any condition for the generation of theses directives ?
     mainHeaderCode
@@ -429,14 +637,14 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // conditioned files included:
     
-    if(false == result.blackboardNames.isEmpty())
+    if(false == pp.blackboardNames.isEmpty())
     {
       mainHeaderCode.addOutputNewline("#include <arinc653/blackboard.h>");
     }
     
     mainHeaderCode.addOutputNewline("#endif") ;
     
-    return result ;
+    return pp ;
   }
 
   private void saveFile(File directory,
@@ -455,19 +663,18 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     output.close() ;
   }
   
-  private void generateDeploymentImpl(ProcessorSubcomponent processor,
-                                      AadlToCSwitchProcess deploymentImplCode,
-                                      PokProperties pokProp)
+  private void genDeploymentImpl(ProcessorSubcomponent processor,
+                                 AadlToCSwitchProcess deploymentImplCode,
+                                 PokProperties pokProp)
   {
     deploymentImplCode.addOutputNewline("#include <types.h>") ;
     deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;    
   }
   
-  
-  private void generateDeploymentHeader(ProcessorSubcomponent processor,
-                                      AadlToCSwitchProcess deploymentHeaderCode,
-                                      PokProperties pokProp)
-                                            throws GenerationException
+  private void genDeploymentHeader(ProcessorSubcomponent processor,
+                                   AadlToCSwitchProcess deploymentHeaderCode,
+                                   PokProperties processorProp)
+                                                      throws GenerationException
   {
     String guard = GenerationUtilsC.generateHeaderInclusionGuard("deployment.h") ;
 
@@ -501,7 +708,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
             // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
             deploymentHeaderCode
                   .addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
-            pokProp.consoleFound = true ;
+            processorProp.consoleFound = true ;
             break ;
           }
         }
@@ -510,7 +717,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           if(s.equalsIgnoreCase("libc_stdio"))
           {
-            pokProp.stdioFound = true ;
+            processorProp.stdioFound = true ;
             break ;
           }
         }
@@ -519,7 +726,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           if(s.equalsIgnoreCase("libc_stdlib"))
           {
-            pokProp.stdlibFound = true ;
+            processorProp.stdlibFound = true ;
             break ;
           }
         }
@@ -646,13 +853,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       ProcessImplementation process =
             (ProcessImplementation) ps.getComponentImplementation() ;
-      if(!pokProp.partitionProperties.containsKey(process))
+      if(!processorProp.partitionProperties.containsKey(process))
       {
         PartitionProperties pp = new PartitionProperties() ;
-        pokProp.partitionProperties.put(process, pp) ;
+        processorProp.partitionProperties.put(process, pp) ;
         findCommunicationMechanism(process, pp) ;
       }
-      PartitionProperties pp = pokProp.partitionProperties.get(process) ;
+      PartitionProperties pp = processorProp.partitionProperties.get(process) ;
       if(pp.blackboardNames.isEmpty() == false)
       {
         deploymentHeaderCode
@@ -666,7 +873,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     for(ProcessSubcomponent ps : bindedProcess)
     {
       PartitionProperties pp =
-            pokProp.partitionProperties.get((ProcessImplementation) ps
+            processorProp.partitionProperties.get((ProcessImplementation) ps
                   .getComponentImplementation()) ;
       deploymentHeaderCode.addOutput(Integer
             .toString(pp.blackboardNames.size())) ;
@@ -806,100 +1013,109 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           long partitionStack =
                 PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
-          pokProp.requiredStackSize += partitionStack ;
-          pokProp.requiredStackSizePerPartition.put(pi, partitionStack) ;
+          processorProp.requiredStackSize += partitionStack ;
+          processorProp.requiredStackSizePerPartition.put(pi, partitionStack) ;
         }
         catch(Exception e)
         {
-          pokProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
-          pokProp.requiredStackSizePerPartition
+          processorProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
+          processorProp.requiredStackSizePerPartition
                 .put(pi, DEFAULT_REQUIRED_STACK_SIZE) ;
         }
       }
     }
 
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
-          Long.toString(pokProp.requiredStackSize)) ;
+          Long.toString(processorProp.requiredStackSize)) ;
 
     deploymentHeaderCode.addOutputNewline("#endif") ;
   }                                            
-
 
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }
+  
 
-  @Override
-  public void process(SystemInstance system,
-		  File generatedFilePath)
-	  	  throws GenerationException {
-	RoutingProperties routing = new RoutingProperties();
-	routing.setRoutingProperties(system);
-	
-	for(ComponentInstance subComponent: system.getComponentInstances())
+  public TargetProperties process(SystemImplementation si,
+                                   File generatedFilePath)
+	     	                                             throws GenerationException
 	{
-		processComponentInstance(subComponent, generatedFilePath, routing);
-	}
+	  SystemInstance system = (SystemInstance) 
+                                     HookAccessImpl.getTransformationTrace(si) ;
+    
+    RoutingProperties routing = new RoutingProperties();
+	  routing.setRoutingProperties(system);
+	  
+	  return routing ;
+	  /*
+	  for(ComponentInstance subComponent: system.getComponentInstances())
+	  {
+		  processComponentInstance(subComponent, generatedFilePath, routing);
+	  }
+	  */
   }
-
+  
+  /*
   private void processComponentInstance(ComponentInstance component,
-		  								File generatedFilePath,
-		  								RoutingProperties routing)
+                                        File generatedFilePath,
+                                        RoutingProperties routing)
   {
+    if(component.getCategory().equals(ComponentCategory.PROCESSOR))
+    {
+      try
+      {
+        File processorDir = new File(generatedFilePath + "/" + component.
+                                                  getSubcomponent().getName()) ;
+        if(!processorDir.isDirectory())
+        {
+          processorDir.mkdir() ;
+        }
 
-	if(component.getCategory().equals(ComponentCategory.PROCESSOR))
-	{
-	  try
-	  {
-		  
-		File processorDir = new File(generatedFilePath+"/"+component.getSubcomponent().getName());
-		if(!processorDir.isDirectory())
-			processorDir.mkdir();
-		
-		File kernelDir = new File(processorDir+"/kernel");
-		if(!kernelDir.isDirectory())
-			kernelDir.mkdir();
-		
-	    // Generate routing.h
-	    AadlToCSwitchProcess routingHeaderCode = new AadlToCSwitchProcess(null) ;
-	    generateRoutingHeader(component, routingHeaderCode, routing) ;
+        File kernelDir = new File(processorDir + "/kernel") ;
+        if(!kernelDir.isDirectory())
+        {
+          kernelDir.mkdir() ;
+        }
 
-	    // Generate routing.c
-	    AadlToCSwitchProcess routingImplCode = new AadlToCSwitchProcess(null) ;
-	    generateRoutingImpl(component, routingImplCode, routing) ;
-	    
-	    saveFile(kernelDir, "routing.h",
-				routingHeaderCode.getOutput()) ;
+        // Generate routing.h
+        AadlToCSwitchProcess routingHeaderCode = new AadlToCSwitchProcess(null) ;
+        genRoutingHeader(component, routingHeaderCode, routing) ;
 
-		saveFile(kernelDir, "routing.c",
-			    routingImplCode.getOutput()) ;
-		
-	  }
-	  catch(GenerationException e)
-	  {
-		// TODO : error message to handle.
-		e.printStackTrace() ;
-	  }
-	  catch(IOException e)
-	  {
-		// TODO : error message to handle.
-		e.printStackTrace() ;
-	  }
-	}
-	else
-	{
-	  for(ComponentInstance subComponent: component.getComponentInstances())
-	  {
-		processComponentInstance(subComponent, generatedFilePath, routing);
-	  }
-	}
+        // Generate routing.c
+        AadlToCSwitchProcess routingImplCode = new AadlToCSwitchProcess(null) ;
+        genRoutingImpl(component, routingImplCode, routing) ;
+
+        saveFile(kernelDir, "routing.h", routingHeaderCode.getOutput()) ;
+
+        saveFile(kernelDir, "routing.c", routingImplCode.getOutput()) ;
+
+      }
+      catch(GenerationException e)
+      {
+        // TODO : error message to handle.
+        e.printStackTrace() ;
+      }
+      catch(IOException e)
+      {
+        // TODO : error message to handle.
+        e.printStackTrace() ;
+      }
+    }
+    else
+    {
+      for(ComponentInstance subComponent : component.getComponentInstances())
+      {
+        processComponentInstance(subComponent, generatedFilePath, routing) ;
+      }
+    }
   }
-
+  */
+  
   private List<FeatureInstance> getLocalPorts(ComponentInstance processor,
-		  RoutingProperties routeProp)
-	                throws GenerationException
+		                                          RoutingProperties routeProp)
+	                                                    throws GenerationException
   {
 	List<FeatureInstance> localPorts = new ArrayList<FeatureInstance>();
 	if(routeProp.processPerProcessor.get(processor).isEmpty())
@@ -911,10 +1127,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	return localPorts;
   }
   
-  private void generateRoutingHeader(ComponentInstance processor,
-          AadlToCSwitchProcess routingHeaderCode,
-          RoutingProperties routeProp)
-                throws GenerationException
+  private void genRoutingHeader(ComponentInstance processor,
+                                AadlToCSwitchProcess routingHeaderCode,
+                                RoutingProperties routeProp)
+                                                      throws GenerationException
   {
 	String guard = GenerationUtilsC.generateHeaderInclusionGuard("routing.h") ;
 	routingHeaderCode.addOutput(guard);
@@ -1002,10 +1218,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	routingHeaderCode.addOutputNewline("#endif");
   }
 
-  private void generateRoutingImpl(ComponentInstance processor,
-          AadlToCSwitchProcess routingImplCode,
-          RoutingProperties routeProp)
-                throws GenerationException
+  private void genRoutingImpl(ComponentInstance processor,
+                              AadlToCSwitchProcess routingImplCode,
+                              RoutingProperties routeProp)
+                                                      throws GenerationException
   {
 	routingImplCode.addOutputNewline("#include \"routing.h\"") ;
 	routingImplCode.addOutputNewline("#include \"middleware/port.h\"") ;
@@ -1170,7 +1386,19 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
 class PartitionProperties
 {
+  public boolean hasBlackboard = false ; 
+  
+  public boolean hasQueue = false ;
+  
+  public boolean hasBuffer = false ;
+  
+  public boolean hasEvent = false ;
+  
+  public boolean hasSampling = false ;
+  
   public Set<String> blackboardNames = new HashSet<String>() ;
+  
+  public Set<Port> queue = new HashSet<Port>() ;
   
   public Set<String> queuingNames = new HashSet<String>() ;
   
