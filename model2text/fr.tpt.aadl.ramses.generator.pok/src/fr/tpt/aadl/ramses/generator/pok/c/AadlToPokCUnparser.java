@@ -107,20 +107,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  private void blackboardHandler(FeatureInstance fi, PartitionProperties pp)
+  private void blackboardHandler(ProcessImplementation processImpl, 
+                                 PartitionProperties pp)
   {
-    // XXX is it right ???    
-    String id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
-    
-    // TODO BIND THE TWO PORTS !!!! Otherwise see OR DO
-    
-    pp.blackboardNames.add(id) ;
-    
-    System.out.println("blackboard found : " + id) ;
-    
-    // OR DO :
-    /*
-    EList<Subcomponent> subcmpts = process.getAllSubcomponents() ;
+    EList<Subcomponent> subcmpts = processImpl.getAllSubcomponents() ;
     
     for(Subcomponent s : subcmpts)
     {
@@ -131,8 +121,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           pp.blackboardNames.add(s.getName()) ;
         }
-    */
-    
+      }
+    }
   }
   
   private void queueHandler(FeatureInstance fi, PartitionProperties pp)
@@ -141,6 +131,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     ConnectionReference cf = null ;
     ConnectedElement c = null ;
     
+    // TODO : queue information are not always in process, recursively fetch
+    // these informations.
     if(DirectionType.OUT == fi.getDirection())
     {
       ci = fi.getSrcConnectionInstances().get(0) ;
@@ -156,31 +148,73 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
     
     Port p = (Port) c.getConnectionEnd() ;
-    pp.queue.add(p) ;
+    
+    QueueInfo queueInfo = new QueueInfo() ;
+    queueInfo.direction = p.getDirection() ;
+    
+    if(getQueueInfo(p, queueInfo))
+    {
+      pp.queueInfo.add(queueInfo) ;
+    }
   }
   
-  private void genQueueMainImpl(PartitionProperties pp) throws Exception
+  // Return false if any information is found.
+  private boolean getQueueInfo(Port port, QueueInfo info)
   {
-    // TODO How to generate queue id ?
-    String id = "" ;
+    // XXX temporary. Until ATL transformation modifications.
+    //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
+    info.id = port.getName() + "_Instance" ;
     
-    for(Port p : pp.queue)
+    try
     {
-      System.out.println("port : " + p.getName()) ;
-            
-      if(DirectionType.OUT == p.getDirection())
-        System.out.println("Direction : SOURCE") ;
-      else
-        System.out.println("Direction : DESTINATION") ;
+      if(info.type == null)
+      {
+        info.type = PropertyUtils.getEnumValue(port, "Queue_Processing_Protocol") ;
+      }
       
-      System.out.println("Queue_Processing_Protocol : " + PropertyUtils.getEnumValue(p, "Queue_Processing_Protocol")) ;
-      
-      System.out.println("Queue_Size : " + PropertyUtils.getIntValue(p, "Queue_Size")) ;
-      
-      
+      if(info.size == -1)
+      {
+        info.size = PropertyUtils.getIntValue(port, "Queue_Size") ;
+      }
+    }
+    catch (Exception e)
+    {
+      return false ;
     }
     
-    
+    return true ;
+  }
+  
+  private void genQueueMainImpl(AadlToCSwitchProcess mainImplCode,
+                                PartitionProperties pp)
+  {
+    for(QueueInfo info : pp.queueInfo)
+    {
+      mainImplCode.addOutput("  CREATE_QUEUING_PORT (\"") ;
+      mainImplCode.addOutput(info.id);
+      mainImplCode.addOutputNewline("\",");
+      mainImplCode.addOutput("    sizeof(QUEUING_PORT_ID_TYPE), ");
+      mainImplCode.addOutput(Long.toString(info.size)) ;
+      mainImplCode.addOutput(", ");
+      
+      String direction = null ;
+      if(DirectionType.IN == info.direction)
+      {
+        direction = "DESTINATION" ;
+      }
+      else
+      {
+        direction = "SOURCE" ;
+      }
+      
+      mainImplCode.addOutput(direction);
+      mainImplCode.addOutput(", ") ;
+      mainImplCode.addOutput(info.type.toUpperCase());
+      mainImplCode.addOutputNewline(",");
+      mainImplCode.addOutput("      &(") ;
+      mainImplCode.addOutput(info.id) ;
+      mainImplCode.addOutputNewline("), &(ret));") ;
+    }
   }
   
   public void process(ProcessSubcomponent process, File generatedFilePath,
@@ -233,7 +267,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
             else
             {
               pp.hasBlackboard = true ;
-//              blackboardHandler(fi, pp);
             }
             
             break ;
@@ -281,24 +314,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     if(pp.hasBlackboard)
     {
-      // blackboardHandler(fi, pp);
+      blackboardHandler(processImpl, pp);
     }
     
-//    System.out.println("&&&&&&&&&&&&& FOR PROCESS INST : " + processInst.getName()) ;
-  System.out.println("***** FOR PROCESS SUB : " + process.getName()) ;
+    System.out.println("***** FOR PROCESS SUB : " + process.getName()) ;
   
-  System.out.println("hasBlackboard : " + pp.hasBlackboard) ;
-  System.out.println("hasQueue : " + pp.hasQueue) ;  
-    
-    try
-    {
-      genQueueMainImpl(pp) ;
-    }
-    catch(Exception e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    System.out.println("hasBlackboard : " + pp.hasBlackboard) ;
+    System.out.println("hasQueue : " + pp.hasQueue) ;  
     
     // ******
     
@@ -326,60 +348,60 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   //Generate global variables.
-  private void genMainGlobalVariables(EList<ThreadSubcomponent> lthreads,
-                               AadlToCSwitchProcess mainImplCode,
-                               PartitionProperties pp)
+  private void genGlobalVariablesMainImpl(EList<ThreadSubcomponent> lthreads,
+                                          AadlToCSwitchProcess mainImplCode,
+                                          PartitionProperties pp)
   {
-    // Preconditions
+    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
+    mainImplCode.addOutputNewline(GenerationUtilsC
+          .generateSectionTitle("GLOBAL VARIABLES")) ;
     
-    if(false == lthreads.isEmpty() ||
-       false == pp.blackboardNames.isEmpty())
+    // Generate thread names array.
+    if(false == lthreads.isEmpty())
     {
-      StringBuilder sb = new StringBuilder() ;
-      
-      mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
-      mainImplCode.addOutputNewline(GenerationUtilsC
-            .generateSectionTitle("GLOBAL VARIABLES")) ;
-      
-      if(false == lthreads.isEmpty())
-      {
-        mainImplCode
-              .addOutputNewline(
-                      "PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];") ;
-      }
-
-      if(false == pp.blackboardNames.isEmpty())
-      {
-        // Generate blackboards names array.
-        sb.append("char* pok_blackboards_names[POK_CONFIG_NB_BLACKBOARDS] = {") ;
-
-        for(String name : pp.blackboardNames)
-        {
-          sb.append('\"') ;
-          sb.append(name) ;
-          sb.append('\"') ;
-        }
-
-        sb.append("};") ;
-        mainImplCode.addOutputNewline(sb.toString()) ;
-        // Generate external variable (declared in deployment.c).
-        sb.setLength(0) ; // Reset string builder.
-
-        for(String name : pp.blackboardNames)
-        {
-          sb.append("extern BLACKBOARD_ID_TYPE ") ;
-          sb.append(name) ;
-          sb.append(";\n") ;
-        }
-
-        mainImplCode.addOutput(sb.toString()) ;
-      }
-
-      mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
+      mainImplCode
+            .addOutputNewline(
+                    "PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];") ;
     }
+    
+    // Generate blackboard names array.
+    if(pp.hasBlackboard)
+    {
+      mainImplCode.addOutput("char* pok_blackboards_names[POK_CONFIG_NB_BLACKBOARDS] = {") ;
+
+      for(String name : pp.blackboardNames)
+      {
+        mainImplCode.addOutput("\"") ;
+        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput("\"") ;
+      }
+
+      mainImplCode.addOutputNewline("};") ;
+      
+      // Generate external variable (declared in deployment.c).
+      for(String name : pp.blackboardNames)
+      {
+        mainImplCode.addOutput("extern BLACKBOARD_ID_TYPE ") ;
+        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutputNewline(";") ;
+      }
+    }
+    
+    // Generate queue names array.
+    if(pp.hasQueue)
+    {
+      for(QueueInfo info : pp.queueInfo)
+      {
+        mainImplCode.addOutput("QUEUING_PORT_ID_TYPE ") ;
+        mainImplCode.addOutput(info.id) ;
+        mainImplCode.addOutputNewline(";") ;
+      }
+    }
+
+    mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
   }
   
-  private void genMainFileIncluded(AadlToCSwitchProcess mainImplCode)
+  private void genFileIncludedMainImpl(AadlToCSwitchProcess mainImplCode)
   {
     // Files included.
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
@@ -390,9 +412,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainImplCode.addOutputNewline("#include \"activity.h\"") ;
   }
   
-  private void genMainThreadDeclaration(ThreadSubcomponent thread,
-                                        int threadIndex,
-                                        AadlToCSwitchProcess mainImplCode)
+  private void genThreadDeclarationMainImpl(ThreadSubcomponent thread,
+                                            int threadIndex,
+                                            AadlToCSwitchProcess mainImplCode)
   {
     ThreadImplementation timpl =
           (ThreadImplementation) thread.getComponentImplementation() ;
@@ -471,7 +493,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       mainImplCode.addOutput("  CREATE_BLACKBOARD (\"") ;
       mainImplCode.addOutput(name) ;
-      mainImplCode.addOutput("\", sizeof (int), &(") ;
+      mainImplCode.addOutput("\", sizeof (BLACKBOARD_ID_TYPE), &(") ;
       mainImplCode.addOutput(name);
       mainImplCode.addOutputNewline("), &(ret));") ;
     }
@@ -485,10 +507,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                                          process.getOwnedThreadSubcomponents() ;
     
     // Included files.
-    genMainFileIncluded(mainImplCode) ;
+    genFileIncludedMainImpl(mainImplCode) ;
     
     // Global files.
-    genMainGlobalVariables(lthreads, mainImplCode, pp);
+    genGlobalVariablesMainImpl(lthreads, mainImplCode, pp);
     
     // main function declaration.
     mainImplCode.addOutputNewline(GenerationUtilsC
@@ -505,12 +527,15 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     // Thread declarations.
     for(ThreadSubcomponent thread : lthreads)
     {
-      genMainThreadDeclaration(thread, threadIndex, mainImplCode) ;
+      genThreadDeclarationMainImpl(thread, threadIndex, mainImplCode) ;
       threadIndex++ ;
     }
     
     // Blackboard declarations.
     genBlackboardMainImpl(mainImplCode, pp) ;
+    
+    // Queue declarations.
+    genQueueMainImpl(mainImplCode,pp) ;
     
     mainImplCode
           .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
@@ -552,10 +577,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                                             PokProperties processorProp,
                                             PartitionProperties pp)
   {
-//    PartitionProperties result = new PartitionProperties() ;
-    
-//    findCommunicationMechanism(process, result) ;
-    
     List<ThreadSubcomponent> bindedThreads =
                                          process.getOwnedThreadSubcomponents() ;
     
@@ -587,31 +608,34 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
           .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
                 Integer.toString(bindedThreads.size() + 1)) ;
     
-    int blackboardNeeded = (pp.blackboardNames.isEmpty()) ? 0 : 1 ;
-
-    if(false == pp.blackboardNames.isEmpty())
+    if(pp.hasBlackboard)
     {
+      int blackboardNeeded = (pp.hasBlackboard) ? 0 : 1 ;
+      
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_BLACKBOARDS " +
                   pp.blackboardNames.size()) ;
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_ARINC653_BLACKBOARD 1") ;
+      
+      mainHeaderCode
+      .addOutputNewline("#define POK_NEEDS_BLACKBOARDS " + blackboardNeeded) ;
     }
 
-    if(blackboardNeeded>0)
-      mainHeaderCode
-          .addOutputNewline("#define POK_NEEDS_BLACKBOARDS " + blackboardNeeded) ;
-    
-    int queuingNeeded = 1 ; //(result.queuingNames.isEmpty()) ? 0 : 1 ;
+    int queuingNeeded = (pp.hasBlackboard) ? 0 : 1 ;
     if(queuingNeeded>0)
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_QUEUEING " +
                                        queuingNeeded) ;
     
+    
+    // TODO to be implemented.
+    /*
     int samplingNeeded = (pp.samplingNames.isEmpty()) ? 0 : 1 ;
     if(samplingNeeded>0)
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_SAMPLING " +
                                        samplingNeeded) ;
-
+    */
+    
     mainHeaderCode
     	.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
     			Long.toString(processorProp.requiredStackSizePerPartition.get(process)));
@@ -630,6 +654,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     /**** "#INCLUDE ****/
     
+    mainHeaderCode.addOutputNewline("");
+    
     // always files included:
     mainHeaderCode.addOutputNewline("#include <arinc653/types.h>");
     mainHeaderCode.addOutputNewline("#include <arinc653/process.h>");
@@ -637,12 +663,17 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // conditioned files included:
     
-    if(false == pp.blackboardNames.isEmpty())
+    if(pp.hasBlackboard)
     {
       mainHeaderCode.addOutputNewline("#include <arinc653/blackboard.h>");
     }
     
-    mainHeaderCode.addOutputNewline("#endif") ;
+    if(pp.hasQueue)
+    {
+      mainHeaderCode.addOutputNewline("#include <arinc653/queueing.h>");
+    }
+    
+    mainHeaderCode.addOutputNewline("\n#endif") ;
     
     return pp ;
   }
@@ -1386,21 +1417,60 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
 class PartitionProperties
 {
-  public boolean hasBlackboard = false ; 
+  boolean hasBlackboard = false ; 
   
-  public boolean hasQueue = false ;
+  boolean hasQueue = false ;
   
-  public boolean hasBuffer = false ;
+  boolean hasBuffer = false ;
   
-  public boolean hasEvent = false ;
+  boolean hasEvent = false ;
   
-  public boolean hasSampling = false ;
+  boolean hasSampling = false ;
   
-  public Set<String> blackboardNames = new HashSet<String>() ;
+  Set<String> blackboardNames = new HashSet<String>() ;
   
-  public Set<Port> queue = new HashSet<Port>() ;
+  Set<String> queuingNames = new HashSet<String>() ;
   
-  public Set<String> queuingNames = new HashSet<String>() ;
+  Set<QueueInfo> queueInfo = new HashSet<QueueInfo>();
   
-  public Set<String> samplingNames = new HashSet<String>() ;
+  Set<String> samplingNames = new HashSet<String>() ;
 }
+
+class QueueInfo
+{
+  String id = null ;
+  
+  long size = -1 ;
+  
+  String type = null ;
+  
+  DirectionType direction = null ;
+}
+
+/*
+main.h
+
+**
+#define POK_NEEDS_PROTOCOLS 1
+#define POK_NEEDS_LIBC_STRING 1
+#define POK_CONFIG_NB_THREADS 3
+#define POK_NEEDS_PARTITIONS 1
+**
+
+#include <core/partition.h>
+
+
+activity.c
+
+#include <protocols/protocols.h>
+#include "gtypes.h"
+#include <arinc653/time.h>
+
+activity.h
+
+******* supprimer #include "arinc653/blackboard.h"
+
+deployment.c
+#include <middleware/port.h>
+
+*/
