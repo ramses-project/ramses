@@ -150,7 +150,11 @@ end receive_ping.impl;
 
 process receive_ping_process
 features
-   pdatain : in event data port integer {Allowed_Connection_Binding_Class => (classifier (queuing::medium_bus)); Queue_Size => 2;};
+   pdatain : in event data port integer 
+      {Allowed_Connection_Binding_Class => (classifier (queuing::medium_bus));
+       Queue_Size => 2;
+       Queue_Processing_Protocol => Fifo;
+      };
 properties
    Source_Code_Size => 10 KByte;
    Source_Data_Size => 15 KByte;

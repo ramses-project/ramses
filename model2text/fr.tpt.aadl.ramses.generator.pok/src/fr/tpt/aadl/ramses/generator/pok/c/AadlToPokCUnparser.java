@@ -5,20 +5,16 @@ import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
 import java.util.ArrayList ;
-import java.util.HashMap ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Map ;
-import java.util.Map.Entry ;
 import java.util.Set ;
 
 import org.eclipse.emf.common.util.EList ;
-import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.ConnectedElement ;
-import org.osate.aadl2.ConnectionEnd ;
 import org.osate.aadl2.DataSubcomponent ;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.Feature ;
+import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.MemorySubcomponent ;
 import org.osate.aadl2.Port ;
 import org.osate.aadl2.ProcessImplementation ;
@@ -29,12 +25,12 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
-import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
 import org.osate.aadl2.instance.ConnectionReference ;
-import org.osate.aadl2.instance.FeatureCategory;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.instance.FeatureCategory ;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
@@ -158,9 +154,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  // Return false if any information is found.
+  // Return false QueueInfo object is not completed.
   private boolean getQueueInfo(Port port, QueueInfo info)
   {
+    boolean result = true ;
+    
     // XXX temporary. Until ATL transformation modifications.
     //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
     info.id = port.getName() + "_Instance" ;
@@ -171,7 +169,14 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       {
         info.type = PropertyUtils.getEnumValue(port, "Queue_Processing_Protocol") ;
       }
-      
+    }
+    catch (Exception e)
+    {
+      result = false ;
+    }  
+    
+    try
+    {
       if(info.size == -1)
       {
         info.size = PropertyUtils.getIntValue(port, "Queue_Size") ;
@@ -179,10 +184,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
     catch (Exception e)
     {
-      return false ;
+      result = false ;
     }
     
-    return true ;
+    return result ;
   }
   
   private void genQueueMainImpl(AadlToCSwitchProcess mainImplCode,
@@ -222,7 +227,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   {
     PartitionProperties pp = new PartitionProperties();
     RoutingProperties routing = (RoutingProperties) tarProp ;
-    // ****** WORK IN PROGRESS
     
     ProcessImplementation processImpl = (ProcessImplementation) 
                                           process.getComponentImplementation() ;
@@ -243,7 +247,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       for (FeatureInstance fi : ci.getFeatureInstances())
       {
         FeatureCategory cat = fi.getCategory() ;
-        System.out.println("##### FEATURE INSTANCE : "+ fi.getName() + ", CAT : " + cat.getLiteral());
         
         if(FeatureCategory.DATA_PORT != cat &&
            FeatureCategory.EVENT_PORT != cat &&
@@ -316,13 +319,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       blackboardHandler(processImpl, pp);
     }
-    
-    System.out.println("***** FOR PROCESS SUB : " + process.getName()) ;
-  
-    System.out.println("hasBlackboard : " + pp.hasBlackboard) ;
-    System.out.println("hasQueue : " + pp.hasQueue) ;  
-    
-    // ******
     
     // Generate main.h
     AadlToCSwitchProcess mainHeaderCode = new AadlToCSwitchProcess(null) ;
@@ -610,8 +606,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     if(pp.hasBlackboard)
     {
-      int blackboardNeeded = (pp.hasBlackboard) ? 0 : 1 ;
-      
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_BLACKBOARDS " +
                   pp.blackboardNames.size()) ;
@@ -619,13 +613,25 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
             .addOutputNewline("#define POK_NEEDS_ARINC653_BLACKBOARD 1") ;
       
       mainHeaderCode
-      .addOutputNewline("#define POK_NEEDS_BLACKBOARDS " + blackboardNeeded) ;
+      .addOutputNewline("#define POK_NEEDS_BLACKBOARDS 1") ;
     }
 
-    int queuingNeeded = (pp.hasBlackboard) ? 0 : 1 ;
-    if(queuingNeeded>0)
-      mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_QUEUEING " +
-                                       queuingNeeded) ;
+    if(pp.hasQueue)
+    {
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_QUEUEING 1") ;
+      
+      // XXX ARBITRARY
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_LIBC_STRING 1");
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1");
+      
+    }
+    
+    // Common #define    
+    if(pp.hasQueue || pp.hasSampling)
+    {
+      // XXX ARBITRARY
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_PROTOCOLS 1") ;
+    }
     
     
     // TODO to be implemented.
@@ -641,6 +647,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     			Long.toString(processorProp.requiredStackSizePerPartition.get(process)));
     
     // XXX Is there any condition for the generation of theses directives ?
+    // XXX ARBITRARY
     mainHeaderCode
           .addOutputNewline("#define POK_NEEDS_ARINC653_TIME 1") ;
     mainHeaderCode
@@ -649,6 +656,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
           .addOutputNewline("#define POK_NEEDS_ARINC653_PARTITION 1") ;
 
     // XXX Is there any condition for the generation of POK_NEEDS_MIDDLEWARE ?
+    // XXX ARBITRARY
     mainHeaderCode
           .addOutputNewline("#define POK_NEEDS_MIDDLEWARE 1") ;
     
@@ -660,6 +668,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainHeaderCode.addOutputNewline("#include <arinc653/types.h>");
     mainHeaderCode.addOutputNewline("#include <arinc653/process.h>");
     mainHeaderCode.addOutputNewline("#include <arinc653/partition.h>");
+    mainHeaderCode.addOutputNewline("#include <arinc653/time.h>");
+    mainHeaderCode.addOutputNewline("#include \"gtypes.h\"");
     
     // conditioned files included:
     
@@ -671,6 +681,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     if(pp.hasQueue)
     {
       mainHeaderCode.addOutputNewline("#include <arinc653/queueing.h>");
+      
+      // XXX ARBITRARY
+      mainHeaderCode.addOutputNewline("#include <protocols/protocols.h>");
+      mainHeaderCode.addOutputNewline("#include <middleware/port.h>");
     }
     
     mainHeaderCode.addOutputNewline("\n#endif") ;
@@ -1088,62 +1102,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  */
   }
   
-  /*
-  private void processComponentInstance(ComponentInstance component,
-                                        File generatedFilePath,
-                                        RoutingProperties routing)
-  {
-    if(component.getCategory().equals(ComponentCategory.PROCESSOR))
-    {
-      try
-      {
-        File processorDir = new File(generatedFilePath + "/" + component.
-                                                  getSubcomponent().getName()) ;
-        if(!processorDir.isDirectory())
-        {
-          processorDir.mkdir() ;
-        }
-
-        File kernelDir = new File(processorDir + "/kernel") ;
-        if(!kernelDir.isDirectory())
-        {
-          kernelDir.mkdir() ;
-        }
-
-        // Generate routing.h
-        AadlToCSwitchProcess routingHeaderCode = new AadlToCSwitchProcess(null) ;
-        genRoutingHeader(component, routingHeaderCode, routing) ;
-
-        // Generate routing.c
-        AadlToCSwitchProcess routingImplCode = new AadlToCSwitchProcess(null) ;
-        genRoutingImpl(component, routingImplCode, routing) ;
-
-        saveFile(kernelDir, "routing.h", routingHeaderCode.getOutput()) ;
-
-        saveFile(kernelDir, "routing.c", routingImplCode.getOutput()) ;
-
-      }
-      catch(GenerationException e)
-      {
-        // TODO : error message to handle.
-        e.printStackTrace() ;
-      }
-      catch(IOException e)
-      {
-        // TODO : error message to handle.
-        e.printStackTrace() ;
-      }
-    }
-    else
-    {
-      for(ComponentInstance subComponent : component.getComponentInstances())
-      {
-        processComponentInstance(subComponent, generatedFilePath, routing) ;
-      }
-    }
-  }
-  */
-  
   private List<FeatureInstance> getLocalPorts(ComponentInstance processor,
 		                                          RoutingProperties routeProp)
 	                                                    throws GenerationException
@@ -1446,31 +1404,3 @@ class QueueInfo
   
   DirectionType direction = null ;
 }
-
-/*
-main.h
-
-**
-#define POK_NEEDS_PROTOCOLS 1
-#define POK_NEEDS_LIBC_STRING 1
-#define POK_CONFIG_NB_THREADS 3
-#define POK_NEEDS_PARTITIONS 1
-**
-
-#include <core/partition.h>
-
-
-activity.c
-
-#include <protocols/protocols.h>
-#include "gtypes.h"
-#include <arinc653/time.h>
-
-activity.h
-
-******* supprimer #include "arinc653/blackboard.h"
-
-deployment.c
-#include <middleware/port.h>
-
-*/

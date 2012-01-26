@@ -87,6 +87,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     
     _activityImplCode = new AadlToCSwitchProcess(this) ;
     _activityImplCode.addOutputNewline("#include \"activity.h\"") ;
+    _activityImplCode.addOutputNewline(MAIN_HEADER_INCLUSION);
     
     _activityHeaderCode = new AadlToCSwitchProcess(this) ;
     _activityHeaderCode.addOutputNewline("#include \"subprograms.h\"") ;
