@@ -684,7 +684,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       
       // XXX ARBITRARY
       mainHeaderCode.addOutputNewline("#include <protocols/protocols.h>");
-      mainHeaderCode.addOutputNewline("#include <middleware/port.h>");
     }
     
     mainHeaderCode.addOutputNewline("\n#endif") ;
@@ -1404,3 +1403,37 @@ class QueueInfo
   
   DirectionType direction = null ;
 }
+
+/*
+TODO
+
+
+BUFFER EXAMPLE:
+
+KERNEL
+
+  #define POK_CONFIG_NB_LOCKOBJECTS 1 (also for blackboard)
+  #define POK_CONFIG_NB_BUSES 0 (also for blackboard and queue see routing properties buses)
+
+PART
+
+  #define POK_CONFIG_NB_BUFFERS 1
+  #define POK_NEEDS_BUFFERS 1
+  #define POK_NEEDS_ARINC653_BUFFER 1
+  
+deployment.c
+
+  uint8_t input_id;
+  char* pok_buffers_names[POK_CONFIG_NB_BUFFERS] = {"input"};
+  
+activity.c
+  
+  test__myint input_dvalue; ?????????????
+  extern BUFFER_ID_TYPE input_id;
+  
+main.c
+
+  extern BUFFER_ID_TYPE input_id;
+  CREATE_BUFFER ("input", sizeof (BUFFER_ID_TYPE), 1, FIFO, &(input_id), &(ret));  
+
+*/
