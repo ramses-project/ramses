@@ -60,7 +60,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                       TargetProperties tarProp) 
                                                      throws GenerationException
   { 
-    PokProperties processorProp = new PokProperties() ;
+    ProcessorProperties processorProp = new ProcessorProperties() ;
     ComponentInstance processorInst = (ComponentInstance) HookAccessImpl.
                                              getTransformationTrace(processor) ;
     RoutingProperties routing = (RoutingProperties) tarProp ;
@@ -333,7 +333,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         }
         // else
         
-        needRoutage = RoutingProperties.needsRoutage(fi) ;
+        needRoutage = AadlToPokCUtils.needsRoutage(fi) ;
         
         switch(cat)
         {
@@ -661,7 +661,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   private PartitionProperties genMainHeader(ProcessImplementation process,
                                             AadlToCSwitchProcess mainHeaderCode,
-                                            PokProperties processorProp,
+                                            ProcessorProperties processorProp,
                                             PartitionProperties pp)
   {
     List<ThreadSubcomponent> bindedThreads =
@@ -790,7 +790,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   private void genDeploymentImpl(ProcessorSubcomponent processor,
                                  AadlToCSwitchProcess deploymentImplCode,
-                                 PokProperties pokProp)
+                                 ProcessorProperties pokProp)
   {
     deploymentImplCode.addOutputNewline("#include <types.h>") ;
     deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;    
@@ -798,7 +798,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   private void genDeploymentHeader(ProcessorSubcomponent processor,
                                    AadlToCSwitchProcess deploymentHeaderCode,
-                                   PokProperties processorProp)
+                                   ProcessorProperties processorProp)
                                                       throws GenerationException
   {
     String guard = GenerationUtilsC.generateHeaderInclusionGuard("deployment.h") ;
@@ -1226,7 +1226,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  int idx=0;
 	  for(ComponentInstance node : routeProp.processors)
 	  {
-		routingHeaderCode.addOutput(RoutingProperties.getComponentInstanceIdentifier(node)) ;
+		routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(node)) ;
 		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
 		routingHeaderCode.addOutputNewline(",") ;
 		idx++;
@@ -1242,7 +1242,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  routingHeaderCode.incrementIndent() ;
 	  for(FeatureInstance fi: localPorts)
 	  {
-		routingHeaderCode.addOutput(RoutingProperties.getFeatureLocalIdentifier(fi));
+		routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
 		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
 		routingHeaderCode.addOutputNewline(",") ;
 		idx++;
@@ -1258,7 +1258,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  routingHeaderCode.incrementIndent() ;
 	  for(FeatureInstance fi: routeProp.globalPort)
 	  {
-		  routingHeaderCode.addOutput(RoutingProperties.getFeatureGlobalIdentifier(fi));
+		  routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi));
 		  routingHeaderCode.addOutput(" = "+Integer.toString(idx));
 		  routingHeaderCode.addOutputNewline(",") ;
 		  idx++;
@@ -1274,7 +1274,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  routingHeaderCode.incrementIndent() ;
 	  for(ComponentInstance bus:routeProp.buses)
 	  {
-		routingHeaderCode.addOutput(RoutingProperties.getComponentInstanceIdentifier(bus));
+		routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(bus));
 		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
 		routingHeaderCode.addOutputNewline(",") ;
 		idx++;
@@ -1310,7 +1310,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	        +"] = {" );
 	  for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
 	  {
-		routingImplCode.addOutput(RoutingProperties.getFeatureLocalIdentifier(fi));
+		routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
 		routingImplCode.addOutput(",");
 	  }
 	  routingImplCode.addOutputNewline("};");
@@ -1321,14 +1321,14 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 		if(fi.getDirection().equals(DirectionType.OUT)
 				|| fi.getDirection().equals(DirectionType.IN_OUT))
 		{
-		  List<FeatureInstance> destinations = routeProp.getFeatureDestinations(fi);
+		  List<FeatureInstance> destinations = AadlToPokCUtils.getFeatureDestinations(fi);
 		  routingImplCode.addOutput("uint8_t ");
-		  routingImplCode.addOutput(RoutingProperties.getFeatureLocalIdentifier(fi)+
+		  routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
 				  "_deployment_destinations["+
 				  Integer.toString(destinations.size())+"] = {");
 		  for(FeatureInstance dst:destinations)
 		  {
-			routingImplCode.addOutput(RoutingProperties.getFeatureGlobalIdentifier(dst));
+			routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(dst));
 			routingImplCode.addOutput(",");
 		  }
 		  routingImplCode.addOutputNewline("};");	  
@@ -1345,7 +1345,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	for(FeatureInstance fi:routeProp.globalPort)
 	{
 	  if(localPorts.contains(fi))
-		routingImplCode.addOutput(RoutingProperties.getFeatureLocalIdentifier(fi));
+		routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
 	  else
 		routingImplCode.addOutput("invalid_local_port");
 	  
@@ -1357,7 +1357,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 			"[POK_CONFIG_NB_PORTS] = {");
 	for(FeatureInstance fi:localPorts)
 	{
-	  routingImplCode.addOutput(RoutingProperties.getFeatureGlobalIdentifier(fi));
+	  routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi));
 	  routingImplCode.addOutput(",");
 	}
 	routingImplCode.addOutputNewline("};");
@@ -1367,7 +1367,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	for(FeatureInstance fi : routeProp.globalPort)
 	{
 	  ComponentInstance inst = routeProp.processorPort.get(fi);
-	  routingImplCode.addOutput(RoutingProperties.getComponentInstanceIdentifier(inst));
+	  routingImplCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(inst));
 	  routingImplCode.addOutput(",");
 	}
 	routingImplCode.addOutputNewline("};");
@@ -1398,7 +1398,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	for(FeatureInstance fi: localPorts)
 	{
 	  routingImplCode.addOutput("\""+
-			  RoutingProperties.getFeatureLocalIdentifier(fi)
+	        AadlToPokCUtils.getFeatureLocalIdentifier(fi)
 			  +"\"");
 	  routingImplCode.addOutput(",");
 	}
@@ -1409,7 +1409,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	for(FeatureInstance fi: localPorts)
 	{
 	  routingImplCode.addOutput(""+
-			  RoutingProperties.getFeatureLocalIdentifier(fi)
+	        AadlToPokCUtils.getFeatureLocalIdentifier(fi)
 			  +"");
 	  routingImplCode.addOutput(",");
 	}
@@ -1419,7 +1419,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 			"[POK_CONFIG_NB_PORTS] = {");
 	for(FeatureInstance fi: localPorts)
 	{
-	  int destNb = routeProp.getFeatureDestinations(fi).size();
+	  int destNb = AadlToPokCUtils.getFeatureDestinations(fi).size();
 	  routingImplCode.addOutput(Integer.toString(destNb));
 	  routingImplCode.addOutput(",");
 	}
@@ -1429,11 +1429,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 			"[POK_CONFIG_NB_PORTS] = {");
 	for(FeatureInstance fi: localPorts)
 	{
-	  int destNb = routeProp.getFeatureDestinations(fi).size();
+	  int destNb = AadlToPokCUtils.getFeatureDestinations(fi).size();
 	  if(destNb==0)
 		  routingImplCode.addOutput("NULL");
 	  else
-		  routingImplCode.addOutput(RoutingProperties.getFeatureLocalIdentifier(fi)
+		  routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)
 				  +"_deployment_destinations");
 	  routingImplCode.addOutput(",");
 	}

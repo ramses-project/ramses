@@ -5,9 +5,7 @@ import java.util.Map ;
 
 import org.osate.aadl2.ProcessImplementation ;
 
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
-
-public class PokProperties implements TargetProperties
+public class ProcessorProperties
 {
   boolean consoleFound = false ;
   
