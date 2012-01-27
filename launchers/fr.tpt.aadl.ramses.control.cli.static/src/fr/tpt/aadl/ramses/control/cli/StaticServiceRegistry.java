@@ -16,8 +16,8 @@ import fr.tpt.aadl.launch.WCETAnalysis ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.generator.c.annex.behavior.AadlBaToCUnparserAction ;
-import fr.tpt.aadl.ramses.generator.pok.PokGeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction ;
+import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory ;
 
 public class StaticServiceRegistry implements ServiceRegistry
 {

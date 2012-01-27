@@ -13,7 +13,7 @@ import org.osate.aadl2.PublicPackageSection ;
 import fr.tpt.aadl.ramses.control.cli.StaticServiceRegistry ;
 import fr.tpt.aadl.ramses.control.core.ToolSuiteLauncher ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.generator.c.AadlToCUnparser ;
+import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
 
 public class GenerationTester
 {

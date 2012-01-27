@@ -8,6 +8,6 @@
 	<classpathentry kind="src" path="/fr.tpt.aadl.ramses.control.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.control.support"/>
 	<classpathentry kind="src" path="/fr.tpt.aadl.ramses.control.cli.static"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generator.c"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.c"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

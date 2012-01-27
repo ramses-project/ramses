@@ -16,7 +16,7 @@ import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.generator.pok.PokGenerator ;
+import fr.tpt.aadl.ramses.generation.pok.PokGenerator ;
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager ;
