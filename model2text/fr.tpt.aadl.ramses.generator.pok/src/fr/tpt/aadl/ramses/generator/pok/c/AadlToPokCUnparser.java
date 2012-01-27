@@ -121,7 +121,22 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
+  
+  //TODO : be refactored with generic interfaces.
   private void queueHandler(FeatureInstance fi, PartitionProperties pp)
+  {
+    Port p = getProcessPort(fi) ;
+    
+    QueueInfo queueInfo = new QueueInfo() ;
+    queueInfo.direction = p.getDirection() ;
+    
+    if(getQueueInfo(p, queueInfo))
+    {
+      pp.queueInfo.add(queueInfo) ;
+    }
+  }
+  
+  private Port getProcessPort(FeatureInstance fi)
   {
     ConnectionInstance ci = null ;
     ConnectionReference cf = null ;
@@ -145,13 +160,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     Port p = (Port) c.getConnectionEnd() ;
     
-    QueueInfo queueInfo = new QueueInfo() ;
-    queueInfo.direction = p.getDirection() ;
-    
-    if(getQueueInfo(p, queueInfo))
-    {
-      pp.queueInfo.add(queueInfo) ;
-    }
+    return p ;
   }
   
   // Return false QueueInfo object is not completed.
@@ -190,6 +199,44 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     return result ;
   }
   
+  // TODO : be refactored with generic interfaces. 
+  private void sampleHandler(FeatureInstance fi, PartitionProperties pp)
+  {
+    Port p = getProcessPort(fi) ;
+    
+    SampleInfo sampleInfo = new SampleInfo() ;
+    sampleInfo.direction = p.getDirection() ;
+    
+    if(getSampleInfo(p, sampleInfo))
+    {
+      pp.sampleInfo.add(sampleInfo) ;
+    }
+  }
+  
+  private boolean getSampleInfo(Port port, SampleInfo info)
+  {
+    boolean result = true ;
+    
+    // XXX temporary. Until ATL transformation modifications.
+    //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
+    info.id = port.getName() + "_Instance" ;
+    
+    try
+    {
+      if(info.refresh == -1)
+      {
+        info.refresh = PropertyUtils.getIntValue(port,
+                                         "Sampling_Refresh_Period") ;
+      }
+    }
+    catch (Exception e)
+    {
+      result = false ;
+    }  
+    
+    return result ;
+  }
+  
   private void genQueueMainImpl(AadlToCSwitchProcess mainImplCode,
                                 PartitionProperties pp)
   {
@@ -215,6 +262,36 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       mainImplCode.addOutput(direction);
       mainImplCode.addOutput(", ") ;
       mainImplCode.addOutput(info.type.toUpperCase());
+      mainImplCode.addOutputNewline(",");
+      mainImplCode.addOutput("      &(") ;
+      mainImplCode.addOutput(info.id) ;
+      mainImplCode.addOutputNewline("), &(ret));") ;
+    }
+  }
+  
+  private void genSampleMainImpl(AadlToCSwitchProcess mainImplCode,
+                                PartitionProperties pp)
+  {
+    for(SampleInfo info : pp.sampleInfo)
+    {
+      mainImplCode.addOutput("  CREATE_SAMPLING_PORT (\"") ;
+      mainImplCode.addOutput(info.id);
+      mainImplCode.addOutputNewline("\",");
+      mainImplCode.addOutput("    sizeof(SAMPLING_PORT_ID_TYPE), ");
+      
+      String direction = null ;
+      if(DirectionType.IN == info.direction)
+      {
+        direction = "DESTINATION" ;
+      }
+      else
+      {
+        direction = "SOURCE" ;
+      }
+      
+      mainImplCode.addOutput(direction);
+      mainImplCode.addOutput(", ") ;
+      mainImplCode.addOutput(Long.toString(info.refresh)) ;
       mainImplCode.addOutputNewline(",");
       mainImplCode.addOutput("      &(") ;
       mainImplCode.addOutput(info.id) ;
@@ -264,8 +341,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
           {
             if(needRoutage)
             {
-              pp.hasSampling = true ;
-              // samplingHandler() ;
+              pp.hasSample = true ;
+              sampleHandler(fi, pp) ;
             }
             else
             {
@@ -389,6 +466,17 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       for(QueueInfo info : pp.queueInfo)
       {
         mainImplCode.addOutput("QUEUING_PORT_ID_TYPE ") ;
+        mainImplCode.addOutput(info.id) ;
+        mainImplCode.addOutputNewline(";") ;
+      }
+    }
+    
+    // Generate sample names array.
+    if(pp.hasSample)
+    {
+      for(SampleInfo info : pp.sampleInfo)
+      {
+        mainImplCode.addOutput("SAMPLING_PORT_ID_TYPE ") ;
         mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
@@ -533,6 +621,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     // Queue declarations.
     genQueueMainImpl(mainImplCode,pp) ;
     
+    // Sample declarations.
+    genSampleMainImpl(mainImplCode, pp) ;
+    
     mainImplCode
           .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
     mainImplCode.addOutputNewline("  return (0);") ;
@@ -623,25 +714,15 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       // XXX ARBITRARY
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_LIBC_STRING 1");
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1");
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_PROTOCOLS 1") ;
       
     }
     
-    // Common #define    
-    if(pp.hasQueue || pp.hasSampling)
+    if(pp.hasSample)
     {
-      // XXX ARBITRARY
-      mainHeaderCode.addOutputNewline("#define POK_NEEDS_PROTOCOLS 1") ;
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_SAMPLING 1");
     }
-    
-    
-    // TODO to be implemented.
-    /*
-    int samplingNeeded = (pp.samplingNames.isEmpty()) ? 0 : 1 ;
-    if(samplingNeeded>0)
-      mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_SAMPLING " +
-                                       samplingNeeded) ;
-    */
-    
+
     mainHeaderCode
     	.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
     			Long.toString(processorProp.requiredStackSizePerPartition.get(process)));
@@ -862,7 +943,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-        e.printStackTrace() ;
+        System.err.println("*** SCHEDULER IS NOT PROVIDED *** ") ;
+//        e.printStackTrace() ;
       }
     }
 
@@ -1382,13 +1464,15 @@ class PartitionProperties
   
   boolean hasEvent = false ;
   
-  boolean hasSampling = false ;
+  boolean hasSample = false ;
   
   Set<String> blackboardNames = new HashSet<String>() ;
   
   Set<String> queuingNames = new HashSet<String>() ;
   
   Set<QueueInfo> queueInfo = new HashSet<QueueInfo>();
+  
+  Set<SampleInfo> sampleInfo = new HashSet<SampleInfo>();
   
   Set<String> samplingNames = new HashSet<String>() ;
 }
@@ -1400,6 +1484,15 @@ class QueueInfo
   long size = -1 ;
   
   String type = null ;
+  
+  DirectionType direction = null ;
+}
+
+class SampleInfo
+{
+  String id = null ;
+  
+  long refresh = -1 ;
   
   DirectionType direction = null ;
 }

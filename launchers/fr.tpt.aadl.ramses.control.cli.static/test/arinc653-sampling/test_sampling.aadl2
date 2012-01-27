@@ -55,14 +55,16 @@ features
 properties
    source_name => "user_send";
    source_language => (C);
-   Source_Text => ("../../../send.o");
+   POK::source_location => "../../../send.o";
+   source_text => ("../../../send.h");
 end hello_part1;
 
 subprogram hello_part2
 features
    input : in parameter integer;
 properties
-   Source_Text => ("../../../receive.o");
+   POK::source_location => "../../../receive.o";
+   source_text => ("../../../receive.h");
    source_language => (C);
    source_name => "user_receive";
 end hello_part2;
@@ -85,7 +87,7 @@ subcomponents
 properties
    ARINC653::Module_Major_Frame => 1000 ms;
    ARINC653::Partition_Slots => (500 ms, 500 ms);
-   ARINC653::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
+   ARINC653::Slots_Allocation => (reference (partition_secure), reference (partition_common));
 end ppc.impl;
 
 thread receive_ping
@@ -189,4 +191,3 @@ properties
 end node.impl;
 
 end sampling;
-
