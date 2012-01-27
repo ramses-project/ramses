@@ -30,7 +30,7 @@ end myint;
 virtual processor partition
 properties
    POK::Scheduler => RR;
-   POK::Additional_Features => (libc_stdio,libc_stdlib,console);
+   POK::Additional_Features => (libc_stdio, libc_stdlib, console);
 end partition;
 
 virtual processor implementation partition.impl
@@ -49,7 +49,7 @@ properties
    POK::Scheduler => Static;
    POK::Module_Major_Frame => 1000 ms;
    POK::Partition_Slots => (500 ms);
-   POK::Slots_Allocation => ( reference (part1));
+   POK::Slots_Allocation => (reference (part1));
 end ppc.impl;
 
 process myprocess1
@@ -77,7 +77,7 @@ end mythread2;
 
 thread implementation mythread1.impl
 calls 
-   call1 : { pspg : subprogram hello_part1;};
+   call1 : {pspg : subprogram hello_part1;};
 connections
    cnx2: parameter pspg.output -> output;
 properties
@@ -87,7 +87,7 @@ end mythread1.impl;
 
 thread implementation mythread2.impl
 calls 
-   call1 : { pspg : subprogram hello_part2;};
+   call1 : {pspg : subprogram hello_part2;};
 connections
    cnx3: parameter input -> pspg.input;
 properties
@@ -100,7 +100,8 @@ features
    output : out parameter myint;
 properties
    source_name => "user_send";
-   source_language => C;
+   source_language => (C);
+   Source_Text => ("../../../send.h");
    POK::Source_Location => "../../../send.o";
 end hello_part1;
 
@@ -109,7 +110,8 @@ features
    input : in parameter myint;
 properties
    POK::Source_Location => "../../../receive.o";
-   source_language => C;
+   Source_Text => ("../../../receive.h");
+   source_language => (C);
    source_name => "user_receive";
 end hello_part2;
 
