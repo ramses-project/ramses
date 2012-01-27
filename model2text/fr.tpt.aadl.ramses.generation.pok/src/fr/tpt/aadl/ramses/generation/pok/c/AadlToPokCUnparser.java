@@ -70,7 +70,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // Generate deployment.h
     AadlToCSwitchProcess deploymentHeaderCode = new AadlToCSwitchProcess(null) ;
-    genDeploymentHeader(processor, deploymentHeaderCode, processorProp) ;
+    genDeploymentHeader(processor, deploymentHeaderCode, routing) ;
     
     // Generate deployment.c
     AadlToCSwitchProcess deploymentImplCode = new AadlToCSwitchProcess(null) ;
@@ -735,7 +735,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
           .addOutputNewline("#define POK_NEEDS_ARINC653_PROCESS 1") ;
     mainHeaderCode
           .addOutputNewline("#define POK_NEEDS_ARINC653_PARTITION 1") ;
-
+    
     // XXX Is there any condition for the generation of POK_NEEDS_MIDDLEWARE ?
     // XXX ARBITRARY
     mainHeaderCode
@@ -798,9 +798,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   private void genDeploymentHeader(ProcessorSubcomponent processor,
                                    AadlToCSwitchProcess deploymentHeaderCode,
-                                   ProcessorProperties processorProp)
+                                   RoutingProperties routing)
                                                       throws GenerationException
   {
+    ProcessorProperties processorProp = routing.processorProp ;
+    
     String guard = GenerationUtilsC.generateHeaderInclusionGuard("deployment.h") ;
 
     deploymentHeaderCode.addOutputNewline(guard) ;
@@ -1153,6 +1155,16 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
           Long.toString(processorProp.requiredStackSize)) ;
+    
+    // XXX is that right ???
+    if(routing.buses.isEmpty())
+    {
+      deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0");
+    }
+    else
+    {
+      deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 1");
+    }
 
     deploymentHeaderCode.addOutputNewline("#endif") ;
   }                                            
@@ -1500,19 +1512,32 @@ class SampleInfo
 /*
 TODO
 
-
-BUFFER EXAMPLE:
+****** ALL EXAMPLE :
 
 KERNEL
 
-  #define POK_CONFIG_NB_LOCKOBJECTS 1 (also for blackboard)
-  #define POK_CONFIG_NB_BUSES 0 (also for blackboard and queue see routing properties buses)
+deployment.h
+
+  #define POK_CONFIG_NB_NODES 1
+
+
+****** BUFFER EXAMPLE:
+
+KERNEL
+
+  #define POK_CONFIG_NB_LOCKOBJECTS 1 (also for blackboard and event and buffer)
+DONE  deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0"); 
+
 
 PART
+
+main.h
 
   #define POK_CONFIG_NB_BUFFERS 1
   #define POK_NEEDS_BUFFERS 1
   #define POK_NEEDS_ARINC653_BUFFER 1
+  
+  #include <arinc653/buffer.h>
   
 deployment.c
 
@@ -1528,5 +1553,29 @@ main.c
 
   extern BUFFER_ID_TYPE input_id;
   CREATE_BUFFER ("input", sizeof (BUFFER_ID_TYPE), 1, FIFO, &(input_id), &(ret));  
+
+****** EVENT EXAMPLE :
+
+PART
+
+main.h 
+
+#define POK_CONFIG_NB_EVENTS 1
+#define POK_NEEDS_EVENTS 1
+#define POK_CONFIG_ARINC653_NB_EVENTS 1
+#define POK_NEEDS_ARINC653_EVENT 1
+
+#include <arinc653/event.h>
+
+deployment.c
+
+EVENT_ID_TYPE input_id;
+char* pok_arinc653_events_names[POK_CONFIG_ARINC653_NB_EVENTS] = {"input"};
+
+main.c
+
+extern EVENT_ID_TYPE input_id;
+
+CREATE_EVENT ("input", &(input_id), &(ret));
 
 */
