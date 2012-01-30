@@ -10,7 +10,6 @@ import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
 import org.osate.aadl2.Element ;
-import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
@@ -40,7 +39,7 @@ public class AadlTargetSpecificCodeGenerator
     _targetBuilderGen = targetBuilderGen ;
   }
   
-  public void setParameters(Map<String, Object> parameters)
+  public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }
@@ -68,6 +67,8 @@ public class AadlTargetSpecificCodeGenerator
         // XXX Have AadlGenericUnparser to unparse the SystemImplementation
         // object ?
         
+        TargetProperties tarProp = _targetUnparser.process(si, generatedFilePath);
+        
         for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
         {
           // create directory with the processor subcomponent name
@@ -82,8 +83,7 @@ public class AadlTargetSpecificCodeGenerator
           // object ?
 //          _genericUnparser.process(ps, kernelFileDir) ;
           
-          TargetProperties tarProp ;
-          tarProp = _targetUnparser.process(ps, kernelFileDir);
+          _targetUnparser.process(ps, kernelFileDir, tarProp);
           List<ProcessSubcomponent> ownedProcess = 
                                         GeneratorUtils.getBindedProcesses(ps) ;
           
@@ -97,9 +97,7 @@ public class AadlTargetSpecificCodeGenerator
             _genericUnparser.process(process, processDirectory) ;
             _targetBuilderGen.process(process, processDirectory) ;
             
-            ProcessImplementation processImpl = (ProcessImplementation)
-                                          process.getComponentImplementation() ;
-            _targetUnparser.process(processImpl, processDirectory, tarProp);
+            _targetUnparser.process(process, processDirectory, tarProp);
           }
         }
       }

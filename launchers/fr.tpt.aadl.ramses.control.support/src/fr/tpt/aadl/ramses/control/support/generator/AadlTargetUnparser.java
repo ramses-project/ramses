@@ -5,6 +5,7 @@ import java.util.Map ;
 
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.SystemImplementation ;
 
 public interface AadlTargetUnparser
 {
@@ -13,8 +14,13 @@ public interface AadlTargetUnparser
                       TargetProperties tarProp) 
                                         throws GenerationException ;
   
-  public void process(ProcessSubcomponent process, File generatedFilePath,
+  public void process(ProcessSubcomponent process,
+                      File generatedFilePath,
                       TargetProperties tarProp) throws GenerationException ;
+  
+  public TargetProperties process(SystemImplementation si,
+                                  File generatedFilePath)
+                                                throws GenerationException ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
 }

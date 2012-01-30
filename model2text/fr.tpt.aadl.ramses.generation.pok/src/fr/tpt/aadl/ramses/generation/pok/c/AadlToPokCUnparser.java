@@ -121,7 +121,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  
   //TODO : be refactored with generic interfaces.
   private void queueHandler(FeatureInstance fi, PartitionProperties pp)
   {
@@ -1174,7 +1173,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   {
     throw new UnsupportedOperationException() ;
   }
-  
 
   public TargetProperties process(SystemImplementation si,
                                    File generatedFilePath)
