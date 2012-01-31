@@ -28,23 +28,26 @@ public class ToolSuiteLauncherCommand
   private static final String ANALYSIS_ONLY_OPTION_ID = "analysis_only" ;
   private static final String ANALYSIS_LIST_OPTION_ID = "analysis_list" ;
   private static final String SOURCE_MODELS_OPTION_ID = "source_models" ;
-  private static final String INCLUDES_OPTION_ID = "includes" ;
+  private static final String INCLUDES_OPTION_ID = "include_directories" ;
   private static final String SUPERIMPOSITION_FILES_OPTION_ID =
         "superimposition_files" ;
   private static final String POST_TRANSFORMATION_FILES_OPTION_ID =
         "post_transformation_files" ;
   private static final String RESOURCES_DIR_OPTION_ID =
-        "transformation_directory" ;
+        "resources_directory" ;
   private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
         "system_to_instantiate" ;
-  private static final String TARGER_DIR_OPTION_ID = "target_dir" ;
+  private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
   
-  private static final String GENERATION_OPTION_ID = "generation_platform" ;
+  private static final String GENERATION_OPTION_ID = "target_platform" ;
 
   private static Switch helpOnlyMode ;
   private static Switch parseOnlyMode ;
   private static Switch analysisOnlyMode ;
   private static QualifiedSwitch analysis ;
+  
+  public final static String DEFAULT_RESOURCES_DIR = 
+                    "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ; 
 
   public static void main(String[] args)
   {
@@ -167,24 +170,27 @@ public class ToolSuiteLauncherCommand
     FlaggedOption model =
           new FlaggedOption(SOURCE_MODELS_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(true)
-                .setShortFlag('m').setList(true).setListSeparator(',')
-                .setLongFlag(JSAP.NO_LONGFLAG)
+                .setLongFlag("model").setShortFlag('m').setList(true)
+                .setListSeparator(',')
                 .setAllowMultipleDeclarations(false) ;
     model.setHelp("List of input aadl files") ;
+    
     FlaggedOption includes =
           new FlaggedOption(INCLUDES_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                .setShortFlag('i').setList(true).setListSeparator(',')
-                .setLongFlag(JSAP.NO_LONGFLAG)
+                .setLongFlag("include").setShortFlag('i').setList(true)
+                .setListSeparator(',')
                 .setAllowMultipleDeclarations(false) ;
     includes.setHelp("List of path to find input models") ;
+    
     FlaggedOption system_to_instantiate =
           new FlaggedOption(SYSTEM_TO_INSTANTIATE_OPTION_ID)
-                .setStringParser(JSAP.STRING_PARSER).setRequired(true)
-                .setShortFlag('s').setList(false).setLongFlag(JSAP.NO_LONGFLAG)
+                .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+                .setLongFlag("system").setShortFlag('s').setList(false)
                 .setAllowMultipleDeclarations(false) ;
     system_to_instantiate
           .setHelp("Name of the system to instantiate in input aadl files") ;
+    
     QualifiedSwitch superimposition_files =
           (QualifiedSwitch) (new QualifiedSwitch(
                 SUPERIMPOSITION_FILES_OPTION_ID).setShortFlag('t')
@@ -194,37 +200,43 @@ public class ToolSuiteLauncherCommand
           .setHelp("Determines whether model transformation is performed or not:\n"
                 + "-t or --transformation only launch the uninstanciate.atl model transformation"
                 + "-t:MyFile.asm launch the superimposition of uninstanciate.atl with MyFile.atl") ;
+    
     FlaggedOption post_transformation_files =
           new FlaggedOption(POST_TRANSFORMATION_FILES_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                .setShortFlag('p').setList(true).setListSeparator(',')
-                .setLongFlag(JSAP.NO_LONGFLAG)
+                .setLongFlag("post-transformation").setShortFlag('p')
+                .setList(true).setListSeparator(',')
                 .setAllowMultipleDeclarations(false) ;
     post_transformation_files
           .setHelp("ASM file names used to refine the result of the superimposed uninstanciate model transformation") ;
-    FlaggedOption transformation_dir =
+    
+    FlaggedOption resources_dir =
           new FlaggedOption(RESOURCES_DIR_OPTION_ID)
-                .setStringParser(JSAP.STRING_PARSER).setRequired(true)
-                .setShortFlag('d').setList(false).setLongFlag(JSAP.NO_LONGFLAG)
-                .setAllowMultipleDeclarations(false) ;
-    transformation_dir
-          .setHelp("Path of the directory where to find predefined resources (ASM Files, AADL property set, etc...)") ;
-    FlaggedOption target_dir =
-          new FlaggedOption(TARGER_DIR_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                .setShortFlag('o').setList(false).setLongFlag(JSAP.NO_LONGFLAG)
+                .setLongFlag("directory").setShortFlag('d').setList(false)
                 .setAllowMultipleDeclarations(false) ;
-    target_dir.setHelp("Output directory") ;
+    resources_dir
+          .setHelp("Path of the directory where to find predefined resources (ASM Files, AADL property set, etc...)") ;
+    
+    FlaggedOption generated_file_path =
+          new FlaggedOption(OUTPUT_DIR_OPTION_ID)
+                .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+                .setLongFlag("output").setShortFlag('o').setList(false)
+                .setAllowMultipleDeclarations(false) ;
+    generated_file_path.setHelp("Directory where files will be generated") ;
+    
     jsapParse.registerParameter(model) ;
     jsapParse.registerParameter(includes) ;
     jsapParse.registerParameter(parseOnlyMode) ;
-    jsapParse.registerParameter(transformation_dir) ;
+    jsapParse.registerParameter(resources_dir) ;
+    
     jsapAnalysis.registerParameter(analysis) ;
     jsapAnalysis.registerParameter(model) ;
     jsapAnalysis.registerParameter(includes) ;
     jsapAnalysis.registerParameter(analysisOnlyMode) ;
     jsapAnalysis.registerParameter(system_to_instantiate) ;
-    jsapAnalysis.registerParameter(transformation_dir) ;
+    jsapAnalysis.registerParameter(resources_dir) ;
+    
     jsapTransfo.registerParameter(analysisOnlyMode) ;
     jsapTransfo.registerParameter(helpOnlyMode) ;
     jsapTransfo.registerParameter(parseOnlyMode) ;
@@ -233,25 +245,25 @@ public class ToolSuiteLauncherCommand
     jsapTransfo.registerParameter(system_to_instantiate) ;
     jsapTransfo.registerParameter(superimposition_files) ;
     jsapTransfo.registerParameter(post_transformation_files) ;
-    jsapTransfo.registerParameter(transformation_dir) ;
-    jsapTransfo.registerParameter(target_dir) ;
+    jsapTransfo.registerParameter(resources_dir) ;
+    jsapTransfo.registerParameter(generated_file_path) ;
     jsapTransfo.registerParameter(analysis) ;
     
     FlaggedOption generation =
           new FlaggedOption(GENERATION_OPTION_ID)
-                .setStringParser(JSAP.STRING_PARSER).setRequired(true)
-                .setShortFlag('g').setList(false).setLongFlag(JSAP.NO_LONGFLAG)
+                .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+                .setLongFlag("generation").setShortFlag('g').setList(false)
                 .setAllowMultipleDeclarations(false) ;
     
-    generation.setHelp("targeted platform for code generation (pok, etc.).") ;
+    generation.setHelp("Targeted platform for code generation (pok, etc.).") ;
     
     jsapGen.registerParameter(helpOnlyMode) ;
     jsapGen.registerParameter(parseOnlyMode) ;
     jsapGen.registerParameter(model) ;
     jsapGen.registerParameter(includes) ;
     jsapGen.registerParameter(system_to_instantiate) ;
-    jsapGen.registerParameter(transformation_dir) ;
-    jsapGen.registerParameter(target_dir) ;
+    jsapGen.registerParameter(resources_dir) ;
+    jsapGen.registerParameter(generated_file_path) ;
     jsapGen.registerParameter(generation) ;
   }
 
@@ -279,10 +291,17 @@ public class ToolSuiteLauncherCommand
     String[] includeFolderNames =
           parseConfig.getStringArray(INCLUDES_OPTION_ID) ;
     String[] mainModels = parseConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-    String transformationDirName =
+    String resourcesDirName =
           parseConfig.getString(RESOURCES_DIR_OPTION_ID) ;
+    
+    // Optional switch.
+    if(resourcesDirName == null)
+    {
+      resourcesDirName = DEFAULT_RESOURCES_DIR ;
+    }
+    
     File aadlResourcesDir =
-          ToolSuiteLauncherCommand.getAADLResourcesDir(transformationDirName) ;
+          ToolSuiteLauncherCommand.getAADLResourcesDir(resourcesDirName) ;
     List<File> mainModelFiles ;
     mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
@@ -304,10 +323,17 @@ public class ToolSuiteLauncherCommand
           analysisConfig.getStringArray(ANALYSIS_LIST_OPTION_ID) ;
     String systemToInstantiate =
           analysisConfig.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
-    String ressourceDirectoryName =
+    String resourcesDirName =
           analysisConfig.getString(RESOURCES_DIR_OPTION_ID) ;
+    
+    // Optional switch.
+    if(resourcesDirName == null)
+    {
+      resourcesDirName = DEFAULT_RESOURCES_DIR ;
+    }
+    
     File aadlResourcesDir =
-          ToolSuiteLauncherCommand.getAADLResourcesDir(ressourceDirectoryName) ;
+          ToolSuiteLauncherCommand.getAADLResourcesDir(resourcesDirName) ;
     List<File> mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
                                                    includeFolderNames) ;
@@ -373,10 +399,16 @@ public class ToolSuiteLauncherCommand
           genConf.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
     String[] mainModels =
           genConf.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-    String target_directory_name =
-          genConf.getString(TARGER_DIR_OPTION_ID) ;
+    String generated_file_path =
+          genConf.getString(OUTPUT_DIR_OPTION_ID) ;
     String resourcesDirName =
           genConf.getString(RESOURCES_DIR_OPTION_ID) ;
+    
+    // Optional switch.
+    if(resourcesDirName == null)
+    {
+      resourcesDirName = DEFAULT_RESOURCES_DIR ;
+    }
     
     String targetName = genConf.getString(GENERATION_OPTION_ID) ;
 
@@ -398,7 +430,7 @@ public class ToolSuiteLauncherCommand
     launcher.parsePredefinedRessources(aadlRessourcesDir) ;
 
     File generatedFilePath =
-          ToolSuiteLauncherCommand.getVerifiedPath(target_directory_name) ;
+          ToolSuiteLauncherCommand.getVerifiedPath(generated_file_path) ;
     
     try
     {
