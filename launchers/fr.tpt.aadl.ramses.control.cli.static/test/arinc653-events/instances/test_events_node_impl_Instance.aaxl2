@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<instance:SystemInstance xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance" xmi:id="_wfV3MEkBEeG-fKkUDsl4zw" name="node_impl_Instance" category="system">
+  <componentInstance xmi:id="_wfirgEkBEeG-fKkUDsl4zw" name="mem" category="memory">
+    <componentInstance xmi:id="_wfirgUkBEeG-fKkUDsl4zw" name="part1" category="memory">
+      <ownedPropertyAssociation xmi:id="_wfuRsEkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_wfuRsUkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_wfuRskkBEeG-fKkUDsl4zw">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.3/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfuRs0kBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.8"/>
+        <ownedValue xmi:id="_wfuRtEkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_wfuRtUkBEeG-fKkUDsl4zw">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/ARINC653.aadl2#//@ownedPropertyType.2/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfuRtkkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.11"/>
+        <ownedValue xmi:id="_wfuRt0kBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_wfuRuEkBEeG-fKkUDsl4zw" value="80000"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:MemorySubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.14/@ownedMemorySubcomponent.0"/>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.16/@ownedMemorySubcomponent.0"/>
+  </componentInstance>
+  <componentInstance xmi:id="_wfirgkkBEeG-fKkUDsl4zw" name="part1" category="process">
+    <ownedPropertyAssociation xmi:id="_wfuRuUkBEeG-fKkUDsl4zw">
+      <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+      <ownedValue xmi:id="_wfuRukkBEeG-fKkUDsl4zw">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfuRu0kBEeG-fKkUDsl4zw">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfuRvEkBEeG-fKkUDsl4zw" referencedInstanceObject="_wfj5okkBEeG-fKkUDsl4zw"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_wfuRvUkBEeG-fKkUDsl4zw">
+      <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+      <ownedValue xmi:id="_wfuRvkkBEeG-fKkUDsl4zw">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfuRv0kBEeG-fKkUDsl4zw">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfuRwEkBEeG-fKkUDsl4zw" referencedInstanceObject="_wfirgUkBEeG-fKkUDsl4zw"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_wfjSkEkBEeG-fKkUDsl4zw" name="thr1" category="thread">
+      <ownedPropertyAssociation xmi:id="_wfu4wEkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_wfu4wUkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfu4wkkBEeG-fKkUDsl4zw">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfu4w0kBEeG-fKkUDsl4zw" referencedInstanceObject="_wfj5okkBEeG-fKkUDsl4zw"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfu4xEkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_wfu4xUkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfu4xkkBEeG-fKkUDsl4zw">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfu4x0kBEeG-fKkUDsl4zw" referencedInstanceObject="_wfirgUkBEeG-fKkUDsl4zw"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfu4yEkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_wfu4yUkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_wfu4ykkBEeG-fKkUDsl4zw">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfu4y0kBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_wfu4zEkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_wfu4zUkBEeG-fKkUDsl4zw" value="1000">
+            <unit href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance xmi:id="_wfjSkUkBEeG-fKkUDsl4zw" name="output" srcConnectionInstance="_wfoLEEkBEeG-fKkUDsl4zw" category="eventPort" direction="out">
+        <ownedPropertyAssociation xmi:id="_wfu4zkkBEeG-fKkUDsl4zw">
+          <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+          <ownedValue xmi:id="_wfu4z0kBEeG-fKkUDsl4zw">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfu40EkBEeG-fKkUDsl4zw">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfu40UkBEeG-fKkUDsl4zw" referencedInstanceObject="_wfj5okkBEeG-fKkUDsl4zw"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_wfu40kkBEeG-fKkUDsl4zw">
+          <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_wfu400kBEeG-fKkUDsl4zw">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfu41EkBEeG-fKkUDsl4zw">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfu41UkBEeG-fKkUDsl4zw" referencedInstanceObject="_wfirgUkBEeG-fKkUDsl4zw"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_wfu41kkBEeG-fKkUDsl4zw">
+          <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+          <ownedValue xmi:id="_wfu410kBEeG-fKkUDsl4zw">
+            <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_wfu4zUkBEeG-fKkUDsl4zw" value="1000">
+              <unit href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <feature xsi:type="aadl2:EventPort" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.7/@ownedEventPort.0"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedThreadSubcomponent.0"/>
+    </componentInstance>
+    <componentInstance xmi:id="_wfjSkkkBEeG-fKkUDsl4zw" name="thr2" category="thread">
+      <ownedPropertyAssociation xmi:id="_wfu42EkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+        <ownedValue xmi:id="_wfvf0EkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfvf0UkBEeG-fKkUDsl4zw">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfvf0kkBEeG-fKkUDsl4zw" referencedInstanceObject="_wfj5okkBEeG-fKkUDsl4zw"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfvf00kBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+        <ownedValue xmi:id="_wfvf1EkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfvf1UkBEeG-fKkUDsl4zw">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfvf1kkBEeG-fKkUDsl4zw" referencedInstanceObject="_wfirgUkBEeG-fKkUDsl4zw"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfvf10kBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0"/>
+        <ownedValue xmi:id="_wfvf2EkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_wfvf2UkBEeG-fKkUDsl4zw">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfvf2kkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+        <ownedValue xmi:id="_wfvf20kBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_wfu4zUkBEeG-fKkUDsl4zw" value="1000">
+            <unit href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance xmi:id="_wfj5oEkBEeG-fKkUDsl4zw" name="input" dstConnectionInstance="_wfoLEEkBEeG-fKkUDsl4zw" category="eventPort">
+        <ownedPropertyAssociation xmi:id="_wfvf3EkBEeG-fKkUDsl4zw">
+          <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2"/>
+          <ownedValue xmi:id="_wfvf3UkBEeG-fKkUDsl4zw">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfvf3kkBEeG-fKkUDsl4zw">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfvf30kBEeG-fKkUDsl4zw" referencedInstanceObject="_wfj5okkBEeG-fKkUDsl4zw"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_wfvf4EkBEeG-fKkUDsl4zw">
+          <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5"/>
+          <ownedValue xmi:id="_wfvf4UkBEeG-fKkUDsl4zw">
+            <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfvf4kkBEeG-fKkUDsl4zw">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" xmi:id="_wfvf40kBEeG-fKkUDsl4zw" referencedInstanceObject="_wfirgUkBEeG-fKkUDsl4zw"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_wfvf5EkBEeG-fKkUDsl4zw">
+          <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
+          <ownedValue xmi:id="_wfvf5UkBEeG-fKkUDsl4zw">
+            <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_wfu4zUkBEeG-fKkUDsl4zw" value="1000">
+              <unit href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation xmi:id="_wfvf5kkBEeG-fKkUDsl4zw">
+          <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.3"/>
+          <ownedValue xmi:id="_wfvf50kBEeG-fKkUDsl4zw">
+            <ownedValue xsi:type="aadl2:ClassifierValue" xmi:id="_wfvf6EkBEeG-fKkUDsl4zw">
+              <classifier xsi:type="aadl2:SubprogramType" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.11"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <feature xsi:type="aadl2:EventPort" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.8/@ownedEventPort.0"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedThreadSubcomponent.1"/>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.16/@ownedProcessSubcomponent.0"/>
+  </componentInstance>
+  <componentInstance xmi:id="_wfj5oUkBEeG-fKkUDsl4zw" name="cpu" category="processor">
+    <ownedPropertyAssociation xmi:id="_wfvf6UkBEeG-fKkUDsl4zw">
+      <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.13"/>
+      <ownedValue xmi:id="_wfvf6kkBEeG-fKkUDsl4zw">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_wfvf60kBEeG-fKkUDsl4zw">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.4/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_wfwG4EkBEeG-fKkUDsl4zw">
+      <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.12"/>
+      <ownedValue xmi:id="_wfwG4UkBEeG-fKkUDsl4zw">
+        <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_wfwG4kkBEeG-fKkUDsl4zw">
+          <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_wfwG40kBEeG-fKkUDsl4zw">
+      <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.2"/>
+      <ownedValue xmi:id="_wfwG5EkBEeG-fKkUDsl4zw">
+        <ownedValue xsi:type="aadl2:IntegerLiteral" xmi:id="_wfwG5UkBEeG-fKkUDsl4zw" value="500">
+          <unit href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_wfwG5kkBEeG-fKkUDsl4zw">
+      <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.0"/>
+      <ownedValue xmi:id="_wfwG50kBEeG-fKkUDsl4zw">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfwG6EkBEeG-fKkUDsl4zw">
+          <ownedListElement xsi:type="aadl2:IntegerLiteral" xmi:id="_wfwG5UkBEeG-fKkUDsl4zw" value="500">
+            <unit href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation xmi:id="_wfwG6UkBEeG-fKkUDsl4zw">
+      <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.1"/>
+      <ownedValue xmi:id="_wfwG6kkBEeG-fKkUDsl4zw">
+        <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfwG60kBEeG-fKkUDsl4zw">
+          <ownedListElement xsi:type="aadl2:ReferenceValue" xmi:id="_wfwG7EkBEeG-fKkUDsl4zw">
+            <containmentPathElement xmi:id="_wfwG7UkBEeG-fKkUDsl4zw">
+              <namedElement xsi:type="aadl2:VirtualProcessorSubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.0"/>
+            </containmentPathElement>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance xmi:id="_wfj5okkBEeG-fKkUDsl4zw" name="part1" category="virtual processor">
+      <ownedPropertyAssociation xmi:id="_wfwG7kkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.7"/>
+        <ownedValue xmi:id="_wfwG70kBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:NamedValue" xmi:id="_wfwG8EkBEeG-fKkUDsl4zw">
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.0/@ownedLiteral.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation xmi:id="_wfwG8UkBEeG-fKkUDsl4zw">
+        <property href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.21"/>
+        <ownedValue xmi:id="_wfwG8kkBEeG-fKkUDsl4zw">
+          <ownedValue xsi:type="aadl2:ListValue" xmi:id="_wfwG80kBEeG-fKkUDsl4zw">
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_wfwG9EkBEeG-fKkUDsl4zw">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.5/@ownedLiteral.6"/>
+            </ownedListElement>
+            <ownedListElement xsi:type="aadl2:NamedValue" xmi:id="_wfwG9UkBEeG-fKkUDsl4zw">
+              <namedValue xsi:type="aadl2:EnumerationLiteral" href="/home/seb/Documents/professionnel/ENST/tmp/workspace/aadl-eclipse-dev/aadlmt/trunk/launchers/fr.tpt.aadl.ramses.control.cli.static/../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.5/@ownedLiteral.2"/>
+            </ownedListElement>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedVirtualProcessorSubcomponent.0"/>
+    </componentInstance>
+    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.16/@ownedProcessorSubcomponent.0"/>
+  </componentInstance>
+  <connectionInstance xmi:id="_wfoLEEkBEeG-fKkUDsl4zw" name="node_impl_Instance.part1.thr1.output_node_impl_Instance.part1.thr2.input" kind="portConnection" destination="_wfj5oEkBEeG-fKkUDsl4zw" source="_wfjSkUkBEeG-fKkUDsl4zw">
+    <connectionReference xmi:id="_wfoyIEkBEeG-fKkUDsl4zw" context="_wfirgkkBEeG-fKkUDsl4zw">
+      <connection xsi:type="aadl2:PortConnection" href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.6/@ownedPortConnection.0"/>
+    </connectionReference>
+  </connectionInstance>
+  <systemOperationMode xmi:id="_wflHwEkBEeG-fKkUDsl4zw" name="No Modes"/>
+  <systemImplementation href="test/arinc653-events/test_events.aadl2#//@ownedPublicSection/@ownedClassifier.16"/>
+</instance:SystemInstance>
