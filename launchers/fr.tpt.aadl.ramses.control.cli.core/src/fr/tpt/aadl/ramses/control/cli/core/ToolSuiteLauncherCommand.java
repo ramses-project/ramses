@@ -6,7 +6,6 @@ import java.util.Iterator ;
 import java.util.List ;
 import java.util.Set ;
 
-import org.eclipse.emf.ecore.resource.Resource ;
 
 import com.martiansoftware.jsap.FlaggedOption ;
 import com.martiansoftware.jsap.JSAP ;
@@ -19,7 +18,6 @@ import fr.tpt.aadl.ramses.control.core.ToolSuiteLauncher ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.generation.pok.PokGenerator ;
 
 
 public class ToolSuiteLauncherCommand
@@ -35,11 +33,13 @@ public class ToolSuiteLauncherCommand
         "superimposition_files" ;
   private static final String POST_TRANSFORMATION_FILES_OPTION_ID =
         "post_transformation_files" ;
-  private static final String TRANSFORMATION_DIR_OPTION_ID =
+  private static final String RESOURCES_DIR_OPTION_ID =
         "transformation_directory" ;
   private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
         "system_to_instantiate" ;
   private static final String TARGER_DIR_OPTION_ID = "target_dir" ;
+  
+  private static final String GENERATION_OPTION_ID = "generation_platform" ;
 
   private static Switch helpOnlyMode ;
   private static Switch parseOnlyMode ;
@@ -51,11 +51,12 @@ public class ToolSuiteLauncherCommand
     JSAP jsapParse = new JSAP() ;
     JSAP jsapAnalysis = new JSAP() ;
     JSAP jsapTransfo = new JSAP() ;
+    JSAP jsapGen = new JSAP() ;
     ToolSuiteLauncher launcher = new ToolSuiteLauncher() ;
 
     try
     {
-      initSwitches(jsapParse, jsapAnalysis, jsapTransfo) ;
+      initSwitches(jsapParse, jsapAnalysis, jsapTransfo, jsapGen) ;
       JSAPResult parseConfig = jsapParse.parse(args) ;
       boolean parseOnly = parseConfig.getBoolean(PARSE_ONLY_OPTION_ID) ;
       jsapParse.unregisterParameter(parseOnlyMode) ;
@@ -103,7 +104,10 @@ public class ToolSuiteLauncherCommand
         }
       }
 
-      transformation(launcher, jsapTransfo, args) ;
+      // Currently disable
+//      transformation(launcher, jsapTransfo, args) ;
+      
+      generation(launcher, jsapGen, args) ;
     }
     catch(Exception e)
     {
@@ -118,7 +122,8 @@ public class ToolSuiteLauncherCommand
   // transformation.
   private static void initSwitches(JSAP jsapParse,
                                    JSAP jsapAnalysis,
-                                   JSAP jsapTransfo)
+                                   JSAP jsapTransfo,
+                                   JSAP jsapGen)
         throws JSAPException
   {
     helpOnlyMode =
@@ -198,7 +203,7 @@ public class ToolSuiteLauncherCommand
     post_transformation_files
           .setHelp("ASM file names used to refine the result of the superimposed uninstanciate model transformation") ;
     FlaggedOption transformation_dir =
-          new FlaggedOption(TRANSFORMATION_DIR_OPTION_ID)
+          new FlaggedOption(RESOURCES_DIR_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(true)
                 .setShortFlag('d').setList(false).setLongFlag(JSAP.NO_LONGFLAG)
                 .setAllowMultipleDeclarations(false) ;
@@ -231,6 +236,23 @@ public class ToolSuiteLauncherCommand
     jsapTransfo.registerParameter(transformation_dir) ;
     jsapTransfo.registerParameter(target_dir) ;
     jsapTransfo.registerParameter(analysis) ;
+    
+    FlaggedOption generation =
+          new FlaggedOption(GENERATION_OPTION_ID)
+                .setStringParser(JSAP.STRING_PARSER).setRequired(true)
+                .setShortFlag('g').setList(false).setLongFlag(JSAP.NO_LONGFLAG)
+                .setAllowMultipleDeclarations(false) ;
+    
+    generation.setHelp("targeted platform for code generation (pok, etc.).") ;
+    
+    jsapGen.registerParameter(helpOnlyMode) ;
+    jsapGen.registerParameter(parseOnlyMode) ;
+    jsapGen.registerParameter(model) ;
+    jsapGen.registerParameter(includes) ;
+    jsapGen.registerParameter(system_to_instantiate) ;
+    jsapGen.registerParameter(transformation_dir) ;
+    jsapGen.registerParameter(target_dir) ;
+    jsapGen.registerParameter(generation) ;
   }
 
   @SuppressWarnings("rawtypes")
@@ -258,7 +280,7 @@ public class ToolSuiteLauncherCommand
           parseConfig.getStringArray(INCLUDES_OPTION_ID) ;
     String[] mainModels = parseConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
     String transformationDirName =
-          parseConfig.getString(TRANSFORMATION_DIR_OPTION_ID) ;
+          parseConfig.getString(RESOURCES_DIR_OPTION_ID) ;
     File aadlResourcesDir =
           ToolSuiteLauncherCommand.getAADLResourcesDir(transformationDirName) ;
     List<File> mainModelFiles ;
@@ -283,7 +305,7 @@ public class ToolSuiteLauncherCommand
     String systemToInstantiate =
           analysisConfig.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
     String ressourceDirectoryName =
-          analysisConfig.getString(TRANSFORMATION_DIR_OPTION_ID) ;
+          analysisConfig.getString(RESOURCES_DIR_OPTION_ID) ;
     File aadlResourcesDir =
           ToolSuiteLauncherCommand.getAADLResourcesDir(ressourceDirectoryName) ;
     List<File> mainModelFiles =
@@ -315,7 +337,86 @@ public class ToolSuiteLauncherCommand
       }
     }
   }
+  
+  private static void generation(ToolSuiteLauncher launcher,
+                                 JSAP jsapGen,
+                                 String[] args)
+                                                   throws Exception
+  {
+    JSAPResult genConf = jsapGen.parse(args) ;
+    
+    boolean helpOnly = genConf.getBoolean(HELP_ONLY_OPTION_ID) ;
 
+    if(helpOnly || false == genConf.success())
+    {
+      StringBuilder sb =
+            new StringBuilder("\nGeneral Configuration Usage:\n\n") ;
+      sb.append(jsapGen.getUsage()) ;
+      sb.append("\n\n") ;
+      sb.append(jsapGen.getHelp()) ;
+      System.out.println(sb.toString()) ;
+      
+      if(genConf.success())
+      {
+        reportError(genConf.getErrorMessageIterator(), sb.toString()) ;
+        System.exit(0) ;
+      }
+      else
+      {
+        System.exit(1) ; 
+      }
+    }
+    
+    String[] includeFolderNames =
+          genConf.getStringArray(INCLUDES_OPTION_ID) ;
+    String systemToInstantiate =
+          genConf.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
+    String[] mainModels =
+          genConf.getStringArray(SOURCE_MODELS_OPTION_ID) ;
+    String target_directory_name =
+          genConf.getString(TARGER_DIR_OPTION_ID) ;
+    String resourcesDirName =
+          genConf.getString(RESOURCES_DIR_OPTION_ID) ;
+    
+    String targetName = genConf.getString(GENERATION_OPTION_ID) ;
+
+    if(resourcesDirName.endsWith("/") == false)
+    {
+      resourcesDirName = resourcesDirName + "/" ;
+    }
+
+    List<File> mainModelFiles =
+          ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
+                                                   includeFolderNames) ;
+    
+    ToolSuiteLauncherCommand.getVerifiedPath(resourcesDirName) ;
+    
+    File aadlRessourcesDir =
+          ToolSuiteLauncherCommand
+                .getAADLResourcesDir(resourcesDirName) ;
+    
+    launcher.parsePredefinedRessources(aadlRessourcesDir) ;
+
+    File generatedFilePath =
+          ToolSuiteLauncherCommand.getVerifiedPath(target_directory_name) ;
+    
+    try
+    {
+      launcher.initializeGeneration(targetName) ;
+      launcher.launchModelGeneration(mainModelFiles,
+                                     systemToInstantiate,
+                                     generatedFilePath,
+                                     targetName) ;
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace() ;
+      System.err.println(e.getMessage()) ;
+      System.exit(0) ;
+    }
+  }
+  
+  /*
   private static void transformation(ToolSuiteLauncher launcher,
                                      JSAP jsapTransfo,
                                      String[] args)
@@ -323,9 +424,13 @@ public class ToolSuiteLauncherCommand
   {
     /********************* TODO TRANSFORMATION SWITCH ***********************/
     // Temporary
-    String[] transformationToPerform = new String[]
-    {PokGenerator.GENERATOR_NAME} ;
+//    String[] transformationToPerform = new String[]
+//    {PokGenerator.GENERATOR_NAME} ;
     /************************************************************************/
+    /*
+    System.err.println("TRANSFORMATION IS CURRENTLY DISABLE") ;
+    System.exit(0) ;
+    
     JSAPResult transfoConfig = jsapTransfo.parse(args) ;
     boolean helpOnly = transfoConfig.getBoolean(HELP_ONLY_OPTION_ID) ;
 
@@ -446,8 +551,10 @@ public class ToolSuiteLauncherCommand
         System.exit(0) ;
       }
     }
+    
   }
-
+  */
+  
   private static File getVerifiedPath(String filePath)
         throws Exception
   {

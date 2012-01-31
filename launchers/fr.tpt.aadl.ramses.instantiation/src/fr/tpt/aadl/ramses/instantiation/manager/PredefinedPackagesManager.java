@@ -28,8 +28,7 @@ public class PredefinedPackagesManager
         } ;
   private HashMap<String, Resource> resources = new HashMap<String, Resource>() ;
 
-  public PredefinedPackagesManager(
-                                   File resourceDir)
+  public PredefinedPackagesManager(File resourceDir)
   {
     StandAloneInstantiator parser = StandAloneInstantiator.getInstantiator() ;
     File[] subDirs = resourceDir.listFiles() ;

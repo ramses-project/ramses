@@ -15,8 +15,8 @@ import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher ;
 public class AadlArinc653Transformation implements
                                        AadlToTargetSpecificAadl
 {
-  public static final String ATL_FILE_PATH = 
-                           "../../model2model/fr.tpt.aadl.transformation.atl/" ;
+  public static final String DEFAULT_ATL_FILE_PATH = 
+                    "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
   
   public static final String[] ATL_FILE_NAMES = new String[]
         {"ExpandThreadsPorts.asm","ExpandSubprogramCalls.asm",
@@ -25,13 +25,11 @@ public class AadlArinc653Transformation implements
   public static final List<File> ATL_FILES = 
                                     new ArrayList<File>(ATL_FILE_NAMES.length) ;
   
-  public static final String GENERATED_FILENAME_PREFIX = "arinc653_specific_" ;
-  
   static
   {
     for(String fileName : ATL_FILE_NAMES)
     {
-      ATL_FILES.add(new File(ATL_FILE_PATH + fileName)) ;
+      ATL_FILES.add(new File(DEFAULT_ATL_FILE_PATH + fileName)) ;
     }
   }
   
@@ -47,11 +45,11 @@ public class AadlArinc653Transformation implements
     {
       atlTransfo = new AtlTransfoLauncher() ;
 
-      File generatorDirectory = new File(ATL_FILE_PATH) ;
-      atlTransfo.setGenerationPathDirectory(generatorDirectory) ;
+      File resourcesDirectory = new File(DEFAULT_ATL_FILE_PATH) ;
+      atlTransfo.setResourcesDirectory(resourcesDirectory) ;
 
-      String aaxlGeneratedFileName = GENERATED_FILENAME_PREFIX + 
-                            inputResource.getURI().toFileString() + ".aaxl2" ;
+      String aaxlGeneratedFileName =  
+                            inputResource.getURI().toFileString() ;
       
       Resource expandedResult =
             atlTransfo.doGeneration(inputResource, standardPropertySets,
@@ -68,9 +66,9 @@ public class AadlArinc653Transformation implements
       }
       */
       
-      // DEBUG
-      String aadlGeneratedFileName = GENERATED_FILENAME_PREFIX + 
-                              inputResource.getURI().toFileString() + ".aadl2" ;
+      String aadlGeneratedFileName = inputResource.getURI().toFileString() ;
+      aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(".aaxl2",
+                                                                 ".aadl2") ;
       
       StandAloneInstantiator instantiator =
             StandAloneInstantiator.getInstantiator() ;
@@ -80,6 +78,7 @@ public class AadlArinc653Transformation implements
     }
     catch(Exception e)
     {
+      e.printStackTrace() ;
       throw new GenerationException(e.getMessage()) ;
     }
   }

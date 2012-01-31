@@ -4,20 +4,21 @@ import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.Comment ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.modelsupport.UnparseText ;
+import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 
 public class AadlToCSwitchProcess
 {
 
-  private static AadlToCUnparser aadlSwitch ;
+  private static AadlProcessingSwitch aadlSwitch ;
 
-  private static void setAadlSwitch(AadlToCUnparser s)
+  private static void setAadlSwitch(AadlProcessingSwitch s)
   {
     aadlSwitch = s ;
   }
 
   private UnparseText unparserContent ;
 
-  public AadlToCSwitchProcess(AadlToCUnparser s)
+  public AadlToCSwitchProcess(AadlProcessingSwitch s)
   {
     unparserContent = new UnparseText() ;
     setAadlSwitch(s) ;

@@ -4,6 +4,7 @@ import java.io.File ;
 import java.util.Map ;
 
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
@@ -50,11 +51,13 @@ public class AadlTargetSpecificGenerator implements Generator
   }
 
   @Override
-  public void generate(Resource inputResource,
+  public void generate(SystemInstance instance,
                        Map<String, Resource> standardPropertySets,
                        File generatedFilePath)
                                                       throws GenerationException
   {
+    Resource inputResource = instance.eResource() ;
+    
     Resource r = _targetTrans.transform(inputResource, standardPropertySets,
                                         generatedFilePath) ;
     

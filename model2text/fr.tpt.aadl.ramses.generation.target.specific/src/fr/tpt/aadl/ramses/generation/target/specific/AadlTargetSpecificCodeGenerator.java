@@ -31,7 +31,7 @@ public class AadlTargetSpecificCodeGenerator
   protected TargetBuilderGenerator _targetBuilderGen ;
   
   public AadlTargetSpecificCodeGenerator(AadlGenericUnparser genericUnparser,
-                                        AadlTargetUnparser targetUnparser,
+                                         AadlTargetUnparser targetUnparser,
                                         TargetBuilderGenerator targetBuilderGen)
   {
     _genericUnparser = genericUnparser ;

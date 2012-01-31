@@ -47,7 +47,7 @@ import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess ;
 public class AtlTransfoLauncher
 {
 
-  private static File transformationDir = null ;
+  private static File resourcesDir = null ;
 
   private static AtlTransfoLauncher launched = null ;
 
@@ -91,7 +91,7 @@ public class AtlTransfoLauncher
 
   public static File getTransformationDirName()
   {
-    return AtlTransfoLauncher.transformationDir ;
+    return AtlTransfoLauncher.resourcesDir ;
   }
 
   private void initTransformation(File transformationDir)
@@ -129,7 +129,7 @@ public class AtlTransfoLauncher
                                String dataTargetfilepath)
         throws FileNotFoundException, IOException, ATLCoreException, Exception
   {
-    if(AtlTransfoLauncher.transformationDir == null)
+    if(AtlTransfoLauncher.resourcesDir == null)
       throw new Exception(
             "Illegal initialization of ATL transformation launcher: "
                   + "directory containing .asm files is undefined") ;
@@ -177,7 +177,7 @@ public class AtlTransfoLauncher
     // create ATLHook
     EMFModel atlHookModel = (EMFModel) factory.newModel(ATLHookMetamodel) ;
     URI fileURI =
-          URI.createURI(AtlTransfoLauncher.transformationDir.getAbsolutePath() +
+          URI.createURI(AtlTransfoLauncher.resourcesDir.getAbsolutePath() +
                 "/ATLHook.atlhooks") ;
     ResourceSet set = new ResourceSetImpl() ;
     Resource hookResource = set.createResource(fileURI) ;
@@ -211,7 +211,7 @@ public class AtlTransfoLauncher
     if(workingWithInstances)
     {
       URL asmMainFile =
-            new URL("file:" + transformationDir.getAbsolutePath() +
+            new URL("file:" + resourcesDir.getAbsolutePath() +
                   "/Uninstanciate.asm") ;
       Object loadedMainModule = launcher.loadModule(asmMainFile.openStream()) ;
       atlModules.add(loadedMainModule) ;
@@ -252,7 +252,7 @@ public class AtlTransfoLauncher
     for(String s : fileName)
     {
       libraryFile =
-            new URL("file:" + transformationDir.getAbsolutePath() + s + ".asm") ;
+            new URL("file:" + resourcesDir.getAbsolutePath() + s + ".asm") ;
       Object loadedLibrary = launcher.loadModule(libraryFile.openStream()) ;
       launcher.addLibrary(s, loadedLibrary) ;
     }
@@ -323,12 +323,12 @@ public class AtlTransfoLauncher
     }
   }
 
-  public void setGenerationPathDirectory(File transformationDir)
-        throws ATLCoreException, Exception
+  public void setResourcesDirectory(File resourcesDir)
+                                              throws ATLCoreException, Exception
   {
-    AtlTransfoLauncher.transformationDir = transformationDir ;
+    AtlTransfoLauncher.resourcesDir = resourcesDir ;
     predefinedPackagesManager =
-          new PredefinedPackagesManager(new File(transformationDir
+          new PredefinedPackagesManager(new File(resourcesDir
                 .getAbsolutePath() +
                 "/aadl_resources")) ;
 
@@ -338,6 +338,6 @@ public class AtlTransfoLauncher
                   "some predefined packages not found: " +
                   predefinedPackagesManager.getPackagesNotFound()) ;
 
-    this.initTransformation(transformationDir) ;
+    this.initTransformation(resourcesDir) ;
   }
 }

@@ -9,13 +9,13 @@ import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator
 
 public class PokGeneratorFactory
 {
-  public static String POK_GENERATOR_NAME = "pok_generator" ;
+  public static String POK_GENERATOR_NAME = "pok" ;
   
   private static Generator createPokGenerator()
   {
-    AadlToCUnparser genericCUnparser = new AadlToCUnparser() ;
-    
     AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser() ;
+    
+    AadlToCUnparser genericCUnparser = new AadlToCUnparser() ;
     
     AadlToPokMakefileUnparser pokMakefileUnparser = new AadlToPokMakefileUnparser() ;
     

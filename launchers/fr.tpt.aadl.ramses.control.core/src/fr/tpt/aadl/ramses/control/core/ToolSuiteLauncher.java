@@ -3,7 +3,6 @@ package fr.tpt.aadl.ramses.control.core ;
 import java.io.File ;
 
 import java.util.ArrayList ;
-import java.util.EnumMap ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
@@ -14,11 +13,10 @@ import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.generation.pok.PokGenerator ;
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager ;
 
 public class ToolSuiteLauncher
@@ -26,10 +24,9 @@ public class ToolSuiteLauncher
 
   private ServiceRegistry _registry ;
   private PredefinedPropertiesManager _predefinedPropertiesManager ;
-  private PredefinedPackagesManager _predefinedRuntimeManager ;
   private StandAloneInstantiator _instantiator ;
   private List<String> _analysisToPerform ;
-  private List<String> _transformationToPerform ;
+//  private List<String> _transformationToPerform ;
 
   public ToolSuiteLauncher()
   {
@@ -44,16 +41,24 @@ public class ToolSuiteLauncher
     _analysisToPerform =
           initialize(analysisIdentifiers, _registry.getAvailableAnalysisNames()) ;
   }
-
+  
+  /*
   public void initializeTransformation(String[] transformationIdentifiers)
         throws Exception
   {
-    // DEBUG Temporary disable.
-    /*
     _transformationToPerform =
           initialize(transformationIdentifiers, _registry
-                           .getAvailableTransformationNames()) ;
-     */
+                           .getAvailableGeneratorNames()) ;
+  }
+  */
+  
+  public void initializeGeneration(String targetName)
+        throws Exception
+  {
+    if(false == _registry.getAvailableGeneratorNames().contains(targetName))
+    {
+      throw new Exception ("Invalid generation target identifier: " + targetName) ;
+    }
   }
 
   private List<String> initialize(String[] processNames,
@@ -122,15 +127,14 @@ public class ToolSuiteLauncher
     {
       _predefinedPropertiesManager
             .extractStandardPropertySets(aadlResourcesDir) ;
-      _predefinedRuntimeManager =
-            new PredefinedPackagesManager(aadlResourcesDir) ;
     }
     catch(Exception e1)
     {
       e1.printStackTrace() ;
     }
   }
-
+  
+  /*
   public Resource launchTransformation(List<File> mainModels,
                                        String systemToInstantiate,
                                        File target_directory,
@@ -184,6 +188,7 @@ public class ToolSuiteLauncher
      
     /********************* TODO GENERATION SWITCH ***********************/
     // Temporary
+    /*
     PokGenerator pokGen = new PokGenerator() ;
     
     pokGen.doGeneration(instanceResource, standardPropertySets,
@@ -191,8 +196,36 @@ public class ToolSuiteLauncher
                         transformationDir, postTransformationFiles,
                         baseTypes, target_directory);
     /************************************************************************/
-    
+    /*
     return output ;
+  }
+  */
+  
+  public void launchModelGeneration (List<File> mainModels,
+                                     String systemToInstantiate,
+                                     File generatedFilePath,
+                                     String targetName)
+                                                      throws GenerationException
+  {
+    List<Resource> aadlModels = _instantiator.parse(mainModels) ;
+    
+    SystemInstance instance =
+          _instantiator.instantiate(aadlModels, systemToInstantiate) ;
+
+    if(instance == null)
+    {
+      throw new GenerationException("instanciation failed.") ;
+    }
+
+    Map<String, Resource> standardPropertySets ;
+    standardPropertySets =
+          _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
+    
+    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    
+    Generator generator = registry.getGenerator(targetName) ;
+    
+    generator.generate(instance, standardPropertySets, generatedFilePath) ;
   }
 
   public void performAnalysis(List<File> mainModelFiles,

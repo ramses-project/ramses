@@ -31,6 +31,7 @@ import org.osate.aadl2.instance.ConnectionReference ;
 import org.osate.aadl2.instance.FeatureCategory ;
 import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.UnparseText ;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
@@ -69,32 +70,32 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     routing.processorProp = processorProp ;
     
     // Generate deployment.h
-    AadlToCSwitchProcess deploymentHeaderCode = new AadlToCSwitchProcess(null) ;
+    UnparseText deploymentHeaderCode = new UnparseText() ;
     genDeploymentHeader(processor, deploymentHeaderCode, routing) ;
     
     // Generate deployment.c
-    AadlToCSwitchProcess deploymentImplCode = new AadlToCSwitchProcess(null) ;
+    UnparseText deploymentImplCode = new UnparseText() ;
     genDeploymentImpl(processor, deploymentImplCode, processorProp) ;
     
     // Generate routing.h
-    AadlToCSwitchProcess routingHeaderCode = new AadlToCSwitchProcess(null) ;
+    UnparseText routingHeaderCode = new UnparseText() ;
     genRoutingHeader(processorInst, routingHeaderCode, routing) ;
 
     // Generate routing.c
-    AadlToCSwitchProcess routingImplCode = new AadlToCSwitchProcess(null) ;
+    UnparseText routingImplCode = new UnparseText() ;
     genRoutingImpl(processorInst, routingImplCode, routing) ;
     
     try
     {
       saveFile(generatedFilePath, "deployment.h",
-               deploymentHeaderCode.getOutput()) ;
+               deploymentHeaderCode.getParseOutput()) ;
       
       saveFile(generatedFilePath, "deployment.c",
-               deploymentImplCode.getOutput()) ;
+               deploymentImplCode.getParseOutput()) ;
       
-      saveFile(generatedFilePath, "routing.h", routingHeaderCode.getOutput()) ;
+      saveFile(generatedFilePath, "routing.h", routingHeaderCode.getParseOutput()) ;
 
-      saveFile(generatedFilePath, "routing.c", routingImplCode.getOutput()) ;
+      saveFile(generatedFilePath, "routing.c", routingImplCode.getParseOutput()) ;
     }
     catch(IOException e)
     {
@@ -788,7 +789,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private void genDeploymentImpl(ProcessorSubcomponent processor,
-                                 AadlToCSwitchProcess deploymentImplCode,
+                                 UnparseText deploymentImplCode,
                                  ProcessorProperties pokProp)
   {
     deploymentImplCode.addOutputNewline("#include <types.h>") ;
@@ -796,7 +797,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private void genDeploymentHeader(ProcessorSubcomponent processor,
-                                   AadlToCSwitchProcess deploymentHeaderCode,
+                                   UnparseText deploymentHeaderCode,
                                    RoutingProperties routing)
                                                       throws GenerationException
   {
@@ -1208,7 +1209,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private void genRoutingHeader(ComponentInstance processor,
-                                AadlToCSwitchProcess routingHeaderCode,
+                                UnparseText routingHeaderCode,
                                 RoutingProperties routeProp)
                                                       throws GenerationException
   {
@@ -1299,7 +1300,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
 
   private void genRoutingImpl(ComponentInstance processor,
-                              AadlToCSwitchProcess routingImplCode,
+                              UnparseText routingImplCode,
                               RoutingProperties routeProp)
                                                       throws GenerationException
   {
