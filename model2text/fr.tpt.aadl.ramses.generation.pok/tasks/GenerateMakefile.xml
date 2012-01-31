@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="GenerateMakefile" name="fr.tpt.aadl.pok.makefile.generator">
+<!--
+AADL-RAMSES
+ 
+Copyright © 2012 TELECOM ParisTech and CNRS
+
+TELECOM ParisTech/LTCI
+
+Authors: see AUTHORS
+
+This program is free software: you can redistribute it and/or modify 
+it under the terms of the Eclipse Public License as published by Eclipse,
+either version 1.0 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Eclipse Public License for more details.
+You should have received a copy of the Eclipse Public License
+along with this program.  If not, see 
+http://www.eclipse.org/org/documents/epl-v10.php
+-->
+<project default="GenerateMakefile" name="fr.tpt.aadl.ramses.generation.pok.makefile">
     <property name="ECLIPSE_HOME" value="../../../../../../../Install/indigo_X86_64b_v2"/>
     <property name="ECLIPSE_WORKSPACE" value="../../../../../../../Documents/workspace"/>
 
     <!-- The classpath with only the dependencies used by the project -->
-    <path id="fr.tpt.aadl.pok.makefile.generator.libraryclasspath">
+    <path id="fr.tpt.aadl.ramses.generation.pok.makefile.libraryclasspath">
         <pathelement location="${ECLIPSE_WORKSPACE}/fr.tpt.aadl.pok.makefile.generator/bin"/>
         <pathelement location="${ECLIPSE_HOME}/plugins/org.eclipse.core.runtime_3.7.0.v20110110.jar"/>
         <pathelement location="${ECLIPSE_HOME}/plugins/org.eclipse.osgi_3.7.1.R37x_v20110808-1106.jar"/>
@@ -32,23 +52,23 @@
         <pathelement location="${ECLIPSE_HOME}/plugins/org.eclipse.uml2.common_1.6.0.v201105021727.jar"/>
     </path>
 
-    <path id="fr.tpt.aadl.pok.makefile.generator.classpath">
-        <path refid="fr.tpt.aadl.pok.makefile.generator.libraryclasspath"/>
+    <path id="fr.tpt.aadl.ramses.generation.pok.makefile.classpath">
+        <path refid="fr.tpt.aadl.ramses.generation.pok.makefile.libraryclasspath"/>
     </path>
 
     <!-- The classpath with only the jars available in the plugin folder of Eclipse -->
-    <path id="fr.tpt.aadl.pok.makefile.generator.libraryclasspath.alljars">
+    <path id="fr.tpt.aadl.ramses.generation.pok.makefile.libraryclasspath.alljars">
         <pathelement location="../fr.tpt.aadl.pok.makefile.generator/bin"/>
         <fileset dir="${ECLIPSE_HOME}/plugins/" includes="*.jar"/>
     </path>
 
-    <path id="fr.tpt.aadl.pok.makefile.generator.classpath.alljars">
-        <path refid="fr.tpt.aadl.pok.makefile.generator.libraryclasspath.alljars"/>
+    <path id="fr.tpt.aadl.ramses.generation.pok.makefile.classpath.alljars">
+        <path refid="fr.tpt.aadl.ramses.generation.pok.makefile.libraryclasspath.alljars"/>
     </path>
 
     <!-- The default task with the jars used by this project -->
     <target name="GenerateMakefile">
-        <java classname="fr.tpt.aadl.pok.makefile.generator.GenerateMakefile" classpathref="fr.tpt.aadl.pok.makefile.generator.classpath">
+        <java classname="fr.tpt.aadl.ramses.generation.pok.makefile.GenerateMakefile" classpathref="fr.tpt.aadl.ramses.generation.pok.makefile.classpath">
             <arg value="${model}"/>
             <arg value="${target}"/>
         </java>
@@ -59,7 +79,7 @@
         Keep in mind that having two versions of the same jar can create problems
     -->
     <target name="GenerateMakefile.alljars">
-        <java classname="fr.tpt.aadl.pok.makefile.generator.GenerateMakefile" classpathref="fr.tpt.aadl.pok.makefile.generator.classpath">
+        <java classname="fr.tpt.aadl.ramses.generation.pok.makefile.GenerateMakefile" classpathref="fr.tpt.aadl.ramses.generation.pok.makefile.classpath">
             <arg value="${model}"/>
             <arg value="${target}"/>
         </java>
