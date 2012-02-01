@@ -57,7 +57,6 @@ import org.osate.aadl2.modelsupport.UnparseText ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
-import fr.tpt.aadl.ramses.generation.c.AadlToCSwitchProcess ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
@@ -258,7 +257,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     return result ;
   }
   
-  private void genQueueMainImpl(AadlToCSwitchProcess mainImplCode,
+  private void genQueueMainImpl(UnparseText mainImplCode,
                                 PartitionProperties pp)
   {
     for(QueueInfo info : pp.queueInfo)
@@ -290,8 +289,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  private void genSampleMainImpl(AadlToCSwitchProcess mainImplCode,
-                                PartitionProperties pp)
+  private void genSampleMainImpl(UnparseText mainImplCode,
+                                 PartitionProperties pp)
   {
     for(SampleInfo info : pp.sampleInfo)
     {
@@ -419,20 +418,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
     
     // Generate main.h
-    AadlToCSwitchProcess mainHeaderCode = new AadlToCSwitchProcess(null) ;
+    UnparseText mainHeaderCode = new UnparseText() ;
     genMainHeader(processImpl, mainHeaderCode, routing.processorProp, pp);
     
     // Generate main.c
-    AadlToCSwitchProcess mainImplCode = new AadlToCSwitchProcess(null) ;
+    UnparseText mainImplCode = new UnparseText() ;
     genMainImpl(processImpl, mainImplCode, pp) ;
     
     try
     {
       saveFile(generatedFilePath, "main.h",
-               mainHeaderCode.getOutput()) ;
+               mainHeaderCode.getParseOutput()) ;
       
       saveFile(generatedFilePath, "main.c",
-               mainImplCode.getOutput()) ;
+               mainImplCode.getParseOutput()) ;
     }
     catch(IOException e)
     {
@@ -443,7 +442,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   //Generate global variables.
   private void genGlobalVariablesMainImpl(EList<ThreadSubcomponent> lthreads,
-                                          AadlToCSwitchProcess mainImplCode,
+                                          UnparseText mainImplCode,
                                           PartitionProperties pp)
   {
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
@@ -506,7 +505,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
   }
   
-  private void genFileIncludedMainImpl(AadlToCSwitchProcess mainImplCode)
+  private void genFileIncludedMainImpl(UnparseText mainImplCode)
   {
     // Files included.
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
@@ -519,7 +518,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   private void genThreadDeclarationMainImpl(ThreadSubcomponent thread,
                                             int threadIndex,
-                                            AadlToCSwitchProcess mainImplCode)
+                                            UnparseText mainImplCode)
   {
     ThreadImplementation timpl =
           (ThreadImplementation) thread.getComponentImplementation() ;
@@ -590,7 +589,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainImplCode.addOutputNewline("]), &(ret));") ;
   }
   
-  private void genBlackboardMainImpl(AadlToCSwitchProcess mainImplCode,
+  private void genBlackboardMainImpl(UnparseText mainImplCode,
                                      PartitionProperties pp)
   {
     // For each blackboard
@@ -605,7 +604,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private void genMainImpl(ProcessImplementation process,
-                           AadlToCSwitchProcess mainImplCode,
+                           UnparseText mainImplCode,
                            PartitionProperties pp)
   {
     EList<ThreadSubcomponent> lthreads =
@@ -681,7 +680,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private PartitionProperties genMainHeader(ProcessImplementation process,
-                                            AadlToCSwitchProcess mainHeaderCode,
+                                            UnparseText mainHeaderCode,
                                             ProcessorProperties processorProp,
                                             PartitionProperties pp)
   {
