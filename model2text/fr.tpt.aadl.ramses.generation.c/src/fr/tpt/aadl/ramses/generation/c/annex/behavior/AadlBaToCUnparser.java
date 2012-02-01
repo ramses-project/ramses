@@ -121,8 +121,6 @@ import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager ;
 import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
 
-;
-
 public class AadlBaToCUnparser extends AadlBaUnparser
 {
 

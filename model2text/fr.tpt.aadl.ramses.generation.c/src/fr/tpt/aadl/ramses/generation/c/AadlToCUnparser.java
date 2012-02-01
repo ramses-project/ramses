@@ -76,13 +76,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   private AadlToCSwitchProcess _currentImplUnparser ;
   private AadlToCSwitchProcess _currentHeaderUnparser ;
 
-  private static List<NamedElement> _delayedDataDeclarations =
-      new ArrayList<NamedElement>() ;
+  private List<NamedElement> _delayedDataDeclarations ;
 
-  private Map<AadlToCSwitchProcess, Set<String>> _additionalHeaders =
-      new HashMap<AadlToCSwitchProcess, Set<String>>() ;
+  private Map<AadlToCSwitchProcess, Set<String>> _additionalHeaders ;
 
-  private List<NamedElement> _processedTypes = new ArrayList<NamedElement>() ;
+  private List<NamedElement> _processedTypes  ;
 
   private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
   
@@ -93,7 +91,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   public AadlToCUnparser()
   {
     super() ;
-
+    init() ;
+  }
+  
+  private void init()
+  {
     _gtypesImplCode = new AadlToCSwitchProcess(this) ;
     _gtypesImplCode.addOutputNewline("#include \"gtypes.h\"") ;
     
@@ -117,8 +119,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     _deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
     
     _deploymentHeaderCode = new AadlToCSwitchProcess(this) ;
+    
+    _processedTypes = new ArrayList<NamedElement>() ;
+    
+    _additionalHeaders = new HashMap<AadlToCSwitchProcess, Set<String>>() ;
+    
+    _delayedDataDeclarations = new ArrayList<NamedElement>() ;
   }
-
+  
   public void saveGeneratedFilesContent(File targetDirectory)
   {
     _currentHeaderUnparser = _gtypesHeaderCode ;
@@ -955,6 +963,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         
         if(dataSubprogramName != null)
         {
+          _currentImplUnparser.addOutput(object.getClassifier().getName().
+                                         toUpperCase());
+          _currentImplUnparser.addOutput(" ");
           _currentImplUnparser.addOutput(dataSubprogramName);
         }
         else
@@ -990,6 +1001,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   {
     AadlToCSwitchProcess.process(element) ;
     saveGeneratedFilesContent(generatedFilePath) ;
+    // Reset all AadlToCSwitchProcess private attributes !
+    init() ;
   }
 
   @Override

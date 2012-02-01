@@ -485,7 +485,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       for(QueueInfo info : pp.queueInfo)
       {
-        mainImplCode.addOutput("QUEUING_PORT_ID_TYPE ") ;
+        mainImplCode.addOutput("extern QUEUING_PORT_ID_TYPE ") ;
         mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
@@ -624,6 +624,15 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
     mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
     
+    // Blackboard declarations.
+    genBlackboardMainImpl(mainImplCode, pp) ;
+    
+    // Queue declarations.
+    genQueueMainImpl(mainImplCode,pp) ;
+    
+    // Sample declarations.
+    genSampleMainImpl(mainImplCode, pp) ;
+    
     // For each declared thread
     // Zero stands for ARINC's IDL thread.
     int threadIndex = 1 ;
@@ -634,15 +643,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       genThreadDeclarationMainImpl(thread, threadIndex, mainImplCode) ;
       threadIndex++ ;
     }
-    
-    // Blackboard declarations.
-    genBlackboardMainImpl(mainImplCode, pp) ;
-    
-    // Queue declarations.
-    genQueueMainImpl(mainImplCode,pp) ;
-    
-    // Sample declarations.
-    genSampleMainImpl(mainImplCode, pp) ;
     
     mainImplCode
           .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
