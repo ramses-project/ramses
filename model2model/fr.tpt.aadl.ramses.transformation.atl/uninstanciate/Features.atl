@@ -37,6 +37,17 @@ uses AADLICopyHelpers;
 --  RULES FOR KINDS OF FEATURES
 -------------------------------------------------------------------------------------
 
+rule Feature (f: AADLI!Feature, featureImg : AADLBA!Feature) {
+	do
+	{
+		if (f.oclIsKindOf(AADLI!DataPort)) { featureImg <- thisModule.DataPort(f); }
+		else if(f.oclIsKindOf(AADLI!EventDataPort)) { featureImg <- thisModule.EventDataPort(f); }
+		else if(f.oclIsKindOf(AADLI!EventPort)) { featureImg <- thisModule.EventPort(f); }
+		else if(f.oclIsKindOf(AADLI!DataAccess)) { featureImg <- thisModule.DataAccess(f); }
+		else if(f.oclIsKindOf(AADLI!Parameter)) { featureImg <- thisModule.Parameter(f); }
+		featureImg;
+	}
+}
 
 lazy rule DataPort {
 	from
@@ -129,12 +140,6 @@ lazy rule Parameter {
 
 
 
-
-
-
-
-
-
 -------------------------------------------------------------------------------------
 --  RULES FOR KINDS OF CONNECTIONS
 -------------------------------------------------------------------------------------
@@ -172,11 +177,11 @@ rule ParameterConnection (co : AADLI!ParameterConnection,
 		destination <- co2destination
 	),
 	co2source : AADLBA!ConnectedElement(
-		connectionEnd <- co.source.getConnFeatureImg(ownerImplImg),
+		connectionEnd <- co.source.getConnFeatureImg(ownerImplImg).debug('Parameter Connection End 1'),
 		context <- co.source.getConnContextImg(ownerImplImg)
 	),
 	co2destination : AADLBA!ConnectedElement(
-		connectionEnd <- co.destination.getConnFeatureImg(ownerImplImg),
+		connectionEnd <- co.destination.getConnFeatureImg(ownerImplImg).debug('Parameter Connection End 2'),
 		context <- co.destination.getConnContextImg(ownerImplImg)
 	)
 	do { co2; }

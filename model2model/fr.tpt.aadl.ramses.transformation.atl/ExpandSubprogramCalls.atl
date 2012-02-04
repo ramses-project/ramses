@@ -118,31 +118,6 @@ rule addParameterConnection(implImg: AADLBA!ThreadImplementation, name: String, 
   }
 }
 
-rule addDataAccessConnection(implImg: AADLBA!ComponentImplementation, name: String, param: AADLBA!DataAccess, ctx:AADLBA!Context, variable: AADLBA!DataSubcomponent)
-{
-  to
-	connectedParam: AADLBA!ConnectedElement
-	(
-		connectionEnd<-param
-	),
-	connectedSubcomponent: AADLBA!ConnectedElement
-	(
-		connectionEnd<-variable
-	),
-	accessConnection: AADLBA!AccessConnection
-	(
-		name<-name,
-		source<-connectedParam,
-		accessCategory<-#data,
-		destination<-connectedSubcomponent
-	)
-  do
-  {
-  	connectedParam.setContext(ctx);
-  	implImg.ownedAccessConnection.add(accessConnection);
-  }
-}
-
 rule addSuprogramCallParameterConnection(implImg:AADLBA!ThreadImplementation, paramConnection: AADLI!ParameterConnection)
 {
 	using

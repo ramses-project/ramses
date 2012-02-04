@@ -49,6 +49,102 @@ properties
   Programming_Properties::Source_Text => ("arinc653/types.h");
 end Queuing_Discipline_Type;
 
+
+--------------------------------------------
+--------------------------------------------
+--                  EVENT                 --
+--------------------------------------------
+--------------------------------------------
+
+
+data Event_Id_Type
+properties
+  Programming_Properties::Source_Name => "EVENT_ID_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Event_Id_Type;
+
+data Event_State_Value_Type
+properties
+  Programming_Properties::Source_Name => "EVENT_STATE_VALUE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Event_State_Value_Type;
+
+data Event_State_Type
+properties
+  Programming_Properties::Source_Name => "EVENT_STATE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Event_State_Type;
+
+data Event_Name_Type
+properties
+  Programming_Properties::Source_Name => "EVENT_NAME_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Event_Name_Type;
+
+data Event_Status_Type
+properties
+  Programming_Properties::Source_Name => "EVENT_STATUS_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Event_Status_Type;
+
+subprogram Create_Event
+features
+  EVENT_NAME: in parameter EVENT_NAME_TYPE;
+  EVENT_ID: out parameter EVENT_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "CREATE_EVENT";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Create_Event;
+
+subprogram Set_Event
+features
+  EVENT_ID: requires data access EVENT_ID_TYPE {Access_Right=>read_only;};
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "SET_EVENT";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Set_Event;
+
+subprogram Reset_Event
+features
+  EVENT_ID: requires data access EVENT_ID_TYPE {Access_Right=>read_only;};
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "RESET_EVENT";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Reset_Event;
+
+subprogram Wait_Event
+features
+  EVENT_ID: requires data access EVENT_ID_TYPE {Access_Right=>read_only;};
+  TIME_OUT: in parameter SYSTEM_TIME_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "WAIT_EVENT";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Wait_Event;
+
+subprogram Get_Event_Id
+features
+  EVENT_NAME: in parameter EVENT_NAME_TYPE;
+  EVENT_ID: out parameter EVENT_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_EVENT_ID";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Get_Event_Id;
+
+subprogram Get_Event_Status
+features
+  EVENT_ID: in parameter EVENT_ID_TYPE;
+  EVENT_STATUS: out parameter EVENT_STATUS_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_EVENT_STATUS";
+  Programming_Properties::Source_Text => ("arinc653/event.h");
+end Get_Event_Status;
+
 --------------------------------------------
 --------------------------------------------
 --             QUEUEING PORT              --

@@ -161,11 +161,16 @@ unique lazy rule ThreadType {
  	type : AADLI!ThreadType
  to 
  	typeImg : AADLBA!ThreadType (
- 	 name <- c.uniqueName(),
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
-	 ownedEventPort <- type.eventPortsMapping(),
-	 ownedDataAccess <- type.ownedDataAccess->collect(e|thisModule.DataAccess(e))
+ 	 name <- c.uniqueName().debug('thread type'),
+--	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
+--	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
+--	 ownedEventPort <- type.eventPortsMapping(),
+--	 ownedDataAccess <- type.ownedDataAccess->collect(e|thisModule.DataAccess(e))
+	 
+	 ownedEventDataPort <- c.featureInstance->select(e| e.category=#eventDataPort)->collect(f| thisModule.resolveTemp(f, 'f').debug('Retreive mapped feature')),
+	 ownedDataPort <- c.featureInstance->select(e| e.category=#dataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
+	 ownedEventPort <- c.featureInstance->select(e| e.category=#eventPort)->collect(f| thisModule.resolveTemp(f, 'f')),
+	 ownedDataAccess <- c.featureInstance->select(e| e.category=#dataAccess)->collect(f| thisModule.resolveTemp(f, 'f'))
  	)
 }
 
@@ -179,29 +184,25 @@ unique lazy rule SubprogramType {
 		ownedDataAccess <- type.ownedDataAccess->collect(p|thisModule.DataAccess(p)),
 		ownedPropertyAssociation <- type.ownedPropertyAssociation->collect(pa|thisModule.PropertyAssociation(pa))
 	)
--- do
--- {
--- 	thisModule.addOrderedSubprogramFeatures(type, typeImg);
--- }
 }
 
-rule addOrderedSubprogramFeatures(type: AADLBA!SubprogramType, typeImg: AADLBA!SubprogramType)
-{
-	do
-	{
-		for(f in type.ownedFeature)
-		{
-			if(f.oclIsKindOf(AADLBA!Parameter))
-			{
-				typeImg.ownedParameter.add(thisModule.Parameter(f));
-			}
-			else if(f.oclIsKindOf(AADLBA!DataAccess))
-			{
-				typeImg.ownedDataAccess.add(thisModule.DataAccess(f));
-			}
-		}
-	}
-}
+--rule addOrderedSubprogramFeatures(type: AADLBA!SubprogramType, typeImg: AADLBA!SubprogramType)
+--{
+--	do
+--	{
+--		for(f in type.ownedFeature)
+--		{
+--			if(f.oclIsKindOf(AADLBA!Parameter))
+--			{
+--				typeImg.ownedParameter.add(thisModule.Parameter(f));
+--			}
+--			else if(f.oclIsKindOf(AADLBA!DataAccess))
+--			{
+--				typeImg.ownedDataAccess.add(thisModule.DataAccess(f));
+--			}
+--		}
+--	}
+--}
 
 unique lazy rule DataType {
  from type : AADLI!DataType 
