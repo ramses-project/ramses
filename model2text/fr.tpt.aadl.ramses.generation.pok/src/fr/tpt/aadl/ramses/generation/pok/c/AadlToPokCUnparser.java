@@ -76,6 +76,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   public final static String SAMPLING_AADL_TYPE =
                                           "pok_runtime::Sampling_Port_Id_Type" ;
   
+  public final static String EVENT_AADL_TYPE =
+                                          "pok_runtime::Event_Id_Type" ;
+  
   public void process(ProcessorSubcomponent processor,
                       File generatedFilePath,
                       TargetProperties tarProp) 
@@ -124,7 +127,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  private void blackboardHandler(ProcessImplementation processImpl, 
+  private void locaCommunicattionHandler(ProcessImplementation processImpl, 
                                  PartitionProperties pp)
   {
     EList<Subcomponent> subcmpts = processImpl.getAllSubcomponents() ;
@@ -133,21 +136,29 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       if(s instanceof DataSubcomponent)
       {
-      if(s.getClassifier().getQualifiedName()
-                                        .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
+        if(s.getClassifier().getQualifiedName()
+              .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
         {
           pp.blackboardNames.add(s.getName()) ;
+        }
+        else if(s.getClassifier().getQualifiedName()
+              .equalsIgnoreCase(EVENT_AADL_TYPE))
+        {
+          pp.eventNames.add(s.getName());
         }
       }
     }
   }
   
   //TODO : be refactored with generic interfaces.
-  private void queueHandler(FeatureInstance fi, PartitionProperties pp)
+  private void queueHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
     Port p = getProcessPort(fi) ;
     
     QueueInfo queueInfo = new QueueInfo() ;
+    
+    queueInfo.id = id;
+    queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
     queueInfo.direction = p.getDirection() ;
     
     if(getQueueInfo(p, queueInfo))
@@ -190,7 +201,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // XXX temporary. Until ATL transformation modifications.
     //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
-    info.id = port.getName() + "_Instance" ;
     
     try
     {
@@ -239,7 +249,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // XXX temporary. Until ATL transformation modifications.
     //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
-    info.id = port.getName() + "_Instance" ;
     
     try
     {
@@ -263,7 +272,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     for(QueueInfo info : pp.queueInfo)
     {
       mainImplCode.addOutput("  CREATE_QUEUING_PORT (\"") ;
-      mainImplCode.addOutput(info.id);
+      mainImplCode.addOutput(info.uniqueId);
       mainImplCode.addOutputNewline("\",");
       mainImplCode.addOutput("    sizeof(QUEUING_PORT_ID_TYPE), ");
       mainImplCode.addOutput(Long.toString(info.size)) ;
@@ -328,93 +337,96 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     ProcessImplementation processImpl = (ProcessImplementation) 
                                           process.getComponentImplementation() ;
     
-    ComponentInstance processInst = (ComponentInstance) HookAccessImpl.
-                                               getTransformationTrace(process) ;
-    boolean needRoutage = false ;
+    this.findCommunicationMechanism(processImpl, pp);
     
-    for(ComponentInstance ci : processInst.getComponentInstances())
-    {
-      if (ComponentCategory.THREAD != ci.getCategory())
-      {
-        continue ;
-      }
-      // else
-      
-      // Fetches thread's feature instances.
-      for (FeatureInstance fi : ci.getFeatureInstances())
-      {
-        FeatureCategory cat = fi.getCategory() ;
-        
-        if(FeatureCategory.DATA_PORT != cat &&
-           FeatureCategory.EVENT_PORT != cat &&
-           FeatureCategory.EVENT_DATA_PORT != cat)
-        {
-          continue ; 
-        }
-        // else
-        
-        needRoutage = AadlToPokCUtils.needsRoutage(fi) ;
-        
-        switch(cat)
-        {
-          case DATA_PORT :
-          {
-            if(needRoutage)
-            {
-              pp.hasSample = true ;
-              sampleHandler(fi, pp) ;
-            }
-            else
-            {
-              pp.hasBlackboard = true ;
-            }
-            
-            break ;
-          }
-          
-          case EVENT_PORT :
-          {
-            if(needRoutage)
-            {
-              pp.hasQueue = true ;
-              // queueHandler() ;
-            }
-            else
-            {
-              pp.hasEvent = true ;
-              // eventHandler() ;
-            }
-            
-            break ;
-          }
-          
-          case EVENT_DATA_PORT :
-          {
-            if(needRoutage)
-            {
-              pp.hasQueue = true ;
-              queueHandler(fi, pp) ;
-            }
-            else
-            {
-              pp.hasBuffer = true ;
-              // bufferHandler() ;
-            }
-            
-            break ;
-          }
-          
-          default:
-          {
-            // Nothing to do.
-          }
-        }
-      }
-    }
+//    ComponentInstance processInst = (ComponentInstance) HookAccessImpl.
+//                                               getTransformationTrace(process) ;
+//    boolean needRoutage = false ;
+//    
+//    for(ComponentInstance ci : processInst.getComponentInstances())
+//    {
+//      if (ComponentCategory.THREAD != ci.getCategory())
+//      {
+//        continue ;
+//      }
+//      // else
+//      
+//      // Fetches thread's feature instances.
+//      for (FeatureInstance fi : ci.getFeatureInstances())
+//      {
+//        FeatureCategory cat = fi.getCategory() ;
+//        
+//        if(FeatureCategory.DATA_PORT != cat &&
+//           FeatureCategory.EVENT_PORT != cat &&
+//           FeatureCategory.EVENT_DATA_PORT != cat)
+//        {
+//          continue ; 
+//        }
+//        // else
+//        
+//        needRoutage = AadlToPokCUtils.needsRoutage(fi) ;
+//        
+//        switch(cat)
+//        {
+//          case DATA_PORT :
+//          {
+//            if(needRoutage)
+//            {
+//              pp.hasSample = true ;
+//              sampleHandler(fi, pp) ;
+//            }
+//            else
+//            {
+//              pp.hasBlackboard = true ;
+//            }
+//            
+//            break ;
+//          }
+//          
+//          case EVENT_PORT :
+//          {
+//            if(needRoutage)
+//            {
+//              pp.hasQueue = true ;
+//              // queueHandler() ;
+//            }
+//            else
+//            {
+//              pp.hasEvent = true ;
+//              // eventHandler() ;
+//            }
+//            
+//            break ;
+//          }
+//          
+//          case EVENT_DATA_PORT :
+//          {
+//            if(needRoutage)
+//            {
+//              pp.hasQueue = true ;
+//              queueHandler(fi, pp) ;
+//            }
+//            else
+//            {
+//              pp.hasBuffer = true ;
+//              // bufferHandler() ;
+//            }
+//            
+//            break ;
+//          }
+//          
+//          default:
+//          {
+//            // Nothing to do.
+//          }
+//        }
+//      }
+//    }
     
-    if(pp.hasBlackboard)
+    if(pp.hasBlackboard 
+          || pp.hasEvent)
     {
-      blackboardHandler(processImpl, pp);
+      locaCommunicattionHandler(processImpl, pp);
     }
     
     // Generate main.h
@@ -475,6 +487,29 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       for(String name : pp.blackboardNames)
       {
         mainImplCode.addOutput("extern BLACKBOARD_ID_TYPE ") ;
+        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutputNewline(";") ;
+      }
+    }
+    
+    // Generate blackboard names array.
+    if(pp.hasEvent)
+    {
+      mainImplCode.addOutput("char* pok_arinc653_events_names[POK_CONFIG_NB_EVENTS] = {") ;
+
+      for(String name : pp.eventNames)
+      {
+        mainImplCode.addOutput("\"") ;
+        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput("\"") ;
+      }
+
+      mainImplCode.addOutputNewline("};") ;
+      
+      // Generate external variable (declared in deployment.c).
+      for(String name : pp.eventNames)
+      {
+        mainImplCode.addOutput("extern EVENT_ID_TYPE ") ;
         mainImplCode.addOutput(name) ;
         mainImplCode.addOutputNewline(";") ;
       }
@@ -660,20 +695,33 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       if(s instanceof DataSubcomponent)
       {
-      if(s.getClassifier().getQualifiedName()
-                                        .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
+        if(s.getClassifier().getQualifiedName()
+              .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
         {
           pp.blackboardNames.add(s.getName()) ;
+          pp.hasBlackboard = true;
         }
         else if(s.getClassifier().getQualifiedName()
-                .equalsIgnoreCase(QUEUING_AADL_TYPE))
+              .equalsIgnoreCase(QUEUING_AADL_TYPE))
         {
-          pp.queuingNames.add(s.getName());
+          queueHandler(s.getName(),
+                       (FeatureInstance) HookAccessImpl.
+                       getTransformationTrace(s), pp);
+          
+          pp.hasQueue = true ;
         }
         else if(s.getClassifier().getQualifiedName()
-                .equalsIgnoreCase(SAMPLING_AADL_TYPE))
+              .equalsIgnoreCase(SAMPLING_AADL_TYPE))
         {
-          pp.samplingNames.add(s.getName());
+          queueHandler(s.getName(), (FeatureInstance) HookAccessImpl.
+                       getTransformationTrace(s), pp);
+          pp.hasSample = true ;
+        }
+        else if(s.getClassifier().getQualifiedName()
+              .equalsIgnoreCase(EVENT_AADL_TYPE))
+        {
+          pp.eventNames.add(s.getName());
+          pp.hasEvent = true ;
         }
       }
     }
@@ -727,6 +775,26 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       .addOutputNewline("#define POK_NEEDS_BLACKBOARDS 1") ;
     }
 
+    if(pp.hasEvent)
+    {
+      int i = pp.eventNames.size(); 
+      mainHeaderCode
+            .addOutputNewline("#define POK_CONFIG_NB_EVENTS " +
+                  pp.eventNames.size()) ;
+      mainHeaderCode
+      .addOutputNewline("#define POK_CONFIG_ARINC653_NB_EVENTS " +
+            pp.eventNames.size()) ;
+      
+      mainHeaderCode
+            .addOutputNewline("#define POK_NEEDS_ARINC653_EVENT 1") ;
+
+      mainHeaderCode
+      .addOutputNewline("#define POK_NEEDS_EVENTS 1") ;
+      
+      mainHeaderCode
+      .addOutputNewline("#define POK_NEEDS_ARINC653_EVENTS 1") ;
+    }
+    
     if(pp.hasQueue)
     {
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_QUEUEING 1") ;
@@ -827,6 +895,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
     deploymentHeaderCode.addOutputNewline(guard) ;
 
+    deploymentHeaderCode.addOutputNewline("#include \"routing.h\"") ;
+    
     // POK::Additional_Features => (libc_stdio,libc_stdlib,console);
     // this property is associated to virtual processors
     List<VirtualProcessorSubcomponent> bindedVPS =
@@ -840,7 +910,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
 
     List<String> additionalFeatures ;
-
+    
+    // Try to fetch POK properties: Additional_Features.
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
       try
@@ -880,6 +951,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
+        // Nothing to do
       }
     }
 
@@ -997,6 +1069,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
     deploymentHeaderCode.addOutputNewline("}") ;
 
+    boolean alreadyAdded = false ;
+    
     for(ProcessSubcomponent ps : bindedProcess)
     {
       ProcessImplementation process =
@@ -1008,11 +1082,19 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         findCommunicationMechanism(process, pp) ;
       }
       PartitionProperties pp = processorProp.partitionProperties.get(process) ;
-      if(pp.blackboardNames.isEmpty() == false)
+      if(pp.hasBlackboard)
       {
         deploymentHeaderCode
               .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;
-        break ;
+      }
+      
+      
+      if(pp.hasQueue && false == alreadyAdded)
+      {
+        deploymentHeaderCode
+                    .addOutputNewline("#define POK_NEEDS_PORTS_QUEUEING 1");
+             
+        alreadyAdded = true ;
       }
     }
 
@@ -1242,8 +1324,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_GLOBAL_PORTS " +
 			  Integer.toString(globalPortNb));
 		
-	  List<FeatureInstance> locaPorts = getLocalPorts(processor, routeProp);
-	  int localPortNb = locaPorts.size();
+	  List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
+	  int localPortNb = localPorts.size();
 	  
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_PORTS " +
 			  Integer.toString(localPortNb));
@@ -1251,10 +1333,33 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
 			  Integer.toString(routeProp.processors.size())) ;
 
+	  int idx=0;
+	  if(!localPorts.isEmpty())
+    {
+	    routingHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_PORTS {");
+	  
+	    idx=0;
+	    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+      {
+        for(FeatureInstance f: routeProp.portPerProcess.get(deployedProcess))
+        {
+	        if(f.equals(localPorts.get(idx)));
+	        {
+	          routingHeaderCode.addOutput(Integer.toString(idx));
+	          routingHeaderCode.addOutput(",");
+	        }
+	      }
+        idx++;
+	    }
+	  }
+	  routingHeaderCode.addOutputNewline("}");
+	  
+	  
 	  routingHeaderCode.addOutputNewline("typedef enum") ;
 	  routingHeaderCode.addOutputNewline("{") ;
 	  routingHeaderCode.incrementIndent() ;
-	  int idx=0;
+	  
+	  idx=0;
 	  for(ComponentInstance node : routeProp.processors)
 	  {
 		routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(node)) ;
@@ -1265,9 +1370,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  routingHeaderCode.decrementIndent() ;
 	  routingHeaderCode.addOutputNewline("} pok_node_identifier_t;") ;
 
-	  List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
 	  idx=0;
-
 	  routingHeaderCode.addOutputNewline("typedef enum") ;
 	  routingHeaderCode.addOutputNewline("{") ;
 	  routingHeaderCode.incrementIndent() ;
@@ -1349,21 +1452,21 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	  // compute list of destination ports for each port of partitions deployed on "processor"
 	  for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
 	  {
-		if(fi.getDirection().equals(DirectionType.OUT)
-				|| fi.getDirection().equals(DirectionType.IN_OUT))
-		{
-		  List<FeatureInstance> destinations = AadlToPokCUtils.getFeatureDestinations(fi);
-		  routingImplCode.addOutput("uint8_t ");
-		  routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
-				  "_deployment_destinations["+
-				  Integer.toString(destinations.size())+"] = {");
-		  for(FeatureInstance dst:destinations)
-		  {
-			routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(dst));
-			routingImplCode.addOutput(",");
-		  }
-		  routingImplCode.addOutputNewline("};");	  
-		}
+	    if(fi.getDirection().equals(DirectionType.OUT)
+	          || fi.getDirection().equals(DirectionType.IN_OUT))
+	    {
+	      List<FeatureInstance> destinations = AadlToPokCUtils.getFeatureDestinations(fi);
+	      routingImplCode.addOutput("uint8_t ");
+	      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
+	                                "_deployment_destinations["+
+	                                Integer.toString(destinations.size())+"] = {");
+	      for(FeatureInstance dst:destinations)
+	      {
+	        routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(dst));
+	        routingImplCode.addOutput(",");
+	      }
+	      routingImplCode.addOutputNewline("};");	  
+	    }
 	  }
 	  
 	  
@@ -1499,18 +1602,19 @@ class PartitionProperties
   
   Set<String> blackboardNames = new HashSet<String>() ;
   
-  Set<String> queuingNames = new HashSet<String>() ;
+  Set<String> eventNames = new HashSet<String>() ;
   
   Set<QueueInfo> queueInfo = new HashSet<QueueInfo>();
   
   Set<SampleInfo> sampleInfo = new HashSet<SampleInfo>();
   
-  Set<String> samplingNames = new HashSet<String>() ;
 }
 
 class QueueInfo
 {
   String id = null ;
+  
+  String uniqueId = null;
   
   long size = -1 ;
   

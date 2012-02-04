@@ -70,7 +70,8 @@ public class AadlArinc653Transformation implements
       atlTransfo.setResourcesDirectory(resourcesDirectory) ;
 
       String aaxlGeneratedFileName =  
-                            inputResource.getURI().toFileString() ;
+                            inputResource.getURI().toFileString()
+                            .replaceFirst(".aaxl2","_extended.aaxl2") ;;
       
       Resource expandedResult =
             atlTransfo.doGeneration(inputResource, standardPropertySets,
@@ -89,7 +90,7 @@ public class AadlArinc653Transformation implements
       
       String aadlGeneratedFileName = inputResource.getURI().toFileString() ;
       aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(".aaxl2",
-                                                                 ".aadl2") ;
+                                                                 "_extended.aadl2") ;
       
       StandAloneInstantiator instantiator =
             StandAloneInstantiator.getInstantiator() ;
