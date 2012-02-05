@@ -230,12 +230,15 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   // TODO : be refactored with generic interfaces. 
-  private void sampleHandler(FeatureInstance fi, PartitionProperties pp)
+  private void sampleHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
     Port p = getProcessPort(fi) ;
     
     SampleInfo sampleInfo = new SampleInfo() ;
     sampleInfo.direction = p.getDirection() ;
+    
+    sampleInfo.id = id;
+    sampleInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
     
     if(getSampleInfo(p, sampleInfo))
     {
@@ -295,6 +298,19 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       mainImplCode.addOutput("      &(") ;
       mainImplCode.addOutput(info.id) ;
       mainImplCode.addOutputNewline("), &(ret));") ;
+    }
+  }
+  
+  private void genEventMainImpl(UnparseText mainImplCode,
+                                 PartitionProperties pp)
+  {
+    for(String eventId: pp.eventNames)
+    {
+      mainImplCode.addOutput("  CREATE_EVENT (\"") ;
+      mainImplCode.addOutput(eventId);
+      mainImplCode.addOutput("\",");
+      mainImplCode.addOutput("&"+eventId+",");
+      mainImplCode.addOutputNewline("& (ret));");
     }
   }
   
@@ -668,6 +684,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     // Sample declarations.
     genSampleMainImpl(mainImplCode, pp) ;
     
+    // Event declarations.
+    genEventMainImpl(mainImplCode, pp) ;
+    
     // For each declared thread
     // Zero stands for ARINC's IDL thread.
     int threadIndex = 1 ;
@@ -713,7 +732,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         else if(s.getClassifier().getQualifiedName()
               .equalsIgnoreCase(SAMPLING_AADL_TYPE))
         {
-          queueHandler(s.getName(), (FeatureInstance) HookAccessImpl.
+          sampleHandler(s.getName(), (FeatureInstance) HookAccessImpl.
                        getTransformationTrace(s), pp);
           pp.hasSample = true ;
         }
@@ -1626,6 +1645,8 @@ class QueueInfo
 class SampleInfo
 {
   String id = null ;
+  
+  String uniqueId = null;
   
   long refresh = -1 ;
   

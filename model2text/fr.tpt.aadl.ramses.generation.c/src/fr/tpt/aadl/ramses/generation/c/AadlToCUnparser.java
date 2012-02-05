@@ -953,9 +953,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       public String caseDataAccess(DataAccess object)
       {
         _currentImplUnparser.addOutput("extern ") ;
-        _currentImplUnparser.addOutput(object.getClassifier().getName().
-                                       toUpperCase());
-        _currentImplUnparser.addOutput(" ");
         
         String dataSubprogramName = null ;
         
@@ -964,25 +961,25 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           dataSubprogramName = _dataAccessMapping.get(object) ;
         }
         
+        
+        try
+        {
+          resolveExistingCodeDependencies(object.getDataFeatureClassifier(),
+                               _currentImplUnparser, _currentHeaderUnparser);
+        }
+        catch(Exception e)
+        {
+          _currentImplUnparser.addOutput(GenerationUtilsC
+                .getGenerationCIdentifier(object.getDataFeatureClassifier()
+                      .getQualifiedName())) ;
+        }
+        _currentImplUnparser.addOutput(" ") ;
         if(dataSubprogramName != null)
         {
           _currentImplUnparser.addOutput(dataSubprogramName);
         }
         else
         {
-          try
-          {
-            resolveExistingCodeDependencies(object.getDataFeatureClassifier(),
-                                 _currentImplUnparser, _currentHeaderUnparser) ;
-          }
-          catch(Exception e)
-          {
-            _currentImplUnparser.addOutput(GenerationUtilsC
-                  .getGenerationCIdentifier(object.getDataFeatureClassifier()
-                        .getQualifiedName())) ;
-          }
-          
-          _currentImplUnparser.addOutput(" ") ;
           _currentImplUnparser.addOutput(GenerationUtilsC
                 .getGenerationCIdentifier(object.getQualifiedName())) ;
         }
