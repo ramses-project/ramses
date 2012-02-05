@@ -421,7 +421,6 @@ rule PortConnection_Instance
 		cnxInst: AADLI!ConnectionInstance
 		(
 			cnxInst.kind = #portConnection and
-			cnxInst.complete = true and
 			cnxInst.source.eContainer().category=#thread
 		)
 	do
@@ -475,13 +474,17 @@ lazy rule mapComputeEntrypoint
 		referencedSubprogram: AADLI!Subprogram = impl.callSequenceFromComputeEntryPoint();
 	}
 	to
-		s2 : AADLBA!SubprogramCall (
+		seq: AADLBA!SubprogramCallSequence(
+			name <- 'callSeq_'+referencedSubprogram.name,
+			ownedCallSpecification <- Sequence{call}
+		),
+		call : AADLBA!SubprogramCall (
 			name <- 'call_'+referencedSubprogram.name,
 			calledSubprogram <- referencedSubprogram
 		)
 	do
 	{
-		s2;
+		seq;
 	}
 }
 

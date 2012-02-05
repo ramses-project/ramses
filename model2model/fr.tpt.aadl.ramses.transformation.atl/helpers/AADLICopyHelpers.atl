@@ -146,13 +146,13 @@ helper context AADLI!ComponentType def : callSequenceFromComputeEntryPoint() : A
 		if(self.ownedEventPort->first().getModalPropertyValue('Compute_Entrypoint') = OclUndefined) then
 			OclUndefined
 		else
-			self.ownedEventPort->first().getModalPropertyValue('Compute_Entrypoint').ownedValue.classifier
+			self.ownedEventPort->first().getModalPropertyValue('Compute_Entrypoint').ownedValue.classifier.debug('Retreived Call Sequence from Compute_Entrypoint')
 		endif
 	endif
 ;
 
 helper context AADLI!ComponentImplementation def : callSequenceFromImpl() : AADLI!SubprogramCallSequence =
-	self.ownedElement->any(e|e.oclIsKindOf(AADLI!SubprogramCallSequence))
+	self.ownedElement->any(e|e.oclIsKindOf(AADLI!SubprogramCallSequence)).debug('Retreived Call Sequence from Impl')
 ;
 
 helper context AADLI!SubprogramCallSequence def : getAllOutParameters() : Sequence(AADLI!Parameter) =
