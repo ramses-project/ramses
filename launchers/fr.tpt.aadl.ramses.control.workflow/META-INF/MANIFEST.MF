@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ramses Workflow Core
+Bundle-SymbolicName: fr.tpt.aadl.ramses.control.workflow
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: TELECOM ParisTech
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
+ org.osate.aadl2.modelsupport,
+ org.osate.aadl2,
+ fr.tpt.aadl.ramses.control.cli.core;bundle-version="0.5.0"
+Export-Package: fr.tpt.aadl.ramses.control.workflow.core,
+ fr.tpt.aadl.ramses.control.workflow.core.actions
