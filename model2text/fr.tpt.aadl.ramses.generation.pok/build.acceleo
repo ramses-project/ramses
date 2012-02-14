@@ -1,0 +1,26 @@
+<!-- ===================================================================== -->
+<!-- Custom targets.                                                       -->
+<!-- Set customBuildCallbacks = build.acceleo in your build.properties.    -->
+<!-- ===================================================================== -->
+<project name="Build Acceleo Module" default="noDefault">    
+    <!-- ================================================================= -->
+    <!-- Default target                                                    -->
+    <!-- ================================================================= -->
+    <target name="noDefault">
+        <echo message="This file must be called with explicit targets" />
+    </target>
+
+    <!-- ================================================================= -->
+    <!-- This will be called automatically after the compilation of each   -->
+    <!-- Bundle... in dependency order.                                    -->
+    <!-- ================================================================= -->
+    <target name="post.compile.@dot">
+        <acceleoCompiler 
+            sourceFolder="${target.folder}"
+            outputFolder="${target.folder}"
+            dependencies="${target.folder}/../../org.osate.aadl2;${target.folder}/../../org.osate.aadl2.modelsupport;${target.folder}/../../org.osate.workspace;${target.folder}/../../org.osate.pluginsupport;${target.folder}/../../org.osate.core;${target.folder}/../../fr.tpt.aadl.toolsuite.support;${target.folder}/../../org.osate.ui;${target.folder}/../../org.osate.aadl2.edit;${target.folder}/../../org.osate.xtext.aadl2.properties;${target.folder}/../../org.osate.contribution.sei;${target.folder}/../../org.osate.annexsupport;${target.folder}/../../fr.tpt.aadl.propertiesutil;${target.folder}/../../fr.tpt.aadl.target.specific.generator;${target.folder}/../../fr.tpt.aadl.annex.behavior;${target.folder}/../../org.osate.xtext.aadl2;${target.folder}/../../org.osate.xtext.aadl2.properties.ui;${target.folder}/../../fr.tpt.aadl.c.unparser;${target.folder}/../../fr.tpt.aadl.instantiation;${target.folder}/../../org.osate.aadl2.instantiation;"
+            binaryResource="false"
+            packagesToRegister="">
+        </acceleoCompiler>
+    </target>    
+</project>

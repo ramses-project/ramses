@@ -1,0 +1,536 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+
+module Uninstanciate;
+
+-- TODO
+--  Multiple call sequences per component
+--  Inheritance
+--  ClassifierValue property kind
+
+-- FIXME
+--  Check why threads feature are empty when connections between threads are mapped in case of multiple threads of the same type/impl.
+--  Check case of duplicated connections intra-process in case of multiple process instance of the same type
+
+-- NOTE
+--  Uninstanciated file can contains properties values out of the package.
+--  During instanciation, some component properties are duplicated on its FeatureInstance.
+--  No matching rule for FeatureInstance, so some duplicated properties are not mapped.
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI,
+	HOOKS			: ATLHOOKS;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+
+
+helper context AADLI!ComponentType def : defaultEventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.ownedEventPort->collect(e|thisModule.EventPort(e))
+;
+
+helper context AADLI!ProcessorType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!VirtualProcessorType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!ProcessType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!ThreadType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------
+--  RULES FOR KINDS OF COMPONENT INSTANCES
+-------------------------------------------------------------------------------------
+
+rule System_Instance {
+	from
+		s : AADLI!SystemInstance (s.category = #system)
+	using
+	{
+		src_package : AADLI!AadlPackage = s.systemImplementation.getNamespace().getOwner();
+	}
+	to
+	
+		type : AADLBA!SystemType (name <- s.systemImplementation.type.name),
+		
+		impl : AADLBA!SystemImplementation (
+			name <- s.systemImplementation.name.debug('system instance'),
+			ownedPropertyAssociation <- s.ownedPropertyAssociation,
+			ownedRealization <- realization,
+			ownedComment <- s.ownedComment,
+			ownedMemorySubcomponent <- impl.getSubcomponentsInstances('memory'),
+			ownedProcessorSubcomponent <- impl.getSubcomponentsInstances('processor'),
+			ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
+			ownedProcessSubcomponent <- impl.getSubcomponentsInstances('process'),
+			ownedSubprogramSubcomponent <- impl.getSubcomponentsInstances('subprogram'),
+			ownedDataSubcomponent <- impl.getSubcomponentsInstances('data'),
+			ownedPortConnection				<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,impl))
+		),
+		
+		section : AADLBA!PublicPackageSection (
+			importedUnit <- src_package.ownedPublicSection.importedUnit,
+			ownedClassifier <- Sequence {type, impl}
+		),
+		
+		pkg : AADLBA!AadlPackage (
+			name <- src_package.name,
+			ownedPublicSection <- section
+		),
+		realization : AADLBA!Realization (implemented <- type)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(impl, s);
+	}
+}
+
+rule Memory_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #memory)
+	to
+		sub : AADLBA!MemorySubcomponent(
+			name <- c.name.debug('memory instance'),
+			memorySubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule Bus_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #bus)
+	to
+		sub : AADLBA!BusSubcomponent(
+			name <- c.name.debug('bus instance'),
+			busSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule Device_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #device)
+	to
+		sub : AADLBA!DeviceSubcomponent(
+			name <- c.name.debug('device instance'),
+			deviceSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule Processor_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #processor)
+	to
+		sub : AADLBA!ProcessorSubcomponent(
+			name <- c.name.debug('processor instance'),
+			processorSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule VirtualProcessor_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category.toString() = 'virtual processor')
+	to
+		sub : AADLBA!VirtualProcessorSubcomponent (
+			name <- c.name.debug('virtual processor instance'),
+			virtualProcessorSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule Thread_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #thread)
+	to 
+		sub : AADLBA!ThreadSubcomponent(
+			name <- c.name.debug('thread instance'),
+			threadSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule Process_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #process)
+	to 
+		sub : AADLBA!ProcessSubcomponent(
+			name <- c.name.debug('process instance'),
+			processSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+
+
+
+rule Data_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #data)
+	to
+		sub : AADLBA!DataSubcomponent (
+			name <- c.name.debug('data instance'),
+			dataSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule DataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataPort)
+	to
+		f: AADLBA!DataPort
+		(
+			name <- fi.feature.name.debug('  copy data port'),
+			direction <- fi.feature.direction,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapClassifier(),
+			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+rule EventPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventPort)
+	to
+		f: AADLBA!EventPort
+		(
+			name <- fi.feature.name.debug('  copy event port'),
+			direction <- fi.feature.direction,
+			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+rule EventDataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventDataPort)
+	to
+		f: AADLBA!EventDataPort
+		(
+			name <- fi.feature.name.debug('  copy event data port instance'),
+			direction <- fi.feature.direction,
+			dataFeatureClassifier <- fi.feature.mapClassifier(),
+			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+rule DataAccess_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataAccess)
+	to
+		f: AADLBA!DataAccess
+		(
+			name <- fi.feature.name.debug('  copy data access'),
+			dataFeatureClassifier <- fi.feature.mapClassifier(),
+			kind <- fi.feature.kind,
+			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+rule Parameter_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#parameter)
+	to
+		f: AADLBA!Parameter
+		(
+			name <- fi.feature.name.debug('  copy parameter'),
+			direction <- fi.feature.direction,
+			dataFeatureClassifier <- fi.feature.mapClassifier(),
+			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+rule ParameterConnection_Instance
+{
+	from
+		cnxInst: AADLI!ConnectionInstance(cnxInst.kind = #parameterConnection)
+	do
+	{
+		for(cnxRef in cnxInst.connectionReference)
+		{
+			thisModule.getContainingImplementation(cnxRef).ownedParameterConnection->add(
+				thisModule.ParameterConnection(
+					cnxRef.connection,
+					thisModule.getContainingImplementation(cnxRef)
+				)
+			);
+		}
+	}
+}
+
+rule defaultPortConnection_mapping(cnxInst: AADLI!ConnectionInstance)
+{
+	do
+	{
+		for(cnxRef in cnxInst.connectionReference)
+		{
+			thisModule.getContainingImplementation(cnxRef).ownedPortConnection->add(
+				thisModule.PortConnection(
+					cnxRef.connection,
+					thisModule.getContainingImplementation(cnxRef)
+				)
+			);
+		}
+	}
+	
+}
+
+rule defaultThreadDataOrEventDataPortConnection_mapping(cnxInst: AADLI!ConnectionInstance)
+{
+	using
+	{
+		implImg : AADLBA!ThreadImplementation = OclUndefined;
+		impl : AADLBA!ThreadImplementation = cnxInst.source.eContainer().subcomponent.subcomponentType;
+	}
+	do
+	{
+		if(impl.oclIsTypeOf(AADLI!ThreadImplementation) and
+				(cnxInst.source.category=#eventDataPort
+				or cnxInst.source.category=#dataPort))
+		{
+			implImg<-thisModule.resolveTemp(cnxInst.source.eContainer(), 'sub').subcomponentType;
+			implImg.ownedParameterConnection->addAll
+			(
+				impl.ownedParameterConnection->collect
+				(
+					co|thisModule.ParameterConnection
+					(
+						co,
+						implImg
+					)
+				)
+			);
+		}
+		if(impl.oclIsTypeOf(AADLI!ThreadImplementation) and
+				(cnxInst.destination.category=#eventDataPort
+				or cnxInst.destination.category=#dataPort))
+		{
+			implImg<-thisModule.resolveTemp(cnxInst.destination.eContainer(), 'sub').subcomponentType;
+			implImg.ownedParameterConnection->addAll
+			(
+				impl.ownedParameterConnection->collect
+				(
+					co|thisModule.ParameterConnection
+					(
+						co,
+						implImg
+					)
+				)
+			);
+		}
+	}
+}
+
+rule PortConnection_Instance
+{
+	from
+		cnxInst: AADLI!ConnectionInstance
+		(
+			cnxInst.kind = #portConnection and
+			cnxInst.source.eContainer().category=#thread
+		)
+	do
+	{
+		thisModule.defaultPortConnection_mapping(cnxInst);
+		thisModule.defaultThreadDataOrEventDataPortConnection_mapping(cnxInst);
+	}
+}
+
+helper def : getContainingImplementation(cnx: AADLI!Connection) : AADLBA!ComponentImplementation =
+	if(thisModule.resolveTemp(cnx.context, 'sub').oclIsUndefined()) then
+		thisModule.resolveTemp(cnx.context, 'impl').debug('Retreived System Implementation')
+	else
+		thisModule.resolveTemp(cnx.context, 'sub').subcomponentType.debug('Retreived Component Implementation')
+	endif
+;
+
+-------------------------------------------------------------------------------------
+--  RULES FOR SUBPROGRAM CALLS
+-------------------------------------------------------------------------------------
+
+lazy rule createCallSequence
+{
+	from
+		call: AADLBA!SubprogramCall
+	to
+		seq: AADLBA!SubprogramCallSequence
+		(
+			ownedCallSpecification <- call
+		)
+}
+
+helper def : CallSequence(impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
+	if(impl.callSequenceFromImpl() = OclUndefined) then
+		if(impl.callSequenceFromComputeEntryPoint() = OclUndefined) then
+			OclUndefined
+		else
+			thisModule.mapComputeEntrypoint(impl)
+		endif
+	else
+		thisModule.mapCallSequence(impl, implImg)
+	endif
+;
+
+lazy rule mapComputeEntrypoint
+{
+	from
+		impl : AADLI!ComponentImplementation
+	using
+	{
+		referencedSubprogram: AADLI!Subprogram = impl.callSequenceFromComputeEntryPoint();
+	}
+	to
+		seq: AADLBA!SubprogramCallSequence(
+			name <- 'callSeq_'+referencedSubprogram.name,
+			ownedCallSpecification <- Sequence{call}
+		),
+		call : AADLBA!SubprogramCall (
+			name <- 'call_'+referencedSubprogram.name,
+			calledSubprogram <- referencedSubprogram
+		)
+	do
+	{
+		seq;
+	}
+}
+
+rule mapCallSequence (impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) {
+	using
+	{
+		callImg : AADLBA!SubprogramCall = OclUndefined;
+	}
+	to
+		s2 : AADLBA!SubprogramCallSequence (name <- impl.callSequenceFromImpl().name)
+	do
+	{
+		impl.callSequenceFromImpl().debug('  copy call sequence');
+		
+		for(call in impl.callSequenceFromImpl().ownedCallSpecification)
+		{
+			callImg <- thisModule.SubprogramCall(call,impl, implImg);
+			s2.getOwnedCallSpecifications().add(callImg);
+			callImg.debug('  copy subprogram call');
+		}
+		
+		-- ownedSubprogramCallSequence <- Sequence{impl.callSequenceFromImpl().ownedCallSpecification->collect(call | thisModule.SubprogramCall(call) )}
+		
+		s2;
+	}
+}
+	
+rule SubprogramCall (s : AADLI!SubprogramCall, 
+					 impl : AADLI!ComponentImplementation, 
+					 implImg : AADLBA!ComponentImplementation) {
+	to
+		s2 : AADLBA!SubprogramCall (
+			name <- s.name,
+			calledSubprogram <- if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType)) then
+									thisModule.Type(OclUndefined,s.calledSubprogram)
+								else
+									thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented))
+								endif
+		)
+	do { s2; }
+}
+
+
+rule Comment {
+	from
+		c : AADLI!Comment
+	to
+		c2 : AADLBA!Comment(body <- c.body, ownedComment <- c.ownedComment)
+}

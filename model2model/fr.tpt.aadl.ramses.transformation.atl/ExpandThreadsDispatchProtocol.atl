@@ -1,0 +1,109 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- nsURI AADLBA=http:///AADLBA
+
+module ExpandThreadsDispatchProtocol;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									POK_RUNTIME: AADLBA;
+
+
+uses Services;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses Uninstanciate;
+uses PropertiesTools;
+
+
+rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstancs, implImg: AADLBA!ThreadImplementation) 
+{
+ do{
+ 	if(inst.isPeriodicThread())
+ 	{
+ 		for(seq in implImg.ownedSubprogramCallSequence)
+ 		{
+ 			thisModule.addPeriodicWaitCall(seq);
+ 		}
+ 	}
+ 	if(inst.isSporadicThread())
+ 	{
+ 	}
+ 	if(inst.isAperiodicThread())
+ 	{
+ 	}
+ }
+}
+
+helper context AADLI!ComponentInstance def: isPeriodicThread() : Boolean =
+	self.getModalPropertyValue('dispatch_protocol').ownedValue.namedValue.name.toLower() = 'periodic'
+;
+
+helper context AADLI!ComponentInstance def: isSporadicThread() : Boolean =
+	self.getModalPropertyValue('dispatch_protocol').ownedValue.namedValue.name.toLower() = 'sporadic'
+;
+
+helper context AADLI!ComponentInstance def: isAperiodicThread() : Boolean =
+	self.getModalPropertyValue('dispatch_protocol').ownedValue.namedValue.name.toLower() = 'aperiodic'
+;
+
+unique lazy rule addPeriodicWaitCall
+{
+	from
+		sequence: AADLBA!SubprogramCallSequence
+	using
+	{
+		implImg: AADLBA!ThreadImplementation = sequence.eContainer();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		spg : AADL!SubprogramType = 'Periodic_Wait'.asSubprogramType('POK_RUNTIME');
+	}
+	to
+		call: AADLBA!SubprogramCall
+		(
+			name<-'call_PeriodicWait',
+			calledSubprogram<-spg
+		),
+		connectedParam_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->first()
+		),
+		connectedSubcomponent_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-RETURN_CODE
+		),
+		paramConnection_RETURN_CODE: AADLBA!ParameterConnection
+		(
+			name<-'call_PeriodicWait_to_ReturnCode',
+			source<-connectedParam_RETURN_CODE,
+			destination<-connectedSubcomponent_RETURN_CODE
+		)		
+	do
+	{
+		connectedParam_RETURN_CODE.setContext(call);
+		implImg.getOwnedParameterConnections().add(paramConnection_RETURN_CODE);
+		sequence.ownedCallSpecification.add(call);
+		call;
+	}
+}

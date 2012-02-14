@@ -1,0 +1,67 @@
+package test
+public
+
+data myint
+end myint;
+
+virtual processor partition
+end partition;
+
+virtual processor implementation partition.impl
+end partition.impl;
+
+processor ppc
+end ppc;
+
+processor implementation ppc.impl
+subcomponents
+   part1 : virtual processor partition.impl;
+end ppc.impl;
+
+process myprocess1
+end myprocess1;
+
+process implementation myprocess1.impl
+subcomponents
+   thr1 : thread mythread1.impl;
+end myprocess1.impl;
+
+thread mythread1
+features
+  d_i: in data port myint;
+  d_o: out data port myint;
+end mythread1;
+
+thread implementation mythread1.impl
+calls
+   call1: { pspg : subprogram hello_part1;
+   pspg2 : subprogram hello_part1;
+   };
+connections
+  cnx: parameter d_i->pspg.d_i;
+  cnx2: parameter pspg.d_o->pspg2.d_i;
+properties
+   dispatch_protocol => periodic;
+   period            => 1000ms;
+end mythread1.impl;
+
+subprogram hello_part1
+features
+  d_i: in parameter myint;
+  d_o: out parameter myint;
+properties
+   source_name => "user_send";
+   source_language => C;
+end hello_part1;
+
+system node
+end node;
+
+system implementation node.impl
+subcomponents
+   cpu   : processor ppc.impl;
+   part1 : process myprocess1.impl;
+properties
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+end node.impl;
+end test;

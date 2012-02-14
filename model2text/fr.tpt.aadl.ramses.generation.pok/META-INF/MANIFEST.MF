@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL-Ramses-Generation-Pok
+Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.pok
+Bundle-Version: 0.5.0
+Bundle-Activator: fr.tpt.aadl.ramses.generation.pok.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf;bundle-version="2.6.0",
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.eclipse.acceleo.engine;bundle-version="3.2.0",
+ org.osate.aadl2.modelsupport;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.generation.c;bundle-version="0.5.0",
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
+ fr.tpt.aadl.annex.behavior;bundle-version="0.8.0",
+ fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
+ fr.tpt.aadl.ramses.generation.target.specific;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0",
+ fr.tpt.aadl.ramses.transformation.atl.launch;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: fr.tpt.aadl.ramses.generation.pok,
+ fr.tpt.aadl.ramses.generation.pok.c,
+ fr.tpt.aadl.ramses.generation.pok.makefile
+Bundle-Vendor: TELECOM Paristech

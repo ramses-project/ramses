@@ -1,0 +1,70 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+library FHSHelpers;
+
+helper def : getQuantumConstant() : AADLBA!NamedElement =
+	AADLBA!NamedElement->allInstancesFrom('SCHEDULER_CONSTANTS')->any(i|i.name='QUANTUM_VALUE')
+;
+
+helper def : getCommonAPISpg(name : String) : AADLBA!Subprogram =
+	AADLBA!Subprogram->allInstancesFrom('SCHEDULER_RUNTIME')->any(s|s.name = name)
+;
+
+helper context AADLBA!ThreadType def : getInitializeEntrypoint() : AADLBA!Subprogram =
+	let asso : AADLBA!PropertyAssociation = self.ownedPropertyAssociation->any(a|a.property.name='Initialize_Entrypoint') in
+	if (asso.oclIsUndefined()) then
+	    AADLBA!Subprogram->allInstancesFrom('SCHEDULER_REALIZATIONS')->any(s|s.name='Default_Thread_Init')
+	else
+		asso.ownedValues->first().ownedValue
+	endif
+;    										
+
+helper def : CurrentTimeSpg() : AADLBA!Subprogram =
+	thisModule.getCommonAPISpg('Current_Time')
+;
+
+helper context String def : asSchedulingProtocolSubprogram() : AADLBA!Subprogram =
+	AADLBA!Subprogram->allInstancesFrom('SCHEDULER_REALIZATIONS')->any(s|s.name=self)
+;
+
+
+helper context AADLI!NamedElement def : getSchedulingProtocol() : String = 
+	let asso : AADLI!PropertyAssociation = self.ownedPropertyAssociation->any(a|a.property.name='Scheduling_Protocol') in
+	if (asso.oclIsUndefined()) then
+		OclUndefined
+	else
+		asso.ownedValue->first().ownedValue.ownedListElement->first().namedValue.name
+	endif
+;
+
+
+helper context AADLI!ComponentInstance def : getSchedulingSubprogram() : AADLBA!Subprogram =
+	if (self.category = #processor) then
+		AADLBA!Subprogram->allInstancesFrom('SCHEDULER_FHS')->any(s|s.name='root_scheduler.impl')
+	else
+		if (self.componentInstance->any(c|c.category.toString='virtual processor').oclIsUndefined()) then
+			AADLBA!Subprogram->allInstancesFrom('SCHEDULER_FHS')->any(s|s.name='leaf_scheduler.impl')
+		else
+			AADLBA!Subprogram->allInstancesFrom('SCHEDULER_FHS')->any(s|s.name='node_scheduler.impl')
+		endif
+	endif
+;

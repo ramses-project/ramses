@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL-Ramses-Core
+Bundle-SymbolicName: fr.tpt.aadl.ramses.control.core
+Bundle-Version: 0.5.0
+Export-Package: fr.tpt.aadl.ramses.control.core
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.emf.ecore;bundle-version="2.7.0",
+ org.osate.aadl2;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
+ fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0",
+ fr.tpt.aadl.ramses.generation.c;bundle-version="0.5.0",
+ org.eclipse.acceleo.engine;bundle-version="3.2.0"
+Bundle-Vendor: TELECOM ParisTech
