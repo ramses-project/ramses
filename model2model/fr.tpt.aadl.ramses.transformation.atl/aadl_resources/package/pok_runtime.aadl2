@@ -52,6 +52,91 @@ end Queuing_Discipline_Type;
 
 --------------------------------------------
 --------------------------------------------
+--                 BUFFER                 --
+--------------------------------------------
+--------------------------------------------
+
+ 
+-- #define  MAX_NUMBER_OF_BUFFERS    SYSTEM_LIMIT_NUMBER_OF_BUFFERS
+
+data Buffer_Name_Type
+properties
+  Programming_Properties::Source_Name => "BUFFER_NAME_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Buffer_Name_Type;
+
+data Buffer_Id_Type
+properties
+  Programming_Properties::Source_Name => "BUFFER_ID_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Buffer_Id_Type;
+
+data Buffer_Status_Type
+properties
+  Programming_Properties::Source_Name => "BUFFER_STATUS_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Buffer_Status_Type;
+
+subprogram Create_Buffer
+features
+  BUFFER_NAME: in parameter BUFFER_NAME_TYPE;
+  MAX_MESSAGE_SIZE: in parameter MESSAGE_SIZE_TYPE;
+  MAX_NB_MESSAGE: in parameter MESSAGE_RANGE_TYPE;
+  QUEUING_DISCIPLINE: in parameter QUEUING_DISCIPLINE_TYPE;
+  BUFFER_ID: out parameter BUFFER_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "CREATE_BUFFER";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Create_Buffer;
+
+subprogram Send_Buffer
+features
+  BUFFER_ID: requires data access BUFFER_ID_TYPE {Access_Right=>read_only;};
+  MESSAGE_ADDR: in out parameter MESSAGE_ADDR_TYPE;
+  LENGTH: in parameter MESSAGE_SIZE_TYPE;
+  TIME_OUT: in parameter SYSTEM_TIME_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "SEND_BUFFER";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Send_Buffer;
+ 
+subprogram Receive_Buffer
+features
+  BUFFER_ID: requires data access BUFFER_ID_TYPE {Access_Right=>read_only;};
+  TIME_OUT: in parameter SYSTEM_TIME_TYPE;
+  MESSAGE_ADDR: out parameter MESSAGE_ADDR_TYPE;
+  LENGTH: out parameter MESSAGE_SIZE_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "RECEIVE_BUFFER";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Receive_Buffer;
+
+subprogram Get_Buffer_Id
+features
+  BUFFER_NAME: in parameter BUFFER_NAME_TYPE; 
+  BUFFER_ID: out parameter BUFFER_ID_TYPE; 
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_BUFFER_ID";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Get_Buffer_Id;
+ 
+subprogram Get_Buffer_Status
+features
+  BUFFER_ID: in parameter BUFFER_ID_TYPE;
+  BUFFER_STATUS: out parameter BUFFER_STATUS_TYPE; 
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "GET_BUFFER_STATUS";
+  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+end Get_Buffer_Status;
+
+
+--------------------------------------------
+--------------------------------------------
 --                  EVENT                 --
 --------------------------------------------
 --------------------------------------------
@@ -274,7 +359,7 @@ end Create_Sampling_Port;
 subprogram Write_Sampling_Message
 features
   SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
-  MESSAGE_ADDR:  in parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR:  in out parameter MESSAGE_ADDR_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
@@ -285,7 +370,7 @@ end Write_Sampling_Message;
 subprogram Read_Sampling_Message
 features
   SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
-  MESSAGE_ADDR:  in parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR: out parameter MESSAGE_ADDR_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   VALIDITY: out parameter VALIDITY_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;

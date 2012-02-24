@@ -40,8 +40,8 @@ public class AadlArinc653Transformation implements
                     "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
   
   public static final String[] ATL_FILE_NAMES = new String[]
-        {"ExpandThreadsPorts.asm","ExpandSubprogramCalls.asm",
-         "ExpandThreadsDispatchProtocol.asm","CreateThreadsBehavior.asm"};
+        {"targets/arinc653/ExpandThreadsPorts.asm","ExpandSubprogramCalls.asm",
+         "targets/arinc653/ExpandThreadsDispatchProtocol.asm","CreateThreadsBehavior.asm"};
   
   public static final List<File> ATL_FILES = 
                                     new ArrayList<File>(ATL_FILE_NAMES.length) ;

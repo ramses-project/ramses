@@ -527,21 +527,42 @@ rule EventDataPort_Instance
 				if(src.eContainer().eContainer() = c.eContainer())
 				{
 					true.debug('Create Buffer Port');
+					-- add data subcomponents for Receive_Buffer
+					f.dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('POK_RUNTIME');
+					thisModule.addTimeOutSubcomponent(implImg,fi);
+					thisModule.addMessageAddrDataSubcomponent(implImg,fi);
+					thisModule.addLengthDataSubcomponent(implImg,fi);
+					
 					-- add call to Receive_Buffer
-					thisModule.createReceiveBufferCallSpecification
+					thisModule.addQueuingMessageCallSpecification
 					(
-						impl.type.ownedDataPort->any(e| e.name = fi.name),
+						'Receive_Buffer'.asSubprogramType('POK_RUNTIME'),
+						impl.type.ownedEventDataPort->any(e| e.name = fi.name),
 						implImg
 					);
 					
-					-- TBC
+					-- add connection to Receive_Queing_Message call
+					for(cnx in impl.getOwnedParameterConnections())
+					{
+						if(cnx.source.connectionEnd = fi.feature)
+						{
+							thisModule.addParameterConnection
+							(
+								implImg,
+								'transfer_'+fi.feature.retreiveMessageAddress(implImg).name+'_to_'+cnx.destination.getConnContextImg(implImg).name+'_'+cnx.destination.getConnFeatureImg(implImg).name,
+								cnx.destination.getConnFeatureImg(implImg),
+								cnx.destination.getConnContextImg(implImg),
+								fi.feature.retreiveMessageAddress(implImg)
+							);
+		
+						}
+					}
 				}
 				else
 				{
 					true.debug('Create Queuing Port');
 					-- add data subcomponents for Receive_Queing_Message
 					f.dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('POK_RUNTIME');
-					-- implImg.type.ownedDataAccess.add(dataAccess);
 					
 					thisModule.addTimeOutSubcomponent(implImg,fi);
 					thisModule.addMessageAddrDataSubcomponent(implImg,fi);
@@ -595,19 +616,41 @@ rule EventDataPort_Instance
 			{
 				if(dest.eContainer().eContainer() = c.eContainer())
 				{
+					-- add data subcomponents for Send_Buffer
+					f.dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('POK_RUNTIME');
+					thisModule.addMessageAddrDataSubcomponent(implImg,fi);
+					thisModule.addLengthDataSubcomponent(implImg,fi);
+					thisModule.addTimeOutSubcomponent(implImg,fi);
+					
 					-- add call to Send_Buffer
-					thisModule.createSendBufferCallSpecification
+					thisModule.addQueuingMessageCallSpecification
 					(
 						'Send_Buffer'.asSubprogramType('POK_RUNTIME'),
 						impl.type.ownedEventDataPort->any(e| e.name = fi.name),
 						implImg
 					);
+					
+					-- add connection to Send_Queuing_Message call
+					for(cnx in impl.getOwnedParameterConnections())
+					{
+						if(cnx.destination.connectionEnd = fi.feature)
+						{
+							thisModule.addParameterConnection
+							(
+								implImg,
+								'transfer_'+fi.feature.retreiveMessageAddress(implImg).name+'_to_'+cnx.source.getConnContextImg(implImg).name+'_'+cnx.source.getConnFeatureImg(implImg).name,
+								cnx.source.getConnFeatureImg(implImg),
+								cnx.source.getConnContextImg(implImg),
+								fi.feature.retreiveMessageAddress(implImg)
+							);
+		
+						}
+					}
 				}
 				else if(dest.eContainer().eContainer().getProcessorBinding() = c.eContainer().getProcessorBinding())
 				{
 					-- add data subcomponents for Send_Queuing_Message
 					f.dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('POK_RUNTIME');
-					-- implImg.type.ownedDataAccess.add(f);
 					thisModule.addMessageAddrDataSubcomponent(implImg,fi);
 					thisModule.addLengthDataSubcomponent(implImg,fi);
 					thisModule.addTimeOutSubcomponent(implImg,fi);
