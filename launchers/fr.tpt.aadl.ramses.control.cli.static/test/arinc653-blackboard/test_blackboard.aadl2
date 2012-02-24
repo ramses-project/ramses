@@ -86,11 +86,9 @@ end mythread1.impl;
 
 thread implementation mythread2.impl
 calls
-   call1 : { pspg : subprogram hello_part2;
-             pspg2: subprogram hello_part1;};
+   call1 : { pspg : subprogram hello_part2;};
 connections
    cnx3: parameter input -> pspg.input;
-   cnx4: parameter pspg2.output -> pspg.input;
 properties
    Dispatch_protocol      => Periodic;
    Period                 => 500ms;

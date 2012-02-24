@@ -42,11 +42,13 @@ end partition;
 virtual processor implementation partition.secure
 properties
    POK::Criticality => 1;
+   POK::Scheduler => RR;
 end partition.secure;
 
 virtual processor implementation partition.common
 properties
    POK::Criticality => 10;
+   POK::Scheduler => RR;
 end partition.common;
 
 subprogram hello_part1
