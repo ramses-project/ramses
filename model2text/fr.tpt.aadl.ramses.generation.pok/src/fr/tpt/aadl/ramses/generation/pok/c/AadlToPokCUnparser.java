@@ -79,6 +79,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   public final static String EVENT_AADL_TYPE =
                                           "pok_runtime::Event_Id_Type" ;
   
+  public final static String BUFFER_AADL_TYPE =
+                                          "pok_runtime::Buffer_Id_Type" ;
+  
   public void process(ProcessorSubcomponent processor,
                       File generatedFilePath,
                       TargetProperties tarProp) 
@@ -165,6 +168,28 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       pp.queueInfo.add(queueInfo) ;
     }
+  }
+  
+  private void bufferHandler(String id, ConnectionInstance ci, PartitionProperties pp)
+  {
+    Port p = getProcessPort((FeatureInstance)ci.getDestination()) ;
+    
+    QueueInfo queueInfo = new QueueInfo() ;
+    
+    queueInfo.id = id;
+    queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier((FeatureInstance)ci.getDestination());
+    
+    if(getQueueInfo(p, queueInfo))
+    {
+      pp.bufferInfo.add(queueInfo) ;
+    }
+    else
+    {
+      queueInfo.type = "FIFO";
+      queueInfo.size = 1;
+      pp.bufferInfo.add(queueInfo) ;
+    }
+    
   }
   
   private Port getProcessPort(FeatureInstance fi)
@@ -314,13 +339,31 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
+  private void genBufferMainImpl(UnparseText mainImplCode,
+                                PartitionProperties pp)
+ {
+   for(QueueInfo info: pp.bufferInfo)
+   {
+     mainImplCode.addOutput("  CREATE_BUFFER (\"") ;
+     mainImplCode.addOutput(info.id);
+     mainImplCode.addOutput("\",");
+     mainImplCode.addOutput("    sizeof(BUFFER_ID_TYPE), ");
+     mainImplCode.addOutput(Long.toString(info.size)) ;
+     mainImplCode.addOutput(", ");
+     mainImplCode.addOutput(info.type.toUpperCase());
+     mainImplCode.addOutput(",");
+     mainImplCode.addOutput("&"+info.id+",");
+     mainImplCode.addOutputNewline("& (ret));");
+   }
+ }
+  
   private void genSampleMainImpl(UnparseText mainImplCode,
                                  PartitionProperties pp)
   {
     for(SampleInfo info : pp.sampleInfo)
     {
       mainImplCode.addOutput("  CREATE_SAMPLING_PORT (\"") ;
-      mainImplCode.addOutput(info.id);
+      mainImplCode.addOutput(info.uniqueId);
       mainImplCode.addOutputNewline("\",");
       mainImplCode.addOutput("    sizeof(SAMPLING_PORT_ID_TYPE), ");
       
@@ -508,7 +551,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
     }
     
-    // Generate blackboard names array.
+    // Generate event names array.
     if(pp.hasEvent)
     {
       mainImplCode.addOutput("char* pok_arinc653_events_names[POK_CONFIG_NB_EVENTS] = {") ;
@@ -527,6 +570,29 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       {
         mainImplCode.addOutput("extern EVENT_ID_TYPE ") ;
         mainImplCode.addOutput(name) ;
+        mainImplCode.addOutputNewline(";") ;
+      }
+    }
+    
+    // Generate buffer names array.
+    if(pp.hasBuffer)
+    {
+      mainImplCode.addOutput("char* pok_buffers_names[POK_CONFIG_NB_BUFFERS] = {") ;
+
+      for(QueueInfo info : pp.bufferInfo)
+      {
+        mainImplCode.addOutput("\"") ;
+        mainImplCode.addOutput(info.id) ;
+        mainImplCode.addOutput("\"") ;
+      }
+
+      mainImplCode.addOutputNewline("};") ;
+      
+      // Generate external variable (declared in deployment.c).
+      for(QueueInfo info : pp.bufferInfo)
+      {
+        mainImplCode.addOutput("extern BUFFER_ID_TYPE ") ;
+        mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
     }
@@ -654,6 +720,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
+  
+  
   private void genMainImpl(ProcessImplementation process,
                            UnparseText mainImplCode,
                            PartitionProperties pp)
@@ -686,6 +754,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // Event declarations.
     genEventMainImpl(mainImplCode, pp) ;
+    
+    // Buffer declarations.    
+    genBufferMainImpl(mainImplCode, pp) ;
     
     // For each declared thread
     // Zero stands for ARINC's IDL thread.
@@ -741,6 +812,14 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           pp.eventNames.add(s.getName());
           pp.hasEvent = true ;
+        }
+        else if(s.getClassifier().getQualifiedName()
+              .equalsIgnoreCase(BUFFER_AADL_TYPE))
+        {
+          bufferHandler(s.getName(),
+                       (ConnectionInstance) HookAccessImpl.
+                       getTransformationTrace(s), pp);
+          pp.hasBuffer = true ;
         }
       }
     }
@@ -828,8 +907,26 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     if(pp.hasSample)
     {
       mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_SAMPLING 1");
+      // XXX ARBITRARY
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_LIBC_STRING 1");
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1");
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_PROTOCOLS 1") ;
     }
 
+    if(pp.hasBuffer)
+    {
+      
+      int i = pp.bufferInfo.size(); 
+      mainHeaderCode
+            .addOutputNewline("#define POK_CONFIG_NB_BUFFERS " +
+                  pp.bufferInfo.size()) ;
+      
+      mainHeaderCode
+      .addOutputNewline("#define POK_NEEDS_BUFFERS 1") ;
+      
+      mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_BUFFER 1");
+    }
+    
     mainHeaderCode
     	.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
     			Long.toString(processorProp.requiredStackSizePerPartition.get(process)));
@@ -1088,8 +1185,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
     deploymentHeaderCode.addOutputNewline("}") ;
 
-    boolean alreadyAdded = false ;
-    
+    boolean queueAlreadyAdded = false ;
+    boolean sampleAlreadyAdded = false ;
+    boolean bufferAlreadyAdded = false ;
     for(ProcessSubcomponent ps : bindedProcess)
     {
       ProcessImplementation process =
@@ -1106,14 +1204,35 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         deploymentHeaderCode
               .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;
       }
+      else if(pp.hasBuffer)
+      {
+        deploymentHeaderCode
+              .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;
+      }
       
       
-      if(pp.hasQueue && false == alreadyAdded)
+      if(pp.hasQueue && false == queueAlreadyAdded)
       {
         deploymentHeaderCode
                     .addOutputNewline("#define POK_NEEDS_PORTS_QUEUEING 1");
              
-        alreadyAdded = true ;
+        queueAlreadyAdded = true ;
+      }
+      
+      if(pp.hasSample && false == sampleAlreadyAdded)
+      {
+        deploymentHeaderCode
+                    .addOutputNewline("#define POK_NEEDS_PORTS_SAMPLING 1");
+             
+        sampleAlreadyAdded = true ;
+      }
+      
+      if(pp.hasBuffer && false == bufferAlreadyAdded)
+      {
+        deploymentHeaderCode
+                    .addOutputNewline("#define POK_NEEDS_PORTS_BUFFER 1");
+             
+        bufferAlreadyAdded = true ;
       }
     }
 
@@ -1125,7 +1244,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
             processorProp.partitionProperties.get((ProcessImplementation) ps
                   .getComponentImplementation()) ;
       deploymentHeaderCode.addOutput(Integer
-            .toString(pp.blackboardNames.size())) ;
+            .toString(pp.blackboardNames.size()
+                      + pp.bufferInfo.size())) ;
       if(bindedProcess.indexOf(ps) < bindedProcess.size() - 1)
       {
         deploymentHeaderCode.addOutput(",") ;
@@ -1623,6 +1743,8 @@ class PartitionProperties
   
   Set<String> eventNames = new HashSet<String>() ;
   
+  Set<QueueInfo> bufferInfo = new HashSet<QueueInfo>() ;
+  
   Set<QueueInfo> queueInfo = new HashSet<QueueInfo>();
   
   Set<SampleInfo> sampleInfo = new HashSet<SampleInfo>();
@@ -1643,6 +1765,17 @@ class QueueInfo
 }
 
 class SampleInfo
+{
+  String id = null ;
+  
+  String uniqueId = null;
+  
+  long refresh = -1 ;
+  
+  DirectionType direction = null ;
+}
+
+class BufferInfo
 {
   String id = null ;
   
