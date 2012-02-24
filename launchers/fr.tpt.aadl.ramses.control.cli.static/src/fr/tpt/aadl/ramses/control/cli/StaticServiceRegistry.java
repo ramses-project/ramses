@@ -58,6 +58,8 @@ public class StaticServiceRegistry implements ServiceRegistry
   {
     // Setup AADLBA Front End parser, resolver and unparser.
     _parsers.put(AadlBaParserAction.ANNEX_NAME, new AadlBaParserAction()) ;
+    
+    /*
     _parsers.put(AadlBaToCUnparserAction.ANNEX_NAME, new AadlBaParserAction()) ;
     _resolvers.put(AadlBaResolver.ANNEX_NAME, new AadlBaResolver()) ;
     _resolvers.put(AadlBaToCUnparserAction.ANNEX_NAME, new AadlBaResolver()) ;
@@ -67,7 +69,7 @@ public class StaticServiceRegistry implements ServiceRegistry
     _analyzers.put(WCETAnalysis.ANALYZER_NAME, new WCETAnalysis()) ;
     
     Generator gen = PokGeneratorFactory.createPokGenerator(false) ;
-    _gen.put(gen.getRegistryName(), gen) ;
+    _gen.put(gen.getRegistryName(), gen) ;*/
   }
 
   @Override

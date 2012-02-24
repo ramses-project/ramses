@@ -143,7 +143,7 @@ public class AnnexJob
       String filename = (new File(_filename)).getName() ;
       System.out.println("*** try to resolve " + _annex.getName() + " in " +
             _parentContainer + " from " + filename) ;
-      _resolver.resolveAnnex(_annex.getName(), _annexElements, _errManager) ;
+       _resolver.resolveAnnex(_annex.getName(), _annexElements, _errManager) ;
       return _errManager.getNumErrors() == 0 ;
     }
     else
