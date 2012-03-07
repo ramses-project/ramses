@@ -73,14 +73,15 @@ public class AadlTargetSpecificGenerator implements Generator
 
   @Override
   public void generate(SystemInstance instance,
+                       File resourceFilePath,
                        Map<String, Resource> standardPropertySets,
                        File generatedFilePath)
                                                       throws GenerationException
   {
     Resource inputResource = instance.eResource() ;
     
-    Resource r = _targetTrans.transform(inputResource, standardPropertySets,
-                                        generatedFilePath) ;
+    Resource r = _targetTrans.transform(inputResource, resourceFilePath,
+                                        standardPropertySets, generatedFilePath);
     
     _codeGen.generate(r, generatedFilePath) ;
   }

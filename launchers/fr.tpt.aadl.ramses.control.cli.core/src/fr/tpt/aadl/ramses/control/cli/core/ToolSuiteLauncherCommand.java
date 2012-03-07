@@ -444,11 +444,14 @@ public class ToolSuiteLauncherCommand
     
     ToolSuiteLauncherCommand.getVerifiedPath(resourcesDirName) ;
     
-    File aadlRessourcesDir =
+    File aadlResourcesDir =
           ToolSuiteLauncherCommand
                 .getAADLResourcesDir(resourcesDirName) ;
     
-    launcher.parsePredefinedRessources(aadlRessourcesDir) ;
+    File atlResourceDir = ToolSuiteLauncherCommand.
+                                          getATLResourceDir(resourcesDirName) ;  
+    
+    launcher.parsePredefinedRessources(aadlResourcesDir) ;
 
     File generatedFilePath =
           ToolSuiteLauncherCommand.getVerifiedPath(generated_file_path) ;
@@ -459,7 +462,8 @@ public class ToolSuiteLauncherCommand
       launcher.launchModelGeneration(mainModelFiles,
                                      systemToInstantiate,
                                      generatedFilePath,
-                                     targetName) ;
+                                     targetName,
+                                     atlResourceDir) ;
     }
     catch(Exception e)
     {
@@ -690,5 +694,14 @@ public class ToolSuiteLauncherCommand
     }
 
     return aadlResourcesDir ;
+  }
+  
+  private static File getATLResourceDir(String dirName)
+        throws Exception
+  {
+    File result =
+          ToolSuiteLauncherCommand.getVerifiedPath(dirName) ;
+    
+    return result ;
   }
 }

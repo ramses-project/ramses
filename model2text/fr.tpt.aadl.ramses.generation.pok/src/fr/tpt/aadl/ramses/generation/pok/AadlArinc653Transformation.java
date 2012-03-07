@@ -23,7 +23,6 @@ package fr.tpt.aadl.ramses.generation.pok ;
 
 import java.io.File ;
 import java.util.ArrayList ;
-import java.util.List ;
 import java.util.Map ;
 
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -43,19 +42,9 @@ public class AadlArinc653Transformation implements
         {"targets/arinc653/ExpandThreadsPorts.asm","ExpandSubprogramCalls.asm",
          "targets/arinc653/ExpandThreadsDispatchProtocol.asm","CreateThreadsBehavior.asm"};
   
-  public static final List<File> ATL_FILES = 
-                                    new ArrayList<File>(ATL_FILE_NAMES.length) ;
-  
-  static
-  {
-    for(String fileName : ATL_FILE_NAMES)
-    {
-      ATL_FILES.add(new File(DEFAULT_ATL_FILE_PATH + fileName)) ;
-    }
-  }
-  
   @Override
   public Resource transform(Resource inputResource,
+                            File resourceFilePath,
                             Map<String, Resource> standardPropertySets,
                             File generatedFilePath)
                                                       throws GenerationException
@@ -66,8 +55,19 @@ public class AadlArinc653Transformation implements
     {
       atlTransfo = new AtlTransfoLauncher() ;
 
-      File resourcesDirectory = new File(DEFAULT_ATL_FILE_PATH) ;
-      atlTransfo.setResourcesDirectory(resourcesDirectory) ;
+      if(resourceFilePath == null)
+      {
+        resourceFilePath = new File(DEFAULT_ATL_FILE_PATH) ;
+      }
+      
+      atlTransfo.setResourcesDirectory(resourceFilePath) ;
+      
+      ArrayList<File> atlFiles = new ArrayList<File>(ATL_FILE_NAMES.length) ;
+      
+      for(String fileName : ATL_FILE_NAMES)
+      {
+        atlFiles.add(new File(resourceFilePath + "/" + fileName)) ;
+      }
 
       String aaxlGeneratedFileName =  
                             inputResource.getURI().toFileString()
@@ -75,7 +75,7 @@ public class AadlArinc653Transformation implements
       
       Resource expandedResult =
             atlTransfo.doGeneration(inputResource, standardPropertySets,
-                                    ATL_FILES, aaxlGeneratedFileName) ;
+                                    atlFiles, aaxlGeneratedFileName) ;
       
       /*
       for(File f : postTransformationFiles)

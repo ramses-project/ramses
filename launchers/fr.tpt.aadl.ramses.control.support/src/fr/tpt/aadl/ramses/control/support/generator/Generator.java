@@ -32,6 +32,7 @@ import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 public interface Generator extends NamedPlugin
 {
   public void generate(SystemInstance instance,
+                       File resourceFilePath,
                        Map<String, Resource> standardPropertySets,
                        File generatedFilePath) throws GenerationException ;
 

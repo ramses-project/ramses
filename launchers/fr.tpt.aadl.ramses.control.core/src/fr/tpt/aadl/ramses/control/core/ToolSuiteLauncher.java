@@ -225,7 +225,8 @@ public class ToolSuiteLauncher
   public void launchModelGeneration (List<File> mainModels,
                                      String systemToInstantiate,
                                      File generatedFilePath,
-                                     String targetName)
+                                     String targetName,
+                                     File resourceFilePath)
                                                       throws GenerationException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
@@ -246,7 +247,8 @@ public class ToolSuiteLauncher
     
     Generator generator = registry.getGenerator(targetName) ;
     
-    generator.generate(instance, standardPropertySets, generatedFilePath) ;
+    generator.generate(instance, resourceFilePath,standardPropertySets,
+                       generatedFilePath) ;
   }
 
   public void performAnalysis(List<File> mainModelFiles,
