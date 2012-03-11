@@ -737,7 +737,46 @@ public class PropertyUtils
     return res ;
   }
 
-  public static List<Subcomponent> getSubcomponentList(ProcessorSubcomponent object,
+  public static List<ComponentInstance> getComponentInstanceList(NamedElement object,
+                        String propertyName)
+  {
+    List<ComponentInstance> res = new ArrayList<ComponentInstance>() ;
+    PropertyAssociation pa = findProperty(propertyName, object) ;
+
+    if(pa != null)
+    {
+      Property p = pa.getProperty() ;
+
+      if(p.getName().equals(propertyName))
+      {
+        List<ModalPropertyValue> values = pa.getOwnedValues() ;
+
+        if(values.size() == 1)
+        {
+          ModalPropertyValue v = values.get(0) ;
+          PropertyExpression expr = v.getOwnedValue() ;
+
+          if(expr instanceof ListValue)
+          {
+            ListValue lv = (ListValue) expr ;
+
+            for(PropertyExpression pe : lv.getOwnedListElements())
+            {
+              if(pe instanceof InstanceReferenceValue)
+              {
+                InstanceReferenceValue c = ((InstanceReferenceValue) pe) ;
+                res.add((ComponentInstance)c.getReferencedInstanceObject()) ;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return res ;
+  }
+  
+  public static List<Subcomponent> getSubcomponentList(NamedElement object,
                                                        String propertyName)
   {
     List<Subcomponent> res = new ArrayList<Subcomponent>() ;
@@ -765,9 +804,10 @@ public class PropertyUtils
               if(pe instanceof ReferenceValue)
               {
                 ReferenceValue c = ((ReferenceValue) pe) ;
-                ContainmentPathElement cpe =
-                      c.getContainmentPathElements().get(0) ;
-                res.add((Subcomponent) cpe.getNamedElement()) ;
+                for(ContainmentPathElement cpe :
+                      c.getContainmentPathElements()){
+                  res.add((Subcomponent) cpe.getNamedElement()) ;
+                }
               }
             }
           }
