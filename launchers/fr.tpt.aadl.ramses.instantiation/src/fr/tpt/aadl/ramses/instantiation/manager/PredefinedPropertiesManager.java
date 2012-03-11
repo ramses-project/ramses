@@ -23,6 +23,7 @@ package fr.tpt.aadl.ramses.instantiation.manager ;
 
 import java.io.File ;
 import java.io.FilenameFilter ;
+import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.Arrays ;
 import java.util.HashMap ;
@@ -32,6 +33,8 @@ import java.util.Map ;
 import org.eclipse.emf.common.util.TreeIterator ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.EnumerationLiteral ;
+import org.osate.aadl2.NamedValue ;
 import org.osate.aadl2.Property ;
 import org.osate.aadl2.PropertySet ;
 import org.osate.aadl2.StringLiteral ;
@@ -144,17 +147,22 @@ public class PredefinedPropertiesManager
 
     while(it.hasNext())
     {
-      if(it instanceof Property)
+      EObject elt = it.next() ;
+      if(elt instanceof Property)
       {
-        Property p = (Property) it ;
+        Property p = (Property) elt ;
 
         if(p.getName().equalsIgnoreCase(PropertyName))
         {
           if(p.getDefaultValue() != null &&
-                p.getDefaultValue() instanceof StringLiteral)
+                p.getDefaultValue() instanceof NamedValue)
           {
-            StringLiteral sl = (StringLiteral) p.getDefaultValue() ;
-            return sl.getValue() ;
+            NamedValue nv = (NamedValue) p.getDefaultValue() ;
+            if(nv.getNamedValue() instanceof EnumerationLiteral)
+            {
+              EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+              return el.getName();
+            }
           }
         }
       }
