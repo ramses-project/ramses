@@ -328,6 +328,7 @@ public class ToolSuiteLauncherCommand
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
                                                    includeFolderNames) ;
     launcher.parsePredefinedRessources(aadlResourcesDir) ;
+    launcher.parsePredefinedPackages(aadlResourcesDir) ;
     launcher.parse(mainModelFiles) ;
     System.out.println("Parsing terminated normally") ;
   }
@@ -359,7 +360,7 @@ public class ToolSuiteLauncherCommand
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
                                                    includeFolderNames) ;
     launcher.parsePredefinedRessources(aadlResourcesDir) ;
-
+    launcher.parsePredefinedPackages(aadlResourcesDir) ;
     if(analysisToPerform.length > 0)
     {
       try
@@ -452,7 +453,7 @@ public class ToolSuiteLauncherCommand
                                           getATLResourceDir(resourcesDirName) ;  
     
     launcher.parsePredefinedRessources(aadlResourcesDir) ;
-
+    launcher.parsePredefinedPackages(aadlResourcesDir) ;
     File generatedFilePath =
           ToolSuiteLauncherCommand.getVerifiedPath(generated_file_path) ;
     
