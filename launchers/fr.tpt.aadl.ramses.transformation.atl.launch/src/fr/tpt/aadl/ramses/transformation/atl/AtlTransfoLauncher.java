@@ -203,10 +203,8 @@ public class AtlTransfoLauncher
     ResourceSet set = new ResourceSetImpl() ;
     Resource hookResource = set.createResource(fileURI) ;
     HookAccess atlHook = AtlHooksFactory.eINSTANCE.createHookAccess() ;
-    atlHook.setPredefinedPackagesManager(predefinedPackagesManager) ;
     hookResource.getContents().add(atlHook) ;
     hookResource.load(null) ;
-    //Resource hookResource = atlHook.eResource();
     injector.inject(atlHookModel, hookResource) ;
     EMFModel refiningTraceModel =
           (EMFModel) factory.newModel(atlRefiningTraceMetamodel) ;
@@ -358,7 +356,7 @@ public class AtlTransfoLauncher
             "Illegal initialization of ATL transformation launcher: " +
                   "some predefined packages not found: " +
                   predefinedPackagesManager.getPackagesNotFound()) ;
-
+     
     this.initTransformation(resourcesDir) ;
   }
 }
