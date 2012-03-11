@@ -34,8 +34,10 @@ import java.util.Set ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.ConnectedElement ;
+import org.osate.aadl2.DataPort ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DirectionType ;
+import org.osate.aadl2.EventDataPort ;
 import org.osate.aadl2.MemorySubcomponent ;
 import org.osate.aadl2.Port ;
 import org.osate.aadl2.ProcessImplementation ;
@@ -54,6 +56,8 @@ import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 
+import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
+import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
@@ -142,7 +146,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         if(s.getClassifier().getQualifiedName()
               .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
         {
-          pp.blackboardNames.add(s.getName()) ;
+          blackBoardHandler(s.getName(), 
+                            (FeatureInstance) HookAccessImpl.
+                            getTransformationTrace(s), pp);
         }
         else if(s.getClassifier().getQualifiedName()
               .equalsIgnoreCase(EVENT_AADL_TYPE))
@@ -151,6 +157,30 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         }
       }
     }
+  }
+  
+//TODO : be refactored with generic interfaces.
+  private void blackBoardHandler(String id, FeatureInstance fi, PartitionProperties pp)
+  {
+
+    BlackBoardInfo blackboardInfo = new BlackBoardInfo() ;
+    blackboardInfo.id = id;
+
+    if(fi.getCategory() == FeatureCategory.DATA_PORT)
+    {
+      DataPort p  = (DataPort) fi.getFeature() ;
+      try
+      {
+        blackboardInfo.dataType=PropertyUtils.getStringValue(p.getDataFeatureClassifier(), "Source_Name") ;
+      }
+      catch(Exception e)
+      {
+        blackboardInfo.dataType =GenerationUtilsC.getGenerationCIdentifier(p.getDataFeatureClassifier()
+                                                                           .getQualifiedName()) ;
+      }
+    }
+    pp.blackboardInfo.add(blackboardInfo); 
+
   }
   
   //TODO : be refactored with generic interfaces.
@@ -164,6 +194,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
     queueInfo.direction = p.getDirection() ;
     
+    if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
+    {
+      EventDataPort port  = (EventDataPort) fi.getFeature() ;
+      try
+      {
+        queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+      }
+      catch(Exception e)
+      {
+        queueInfo.dataType =GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier()
+                                                                           .getQualifiedName()) ;
+      }
+    }
+    
     if(getQueueInfo(p, queueInfo))
     {
       pp.queueInfo.add(queueInfo) ;
@@ -176,8 +220,24 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     QueueInfo queueInfo = new QueueInfo() ;
     
+    FeatureInstance fi = (FeatureInstance)ci.getDestination();
+    
     queueInfo.id = id;
-    queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier((FeatureInstance)ci.getDestination());
+    queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
+    
+    if(fi.getCategory() == FeatureCategory.DATA_PORT)
+    {
+      DataPort port  = (DataPort) fi.getFeature() ;
+      try
+      {
+        queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+      }
+      catch(Exception e)
+      {
+        queueInfo.dataType =GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier()
+                                                                           .getQualifiedName()) ;
+      }
+    }
     
     if(getQueueInfo(p, queueInfo))
     {
@@ -262,6 +322,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     SampleInfo sampleInfo = new SampleInfo() ;
     sampleInfo.direction = p.getDirection() ;
     
+    if(fi.getCategory() == FeatureCategory.DATA_PORT)
+    {
+      DataPort port  = (DataPort) fi.getFeature() ;
+      try
+      {
+        sampleInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+      }
+      catch(Exception e)
+      {
+        sampleInfo.dataType =GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier()
+                                                                           .getQualifiedName()) ;
+      }
+    }
+    
     sampleInfo.id = id;
     sampleInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
     
@@ -302,7 +376,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       mainImplCode.addOutput("  CREATE_QUEUING_PORT (\"") ;
       mainImplCode.addOutput(info.uniqueId);
       mainImplCode.addOutputNewline("\",");
-      mainImplCode.addOutput("    sizeof(QUEUING_PORT_ID_TYPE), ");
+      mainImplCode.addOutput("    sizeof( "+info.dataType+" ), ");
       mainImplCode.addOutput(Long.toString(info.size)) ;
       mainImplCode.addOutput(", ");
       
@@ -347,7 +421,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
      mainImplCode.addOutput("  CREATE_BUFFER (\"") ;
      mainImplCode.addOutput(info.id);
      mainImplCode.addOutput("\",");
-     mainImplCode.addOutput("    sizeof(BUFFER_ID_TYPE), ");
+     mainImplCode.addOutput("    sizeof( "+info.dataType+" ), ");
      mainImplCode.addOutput(Long.toString(info.size)) ;
      mainImplCode.addOutput(", ");
      mainImplCode.addOutput(info.type.toUpperCase());
@@ -365,7 +439,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       mainImplCode.addOutput("  CREATE_SAMPLING_PORT (\"") ;
       mainImplCode.addOutput(info.uniqueId);
       mainImplCode.addOutputNewline("\",");
-      mainImplCode.addOutput("    sizeof(SAMPLING_PORT_ID_TYPE), ");
+      mainImplCode.addOutput("    sizeof( " + info.dataType + " ), ");
       
       String direction = null ;
       if(DirectionType.IN == info.direction)
@@ -533,20 +607,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       mainImplCode.addOutput("char* pok_blackboards_names[POK_CONFIG_NB_BLACKBOARDS] = {") ;
 
-      for(String name : pp.blackboardNames)
+      for(BlackBoardInfo info : pp.blackboardInfo)
       {
         mainImplCode.addOutput("\"") ;
-        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutput("\"") ;
       }
 
       mainImplCode.addOutputNewline("};") ;
       
       // Generate external variable (declared in deployment.c).
-      for(String name : pp.blackboardNames)
+      for(BlackBoardInfo info : pp.blackboardInfo)
       {
         mainImplCode.addOutput("extern BLACKBOARD_ID_TYPE ") ;
-        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
     }
@@ -710,12 +784,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                                      PartitionProperties pp)
   {
     // For each blackboard
-    for(String name : pp.blackboardNames)
+    for(BlackBoardInfo info : pp.blackboardInfo)
     {
       mainImplCode.addOutput("  CREATE_BLACKBOARD (\"") ;
-      mainImplCode.addOutput(name) ;
-      mainImplCode.addOutput("\", sizeof (BLACKBOARD_ID_TYPE), &(") ;
-      mainImplCode.addOutput(name);
+      mainImplCode.addOutput(info.id) ;
+      mainImplCode.addOutput(info.id);
       mainImplCode.addOutputNewline("), &(ret));") ;
     }
   }
@@ -788,7 +861,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         if(s.getClassifier().getQualifiedName()
               .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
         {
-          pp.blackboardNames.add(s.getName()) ;
+          blackBoardHandler(s.getClassifier().getQualifiedName(),
+                            (FeatureInstance) HookAccessImpl.
+                            getTransformationTrace(s), pp);
           pp.hasBlackboard = true;
         }
         else if(s.getClassifier().getQualifiedName()
@@ -865,7 +940,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_BLACKBOARDS " +
-                  pp.blackboardNames.size()) ;
+                  pp.blackboardInfo.size()) ;
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_ARINC653_BLACKBOARD 1") ;
       
@@ -1244,7 +1319,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
             processorProp.partitionProperties.get((ProcessImplementation) ps
                   .getComponentImplementation()) ;
       deploymentHeaderCode.addOutput(Integer
-            .toString(pp.blackboardNames.size()
+            .toString(pp.blackboardInfo.size()
                       + pp.bufferInfo.size())) ;
       if(bindedProcess.indexOf(ps) < bindedProcess.size() - 1)
       {
@@ -1482,12 +1557,19 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       {
         for(FeatureInstance f: routeProp.portPerProcess.get(deployedProcess))
         {
-	        if(f.equals(localPorts.get(idx)));
-	        {
-	          routingHeaderCode.addOutput(Integer.toString(idx));
-	          routingHeaderCode.addOutput(",");
-	        }
-	      }
+          List<ComponentInstance> bindedVP = PropertyUtils.getComponentInstanceList(deployedProcess,
+                "Actual_Processor_Binding") ;
+          for(ComponentInstance virtualProcessor:bindedVP)
+          {
+            if(processor.getComponentInstances().contains(virtualProcessor))
+            {
+              int partitionIndex = processor.getComponentInstances().indexOf(virtualProcessor);
+              routingHeaderCode.addOutput(Integer.toString(partitionIndex));
+            }
+          }
+          routingHeaderCode.addOutput(",");
+
+        }
         idx++;
 	    }
 	  }
@@ -1739,7 +1821,7 @@ class PartitionProperties
   
   boolean hasSample = false ;
   
-  Set<String> blackboardNames = new HashSet<String>() ;
+  Set<BlackBoardInfo> blackboardInfo = new HashSet<BlackBoardInfo>() ;
   
   Set<String> eventNames = new HashSet<String>() ;
   
@@ -1749,6 +1831,13 @@ class PartitionProperties
   
   Set<SampleInfo> sampleInfo = new HashSet<SampleInfo>();
   
+}
+
+class BlackBoardInfo
+{
+  String id = null ;
+    
+  String dataType = null;
 }
 
 class QueueInfo
@@ -1761,6 +1850,8 @@ class QueueInfo
   
   String type = null ;
   
+  String dataType = null;
+  
   DirectionType direction = null ;
 }
 
@@ -1772,6 +1863,8 @@ class SampleInfo
   
   long refresh = -1 ;
   
+  String dataType = null;
+  
   DirectionType direction = null ;
 }
 
@@ -1782,6 +1875,8 @@ class BufferInfo
   String uniqueId = null;
   
   long refresh = -1 ;
+  
+  String dataType = null;
   
   DirectionType direction = null ;
 }

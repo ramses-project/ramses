@@ -80,13 +80,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
   private Map<AadlToCSwitchProcess, Set<String>> _additionalHeaders ;
 
-  private List<NamedElement> _processedTypes  ;
+  private List<String> _processedTypes  ;
 
   private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
   
   // Map Data Access with their relative Data Subcomponent. Relations 
   // are defined in the process implementation via connections.
-  private Map<DataAccess, String> _dataAccessMapping ;
+  private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
   
   public AadlToCUnparser()
   {
@@ -120,7 +120,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     
     _deploymentHeaderCode = new AadlToCSwitchProcess(this) ;
     
-    _processedTypes = new ArrayList<NamedElement>() ;
+    _processedTypes = new ArrayList<String>() ;
     
     _additionalHeaders = new HashMap<AadlToCSwitchProcess, Set<String>>() ;
     
@@ -291,6 +291,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   protected void getCTypeDeclarator(NamedElement object,
                                     boolean delayComplexTypes)
   {
+    
     String id =
           GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
     TypeHolder dataTypeHolder = null ;
@@ -321,6 +322,33 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       }
     }
 
+    // define types the current data type depends on
+    EList<PropertyExpression> referencedBaseType =
+          AadlBaGetProperties
+                .getPropertyExpression(dataTypeHolder.klass,
+                                       DataModelProperties.BASE_TYPE) ;
+
+    for(PropertyExpression baseTypeProperty : referencedBaseType)
+    {
+      if(baseTypeProperty instanceof ListValue)
+      {
+        ListValue lv = (ListValue) baseTypeProperty ;
+
+        for(PropertyExpression v : lv.getOwnedListElements())
+        {
+          if(v instanceof ClassifierValue)
+          {
+            ClassifierValue cv = (ClassifierValue) v ;
+            if(_processedTypes.contains(cv.getClassifier().getQualifiedName())==false && cv.getClassifier() instanceof DataSubcomponentType)
+            {
+              getCTypeDeclarator(cv.getClassifier(), false);
+              _processedTypes.add(cv.getClassifier().getQualifiedName());
+            }
+          }
+        }
+      }
+    }
+    
     switch ( dataTypeHolder.dataRep )
     {
     // Simple types
@@ -358,7 +386,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           break ;
         }
 
-        _currentHeaderUnparser.addOutputNewline("typedef enum " + id + " {") ;
+        _currentHeaderUnparser.addOutputNewline("typedef enum e_" + id + " {") ;
         _currentHeaderUnparser.incrementIndent() ;
         List<String> stringifiedRepresentation = new ArrayList<String>() ;
         EList<PropertyExpression> dataRepresentation =
@@ -644,12 +672,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       @Override
       public String caseDataType(DataType object)
       {
-        if(_processedTypes.contains(object))
+        if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;
         }
-
-        _processedTypes.add(object) ;
+        _processedTypes.add(object.getQualifiedName());
         _currentHeaderUnparser = _gtypesHeaderCode ;
         _gtypesHeaderCode.processComments(object) ;
         getCTypeDeclarator((NamedElement) object, true) ;
@@ -789,10 +816,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         unparser.addOutput(GeneratorUtils.getInitialValue(object)) ;
         unparser.addOutputNewline(";") ;
 
-        if(_processedTypes.contains(object.getDataSubcomponentType()) == false)
+        if(_processedTypes.contains(object.getDataSubcomponentType().getQualifiedName()) == false)
         {
-          process(object.getDataSubcomponentType()) ;
-          _processedTypes.add(object.getDataSubcomponentType()) ;
+          _processedTypes.add(object.getQualifiedName());
+          process(object.getDataSubcomponentType());
         }
 
         return null ;
@@ -800,7 +827,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseProcessImplementation(ProcessImplementation object)
       {
-        _dataAccessMapping = buildDataAccessMapping(object) ;
+        buildDataAccessMapping(object) ;
         
         processEList(object.getOwnedThreadSubcomponents()) ;
         
@@ -829,12 +856,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       // Builds the data access mapping via the connections described in the
       // process implementation.
-      private Map<DataAccess, String> buildDataAccessMapping(
-                                              ProcessImplementation processImpl)
+      private void buildDataAccessMapping(ComponentImplementation cptImpl)
       {
-        Map<DataAccess, String> result = new HashMap<DataAccess, String>() ;
         
-        EList<Subcomponent> subcmpts = processImpl.getAllSubcomponents() ;
+        EList<Subcomponent> subcmpts = cptImpl.getAllSubcomponents() ;
         
         List<String> dataSubcomponentNames = new ArrayList<String>() ;
         
@@ -849,26 +874,23 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         
         // Binds data subcomponent names with DataAcess objects.
         // See process implementation's connections.
-        for(Connection connect : processImpl.getAllConnections())
+        for(Connection connect : cptImpl.getAllConnections())
         {
           if (connect instanceof AccessConnection &&
-             ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
+             ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA &&
+             connect.getAllDestination() instanceof DataSubcomponent)
           {
-            DataSubcomponent destination =  (DataSubcomponent) connect.
+            DataSubcomponent destination = (DataSubcomponent) connect.
                                                            getAllDestination() ;
             
             if(AadlBaUtils.contains(destination.getName(), dataSubcomponentNames))
             {
               ConnectedElement source = (ConnectedElement) connect.getSource() ;
-              
               DataAccess da = (DataAccess) source.getConnectionEnd() ;
-              
-              result.put(da, destination.getName()) ;
+              _dataAccessMapping.put(da, destination.getName()) ;
             }
           }
         }
-        
-        return result ;
       }
       
       public String caseProcessSubcomponent(ProcessSubcomponent object)
@@ -879,6 +901,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
       public String caseThreadImplementation(ThreadImplementation object)
       {
+        buildDataAccessMapping(object) ;
         process(object.getType()) ;
         _activityImplCode.addOutput("void* ") ;
         _activityImplCode.addOutput(GenerationUtilsC
@@ -919,12 +942,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
       public String caseThreadType(ThreadType object)
       {
-        if(_processedTypes.contains(object))
+        if(_processedTypes.contains(object.getQualifiedName()))
         {
           return null ;
         }
 
-        _processedTypes.add(object) ;
+        _processedTypes.add(object.getQualifiedName()) ;
         _currentHeaderUnparser = _activityHeaderCode ;
         _currentImplUnparser = _activityImplCode ;
 

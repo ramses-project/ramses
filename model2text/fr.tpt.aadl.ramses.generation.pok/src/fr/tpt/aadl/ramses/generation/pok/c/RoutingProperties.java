@@ -58,8 +58,8 @@ public class RoutingProperties implements TargetProperties {
 	Map<FeatureInstance, ComponentInstance> processorPort = 
 	                            new HashMap<FeatureInstance, ComponentInstance>();
 
-	Map<ComponentInstance, List<ComponentInstance>> processPerProcessor =
-	                    new HashMap<ComponentInstance, List<ComponentInstance>>();
+	Map<ComponentInstance, Set<ComponentInstance>> processPerProcessor =
+	                    new HashMap<ComponentInstance, Set<ComponentInstance>>();
 	
 	void setRoutingProperties(SystemInstance system)
 	{
@@ -152,7 +152,7 @@ public class RoutingProperties implements TargetProperties {
 							processPerProcessor.get(processor).add(process);
 						else
 						{
-							List<ComponentInstance> processes  =new ArrayList<ComponentInstance>();
+							Set<ComponentInstance> processes  =new HashSet<ComponentInstance>();
 							processes.add(process);
 							processPerProcessor.put(processor, processes);
 						}

@@ -36,6 +36,7 @@ import org.osate.aadl2.AccessType ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.DataAccess ;
+import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
@@ -1054,7 +1055,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                     _cFileContent.addOutput("&") ;
                   }
                   
-                  process(pl) ;
+                  process((ParameterLabel) pl) ;
                 }
                 else if(pce instanceof DataAccess)
                 {
@@ -1099,7 +1100,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   }
                   else // Otherwise, process parameter label as usual.
                   {
-                    process(pl) ;
+                    if(pl.getAadlRef() instanceof DataSubcomponent)
+                    {
+                      DataSubcomponent ds = (DataSubcomponent)pl.getAadlRef();
+                      _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(ds.getQualifiedName()));
+                    }
+                    else
+                      process((ParameterLabel) pl) ;
                   }
                 }
 
@@ -1223,6 +1230,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
 
+      /**
+       * Unparse parameterlabel
+       */
+      public String caseParameterLabel(ValueExpression object)
+      {
+        return DONE;
+      }
+      
       /**
        * Unparse valueexpression
        */
