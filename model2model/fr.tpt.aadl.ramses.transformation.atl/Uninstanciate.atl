@@ -93,17 +93,18 @@ rule System_Instance {
 		type : AADLBA!SystemType (name <- s.systemImplementation.type.name),
 		
 		impl : AADLBA!SystemImplementation (
-			name <- s.systemImplementation.name.debug('system instance'),
-			ownedPropertyAssociation <- s.ownedPropertyAssociation,
-			ownedRealization <- realization,
-			ownedComment <- s.ownedComment,
-			ownedMemorySubcomponent <- impl.getSubcomponentsInstances('memory'),
-			ownedProcessorSubcomponent <- impl.getSubcomponentsInstances('processor'),
+			name                              <- s.systemImplementation.name.debug('system instance'),
+			ownedPropertyAssociation          <- s.ownedPropertyAssociation,
+			ownedRealization                  <- realization,
+			ownedComment                      <- s.ownedComment,
+			ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory'),
+			ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor'),
 			ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
-			ownedProcessSubcomponent <- impl.getSubcomponentsInstances('process'),
-			ownedSubprogramSubcomponent <- impl.getSubcomponentsInstances('subprogram'),
-			ownedDataSubcomponent <- impl.getSubcomponentsInstances('data'),
-			ownedPortConnection				<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,impl))
+			ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
+			ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
+			ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data'),
+			ownedPortConnection				  <- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,impl)),
+			ownedPropertyAssociation          <- s.mapOwnedPropertyAssociationList()
 		),
 		
 		section : AADLBA!PublicPackageSection (
@@ -369,6 +370,41 @@ rule defaultPortConnection_mapping(cnxInst: AADLI!ConnectionInstance)
 	
 }
 
+rule defaultAccessConnection_mapping(cnxInst: AADLI!ConnectionInstance)
+{
+	do
+	{
+		for(cnxRef in cnxInst.connectionReference)
+		{
+			thisModule.getContainingImplementation(cnxRef).ownedAccessConnection->add(
+				thisModule.AccessConnection(
+					cnxRef.connection,
+					thisModule.getContainingImplementation(cnxRef)
+				)
+			);
+		}
+	}
+	
+}
+
+rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
+{
+	using
+	{
+		c : AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
+		impl: AADLBA!ComponentImplementation = c.getImpl();
+	}
+	do
+	{
+		if(c.category=#thread and c.featureInstance->last() = fi)
+		{
+			implImg.ownedParameterConnection <- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co, implImg));
+			implImg.ownedAccessConnection    <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
+		}
+	}
+}
+
 rule defaultThreadDataOrEventDataPortConnection_mapping(cnxInst: AADLI!ConnectionInstance)
 {
 	using
@@ -421,12 +457,28 @@ rule PortConnection_Instance
 		cnxInst: AADLI!ConnectionInstance
 		(
 			cnxInst.kind = #portConnection and
-			cnxInst.source.eContainer().category=#thread
+			(cnxInst.source.eContainer().category=#thread
+			 or cnxInst.destination.eContainer().category=#thread)
 		)
 	do
 	{
 		thisModule.defaultPortConnection_mapping(cnxInst);
 		thisModule.defaultThreadDataOrEventDataPortConnection_mapping(cnxInst);
+	}
+}
+
+rule AccessConnection_Instance
+{
+	from
+		cnxInst: AADLI!ConnectionInstance
+		(
+			(cnxInst.kind = #accessConnection and
+			(cnxInst.source.eContainer().category=#thread
+			 or cnxInst.destination.eContainer().category=#thread))
+		)
+	do
+	{
+		thisModule.defaultAccessConnection_mapping(cnxInst);
 	}
 }
 
@@ -453,7 +505,7 @@ lazy rule createCallSequence
 		)
 }
 
-helper def : CallSequence(impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
+helper def : copyCallSequence(impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
 	if(impl.callSequenceFromImpl() = OclUndefined) then
 		if(impl.callSequenceFromComputeEntryPoint() = OclUndefined) then
 			OclUndefined

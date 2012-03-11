@@ -113,7 +113,8 @@ rule addParameterConnection(implImg: AADLBA!ThreadImplementation, name: String, 
 	)
   do
   {
-  	connectedParam.setContext(ctx);
+  	if(not ctx.oclIsUndefined())
+  		connectedParam.setContext(ctx);
   	implImg.ownedParameterConnection.add(paramConnection);
   }
 }
@@ -122,16 +123,16 @@ rule addSuprogramCallParameterConnection(implImg:AADLBA!ThreadImplementation, pa
 {
 	using
 	{
-		dataSubcomponent: AADLBA!DataSubcomponent = thisModule.addParameterLocalVariable(implImg,  paramConnection.source);
+		dataSubcomponent: AADLBA!DataSubcomponent = thisModule.addParameterLocalVariable(paramConnection.source, implImg);
 	}
 	do
 	{
-		thisModule.addParameterConnection(implImg, 'dest_'+dataSubcomponent.name,
+		thisModule.addParameterConnection(implImg, 'dest_'+paramConnection.destination.connectionEnd.name,
 							paramConnection.destination.getConnFeatureImg(implImg),
 							paramConnection.destination.getConnContextImg(implImg),
 							dataSubcomponent);
 			
-		thisModule.addParameterConnection(implImg, 'src_'+dataSubcomponent.name ,
+		thisModule.addParameterConnection(implImg, 'src_'+paramConnection.source.connectionEnd.name ,
 							paramConnection.source.getConnFeatureImg(implImg),
 							paramConnection.source.getConnContextImg(implImg),
 							dataSubcomponent);
@@ -141,8 +142,8 @@ rule addSuprogramCallParameterConnection(implImg:AADLBA!ThreadImplementation, pa
 unique lazy rule addParameterLocalVariable
 {
 	from
-		implImg: AADLBA!ThreadImplementation,
-		paramConnectionEnd: AADLI!ParameterConnectionEnd
+		paramConnectionEnd: AADLI!ParameterConnectionEnd,
+		implImg: AADLBA!ThreadImplementation
 	to
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(

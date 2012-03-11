@@ -93,10 +93,10 @@ helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(cat
 
 helper context AADLI!ConnectedElement def : getConnContextImg(owner : AADLBA!ComponentImplementation) : AADLBA!Context =
 	if (self.context.oclIsUndefined()) then
-		OclUndefined.debug('1')
+		OclUndefined
 	else
 		if (self.context.oclIsKindOf(AADLI!SubprogramCall).debug('Context is subprogram call')) then
-			owner.ownedSubprogramCallSequence->first().ownedCallSpecification->any(call|call.name.debug('2') = self.context.name.debug('3'))
+			owner.ownedSubprogramCallSequence->first().ownedCallSpecification->any(call|call.name = self.context.name)
 		else
 			-- can return OclUndefined if the subcomponent is not yet mapped
 			owner.getAllSubcomponents()->any(s|s.name = self.context.name)
@@ -104,24 +104,28 @@ helper context AADLI!ConnectedElement def : getConnContextImg(owner : AADLBA!Com
 	endif
 ; 
 
-
 helper context AADLI!ConnectedElement def : getConnFeatureImg(owner : AADLBA!ComponentImplementation) : AADLBA!Feature =
-	if (self.context.oclIsUndefined()) then
-		owner.getType().getOwnedFeatures()->any(f|f.name=self.connectionEnd.name)
-	else 
-		if (self.getConnContextImg(owner).oclIsUndefined()) then
-			-- subcomponent is not yet mapped: feature cannot be resolved yet
-			OclUndefined.debug('XXX')
+	if(not self.connectionEnd.oclIsKindOf(AADLI!Feature)) then
+		owner.ownedSubcomponent->any(f|f.name=self.connectionEnd.name)
+	else
+		if (self.context.oclIsUndefined()) then
+			owner.getType().getOwnedFeatures()->any(f|f.name=self.connectionEnd.name)
 		else 
-			if (self.getConnContextImg(owner).oclIsKindOf(AADLBA!SubprogramCall)) then
-				self.getConnContextImg(owner).calledSubprogram.ownedParameter->any(p|p.name.debug('Param1')=self.connectionEnd.name.debug('Param2'))
-			else
+			if (self.getConnContextImg(owner).oclIsUndefined()) then
+				-- subcomponent is not yet mapped: feature cannot be resolved yet
+				OclUndefined.debug('XXX')
+			else 
 				-- subcomponent is mapped: feature is accessible
-				self.getConnContextImg(owner).getType().getOwnedFeatures()->any(f|f.name=self.connectionEnd.name)
+				if (self.getConnContextImg(owner).oclIsKindOf(AADLBA!SubprogramCall)) then
+					self.getConnContextImg(owner).calledSubprogram.getConnFeatureImg(self)
+				else
+					self.getConnContextImg(owner).getType().getOwnedFeatures()->any(f|f.name=self.connectionEnd.name)
+				endif
 			endif
 		endif
 	endif
 ;
+
 
 helper context AADLI!ComponentImplementation def : callSequenceFromComputeEntryPoint() : AADLI!Subrpogram =
 	if(self.getModalPropertyValue('Compute_Entrypoint') = OclUndefined) then

@@ -170,9 +170,7 @@ unique lazy rule ProcessImplementation {
 		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('thread group'),
 		ownedThreadSubcomponent 		<- impl.getSubcomponentsInstances('thread'),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
-		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
-		-- ownedPortConnection				<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,implImg)),
-		ownedAccessConnection			<- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co))
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
 	)
 }
 
@@ -202,19 +200,10 @@ unique lazy rule ThreadImplementation {
 		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
-		-- ownedPortConnection				<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,implImg)),
-		ownedSubprogramCallSequence     <- thisModule.CallSequence(impl,implImg)--,
-		-- ownedParameterConnection		<- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co,implImg))
+		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(impl,implImg)--,
 	)
--- do
--- {
--- 	if(not (impl.callSequenceFromImpl() = OclUndefined))
--- 	{
--- 		implImg.ownedSubprogramCallSequence.addAll(thisModule.CallSequence(impl,implImg));
--- 	}
--- 	
--- }
 }
+
 unique lazy rule SubprogramImplementation {
  from
     typeImg : AADLBA!SubprogramType,
@@ -224,17 +213,8 @@ unique lazy rule SubprogramImplementation {
  		name <- impl.name,
 		ownedRealization <- thisModule.Realization(typeImg, implImg),
 		ownedPropertyAssociation <- impl.mapOwnedPropertyAssociationList(),
-		ownedSubprogramCallSequence     <- thisModule.CallSequence(impl,implImg)
-		
+		ownedSubprogramCallSequence <- thisModule.copyCallSequence(impl,implImg)
 	)
--- do
--- {
--- 	if(not (impl.callSequenceFromImpl() = OclUndefined))
--- 	{
--- 		implImg.ownedSubprogramCallSequence.addAll(thisModule.CallSequence(impl,implImg));
--- 	}
--- 	
--- }
 }
 
 lazy rule DataImplementation {

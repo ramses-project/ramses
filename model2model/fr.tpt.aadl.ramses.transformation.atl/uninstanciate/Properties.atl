@@ -188,10 +188,22 @@ lazy rule InstanceReferenceValue extends PropertyExpression {
 	from
 		l : AADLI!InstanceReferenceValue
 	to
-		l2 : AADLBA!ReferenceValue (containmentPathElement <- Sequence {path1,path2}),
+		l2 : AADLBA!ReferenceValue(containmentPathElement <- Sequence {}),
 		path1 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.eContainer().getSubcomponentImg()),
 		path2 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.getSubcomponentImg())
-	do { l2; }
+		
+	do { 
+		if(path1.namedElement.oclIsUndefined())
+		{
+			l2.containmentPathElement.add(path2);
+		}
+		else
+		{
+			l2.containmentPathElement.add(path1);
+			l2.containmentPathElement.add(path2);
+		}
+		l2;
+	}
 }
 
 lazy rule IntegerLiteral extends PropertyExpression{	

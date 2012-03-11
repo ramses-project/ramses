@@ -143,30 +143,26 @@ lazy rule Parameter {
 -------------------------------------------------------------------------------------
 --  RULES FOR KINDS OF CONNECTIONS
 -------------------------------------------------------------------------------------
-lazy rule AccessConnection {
-  from
-	co : AADLI!AccessConnection
-  using
-  {
-	ownerImplImg : AADLBA!ComponentImplementation = AADLBA!ComponentImplementation->allInstancesFrom('OUT')->any(i|i.name=co.eContainer().name);
-  }
+rule AccessConnection (co : AADLI!AccessConnection,
+					 ownerImplImg : AADLBA!ComponentImplementation){
   to
     co2 : AADLBA!AccessConnection(
 		name <- co.name,
-		accessCategory <- co.accessCategory,
 		source <- co2source,
-		destination <- co2destination
+		destination <- co2destination,
+		accessCategory <- co.accessCategory
 	),
 	co2source : AADLBA!ConnectedElement(
-		connectionEnd <- co.source.getConnFeatureImg(ownerImplImg),
+		connectionEnd <- co.source.getConnFeatureImg(ownerImplImg).debug('Source Access Connection End'),
 		context <- co.source.getConnContextImg(ownerImplImg)
 	),
 	co2destination : AADLBA!ConnectedElement(
-		connectionEnd <- co.destination.getConnFeatureImg(ownerImplImg),
+		connectionEnd <- co.destination.getConnFeatureImg(ownerImplImg).debug('Destination Access Connection End'),
 		context <- co.destination.getConnContextImg(ownerImplImg)
 	)
 	do { co2; }
 }
+
 
 rule ParameterConnection (co : AADLI!ParameterConnection,
 							   ownerImplImg : AADLBA!ComponentImplementation){

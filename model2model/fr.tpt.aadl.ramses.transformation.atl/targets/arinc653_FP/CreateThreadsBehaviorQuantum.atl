@@ -66,7 +66,7 @@ unique lazy rule ThreadImplementation {
  		name 						<- impl.name,
 		ownedRealization 			<- thisModule.Realization(typeImg, implImg),
 		ownedSubprogramSubcomponent <- impl.getSubcomponentsInstances('subprogram'),
-		ownedSubprogramCallSequence <- Sequence {thisModule.CallSequence(impl,implImg)},
+		ownedSubprogramCallSequence <- Sequence {thisModule.copyCallSequence(impl,implImg)},
 		ownedDataSubcomponent 		<- impl.getSubcomponentsInstances('data')->union(Sequence{fIndex,functions_wcet}),
 		ownedPortConnection			<- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co)),
 		ownedParameterConnection	<- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co)),
