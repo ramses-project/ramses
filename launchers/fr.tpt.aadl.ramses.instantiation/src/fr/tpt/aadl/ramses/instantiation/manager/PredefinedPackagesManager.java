@@ -47,10 +47,12 @@ public class PredefinedPackagesManager
   //        "Scheduler_Runtime"
   //        "Scheduler_FHS"
         } ;
-  private HashMap<String, Resource> resources = new HashMap<String, Resource>() ;
+  private static HashMap<String, Resource> resources = new HashMap<String, Resource>() ;
 
   public PredefinedPackagesManager(File resourceDir)
   {
+    if(resources.isEmpty()==false)
+      return;
     StandAloneInstantiator parser = StandAloneInstantiator.getInstantiator() ;
     File[] subDirs = resourceDir.listFiles() ;
 
