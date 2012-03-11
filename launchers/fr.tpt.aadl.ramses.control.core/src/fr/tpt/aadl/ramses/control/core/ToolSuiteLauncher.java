@@ -38,6 +38,7 @@ import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager ;
 
 public class ToolSuiteLauncher
@@ -45,6 +46,7 @@ public class ToolSuiteLauncher
 
   private ServiceRegistry _registry ;
   private PredefinedPropertiesManager _predefinedPropertiesManager ;
+  private PredefinedPackagesManager _predefinedPackagesManager ;
   private StandAloneInstantiator _instantiator ;
   private List<String> _analysisToPerform ;
 //  private List<String> _transformationToPerform ;
@@ -155,6 +157,7 @@ public class ToolSuiteLauncher
     }
   }
   
+  
   /*
   public Resource launchTransformation(List<File> mainModels,
                                        String systemToInstantiate,
@@ -162,7 +165,7 @@ public class ToolSuiteLauncher
                                        List<File> transformationFileNames,
                                        List<File> postTransformationFileNames,
                                        String transformationDir)
-        throws AnalysisResultException, GenerationException
+        throws Exception
   {
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
     return this.launchModelTransformation(aadlModels, systemToInstantiate,
@@ -178,7 +181,7 @@ public class ToolSuiteLauncher
                                             List<File> transformationFiles,
                                             List<File> postTransformationFiles,
                                             String transformationDir)
-        throws AnalysisResultException, GenerationException
+        throws Exception
   {
     Resource output = null ;
     SystemInstance instance =
@@ -259,5 +262,11 @@ public class ToolSuiteLauncher
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
     this.performAnalysis(instance) ;
+  }
+
+  public void parsePredefinedPackages(File aadlResourcesDir)
+  {
+    _predefinedPackagesManager = new PredefinedPackagesManager(aadlResourcesDir);
+    
   }
 }
