@@ -199,7 +199,7 @@ public class StandAloneInstantiator
     if(!existParsingErrors &&
           ServiceRegistry.PARSE_ERR_REPORTER.getNumErrors() == 0)
     {
-      // Aadl2StandaloneAnnexParserAgent._jobHandler.resolveAllAnnexes() ;
+      Aadl2StandaloneAnnexParserAgent._jobHandler.resolveAllAnnexes() ;
     }
     else
     {
