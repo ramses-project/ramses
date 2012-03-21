@@ -1,33 +1,32 @@
 #include "pingpong.h"
 #include <stdio.h>
 
+#include "pingpong.h"
+#include <stdio.h>
+
 void ping(PingPongMessage replyPong,
 	  PingPongMessage * PingOut, 
 	  Exception * badSequenceNumber,
 	  SEQ * seqNb_in, 
 	  SEQ * seqNb_out) 
 {
-  printf("In ping: received answer = %d, current value = %d\n",replyPong.m_seqNb, *seqNb_in);
+  printf("In ping: current value = %d, received answer = %d\n", *seqNb_in, replyPong.m_seqNb);
   if(replyPong.m_seqNb == *seqNb_in)
     {
       *seqNb_out = (*seqNb_in)+1;
       PingOut->m_type = "Bonjour";
       PingOut->m_sender = Cping;
-      PingOut->m_seqNb = *seqNb_out;
+      PingOut->m_seqNb = *seqNb_out % 5;
+      *badSequenceNumber=0;
       printf("In ping: OK!\n");
     }
   else
     {
-      //*badSequenceNumber=1;
+      *badSequenceNumber=1;
+      *seqNb_out=0;
+      PingOut->m_seqNb=0;
       printf("In ping: NOK!\n");
     }
-}
-
-void noPing(PingPongMessage * PingOut,
-	    Exception * badSequenceNumber, 
-	    SEQ * seqNb)
-{  
-  //printf("In noPing\n");
 }
 
 void pong(PingPongMessage PingIn,
@@ -35,37 +34,8 @@ void pong(PingPongMessage PingIn,
 {
   PongOut->m_type = "Bonsoir";
   PongOut->m_sender = Cpong;
-  PongOut->m_seqNb = 4;//PingIn.m_seqNb;
-  printf("In pong\n");
-}
-
-void storePong(PingPongMessage PongIn, 
-	       PingPongMessage * replyPong)
-{
-  replyPong->m_type = PongIn.m_type;
-  replyPong->m_sender = PongIn.m_sender;
-  replyPong->m_seqNb = PongIn.m_seqNb;
-  printf("In storePong\n");
-}
-
-void noPong(PingPongMessage * PongOut)
-{
-  printf("In noPong\n");
-}
-
-void noPingPong(PingPongMessage * PingOut,
-		PingPongMessage * PongOut, 
-		Exception * badSequenceNumber, 
-		SEQ * seqNb)
-{
-  printf("In noPingPong\n");
-}
-
-void storeError(Exception error_in, 
-		Exception * error_out)
-{
-  //  *error_out=error_in;
-  //  printf("In storeError\n");
+  PongOut->m_seqNb = PingIn.m_seqNb;
+  printf("In pong, returned value = %d\n", PongOut->m_seqNb);
 }
 
 int first = 1;
@@ -78,24 +48,65 @@ void changeState(Exception error_in1,
 {
   if(first==1)
     {
-      first=0;
       *mode_out1 = PING;
       *mode_out2 = PONG;
       *state_in = "Initialization";
     }
   else
     {
-      if(0)//error_in1)
+      *state_in = "Nominal";
+      if(error_in1)
 	{
-	  first=1;
+	  ROLE to_switch = *mode_out2;
+	  *mode_out2 = *mode_out1;
+	  *mode_out1 = to_switch;
+	  *state_in = "Switch";
+	}
+      else if(error_in2)
+	{
 	  ROLE to_switch = *mode_out1;
 	  *mode_out1 = *mode_out2;
 	  *mode_out2 = to_switch;
 	  *state_in = "Switch";
 	}
     }
-
   printf("In changeState: %s\n",*state_in);
+}
+
+void noPing(PingPongMessage * PingOut,
+	    Exception * badSequenceNumber, 
+	    SEQ * seqNb)
+{  
+  //printf("In noPing\n");
+}
+
+void storePong(PingPongMessage PongIn, 
+	       PingPongMessage * replyPong)
+{
+  replyPong->m_type = PongIn.m_type;
+  replyPong->m_sender = PongIn.m_sender;
+  replyPong->m_seqNb = PongIn.m_seqNb;
+  // printf("In storePong, %d\n", PongIn.m_seqNb);
+}
+
+void noPong(PingPongMessage * PongOut)
+{
+  //  printf("In noPong\n");
+}
+
+void noPingPong(PingPongMessage * PingOut,
+		PingPongMessage * PongOut, 
+		Exception * badSequenceNumber, 
+		SEQ * seqNb)
+{
+  //  printf("In noPingPong\n");
+}
+
+void storeError(Exception error_in, 
+		Exception * error_out)
+{
+  //  *error_out=error_in;
+  //  printf("In storeError\n");
 }
 
 /*
@@ -106,6 +117,7 @@ void changeState(Exception error_in1,
 */
 
 int fresh=0;
+ROLE prev=UNCONNECTED;
 void mode(SEQ * seqNb, 
 	  PingPongMessage PingIn,
 	  PingPongMessage * PingOut,
@@ -114,16 +126,15 @@ void mode(SEQ * seqNb,
 	  Exception * badSequenceNumber,
 	  ROLE mode_aadlKeywords)
 {
-  printf("In mode:      %d\n",mode_aadlKeywords);
   PingPong__IPingOrPong_mode_BA_State_t current_state = PingPong__IPingOrPong_mode_switch_state;
   PingPongMessage replyPong;
-  if(first)
+  if(prev!=mode_aadlKeywords)
     {
-      mode_aadlKeywords = *seqNb;
       *seqNb=0;
       first=0;
+      prev=mode_aadlKeywords;
       replyPong.m_seqNb=0;
-      first=0;
+      *badSequenceNumber=0;
     }
   char final = 0;
   while(final != 1)
@@ -134,8 +145,8 @@ void mode(SEQ * seqNb,
 	  if(mode_aadlKeywords == PING)
 	    {
 	      
-	      if(fresh) storePong(PongIn, &replyPong);
-	      ping(replyPong, PingOut, badSequenceNumber, seqNb, seqNb);
+	      storePong(PongIn, &replyPong);
+	      if(fresh==1) ping(replyPong, PingOut, badSequenceNumber, seqNb, seqNb);
 	      noPong(PongOut);
 	      
 	      current_state = PingPong__IPingOrPong_mode_ret_state;

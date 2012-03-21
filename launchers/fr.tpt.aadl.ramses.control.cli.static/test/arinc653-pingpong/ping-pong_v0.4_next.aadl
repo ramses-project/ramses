@@ -45,7 +45,6 @@ end SEQ;
   
   data ROLE
     properties
-      -- TODO: replace string by enum
       Data_Model::Data_Representation => Enum;
       Data_Model::Enumerators => ("PING", "PONG", "UNCONNECTED");
       source_name => "ROLE";
@@ -122,8 +121,8 @@ end SEQ;
       VP_S1_inst: virtual processor VP_S1.impl;
       VP_S2_inst: virtual processor VP_S2.impl;
     properties
-      ARINC653::Module_Major_Frame => 10000 ms;
-      ARINC653::Partition_Slots => (5000 ms, 5000 ms);
+      ARINC653::Module_Major_Frame => 2000 ms;
+      ARINC653::Partition_Slots => (1000 ms, 1000 ms);
       ARINC653::Slots_Allocation => (reference (VP_S1_inst), reference (VP_S2_inst));
   end node_1.impl;
   
@@ -158,16 +157,16 @@ end SEQ;
       Mon_mode_C2: out data port ROLE{ARINC653::Sampling_Refresh_Period => 10 ms;};
       C1_PingOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
       C1_PongOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
-      C1_PingIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
-      C1_PongIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
-      Mon_error_C2: in data port Exception{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PingIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      C1_PongIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      Mon_error_C2: in data port Exception{ARINC653::Sampling_Refresh_Period => 10000 ms;};
   end S1;
   
   process S2
     features
-      C2_mode: in data port ROLE{ARINC653::Sampling_Refresh_Period => 10 ms;};
-      C2_PingIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
-      C2_PongIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C2_mode: in data port ROLE{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      C2_PingIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      C2_PongIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
       C2_PingOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
       C2_PongOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
       C2_badSequenceNumber: out data port Exception{ARINC653::Sampling_Refresh_Period => 10 ms;};
@@ -177,7 +176,6 @@ end SEQ;
     subcomponents
       a1_inst: thread a1.impl;
       state_baKeywords: data TYPE_aadlKeywords;
-      --seqNb: data SEQ;
     connections
       C2_ping_implicit_cnx: port C1_PingIn -> a1_inst.C1_PingIn;
       C2_pong_implicit_cnx: port C1_PongIn -> a1_inst.C1_PongIn;
@@ -215,14 +213,14 @@ end SEQ;
       Dispatch_Protocol => Periodic;
       Source_Stack_Size => 100 KByte;
       Priority => 1;
-      Period => 5000 ms;
+      Period => 2000 ms;
   end a1;
   
   thread implementation a1.impl
     subcomponents
       state_baKeywords: data TYPE_aadlKeywords;
       seqNb: data SEQ {
-        Data_Model::Initial_Value => ("1");
+        Data_Model::Initial_Value => ("0");
         };
     calls
       call_seq : 
@@ -258,13 +256,13 @@ end SEQ;
       Dispatch_Protocol => Periodic;
       Source_Stack_Size => 100 KByte;
       Priority => 2;
-      Period => 5000 ms;
+      Period => 2000 ms;
   end a2;
 
   thread implementation a2.impl
     subcomponents
       seqNb: data SEQ {
-        Data_Model::Initial_Value => ("1");
+        Data_Model::Initial_Value => ("0");
         };
     calls
       call_seq : 
@@ -297,12 +295,10 @@ end SEQ;
       POK::source_location => "../../../pingpong.o";
       source_text => ("../../../pingpong.h");
     annex behavior_specification {**
-    -- TODO: replace string by ENUM
 		variables 
 			replyPong: PingPongMessage;
 		states 
 			switch: initial state;
-    -- TODO: add a final state
 			ret: final state;
 		transitions 
 			switch -[ mode_aadlKeywords = ROLE.enumerators#PING]-> switch
