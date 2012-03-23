@@ -1,0 +1,160 @@
+module ExpandThreadsPorts;
+create OUT : AADLBA								-- Detailed model : org.osate.aadl2/model/addl2.ecore
+from 		IN : AADLI,							-- Simplified model : org.osate.aadl2/model/instance.ecore
+			AADL_RUNTIME: AADLBA,
+			DATA_MODEL: AADLBA,
+			PROGRAMMING_PROPERTIES: AADLBA,
+			HOOKS: ATLHOOKS,						
+			OSEK_RUNTIME: AADLBA;
+
+uses Services;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses Uninstanciate;
+uses PropertiesTools;
+
+unique lazy rule ThreadImplementation {
+ from 
+    c : AADLI!ComponentInstance,
+ 	typeImg : AADLBA!ThreadType,
+ 	impl : AADLI!ThreadImplementation
+ to 
+ 	implImg : AADLBA!ThreadImplementation (
+ 		name <- c.uniqueName().concat('.impl'),
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
+	)
+}
+
+rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
+{
+	using
+	{
+		c : AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
+		impl: AADLBA!ComponentImplementation = c.getImpl();
+	}
+	do
+	{
+		if(c.category=#thread and c.featureInstance->last() = fi)
+		{
+			--implImg.ownedParameterConnection <- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co, implImg));
+			thisModule.OsekThreadCallSequence (c, impl, implImg);
+			thisModule.mapSubprogramParameters(implImg, impl);
+			implImg.ownedAccessConnection    <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
+			thisModule.createThreadBehavior(implImg);
+		}
+	}
+}
+
+rule SubprogramCall (c: AADLI!ComponentInstance,
+					 s : AADLI!SubprogramCall, 
+					 impl : AADLI!ComponentImplementation, 
+					 implImg : AADLBA!ComponentImplementation) {
+	using
+	{
+		constantValue: Sequence(AADLBA!StringLiteral) = OclUndefined;
+		constantValueParameters: Sequence(AADLBA!StringLiteral) = OclUndefined;
+		parameterConstantValue: String = '';
+	}
+	to
+		s2 : AADLBA!SubprogramCall (
+			name <- s.name
+		)
+	do
+	{
+		if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType))
+			s2.calledSubprogram <- thisModule.Type(OclUndefined,s.calledSubprogram);
+		else if(s.calledSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
+			s2.calledSubprogram <- thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented));
+		else if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramAccess))
+			if(s.calledSubprogram.subprogramFeatureClassifier.oclIsKindOf(AADLI!SubprogramType))
+				s2.calledSubprogram <-  thisModule.Type(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier);
+			else if (s.calledSubprogram.subprogramFeatureClassifier.oclIsKindOf(AADLI!SubprogramType))
+				s2.calledSubprogram <-  thisModule.Implementation(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier, thisModule.Type(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier.getOwnedRealization().implemented));
+		
+		if(not s.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').oclIsUndefined()
+				and not s.calledSubprogram.getModalPropertyValue('Constant_Value').oclIsUndefined())
+		{
+			constantValue <- s.calledSubprogram.getModalPropertyValue('Constant_Value').ownedValue;
+			constantValueParameters <- s.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').ownedValue;
+			-- WARNING : We use both s (from input model) and s2 (from output model)
+			-- in this code
+			-- It is ok if: 
+				-- 1) parameter constant values ('Constant_Value') and 
+				-- parameters ('Constant_Value_Parameters') are identified 
+				-- by strings in the property set
+				-- 2) properties are copied from source to target model
+				-- 3) parameters have the same name in the source and target model
+			for(p in s2.calledSubprogram.getSubprogramParameters())
+			{
+				for(constantParamString in constantValueParameters.ownedListElement)
+				{
+					if(constantParamString.value=p.name)
+					{
+						parameterConstantValue <- constantValue.ownedListElement->at(constantValueParameters.ownedListElement->indexOf(constantParamString)).value;
+						thisModule.mapConstantParameter(p, parameterConstantValue, s2, implImg);
+					}
+				}	
+			}
+		} else
+		{
+			if(not s2.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').oclIsUndefined()
+					and not s2.calledSubprogram.getModalPropertyValue('Constant_Value').oclIsUndefined())
+			{
+				constantValue <- s2.calledSubprogram.getModalPropertyValue('Constant_Value').ownedValue;
+				constantValueParameters <- s2.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').ownedValue;
+				for(p in s2.calledSubprogram.getSubprogramParameters())
+				{
+					for(constantParamString in constantValueParameters.ownedListElement)
+					{
+						if(constantParamString.value=p.name)
+						{
+							parameterConstantValue <- constantValue.ownedListElement->at(constantValueParameters.ownedListElement->indexOf(constantParamString)).value;
+							thisModule.mapConstantParameter(p, parameterConstantValue, s2, implImg);
+						}
+					}	
+				}
+			}
+		}
+			
+		
+		s2;
+	}
+}
+
+
+helper context AADLBA!SubprogramType def: getSubprogramParameters() : Sequence(AADLBA!Parameter) = 
+	self.ownedParameter
+;
+
+helper context AADLBA!SubprogramImplementation def: getSubprogramParameters() : Sequence(AADLBA!Parameter) = 
+	self.type.ownedParameter
+;
+
+rule OsekThreadCallSequence (c : AADLI!ComponentInstance, impl : AADLI!ThreadImplementation, implImg : AABDLBA!ThreadImplementation) {
+	using
+	{
+		callImg : AADLBA!SubprogramCall = OclUndefined;
+	}
+	to
+		terminateTaskCall: AADLBA!SubprogramCall
+		(
+			name<-'call_TerminateTask',
+			calledSubprogram<-'TerminateTask'.asSubprogramType('OSEK_RUNTIME')
+		),
+		s2 : AADLBA!SubprogramCallSequence (name <- impl.callSequenceFromImpl().name)
+	do
+	{
+		for(call in impl.callSequenceFromImpl().ownedCallSpecification)
+		{
+			callImg <- thisModule.SubprogramCall(c, call, impl, implImg);
+			s2.getOwnedCallSpecifications().add(callImg);
+			callImg.debug('  Subprogram name [' + call.name + ']');
+		}
+		
+		s2.getOwnedCallSpecifications().add(terminateTaskCall);
+		implImg.ownedSubprogramCallSequence <- s2;
+	}
+}

@@ -129,3 +129,53 @@ rule createThreadBehavior(threadImpl: AADLBA!ThreadImplementation)
 helper context AADLBA!SubprogramCallSequence def : generateSubprogramCallActionSequence(): Sequence(AADLBA!SubprogramCallAction) = 
 			self.ownedCallSpecification->collect(e|thisModule.generateSubprogramCallActionFromCallSpecication(e));
 
+
+lazy rule generateSubprogramCallActionFromCallSpecication
+{
+	from
+		callSpecification : AADLBA!SubprogramCall
+	using
+	{
+		orderedFeatures: Sequence(AADLBA!Feature) = callSpecification.calledSubprogram.getOrderedFeature();
+	}
+	to
+		callAction: AADLBA!SubprogramCallAction
+		(
+			subprogramReference <- thisModule.generateUCCR(callSpecification.calledSubprogram)
+		)
+	do
+	{
+		for(p in orderedFeatures)
+		{
+			-- get connected data subcomponent
+			if(p.oclIsKindOf(AADLBA!Parameter))
+			{
+				if(not callSpecification.getConnectedParamDataSubcomponent(p).oclIsUndefined())
+				{
+					callAction.parameterLabels.add(
+						thisModule.DataSubcomponentAsValueExpression
+						(
+							callSpecification.getConnectedParamDataSubcomponent(p),
+							OclUndefined
+						));
+				}
+				else
+					true.debug('ERROR : could not find data subcomponent connected to '+p.name+' in call '+callSpecification.name);
+			}
+			else if(p.oclIsKindOf(AADLBA!DataAccess))
+			{
+				if(not callSpecification.getConnectedAccessDataSubcomponent(p).oclIsUndefined())
+				{
+					callAction.parameterLabels.add(
+						thisModule.DataSubcomponentAsValueExpression
+						(
+							callSpecification.getConnectedAccessDataSubcomponent(p),
+							OclUndefined
+						));
+				}
+				else
+					true.debug('ERROR : could not find data subcomponent connected to '+p.name+' in call '+callSpecification.name);
+			}
+		}
+	}
+}

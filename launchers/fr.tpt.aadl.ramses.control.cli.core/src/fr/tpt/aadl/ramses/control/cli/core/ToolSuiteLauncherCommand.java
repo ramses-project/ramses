@@ -623,7 +623,7 @@ public class ToolSuiteLauncherCommand
       return potentialFile ;
     }
 
-    throw new Exception("ERROR: file or directory " + filePath +
+    throw new Exception("ERROR: file or directory " + potentialFile.getCanonicalPath() +
           " could not be found") ;
   }
 
@@ -633,11 +633,12 @@ public class ToolSuiteLauncherCommand
   {
     List<File> verifiedPaths = new ArrayList<File>() ;
     boolean error = false ;
+    String errorMessage = "";
 
     for(int i = 0 ; i < filePath.length ; i++)
     {
       File potentialFile = new File(filePath[i]) ;
-
+      
       if(potentialFile.exists())
       {
         verifiedPaths.add(potentialFile) ;
@@ -665,8 +666,7 @@ public class ToolSuiteLauncherCommand
 
       if(pathFound == false)
       {
-        System.err
-              .println("ERROR: file " + filePath[i] + " could not be found") ;
+        errorMessage = "ERROR: file " + new File(filePath[i]).getCanonicalPath() + " could not be found";
         error = true ;
         break ;
       }
@@ -674,7 +674,7 @@ public class ToolSuiteLauncherCommand
 
     if(error == true)
     {
-      throw new Exception() ;
+      throw new Exception(errorMessage);
     }
 
     return verifiedPaths ;

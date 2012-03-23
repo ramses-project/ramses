@@ -28,16 +28,17 @@ import org.osate.aadl2.ProcessImplementation ;
 
 public class ProcessorProperties
 {
-  boolean consoleFound = false ;
+  public boolean consoleFound = false ;
   
-  boolean stdioFound = false ;
+  public boolean stdioFound = false ;
   
-  boolean stdlibFound = false ;
+  public boolean stdlibFound = false ;
   
-  int requiredStackSize = 0 ;
+  public int requiredStackSize = 0 ;
   
-  Map<ProcessImplementation, Long> requiredStackSizePerPartition = 
+  public Map<ProcessImplementation, Long> requiredStackSizePerPartition = 
         new HashMap<ProcessImplementation, Long>();
-  Map<ProcessImplementation, PartitionProperties> partitionProperties = 
+  
+  public Map<ProcessImplementation, PartitionProperties> partitionProperties = 
         new HashMap<ProcessImplementation, PartitionProperties>();
 }

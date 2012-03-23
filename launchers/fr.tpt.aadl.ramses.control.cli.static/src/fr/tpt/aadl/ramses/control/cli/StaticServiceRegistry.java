@@ -22,23 +22,24 @@
 package fr.tpt.aadl.ramses.control.cli ;
 
 
-import java.util.HashMap ;
-import java.util.Map ;
-import java.util.Set ;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import org.osate.annexsupport.AnnexParser ;
-import org.osate.annexsupport.AnnexResolver ;
-import org.osate.annexsupport.AnnexUnparser ;
+import org.osate.annexsupport.AnnexParser;
+import org.osate.annexsupport.AnnexResolver;
+import org.osate.annexsupport.AnnexUnparser;
 
-import fr.tpt.aadl.annex.behavior.AadlBaParserAction ;
-import fr.tpt.aadl.annex.behavior.AadlBaResolver ;
-import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction ;
-import fr.tpt.aadl.launch.WCETAnalysis ;
-import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
-import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction ;
-import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory ;
+import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
+import fr.tpt.aadl.annex.behavior.AadlBaResolver;
+import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
+import fr.tpt.aadl.launch.WCETAnalysis;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
+import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
+import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
+import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory;
 
 public class StaticServiceRegistry implements ServiceRegistry
 {
@@ -66,8 +67,11 @@ public class StaticServiceRegistry implements ServiceRegistry
                    new AadlBaToCUnparserAction()) ;
     _analyzers.put(WCETAnalysis.ANALYZER_NAME, new WCETAnalysis()) ;
     
-    Generator gen = PokGeneratorFactory.createPokGenerator(false) ;
-    _gen.put(gen.getRegistryName(), gen) ;
+    Generator genPok = PokGeneratorFactory.createPokGenerator(false) ;
+    Generator genOsek = OSEKGeneratorFactory.createOSEKGenerator(false);
+    
+    _gen.put(genPok.getRegistryName(), genPok) ;
+    _gen.put(genOsek.getRegistryName(), genOsek) ;
   }
 
   @Override

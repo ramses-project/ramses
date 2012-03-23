@@ -64,6 +64,8 @@ import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.util.generation.FileUtils ;
+import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
 import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
@@ -86,6 +88,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   public final static String BUFFER_AADL_TYPE =
                                           "pok_runtime::Buffer_Id_Type" ;
   
+  private ProcessorProperties _processorProp;
+  
   public void process(ProcessorSubcomponent processor,
                       File generatedFilePath,
                       TargetProperties tarProp) 
@@ -97,7 +101,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     RoutingProperties routing = (RoutingProperties) tarProp ;
     
     // Discard older processor properties !
-    routing.processorProp = processorProp ;
+    _processorProp = processorProp ;
     
     // Generate deployment.h
     UnparseText deploymentHeaderCode = new UnparseText() ;
@@ -117,15 +121,15 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     try
     {
-      saveFile(generatedFilePath, "deployment.h",
+      FileUtils.saveFile(generatedFilePath, "deployment.h",
                deploymentHeaderCode.getParseOutput()) ;
       
-      saveFile(generatedFilePath, "deployment.c",
+      FileUtils.saveFile(generatedFilePath, "deployment.c",
                deploymentImplCode.getParseOutput()) ;
       
-      saveFile(generatedFilePath, "routing.h", routingHeaderCode.getParseOutput()) ;
+      FileUtils.saveFile(generatedFilePath, "routing.h", routingHeaderCode.getParseOutput()) ;
 
-      saveFile(generatedFilePath, "routing.c", routingImplCode.getParseOutput()) ;
+      FileUtils.saveFile(generatedFilePath, "routing.c", routingImplCode.getParseOutput()) ;
     }
     catch(IOException e)
     {
@@ -564,7 +568,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // Generate main.h
     UnparseText mainHeaderCode = new UnparseText() ;
-    genMainHeader(processImpl, mainHeaderCode, routing.processorProp, pp);
+    genMainHeader(processImpl, mainHeaderCode, _processorProp, pp);
     
     // Generate main.c
     UnparseText mainImplCode = new UnparseText() ;
@@ -572,10 +576,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     try
     {
-      saveFile(generatedFilePath, "main.h",
+      FileUtils.saveFile(generatedFilePath, "main.h",
                mainHeaderCode.getParseOutput()) ;
       
-      saveFile(generatedFilePath, "main.c",
+      FileUtils.saveFile(generatedFilePath, "main.c",
                mainImplCode.getParseOutput()) ;
     }
     catch(IOException e)
@@ -1050,22 +1054,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     return pp ;
   }
-
-  private void saveFile(File directory,
-                        String fileName,
-                        String content) throws IOException
-  {
-    BufferedWriter output ;
-    
-    FileWriter file =
-          new FileWriter(directory.getAbsolutePath() + "/" + fileName) ;
-    
-    output = new BufferedWriter(file) ;
-    
-    output.write(content) ;
-    
-    output.close() ;
-  }
+  
   
   private void genDeploymentImpl(ProcessorSubcomponent processor,
                                  UnparseText deploymentImplCode,
@@ -1080,7 +1069,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                                    RoutingProperties routing)
                                                       throws GenerationException
   {
-    ProcessorProperties processorProp = routing.processorProp ;
+    _processorProp = new ProcessorProperties() ;
     
     String guard = GenerationUtilsC.generateHeaderInclusionGuard("deployment.h") ;
 
@@ -1117,7 +1106,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
             // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
             deploymentHeaderCode
                   .addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
-            processorProp.consoleFound = true ;
+            _processorProp.consoleFound = true ;
             break ;
           }
         }
@@ -1126,7 +1115,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           if(s.equalsIgnoreCase("libc_stdio"))
           {
-            processorProp.stdioFound = true ;
+            _processorProp.stdioFound = true ;
             break ;
           }
         }
@@ -1135,7 +1124,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           if(s.equalsIgnoreCase("libc_stdlib"))
           {
-            processorProp.stdlibFound = true ;
+            _processorProp.stdlibFound = true ;
             break ;
           }
         }
@@ -1267,13 +1256,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       ProcessImplementation process =
             (ProcessImplementation) ps.getComponentImplementation() ;
-      if(!processorProp.partitionProperties.containsKey(process))
+      if(!_processorProp.partitionProperties.containsKey(process))
       {
         PartitionProperties pp = new PartitionProperties() ;
-        processorProp.partitionProperties.put(process, pp) ;
+        _processorProp.partitionProperties.put(process, pp) ;
         findCommunicationMechanism(process, pp) ;
       }
-      PartitionProperties pp = processorProp.partitionProperties.get(process) ;
+      PartitionProperties pp = _processorProp.partitionProperties.get(process) ;
       if(pp.hasBlackboard)
       {
         deploymentHeaderCode
@@ -1316,7 +1305,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     for(ProcessSubcomponent ps : bindedProcess)
     {
       PartitionProperties pp =
-            processorProp.partitionProperties.get((ProcessImplementation) ps
+            _processorProp.partitionProperties.get((ProcessImplementation) ps
                   .getComponentImplementation()) ;
       deploymentHeaderCode.addOutput(Integer
             .toString(pp.blackboardInfo.size()
@@ -1457,20 +1446,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         {
           long partitionStack =
                 PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
-          processorProp.requiredStackSize += partitionStack ;
-          processorProp.requiredStackSizePerPartition.put(pi, partitionStack) ;
+          _processorProp.requiredStackSize += partitionStack ;
+          _processorProp.requiredStackSizePerPartition.put(pi, partitionStack) ;
         }
         catch(Exception e)
         {
-          processorProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
-          processorProp.requiredStackSizePerPartition
+          _processorProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
+          _processorProp.requiredStackSizePerPartition
                 .put(pi, DEFAULT_REQUIRED_STACK_SIZE) ;
         }
       }
     }
 
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
-          Long.toString(processorProp.requiredStackSize)) ;
+          Long.toString(_processorProp.requiredStackSize)) ;
     
     // XXX is that right ???
     if(routing.buses.isEmpty())
@@ -1676,7 +1665,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	    if(fi.getDirection().equals(DirectionType.OUT)
 	          || fi.getDirection().equals(DirectionType.IN_OUT))
 	    {
-	      List<FeatureInstance> destinations = AadlToPokCUtils.getFeatureDestinations(fi);
+	      List<FeatureInstance> destinations = RoutingProperties.getFeatureDestinations(fi);
 	      routingImplCode.addOutput("uint8_t ");
 	      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
 	                                "_deployment_destinations["+
@@ -1774,7 +1763,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 			"[POK_CONFIG_NB_PORTS] = {");
 	for(FeatureInstance fi: localPorts)
 	{
-	  int destNb = AadlToPokCUtils.getFeatureDestinations(fi).size();
+	  int destNb = RoutingProperties.getFeatureDestinations(fi).size();
 	  routingImplCode.addOutput(Integer.toString(destNb));
 	  routingImplCode.addOutput(",");
 	}
@@ -1784,7 +1773,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 			"[POK_CONFIG_NB_PORTS] = {");
 	for(FeatureInstance fi: localPorts)
 	{
-	  int destNb = AadlToPokCUtils.getFeatureDestinations(fi).size();
+	  int destNb = RoutingProperties.getFeatureDestinations(fi).size();
 	  if(destNb==0)
 		  routingImplCode.addOutput("NULL");
 	  else

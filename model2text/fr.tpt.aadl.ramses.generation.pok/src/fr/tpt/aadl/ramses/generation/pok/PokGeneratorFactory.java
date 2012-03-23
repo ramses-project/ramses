@@ -36,7 +36,7 @@ public class PokGeneratorFactory
   {
     AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser() ;
     
-    AadlToCUnparser genericCUnparser = new AadlToCUnparser() ;
+    AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
     
     AadlToPokMakefileUnparser pokMakefileUnparser = new AadlToPokMakefileUnparser() ;
     

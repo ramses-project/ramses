@@ -21,6 +21,11 @@
 
 package fr.tpt.aadl.ramses.generation.c ;
 
+import java.io.BufferedWriter ;
+import java.io.File ;
+import java.io.FileWriter ;
+import java.io.IOException ;
+
 public class GenerationUtilsC
 {
   public final static String THREAD_SUFFIX = "_Job" ;
@@ -113,4 +118,5 @@ public class GenerationUtilsC
   {
     return "\n/******************************************************************************/" ;
   }
+                
 }

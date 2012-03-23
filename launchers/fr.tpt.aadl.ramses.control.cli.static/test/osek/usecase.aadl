@@ -1,0 +1,312 @@
+package nxt_use_case
+public
+
+with Data_Model;
+--with OSEK;
+
+----------
+-- Data --
+----------
+
+data Int
+properties
+  Data_Model::Data_Representation => integer;
+end Int;
+
+data Robot_state
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("FORWARD", "BACKWARD", "STOP");
+  Source_name => "Robot_state";
+  Source_Text => ("in_robot.h");
+end Robot_state;
+
+-----------------
+-- Subprograms --
+-----------------
+
+subprogram computePID
+features
+  light : in parameter Int;
+  angle : out parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("in_robot.h");
+  Source_name => "computePID";
+  OSEK::Source_Location => ("in_robot.c");
+end computePID;
+
+subprogram computeSpeed
+features
+  angle       : in parameter Int;
+  speedl      : out parameter Int;
+  speedr      : out parameter Int;
+  s : requires data access Robot_state;
+properties
+  Source_language => (C);
+  Source_text => ("in_robot.h");
+  Source_name => "computeSpeed";
+  OSEK::Source_Location => ("in_robot.c");
+end computeSpeed;
+
+subprogram select_State
+features
+  distance : in parameter Int;
+  s : requires data access Robot_state;
+properties
+  Source_language => (C);
+  Source_text => ("in_robot.h");
+  Source_name => "selectState";
+  OSEK::Source_Location => ("in_robot.c");
+end select_State;
+  
+
+-------------
+-- Threads --
+-------------
+-- En fonction du type de mouvement a realiser, calcule les vitesses a appliquer sur les moteurs
+thread ContrThread
+features
+  s : requires data access Robot_state;
+  getLight: requires subprogram access ecrobotGetLightSensorLib;
+  setSpeedLeft: requires subprogram access nxtMotorSetSpeedLib;
+  setSpeedRight: requires subprogram access nxtMotorSetSpeedLib
+  {
+  Generation_Properties::Constant_Value => ("NXT_PORT_C", "0");
+  Generation_Properties::Constant_Value_Parameters => ("portNb", "brake");
+  };
+end ContrThread;
+
+thread implementation ContrThread.Impl
+calls call1:
+  {
+  cl   : subprogram getLight;
+  cp   : subprogram computePID;
+  cs   : subprogram computeSpeed;
+  ssL  : subprogram setSpeedLeft;
+  ssR  : subprogram setSpeedRight;
+  };
+connections
+  cc0 : parameter cl.light -> cp.light;
+  cc1 : parameter cp.angle -> cs.angle;
+  cc2 : parameter cs.speedL -> ssL.speed;
+  cc3 : parameter cs.speedR -> ssR.speed;
+  cc4 : data access s -> cs.s;
+properties
+  Dispatch_Protocol                  => periodic;
+  Period                             => 100 ms;
+  Compute_Execution_time             => 0 ms .. 50 ms; -- arbitraire... mais a son importance si mecanisme de detection d'overrrun. 
+  Deadline                           => 100 ms;
+  Priority                           => 1;
+  First_Dispatch_Time                => 1ms;
+end ContrThread.Impl;
+
+thread EventThread
+features
+  s        : requires data access Robot_state;
+  getDistance: requires subprogram access ecrobotGetSonarSensorLib;
+end EventThread;
+
+thread implementation EventThread.Impl
+calls call2:
+  {
+  d : subprogram getDistance;
+  se : subprogram select_State;
+  };
+connections
+  ce1 : parameter d.distance -> se.distance;
+  ce2 : data access s -> se.s;
+properties
+  Dispatch_Protocol                  => periodic;
+  Period                             => 50 ms;
+  Compute_Execution_time             => 0 ms .. 25 ms;
+  Deadline                           => 50 ms;
+  Priority                           => 2;
+  First_Dispatch_Time                => 1ms;
+end EventThread.Impl;
+
+---------------
+-- Processes --
+---------------
+
+process Proc
+features
+  getLight: requires subprogram access ecrobotGetLightSensorLib;
+  getDistance: requires subprogram access ecrobotGetSonarSensorLib;
+  setSpeedLeft: requires subprogram access nxtMotorSetSpeedLib;
+  setSpeedRight: requires subprogram access nxtMotorSetSpeedLib;
+end Proc;
+
+process implementation Proc.Impl
+subcomponents
+  C_Th   : thread ContrThread.Impl;
+  E_Th   : thread EventThread.Impl;
+  S      : data Robot_state;
+connections
+  cp1 : data access C_Th.s -> S;
+  cp2 : data access E_Th.s -> S;
+  cp3 : subprogram access getDistance -> E_Th.getDistance;
+  cp4 : subprogram access getLight -> C_Th.getLight;
+  cp5 : subprogram access setSpeedLeft -> C_Th.setSpeedLeft;
+  cp6 : subprogram access setSpeedRight -> C_Th.setSpeedRight;
+end Proc.Impl;
+
+---------------
+-- Processor --
+---------------
+
+processor arm
+end arm;
+
+processor implementation arm.impl
+end arm.impl;
+
+-------------
+-- NXT LIB --
+-------------
+
+-- Devices
+
+-- Light Sensor
+
+subprogram ecrobotGetLightSensorLib
+features
+  portNb: in parameter Int;-- {Generation_Properties::Constant_Value => "NXT_PORT_S2";};
+  light : out parameter Int;-- {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_get_light_sensor";
+  OSEKNXT::nxtport => "NXT_PORT_S2";
+end ecrobotGetLightSensorLib;
+
+subprogram ecrobotSetLightSensorActiveLib
+features
+  portNb: in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_set_light_sensor_active";
+  OSEKNXT::nxtport => "NXT_PORT_S2";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S2");
+  Generation_Properties::Constant_Value_Parameters => ("portNb");
+end ecrobotSetLightSensorActiveLib;
+
+subprogram ecrobotSetLightSensorInactiveLib
+features
+  portNb: in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_set_light_sensor_inactive";
+  OSEKNXT::nxtport => "NXT_PORT_S2";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S2");
+  Generation_Properties::Constant_Value_Parameters => ("portNb");
+end ecrobotSetLightSensorInactiveLib;
+
+device LightSensor
+features
+  getLight: provides subprogram access ecrobotGetLightSensorLib;
+properties
+  Initialize_Entrypoint => classifier (ecrobotSetLightSensorActiveLib);
+  Finalize_Entrypoint => classifier (ecrobotSetLightSensorInactiveLib);      
+end LightSensor;
+
+-- SONAR
+
+device Sonar
+features
+  getDistance: provides subprogram access ecrobotGetSonarSensorLib;
+properties
+  Initialize_Entrypoint => classifier (ecrobotInitSonarSensorLib);
+  Finalize_Entrypoint => classifier (ecrobotTermSonarSensorLib);
+end Sonar;
+
+subprogram ecrobotGetSonarSensorLib
+features
+  portNb: in parameter Int;
+  distance : out parameter Int {Generation_Properties::Return_Parameter => true;};
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_get_sonar_sensor";
+  OSEKNXT::nxtport => "NXT_PORT_S1";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
+  Generation_Properties::Constant_Value_Parameters => ("portNb");
+end ecrobotGetSonarSensorLib;
+
+subprogram ecrobotInitSonarSensorLib
+features
+  portNb: in parameter Int;
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_init_sonar_sensor";
+  OSEKNXT::nxtport => "NXT_PORT_S1";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
+  Generation_Properties::Constant_Value_Parameters => ("portNb");
+end ecrobotInitSonarSensorLib;
+
+subprogram ecrobotTermSonarSensorLib
+features
+  portNb: in parameter Int ; --{Generation_Properties::Constant_Value => "NXT_PORT_S1";}
+properties
+  Source_language => (C);
+  Source_text => ("ecrobot_interface.h");
+  Source_name => "ecrobot_term_sonar_sensor";
+  OSEKNXT::nxtport => "NXT_PORT_S1";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
+  Generation_Properties::Constant_Value_Parameters => ("portNb");
+end ecrobotTermSonarSensorLib;
+
+-- MOTOR
+
+device Motor
+features
+  setSpeed: provides subprogram access nxtMotorSetSpeedLib;
+end Motor;
+
+subprogram nxtMotorSetSpeedLib
+features
+  portNb: in parameter Int; --{Generation_Properties::Constant_Value => "NXT_PORT_A";};
+  speed : in parameter Int;
+  brake : in parameter Int;--{Generation_Properties::Constant_Value => "0";};
+properties
+  Source_language => (C);
+  Source_text => ("nxt_motors.h");
+  Source_name => "nxt_motor_set_speed";
+  OSEKNXT::nxtport => "NXT_PORT_A";
+  Generation_Properties::Constant_Value => ("NXT_PORT_A", "0");
+  Generation_Properties::Constant_Value_Parameters => ("portNb", "brake");
+end nxtMotorSetSpeedLib;
+
+------------
+-- System --
+------------
+
+system nxt
+end nxt;
+
+system implementation nxt.Impl
+subcomponents 
+  nxt_cpu      :  processor arm.impl;
+  PROC     :  process Proc.Impl; 
+  LightSensor: device LightSensor;
+  DistanceSensor: device Sonar;
+  LeftEngine: device Motor;
+  RightEngine: device Motor;
+connections
+  light: subprogram access  PROC.getLight -> LightSensor.getLight;
+  distance: subprogram access PROC.getDistance -> DistanceSensor.getDistance;
+  speedLeft: subprogram access PROC.setSpeedLeft -> LeftEngine.setSpeed; 
+  speedRight: subprogram access PROC.setSpeedRight -> RightEngine.setSpeed;
+properties
+  Actual_Processor_Binding => (reference (nxt_cpu)) applies to PROC;
+  Actual_Processor_Binding => (reference (nxt_cpu)) applies to LightSensor;
+  OSEK::SystemCounter_Source => "it_timer1";
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
+end nxt.Impl;
+
+end nxt_use_case;

@@ -46,7 +46,15 @@ helper context AADLI!ComponentInstance def : getImpl() : AADLI!ComponentImplemen
 	endif
 ;
 
-helper context AADLI!ComponentInstance def : uniqueName() : String =
+helper context AADLI!ComponentInstance def : getTypeOrImpl() : AADLI!ComponentClassifier =
+	if(not self.getImpl().oclIsUndefined()) then
+		self.getImpl()
+	else
+		self.getType()
+	endif
+;
+	
+helper context AADLI!InstanceObject def : uniqueName() : String =
 	if (self.eContainer().oclIsKindOf(AADLI!SystemInstance)) then
 		self.name
 	else
@@ -84,6 +92,10 @@ helper context AADLI!ComponentType def : getImage() : AADLBA!ComponentType =
 
 helper context AADLI!ComponentInstance def : getSubcomponentImg() : AADLBA!Subcomponent =
 	thisModule.resolveTemp(self, 'sub')
+;
+
+helper context AADLI!FeatureInstance def : getFeatureImg() : AADLBA!Subcomponent =
+	thisModule.resolveTemp(self, 'f')
 ;
 
 helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(category : String) : Sequence(AADLI!ComponentInstance) =
@@ -126,6 +138,13 @@ helper context AADLI!ConnectedElement def : getConnFeatureImg(owner : AADLBA!Com
 	endif
 ;
 
+helper context AADLI!Subprogram def : getConnFeatureImg(connectedElt: AADLI!ConnectedElement) : AADLBA!Feature =
+	self.ownedFeature->any(p|p.name.debug('Param1')=connectedElt.connectionEnd.name.debug('Param2'))
+;
+
+helper context AADLI!SubprogramAccess def : getConnFeatureImg(connectedElt: AADLI!ConnectedElement) : AADLBA!Feature =
+	self.subprogramFeatureClassifier.ownedParameter->any(p|p.name.debug('Param1')=connectedElt.connectionEnd.name.debug('Param2'))
+;
 
 helper context AADLI!ComponentImplementation def : callSequenceFromComputeEntryPoint() : AADLI!Subrpogram =
 	if(self.getModalPropertyValue('Compute_Entrypoint') = OclUndefined) then
@@ -164,7 +183,7 @@ helper context AADLI!SubprogramCallSequence def : getAllOutParameters() : Sequen
 ;
 
 
-helper context AADLI!Feature def : mapClassifier() : AADLBA!DataClassifier =
+helper context AADLI!Feature def : mapDataClassifier() : AADLBA!DataClassifier =
 	if (self.dataFeatureClassifier.oclIsKindOf(AADLI!DataImplementation)) then
 		thisModule.Implementation(OclUndefined,self.dataFeatureClassifier, thisModule.Type(OclUndefined,self.dataFeatureClassifier.getType()))
 	else
@@ -172,7 +191,15 @@ helper context AADLI!Feature def : mapClassifier() : AADLBA!DataClassifier =
 	endif
 ;
 
-helper context AADLI!DataClassifier def : mapClassifier() : AADLBA!DataClassifier =
+helper context AADLI!Feature def : mapSubprogramClassifier() : AADLBA!SubprogramClassifier =
+	if (self.subprogramFeatureClassifier.oclIsKindOf(AADLI!SubprogramImplementation)) then
+		thisModule.Implementation(OclUndefined,self.subprogramFeatureClassifier, thisModule.Type(OclUndefined,self.subprogramFeatureClassifier.getType()))
+	else
+		thisModule.Type(OclUndefined,self.subprogramFeatureClassifier)
+	endif
+;
+
+helper context AADLI!DataClassifier def : mapDataClassifier() : AADLBA!DataClassifier =
 	if (self.oclIsKindOf(AADLI!DataImplementation)) then
 		thisModule.Implementation(OclUndefined,self, thisModule.Type(OclUndefined,self.getType()))
 	else

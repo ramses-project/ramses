@@ -21,7 +21,10 @@
 
 package fr.tpt.aadl.ramses.control.support.generator;
 
+import java.io.BufferedWriter ;
 import java.io.File ;
+import java.io.FileWriter ;
+import java.io.IOException ;
 import java.util.Map ;
 
 import org.osate.aadl2.ProcessSubcomponent ;
@@ -44,4 +47,5 @@ public interface AadlTargetUnparser
                                                 throws GenerationException ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
+  
 }

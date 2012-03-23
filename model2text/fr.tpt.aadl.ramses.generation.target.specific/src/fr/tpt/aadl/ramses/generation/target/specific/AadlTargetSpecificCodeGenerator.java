@@ -99,11 +99,7 @@ public class AadlTargetSpecificCodeGenerator
           _targetBuilderGen.process(ps, processorFileDir) ;
           
           File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
-          
-          // XXX Have AadlGenericUnparser to unparse the ProcessorSubcomponent 
-          // object ?
-//          _genericUnparser.process(ps, kernelFileDir) ;
-          
+                    
           _targetUnparser.process(ps, kernelFileDir, tarProp);
           List<ProcessSubcomponent> ownedProcess = 
                                         GeneratorUtils.getBindedProcesses(ps) ;
@@ -116,9 +112,9 @@ public class AadlTargetSpecificCodeGenerator
             processDirectory.mkdir() ;
             
             _genericUnparser.process(process, processDirectory) ;
-            _targetBuilderGen.process(process, processDirectory) ;
             
             _targetUnparser.process(process, processDirectory, tarProp);
+            _targetBuilderGen.process(process, processDirectory) ;
           }
         }
       }

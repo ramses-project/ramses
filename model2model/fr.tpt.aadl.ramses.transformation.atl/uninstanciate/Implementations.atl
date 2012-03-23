@@ -51,7 +51,7 @@ rule Implementation (c : AADLI!ComponentInstance,
 			else if (impl.oclIsKindOf(AADLI!ProcessorImplementation)) { implImg <- thisModule.ProcessorImplementation(typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!VirtualProcessorImplementation)) { implImg <- thisModule.VirtualProcessorImplementation(typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!MemoryImplementation)) { implImg <- thisModule.MemoryImplementation(typeImg,impl); }
-			else if (impl.oclIsKindOf(AADLI!ProcessImplementation)) { implImg <- thisModule.ProcessImplementation(typeImg,impl); }
+			else if (impl.oclIsKindOf(AADLI!ProcessImplementation)) { implImg <- thisModule.ProcessImplementation(c,typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!ThreadGroupImplementation)) { implImg <- thisModule.ThreadGroupImplementation(typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!ThreadImplementation)) { implImg <- thisModule.ThreadImplementation(c,typeImg, impl); }
 			else if (impl.oclIsKindOf(AADLI!SubprogramImplementation)) { implImg <- thisModule.SubprogramImplementation(typeImg,impl); }
@@ -161,11 +161,12 @@ unique lazy rule MemoryImplementation {
 
 unique lazy rule ProcessImplementation {
  from
+ 	c : AADLI!ComponentInstance,
     typeImg : AADLBA!ProcessType,
  	impl : AADLI!ProcessImplementation
  to 
  	implImg : AADLBA!ProcessImplementation (
- 		name 							<- impl.name,
+ 		name 							<- c.uniqueName().concat('.impl'),
 		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
 		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('thread group'),
 		ownedThreadSubcomponent 		<- impl.getSubcomponentsInstances('thread'),
@@ -200,7 +201,7 @@ unique lazy rule ThreadImplementation {
 		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
-		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(impl,implImg)--,
+		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c, impl,implImg)
 	)
 }
 
@@ -210,14 +211,15 @@ unique lazy rule SubprogramImplementation {
  	impl : AADLI!SubprogramImplementation 
  to 
  	implImg : AADLBA!SubprogramImplementation (
- 		name <- impl.name,
-		ownedRealization <- thisModule.Realization(typeImg, implImg),
-		ownedPropertyAssociation <- impl.mapOwnedPropertyAssociationList(),
-		ownedSubprogramCallSequence <- thisModule.copyCallSequence(impl,implImg)
+ 		name                        <- impl.name,
+		ownedRealization            <- thisModule.Realization(typeImg, implImg),
+		ownedPropertyAssociation    <- impl.mapOwnedPropertyAssociationList(),
+		ownedSubprogramCallSequence <- thisModule.copyCallSequence(OclUndefined, impl,implImg),
+		ownedAccessConnection		<- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg))
 	)
 }
 
-lazy rule DataImplementation {
+unique lazy rule DataImplementation {
   from
     typeImg : AADLBA!DataType,
  	impl : AADLI!DataImplementation 
@@ -236,6 +238,6 @@ lazy rule DataSubcomponent {
  to
    sub2 : AADLBA!DataSubcomponent (
    		name <- sub.name,
-		dataSubcomponentType <- sub.dataSubcomponentType.mapClassifier()
+		dataSubcomponentType <- sub.dataSubcomponentType.mapDataClassifier()
    )
 }

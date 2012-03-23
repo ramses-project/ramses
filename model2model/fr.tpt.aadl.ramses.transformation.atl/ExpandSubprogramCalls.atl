@@ -139,6 +139,21 @@ rule addSuprogramCallParameterConnection(implImg:AADLBA!ThreadImplementation, pa
 	}
 }
 
+rule mapSubprogramParameters(implImg: AADLBA!ComponentImplementation, impl: AADLI!ComponentClassifier)
+{
+	do
+	{
+		for(paramConnection in impl.ownedParameterConnection)
+		{
+			if(paramConnection.source.connectionEnd.oclIsKindOf(AADLI!Parameter) and paramConnection.destination.connectionEnd.oclIsKindOf(AADLI!Parameter))
+			{
+				thisModule.addSuprogramCallParameterConnection(implImg, paramConnection);
+			}
+		}
+	}
+}
+
+
 unique lazy rule addParameterLocalVariable
 {
 	from
@@ -152,68 +167,47 @@ unique lazy rule addParameterLocalVariable
 		)
 	do
 	{
-		implImg.ownedDataSubcomponent.add(dataSubcomponent);
+		implImg.ownedDataSubcomponent.add(dataSubcomponent.debug('Added Parameter Local Variable'));
+		
 	}
 }
 
-lazy rule generateSubprogramCallActionFromCallSpecication
+lazy rule mapConstantParameter
 {
 	from
-		callSpecification : AADLBA!SubprogramCall
+		p: AADLBA!Parameter,
+		value : String,
+		call: AADLI!SubprogramCall,
+		implImg : AADLBA!ComponentImplementation
 	using
 	{
-		orderedFeatures: Sequence(AADLBA!Feature) = callSpecification.calledSubprogram.getOrderedFeature();
+		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression(value);
 	}
 	to
-		callAction: AADLBA!SubprogramCallAction
+		dataSubcomponent: AADLBA!DataSubcomponent
 		(
-			subprogramReference <- thisModule.generateUCCR(callSpecification.calledSubprogram)
+			name <- 'constant_'+call.name+'_'+p.name,
+			dataSubcomponentType <- p.dataFeatureClassifier,
+			ownedPropertyAssociation <- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
+		),
+		lv: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{initValuePE}
 		)
+		
 	do
 	{
-		for(p in orderedFeatures)
-		{
-			-- get connected data subcomponent
-			if(p.oclIsKindOf(AADLBA!Parameter))
-			{
-				if(not callSpecification.getConnectedParamDataSubcomponent(p).oclIsUndefined())
-				{
-					callAction.parameterLabels.add(
-						thisModule.DataSubcomponentAsValueExpression
-						(
-							callSpecification.getConnectedParamDataSubcomponent(p),
-							OclUndefined
-						));
-				}
-			}
-			else if(p.oclIsKindOf(AADLBA!DataAccess))
-			{
-				if(not callSpecification.getConnectedAccessDataSubcomponent(p).oclIsUndefined())
-				{
-					callAction.parameterLabels.add(
-						thisModule.DataSubcomponentAsValueExpression
-						(
-							callSpecification.getConnectedAccessDataSubcomponent(p),
-							OclUndefined
-						));
-				}
-			}
-		}
+		implImg.ownedDataSubcomponent.add(dataSubcomponent);
+		
+		thisModule.addParameterConnection(implImg, 'dest_'+dataSubcomponent.name,
+							p,
+							call,
+							dataSubcomponent);
 	}
 }
 
 helper context AADLBA!SubprogramType def: getOrderedFeature() : Sequence(AADLBA!Feauture) =
 	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().orderFeatures(self);
---	if(self.getModalPropertyValue('Ordered_Features').oclIsUndefined())then
---		self.ownedFeature
---	else
---		let orderedFeatureNames : Sequence(String) = thisModule.getStringListValue(self.getModalPropertyValue('Ordered_Features')) in
---		orderedFeatureNames->collect
---		(
---			e|self.ownedFeature->any(f|e.equalsIgnoreCase(f.name))
---		)
---	endif
---;
 
 
 helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String) = 
@@ -247,7 +241,7 @@ helper context AADLBA!SubprogramCall def:getConnectedParamDataSubcomponent(p: AA
 	else 
 		if(not self.eContainer().eContainer().getOwnedParameterConnections()->any
 		( paramCnx |
-			paramCnx.source.getContext() = self and paramCnx.source.connectionEnd = p
+			paramCnx.destination.getContext() = self and paramCnx.destination.connectionEnd = p
 		).oclIsUndefined())
 		then
 			self.eContainer().eContainer().getOwnedParameterConnections()->any
@@ -255,7 +249,7 @@ helper context AADLBA!SubprogramCall def:getConnectedParamDataSubcomponent(p: AA
 				paramCnx.destination.getContext() = self and paramCnx.destination.connectionEnd = p
 			).source.connectionEnd
 		else
-			OclUndefined
+			OclUndefined.debug('ERROR: Could not find Parameter Connection for '+p.name+' in '+self.name)
 		endif
 	endif
 ;
@@ -273,10 +267,10 @@ helper context AADLBA!SubprogramCall def:getConnectedAccessDataSubcomponent(p: A
 	else 
 		if(not self.eContainer().eContainer().getOwnedAccessConnections()->any
 		( accessCnx |
-			accessCnx.source.getContext() = self and accessCnx.source.connectionEnd = p
+			accessCnx.destination.getContext() = self and accessCnx.destination.connectionEnd = p
 		).oclIsUndefined())
 		then
-			self.eContainer().eContainer().getOwnedParameterConnections()->any
+			self.eContainer().eContainer().getOwnedAccessConnections()->any
 			( accessCnx |
 				accessCnx.destination.getContext() = self and accessCnx.destination.connectionEnd = p
 			).source.connectionEnd

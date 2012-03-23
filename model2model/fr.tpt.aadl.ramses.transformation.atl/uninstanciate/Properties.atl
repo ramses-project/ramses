@@ -104,7 +104,7 @@ lazy rule BooleanLiteral extends PropertyExpression {
 	from
 		l : AADLI!BooleanLiteral
 	to
-		l2 : AADLBA!BooleanLiteral (isValue <- l.isValue)
+		l2 : AADLBA!BooleanLiteral (value <- l.value)
 	do { l2; }
 }
 
@@ -112,9 +112,24 @@ lazy rule ClassifierValue extends PropertyExpression {
 	from
 		l : AADLI!ClassifierValue
 	to
-		l2 : AADLBA!ClassifierValue(classifier <- l.classifier)
-	do { l2; }
+		l2 : AADLBA!ClassifierValue(classifier <- l.classifier.getClassifierImg())
+	do 
+	{
+		l2; 
+	}
 }
+
+helper context AADLI!Classifier def: getClassifierImg() : AADLBA!ClassifierValue =
+	if(not self.oclIsKindOf(AADLBA!Subprogram)) then
+		self
+	else
+		if(self.oclIsTypeOf(AADLBA!SubprogramType)) then
+			thisModule.Type(OclUndefined, self)
+		else
+			thisModule.Implementation(OclUndefined, thisModule.SubprogramType(self.type), self)
+		endif
+	endif
+;
 
 --rule ClassifierValue {
 --	from
@@ -211,7 +226,6 @@ lazy rule IntegerLiteral extends PropertyExpression{
 		l : AADLI!IntegerLiteral
 	to
 		l2 : AADLBA!IntegerLiteral (
-			--unit <- thisModule.PropertyExpression(l.unit),
 			unit <- l.unit,
 			value <- l.value,
 			base <- l.base)

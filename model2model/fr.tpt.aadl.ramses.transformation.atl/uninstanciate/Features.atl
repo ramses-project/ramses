@@ -57,7 +57,7 @@ lazy rule DataPort {
 		(
 			name <- f.name.debug('  copy data port'),
 			direction <- f.direction,
-			dataFeatureClassifier <- f.dataFeatureClassifier.mapClassifier(),
+			dataFeatureClassifier <- f.dataFeatureClassifier.mapDataClassifier(),
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
 	do
@@ -75,7 +75,7 @@ lazy rule EventDataPort {
 		(
 			name <- f.name.debug('  copy event data port'),
 			direction <- f.direction,
-			dataFeatureClassifier <- f.mapClassifier(),
+			dataFeatureClassifier <- f.mapDataClassifier(),
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
 	do
@@ -109,7 +109,7 @@ lazy rule DataAccess {
 		f2 : AADLBA!DataAccess
 		(
 			name <- f.name.debug('  copy data access'),
-			dataFeatureClassifier <- f.mapClassifier(),
+			dataFeatureClassifier <- f.mapDataClassifier(),
 			kind <- f.kind,
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
@@ -128,7 +128,7 @@ lazy rule Parameter {
 		(
 			name <- f.name.debug('  copy parameter'),
 			direction <- f.direction,
-			dataFeatureClassifier <- f.mapClassifier(),
+			dataFeatureClassifier <- f.mapDataClassifier(),
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
 	do
@@ -201,3 +201,32 @@ rule PortConnection (co : AADLI!PortConnection,
 	)
 	do { co2; }
 }
+
+rule addDataAccessConnection(implImg: AADLBA!ComponentImplementation, name: String, param: AADLBA!DataAccess, ctx:AADLBA!Context, variable: AADLBA!DataSubcomponent)
+{
+  to
+	connectedParam: AADLBA!ConnectedElement
+	(
+		connectionEnd<-param
+	),
+	connectedSubcomponent: AADLBA!ConnectedElement
+	(
+		connectionEnd<-variable
+	),
+	accessConnection: AADLBA!AccessConnection
+	(
+		name<-name,
+		source<-connectedParam,
+		accessCategory<-#data,
+		destination<-connectedSubcomponent
+	)
+  do
+  {
+  	if(not ctx.oclIsUndefined())
+  	{
+  		connectedParam.setContext(ctx);
+  	}
+  	implImg.ownedAccessConnection.add(accessConnection);
+  }
+}
+

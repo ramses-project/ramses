@@ -235,7 +235,13 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
                                     Element source)
   {
     INode node = NodeModelUtils.findActualNodeFor(source) ;
-    int line = node.getStartLine() ;
+    int line;
+    if(node!=null)
+    	line = node.getStartLine() ;
+    else
+    {
+    	line = source.getLocationReference().getLine();
+    }
     LocationReference lr =
           new LocationReference(source.eResource().getURI().lastSegment(), line) ;
     target.setLocationReference(lr) ;

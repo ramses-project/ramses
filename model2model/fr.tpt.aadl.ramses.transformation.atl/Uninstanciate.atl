@@ -94,11 +94,11 @@ rule System_Instance {
 		
 		impl : AADLBA!SystemImplementation (
 			name                              <- s.systemImplementation.name.debug('system instance'),
-			ownedPropertyAssociation          <- s.ownedPropertyAssociation,
 			ownedRealization                  <- realization,
 			ownedComment                      <- s.ownedComment,
 			ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory'),
 			ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor'),
+			ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device'),
 			ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
 			ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
 			ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
@@ -209,6 +209,7 @@ rule Thread_Instance {
 		)
 	do
 	{
+		
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
 	}
 }
@@ -255,7 +256,7 @@ rule DataPort_Instance
 		(
 			name <- fi.feature.name.debug('  copy data port'),
 			direction <- fi.feature.direction,
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapClassifier(),
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier(),
 			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
 		)
 	do
@@ -290,7 +291,7 @@ rule EventDataPort_Instance
 		(
 			name <- fi.feature.name.debug('  copy event data port instance'),
 			direction <- fi.feature.direction,
-			dataFeatureClassifier <- fi.feature.mapClassifier(),
+			dataFeatureClassifier <- fi.feature.mapDataClassifier(),
 			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
 		)
 	do
@@ -307,13 +308,55 @@ rule DataAccess_Instance
 		f: AADLBA!DataAccess
 		(
 			name <- fi.feature.name.debug('  copy data access'),
-			dataFeatureClassifier <- fi.feature.mapClassifier(),
+			dataFeatureClassifier <- fi.feature.mapDataClassifier(),
 			kind <- fi.feature.kind,
 			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
 		)
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+rule SubprogramAccess_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#subprogramAccess)
+	using
+	{
+			c : AADLI!ComponentInstance = fi.eContainer();
+	}
+	to
+		f: AADLBA!SubprogramAccess
+		(
+			name <- fi.feature.name.debug('  copy subprogram access'),
+			subprogramFeatureClassifier <- fi.feature.mapSubprogramClassifier(),
+			kind <- fi.feature.kind,
+			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		thisModule.addThreadsInternalConnections(fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+
+rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
+{
+	using
+	{
+		c : AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
+		impl: AADLBA!ComponentImplementation = c.getImpl();
+	}
+	do
+	{
+		if(c.category=#thread and c.featureInstance->last() = fi)
+		{
+			implImg.ownedParameterConnection <- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co, implImg));
+			implImg.ownedAccessConnection    <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
+		}
 	}
 }
 
@@ -326,7 +369,7 @@ rule Parameter_Instance
 		(
 			name <- fi.feature.name.debug('  copy parameter'),
 			direction <- fi.feature.direction,
-			dataFeatureClassifier <- fi.feature.mapClassifier(),
+			dataFeatureClassifier <- fi.feature.mapDataClassifier(),
 			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
 		)
 	do
@@ -370,40 +413,7 @@ rule defaultPortConnection_mapping(cnxInst: AADLI!ConnectionInstance)
 	
 }
 
-rule defaultAccessConnection_mapping(cnxInst: AADLI!ConnectionInstance)
-{
-	do
-	{
-		for(cnxRef in cnxInst.connectionReference)
-		{
-			thisModule.getContainingImplementation(cnxRef).ownedAccessConnection->add(
-				thisModule.AccessConnection(
-					cnxRef.connection,
-					thisModule.getContainingImplementation(cnxRef)
-				)
-			);
-		}
-	}
-	
-}
 
-rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
-{
-	using
-	{
-		c : AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
-		impl: AADLBA!ComponentImplementation = c.getImpl();
-	}
-	do
-	{
-		if(c.category=#thread and c.featureInstance->last() = fi)
-		{
-			implImg.ownedParameterConnection <- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co, implImg));
-			implImg.ownedAccessConnection    <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
-		}
-	}
-}
 
 rule defaultThreadDataOrEventDataPortConnection_mapping(cnxInst: AADLI!ConnectionInstance)
 {
@@ -482,6 +492,22 @@ rule AccessConnection_Instance
 	}
 }
 
+rule defaultAccessConnection_mapping(cnxInst: AADLI!ConnectionInstance)
+{
+	do
+	{
+		for(cnxRef in cnxInst.connectionReference)
+		{
+			thisModule.getContainingImplementation(cnxRef).ownedAccessConnection->add(
+				thisModule.AccessConnection(
+					cnxRef.connection,
+					thisModule.getContainingImplementation(cnxRef)
+				)
+			);
+		}
+	}	
+}
+
 helper def : getContainingImplementation(cnx: AADLI!Connection) : AADLBA!ComponentImplementation =
 	if(thisModule.resolveTemp(cnx.context, 'sub').oclIsUndefined()) then
 		thisModule.resolveTemp(cnx.context, 'impl').debug('Retreived System Implementation')
@@ -505,7 +531,7 @@ lazy rule createCallSequence
 		)
 }
 
-helper def : copyCallSequence(impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
+helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
 	if(impl.callSequenceFromImpl() = OclUndefined) then
 		if(impl.callSequenceFromComputeEntryPoint() = OclUndefined) then
 			OclUndefined
@@ -513,7 +539,7 @@ helper def : copyCallSequence(impl : AADLI!ComponentImplementation, implImg : AA
 			thisModule.mapComputeEntrypoint(impl)
 		endif
 	else
-		thisModule.mapCallSequence(impl, implImg)
+		thisModule.mapCallSequence(c, impl, implImg)
 	endif
 ;
 
@@ -540,7 +566,7 @@ lazy rule mapComputeEntrypoint
 	}
 }
 
-rule mapCallSequence (impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) {
+rule mapCallSequence (c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) {
 	using
 	{
 		callImg : AADLBA!SubprogramCall = OclUndefined;
@@ -553,30 +579,32 @@ rule mapCallSequence (impl : AADLI!ComponentImplementation, implImg : AABDLBA!Co
 		
 		for(call in impl.callSequenceFromImpl().ownedCallSpecification)
 		{
-			callImg <- thisModule.SubprogramCall(call,impl, implImg);
+			callImg <- thisModule.SubprogramCall(c, call, impl, implImg);
 			s2.getOwnedCallSpecifications().add(callImg);
 			callImg.debug('  copy subprogram call');
 		}
-		
-		-- ownedSubprogramCallSequence <- Sequence{impl.callSequenceFromImpl().ownedCallSpecification->collect(call | thisModule.SubprogramCall(call) )}
-		
 		s2;
 	}
 }
 	
-rule SubprogramCall (s : AADLI!SubprogramCall, 
+rule SubprogramCall (c: AADLI!ComponentInstance,
+					 s : AADLI!SubprogramCall, 
 					 impl : AADLI!ComponentImplementation, 
 					 implImg : AADLBA!ComponentImplementation) {
 	to
 		s2 : AADLBA!SubprogramCall (
-			name <- s.name,
-			calledSubprogram <- if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType)) then
-									thisModule.Type(OclUndefined,s.calledSubprogram)
-								else
-									thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented))
-								endif
+			name <- s.name
 		)
-	do { s2; }
+	do
+	{
+		if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType))
+			s2.calledSubprogram <- thisModule.Type(OclUndefined,s.calledSubprogram);
+		else if(s.calledSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
+			s2.calledSubprogram <- thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented));
+		else if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramAccess))
+			s2.calledSubprogram <- c.featureInstance->any(f|f.name = s.calledSubprogram.name).getFeatureImg();
+		s2; 
+	}
 }
 
 

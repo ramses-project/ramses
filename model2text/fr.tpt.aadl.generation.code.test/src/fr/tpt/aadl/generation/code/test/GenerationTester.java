@@ -61,7 +61,7 @@ public class GenerationTester
     launcher.parsePredefinedRessources(new File(
           "../../model2model/fr.tpt.aadl.transformation.atl/aadl_resources/")) ;
     List<Resource> parsedFiles = launcher.parse(test) ;
-    AadlToCUnparser generator = new AadlToCUnparser() ;
+    AadlToCUnparser generator = AadlToCUnparser.getAadlToCUnparser() ;
 
     for(Resource r : parsedFiles)
     {

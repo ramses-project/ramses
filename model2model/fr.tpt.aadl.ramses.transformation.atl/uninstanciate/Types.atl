@@ -50,7 +50,7 @@ rule Type (c : AADLI!ComponentInstance,
 		else if (type.oclIsKindOf(AADLI!ProcessorType)) { typeImg <- thisModule.ProcessorType(type); }
 		else if (type.oclIsKindOf(AADLI!VirtualProcessorType)) { typeImg <- thisModule.VirtualProcessorType(type); }
 		else if (type.oclIsKindOf(AADLI!MemoryType)) { typeImg <- thisModule.MemoryType(type); }
-		else if (type.oclIsKindOf(AADLI!ProcessType)) { typeImg <- thisModule.ProcessType(type); }
+		else if (type.oclIsKindOf(AADLI!ProcessType)) { typeImg <- thisModule.ProcessType(c,type); }
 		else if (type.oclIsKindOf(AADLI!ThreadGroupType)) { typeImg <- thisModule.ThreadGroupType(type); }
 		else if (type.oclIsKindOf(AADLI!ThreadType)) { typeImg <- thisModule.ThreadType(c,type); }
 		else if (type.oclIsKindOf(AADLI!SubprogramType)) { typeImg <- thisModule.SubprogramType(type); }
@@ -132,14 +132,16 @@ unique lazy rule MemoryType {
 
 
 unique lazy rule ProcessType {
- from 
+ from
+ 	c : AADLI!ComponentInstance,
  	type : AADLI!ProcessType
  to 
  	typeImg : AADLBA!ProcessType (
  	 name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
-	 ownedEventPort <- type.eventPortsMapping()
+	 ownedEventDataPort <- c.featureInstance->select(e| e.category=#eventDataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
+	 ownedDataPort <- c.featureInstance->select(e| e.category=#dataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
+	 ownedEventPort <- c.featureInstance->select(e| e.category=#eventPort)->collect(f| thisModule.resolveTemp(f, 'f')),
+	 ownedSubprogramAccess <- c.featureInstance->select(e| e.category=#subprogramAccess)->collect(f| thisModule.resolveTemp(f, 'f').debug('Retreive mapped subprogram access'))
 	)
 }
 
@@ -162,15 +164,11 @@ unique lazy rule ThreadType {
  to 
  	typeImg : AADLBA!ThreadType (
  	 name <- c.uniqueName().debug('thread type'),
---	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
---	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
---	 ownedEventPort <- type.eventPortsMapping(),
---	 ownedDataAccess <- type.ownedDataAccess->collect(e|thisModule.DataAccess(e))
-	 
 	 ownedEventDataPort <- c.featureInstance->select(e| e.category=#eventDataPort)->collect(f| thisModule.resolveTemp(f, 'f').debug('Retreive mapped feature')),
 	 ownedDataPort <- c.featureInstance->select(e| e.category=#dataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
 	 ownedEventPort <- c.featureInstance->select(e| e.category=#eventPort)->collect(f| thisModule.resolveTemp(f, 'f')),
-	 ownedDataAccess <- c.featureInstance->select(e| e.category=#dataAccess)->collect(f| thisModule.resolveTemp(f, 'f'))
+	 ownedDataAccess <- c.featureInstance->select(e| e.category=#dataAccess)->collect(f| thisModule.resolveTemp(f, 'f')),
+	 ownedSubprogramAccess <- c.featureInstance->select(e| e.category=#subprogramAccess)->collect(f| thisModule.resolveTemp(f, 'f').debug('Retreive mapped subprogram access'))
  	)
 }
 

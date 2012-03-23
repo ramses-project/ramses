@@ -34,30 +34,6 @@ uses AADLICopyHelpers;
 -------------------------------------------------------------------------------------
 --  RULES FOR SUBPROGRAM CALLS
 -------------------------------------------------------------------------------------
-
-rule CallSequence (impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) {
-	using
-	{
-		callImg : AADLBA!SubprogramCall = OclUndefined;
-	}
-	to
-		s2 : AADLBA!SubprogramCallSequence (name <- impl.callSequenceFromImpl().name)
-	do
-	{
-		impl.callSequenceFromImpl().debug('  copy call sequence');
-		
-		for(call in impl.callSequenceFromImpl().ownedCallSpecification)
-		{
-			callImg <- thisModule.SubprogramCall(call,impl, implImg);
-			s2.getOwnedCallSpecifications().add(callImg);
-			callImg.debug('  copy subprogram call');
-		}
-		
-		-- ownedSubprogramCallSequence <- Sequence{impl.callSequenceFromImpl().ownedCallSpecification->collect(call | thisModule.SubprogramCall(call) )}
-		
-		s2;
-	}
-}
 	
 rule SubprogramCall (s : AADLI!SubprogramCall, 
 					 impl : AADLI!ComponentImplementation, 

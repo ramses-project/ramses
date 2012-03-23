@@ -1,0 +1,7 @@
+property set OSEK is
+  SystemCounter_Source : aadlstring applies to (system);
+  SystemCounter_MaxAllowedValue : aadlinteger applies to (system);
+  SystemCounter_TicksPerBase : aadlinteger applies to (system);
+  SystemCounter_MinCycle : aadlinteger applies to (system);
+  Source_Location : aadlstring applies to (subprogram);
+end OSEK;

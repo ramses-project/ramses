@@ -23,7 +23,6 @@ package fr.tpt.aadl.ramses.instantiation.manager ;
 
 import java.io.File ;
 import java.io.FilenameFilter ;
-import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.Arrays ;
 import java.util.HashMap ;
@@ -33,11 +32,12 @@ import java.util.Map ;
 import org.eclipse.emf.common.util.TreeIterator ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.osate.aadl2.EnumerationLiteral ;
-import org.osate.aadl2.NamedValue ;
+import org.osate.aadl2.BooleanLiteral;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Property ;
 import org.osate.aadl2.PropertySet ;
-import org.osate.aadl2.StringLiteral ;
 
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
@@ -61,6 +61,8 @@ public class PredefinedPropertiesManager
     expectedPropertySet.add("Scheduler_Constants") ;
     expectedPropertySet.add("Generation_Properties") ;
     expectedPropertySet.add("pok_properties") ;
+    expectedPropertySet.add("oseknxt_properties") ; // Added by Arnaud
+    expectedPropertySet.add("osek_properties") ; // Added by Arnaud
   }
 
   public Map<String, Resource> extractStandardPropertySets(File resourceDirectory)
@@ -171,4 +173,33 @@ public class PredefinedPropertiesManager
     return res ;
   }
 
+  public static boolean getDefaultBooleanValue(String PropertySetName,
+          String PropertyName)
+  {
+	  boolean res = false ;
+	  Resource r = predefinedPropertySets.get(PropertySetName) ;
+	  TreeIterator<EObject> it = r.getAllContents() ;
+	  while(it.hasNext())
+	  {
+		  Element elt = (Element) it.next() ;
+		  if(elt instanceof Property)
+		  {
+			  Property p = (Property) elt ;
+
+			  if(p.getName().equalsIgnoreCase(PropertyName))
+			  {
+				  if(p.getDefaultValue() != null &&
+						  p.getDefaultValue() instanceof BooleanLiteral)
+				  {
+					  BooleanLiteral sl = (BooleanLiteral) p.getDefaultValue() ;
+					  return sl.getValue() ;
+				  }
+			  }
+		  }
+	  }
+
+	  return res ;
+  }
+  
+  
 }

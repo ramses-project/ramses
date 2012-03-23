@@ -1003,26 +1003,20 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseSubprogramCallAction(SubprogramCallAction object)
       {
-        if(object.getSubprogramReference() != null)
-        {
-          process(object.getSubprogramReference()) ;
-        }
-        else if(object.isSetSubprogramNames())
+    	Parameter returnParameter = null;
+    	
+        if(object.isSetSubprogramNames())
         {
           processEList(_cFileContent, object.getSubprogramNames(), "_") ;
         }
-        else
-        {
-          return DONE ;
-        }
-
-        if(object.getSubprogramReference() != null)
+        else if(object.getSubprogramReference() != null)
         {
           SubprogramType st = null ;
           SubprogramSubcomponentType sct =
                 (SubprogramSubcomponentType) object.getSubprogramReference()
                       .getAadlRef() ;
 
+          
           if(sct instanceof SubprogramType)
           {
             st = (SubprogramType) sct ;
@@ -1035,10 +1029,40 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
           List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st) ;
 
+          for(ParameterLabel pl : object.getParameterLabels())
+          {
+            ParameterConnectionEnd pce =
+                  (ParameterConnectionEnd) ordereFeatureList.get(object
+                        .getParameterLabels().indexOf(pl)) ;
+
+              if(pce instanceof Parameter)
+              {
+                Parameter p = (Parameter) pce ;
+                boolean isReturnParam=false;
+                try {
+					isReturnParam =
+					        PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
+				} catch (Exception e) {
+					isReturnParam  = PredefinedPropertiesManager
+                    .getDefaultBooleanValue("Generation_Properties",
+                                           "Return_Parameter") ;
+				}
+                if(isReturnParam)
+                {
+                	returnParameter = p;
+                	process(pl);
+                	_cFileContent.addOutput(" = ") ;
+                	break;
+                }
+              }
+          }
+
+          process(object.getSubprogramReference()) ;
+          
           if(st != null)
           {
             _cFileContent.addOutput(" (") ;
-
+            boolean first = true;
             for(ParameterLabel pl : object.getParameterLabels())
             {
               ParameterConnectionEnd pce =
@@ -1048,7 +1072,10 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 if(pce instanceof Parameter)
                 {
                   Parameter p = (Parameter) pce ;
-
+                  if(p==returnParameter)
+                	  continue;
+                  if(first==false)
+                	  _cFileContent.addOutput(", ") ;
                   if(p.getDirection().equals(DirectionType.OUT) ||
                         p.getDirection().equals(DirectionType.IN_OUT))
                   {
@@ -1056,11 +1083,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   }
                   
                   process((ParameterLabel) pl) ;
+                  first=false;
                 }
                 else if(pce instanceof DataAccess)
                 {
                   DataAccess da = (DataAccess) pce ;
-
+                  if(first==false)
+                	  _cFileContent.addOutput(", ") ;
                   if(da.getKind().equals(AccessType.REQUIRED))
                   {
                     String accessRight = null ;
@@ -1077,7 +1106,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                                   .getDefaultStringValue("Memory_Properties",
                                                          "Access_Right") ;
                     }
-
+                    
                     if(accessRight.equalsIgnoreCase("Read_Write"))
                     {
                       _cFileContent.addOutput("&") ;
@@ -1108,13 +1137,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                     else
                       process((ParameterLabel) pl) ;
                   }
+                  first=false;
                 }
 
-                if(object.getParameterLabels().indexOf(pl) != object
-                      .getParameterLabels().size() - 1)
-                {
-                  _cFileContent.addOutput(", ") ;
-                }
               }
 
               _cFileContent.addOutputNewline(");") ;

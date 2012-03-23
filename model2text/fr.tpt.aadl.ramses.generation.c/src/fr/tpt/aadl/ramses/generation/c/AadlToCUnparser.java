@@ -56,6 +56,8 @@ import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
 public class AadlToCUnparser extends AadlProcessingSwitch
                              implements AadlGenericUnparser
 {
+  private static AadlToCUnparser singleton;
+  
   // gtype.c and .h
   protected AadlToCSwitchProcess _gtypesImplCode ;
   protected AadlToCSwitchProcess _gtypesHeaderCode ;
@@ -83,12 +85,18 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   private List<String> _processedTypes  ;
 
   private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
-  
   // Map Data Access with their relative Data Subcomponent. Relations 
   // are defined in the process implementation via connections.
   private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
   
-  public AadlToCUnparser()
+  public static AadlToCUnparser getAadlToCUnparser()
+  {
+    if(singleton==null)
+      singleton = new AadlToCUnparser();
+    return singleton;
+  }
+  
+  private AadlToCUnparser()
   {
     super() ;
     init() ;
@@ -135,7 +143,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     {
       getCTypeDeclarator(ne, false) ;
     }
-
+    
     _gtypesHeaderCode.addOutputNewline("\n#endif\n") ;
     _subprogramHeaderCode.addOutputNewline("\n#endif\n") ;
     _activityHeaderCode.addOutputNewline("\n#endif\n") ;
@@ -288,6 +296,22 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     return false ;
   }
 
+  protected void processDataSubcomponentType(DataSubcomponentType dst,
+		  AadlToCSwitchProcess sourceNameDest, 
+		  AadlToCSwitchProcess sourceTextDest)
+  {
+
+    try
+    {
+      resolveExistingCodeDependencies(dst, sourceNameDest, sourceTextDest) ;
+    }
+    catch(Exception e)
+    {
+      sourceNameDest.addOutput(GenerationUtilsC.getGenerationCIdentifier(dst
+          .getQualifiedName())) ;
+    }
+  }
+  
   protected void getCTypeDeclarator(NamedElement object,
                                     boolean delayComplexTypes)
   {
@@ -800,15 +824,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         unparser.processComments(object) ;
         DataSubcomponentType dst = object.getDataSubcomponentType() ;
 
-        try
-        {
-          resolveExistingCodeDependencies(dst, unparser, _currentHeaderUnparser) ;
-        }
-        catch(Exception e)
-        {
-          unparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(dst
-                .getQualifiedName())) ;
-        }
+        processDataSubcomponentType(dst, unparser, _currentHeaderUnparser);
 
         unparser.addOutput(" ") ;
         unparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object
@@ -831,24 +847,35 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         
         processEList(object.getOwnedThreadSubcomponents()) ;
         
+        _currentImplUnparser = _deploymentImplCode;
+        
+        for(DataSubcomponent ds: object.getOwnedDataSubcomponents())
+        {
+          if(false == _dataAccessMapping.containsValue(ds.getName()))
+          {
+        	  processDataSubcomponentType(ds.getDataSubcomponentType(), _deploymentImplCode, _deploymentHeaderCode);
+        	  _deploymentImplCode.addOutputNewline(" "+ds.getName()+";") ;
+          }
+        }
         // *** Generate deployment.c ***
         if(false == _dataAccessMapping.isEmpty())
         {
-          // XXX performance to be improved.
-          // Removes duplicates.
-          Set<String> dataComponentNames = new HashSet<String>(_dataAccessMapping.
-                                                                      values());
-          
-          StringBuilder sb = new StringBuilder() ;
-
-          for(String name : dataComponentNames)
+          List<String> treatedDeclarations = new ArrayList<String>();
+          for(DataAccess d : _dataAccessMapping.keySet())
           {
-            sb.append("uint8_t ") ;
-            sb.append(name) ;
-            sb.append(';') ;
+        	if(treatedDeclarations.contains(_dataAccessMapping.get(d)))
+        	{
+        		continue;
+        	}
+        	else
+        	{
+        	  DataSubcomponentType dst = d.getDataFeatureClassifier();
+        	  String declarationID = _dataAccessMapping.get(d);
+              processDataSubcomponentType(dst, _deploymentImplCode, _deploymentHeaderCode);
+              _deploymentImplCode.addOutputNewline(" "+declarationID+";") ;
+              treatedDeclarations.add(declarationID);
+        	}
           }
-
-          _deploymentImplCode.addOutputNewline(sb.toString()) ;
         }
 
         return DONE ;
@@ -880,14 +907,33 @@ public class AadlToCUnparser extends AadlProcessingSwitch
              ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA &&
              connect.getAllDestination() instanceof DataSubcomponent)
           {
-            DataSubcomponent destination = (DataSubcomponent) connect.
+
+        	if(connect.getAllDestination() instanceof DataSubcomponent)
+        	{
+        	  DataSubcomponent destination =  (DataSubcomponent) connect.
                                                            getAllDestination() ;
             
-            if(AadlBaUtils.contains(destination.getName(), dataSubcomponentNames))
+              if(AadlBaUtils.contains(destination.getName(), dataSubcomponentNames))
+              {
+                ConnectedElement source = (ConnectedElement) connect.getSource() ;
+                DataAccess da = (DataAccess) source.getConnectionEnd() ;
+                _dataAccessMapping.put(da, destination.getName()) ; 
+              }
+        	}
+            else
             {
-              ConnectedElement source = (ConnectedElement) connect.getSource() ;
-              DataAccess da = (DataAccess) source.getConnectionEnd() ;
-              _dataAccessMapping.put(da, destination.getName()) ;
+              if(connect.getAllSource() instanceof DataSubcomponent)
+              {
+            	DataSubcomponent source =  (DataSubcomponent) connect.
+              			getAllSource() ;
+              	if(AadlBaUtils.contains(source.getName(), dataSubcomponentNames))
+                {
+                  ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
+                  
+                  DataAccess da = (DataAccess) dest.getConnectionEnd() ;
+                  _dataAccessMapping.put(da, source.getName()) ;
+                }
+              }
             }
           }
         }

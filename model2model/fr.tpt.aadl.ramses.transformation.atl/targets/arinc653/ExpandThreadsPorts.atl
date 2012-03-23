@@ -79,7 +79,7 @@ unique lazy rule ThreadImplementation {
 		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
-		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(impl,implImg)
+		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c,impl,implImg)
 	)
 }
 
@@ -728,7 +728,8 @@ rule intra_PortConnection_Instance
 			(name<-cnxInst.destination.name+thisModule.dataSubcomponentSuffix())
 	do
 	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(d, cnxInst);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(d, cnxInst.destination);
+		
 		sourceImplImg <- c_source.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
 		destinationImplImg <- c_destination.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
 		processImplImg <- c_source.eContainer().getSubcomponentImg().subcomponentType.debug('Retreived Process Implementation');
