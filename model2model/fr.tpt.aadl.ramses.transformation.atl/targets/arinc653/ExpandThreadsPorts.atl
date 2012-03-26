@@ -1524,17 +1524,17 @@ rule initSubprogramCallSequence(implImg: AADLBA!ThreadIplementation, impl: AADLI
 {
 	do
 	{
-		if(not thisModule.copyCallSequence(impl,implImg).oclIsUndefined())
+		if(not thisModule.copyCallSequence(OclUndefined, impl,implImg).oclIsUndefined())
  		{
 			if(implImg.callSequence().ownedCallSpecification->isEmpty())
 			{
 				if(impl.ownedSubprogramCallSequence->isEmpty())
 				{
-					implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(thisModule.copyCallSequence(impl,implImg)));
+					implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(thisModule.copyCallSequence(OclUndefined, impl,implImg)));
 				}
 				else
 				{
-					implImg.ownedSubprogramCallSequence.add(thisModule.copyCallSequence(impl,implImg));
+					implImg.ownedSubprogramCallSequence.add(thisModule.copyCallSequence(OclUndefined, impl,implImg));
 				}
  			}
 		}
