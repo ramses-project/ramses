@@ -34,17 +34,17 @@ import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 
 public class AadlToPokCUtils
 {
-  static String getFeatureLocalIdentifier(FeatureInstance fi)
+  public static String getFeatureLocalIdentifier(FeatureInstance fi)
   {
     return GenerationUtilsC.getGenerationCIdentifier(fi.getComponentInstancePath()+"_"+fi.getName());
   }
   
-  static String getFeatureGlobalIdentifier(FeatureInstance fi)
+  public static String getFeatureGlobalIdentifier(FeatureInstance fi)
   {
     return GenerationUtilsC.getGenerationCIdentifier(fi.getComponentInstancePath()+"_"+fi.getName()+"_global");
   }
   
-  static String getComponentInstanceIdentifier(ComponentInstance instance)
+  public static String getComponentInstanceIdentifier(ComponentInstance instance)
   {
     return GenerationUtilsC.getGenerationCIdentifier(instance.getComponentInstancePath());
   }
