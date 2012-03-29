@@ -314,13 +314,29 @@ lazy rule DelayedPortConnection_Destination
 		internalThreadPortTmp   : AADLBA!EventDataPort (
 			name <- fi.getNameOnInternalThreadForCache(),
 			direction <- 'in',
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier(),
+			ownedPropertyAssociation <- Sequence {dequeueProtocol}
 		),
+		
+		dequeueProtocol : AADLBA!PropertyAssociation (
+			property						<- thisModule.getProperty('Dequeue_Protocol'),
+			ownedValue						<- dequeueProtocolMPV
+		),
+		
+		dequeueProtocolMPV : AADLBA!ModalPropertyValue (
+			ownedValue						<- dequeueProtocolNV 
+		),
+		
+		dequeueProtocolNV  : AADLBA!NamedValue (
+			namedValue						<- AADLI!EnumerationLiteral->allInstances()->any(e|e.name='AllItems')
+		),
+		
 		internalThreadPort : AADLBA!EventDataPort (
 			name <- fi.getNameOnInternalThread(),
 			direction <- #out,
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
 		),
+		
 		cacheToInternal : AADLBA!PortConnection (
 			name <- 'update_'.concat(fi.getNameOnInternalThread()),
 			source <- cacheToInternal_source,
