@@ -1,0 +1,499 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+module ExpandDelayedConnections;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									POK_RUNTIME: AADLBA;
+
+
+uses Services;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses Uninstanciate;
+uses PropertiesTools;
+
+-------------------------------------------------------------------------------------------
+----		OVERRIDEN RULES
+-------------------------------------------------------------------------------------------
+helper context AADLI!ConnectionInstance def : isDefaultConnectionInstance() : Boolean =
+	self.kind = #portConnection and (self.source.eContainer().category=#thread
+			 or self.destination.eContainer().category=#thread)
+		and not self.destination.isDelayedPort()
+;
+-------------------------------------------------------------------------------------------
+----		NEW RULES
+-------------------------------------------------------------------------------------------
+helper context AADLI!FeatureInstance def : isDelayedPort() : Boolean =
+	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Timing').oclIsUndefined()) then
+		false
+	else
+		self.ownedPropertyAssociation->any(pa|pa.property.name='Timing')
+					.ownedValue->first().ownedValue.namedValue.name='delayed'
+	endif
+;
+
+helper context AADLBA!Subcomponent def : getDataPorts() : Sequence(AADLBA!DataPort) =
+	self.getComponentType().getOwnedDataPorts()
+;
+
+helper context AADLBA!Subcomponent def : getEventDataPorts() : Sequence(AADLBA!DataPort) =
+	self.getComponentType().getOwnedEventDataPorts()
+;
+helper context AADLBA!Subcomponent def : getPortConnections() : Sequence(AADLBA!PortConnection) =
+	self.getComponentImplementation().getOwnedPortConnections()
+;
+
+helper context AADLI!FeatureInstance def : getNameOnInternalThreadForCache() : String =
+	self.getNameOnInternalThread().concat('_cache')
+;
+
+rule DelayedPortConnection_Instance
+{
+	from
+		cnxInst: AADLI!ConnectionInstance
+		(
+			cnxInst.kind = #portConnection and
+			(cnxInst.source.eContainer().category=#thread
+			 or cnxInst.destination.eContainer().category=#thread)
+			and cnxInst.destination.isDelayedPort()
+		)
+	using
+	{
+		DeadlineThread    : AADLBA!ThreadSubcomponent = OclUndefined;
+		PeriodThread      : AADLBA!ThreadSubcomponent = OclUndefined;
+
+		DeadlineThreadCachePort : AADLBA!DataPort = OclUndefined;
+		PeriodThreadCachePort   : AADLBA!EventDataPort = OclUndefined;
+
+		InternalProcess   : AADLBA!ThreadImplementation = OclUndefined;
+		CacheConnection   : AADLBA!PortConnection = OclUndefined;
+	}
+	do
+	{
+		-- Create scheduler components and connections with the process
+		thisModule.DelayedPortConnection_Source (cnxInst.source);
+		thisModule.DelayedPortConnection_Destination (cnxInst.destination);
+
+		-- Resolve scheduler threads
+		DeadlineThread <- thisModule.InternalThread_Deadline (cnxInst.source.eContainer());
+		PeriodThread <- thisModule.InternalThread_Period (cnxInst.destination.eContainer());
+		
+		-- Create/resolve cache port of scheduler threads
+		DeadlineThreadCachePort <- thisModule.InternalThread_Deadline_SetupCache(DeadlineThread, cnxInst);
+		PeriodThreadCachePort <- PeriodThread.getEventDataPorts()->any(p|p.name = cnxInst.destination.getNameOnInternalThreadForCache());
+		
+		-- Connect cache ports of scheduler threads
+		InternalProcess <- thisModule.InternalProcess (cnxInst.source.eContainer().eContainer());
+		CacheConnection <- thisModule.InternalProcess_CacheConnection (DeadlineThread, PeriodThread, DeadlineThreadCachePort,PeriodThreadCachePort);
+		InternalProcess.getOwnedPortConnections().add(CacheConnection);
+	}
+}
+
+
+
+
+
+
+
+lazy rule DelayedPortConnection_Source
+{
+	from
+		fi : AADLI!FeatureInstance
+	using
+	{
+		processImg : AADLBA!ProcessType = thisModule.resolveTemp(fi.eContainer().eContainer(),'sub').getComponentType();
+		processImplImg : AADLBA!ProcessType = thisModule.resolveTemp(fi.eContainer().eContainer(),'sub').getComponentImplementation();
+
+		process : AADLBA!ProcessSubcomponent = thisModule.resolveTemp(fi.eContainer().eContainer(),'sub');
+		
+		vpInst    : AADLI!ComponentInstance = fi.eContainer().processorBinding();
+		sysImpl   : AADLBA!SystemImplementation = thisModule.resolveTemp(fi.eContainer().getSystemInstance(),'impl');
+
+		processor : AADLBA!ProcessorSubcomponent = thisModule.resolveTemp(vpInst.eContainer(),'sub');
+		vp        : AADLBA!VirtualProcessorSubcomponent = thisModule.resolveTemp(vpInst,'sub');
+		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (fi.eContainer().eContainer());
+		internalThread    : AADLBA!ThreadSubcomponent = thisModule.InternalThread_Deadline (fi.eContainer());
+	}
+	to
+		processPort  : AADLBA!DataPort (
+			name <- fi.nameForProcessPort(),
+			direction <- #out,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		threadToProcess : AADLBA!PortConnection (
+			name <- processPort.name.concat('_update'),
+			source <- threadToProcess_source,
+			destination <- threadToProcess_dest
+		),
+		threadToProcess_source : AADLBA!ConnectedElement (
+			context <- thisModule.resolveTemp(fi.eContainer(), 'sub'), -- thread
+			connectionEnd <- thisModule.resolveTemp(fi, 'f') -- port thread
+		),
+		threadToProcess_dest : AADLBA!ConnectedElement (
+			connectionEnd <- processPort
+		),
+		
+		
+		
+		
+		processorPort : AADLBA!DataPort (
+			name <- vp.name.concat('_').concat(fi.getNameOnInternalThread()),
+			direction <- 'in',
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		vpPort : AADLBA!DataPort (
+			name <- fi.getNameOnInternalThread(),
+			direction <- 'in',
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		internalProcessPort : AADLBA!DataPort (
+			name <- fi.getNameOnInternalThread(),
+			direction <- 'in',
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		internalThreadPort : AADLBA!DataPort (
+			name <- fi.getNameOnInternalThread(),
+			direction <- 'in',
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		processorToVP : AADLBA!PortConnection (
+			name <- 'copy_'.concat(fi.getNameOnInternalThread()),
+			source <- processorToVP_source,
+			destination <- processorToVP_dest
+		),
+		processorToVP_source : AADLBA!ConnectedElement (
+			connectionEnd <- processorPort
+		),
+		processorToVP_dest : AADLBA!ConnectedElement (
+			context <- vp,
+			connectionEnd <- vpPort
+		),	
+		internal_processToThread : AADLBA!PortConnection (
+			name <- 'copy_'.concat(fi.getNameOnInternalThread()),
+			source <- internal_processToThread_source,
+			destination <- internal_processToThread_dest
+		),
+		internal_processToThread_source : AADLBA!ConnectedElement (
+			connectionEnd <- internalProcessPort
+		),
+		internal_processToThread_dest : AADLBA!ConnectedElement (
+			context <- internalThread,
+			connectionEnd <- internalThreadPort
+		),
+		processToProcessor : AADLBA!PortConnection (
+			name <- 'copy_'.concat(fi.getNameOnInternalThread()),
+			source <- processToProcessor_source,
+			destination <- processToProcessor_dest
+		),
+		processToProcessor_source : AADLBA!ConnectedElement (
+			context <- process,
+			connectionEnd <- processPort
+		),
+		processToProcessor_dest : AADLBA!ConnectedElement (
+			context <- processor,
+			connectionEnd <- processorPort
+		)
+		
+	do
+	{
+		processImg.getOwnedDataPorts().add(processPort);
+		processImplImg.getOwnedPortConnections().add(threadToProcess);
+		
+		
+		processor.getComponentType().getOwnedDataPorts().add(processorPort);
+		vp.getComponentType().getOwnedDataPorts().add(vpPort);
+		internalProcess.getComponentType().getOwnedDataPorts().add(internalProcessPort);
+		internalThread.getComponentType().getOwnedDataPorts().add(internalThreadPort);
+		
+		processor.getComponentImplementation().getOwnedPortConnections().add(processorToVP);
+		internalProcess.getOwnedPortConnections().add(internal_processToThread);
+		
+		sysImpl.getOwnedPortConnections().add(processToProcessor);
+		
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(processPort, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(vpPort, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(internalProcessPort, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(internalThreadPort, fi);
+		
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(threadToProcess, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(processorToVP, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(internal_processToThread, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(processToProcessor, fi);
+		
+		processPort;
+	}
+}
+
+
+
+
+lazy rule DelayedPortConnection_Destination
+{
+	from
+		fi : AADLI!FeatureInstance
+	using
+	{
+		processImg : AADLBA!ProcessType = thisModule.resolveTemp(fi.eContainer().eContainer(),'sub').getComponentType();
+		processImplImg : AADLBA!ProcessType = thisModule.resolveTemp(fi.eContainer().eContainer(),'sub').getComponentImplementation();
+
+
+
+		process : AADLBA!ProcessSubcomponent = thisModule.resolveTemp(fi.eContainer().eContainer(),'sub');
+
+		vpInst    : AADLI!ComponentInstance = fi.eContainer().processorBinding();
+		sysImpl   : AADLBA!SystemImplementation = thisModule.resolveTemp(fi.eContainer().getSystemInstance(),'impl');
+
+		processor : AADLBA!ProcessorSubcomponent = thisModule.resolveTemp(vpInst.eContainer(),'sub');
+		vp        : AADLBA!VirtualProcessorSubcomponent = thisModule.resolveTemp(vpInst,'sub');
+		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (fi.eContainer().eContainer());
+		internalThread    : AADLBA!ThreadSubcomponent = thisModule.InternalThread_Period (fi.eContainer());
+	}
+	to
+		processPort  : AADLBA!EventDataPort (
+			name <- fi.nameForProcessPort(),
+			direction <- 'in',
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		processToThread : AADLBA!PortConnection (
+			name <- processPort.name.concat('_update'),
+			source <- processToThread_source,
+			destination <- processToThread_dest
+		),
+		processToThread_source : AADLBA!ConnectedElement (
+			connectionEnd <- processPort
+		),
+		processToThread_dest : AADLBA!ConnectedElement (
+			context <- thisModule.resolveTemp(fi.eContainer(), 'sub'), -- thread
+			connectionEnd <- thisModule.resolveTemp(fi, 'f') -- port thread
+		),
+		
+		
+		
+		
+		
+		processorPort : AADLBA!EventDataPort (
+			name <- vp.name.concat('_').concat(fi.getNameOnInternalThread()),
+			direction <- #out,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		vpPort : AADLBA!EventDataPort (
+			name <- fi.getNameOnInternalThread(),
+			direction <- #out,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		internalProcessPort : AADLBA!EventDataPort (
+			name <- fi.getNameOnInternalThread(),
+			direction <- #out,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		internalThreadPortTmp   : AADLBA!EventDataPort (
+			name <- fi.getNameOnInternalThreadForCache(),
+			direction <- 'in',
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		internalThreadPort : AADLBA!EventDataPort (
+			name <- fi.getNameOnInternalThread(),
+			direction <- #out,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		),
+		cacheToInternal : AADLBA!PortConnection (
+			name <- 'update_'.concat(fi.getNameOnInternalThread()),
+			source <- cacheToInternal_source,
+			destination <- cacheToInternal_destination
+		),
+		cacheToInternal_source : AADLBA!ConnectedElement (
+			connectionEnd <- internalThreadPortTmp
+		),
+		cacheToInternal_destination : AADLBA!ConnectedElement (
+			connectionEnd <- internalThreadPort
+		),
+		vpToProcessor : AADLBA!PortConnection (
+			name <- 'update_'.concat(fi.getNameOnInternalThread()),
+			source <- vpToProcessor_source,
+			destination <- vpToProcessor_dest
+		),
+		vpToProcessor_source : AADLBA!ConnectedElement (
+			context <- vp,
+			connectionEnd <- vpPort
+		),		
+		vpToProcessor_dest : AADLBA!ConnectedElement (
+			connectionEnd <- processorPort
+		),
+		internal_processToThread : AADLBA!PortConnection (
+			name <- 'update_'.concat(fi.getNameOnInternalThread()),
+			source <- internal_processToThread_source,
+			destination <- internal_processToThread_dest
+		),
+		internal_processToThread_source : AADLBA!ConnectedElement (
+			context <- internalThread,
+			connectionEnd <- internalThreadPort
+		),
+		internal_processToThread_dest : AADLBA!ConnectedElement (
+			connectionEnd <- internalProcessPort
+		),
+		processToProcessor : AADLBA!PortConnection (
+			name <- 'update_'.concat(fi.getNameOnInternalThread()),
+			source <- processToProcessor_source,
+			destination <- processToProcessor_dest
+		),
+		processToProcessor_source : AADLBA!ConnectedElement (
+			context <- processor,
+			connectionEnd <- processorPort
+		),
+		processToProcessor_dest : AADLBA!ConnectedElement (
+			context <- process,
+			connectionEnd <- processPort
+		)
+	do
+	{
+		processImg.getOwnedEventDataPorts().add(processPort);
+		processImplImg.getOwnedPortConnections().add(processToThread);
+		
+		
+		processor.getComponentType().getOwnedEventDataPorts().add(processorPort);
+		vp.getComponentType().getOwnedEventDataPorts().add(vpPort);
+		internalProcess.getComponentType().getOwnedEventDataPorts().add(internalProcessPort);
+		
+		internalThread.getComponentType().getOwnedEventDataPorts().add(internalThreadPortTmp);
+		internalThread.getComponentType().getOwnedEventDataPorts().add(internalThreadPort);
+		
+		internalThread.getComponentImplementation().getOwnedPortConnections().add(cacheToInternal);
+		processor.getComponentImplementation().getOwnedPortConnections().add(vpToProcessor);
+		internalProcess.getOwnedPortConnections().add(internal_processToThread);
+		
+		sysImpl.getOwnedPortConnections().add(processToProcessor);
+		
+		
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(processPort, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(vpPort, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(internalProcessPort, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(internalThreadPort, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(internalThreadPortTmp, fi);
+		
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(processToThread, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(cacheToInternal, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(vpToProcessor, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(internal_processToThread, fi);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(processToProcessor, fi);
+		
+		
+		processPort;
+	}
+}
+
+
+rule InternalProcess_CacheConnection (
+	DeadlineThread : AADLBA!ThreadSubcomponent,
+	PeriodThread   : AADLBA!ThreadSubcomponent,
+	DeadlineThreadCachePort : AADLBA!EventDataPort,
+	PeriodThreadCachePort : AADLBA!EventDataPort)
+{
+	to
+		toCache : AADLBA!PortConnection (
+			name <- 'update_'.concat(PeriodThreadCachePort.name),
+			source <- toCache_source,
+			destination <- toCache_dest
+		),
+		toCache_source : AADLBA!ConnectedElement (
+			context <- DeadlineThread,
+			connectionEnd <- DeadlineThreadCachePort
+		),
+		toCache_dest : AADLBA!ConnectedElement (
+			context <- PeriodThread,
+			connectionEnd <- PeriodThreadCachePort
+		)
+	do { toCache; }
+}
+
+
+rule InternalThread_Deadline_InputToCache (
+	DeadlineThreadInputPort : AADLBA!DataPort, DeadlineThreadCachePort : AADLBA!EventDataPort)
+{
+	to
+		toCache : AADLBA!PortConnection (
+			name <- DeadlineThreadInputPort.name.concat('_to_').concat(DeadlineThreadCachePort.name),
+			source <- toCache_source,
+			destination <- toCache_dest
+		),
+		toCache_source : AADLBA!ConnectedElement (
+			connectionEnd <- DeadlineThreadInputPort
+		),
+		toCache_dest : AADLBA!ConnectedElement (
+			connectionEnd <- DeadlineThreadCachePort
+		)
+	do {
+		toCache;
+	}
+}
+
+rule InternalThread_Deadline_SetupCache (DeadlineThread : AADLBA!Subcomponent, 
+										cnxInst : AADLI!ConnectionInstance)
+{
+	using
+	{
+		DeadlineThreadInputPort : AADLBA!DataPort = OclUndefined;
+		DeadlineThreadCachePort : AADLBA!DataPort = OclUndefined;
+		InputToCache            : AADLBA!PortConnection = OclUndefined;
+	}
+	do
+	{
+		-- Resolve input port of deadline thread
+		DeadlineThreadInputPort <- DeadlineThread.getDataPorts()->any(
+						p|p.name = cnxInst.source.getNameOnInternalThread());
+		
+		-- Create or resolve cache port of deadline thread
+		DeadlineThreadCachePort <- thisModule.InternalThread_Deadline_CachePort(cnxInst.destination);
+		if (not DeadlineThread.getEventDataPorts()->contains(DeadlineThreadCachePort))
+		{
+			DeadlineThread.getEventDataPorts().add(DeadlineThreadCachePort);
+		}
+		
+		-- Connect input port to cache port into the deadline thread
+		InputToCache <- thisModule.InternalThread_Deadline_InputToCache(DeadlineThreadInputPort, DeadlineThreadCachePort);
+		DeadlineThread.getPortConnections().add(InputToCache);
+		
+		DeadlineThreadCachePort;
+	}
+}
+
+unique lazy rule InternalThread_Deadline_CachePort
+{
+	from
+		fi : AADLI!FeatureInstance
+	to
+		d : AADLBA!EventDataPort (
+			name <- fi.getNameOnInternalThreadForCache(),
+			direction <- #out,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(d, fi);
+		d;
+	}
+}
