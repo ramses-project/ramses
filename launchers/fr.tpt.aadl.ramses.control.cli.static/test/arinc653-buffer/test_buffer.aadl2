@@ -67,12 +67,18 @@ end myprocess1.impl;
 
 thread mythread1
 features
-   output : out event data port myint {Compute_Deadline => 10ms;};
+   output : out event data port myint 
+   {
+   	Compute_Deadline => 10ms;
+   };
 end mythread1;
 
 thread mythread2
 features
-   input : in event data port myint {Compute_Deadline => 20ms;};
+   input : in event data port myint {
+   	Compute_Deadline => 20ms;
+   	Timing => Delayed;
+   };
 end mythread2;
 
 thread implementation mythread1.impl
@@ -122,8 +128,8 @@ end node;
 system implementation node.impl
 subcomponents
    cpu   : processor ppc.impl;
-   part1 : process myprocess1.impl;
+   p1 : process myprocess1.impl;
 properties
-   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
+   Actual_Processor_Binding => (reference (cpu.part1)) applies to p1;
 end node.impl;
 end test_buffer;
