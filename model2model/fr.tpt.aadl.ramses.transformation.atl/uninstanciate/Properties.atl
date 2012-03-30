@@ -237,8 +237,6 @@ lazy rule RealLiteral extends PropertyExpression {
 		l : AADLI!RealLiteral
 	to
 		l2 : AADLBA!RealLiteral (
-			valueString <- l.valueString,
-			--unit <- thisModule.PropertyExpression(l.unit),
 			unit <- l.unit,
 			value <- l.value)
 	do { l2; }
