@@ -7,7 +7,7 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--parse -m test/test1.aadl2 -d ../../model2model/fr.tpt.aadl.ramses.transformation.atl/"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--parse -m /Users/MacBookpro/Projets/PARSEC/com.ellidiss.coal.1.0.1__ping-pong_v0.9/ping-pong_v0.9_next2.aadl -d ../../model2model/fr.tpt.aadl.ramses.transformation.atl/"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&#10;-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl&#10;-Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
 </launchConfiguration>

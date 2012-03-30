@@ -1,131 +1,146 @@
 --
---                              POK header
+-- AADL-RAMSES
 -- 
---  The following file is a part of the POK project. Any modification should
---  be made according to the POK licence. You CANNOT use this file or a part
---  of a file for your own project.
+-- Copyright ¬© 2012 TELECOM ParisTech and CNRS
 -- 
---  For more information on the POK licence, please see our LICENCE FILE
---
---  Please follow the coding guidelines described in doc/CODING_GUIDELINES
---
---                                      Copyright (c) 2007-2009 POK team
---
---  Created by julien on Thu Jan 15 23:34:13 2009
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
 package test_blackboard
 public
 
-with Data_Model;
-with POK;
+  system root
+  end root;
 
-data myint
-properties
-  Data_Model::Data_Representation => integer;
-end myint;
+  system implementation root.impl
+  subcomponents
+    the_cpu: processor cpu.impl;
+    the_proc: process proc.impl;
+    the_mem: memory mem.impl;
+  properties
+    actual_processor_binding => (reference (the_cpu.the_part)) applies to the_proc;
+    actual_memory_binding => (reference (the_mem)) applies to the_proc;
+  end root.impl;
 
-virtual processor partition
-end partition;
+  processor cpu
+  properties
+    POK::Architecture => x86;
+    POK::BSP => x86_qemu;
+  end cpu;
 
-virtual processor implementation partition.impl
-properties
-  POK::Scheduler => RR;
-  POK::Additional_Features => (libc_stdio, console);
-end partition.impl;
+  processor implementation cpu.impl
+  subcomponents
+    the_part:  virtual processor part.impl;
+  properties
+    POK::Module_Major_Frame => 1000 ms;
+    POK::Scheduler => static;
+    POK::Partition_Slots => (1000 ms);
+    POK::Slots_Allocation => (reference (the_part));
+  end cpu.impl;
 
-processor ppc
-end ppc;
+  virtual processor part
+  properties
+    POK::Additional_Features => (libc_stdio, console);
+  end part;
 
-processor implementation ppc.impl
-subcomponents
-   part1 : virtual processor partition.impl;
-properties
-   POK::Architecture => x86;
-   POK::BSP => x86_qemu;
-   POK::Module_Major_Frame => 1000 ms;
-   POK::Scheduler => static;
-   POK::Partition_Slots => (1000 ms);
-   POK::Slots_Allocation => (reference (part1));
-end ppc.impl;
+  virtual processor implementation part.impl
+  properties
+    POK::Scheduler => RR;
+  end part.impl;
 
-process myprocess1
-end myprocess1;
+  process proc
+  end proc;
 
-process implementation myprocess1.impl
-subcomponents
-   thr1 : thread mythread1.impl;
-   thr2 : thread mythread2.impl;
-connections
-   cnx1: port thr1.output -> thr2.input;
-properties
-   POK::Needed_Memory_Size => 200 kbyte;
-end myprocess1.impl;
+  process implementation proc.impl
+  subcomponents
+    the_sender: thread sender.impl;
+    the_receiver: thread receiver.impl;
+  connections
+    cnx: port the_sender.p -> the_receiver.p;
+  end proc.impl;
 
-thread mythread1
-features
-   output : out data port myint;
-end mythread1;
+  memory mem
+  end mem;
 
-thread mythread2
-features
-   input : in data port myint;
-end mythread2;
+  memory implementation mem.impl
+  properties
+    Byte_Count => 80000;
+  end mem.impl;
 
-thread implementation mythread1.impl
-calls
-   call1 : { pspg : subprogram hello_part1;};
-connections
-   cnx2: parameter pspg.output -> output;
-properties
-   Dispatch_protocol      => Periodic;
-   Period                 => 1000ms;
-   Deadline               => 900ms;
-   Compute_Execution_Time => 300 ms .. 400 ms;
-end mythread1.impl;
+  thread sender
+  features
+    p: out data port Integer;
+  properties
+    Dispatch_Protocol => Periodic;
+    Compute_Execution_Time => 0 ms .. 1 ms;
+    Period => 1000 Ms;
+    Source_Data_Size => 40000 bytes;
+    Source_Stack_Size => 40000 bytes;
+    Source_Code_Size => 40 bytes;
+  end sender;
 
-thread implementation mythread2.impl
-calls
-   call1 : { pspg : subprogram hello_part2;};
-connections
-   cnx3: parameter input -> pspg.input;
-properties
-   Dispatch_protocol      => Periodic;
-   Period                 => 500ms;
-   Deadline               => 450ms;
-   Compute_Execution_Time => 200 ms .. 300 ms;
-end mythread2.impl;
+  thread implementation sender.impl
+  calls
+    call : { c : subprogram sender_spg;};
+  connections
+    cnx: parameter c.result -> p;
+  end sender.impl;
 
-subprogram hello_part1
-features
-   output : out parameter myint;
-properties
-   source_name => "user_send";
-   Source_Text => ("../../../send.h");
-   source_language => (C);
-   POK::Source_Location => "../../../send.o";
-end hello_part1;
+  subprogram sender_spg
+  features
+    result : out parameter Integer;
+  properties
+    source_name => "send";
+    source_language => (C);
+    source_text => ("../../../user_code.h");
+    POK::source_location => "../../../user_code.o";
+  end sender_spg;
 
-subprogram hello_part2
-features
-   input : in parameter myint;
-properties
-   POK::Source_Location => "../../../receive.o";
-   source_language => (C);
-   source_name => "user_receive";
-   Source_Text => ("../../../receive.h");
-end hello_part2;
+  thread receiver
+  features
+    p: in data port Integer;
+  properties
+    Dispatch_Protocol => Periodic;
+    Compute_Execution_Time => 0 ms .. 1 ms;
+    Period => 200 Ms;
+    Source_Data_Size => 40000 bytes;
+    Source_Stack_Size => 40000 bytes;
+    Source_Code_Size => 40 bytes;
+  end receiver;
 
+  thread implementation receiver.impl
+  calls
+    call : { c : subprogram receiver_spg;};
+  connections
+    cnx: parameter p -> c.input;
+  end receiver.impl;
 
-system node
-end node;
+  subprogram receiver_spg
+  features
+    input : in parameter Integer;
+  properties
+    source_name => "receive";
+    source_language => (C);
+    source_text => ("../../../user_code.h");
+    POK::source_location => "../../../user_code.o";
+  end receiver_spg;
 
-system implementation node.impl
-subcomponents
-   cpu   : processor ppc.impl;
-   part1 : process myprocess1.impl;
-properties
-   Actual_Processor_Binding => (reference (cpu.part1)) applies to part1;
-end node.impl;
+  data Integer
+  properties
+    Data_Model::Data_Representation => integer;
+  end Integer;
+
 end test_blackboard;
-

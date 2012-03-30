@@ -1,234 +1,158 @@
 --
---                              POK header
+-- AADL-RAMSES
 -- 
---  The following file is a part of the POK project. Any modification should
---  be made according to the POK licence. You CANNOT use this file or a part
---  of a file for your own project.
+-- Copyright ¬© 2012 TELECOM ParisTech and CNRS
 -- 
---  For more information on the POK licence, please see our LICENCE FILE
---
---  Please follow the coding guidelines described in doc/CODING_GUIDELINES
---
---                                      Copyright (c) 2007-2009 POK team
---
---  Created by julien on Thu Jan 15 23:34:13 2009
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
-
-package queuing
-
+package test_queuing
 public
 
-with Data_Model;
-with POK;
-with ARINC653;
+  system root
+  end root;
 
+  system implementation root.impl
+  subcomponents
+    the_cpu: processor cpu.impl;
+    the_proc1: process proc1.impl;
+    the_proc2: process proc2.impl;
+  connections
+    cnx: port the_proc1.p -> the_proc2.p;
+  properties
+    actual_processor_binding => (reference (the_cpu.the_part1)) applies to the_proc1;
+    actual_processor_binding => (reference (the_cpu.the_part2)) applies to the_proc2;
+  end root.impl;
 
-data integer
-properties
-  Data_Model::Data_Representation => integer;
-end integer;
+  processor cpu
+  properties
+    POK::Architecture => x86;
+    POK::BSP => x86_qemu;
+  end cpu;
 
-virtual bus secure_bus
-properties
-   Required_Connection_Quality_Of_Service => (SecureDelivery);
-end secure_bus;
+  processor implementation cpu.impl
+  subcomponents
+    the_part1:  virtual processor part.impl;
+    the_part2:  virtual processor part.impl;
+  properties
+    POK::Module_Major_Frame => 1000 ms;
+    POK::Scheduler => static;
+    POK::Partition_Slots => (500 ms, 500 ms);
+    POK::Slots_Allocation => (reference (the_part1), reference (the_part2));
+  end cpu.impl;
 
-virtual bus medium_bus
-properties
-   Required_Connection_Quality_Of_Service => (SecureDelivery);
-end medium_bus;
+  virtual processor part
+  properties
+    POK::Additional_Features => (libc_stdio, console);
+  end part;
 
+  virtual processor implementation part.impl
+  properties
+    POK::Scheduler => RR;
+  end part.impl;
 
-virtual bus common_bus
-properties
-   Required_Connection_Quality_Of_Service => (SecureDelivery);
-end common_bus;
+  process proc1
+  features
+    p: out event data port Integer;
+  properties
+    POK::Needed_Memory_Size => 200 kbyte;
+  end proc1;
 
-virtual processor partition
-properties
-   ARINC653::HM_Errors => (Partition_Init);
-   ARINC653::HM_Actions => (Partition_Restart);
-   POK::Additional_Features => (libc_stdio, console);
-end partition;
+  process implementation proc1.impl
+  subcomponents
+    the_sender: thread sender.impl;
+  connections
+    cnx: port the_sender.p -> p;
+  end proc1.impl;
 
-virtual processor implementation partition.secure
-properties
-   Provided_Virtual_Bus_Class =>
-               (classifier (queuing::secure_bus));
-   POK::Criticality => 10;
-   POK::Scheduler => RR;
-end partition.secure;
+  process proc2
+  features
+    p: in event data port Integer;
+  properties
+    POK::Needed_Memory_Size => 200 kbyte;
+  end proc2;
 
-subprogram hello_part1
-features
-   output : out parameter integer;
-properties
-   source_name => "user_send";
-   source_language => (C);
-   source_text => ("../../../send.h");
-   POK::source_location => "../../../send.o";
-end hello_part1;
+  process implementation proc2.impl
+  subcomponents
+    the_receiver: thread receiver.impl;
+  connections
+    cnx: port p -> the_receiver.p;
+  end proc2.impl;
 
-subprogram hello_part2
-features
-   input : in parameter integer;
-properties
-  POK::source_location => "../../../receive.o";
-   source_text => ("../../../receive.h");
-   source_language => (C);
-   source_name => "user_receive";
-end hello_part2;
+  thread sender
+  features
+    p: out event data port Integer;
+  properties
+    Dispatch_Protocol => Periodic;
+    Compute_Execution_Time => 0 ms .. 1 ms;
+    Period => 1000 Ms;
+    Source_Data_Size => 40000 bytes;
+    Source_Stack_Size => 40000 bytes;
+    Source_Code_Size => 40 bytes;
+  end sender;
 
-virtual processor implementation partition.common
-properties
-   Provided_Virtual_Bus_Class =>
-               (classifier (queuing::common_bus));
-   POK::Criticality => 1;
-   POK::Scheduler => RR;
-end partition.common;
+  thread implementation sender.impl
+  calls
+    call : { c : subprogram sender_spg;};
+  connections
+    cnx: parameter c.result -> p;
+  end sender.impl;
 
-processor ppc
-properties
-   POK::Architecture => x86;
-   POK::BSP => x86_qemu;
-end ppc;
+  subprogram sender_spg
+  features
+    result : out parameter Integer;
+  properties
+    source_name => "send";
+    source_language => (C);
+    source_text => ("../../../user_send.h");
+    POK::source_location => "../../../user_send.o";
+  end sender_spg;
 
-processor implementation ppc.impl
-subcomponents
-   partition_secure : virtual processor partition.secure;
-   partition_common : virtual processor partition.common;
-properties
-   ARINC653::Module_Major_Frame => 1000ms;
-   ARINC653::Partition_Slots => (1000ms, 1000ms);
-   ARINC653::Slots_Allocation => ( reference (partition_secure), reference (partition_common));
-end ppc.impl;
+  thread receiver
+  features
+    p: in event data port Integer;
+  properties
+    Dispatch_Protocol => Periodic;
+    Compute_Execution_Time => 0 ms .. 1 ms;
+    Period => 200 Ms;
+    Source_Data_Size => 40000 bytes;
+    Source_Stack_Size => 40000 bytes;
+    Source_Code_Size => 40 bytes;
+  end receiver;
 
-thread receive_ping
-features
-   tdatain : in event data port integer
-                     {ARINC653::Timeout => 10 ms;};
-properties
-   Dispatch_Protocol => Periodic;
-   Compute_Execution_Time => 0 ms .. 1 ms;
-   Period => 1000 Ms;
-   ARINC653::HM_Errors => (Numeric_Error);
-   ARINC653::HM_Actions => (Partition_Restart);
-   Source_Data_Size => 400000 bytes;
-   Source_Stack_Size => 400000 bytes;
-   Source_Code_Size => 40 bytes;
-end receive_ping;
+  thread implementation receiver.impl
+  calls
+    call : { c : subprogram receiver_spg;};
+  connections
+    cnx: parameter p -> c.input;
+  end receiver.impl;
 
-thread send_ping
-features
-   tdataout : out event data port integer
-                     {ARINC653::Timeout => 10 ms;};
-properties
-   Dispatch_Protocol => Periodic;
-   Period => 1000 Ms;
-   Source_Data_Size => 40 bytes;
-   Source_Stack_Size => 40 bytes;
-   Source_Code_Size => 40 bytes;
-   Compute_Execution_Time => 0 ms .. 1 ms;
-   ARINC653::HM_Errors => (Numeric_Error);
-   ARINC653::HM_Actions => (Partition_Restart);
-end send_ping;
+  subprogram receiver_spg
+  features
+    input : in parameter Integer;
+  properties
+    source_name => "receive";
+    source_language => (C);
+    source_text => ("../../../user_receive.h");
+    POK::source_location => "../../../user_receive.o";
+  end receiver_spg;
 
-thread implementation send_ping.impl
-calls
-   call1 : { pspg : subprogram hello_part1;};
-connections
-   cnx: parameter pspg.output -> tdataout;
-end send_ping.impl;
+  data Integer
+  properties
+    Data_Model::Data_Representation => integer;
+  end Integer;
 
-thread implementation receive_ping.impl
-calls
-   call1 : { pspg : subprogram hello_part2;};
-connections
-   cnx: parameter tdatain -> pspg.input;
-end receive_ping.impl;
-
-process receive_ping_process
-features
-   pdatain : in event data port integer 
-      {Allowed_Connection_Binding_Class => (classifier (queuing::medium_bus));
-       Queue_Size => 2;
-       Queue_Processing_Protocol => Fifo;
-      };
-properties
-   Source_Code_Size => 10 KByte;
-   Source_Data_Size => 15 KByte;
-end receive_ping_process;
-
-process send_ping_process
-features
-   pdataout : out event data port integer
-      {Overflow_Handling_Protocol => DropOldest;
-         Allowed_Connection_Binding_Class => (classifier (queuing::secure_bus));
-       Queue_Size => 2;
-       ARINC653::Timeout => 10 ms;
-       Queue_Processing_Protocol => Fifo;
-       };
-end send_ping_process;
-
-process implementation receive_ping_process.impl
-subcomponents
-   thr : thread receive_ping.impl;
-connections
-   cnx: port pdatain -> thr.tdatain;
-end receive_ping_process.impl;
-
-process implementation send_ping_process.impl
-subcomponents
-   thr : thread send_ping.impl;
-connections
-   cnx: port thr.tdataout -> pdataout;
-end send_ping_process.impl;
-
-system node
-end node;
-
-memory partitionmemory
-properties
-   Byte_Count => 80000;
-   ARINC653::Memory_Kind => memory_code;
-   ARINC653::Access_Type => read;
-end partitionmemory;
-
-memory mainmemory
-end mainmemory;
-
-memory implementation mainmemory.impl
-subcomponents
-   part1: memory partitionmemory
-               {ARINC653::Memory_Kind => memory_code;
-                ARINC653::Access_Type => read;};
-   part2: memory partitionmemory
-               {ARINC653::Memory_Kind => memory_data;
-               ARINC653::Access_Type => write;};
-end mainmemory.impl;
-
-
-
-system implementation node.impl
-subcomponents
-   cpu : processor ppc.impl;
-   pr1 : process send_ping_process.impl;
-   pr2 : process receive_ping_process.impl;
-   mem : memory mainmemory.impl;
-connections
-   cnx: port pr1.pdataout -> pr2.pdatain
-      {Allowed_Connection_Binding_Class => (classifier (queuing::secure_bus));};
-properties
-   actual_processor_binding =>
-      (reference (cpu.partition_secure)) applies to pr2;
-   actual_processor_binding =>
-      (reference (cpu.partition_common)) applies to pr1;
-   actual_memory_binding =>
-      (reference (mem.part1)) applies to pr1;
-   actual_memory_binding =>
-      (reference (mem.part2)) applies to pr2;
-end node.impl;
-
-end queuing;
-
+end test_queuing;
