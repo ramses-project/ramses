@@ -256,6 +256,7 @@ public class AtlTransfoLauncher
     options.put("allowInterModelReferences", "true") ;
     URL libraryFile ;
     List<String> fileName = new ArrayList<String>() ;
+    fileName.add("/helpers/IOHelpers") ;
     fileName.add("/helpers/AADLCopyHelpers") ;
     fileName.add("/helpers/AADLICopyHelpers") ;
     fileName.add("/tools/PropertiesTools") ;
