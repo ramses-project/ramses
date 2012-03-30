@@ -1,0 +1,88 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+library IOHelpers;
+
+helper context AADLBA!ThreadType def : getMinExecutionTime() : AADLBA!RealLiteral =
+	self.ownedPropertyAssociation
+		->any(pa|pa.property.name='Compute_Execution_Time').ownedValue
+		->first().ownedValue.minimum
+;
+
+helper context AADLBA!ThreadType def : getMaxExecutionTime() : AADLBA!RealLiteral =
+	self.ownedPropertyAssociation
+		->any(pa|pa.property.name='Compute_Execution_Time').ownedValue
+		->first().ownedValue.maximum
+;
+
+helper context AADLI!ComponentInstance def : getReadTime() : AADLI!RecordValue =
+	if (self.category=#memory) then
+		self.ownedPropertyAssociation
+			->any(pa|pa.property.name='Read_Time').ownedValue
+			->first().ownedValue
+	else
+		self.memoryBinding().getReadTime()
+	endif
+;
+
+helper context AADLI!ComponentInstance def : getFixedReadTime() : Real =
+	self.getReadTime().ownedFieldValue->any(fv|fv.property.name='Fixed').ownedValue.value
+;
+
+helper context AADLI!ComponentInstance def : getPerByteReadTime() : Real =
+	self.getReadTime().ownedFieldValue->any(fv|fv.property.name='PerByte').ownedValue.value
+;
+
+helper context AADLI!ComponentInstance def : getWriteTime() : AADLI!RecordValue =
+	if (self.category=#memory) then
+		self.ownedPropertyAssociation
+			->any(pa|pa.property.name='Write_Time').ownedValue
+			->first().ownedValue
+	else
+		self.memoryBinding().getWriteTime()
+	endif
+;
+
+helper context AADLI!ComponentInstance def : getFixedWriteTime() : Real =
+	self.getWriteTime().ownedFieldValue->any(fv|fv.property.name='Fixed').ownedValue.value
+;
+
+helper context AADLI!ComponentInstance def : getPerByteWriteTime() : Real =
+	self.getWriteTime().ownedFieldValue->any(fv|fv.property.name='PerByte').ownedValue.value
+;
+
+helper context AADLI!FeatureInstance def : getDataSize() : Integer =
+	self.feature.dataFeatureClassifier.ownedPropertyAssociation
+		->any(pa|pa.property.name='Source_Data_Size')
+		.ownedValue->first().ownedValue.value
+;
+
+helper context AADLI!FeatureInstance def : getReadTime() : Real =
+	self.eContainer().getFixedReadTime().doubleValue()
+	  + (self.getDataSize().intValue() * self.eContainer().getPerByteReadTime().doubleValue())
+;
+
+helper context AADLI!FeatureInstance def : getWriteTime() : Real =
+	self.eContainer().getFixedWriteTime().doubleValue()
+	  + (self.getDataSize().intValue() * self.eContainer().getPerByteWriteTime().doubleValue())
+;
