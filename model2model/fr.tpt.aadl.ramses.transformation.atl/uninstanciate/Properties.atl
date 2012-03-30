@@ -256,6 +256,27 @@ lazy rule RangeValue extends PropertyExpression {
 	do { l2; }
 }
 
+lazy rule RecordValue extends PropertyExpression {
+	from
+		l : AADLI!RecordValue
+	to
+		l2 : AADLBA!RecordValue (
+			ownedFieldValue <- l.ownedFieldValue->collect(fv|thisModule.BasicPropertyAssociation(fv))
+		)
+	do { l2; }
+}
+
+lazy rule BasicPropertyAssociation {
+	from
+		bpa : AADLI!BasicPropertyAssociation
+	to
+		bpa2 : AADLBA!BasicPropertyAssociation (
+			property <- bpa.property,
+			ownedValue <- thisModule.PropertyExpression (bpa.ownedValue)
+		)
+	do { bpa2; }
+}
+
 lazy rule StringLiteral extends PropertyExpression {
 	from
 		l : AADLI!StringLiteral
