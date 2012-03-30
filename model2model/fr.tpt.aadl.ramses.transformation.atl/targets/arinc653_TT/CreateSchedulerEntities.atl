@@ -67,6 +67,11 @@ helper context AADLI!ComponentInstance def : processorBinding() : AADLBA!Process
 		.ownedValue->first().ownedValue.ownedListElement->first().referencedInstanceObject
 ;
 
+helper context AADLI!ComponentInstance def : memoryBinding() : AADLBA!ProcessorSubcomponent =
+	self.ownedPropertyAssociation->any(pa|pa.property.name='Actual_Memory_Binding')
+		.ownedValue->first().ownedValue.ownedListElement->first().referencedInstanceObject
+;
+
 helper context AADLI!FeatureInstance def : getNameOnInternalThread() : String =
 	self.eContainer().name.concat('_').concat(self.name)
 ;
@@ -133,7 +138,7 @@ unique lazy rule InternalThread_Deadline
 		
 		DeadlineThread : AADLBA!ThreadType (
 			name <- t.eContainer().name.concat('_').concat(t.name).concat('_Deadline'),
-			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA, deadlinePA, dispatchOffset}
+			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA, deadlinePA, executionTime,dispatchOffset}
 		),
 		
 		DeadlineThreadImpl : AADLBA!ThreadImplementation (
@@ -179,6 +184,30 @@ unique lazy rule InternalThread_Deadline
 			unit						<- t.getDeadline().unit
 		),
 		
+		executionTime : AADLBA!PropertyAssociation (
+			property						<- thisModule.getProperty('Compute_Execution_Time'),
+			ownedValue						<- Sequence {executionTimeMPV}
+		),
+		
+		executionTimeMPV : AADLBA!ModalPropertyValue (
+			ownedValue						<- executionTimeRange
+		),
+		
+		executionTimeRange : AADLBA!RangeValue (
+			minimum							<- executionTimeMin,
+			maximum							<- executionTimeMax
+		),
+		
+		executionTimeMin   : AADLBA!RealLiteral (
+			value						<- 0.doubleValue(),
+			unit						<- AADLBA!UnitLiteral->allInstances()->any(u|u.name='ms')
+		),
+		
+		executionTimeMax   : AADLBA!RealLiteral (
+			value						<- 0.doubleValue(),
+			unit						<- AADLBA!UnitLiteral->allInstances()->any(u|u.name='ms')
+		),
+		
 		dispatchOffset : AADLBA!PropertyAssociation (
 			property						<- thisModule.getProperty('Dispatch_Offset'),
 			ownedValue						<- Sequence {dispatchOffsetMPV}
@@ -222,7 +251,7 @@ unique lazy rule InternalThread_Period
 		
 		PeriodThread : AADLBA!ThreadType (
 			name <- t.eContainer().name.concat('_').concat(t.name).concat('_Period'),
-			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA, deadlinePA}
+			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA, deadlinePA, executionTime}
 		),
 		
 		PeriodThreadImpl : AADLBA!ThreadImplementation (
@@ -266,6 +295,30 @@ unique lazy rule InternalThread_Period
 		deadlineL  : AADLBA!IntegerLiteral (
 			value						<- t.getDeadline().value,
 			unit						<- t.getDeadline().unit
+		),
+		
+		executionTime : AADLBA!PropertyAssociation (
+			property						<- thisModule.getProperty('Compute_Execution_Time'),
+			ownedValue						<- Sequence {executionTimeMPV}
+		),
+		
+		executionTimeMPV : AADLBA!ModalPropertyValue (
+			ownedValue						<- executionTimeRange
+		),
+		
+		executionTimeRange : AADLBA!RangeValue (
+			minimum							<- executionTimeMin,
+			maximum							<- executionTimeMax
+		),
+		
+		executionTimeMin   : AADLBA!RealLiteral (
+			value						<- 0.doubleValue(),
+			unit						<- AADLBA!UnitLiteral->allInstances()->any(u|u.name='ms')
+		),
+		
+		executionTimeMax   : AADLBA!RealLiteral (
+			value						<- 0.doubleValue(),
+			unit						<- AADLBA!UnitLiteral->allInstances()->any(u|u.name='ms')
 		)
 	do
 	{
@@ -281,4 +334,3 @@ unique lazy rule InternalThread_Period
 		PeriodThreadSub;
 	}
 }
-
