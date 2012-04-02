@@ -461,15 +461,15 @@ rule defaultThreadDataOrEventDataPortConnection_mapping(cnxInst: AADLI!Connectio
 	}
 }
 
+helper context AADLI!ConnectionInstance def : isDefaultConnectionInstance() : Boolean =
+	self.kind = #portConnection and (self.source.eContainer().category=#thread
+			 or self.destination.eContainer().category=#thread)
+;
+	
 rule PortConnection_Instance
 {
 	from
-		cnxInst: AADLI!ConnectionInstance
-		(
-			cnxInst.kind = #portConnection and
-			(cnxInst.source.eContainer().category=#thread
-			 or cnxInst.destination.eContainer().category=#thread)
-		)
+		cnxInst: AADLI!ConnectionInstance (cnxInst.isDefaultConnectionInstance())
 	do
 	{
 		thisModule.defaultPortConnection_mapping(cnxInst);
