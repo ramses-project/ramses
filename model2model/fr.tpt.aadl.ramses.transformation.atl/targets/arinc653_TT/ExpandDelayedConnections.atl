@@ -42,13 +42,7 @@ uses IOHelpers;
 -------------------------------------------------------------------------------------------
 ----		OVERRIDEN RULES
 -------------------------------------------------------------------------------------------
-helper context AADLI!ConnectionInstance def : isDefaultConnectionInstance() : Boolean =
-	(not self.source.isDelayedPort()) and not self.destination.isDelayedPort()
-;
--------------------------------------------------------------------------------------------
-----		NEW RULES
--------------------------------------------------------------------------------------------
-helper context AADLI!FeatureInstance def : isDelayedPort() : Boolean =
+helper context AADLI!ConnectionInstance def : isDelayedConnectionInstance() : Boolean =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Timing').oclIsUndefined()) then
 		false
 	else
@@ -57,6 +51,15 @@ helper context AADLI!FeatureInstance def : isDelayedPort() : Boolean =
 	endif
 ;
 
+helper context AADLI!ConnectionInstance def : isDefaultConnectionInstance() : Boolean =
+	(self.kind = #portConnection and (self.source.eContainer().category=#thread
+			 or self.destination.eContainer().category=#thread))
+	and not self.isDelayedConnectionInstance()
+;
+
+-------------------------------------------------------------------------------------------
+----		NEW RULES
+-------------------------------------------------------------------------------------------
 helper context AADLBA!Subcomponent def : getDataPorts() : Sequence(AADLBA!DataPort) =
 	self.getComponentType().getOwnedDataPorts()
 ;
@@ -80,7 +83,7 @@ rule DelayedPortOutgoingInterConnection_Instance
 			cnxInst.kind = #portConnection 
 			and cnxInst.source.eContainer().category=#thread
 			and cnxInst.destination.eContainer().category=#process
-			and cnxInst.source.isDelayedPort()
+			and cnxInst.isDelayedConnectionInstance()
 		)
 	using
 	{
@@ -216,7 +219,7 @@ rule DelayedPortIntraConnection_Instance
 			cnxInst.kind = #portConnection 
 			and cnxInst.source.eContainer().category=#thread
 			and cnxInst.destination.eContainer().category=#thread
-			and cnxInst.destination.isDelayedPort()
+			and cnxInst.isDelayedConnectionInstance()
 		)
 	using
 	{
