@@ -63,13 +63,12 @@ helper context AADLI!FeatureInstance def : nameForProcessPort() : String =
 ;
 
 helper context AADLI!ComponentInstance def : processorBinding() : AADLBA!ProcessorSubcomponent =
-	self.ownedPropertyAssociation->any(pa|pa.property.name='Actual_Processor_Binding')
-		.ownedValue->first().ownedValue.ownedListElement->first().referencedInstanceObject
-;
-
-helper context AADLI!ComponentInstance def : memoryBinding() : AADLBA!ProcessorSubcomponent =
-	self.ownedPropertyAssociation->any(pa|pa.property.name='Actual_Memory_Binding')
-		.ownedValue->first().ownedValue.ownedListElement->first().referencedInstanceObject
+	if ((self.category=#processor) or (self.category.toString()='virtual processor')) then
+		self
+	else
+		self.ownedPropertyAssociation->any(pa|pa.property.name='Actual_Processor_Binding')
+			.ownedValue->first().ownedValue.ownedListElement->first().referencedInstanceObject
+	endif
 ;
 
 helper context AADLI!FeatureInstance def : getNameOnInternalThread() : String =
@@ -332,5 +331,102 @@ unique lazy rule InternalThread_Period
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(PeriodThreadImpl, t);
 		
 		PeriodThreadSub;
+	}
+}
+
+unique lazy rule InternalThread_PartitionWindow
+{
+	from
+		windowIndex : Integer,
+		offsetEnd   : Integer,
+		processor : AADLI!ComponentInstance
+	using
+	{
+		maf : AADLI!IntegerLiteral = processor.ownedPropertyAssociation
+				->any(pa|pa.property.name='Module_Major_Frame').ownedValue->first().ownedValue;
+
+		pswitchTime : AADLI!RealLiteral = processor.getPartitionSwitchTime();
+	}
+	to
+		WindowThreadSub : AADLBA!ThreadSubcomponent (
+			name <- 'PWS_'.concat(windowIndex.toString()),
+			threadSubcomponentType <- WindowThreadImpl
+		),
+		
+		WindowThread : AADLBA!ThreadType (
+			name <- processor.name.concat('_PartitionWindowSwitch_'.concat(windowIndex.toString())),
+			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA,executionTime, dispatchOffset}
+		),
+		
+		WindowThreadImpl : AADLBA!ThreadImplementation (
+			name <- WindowThread.name.concat('.impl'),
+			ownedRealization 				<- thisModule.Realization(WindowThread, WindowThreadImpl)
+		),
+		
+		dispatchProtocol : AADLBA!PropertyAssociation (
+			property						<- thisModule.getProperty('Dispatch_Protocol'),
+			ownedValue						<- Sequence {dispatchProtocolMPV}
+		),
+		dispatchProtocolMPV  : AADLBA!ModalPropertyValue (
+			ownedValue						<- dispatchProtocolNV
+		),
+		
+		dispatchProtocolNV  : AADLBA!NamedValue (
+			namedValue						<- AADLI!EnumerationLiteral->allInstances()->any(e|e.name='Periodic')
+		),
+		
+		periodPA : AADLBA!PropertyAssociation (
+			property						<- thisModule.getProperty('Period'),
+			ownedValue						<- Sequence {periodMPV}
+		),
+		periodMPV  : AADLBA!ModalPropertyValue (
+			ownedValue						<- periodL
+		),
+		
+		periodL  : AADLBA!IntegerLiteral (
+			value						<- maf.value,
+			unit						<- maf.unit
+		),
+		
+		dispatchOffset : AADLBA!PropertyAssociation (
+			property						<- thisModule.getProperty('Dispatch_Offset'),
+			ownedValue						<- Sequence {dispatchOffsetMPV}
+		),
+		dispatchOffsetMPV  : AADLBA!ModalPropertyValue (
+			ownedValue						<- dispatchOffsetL
+		),
+		
+		dispatchOffsetL  : AADLBA!RealLiteral (
+			value						<- offsetEnd.doubleValue() - pswitchTime.value,
+			unit						<- AADLBA!UnitLiteral->allInstances()->any(u|u.name='ms')
+		),
+		
+		executionTime : AADLBA!PropertyAssociation (
+			property						<- thisModule.getProperty('Compute_Execution_Time'),
+			ownedValue						<- Sequence {executionTimeMPV}
+		),
+		
+		executionTimeMPV : AADLBA!ModalPropertyValue (
+			ownedValue						<- executionTimeRange
+		),
+		
+		executionTimeRange : AADLBA!RangeValue (
+			minimum							<- executionTimeMin,
+			maximum							<- executionTimeMax
+		),
+		
+		executionTimeMin   : AADLBA!RealLiteral (
+			value						<- pswitchTime.value,
+			unit						<- pswitchTime.unit
+		),
+		
+		executionTimeMax   : AADLBA!RealLiteral (
+			value						<- pswitchTime.value,
+			unit						<- pswitchTime.unit
+		)
+	do
+	{
+		thisModule.public().getOwnedClassifiers().add(WindowThread);
+		thisModule.public().getOwnedClassifiers().add(WindowThreadImpl);
 	}
 }
