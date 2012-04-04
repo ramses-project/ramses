@@ -3,7 +3,7 @@
 -- 
 -- Copyright © 2012 TELECOM ParisTech and CNRS
 -- 
--- TELECOM ParisTech/LTCI
+-- TELECOM ParisTech/LTCI 
 -- 
 -- Authors: see AUTHORS
 -- 
@@ -70,6 +70,20 @@ helper context AADLI!ComponentInstance def : getDeadline() : AADLI!PropertyExpre
 	endif
 ;
 
+helper def : InternalThread_RuleWrapper (period : Integer, deadline: Integer, 
+		offset: Integer, t: AADLI!ComponentInstance) : AADLBA!ThreadSubcomponent =
+	thisModule.InternalThread (thisModule.getUniqueIdentifier(period, deadline, offset),
+							   period, deadline, offset, t)					
+;
+
+
+helper def : getUniqueIdentifier(period: Integer, deadline: Integer, offset: Integer) : String =
+	period.toString().concat('_').concat(deadline.toString()).concat('_').concat(offset.toString())
+;
+
+
+
+
 helper context AADLI!FeatureInstance def : nameForProcessPort() : String =
 	self.eContainer().name.concat('_').concat(self.name)
 ;
@@ -134,34 +148,37 @@ unique lazy rule InternalProcess
 }
 
 helper def : InternalThread_Deadline (t : AADLI!ComponentInstance) : AADLBA!ThreadSubcomponent =
-	thisModule.InternalThread (t.getPeriod().value,    -- period
+	thisModule.InternalThread_RuleWrapper (t.getPeriod().value,    -- period
 		                       t.getDeadline().value,  -- deadline
 							   t.getDeadline().value,  -- offset
-							   t.eContainer()) 
+							   t) 
 ;
 
 helper def : InternalThread_Period (t : AADLI!ComponentInstance) : AADLBA!ThreadSubcomponent =
-	thisModule.InternalThread (t.getPeriod().value,    -- period
+	thisModule.InternalThread_RuleWrapper (t.getPeriod().value,    -- period
 		                       t.getDeadline().value,  -- deadline
-							   0,                      -- offset
-							   t.eContainer())
+							   0.longValue(),                      -- offset
+							   t)
 ;
+
 
 unique lazy rule InternalThread
 {
 	from
+		id : String,  -- only the first parameter is taken into account for
+		              -- unique (must have a unique identifier for all parameters)
 		period : Integer,
 		deadline : Integer,
 		offset : Integer,
-		process : AADLI!ComponentInstance
+		thread : AADLI!ComponentInstance
 	using
 	{
-		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (process);
+		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (thread.eContainer());
 		nInternals        : Integer = internalProcess.getOwnedThreadSubcomponents()->size() + 1;
 	}
 	to
 		ThreadSub : AADLBA!ThreadSubcomponent (
-			name <- process.eContainer().name.concat('_').concat(process.name).concat('_Internal_').concat(nInternals),
+			name <- thread.eContainer().eContainer().name.concat('_').concat(thread.eContainer().name).concat('_Internal_').concat(nInternals),
 			threadSubcomponentType <- ThreadImpl
 		),
 		
