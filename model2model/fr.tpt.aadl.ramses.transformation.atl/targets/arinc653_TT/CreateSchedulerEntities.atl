@@ -174,16 +174,19 @@ unique lazy rule InternalThread
 	using
 	{
 		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (thread.eContainer());
+        
 		nInternals        : Integer = internalProcess.getOwnedThreadSubcomponents()->size() + 1;
+		vpInst    : AADLI!ComponentInstance = thread.processorBinding();
+        processor : AADLBA!ProcessorSubcomponent = thisModule.resolveTemp(vpInst.eContainer(),'sub');
 	}
 	to
 		ThreadSub : AADLBA!ThreadSubcomponent (
-			name <- thread.eContainer().eContainer().name.concat('_').concat(thread.eContainer().name).concat('_Internal_').concat(nInternals),
+			name <- 'InternalJob_'.concat(nInternals),
 			threadSubcomponentType <- ThreadImpl
 		),
 		
 		Thread : AADLBA!ThreadType (
-			name <- ThreadSub.name,
+			name <- processor.name.concat('_').concat(vpInst.name).concat('_').concat(ThreadSub.name),
 			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA, deadlinePA, executionTime,dispatchOffset}
 		),
 		
