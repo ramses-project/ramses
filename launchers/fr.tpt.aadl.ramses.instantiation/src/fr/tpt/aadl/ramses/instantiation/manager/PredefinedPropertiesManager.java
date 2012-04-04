@@ -55,6 +55,7 @@ public class PredefinedPropertiesManager
     expectedPropertySet.add("Data_Model") ;
     expectedPropertySet.add("Deployment_Properties") ;
     expectedPropertySet.add("Memory_Properties") ;
+    expectedPropertySet.add("Modeling_Properties") ;
     expectedPropertySet.add("Programming_Properties") ;
     expectedPropertySet.add("Thread_Properties") ;
     expectedPropertySet.add("Timing_Properties") ;

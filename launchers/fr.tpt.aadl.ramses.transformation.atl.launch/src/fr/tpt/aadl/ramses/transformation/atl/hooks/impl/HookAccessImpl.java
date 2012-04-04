@@ -27,42 +27,43 @@
  */
 package fr.tpt.aadl.ramses.transformation.atl.hooks.impl ;
 
-import java.io.File ;
-import java.io.FileNotFoundException ;
-import java.io.IOException ;
-import java.util.ArrayList ;
-import java.util.HashMap ;
-import java.util.List ;
-import java.util.Map ;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.emf.ecore.EClass ;
-import org.eclipse.emf.ecore.impl.EObjectImpl ;
-import org.osate.aadl2.ComponentType ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.m2m.atl.core.ATLCoreException ;
-import org.eclipse.xtext.nodemodel.INode ;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
-import org.osate.aadl2.DirectedFeature ;
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.Feature ;
-import org.osate.aadl2.DirectionType ;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.m2m.atl.core.ATLCoreException;
+import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DirectedFeature;
+import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.ThreadImplementation;
+import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.InstanceObject;
-import org.osate.aadl2.parsesupport.LocationReference ;
+import org.osate.aadl2.parsesupport.LocationReference;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
-import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver ;
-
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.utils.Aadl2Utils ;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
-import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess ;
-
-import org.eclipse.emf.common.util.BasicEList ;
-import org.eclipse.emf.common.util.EList ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
+import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.utils.Aadl2Utils;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
+import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
 
 /**
  * <!-- begin-user-doc -->
@@ -261,6 +262,37 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   public static InstanceObject getTransformationTrace(NamedElement targetDeclarative)
   {
     return _transformationTrace.get(targetDeclarative);
+  }
+  
+  public static List<NamedElement> getTransformationTracesFromSource(InstanceObject sourceInstance)
+  {
+	  ArrayList<NamedElement> l = new ArrayList<NamedElement>();
+	  for(NamedElement e : _transformationTrace.keySet())
+	  {
+		  if (_transformationTrace.get(e) == sourceInstance)
+		  {
+			  l.add(e);
+		  }
+	  }
+	  return l;
+  }
+  
+  public static List<NamedElement> getTransformationTracesFromSourceDecl(ComponentImplementation el)
+  {
+	  ArrayList<NamedElement> l = new ArrayList<NamedElement>();
+	  for(NamedElement e : _transformationTrace.keySet())
+	  {
+		  if (e instanceof SystemImplementation)
+			  continue;
+		  
+		  if (_transformationTrace.get(e) instanceof ComponentInstance )
+		  {
+			  ComponentInstance c = (ComponentInstance) _transformationTrace.get(e);
+			  if ((c.getName()+".impl").equals(el.getName()))
+				  l.add(e);
+		  }
+	  }
+	  return l;
   }
 
 } //HookAccessImpl
