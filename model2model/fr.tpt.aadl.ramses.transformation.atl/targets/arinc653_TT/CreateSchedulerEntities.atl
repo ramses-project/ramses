@@ -44,6 +44,18 @@ helper context AADLBA!ThreadSubcomponent def : getType() : AADLBA!ThreadType =
 	self.threadSubcomponentType.ownedRealization.implemented
 ;
 
+helper context Integer def : value : Integer = self;
+helper context Integer def : unit  : AADLI!UnitLiteral = OclUndefined;
+
+helper context AADLI!ComponentInstance def : getOffset() : AADLI!PropertyExpression =
+	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Dispatch_Offset').oclIsUndefined()) then
+		0
+	else
+		self.ownedPropertyAssociation->any(pa|pa.property.name='Dispatch_Offset')
+			.ownedValue->first().ownedValue
+	endif
+;
+
 helper context AADLI!ComponentInstance def : getPeriod() : AADLI!PropertyExpression =
 	self.ownedPropertyAssociation->any(pa|pa.property.name='Period')
 		.ownedValue->first().ownedValue
@@ -121,28 +133,46 @@ unique lazy rule InternalProcess
 	}
 }
 
-unique lazy rule InternalThread_Deadline
+helper def : InternalThread_Deadline (t : AADLI!ComponentInstance) : AADLBA!ThreadSubcomponent =
+	thisModule.InternalThread (t.getPeriod().value,    -- period
+		                       t.getDeadline().value,  -- deadline
+							   t.getDeadline().value,  -- offset
+							   t.eContainer()) 
+;
+
+helper def : InternalThread_Period (t : AADLI!ComponentInstance) : AADLBA!ThreadSubcomponent =
+	thisModule.InternalThread (t.getPeriod().value,    -- period
+		                       t.getDeadline().value,  -- deadline
+							   0,                      -- offset
+							   t.eContainer())
+;
+
+unique lazy rule InternalThread
 {
 	from
-		t : AADLI!ComponentInstance
+		period : Integer,
+		deadline : Integer,
+		offset : Integer,
+		process : AADLI!ComponentInstance
 	using
 	{
-		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (t.eContainer());
+		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (process);
+		nInternals        : Integer = internalProcess.getOwnedThreadSubcomponents()->size() + 1;
 	}
 	to
-		DeadlineThreadSub : AADLBA!ThreadSubcomponent (
-			name <- t.name.concat('_Deadline'),
-			threadSubcomponentType <- DeadlineThreadImpl
+		ThreadSub : AADLBA!ThreadSubcomponent (
+			name <- process.eContainer().name.concat('_').concat(process.name).concat('_Internal_').concat(nInternals),
+			threadSubcomponentType <- ThreadImpl
 		),
 		
-		DeadlineThread : AADLBA!ThreadType (
-			name <- t.eContainer().name.concat('_').concat(t.name).concat('_Deadline'),
+		Thread : AADLBA!ThreadType (
+			name <- ThreadSub.name,
 			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA, deadlinePA, executionTime,dispatchOffset}
 		),
 		
-		DeadlineThreadImpl : AADLBA!ThreadImplementation (
-			name <- DeadlineThread.name.concat('.impl'),
-			ownedRealization 				<- thisModule.Realization(DeadlineThread, DeadlineThreadImpl)
+		ThreadImpl : AADLBA!ThreadImplementation (
+			name <- Thread.name.concat('.impl'),
+			ownedRealization 				<- thisModule.Realization(Thread, ThreadImpl)
 		),
 		
 		dispatchProtocol : AADLBA!PropertyAssociation (
@@ -166,8 +196,8 @@ unique lazy rule InternalThread_Deadline
 		),
 		
 		periodL  : AADLBA!IntegerLiteral (
-			value						<- t.getPeriod().value,
-			unit						<- t.getPeriod().unit
+			value						<- period,
+			unit						<- AADLI!UnitLiteral->allInstances()->any(l|l.name='ms')
 		),
 		
 		deadlinePA : AADLBA!PropertyAssociation (
@@ -179,8 +209,8 @@ unique lazy rule InternalThread_Deadline
 		),
 		
 		deadlineL  : AADLBA!IntegerLiteral (
-			value						<- t.getDeadline().value,
-			unit						<- t.getDeadline().unit
+			value						<- deadline,
+			unit						<- AADLI!UnitLiteral->allInstances()->any(l|l.name='ms')
 		),
 		
 		executionTime : AADLBA!PropertyAssociation (
@@ -216,121 +246,22 @@ unique lazy rule InternalThread_Deadline
 		),
 		
 		dispatchOffsetL  : AADLBA!IntegerLiteral (
-			value						<- t.getDeadline().value,
-			unit						<- t.getDeadline().unit
+			--value						<- t.getDeadline().value + t.getOffset().value,
+			value						<- offset,
+			unit						<- AADLI!UnitLiteral->allInstances()->any(l|l.name='ms')
 		)
 	do
 	{
-		thisModule.public().getOwnedClassifiers().add(DeadlineThread);
-		thisModule.public().getOwnedClassifiers().add(DeadlineThreadImpl);
+		thisModule.public().getOwnedClassifiers().add(Thread);
+		thisModule.public().getOwnedClassifiers().add(ThreadImpl);
 		
-		internalProcess.getOwnedThreadSubcomponents().add(DeadlineThreadSub);
+		internalProcess.getOwnedThreadSubcomponents().add(ThreadSub);
 		
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(DeadlineThreadSub, t);
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(DeadlineThread, t);
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(DeadlineThreadImpl, t);
+		--ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(DeadlineThreadSub, t);
+		--ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(DeadlineThread, t);
+		--ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(DeadlineThreadImpl, t);
 
-		DeadlineThreadSub;
-	}
-}
-
-unique lazy rule InternalThread_Period
-{
-	from
-		t : AADLI!ComponentInstance
-	using
-	{
-		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (t.eContainer());
-	}
-	to
-		PeriodThreadSub : AADLBA!ThreadSubcomponent (
-			name <- t.name.concat('_Period'),
-			threadSubcomponentType <- PeriodThreadImpl
-		),
-		
-		PeriodThread : AADLBA!ThreadType (
-			name <- t.eContainer().name.concat('_').concat(t.name).concat('_Period'),
-			ownedPropertyAssociation <- Sequence {dispatchProtocol,periodPA, deadlinePA, executionTime}
-		),
-		
-		PeriodThreadImpl : AADLBA!ThreadImplementation (
-			name <- PeriodThread.name.concat('.impl'),
-			ownedRealization 				<- thisModule.Realization(PeriodThread, PeriodThreadImpl)
-		),
-		
-		dispatchProtocol : AADLBA!PropertyAssociation (
-			property						<- thisModule.getProperty('Dispatch_Protocol'),
-			ownedValue						<- Sequence {dispatchProtocolMPV}
-		),
-		dispatchProtocolMPV  : AADLBA!ModalPropertyValue (
-			ownedValue						<- dispatchProtocolNV
-		),
-		
-		dispatchProtocolNV  : AADLBA!NamedValue (
-			namedValue						<- AADLI!EnumerationLiteral->allInstances()->any(e|e.name='Periodic')
-		),
-		
-		periodPA : AADLBA!PropertyAssociation (
-			property						<- thisModule.getProperty('Period'),
-			ownedValue						<- Sequence {periodMPV}
-		),
-		periodMPV  : AADLBA!ModalPropertyValue (
-			ownedValue						<- periodL
-		),
-		
-		periodL  : AADLBA!IntegerLiteral (
-			value						<- t.getPeriod().value,
-			unit						<- t.getPeriod().unit
-		),
-		
-		deadlinePA : AADLBA!PropertyAssociation (
-			property						<- thisModule.getProperty('Deadline'),
-			ownedValue						<- Sequence {deadlineMPV}
-		),
-		deadlineMPV  : AADLBA!ModalPropertyValue (
-			ownedValue						<- deadlineL
-		),
-		
-		deadlineL  : AADLBA!IntegerLiteral (
-			value						<- t.getDeadline().value,
-			unit						<- t.getDeadline().unit
-		),
-		
-		executionTime : AADLBA!PropertyAssociation (
-			property						<- thisModule.getProperty('Compute_Execution_Time'),
-			ownedValue						<- Sequence {executionTimeMPV}
-		),
-		
-		executionTimeMPV : AADLBA!ModalPropertyValue (
-			ownedValue						<- executionTimeRange
-		),
-		
-		executionTimeRange : AADLBA!RangeValue (
-			minimum							<- executionTimeMin,
-			maximum							<- executionTimeMax
-		),
-		
-		executionTimeMin   : AADLBA!RealLiteral (
-			value						<- 0.doubleValue(),
-			unit						<- AADLBA!UnitLiteral->allInstances()->any(u|u.name='ms')
-		),
-		
-		executionTimeMax   : AADLBA!RealLiteral (
-			value						<- 0.doubleValue(),
-			unit						<- AADLBA!UnitLiteral->allInstances()->any(u|u.name='ms')
-		)
-	do
-	{
-		thisModule.public().getOwnedClassifiers().add(PeriodThread);
-		thisModule.public().getOwnedClassifiers().add(PeriodThreadImpl);
-		
-		internalProcess.getOwnedThreadSubcomponents().add(PeriodThreadSub);
-		
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(PeriodThreadSub, t);
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(PeriodThread, t);
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(PeriodThreadImpl, t);
-		
-		PeriodThreadSub;
+		ThreadSub;
 	}
 }
 
