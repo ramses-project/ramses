@@ -80,7 +80,7 @@ subcomponents
    thr1 : thread mythread1.impl;
    thr2 : thread mythread2.impl;
 connections
-   cnx1: port thr1.output -> thr2.input;
+   cnx1: port thr1.output -> thr2.input { Timing => Delayed; };
 properties
    POK::Needed_Memory_Size => 200 Kbyte;
 end myprocess1.impl;
@@ -90,6 +90,7 @@ features
    output : out event data port myint 
    {
    	Compute_Deadline => 10ms;
+   	Output_Rate => (Value_Range => 2.0;);
    };
 end mythread1;
 
@@ -97,7 +98,7 @@ thread mythread2
 features
    input : in event data port myint {
    	Compute_Deadline => 20ms;
-   	Timing => Delayed;
+   	Input_Rate => (Value_Range => 2.0;);
    };
 end mythread2;
 
