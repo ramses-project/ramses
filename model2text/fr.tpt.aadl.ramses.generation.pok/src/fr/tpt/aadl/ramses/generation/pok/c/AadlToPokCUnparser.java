@@ -21,40 +21,37 @@
 
 package fr.tpt.aadl.ramses.generation.pok.c;
 
-import java.io.BufferedWriter ;
-import java.io.File ;
-import java.io.FileWriter ;
-import java.io.IOException ;
-import java.util.ArrayList ;
-import java.util.HashSet ;
-import java.util.List ;
-import java.util.Map ;
-import java.util.Set ;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.emf.common.util.EList ;
-import org.osate.aadl2.ComponentCategory ;
-import org.osate.aadl2.ConnectedElement ;
-import org.osate.aadl2.DataPort ;
-import org.osate.aadl2.DataSubcomponent ;
-import org.osate.aadl2.DirectionType ;
-import org.osate.aadl2.EventDataPort ;
-import org.osate.aadl2.MemorySubcomponent ;
-import org.osate.aadl2.Port ;
-import org.osate.aadl2.ProcessImplementation ;
-import org.osate.aadl2.ProcessSubcomponent ;
-import org.osate.aadl2.ProcessorSubcomponent ;
-import org.osate.aadl2.Subcomponent ;
-import org.osate.aadl2.SystemImplementation ;
-import org.osate.aadl2.ThreadImplementation ;
-import org.osate.aadl2.ThreadSubcomponent ;
-import org.osate.aadl2.VirtualProcessorSubcomponent ;
-import org.osate.aadl2.instance.ComponentInstance ;
-import org.osate.aadl2.instance.ConnectionInstance ;
-import org.osate.aadl2.instance.ConnectionReference ;
-import org.osate.aadl2.instance.FeatureCategory ;
-import org.osate.aadl2.instance.FeatureInstance ;
-import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.modelsupport.UnparseText ;
+import org.eclipse.emf.common.util.EList;
+import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.DataPort;
+import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.EventDataPort;
+import org.osate.aadl2.MemorySubcomponent;
+import org.osate.aadl2.Port;
+import org.osate.aadl2.ProcessImplementation;
+import org.osate.aadl2.ProcessSubcomponent;
+import org.osate.aadl2.ProcessorSubcomponent;
+import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.ThreadImplementation;
+import org.osate.aadl2.ThreadSubcomponent;
+import org.osate.aadl2.VirtualProcessorSubcomponent;
+import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ConnectionInstance;
+import org.osate.aadl2.instance.ConnectionReference;
+import org.osate.aadl2.instance.FeatureCategory;
+import org.osate.aadl2.instance.FeatureInstance;
+import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.modelsupport.UnparseText;
 
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
@@ -590,7 +587,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   //Generate global variables.
-  private void genGlobalVariablesMainImpl(EList<ThreadSubcomponent> lthreads,
+  private void genGlobalVariablesMainImpl(ProcessImplementation process, EList<ThreadSubcomponent> lthreads,
                                           UnparseText mainImplCode,
                                           PartitionProperties pp)
   {
@@ -696,11 +693,16 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
         mainImplCode.addOutputNewline(";") ;
       }
     }
+    
+    genGlobalVariablesMainOptional(process, mainImplCode);
 
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
   }
   
-  private void genFileIncludedMainImpl(UnparseText mainImplCode)
+  protected void genGlobalVariablesMainOptional(ProcessImplementation process,
+		UnparseText mainImplCode){}
+
+private void genFileIncludedMainImpl(UnparseText mainImplCode)
   {
     // Files included.
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
@@ -813,7 +815,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     genFileIncludedMainImpl(mainImplCode) ;
     
     // Global files.
-    genGlobalVariablesMainImpl(lthreads, mainImplCode, pp);
+    genGlobalVariablesMainImpl(process, lthreads, mainImplCode, pp);
     
     // main function declaration.
     mainImplCode.addOutputNewline(GenerationUtilsC
@@ -849,6 +851,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       threadIndex++ ;
     }
     
+    genMainImplEnd(process, mainImplCode);
+    
     mainImplCode
           .addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
     mainImplCode.addOutputNewline("  return (0);") ;
@@ -856,7 +860,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
   }
   
-  private void findCommunicationMechanism(ProcessImplementation process,
+  protected void genMainImplEnd(ProcessImplementation process,
+		  					    UnparseText mainImplCode){}
+
+private void findCommunicationMechanism(ProcessImplementation process,
                                           PartitionProperties pp)
   {
     EList<Subcomponent> subcmpts = process.getAllSubcomponents() ;
@@ -1057,9 +1064,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     return pp ;
   }
-  
-  
-  private void genDeploymentImpl(ProcessorSubcomponent processor,
+
+private void genDeploymentImpl(ProcessorSubcomponent processor,
                                  UnparseText deploymentImplCode,
                                  ProcessorProperties pokProp)
   {
@@ -1474,10 +1480,14 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 1");
     }
 
+    genDeploymentHeaderEnd(deploymentHeaderCode);
+    
     deploymentHeaderCode.addOutputNewline("#endif") ;
   }                                            
 
-  @Override
+  protected void genDeploymentHeaderEnd(UnparseText deploymentHeaderCode){}
+
+@Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
@@ -1739,7 +1749,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	}
 	routingImplCode.addOutputNewline("};");
 	
-	
 	routingImplCode.addOutput("char* pok_ports_names" +
 			"[POK_CONFIG_NB_PORTS] = {");
 	for(FeatureInstance fi: localPorts)
@@ -1799,79 +1808,60 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 	}
 	routingImplCode.addOutputNewline("};");
   }
-}
-
-class PartitionProperties
-{
-  boolean hasBlackboard = false ; 
   
-  boolean hasQueue = false ;
+  public static class BlackBoardInfo
+  {
+  	public String id = null ;
+      
+  	public String dataType = null;
+  }
   
-  boolean hasBuffer = false ;
-  
-  boolean hasEvent = false ;
-  
-  boolean hasSample = false ;
-  
-  Set<BlackBoardInfo> blackboardInfo = new HashSet<BlackBoardInfo>() ;
-  
-  Set<String> eventNames = new HashSet<String>() ;
-  
-  Set<QueueInfo> bufferInfo = new HashSet<QueueInfo>() ;
-  
-  Set<QueueInfo> queueInfo = new HashSet<QueueInfo>();
-  
-  Set<SampleInfo> sampleInfo = new HashSet<SampleInfo>();
-  
-}
-
-class BlackBoardInfo
-{
-  String id = null ;
+  public static class QueueInfo
+  {
+	public String id = null ;
     
-  String dataType = null;
+	public String uniqueId = null;
+    
+	public long size = -1 ;
+    
+	public String type = null ;
+    
+	public String dataType = null;
+    
+	public DirectionType direction = null ;
+  }
+  
+  public static class SampleInfo
+  {
+	public String id = null ;
+    
+	public String uniqueId = null;
+    
+	public long refresh = -1 ;
+    
+	public String dataType = null;
+    
+	public DirectionType direction = null ;
+  }
+  
+  public static class BufferInfo
+  {
+	public String id = null ;
+    
+	public String uniqueId = null;
+    
+	public long refresh = -1 ;
+    
+	public String dataType = null;
+    
+	public DirectionType direction = null ;
+  }
 }
 
-class QueueInfo
-{
-  String id = null ;
-  
-  String uniqueId = null;
-  
-  long size = -1 ;
-  
-  String type = null ;
-  
-  String dataType = null;
-  
-  DirectionType direction = null ;
-}
 
-class SampleInfo
-{
-  String id = null ;
-  
-  String uniqueId = null;
-  
-  long refresh = -1 ;
-  
-  String dataType = null;
-  
-  DirectionType direction = null ;
-}
 
-class BufferInfo
-{
-  String id = null ;
-  
-  String uniqueId = null;
-  
-  long refresh = -1 ;
-  
-  String dataType = null;
-  
-  DirectionType direction = null ;
-}
+
+
 
 /*
 TODO
