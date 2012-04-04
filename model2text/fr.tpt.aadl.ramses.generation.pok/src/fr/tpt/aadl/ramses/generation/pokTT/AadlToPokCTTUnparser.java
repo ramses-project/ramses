@@ -25,112 +25,211 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.ComponentClassifier;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.ListValue;
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.Port;
+import org.osate.aadl2.PortConnection;
+import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.ThreadImplementation;
+import org.osate.aadl2.ThreadSubcomponent;
+import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.FeatureCategory;
-import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.InstanceReferenceValue;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
 
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser;
-import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUtils;
-import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.util.properties.PropertyUtils;
 
 public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 {
-	protected void genRoutingImpl(ComponentInstance processor,
-			UnparseText routingImplCode, RoutingProperties routeProp)
-			throws GenerationException
+	private ArrayList<String> activitiesDecl = new ArrayList<String>();
+	private ArrayList<String> portsDecl = new ArrayList<String>();
+	
+	@Override
+	protected void genDeploymentHeaderEnd(UnparseText mainHeaderCode)
 	{
-		super.genRoutingImpl(processor, routingImplCode, routeProp);
-
-		routingImplCode.addOutputNewline("");
-		routingImplCode.addOutputNewline("/* Time-Triggered communications */");
-
-		String intraPortsList = "";
-		String intraPortsNbList = "";
-
-		List<ComponentInstance> bindedProcesses = getAllBindedProcesses(processor);
-		for (ComponentInstance deployedProcess : bindedProcesses)
+		mainHeaderCode.addOutputNewline("#define POK_NEEDS_TIME_TRIGGERED 1");
+	}
+	
+	@Override
+	protected void genMainImplEnd(ProcessImplementation process, 
+								  UnparseText mainImplCode)
+	{
+		for(String s : portsDecl)
 		{
-			int nbPorts = routeProp.portPerProcess.get(deployedProcess).size();
-
-			intraPortsNbList = intraPortsNbList + nbPorts + ",";
-
-			/*
-			 * ProcessImplementation p = null; FlowImplementation flow = new
-			 * FlowImplementation(); p.getOwnedFlowImplementations().add(flow);
-			 */
-
-			for (ComponentInstance c : deployedProcess
-					.getAllComponentInstances())
-			{
-				if (c.getCategory() == ComponentCategory.THREAD)
-				{
-					String internalList = "";
-					
-					String arrayPorts = deployedProcess.getSubcomponent()
-							.getName()
-							+ "_"
-							+ c.getSubcomponent().getName()
-							+ "_intraports";
-					
-					String arrayInternalPorts = deployedProcess.getSubcomponent()
-							.getName()
-							+ "_"
-							+ c.getSubcomponent().getName()
-							+ "_intraports_internal";
-					
-					routingImplCode.addOutput("uint8_t " + arrayPorts + "["
-							+ nbPorts + "] = {");
-
-					intraPortsList = intraPortsList + arrayPorts + ",";
-
-					for (FeatureInstance f : c.getFeatureInstances())
-					{
-						if (f.getCategory() != FeatureCategory.DATA_ACCESS)
-						{
-							routingImplCode.addOutput(AadlToPokCUtils
-									.getFeatureLocalIdentifier(f));
-							routingImplCode.addOutput(",");
-							
-							if (f.getDirection() == DirectionType.IN)
-							{
-								String internalName = AadlToPokCUtils
-										.getFeatureLocalIdentifier(f) + "_internal";
-								internalList = internalList + internalName + ",";
-							}
-						}
-					}
-					routingImplCode.addOutputNewline("};");
-					
-					if (internalList.length()>0)
-					{
-						routingImplCode.addOutput("uint8_t " + arrayInternalPorts + "["
-								+ nbPorts + "] = {");
-						routingImplCode.addOutput(internalList);
-						routingImplCode.addOutputNewline("};");
-					}
-					
-				}
-			}
+			mainImplCode.addOutputNewline("  pok_create_tt_port(" + s + ");");
 		}
-		routingImplCode
-				.addOutputNewline("uint8_t* pok_intraports_by_thread[POK_CONFIG_NB_THREADS] = {"
-						+ intraPortsList + "};");
-		routingImplCode
-				.addOutputNewline("uint8_t pok_nb_intraports_by_thread[POK_CONFIG_NB_THREADS] = {"
-						+ intraPortsNbList + "};");
+		portsDecl.clear();
+		
+		for(String s : activitiesDecl)
+		{
+			mainImplCode.addOutputNewline("  pok_create_tt_activity (" + s + ");");
+		}
+		activitiesDecl.clear();
 	}
 
-	private List<ComponentInstance> getAllBindedProcesses(
+	@Override
+	protected void genGlobalVariablesMainOptional(ProcessImplementation process,
+			UnparseText mainImplCode)
+	{
+		ProcessImplementation pi = (ProcessImplementation) getImplementedAs(process);
+		for(ThreadSubcomponent ts : pi.getOwnedThreadSubcomponents())
+		{
+			ThreadType tt = (ThreadType) ts.getComponentType();
+			ThreadImplementation ti = (ThreadImplementation) ts.getComponentImplementation();
+			
+			final String tName = ts.getName();
+			final String tSourcesName = tName + "_sources";
+			final String tDestinationsName = tName + "_destinations";
+			final String tNbDestinationsName = tName + "_nb_dests";
+			
+			final List<Port> in = getPorts(tt, DirectionType.IN);
+			
+			mainImplCode.addOutput("uint8_t  " + tSourcesName + "["+in.size()+"]={");
+			
+			
+			/** Browse all source ports. */
+			String destinationLists = "";
+			String destinationList  = "";
+			String destinationCountList = "";
+			for(int iSourcePort=0;iSourcePort<in.size();iSourcePort++)
+			{
+				Port source = in.get(iSourcePort);
+				List<Port> out = getDestinations(ti, source);
+				
+				mainImplCode.addOutput(getPortIdentifier(process,source));
+				if (iSourcePort<in.size()-1)
+					mainImplCode.addOutput(",");
+				
+				
+				
+				
+				/** Browse all destination ports connected to the source one. */
+				
+				final String tDestsName = tName + "_destinations_" + getPortIdentifier(process,source);
+				String destIdentifierList = "";
+				for(int iDestPort=0; iDestPort < out.size();iDestPort++)
+				{
+					Port dest = out.get(iDestPort);
+					final String destID = getPortIdentifier(process,dest);
+					
+					destIdentifierList = destIdentifierList + destID;
+					if (iDestPort < out.size()-1)
+						destIdentifierList = destIdentifierList + ",";
+				}
+				final String tDestDecl = "uint8_t  " + tDestsName + "["+out.size()+"]={"+destIdentifierList+"};";
+				destinationLists += tDestDecl + "\n";
+				
+				destinationList  += tDestsName + ((iSourcePort < in.size()-1) ? "," : "");
+				destinationCountList += out.size() + ((iSourcePort < in.size()-1) ? "," : "");
+			}
+			mainImplCode.addOutputNewline("};");
+			mainImplCode.addOutput(destinationLists);
+			mainImplCode.addOutputNewline("uint8_t* " + tDestinationsName + "["+in.size()+"]={"+destinationList+"};");
+			mainImplCode.addOutputNewline("uint8_t  " + tNbDestinationsName + "["+in.size()+"]={"+destinationCountList+"};");
+			mainImplCode.addOutputNewline("");
+			
+			final int period = getPropertyInt("Period", ts, 0);
+			final int offset = getPropertyInt("Dispatch_Offset", ts, 0);
+			
+			String activityInit = period + "," 
+			                       + offset + ","
+			                       + "&" + tSourcesName + ","
+			                       + in.size() + ","
+			                       + "&" + tDestinationsName + ","
+			                       + tNbDestinationsName;
+			
+			activitiesDecl.add(activityInit);
+		}
+		for(PortConnection co : pi.getOwnedPortConnections())
+		{
+			ConnectedElement src = (ConnectedElement) co.getSource();
+			ConnectedElement dest = (ConnectedElement) co.getDestination();
+			if ((src.getContext()!=null) && (dest.getContext() != null))
+			{
+				Port p = (Port) dest.getConnectionEnd();
+				
+				final String portID = p.getName() + "_id";
+				mainImplCode.addOutputNewline("pok_port_id_t " + portID + ";");
+				
+				final String portInit = "\"" + p.getName() + "\"" + ","
+				                        + "sizeof(int) * " + getPropertyInt("Queue_Size", p, 1) + ","
+				                        + "FIFO" + ","
+				                        + "&" + portID;
+				
+				portsDecl.add(portInit);
+			}
+		}
+	}
+
+	private static int getPropertyInt(final String propertyName, NamedElement e, final int defaultValue)
+	{
+		 try
+		    {
+		      return (int) PropertyUtils.getIntValue(e, propertyName) ;
+		    }
+		    catch(Exception ex)
+		    {
+		      if (e instanceof Subcomponent)
+		    	  return getPropertyInt(propertyName, ((Subcomponent)e).getComponentImplementation(),defaultValue);
+		      else if (e instanceof ComponentImplementation)
+		    	  return getPropertyInt(propertyName, ((ComponentImplementation)e).getType(),defaultValue);
+		      else
+		    	  //ex.printStackTrace() ;
+		      return defaultValue;
+		    }
+	}
+
+	private static String getPortIdentifier (NamedElement process, Port p)
+	{
+		return p.getName();
+	}
+	
+	private static List<Port> getPorts(ThreadType tt, DirectionType d)
+	{
+		ArrayList<Port> l = new ArrayList<Port>();
+		for(DataPort dp : tt.getOwnedDataPorts())
+		{
+			if (dp.getDirection() == d)
+				l.add(dp);
+		}
+		for(EventDataPort dp : tt.getOwnedEventDataPorts())
+		{
+			if (dp.getDirection() == d)
+				l.add(dp);
+		}
+		return l;
+	}
+	
+	private static List<Port> getDestinations(ThreadImplementation ti, Port source)
+	{
+		ArrayList<Port> l = new ArrayList<Port>();
+		for(PortConnection pc : ti.getOwnedPortConnections())
+		{
+			ConnectedElement ceSource = (ConnectedElement) pc.getSource();
+			if (ceSource.getConnectionEnd() == source)
+			{
+				ConnectedElement ceDest = (ConnectedElement) pc.getDestination();
+				l.add((Port) ceDest.getConnectionEnd());
+			}
+		}
+		return l;
+	}
+	
+	
+
+	private static List<ComponentInstance> getAllBindedProcesses(
 			ComponentInstance processor)
 	{
 		ArrayList<ComponentInstance> processList = new ArrayList<ComponentInstance>();
@@ -150,7 +249,7 @@ public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 		return processList;
 	}
 
-	private ComponentInstance getProcessBind(ComponentInstance process)
+	private static ComponentInstance getProcessBind(ComponentInstance process)
 	{
 		try
 		{
@@ -168,79 +267,13 @@ public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 		}
 	}
 	
-	protected void genDeploymentHeaderEnd(UnparseText mainHeaderCode)
+	private static ComponentClassifier getImplementedAs(ProcessImplementation process)
 	{
-		mainHeaderCode.addOutputNewline("#define POK_NEEDS_TIME_TRIGGERED 1") ;
-	}
-	
-	private String getFeatureIdentifier(FeatureInstance fi)
-	{
-		return GenerationUtilsC.getGenerationCIdentifier(fi.getComponentInstancePath()+"_"+fi.getName());
-	}
+		for(NamedElement ne : HookAccessImpl.getTransformationTracesFromSourceDecl(process))
+		{
+			if (ne instanceof ProcessImplementation)
+				return (ProcessImplementation) ne;
+		}
+		return null;
+	} 
 }
-
-/*
- * TODO
- * 
- * ***** ALL EXAMPLE :
- * 
- * KERNEL
- * 
- * deployment.h
- * 
- * #define POK_CONFIG_NB_NODES 1
- * 
- * 
- * ***** BUFFER EXAMPLE:
- * 
- * KERNEL
- * 
- * #define POK_CONFIG_NB_LOCKOBJECTS 1 (also for blackboard and event and
- * buffer) DONE
- * deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0");
- * 
- * 
- * PART
- * 
- * main.h
- * 
- * #define POK_CONFIG_NB_BUFFERS 1 #define POK_NEEDS_BUFFERS 1 #define
- * POK_NEEDS_ARINC653_BUFFER 1
- * 
- * #include <arinc653/buffer.h>
- * 
- * deployment.c
- * 
- * uint8_t input_id; char* pok_buffers_names[POK_CONFIG_NB_BUFFERS] = {"input"};
- * 
- * activity.c
- * 
- * test__myint input_dvalue; ????????????? extern BUFFER_ID_TYPE input_id;
- * 
- * main.c
- * 
- * extern BUFFER_ID_TYPE input_id; CREATE_BUFFER ("input", sizeof
- * (BUFFER_ID_TYPE), 1, FIFO, &(input_id), &(ret));
- * 
- * ***** EVENT EXAMPLE :
- * 
- * PART
- * 
- * main.h
- * 
- * #define POK_CONFIG_NB_EVENTS 1 #define POK_NEEDS_EVENTS 1 #define
- * POK_CONFIG_ARINC653_NB_EVENTS 1 #define POK_NEEDS_ARINC653_EVENT 1
- * 
- * #include <arinc653/event.h>
- * 
- * deployment.c
- * 
- * EVENT_ID_TYPE input_id; char*
- * pok_arinc653_events_names[POK_CONFIG_ARINC653_NB_EVENTS] = {"input"};
- * 
- * main.c
- * 
- * extern EVENT_ID_TYPE input_id;
- * 
- * CREATE_EVENT ("input", &(input_id), &(ret));
- */
