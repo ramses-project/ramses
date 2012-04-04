@@ -137,7 +137,7 @@ unique lazy rule ProcessType {
  	type : AADLI!ProcessType
  to 
  	typeImg : AADLBA!ProcessType (
- 	 name <- type.name,
+ 	 name <- c.uniqueName(),
 	 ownedEventDataPort <- c.featureInstance->select(e| e.category=#eventDataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
 	 ownedDataPort <- c.featureInstance->select(e| e.category=#dataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
 	 ownedEventPort <- c.featureInstance->select(e| e.category=#eventPort)->collect(f| thisModule.resolveTemp(f, 'f')),
