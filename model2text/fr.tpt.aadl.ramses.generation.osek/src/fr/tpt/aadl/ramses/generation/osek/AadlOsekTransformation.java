@@ -14,7 +14,7 @@ import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 
-	public static final String[] ATL_FILE_NAMES = new String[] { "osek/ExpandThreadsPorts.asm", "ExpandSubprogramCalls.asm", "CreateThreadsBehavior.asm" };
+	public static final String[] ATL_FILE_NAMES = new String[] { "targets/osek/ExpandThreadsPorts.asm", "ExpandSubprogramCalls.asm", "CreateThreadsBehavior.asm" };
 
 	public static final List<File> ATL_FILES = new ArrayList<File>(
 			ATL_FILE_NAMES.length);
