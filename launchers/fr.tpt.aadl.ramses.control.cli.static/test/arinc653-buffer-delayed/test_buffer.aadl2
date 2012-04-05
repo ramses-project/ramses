@@ -91,6 +91,7 @@ features
    {
    	Compute_Deadline => 10ms;
    	Output_Rate => (Value_Range => 2.0;);
+   	Output_Time => (Time => Deadline; Offset => 0.0 ms;);
    };
 end mythread1;
 
