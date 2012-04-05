@@ -7,11 +7,11 @@ import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.instance.ComponentInstance ;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition ;
-import fr.tpt.aadl.annex.behavior.aadlba.Identifier ;
 import fr.tpt.aadl.annex.behavior.aadlba.LoopStatement ;
 import fr.tpt.aadl.flow.extraction.ExtractionContext ;
 import fr.tpt.aadl.flow.model.RTAction ;
@@ -30,16 +30,17 @@ public abstract class AutomatonAnalyzer extends BAElementAnalyzer
 
   protected boolean checkIsCompatibleSpecification(BehaviorAnnex ba)
   {
-    List<BehaviorTransition> transitions = ba.getBehaviorTransitions() ;
+    List<BehaviorTransition> transitions = ba.getTransitions() ;
 
     for(int indexTr = 0 ; indexTr < transitions.size() ; indexTr++)
     {
       BehaviorTransition tran = transitions.get(indexTr) ;
+      BehaviorActionBlock bab = tran.getActionBlock();
+      
       BehaviorActionSequence actions =
-            (BehaviorActionSequence) tran.getBehaviorActionBlockOwned()
-                  .getBehaviorActionsOwned() ;
+            (BehaviorActionSequence) bab.getContent();
 
-      for(BehaviorAction action : actions.getBehaviorActions())
+      for(BehaviorAction action : actions.getActions())
       {
         if(action instanceof LoopStatement)
         {
@@ -56,9 +57,8 @@ public abstract class AutomatonAnalyzer extends BAElementAnalyzer
   protected static boolean isInitial(BehaviorTransition t,
                                      String stateID)
   {
-    Identifier s = t.getSourceStateIdentifiers().get(0) ;
-    BehaviorState bs = (BehaviorState) s.getBaRef() ;
-    return (s.getId().equals(stateID) && bs.isInitial()) ;
+    BehaviorState bs = t.getSourceState() ;
+    return (bs.getName().equals(stateID) && bs.isInitial()) ;
   }
 
   protected static void registerStatesIntoGraph(BehaviorAnnex ba,
@@ -69,10 +69,9 @@ public abstract class AutomatonAnalyzer extends BAElementAnalyzer
     String ownerID = ((NamedElement) ba.getOwner()).getName() ;
     ownerID = ownerID.replace(".", "_") ;
 
-    for(BehaviorState s : ba.getBehaviorStates())
+    for(BehaviorState s : ba.getStates())
     {
-      Identifier stateID = s.getIdentifierOwned() ;
-      String id = stateID.getId() ;
+      String id = s.getName() ;
       RTAction st =
             RTAction.createEmptyAction(ownerID + "_entering_state_" + id, task) ;
       RTAction end =

@@ -29,6 +29,8 @@ package fr.tpt.aadl.ramses.transformation.atl.hooks ;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
 
 import org.eclipse.emf.common.util.EList ;
@@ -48,7 +50,7 @@ import org.osate.aadl2.instance.InstanceObject;
  * <!-- end-user-doc -->
  *
  *
- * @see fr.tpt.aadl.transformation.hooks.ATLHooks.ATLHooksPackage#getHookAccess()
+ * @see fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage#getHookAccess()
  * @model
  * @generated
  */
@@ -111,5 +113,13 @@ public interface HookAccess extends EObject
    * @generated
    */
   void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance);
+
+    /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @model stateRequired="true" transitionRequired="true"
+   * @generated
+   */
+  void putTransitionWhereSrc(BehaviorState state, BehaviorTransition transition);
 
 } // HookAccess

@@ -48,10 +48,11 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Task;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
 import fr.tpt.aadl.ramses.util.generation.FileUtils ;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
+import fr.tpt.aadl.ramses.util.properties.PropertyNotFound ;
 import fr.tpt.aadl.ramses.util.properties.PropertyUtils;
 
 /**
- * Parser pour générer un fichier.oil pour OSEK à partir du aadl.
+ * Unparser to generate an oil file for OSEK from aadl.
  */
 public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 
@@ -98,19 +99,6 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 */
 	private final static int THREAD_ACTIVATION = 1;
 	private final static int THREAD_STACKSIZE = 512;
-	
-	/**
-	 * Exception thrown when a mandatory property is not found in the 
-	 * input AADL model.
-	 */
-	private static class PropertyNotFound extends RuntimeException {
-
-		private static final long serialVersionUID = 1L;
-
-		private PropertyNotFound(Throwable cause) {
-			super(cause);
-		}
-	}
 	
 	/**
 	 * OIL AST

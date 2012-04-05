@@ -34,23 +34,22 @@ import org.eclipse.emf.common.util.AbstractEnumerator ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AccessType ;
 import org.osate.aadl2.AnnexSubclause ;
-import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.ArrayDimension ;
 import org.osate.aadl2.DataAccess ;
+import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DirectionType ;
-import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
-import org.osate.aadl2.IntegerLiteral ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Parameter ;
 import org.osate.aadl2.ParameterConnectionEnd ;
-import org.osate.aadl2.PropertyConstant ;
 import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramSubcomponentType ;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.modelsupport.AadlConstants ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 
+import fr.tpt.aadl.annex.behavior.aadlba.Any ;
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence ;
@@ -58,9 +57,9 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSet ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorBooleanLiteral ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorEnumerationLiteral ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorIntegerLiteral ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorNamedElement ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorPropertyConstant ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorRealLiteral ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorStringLiteral ;
@@ -69,18 +68,19 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable ;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryNumericOperator ;
-import fr.tpt.aadl.annex.behavior.aadlba.CompletionRelativeTimeoutConditionAndCatch ;
-import fr.tpt.aadl.annex.behavior.aadlba.ComponentPropertyValue ;
+import fr.tpt.aadl.annex.behavior.aadlba.CalledSubprogramHolder ;
+import fr.tpt.aadl.annex.behavior.aadlba.DataAccessHolder ;
 import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference ;
-import fr.tpt.aadl.annex.behavior.aadlba.Declarator ;
+import fr.tpt.aadl.annex.behavior.aadlba.DataSubcomponentHolder ;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchCondition ;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchConjunction ;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchTriggerConditionStop ;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchTriggerLogicalExpression ;
+import fr.tpt.aadl.annex.behavior.aadlba.ElementHolder ;
 import fr.tpt.aadl.annex.behavior.aadlba.ElementValues ;
+import fr.tpt.aadl.annex.behavior.aadlba.ElseStatement ;
 import fr.tpt.aadl.annex.behavior.aadlba.Factor ;
 import fr.tpt.aadl.annex.behavior.aadlba.ForOrForAllStatement ;
-import fr.tpt.aadl.annex.behavior.aadlba.Identifier ;
 import fr.tpt.aadl.annex.behavior.aadlba.IfStatement ;
 import fr.tpt.aadl.annex.behavior.aadlba.IntegerRange ;
 import fr.tpt.aadl.annex.behavior.aadlba.IntegerValue ;
@@ -89,9 +89,8 @@ import fr.tpt.aadl.annex.behavior.aadlba.IntegerValueVariable ;
 import fr.tpt.aadl.annex.behavior.aadlba.LockAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.LogicalOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.MultiplyingOperator ;
-import fr.tpt.aadl.annex.behavior.aadlba.Name ;
-import fr.tpt.aadl.annex.behavior.aadlba.Numeral ;
 import fr.tpt.aadl.annex.behavior.aadlba.Otherwise ;
+import fr.tpt.aadl.annex.behavior.aadlba.ParameterHolder ;
 import fr.tpt.aadl.annex.behavior.aadlba.ParameterLabel ;
 import fr.tpt.aadl.annex.behavior.aadlba.PortCountValue ;
 import fr.tpt.aadl.annex.behavior.aadlba.PortDequeueAction ;
@@ -103,9 +102,10 @@ import fr.tpt.aadl.annex.behavior.aadlba.Relation ;
 import fr.tpt.aadl.annex.behavior.aadlba.RelationalOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression ;
 import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction ;
+import fr.tpt.aadl.annex.behavior.aadlba.SubprogramHolder ;
 import fr.tpt.aadl.annex.behavior.aadlba.Term ;
 import fr.tpt.aadl.annex.behavior.aadlba.TimedAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.TimeoutCatch ;
+import fr.tpt.aadl.annex.behavior.aadlba.UnaryAddingOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryBooleanOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryNumericOperator ;
 import fr.tpt.aadl.annex.behavior.aadlba.UnlockAction ;
@@ -115,6 +115,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.util.AadlBaSwitch ;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
 import fr.tpt.aadl.annex.behavior.unparser.AadlBaUnparser ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
+import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
 import fr.tpt.aadl.ramses.control.support.utils.Aadl2Utils ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
@@ -186,9 +187,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       first = false ;
       Object o = it.next() ;
 
-      if(o instanceof Element)
+      if(o instanceof ElementHolder)
       {
-        process((Element) o) ;
+        process((ElementHolder) o) ;
       }
       else if(o instanceof AbstractEnumerator)
         aadlText.addOutput(((AbstractEnumerator) o).getName().toLowerCase()) ;
@@ -204,9 +205,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   }
 
   public void processEList(UnparseText aadlText,
-                           final EList<? extends Element> list)
+                           final EList<? extends BehaviorElement> list)
   {
-    for(Iterator<? extends Element> it = list.iterator() ; it.hasNext() ;)
+    for(Iterator<? extends BehaviorElement> it = list.iterator() ; it.hasNext() ;)
     {
       process(it.next()) ;
     }
@@ -241,11 +242,11 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
   protected static String getInitialStateIdentifier(BehaviorAnnex ba)
   {
-    for(BehaviorState s : ba.getBehaviorStates())
+    for(BehaviorState s : ba.getStates())
     {
       if(s.isInitial())
       {
-        return s.getIdentifierOwned().getId() ;
+        return s.getName() ;
       }
     }
 
@@ -354,7 +355,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseAnnexSubclause(AnnexSubclause object)
       {
-        //FIXME : TODO : update location reference
         process((BehaviorAnnex) object) ;
         return DONE ;
       }
@@ -376,7 +376,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               "_BA_State_t current_state = " + aadlComponentCId + "_" +
               AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
         _cFileContent.addOutputNewline("char final = 0;") ;
-        processEList(_cFileContent, ba.getBehaviorVariables()) ;
+        processEList(_cFileContent, ba.getVariables()) ;
         _cFileContent.addOutputNewline("while(final != 1)") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
@@ -386,19 +386,24 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _headerFileContent.addOutputNewline("typedef enum {") ;
         _headerFileContent.incrementIndent() ;
 
-        for(BehaviorState state : ba.getBehaviorStates())
+        for(BehaviorState state : ba.getStates())
         {
-          if(state.getSourceInTrans().isEmpty() == false)
+          if(AadlBaVisitors.getTransitionWhereSrc
+                (state).isEmpty() == false)
           {
             _cFileContent.addOutputNewline("case " + aadlComponentCId + "_" +
-                  state.getIdentifierOwned().getId() + ":") ;
-            processEList(_cFileContent, state.getSourceInTrans()) ;
+                  state.getName() + ":") ;
+            processEList(_cFileContent, (EList<BehaviorTransition>) AadlBaVisitors.
+                         getTransitionWhereSrc(state)) ;
           }
+          
+          String stateCId = GenerationUtilsC.
+                getGenerationCIdentifier(aadlComponent.getQualifiedName()+
+                                         "_"+state.getName());
+          _headerFileContent.addOutput(stateCId);
 
-          aadlbaText = _headerFileContent ;
-          caseIdentifier(state.getIdentifierOwned()) ;
 
-          if(ba.getBehaviorStates().indexOf(state) < ba.getBehaviorStates()
+          if(ba.getStates().indexOf(state) < ba.getStates()
                 .size() - 1)
           {
             _headerFileContent.addOutput(",") ;
@@ -424,79 +429,45 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseBehaviorVariable(BehaviorVariable object)
       {
-        //FIXME : TODO : update location reference
-        for(Declarator d : object.getLocalVariableDeclarators())
+        String sourceName ;
+        try
         {
-          process(object.getDataUniqueComponentClassifierReference()) ;
-          process(d) ;
-          GeneratorUtils.getInitialValue(object
-                .getDataUniqueComponentClassifierReference()) ;
-          _cFileContent.addOutputNewline("") ;
+          sourceName = PropertyUtils.
+                getStringValue(object.getDataClassifier(), "Source_Name") ;
         }
-
-        return DONE ;
-      }
-
-      /**
-       * Unparse declarators
-       */
-      public String caseDeclarator(Declarator object)
-      {
-        //FIXME : TODO : update location reference
-        _cFileContent.addOutput(" " + object.getIdentifierOwned().getId()) ;
-        caseArraySize(object.getArraySizes()) ;
-        _cFileContent.addOutput(";") ;
+        catch (Exception e)
+        {
+          sourceName = GenerationUtilsC.
+                getGenerationCIdentifier(object.
+                                         getDataClassifier().getQualifiedName());
+        }
+        _cFileContent.addOutput(sourceName);
+        _cFileContent.addOutput(" " + object.getName()) ;
+        caseArrayDimensions(object.getArrayDimensions()) ;
+        GeneratorUtils.getInitialValue(object.getDataClassifier()) ;
+        _cFileContent.addOutputNewline("") ;
         return DONE ;
       }
 
       /**
        * Unparse arraysize
        */
-      public String caseArraySize(EList<IntegerValueConstant> arraySizes)
+      public String caseArrayDimensions(EList<ArrayDimension> arrayDimensions)
       {
-        //FIXME : TODO : update location reference
-        for(IntegerValueConstant ivc : arraySizes)
+        for(ArrayDimension ivc : arrayDimensions)
         {
           _cFileContent.addOutput("[") ;
-
-          if(ivc instanceof BehaviorPropertyConstant)
-          {
-            PropertyConstant pc =
-                  (PropertyConstant) ((BehaviorPropertyConstant) ivc)
-                        .getAadlRef() ;
-            _cFileContent.addOutput(Long.toString(((IntegerLiteral) pc
-                  .getConstantValue()).getValue())) ;
-          }
-          else
-          {
-            process(ivc) ;
-          }
-
+          _cFileContent.addOutput(Long.toString(ivc.getSize().getSize()));
           _cFileContent.addOutput("]") ;
         }
 
         return DONE ;
       }
 
-      public String caseBehaviorNamedElement(BehaviorNamedElement object)
-      {
-        if(object.getAadlRef() != null &&
-              object.getAadlRef() instanceof NamedElement)
-        {
-          if(resolveExistingCodeDependencies((NamedElement) object.getAadlRef()))
-          {
-            return DONE ;
-          }
-        }
-
-        caseIdentifier(object.getQualifiedName()) ;
-        return DONE ;
-      }
-
-      public String caseComponentPropertyValue(ComponentPropertyValue object)
+      public String caseBehaviorEnumerationLiteral(BehaviorEnumerationLiteral object)
       {
         // ComponentPropertyValue is defined to refer Enumerated data
-        caseIdentifier(object.getElementListIdentifier()) ;
+        _cFileContent.addOutput(object.getEnumLiteral().getValue());
         return DONE ;
       }
 
@@ -512,7 +483,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               GenerationUtilsC.getGenerationCIdentifier(aadlComponent
                     .getQualifiedName()) ;
         _cFileContent.addOutputNewline("current_state = " + aadlComponentCId +
-              "_" + object.getIdentifierOwned().getId() + ";") ;
+              "_" + object.getName() + ";") ;
         //if (object.isComplete())
 
         if(object.isFinal())
@@ -524,89 +495,38 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
 
-      /**
-       * Unparse identifier
-       */
-      public String caseIdentifier(Identifier object)
-      {
-        //FIXME : TODO : update location reference
-        if(object.getAadlRef() != null &&
-              object.getAadlRef() instanceof NamedElement)
-        {
-          NamedElement ne = (NamedElement) object.getAadlRef() ;
-          aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(ne
-                .getQualifiedName())) ;
-        }
-        else if(object.getBaRef() != null &&
-              object.getBaRef() instanceof NamedElement)
-        {
-          NamedElement ne = (NamedElement) object.getBaRef() ;
-          aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(ne
-                .getQualifiedName())) ;
-        }
-        else
-        {
-          Element e = (Element) object ;
-
-          while(e != null && e instanceof Classifier == false)
-          {
-            e = (Element) e.eContainer() ;
-          }
-
-          if(e != null)
-          {
-            Classifier ne = (Classifier) e ;
-            String r =
-                  GenerationUtilsC.getGenerationCIdentifier(ne
-                        .getQualifiedName() +
-                        "_" + object.getId()) ;
-            aadlbaText.addOutput(r) ;
-            return DONE ;
-          }
-
-          aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(object
-                .getId())) ;
-          return DONE ;
-        }
-
-        return DONE ;
-      }
-
+      
       /**
        * Unparse behaviortransition
        */
       public String caseBehaviorTransition(BehaviorTransition object)
       {
-        //FIXME : TODO : update location reference
         aadlbaText = _cFileContent ;
-        Identifier tid = object.getTransitionIdentifier() ;
-        Numeral num = object.getBehaviorTransitionPriority() ;
+        long num = object.getPriority() ;
 
-        if(tid != null)
+
+        _cFileContent.addOutput("// Transition id: " + object.getName()) ;
+
+
+        if(num != -1) // numeral
         {
-          _cFileContent.addOutput("// Transition id: ") ;
-          process(tid) ;
-
-          if(num != null) // numeral
-          {
-            _cFileContent.addOutput(" -- Priority " +
-                  String.valueOf(num.getValue())) ;
-          }
-
-          _cFileContent.addOutputNewline("") ;
+          _cFileContent.addOutput(" -- Priority " +
+                String.valueOf(num)) ;
         }
 
-        if(object.getBehaviorConditionOwned() != null)
+        _cFileContent.addOutputNewline("") ;
+
+        if(object.getCondition() != null)
         {
-          if(object.getBehaviorConditionOwned() instanceof Otherwise)
+          if(object.getCondition() instanceof Otherwise)
           {
             _cFileContent.addOutput("else") ;
-            process(object.getBehaviorConditionOwned()) ;
+            process(object.getCondition()) ;
           }
           else
           {
             _cFileContent.addOutput("if(") ;
-            process(object.getBehaviorConditionOwned()) ;
+            process(object.getCondition()) ;
             _cFileContent.addOutputNewline(")") ;
           }
         }
@@ -618,23 +538,17 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
 
-        if(object.getBehaviorActionBlockOwned() != null)
+        if(object.getActionBlock() != null)
         {
-          process(object.getBehaviorActionBlockOwned()) ;
+          process(object.getActionBlock()) ;
         }
 
-        process((BehaviorState) object.getDestinationStateIdentifier()
-              .getBaRef()) ;
+        process((BehaviorState) object.getDestinationState()) ;
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         return DONE ;
       }
 
-      public String caseTimeoutCatch(TimeoutCatch object)
-      {
-        // TODO: throw new Exception
-        return DONE ;
-      }
 
       public String caseOtherwise(Otherwise object)
       {
@@ -657,12 +571,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
 
-      public String caseCompletionRelativeTimeoutConditionAndCatch(CompletionRelativeTimeoutConditionAndCatch object)
-      {
-        // TODO: throw new Exception
-        return DONE ;
-      }
-
       public String caseDispatchTriggerLogicalExpression(DispatchTriggerLogicalExpression object)
       {
         // TODO: throw new Exception
@@ -677,9 +585,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseBehaviorActionBlock(BehaviorActionBlock object)
       {
-        process(object.getBehaviorActionsOwned()) ;
+        process(object.getContent()) ;
 
-        if(object.getBehaviorTimeOwned() != null)
+        if(object.getTimeout() != null)
         {
           // TODO: throw Exception
         }
@@ -689,7 +597,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseBehaviorActionSequence(BehaviorActionSequence object)
       {
-        processEList(_cFileContent, object.getBehaviorActions()) ;
+        processEList(_cFileContent, object.getActions()) ;
         return DONE ;
       }
 
@@ -699,42 +607,44 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
 
+      
+      /**
+       * Unparse elsestatement
+       */
+      public String caseElseStatement(ElseStatement object)
+      {
+        BehaviorActions lba = object.getBehaviorActions() ;
+        _cFileContent.addOutput("else ") ;
+        _cFileContent.addOutputNewline("{") ;
+        process(lba) ;
+        _cFileContent.addOutputNewline("}") ;
+        return DONE ;
+      }
+      
       /**
        * Unparse ifstatement
        */
       public String caseIfStatement(IfStatement object)
       {
-        //FIXME : TODO : update location reference
-        boolean first = true ;
-        EList<ValueExpression> lve = object.getLogicalValueExpressions() ;
-        EList<BehaviorActions> lba = object.getBehaviorActionsOwned() ;
+        ValueExpression ve = object.getLogicalValueExpression() ;
+        BehaviorActions lba = object.getBehaviorActions() ;
 
-        for(ValueExpression ve : lve)
+        if(object.eContainer() instanceof IfStatement)
         {
-          if(first)
-          {
-            first = false ;
-            _cFileContent.addOutput("if (") ;
-          }
-          else
-          {
-            _cFileContent.addOutput("elsif (") ;
-          }
-
+          _cFileContent.addOutput("elsif (") ;
           process(ve) ;
           _cFileContent.addOutput(") ") ;
-          _cFileContent.addOutputNewline("{") ;
-          process(lba.get(lve.indexOf(ve))) ;
-          _cFileContent.addOutputNewline("}") ;
         }
-
-        if(object.isHasElse())
+        else
         {
-          _cFileContent.addOutput("else ") ;
-          _cFileContent.addOutputNewline("{") ;
-          process(lba.get(lba.size() - 1)) ;
-          _cFileContent.addOutputNewline("}") ;
+          _cFileContent.addOutput("if (") ;
+          process(ve) ;
+          _cFileContent.addOutput(") ") ;
         }
+        
+        _cFileContent.addOutputNewline("{") ;
+        process(lba) ;
+        _cFileContent.addOutputNewline("}") ;
 
         return DONE ;
       }
@@ -751,16 +661,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         {
           if(integerValue instanceof BehaviorVariable)
           {
-            return ((BehaviorVariable) integerValue)
-                  .getDataUniqueComponentClassifierReference().getName()
-                  .getId() ;
+            return ((BehaviorVariable) integerValue).getDataClassifier()
+                  .getName();
           }
 
           if(integerValue instanceof DataComponentReference)
           {
-            return ((BehaviorVariable) integerValue)
-                  .getDataUniqueComponentClassifierReference().getName()
-                  .getId() ;
+            return ((BehaviorVariable) integerValue).getDataClassifier()
+                  .getName();
           }
         }
 
@@ -772,8 +680,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseForOrForAllStatement(ForOrForAllStatement object)
       {
-        //FIXME : TODO : update location reference
-        ElementValues set = object.getElementValuesOwned() ;
+        ElementValues set = object.getIteratedValues() ;
 
         if(set instanceof IntegerRange)
         {
@@ -785,11 +692,21 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 ";iter<=" + upperRangeValue + ";iter++)") ;
           _cFileContent.addOutputNewline("{") ;
           _cFileContent.incrementIndent() ;
-          process(object.getDataUniqueComponentClassifierReference()) ;
+          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
+          try
+          {
+            resolveExistingCodeDependencies(iterativeVariableClassifier);
+          } catch(Exception e)
+          {
+            _cFileContent.addOutput(GenerationUtilsC.
+                                    getGenerationCIdentifier(iterativeVariableClassifier.
+                                    getQualifiedName()));
+          }
+          
           _cFileContent.addOutput(" ") ;
-          process(object.getElementIdentifier()) ;
+          _cFileContent.addOutput(object.getIterativeVariable().getName()) ;
           _cFileContent.addOutputNewline(" = iter;") ;
-          process(object.getBehaviorActionsOwned()) ;
+          process(object.getBehaviorActions()) ;
           _cFileContent.decrementIndent() ;
           _cFileContent.addOutputNewline("}") ;
         }
@@ -801,7 +718,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           try
           {
             dataReferenceTypeHolder =
-                  AadlBaUtils.getTypeHolder(object.getElementValuesOwned()) ;
+                  AadlBaUtils.getTypeHolder(object.getIteratedValues()) ;
           }
           catch(DimensionException e)
           {
@@ -823,11 +740,20 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             _cFileContent.incrementIndent() ;
           }
 
-          process(object.getDataUniqueComponentClassifierReference()) ;
+          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
+          try
+          {
+            resolveExistingCodeDependencies(iterativeVariableClassifier);
+          }
+          catch(Exception e)
+          {
+            _cFileContent.addOutput(GenerationUtilsC.
+                                    getGenerationCIdentifier(iterativeVariableClassifier.getQualifiedName()));
+          }
           _cFileContent.addOutput(" ") ;
-          process(object.getElementIdentifier()) ;
+          _cFileContent.addOutput(object.getIterativeVariable().getName()) ;
           _cFileContent.addOutput(" = ") ;
-          process(object.getElementValuesOwned()) ;
+          process(object.getIteratedValues()) ;
 
           for(int i = 0 ; i < numberOfLoop ; i++)
           {
@@ -838,7 +764,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           }
 
           _cFileContent.addOutputNewline(";") ;
-          process(object.getBehaviorActionsOwned()) ;
+          process(object.getBehaviorActions()) ;
 
           for(int i = 0 ; i < numberOfLoop ; i++)
           {
@@ -873,7 +799,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutputNewline(")") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
-        process(object.getBehaviorActionsOwned()) ;
+        process(object.getBehaviorActions()) ;
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         return DONE ;
@@ -888,7 +814,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutputNewline("do") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
-        process(object.getBehaviorActionsOwned()) ;
+        process(object.getBehaviorActions()) ;
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         _cFileContent.addOutput("while (") ;
@@ -920,103 +846,41 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseAssignmentAction(AssignmentAction object)
       {
-        //FIXME : TODO : update location reference
-        process(object.getTargetOwned()) ;
+        process(object.getTarget()) ;
         _cFileContent.addOutput(" = ") ;
 
-        if(object.isAny())
+        if(object instanceof Any)
         // TODO: throw new Exception
         {
           _cFileContent.addOutput("") ;
         }
         else
         {
-          process(object.getValueExpressionOwned()) ;
+          process(object.getValueExpression()) ;
         }
 
         _cFileContent.addOutputNewline(";") ;
         return DONE ;
       }
-
-      /**
-       * Unparse name
-       */
-      public String caseName(Name object)
+      
+      public String caseCalledSubprogramHolder(CalledSubprogramHolder object)
       {
-        //FIXME : TODO : update location reference
-        process(object.getIdentifierOwned()) ;
-
-        if(object.isSetArrayIndexes())
-        {
-          return caseArrayIndex(object.getArrayIndexes()) ;
-        }
-        else
-        {
-          return DONE ;
-        }
-      }
-
-      /**
-       * Unparse arrayindex
-       */
-      public String caseArrayIndex(EList<IntegerValue> object)
-      {
-        //FIXME : TODO : update location reference
-        for(IntegerValue iv : object)
-        {
-          _cFileContent.addOutput("[") ;
-          process(iv) ;
-          _cFileContent.addOutput("]") ;
-        }
-
+        aadlbaText = _cFileContent;
+        resolveExistingCodeDependencies(object.getElement());
         return DONE ;
       }
-
-      /**
-       * Unparse datacomponentreference
-       */
-      public String caseDataComponentReference(DataComponentReference object)
-      {
-        if(object.getAadlRef() != null &&
-              object.getAadlRef() instanceof NamedElement)
-        {
-          if(resolveExistingCodeDependencies((NamedElement) object.getAadlRef()))
-          {
-            return DONE ;
-          }
-        }
-
-        Element elt =
-              object.getNames().get(0).getIdentifierOwned().getAadlRef() ;
-
-        if(elt != null && elt instanceof NamedElement)
-        {
-          if(resolveExistingCodeDependencies((NamedElement) elt))
-          {
-            return DONE ;
-          }
-        }
-
-        processEList(aadlbaText, object.getNames()) ;
-        return DONE ;
-      }
-
+      
       public String caseSubprogramCallAction(SubprogramCallAction object)
       {
-    	Parameter returnParameter = null;
-    	
-        if(object.isSetSubprogramNames())
-        {
-          processEList(_cFileContent, object.getSubprogramNames(), "_") ;
-        }
-        else if(object.getSubprogramReference() != null)
+        Parameter returnParameter = null;
+
+        if(object.getSubprogram().getElement() != null)
         {
           SubprogramType st = null ;
           SubprogramSubcomponentType sct =
-                (SubprogramSubcomponentType) object.getSubprogramReference()
-                      .getAadlRef() ;
+                (SubprogramSubcomponentType) object.getSubprogram().getElement() ;
 
-          
+
           if(sct instanceof SubprogramType)
           {
             st = (SubprogramType) sct ;
@@ -1033,32 +897,32 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           {
             ParameterConnectionEnd pce =
                   (ParameterConnectionEnd) ordereFeatureList.get(object
-                        .getParameterLabels().indexOf(pl)) ;
+                                                                 .getParameterLabels().indexOf(pl)) ;
 
-              if(pce instanceof Parameter)
-              {
-                Parameter p = (Parameter) pce ;
-                boolean isReturnParam=false;
-                try {
-					isReturnParam =
-					        PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
-				} catch (Exception e) {
-					isReturnParam  = PredefinedPropertiesManager
-                    .getDefaultBooleanValue("Generation_Properties",
-                                           "Return_Parameter") ;
-				}
-                if(isReturnParam)
-                {
-                	returnParameter = p;
-                	process(pl);
-                	_cFileContent.addOutput(" = ") ;
-                	break;
-                }
+            if(pce instanceof Parameter)
+            {
+              Parameter p = (Parameter) pce ;
+              boolean isReturnParam=false;
+              try {
+                isReturnParam =
+                      PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
+              } catch (Exception e) {
+                isReturnParam  = PredefinedPropertiesManager
+                      .getDefaultBooleanValue("Generation_Properties",
+                            "Return_Parameter") ;
               }
+              if(isReturnParam)
+              {
+                returnParameter = p;
+                process(pl);
+                _cFileContent.addOutput(" = ") ;
+                break;
+              }
+            }
           }
 
-          process(object.getSubprogramReference()) ;
-          
+          process(object.getSubprogram()) ;
+
           if(st != null)
           {
             _cFileContent.addOutput(" (") ;
@@ -1067,82 +931,85 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             {
               ParameterConnectionEnd pce =
                     (ParameterConnectionEnd) ordereFeatureList.get(object
-                          .getParameterLabels().indexOf(pl)) ;
+                                                                   .getParameterLabels().indexOf(pl)) ;
 
-                if(pce instanceof Parameter)
+              if(pce instanceof Parameter)
+              {
+                Parameter p = (Parameter) pce ;
+                if(p==returnParameter)
+                  continue;
+                if(first==false)
+                  _cFileContent.addOutput(", ") ;
+                if(p.getDirection().equals(DirectionType.OUT) ||
+                      p.getDirection().equals(DirectionType.IN_OUT))
                 {
-                  Parameter p = (Parameter) pce ;
-                  if(p==returnParameter)
-                	  continue;
-                  if(first==false)
-                	  _cFileContent.addOutput(", ") ;
-                  if(p.getDirection().equals(DirectionType.OUT) ||
-                        p.getDirection().equals(DirectionType.IN_OUT))
+                  _cFileContent.addOutput("&") ;
+                }
+
+                process(pl) ;
+                first=false;
+              }
+              else if(pce instanceof DataAccess)
+              {
+                DataAccess da = (DataAccess) pce ;
+                if(first==false)
+                  _cFileContent.addOutput(", ") ;
+                if(da.getKind().equals(AccessType.REQUIRED))
+                {
+                  String accessRight = null ;
+
+                  try
+                  {
+                    accessRight =
+                          PropertyUtils.getEnumValue(da, "Access_Right") ;
+                  }
+                  catch(Exception e)
+                  {
+                    accessRight =
+                          PredefinedPropertiesManager
+                          .getDefaultStringValue("Memory_Properties",
+                                "Access_Right") ;
+                  }
+
+                  if(accessRight.equalsIgnoreCase("Read_Write"))
                   {
                     _cFileContent.addOutput("&") ;
                   }
-                  
-                  process((ParameterLabel) pl) ;
-                  first=false;
                 }
-                else if(pce instanceof DataAccess)
+
+                String name = null ;
+
+                // If a data access mapping is provided:
+                // Transforms any data access into the right data subcomponent
+                // 's name thanks to the given data access mapping.
+                if(_dataAccessMapping != null)
                 {
-                  DataAccess da = (DataAccess) pce ;
-                  if(first==false)
-                	  _cFileContent.addOutput(", ") ;
-                  if(da.getKind().equals(AccessType.REQUIRED))
-                  {
-                    String accessRight = null ;
-
-                    try
-                    {
-                      accessRight =
-                            PropertyUtils.getEnumValue(da, "Access_Right") ;
-                    }
-                    catch(Exception e)
-                    {
-                      accessRight =
-                            PredefinedPropertiesManager
-                                  .getDefaultStringValue("Memory_Properties",
-                                                         "Access_Right") ;
-                    }
-                    
-                    if(accessRight.equalsIgnoreCase("Read_Write"))
-                    {
-                      _cFileContent.addOutput("&") ;
-                    }
-                  }
-                  
-                  String name = null ;
-                  
-                  // If a data access mapping is provided:
-                  // Transforms any data access into the right data subcomponent
-                  // 's name thanks to the given data access mapping.
-                  if(_dataAccessMapping != null)
-                  {
-                    name = _dataAccessMapping.get(pl.getAadlRef());
-                  }
-                  
-                  if (name != null)
-                  {
-                    _cFileContent.addOutput(name);
-                  }
-                  else // Otherwise, process parameter label as usual.
-                  {
-                    if(pl.getAadlRef() instanceof DataSubcomponent)
-                    {
-                      DataSubcomponent ds = (DataSubcomponent)pl.getAadlRef();
-                      _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(ds.getQualifiedName()));
-                    }
-                    else
-                      process((ParameterLabel) pl) ;
-                  }
-                  first=false;
+                  Relation r = ((ValueExpression)pl).getRelations().get(0);
+                  Term t = r.getFirstExpression().getTerms().get(0);
+                  DataSubcomponentHolder dsh = (DataSubcomponentHolder) t.getFactors().get(0).getFirstValue();
+                  name = _dataAccessMapping.get((DataAccess)dsh.getElement());
                 }
 
+                if (name != null)
+                {
+                  _cFileContent.addOutput(name);
+                }
+                else // Otherwise, process parameter label as usual.
+                {
+                  if(pl instanceof DataSubcomponentHolder)
+                  {
+                    DataSubcomponent ds = ((DataSubcomponentHolder)pl).getDataSubcomponent();
+                    _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(ds.getQualifiedName()));
+                  }
+                  else
+                    process((ParameterLabel) pl) ;
+                }
+                first=false;
               }
 
-              _cFileContent.addOutputNewline(");") ;
+            }
+
+            _cFileContent.addOutputNewline(");") ;
           }
         }
         else
@@ -1158,6 +1025,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
 
+      public String caseElementHolder(ElementHolder object)
+      {
+        String id = object.getElement().getQualifiedName();
+        aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(id));
+        return DONE ;
+      }
+      
       public String casePortSendAction(PortSendAction object)
       {
         // TODO: throw new Exception
@@ -1254,21 +1128,12 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutput(Long.toString(object.getValue())) ;
         return DONE ;
       }
-
-      /**
-       * Unparse parameterlabel
-       */
-      public String caseParameterLabel(ValueExpression object)
-      {
-        return DONE;
-      }
       
       /**
        * Unparse valueexpression
        */
       public String caseValueExpression(ValueExpression object)
       {
-        //FIXME : TODO : update location reference
         Iterator<Relation> itRel = object.getRelations().iterator() ;
         process(itRel.next()) ;
 
@@ -1294,15 +1159,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseRelation(Relation object)
       {
-        //FIXME : TODO : update location reference
-        process(object.getSimpleExpressionOwned()) ;
+        process(object.getFirstExpression()) ;
 
-        if(object.getSimpleExpressionSdOwned() != null)
+        if(object.getSecondExpression() != null)
         {
           _cFileContent.addOutput(" " +
                 AadlBaToCUnparser.getTargetLanguageOperator(object
-                      .getRelationalOperatorOwned()) + " ") ;
-          process(object.getSimpleExpressionSdOwned()) ;
+                      .getRelationalOperator()) + " ") ;
+          process(object.getSecondExpression()) ;
         }
 
         return DONE ;
@@ -1313,10 +1177,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseSimpleExpression(SimpleExpression object)
       {
-        //FIXME : TODO : update location reference
-        if(object.isSetUnaryAddingOperatorOwned())
+        if(object.getUnaryAddingOperator()!=UnaryAddingOperator.NONE)
         {
-          _cFileContent.addOutput(object.getUnaryAddingOperatorOwned()
+          _cFileContent.addOutput(object.getUnaryAddingOperator()
                 .getLiteral()) ;
         }
 
@@ -1343,7 +1206,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseTerm(Term object)
       {
-        //FIXME : TODO : update location reference
         Iterator<Factor> itFact = object.getFactors().iterator() ;
         process(itFact.next()) ;
 
@@ -1369,57 +1231,54 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseFactor(Factor object)
       {
-        //FIXME : TODO : update location reference
-        if(object.isSetUnaryNumericOperatorOwned() ||
-              object.isSetUnaryBooleanOperatorOwned())
+        if(object.getUnaryNumericOperator() != UnaryNumericOperator.NONE)
         {
-          if(object.isSetUnaryNumericOperatorOwned())
-          {
-            _cFileContent.addOutput(AadlBaToCUnparser
-                  .getTargetLanguageOperator(object
-                        .getUnaryNumericOperatorOwned())) ;
-          }
-          else if(object.isSetUnaryBooleanOperatorOwned())
-          {
-            _cFileContent.addOutput(AadlBaToCUnparser
-                  .getTargetLanguageOperator(object
-                        .getUnaryBooleanOperatorOwned())) ;
-          }
-
+          _cFileContent.addOutput(AadlBaToCUnparser
+                                  .getTargetLanguageOperator(object
+                                                             .getUnaryNumericOperator())) ;
+          _cFileContent.addOutput("(") ;
+        }
+        else if(object.getUnaryBooleanOperator()!= UnaryBooleanOperator.NONE)
+        {
+          _cFileContent.addOutput(AadlBaToCUnparser
+                                  .getTargetLanguageOperator(object
+                                                             .getUnaryBooleanOperator())) ;
           _cFileContent.addOutput("(") ;
         }
 
-        if(object.getValueOwned() instanceof ValueExpression)
+
+
+        if(object.getFirstValue() instanceof ValueExpression)
         {
           _cFileContent.addOutput("(") ;
-          process(object.getValueOwned()) ;
+          process(object.getFirstValue()) ;
           _cFileContent.addOutput(")") ;
         }
         else
         {
-          process(object.getValueOwned()) ;
+          process(object.getFirstValue()) ;
         }
 
-        if(object.isSetUnaryNumericOperatorOwned() ||
-              object.isSetUnaryBooleanOperatorOwned())
+        if(object.getUnaryNumericOperator()!=UnaryNumericOperator.NONE ||
+              object.getUnaryBooleanOperator() != UnaryBooleanOperator.NONE)
         {
           _cFileContent.addOutput(")") ;
         }
 
-        if(object.isSetBinaryNumericOperatorOwned())
+        if(object.getBinaryNumericOperator()!=BinaryNumericOperator.NONE)
         {
           _cFileContent.addOutput(" " +
-                object.getBinaryNumericOperatorOwned().getLiteral() + " ") ;
+                object.getBinaryNumericOperator().getLiteral() + " ") ;
 
-          if(object.getValueSdOwned() instanceof ValueExpression)
+          if(object.getSecondValue() instanceof ValueExpression)
           {
             _cFileContent.addOutput("(") ;
-            process(object.getValueSdOwned()) ;
+            process(object.getSecondValue()) ;
             _cFileContent.addOutput(")") ;
           }
           else
           {
-            process(object.getValueSdOwned()) ;
+            process(object.getSecondValue()) ;
           }
         }
 

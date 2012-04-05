@@ -180,24 +180,33 @@ lazy rule NamedValue extends PropertyExpression {
 
 lazy rule ReferenceValue extends PropertyExpression {
 	from
-		l : AADLI!ReferenceValue
+		l : AADLI!ReferenceValue (not l.getOwnerComponent().oclIsUndefined())
 	using
 	{
 		ref : AADLI!Subcomponent = l.containmentPathElement->first().namedElement;
 			
 		o : AADLI!ComponentInstance = l.getOwnerComponent();
-		subi : AADLI!ComponentInstance = o.componentInstance->any(subc|subc.name=ref.name);
+		subi : AADLI!ComponentInstance = o.getReferenceValueContainer(l);
 		sub : AADLBA!Subcomponent = thisModule.resolveTemp(subi,'sub');
 	}
 	to
 		l2 : AADLBA!ReferenceValue (containmentPathElement <- Sequence {cpe}),
 		cpe : AADLBA!ContainmentPathElement (namedElement <- sub)
-	do { 
+	do {
 		ref.debug('REF');
 		sub.debug('SUB');
 		l2;
 	}
 }
+
+helper context AADLI!ComponentInstance def:getReferenceValueContainer(l: AADLI!ReferenceValue) : AADLI!ComponentInstance =
+  let ref : AADLI!Subcomponent = l.containmentPathElement->first().namedElement in
+	if(self.componentInstance->any(subc|subc.name=ref.name).oclIsUndefined()) then
+	  	self.eContainer().getReferenceValueContainer(l)
+  	else
+  		self.componentInstance->any(subc|subc.name=ref.name)
+  	endif
+;
 
 lazy rule InstanceReferenceValue extends PropertyExpression {
 	from

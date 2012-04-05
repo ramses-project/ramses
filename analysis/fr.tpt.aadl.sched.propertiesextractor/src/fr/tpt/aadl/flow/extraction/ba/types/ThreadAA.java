@@ -80,17 +80,16 @@ public class ThreadAA extends AutomatonAnalyzer
     registerStatesIntoGraph(ba, taskI, stateToStart, stateToEnd) ;
     RTAction iterationStart = null ;
     RTAction iterationEnd = null ;
-    List<BehaviorTransition> transitions = ba.getBehaviorTransitions() ;
+    List<BehaviorTransition> transitions = ba.getTransitions() ;
 
     for(int indexTr = 0 ; indexTr < transitions.size() ; indexTr++)
     {
       BehaviorTransition tran = transitions.get(indexTr) ;
       BehaviorActionSequence seq =
-            (BehaviorActionSequence) tran.getBehaviorActionBlockOwned()
-                  .getBehaviorActionsOwned() ;
-      List<BehaviorAction> actions = seq.getBehaviorActions() ;
-      String srcState = tran.getSourceStateIdentifiers().get(0).getId() ;
-      String dstState = tran.getDestinationStateIdentifier().getId() ;
+            (BehaviorActionSequence) tran.getActionBlock() ;
+      List<BehaviorAction> actions = seq.getActions() ;
+      String srcState = tran.getSourceState().getName() ;
+      String dstState = tran.getDestinationState().getName() ;
       RTAction srcEnd = stateToEnd.get(srcState) ;
       RTAction dstStart = stateToStart.get(dstState) ;
       RTAction dstEnd = stateToEnd.get(dstState) ;
@@ -120,10 +119,10 @@ public class ThreadAA extends AutomatonAnalyzer
   {
     final ExecutionGraph aTask = new ExecutionGraph() ;
 
-    for(BehaviorTransition t : ba.getBehaviorTransitions())
+    for(BehaviorTransition t : ba.getTransitions())
     {
-      String sourceID = t.getSourceStateIdentifiers().get(0).getId() ;
-      String targetID = t.getDestinationStateIdentifier().getId() ;
+      String sourceID = t.getSourceState().getName() ;
+      String targetID = t.getDestinationState().getName() ;
       RTAction stStart = stateToStart.get(targetID) ;
 
       if(isInitial(t, sourceID))

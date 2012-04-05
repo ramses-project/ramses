@@ -10,7 +10,6 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState ;
 import fr.tpt.aadl.annex.behavior.aadlba.CommunicationAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.UniqueComponentClassifierReference ;
 
 public class BehaviorAnnexUtil
 {
@@ -52,8 +51,7 @@ public class BehaviorAnnexUtil
   public static NamedElement getSubprogramReference(CommunicationAction a)
   {
     SubprogramCallAction c = (SubprogramCallAction) a ;
-    UniqueComponentClassifierReference uref = c.getSubprogramReference() ;
-    return (NamedElement) uref.getAadlRef() ;
+    return c.getSubprogram().getElement() ;
   }
 
   public static String getSharedDataNameFromSubprogramCall(SubprogramCallAction a)
@@ -84,11 +82,11 @@ public class BehaviorAnnexUtil
 
   public static String getInitialState(BehaviorAnnex ba)
   {
-    for(BehaviorState s : ba.getBehaviorStates())
+    for(BehaviorState s : ba.getStates())
     {
       if(s.isInitial())
       {
-        return s.getIdentifierOwned().getId() ;
+        return s.getName() ;
       }
     }
 
@@ -97,11 +95,11 @@ public class BehaviorAnnexUtil
 
   public static String getFinalState(BehaviorAnnex ba)
   {
-    for(BehaviorState s : ba.getBehaviorStates())
+    for(BehaviorState s : ba.getStates())
     {
       if(s.isFinal())
       {
-        return s.getIdentifierOwned().getId() ;
+        return s.getName() ;
       }
     }
 

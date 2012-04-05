@@ -25,6 +25,7 @@ package fr.tpt.aadl.ramses.generation.c.annex.behavior ;
 import org.osate.aadl2.AnnexSubclause ;
 
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
 // ** AADL RESTRICTED BA HAS TO BE SET AS A STANDALONE ECLIPSE PLUGIN PROJECT ** 
@@ -45,16 +46,8 @@ public class AadlBaToCUnparserAction extends AadlBaUnParserAction
   public String unparseAnnexSubclause(AnnexSubclause subclause,
                                       String indent)
   {
-    return _unparser.process(subclause) ;
+    return _unparser.process((BehaviorElement) subclause) ;
   }
-/*
-  public AadlBaToCUnparser createUnparser(Map<DataAccess, String> dataAccessMapping)
-  {
-    unparser = new AadlBaToCUnparser() ;
-    unparser.setDataAccessMapping(dataAccessMapping) ;
-    return unparser ;
-  }
-*/
 
   public AadlBaToCUnparser getUnparser()
   {

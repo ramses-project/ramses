@@ -35,20 +35,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.m2m.atl.core.ATLCoreException;
-import org.eclipse.xtext.nodemodel.INode;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.DirectedFeature;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.Feature;
+
+import org.eclipse.emf.common.util.BasicEList ;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.ecore.EClass ;
+import org.eclipse.emf.ecore.impl.EObjectImpl ;
+import org.osate.aadl2.ComponentType ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.m2m.atl.core.ATLCoreException ;
+import org.eclipse.xtext.nodemodel.INode ;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.ComponentImplementation ;
+import org.osate.aadl2.DirectedFeature ;
+import org.osate.aadl2.Element ;
+import org.osate.aadl2.Feature ;
+import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
@@ -56,14 +58,17 @@ import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.parsesupport.LocationReference;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
-import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.utils.Aadl2Utils;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
-import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
+import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver ;
+import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.utils.Aadl2Utils ;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
+import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher ;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage ;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess ;
 
 /**
  * <!-- begin-user-doc -->
@@ -155,12 +160,11 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
           if(o instanceof ThreadImplementation)
           {
             ThreadImplementation t = (ThreadImplementation) o ;
-
-            if(t.getOwnedAnnexSubclauses().get(0) instanceof BehaviorAnnex)
+            for (AnnexSubclause as: t.getOwnedAnnexSubclauses())
+            if(as instanceof BehaviorAnnex)
             {
               BehaviorAnnex ba =
-                    (BehaviorAnnex) t.getOwnedAnnexSubclauses().get(0) ;
-              ba.setAadlRef(t) ;
+                    (BehaviorAnnex) as ;
               createdThreadAnnexes.put(t.getName(), ba) ;
             }
           }
@@ -259,6 +263,16 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     _transformationTrace.put(targetDeclarative, sourceInstance);
   }
   
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated NOT
+   */
+  public void putTransitionWhereSrc(BehaviorState state, BehaviorTransition transition)
+  {
+    AadlBaVisitors.putTransitionWhereSrc(state, transition);
+  }
+
   public static InstanceObject getTransformationTrace(NamedElement targetDeclarative)
   {
     return _transformationTrace.get(targetDeclarative);

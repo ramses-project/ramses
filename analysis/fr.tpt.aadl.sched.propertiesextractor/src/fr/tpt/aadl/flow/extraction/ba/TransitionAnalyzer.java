@@ -109,17 +109,17 @@ public class TransitionAnalyzer extends BAElementAnalyzer
     actionIf.setJoin(actionIfEnd) ;
     IfStatement stmt = (IfStatement) action ;
 
-    if(stmt.getBehaviorActionsOwned().size() == 1)
+    if(stmt.getBehaviorActions() instanceof BasicAction)
     {
       // no else
       actionIf.addNext(actionIfEnd) ;
     }
 
-    for(BehaviorActions alt : stmt.getBehaviorActionsOwned())
+    if(stmt.getBehaviorActions() instanceof BehaviorActionSequence)
     {
-      BehaviorActionSequence seq = (BehaviorActionSequence) alt ;
+      BehaviorActionSequence seq = (BehaviorActionSequence) stmt.getBehaviorActions() ;
       extractActions(
-                     taskInstance, seq.getBehaviorActions(), actionIf)
+                     taskInstance, seq.getActions(), actionIf)
             .addNext(actionIfEnd) ;
     }
 
@@ -139,8 +139,8 @@ public class TransitionAnalyzer extends BAElementAnalyzer
                 RTActionType.LoopEnd, taskInstance) ;
     actionFor.setJoin(actionForEnd) ;
     BehaviorActionSet set =
-          (BehaviorActionSet) forall.getBehaviorActionsOwned() ;
-    List<BehaviorAction> actionBlock = set.getBehaviorActions() ;
+          (BehaviorActionSet) forall.getBehaviorActions() ;
+    List<BehaviorAction> actionBlock = set.getActions() ;
     IntegerRange range = getForRange(forall) ;
 
     for(int i = range.getMin() ; i <= range.getMax() ; i++)
@@ -154,7 +154,7 @@ public class TransitionAnalyzer extends BAElementAnalyzer
 
   private IntegerRange getForRange(ForOrForAllStatement forall)
   {
-    ElementValues values = forall.getElementValuesOwned() ;
+    ElementValues values = forall.getIteratedValues() ;
 
     if(values instanceof fr.tpt.aadl.annex.behavior.aadlba.IntegerRange)
     {
@@ -200,8 +200,8 @@ public class TransitionAnalyzer extends BAElementAnalyzer
       TimedAction ta = (TimedAction) basic ;
       IntegerValue min, max ;
       float minVal, maxVal ;
-      min = ta.getLowerBehaviorTime().getIntegerValueOwned() ;
-      max = ta.getUpperBehaviorTime().getIntegerValueOwned() ;
+      min = ta.getLowerTime().getIntegerValue() ;
+      max = ta.getUpperTime().getIntegerValue() ;
 
       if(min instanceof IntegerLiteral)
       {

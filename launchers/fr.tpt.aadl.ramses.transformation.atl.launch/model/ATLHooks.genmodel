@@ -33,6 +33,10 @@
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/addTransformationBackTrace/targetDeclarative"/>
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/addTransformationBackTrace/sourceInstance"/>
       </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc/state"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc/transition"/>
+      </genOperations>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

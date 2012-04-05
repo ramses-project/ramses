@@ -53,11 +53,8 @@ unique lazy rule CreateVariableForParameter {
  }
  to
 	v : AADLBA!BehaviorVariable (
-		DataUniqueComponentClassifierReference <- type,
-		LocalVariableDeclarators <- Sequence{decl}
-	),
-	type : AADLBA!UniqueComponentClassifierReference (aadlRef <- p.dataFeatureClassifier),
-	decl : AADLBA!Declarator (identifierOwned <- thisModule.CreateIdentifier(pName, OclUndefined))
+		dataClassifier <- p.dataFeatureClassifier
+	)
   do 
   { 
   	pName.debug('  create behavior variable');

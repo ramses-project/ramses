@@ -28,10 +28,9 @@ public
   system implementation root.impl
   subcomponents
     the_cpu: processor cpu.impl;
-    the_proc: process proc.impl;
+    the_proc: process proc.impl {actual_processor_binding => (reference (the_cpu.the_part));};
     the_mem: memory mem.impl;
   properties
-    actual_processor_binding => (reference (the_cpu.the_part)) applies to the_proc;
     actual_memory_binding => (reference (the_mem)) applies to the_proc;
   end root.impl;
 

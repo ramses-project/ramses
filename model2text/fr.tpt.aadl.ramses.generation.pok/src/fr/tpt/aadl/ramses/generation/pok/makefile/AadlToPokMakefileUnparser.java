@@ -21,10 +21,13 @@
 
 package fr.tpt.aadl.ramses.generation.pok.makefile ;
 
+import java.io.BufferedReader ;
 import java.io.BufferedWriter ;
 import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
+import java.io.InputStream ;
+import java.io.InputStreamReader ;
 import java.util.List;
 import java.util.Map ;
 
@@ -266,6 +269,46 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         throws GenerationException
   {
     generateMakefile((NamedElement) system, generatedFilePath) ;
+    Runtime runtime = Runtime.getRuntime();
+    if(System.getenv("POK_PATH")!=""
+          || System.getenv("POK_PATH")!=null)
+    {
+      try
+      {
+        Process makeProcess = runtime.exec("cd generated-code; make all") ;
+        makeProcess.waitFor();
+        runtime.exec("cd -");
+        
+        if (makeProcess.exitValue() != 0) {
+          System.err.println("Error when compiling generated code: ");
+
+          InputStream is = makeProcess.getErrorStream();
+          BufferedReader in = new BufferedReader(new InputStreamReader(is));
+          String line = null;
+          while ((line = in.readLine()) != null) {
+            System.err.println(line);
+          }
+        }
+        else
+        {
+          System.out.println("Generated code was successfully built.\n" +
+          		"\tTo run the executable files produced, tape: \n" +
+          		"\t$cd <example>/generated-code\n" +
+          		"\t$make run&");
+        }
+      }
+      catch(IOException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      catch(InterruptedException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      
+    }
   }
 
   @Override

@@ -56,17 +56,17 @@ public class SubprogramAA extends AutomatonAnalyzer
     RTAction initialAction = stateToStart.get(initStateID) ;
     RTAction endAction = stateToEnd.get(finalStateID) ;
     initialAction.addNext(stateToEnd.get(initStateID)) ;
-    List<BehaviorTransition> transitions = ba.getBehaviorTransitions() ;
+    List<BehaviorTransition> transitions = ba.getTransitions() ;
 
     for(int indexTr = 0 ; indexTr < transitions.size() ; indexTr++)
     {
       BehaviorTransition tran = transitions.get(indexTr) ;
       BehaviorActionSequence seq =
-            (BehaviorActionSequence) tran.getBehaviorActionBlockOwned()
-                  .getBehaviorActionsOwned() ;
-      List<BehaviorAction> actions = seq.getBehaviorActions() ;
-      String srcState = tran.getSourceStateIdentifiers().get(0).getId() ;
-      String dstState = tran.getDestinationStateIdentifier().getId() ;
+            (BehaviorActionSequence) tran.getActionBlock();
+      
+      List<BehaviorAction> actions = seq.getActions() ;
+      String srcState = tran.getSourceState().getName() ;
+      String dstState = tran.getDestinationState().getName() ;
       RTAction srcEnd = stateToEnd.get(srcState) ;
       RTAction dstStart = stateToStart.get(dstState) ;
       RTAction dstEnd = stateToEnd.get(dstState) ;

@@ -63,7 +63,20 @@ import org.osate.xtext.aadl2.properties.util.GetProperties;
  * @author Fabien Cadoret
  */
 public class PropertyUtils {
+  
+  /**
+   * Exception thrown when a mandatory property is not found in the 
+   * input AADL model.
+   */
+  public static class PropertyNotFound extends RuntimeException {
 
+    private static final long serialVersionUID = 1L;
+
+    private PropertyNotFound(Throwable cause) {
+      super(cause);
+    }
+  }
+  
 	public static PropertyAssociation findProperty(String propertyName, NamedElement owner) {
 		for (PropertyAssociation pa : owner.getOwnedPropertyAssociations()) {
 			if (pa.getProperty().getName() == null) {

@@ -226,6 +226,10 @@ public class AtlHooksPackageImpl extends EPackageImpl implements AtlHooksPackage
     addEParameter(op, theAadl2Package.getNamedElement(), "targetDeclarative", 1, 1, IS_UNIQUE, IS_ORDERED);
     addEParameter(op, theInstancePackage.getInstanceObject(), "sourceInstance", 1, 1, IS_UNIQUE, IS_ORDERED);
 
+    op = addEOperation(hookAccessEClass, null, "putTransitionWhereSrc", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadlBaPackage.getBehaviorState(), "state", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadlBaPackage.getBehaviorTransition(), "transition", 1, 1, IS_UNIQUE, IS_ORDERED);
+
     // Create resource
     createResource(eNS_URI);
   }

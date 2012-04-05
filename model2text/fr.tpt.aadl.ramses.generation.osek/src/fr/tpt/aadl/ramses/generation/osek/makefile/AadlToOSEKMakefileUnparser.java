@@ -45,23 +45,11 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
 		this.oil = oil;
 	}
 
-	// XXX: Not implemented, just used for conformance with the interface
-	// definition
-
+	
 	@Override
-	public void process(SystemImplementation system, File generatedFilePath) throws GenerationException {
-		// TODO Do NOT use
-	}
-
-	@Override
-	public void process(ProcessorSubcomponent processor, File generatedFilePath) throws GenerationException {
-		// TODO Do NOT use
-	}
-
-	@Override
-	public void process(ProcessSubcomponent process, File generatedFilePath) throws GenerationException {
-	  
-	  Runtime runtime = Runtime.getRuntime();
+  public void process(ProcessSubcomponent process, File generatedFilePath) throws GenerationException {
+    
+    Runtime runtime = Runtime.getRuntime();
 
     System.out.println("* Prepare Make ...");
 
@@ -129,6 +117,20 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
         e.printStackTrace();
       }
     }
+  }
+	
+	
+	// XXX: Not implemented, just used for conformance with the interface
+	// definition
+
+	@Override
+	public void process(SystemImplementation system, File generatedFilePath) throws GenerationException {
+		// TODO Do NOT use
+	}
+
+	@Override
+	public void process(ProcessorSubcomponent processor, File generatedFilePath) throws GenerationException {
+		// TODO Do NOT use
 	}
 
 	@Override

@@ -69,48 +69,9 @@ helper context AADLBA!Feature def : asBehaviorName() : String =
 ;
 
 
-helper context AADLBA!Identifier def : doClone() : AADLBA!Identifier =
-	thisModule.CloneIdentifier(self)
-;
-
-helper context AADLBA!BehaviorState def : cloneIdentifier() : AADLBA!Identifier =
-	self.identifiers->first().doClone()
-;
-
 helper context AADLBA!AbstractNamedValue def : asNamedValue() : AADLBA!NamedValue =
 	thisModule.CreateNamedValue (self)
 ;
-
-
-rule CreateIdentifier (name : String, ref : AADLBA!Element){
-	to
-		id : AADLBA!Identifier (aadlRef <- ref, id <- name)
-	do { id; }
-}
-
-rule CreateBAIdentifier (name : String, ref : AADLBA!Element){
-	to
-		id : AADLBA!Identifier (baRef <- ref, id <- name)
-	do { id; }
-}
-
-rule CreateName (name : String, ref : AADLBA!Element) {
-	to
-		n : AADLBA!Name (identifierOwned <- thisModule.CreateIdentifier(name, ref))
-	do { n; }
-}
-
-rule CreateBAName (name : String, ref : AADLBA!Element) {
-	to
-		n : AADLBA!Name (identifierOwned <- thisModule.CreateBAIdentifier(name, ref))
-	do { n; }
-}
-
-rule CloneIdentifier (identifier : AADLBA!Identifier){
-	to
-		id2 : AADLBA!Identifier (aadlRef <- identifier.aadlRef, id <- identifier.id)
-	do { id2; }
-}
 
 rule ReferenceAsExpression (c : AADLBA!Element, index : AADLBA!IntegerValue) {
  to
@@ -136,20 +97,15 @@ rule ReferenceAsTerm (c : AADLBA!Element, index : AADLBA!IntegerValue) {
 
 rule BehaviorVariableAsFactor (c : AADLBA!BehaviorVariable) {
  to
-  factor				: AADLBA!Factor (valueOwned <- value),
-  value					: AADLBA!Name (identifierOwned <- thisModule.CreateIdentifier(c.getName(), c))
+  factor				: AADLBA!Factor (firstValue <- value),
+  value					: AADLBA!BehaviorVariable (dataClassifier <- c)
  do { factor; }
 }
 
 rule DataSubcomponentAsFactor (c : AADLBA!DataSubcomponent, index : AADLBA!IntegerValue) {
  to
-  factor				: AADLBA!Factor (valueOwned <- value),
-  value					: AADLBA!DataComponentReference (names <- Sequence {valueName}),
-  valueName				: AADLBA!Name (
-  							identifierOwned <- thisModule.CreateIdentifier(c.getName(), c),
-							arrayIndexes	<- if (index.oclIsUndefined()) then Sequence {}
-											   else Sequence {index} endif
-  )								
+  factor				: AADLBA!Factor (firstValue <- value),
+  value					: AADLBA!DataSubcomponentHolder (element <- c)						
  do { factor; }
 }
 
@@ -159,10 +115,10 @@ rule DataSubcomponentAsValueExpression (c : AADLBA!DataSubcomponent, index : AAD
 		factor : AADLBA!Factor = thisModule.DataSubcomponentAsFactor(c, index);
 	}
 	to
-		r: AADLBA!Relation (simpleExpressionOwned<-se),
+		r: AADLBA!Relation (firstExpression<-se),
 		se: AADLBA!SimpleExpression(terms<-Sequence{t}),
 		t: AADLBA!Term(factors<-Sequence{factor}),
-		valueExpression: AADLBA!ValueExpression(aadlRef<-c, relations<-Sequence{r})
+		valueExpression: AADLBA!ValueExpression(relations<-Sequence{r})
 	
 	do
 	{
@@ -221,19 +177,13 @@ lazy rule CreateIntegerVariable {
  do { v; }
 }
 
-lazy rule generateUCCR
+lazy rule generateCalledSubprogramHolder
 {
 	from
-		elt: AADLBA!NamedElement
+		elt: AADLBA!Subprogram
 	to
-	  result: AADLBA!UniqueComponentClassifierReference
+	  result: AADLBA!CalledSubprogramHolder
 	  (
-	  	aadlRef<-elt,
-	  	name<-identifier,
-		qualifiedName<-qualifiedIdentifier--,
-		--namespace <- nsID 
-	  ),
-	  qualifiedIdentifier: AADLBA!Identifier(id<-elt.qualifiedName),
-	  identifier: AADLBA!Identifier(id<-elt.name)--,
-	  --nsID: AADLBA!Identifier(id<-elt.getNamespace().getNamesOfMember(elt))
+	  	element<-elt 
+	  )
 }
