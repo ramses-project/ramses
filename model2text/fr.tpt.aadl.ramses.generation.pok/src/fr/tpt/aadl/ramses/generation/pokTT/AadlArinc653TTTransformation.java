@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.NamedElement;
@@ -65,39 +66,75 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 			{
 				resourceFilePath = new File(DEFAULT_ATL_FILE_PATH);
 			}
-			System.out.println("Expansion n°1: Delayed connections (resource: "
-					+ inputResource.getURI().path() + ")");
-			Resource r1 = transform(inputResource, resourceFilePath,
-					standardPropertySets, generatedFilePath,
-					ATL_FILE_NAMES_STEP1);
+			
+			
+			Resource r1 = step1(inputResource, resourceFilePath, standardPropertySets, generatedFilePath);
+			
+			SystemInstance s = instanciate(r1);
+			System.out.println("Instanciation: " + s.eResource().getURI().path());
 
-			/*
-			System.out.println("Expansion n°2: Threads behavior (resource: "
-					+ r1.getURI().path() + ")");
-
-			StandAloneInstantiator instantiator = StandAloneInstantiator
-					.getInstantiator();
-			ArrayList<Resource> res = new ArrayList<Resource>();
-			res.add(r1);
-
-			SystemInstance s = instantiator.instantiate(res, findSystemName(r1));
-
-			String aadlGeneratedFileName = inputResource.getURI()
-					.toFileString()
-					.replaceFirst("_extended.aaxl2", "_extended_inst.aadl2");
-
-			instantiator.serialize(s.eResource(), aadlGeneratedFileName);*/
-
-			/*Resource r2 = transform(s.eResource(), resourceFilePath, standardPropertySets,
-					generatedFilePath, ATL_FILE_NAMES_STEP2);
-
-			return r2;*/
-			return r1;
-		} catch (Exception e)
+			Resource r2 = step2(s.eResource(), resourceFilePath, standardPropertySets, generatedFilePath);
+			
+			return r2;
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			throw new GenerationException(e.getMessage());
 		}
+	}
+	
+	private Resource step1(Resource r, File resourceFilePath, Map<String, Resource> standardPropertySets,
+			File generatedFilePath) throws Exception
+	{
+		System.out.println("********************************************");
+		System.out.println("Expansion n°1: Delayed connections\n(resource: "
+				+ r.getURI().path() + ")");
+		Resource r1 = transform(r, resourceFilePath,
+				standardPropertySets, generatedFilePath,
+				ATL_FILE_NAMES_STEP1);
+		
+		return r1;
+	}
+	
+	private Resource step2(Resource r1, 
+			File resourceFilePath, Map<String, Resource> standardPropertySets,
+			File generatedFilePath) throws Exception
+	{
+		System.out.println("********************************************");
+		
+		System.out.println("Expansion n°2: Threads behavior\n(resource: "
+				+ r1.getURI().path() + ")");
+
+		Resource r2 = transform(r1, resourceFilePath, standardPropertySets,
+				generatedFilePath, ATL_FILE_NAMES_STEP2);
+		
+		System.out.println("**************   D O N E   *****************");
+
+		return r2;
+	}
+	
+	private SystemInstance instanciate (Resource r)
+	{
+		StandAloneInstantiator instantiator = StandAloneInstantiator
+				.getInstantiator();
+		ArrayList<Resource> res = new ArrayList<Resource>();
+		res.add(r);
+
+		SystemInstance s = instantiator.instantiate(res, findSystemName(r));
+		return s;
+	}
+	
+	private void serialize(SystemInstance s)
+	{
+		StandAloneInstantiator instantiator = StandAloneInstantiator
+				.getInstantiator();
+		
+		String aadlGeneratedFileName = s.eResource().getURI()
+				.toFileString()
+				.replaceFirst("extended_node_impl_Instance.aaxl2", "extended_inst.aadl2");
+
+		instantiator.serialize(s.eResource(), aadlGeneratedFileName);
 	}
 
 	private Resource transform(Resource inputResource, File resourceFilePath,

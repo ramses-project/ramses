@@ -59,7 +59,8 @@ public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 	@Override
 	protected void genDeploymentHeaderEnd(UnparseText mainHeaderCode)
 	{
-		mainHeaderCode.addOutputNewline("#define POK_NEEDS_TIME_TRIGGERED 1");
+		if ((! activitiesDecl.isEmpty()) && (! portsDecl.isEmpty()))
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_TIME_TRIGGERED 1");
 	}
 	
 	@Override
@@ -84,6 +85,10 @@ public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 			UnparseText mainImplCode)
 	{
 		ProcessImplementation pi = (ProcessImplementation) getImplementedAs(process);
+		
+		if (pi == null)
+			return;
+		
 		for(ThreadSubcomponent ts : pi.getOwnedThreadSubcomponents())
 		{
 			ThreadType tt = (ThreadType) ts.getComponentType();
