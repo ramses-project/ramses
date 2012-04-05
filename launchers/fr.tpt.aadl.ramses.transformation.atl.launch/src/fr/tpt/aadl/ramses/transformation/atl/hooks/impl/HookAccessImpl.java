@@ -64,11 +64,11 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.utils.Aadl2Utils ;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher ;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess ;
+import fr.tpt.aadl.utils.Aadl2Utils ;
 
 /**
  * <!-- begin-user-doc -->
