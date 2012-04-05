@@ -47,6 +47,18 @@ helper context AADLBA!ThreadType def : getMaxExecutionTime() : AADLBA!RealLitera
 		->first().ownedValue.maximum
 ;
 
+
+helper context AADLI!FeatureInstance def : getQueueSize() : Integer =
+	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Queue_Size')
+			.oclIsUndefined()) then
+			1
+	else
+		self.ownedPropertyAssociation->any(pa|pa.property.name='Queue_Size')
+		.ownedValue->first().value
+	endif
+;
+
+
 helper context AADLI!FeatureInstance def : getInputRate() : Integer =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Input_Rate')
 		.oclIsUndefined()) then
@@ -66,6 +78,33 @@ helper context AADLI!FeatureInstance def : getOutputRate() : Integer =
 		self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Rate')
 		.ownedValue->first().ownedValue.ownedFieldValue->any(fv|fv.property.name='Value_Range')
 		.ownedValue.maximum.value
+	endif
+;
+
+helper context AADLI!FeatureInstance def : getOutputTime() : AADLI!RecordValue =
+	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time')) then
+		OclUndefined
+	else
+		self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time')
+		.ownedValue->first().ownedValue
+	endif
+;
+
+helper context AADLI!FeatureInstance def : getOutputTimeKind() : String =
+	if (self.getOutputTime().oclIsUndefined()) then
+		OclUndefined
+	else
+		self.getOutputTime().ownedFieldValue
+			->any(fv|fv.property.name='Time').ownedValue.namedValue.name
+	endif
+;
+
+helper context AADLI!FeatureInstance def : getOutputTimeOffset() : AADLI!RealLiteral =
+	if (self.getOutputTime().oclIsUndefined()) then
+		OclUndefined
+	else
+		self.getOutputTime().ownedFieldValue
+			->any(fv|fv.property.name='Offset').ownedValue
 	endif
 ;
 

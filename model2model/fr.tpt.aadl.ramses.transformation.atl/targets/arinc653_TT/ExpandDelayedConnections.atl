@@ -42,7 +42,28 @@ uses IOHelpers;
 -------------------------------------------------------------------------------------------
 ----		OVERRIDEN RULES
 -------------------------------------------------------------------------------------------
-helper context AADLI!ConnectionInstance def : isDelayedConnectionInstance() : Boolean =
+helper context AADLI!ConnectionInstance def : isDefaultConnectionInstance() : Boolean =
+	(self.kind = #portConnection and (self.source.eContainer().category=#thread
+			 or self.destination.eContainer().category=#thread))
+	and not self.isDelayedConnectionInstanceWithoutOffset()
+;
+
+-------------------------------------------------------------------------------------------
+----		NEW RULES
+-------------------------------------------------------------------------------------------
+helper context AADLI!ConnectionInstance def : isDelayedConnectionInstanceWithoutOffset() : Boolean =
+	self.isDelayedConnectionInstance_()
+	and self.source.isDelayedPort()
+	and self.source.hasNoOutputOffset()
+;
+
+helper context AADLI!ConnectionInstance def : isDelayedConnectionInstanceWithOffset() : Boolean =
+	self.isDelayedConnectionInstance_()
+	and self.source.isDelayedPort()
+	and not self.source.hasNoOutputOffset()
+;
+
+helper context AADLI!ConnectionInstance def : isDelayedConnectionInstance_() : Boolean =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Timing').oclIsUndefined()) then
 		false
 	else
@@ -51,17 +72,14 @@ helper context AADLI!ConnectionInstance def : isDelayedConnectionInstance() : Bo
 	endif
 ;
 
-helper context AADLI!ConnectionInstance def : isDefaultConnectionInstance() : Boolean =
-	(self.kind = #portConnection and (self.source.eContainer().category=#thread
-			 or self.destination.eContainer().category=#thread))
-	and not self.isDelayedConnectionInstance()
+helper context AADLI!FeatureInstance def : isDelayedPort() : Boolean =
+	self.getOutputTimeKind().oclIsUndefined()
+	or self.getOutputTimeKind() = 'Deadline'
 ;
 
--------------------------------------------------------------------------------------------
-----		NEW RULES
--------------------------------------------------------------------------------------------
-helper context AADLBA!Subcomponent def : getDataPorts() : Sequence(AADLBA!DataPort) =
-	self.getComponentType().getOwnedDataPorts()
+helper context AADLI!FeatureInstance def : hasNoOutputOffset() : Boolean =
+	self.getOutputTimeOffset().oclIsUndefined()
+	or self.getOutputTimeOffset().value = 0
 ;
 
 helper context AADLBA!Subcomponent def : getEventDataPorts() : Sequence(AADLBA!DataPort) =
@@ -75,7 +93,7 @@ helper context AADLI!FeatureInstance def : getNameOnInternalThreadForCache() : S
 	self.getNameOnInternalThread().concat('_cache')
 ;
 
-rule DelayedPortIntraConnection_Instance
+rule DelayedConnectionWithoutOffset_Instance
 {
 	from
 		cnxInst: AADLI!ConnectionInstance
@@ -83,14 +101,14 @@ rule DelayedPortIntraConnection_Instance
 			cnxInst.kind = #portConnection 
 			and cnxInst.source.eContainer().category=#thread
 			and cnxInst.destination.eContainer().category=#thread
-			and cnxInst.isDelayedConnectionInstance()
+			and cnxInst.isDelayedConnectionInstanceWithoutOffset()
 		)
 	using
 	{
 		DeadlineThread    : AADLBA!ThreadSubcomponent = OclUndefined;
 		PeriodThread      : AADLBA!ThreadSubcomponent = OclUndefined;
 
-		DeadlineThreadCachePort : AADLBA!DataPort = OclUndefined;
+		DeadlineThreadCachePort : AADLBA!EventDataPort = OclUndefined;
 		PeriodThreadCachePort   : AADLBA!EventDataPort = OclUndefined;
 
 		InternalProcess   : AADLBA!ThreadImplementation = OclUndefined;
@@ -139,12 +157,7 @@ rule DelayedPortIntraConnection_Instance
 }
 
 
-
-
-
-
-
-lazy rule DelayedPortIntraConnection_Source
+unique lazy rule DelayedPortIntraConnection_Source
 {
 	from
 		fi : AADLI!FeatureInstance
@@ -164,7 +177,7 @@ lazy rule DelayedPortIntraConnection_Source
 		internalThread    : AADLBA!ThreadSubcomponent = thisModule.InternalThread_Deadline (fi.eContainer());
 	}
 	to
-		processPort  : AADLBA!DataPort (
+		processPort  : AADLBA!EventDataPort (
 			name <- fi.nameForProcessPort(),
 			direction <- #out,
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
@@ -185,26 +198,39 @@ lazy rule DelayedPortIntraConnection_Source
 		
 		
 		
-		processorPort : AADLBA!DataPort (
+		processorPort : AADLBA!EventDataPort (
 			name <- vp.name.concat('_').concat(fi.getNameOnInternalThread()),
 			direction <- 'in',
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
 		),
-		vpPort : AADLBA!DataPort (
+		vpPort : AADLBA!EventDataPort (
 			name <- fi.getNameOnInternalThread(),
 			direction <- 'in',
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
 		),
-		internalProcessPort : AADLBA!DataPort (
+		internalProcessPort : AADLBA!EventDataPort (
 			name <- fi.getNameOnInternalThread(),
 			direction <- 'in',
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
 		),
-		internalThreadPort : AADLBA!DataPort (
+		internalThreadPort : AADLBA!EventDataPort (
 			name <- fi.getNameOnInternalThread(),
 			direction <- 'in',
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier()
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier(),
+			ownedPropertyAssociation <- Sequence {queueSize}
 		),
+		queueSize : AADLBA!PropertyAssociation (
+			property <- thisModule.getProperty('Queue_Size'),
+			ownedValue <- queueSizeMPV
+		),
+		queueSizeMPV : AADLBA!ModalPropertyValue (
+			ownedValue <- queueSizeL
+		),
+		queueSizeL : AADLBA!IntegerLiteral (
+			value	   <- fi.getOutputRate().longValue()
+		),
+		
+		
 		processorToVP : AADLBA!PortConnection (
 			name <- 'copy_'.concat(fi.getNameOnInternalThread()),
 			source <- processorToVP_source,
@@ -242,17 +268,16 @@ lazy rule DelayedPortIntraConnection_Source
 			context <- processor,
 			connectionEnd <- processorPort
 		)
-		
 	do
 	{
-		processImg.getOwnedDataPorts().add(processPort);
+		processImg.getOwnedEventDataPorts().add(processPort);
 		processImplImg.getOwnedPortConnections().add(threadToProcess);
 		
 		
-		processor.getComponentType().getOwnedDataPorts().add(processorPort);
-		vp.getComponentType().getOwnedDataPorts().add(vpPort);
-		internalProcess.getComponentType().getOwnedDataPorts().add(internalProcessPort);
-		internalThread.getComponentType().getOwnedDataPorts().add(internalThreadPort);
+		processor.getComponentType().getOwnedEventDataPorts().add(processorPort);
+		vp.getComponentType().getOwnedEventDataPorts().add(vpPort);
+		internalProcess.getComponentType().getOwnedEventDataPorts().add(internalProcessPort);
+		internalThread.getComponentType().getOwnedEventDataPorts().add(internalThreadPort);
 		
 		processor.getComponentImplementation().getOwnedPortConnections().add(processorToVP);
 		internalProcess.getOwnedPortConnections().add(internal_processToThread);
@@ -276,7 +301,7 @@ lazy rule DelayedPortIntraConnection_Source
 
 
 
-lazy rule DelayedPortIntraConnection_Destination
+unique lazy rule DelayedPortIntraConnection_Destination
 {
 	from
 		fi : AADLI!FeatureInstance
@@ -339,7 +364,18 @@ lazy rule DelayedPortIntraConnection_Destination
 			name <- fi.getNameOnInternalThreadForCache(),
 			direction <- 'in',
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier.mapDataClassifier(),
-			ownedPropertyAssociation <- Sequence {dequeueProtocol}
+			ownedPropertyAssociation <- Sequence {dequeueProtocol, queueSize}
+		),
+		
+		queueSize : AADLBA!PropertyAssociation (
+			property <- thisModule.getProperty('Queue_Size'),
+			ownedValue <- queueSizeMPV
+		),
+		queueSizeMPV : AADLBA!ModalPropertyValue (
+			ownedValue <- queueSizeL
+		),
+		queueSizeL : AADLBA!IntegerLiteral (
+			value	   <- fi.getQueueSize().longValue()
 		),
 		
 		dequeueProtocol : AADLBA!PropertyAssociation (
@@ -496,14 +532,14 @@ rule InternalThread_Deadline_SetupCache (DeadlineThread : AADLBA!Subcomponent,
 {
 	using
 	{
-		DeadlineThreadInputPort : AADLBA!DataPort = OclUndefined;
-		DeadlineThreadCachePort : AADLBA!DataPort = OclUndefined;
+		DeadlineThreadInputPort : AADLBA!EventDataPort = OclUndefined;
+		DeadlineThreadCachePort : AADLBA!EventDataPort = OclUndefined;
 		InputToCache            : AADLBA!PortConnection = OclUndefined;
 	}
 	do
 	{
 		-- Resolve input port of deadline thread
-		DeadlineThreadInputPort <- DeadlineThread.getDataPorts()->any(
+		DeadlineThreadInputPort <- DeadlineThread.getEventDataPorts()->any(
 						p|p.name = cnxInst.source.getNameOnInternalThread());
 		
 		-- Create or resolve cache port of deadline thread
