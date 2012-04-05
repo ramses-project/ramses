@@ -78,8 +78,11 @@ helper context AADLI!FeatureInstance def : isDelayedPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def : hasNoOutputOffset() : Boolean =
-	self.getOutputTimeOffset().oclIsUndefined()
-	or self.getOutputTimeOffset().value = 0
+	if (not self.getOutputTimeOffset().oclIsUndefined()) then
+		self.getOutputTimeOffset().value = 0
+	else
+		true
+	endif
 ;
 
 helper context AADLBA!Subcomponent def : getEventDataPorts() : Sequence(AADLBA!DataPort) =

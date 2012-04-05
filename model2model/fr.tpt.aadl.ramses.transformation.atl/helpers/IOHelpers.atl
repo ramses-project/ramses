@@ -82,7 +82,7 @@ helper context AADLI!FeatureInstance def : getOutputRate() : Integer =
 ;
 
 helper context AADLI!FeatureInstance def : getOutputTime() : AADLI!RecordValue =
-	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time')) then
+	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time').oclIsUndefined()) then
 		OclUndefined
 	else
 		self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time')
