@@ -49,7 +49,7 @@ import org.osate.aadl2.modelsupport.UnparseText;
 
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
-import fr.tpt.aadl.ramses.util.properties.PropertyUtils;
+import fr.tpt.aadl.utils.PropertyUtils ;
 
 public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 {

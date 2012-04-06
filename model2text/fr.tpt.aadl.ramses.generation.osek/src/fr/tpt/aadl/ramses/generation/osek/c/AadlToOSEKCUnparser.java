@@ -48,8 +48,8 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Task;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
 import fr.tpt.aadl.ramses.util.generation.FileUtils ;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
-import fr.tpt.aadl.ramses.util.properties.PropertyNotFound ;
-import fr.tpt.aadl.ramses.util.properties.PropertyUtils;
+import fr.tpt.aadl.utils.PropertyNotFound ;
+import fr.tpt.aadl.utils.PropertyUtils ;
 
 /**
  * Unparser to generate an oil file for OSEK from aadl.

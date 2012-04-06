@@ -26,7 +26,7 @@ import fr.tpt.aadl.flow.extraction.util.BehaviorAnnexUtil ;
 import fr.tpt.aadl.flow.extraction.util.IDGenerator ;
 import fr.tpt.aadl.flow.model.RTAction ;
 import fr.tpt.aadl.flow.model.RTActionType ;
-import fr.tpt.aadl.ramses.util.properties.IntegerRange ;
+import fr.tpt.aadl.utils.IntegerRange ;
 
 /**
  * Extract action flow from a list of Behavior Actions

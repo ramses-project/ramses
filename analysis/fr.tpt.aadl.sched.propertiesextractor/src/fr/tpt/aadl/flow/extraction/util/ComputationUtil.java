@@ -5,7 +5,7 @@ import org.osate.aadl2.SubprogramSubcomponent ;
 
 import fr.tpt.aadl.flow.extraction.ExecutionAnalyzer ;
 import fr.tpt.aadl.flow.model.RTActionType ;
-import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
+import fr.tpt.aadl.utils.PropertyUtils ;
 
 public class ComputationUtil
 {

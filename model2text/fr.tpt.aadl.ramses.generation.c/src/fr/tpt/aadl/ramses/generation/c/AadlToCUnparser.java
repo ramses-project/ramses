@@ -46,7 +46,7 @@ import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser ;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction ;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
-import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
+import fr.tpt.aadl.utils.PropertyUtils ;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
 import fr.tpt.aadl.annex.behavior.names.DataModelProperties ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaGetProperties ;

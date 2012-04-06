@@ -34,7 +34,7 @@ import java.util.Map ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
-import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
+import fr.tpt.aadl.utils.PropertyUtils ;
 
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.ProcessImplementation ;

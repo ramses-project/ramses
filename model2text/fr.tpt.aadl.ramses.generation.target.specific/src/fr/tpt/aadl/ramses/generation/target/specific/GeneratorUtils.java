@@ -62,7 +62,7 @@ import fr.tpt.aadl.annex.behavior.names.DataModelProperties ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaGetProperties ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
-import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
+import fr.tpt.aadl.utils.PropertyUtils ;
 
 public class GeneratorUtils
 {

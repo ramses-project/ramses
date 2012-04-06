@@ -4,7 +4,7 @@ import org.osate.aadl2.instance.ComponentInstance ;
 
 import fr.tpt.aadl.flow.analysis.util.LongestAndShortestPath ;
 import fr.tpt.aadl.flow.analysis.util.TaskSequence ;
-import fr.tpt.aadl.ramses.util.properties.PropertyUtils ;
+import fr.tpt.aadl.utils.PropertyUtils ;
 
 public class ExecutionGraph
 {
