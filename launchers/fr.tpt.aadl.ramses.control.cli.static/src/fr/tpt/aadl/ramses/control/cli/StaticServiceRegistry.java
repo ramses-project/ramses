@@ -40,6 +40,7 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory;
+import fr.tpt.aadl.ramses.generation.pokTT.PokTTGeneratorFactory ;
 
 public class StaticServiceRegistry implements ServiceRegistry
 {
@@ -68,9 +69,11 @@ public class StaticServiceRegistry implements ServiceRegistry
     _analyzers.put(WCETAnalysis.ANALYZER_NAME, new WCETAnalysis()) ;
     
     Generator genPok = PokGeneratorFactory.createPokGenerator(false) ;
+    Generator genPokTT = PokTTGeneratorFactory.createPokTTGenerator(false) ;
     Generator genOsek = OSEKGeneratorFactory.createOSEKGenerator(false);
     
     _gen.put(genPok.getRegistryName(), genPok) ;
+    _gen.put(genPokTT.getRegistryName(), genPokTT) ;
     _gen.put(genOsek.getRegistryName(), genOsek) ;
   }
 
