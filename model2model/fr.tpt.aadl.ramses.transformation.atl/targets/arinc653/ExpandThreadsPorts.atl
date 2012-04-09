@@ -451,10 +451,17 @@ rule DataPort_Instance
 		{
 			for(src in fi.getSources())
 			{
-				if(src.eContainer().eContainer().debug(src.name+' double econtainer') = c.eContainer().debug(c.name+' simple econtainer'))
+				-- Time-Triggered intra-partition communication
+				if (src.eContainer().category.toString()='virtual processor')
 				{
 					thisModule.addReadBlackBoard(fi, impl, f, implImg);
 				}
+				-- Non Time-Triggered intra-partition communication
+				else if(src.eContainer().eContainer().debug(src.name+' double econtainer') = c.eContainer().debug(c.name+' simple econtainer'))
+				{
+					thisModule.addReadBlackBoard(fi, impl, f, implImg);
+				}
+				-- Non Time-Triggered inter-partition communication
 				else if(src.eContainer().eContainer().getProcessorBinding().debug(src.name+' double econtainer + processor binding') = c.eContainer().getProcessorBinding().debug(c.name+' simple econtainer + processor binding'))
 				{
 					thisModule.addReadSampling(fi, impl, communicationID, f, processImplImg, implImg);
@@ -614,10 +621,17 @@ rule EventDataPort_Instance
 			true.debug('Create Buffer Port');
 			for(dest in fi.getDestinations())
 			{
-				if(dest.eContainer().eContainer() = c.eContainer())
+				-- Time-Triggered intra-partition communication
+				if (dest.eContainer().category.toString()='virtual processor')
 				{
 					thisModule.addSendBuffer(fi, impl, f, implImg);
 				}
+				-- Non Time-Triggered intra-partition communication
+				else if(dest.eContainer().eContainer() = c.eContainer())
+				{
+					thisModule.addSendBuffer(fi, impl, f, implImg);
+				}
+				-- Non Time-Triggered inter-partition communication
 				else if(dest.eContainer().eContainer().getProcessorBinding() = c.eContainer().getProcessorBinding())
 				{
 					thisModule.addSendQueuing(fi, impl, communicationID, f, processImplImg, implImg);
