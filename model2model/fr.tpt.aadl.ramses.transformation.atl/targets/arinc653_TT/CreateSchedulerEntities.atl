@@ -147,18 +147,20 @@ unique lazy rule InternalProcess
 	}
 }
 
-helper def : InternalThread_Deadline (t : AADLI!ComponentInstance) : AADLBA!ThreadSubcomponent =
-	thisModule.InternalThread_RuleWrapper (t.getPeriod().value,    -- period
-		                       t.getDeadline().value,  -- deadline
-							   t.getDeadline().value,  -- offset
-							   t) 
+helper def : InternalThread_Deadline (fi : AADLI!FeatureInstance) : AADLBA!ThreadSubcomponent =
+	thisModule.InternalThread_RuleWrapper (
+		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getOutputRatePeriodFactor(),    -- period
+		                       fi.eContainer().getDeadline().value.doubleValue() * fi.getOutputRatePeriodFactor(),  -- deadline
+							   fi.eContainer().getDeadline().value,  -- offset
+							   fi.eContainer()) 
 ;
 
-helper def : InternalThread_Period (t : AADLI!ComponentInstance) : AADLBA!ThreadSubcomponent =
-	thisModule.InternalThread_RuleWrapper (t.getPeriod().value,    -- period
-		                       t.getDeadline().value,  -- deadline
+helper def : InternalThread_Period (fi : AADLI!FeatureInstance) : AADLBA!ThreadSubcomponent =
+	thisModule.InternalThread_RuleWrapper (
+		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getInputRatePeriodFactor(),    -- period
+		                       fi.eContainer().getDeadline().value.doubleValue() * fi.getInputRatePeriodFactor(),  -- deadline
 							   0.longValue(),                      -- offset
-							   t)
+							   fi.eContainer())
 ;
 
 
@@ -167,8 +169,8 @@ unique lazy rule InternalThread
 	from
 		id : String,  -- only the first parameter is taken into account for
 		              -- unique (must have a unique identifier for all parameters)
-		period : Integer,
-		deadline : Integer,
+		period : Real,
+		deadline : Real,
 		offset : Integer,
 		thread : AADLI!ComponentInstance
 	using
@@ -215,8 +217,8 @@ unique lazy rule InternalThread
 			ownedValue						<- periodL
 		),
 		
-		periodL  : AADLBA!IntegerLiteral (
-			value						<- period,
+		periodL  : AADLBA!RealLiteral (
+			value						<- period.doubleValue(),
 			unit						<- AADLI!UnitLiteral->allInstances()->any(l|l.name='ms')
 		),
 		
@@ -228,8 +230,8 @@ unique lazy rule InternalThread
 			ownedValue						<- deadlineL
 		),
 		
-		deadlineL  : AADLBA!IntegerLiteral (
-			value						<- deadline,
+		deadlineL  : AADLBA!RealLiteral (
+			value						<- deadline.doubleValue(),
 			unit						<- AADLI!UnitLiteral->allInstances()->any(l|l.name='ms')
 		),
 		

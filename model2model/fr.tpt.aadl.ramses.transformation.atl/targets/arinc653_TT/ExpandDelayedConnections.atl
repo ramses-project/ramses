@@ -124,8 +124,8 @@ rule DelayedConnectionWithoutOffset_Instance
 		thisModule.DelayedPortIntraConnection_Destination (cnxInst.destination);
 
 		-- Resolve scheduler threads
-		DeadlineThread <- thisModule.InternalThread_Deadline (cnxInst.source.eContainer());
-		PeriodThread <- thisModule.InternalThread_Period (cnxInst.destination.eContainer());
+		DeadlineThread <- thisModule.InternalThread_Deadline (cnxInst.source);
+		PeriodThread <- thisModule.InternalThread_Period (cnxInst.destination);
 		
 		-- Create/resolve cache port of scheduler threads
 		DeadlineThreadCachePort <- thisModule.InternalThread_Deadline_SetupCache(DeadlineThread, cnxInst);
@@ -177,7 +177,7 @@ unique lazy rule DelayedPortIntraConnection_Source
 		processor : AADLBA!ProcessorSubcomponent = thisModule.resolveTemp(vpInst.eContainer(),'sub');
 		vp        : AADLBA!VirtualProcessorSubcomponent = thisModule.resolveTemp(vpInst,'sub');
 		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (fi.eContainer().eContainer());
-		internalThread    : AADLBA!ThreadSubcomponent = thisModule.InternalThread_Deadline (fi.eContainer());
+		internalThread    : AADLBA!ThreadSubcomponent = thisModule.InternalThread_Deadline (fi);
 	}
 	to
 		processPort  : AADLBA!EventDataPort (
@@ -230,7 +230,10 @@ unique lazy rule DelayedPortIntraConnection_Source
 			ownedValue <- queueSizeL
 		),
 		queueSizeL : AADLBA!IntegerLiteral (
-			value	   <- fi.getOutputRate().longValue()
+			value	   <- if fi.getOutputRate() < 1
+						  then 1.longValue()
+						  else fi.getOutputRate().longValue()
+						  endif
 		),
 		
 		
@@ -323,7 +326,7 @@ unique lazy rule DelayedPortIntraConnection_Destination
 		processor : AADLBA!ProcessorSubcomponent = thisModule.resolveTemp(vpInst.eContainer(),'sub');
 		vp        : AADLBA!VirtualProcessorSubcomponent = thisModule.resolveTemp(vpInst,'sub');
 		internalProcess   : AADLBA!ProcessImplementation = thisModule.InternalProcess (fi.eContainer().eContainer());
-		internalThread    : AADLBA!ThreadSubcomponent = thisModule.InternalThread_Period (fi.eContainer());
+		internalThread    : AADLBA!ThreadSubcomponent = thisModule.InternalThread_Period (fi);
 	}
 	to
 		processPort  : AADLBA!EventDataPort (
