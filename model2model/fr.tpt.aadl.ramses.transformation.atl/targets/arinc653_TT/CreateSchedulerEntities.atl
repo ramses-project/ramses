@@ -155,6 +155,14 @@ helper def : InternalThread_Deadline (fi : AADLI!FeatureInstance) : AADLBA!Threa
 							   fi.eContainer()) 
 ;
 
+helper def : InternalThread_Offset (fi : AADLI!FeatureInstance) : AADLBA!ThreadSubcomponent =
+	thisModule.InternalThread_RuleWrapper (
+		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getOutputRatePeriodFactor(),    -- period
+		                       fi.eContainer().getDeadline().value.doubleValue() * fi.getOutputRatePeriodFactor(),  -- deadline
+							   fi.eContainer().getDeadline().value.doubleValue() + fi.getOutputTimeOffset().value.doubleValue(),  -- offset
+							   fi.eContainer()) 
+;
+
 helper def : InternalThread_Period (fi : AADLI!FeatureInstance) : AADLBA!ThreadSubcomponent =
 	thisModule.InternalThread_RuleWrapper (
 		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getInputRatePeriodFactor(),    -- period
@@ -171,7 +179,7 @@ unique lazy rule InternalThread
 		              -- unique (must have a unique identifier for all parameters)
 		period : Real,
 		deadline : Real,
-		offset : Integer,
+		offset : Real,
 		thread : AADLI!ComponentInstance
 	using
 	{
@@ -267,9 +275,9 @@ unique lazy rule InternalThread
 			ownedValue						<- dispatchOffsetL
 		),
 		
-		dispatchOffsetL  : AADLBA!IntegerLiteral (
+		dispatchOffsetL  : AADLBA!RealLiteral (
 			--value						<- t.getDeadline().value + t.getOffset().value,
-			value						<- offset,
+			value						<- offset.doubleValue(),
 			unit						<- AADLI!UnitLiteral->allInstances()->any(l|l.name='ms')
 		)
 	do

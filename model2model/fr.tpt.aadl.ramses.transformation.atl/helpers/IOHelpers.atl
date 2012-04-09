@@ -58,8 +58,16 @@ helper context AADLI!FeatureInstance def : getQueueSize() : Integer =
 	endif
 ;
 
+helper context AADLI!FeatureInstance def : getQueueSizeFromInputRate() : Integer =
+	self.getInputRate().round().longValue()
+;
 
-helper context AADLI!FeatureInstance def : getInputRate() : Integer =
+helper context AADLI!FeatureInstance def : getQueueSizeFromOutputRate() : Integer =
+	self.getOutputRate().round().longValue()
+;
+
+
+helper context AADLI!FeatureInstance def : getInputRate() : Real =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Input_Rate')
 		.oclIsUndefined()) then
 		1
@@ -86,7 +94,7 @@ helper context AADLI!FeatureInstance def : getInputRatePeriodFactor() : Real =
 	endif
 ;
 
-helper context AADLI!FeatureInstance def : getOutputRate() : Integer =
+helper context AADLI!FeatureInstance def : getOutputRate() : Real =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Rate')
 		.oclIsUndefined()) then
 		1
@@ -183,4 +191,9 @@ helper context AADLI!FeatureInstance def : getWriteTime() : Real =
 	  + (self.getDataSize().intValue() * self.eContainer().getPerByteWriteTime().doubleValue()))
 	  
 	* self.getInputRate()
+;
+
+helper context AADLI!ConnectionInstance def : getIOTime() : Real =
+	Sequence{self.source.getReadTime(), self.destination.getWriteTime()}
+		->sum().doubleValue()
 ;
