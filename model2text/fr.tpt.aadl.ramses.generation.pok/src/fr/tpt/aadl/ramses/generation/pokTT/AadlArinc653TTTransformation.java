@@ -68,12 +68,13 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 			}
 			
 			
-			Resource r1 = step1(inputResource, resourceFilePath, standardPropertySets, generatedFilePath);
+			Resource r1 = expandDelayedConnections(inputResource, resourceFilePath, standardPropertySets, generatedFilePath);
 			
 			SystemInstance s = instanciate(r1);
 			System.out.println("Instanciation: " + s.eResource().getURI().path());
 
-			Resource r2 = step2(s.eResource(), resourceFilePath, standardPropertySets, generatedFilePath);
+			Resource r2 = expandThreadsBehavior(s.eResource(), resourceFilePath, standardPropertySets, generatedFilePath);
+			//Resource r2 = s.eResource();
 			
 			return r2;
 		}
@@ -84,7 +85,7 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 		}
 	}
 	
-	private Resource step1(Resource r, File resourceFilePath, Map<String, Resource> standardPropertySets,
+	private Resource expandDelayedConnections(Resource r, File resourceFilePath, Map<String, Resource> standardPropertySets,
 			File generatedFilePath) throws Exception
 	{
 		System.out.println("********************************************");
@@ -97,7 +98,7 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 		return r1;
 	}
 	
-	private Resource step2(Resource r1, 
+	private Resource expandThreadsBehavior(Resource r1, 
 			File resourceFilePath, Map<String, Resource> standardPropertySets,
 			File generatedFilePath) throws Exception
 	{
