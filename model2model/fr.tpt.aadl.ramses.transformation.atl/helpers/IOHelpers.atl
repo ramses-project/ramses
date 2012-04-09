@@ -70,6 +70,22 @@ helper context AADLI!FeatureInstance def : getInputRate() : Integer =
 	endif
 ;
 
+helper context AADLI!FeatureInstance def : getOutputRatePeriodFactor() : Real =
+	if (self.getOutputRate() < 1) then
+		1.0 / self.getOutputRate()
+	else
+		1.0
+	endif
+;
+
+helper context AADLI!FeatureInstance def : getInputRatePeriodFactor() : Real =
+	if (self.getInputRate() < 1) then
+		1.0 / self.getInputRate()
+	else
+		1.0
+	endif
+;
+
 helper context AADLI!FeatureInstance def : getOutputRate() : Integer =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Rate')
 		.oclIsUndefined()) then
