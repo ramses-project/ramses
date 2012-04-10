@@ -1,17 +1,22 @@
 --
---                              POK header
+-- AADL-RAMSES
 -- 
---  The following file is a part of the POK project. Any modification should
---  be made according to the POK licence. You CANNOT use this file or a part 
---  of a file for your own project.
+-- Copyright ¬© 2012 TELECOM ParisTech and CNRS
 -- 
---  For more information on the POK licence, please see our LICENCE FILE
---
---  Please follow the coding guidelines described in doc/CODING_GUIDELINES
---
---                                      Copyright (c) 2007-2009 POK team 
---
---  Created by julien on Thu Jan 15 23:34:13 2009 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
 
@@ -90,8 +95,8 @@ features
    output : out event data port myint 
    {
    	Compute_Deadline => 10ms;
-   	Output_Rate => (Value_Range => 2.0;);
-   	Output_Time => (Time => Deadline; Offset => 0.0 ms;);
+   	Output_Rate => (Value_Range => 2.5;);
+   	Output_Time => (Time => Deadline; Offset => 200.0 ms;);
    };
 end mythread1;
 
