@@ -38,9 +38,9 @@ unique lazy rule ProcessTypeWithoutInst {
  to 
  	typeImg : AADLBA!ProcessType (
  	 name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.Port(p)),
-	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.Port(p)),
-	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.Port(p)),
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.EventDataPort(p)),
+	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.DataPort(p)),
+	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.EventPort(p)),
 	 --ownedSubprogramAccess <- type.ownedSubprogramAccess,
 	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
 	)
@@ -60,10 +60,10 @@ unique lazy rule ProcessImplementationWithtoutInst {
  		name 							<- impl.name,
 		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
 		--ownedThreadGroupSubcomponent 	<- impl.ownedThreadGroupSubcomponent,
-		ownedThreadSubcomponent 		<- impl.ownedThreadSubcomponent->collect(s|thisModule.Subcomponent(s)),
+		ownedThreadSubcomponent 		<- impl.ownedThreadSubcomponent->collect(s|thisModule.AbstractSubcomponent(s)),
 		--ownedSubprogramSubcomponent 	<- impl.ownedSubprogramSubcomponent,
 		--ownedDataSubcomponent 			<- impl.ownedDataSubcomponent,
-		ownedPortConnection             <- impl.ownedPortConnection->collect(c|thisModule.PortConnection(c)),
+		ownedPortConnection             <- impl.ownedPortConnection->collect(c|thisModule.PortConnectionUninst(c)),
 		ownedPropertyAssociation 		<- impl.mapOwnedPropertyAssociationList()
 	)
  do
@@ -72,14 +72,14 @@ unique lazy rule ProcessImplementationWithtoutInst {
  }
 }
 
-unique lazy abstract rule Subcomponent {
+unique lazy abstract rule AbstractSubcomponent {
 	from
 		sub : AADLI!Subcomponent
 	to
 		sub2 : AADLBA!Subcomponent
 }
 
-unique lazy rule ThreadSubcomponent extends Subcomponent {
+unique lazy rule ThreadSubcomponent extends AbstractSubcomponent {
 	from
 		sub : AADLI!ThreadSubcomponent
 	to
@@ -96,9 +96,9 @@ unique lazy rule ThreadTypeWithoutInst {
  to 
  	typeImg : AADLBA!ThreadType (
  	 name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.Port(p)),
-	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.Port(p)),
-	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.Port(p)),
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.EventDataPort(p)),
+	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.DataPort(p)),
+	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.EventPort(p)),
 	 --ownedDataAccess <- type.ownedDataAccess,
 	 --ownedSubprogramAccess <- type.ownedSubprogramAccess,
 	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
@@ -121,13 +121,13 @@ unique lazy rule ThreadImplementationWithtoutInst {
 		--ownedSubprogramSubcomponent 	<- impl.ownedSubprogramSubcomponent,
 		--ownedDataSubcomponent 			<- impl.ownedDataSubcomponent,
 		--ownedSubprogramCallSequence     <- impl.ownedSubprogramCallSequence,
-		ownedPortConnection             <- impl.ownedPortConnection->collect (c|thisModule.PortConnection(c)),
+		ownedPortConnection             <- impl.ownedPortConnection->collect (c|thisModule.PortConnectionUninst(c)),
 		ownedPropertyAssociation 		<- impl.mapOwnedPropertyAssociationList()
 	)
 }
 
 
-unique lazy abstract rule Port
+unique lazy abstract rule AbstractPortUninst
 {
 	from
 		f: AADLI!Port
@@ -135,7 +135,7 @@ unique lazy abstract rule Port
 		f2: AADLBA!Port
 }
 
-unique lazy rule EventPort extends Port
+unique lazy rule EventPortUninst extends AbstractPortUninst
 {
 	from
 		f: AADLI!EventPort
@@ -149,7 +149,7 @@ unique lazy rule EventPort extends Port
 	do { f2; }
 }
 
-unique lazy abstract rule TypedPort extends Port
+unique lazy abstract rule TypedPortUninst extends AbstractPortUninst
 {
 	from
 		f: AADLI!Port
@@ -164,7 +164,7 @@ unique lazy abstract rule TypedPort extends Port
 	do { f2; }
 }
 
-unique lazy rule EventDataPort extends TypedPort
+unique lazy rule EventDataPortUninst extends TypedPortUninst
 {
 	from
 		f: AADLI!EventDataPort
@@ -173,7 +173,7 @@ unique lazy rule EventDataPort extends TypedPort
 	do { f2; }
 }
 
-unique lazy rule DataPort extends TypedPort
+unique lazy rule DataPortUninst extends TypedPortUninst
 {
 	from
 		f: AADLI!EventDataPort
@@ -182,7 +182,7 @@ unique lazy rule DataPort extends TypedPort
 	do { f2; }
 }
 
-unique lazy rule PortConnection
+unique lazy rule PortConnectionUninst
 {
 	from
 		c : AADLI!PortConnection
@@ -196,17 +196,17 @@ unique lazy rule PortConnection
 			context <- if c.source.context.oclIsUndefined() then
 							OclUndefined
 					   else
-					   		thisModule.Subcomponent (c.source.context)
+					   		thisModule.AbstractSubcomponent (c.source.context)
 					   endif,
-			connectionEnd <- thisModule.Port (c.source.connectionEnd)
+			connectionEnd <- thisModule.AbstractPortUninst (c.source.connectionEnd)
 		),
 		c2_destination : AADLBA!ConnectedElement (
 			context <- if c.destination.context.oclIsUndefined() then
 							OclUndefined
 					   else
-					   		thisModule.Subcomponent (c.destination.context)
+					   		thisModule.AbstractSubcomponent (c.destination.context)
 					   endif,
-			connectionEnd <- thisModule.Port (c.destination.connectionEnd)
+			connectionEnd <- thisModule.AbstractPortUninst (c.destination.connectionEnd)
 		)
 	do { c2; }
 }
