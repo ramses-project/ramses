@@ -265,6 +265,7 @@ public class AtlTransfoLauncher
     fileName.add("/uninstanciate/Features") ;
     fileName.add("/uninstanciate/Implementations") ;
     //fileName.add("/uninstanciate/Misc");
+    fileName.add("/uninstanciate/NonInstanciated");
     fileName.add("/uninstanciate/Properties") ;
     fileName.add("/uninstanciate/Types") ;
     fileName.add("/helpers/Services") ;
