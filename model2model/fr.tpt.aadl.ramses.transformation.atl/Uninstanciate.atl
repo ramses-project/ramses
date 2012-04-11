@@ -123,29 +123,6 @@ rule System_Instance {
 	}
 }
 
-unique lazy rule CreateSecondaryModel
-{
-	from
-		s : AADLI!SystemInstance (s.category = #system)
-	using
-	{
-		src_package : AADLI!AadlPackage = s.systemImplementation.getNamespace().getOwner();
-	}
-	to
-		section : AADLBA!PublicPackageSection (
-			importedUnit <- src_package.ownedPublicSection.importedUnit
-		),
-		
-		pkg : AADLBA!AadlPackage (
-			name <- src_package.name,
-			ownedPublicSection <- section
-		)
-	do
-	{
-		pkg;
-	}
-}
-
 rule Memory_Instance {
 	from
 		c : AADLI!ComponentInstance (c.category = #memory)
