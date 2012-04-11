@@ -38,9 +38,9 @@ unique lazy rule ProcessTypeWithoutInst {
  to 
  	typeImg : AADLBA!ProcessType (
  	 name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.EventDataPort(p)),
-	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.DataPort(p)),
-	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.EventPort(p)),
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.Port(p)),
+	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.Port(p)),
+	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.Port(p)),
 	 --ownedSubprogramAccess <- type.ownedSubprogramAccess,
 	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
 	)
@@ -96,9 +96,9 @@ unique lazy rule ThreadTypeWithoutInst {
  to 
  	typeImg : AADLBA!ThreadType (
  	 name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.EventDataPort(p)),
-	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.DataPort(p)),
-	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.EventPort(p)),
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.Port(p)),
+	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.Port(p)),
+	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.Port(p)),
 	 --ownedDataAccess <- type.ownedDataAccess,
 	 --ownedSubprogramAccess <- type.ownedSubprogramAccess,
 	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
@@ -127,60 +127,60 @@ unique lazy rule ThreadImplementationWithtoutInst {
 }
 
 
-unique lazy abstract rule AbstractPortUninst
-{
-	from
-		f: AADLI!Port
-	to
-		f2: AADLBA!Port
-}
-
-unique lazy rule EventPortUninst extends AbstractPortUninst
-{
-	from
-		f: AADLI!EventPort
-	to
-		f2: AADLBA!EventPort
-		(
-			name <- f.name,
-			direction <- f.direction,
-			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
-		)
-	do { f2; }
-}
-
-unique lazy abstract rule TypedPortUninst extends AbstractPortUninst
-{
-	from
-		f: AADLI!Port
-	to
-		f2: AADLBA!Port
-		(
-			name <- f.name,
-			direction <- f.direction,
-			dataFeatureClassifier <- f.mapDataClassifier(),
-			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
-		)
-	do { f2; }
-}
-
-unique lazy rule EventDataPortUninst extends TypedPortUninst
-{
-	from
-		f: AADLI!EventDataPort
-	to
-		f2: AADLBA!EventDataPort
-	do { f2; }
-}
-
-unique lazy rule DataPortUninst extends TypedPortUninst
-{
-	from
-		f: AADLI!EventDataPort
-	to
-		f2: AADLBA!EventDataPort
-	do { f2; }
-}
+--unique lazy abstract rule AbstractPortUninst
+--{
+--	from
+--		f: AADLI!Port
+--	to
+--		f2: AADLBA!Port
+--}
+--
+--unique lazy rule EventPortUninst extends AbstractPortUninst
+--{
+--	from
+--		f: AADLI!EventPort
+--	to
+--		f2: AADLBA!EventPort
+--		(
+--			name <- f.name,
+--			direction <- f.direction,
+--			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+--		)
+--	do { f2; }
+--}
+--
+--unique lazy abstract rule TypedPortUninst extends AbstractPortUninst
+--{
+--	from
+--		f: AADLI!Port
+--	to
+--		f2: AADLBA!Port
+--		(
+--			name <- f.name,
+--			direction <- f.direction,
+--			dataFeatureClassifier <- f.mapDataClassifier(),
+--			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+--		)
+--	do { f2; }
+--}
+--
+--unique lazy rule EventDataPortUninst extends TypedPortUninst
+--{
+--	from
+--		f: AADLI!EventDataPort
+--	to
+--		f2: AADLBA!EventDataPort
+--	do { f2; }
+--}
+--
+--unique lazy rule DataPortUninst extends TypedPortUninst
+--{
+--	from
+--		f: AADLI!EventDataPort
+--	to
+--		f2: AADLBA!EventDataPort
+--	do { f2; }
+--}
 
 unique lazy rule PortConnectionUninst
 {
@@ -198,7 +198,7 @@ unique lazy rule PortConnectionUninst
 					   else
 					   		thisModule.AbstractSubcomponent (c.source.context)
 					   endif,
-			connectionEnd <- thisModule.AbstractPortUninst (c.source.connectionEnd)
+			connectionEnd <- thisModule.Port (c.source.connectionEnd)
 		),
 		c2_destination : AADLBA!ConnectedElement (
 			context <- if c.destination.context.oclIsUndefined() then
@@ -206,7 +206,7 @@ unique lazy rule PortConnectionUninst
 					   else
 					   		thisModule.AbstractSubcomponent (c.destination.context)
 					   endif,
-			connectionEnd <- thisModule.AbstractPortUninst (c.destination.connectionEnd)
+			connectionEnd <- thisModule.Port (c.destination.connectionEnd)
 		)
 	do { c2; }
 }

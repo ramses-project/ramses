@@ -107,9 +107,9 @@ unique lazy rule DeviceType {
  to
  	typeImg : AADLBA!DeviceType (
  		name <- type.name,
-		ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
-	 	ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
-	 	ownedEventPort <- type.ownedEventPort->collect(e|thisModule.EventPort(e))
+		ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
+	 	ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
+	 	ownedEventPort <- type.ownedEventPort->collect(e|thisModule.Port(e))
  	)
 }
 
@@ -119,8 +119,8 @@ unique lazy rule ProcessorType {
  to 
     typeImg : AADLBA!ProcessorType (
      name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
+	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
 	 ownedEventPort <- type.eventPortsMapping()
  )
 }
@@ -131,8 +131,8 @@ unique lazy rule VirtualProcessorType {
  to 
     typeImg : AADLBA!VirtualProcessorType (
      name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
+	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
 	 ownedEventPort <- type.eventPortsMapping()
 	)
 }
@@ -163,9 +163,9 @@ unique lazy rule ThreadGroupType {
  to 
  	typeImg : AADLBA!ThreadGroupType (
  	 name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.EventDataPort(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.DataPort(e)),
-	 ownedEventPort <- type.ownedEventPort->collect(e|thisModule.EventPort(e))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
+	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
+	 ownedEventPort <- type.ownedEventPort->collect(e|thisModule.Port(e))
 	)
 }
 

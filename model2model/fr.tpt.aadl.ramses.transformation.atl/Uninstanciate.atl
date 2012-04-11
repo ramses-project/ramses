@@ -103,7 +103,7 @@ rule System_Instance {
 			ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
 			ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
 			ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data'),
-			ownedPortConnection				  <- impl.ownedPortConnection->collect(co|thisModule.PortConnection(co,impl)),
+			--ownedPortConnection				  <- s.connectionInstance->collect(co|thisModule.PortConnection(co,impl)),
 			ownedPropertyAssociation          <- s.mapOwnedPropertyAssociationList()
 		),
 		
@@ -119,6 +119,7 @@ rule System_Instance {
 		realization : AADLBA!Realization (implemented <- type)
 	do
 	{
+		impl.ownedPortConnection.debug('plop');
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(impl, s);
 	}
 }

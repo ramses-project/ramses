@@ -49,7 +49,14 @@ rule Feature (f: AADLI!Feature, featureImg : AADLBA!Feature) {
 	}
 }
 
-lazy rule DataPort {
+lazy abstract rule Port {
+	from
+		f : AADLI!Port
+	to
+		f2 : AADLBA!Port
+}
+
+lazy rule DataPort extends Port {
 	from
 		f : AADLI!DataPort
 	to
@@ -67,7 +74,7 @@ lazy rule DataPort {
 	}
 }
 
-lazy rule EventDataPort {
+lazy rule EventDataPort extends Port {
 	from
 		f : AADLI!EventDataPort
 	to
@@ -85,7 +92,7 @@ lazy rule EventDataPort {
 	}
 }
 
-lazy rule EventPort {
+lazy rule EventPort extends Port{
 	from
 		f : AADLI!EventPort
 	to
