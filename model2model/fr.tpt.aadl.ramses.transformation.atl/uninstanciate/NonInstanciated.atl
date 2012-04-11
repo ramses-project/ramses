@@ -1,0 +1,212 @@
+module NonInstanciated;
+
+
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+
+unique lazy rule ProcessTypeWithoutInst {
+ from
+ 	type : AADLI!ProcessType
+ to 
+ 	typeImg : AADLBA!ProcessType (
+ 	 name <- type.name,
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.Port(p)),
+	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.Port(p)),
+	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.Port(p)),
+	 --ownedSubprogramAccess <- type.ownedSubprogramAccess,
+	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+	)
+}
+
+unique lazy rule ProcessImplementationWithtoutInst {
+ from
+    typeImg : AADLBA!ProcessType,
+ 	impl : AADLI!ProcessImplementation
+ using
+ {
+	threadTypeImg : AADLBA!ComponentType = OclUndefined;
+	threadImplImg : AADLBA!ComponentImplementation = OclUndefined;
+ }
+ to 
+ 	implImg : AADLBA!ProcessImplementation (
+ 		name 							<- impl.name,
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		--ownedThreadGroupSubcomponent 	<- impl.ownedThreadGroupSubcomponent,
+		ownedThreadSubcomponent 		<- impl.ownedThreadSubcomponent->collect(s|thisModule.Subcomponent(s)),
+		--ownedSubprogramSubcomponent 	<- impl.ownedSubprogramSubcomponent,
+		--ownedDataSubcomponent 			<- impl.ownedDataSubcomponent,
+		ownedPortConnection             <- impl.ownedPortConnection->collect(c|thisModule.PortConnection(c)),
+		ownedPropertyAssociation 		<- impl.mapOwnedPropertyAssociationList()
+	)
+ do
+ {
+ 	implImg;
+ }
+}
+
+unique lazy abstract rule Subcomponent {
+	from
+		sub : AADLI!Subcomponent
+	to
+		sub2 : AADLBA!Subcomponent
+}
+
+unique lazy rule ThreadSubcomponent extends Subcomponent {
+	from
+		sub : AADLI!ThreadSubcomponent
+	to
+	  sub2 : AADLBA!ThreadSubcomponent (
+	  	name <- sub.name,
+		threadSubcomponentType <- thisModule.createOrSetTypeAndImplementation(sub)
+	  )
+	do { sub2; }
+}
+
+unique lazy rule ThreadTypeWithoutInst {
+ from
+ 	type : AADLI!ThreadType
+ to 
+ 	typeImg : AADLBA!ThreadType (
+ 	 name <- type.name,
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.Port(p)),
+	 ownedDataPort <- type.ownedDataPort->collect(p|thisModule.Port(p)),
+	 ownedEventPort <- type.ownedEventPort->collect(p|thisModule.Port(p)),
+	 --ownedDataAccess <- type.ownedDataAccess,
+	 --ownedSubprogramAccess <- type.ownedSubprogramAccess,
+	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+	)
+ do
+ {
+ 	typeImg.debug('ThreadTypeWithoutInst');
+ 	typeImg;
+ }
+}
+
+unique lazy rule ThreadImplementationWithtoutInst {
+ from 
+ 	typeImg : AADLBA!ThreadType,
+ 	impl : AADLI!ThreadImplementation
+ to 
+ 	implImg : AADLBA!ThreadImplementation (
+ 		name <- impl.name,
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		--ownedSubprogramSubcomponent 	<- impl.ownedSubprogramSubcomponent,
+		--ownedDataSubcomponent 			<- impl.ownedDataSubcomponent,
+		--ownedSubprogramCallSequence     <- impl.ownedSubprogramCallSequence,
+		ownedPortConnection             <- impl.ownedPortConnection->collect (c|thisModule.PortConnection(c)),
+		ownedPropertyAssociation 		<- impl.mapOwnedPropertyAssociationList()
+	)
+}
+
+
+unique lazy abstract rule Port
+{
+	from
+		f: AADLI!Port
+	to
+		f2: AADLBA!Port
+}
+
+unique lazy rule EventPort extends Port
+{
+	from
+		f: AADLI!EventPort
+	to
+		f2: AADLBA!EventPort
+		(
+			name <- f.name,
+			direction <- f.direction,
+			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+		)
+	do { f2; }
+}
+
+unique lazy abstract rule TypedPort extends Port
+{
+	from
+		f: AADLI!Port
+	to
+		f2: AADLBA!Port
+		(
+			name <- f.name,
+			direction <- f.direction,
+			dataFeatureClassifier <- f.mapDataClassifier(),
+			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+		)
+	do { f2; }
+}
+
+unique lazy rule EventDataPort extends TypedPort
+{
+	from
+		f: AADLI!EventDataPort
+	to
+		f2: AADLBA!EventDataPort
+	do { f2; }
+}
+
+unique lazy rule DataPort extends TypedPort
+{
+	from
+		f: AADLI!EventDataPort
+	to
+		f2: AADLBA!EventDataPort
+	do { f2; }
+}
+
+unique lazy rule PortConnection
+{
+	from
+		c : AADLI!PortConnection
+	to
+		c2 : AADLBA!PortConnection (
+			name <- c.name,
+			source <- c2_source,
+			destination <- c2_destination
+		),
+		c2_source : AADLBA!ConnectedElement (
+			context <- if c.source.context.oclIsUndefined() then
+							OclUndefined
+					   else
+					   		thisModule.Subcomponent (c.source.context)
+					   endif,
+			connectionEnd <- thisModule.Port (c.source.connectionEnd)
+		),
+		c2_destination : AADLBA!ConnectedElement (
+			context <- if c.destination.context.oclIsUndefined() then
+							OclUndefined
+					   else
+					   		thisModule.Subcomponent (c.destination.context)
+					   endif,
+			connectionEnd <- thisModule.Port (c.destination.connectionEnd)
+		)
+	do { c2; }
+}

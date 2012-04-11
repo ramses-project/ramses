@@ -215,6 +215,12 @@ helper context AADLI!ComponentInstance def : createOrSetTypeAndImplementation() 
 	endif
 ;
 
+helper def : createOrSetTypeAndImplementation (s : AADLI!Subcomponent) : AADLBA!ComponentClassifier =
+	thisModule.Implementation (OclUndefined, 
+							   s.getComponentImplementation(), 
+							   thisModule.Type(OclUndefined, s.getComponentType()))
+;
+
 helper context AADLI!NamedElement def : mapOwnedPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
 	self.ownedPropertyAssociation->collect (e|thisModule.PropertyAssociation (e))
 ;

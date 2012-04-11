@@ -50,9 +50,21 @@ rule Type (c : AADLI!ComponentInstance,
 		else if (type.oclIsKindOf(AADLI!ProcessorType)) { typeImg <- thisModule.ProcessorType(type); }
 		else if (type.oclIsKindOf(AADLI!VirtualProcessorType)) { typeImg <- thisModule.VirtualProcessorType(type); }
 		else if (type.oclIsKindOf(AADLI!MemoryType)) { typeImg <- thisModule.MemoryType(type); }
-		else if (type.oclIsKindOf(AADLI!ProcessType)) { typeImg <- thisModule.ProcessType(c,type); }
+		else if (type.oclIsKindOf(AADLI!ProcessType)) 
+		{ 
+			if (c.oclIsUndefined())
+				typeImg <- thisModule.ProcessTypeWithoutInst(type);
+			else
+				typeImg <- thisModule.ProcessType(c,type);
+		}
 		else if (type.oclIsKindOf(AADLI!ThreadGroupType)) { typeImg <- thisModule.ThreadGroupType(type); }
-		else if (type.oclIsKindOf(AADLI!ThreadType)) { typeImg <- thisModule.ThreadType(c,type); }
+		else if (type.oclIsKindOf(AADLI!ThreadType)) 
+		{ 
+			if (c.oclIsUndefined())
+				typeImg <- thisModule.ThreadTypeWithoutInst(type);
+			else
+				typeImg <- thisModule.ThreadType(c,type);
+		}
 		else if (type.oclIsKindOf(AADLI!SubprogramType)) { typeImg <- thisModule.SubprogramType(type); }
 		else if (type.oclIsKindOf(AADLI!DataType)) { typeImg <- thisModule.DataType(type); }
 		

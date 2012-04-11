@@ -183,14 +183,14 @@ helper context AADLI!FeatureInstance def : getReadTime() : Real =
 	(self.eContainer().getFixedReadTime().doubleValue()
 	  + (self.getDataSize().intValue() * self.eContainer().getPerByteReadTime().doubleValue()))
 
-	* self.getOutputRate()
+	* self.getQueueSizeFromOutputRate()
 ;
 
 helper context AADLI!FeatureInstance def : getWriteTime() : Real =
 	(self.eContainer().getFixedWriteTime().doubleValue()
 	  + (self.getDataSize().intValue() * self.eContainer().getPerByteWriteTime().doubleValue()))
 	  
-	* self.getInputRate()
+	* self.getQueueSizeFromInputRate()
 ;
 
 helper context AADLI!ConnectionInstance def : getIOTime() : Real =

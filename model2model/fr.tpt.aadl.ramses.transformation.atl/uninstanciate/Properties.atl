@@ -111,10 +111,20 @@ lazy rule BooleanLiteral extends PropertyExpression {
 lazy rule ClassifierValue extends PropertyExpression {
 	from
 		l : AADLI!ClassifierValue
+	using
+	{
+		typeImg : AADLBA!ComponentType = OclUndefined;
+		implImg : AADLBA!ComponentImplementation = OclUndefined;
+	}
 	to
 		l2 : AADLBA!ClassifierValue(classifier <- l.classifier.getClassifierImg())
 	do 
 	{
+		if (thisModule.public().name = l.classifier.getNamespace().name)
+		{
+			typeImg <- thisModule.Type(OclUndefined, l.classifier.getComponentType());
+			implImg <- thisModule.Implementation (OclUndefined, l.classifier, typeImg);
+		}
 		l2; 
 	}
 }

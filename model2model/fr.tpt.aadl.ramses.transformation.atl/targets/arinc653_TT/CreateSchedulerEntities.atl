@@ -22,13 +22,16 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 
 module CreateSchedulerEntities;
-create OUT : AADLBA 	from 		IN : AADLI,
-									AADL_RUNTIME: AADLBA,
-									DATA_MODEL: AADLBA,
-									PROGRAMMING_PROPERTIES: AADLBA,
-									HOOKS: ATLHOOKS,
+create 
+	OUT : AADLBA
+from
+	IN : AADLI,
+	AADL_RUNTIME: AADLBA,
+	DATA_MODEL: AADLBA,
+	PROGRAMMING_PROPERTIES: AADLBA,
+	HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+	POK_RUNTIME: AADLBA;
 
 
 uses Services;
