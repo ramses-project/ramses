@@ -173,13 +173,13 @@ end ShutdownHook;
 data EventQueueIdType
 properties
   Programming_Properties::Source_Name => "EventQueueIdType";
-  Programming_Properties::Source_Text => "osek_runtime.h";
+  Programming_Properties::Source_Text => ("osek_runtime.h");
 end EventQueueIdType;
 
 data EventDataType
 properties
   Programming_Properties::Source_Name => "EventDataType";
-  Programming_Properties::Source_Text => "osek_runtime.h";
+  Programming_Properties::Source_Text => ("osek_runtime.h");
 end EventDataType;
 
 subprogram SetOSEKEventData

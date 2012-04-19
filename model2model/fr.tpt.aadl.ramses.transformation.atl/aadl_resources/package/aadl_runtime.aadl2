@@ -2,7 +2,7 @@ package AADL_Runtime
 
 public
 
-with data_model;
+with Base_Types, data_model;
 
 data t_aadl_ressource
 end t_aadl_ressource;
