@@ -21,9 +21,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.m2m.atl.engine.emfvm;bundle-version="3.2.1",
  org.eclipse.m2m.atl.core,
  org.eclipse.m2m.atl.common;bundle-version="3.2.0",
- fr.tpt.aadl.utils;bundle-version="0.8.5",
+ fr.tpt.aadl.utils;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
- fr.tpt.aadl.annex.behavior;visibility:=reexport,
+ fr.tpt.aadl.annex.behavior;bundle-version="0.9.5";visibility:=reexport,
  fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0"
 Bundle-ActivationPolicy: lazy
 

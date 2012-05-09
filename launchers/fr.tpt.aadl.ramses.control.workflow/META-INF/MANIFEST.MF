@@ -8,7 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.osate.aadl2.modelsupport,
  org.osate.aadl2,
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
- fr.tpt.aadl.utils;bundle-version="0.8.5",
+ fr.tpt.aadl.utils;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.cli.core;bundle-version="0.5.0"
 Export-Package: fr.tpt.aadl.ramses.control.workflow.core,
  fr.tpt.aadl.ramses.control.workflow.core.actions
