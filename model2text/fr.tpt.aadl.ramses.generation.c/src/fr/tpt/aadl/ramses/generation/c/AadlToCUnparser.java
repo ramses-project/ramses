@@ -46,10 +46,10 @@ import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser ;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction ;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
+import fr.tpt.aadl.utils.Aadl2Utils ;
 import fr.tpt.aadl.utils.PropertyUtils ;
+import fr.tpt.aadl.utils.names.DataModelProperties ;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
-import fr.tpt.aadl.annex.behavior.names.DataModelProperties ;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaGetProperties ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
 
@@ -331,7 +331,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
 
     EList<PropertyExpression> numberRepresentation =
-          AadlBaGetProperties
+          PropertyUtils
                 .getPropertyExpression(dataTypeHolder.klass,
                                        DataModelProperties.NUMBER_REPRESENTATION) ;
     String numberRepresentationValue = "" ;
@@ -348,7 +348,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
     // define types the current data type depends on
     EList<PropertyExpression> referencedBaseType =
-          AadlBaGetProperties
+          PropertyUtils
                 .getPropertyExpression(dataTypeHolder.klass,
                                        DataModelProperties.BASE_TYPE) ;
 
@@ -414,7 +414,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentHeaderUnparser.incrementIndent() ;
         List<String> stringifiedRepresentation = new ArrayList<String>() ;
         EList<PropertyExpression> dataRepresentation =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.REPRESENTATION) ;
 
@@ -436,7 +436,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
 
         EList<PropertyExpression> dataEnumerators =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ENUMERATORS) ;
 
@@ -492,7 +492,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentHeaderUnparser.addOutputNewline("typedef struct " + id + " {") ;
         _currentHeaderUnparser.incrementIndent() ;
         EList<PropertyExpression> elementNames =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ELEMENT_NAMES) ;
         List<String> stringifiedElementNames = new ArrayList<String>() ;
@@ -515,7 +515,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
 
         EList<PropertyExpression> elementTypes =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
 
@@ -557,7 +557,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentHeaderUnparser.addOutputNewline("typedef union " + id + " {") ;
         _currentHeaderUnparser.incrementIndent() ;
         EList<PropertyExpression> elementNames =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ELEMENT_NAMES) ;
         List<String> stringifiedElementNames = new ArrayList<String>() ;
@@ -580,7 +580,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
 
         EList<PropertyExpression> elementTypes =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
 
@@ -615,7 +615,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       {
         _currentHeaderUnparser.addOutput("typedef ") ;
         EList<PropertyExpression> baseType =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
 
@@ -641,7 +641,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentHeaderUnparser.addOutput(" ") ;
         _currentHeaderUnparser.addOutput(id) ;
         EList<PropertyExpression> arrayDimensions =
-              AadlBaGetProperties
+              PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.DIMENSION) ;
 
@@ -913,7 +913,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         	  DataSubcomponent destination =  (DataSubcomponent) connect.
                                                            getAllDestination() ;
             
-              if(AadlBaUtils.contains(destination.getName(), dataSubcomponentNames))
+              if(Aadl2Utils.contains(destination.getName(), dataSubcomponentNames))
               {
                 ConnectedElement source = (ConnectedElement) connect.getSource() ;
                 DataAccess da = (DataAccess) source.getConnectionEnd() ;
@@ -926,7 +926,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               {
             	DataSubcomponent source =  (DataSubcomponent) connect.
               			getAllSource() ;
-              	if(AadlBaUtils.contains(source.getName(), dataSubcomponentNames))
+              	if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
                 {
                   ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
                   

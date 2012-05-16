@@ -58,11 +58,10 @@ import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
-import fr.tpt.aadl.annex.behavior.names.DataModelProperties ;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaGetProperties ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
 import fr.tpt.aadl.utils.PropertyUtils ;
+import fr.tpt.aadl.utils.names.DataModelProperties ;
 
 public class GeneratorUtils
 {
@@ -92,7 +91,7 @@ public class GeneratorUtils
                   p.getName()
                         .equalsIgnoreCase(DataModelProperties.INITIAL_VALUE))
             {
-              setInitialization(initialization, AadlBaGetProperties
+              setInitialization(initialization, PropertyUtils
                                       .getPropertyExpression(pa)) ;
               return initialization.toString() ;
             }
@@ -104,7 +103,7 @@ public class GeneratorUtils
         {
           DataClassifier dc = (DataClassifier) d ;
           EList<PropertyExpression> initialValueProperty =
-                AadlBaGetProperties
+                PropertyUtils
                       .getPropertyExpression(dc,
                                              DataModelProperties.INITIAL_VALUE) ;
           setInitialization(initialization, initialValueProperty) ;
