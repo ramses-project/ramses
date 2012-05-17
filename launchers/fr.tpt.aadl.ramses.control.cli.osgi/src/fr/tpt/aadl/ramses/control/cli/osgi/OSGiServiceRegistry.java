@@ -102,19 +102,19 @@ public class OSGiServiceRegistry implements ServiceRegistry
   @Override
   public AnnexParser getParser(String annexName)
   {
-    return _parserRegistry.getAnnexParser(annexName) ;
+    return _parserRegistry.getAnnexParser(annexName.toLowerCase()) ;
   }
 
   @Override
   public AnnexResolver getResolver(String annexName)
   {
-    return _resolverRegistry.getAnnexResolver(annexName) ;
+    return _resolverRegistry.getAnnexResolver(annexName.toLowerCase()) ;
   }
 
   @Override
   public AnnexUnparser getUnparser(String annexName)
   {
-    return _unparserRegistry.getAnnexUnparser(annexName) ;
+    return _unparserRegistry.getAnnexUnparser(annexName.toLowerCase()) ;
   }
 
   @Override
@@ -132,13 +132,13 @@ public class OSGiServiceRegistry implements ServiceRegistry
   @Override
   public Analyzer getAnalyzer(String analyzerName)
   {
-    return _analyzersRegistry.get(analyzerName) ;
+    return _analyzersRegistry.get(analyzerName.toLowerCase()) ;
   }
 
   @Override
   public Generator getGenerator(String generatorName)
   {
-    return _genRegistry.get(generatorName) ;
+    return _genRegistry.get(generatorName.toLowerCase()) ;
   }
 
   @Override

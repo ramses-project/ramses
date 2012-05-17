@@ -80,19 +80,19 @@ public class StaticServiceRegistry implements ServiceRegistry
   @Override
   public AnnexParser getParser(String annexName)
   {
-    return _parsers.get(annexName) ;
+    return _parsers.get(annexName.toLowerCase()) ;
   }
 
   @Override
   public AnnexResolver getResolver(String annexName)
   {
-    return _resolvers.get(annexName) ;
+    return _resolvers.get(annexName.toLowerCase()) ;
   }
 
   @Override
   public AnnexUnparser getUnparser(String annexName)
   {
-    return _unparsers.get(annexName) ;
+    return _unparsers.get(annexName.toLowerCase()) ;
   }
 
   @Override
@@ -110,12 +110,12 @@ public class StaticServiceRegistry implements ServiceRegistry
   @Override
   public Analyzer getAnalyzer(String analyzerName)
   {
-    return _analyzers.get(analyzerName) ;
+    return _analyzers.get(analyzerName.toLowerCase()) ;
   }
 
   public Generator getGenerator(String TransformationName)
   {
-    return _gen.get(TransformationName) ;
+    return _gen.get(TransformationName.toLowerCase()) ;
   }
 
   @Override
