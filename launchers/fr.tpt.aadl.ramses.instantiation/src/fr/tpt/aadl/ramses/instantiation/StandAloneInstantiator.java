@@ -47,6 +47,7 @@ import org.osate.aadl2.instantiation.InstantiateModel ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl ;
 import org.osate.aadl2.util.Aadl2ResourceImpl ;
+import org.osate.core.OsateCorePlugin ;
 
 import com.google.inject.Injector ;
 
@@ -65,6 +66,8 @@ public class StandAloneInstantiator
   private final XtextResourceSet resourceSet = injector
         .getInstance(XtextResourceSet.class) ;
 
+  private OsateCorePlugin corePlugin = new OsateCorePlugin();
+  
   // Singleton
   protected StandAloneInstantiator()
   {
@@ -224,7 +227,8 @@ public class StandAloneInstantiator
 
             for(Diagnostic d : diagnostic.getChildren())
             {
-              System.err.println("Model has errors: " + d.getMessage()) ;
+              System.err.println("Model has errors: "
+                    + input_resource.getURI().lastSegment() + " " + d.getMessage()) ;
             }
 
             break ;
