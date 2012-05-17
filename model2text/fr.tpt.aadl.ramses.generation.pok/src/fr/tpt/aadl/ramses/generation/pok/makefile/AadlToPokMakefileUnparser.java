@@ -269,16 +269,20 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         throws GenerationException
   {
     generateMakefile((NamedElement) system, generatedFilePath) ;
+    executeMake(generatedFilePath);
+  }
+  
+  
+  public void executeMake(File generatedFilePath)
+  {
     Runtime runtime = Runtime.getRuntime();
     if(System.getenv("POK_PATH")!=""
           || System.getenv("POK_PATH")!=null)
     {
       try
       {
-        Process makeProcess = runtime.exec("cd generated-code; make all") ;
+        Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all") ;
         makeProcess.waitFor();
-        runtime.exec("cd -");
-        
         if (makeProcess.exitValue() != 0) {
           System.err.println("Error when compiling generated code: ");
 
@@ -292,9 +296,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         else
         {
           System.out.println("Generated code was successfully built.\n" +
-          		"\tTo run the executable files produced, tape: \n" +
-          		"\t$cd <example>/generated-code\n" +
-          		"\t$make run&");
+              "\tTo run the executable files produced, tape: \n" +
+              "\t$cd "+generatedFilePath.getAbsolutePath()+"\n" +
+              "\t$make run&");
         }
       }
       catch(IOException e)
