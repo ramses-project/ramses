@@ -205,7 +205,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   }
 
   public void processEList(UnparseText aadlText,
-                           final EList<? extends BehaviorElement> list)
+                           final List<? extends BehaviorElement> list)
   {
     for(Iterator<? extends BehaviorElement> it = list.iterator() ; it.hasNext() ;)
     {
@@ -393,7 +393,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           {
             _cFileContent.addOutputNewline("case " + aadlComponentCId + "_" +
                   state.getName() + ":") ;
-            processEList(_cFileContent, (EList<BehaviorTransition>) AadlBaVisitors.
+            processEList(_cFileContent, (ArrayList<BehaviorTransition>) AadlBaVisitors.
                          getTransitionWhereSrc(state)) ;
           }
           
