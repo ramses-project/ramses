@@ -21,7 +21,7 @@
 
 package test_queuing
 public
-
+  with POK, Data_Model;
   system root
   end root;
 

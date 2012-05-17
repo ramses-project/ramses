@@ -21,7 +21,8 @@
 
 package test_sampling
 public
-
+  with POK,Data_Model,ARINC653,Base_Types;
+  
   system root
   end root;
 
