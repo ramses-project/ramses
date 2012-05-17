@@ -40,44 +40,46 @@ rule Type (c : AADLI!ComponentInstance,
 		   type : AADLI!ComponentType) {
 	using
 	{
-		typeImg : AADLBA!ComponentType = OclUndefined;
+		typeImg : AADLBA!ComponentType = type.getComponentType();
 	}
 	do
 	{
-		if (type.oclIsKindOf(AADLI!BusType)) { typeImg <- thisModule.BusType(type); }
-		else if (type.oclIsKindOf(AADLI!VirtualBusType)) { typeImg <- thisModule.VirtualBusType(type); }	
-		else if (type.oclIsKindOf(AADLI!DeviceType)) { typeImg <- thisModule.DeviceType(type); }
-		else if (type.oclIsKindOf(AADLI!ProcessorType)) { typeImg <- thisModule.ProcessorType(type); }
-		else if (type.oclIsKindOf(AADLI!VirtualProcessorType)) { typeImg <- thisModule.VirtualProcessorType(type); }
-		else if (type.oclIsKindOf(AADLI!MemoryType)) { typeImg <- thisModule.MemoryType(type); }
-		else if (type.oclIsKindOf(AADLI!ProcessType)) 
-		{ 
-			if (c.oclIsUndefined())
-				typeImg <- thisModule.ProcessTypeWithoutInst(type);
-			else
-				typeImg <- thisModule.ProcessType(c,type);
-		}
-		else if (type.oclIsKindOf(AADLI!ThreadGroupType)) { typeImg <- thisModule.ThreadGroupType(type); }
-		else if (type.oclIsKindOf(AADLI!ThreadType)) 
-		{ 
-			if (c.oclIsUndefined())
-				typeImg <- thisModule.ThreadTypeWithoutInst(type);
-			else
-				typeImg <- thisModule.ThreadType(c,type);
-		}
-		else if (type.oclIsKindOf(AADLI!SubprogramType)) { typeImg <- thisModule.SubprogramType(type); }
-		else if (type.oclIsKindOf(AADLI!DataType)) { typeImg <- thisModule.DataType(type); }
-		
-		
-		if (thisModule.public().getOwnedClassifiers()->includes(typeImg))
-		  typeImg.debug('  previously declared type');
-		else
+		if(typeImg.oclIsUndefined())
 		{
-		  typeImg.debug('  declare type');
-		  thisModule.public().getOwnedClassifiers().add(typeImg);
+			if (type.oclIsKindOf(AADLI!BusType)) { typeImg <- thisModule.BusType(type); }
+			else if (type.oclIsKindOf(AADLI!VirtualBusType)) { typeImg <- thisModule.VirtualBusType(type); }	
+			else if (type.oclIsKindOf(AADLI!DeviceType)) { typeImg <- thisModule.DeviceType(type); }
+			else if (type.oclIsKindOf(AADLI!ProcessorType)) { typeImg <- thisModule.ProcessorType(type); }
+			else if (type.oclIsKindOf(AADLI!VirtualProcessorType)) { typeImg <- thisModule.VirtualProcessorType(type); }
+			else if (type.oclIsKindOf(AADLI!MemoryType)) { typeImg <- thisModule.MemoryType(type); }
+			else if (type.oclIsKindOf(AADLI!ProcessType)) 
+			{ 
+				if (c.oclIsUndefined())
+					typeImg <- thisModule.ProcessTypeWithoutInst(type);
+				else
+					typeImg <- thisModule.ProcessType(c,type);
+			}
+			else if (type.oclIsKindOf(AADLI!ThreadGroupType)) { typeImg <- thisModule.ThreadGroupType(type); }
+			else if (type.oclIsKindOf(AADLI!ThreadType)) 
+			{ 
+				if (c.oclIsUndefined())
+					typeImg <- thisModule.ThreadTypeWithoutInst(type);
+				else
+					typeImg <- thisModule.ThreadType(c,type);
+			}
+			else if (type.oclIsKindOf(AADLI!SubprogramType)) { typeImg <- thisModule.SubprogramType(type); }
+			else if (type.oclIsKindOf(AADLI!DataType)) { typeImg <- thisModule.DataType(type); }
+			
+		
+--			if (thisModule.public().getOwnedClassifiers()->includes(typeImg))
+--			  typeImg.debug('  previously declared type');
+--			else
+--			{
+--			  typeImg.debug('  declare type');
+--			  thisModule.public().getOwnedClassifiers().add(typeImg);
+--			}
+		
 		}
-		
-		
 		
 		typeImg;
 	}

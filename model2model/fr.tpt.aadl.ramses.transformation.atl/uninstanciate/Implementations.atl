@@ -39,11 +39,12 @@ rule Implementation (c : AADLI!ComponentInstance,
 					 typeImg : AADLBA!ComponentType){
 	using
 	{
-		implImg : AADLBA!ComponentImplementation = OclUndefined;
+		implImg : AADLBA!ComponentImplementation = impl.getComponentImplementation();
 	}
 	do
 	{
-		if (not impl.oclIsUndefined())
+		if (not impl.oclIsUndefined()
+				and implImg.oclIsUndefined())
 		{
 			if (impl.oclIsKindOf(AADLI!BusImplementation)) { implImg <- thisModule.BusImplementation(typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!VirtualBusImplementation)) { implImg <- thisModule.VirtualBusImplementation(typeImg,impl); }
@@ -69,17 +70,24 @@ rule Implementation (c : AADLI!ComponentInstance,
 			else if (impl.oclIsKindOf(AADLI!SubprogramImplementation)) { implImg <- thisModule.SubprogramImplementation(typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!DataImplementation)) { implImg <- thisModule.DataImplementation(typeImg,impl); }
 			
-			if (not implImg.isDeclared())
+--			if (not implImg.isDeclared())
+--			{
+--				implImg.debug('  declare implementation');
+--				thisModule.public().getOwnedClassifiers().add(implImg);
+--			}
+--			else
+--			{
+--				implImg.debug('  previously declared implementation');
+--			}
+			if(not impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined())
 			{
-				implImg.debug('  declare implementation');
-				thisModule.public().getOwnedClassifiers().add(implImg);
+				implImg.ownedAnnexSubclause.add
+				(
+					thisModule.copyBehaviorAnnex(c, impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)))
+				);
 			}
-			else
-			{
-				implImg.debug('  previously declared implementation');
-			}
-			implImg;
 		}
+		implImg;
 	}
 }
 

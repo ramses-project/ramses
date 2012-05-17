@@ -23,6 +23,22 @@ library AADLCopyHelpers;
 
 helper def : public() : AADLBA!PublicPackageSection = AADLBA!PublicPackageSection->allInstancesFrom('OUT')->first();
 
+helper context AADLBA!ComponentClassifier def : getClassifierInOutput() : AADLBA!ComponentClassifier =
+	if(self.oclIsKindOf(AADLBA!ComponentImplementation)) then 
+		thisModule.Implementation(OclUndefined, self, thisModule.Type(OclUndefined, self.getType()))
+	else
+		thisModule.Type(OclUndefined, self)
+	endif
+;
+
+helper context AADLBA!ComponentImplementation def : getComponentImplementation() : AADLBA!ComponentImplementation = 
+	AADLBA!ComponentImplementation->allInstancesFrom('OUT')->any(e | e.qualifiedName = self.qualifiedName)
+;
+
+helper context AADLBA!ComponentType def : getComponentType() : AADLBA!ComponentType = 
+	AADLBA!ComponentImplementation->allInstancesFrom('OUT')->any(e | e.qualifiedName = self.qualifiedName)
+;
+
 helper context AADLBA!NamedElement def : isDeclared() : Boolean =
 	thisModule.public().getOwnedClassifiers()->includes(self)
 ;

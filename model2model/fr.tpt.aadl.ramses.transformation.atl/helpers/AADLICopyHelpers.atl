@@ -25,6 +25,9 @@ helper context AADLI!Subcomponent def : getType() : AADLI!ComponentType =
 	self.getClassifier().getOwnedRealization().implemented
 ;
 
+helper context AADLI!ComponentImplementation def : getType() : AADLI!ComponentType =
+	self.getOwnedRealization().implemented
+;
 
 helper context AADLI!ComponentInstance def : getType() : AADLI!ComponentType =
 	if (self.getSubcomponent().getClassifier().oclIsKindOf(AADLI!ComponentType)) then
@@ -84,10 +87,6 @@ helper context AADLI!ComponentInstance def : ownerImplImg() : AADLBA!ComponentIm
 
 helper context AADLI!ComponentInstance def : ownerTypeImg() : AADLBA!ComponentImplementation = 
 	self.ownerImplImg().getOwnedRealization().implemented
-;
-
-helper context AADLI!ComponentType def : getImage() : AADLBA!ComponentType =
-	thisModule.resolveTemp(self, 'typeImg')
 ;
 
 helper context AADLI!ComponentInstance def : getSubcomponentImg() : AADLBA!Subcomponent =
