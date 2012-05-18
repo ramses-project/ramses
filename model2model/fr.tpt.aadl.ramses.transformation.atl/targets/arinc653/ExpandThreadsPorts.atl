@@ -32,7 +32,8 @@ create OUT : AADLBA 	from 		IN : AADLI,
 
 
 uses Services;
-uses MappingHelpers;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
 uses Uninstanciate;
 uses PropertiesTools;
 
@@ -78,8 +79,7 @@ unique lazy rule ThreadImplementation {
 		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
-		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c,impl,implImg),
-		ownedParameterConnection		<- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnectionUninst(co))
+		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c,impl,implImg)
 	)
 }
 

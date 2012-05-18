@@ -35,7 +35,8 @@ from
 
 
 uses Services;
-uses MappingHelpers;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
 uses Uninstanciate;
 uses PropertiesTools;
 
@@ -153,18 +154,18 @@ helper def : InternalThread_Deadline (fi : AADLI!FeatureInstance) : AADLBA!Threa
 	thisModule.InternalThread_RuleWrapper (
 		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getOutputRatePeriodFactor(),    -- period
 		                       fi.eContainer().getDeadline().value.doubleValue() * fi.getOutputRatePeriodFactor(),  -- deadline
-							   fi.eContainer().getDeadline().value.doubleValue() + fi.getOutputTimeOffset().value.doubleValue(),  -- offset
-							   fi.eContainer())
+							   fi.eContainer().getDeadline().value,  -- offset
+							   fi.eContainer()) 
 ;
 
---helper def : InternalThread_Offset (fi : AADLI!FeatureInstance) : AADLBA!ThreadSubcomponent =
---	thisModule.InternalThread_RuleWrapper (
---		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getOutputRatePeriodFactor(),    -- period
---		                       fi.eContainer().getDeadline().value.doubleValue() * fi.getOutputRatePeriodFactor(),  -- deadline
---							   fi.eContainer().getDeadline().value.doubleValue() + fi.getOutputTimeOffset().value.doubleValue(),  -- offset
---							   fi.eContainer()) 
---;
---
+helper def : InternalThread_Offset (fi : AADLI!FeatureInstance) : AADLBA!ThreadSubcomponent =
+	thisModule.InternalThread_RuleWrapper (
+		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getOutputRatePeriodFactor(),    -- period
+		                       fi.eContainer().getDeadline().value.doubleValue() * fi.getOutputRatePeriodFactor(),  -- deadline
+							   fi.eContainer().getDeadline().value.doubleValue() + fi.getOutputTimeOffset().value.doubleValue(),  -- offset
+							   fi.eContainer()) 
+;
+
 helper def : InternalThread_Period (fi : AADLI!FeatureInstance) : AADLBA!ThreadSubcomponent =
 	thisModule.InternalThread_RuleWrapper (
 		                       fi.eContainer().getPeriod().value.doubleValue() * fi.getInputRatePeriodFactor(),    -- period
