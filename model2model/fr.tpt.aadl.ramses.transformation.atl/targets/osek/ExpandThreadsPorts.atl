@@ -8,8 +8,7 @@ from 		IN : AADLI,							-- Simplified model : org.osate.aadl2/model/instance.ec
 			OSEK_RUNTIME: AADLBA;
 
 uses Services;
-uses AADLCopyHelpers;
-uses AADLICopyHelpers;
+uses MappingHelpers;
 uses Uninstanciate;
 uses PropertiesTools;
 
