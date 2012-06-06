@@ -12,8 +12,7 @@ Export-Package: fr.tpt.aadl.ramses.control.support,
  fr.tpt.aadl.ramses.control.support.generator,
  fr.tpt.aadl.ramses.control.support.plugins,
  fr.tpt.aadl.ramses.control.support.reporters,
- fr.tpt.aadl.ramses.control.support.services,
- fr.tpt.aadl.ramses.control.support.utils
+ fr.tpt.aadl.ramses.control.support.services
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.ui;bundle-version="3.7.0",
  org.osate.aadl2;bundle-version="1.0.0",
