@@ -146,7 +146,7 @@ public class StandAloneInstantiator
     // Must specify file protocol. Otherwise, got resource doesn't exist when
     // using OSGi mechanism.
     //TODO: implemente test osgi and add "file:" in case osgi is used
-    URI uri = URI.createURI(aadlFile.toString()) ;
+    URI uri = URI.createFileURI(aadlFile.toString()) ;
     Resource input_resource = resourceSet.getResource(uri, true) ;
 
     if(input_resource.getErrors().isEmpty() == false)
