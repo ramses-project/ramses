@@ -80,7 +80,6 @@ public class AtlTransfoLauncher
   private static EMFReferenceModel aadlMetamodel ;
   private static EMFReferenceModel aadlbaMetamodel ;
   private static EMFReferenceModel aadliMetamodel ;
-  private static EMFReferenceModel atlRefiningTraceMetamodel ;
   private static EMFReferenceModel ATLHookMetamodel ;
 
   private List<File> transformationFilepath ;
@@ -136,10 +135,6 @@ public class AtlTransfoLauncher
     injector.inject(aadlbaMetamodel, AADLBA_MM_URI) ;
     aadliMetamodel = (EMFReferenceModel) factory.newReferenceModel() ;
     injector.inject(aadliMetamodel, AADLI_MM_URI) ;
-    atlRefiningTraceMetamodel = (EMFReferenceModel) factory.newReferenceModel() ;
-    injector.inject(atlRefiningTraceMetamodel, "file:" +
-                          transformationDir.getAbsolutePath() +
-                          "/atl_metamodels/RefiningTrace.ecore") ;
     ATLHookMetamodel = (EMFReferenceModel) factory.newReferenceModel() ;
     injector.inject(ATLHookMetamodel, ATLHOOKS_MM_URI) ;
   }
@@ -206,9 +201,7 @@ public class AtlTransfoLauncher
     hookResource.getContents().add(atlHook) ;
     hookResource.load(null) ;
     injector.inject(atlHookModel, hookResource) ;
-    EMFModel refiningTraceModel =
-          (EMFModel) factory.newModel(atlRefiningTraceMetamodel) ;
-
+    
     // Launch the ATL transformation
     if(workingWithInstances)
     {
@@ -224,7 +217,6 @@ public class AtlTransfoLauncher
     //launcher.addInModel(baseTypesModel, "BASE_TYPES", "AADLBA");
     registerPredefinedPackagesInLauncher(launcher) ;
     launcher.addOutModel(targetModel, "OUT", "AADLBA") ;
-    launcher.addOutModel(refiningTraceModel, "refiningTrace", "RefiningTrace") ;
     this.addStandardPropertySetInputs(propertySets, launcher) ;
 
     if(workingWithInstances)
