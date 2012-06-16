@@ -5,9 +5,9 @@ public class CheddarOptions
 
   /** Cheddar simulator command-line. */
   public static final String CHEDDAR_SIMULATOR_PATH =
-        "/home/fabien/Ressources/build_schedule_from_xml" ;
+        "/home/borde/Install/CHEDDAR2/trunk/src/framework_examples/build_schedule_from_xml" ;
   public static final String CHEDDAR_TOOL_NAME =
-        "/home/fabien/Travail/svn/CHEDDAR-2.0/trunk/src/binaries/bin/debug/cheddar_d" ;
+        "/home/borde/Install/CHEDDAR2/trunk/src/binaries/bin/debug/cheddar_d" ;
 
   public static final boolean CHEDDAR_EXPORT_CRITICAL_SECTIONS = true ;
 

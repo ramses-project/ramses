@@ -54,12 +54,11 @@ public class ToolSuiteLauncherCommand
         "superimposition_files" ;
   private static final String POST_TRANSFORMATION_FILES_OPTION_ID =
         "post_transformation_files" ;
-  private static final String RESOURCES_DIR_OPTION_ID =
-        "resources_directory" ;
   private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
         "system_to_instantiate" ;
   private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
-  
+  private static final String RAMSES_RESOURCES_VAR = "RAMSES_RESOURCES_DIR";
+  private static final String RAMSES_RESOURCES_DIR = System.getenv(RAMSES_RESOURCES_VAR) ;
   private static final String GENERATION_OPTION_ID = "target_platform" ;
 
   private static Switch helpOnlyMode ;
@@ -231,14 +230,6 @@ public class ToolSuiteLauncherCommand
     post_transformation_files
           .setHelp("ASM file names used to refine the result of the superimposed uninstanciate model transformation") ;
     
-    FlaggedOption resources_dir =
-          new FlaggedOption(RESOURCES_DIR_OPTION_ID)
-                .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                .setLongFlag("directory").setShortFlag('d').setList(false)
-                .setAllowMultipleDeclarations(false) ;
-    resources_dir
-          .setHelp("Path of the directory where to find predefined resources (ASM Files, AADL property set, etc...)") ;
-    
     FlaggedOption generated_file_path =
           new FlaggedOption(OUTPUT_DIR_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(false)
@@ -249,14 +240,12 @@ public class ToolSuiteLauncherCommand
     jsapParse.registerParameter(model) ;
     jsapParse.registerParameter(includes) ;
     jsapParse.registerParameter(parseOnlyMode) ;
-    jsapParse.registerParameter(resources_dir) ;
     
     jsapAnalysis.registerParameter(analysis) ;
     jsapAnalysis.registerParameter(model) ;
     jsapAnalysis.registerParameter(includes) ;
     jsapAnalysis.registerParameter(analysisOnlyMode) ;
     jsapAnalysis.registerParameter(system_to_instantiate) ;
-    jsapAnalysis.registerParameter(resources_dir) ;
     
     jsapTransfo.registerParameter(analysisOnlyMode) ;
     jsapTransfo.registerParameter(helpOnlyMode) ;
@@ -266,7 +255,6 @@ public class ToolSuiteLauncherCommand
     jsapTransfo.registerParameter(system_to_instantiate) ;
     jsapTransfo.registerParameter(superimposition_files) ;
     jsapTransfo.registerParameter(post_transformation_files) ;
-    jsapTransfo.registerParameter(resources_dir) ;
     jsapTransfo.registerParameter(generated_file_path) ;
     jsapTransfo.registerParameter(analysis) ;
     
@@ -283,7 +271,6 @@ public class ToolSuiteLauncherCommand
     jsapGen.registerParameter(model) ;
     jsapGen.registerParameter(includes) ;
     jsapGen.registerParameter(system_to_instantiate) ;
-    jsapGen.registerParameter(resources_dir) ;
     jsapGen.registerParameter(generated_file_path) ;
     jsapGen.registerParameter(generation) ;
   }
@@ -312,13 +299,14 @@ public class ToolSuiteLauncherCommand
     String[] includeFolderNames =
           parseConfig.getStringArray(INCLUDES_OPTION_ID) ;
     String[] mainModels = parseConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-    String resourcesDirName =
-          parseConfig.getString(RESOURCES_DIR_OPTION_ID) ;
+    String resourcesDirName = RAMSES_RESOURCES_DIR ;
     
     // Optional switch.
     if(resourcesDirName == null)
     {
-      resourcesDirName = DEFAULT_RESOURCES_DIR ;
+      resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
+      if(resourcesDirName == null)
+        resourcesDirName = DEFAULT_RESOURCES_DIR ;
     }
     
     File aadlResourcesDir =
@@ -345,13 +333,14 @@ public class ToolSuiteLauncherCommand
           analysisConfig.getStringArray(ANALYSIS_LIST_OPTION_ID) ;
     String systemToInstantiate =
           analysisConfig.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
-    String resourcesDirName =
-          analysisConfig.getString(RESOURCES_DIR_OPTION_ID) ;
+    String resourcesDirName = RAMSES_RESOURCES_DIR;
     
     // Optional switch.
     if(resourcesDirName == null)
     {
-      resourcesDirName = DEFAULT_RESOURCES_DIR ;
+      resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
+      if(resourcesDirName == null)
+        resourcesDirName = DEFAULT_RESOURCES_DIR ;
     }
     
     File aadlResourcesDir =
@@ -423,13 +412,14 @@ public class ToolSuiteLauncherCommand
           genConf.getStringArray(SOURCE_MODELS_OPTION_ID) ;
     String generated_file_path =
           genConf.getString(OUTPUT_DIR_OPTION_ID) ;
-    String resourcesDirName =
-          genConf.getString(RESOURCES_DIR_OPTION_ID) ;
+    String resourcesDirName = RAMSES_RESOURCES_DIR ;
     
     // Optional switch.
     if(resourcesDirName == null)
     {
-      resourcesDirName = DEFAULT_RESOURCES_DIR ;
+      resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
+      if(resourcesDirName == null)
+        resourcesDirName = DEFAULT_RESOURCES_DIR ;
     }
     
     String targetName = genConf.getString(GENERATION_OPTION_ID) ;

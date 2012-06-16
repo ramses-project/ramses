@@ -50,7 +50,7 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
   public void process(ProcessSubcomponent process, File generatedFilePath) throws GenerationException {
     
     Runtime runtime = Runtime.getRuntime();
-
+    
     System.out.println("* Prepare Make ...");
 
     
@@ -70,55 +70,79 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
     preparemake = FileUtils.copyFile(preparemake, generatedFilePath);
     preparemake.setExecutable(true);
 
-    // TrampolineBasePath NOT found
-    if (oil.getCpu().getOs().getTrampolineBasePath() == null) {
+    File refineOil = new File(FileUtils.getContainingDirectory(process.eResource()), "/refine_oil.sh");
+    refineOil = FileUtils.copyFile(refineOil, generatedFilePath);
+    refineOil.setExecutable(true);
+    
+    File oilTrashFile = new File(generatedFilePath, process.getName());
+    try {
 
-      File refineOil = new File(FileUtils.getContainingDirectory(process.eResource()), "/refine_oil.sh");
-      refineOil = FileUtils.copyFile(refineOil, generatedFilePath);
-      refineOil.setExecutable(true);
+      // TrampolineBasePath NOT found
+      if (oil.getCpu().getOs().getTrampolineBasePath() == null) {
 
-      System.err.println("Unable to generate Makefile.");
-      System.err.println("The environment variable TRAMPOLINEPATH is not defined.");
-      System.err.println("To fix this probleme you can : ");
-      System.err.println("\t 1) add this variable in your bashrc");
-      System.err.println("\t 2) - execute 'source env' on lejos directory");
-      System.err.println("\t    - run eclipse on the same shell");
-      System.err.println("You can also generate manually the Makefile :");
-      System.err.println("\t 1) - execute source env on lejos directory");
-      System.err.println("\t 2) - execute ./refine_oil.sh " + process.getName() + "_specification.oil");
-      System.err.println("\t 3) - execute ./preparemake.sh " + process.getName() + "_specification.oil");
+        Process makeProcess = runtime.exec(new String[] { refineOil.getCanonicalPath(), oilTrashFile.getCanonicalPath() + "_specification.oil"});
+        makeProcess.waitFor();
+        if (makeProcess.exitValue() != 0) {
+          System.err.println("Error on goil generation: refine_oil;");
+          displayErrorMessage(makeProcess);
+        }
+        
+        System.err.println("Unable to generate Makefile.");
+        System.err.println("The environment variable TRAMPOLINEPATH is not defined.");
+        System.err.println("To fix this probleme you can : ");
+        System.err.println("\t 1) add this variable in your bashrc");
+        System.err.println("\t 2) - execute 'source env' on lejos directory");
+        System.err.println("\t    - run eclipse on the same shell");
+        System.err.println("You can also generate manually the Makefile :");
+        System.err.println("\t 1) - execute source env on lejos directory");
+        System.err.println("\t 2) - execute ./refine_oil.sh " + oilTrashFile.getCanonicalPath() + "_specification.oil");
+        System.err.println("\t 3) - execute ./preparemake.sh " + oilTrashFile.getCanonicalPath() + "_specification.oil");
 
-      return;
-    }
-    // Generate Makefile
-    else {
-      try {
-
-        File oilTrashFile = new File(generatedFilePath, process.getName());
-
-        Process makeProcess = runtime.exec(new String[] { preparemake.getCanonicalPath(),
-            oilTrashFile.getCanonicalPath() });
-
+        return;
+      }
+      // Generate Makefile
+      else {
+        System.out.println("Premaring Make");
+        Process makeProcess = runtime.exec(new String[] { preparemake.getCanonicalPath(), oilTrashFile.getCanonicalPath() + "_specification.oil"});
         makeProcess.waitFor();
 
         if (makeProcess.exitValue() != 0) {
-          System.err.println("Error on goil generation: ");
-
-          InputStream is = makeProcess.getErrorStream();
+          System.err.println("Error on goil generation: PrepareMake");
+          displayErrorMessage(makeProcess);
+        }
+        else
+        {
+          System.out.println("Compiling Code");
+          makeProcess = runtime.exec("make -o Makefile", null, generatedFilePath);
+          InputStream is = makeProcess.getInputStream();
           BufferedReader in = new BufferedReader(new InputStreamReader(is));
           String line = null;
           while ((line = in.readLine()) != null) {
-            System.err.println(line);
+            System.out.println(line);
+          }
+          makeProcess.waitFor();
+          if (makeProcess.exitValue() != 0) {
+            displayErrorMessage(makeProcess);
           }
         }
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+
       }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
-  }
+	}
 	
+	private void displayErrorMessage(Process makeProcess) throws IOException
+	{
+	  InputStream is = makeProcess.getErrorStream();
+    BufferedReader in = new BufferedReader(new InputStreamReader(is));
+    String line = null;
+    while ((line = in.readLine()) != null) {
+      System.err.println(line);
+    }
+	}
 	
 	// XXX: Not implemented, just used for conformance with the interface
 	// definition

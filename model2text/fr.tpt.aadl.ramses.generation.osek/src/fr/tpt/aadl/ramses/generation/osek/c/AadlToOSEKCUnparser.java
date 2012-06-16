@@ -1,6 +1,7 @@
 package fr.tpt.aadl.ramses.generation.osek.c;
 
 import java.io.File;
+import java.io.FileNotFoundException ;
 import java.io.IOException;
 import java.util.ArrayList ;
 import java.util.List;
@@ -426,10 +427,14 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	  srcs_SL.addAll(srcs_ST);
 	  for (String src : srcs_SL)
 	  {
-	    if(src.endsWith(".c"))
-	      os.addAppSrc(new File(FileUtils.getContainingDirectory(elt.eResource()), src));
-	    else if (src.endsWith(".h"))
-	      os.addAppHeader(new File(FileUtils.getContainingDirectory(elt.eResource()), src));
+	    File source = new File(FileUtils.getContainingDirectory(elt.eResource()), src);
+	    if(source.exists())
+	    {
+	      if(src.endsWith(".c"))
+	        os.addAppSrc(source);
+	      else if (src.endsWith(".h"))
+	        os.addAppHeader(source);
+	    }
 	  }
 	}
 
@@ -561,7 +566,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 */
 	public void close() {
 
-		System.out.println("======== Generation des hooks ============");
+		System.out.println("======== Hooks generation ============");
 		
 		_mainCCode.addOutputNewline("void StartupHook(void)");
 		_mainCCode.addOutputNewline("{");

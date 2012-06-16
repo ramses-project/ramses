@@ -39,6 +39,8 @@ import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
 public class GenerationTester
 {
 
+  public static String DEPENDENCIES_DIR_NAME = "../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources"; 
+  
   public static void main(String[] args)
   {
     ToolSuiteLauncher launcher = new ToolSuiteLauncher() ;
@@ -54,12 +56,12 @@ public class GenerationTester
     }
 
     List<File> test = new ArrayList<File>() ;
+    test.add(new File(DEPENDENCIES_DIR_NAME+"/package/base_types.aadl2"));
     test.add(new File("test/dummyPropertySet.aadl")) ;
     test.add(new File("test/dummySubRoutine.aadl")) ;
     test.add(new File("test/dummyTypes.aadl")) ;
     test.add(new File("test/ba_generation_test_001.aadl")) ;
-    launcher.parsePredefinedRessources(new File(
-          "../../model2model/fr.tpt.aadl.transformation.atl/aadl_resources/")) ;
+    launcher.parsePredefinedRessources(new File(DEPENDENCIES_DIR_NAME)) ;
     List<Resource> parsedFiles = launcher.parse(test) ;
     AadlToCUnparser generator = AadlToCUnparser.getAadlToCUnparser() ;
 
