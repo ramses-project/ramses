@@ -3,6 +3,7 @@ package fr.tpt.aadl.sched.cheddar.strategies ;
 import java.util.List ;
 
 import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.InstanceObject ;
@@ -74,9 +75,10 @@ public class ProcessSection extends
   {
     try
     {
-      PropertyExpression val =
-            PropertyUtils.getPropertyValue("Actual_Processor_Binding", process) ;
-      InstanceReferenceValue ref = (InstanceReferenceValue) val ;
+      ListValue lv = (ListValue) PropertyUtils.
+            getPropertyValue("Actual_Processor_Binding", process) ;
+            
+      InstanceReferenceValue ref = (InstanceReferenceValue) lv.getOwnedListElements().get(0) ;
       InstanceObject owner = ref.getReferencedInstanceObject() ;
       return (ComponentInstance) owner ;
     }

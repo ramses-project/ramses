@@ -67,7 +67,7 @@ public class ThreadSection extends CheddarModelConversionPart<CheddarTask>
     t.setQueueing_policy(getInfoTaskPolicy(aadlInstance, "SCHED_FIFO")) ;
     t.setDeadline(deadline) ;
     t.setBlocking_time(getInfoTaskBlockingTime(aadlInstance)) ;
-    t.setPriority(AadlUtil.getInfoTaskPriority(aadlInstance)) ;
+    // t.setPriority(AadlUtil.getInfoTaskPriority(aadlInstance)) ;
     t.setText_memory_size(AadlUtil.getInfoTaskMemorySize(aadlInstance)) ;
     t.setStack_memory_size(AadlUtil.getInfoTaskStackSize(aadlInstance)) ;
     t.setPeriod(AadlUtil.getInfoTaskPeriod(aadlInstance)) ;

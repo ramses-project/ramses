@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.6.1",
  org.jdom;bundle-version="1.1.1",
  fr.tpt.aadl.utils;bundle-version="0.8.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
- fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0"
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.control.core;bundle-version="0.5.0"
 Provide-Package: 
  fr.tpt.aadl.launch,
  fr.tpt.aadl.sched.cheddar,

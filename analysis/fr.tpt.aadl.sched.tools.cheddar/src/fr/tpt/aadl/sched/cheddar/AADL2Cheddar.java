@@ -63,7 +63,7 @@ public class AADL2Cheddar
   {
     CheddarModelConversionPart.init() ;
     OUTPUT_PATH =
-          PluginActivator.getInstance().getSimulationDirectory() + prefix +
+          PluginActivator.getInstance().getSimulationDirectory(root.eResource()) + prefix +
                 root.getName() + ".xml" ;
     /** Step 1 : Extract Cheddar Model from AADL Model. */
     cheddarElements = new ArrayList<CheddarElement>() ;

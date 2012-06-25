@@ -98,7 +98,7 @@ public class CheddarSimulator
     }
     catch(Exception e)
     {
-      System.err.println("simulation error: error code = " + p.exitValue()) ;
+      System.err.println("simulation error: could not execute = " + cmd ) ;
     }
 
     executed = true ;

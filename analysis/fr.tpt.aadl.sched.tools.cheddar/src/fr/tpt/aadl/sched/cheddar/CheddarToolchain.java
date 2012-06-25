@@ -127,8 +127,10 @@ public class CheddarToolchain
     /** Step 1 Generate Cheddar model and then XML */
     createCheddarModel(scaling) ;
     /** Step 2 Simulate. */
+    return exportAndSimule(scaling);
+    /*
     simulator = new CheddarSimulator(exporter) ;
-    return simulator.execute(false) ;
+    return simulator.execute(false) ;*/
   }
 
   public SimulationData getSimulationData()
