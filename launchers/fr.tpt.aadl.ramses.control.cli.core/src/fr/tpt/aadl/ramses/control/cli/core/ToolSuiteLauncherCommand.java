@@ -37,6 +37,7 @@ import com.martiansoftware.jsap.Switch ;
 
 import fr.tpt.aadl.ramses.control.core.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.core.ToolSuiteLauncher ;
+import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
@@ -66,6 +67,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static Switch parseOnlyMode ;
   private static Switch analysisOnlyMode ;
   private static QualifiedSwitch analysis ;
+  
+  private static final String XML_OPTION_ID = "xml_path" ;
   
   public final static String DEFAULT_RESOURCES_DIR = 
                     "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ; 
@@ -238,6 +241,14 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                 .setAllowMultipleDeclarations(false) ;
     generated_file_path.setHelp("Directory where files will be generated") ;
     
+    FlaggedOption xml_path =
+          new FlaggedOption(XML_OPTION_ID)
+                  .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+                  .setLongFlag("xml").setShortFlag(JSAP.NO_SHORTFLAG).setList(false)
+            .setAllowMultipleDeclarations(false) ;
+                  xml_path.setHelp("The specified XML file contains the workflow") ;
+
+    
     jsapParse.registerParameter(model) ;
     jsapParse.registerParameter(includes) ;
     jsapParse.registerParameter(parseOnlyMode) ;
@@ -275,6 +286,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapGen.registerParameter(system_to_instantiate) ;
     jsapGen.registerParameter(generated_file_path) ;
     jsapGen.registerParameter(generation) ;
+    jsapGen.registerParameter(xml_path) ;
   }
 
   @SuppressWarnings("rawtypes")
@@ -462,19 +474,39 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
     try
     {
-      launcher.initializeGeneration(targetName) ;
-      launcher.launchModelGeneration(mainModelFiles,
-                                     systemToInstantiate,
-                                     outputDir,
-                                     targetName,
-                                     atlResourceDir) ;
+      String xml_path =
+            genConf.getString(XML_OPTION_ID) ;
+
+      if(xml_path == null)
+      {
+        launcher.initializeGeneration(targetName) ;
+        launcher.launchModelGeneration(mainModelFiles,
+                                       systemToInstantiate,
+                                       outputDir,
+                                       targetName,
+                                       atlResourceDir) ;
+      }
+      else
+      {
+        XMLPilot xmlPilot = new XMLPilot(genConf.getString(XML_OPTION_ID));
+
+        launcher.initializeGeneration(targetName) ;
+        launcher.launchModelGenerationXML(mainModelFiles,
+                                          systemToInstantiate,
+                                          outputDir,
+                                          targetName,
+                                          atlResourceDir,
+                                          xmlPilot) ;
+      }
     }
     catch(Exception e)
     {
-      e.printStackTrace() ;
-      System.err.println(e.getMessage()) ;
-      System.exit(0) ;
+            e.printStackTrace() ;
+            System.err.println(e.getMessage()) ;
+            System.exit(0) ;
     }
+
+    
   }
   
   /*

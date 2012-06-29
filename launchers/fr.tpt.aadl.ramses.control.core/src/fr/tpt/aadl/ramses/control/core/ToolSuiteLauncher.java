@@ -22,7 +22,6 @@
 package fr.tpt.aadl.ramses.control.core ;
 
 import java.io.File ;
-
 import java.util.ArrayList ;
 import java.util.List ;
 import java.util.Map ;
@@ -32,6 +31,7 @@ import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.instance.SystemInstance ;
 
+import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -254,6 +254,38 @@ public class ToolSuiteLauncher
                        generatedFilePath) ;
   }
 
+  public void launchModelGenerationXML (List<File> mainModels,
+                                        String systemToInstantiate,
+                                        File generatedFilePath,
+                                        String targetName,
+                                        File resourceFilePath,
+                                        XMLPilot xmlPilot)
+                                              throws GenerationException
+  {
+    List<Resource> aadlModels = _instantiator.parse(mainModels) ;
+
+    SystemInstance instance =
+          _instantiator.instantiate(aadlModels, systemToInstantiate) ;
+
+    if(instance == null)
+    {
+      throw new GenerationException("instanciation failed.") ;
+    }
+
+    Map<String, Resource> standardPropertySets ;
+    standardPropertySets =
+          _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
+
+    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+
+    Generator generator = registry.getGenerator(targetName) ;
+    System.out.println("Generator.generateXML called");
+
+    generator.generateXML(instance, resourceFilePath, standardPropertySets,
+                          generatedFilePath, xmlPilot) ;
+  }
+  
+  
   public void performAnalysis(List<File> mainModelFiles,
                               String systemToInstantiate)
         throws AnalysisResultException
