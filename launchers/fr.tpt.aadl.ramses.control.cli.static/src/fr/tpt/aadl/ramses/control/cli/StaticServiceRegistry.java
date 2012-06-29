@@ -110,12 +110,12 @@ public class StaticServiceRegistry implements ServiceRegistry
   @Override
   public Analyzer getAnalyzer(String analyzerName)
   {
-    return _analyzers.get(analyzerName.toLowerCase()) ;
+    return _analyzers.get(analyzerName) ;
   }
 
   public Generator getGenerator(String TransformationName)
   {
-    return _gen.get(TransformationName.toLowerCase()) ;
+    return _gen.get(TransformationName) ;
   }
 
   @Override

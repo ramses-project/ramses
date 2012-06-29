@@ -8,7 +8,7 @@
 </listAttribute>
 <mapAttribute key="org.eclipse.debug.core.environmentVariables">
 <mapEntry key="RAMSES_RESOURCES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
-<mapEntry key="TRAMPOLINEPATH" value="/Users/MacBookpro/Install/lego-deploy_i686-apple-darwin10/trampoline2beta"/>
+<mapEntry key="TRAMPOLINEPATH" value="${env_var:TRAMPOLINEPATH}"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m test/osek/usecase.aadl  -g osek -s nxt.Impl -o test/osek/ -i test/"/>

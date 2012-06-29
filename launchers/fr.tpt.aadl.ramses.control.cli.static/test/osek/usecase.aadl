@@ -74,7 +74,7 @@ features
   setSpeedLeft: requires subprogram access nxtMotorSetSpeedLib;
   setSpeedRight: requires subprogram access nxtMotorSetSpeedLib
   {
-  Generation_Properties::Constant_Value => ("NXT_PORT_C", "0");
+  Generation_Properties::Constant_Value => ("NXT_PORT_A", "0");
   Generation_Properties::Constant_Value_Parameters => ("portNb", "brake");
   };
 end ContrThread;
@@ -173,13 +173,13 @@ end arm.impl;
 
 subprogram ecrobotGetLightSensorLib
 features
-  portNb: in parameter Int;-- {Generation_Properties::Constant_Value => "NXT_PORT_S2";};
+  portNb: in parameter Int;-- {Generation_Properties::Constant_Value => "NXT_PORT_S4";};
   light : out parameter Int;-- {Generation_Properties::Return_Parameter => true;};
 properties
   Source_language => (C);
   Source_text => ("ecrobot_interface.h");
   Source_name => "ecrobot_get_light_sensor";
-  OSEKNXT::nxtport => "NXT_PORT_S2";
+  OSEKNXT::nxtport => "NXT_PORT_S1";
 end ecrobotGetLightSensorLib;
 
 subprogram ecrobotSetLightSensorActiveLib
@@ -189,8 +189,8 @@ properties
   Source_language => (C);
   Source_text => ("ecrobot_interface.h");
   Source_name => "ecrobot_set_light_sensor_active";
-  OSEKNXT::nxtport => "NXT_PORT_S2";
-  Generation_Properties::Constant_Value => ("NXT_PORT_S2");
+  OSEKNXT::nxtport => "NXT_PORT_S1";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
 end ecrobotSetLightSensorActiveLib;
 
@@ -201,8 +201,8 @@ properties
   Source_language => (C);
   Source_text => ("ecrobot_interface.h");
   Source_name => "ecrobot_set_light_sensor_inactive";
-  OSEKNXT::nxtport => "NXT_PORT_S2";
-  Generation_Properties::Constant_Value => ("NXT_PORT_S2");
+  OSEKNXT::nxtport => "NXT_PORT_S1";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
 end ecrobotSetLightSensorInactiveLib;
 
@@ -232,8 +232,8 @@ properties
   Source_language => (C);
   Source_text => ("ecrobot_interface.h");
   Source_name => "ecrobot_get_sonar_sensor";
-  OSEKNXT::nxtport => "NXT_PORT_S1";
-  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
+  OSEKNXT::nxtport => "NXT_PORT_S4";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S4");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
 end ecrobotGetSonarSensorLib;
 
@@ -244,8 +244,8 @@ properties
   Source_language => (C);
   Source_text => ("ecrobot_interface.h");
   Source_name => "ecrobot_init_sonar_sensor";
-  OSEKNXT::nxtport => "NXT_PORT_S1";
-  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
+  OSEKNXT::nxtport => "NXT_PORT_S4";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S4");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
 end ecrobotInitSonarSensorLib;
 
@@ -256,8 +256,8 @@ properties
   Source_language => (C);
   Source_text => ("ecrobot_interface.h");
   Source_name => "ecrobot_term_sonar_sensor";
-  OSEKNXT::nxtport => "NXT_PORT_S1";
-  Generation_Properties::Constant_Value => ("NXT_PORT_S1");
+  OSEKNXT::nxtport => "NXT_PORT_S4";
+  Generation_Properties::Constant_Value => ("NXT_PORT_S4");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
 end ecrobotTermSonarSensorLib;
 
@@ -277,8 +277,8 @@ properties
   Source_language => (C);
   Source_text => ("nxt_motors.h");
   Source_name => "nxt_motor_set_speed";
-  OSEKNXT::nxtport => "NXT_PORT_A";
-  Generation_Properties::Constant_Value => ("NXT_PORT_A", "0");
+  OSEKNXT::nxtport => "NXT_PORT_C";
+  Generation_Properties::Constant_Value => ("NXT_PORT_C", "0");
   Generation_Properties::Constant_Value_Parameters => ("portNb", "brake");
 end nxtMotorSetSpeedLib;
 

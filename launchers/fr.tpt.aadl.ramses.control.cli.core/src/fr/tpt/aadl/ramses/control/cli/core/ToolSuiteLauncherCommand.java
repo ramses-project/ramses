@@ -35,13 +35,14 @@ import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
+import fr.tpt.aadl.ramses.control.core.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.core.ToolSuiteLauncher ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
 
-public class ToolSuiteLauncherCommand
+public class ToolSuiteLauncherCommand extends RamsesConfiguration
 {
 
   private static final String HELP_ONLY_OPTION_ID = "help_only" ;
@@ -68,7 +69,7 @@ public class ToolSuiteLauncherCommand
   
   public final static String DEFAULT_RESOURCES_DIR = 
                     "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ; 
-
+  
   public static void main(String[] args)
   {
     JSAP jsapParse = new JSAP() ;
@@ -246,6 +247,7 @@ public class ToolSuiteLauncherCommand
     jsapAnalysis.registerParameter(includes) ;
     jsapAnalysis.registerParameter(analysisOnlyMode) ;
     jsapAnalysis.registerParameter(system_to_instantiate) ;
+    jsapAnalysis.registerParameter(generated_file_path) ;
     
     jsapTransfo.registerParameter(analysisOnlyMode) ;
     jsapTransfo.registerParameter(helpOnlyMode) ;
@@ -333,6 +335,15 @@ public class ToolSuiteLauncherCommand
           analysisConfig.getStringArray(ANALYSIS_LIST_OPTION_ID) ;
     String systemToInstantiate =
           analysisConfig.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
+    String analysis_output_path =
+          analysisConfig.getString(OUTPUT_DIR_OPTION_ID) ;
+    
+    if(analysis_output_path!=null)
+    {
+      File outputDir =
+            ToolSuiteLauncherCommand.getVerifiedPath(analysis_output_path) ;
+      setOutputDir(outputDir);
+    }
     String resourcesDirName = RAMSES_RESOURCES_DIR;
     
     // Optional switch.
@@ -444,15 +455,17 @@ public class ToolSuiteLauncherCommand
     
     launcher.parsePredefinedRessources(aadlResourcesDir) ;
     launcher.parsePredefinedPackages(aadlResourcesDir) ;
-    File generatedFilePath =
+    File outputDir =
           ToolSuiteLauncherCommand.getVerifiedPath(generated_file_path) ;
+    
+    setOutputDir(outputDir);
     
     try
     {
       launcher.initializeGeneration(targetName) ;
       launcher.launchModelGeneration(mainModelFiles,
                                      systemToInstantiate,
-                                     generatedFilePath,
+                                     outputDir,
                                      targetName,
                                      atlResourceDir) ;
     }

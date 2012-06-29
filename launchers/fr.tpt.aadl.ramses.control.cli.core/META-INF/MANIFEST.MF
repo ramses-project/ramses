@@ -3,8 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AADL-Ramses-Cli-Core
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.cli.core
 Bundle-Version: 0.5.0
-Bundle-ClassPath: cli.jar,
- lib/JSAP-2.1.jar
 Export-Package: com.martiansoftware.jsap,
  com.martiansoftware.jsap.ant,
  com.martiansoftware.jsap.defaultsources,

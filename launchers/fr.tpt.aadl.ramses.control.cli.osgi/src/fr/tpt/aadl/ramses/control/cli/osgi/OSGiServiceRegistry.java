@@ -132,13 +132,13 @@ public class OSGiServiceRegistry implements ServiceRegistry
   @Override
   public Analyzer getAnalyzer(String analyzerName)
   {
-    return _analyzersRegistry.get(analyzerName.toLowerCase()) ;
+    return _analyzersRegistry.get(analyzerName) ;
   }
 
   @Override
   public Generator getGenerator(String generatorName)
   {
-    return _genRegistry.get(generatorName.toLowerCase()) ;
+    return _genRegistry.get(generatorName) ;
   }
 
   @Override
