@@ -13,11 +13,4 @@
 	<version>0.5.0</version>
 	<packaging>eclipse-plugin</packaging>
 	
-	 <dependencies>
-        <dependency>
-         <groupId>com.martiansoftware</groupId>
-          <artifactId>JSAP-2.1</artifactId>
-          <version>0.8.2</version>
-        </dependency>
-    </dependencies>
 </project>
