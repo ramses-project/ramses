@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.c"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.pok"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.osek"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
