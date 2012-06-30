@@ -85,6 +85,48 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 		}
 	}
 	
+	 // transformXML does not act as transform since it deals with one single transformation at the same time
+  // if you want to specify the same workflow as in the transform method, please just consider two
+  // transformations in the XML file
+  
+  @Override
+  public Resource transformXML(Resource inputResource, File resourceFilePath,
+      List<String> resourceFileNameList,
+      Map<String, Resource> standardPropertySets, File generatedFilePath)
+      throws GenerationException
+  {
+    try
+    {
+      if (resourceFilePath == null)
+      {
+        resourceFilePath = new File(DEFAULT_ATL_FILE_PATH);
+      }
+      
+      
+      ArrayList<File> atlFiles = new ArrayList<File>(resourceFileNameList.size());
+
+      for (String fileName : resourceFileNameList)
+      {
+        atlFiles.add(new File(resourceFilePath + "/" + fileName));
+      }
+
+      Resource r1 = transformCommon(inputResource, resourceFilePath,
+          standardPropertySets, generatedFilePath, atlFiles);
+          
+      SystemInstance s = instanciate(r1);
+      System.out.println("Instanciation: " + s.eResource().getURI().path());
+
+      
+      return r1;
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+      throw new GenerationException(e.getMessage());
+    }
+  }
+  
+	
 	private Resource expandDelayedConnections(Resource r, File resourceFilePath, Map<String, Resource> standardPropertySets,
 			File generatedFilePath) throws Exception
 	{
@@ -139,36 +181,46 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 	}
 
 	private Resource transform(Resource inputResource, File resourceFilePath,
-			Map<String, Resource> standardPropertySets, File generatedFilePath,
-			final String[] modules) throws Exception
-	{
-		AtlTransfoLauncher atlTransfo = new AtlTransfoLauncher();
-		atlTransfo.setResourcesDirectory(resourceFilePath);
+	                           Map<String, Resource> standardPropertySets, File generatedFilePath,
+	                           final String[] modules) throws Exception
+  {
+	  ArrayList<File> atlFiles = new ArrayList<File>(modules.length);
 
-		ArrayList<File> atlFiles = new ArrayList<File>(modules.length);
+	  for (String fileName : modules)
+	  {
+	    atlFiles.add(new File(resourceFilePath + "/" + fileName));
+	  }
 
-		for (String fileName : modules)
-		{
-			atlFiles.add(new File(resourceFilePath + "/" + fileName));
-		}
+	  return transformCommon(inputResource, resourceFilePath,
+	                         standardPropertySets, generatedFilePath, atlFiles);
+  }
 
-		String aaxlGeneratedFileName = inputResource.getURI().toFileString()
-				.replaceFirst(".aaxl2", "_extended.aaxl2");
 
-		Resource expandedResult = atlTransfo.doGeneration(inputResource,
-				standardPropertySets, atlFiles, aaxlGeneratedFileName);
+  private Resource transformCommon(Resource inputResource, File resourceFilePath,
+      Map<String, Resource> standardPropertySets, File generatedFilePath,
+      ArrayList<File> atlFiles) throws Exception
+  {
+    AtlTransfoLauncher atlTransfo = new AtlTransfoLauncher();
+    atlTransfo.setResourcesDirectory(resourceFilePath);
 
-		String aadlGeneratedFileName = inputResource.getURI().toFileString();
-		aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(".aaxl2",
-				"_extended.aadl2");
+    String aaxlGeneratedFileName = inputResource.getURI().toFileString()
+        .replaceFirst(".aaxl2", "_extended.aaxl2");
 
-		StandAloneInstantiator instantiator = StandAloneInstantiator
-				.getInstantiator();
-		instantiator.serialize(expandedResult, aadlGeneratedFileName);
+    Resource expandedResult = atlTransfo.doGeneration(inputResource,
+        standardPropertySets, atlFiles, aaxlGeneratedFileName);
 
-		return expandedResult;
-	}
+    String aadlGeneratedFileName = inputResource.getURI().toFileString();
+    aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(".aaxl2",
+        "_extended.aadl2");
 
+    StandAloneInstantiator instantiator = StandAloneInstantiator
+        .getInstantiator();
+    instantiator.serialize(expandedResult, aadlGeneratedFileName);
+
+    return expandedResult;
+  }
+  
+	
 	public String findSystemName(Resource r)
 	{
 		AadlPackage aadlPackage = (AadlPackage) r.getContents().get(0);

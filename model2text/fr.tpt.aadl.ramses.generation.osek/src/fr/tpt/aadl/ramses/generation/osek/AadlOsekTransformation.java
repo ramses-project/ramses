@@ -19,47 +19,84 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 	public static final List<File> ATL_FILES = new ArrayList<File>(
 			ATL_FILE_NAMES.length);
 
+	public Resource transformCommon(Resource inputResource,
+	                                File resourceFilePath,
+	                                List<File> atlFiles,
+	                                Map<String, Resource> standardPropertySets,
+	                                File generatedFilePath) throws GenerationException
+  {
+	  AtlTransfoLauncher atlTransfo = null;
+
+	  try {
+	    atlTransfo = new AtlTransfoLauncher();
+
+
+	    atlTransfo.setResourcesDirectory(resourceFilePath);
+
+	    String aaxlGeneratedFileName = inputResource.getURI()
+	          .toFileString().replaceFirst(".aaxl2", "_extended.aaxl2");
+
+	    Resource expandedResult = atlTransfo.doGeneration(inputResource,
+	                                                      standardPropertySets, atlFiles, aaxlGeneratedFileName);
+
+	    String aadlGeneratedFileName = inputResource.getURI()
+	          .toFileString();
+	    aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
+	                                                               ".aaxl2", "_extended.aadl2");
+
+	    StandAloneInstantiator instantiator = StandAloneInstantiator
+	          .getInstantiator();
+	    instantiator.serialize(expandedResult, aadlGeneratedFileName);
+
+	    return expandedResult;
+	  } catch (Exception e) {
+	    e.printStackTrace();
+	    throw new GenerationException(e.getMessage());
+	  }
+  }
+
+
+
 	@Override
 	public Resource transform(Resource inputResource,
 	                          File resourceFilePath,
 	                          Map<String, Resource> standardPropertySets,
 	                          File generatedFilePath)
 	                                throws GenerationException {
-		
+
 	  for (String fileName : ATL_FILE_NAMES) {
-      ATL_FILES.add(new File(resourceFilePath.getAbsolutePath() +"/"+ fileName));
-    }
-	  
-	  AtlTransfoLauncher atlTransfo = null;
+	    ATL_FILES.add(new File(resourceFilePath.getAbsolutePath() +"/"+ fileName));
+	  }
 
-		try {
-			atlTransfo = new AtlTransfoLauncher();
+	  return transformCommon(inputResource,
+	                         resourceFilePath,
+	                         ATL_FILES,
+	                         standardPropertySets,
+	                         generatedFilePath);
+  }
 
-			
-			atlTransfo.setResourcesDirectory(resourceFilePath);
 
-			String aaxlGeneratedFileName = inputResource.getURI()
-					.toFileString().replaceFirst(".aaxl2", "_extended.aaxl2");
+	 @Override
+	  public Resource transformXML(Resource inputResource,
+	                            File resourceFilePath,
+	                            List<String> resourceFileNameList,
+	                            Map<String, Resource> standardPropertySets,
+	                            File generatedFilePath)
+	                                  throws GenerationException {
+	    
+	    List<File> atlFiles = new ArrayList<File>();
+	    for(String resourceFileName : resourceFileNameList)
+	    {
+	      atlFiles.add(new File(resourceFilePath.getAbsolutePath() +"/"+ resourceFileName));
+	    }
 
-			Resource expandedResult = atlTransfo.doGeneration(inputResource,
-					standardPropertySets, ATL_FILES, aaxlGeneratedFileName);
-
-			String aadlGeneratedFileName = inputResource.getURI()
-					.toFileString();
-			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
-					".aaxl2", "_extended.aadl2");
-
-			StandAloneInstantiator instantiator = StandAloneInstantiator
-					.getInstantiator();
-			instantiator.serialize(expandedResult, aadlGeneratedFileName);
-
-			return expandedResult;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new GenerationException(e.getMessage());
-		}
-	}
-
+	    return transformCommon(inputResource,
+	                resourceFilePath,
+	                atlFiles,
+	                standardPropertySets,
+	                generatedFilePath);
+	  }
+	
 	@Override
 	public void setParameters(Map<Enum<?>, Object> parameters) {
 		throw new UnsupportedOperationException();

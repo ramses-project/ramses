@@ -1,0 +1,352 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>ramses</groupId>
+    <artifactId>ramses-maven-build</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../../ramses-maven-build/pom.xml</relativePath>
+  </parent>
+  <groupId>ramses</groupId>
+  <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
+
+  <build>
+    <finalName>ramses</finalName>
+    <plugins>
+      <plugin>  
+        <groupId>org.apache.maven.plugins</groupId>  
+        <artifactId>maven-assembly-plugin</artifactId>  
+        <configuration>  
+          <descriptors>  
+            <descriptor>assembly.xml</descriptor>  
+          </descriptors>
+	  <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>  
+              <mainClass>fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher</mainClass>
+            </manifest>
+	    <manifestEntries>
+	      <Class-Path>lib/org.osate.aadl2.jar lib/org.eclipse.emf.common_2.7.0.v20120127-1122.jar lib/org.eclipse.emf.ecore_2.7.0.v20120127-1122.jar lib/org.eclipse.core.runtime_3.7.0.v20110110.jar lib/org.eclipse.equinox.common_3.6.0.v20110523.jar lib/org.eclipse.uml2.uml_3.2.100.v201108110105.jar lib/org.eclipse.emf.ecore.xmi_2.7.0.v20120127-1122.jar lib/org.eclipse.ui_3.7.0.I20110602-0100.jar lib/org.eclipse.ui.workbench_3.7.0.I20110519-0100.jar lib/org.eclipse.emf.transaction_1.4.0.v20100331-1738.jar com.google.guava.jar lib/org.eclipse.xtext_2.2.1.v201112130541.jar lib/org.eclipse.xtext.util_2.2.1.v201112130541.jar lib/org.eclipse.uml2.common_1.6.0.v201105021727.jar lib/org.eclipse.ocl_3.1.0.v20110913-1213.jar lib/org.eclipse.ocl.ecore_3.1.1.v20110823-1646.jar lib/lpg.runtime.java_2.0.17.v201004271640.jar lib/org.eclipse.m2m.atl_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.core_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.core.emf_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.common_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.engine.emfvm_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.engine.emfvm.launch_3.2.1.v20110914-0724.jar</Class-Path>
+	      
+	    </manifestEntries>
+          </archive>
+        </configuration>  
+        <executions>
+          <execution>  
+            <id>make-assembly</id>  
+            <phase>package</phase>  
+            <goals>  
+              <goal>single</goal>  
+            </goals>  
+          </execution>  
+        </executions>  
+      </plugin> 
+    </plugins>  
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>resources</artifactId>
+      <version>3.3.0-v20070604</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>jobs</artifactId>
+      <version>3.2.0-v20060603</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>eclipse</groupId>
+      <artifactId>eclipse-runtime</artifactId>
+      <version>2.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>swt</groupId>
+      <artifactId>jface</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.annex.behavior</artifactId>
+      <version>0.9.5</version>
+      <scope></scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.instantiation</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.atl.launch</artifactId>
+      <version>1.0.0.qualifier</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.util.generation</artifactId>
+      <version>1.0.0.qualifier</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <version>1.0.0</version>
+      <artifactId>PropertiesExtractor</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.util.properties</artifactId>
+      <version>1.0.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+	<artifactId>fr.tpt.aadl.sched.tools.cheddar</artifactId>
+	<version>1.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <version>0.9.5</version>
+      <artifactId>fr.tpt.aadl.utils</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.control.cli.core</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+   
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.control.core</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.control.support</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.sched.tools.cheddar</artifactId>
+      <version>1.0.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.c</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.target.specific</artifactId>
+      <version>1.0.0.qualifier</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.annex.behavior</artifactId>
+      <version>0.9.5</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.osek</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.pok</artifactId>
+      <version>0.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.core</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.aadl2.instantiation</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.annexsupport</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.ui</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.aadl2.modelsupport</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.aadl2</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.xtext.aadl2.properties.ui</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.xtext.aadl2.properties</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.xtext.aadl2</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr</artifactId>
+      <version>3.1.3</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>${swt.groupId}</groupId>
+      <artifactId>${swt.artifactId}</artifactId>
+      <version>3.3.0-v3346</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>10.0.1</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>3.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.15</version>
+      <exclusions>
+            <exclusion>
+                <groupId>com.sun.jmx</groupId>
+                <artifactId>jmxri</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>com.sun.jdmk</groupId>
+                <artifactId>jmxtools</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.martiansoftware</groupId>
+      <artifactId>jsap</artifactId>
+      <version>2.1</version>
+    </dependency>
+
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>mac</id>
+      <activation>
+	<os>
+	  <name>mac os x</name>
+	</os>
+      </activation>
+      <properties>
+	<swt.groupId>org.eclipse.swt.carbon</swt.groupId>
+	<swt.artifactId>macosx</swt.artifactId>
+      </properties>
+    </profile>
+    <profile>
+      <id>windows</id>
+      <activation>
+	<os>
+	  <family>windows</family>
+	</os>
+            </activation>
+            <properties>
+	      <swt.groupId>org.eclipse.swt.win32.win32</swt.groupId>
+	      <swt.artifactId>x86</swt.artifactId>
+            </properties>
+    </profile>
+    <profile>
+      <id>linux</id>
+      <activation>
+	<os>
+	  <family>linux</family>
+	</os>
+      </activation>
+      <properties>
+	<swt.groupId>org.eclipse.swt.gtk.linux</swt.groupId>
+	<swt.artifactId>x86_64</swt.artifactId>
+      </properties>
+    </profile>
+  </profiles>
+
+  
+</project>

@@ -22,14 +22,26 @@
 package fr.tpt.aadl.ramses.generation.target.specific;
 
 import java.io.File ;
+import java.util.ArrayList ;
+import java.util.List ;
 import java.util.Map ;
 
+import javax.swing.JOptionPane ;
+
+import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.instance.SystemInstance ;
 
+import fr.tpt.aadl.ramses.control.support.XMLPilot ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
+
+
 
 public class AadlTargetSpecificGenerator implements Generator
 {
@@ -86,6 +98,92 @@ public class AadlTargetSpecificGenerator implements Generator
     _codeGen.generate(r, generatedFilePath) ;
   }
 
+  @Override
+  public void generateXML(SystemInstance instance,
+      File resourceFilePath,
+          Map<String, Resource> standardPropertySets,
+          File generatedFilePath,
+          XMLPilot xmlPilot) throws GenerationException
+  {
+    Resource r = instance.eResource() ;
+    String systemToInstantiate = instance.getSystemImplementation().getName();
+
+    while(xmlPilot.hasNextOperation())
+    {
+      String operation = xmlPilot.getNextOperation();
+      if(operation.equals("analysis"))
+      {
+        String analysisName = xmlPilot.getNextAnalysisName();
+        String analysisMode = xmlPilot.getNextAnalysisMode();
+        System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
+        try {       
+          ServiceRegistryProvider.getServiceRegistry().getAnalyzer(analysisName)
+          .performAnalysis(instance,
+                           ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+                           new NullProgressMonitor()) ;
+        } catch (AnalysisResultException e) {
+          e.printStackTrace();
+        }
+
+
+        // Here is the line where to catch the analysis result
+        // Then just send it to the xmlPilot
+
+
+
+        if(analysisMode.equals("automatic"))
+        {
+          xmlPilot.setAnalysisResult(true);
+          System.out.println(">> " + analysisName + " result set at true");
+        }
+        else if(analysisMode.equals("manual")) {
+          int res = JOptionPane.showConfirmDialog(null, "Was the analysis " + analysisName + " successfull?", "Confirmation", JOptionPane.YES_NO_OPTION);
+          if(res == JOptionPane.YES_OPTION) 
+          {
+            xmlPilot.setAnalysisResult(true);
+            System.out.println(">> " + analysisName + " result set at true");
+          }
+          else
+          {
+            xmlPilot.setAnalysisResult(false);
+            System.out.println(">> " + analysisName + " result set at false");
+          }
+        }
+      }
+      else if(operation.equals("transformation"))
+      {
+        List<String> resourceFileNameList = xmlPilot.getNextTransformationFileNameList();
+        System.out.println("Transformation launched : " + resourceFileNameList);
+
+        Resource result = _targetTrans.transformXML(r, resourceFilePath, resourceFileNameList, 
+                                                    standardPropertySets, generatedFilePath);
+
+        List<Resource> rList = new ArrayList<Resource>();
+        rList.add(result);
+        SystemInstance newInstance =
+              StandAloneInstantiator.getInstantiator().instantiate(rList, systemToInstantiate) ;
+        r = newInstance.eResource();
+      }
+      else if(operation.equals("errorstate"))
+      {
+        System.err.println("\n\nXML piloting achieved in errorstate");
+      }
+      else if(operation.equals("generation"))
+      {
+        System.out.println("Generation launched");
+        _codeGen.generate(r, generatedFilePath) ;
+      }   
+      else
+      {
+        System.err.println("Undefined operation : " + operation);
+
+      }
+
+      xmlPilot.goForward();
+    }
+  }
+
+  
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
         throws Exception
