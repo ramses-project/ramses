@@ -10,7 +10,7 @@
 		<relativePath>../../../ramses-maven-build/pom.xml</relativePath>
 	</parent>
 	<groupId>ramses</groupId>
-	<artifactId>fr.tpt.aadl.sched.propertiesextractor</artifactId>
+	<artifactId>PropertiesExtractor</artifactId>
 	<version>1.0.0</version>
 	<packaging>eclipse-plugin</packaging>
 	
