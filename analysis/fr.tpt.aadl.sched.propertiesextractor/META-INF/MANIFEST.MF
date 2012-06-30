@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-Name: Properties Extractor
-Bundle-SymbolicName: PropertiesExtractor;singleton=true
+Bundle-SymbolicName: fr.tpt.aadl.sched.propertiesextractor;singleton=true
 Bundle-Version: 1.0.0
 Bundle-Vendor: TELECOM Paristech
 Provide-Package: fr.tpt.aadl.flow,
