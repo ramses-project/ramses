@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
- 
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>ramses</groupId>
@@ -9,15 +10,7 @@
 		<relativePath>../../../ramses-maven-build/pom.xml</relativePath>
 	</parent>
 	<groupId>ramses</groupId>
-	<artifactId>fr.tpt.aadl.ramses.control.cli.core</artifactId>
+	<artifactId>fr.tpt.aadl.ramses.control.core</artifactId>
 	<version>0.5.0</version>
 	<packaging>eclipse-plugin</packaging>
-	
-	 <dependencies>
-        <dependency>
-         <groupId>com.martiansoftware</groupId>
-          <artifactId>JSAP-2.1</artifactId>
-          <version>0.8.2</version>
-        </dependency>
-    </dependencies>
 </project>
