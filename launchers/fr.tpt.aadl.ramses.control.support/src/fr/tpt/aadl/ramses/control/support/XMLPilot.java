@@ -1,8 +1,8 @@
 package fr.tpt.aadl.ramses.control.support;
 
 import java.io.*;
-import org.jdom.*;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.*;
+import org.jdom2.input.SAXBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class XMLPilot
 {
 
 	SAXBuilder sxb;
-	org.jdom.Document document;
+	org.jdom2.Document document;
 	Element racine;
 	boolean analysisResult;
 	
