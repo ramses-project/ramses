@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.osate.annexsupport.AnnexParser;
-import org.osate.annexsupport.AnnexResolver;
 import org.osate.annexsupport.AnnexUnparser;
+import org.osate.annexsupport.AnnexResolver;
 
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.annex.behavior.AadlBaResolver;

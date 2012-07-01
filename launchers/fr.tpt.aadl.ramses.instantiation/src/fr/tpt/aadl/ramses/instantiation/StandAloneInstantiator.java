@@ -131,8 +131,8 @@ public class StandAloneInstantiator
                           .createResource(instanceURI) ;
             }
 
-            return instantiateModel.createSystemInstanceInt(toInstantiate,
-                                                            aadlResource) ;
+            return instantiateModel.createSystemInstance(toInstantiate,
+                                                         aadlResource) ;
           }
         }
       }
