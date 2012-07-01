@@ -21,5 +21,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.pok.c,
- fr.tpt.aadl.ramses.generation.pok.makefile
+ fr.tpt.aadl.ramses.generation.pok.makefile,
+ fr.tpt.aadl.ramses.generation.pokTT
 Bundle-Vendor: TELECOM Paristech
