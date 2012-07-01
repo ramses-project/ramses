@@ -3,6 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AADL-Ramses-Cli-Core
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.cli.core
 Bundle-Version: 0.5.0
+Bundle-ClassPath: .,
+ lib/JSAP-2.1.jar
 Export-Package: com.martiansoftware.jsap,
  com.martiansoftware.jsap.ant,
  com.martiansoftware.jsap.defaultsources,
@@ -16,5 +18,3 @@ Require-Bundle: org.eclipse.emf.common;bundle-version="2.7.0",
  fr.tpt.aadl.ramses.control.core;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
 Bundle-Vendor: TELECOM ParisTech
-Bundle-ClassPath: lib/JSAP-2.1.jar,
- .
