@@ -954,7 +954,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 DataAccess da = (DataAccess) pce ;
                 if(first==false)
                   _cFileContent.addOutput(", ") ;
-                if(da.getKind().equals(AccessType.REQUIRED))
+                if(da.getKind().equals(AccessType.REQUIRES))
                 {
                   String accessRight = null ;
 

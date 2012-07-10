@@ -999,7 +999,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         for(DataAccess d : object.getOwnedDataAccesses())
         {
-          if(d.getKind().equals(AccessType.REQUIRED))
+          if(d.getKind().equals(AccessType.REQUIRES))
           {
             process(d) ;
           }
