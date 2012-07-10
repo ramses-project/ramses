@@ -1548,7 +1548,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         String d ;
         processComments(object) ;
 
-        if(object.getKind() == AccessType.REQUIRED)
+        if(object.getKind() == AccessType.REQUIRES)
         {
           d = "requires" ;
         }
@@ -1575,7 +1575,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         String d ;
         processComments(object) ;
 
-        if(object.getKind() == AccessType.REQUIRED)
+        if(object.getKind() == AccessType.REQUIRES)
         {
           d = "requires" ;
         }
@@ -1602,7 +1602,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         String d ;
         processComments(object) ;
 
-        if(object.getKind() == AccessType.REQUIRED)
+        if(object.getKind() == AccessType.REQUIRES)
         {
           d = "requires" ;
         }
