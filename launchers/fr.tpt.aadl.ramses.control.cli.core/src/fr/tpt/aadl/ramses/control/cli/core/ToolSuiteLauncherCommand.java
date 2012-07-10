@@ -59,8 +59,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
         "system_to_instantiate" ;
   private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
-  private static final String RAMSES_RESOURCES_VAR = "RAMSES_RESOURCES_DIR";
-  private static final String RAMSES_RESOURCES_DIR = System.getenv(RAMSES_RESOURCES_VAR) ;
+  private static final String RAMSES_RESOURCES_VAR = "RAMSES_DIR";
+  private static final String RAMSES_DIR = System.getenv(RAMSES_RESOURCES_VAR) ;
   private static final String GENERATION_OPTION_ID = "target_platform" ;
 
   private static Switch helpOnlyMode ;
@@ -313,7 +313,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     String[] includeFolderNames =
           parseConfig.getStringArray(INCLUDES_OPTION_ID) ;
     String[] mainModels = parseConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-    String resourcesDirName = RAMSES_RESOURCES_DIR ;
+    String resourcesDirName = RAMSES_DIR ;
     
     // Optional switch.
     if(resourcesDirName == null)
@@ -356,7 +356,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
             ToolSuiteLauncherCommand.getVerifiedPath(analysis_output_path) ;
       setOutputDir(outputDir);
     }
-    String resourcesDirName = RAMSES_RESOURCES_DIR;
+    String resourcesDirName = RAMSES_DIR;
     
     // Optional switch.
     if(resourcesDirName == null)
@@ -435,7 +435,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
           genConf.getStringArray(SOURCE_MODELS_OPTION_ID) ;
     String generated_file_path =
           genConf.getString(OUTPUT_DIR_OPTION_ID) ;
-    String resourcesDirName = RAMSES_RESOURCES_DIR ;
+    String resourcesDirName = RAMSES_DIR ;
     
     // Optional switch.
     if(resourcesDirName == null)

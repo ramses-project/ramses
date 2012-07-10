@@ -7,7 +7,7 @@
 <listEntry value="1"/>
 </listAttribute>
 <mapAttribute key="org.eclipse.debug.core.environmentVariables">
-<mapEntry key="RAMSES_RESOURCES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
+<mapEntry key="RAMSES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m test/arinc653-events/test_events.aadl2  -g pok -s root.impl -o test/arinc653-events -i test/"/>
