@@ -71,13 +71,13 @@ rule Type (c : AADLI!ComponentInstance,
 			else if (type.oclIsKindOf(AADLI!DataType)) { typeImg <- thisModule.DataType(type); }
 			
 		
---			if (thisModule.public().getOwnedClassifiers()->includes(typeImg))
---			  typeImg.debug('  previously declared type');
---			else
---			{
---			  typeImg.debug('  declare type');
---			  thisModule.public().getOwnedClassifiers().add(typeImg);
---			}
+			if (typeImg.isDeclared())
+			  typeImg.debug('  previously declared type');
+			else
+			{
+			  typeImg.debug('  declare type');
+			  thisModule.public().getOwnedClassifiers().add(typeImg);
+			}
 		
 		}
 		

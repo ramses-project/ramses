@@ -432,6 +432,9 @@ rule DataPort_Instance
 				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
 				kind <- #requires
 			),
+		
+		-- XXX TPT: put the creation of communicationID in a rule dealing with interprocess partitions
+		
 		-- creation of a data subcomponent, to be added to the container process of target thread component, 
 		-- this data is a global variable representing the
 		-- ARINC653 communication identifier.

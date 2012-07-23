@@ -114,7 +114,7 @@ rule System_Instance {
 		),
 		
 		pkg : AADLBA!AadlPackage (
-			name <- src_package.name,
+			name <- src_package.name+'_refined',
 			ownedPublicSection <- section
 		),
 		realization : AADLBA!Realization (implemented <- type)

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.osate.pluginsupport.aadlcontribution">
+
+      <!-- Contributed packages -->
+      <aadlcontribution
+            file="aadl_resources/package/base_types.aadl2"
+            id="fr.tpt.aadl.packages.base_types.aadlcontribution"
+            name="Base-Types">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/package/OSEK_runtime.aadl2"
+            id="fr.tpt.aadl.packages.osek_runtime.aadlcontribution"
+            name="OSEK-Runtime">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/package/pok_runtime.aadl2"
+            id="fr.tpt.aadl.packages.pok_runtime.aadlcontribution"
+            name="POK-Runtime">
+      </aadlcontribution>
+
+      <!-- Contributed properties -->
+      <aadlcontribution
+            file="aadl_resources/propertyset/ARINC653.aadl2"
+            id="fr.tpt.aadl.propetries.arinc653.aadlcontribution"
+            name="ARINC653-Properties">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/pok_properties.aadl2"
+            id="fr.tpt.aadl.propetries.pok.aadlcontribution"
+            name="POK-Properties">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/osek_properties.aadl2"
+            id="fr.tpt.aadl.propetries.osek.aadlcontribution"
+            name="OSEK-Properties">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/oseknxt_properties.aadl2"
+            id="fr.tpt.aadl.propetries.oseknxt.aadlcontribution"
+            name="OSEK-NXT-Properties">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/data_model.aadl2"
+            id="fr.tpt.aadl.propetries.data.model.aadlcontribution"
+            name="Data-Model-Properties">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/propertyset/Generation_Properties.aadl2"
+            id="fr.tpt.aadl.propetries.generation.aadlcontribution"
+            name="Generation-Properties">
+      </aadlcontribution>
+      
+      
+      
+   </extension>
+</plugin>

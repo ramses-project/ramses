@@ -89,11 +89,6 @@ rule createThreadBehavior(threadImpl: AADLBA!ThreadImplementation)
 	do
 	{
 		threadImpl.getOwnedAnnexSubclauses().add(behvior_annex);
-		if (not threadImpl.isDeclared())
-		{
-			threadImpl.debug('  declare implementation');
-			thisModule.public().getOwnedClassifiers().add(threadImpl);
-		}
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().putTransitionWhereSrc(initialState, initTransition);
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().putTransitionWhereSrc(mainState, mainTransition);
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().putTransitionWhereSrc(mainState, finalTransition);
