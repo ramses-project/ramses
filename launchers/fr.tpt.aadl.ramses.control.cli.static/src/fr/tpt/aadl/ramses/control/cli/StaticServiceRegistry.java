@@ -35,6 +35,7 @@ import fr.tpt.aadl.annex.behavior.AadlBaResolver;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
 import fr.tpt.aadl.launch.WCETAnalysis;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
+import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
@@ -68,9 +69,13 @@ public class StaticServiceRegistry implements ServiceRegistry
                    new AadlBaToCUnparserAction()) ;
     _analyzers.put(WCETAnalysis.ANALYZER_NAME, new WCETAnalysis()) ;
     
-    Generator genPok = PokGeneratorFactory.createPokGenerator(false) ;
-    Generator genPokTT = PokTTGeneratorFactory.createPokTTGenerator(false) ;
-    Generator genOsek = OSEKGeneratorFactory.createOSEKGenerator(false);
+    AbstractGeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
+    AbstractGeneratorFactory pokTTGeneratorFactory = new PokTTGeneratorFactory();
+    AbstractGeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();
+    
+    Generator genPok = pokGeneratorFactory.createGenerator() ;
+    Generator genPokTT = pokTTGeneratorFactory.createGenerator() ;
+    Generator genOsek = oSEKGeneratorFactory.createGenerator();
     
     _gen.put(genPok.getRegistryName(), genPok) ;
     _gen.put(genPokTT.getRegistryName(), genPokTT) ;
