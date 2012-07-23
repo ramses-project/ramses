@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            name="RAMSES Build"
+            class="fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage"
+            id="fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage">
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+	     <filter
+	           name="nature"
+	           value="org.osate.core.aadlnature">
+	     </filter>
+      </page>
+   </extension>
+   
+   
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+      		label="GenerateCodeAction"
+            id="fr.tpt.aadl.ramses.control.osate.generate"
+            visible="true">
+         <menu
+               id="menu.ramses"
+               label="RAMSES"
+               path="project/additions">
+               <separator name="generation"/>
+               <groupMarker name="top.grp"/>
+         </menu>
+         <action
+               class="fr.tpt.aadl.ramses.control.osate.GenerateAction"
+               id="fr.tpt.aadl.ramses.control.osate.generate.action"
+               menubarPath="menu.ramses/top.grp"
+               toolbarPath="menu.ramses/generation"
+               enablesFor="1"
+               label="&amp;Generate Code"
+               icon="icons/RAMSES.gif"
+               tooltip="Generate code for a given target platform">
+            <enablement>
+               <or>
+                  <and>
+                     <objectClass name="org.eclipse.core.resources.IFile"/>
+                     <objectState name="extension" value="aaxl2"/>
+                  </and>
+                  <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
+               </or>
+            </enablement>
+         </action>
+      </actionSet>
+   </extension>
+   
+   <extension point="org.osate.ui.analysis">
+      <analysis
+   		 id="fr.tpt.aadl.ramses.control.osate.generate"
+   		 name="RAMSES"
+   		 class="fr.tpt.aadl.ramses.control.osate.GenerateAction">
+   		 <declarativeModel selectRootObject="true">
+   		    <selectedObject objectType="org.osate.aadl2.instance.SystemInstance"/>
+   		 </declarativeModel>
+   		 <instanceModel selectRootObject="true"/>
+   	  </analysis>
+   </extension>
+   
+</plugin>
