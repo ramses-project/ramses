@@ -27,8 +27,8 @@ public class XMLPilot
 			document = sxb.build(new File(_xmlFileName));
 			racine = document.getRootElement();
 			
-			List listChildren = racine.getChildren();
-			Iterator i = listChildren.iterator();
+			List<Element> listChildren = racine.getChildren();
+			Iterator<Element> i = listChildren.iterator();
 			
 			if(i.hasNext())
 			{
@@ -82,8 +82,8 @@ public class XMLPilot
 		{
 			Element nodeFiles = racine.getChild("list");
 							
-			List listFileTags = nodeFiles.getChildren("file");
-			Iterator i = listFileTags.iterator();
+			List<Element> listFileTags = nodeFiles.getChildren("file");
+			Iterator<Element> i = listFileTags.iterator();
 			
 			List<String> listFileNames = new ArrayList<String>();
 			
@@ -120,8 +120,8 @@ public class XMLPilot
 				racine = racine.getChild("no");
 			}
 			
-			List listChildren = racine.getChildren();
-			Iterator i = listChildren.iterator();
+			List<Element> listChildren = racine.getChildren();
+			Iterator<Element> i = listChildren.iterator();
 			
 			if(i.hasNext())
 			{
@@ -134,9 +134,9 @@ public class XMLPilot
 		}
 		else if(racine.getName() == "transformation")
 		{
-			List listChildren = racine.getChildren();
+			List<Element> listChildren = racine.getChildren();
 
-			Iterator j = listChildren.iterator();
+			Iterator<Element> j = listChildren.iterator();
 			Element tag = null;
 			while(j.hasNext())
 			{

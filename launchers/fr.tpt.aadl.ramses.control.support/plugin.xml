@@ -21,7 +21,7 @@ along with this program.  If not, see
 http://www.eclipse.org/org/documents/epl-v10.php
 -->
 <plugin>
-   <extension-point id="analyzer" name="TPT AADL analyzer" schema="schema/analyzer.exsd"/>
-   <extension-point id="generator" name="TPT AADL generator" schema="schema/generator.exsd"/>
+   <extension-point id="fr.tpt.aadl.ramses.control.support.analyzer" name="TPT AADL analyzer" schema="schema/analyzer.exsd"/>
+   <extension-point id="fr.tpt.aadl.ramses.control.support.generator" name="TPT AADL generator" schema="schema/generator.exsd"/>
 
 </plugin>

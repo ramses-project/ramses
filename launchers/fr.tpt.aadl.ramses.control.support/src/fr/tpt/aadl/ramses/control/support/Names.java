@@ -27,7 +27,7 @@ public class Names
   {"aadl2", "aadl"} ;
 
   public final static String RAMSES_SUPPORT_PLUGIN_ID =
-        "fr.tpt.aadl.ramses.support" ;
+        "fr.tpt.aadl.ramses.control.support" ;
 
   public final static String ANALYSIS_EXT_ID = "analyzer" ;
 

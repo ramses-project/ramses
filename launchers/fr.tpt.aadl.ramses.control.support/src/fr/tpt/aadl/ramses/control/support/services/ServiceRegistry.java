@@ -53,8 +53,7 @@ public interface ServiceRegistry
         new StandAloneAnalysisErrorReporterFactory(MSG_REPORTER) ;
 
   public final static AnalysisErrorReporterManager ANALYSIS_ERR_REPORTER_MANAGER =
-        new AnalysisErrorReporterManager(INT_ERR_REPORTER,
-              ANALYSIS_ERR_REPORTER_FACT) ;
+        new AnalysisErrorReporterManager(ANALYSIS_ERR_REPORTER_FACT) ;
 
   public boolean isOSGi() ;
 

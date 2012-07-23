@@ -31,7 +31,6 @@ public interface AadlToTargetSpecificAadl
 {
   public Resource transform(Resource inputResource,
                             File resourceFilePath,
-                            Map<String, Resource> standardPropertySets,
                             File generatedFilePath) throws GenerationException ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
@@ -39,7 +38,6 @@ public interface AadlToTargetSpecificAadl
   public Resource transformXML(Resource r,
                                File resourceFilePath,
                                List<String> resourceFileNameList,
-                               Map<String, Resource> standardPropertySets,
                                File generatedFilePath) throws GenerationException ;
 
 }
