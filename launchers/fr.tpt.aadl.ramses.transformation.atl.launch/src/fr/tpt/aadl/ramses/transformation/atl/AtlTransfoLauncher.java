@@ -26,44 +26,50 @@
 
 package fr.tpt.aadl.ramses.transformation.atl ;
 
-import java.io.File ;
-import java.io.FileNotFoundException ;
-import java.io.IOException ;
-import java.net.URL ;
-import java.util.ArrayList ;
-import java.util.Collections ;
-import java.util.HashMap ;
-import java.util.List ;
-import java.util.Map ;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.core.runtime.NullProgressMonitor ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.EPackage ;
-import org.eclipse.emf.ecore.EcorePackage ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
-import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl ;
-import org.eclipse.m2m.atl.core.ATLCoreException ;
-import org.eclipse.m2m.atl.core.emf.EMFExtractor ;
-import org.eclipse.m2m.atl.core.emf.EMFInjector ;
-import org.eclipse.m2m.atl.core.emf.EMFModel ;
-import org.eclipse.m2m.atl.core.emf.EMFModelFactory ;
-import org.eclipse.m2m.atl.core.emf.EMFReferenceModel ;
-import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher ;
-import org.osate.aadl2.DataSubcomponentType ;
-import org.osate.aadl2.instance.InstancePackage ;
-import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.util.Aadl2ResourceFactoryImpl ;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
+import org.eclipse.m2m.atl.core.ATLCoreException;
+import org.eclipse.m2m.atl.core.emf.EMFExtractor;
+import org.eclipse.m2m.atl.core.emf.EMFInjector;
+import org.eclipse.m2m.atl.core.emf.EMFModel;
+import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
+import org.eclipse.m2m.atl.core.emf.EMFReferenceModel;
+import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.DataSubcomponentType;
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.instance.InstancePackage;
+import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
+import org.osate.pluginsupport.PluginSupportUtil;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage ;
-
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess ;
+import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
 
 public class AtlTransfoLauncher
 {
@@ -97,6 +103,7 @@ public class AtlTransfoLauncher
    */
   private static String dataTargetfilepath ;
   private static PredefinedPackagesManager predefinedPackagesManager ;
+  private static PredefinedPropertiesManager predefinedPropertiesManager; 
 
   public AtlTransfoLauncher()
         throws Exception
@@ -138,13 +145,48 @@ public class AtlTransfoLauncher
     ATLHookMetamodel = (EMFReferenceModel) factory.newReferenceModel() ;
     injector.inject(ATLHookMetamodel, ATLHOOKS_MM_URI) ;
   }
+  
+  public Resource generationEntryPoint(Resource inputResource,
+		  File resourceFilePath,
+		  List<File> atlFiles,
+		  File generatedFilePath) throws GenerationException
+  {
+	  try {
+
+		  this.setResourcesDirectory(resourceFilePath);
+
+		  String workspaceURI = inputResource.getURI().toString();
+		  if(workspaceURI.startsWith("platform:/resource"))
+		    	workspaceURI = workspaceURI.substring(18);
+		  String aaxlGeneratedFileName = workspaceURI.replaceFirst(".aaxl2", "_extended.aaxl2");
+
+		  Resource expandedResult = this.doGeneration(inputResource,
+				  atlFiles, aaxlGeneratedFileName);
+
+		  String aadlGeneratedFileName = inputResource.getURI().lastSegment();
+		  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
+				  ".aaxl2", "_extended.aadl2");
+
+		  File outputModelDir =  new File(generatedFilePath.getAbsolutePath()+"/refined-models");
+		  if(outputModelDir.exists()==false)
+			  outputModelDir.mkdir();
+		  StandAloneInstantiator instantiator = StandAloneInstantiator
+				  .getInstantiator();
+		  instantiator.serialize(expandedResult, outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName);
+
+		  return expandedResult;
+	  } catch (Exception e) {
+		  e.printStackTrace();
+		  throw new GenerationException(e.getMessage());
+	  }
+  }
 
   public Resource doGeneration(Resource inputResource,
-                               Map<String, Resource> propertySets,
                                List<File> transformationFileName,
                                String dataTargetfilepath)
         throws FileNotFoundException, IOException, ATLCoreException, Exception
   {
+    
     if(AtlTransfoLauncher.resourcesDir == null)
       throw new Exception(
             "Illegal initialization of ATL transformation launcher: "
@@ -157,15 +199,15 @@ public class AtlTransfoLauncher
       AtlTransfoLauncher.dataTargetfilepath = dataTargetfilepath ;
     }
 
-    return doTransformation(inputResource, propertySets) ;
+    return doTransformation(inputResource) ;
   }
   
-  private Resource doTransformation(Resource inputResource,
-                                   Map<String, Resource> propertySets)
+  private Resource doTransformation(Resource inputResource)
         throws FileNotFoundException, IOException, ATLCoreException
   {
     boolean workingWithInstances =
           (inputResource.getContents().get(0) instanceof SystemInstance) ;
+    
     List<Object> atlModules = new ArrayList<Object>() ;
     // Initialize the ATL launcher
     EMFVMLauncher launcher = new EMFVMLauncher() ;
@@ -186,14 +228,16 @@ public class AtlTransfoLauncher
     EMFModel targetModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
     ResourceSet rs =
           StandAloneInstantiator.getInstantiator().getAadlResourceSet() ;
+    
     Resource outputResource =
-          rs.createResource(URI.createFileURI(dataTargetfilepath
+          rs.createResource(URI.createURI(dataTargetfilepath
                 .replaceAll(".aaxl2", ".aadl2"))) ;
+    
     injector.inject(targetModel, outputResource) ;
     // create ATLHook
     EMFModel atlHookModel = (EMFModel) factory.newModel(ATLHookMetamodel) ;
     URI fileURI =
-          URI.createURI(AtlTransfoLauncher.resourcesDir.getAbsolutePath() +
+          URI.createFileURI(AtlTransfoLauncher.resourcesDir.getAbsolutePath() +
                 "/ATLHook.atlhooks") ;
     ResourceSet set = new ResourceSetImpl() ;
     Resource hookResource = set.createResource(fileURI) ;
@@ -213,11 +257,16 @@ public class AtlTransfoLauncher
     }
 
     launcher.addInModel(atlHookModel, "HOOKS", "ATLHOOKS") ;
-    //launcher.addInModel(runtimeModel, "AADL_RUNTIME", "AADLBA");
-    //launcher.addInModel(baseTypesModel, "BASE_TYPES", "AADLBA");
-    registerPredefinedPackagesInLauncher(launcher) ;
+    if(Platform.isRunning())
+    {
+    	registerContributedAadl(launcher);
+    }
+    else
+    {
+    	registerPredefinedPackagesInLauncher(launcher) ;
+        registerPredefinedPropertiesInLauncher(launcher) ;
+    }
     launcher.addOutModel(targetModel, "OUT", "AADLBA") ;
-    this.addStandardPropertySetInputs(propertySets, launcher) ;
 
     if(workingWithInstances)
     {
@@ -256,7 +305,6 @@ public class AtlTransfoLauncher
     fileName.add("/tools/BehaviorAnnexTools") ;
     fileName.add("/uninstanciate/Features") ;
     fileName.add("/uninstanciate/Implementations") ;
-    //fileName.add("/uninstanciate/Misc");
     fileName.add("/uninstanciate/NonInstanciated");
     fileName.add("/uninstanciate/Properties") ;
     fileName.add("/uninstanciate/Types") ;
@@ -287,23 +335,7 @@ public class AtlTransfoLauncher
     }
   }
 
-  private void addStandardPropertySetInputs(Map<String, Resource> propertySets,
-                                            EMFVMLauncher launcher)
-  {
-    for(String s : propertySets.keySet())
-    {
-      EMFModel propertySetModel ;
-      propertySetModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
-      injector.inject(propertySetModel, propertySets.get(s)) ;
-
-      if(propertySetModel != null)
-      {
-        launcher.addInModel(propertySetModel, s.toUpperCase(), "AADLBA") ;
-      }
-    }
-  }
-
-  public DataSubcomponentType getRuntimeData(String dataName)
+public DataSubcomponentType getRuntimeData(String dataName)
   {
     DataSubcomponentType result = null ;
     Resource aadlRuntime = predefinedPackagesManager.getRuntimeResource() ;
@@ -324,7 +356,7 @@ public class AtlTransfoLauncher
     return null ;
   }
 
-  public void registerPredefinedPackagesInLauncher(EMFVMLauncher launcher)
+  private void registerPredefinedPackagesInLauncher(EMFVMLauncher launcher)
   {
     for(int p = 0 ; p < predefinedPackagesManager.getPackagesCount() ; p++)
     {
@@ -335,22 +367,57 @@ public class AtlTransfoLauncher
       launcher.addInModel(rModel, name.toUpperCase(), "AADLBA") ;
     }
   }
-
+  
+  private void registerPredefinedPropertiesInLauncher(EMFVMLauncher launcher)
+  {
+    for(int p = 0 ; p < predefinedPropertiesManager.getPropertiesCount() ; p++)
+    {
+      String name = predefinedPropertiesManager.getPropertySetName(p) ;
+      Resource r = predefinedPropertiesManager.getPropertySetResource(name) ;
+      EMFModel rModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
+      injector.inject(rModel, r) ;
+      launcher.addInModel(rModel, name.toUpperCase(), "AADLBA") ;
+    }
+  }
+  
+  private void registerContributedAadl(EMFVMLauncher launcher) {
+	  List<URI> contributedResourceUriList = PluginSupportUtil.getContributedAadl();
+	  for(URI contributedResourceUri : contributedResourceUriList)
+	  {
+		  ResourceSet resourceSet = new ResourceSetImpl();
+		  Resource resource = resourceSet.getResource(contributedResourceUri, true);
+		  
+		  EMFModel rModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
+	      injector.inject(rModel, resource) ;
+	      NamedElement elt=null;
+	      if(resource.getContents().get(0) instanceof PropertySet)
+	    	  elt = (PropertySet) resource.getContents().get(0);
+	      else if (resource.getContents().get(0) instanceof AadlPackage)
+	    	  elt = (AadlPackage) resource.getContents().get(0);
+	      launcher.addInModel(rModel, elt.getName().toUpperCase(), "AADLBA") ;
+		  
+	  }
+  }
+  
   public void setResourcesDirectory(File resourcesDir)
                                               throws ATLCoreException, Exception
   {
     AtlTransfoLauncher.resourcesDir = resourcesDir ;
-    predefinedPackagesManager =
-          new PredefinedPackagesManager(new File(resourcesDir
-                .getAbsolutePath() +
-                "/aadl_resources")) ;
+    if(!Platform.isRunning())
+    {
+    	predefinedPackagesManager =
+    			new PredefinedPackagesManager(new File(resourcesDir
+    					.getAbsolutePath() +
+    					"/aadl_resources")) ;
 
-    if(!predefinedPackagesManager.allPackagesFound())
-      throw new Exception(
-            "Illegal initialization of ATL transformation launcher: " +
-                  "some predefined packages not found: " +
-                  predefinedPackagesManager.getPackagesNotFound()) ;
-     
+    	if(!predefinedPackagesManager.allPackagesFound())
+    		throw new Exception(
+    				"Illegal initialization of ATL transformation launcher: " +
+    						"some predefined packages not found: " +
+    						predefinedPackagesManager.getPackagesNotFound()) ;
+
+    	predefinedPropertiesManager = new PredefinedPropertiesManager();
+    }
     this.initTransformation(resourcesDir) ;
   }
 }

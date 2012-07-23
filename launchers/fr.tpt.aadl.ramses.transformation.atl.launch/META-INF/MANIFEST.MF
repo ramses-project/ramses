@@ -12,6 +12,7 @@ Export-Package: fr.tpt.aadl.ramses.transformation.atl,
  fr.tpt.aadl.ramses.transformation.atl.hooks.impl,
  fr.tpt.aadl.ramses.transformation.atl.hooks.util
 Require-Bundle: org.eclipse.core.runtime,
+ org.osate.aadl2.modelsupport;bundle-version="1.0.0";visibility:=reexport,
  org.eclipse.ui.workbench;bundle-version="3.7.0",
  org.eclipse.emf.ecore;visibility:=reexport,
  org.eclipse.emf.ecore.xmi;visibility:=reexport,
@@ -24,6 +25,9 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.utils;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  fr.tpt.aadl.annex.behavior;bundle-version="0.9.5";visibility:=reexport,
- fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0"
+ fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0",
+ org.osate.pluginsupport;bundle-version="1.0.0",
+ org.osate.workspace,
+ org.eclipse.core.resources;bundle-version="3.7.101"
 Bundle-ActivationPolicy: lazy
 

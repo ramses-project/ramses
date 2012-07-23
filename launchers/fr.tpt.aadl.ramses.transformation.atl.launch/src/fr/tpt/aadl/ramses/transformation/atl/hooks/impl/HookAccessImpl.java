@@ -140,7 +140,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
       }
 
       Resource inputResource = threadImpl.eResource() ;
-      Map<String, Resource> propertySets = new HashMap<String, Resource>() ;
       // TODO: replace ${workspace} by an ocarina specific environment variable
       String transformationFileName =
             AtlTransfoLauncher.getTransformationDirName() +
@@ -152,9 +151,9 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
       try
       {
         Resource outputResource =
-              atlLauncher.doGeneration(inputResource, propertySets,
-                                       transformationFileList, "") ;
-
+        		atlLauncher.doGeneration(inputResource, transformationFileList, "") ;
+        
+        
         for(Object o : outputResource.getContents())
         {
           if(o instanceof ThreadImplementation)
