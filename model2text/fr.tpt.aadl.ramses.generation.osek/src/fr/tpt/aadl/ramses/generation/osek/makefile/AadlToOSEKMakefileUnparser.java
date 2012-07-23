@@ -21,21 +21,19 @@
 
 package fr.tpt.aadl.ramses.generation.osek.makefile;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.SystemImplementation;
 
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
+import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
-import fr.tpt.aadl.ramses.util.generation.FileUtils ;
+import fr.tpt.aadl.ramses.util.generation.FileUtils;
 
 public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
 
@@ -84,7 +82,7 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
         makeProcess.waitFor();
         if (makeProcess.exitValue() != 0) {
           System.err.println("Error on goil generation: refine_oil;");
-          displayErrorMessage(makeProcess);
+          ProcessMessageDisplay.displayErrorMessage(makeProcess);
         }
         
         System.err.println("Unable to generate Makefile.");
@@ -108,21 +106,16 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
 
         if (makeProcess.exitValue() != 0) {
           System.err.println("Error on goil generation: PrepareMake");
-          displayErrorMessage(makeProcess);
+          ProcessMessageDisplay.displayErrorMessage(makeProcess);
         }
         else
         {
           System.out.println("Compiling Code");
           makeProcess = runtime.exec("make -o Makefile", null, generatedFilePath);
-          InputStream is = makeProcess.getInputStream();
-          BufferedReader in = new BufferedReader(new InputStreamReader(is));
-          String line = null;
-          while ((line = in.readLine()) != null) {
-            System.out.println(line);
-          }
+          ProcessMessageDisplay.displayOutputMessage(makeProcess);
           makeProcess.waitFor();
           if (makeProcess.exitValue() != 0) {
-            displayErrorMessage(makeProcess);
+            ProcessMessageDisplay.displayErrorMessage(makeProcess);
           }
         }
 
@@ -131,16 +124,6 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
       e.printStackTrace();
     } catch (InterruptedException e) {
       e.printStackTrace();
-    }
-	}
-	
-	private void displayErrorMessage(Process makeProcess) throws IOException
-	{
-	  InputStream is = makeProcess.getErrorStream();
-    BufferedReader in = new BufferedReader(new InputStreamReader(is));
-    String line = null;
-    while ((line = in.readLine()) != null) {
-      System.err.println(line);
     }
 	}
 	

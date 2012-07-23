@@ -21,8 +21,10 @@
 
 package fr.tpt.aadl.ramses.generation.c ;
 
+
 public class GenerationUtilsC
 {
+  
   public final static String THREAD_SUFFIX = "_Job" ;
   
   // Give file name, in upper case or not and with or without extension.
@@ -104,7 +106,6 @@ public class GenerationUtilsC
     if(object.length() > 74) // 80 - 6 length of /*_ x 2
     {
       String errorMsg = "title more than 78 characters" ;
-      System.err.println(errorMsg) ;
       throw new UnsupportedOperationException(errorMsg) ;
     }
   }

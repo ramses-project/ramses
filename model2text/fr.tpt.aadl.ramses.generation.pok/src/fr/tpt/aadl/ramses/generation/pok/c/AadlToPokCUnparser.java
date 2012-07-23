@@ -21,9 +21,7 @@
 
 package fr.tpt.aadl.ramses.generation.pok.c;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,17 +51,15 @@ import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
 
-import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
-import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
-import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
-import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
-import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
-import fr.tpt.aadl.ramses.util.generation.FileUtils ;
-import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
-import fr.tpt.aadl.utils.PropertyUtils ;
+import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
+import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
+import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
+import fr.tpt.aadl.ramses.util.generation.FileUtils;
+import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
+import fr.tpt.aadl.utils.PropertyUtils;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
 {
@@ -466,96 +462,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                       TargetProperties tarProp)
   {
     PartitionProperties pp = new PartitionProperties();
-    RoutingProperties routing = (RoutingProperties) tarProp ;
     
     ProcessImplementation processImpl = (ProcessImplementation) 
                                           process.getComponentImplementation() ;
     
     this.findCommunicationMechanism(processImpl, pp);
-    
-//    ComponentInstance processInst = (ComponentInstance) HookAccessImpl.
-//                                               getTransformationTrace(process) ;
-//    boolean needRoutage = false ;
-//    
-//    for(ComponentInstance ci : processInst.getComponentInstances())
-//    {
-//      if (ComponentCategory.THREAD != ci.getCategory())
-//      {
-//        continue ;
-//      }
-//      // else
-//      
-//      // Fetches thread's feature instances.
-//      for (FeatureInstance fi : ci.getFeatureInstances())
-//      {
-//        FeatureCategory cat = fi.getCategory() ;
-//        
-//        if(FeatureCategory.DATA_PORT != cat &&
-//           FeatureCategory.EVENT_PORT != cat &&
-//           FeatureCategory.EVENT_DATA_PORT != cat)
-//        {
-//          continue ; 
-//        }
-//        // else
-//        
-//        needRoutage = AadlToPokCUtils.needsRoutage(fi) ;
-//        
-//        switch(cat)
-//        {
-//          case DATA_PORT :
-//          {
-//            if(needRoutage)
-//            {
-//              pp.hasSample = true ;
-//              sampleHandler(fi, pp) ;
-//            }
-//            else
-//            {
-//              pp.hasBlackboard = true ;
-//            }
-//            
-//            break ;
-//          }
-//          
-//          case EVENT_PORT :
-//          {
-//            if(needRoutage)
-//            {
-//              pp.hasQueue = true ;
-//              // queueHandler() ;
-//            }
-//            else
-//            {
-//              pp.hasEvent = true ;
-//              // eventHandler() ;
-//            }
-//            
-//            break ;
-//          }
-//          
-//          case EVENT_DATA_PORT :
-//          {
-//            if(needRoutage)
-//            {
-//              pp.hasQueue = true ;
-//              queueHandler(fi, pp) ;
-//            }
-//            else
-//            {
-//              pp.hasBuffer = true ;
-//              // bufferHandler() ;
-//            }
-//            
-//            break ;
-//          }
-//          
-//          default:
-//          {
-//            // Nothing to do.
-//          }
-//        }
-//      }
-//    }
     
     if(pp.hasBlackboard 
           || pp.hasEvent)
@@ -964,7 +875,6 @@ private void findCommunicationMechanism(ProcessImplementation process,
 
     if(pp.hasEvent)
     {
-      int i = pp.eventNames.size(); 
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_EVENTS " +
                   pp.eventNames.size()) ;
@@ -1005,7 +915,6 @@ private void findCommunicationMechanism(ProcessImplementation process,
     if(pp.hasBuffer)
     {
       
-      int i = pp.bufferInfo.size(); 
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_BUFFERS " +
                   pp.bufferInfo.size()) ;

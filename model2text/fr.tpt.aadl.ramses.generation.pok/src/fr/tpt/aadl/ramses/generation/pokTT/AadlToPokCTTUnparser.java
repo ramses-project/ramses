@@ -24,32 +24,25 @@ package fr.tpt.aadl.ramses.generation.pokTT;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentClassifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
-import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.PortConnection;
 import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.InstanceObject;
-import org.osate.aadl2.instance.InstanceReferenceValue;
-import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
 
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
-import fr.tpt.aadl.utils.PropertyUtils ;
+import fr.tpt.aadl.utils.PropertyUtils;
 
 public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 {
@@ -230,46 +223,6 @@ public class AadlToPokCTTUnparser extends AadlToPokCUnparser
 			}
 		}
 		return l;
-	}
-	
-	
-
-	private static List<ComponentInstance> getAllBindedProcesses(
-			ComponentInstance processor)
-	{
-		ArrayList<ComponentInstance> processList = new ArrayList<ComponentInstance>();
-		SystemInstance s = processor.getSystemInstance();
-
-		for (ComponentInstance c : s.getComponentInstances())
-		{
-			if (c.getCategory() == ComponentCategory.PROCESS)
-			{
-				if ((ComponentInstance) getProcessBind(c).getOwner() == processor)
-				{
-					processList.add(c);
-				}
-			}
-		}
-
-		return processList;
-	}
-
-	private static ComponentInstance getProcessBind(ComponentInstance process)
-	{
-		try
-		{
-			PropertyExpression val = PropertyUtils.getPropertyValue(
-					"Actual_Processor_Binding", process);
-			PropertyExpression e = ((ListValue) val).getOwnedListElements()
-					.get(0);
-			InstanceReferenceValue ref = (InstanceReferenceValue) e;
-			InstanceObject owner = ref.getReferencedInstanceObject();
-			return (ComponentInstance) owner;
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
 	private static ComponentClassifier getImplementedAs(ProcessImplementation process)

@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.generation.pok;
 
+import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser ;
@@ -28,7 +29,7 @@ import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
 
-public class PokGeneratorFactory
+public class PokGeneratorFactory extends AbstractGeneratorFactory
 {
   public static String POK_GENERATOR_NAME = "pok" ;
   
@@ -56,15 +57,10 @@ public class PokGeneratorFactory
     return result ;
   }
   
-  public static Generator createPokGenerator(boolean isOSGi)
+  
+  
+  public Generator createGenerator()
   {
-    if (false == isOSGi)
-    {
       return createPokGenerator();
-    }
-    else
-    {
-      throw new UnsupportedOperationException() ;
-    }
   }
 }

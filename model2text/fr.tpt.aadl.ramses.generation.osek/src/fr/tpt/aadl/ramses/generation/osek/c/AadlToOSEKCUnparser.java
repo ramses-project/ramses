@@ -1,27 +1,26 @@
 package fr.tpt.aadl.ramses.generation.osek.c;
 
 import java.io.File;
-import java.io.FileNotFoundException ;
 import java.io.IOException;
-import java.util.ArrayList ;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
-import org.osate.aadl2.CallSpecification ;
+import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DeviceSubcomponent;
-import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.SubprogramCall ;
-import org.osate.aadl2.SubprogramCallSequence ;
-import org.osate.aadl2.SubprogramType ;
+import org.osate.aadl2.SubprogramCall;
+import org.osate.aadl2.SubprogramCallSequence;
+import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.modelsupport.UnparseText;
 
@@ -47,10 +46,10 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status;
 import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
-import fr.tpt.aadl.ramses.util.generation.FileUtils ;
-import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
-import fr.tpt.aadl.utils.PropertyNotFound ;
-import fr.tpt.aadl.utils.PropertyUtils ;
+import fr.tpt.aadl.ramses.util.generation.FileUtils;
+import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
+import fr.tpt.aadl.utils.PropertyNotFound;
+import fr.tpt.aadl.utils.PropertyUtils;
 
 /**
  * Unparser to generate an oil file for OSEK from aadl.

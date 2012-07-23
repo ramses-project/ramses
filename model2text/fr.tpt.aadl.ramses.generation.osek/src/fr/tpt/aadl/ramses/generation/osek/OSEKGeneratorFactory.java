@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.generation.osek;
 
+import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
@@ -30,7 +31,7 @@ import fr.tpt.aadl.ramses.generation.osek.makefile.AadlToOSEKMakefileUnparser;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator;
 
-public class OSEKGeneratorFactory {
+public class OSEKGeneratorFactory extends AbstractGeneratorFactory {
 	public static String OSEK_GENERATOR_NAME = "osek";
 
 	private static Generator createOSEKGenerator() {
@@ -60,12 +61,9 @@ public class OSEKGeneratorFactory {
 
 		return result;
 	}
-
-	public static Generator createOSEKGenerator(boolean isOSGi) {
-		if (false == isOSGi) {
+	
+	@Override
+	public Generator createGenerator() {
 			return createOSEKGenerator();
-		} else {
-			throw new UnsupportedOperationException();
-		}
 	}
 }

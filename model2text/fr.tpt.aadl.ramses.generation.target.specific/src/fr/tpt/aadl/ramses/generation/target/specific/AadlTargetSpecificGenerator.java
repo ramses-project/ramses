@@ -51,6 +51,10 @@ public class AadlTargetSpecificGenerator implements Generator
   
   protected String _registryName = null ;
   
+  protected AadlTargetSpecificGenerator()
+  {
+  }
+  
   public AadlTargetSpecificGenerator(AadlToTargetSpecificAadl targetTrans,
                                      AadlTargetSpecificCodeGenerator codeGen)
   {
@@ -86,24 +90,22 @@ public class AadlTargetSpecificGenerator implements Generator
   @Override
   public void generate(SystemInstance instance,
                        File resourceFilePath,
-                       Map<String, Resource> standardPropertySets,
                        File generatedFilePath)
                                                       throws GenerationException
   {
     Resource inputResource = instance.eResource() ;
     
     Resource r = _targetTrans.transform(inputResource, resourceFilePath,
-                                        standardPropertySets, generatedFilePath);
+                                        generatedFilePath);
     
     _codeGen.generate(r, generatedFilePath) ;
   }
 
   @Override
   public void generateXML(SystemInstance instance,
-      File resourceFilePath,
-          Map<String, Resource> standardPropertySets,
-          File generatedFilePath,
-          XMLPilot xmlPilot) throws GenerationException
+                          File resourceFilePath,
+                          File generatedFilePath,
+                          XMLPilot xmlPilot) throws GenerationException
   {
     Resource r = instance.eResource() ;
     String systemToInstantiate = instance.getSystemImplementation().getName();
@@ -156,7 +158,7 @@ public class AadlTargetSpecificGenerator implements Generator
         System.out.println("Transformation launched : " + resourceFileNameList);
 
         Resource result = _targetTrans.transformXML(r, resourceFilePath, resourceFileNameList, 
-                                                    standardPropertySets, generatedFilePath);
+                                                    generatedFilePath);
 
         List<Resource> rList = new ArrayList<Resource>();
         rList.add(result);

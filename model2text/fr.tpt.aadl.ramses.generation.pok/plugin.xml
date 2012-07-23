@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="fr.tpt.aadl.ramses.control.support.generator">
+      <generator
+            class="fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory"
+            id="fr.tpt.aadl.ramses.generation.target.pok"
+            transformationName="pok">
+      </generator>
+   </extension>
+	<extension
+         point="fr.tpt.aadl.ramses.control.support.generator">
+      <generator
+            class="fr.tpt.aadl.ramses.generation.pokTT.PokTTGeneratorFactory"
+            id="fr.tpt.aadl.ramses.generation.target.pokTT"
+            transformationName="pokTT">
+      </generator>
+   </extension>
+</plugin>

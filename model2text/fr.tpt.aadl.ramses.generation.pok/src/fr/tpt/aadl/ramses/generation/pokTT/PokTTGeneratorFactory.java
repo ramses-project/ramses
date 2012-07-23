@@ -1,12 +1,13 @@
 package fr.tpt.aadl.ramses.generation.pokTT;
 
+import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
 import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
 
-public class PokTTGeneratorFactory
+public class PokTTGeneratorFactory extends AbstractGeneratorFactory
 {
   public static String POK_TT_GENERATOR_NAME = "pok_time_triggered" ;
   
@@ -34,15 +35,9 @@ public class PokTTGeneratorFactory
     return result ;
   }
   
-  public static Generator createPokTTGenerator(boolean isOSGi)
+  @Override
+  public Generator createGenerator()
   {
-    if (false == isOSGi)
-    {
-      return createPokTTGenerator();
-    }
-    else
-    {
-      throw new UnsupportedOperationException() ;
-    }
+    return createPokTTGenerator();
   }
 }

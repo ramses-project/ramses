@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.NamedElement;
@@ -57,8 +56,8 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 
 	@Override
 	public Resource transform(Resource inputResource, File resourceFilePath,
-			Map<String, Resource> standardPropertySets, File generatedFilePath)
-			throws GenerationException
+	                          File generatedFilePath)
+	                                throws GenerationException
 	{
 		try
 		{
@@ -68,12 +67,12 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 			}
 			
 			
-			Resource r1 = expandDelayedConnections(inputResource, resourceFilePath, standardPropertySets, generatedFilePath);
+			Resource r1 = expandDelayedConnections(inputResource, resourceFilePath, generatedFilePath);
 			
 			SystemInstance s = instanciate(r1);
 			System.out.println("Instanciation: " + s.eResource().getURI().path());
 
-			Resource r2 = expandThreadsBehavior(s.eResource(), resourceFilePath, standardPropertySets, generatedFilePath);
+			Resource r2 = expandThreadsBehavior(s.eResource(), resourceFilePath, generatedFilePath);
 			//Resource r2 = s.eResource();
 			
 			return r2;
@@ -92,7 +91,7 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
   @Override
   public Resource transformXML(Resource inputResource, File resourceFilePath,
       List<String> resourceFileNameList,
-      Map<String, Resource> standardPropertySets, File generatedFilePath)
+      File generatedFilePath)
       throws GenerationException
   {
     try
@@ -110,9 +109,21 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
         atlFiles.add(new File(resourceFilePath + "/" + fileName));
       }
 
-      Resource r1 = transformCommon(inputResource, resourceFilePath,
-          standardPropertySets, generatedFilePath, atlFiles);
-          
+      Resource r1 ;
+      
+      AtlTransfoLauncher atlLauncher;
+	  try {
+		  atlLauncher = new AtlTransfoLauncher();
+		  r1 = atlLauncher.generationEntryPoint(inputResource,
+				  resourceFilePath,
+				  atlFiles,
+				  generatedFilePath);
+	  } catch (Exception e) {
+		  // TODO Auto-generated catch block
+		  e.printStackTrace();
+		  return null;
+	  }
+      
       SystemInstance s = instanciate(r1);
       System.out.println("Instanciation: " + s.eResource().getURI().path());
 
@@ -127,21 +138,21 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
   }
   
 	
-	private Resource expandDelayedConnections(Resource r, File resourceFilePath, Map<String, Resource> standardPropertySets,
+	private Resource expandDelayedConnections(Resource r, File resourceFilePath,
 			File generatedFilePath) throws Exception
 	{
 		System.out.println("********************************************");
 		System.out.println("Expansion n°1: Delayed connections\n(resource: "
 				+ r.getURI().path() + ")");
 		Resource r1 = transform(r, resourceFilePath,
-				standardPropertySets, generatedFilePath,
+				generatedFilePath,
 				ATL_FILE_NAMES_STEP1);
 		
 		return r1;
 	}
 	
 	private Resource expandThreadsBehavior(Resource r1, 
-			File resourceFilePath, Map<String, Resource> standardPropertySets,
+			File resourceFilePath,
 			File generatedFilePath) throws Exception
 	{
 		System.out.println("********************************************");
@@ -149,7 +160,7 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 		System.out.println("Expansion n°2: Threads behavior\n(resource: "
 				+ r1.getURI().path() + ")");
 
-		Resource r2 = transform(r1, resourceFilePath, standardPropertySets,
+		Resource r2 = transform(r1, resourceFilePath,
 				generatedFilePath, ATL_FILE_NAMES_STEP2);
 		
 		System.out.println("**************   D O N E   *****************");
@@ -167,21 +178,9 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 		SystemInstance s = instantiator.instantiate(res, findSystemName(r));
 		return s;
 	}
-	
-	private void serialize(SystemInstance s)
-	{
-		StandAloneInstantiator instantiator = StandAloneInstantiator
-				.getInstantiator();
-		
-		String aadlGeneratedFileName = s.eResource().getURI()
-				.toFileString()
-				.replaceFirst("extended_node_impl_Instance.aaxl2", "extended_inst.aadl2");
-
-		instantiator.serialize(s.eResource(), aadlGeneratedFileName);
-	}
 
 	private Resource transform(Resource inputResource, File resourceFilePath,
-	                           Map<String, Resource> standardPropertySets, File generatedFilePath,
+	                           File generatedFilePath,
 	                           final String[] modules) throws Exception
   {
 	  ArrayList<File> atlFiles = new ArrayList<File>(modules.length);
@@ -191,33 +190,18 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 	    atlFiles.add(new File(resourceFilePath + "/" + fileName));
 	  }
 
-	  return transformCommon(inputResource, resourceFilePath,
-	                         standardPropertySets, generatedFilePath, atlFiles);
-  }
-
-
-  private Resource transformCommon(Resource inputResource, File resourceFilePath,
-      Map<String, Resource> standardPropertySets, File generatedFilePath,
-      ArrayList<File> atlFiles) throws Exception
-  {
-    AtlTransfoLauncher atlTransfo = new AtlTransfoLauncher();
-    atlTransfo.setResourcesDirectory(resourceFilePath);
-
-    String aaxlGeneratedFileName = inputResource.getURI().toFileString()
-        .replaceFirst(".aaxl2", "_extended.aaxl2");
-
-    Resource expandedResult = atlTransfo.doGeneration(inputResource,
-        standardPropertySets, atlFiles, aaxlGeneratedFileName);
-
-    String aadlGeneratedFileName = inputResource.getURI().toFileString();
-    aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(".aaxl2",
-        "_extended.aadl2");
-
-    StandAloneInstantiator instantiator = StandAloneInstantiator
-        .getInstantiator();
-    instantiator.serialize(expandedResult, aadlGeneratedFileName);
-
-    return expandedResult;
+	  AtlTransfoLauncher atlLauncher;
+	  try {
+		  atlLauncher = new AtlTransfoLauncher();
+		  return atlLauncher.generationEntryPoint(inputResource,
+				  resourceFilePath,
+				  atlFiles,
+				  generatedFilePath);
+	  } catch (Exception e) {
+		  // TODO Auto-generated catch block
+		  e.printStackTrace();
+		  return null;
+	  }
   }
   
 	

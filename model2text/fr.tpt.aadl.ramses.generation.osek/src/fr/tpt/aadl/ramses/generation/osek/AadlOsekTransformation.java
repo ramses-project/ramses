@@ -9,7 +9,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
@@ -19,48 +18,11 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 	public static final List<File> ATL_FILES = new ArrayList<File>(
 			ATL_FILE_NAMES.length);
 
-	public Resource transformCommon(Resource inputResource,
-	                                File resourceFilePath,
-	                                List<File> atlFiles,
-	                                Map<String, Resource> standardPropertySets,
-	                                File generatedFilePath) throws GenerationException
-  {
-	  AtlTransfoLauncher atlTransfo = null;
-
-	  try {
-	    atlTransfo = new AtlTransfoLauncher();
-
-
-	    atlTransfo.setResourcesDirectory(resourceFilePath);
-
-	    String aaxlGeneratedFileName = inputResource.getURI()
-	          .toFileString().replaceFirst(".aaxl2", "_extended.aaxl2");
-
-	    Resource expandedResult = atlTransfo.doGeneration(inputResource,
-	                                                      standardPropertySets, atlFiles, aaxlGeneratedFileName);
-
-	    String aadlGeneratedFileName = inputResource.getURI()
-	          .toFileString();
-	    aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
-	                                                               ".aaxl2", "_extended.aadl2");
-
-	    StandAloneInstantiator instantiator = StandAloneInstantiator
-	          .getInstantiator();
-	    instantiator.serialize(expandedResult, aadlGeneratedFileName);
-
-	    return expandedResult;
-	  } catch (Exception e) {
-	    e.printStackTrace();
-	    throw new GenerationException(e.getMessage());
-	  }
-  }
-
 
 
 	@Override
 	public Resource transform(Resource inputResource,
 	                          File resourceFilePath,
-	                          Map<String, Resource> standardPropertySets,
 	                          File generatedFilePath)
 	                                throws GenerationException {
 
@@ -68,11 +30,19 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 	    ATL_FILES.add(new File(resourceFilePath.getAbsolutePath() +"/"+ fileName));
 	  }
 
-	  return transformCommon(inputResource,
-	                         resourceFilePath,
-	                         ATL_FILES,
-	                         standardPropertySets,
-	                         generatedFilePath);
+	  AtlTransfoLauncher atlLauncher;
+	  try {
+		  atlLauncher = new AtlTransfoLauncher();
+		  return atlLauncher.generationEntryPoint(inputResource,
+				  resourceFilePath,
+				  ATL_FILES,
+				  generatedFilePath);
+	  } catch (Exception e) {
+		  // TODO Auto-generated catch block
+		  e.printStackTrace();
+		  return null;
+	  }
+	  
   }
 
 
@@ -80,7 +50,6 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 	  public Resource transformXML(Resource inputResource,
 	                            File resourceFilePath,
 	                            List<String> resourceFileNameList,
-	                            Map<String, Resource> standardPropertySets,
 	                            File generatedFilePath)
 	                                  throws GenerationException {
 	    
@@ -90,11 +59,18 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 	      atlFiles.add(new File(resourceFilePath.getAbsolutePath() +"/"+ resourceFileName));
 	    }
 
-	    return transformCommon(inputResource,
-	                resourceFilePath,
-	                atlFiles,
-	                standardPropertySets,
-	                generatedFilePath);
+	    AtlTransfoLauncher atlLauncher;
+		  try {
+			  atlLauncher = new AtlTransfoLauncher();
+			  return atlLauncher.generationEntryPoint(inputResource,
+					  resourceFilePath,
+					  ATL_FILES,
+					  generatedFilePath);
+		  } catch (Exception e) {
+			  // TODO Auto-generated catch block
+			  e.printStackTrace();
+			  return null;
+		  }
 	  }
 	
 	@Override
