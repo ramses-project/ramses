@@ -8,7 +8,6 @@ public class RamsesConfiguration
 {
   private static File OutputDirectory;
   private static List<File> IncludeDirectories = new ArrayList<File>();
-  
   private static File RamsesRessourcesDir;
   
   protected static void setOutputDir(File outputDir)

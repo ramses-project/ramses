@@ -24,7 +24,6 @@ package fr.tpt.aadl.ramses.control.core ;
 import java.io.File ;
 import java.util.ArrayList ;
 import java.util.List ;
-import java.util.Map ;
 import java.util.Set ;
 
 import org.eclipse.core.runtime.NullProgressMonitor ;
@@ -46,10 +45,8 @@ public class ToolSuiteLauncher
 
   private ServiceRegistry _registry ;
   private PredefinedPropertiesManager _predefinedPropertiesManager ;
-  private PredefinedPackagesManager _predefinedPackagesManager ;
   private StandAloneInstantiator _instantiator ;
   private List<String> _analysisToPerform ;
-//  private List<String> _transformationToPerform ;
 
   public ToolSuiteLauncher()
   {
@@ -64,16 +61,6 @@ public class ToolSuiteLauncher
     _analysisToPerform =
           initialize(analysisIdentifiers, _registry.getAvailableAnalysisNames()) ;
   }
-  
-  /*
-  public void initializeTransformation(String[] transformationIdentifiers)
-        throws Exception
-  {
-    _transformationToPerform =
-          initialize(transformationIdentifiers, _registry
-                           .getAvailableGeneratorNames()) ;
-  }
-  */
   
   public void initializeGeneration(String targetName)
         throws Exception
@@ -144,10 +131,11 @@ public class ToolSuiteLauncher
     return _instantiator.parse(aadlFile) ;
   }
 
-  public void parsePredefinedRessources(File aadlResourcesDir)
+  public void parsePredefinedRessources()
   {
     try
     {
+      File aadlResourcesDir = RamsesConfiguration.getRamsesResourcesDir();
       _predefinedPropertiesManager
             .extractStandardPropertySets(aadlResourcesDir) ;
     }
@@ -156,74 +144,6 @@ public class ToolSuiteLauncher
       e1.printStackTrace() ;
     }
   }
-  
-  
-  /*
-  public Resource launchTransformation(List<File> mainModels,
-                                       String systemToInstantiate,
-                                       File target_directory,
-                                       List<File> transformationFileNames,
-                                       List<File> postTransformationFileNames,
-                                       String transformationDir)
-        throws Exception
-  {
-    List<Resource> aadlModels = _instantiator.parse(mainModels) ;
-    return this.launchModelTransformation(aadlModels, systemToInstantiate,
-                                          target_directory,
-                                          transformationFileNames,
-                                          postTransformationFileNames,
-                                          transformationDir) ;
-  }
-
-  public Resource launchModelTransformation(List<Resource> aadlModels,
-                                            String systemToInstantiate,
-                                            File target_directory,
-                                            List<File> transformationFiles,
-                                            List<File> postTransformationFiles,
-                                            String transformationDir)
-        throws Exception
-  {
-    Resource output = null ;
-    SystemInstance instance =
-          _instantiator.instantiate(aadlModels, systemToInstantiate) ;
-
-    if(instance == null)
-    {
-      throw new AnalysisResultException() ;
-    }
-
-    this.performAnalysis(instance) ;
-    Resource instanceResource = instance.eResource() ;
-    Map<String, Resource> standardPropertySets ;
-    standardPropertySets =
-          _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
-    
-    // XXX Is that for DEBUG purpose ???
-     String dataTargetfilepath = target_directory +
-                    instanceResource.getURI().toFileString()
-                          .substring(instanceResource.getURI().toFileString()
-                                           .lastIndexOf('/'),
-                                     instanceResource.getURI().toFileString()
-                                           .lastIndexOf(".aaxl2")) + ".aaxl2" ;
-
-     
-     Resource baseTypes =
-           _predefinedRuntimeManager.getBaseTypesResource() ; 
-     
-    /********************* TODO GENERATION SWITCH ***********************/
-    // Temporary
-    /*
-    PokGenerator pokGen = new PokGenerator() ;
-    
-    pokGen.doGeneration(instanceResource, standardPropertySets,
-                        transformationFiles, dataTargetfilepath,
-                        transformationDir, postTransformationFiles,
-                        baseTypes, target_directory);
-    /************************************************************************/
-    /*
-    return output ;
-  }
-  */
   
   public void launchModelGeneration (List<File> mainModels,
                                      String systemToInstantiate,
@@ -242,15 +162,13 @@ public class ToolSuiteLauncher
       throw new GenerationException("instanciation failed.") ;
     }
 
-    Map<String, Resource> standardPropertySets ;
-    standardPropertySets =
-          _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
+    _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
     
     ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
     
     Generator generator = registry.getGenerator(targetName) ;
     
-    generator.generate(instance, resourceFilePath,standardPropertySets,
+    generator.generate(instance, resourceFilePath,
                        generatedFilePath) ;
   }
 
@@ -272,16 +190,14 @@ public class ToolSuiteLauncher
       throw new GenerationException("instanciation failed.") ;
     }
 
-    Map<String, Resource> standardPropertySets ;
-    standardPropertySets =
-          _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
+    _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
 
     ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
 
     Generator generator = registry.getGenerator(targetName) ;
     System.out.println("Generator.generateXML called");
 
-    generator.generateXML(instance, resourceFilePath, standardPropertySets,
+    generator.generateXML(instance, resourceFilePath,
                           generatedFilePath, xmlPilot) ;
   }
   
@@ -296,9 +212,9 @@ public class ToolSuiteLauncher
     this.performAnalysis(instance) ;
   }
 
-  public void parsePredefinedPackages(File aadlResourcesDir)
+  public void parsePredefinedPackages()
   {
-    _predefinedPackagesManager = new PredefinedPackagesManager(aadlResourcesDir);
-    
+    File aadlResourcesDir = RamsesConfiguration.getRamsesResourcesDir();
+    new PredefinedPackagesManager(aadlResourcesDir);
   }
 }
