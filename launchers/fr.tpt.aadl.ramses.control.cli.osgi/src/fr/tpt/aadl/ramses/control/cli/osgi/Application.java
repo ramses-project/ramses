@@ -27,6 +27,7 @@ import org.eclipse.equinox.app.IApplication ;
 import org.eclipse.equinox.app.IApplicationContext ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
+import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
 /**
