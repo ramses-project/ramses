@@ -39,6 +39,9 @@ import fr.tpt.aadl.ramses.control.core.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.core.ToolSuiteLauncher ;
 import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
+import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
+import fr.tpt.aadl.ramses.control.support.reporters.StdOutputMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
@@ -72,6 +75,9 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   public final static String DEFAULT_RESOURCES_DIR = 
                     "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ; 
+  
+  private final static StdOutputMessageReporter _reporter = new StdOutputMessageReporter();
+  private final static StandAloneInternalErrorReporter _errorReporter = new StandAloneInternalErrorReporter(_reporter);
   
   public static void main(String[] args)
   {
@@ -303,7 +309,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     }
 
     sb.append(message) ;
-    System.err.println(sb.toString()) ;
+    _errorReporter.internalErrorImpl(sb.toString()) ;
   }
 
   private static void parse(ToolSuiteLauncher launcher,
@@ -315,24 +321,26 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     String[] mainModels = parseConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
     String resourcesDirName = RAMSES_DIR ;
     
-    // Optional switch.
-    if(resourcesDirName == null)
+    if(resourcesDirName == null || resourcesDirName.isEmpty() )
     {
       resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
-      if(resourcesDirName == null)
+      if(resourcesDirName == null || resourcesDirName.isEmpty())
         resourcesDirName = DEFAULT_RESOURCES_DIR ;
     }
     
     File aadlResourcesDir =
           ToolSuiteLauncherCommand.getAADLResourcesDir(resourcesDirName) ;
+    RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
+    
     List<File> mainModelFiles ;
     mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
                                                    includeFolderNames) ;
-    launcher.parsePredefinedRessources(aadlResourcesDir) ;
-    launcher.parsePredefinedPackages(aadlResourcesDir) ;
+    launcher.parsePredefinedRessources() ;
+    launcher.parsePredefinedPackages() ;
     launcher.parse(mainModelFiles) ;
-    System.out.println("Parsing terminated normally") ;
+    MessageStatus ms = MessageStatus.INFO ;
+    _reporter.reportMessage(ms, "Parsing terminated normally") ;
   }
 
   private static void analyse(ToolSuiteLauncher launcher,
@@ -354,25 +362,26 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     {
       File outputDir =
             ToolSuiteLauncherCommand.getVerifiedPath(analysis_output_path) ;
-      setOutputDir(outputDir);
+      RamsesConfiguration.setOutputDir(outputDir);
     }
     String resourcesDirName = RAMSES_DIR;
     
-    // Optional switch.
-    if(resourcesDirName == null)
+    if(resourcesDirName == null || resourcesDirName.isEmpty())
     {
       resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
-      if(resourcesDirName == null)
+      if(resourcesDirName == null || resourcesDirName.isEmpty())
         resourcesDirName = DEFAULT_RESOURCES_DIR ;
     }
     
     File aadlResourcesDir =
           ToolSuiteLauncherCommand.getAADLResourcesDir(resourcesDirName) ;
+    RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
+    
     List<File> mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
                                                    includeFolderNames) ;
-    launcher.parsePredefinedRessources(aadlResourcesDir) ;
-    launcher.parsePredefinedPackages(aadlResourcesDir) ;
+    launcher.parsePredefinedRessources() ;
+    launcher.parsePredefinedPackages() ;
     if(analysisToPerform.length > 0)
     {
       try
@@ -381,8 +390,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       }
       catch(Exception e)
       {
-        System.err.println(e.getMessage()) ;
-        System.err.println(analysis.getHelp()) ;
+        _errorReporter.internalErrorImpl(e.getMessage());
+        _reporter.reportMessage(MessageStatus.INFO, analysis.getHelp()) ;
         System.exit(0) ;
       }
 
@@ -392,7 +401,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       }
       catch(AnalysisResultException e)
       {
-        System.err.println(e.getMessage()) ;
+        _errorReporter.internalErrorImpl("An error ocurred when performing analysis: "+analysisToPerform);
+        _errorReporter.internalErrorImpl(e.getMessage()) ;
         System.exit(0) ;
       }
     }
@@ -414,7 +424,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       sb.append(jsapGen.getUsage()) ;
       sb.append("\n\n") ;
       sb.append(jsapGen.getHelp()) ;
-      System.out.println(sb.toString()) ;
+      _reporter.reportMessage(MessageStatus.INFO, sb.toString()) ;
       
       if(genConf.success())
       {
@@ -438,10 +448,10 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     String resourcesDirName = RAMSES_DIR ;
     
     // Optional switch.
-    if(resourcesDirName == null)
+    if(resourcesDirName == null || resourcesDirName.isEmpty() )
     {
       resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
-      if(resourcesDirName == null)
+      if(resourcesDirName == null || resourcesDirName.isEmpty())
         resourcesDirName = DEFAULT_RESOURCES_DIR ;
     }
     
@@ -462,15 +472,17 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
           ToolSuiteLauncherCommand
                 .getAADLResourcesDir(resourcesDirName) ;
     
+    RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
+    
     File atlResourceDir = ToolSuiteLauncherCommand.
                                           getATLResourceDir(resourcesDirName) ;  
     
-    launcher.parsePredefinedRessources(aadlResourcesDir) ;
-    launcher.parsePredefinedPackages(aadlResourcesDir) ;
+    launcher.parsePredefinedRessources() ;
+    launcher.parsePredefinedPackages() ;
     File outputDir =
           ToolSuiteLauncherCommand.getVerifiedPath(generated_file_path) ;
     
-    setOutputDir(outputDir);
+    RamsesConfiguration.setOutputDir(outputDir);
     
     try
     {
@@ -502,151 +514,12 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     catch(Exception e)
     {
             e.printStackTrace() ;
-            System.err.println(e.getMessage()) ;
+            _errorReporter.internalErrorImpl(e) ;
             System.exit(0) ;
     }
 
     
   }
-  
-  /*
-  private static void transformation(ToolSuiteLauncher launcher,
-                                     JSAP jsapTransfo,
-                                     String[] args)
-        throws Exception
-  {
-    /********************* TODO TRANSFORMATION SWITCH ***********************/
-    // Temporary
-//    String[] transformationToPerform = new String[]
-//    {PokGenerator.GENERATOR_NAME} ;
-    /************************************************************************/
-    /*
-    System.err.println("TRANSFORMATION IS CURRENTLY DISABLE") ;
-    System.exit(0) ;
-    
-    JSAPResult transfoConfig = jsapTransfo.parse(args) ;
-    boolean helpOnly = transfoConfig.getBoolean(HELP_ONLY_OPTION_ID) ;
-
-    if(helpOnly)
-    {
-      StringBuilder sb =
-            new StringBuilder("\nGeneral Configuration Usage:\n\n") ;
-      sb.append(jsapTransfo.getUsage()) ;
-      sb.append("\n\n") ;
-      sb.append(jsapTransfo.getHelp()) ;
-      System.out.println(sb.toString()) ;
-      System.exit(1) ;
-    }
-    else
-    {
-      if(transfoConfig.success())
-      {
-        String[] analysisToPerform =
-              transfoConfig.getStringArray(ANALYSIS_LIST_OPTION_ID) ;
-        String[] includeFolderNames =
-              transfoConfig.getStringArray(INCLUDES_OPTION_ID) ;
-        String systemToInstantiate =
-              transfoConfig.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
-        String[] mainModels =
-              transfoConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-        String target_directory_name =
-              transfoConfig.getString(TARGER_DIR_OPTION_ID) ;
-        String[] superimpositionFileNames =
-              transfoConfig.getStringArray(SUPERIMPOSITION_FILES_OPTION_ID) ;
-        String[] postTransformationFileNames =
-              transfoConfig.getStringArray(POST_TRANSFORMATION_FILES_OPTION_ID) ;
-        String transformationDirName =
-              transfoConfig.getString(TRANSFORMATION_DIR_OPTION_ID) ;
-
-        if(transformationDirName.endsWith("/") == false)
-        {
-          transformationDirName = transformationDirName + "/" ;
-        }
-
-        List<File> mainModelFiles =
-              ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
-                                                       includeFolderNames) ;
-        File aadlRessourcesDir =
-              ToolSuiteLauncherCommand
-                    .getAADLResourcesDir(transformationDirName) ;
-        launcher.parsePredefinedRessources(aadlRessourcesDir) ;
-
-        if(analysisToPerform.length > 0)
-        {
-          try
-          {
-            launcher.initializeAnalysis(analysisToPerform) ;
-          }
-          catch(Exception e)
-          {
-            System.err.println(e.getMessage()) ;
-            System.err.println(analysis.getHelp()) ;
-            System.exit(0) ;
-          }
-
-          try
-          {
-            launcher.performAnalysis(mainModelFiles, systemToInstantiate) ;
-          }
-          catch(AnalysisResultException e)
-          {
-            System.err.println(e.getMessage()) ;
-            System.exit(0) ;
-          }
-        }
-
-        File target_directory =
-              ToolSuiteLauncherCommand.getVerifiedPath(target_directory_name) ;
-        List<File> superimpositionFiles = new ArrayList<File>() ;
-        List<File> postTransformationFiles = new ArrayList<File>() ;
-
-        for(int i = 0 ; i < superimpositionFileNames.length ; i++)
-        {
-          superimpositionFiles.add(ToolSuiteLauncherCommand
-                .getVerifiedPath(transformationDirName +
-                      superimpositionFileNames[i])) ;
-        }
-
-        for(int i = 0 ; i < postTransformationFileNames.length ; i++)
-        {
-          postTransformationFiles.add(ToolSuiteLauncherCommand
-                .getVerifiedPath(transformationDirName +
-                      postTransformationFileNames[i])) ;
-        }
-
-        try
-        {
-          File transformationDir =
-                ToolSuiteLauncherCommand.getVerifiedPath(transformationDirName) ;
-          launcher.initializeTransformation(transformationToPerform) ;
-          Resource result =
-                launcher.launchTransformation(mainModelFiles,
-                                              systemToInstantiate,
-                                              target_directory,
-                                              superimpositionFiles,
-                                              postTransformationFiles,
-                                              transformationDirName) ;
-        }
-        catch(AnalysisResultException e)
-        {
-          System.err.println(e.getMessage()) ;
-          System.exit(0) ;
-        }
-      }
-      else
-      {
-        StringBuilder sb =
-              new StringBuilder("\nTransformation Configuration Usage:\n\n") ;
-        sb.append(jsapTransfo.getUsage()) ;
-        sb.append("\n\n") ;
-        sb.append(jsapTransfo.getHelp()) ;
-        reportError(transfoConfig.getErrorMessageIterator(), sb.toString()) ;
-        System.exit(0) ;
-      }
-    }
-    
-  }
-  */
   
   private static File getVerifiedPath(String filePath)
         throws Exception
@@ -658,7 +531,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       return potentialFile ;
     }
 
-    throw new Exception("ERROR: file or directory " + potentialFile.getCanonicalPath() +
+    throw new Exception("file or directory " + potentialFile.getCanonicalPath() +
           " could not be found") ;
   }
 
@@ -701,7 +574,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
       if(pathFound == false)
       {
-        errorMessage = "ERROR: file " + new File(filePath[i]).getCanonicalPath() + " could not be found";
+        errorMessage = "file " + new File(filePath[i]).getCanonicalPath() + " could not be found";
         error = true ;
         break ;
       }
