@@ -26,7 +26,9 @@ import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
 import java.util.ArrayList ;
+import java.util.HashMap;
 import java.util.List ;
+import java.util.Map;
 
 import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.Diagnostic ;
@@ -36,8 +38,10 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.emf.ecore.util.Diagnostician ;
+import org.eclipse.xtext.resource.SaveOptions;
 import org.eclipse.xtext.resource.XtextResource ;
 import org.eclipse.xtext.resource.XtextResourceSet ;
+import org.eclipse.xtext.serializer.impl.Serializer;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.NamedElement ;
@@ -48,6 +52,7 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl ;
 import org.osate.aadl2.util.Aadl2ResourceImpl ;
 import org.osate.core.OsateCorePlugin ;
+import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 
 import com.google.inject.Injector ;
 
@@ -55,18 +60,17 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 public class StandAloneInstantiator
 {
-
+  OsateCorePlugin corePlugin = new OsateCorePlugin();
+  
   private static StandAloneInstantiator _instantiator ;
   private InstantiateModel instantiateModel ;
   private ResourceSet aadlResourceSet = new ResourceSetImpl() ;
-  private Aadl2StandaloneLinking aadlStandAloneSetup =
+  private static final Aadl2StandaloneLinking aadlStandAloneSetup =
         new Aadl2StandaloneLinking() ;
-  private final Injector injector = aadlStandAloneSetup
+  private static final Injector injector = aadlStandAloneSetup
         .createInjectorAndDoEMFRegistration() ;
-  private final XtextResourceSet resourceSet = injector
+  private static final XtextResourceSet resourceSet = injector
         .getInstance(XtextResourceSet.class) ;
-
-  private OsateCorePlugin corePlugin = new OsateCorePlugin();
   
   // Singleton
   protected StandAloneInstantiator()
@@ -120,6 +124,7 @@ public class StandAloneInstantiator
           {
             URI instanceURI =
                   OsateResourceUtil.getInstanceModelURI(toInstantiate) ;
+            
             Aadl2ResourceImpl aadlResource =
                   (Aadl2ResourceImpl) aadlResourceSet.getResource(instanceURI,
                                                                   false) ;
@@ -131,8 +136,9 @@ public class StandAloneInstantiator
                           .createResource(instanceURI) ;
             }
 
-            return instantiateModel.createSystemInstance(toInstantiate,
-                                                         aadlResource) ;
+            SystemInstance instance = instantiateModel.createSystemInstanceInt(toInstantiate,
+                                                            aadlResource) ;
+            return instance;
           }
         }
       }
@@ -145,10 +151,9 @@ public class StandAloneInstantiator
   {
     // Must specify file protocol. Otherwise, got resource doesn't exist when
     // using OSGi mechanism.
-    //TODO: implemente test osgi and add "file:" in case osgi is used
-    URI uri = URI.createFileURI(aadlFile.toString()) ;
+    //TODO: implement test osgi and add "file:" in case osgi is used
+    URI uri = URI.createFileURI(aadlFile.getAbsolutePath().toString()) ;
     Resource input_resource = resourceSet.getResource(uri, true) ;
-
     if(input_resource.getErrors().isEmpty() == false)
     {
       for(org.eclipse.emf.ecore.resource.Resource.Diagnostic diag : input_resource
@@ -249,22 +254,22 @@ public class StandAloneInstantiator
                         String targetFileName)
   {
     // serialization code
-    //Injector injector = new Aadl2StandaloneSetup().createInjectorAndDoEMFRegistration();
-    //XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet.class);
-    //    XtextResource resource = (XtextResource)resourceSet.createResource(URI.createURI(targetFileName));
-    //    resource.getContents().add(transfoResult.getContents().get(0));
-    //    SaveOptions.Builder sb = SaveOptions.newBuilder();
-    //    Map<Object,Object> options = new HashMap();
-    //    sb.getOptions().addTo(options);
-    //    try {
-    //      resource.save(options);
-    //    } catch (IOException e) {
-    //      e.printStackTrace();
-    //    }
+//    XtextResource resource = (XtextResource) resourceSet.createResource(URI.createURI(targetFileName));
+//    resource.getContents().add(transfoResult.getContents().get(0));
+//    SaveOptions.Builder sb = SaveOptions.newBuilder();
+//    Map<Object,Object> options = new HashMap<Object,Object>();
+//    sb.getOptions().addTo(options);
+//    try {
+//    	resource.save(options);
+//    } catch (IOException e) {
+//    	e.printStackTrace();
+//    }
+	  
+//	  Serializer serializer = injector.getInstance(Serializer.class);
+//	  String resultFileContent = serializer.serialize(transfoResult.getContents().get(0));
     String resultFileContent =
-          Aadl2StandaloneUnparser.getAadlUnparser()
-                .doUnparse((Element) transfoResult.getContents().get(0)) ;
-
+            Aadl2StandaloneUnparser.getAadlUnparser()
+                  .doUnparse((Element) transfoResult.getContents().get(0)) ;
     try
     {
       BufferedWriter out = new BufferedWriter(new FileWriter(targetFileName)) ;
@@ -282,6 +287,6 @@ public class StandAloneInstantiator
 
   public ResourceSet getAadlResourceSet()
   {
-    return resourceSet ;
+    return aadlResourceSet ;
   }
 }

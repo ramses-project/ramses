@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.instantiation ;
 
+
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup ;
 
 import com.google.inject.Guice ;

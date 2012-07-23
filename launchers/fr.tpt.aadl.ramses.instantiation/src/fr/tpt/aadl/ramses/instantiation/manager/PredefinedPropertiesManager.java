@@ -48,22 +48,18 @@ public class PredefinedPropertiesManager
   private static Map<String, Resource> predefinedPropertySets =
         new HashMap<String, Resource>() ;
 
+  private static String[] names =
+      {"AADL_Project", "Communication_Properties", "Data_Model", "Deployment_Properties",
+       "Memory_Properties", "Modeling_Properties", "Programming_Properties",
+       "Thread_Properties", "Timing_Properties", "Scheduler_Constants",
+       "Generation_Properties", "pok_properties", "oseknxt_properties",
+       "osek_properties"
+            } ;
+  
   public PredefinedPropertiesManager()
   {
-    expectedPropertySet.add("AADL_Project") ;
-    expectedPropertySet.add("Communication_Properties") ;
-    expectedPropertySet.add("Data_Model") ;
-    expectedPropertySet.add("Deployment_Properties") ;
-    expectedPropertySet.add("Memory_Properties") ;
-    expectedPropertySet.add("Modeling_Properties") ;
-    expectedPropertySet.add("Programming_Properties") ;
-    expectedPropertySet.add("Thread_Properties") ;
-    expectedPropertySet.add("Timing_Properties") ;
-    expectedPropertySet.add("Scheduler_Constants") ;
-    expectedPropertySet.add("Generation_Properties") ;
-    expectedPropertySet.add("pok_properties") ;
-    expectedPropertySet.add("oseknxt_properties") ; // Added by Arnaud
-    expectedPropertySet.add("osek_properties") ; // Added by Arnaud
+    for (int i=0; i<names.length; i++)
+      expectedPropertySet.add(names[i]) ; // Added by Arnaud
   }
 
   public Map<String, Resource> extractStandardPropertySets(File resourceDirectory)
@@ -202,5 +198,19 @@ public class PredefinedPropertiesManager
 	  return res ;
   }
   
-  
+  public int getPropertiesCount()
+  {
+    return predefinedPropertySets.size() ;
+  }
+
+  public String getPropertySetName(int p)
+  {
+    return names[p] ;
+  }
+
+  public Resource getPropertySetResource(String name)
+  {
+    return predefinedPropertySets.get(name);
+  }
+
 }
