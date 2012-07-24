@@ -290,7 +290,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     // TODO: find mapping for REM operator
     if(operator.equals(MultiplyingOperator.REM))
     {
-      return "" ;
+      throw new UnsupportedOperationException() ;
     }
 
     return operator.getLiteral() ;
@@ -558,26 +558,22 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseDispatchCondition(DispatchCondition object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String caseDispatchTriggerConditionStop(DispatchTriggerConditionStop object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String caseDispatchTriggerLogicalExpression(DispatchTriggerLogicalExpression object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String caseDispatchConjunction(DispatchConjunction object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String caseBehaviorActionBlock(BehaviorActionBlock object)
@@ -586,7 +582,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         if(object.getTimeout() != null)
         {
-          // TODO: throw Exception
+          throw new UnsupportedOperationException() ;
         }
 
         return DONE ;
@@ -600,8 +596,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseBehaviorActionSet(BehaviorActionSet object)
       {
-        // TODO: throw Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       
@@ -825,8 +820,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseIntegerRange(IntegerRange object)
       {
-        // TODO: throw new Exception
-        return "" ;
+        throw new UnsupportedOperationException() ;
       }
 
       /**
@@ -834,8 +828,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseTimedAction(TimedAction object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       /**
@@ -847,9 +840,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutput(" = ") ;
 
         if(object instanceof Any)
-        // TODO: throw new Exception
         {
-          _cFileContent.addOutput("") ;
+          throw new UnsupportedOperationException() ;
         }
         else
         {
@@ -1031,32 +1023,27 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       
       public String casePortSendAction(PortSendAction object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String casePortFreezeAction(PortFreezeAction object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String casePortDequeueAction(PortDequeueAction object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String caseLockAction(LockAction object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String caseUnlockAction(UnlockAction object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       /**
@@ -1064,26 +1051,22 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseBehaviorTime(BehaviorTime object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String casePortDequeueValue(PortDequeueValue object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String casePortCountValue(PortCountValue object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       public String casePortFreshValue(PortFreshValue object)
       {
-        // TODO: throw new Exception
-        return DONE ;
+        throw new UnsupportedOperationException() ;
       }
 
       /**
