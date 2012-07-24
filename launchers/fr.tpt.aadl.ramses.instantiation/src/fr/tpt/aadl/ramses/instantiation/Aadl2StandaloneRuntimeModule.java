@@ -36,4 +36,19 @@ public class Aadl2StandaloneRuntimeModule extends Aadl2RuntimeModule
   {
     return Aadl2StandaloneAnnexParserAgent.class ;
   }
+  
+  
+	@Override
+public Class<? extends org.eclipse.xtext.resource.EObjectAtOffsetHelper> bindEObjectAtOffsetHelper() {
+	return null;
+}
+
+  @Override
+  public Class<? extends org.eclipse.xtext.ui.editor.doubleClicking.AbstractWordAwareDoubleClickStrategy> bindLexerTokenAndCharacterPairAwareStrategy() {
+	return null;
+  }
+  
+  public Class<? extends org.eclipse.xtext.ui.editor.doubleClicking.DoubleClickStrategyProvider> bindDoubleClickStrategyProvider() {
+		return null;
+	}
 }
