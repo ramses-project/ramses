@@ -419,7 +419,6 @@ rule DataPort_Instance
 		impl: AADLI!ComponentImplementation = c.subcomponent.subcomponentType;
 		-- local variable that will be initialized in the "do" section.
 		implImg: AADLI!ComponentImplementation = OclUndefined;
-		processImplImg: AADLI!ProcessImplementation = OclUndefined;
 	}
 	to
 		-- creation of a data access feature, to be added to the target thread component, 
@@ -431,89 +430,19 @@ rule DataPort_Instance
 			(
 				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
 				kind <- #requires
-			),
-		
-		-- XXX TPT: put the creation of communicationID in a rule dealing with interprocess partitions
-		
-		-- creation of a data subcomponent, to be added to the container process of target thread component, 
-		-- this data is a global variable representing the
-		-- ARINC653 communication identifier.
-		communicationID: AADLBA!DataSubcomponent
-			(name<-fi.name+thisModule.dataSubcomponentSuffix())
+			)
 	do
 	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(communicationID, fi);
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
 		
 		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
-		processImplImg <- c.eContainer().getSubcomponentImg().subcomponentType;
+		
 		thisModule.initSubprogramCallSequence(implImg, impl);
 		thisModule.addReturnCodeDataSubcomponent(implImg);
-		if(not implImg.oclIsUndefined() and
-				(fi.direction.toString()='in' or fi.direction=#inOut) )
-		{
-			for(src in fi.getSources())
-			{
-				-- Time-Triggered intra-partition communication
-				if (src.eContainer().category.toString()='virtual processor')
-				{
-					thisModule.addReadBlackBoard(fi, impl, f, implImg);
-				}
-				-- Non Time-Triggered intra-partition communication
-				else if(src.eContainer().eContainer().debug(src.name+' double econtainer') = c.eContainer().debug(c.name+' simple econtainer'))
-				{
-					thisModule.addReadBlackBoard(fi, impl, f, implImg);
-				}
-				-- Non Time-Triggered inter-partition communication
-				else if(src.eContainer().eContainer().getProcessorBinding().debug(src.name+' double econtainer + processor binding') = c.eContainer().getProcessorBinding().debug(c.name+' simple econtainer + processor binding'))
-				{
-					thisModule.addReadSampling(fi, impl, communicationID, f, processImplImg, implImg);
-				}
-				else
-				{
-					OclUndefined.debug('ERROR : Unexpected Deployment Model');
-				}
-			}
-		}
-			
-		if(not implImg.oclIsUndefined() and
-				(fi.direction.toString()='out' or fi.direction=#inOut) )
-		{
-			for(dest in fi.getDestinations())
-			{
-				if(dest.eContainer().eContainer() = c.eContainer())
-				{
-					thisModule.addDisplayBlackBoard(fi, impl, f, implImg);
-				}
-				else
-				{
-					thisModule.addWriteSampling(fi, impl, communicationID, f, processImplImg, implImg);
-				}
-			}
-		}
-		thisModule.addThreadsInternalConnections(fi);
-		if(c.featureInstance->last().debug('Last Feature Instance') = fi.debug('Current Feature Instance'))
-		{
-			true.debug('Begin Expansion of Dispatch Protocol');
-			thisModule.expandThreadDispatchProtocol(c, implImg);
-			thisModule.createThreadBehavior(implImg);
-		}
 	}
 }
 
-rule PortConnection_Instance
-{
-	from
-		cnxInst: AADLI!ConnectionInstance
-		(
-			cnxInst.kind = #portConnection and
-			cnxInst.source.eContainer().category=#thread and
-			not (cnxInst.source.eContainer().eContainer() = cnxInst.destination.eContainer().eContainer()) 
-		)
-	do
-	{
-	}
-}
+
 
 
 rule EventPort_Instance
@@ -578,7 +507,6 @@ rule EventDataPort_Instance
 		c: AADLI!ComponentInstance = fi.eContainer();
 		implImg: AADLI!ComponentImplementation = OclUndefined; 
 		impl: AADLI!ComponentImplementation = c.subcomponent.subcomponentType;
-		processImplImg: AADLI!ProcessImplementation = OclUndefined;
 	}
 	to
 		-- target data access must be called 'f' to be retreived with resolveTemp 
@@ -595,62 +523,9 @@ rule EventDataPort_Instance
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
 		
 		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
-		processImplImg <- c.eContainer().getSubcomponentImg().subcomponentType;
 		thisModule.initSubprogramCallSequence(implImg, impl);
 		thisModule.addReturnCodeDataSubcomponent(implImg);
-
-		if(not implImg.oclIsUndefined() and (c.category=#thread) and
-				(fi.direction.toString()='in' or fi.direction=#inOut) )
-		{
-			for(src in fi.getSources())
-			{
-				if(src.eContainer().eContainer() = c.eContainer())
-				{
-					thisModule.addReceiveBuffer(fi, impl, f, implImg);
-				}
-				else
-				{
-					
-					thisModule.addReceiveQueuing(fi, impl, communicationID, f, processImplImg, implImg);
-					
-				}
-			}
-			
-		}
 		
-		if((not implImg.oclIsUndefined()) and (c.category=#thread) and
-				(fi.direction.toString()='out' or fi.direction=#inOut) )
-		{
-			true.debug('Create Buffer Port');
-			for(dest in fi.getDestinations())
-			{
-				-- Time-Triggered intra-partition communication
-				if (dest.eContainer().category.toString()='virtual processor')
-				{
-					thisModule.addSendBuffer(fi, impl, f, implImg);
-				}
-				-- Non Time-Triggered intra-partition communication
-				else if(dest.eContainer().eContainer() = c.eContainer())
-				{
-					thisModule.addSendBuffer(fi, impl, f, implImg);
-				}
-				-- Non Time-Triggered inter-partition communication
-				else if(dest.eContainer().eContainer().getProcessorBinding() = c.eContainer().getProcessorBinding())
-				{
-					thisModule.addSendQueuing(fi, impl, communicationID, f, processImplImg, implImg);
-				}
-			}
-		}
-		thisModule.addThreadsInternalConnections(fi);
-		if(c.category=#thread)
-		{
-			if(c.featureInstance->last().debug('Last Feature Instance') = fi.debug('Current Feature Instance'))
-			{
-				true.debug('Expand Dispatch Protocol');
-				thisModule.expandThreadDispatchProtocol(c, implImg);
-				thisModule.createThreadBehavior(implImg);
-			}
-		}
 	}
 }
 
@@ -718,6 +593,80 @@ helper context AADLI!ConnectedElement def : getConnFeatureImg(owner : AADLBA!Com
 	endif
 ;
 
+rule PortConnection_Instance
+{
+	from
+		cnxInst: AADLI!ConnectionInstance
+		(
+			cnxInst.kind = #portConnection and
+			cnxInst.source.eContainer().category=#thread and
+			not (cnxInst.source.eContainer().eContainer() = cnxInst.destination.eContainer().eContainer())
+		)
+		
+	using
+	{
+		c_source: AADLBA!ComponentInstance = cnxInst.source.eContainer();
+		c_destination: AADLBA!ComponentInstance = cnxInst.destination.eContainer();
+		process_sourceImplImg: AADLBA!ProcessImplementation = OclUndefined;
+		process_destinationImplImg: AADLBA!ProcessImplementation = OclUndefined;
+		sourceImplImg: AADLBA!ThreadImplementation = OclUndefined;
+		sourceImpl: AADLI!ComponentImplementation = c_source.subcomponent.subcomponentType;
+		destinationImplImg: AADLBA!ThreadImplementation = OclUndefined;
+		destinationImpl: AADLI!ComponentImplementation = c_destination.subcomponent.subcomponentType;
+		sourceFeatureImg: AADLBA!DataAccess = OclUndefined;
+		destinationFeatureImg: AADLBA!DataAccess = OclUndefined;
+
+	}
+	to
+		
+		-- creation of a data subcomponent, to be added to the container process of target thread component, 
+		-- this data is a global variable representing the
+		-- ARINC653 communication identifier.
+		communicationSrcID: AADLBA!DataSubcomponent
+			(name<-'src_'+cnxInst.source.name+thisModule.dataSubcomponentSuffix()),
+		communicationDstID: AADLBA!DataSubcomponent
+			(name<-'dst_'+cnxInst.source.name+thisModule.dataSubcomponentSuffix())
+	do
+	{
+		cnxInst.debug('initializing connection instance');
+		
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(communicationSrcID, cnxInst.source);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(communicationDstID, cnxInst.destination);
+		
+		sourceImplImg <- c_source.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		destinationImplImg <- c_destination.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		process_sourceImplImg <- c_source.eContainer().getSubcomponentImg().subcomponentType.debug('Retreived Process Implementation');
+		process_destinationImplImg <- c_destination.eContainer().getSubcomponentImg().subcomponentType.debug('Retreived Process Implementation');
+		sourceFeatureImg <- cnxInst.source.getFeatureImg().debug('Retreived Feature Image');
+		destinationFeatureImg <- cnxInst.destination.getFeatureImg().debug('Retreived Feature Image');
+		
+		if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
+		{
+			thisModule.addReceiveQueuing(cnxInst.source, sourceImpl, communicationSrcID, sourceFeatureImg, process_sourceImplImg, sourceImplImg);
+			thisModule.addSendQueuing(cnxInst.destination, destinationImpl, communicationDstID, destinationFeatureImg, process_destinationImplImg, destinationImplImg);
+		}
+		else if(cnxInst.source.category=#dataPort)
+		{
+			thisModule.addReadSampling(cnxInst.source, sourceImpl, communicationSrcID, sourceFeatureImg, process_sourceImplImg, sourceImplImg);
+			thisModule.addWriteSampling(cnxInst.destination, destinationImpl, communicationDstID, destinationFeatureImg, process_destinationImplImg, destinationImplImg);
+		}
+		
+		thisModule.addThreadsInternalConnections(cnxInst.source);
+		thisModule.addThreadsInternalConnections(cnxInst.destination);
+		if(c_source.featureInstance->last().debug('Last Feature Instance') = cnxInst.source.debug('Current Feature Instance'))
+		{
+			true.debug('Expand Dispatch Protocol');
+			thisModule.expandThreadDispatchProtocol(c_source, sourceImplImg);
+			thisModule.createThreadBehavior(sourceImplImg);
+		}
+		if(c_destination.featureInstance->last().debug('Last Feature Instance') = cnxInst.destination.debug('Current Feature Instance'))
+		{
+			true.debug('Expand Dispatch Protocol');
+			thisModule.expandThreadDispatchProtocol(c_destination, destinationImplImg);
+			thisModule.createThreadBehavior(destinationImplImg);
+		}
+	}
+}
 
 -------------------------------------------------------------------------------------------
 ----		ADDED MATCHED RULES
@@ -739,6 +688,8 @@ rule intra_PortConnection_Instance
 		processImplImg: AADLBA!ProcessImplementation = OclUndefined;
 		sourceImplImg: AADLBA!ThreadImplementation = OclUndefined;
 		destinationImplImg: AADLBA!ThreadImplementation = OclUndefined;
+		sourceFeatureImg: AADLBA!Feature = OclUndefined;
+		destinationFeatureImg: AADLBA!Feature = OclUndefined;
 	}
 	to
 		d: AADLBA!DataSubcomponent
@@ -753,11 +704,23 @@ rule intra_PortConnection_Instance
 		
 		-- add and connect data subcomponent, Id of the communication protocol
 		if(cnxInst.source.category=#eventPort)
+		{
+			thisModule.addWaitEvent(cnxInst.destination, c_destination, destinationFeatureImg, destinationImplImg);
+			thisModule.addSetEvent(cnxInst.source, c_source, sourceFeatureImg, sourceImplImg);
 			d.dataSubcomponentType<-'Event_Id_Type'.asDataType('POK_RUNTIME');
+		}
 		else if(cnxInst.source.category=#eventDataPort)
+		{
+			thisModule.addReceiveBuffer(cnxInst.destination, c_destination, destinationFeatureImg, destinationImplImg);
+			thisModule.addSendBuffer(cnxInst.source, c_source, sourceFeatureImg, sourceImplImg);
 			d.dataSubcomponentType<-'Buffer_Id_Type'.asDataType('POK_RUNTIME');
+		}
 		else if(cnxInst.source.category=#dataPort)
+		{
+			thisModule.addReadBlackBoard(cnxInst.destination, c_destination, destinationFeatureImg, destinationImplImg);
+			thisModule.addDisplayBlackBoard(cnxInst.source, c_source, sourceFeatureImg, sourceImplImg);
 			d.dataSubcomponentType<-'Blackboard_Id_Type'.asDataType('POK_RUNTIME');
+		}
 		processImplImg.ownedDataSubcomponent.add(d);
 		thisModule.addDataAccessConnection(
 			processImplImg,
@@ -775,6 +738,21 @@ rule intra_PortConnection_Instance
 			d
 		);
 		
+		
+		thisModule.addThreadsInternalConnections(cnxInst.source);
+		thisModule.addThreadsInternalConnections(cnxInst.destination);
+		if(c_source.featureInstance->last().debug('Last Feature Instance') = cnxInst.source.debug('Current Feature Instance'))
+		{
+			true.debug('Expand Dispatch Protocol');
+			thisModule.expandThreadDispatchProtocol(c_source, sourceImplImg);
+			thisModule.createThreadBehavior(sourceImplImg);
+		}
+		if(c_destination.featureInstance->last().debug('Last Feature Instance') = cnxInst.destination.debug('Current Feature Instance'))
+		{
+			true.debug('Expand Dispatch Protocol');
+			thisModule.expandThreadDispatchProtocol(c_destination, destinationImplImg);
+			thisModule.createThreadBehavior(destinationImplImg);
+		}
 	}
 }
 
@@ -1537,28 +1515,36 @@ rule addEventCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!Subprogr
 	}
 }
 
-rule initSubprogramCallSequence(implImg: AADLBA!ThreadIplementation, impl: AADLI!ThreadImplementation)
+unique lazy rule initSubprogramCallSequence
 {
+	from
+		implImg: AADLBA!ThreadIplementation,
+		impl: AADLI!ThreadImplementation
+	using
+	{
+		result: AADLBA!SubprogramCallSequence = OclUndefined;
+	}
 	do
 	{
-		if(not thisModule.copyCallSequence(OclUndefined, impl,implImg).oclIsUndefined())
- 		{
-			if(implImg.callSequence().ownedCallSpecification->isEmpty())
-			{
+		if(implImg.callSequence().ownedCallSpecification->isEmpty())
+		{
+			result <- thisModule.copyCallSequence(OclUndefined, impl,implImg);
+			if(not result.oclIsUndefined())
+ 			{
 				if(impl.ownedSubprogramCallSequence->isEmpty())
 				{
 					implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(thisModule.copyCallSequence(OclUndefined, impl,implImg)));
 				}
 				else
 				{
-					implImg.ownedSubprogramCallSequence.add(thisModule.copyCallSequence(OclUndefined, impl,implImg));
+					implImg.ownedSubprogramCallSequence.add(result);
 				}
  			}
 		}
 	}
 }
 
-rule addSubprogramCall(f:AADLBA!Feature, impl: AADLBA!ComponentImplementation, call: AADLBA!SubprogramCall)
+rule addSubprogramCall(f:AADLBA!Feature, implImg: AADLBA!ComponentImplementation, call: AADLBA!SubprogramCall)
 {
 	using
 	{
@@ -1566,13 +1552,13 @@ rule addSubprogramCall(f:AADLBA!Feature, impl: AADLBA!ComponentImplementation, c
 	}
 	do
 	{
-		if(impl.ownedSubprogramCallSequence->isEmpty())
+		if(implImg.ownedSubprogramCallSequence->isEmpty())
 		{
-			impl.ownedSubprogramCallSequence.add(thisModule.createCallSequence(call));
+			implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(call));
 		}
 		else
 		{
-			for(seq in impl.getOwnedSubprogramCallSequences())
+			for(seq in implImg.getOwnedSubprogramCallSequences())
 			{
 				if(f.direction.toString()='in' or f.direction=#inOut)
 					seq.getOwnedCallSpecifications().add(0, call);

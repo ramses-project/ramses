@@ -93,7 +93,7 @@ helper context AADLI!ComponentInstance def : getSubcomponentImg() : AADLBA!Subco
 	thisModule.resolveTemp(self, 'sub')
 ;
 
-helper context AADLI!FeatureInstance def : getFeatureImg() : AADLBA!Subcomponent =
+helper context AADLI!FeatureInstance def : getFeatureImg() : AADLBA!Feature =
 	thisModule.resolveTemp(self, 'f')
 ;
 

@@ -35,7 +35,8 @@ rule createThreadBehavior(threadImpl: AADLBA!ThreadImplementation)
 		behvior_annex : AADLBA!BehaviorAnnex (
             name <- 'behavior_specification',
             states <- Sequence{initialState, mainState, finalState},
-            transitions <- Sequence{initTransition,mainTransition,finalTransition} 
+            transitions <- Sequence{initTransition,mainTransition,finalTransition}, 
+            actions <- Sequence{mainActionBlock}
         ),
 		initialState: AADLBA!BehaviorState
 		(
