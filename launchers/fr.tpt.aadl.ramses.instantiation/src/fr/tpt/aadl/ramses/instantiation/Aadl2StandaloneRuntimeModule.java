@@ -21,11 +21,22 @@
 
 package fr.tpt.aadl.ramses.instantiation ;
 
-import org.osate.xtext.aadl2.Aadl2RuntimeModule ;
+import org.eclipse.xtext.conversion.IValueConverterService;
+import org.osate.xtext.aadl2.valueconversion.Aadl2ValueConverter;
 
-public class Aadl2StandaloneRuntimeModule extends Aadl2RuntimeModule
+public class Aadl2StandaloneRuntimeModule extends org.osate.xtext.aadl2.AbstractAadl2RuntimeModule
 {
+	
+  @Override
+  public Class<? extends IValueConverterService> bindIValueConverterService() {
+    return Aadl2ValueConverter.class;
+  }
   
+  @Override
+  public Class<? extends org.eclipse.xtext.naming.IQualifiedNameProvider> bindIQualifiedNameProvider() {
+    return org.osate.xtext.aadl2.naming.Aadl2QualifiedNameProvider.class;
+  }
+
   @Override
   public Class<? extends org.eclipse.xtext.linking.ILinkingService> bindILinkingService() {
     return Aadl2StandaloneLinkingService.class;
@@ -37,18 +48,4 @@ public class Aadl2StandaloneRuntimeModule extends Aadl2RuntimeModule
     return Aadl2StandaloneAnnexParserAgent.class ;
   }
   
-  
-	@Override
-public Class<? extends org.eclipse.xtext.resource.EObjectAtOffsetHelper> bindEObjectAtOffsetHelper() {
-	return null;
-}
-
-  @Override
-  public Class<? extends org.eclipse.xtext.ui.editor.doubleClicking.AbstractWordAwareDoubleClickStrategy> bindLexerTokenAndCharacterPairAwareStrategy() {
-	return null;
-  }
-  
-  public Class<? extends org.eclipse.xtext.ui.editor.doubleClicking.DoubleClickStrategyProvider> bindDoubleClickStrategyProvider() {
-		return null;
-	}
 }
