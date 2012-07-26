@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright Â© 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -19,22 +19,91 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-
+/*
+ *
+ * <copyright>
+ * Copyright  2011 by Carnegie Mellon University, all rights reserved.
+ *
+ * Use of the Open Source AADL Tool Environment (OSATE) is subject to the terms of the license set forth
+ * at http://www.eclipse.org/legal/cpl-v10.html.
+ *
+ * NO WARRANTY
+ *
+ * ANY INFORMATION, MATERIALS, SERVICES, INTELLECTUAL PROPERTY OR OTHER PROPERTY OR RIGHTS GRANTED OR PROVIDED BY
+ * CARNEGIE MELLON UNIVERSITY PURSUANT TO THIS LICENSE (HEREINAFTER THE "DELIVERABLES") ARE ON AN "AS-IS" BASIS.
+ * CARNEGIE MELLON UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED AS TO ANY MATTER INCLUDING,
+ * BUT NOT LIMITED TO, WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, INFORMATIONAL CONTENT,
+ * NONINFRINGEMENT, OR ERROR-FREE OPERATION. CARNEGIE MELLON UNIVERSITY SHALL NOT BE LIABLE FOR INDIRECT, SPECIAL OR
+ * CONSEQUENTIAL DAMAGES, SUCH AS LOSS OF PROFITS OR INABILITY TO USE SAID INTELLECTUAL PROPERTY, UNDER THIS LICENSE,
+ * REGARDLESS OF WHETHER SUCH PARTY WAS AWARE OF THE POSSIBILITY OF SUCH DAMAGES. LICENSEE AGREES THAT IT WILL NOT
+ * MAKE ANY WARRANTY ON BEHALF OF CARNEGIE MELLON UNIVERSITY, EXPRESS OR IMPLIED, TO ANY PERSON CONCERNING THE
+ * APPLICATION OF OR THE RESULTS TO BE OBTAINED WITH THE DELIVERABLES UNDER THIS LICENSE.
+ *
+ * Licensee hereby agrees to defend, indemnify, and hold harmless Carnegie Mellon University, its trustees, officers,
+ * employees, and agents from all claims or demands made against them (and any related losses, expenses, or
+ * attorney's fees) arising out of, or relating to Licensee's and/or its sub licensees' negligent use or willful
+ * misuse of or negligent conduct or willful misconduct regarding the Software, facilities, or other rights or
+ * assistance granted by Carnegie Mellon University under this License, including, but not limited to, any claims of
+ * product liability, personal injury, death, damage to property, or violation of any laws or regulations.
+ *
+ * Carnegie Mellon University Software Engineering Institute authored documents are sponsored by the U.S. Department
+ * of Defense under Contract F19628-00-C-0003. Carnegie Mellon University retains copyrights in all material produced
+ * under this contract. The U.S. Government retains a non-exclusive, royalty-free license to publish or reproduce these
+ * documents, or allow others to do so, for U.S. Government purposes only pursuant to the copyright license
+ * under the contract clause at 252.227.7013.
+ *
+ * </copyright>
+ *
+ *
+ * @version $Id: AadlUnparser.java,v 1.100 2008-01-24 21:40:34 jseibel Exp $
+ */
 package fr.tpt.aadl.ramses.instantiation ;
 
-import org.eclipse.emf.common.util.EList;
-import org.osate.aadl2.*;
-import org.osate.aadl2.modelsupport.UnparseText;
-import org.osate.aadl2.util.Aadl2Switch;
-import org.osate.annexsupport.AnnexUnparser;
-import org.osate.xtext.aadl2.unparsing.AadlUnparser;
+import java.io.ByteArrayInputStream ;
+import java.io.File ;
+import java.io.FileOutputStream ;
+import java.io.InputStream ;
+import java.util.Iterator ;
 
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import org.eclipse.core.resources.IFile ;
+import org.eclipse.core.resources.IResource ;
+import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.CoreException ;
+import org.eclipse.core.runtime.IPath ;
+import org.eclipse.emf.common.util.AbstractEnumerator ;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.xtext.AbstractRule ;
+import org.eclipse.xtext.nodemodel.BidiTreeIterator ;
+import org.eclipse.xtext.nodemodel.ILeafNode ;
+import org.eclipse.xtext.nodemodel.INode ;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.* ;
+import org.osate.aadl2.instance.InstanceObject ;
+import org.osate.aadl2.modelsupport.AadlConstants ;
+import org.osate.aadl2.modelsupport.UnparseText ;
+import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.aadl2.modelsupport.util.AadlUtil ;
+import org.osate.aadl2.util.Aadl2Switch ;
+import org.osate.annexsupport.AnnexUnparser ;
 
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
-public class Aadl2StandaloneUnparser extends AadlUnparser
+/**
+ * This class implements the converter from an AADL object model to textual
+ * AADL. The generated text is made available as a string buffer.
+ *
+ * @author phf
+ */
+public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
 {
+
+  private static final String NONESTMT = "none ;" ;
+
+  private static final String NEWLINE = AadlConstants.newlineChar ;
 
   private UnparseText aadlText ;
 
@@ -54,7 +123,8 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
 
   public Aadl2StandaloneUnparser()
   {
-    super() ;
+    super(PROCESS_PRE_ORDER_ALL) ;
+    aadlText = new UnparseText() ;
 
     try
     {
@@ -74,12 +144,21 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
     {
       public String caseAadlPackage(AadlPackage object)
       {
-        return super.caseAadlPackage(object);
+        processComments(object) ;
+        aadlText.addOutputNewline("package " + object.getName()) ;
+        process(object.getOwnedPublicSection()) ;
+        process(object.getOwnedPrivateSection()) ;
+        processOptionalSection(object.getOwnedPropertyAssociations(),
+                               "properties", AadlConstants.emptyString) ;
+        aadlText.addOutputNewline("end " + object.getName() + ";") ;
+        return DONE ;
       }
 
       public String casePrivatePackageSection(PrivatePackageSection object)
       {
-        return super.casePrivatePackageSection(object) ;
+        processComments(object) ;
+        aadlText.addOutputNewline("private") ;
+        return null ;
       }
 
       /*
@@ -89,27 +168,59 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String casePublicPackageSection(PublicPackageSection object)
       {
-        return super.casePublicPackageSection(object) ;
+        processComments(object) ;
+        aadlText.addOutputNewline("public") ;
+        return null ;
       }
 
       public String casePackageSection(PackageSection object)
       {
-        return super.casePackageSection(object) ;
+        if(!object.getImportedUnits().isEmpty())
+        {
+          aadlText.addOutput("with ") ;
+          processRefEList(object.getImportedUnits(), ",", object) ;
+          aadlText.addOutputNewline(";") ;
+        }
+
+        processEList(object.getOwnedPackageRenames()) ;
+        processEList(object.getOwnedFeatureGroupTypeRenames()) ;
+        processEList(object.getOwnedComponentTypeRenames()) ;
+        aadlText.incrementIndent() ;
+        processEList(object.getOwnedClassifiers(), NEWLINE) ;
+        processEList(object.getOwnedAnnexLibraries(), NEWLINE) ;
+        aadlText.decrementIndent() ;
+        return DONE ;
       }
 
       public String casePackageRename(PackageRename object)
       {
-        return super.casePackageRename(object) ;
+        processComments(object) ;
+        aadlText.addOutputNewline(object.getName() + " renames package " +
+              object.getRenamedPackage().getName() +
+              (object.isRenameAll() ? "::all;" : ";")) ;
+        return DONE ;
       }
 
       public String caseComponentTypeRename(ComponentTypeRename object)
       {
-    	return super.caseComponentTypeRename(object);
+        processComments(object) ;
+        aadlText.addOutputNewline(object.getName() +
+              " renames " +
+              object.getCategory().getName() +
+              " " +
+              AadlUtil.getClassifierName(object.getRenamedComponentType(),
+                                         object) + ";") ;
+        return DONE ;
       }
 
       public String caseFeatureGroupTypeRename(FeatureGroupTypeRename object)
       {
-        return caseFeatureGroupTypeRename(object) ;
+        processComments(object) ;
+        aadlText.addOutputNewline(object.getName() +
+              " renames " +
+              AadlUtil.getClassifierName(object.getRenamedFeatureGroupType(),
+                                         object) + ";") ;
+        return DONE ;
       }
 
       /**
@@ -119,7 +230,46 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseComponentImplementation(ComponentImplementation object)
       {
-        return super.caseComponentImplementation(object) ;
+        aadlText.addOutputNewline(object.getName()) ;
+        aadlText.incrementIndent() ;
+
+        if(object.getExtended() != null)
+        {
+          aadlText.addOutputNewline("extends " +
+                AadlUtil.getClassifierName(object.getExtended(), object)) ;
+        }
+
+        processOptionalSection(object.getOwnedPrototypes(), "prototypes",
+                               AadlConstants.emptyString) ;
+        processOptionalSection(object.getOwnedSubcomponents(), "subcomponents",
+                               AadlConstants.emptyString) ;
+
+        if(object instanceof ThreadImplementation)
+        {
+          processOptionalSection(((ThreadImplementation) object)
+                                       .getOwnedSubprogramCallSequences(),
+                                 "calls", AadlConstants.emptyString) ;
+        }
+        else if(object instanceof SubprogramImplementation)
+        {
+          processOptionalSection(((SubprogramImplementation) object)
+                                       .getOwnedSubprogramCallSequences(),
+                                 "calls", AadlConstants.emptyString) ;
+        }
+
+        processOptionalSection(object.getOwnedConnections(), "connections",
+                               AadlConstants.emptyString) ;
+        processOptionalSection(object.getOwnedEndToEndFlows(), "flows",
+                               AadlConstants.emptyString) ;
+        processOptionalSection(object.getOwnedModes(), "modes",
+                               AadlConstants.emptyString) ;
+        processOptionalSection(object.getOwnedPropertyAssociations(),
+                               "properties", AadlConstants.emptyString) ;
+        processEList(object.getOwnedAnnexSubclauses()) ;
+        aadlText.decrementIndent() ;
+        aadlText.addOutput("end ") ;
+        aadlText.addOutputNewline(object.getName() + ";") ;
+        return DONE ;
       }
 
       /**
@@ -127,7 +277,27 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseComponentType(ComponentType object)
       {
-        return super.caseComponentType(object) ;
+        aadlText.addOutputNewline(object.getName()) ;
+        aadlText.incrementIndent() ;
+
+        if(object.getExtended() != null)
+        {
+          aadlText.addOutputNewline("extends " +
+                AadlUtil.getClassifierName(object.getExtended(), object)) ;
+        }
+
+        processOptionalSection(object.getOwnedPrototypes(), "prototypes",
+                               AadlConstants.emptyString) ;
+        processOptionalSection(object.getOwnedFeatures(), "features",
+                               AadlConstants.emptyString) ;
+        processOptionalSection(object.getOwnedFlowSpecifications(), "flows",
+                               AadlConstants.emptyString) ;
+        processOptionalSection(object.getOwnedPropertyAssociations(),
+                               "properties", AadlConstants.emptyString) ;
+        processEList(object.getOwnedAnnexSubclauses()) ;
+        aadlText.decrementIndent() ;
+        aadlText.addOutputNewline("end " + object.getName() + ";") ;
+        return DONE ;
       }
 
       /*
@@ -137,7 +307,21 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseMode(Mode object)
       {
-        return super.caseMode(object) ;
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": ") ;
+
+        if(object.isInitial())
+        {
+          aadlText.addOutput("initial mode ") ;
+        }
+        else
+        {
+          aadlText.addOutput("mode ") ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -145,7 +329,28 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseModeTransition(ModeTransition object)
       {
-        return super.caseModeTransition(object) ;
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": ") ;
+        String s = (object.getSource().getName()) ;
+        aadlText.addOutput(s + " -[ ") ;
+        EList<ModeTransitionTrigger> l = object.getOwnedTriggers() ;
+        boolean first = true ;
+
+        for(ModeTransitionTrigger modeTransitionTrigger : l)
+        {
+          if(!first)
+          {
+            aadlText.addOutput(", ") ;
+          }
+
+          first = false ;
+          s = AadlUtil.getModeTransitionTriggerName(modeTransitionTrigger) ;
+          aadlText.addOutputNewline(" ]-> " + s + ";") ;
+        }
+
+        s = (object.getDestination().getName()) ;
+        aadlText.addOutputNewline(" ]-> " + s + ";") ;
+        return DONE ;
       }
 
       /**
@@ -153,17 +358,38 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubcomponent(Subcomponent object)
       {
-        return super.caseSubcomponent(object) ;
+        aadlText.addOutput(" " +
+              AadlUtil.getClassifierName(object.getClassifier(), object)) ;
+        processOptionalEList(object.getOwnedPrototypeBindings(), ",") ;
+        processEList(object.getArrayDimensions(), AadlConstants.emptyString) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalElement(object) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseArrayDimension(ArrayDimension object)
       {
-        return caseArrayDimension(object) ;
+        aadlText.addOutput("[") ;
+        process(object.getSize()) ;
+        aadlText.addOutput("]") ;
+        return DONE ;
       }
 
       public String caseArraySize(ArraySize object)
       {
-        return caseArraySize(object) ;
+        if(object.getSizeProperty() != null)
+        {
+          aadlText.addOutput(AadlUtil
+                .getPropertySetElementName((NamedElement) object
+                      .getSizeProperty())) ;
+        }
+        else
+        {
+          aadlText.addOutput(Long.toString(object.getSize())) ;
+        }
+
+        return DONE ;
       }
 
       /**
@@ -267,7 +493,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseBusImplementation(BusImplementation object)
       {
-        return super.caseBusImplementation(object) ;
+        processComments(object) ;
+        aadlText.addOutput("bus implementation ") ;
+        return null ;
       }
 
       /*
@@ -277,7 +505,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseBusSubcomponent(BusSubcomponent object)
       {
-        return super.caseBusSubcomponent(object) ;
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "bus") ;
+        return null ;
       }
 
       /**
@@ -285,7 +520,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseBusType(BusType object)
       {
-        return super.caseBusType(object) ;
+        processComments(object) ;
+        aadlText.addOutput("bus ") ;
+        return null ;
       }
 
       /**
@@ -293,7 +530,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDataImplementation(DataImplementation object)
       {
-        return super.caseDataImplementation(object) ;
+        processComments(object) ;
+        aadlText.addOutput("data implementation ") ;
+        return null ;
       }
 
       /**
@@ -302,7 +541,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDataSubcomponent(DataSubcomponent object)
       {
-        return super.caseDataSubcomponent(object) ;
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "data") ;
+        return null ;
       }
 
       /**
@@ -310,7 +556,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDataType(DataType object)
       {
-        return caseDataType(object) ;
+        processComments(object) ;
+        aadlText.addOutput("data ") ;
+        return null ;
       }
 
       /**
@@ -318,7 +566,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDeviceImplementation(DeviceImplementation object)
       {
-        return caseDeviceImplementation(object) ;
+        processComments(object) ;
+        aadlText.addOutput("device implementation ") ;
+        return null ;
       }
 
       /*
@@ -328,7 +578,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDeviceSubcomponent(DeviceSubcomponent object)
       {
-        return super.caseDeviceSubcomponent(object) ;
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "device") ;
+        return null ;
       }
 
       /**
@@ -336,7 +593,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDeviceType(DeviceType object)
       {
-        return super.caseDeviceType(object) ;
+        processComments(object) ;
+        aadlText.addOutput("device ") ;
+        return null ;
       }
 
       /**
@@ -344,7 +603,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseMemoryImplementation(MemoryImplementation object)
       {
-        return super.caseMemoryImplementation(object) ;
+        processComments(object) ;
+        aadlText.addOutput("memory implementation ") ;
+        return null ;
       }
 
       /**
@@ -352,7 +613,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseMemorySubcomponent(MemorySubcomponent object)
       {
-        return super.caseMemorySubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "memory") ;
+        return null ;
       }
 
       /**
@@ -360,7 +628,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseMemoryType(MemoryType object)
       {
-        return super.caseMemory(object);
+        processComments(object) ;
+        aadlText.addOutput("memory ") ;
+        return null ;
       }
 
       /**
@@ -368,7 +638,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessImplementation(ProcessImplementation object)
       {
-        return super.caseProcessImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("process implementation ") ;
+        return null ;
       }
 
       /**
@@ -376,7 +648,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualProcessorImplementation(VirtualProcessorImplementation object)
       {
-        return super.caseVirtualProcessorImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("virtual processor implementation ") ;
+        return null ;
       }
 
       /**
@@ -384,7 +658,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualProcessorSubcomponent(VirtualProcessorSubcomponent object)
       {
-    	  return super.caseVirtualProcessorSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " virtual processor") ;
+        return null ;
       }
 
       /**
@@ -392,7 +673,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualProcessorType(VirtualProcessorType object)
       {
-    	  return super.caseVirtualProcessorType(object);
+        processComments(object) ;
+        aadlText.addOutput("virtual processor ") ;
+        return null ;
       }
 
       /**
@@ -400,7 +683,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualBusImplementation(VirtualBusImplementation object)
       {
-    	  return super.caseVirtualBusImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("virtual bus implementation ") ;
+        return null ;
       }
 
       /**
@@ -408,7 +693,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualBusSubcomponent(VirtualBusSubcomponent object)
       {
-    	  return super.caseVirtualBusSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " virtual bus") ;
+        return null ;
       }
 
       /**
@@ -416,7 +708,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualBusType(VirtualBusType object)
       {
-    	  return super.caseVirtualBusType(object);
+        processComments(object) ;
+        aadlText.addOutput("virtual bus ") ;
+        return null ;
       }
 
       /**
@@ -424,7 +718,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseAbstractImplementation(AbstractImplementation object)
       {
-    	  return super.caseAbstractImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("abstract implementation ") ;
+        return null ;
       }
 
       /**
@@ -432,7 +728,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseAbstractSubcomponent(AbstractSubcomponent object)
       {
-    	  return super.caseAbstractSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "abstract") ;
+        return null ;
       }
 
       /**
@@ -440,7 +743,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseAbstractType(AbstractType object)
       {
-    	  return super.caseAbstractType(object);
+        processComments(object) ;
+        aadlText.addOutput("abstract ") ;
+        return null ;
       }
 
       /**
@@ -448,7 +753,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessorImplementation(ProcessorImplementation object)
       {
-    	  return super.caseProcessorImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("processor implementation ") ;
+        return null ;
       }
 
       /**
@@ -456,7 +763,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessorSubcomponent(ProcessorSubcomponent object)
       {
-    	  return super.caseProcessorSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "processor") ;
+        return null ;
       }
 
       /**
@@ -464,7 +778,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessorType(ProcessorType object)
       {
-    	  return super.caseProcessorType(object);
+        processComments(object) ;
+        aadlText.addOutput("processor ") ;
+        return null ;
       }
 
       /**
@@ -473,7 +789,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
-    	  return super.caseProcessSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "process") ;
+        return null ;
       }
 
       /**
@@ -481,7 +804,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessType(ProcessType object)
       {
-    	  return super.caseProcessType(object);
+        processComments(object) ;
+        aadlText.addOutput("process ") ;
+        return null ;
       }
 
       /**
@@ -489,7 +814,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSystemImplementation(SystemImplementation object)
       {
-    	  return super.caseSystemImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("system implementation ") ;
+        return null ;
       }
 
       /**
@@ -498,7 +825,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSystemSubcomponent(SystemSubcomponent object)
       {
-    	  return super.caseSystemSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "system") ;
+        return null ;
       }
 
       /**
@@ -506,7 +840,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSystemType(SystemType object)
       {
-        return super.caseSystemType(object);
+        processComments(object) ;
+        aadlText.addOutput("system ") ;
+        return null ;
       }
 
       /**
@@ -514,7 +850,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadGroupImplementation(ThreadGroupImplementation object)
       {
-        return super.caseThreadGroupImplementation(object) ;
+        processComments(object) ;
+        aadlText.addOutput("thread group implementation ") ;
+        return null ;
       }
 
       /**
@@ -522,7 +860,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadGroupSubcomponent(ThreadGroupSubcomponent object)
       {
-        return super.caseThreadGroupSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "thread group") ;
+        return null ;
       }
 
       /**
@@ -530,7 +875,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadGroupType(ThreadGroupType object)
       {
-    	  return super.caseThreadGroupType(object);
+        processComments(object) ;
+        aadlText.addOutput("thread group ") ;
+        return null ;
       }
 
       /**
@@ -538,7 +885,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadImplementation(ThreadImplementation object)
       {
-    	  return super.caseThreadImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("thread implementation ") ;
+        return null ;
       }
 
       /**
@@ -547,7 +896,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadSubcomponent(ThreadSubcomponent object)
       {
-    	  return super.caseThreadSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "thread") ;
+        return null ;
       }
 
       /**
@@ -555,7 +911,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadType(ThreadType object)
       {
-    	  return super.caseThreadType(object);
+        processComments(object) ;
+        aadlText.addOutput("thread ") ;
+        return null ;
       }
 
       /**
@@ -563,7 +921,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramImplementation(SubprogramImplementation object)
       {
-    	  return super.caseSubprogramImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("subprogram implementation ") ;
+        return null ;
       }
 
       /**
@@ -571,7 +931,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramType(SubprogramType object)
       {
-    	  return super.caseSubprogramType(object);
+        processComments(object) ;
+        aadlText.addOutput("subprogram ") ;
+        return null ;
       }
 
       /*
@@ -580,7 +942,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramSubcomponent(SubprogramSubcomponent object)
       {
-        return super.caseSubprogramSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "subprogram") ;
+        return null ;
       }
 
       /**
@@ -588,7 +957,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramGroupImplementation(SubprogramGroupImplementation object)
       {
-    	  return super.caseSubprogramGroupImplementation(object);
+        processComments(object) ;
+        aadlText.addOutput("subprogram group implementation ") ;
+        return null ;
       }
 
       /**
@@ -596,7 +967,9 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramGroupType(SubprogramGroupType object)
       {
-    	  return super.caseSubprogramGroupType(object);
+        processComments(object) ;
+        aadlText.addOutput("subprogram group ") ;
+        return null ;
       }
 
       /*
@@ -605,7 +978,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramGroupSubcomponent(SubprogramGroupSubcomponent object)
       {
-    	  return super.caseSubprogramGroupSubcomponent(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "subprogram group") ;
+        return null ;
       }
 
       /**
@@ -616,7 +996,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramPrototype(SubprogramPrototype object)
       {
-    	  return super.caseSubprogramPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " subprogram") ;
+        return null ;
       }
 
       /**
@@ -624,7 +1011,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSystemPrototype(SystemPrototype object)
       {
-    	  return super.caseSystemPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " system") ;
+        return null ;
       }
 
       /**
@@ -632,7 +1026,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseAbstractPrototype(AbstractPrototype object)
       {
-    	  return super.caseAbstractPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " abstract") ;
+        return null ;
       }
 
       /**
@@ -640,7 +1041,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessPrototype(ProcessPrototype object)
       {
-        return super.caseProcessPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " process") ;
+        return null ;
       }
 
       /**
@@ -648,7 +1056,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadGroupPrototype(ThreadGroupPrototype object)
       {
-        return super.caseThreadGroupPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " thread group") ;
+        return null ;
       }
 
       /**
@@ -656,7 +1071,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseThreadPrototype(ThreadPrototype object)
       {
-        return super.caseThreadPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " thread") ;
+        return null ;
       }
 
       /**
@@ -664,7 +1086,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseProcessorPrototype(ProcessorPrototype object)
       {
-        return super.caseProcessorPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " processor") ;
+        return null ;
       }
 
       /**
@@ -672,7 +1101,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseMemoryPrototype(MemoryPrototype object)
       {
-        return super.caseMemoryPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " memory") ;
+        return null ;
       }
 
       /**
@@ -680,7 +1116,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseBusPrototype(BusPrototype object)
       {
-        return super.caseBusPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " bus") ;
+        return null ;
       }
 
       /**
@@ -688,7 +1131,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDevicePrototype(DevicePrototype object)
       {
-        return super.caseDevicePrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " device") ;
+        return null ;
       }
 
       /**
@@ -696,7 +1146,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualProcessorPrototype(VirtualProcessorPrototype object)
       {
-        return super.caseVirtualProcessorPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " virtual processor") ;
+        return null ;
       }
 
       /**
@@ -704,7 +1161,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseVirtualBusPrototype(VirtualBusPrototype object)
       {
-        return super.caseVirtualBusPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " virtual bus") ;
+        return null ;
       }
 
       /**
@@ -712,7 +1176,14 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramGroupPrototype(SubprogramGroupPrototype object)
       {
-        return super.caseSubprogramGroupPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " subprogram group") ;
+        return null ;
       }
 
       /**
@@ -720,12 +1191,39 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseComponentPrototype(ComponentPrototype object)
       {
-        return super.caseComponentPrototype(object);
+        aadlText.addOutput(AadlUtil
+              .getClassifierName(object.getConstrainingClassifier(), object)) ;
+
+        if(object.isArray())
+        {
+          aadlText.addOutput("[] ") ;
+        }
+        else
+        {
+          aadlText.addOutputNewline(" ") ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseFeatureGroupPrototype(FeatureGroupPrototype object)
       {
-        return super.caseFeatureGroupPrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " feature group") ;
+        aadlText.addOutput(AadlUtil
+              .getClassifierName(object.getConstrainingFeatureGroupType(),
+                                 object)) ;
+        aadlText.addOutputNewline(" ") ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -733,7 +1231,19 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseFeaturePrototype(FeaturePrototype object)
       {
-        return super.caseFeaturePrototype(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ":")
+                                                     : (object.getRefined()
+                                                           .getName() + " refined to")) +
+                    " feature") ;
+        aadlText.addOutput(AadlUtil
+              .getClassifierName(object.getConstrainingClassifier(), object)) ;
+        aadlText.addOutputNewline(" ") ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -741,7 +1251,19 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseComponentPrototypeBinding(ComponentPrototypeBinding object)
       {
-    	  return super.caseComponentPrototypeBinding(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getFormal().getName() + " => ") ;
+
+        if(object.getActuals().size() == 1)
+        {
+          process(object.getActuals().get(0)) ;
+        }
+        else
+        {
+          processOptionalEList(object.getActuals(), ",") ;
+        }
+
+        return DONE ;
       }
 
       /**
@@ -749,7 +1271,22 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseComponentPrototypeActual(ComponentPrototypeActual object)
       {
-    	  return super.caseComponentPrototypeActual(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getCategory().getName() + " ") ;
+        SubcomponentType sct = object.getSubcomponentType() ;
+
+        if(sct instanceof Classifier)
+        {
+          aadlText.addOutput(AadlUtil.getClassifierName((Classifier) sct,
+                                                        object)) ;
+        }
+        else
+        {
+          aadlText.addOutput(((NamedElement) sct).getName()) ;
+        }
+
+        processOptionalEList(object.getBindings(), ",") ;
+        return DONE ;
       }
 
       /**
@@ -757,12 +1294,28 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseFeatureGroupPrototypeBinding(FeatureGroupPrototypeBinding object)
       {
-    	  return super.caseFeatureGroupPrototypeBinding(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getFormal().getName() + " => feature group ") ;
+        process(object.getActual()) ;
+        return DONE ;
       }
 
       public String caseFeatureGroupPrototypeActual(FeatureGroupPrototypeActual object)
       {
-    	  return super.caseFeatureGroupPrototypeActual(object);
+        FeatureType sct = object.getFeatureType() ;
+
+        if(sct instanceof Classifier)
+        {
+          aadlText.addOutput(AadlUtil.getClassifierName((Classifier) sct,
+                                                        object)) ;
+        }
+        else
+        {
+          aadlText.addOutput(((NamedElement) sct).getName()) ;
+        }
+
+        processOptionalEList(object.getBindings(), ",") ;
+        return DONE ;
       }
 
       /**
@@ -770,22 +1323,47 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseFeaturePrototypeBinding(FeaturePrototypeBinding object)
       {
-    	  return super.caseFeaturePrototypeBinding(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getFormal().getName() + " => ") ;
+        process(object.getActual()) ;
+        return DONE ;
       }
 
       public String casePortSpecification(PortSpecification object)
       {
-    	  return super.casePortSpecification(object);
+        aadlText.addOutput(object.getDirection().getName() + " " +
+              object.getCategory().getName() + " port ") ;
+        Classifier sct = object.getClassifier() ;
+
+        if(sct != null)
+        {
+          aadlText.addOutput(AadlUtil.getClassifierName((Classifier) sct,
+                                                        object)) ;
+        }
+
+        return DONE ;
       }
 
       public String caseAccessSpecification(AccessSpecification object)
       {
-    	  return super.caseAccessSpecification(object);
+        aadlText.addOutput(object.getKind().getName() + " " +
+              object.getCategory().getName() + " access ") ;
+        Classifier sct = object.getClassifier() ;
+
+        if(sct != null)
+        {
+          aadlText.addOutput(AadlUtil.getClassifierName((Classifier) sct,
+                                                        object)) ;
+        }
+
+        return DONE ;
       }
 
       public String caseFeaturePrototypeReference(FeaturePrototypeReference object)
       {
-    	  return super.caseFeaturePrototypeReference(object);
+        aadlText.addOutput(object.getDirection().getName() + " feature " +
+              object.getPrototype().getName()) ;
+        return DONE ;
       }
 
       /**
@@ -793,7 +1371,26 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramCallSequence(SubprogramCallSequence object)
       {
-    	  return super.caseSubprogramCallSequence(object);
+        processComments(object) ;
+        String n = object.getName() ;
+        aadlText.addOutput(n + ": ") ;
+        EList<CallSpecification> list = object.getOwnedCallSpecifications() ;
+        processComments(object) ;
+
+        if(list != null && !list.isEmpty())
+        {
+          aadlText.addOutputNewline(" {") ;
+          aadlText.incrementIndent() ;
+          processEList(list) ;
+          aadlText.addOutput("}") ;
+          aadlText.decrementIndent() ;
+        }
+
+        aadlText.addOutputNewline(" ") ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalElement(object) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -801,32 +1398,146 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramCall(SubprogramCall object)
       {
-    	  return super.caseSubprogramCall(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": " + "subprogram ") ;
+        CallContext cxt = object.getContext() ;
+
+        if(cxt != null)
+        {
+          if(cxt instanceof Classifier)
+          {
+            aadlText.addOutput(AadlUtil.getClassifierName((Classifier) cxt,
+                                                          object) +
+                  ".") ;
+          }
+          else
+          {
+            aadlText.addOutput(((NamedElement) cxt).getName() + ".") ;
+          }
+        }
+
+        CalledSubprogram cs = object.getCalledSubprogram() ;
+
+        if(cs instanceof Classifier)
+        {
+          aadlText.addOutput(AadlUtil
+                .getClassifierName((Classifier) cs, object)) ;
+        }
+        else
+        {
+          aadlText.addOutput(((NamedElement) cs).getName()) ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseProcessorCall(ProcessorCall object)
       {
-    	  return super.caseProcessorCall(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": " + "subprogram processor." +
+              object.getSubprogramAccessName()) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String casePortConnection(PortConnection object)
       {
-    	  return super.casePortConnection(object);
+        processComments(object) ;
+
+        if(object.getRefined() != null)
+        {
+          aadlText.addOutput(object.getRefined().getName() + ": refined to " +
+                "port ") ;
+        }
+        else
+        {
+          aadlText.addOutput(object.getName() + ": " + "port ") ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object.getSource()) +
+                (object.isBidirectional() ? " <-> " : " -> ")) ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object
+                .getDestination())) ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalPath(object) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseFeatureGroupConnection(FeatureGroupConnection object)
       {
-    	  return super.caseFeatureGroupConnection(object);
+        processComments(object) ;
+
+        if(object.getRefined() != null)
+        {
+          aadlText.addOutput(object.getRefined().getName() + ": refined to " +
+                "feature group ") ;
+        }
+        else
+        {
+          aadlText.addOutput(object.getName() + ": " + "feature group ") ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object.getSource()) +
+                (object.isBidirectional() ? " <-> " : " -> ")) ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object
+                .getDestination())) ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalPath(object) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseParameterConnection(ParameterConnection object)
       {
-    	  return super.caseParameterConnection(object);
+        processComments(object) ;
+
+        if(object.getRefined() != null)
+        {
+          aadlText.addOutput(object.getRefined().getName() + ": refined to " +
+                "parameter ") ;
+        }
+        else
+        {
+          aadlText.addOutput(object.getName() + ": " + "parameter ") ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object.getSource()) +
+                (object.isBidirectional() ? " <-> " : " -> ")) ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object
+                .getDestination())) ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalPath(object) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseAccessConnection(AccessConnection object)
       {
-    	  return super.caseAccessConnection(object);
+        processComments(object) ;
+
+        if(object.getRefined() != null)
+        {
+          aadlText.addOutput(object.getRefined().getName() + ": refined to " +
+                object.getAccessCategory().getName() + " access ") ;
+        }
+        else
+        {
+          aadlText.addOutput(object.getName() + ": " +
+                object.getAccessCategory().getName() + " access ") ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object.getSource()) +
+                (object.isBidirectional() ? " <-> " : " -> ")) ;
+          aadlText.addOutput(AadlUtil.getConnectionEndName(object
+                .getDestination())) ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalPath(object) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -834,7 +1545,26 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseBusAccess(BusAccess object)
       {
-    	  return super.caseBusAccess(object);
+        String d ;
+        processComments(object) ;
+
+        if(object.getKind() == AccessType.REQUIRES)
+        {
+          d = "requires" ;
+        }
+        else
+        {
+          d = "provides" ;
+        }
+
+        aadlText.addOutput(object.getName() + ": " +
+              (object.getRefined() != null ? "refined to " : "") + d +
+              " bus access ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -842,7 +1572,26 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramAccess(SubprogramAccess object)
       {
-    	  return super.caseSubprogramAccess(object);
+        String d ;
+        processComments(object) ;
+
+        if(object.getKind() == AccessType.REQUIRES)
+        {
+          d = "requires" ;
+        }
+        else
+        {
+          d = "provides" ;
+        }
+
+        aadlText.addOutput(object.getName() + ": " +
+              (object.getRefined() != null ? "refined to " : "") + d +
+              " subprogram access ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -850,7 +1599,26 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseSubprogramGroupAccess(SubprogramGroupAccess object)
       {
-    	  return super.caseSubprogramGroupAccess(object);
+        String d ;
+        processComments(object) ;
+
+        if(object.getKind() == AccessType.REQUIRES)
+        {
+          d = "requires" ;
+        }
+        else
+        {
+          d = "provides" ;
+        }
+
+        aadlText.addOutput(object.getName() + ": " +
+              (object.getRefined() != null ? "refined to " : "") + d +
+              " subprogram group access ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -858,12 +1626,43 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseDataAccess(DataAccess object)
       {
-    	  return super.caseDataAccess(object);
+        processComments(object) ;
+        /*
+        String d ;
+        if(object.getKind() == AccessType.REQUIRED)
+        {
+          d = "requires" ;
+        }
+        else
+        {
+          d = "provides" ;
+        }
+        */
+        aadlText
+              .addOutput((object.getRefined() == null
+                                              ? (object.getName() + ": ")
+                                              : (object.getRefined()
+                                                .getName() + ": refined to ")) +
+                    " data access ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseDataPort(DataPort object)
       {
-    	  return super.caseDataPort(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    object.getDirection().getName() + " data port ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        return null ;
       }
 
       /**
@@ -871,7 +1670,24 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseEventDataPort(EventDataPort object)
       {
-    	  return super.caseEventDataPort(object);
+        String name = object.getName() ;
+        Classifier ct = object.getContainingClassifier() ;
+
+        if((ct instanceof ThreadType) && name.equalsIgnoreCase("error"))
+        {
+          return DONE ;
+        }
+
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    object.getDirection().getName() + " event data port ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        return null ;
       }
 
       /**
@@ -879,7 +1695,22 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseEventPort(EventPort object)
       {
-    	  return super.caseEventPort(object);
+        String name = object.getName() ;
+        Classifier ct = object.getContainingClassifier() ;
+
+        if((ct instanceof ThreadType) && (name.equalsIgnoreCase("complete")))
+        {
+          return DONE ;
+        }
+
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    object.getDirection().getName() + " event port ") ;
+        return null ;
       }
 
       /**
@@ -887,7 +1718,10 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String casePort(Port object)
       {
-    	  return super.casePort(object);
+        processEList(object.getArrayDimensions(), AadlConstants.emptyString) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -895,7 +1729,18 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseParameter(Parameter object)
       {
-    	  return super.caseParameter(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    object.getDirection() + " parameter ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -903,7 +1748,18 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseFeatureGroup(FeatureGroup object)
       {
-    	  return super.caseFeatureGroup(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "feature group ") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -911,7 +1767,38 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseFeatureGroupType(FeatureGroupType object)
       {
-    	  return super.caseFeatureGroupType(object);
+        processComments(object) ;
+        aadlText.addOutput("feature group ") ;
+        aadlText.addOutputNewline(object.getName()) ;
+        aadlText.incrementIndent() ;
+
+        if(object.getExtended() != null)
+        {
+          aadlText.addOutput(" extends " +
+                AadlUtil.getClassifierName(object.getExtended(), object)) ;
+        }
+
+        processOptionalSection(object.getOwnedPrototypes(), "prototypes",
+                               AadlConstants.emptyString) ;
+        EList<Feature> features = object.getOwnedFeatures() ;
+        String invName =
+              AadlUtil.getClassifierName(object.getInverse(), object) ;
+
+        if(!(invName != null && (object.getOwnedFeatures() == null || features
+              .isEmpty())))
+        {
+          processOptionalSection(features, "features", NONESTMT) ;
+        }
+
+        if(invName != null)
+          aadlText.addOutputNewline("inverse of" + invName) ;
+
+        processSection(object.getOwnedPropertyAssociations(), "properties",
+                       object.isNoProperties()) ;
+        processEList(object.getOwnedAnnexSubclauses()) ;
+        aadlText.decrementIndent() ;
+        aadlText.addOutputNewline("end " + object.getName() + ";") ;
+        return DONE ;
       }
 
       /**
@@ -919,7 +1806,18 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseAbstractFeature(AbstractFeature object)
       {
-    	  return super.caseAbstractFeature(object);
+        processComments(object) ;
+        aadlText
+              .addOutput((object.getRefined() == null
+                                                     ? (object.getName() + ": ")
+                                                     : (object.getRefined()
+                                                           .getName() + ": refined to ")) +
+                    "feature") ;
+        aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
+                                                      object)) ;
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -927,7 +1825,39 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseFlowSpecification(FlowSpecification object)
       {
-    	  return super.caseFlowSpecification(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": ") ;
+
+        if(object.getRefined() != null)
+        {
+          aadlText.addOutput("refined to ") ;
+        }
+
+        aadlText.addOutput("flow " + object.getKind().getName() + " ") ;
+
+        if(object.getRefined() == null)
+        {
+          FlowEnd inend = object.getInEnd() ;
+          FlowEnd outend = object.getOutEnd() ;
+
+          if(inend != null && outend != null)
+          {
+            aadlText.addOutput(AadlUtil.getFlowEndName(inend) + " -> " +
+                  AadlUtil.getFlowEndName(outend)) ;
+          }
+          else if(inend != null)
+          {
+            aadlText.addOutput(AadlUtil.getFlowEndName(inend)) ;
+          }
+          else
+          {
+            aadlText.addOutput(AadlUtil.getFlowEndName(outend)) ;
+          }
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -935,7 +1865,50 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseFlowImplementation(FlowImplementation object)
       {
-    	  return super.caseFlowImplementation(object);
+        processComments(object) ;
+        // add location counter
+        aadlText.addOutput(object.getName() + ": ") ;
+        aadlText.addOutput("flow " + object.getKind().getName() + " ") ;
+        FlowSpecification fps = object.getSpecification() ;
+        FlowEnd inend = fps.getInEnd() ;
+        boolean doArrow = false ;
+
+        if(inend != null)
+        {
+          aadlText.addOutput(AadlUtil.getFlowEndName(inend)) ;
+          doArrow = true ;
+        }
+
+        EList<FlowSegment> fel = object.getOwnedFlowSegments() ;
+        aadlText.incrementIndent() ;
+        boolean even = true ;
+
+        for(FlowSegment flowSegment : fel)
+        {
+          aadlText.addOutput((doArrow ? " -> " : "") +
+                AadlUtil.getFlowSegmentName(flowSegment)) ;
+          doArrow = true ;
+          even = !even ;
+
+          if(even)
+          {
+            aadlText.addOutputNewline("") ;
+          }
+        }
+
+        FlowEnd outend = fps.getInEnd() ;
+
+        if(outend != null)
+        {
+          aadlText.addOutput((doArrow ? " -> " : "") +
+                AadlUtil.getFlowEndName(fps.getOutEnd())) ;
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalElement(object) ;
+        aadlText.decrementIndent() ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       /**
@@ -943,203 +1916,1144 @@ public class Aadl2StandaloneUnparser extends AadlUnparser
        */
       public String caseEndToEndFlow(EndToEndFlow object)
       {
-    	  return super.caseEndToEndFlow(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": ") ;
+
+        if(object.getRefined() != null)
+        {
+          aadlText.addOutput("refined to ") ;
+        }
+
+        aadlText.addOutput("end to end flow ") ;
+
+        if(object.getRefined() == null)
+        {
+          EList<EndToEndFlowSegment> fel =
+                object.getOwnedEndToEndFlowSegments() ;
+          Iterator<EndToEndFlowSegment> it = fel.iterator() ;
+          EndToEndFlowSegment flowSegment = (EndToEndFlowSegment) it.next() ;
+          aadlText.addOutput(AadlUtil.getFlowSegmentName(flowSegment)) ;
+          aadlText.incrementIndent() ;
+
+          while(it.hasNext())
+          {
+            flowSegment = (EndToEndFlowSegment) it.next() ;
+            aadlText.addOutput(" -> " +
+                  AadlUtil.getFlowSegmentName(flowSegment)) ;
+
+            if(it.hasNext())
+            {
+              flowSegment = (EndToEndFlowSegment) it.next() ;
+              aadlText.addOutputNewline(" -> " +
+                    AadlUtil.getFlowSegmentName(flowSegment)) ;
+            }
+          }
+        }
+
+        processCurlyList(object.getOwnedPropertyAssociations()) ;
+        processModalElement(object) ;
+        aadlText.decrementIndent() ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String casePropertySet(PropertySet object)
       {
-    	  return super.casePropertySet(object);
+        processComments(object) ;
+        aadlText.addOutputNewline("property set " + object.getName() + " is") ;
+        aadlText.incrementIndent() ;
+        processEList(object.getOwnedMembers()) ;
+        aadlText.decrementIndent() ;
+        aadlText.addOutputNewline("end " + object.getName() + ";") ;
+        return DONE ;
       }
 
       public String caseAadlBoolean(AadlBoolean object)
       {
-    	  return super.caseAadlBoolean(object);
+        processComments(object) ;
+
+        if(object.getName() != null)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+        }
+
+        aadlText.addOutput("aadlboolean ") ;
+
+        if(object.getName() != null)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseAadlString(AadlString object)
       {
-    	  return super.caseAadlString(object);
+        processComments(object) ;
+
+        if(object.getName() != null)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+        }
+
+        aadlText.addOutput("aadlstring ") ;
+
+        if(object.getName() != null)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseAadlInteger(AadlInteger object)
       {
-    	  return super.caseAadlInteger(object);
+        processComments(object) ;
+        boolean isDecl = false ;
+
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+          isDecl = true ;
+        }
+
+        aadlText.addOutput("aadlinteger ") ;
+
+        if(object.getRange() != null)
+        {
+          process(object.getRange()) ;
+        }
+
+        if(object.getUnitsType() != null)
+        {
+          aadlText.addOutput(" units ") ;
+          processRef(object.getUnitsType()) ;
+        }
+
+        if(isDecl)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseAadlReal(AadlReal object)
       {
-    	  return super.caseAadlReal(object);
+        processComments(object) ;
+        boolean isDecl = false ;
+
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+          isDecl = true ;
+        }
+
+        aadlText.addOutput("aadlreal ") ;
+
+        if(object.getRange() != null)
+        {
+          process(object.getRange()) ;
+        }
+
+        if(object.getUnitsType() != null)
+        {
+          processRef(object.getUnitsType()) ;
+        }
+
+        if(isDecl)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseEnumerationType(EnumerationType object)
       {
-    	  return super.caseEnumerationType(object);
+        processComments(object) ;
+        boolean isDecl = false ;
+
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+          isDecl = true ;
+        }
+
+        aadlText.addOutput(" enumeration (") ;
+        processEList(object.getOwnedLiterals(), ", ") ;
+        aadlText.addOutput(")") ;
+
+        if(isDecl)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseUnitsType(UnitsType object)
       {
-    	  return super.caseUnitsType(object);
+        processComments(object) ;
+        boolean isDecl = false ;
+
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+          isDecl = true ;
+        }
+
+        aadlText.addOutput(" units (") ;
+        processEList(object.getOwnedLiterals(), ", ") ;
+        aadlText.addOutput(")") ;
+
+        if(isDecl)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseEnumerationLiteral(EnumerationLiteral object)
       {
-    	  return super.caseEnumerationLiteral(object);
+        aadlText.addOutput(object.getName()) ;
+        return DONE ;
       }
 
       public String caseUnitLiteral(UnitLiteral object)
       {
-    	  return super.caseUnitLiteral(object);
+        aadlText.addOutput(object.getName()) ;
+
+        if(object.getBaseUnit() != null && object.getFactor() != null)
+        {
+          aadlText.addOutput(" => " + object.getBaseUnit().getName() + " * " +
+                getNumberValueAsString(object.getFactor())) ;
+        }
+
+        return DONE ;
       }
 
       public String caseReferenceType(ReferenceType object)
       {
-    	  return super.caseReferenceType(object);
+        processComments(object) ;
+        boolean isDecl = false ;
+
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+          isDecl = true ;
+        }
+
+        aadlText.addOutput(" reference") ;
+        EList<MetaclassReference> catlist = object.getNamedElementReferences() ;
+
+        if(catlist.size() > 0)
+        {
+          aadlText.addOutput("(") ;
+          processEList(catlist, ", ") ;
+          aadlText.addOutput(")") ;
+        }
+
+        if(isDecl)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseReferenceValue(ReferenceValue object)
       {
-    	  return super.caseReferenceValue(object);
+        aadlText.addOutput("reference(") ;
+        processEList(object.getContainmentPathElements(), ".") ;
+        aadlText.addOutput(")") ;
+        return DONE ;
       }
 
       public String caseClassifierType(ClassifierType object)
       {
-    	  return super.caseClassifierType(object);
+        processComments(object) ;
+        boolean isDecl = false ;
+
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type ") ;
+          isDecl = true ;
+        }
+
+        aadlText.addOutput(" classifier") ;
+        EList<MetaclassReference> catlist = object.getClassifierReferences() ;
+
+        if(catlist.size() > 0)
+        {
+          aadlText.addOutput("(") ;
+          processEList(catlist, ", ") ;
+          aadlText.addOutput(")") ;
+        }
+
+        if(isDecl)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseClassifierValue(ClassifierValue object)
       {
-    	  return super.caseClassifierValue(object);
+        aadlText.addOutput("classifier(" +
+              AadlUtil.getClassifierName(object.getClassifier(), object) + ")") ;
+        return DONE ;
       }
 
       public String caseMetaclassReference(MetaclassReference object)
       {
-    	  return super.caseMetaclassReference(object);
+        processEList(object.getMetaclassNames(), " ") ;
+        return DONE ;
       }
 
       public String caseModalPropertyValue(ModalPropertyValue object)
       {
-    	  return super.caseModalPropertyValue(object);
+        process(object.getOwnedValue()) ;
+        processModalElement(object) ;
+        return DONE ;
       }
 
       public String casePropertyAssociation(PropertyAssociation object)
       {
-    	  return super.casePropertyAssociation(object);
+        processComments(object) ;
+        aadlText.addOutput(AadlUtil.getPropertySetElementName(object
+              .getProperty())) ;
+        aadlText.addOutput(object.isAppend() ? " +=> " : " => ") ;
+        final EList<ModalPropertyValue> pl = object.getOwnedValues() ;
+        boolean didParens = false ;
+
+        if(pl.size() > 1 ||
+              (pl.size() == 1 && !((ModalPropertyValue) pl.get(0)).getInModes()
+                    .isEmpty()))
+        {
+          aadlText.addOutput("(") ;
+          didParens = true ;
+        }
+
+        processEList(pl, ", ") ;
+
+        if(didParens)
+        {
+          aadlText.addOutput(")") ;
+        }
+
+        EList<ContainedNamedElement> atl = object.getAppliesTos() ;
+
+        if(atl.size() > 0)
+        {
+          aadlText.addOutput(" applies to ") ;
+          processEList(atl, ".") ;
+        }
+
+        // processInBinding(object);
+        EList<Classifier> ibl = object.getInBindings() ;
+
+        if(ibl.size() > 0)
+        {
+          aadlText.addOutput(" in binding (") ;
+          processEList(ibl, ",") ;
+          aadlText.addOutput(")") ;
+        }
+
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseContainedNamedElement(ContainedNamedElement object)
       {
-    	  return super.caseContainedNamedElement(object);
+        processEList(object.getContainmentPathElements(), ".") ;
+        return DONE ;
       }
 
       public String caseContainmentPathElement(ContainmentPathElement object)
       {
-    	  return super.caseContainmentPathElement(object);
+        aadlText.addOutput(object.getNamedElement().getName()) ;
+
+        if(!object.getArrayRanges().isEmpty())
+        {
+          processEList(object.getArrayRanges(), " ") ;
+        }
+
+        return DONE ;
       }
 
       public String casePropertyConstant(PropertyConstant object)
       {
-    	  return super.casePropertyConstant(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": constant ") ;
+
+        if(object.getPropertyType() != null)
+        {
+          processRef(object.getPropertyType()) ;
+        }
+
+        PropertyExpression pe = object.getConstantValue() ;
+
+        if(pe != null)
+        {
+          aadlText.addOutput(" => ") ;
+          process(pe) ;
+        }
+
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseProperty(Property object)
       {
-    	  return super.caseProperty(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": ") ;
+
+        if(object.isInherit())
+        {
+          aadlText.addOutput("inherit ") ;
+        }
+
+        if(object.getPropertyType() != null)
+        {
+          processRef(object.getPropertyType()) ;
+        }
+
+        PropertyExpression pe = object.getDefaultValue() ;
+
+        if(pe != null)
+        {
+          aadlText.addOutput(" => ") ;
+          process(pe) ;
+        }
+
+        aadlText.addOutput(" applies to (") ;
+        processEList(object.getAppliesTos(), ",") ;
+        aadlText.addOutputNewline(");") ;
+        return DONE ;
       }
 
       public String caseBasicProperty(BasicProperty object)
       {
-    	  return super.caseBasicProperty(object);
+        processComments(object) ;
+        aadlText.addOutput(object.getName() + ": ") ;
+
+        if(object.getPropertyType() != null)
+        {
+          processRef(object.getPropertyType()) ;
+        }
+
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
 
       public String caseListType(ListType object)
       {
-    	  return super.caseListType(object);
+        aadlText.addOutput("list of ") ;
+        process(object.getElementType()) ;
+        return DONE ;
       }
 
       public String caseListValue(ListValue object)
       {
-    	  return super.caseListValue(object);
+        aadlText.addOutput("(") ;
+        processEList(object.getOwnedListElements(), ", ") ;
+        aadlText.addOutput(")") ;
+        return DONE ;
       }
 
       public String caseOperation(Operation object)
       {
-    	  return super.caseOperation(object);
+        EList<PropertyExpression> el = object.getOwnedPropertyExpressions() ;
+        OperationKind ok = object.getOp() ;
+        boolean doparens = false ;
+
+        if(object.getOwner() instanceof Operation)
+        {
+          if(((Operation) object.getOwner()).getOp() != OperationKind.OR)
+          {
+            aadlText.addOutput("(") ;
+            doparens = true ;
+          }
+        }
+
+        if(ok == OperationKind.NOT)
+        {
+          aadlText.addOutput("not ") ;
+          process(el.get(0)) ;
+        }
+        else
+        {
+          processEList(el, " " + ok.getName() + " ") ;
+        }
+
+        if(doparens)
+        {
+          aadlText.addOutput(")") ;
+        }
+
+        return DONE ;
       }
 
       public String caseBooleanLiteral(BooleanLiteral object)
       {
-    	  return super.caseBooleanLiteral(object);
+        aadlText.addOutput(object.getValue() ? "true" : "false") ;
+        return DONE ;
       }
 
       public String caseStringLiteral(StringLiteral object)
       {
-    	  return super.caseStringLiteral(object);
+        String s = object.getValue() ;
+
+        if(s.startsWith("\"") && s.endsWith("\""))
+        {
+          aadlText.addOutput(s) ;
+        }
+        else
+        {
+          aadlText.addOutput("\"" + s + "\"") ;
+        }
+
+        return DONE ;
       }
 
       public String caseNumberValue(NumberValue object)
       {
-    	  return super.caseNumberValue(object);
+        aadlText.addOutput(getNumberValueAsString(object)) ;
+        UnitLiteral us = object.getUnit() ;
+
+        if(us != null)
+        {
+          aadlText.addOutput(" " + us.getName()) ;
+        }
+
+        return DONE ;
       }
 
       public String caseNamedValue(NamedValue object)
       {
-    	  return super.caseNamedValue(object);
+        AbstractNamedValue anv = object.getNamedValue() ;
+
+        if(anv instanceof EnumerationLiteral)
+        {
+          aadlText.addOutput(((EnumerationLiteral) anv).getName()) ;
+        }
+        else
+        {
+          processRef((NamedElement) anv) ;
+        }
+
+        return DONE ;
       }
 
       public String caseRangeType(RangeType object)
       {
-    	  return super.caseRangeType(object);
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type") ;
+        }
+
+        aadlText.addOutput(" range of ") ;
+
+        if(object.getNumberType() != null)
+        {
+          processRef(object.getNumberType()) ;
+        }
+
+        if(object.getName() != null)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseRangeValue(RangeValue object)
       {
-    	  return super.caseRangeValue(object);
+        PropertyExpression min = object.getMinimum() ;
+        PropertyExpression max = object.getMaximum() ;
+        PropertyExpression delta = object.getDelta() ;
+
+        if(min != null)
+        {
+          process(min) ;
+        }
+        else
+        {
+          aadlText.addOutput("-- ** no minimum value **") ;
+        }
+
+        aadlText.addOutput(" .. ") ;
+
+        if(max != null)
+        {
+          process(max) ;
+        }
+        else
+        {
+          aadlText.addOutput("-- ** no maximum value **") ;
+        }
+
+        if(delta != null)
+        {
+          aadlText.addOutput(" delta ") ;
+          process(delta) ;
+        }
+
+        return DONE ;
       }
 
       public String caseArrayRange(ArrayRange object)
       {
-    	  return super.caseArrayRange(object);
+        if(object == null)
+        {
+          return DONE ;
+        }
+
+        aadlText.addOutput("[" + Long.toString(object.getLowerBound())) ;
+        long ub = object.getUpperBound() ;
+
+        if(ub != 0L)
+        {
+          aadlText.addOutput(" .. " + Long.toString(ub)) ;
+        }
+
+        aadlText.addOutput("]") ;
+        return DONE ;
       }
 
       public String caseNumericRange(NumericRange object)
       {
-    	return super.caseNumericRange(object);
+        if(object == null)
+        {
+          return DONE ;
+        }
+
+        PropertyExpression min = object.getLowerBound() ;
+        PropertyExpression max = object.getUpperBound() ;
+
+        if(min != null)
+        {
+          process(min) ;
+        }
+        else
+        {
+          aadlText.addOutput("-- ** no minimum value **") ;
+        }
+
+        aadlText.addOutput(" .. ") ;
+
+        if(max != null)
+        {
+          process(max) ;
+        }
+        else
+        {
+          aadlText.addOutput("-- ** no maximum value **") ;
+        }
+
+        return DONE ;
       }
 
       public String caseRecordType(RecordType object)
       {
-    	return super.caseRecordType(object);
+        if(object.getName() != null && object.getName().length() > 0)
+        {
+          aadlText.addOutput(object.getName() + ": type") ;
+        }
+
+        aadlText.addOutputNewline(" record (") ;
+        processEList(object.getOwnedFields()) ;
+        aadlText.addOutput(")") ;
+
+        if(object.getName() != null)
+        {
+          aadlText.addOutputNewline(";") ;
+        }
+
+        return DONE ;
       }
 
       public String caseRecordValue(RecordValue object)
       {
-    	return super.caseRecordValue(object);
+        aadlText.incrementIndent() ;
+        aadlText.addOutputNewline("(") ;
+        processEList(object.getOwnedFieldValues()) ;
+        aadlText.decrementIndent() ;
+        aadlText.addOutput(")") ;
+        return DONE ;
       }
 
       public String caseBasicPropertyAssociation(BasicPropertyAssociation object)
       {
-        return super.caseBasicPropertyAssociation(object);
+        aadlText.addOutput(object.getProperty().getName() + "=> ") ;
+        process(object.getOwnedValue()) ;
+        aadlText.addOutputNewline(";") ;
+        return DONE ;
       }
     } ;
   }
 
+  /**
+   * Set the model name as the name of the object and unparse the (sub)-model
+   *
+   * @param obj
+   *            Element
+   */
+  private void unparse(Element obj)
+  {
+    process(obj) ;
+  }
 
-  private void processComments(final Element obj) {
-		if (obj != null) {
-			EList<Comment> el = obj.getOwnedComments();
-			if (!el.isEmpty()){
-				for (Comment comment : el) {
-					String str = comment.getBody();
-					if (!str.startsWith("--") ) {
-						str = "--" +(str.startsWith(" ") ? "" : " ") + str;
-					}
-					aadlText.addOutputNewline(str);
-				}
-			} else {
-				// see if there are comments in the parse tree
-				processComment(obj);
-			}
-		}
-	}
+  private void processRef(NamedElement propref)
+  {
+    if(propref.getName() != null)
+    {
+      aadlText.addOutput(AadlUtil.getPropertySetElementName(propref)) ;
+    }
+    else
+    {
+      process(propref) ;
+    }
+  }
+
+  /**
+   * returns the unparsed output as a single String
+   *
+   * @return String
+   */
+  public String getOutput()
+  {
+    return aadlText.getParseOutput() ;
+  }
+
+  /**
+   * Does processing of list with separators and parens if not empty
+   *
+   * @param list
+   * @param separator
+   */
+  public void processOptionalEList(EList<?> list,
+                                   String separator)
+  {
+    if(list.size() > 0)
+    {
+      aadlText.addOutput("(") ;
+      processEList(list, ",") ;
+      aadlText.addOutput(")") ;
+    }
+  }
+
+  /**
+   * Does processing of list with separators
+   *
+   * @param list
+   * @param separator
+   */
+  public void processEList(EList<?> list,
+                           String separator)
+  {
+    boolean first = true ;
+
+    for(Iterator<?> it = list.iterator() ; it.hasNext() ;)
+    {
+      if(!first)
+      {
+        if(separator == AadlConstants.newlineChar)
+        {
+          aadlText.addOutputNewline(AadlConstants.emptyString) ;
+        }
+        else
+        {
+          aadlText.addOutput(separator) ;
+        }
+      }
+
+      first = false ;
+      Object o = it.next() ;
+
+      if(o instanceof Element)
+      {
+        process((Element) o) ;
+      }
+      else if(o instanceof AbstractEnumerator)
+        aadlText.addOutput(((AbstractEnumerator) o).getName().toLowerCase()) ;
+      else if(o instanceof String)
+      {
+        aadlText.addOutput((String) o) ;
+      }
+      else
+      {
+        aadlText.addOutput("processEList: oh my, oh my!!") ;
+      }
+    }
+  }
+
+  /**
+   * Does processing of list with separators
+   *
+   * @param list
+   * @param separator
+   */
+  public void processRefEList(EList<?> list,
+                              String separator,
+                              Element context)
+  {
+    boolean first = true ;
+
+    for(Iterator<?> it = list.iterator() ; it.hasNext() ;)
+    {
+      if(!first)
+      {
+        if(separator == AadlConstants.newlineChar)
+        {
+          aadlText.addOutputNewline(AadlConstants.emptyString) ;
+        }
+        else
+        {
+          aadlText.addOutput(separator) ;
+        }
+      }
+
+      first = false ;
+      Object obj = it.next() ;
+
+      if(obj instanceof Classifier)
+      {
+        aadlText.addOutput(AadlUtil
+              .getClassifierName((Classifier) obj, context)) ;
+      }
+      else if(obj instanceof NamedElement)
+      {
+        aadlText.addOutput(((NamedElement) obj).getName()) ;
+      }
+    }
+  }
+
+  /**
+   * unparse curly (property) list
+   */
+  public void processCurlyList(EList<PropertyAssociation> list)
+  {
+    // process property associations
+    if(list == null || list.isEmpty())
+    {
+      return ;
+    }
+
+    if(list != null && !list.isEmpty())
+    {
+      aadlText.addOutputNewline(" {") ;
+      aadlText.incrementIndent() ;
+      processEList(list) ;
+      aadlText.addOutput("}") ;
+      aadlText.decrementIndent() ;
+    }
+  }
+
+  private void processComments(final Element obj)
+  {
+    if(obj != null)
+    {
+      EList<Comment> el = obj.getOwnedComments() ;
+
+      for(Comment comment : el)
+      {
+        String str = comment.getBody() ;
+
+        if(!str.startsWith("--"))
+        {
+          str = "--" + (str.charAt(0) == ' ' ? "" : " ") + str ;
+          //          } else if (comment.startsWith("/*")) {
+          //             comment = comment.substring(2, comment.length() - 2);
+          //             comment = "--" + (comment.charAt(0) == ' ' ? "" : " ") + comment;
+          //             comment = comment.replaceAll("\n", "\n--");
+        }
+
+        aadlText.addOutputNewline(str) ;
+      }
+
+      //       processComment(obj);
+    }
+  }
+
+  /**
+   * unparse modes of ModalElement
+   *
+   * @param mm
+   *            modal element
+   */
+  public void processModalElement(ModalElement mm)
+  {
+    EList<Mode> list = mm.getAllInModes() ;
+
+    if(!list.isEmpty())
+    {
+      aadlText.addOutput(" in modes (") ;
+      processEList(list, ",") ;
+      aadlText.addOutput(")") ;
+    }
+  }
+
+  /**
+   * unparse modes of ModalElement
+   *
+   * @param mm
+   *            modal element
+   */
+  public void processModalPath(ModalPath mm)
+  {
+    EList<ModeFeature> list = mm.getInModeOrTransitions() ;
+
+    if(!list.isEmpty())
+    {
+      aadlText.addOutput(" in modes (") ;
+      processEList(list, ",") ;
+      aadlText.addOutput(")") ;
+    }
+  }
+
+  /**
+   * Does processing of list as optional section without separators
+   *
+   * @param list
+   *            to be processed
+   * @param sectionName
+   *            section
+   * @param emptyOption
+   *            shown with section name if empty list
+   */
+  public void processOptionalSection(EList<? extends Element> list,
+                                     String sectionName,
+                                     String emptyOption)
+  {
+    if(list == null)
+    {
+      return ;
+    }
+
+    if(!list.isEmpty())
+    {
+      aadlText.addOutputNewline(sectionName) ;
+      aadlText.incrementIndent() ;
+      processEList(list) ;
+      aadlText.decrementIndent() ;
+    }
+    else if(emptyOption != null && emptyOption.length() > 0)
+    {
+      aadlText.addOutputNewline(sectionName + " " + emptyOption) ;
+    }
+  }
+
+  /**
+   * Does processing of list as section without separators
+   *
+   * @param list
+   *            to be processed
+   * @param sectionName
+   *            section
+   * @param emptyOption
+   *            shown with section name if empty list
+   */
+  public void processSection(EList<? extends Element> list,
+                             String sectionName,
+                             Boolean doNone)
+  {
+    if(list == null)
+    {
+      return ;
+    }
+
+    if(!list.isEmpty())
+    {
+      aadlText.addOutputNewline(sectionName) ;
+      aadlText.incrementIndent() ;
+      processEList(list) ;
+      aadlText.decrementIndent() ;
+    }
+    else if(doNone)
+    {
+      aadlText.addOutputNewline(sectionName + " " + NONESTMT) ;
+    }
+  }
+
+  public boolean hasDeclaredFeatures(EList<?> ftl)
+  {
+    for(Iterator<?> it = ftl.iterator() ; it.hasNext() ;)
+    {
+      Feature f = (Feature) it.next() ;
+      String n = f.getName() ;
+
+      if(!(n.equalsIgnoreCase("error") || n.equalsIgnoreCase("dispatch") || n
+            .equalsIgnoreCase("complete")))
+      {
+        return true ;
+      }
+    }
+
+    return false ;
+  }
+
+  /**
+   * Unparses the aadl spec and returns it as string
+   *
+   * @param as
+   *            AadlSpec or any other Element in the Aadl grammar
+   */
+  public String doUnparse(Element as)
+  {
+    this.unparse(as) ;
+    return this.getOutput() ;
+  }
+
+  private String getNumberValueAsString(NumberValue nv)
+  {
+    if(nv instanceof IntegerLiteral)
+    {
+      return Long.toString(((IntegerLiteral) nv).getValue()) ;
+    }
+    else
+    {
+      return Double.toString(((RealLiteral) nv).getValue()) ;
+    }
+  }
+
+  public void doUnparseToFile(IResource aaxlFile)
+  {
+    IPath path = aaxlFile.getFullPath() ;
+    IPath txtpath = path.removeFileExtension().addFileExtension("aadl") ;
+    Resource res = OsateResourceUtil.getResource(aaxlFile) ;
+    EList<EObject> rl = res.getContents() ;
+    doUnparseToFile((Element) rl.get(0), txtpath) ;
+  }
+
+  /**
+   * unparse the AADL model into the specified file. The model must be a
+   * declarative model.
+   *
+   * @param obj
+   *            Element. If it is an Instance object nothing is unparsed.
+   * @param path
+   *            The file path to unparse to.
+   */
+  public IFile doUnparseToFile(Element obj,
+                               IPath path)
+  {
+    aadlText = new UnparseText() ;
+    Element root = obj.getElementRoot() ;
+
+    if(root instanceof InstanceObject)
+    {
+      return null ;
+    }
+
+    String s = this.doUnparse(root) ;
+
+    if(path != null)
+    {
+      IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path) ;
+
+      if(file != null)
+      {
+        final InputStream input = new ByteArrayInputStream(s.getBytes()) ;
+
+        try
+        {
+          if(file.exists())
+          {
+            file.setContents(input, true, true, null) ;
+          }
+          else
+          {
+            AadlUtil.makeSureFoldersExist(path) ;
+            file.create(input, true, null) ;
+          }
+
+          file.deleteMarkers(null, true, IResource.DEPTH_INFINITE) ;
+        }
+        catch(final CoreException e)
+        {
+        }
+      }
+
+      return file ;
+    }
+
+    return null ;
+  }
+
+  /**
+   * Used to unparse to files outside the scope of Eclipse.
+   */
+  public void doUnparseToExternalFile(Element obj,
+                                      File file)
+  {
+    Element root = obj.getElementRoot() ;
+
+    if(root instanceof InstanceObject)
+    {
+      return ;
+    }
+
+    String s = doUnparse(root) ;
+
+    if(file != null)
+    {
+      try
+      {
+        FileOutputStream os = new FileOutputStream(file) ;
+        os.write(s.getBytes()) ;
+        os.flush() ;
+        os.close() ;
+      }
+      catch(Exception e)
+      {
+      }
+    }
+  }
+
+  //   public void doUnparseToFile(Element obj) {
+  //      IResource aaxlFile = OsateResourceUtil.convertToIResource(obj
+  //            .eResource());
+  //      IPath path = AadlWorkspace.getAadlWorkspace().getAadlProject(aaxlFile)
+  //            .getAadlPath((IFile) aaxlFile);
+  //      doUnparseToFile(obj, path);
+  //   }
+
+  public void processComment(EObject o)
+  {
+    INode node = NodeModelUtils.findActualNodeFor(o) ;
+    BidiTreeIterator<INode> ti = node.getAsTreeIterable().iterator() ;
+
+    while(ti.hasNext())
+    {
+      INode next = ti.next() ;
+
+      if(isCommentNode(next))
+      {
+        aadlText.addOutputNewline("-- " + next.getText()) ;
+      }
+    }
+  }
+
+  public boolean isCommentNode(INode node)
+  {
+    if(node instanceof ILeafNode && ((ILeafNode) node).isHidden() &&
+          node.getGrammarElement() instanceof AbstractRule)
+    {
+      return isComment((AbstractRule) node.getGrammarElement()) ;
+    }
+
+    return false ;
+  }
+
+  public boolean isComment(AbstractRule rule)
+  {
+    return rule != null &&
+          ("ML_COMMENT".equals(rule.getName()) || "SL_COMMENT".equals(rule
+                .getName())) ;
+  }
 
 }
