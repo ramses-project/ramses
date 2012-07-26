@@ -64,7 +64,7 @@ unique lazy rule ThreadType {
  to 
  	typeImg : AADLBA!ThreadType (
  	 name <- c.uniqueName().debug('thread type'),
-	 ownedDataAccess <- c.featureInstance->collect(f| thisModule.resolveTemp(f, 'f'))
+	 ownedDataAccess <- c.featureInstance->collect(f| f.getFeatureImg())
  	)
 }
 
@@ -287,7 +287,7 @@ rule addSamplingGlobalVariable(fi: AADLI!FeatureInstance,
 		processImplImg.ownedDataSubcomponent.add(communicationID);
 		thisModule.addDataAccessConnection(
 			processImplImg,
-			'Id_instance_to_'+fi.name,
+			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,
 			fi.feature.retreiveIdAccess(implImg), 
 			OclUndefined,
 			communicationID
@@ -369,7 +369,7 @@ rule addQueuingGlobalVariable(fi: AADLI!FeatureInstance,
 		processImplImg.ownedDataSubcomponent.add(communicationID);
 		thisModule.addDataAccessConnection(
 			processImplImg,
-			'Id_instance_to_'+fi.name,
+			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,
 			fi.feature.retreiveIdAccess(implImg), 
 			OclUndefined,
 			communicationID
@@ -443,8 +443,6 @@ rule DataPort_Instance
 }
 
 
-
-
 rule EventPort_Instance
 {
 	from
@@ -470,30 +468,6 @@ rule EventPort_Instance
 		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
 		thisModule.initSubprogramCallSequence(implImg, impl);
 		thisModule.addReturnCodeDataSubcomponent(implImg);
-		
-		if(not implImg.oclIsUndefined() and
-				(fi.direction.toString()='in' or fi.direction=#inOut) )
-		{
-			for(src in fi.getSources())
-			{
-				if(src.eContainer().eContainer().debug(src.name+' double econtainer') = c.eContainer().debug(c.name+' simple econtainer'))
-				{
-					thisModule.addWaitEvent(fi, impl, f, implImg);
-				}
-			}
-		}
-		if(not implImg.oclIsUndefined() and
-				(fi.direction.toString()='out' or fi.direction=#inOut))
-		{
-			thisModule.addSetEvent(fi, impl, f, implImg);
-		}
-		thisModule.addThreadsInternalConnections(fi);
-		if(c.featureInstance->last().debug('Last Feature Instance') = fi.debug('Current Feature Instance'))
-		{
-			true.debug('Expand Dispatch Protocol');
-			thisModule.expandThreadDispatchProtocol(c, implImg);
-			thisModule.createThreadBehavior(implImg);
-		}
 	}
 }
 
@@ -639,6 +613,8 @@ rule PortConnection_Instance
 		process_destinationImplImg <- c_destination.eContainer().getSubcomponentImg().subcomponentType.debug('Retreived Process Implementation');
 		sourceFeatureImg <- cnxInst.source.getFeatureImg().debug('Retreived Feature Image');
 		destinationFeatureImg <- cnxInst.destination.getFeatureImg().debug('Retreived Feature Image');
+		process_destinationImplImg.ownedDataSubcomponent.add(communicationDstID);
+		process_sourceImplImg.ownedDataSubcomponent.add(communicationSrcID);
 		
 		if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
 		{
@@ -685,6 +661,8 @@ rule intra_PortConnection_Instance
 	{
 		c_source: AADLBA!ComponentInstance = cnxInst.source.eContainer();
 		c_destination: AADLBA!ComponentInstance = cnxInst.destination.eContainer();
+		impl_source: AADLBA!ComponentClassifier = c_source.subcomponent.subcomponentType;
+		impl_destination: AADLBA!ComponentClassifier = c_destination.subcomponent.subcomponentType;
 		processImplImg: AADLBA!ProcessImplementation = OclUndefined;
 		sourceImplImg: AADLBA!ThreadImplementation = OclUndefined;
 		destinationImplImg: AADLBA!ThreadImplementation = OclUndefined;
@@ -701,30 +679,33 @@ rule intra_PortConnection_Instance
 		sourceImplImg <- c_source.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
 		destinationImplImg <- c_destination.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
 		processImplImg <- c_source.eContainer().getSubcomponentImg().subcomponentType.debug('Retreived Process Implementation');
+		sourceFeatureImg <- cnxInst.source.getFeatureImg().debug('Retreived Feature Image');
+		destinationFeatureImg <- cnxInst.destination.getFeatureImg().debug('Retreived Feature Image'); 
+		processImplImg.ownedDataSubcomponent.add(d);
 		
 		-- add and connect data subcomponent, Id of the communication protocol
 		if(cnxInst.source.category=#eventPort)
 		{
-			thisModule.addWaitEvent(cnxInst.destination, c_destination, destinationFeatureImg, destinationImplImg);
-			thisModule.addSetEvent(cnxInst.source, c_source, sourceFeatureImg, sourceImplImg);
+			thisModule.addWaitEvent(cnxInst.destination, impl_destination, destinationFeatureImg, destinationImplImg);
+			thisModule.addSetEvent(cnxInst.source, impl_source, sourceFeatureImg, sourceImplImg);
 			d.dataSubcomponentType<-'Event_Id_Type'.asDataType('POK_RUNTIME');
 		}
 		else if(cnxInst.source.category=#eventDataPort)
 		{
-			thisModule.addReceiveBuffer(cnxInst.destination, c_destination, destinationFeatureImg, destinationImplImg);
-			thisModule.addSendBuffer(cnxInst.source, c_source, sourceFeatureImg, sourceImplImg);
+			thisModule.addReceiveBuffer(cnxInst.destination, impl_destination, destinationFeatureImg, destinationImplImg);
+			thisModule.addSendBuffer(cnxInst.source, impl_source, sourceFeatureImg, sourceImplImg);
 			d.dataSubcomponentType<-'Buffer_Id_Type'.asDataType('POK_RUNTIME');
 		}
 		else if(cnxInst.source.category=#dataPort)
 		{
-			thisModule.addReadBlackBoard(cnxInst.destination, c_destination, destinationFeatureImg, destinationImplImg);
-			thisModule.addDisplayBlackBoard(cnxInst.source, c_source, sourceFeatureImg, sourceImplImg);
+			thisModule.addReadBlackBoard(cnxInst.destination, impl_destination, destinationFeatureImg, destinationImplImg);
+			thisModule.addDisplayBlackBoard(cnxInst.source, impl_source, sourceFeatureImg, sourceImplImg);
 			d.dataSubcomponentType<-'Blackboard_Id_Type'.asDataType('POK_RUNTIME');
 		}
-		processImplImg.ownedDataSubcomponent.add(d);
+		
 		thisModule.addDataAccessConnection(
 			processImplImg,
-			'Id_instance_to_'+cnxInst.source.name,
+			'Id_instance_to_'+cnxInst.source.eContainer().name+'_'+cnxInst.source.name,
 			cnxInst.source.feature.retreiveIdAccess(sourceImplImg), 
 			OclUndefined,
 			d
@@ -732,15 +713,15 @@ rule intra_PortConnection_Instance
 		
 		thisModule.addDataAccessConnection(
 			processImplImg,
-			'Id_instance_to_'+cnxInst.destination.name,
+			'Id_instance_to_'+cnxInst.destination.eContainer().name+'_'+cnxInst.destination.name,
 			cnxInst.destination.feature.retreiveIdAccess(destinationImplImg), 
 			OclUndefined,
 			d
 		);
 		
 		
-		thisModule.addThreadsInternalConnections(cnxInst.source);
 		thisModule.addThreadsInternalConnections(cnxInst.destination);
+		thisModule.addThreadsInternalConnections(cnxInst.source);
 		if(c_source.featureInstance->last().debug('Last Feature Instance') = cnxInst.source.debug('Current Feature Instance'))
 		{
 			true.debug('Expand Dispatch Protocol');
@@ -1515,21 +1496,18 @@ rule addEventCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!Subprogr
 	}
 }
 
-unique lazy rule initSubprogramCallSequence
+rule initSubprogramCallSequence(implImg: AADLBA!ThreadIplementation, impl: AADLI!ThreadImplementation)
 {
-	from
-		implImg: AADLBA!ThreadIplementation,
-		impl: AADLI!ThreadImplementation
 	using
 	{
 		result: AADLBA!SubprogramCallSequence = OclUndefined;
 	}
 	do
 	{
-		if(implImg.callSequence().ownedCallSpecification->isEmpty())
+		result <- thisModule.copyCallSequence(OclUndefined, impl,implImg);
+		if(not result.oclIsUndefined())
 		{
-			result <- thisModule.copyCallSequence(OclUndefined, impl,implImg);
-			if(not result.oclIsUndefined())
+			if(implImg.callSequence().ownedCallSpecification->isEmpty())
  			{
 				if(impl.ownedSubprogramCallSequence->isEmpty())
 				{

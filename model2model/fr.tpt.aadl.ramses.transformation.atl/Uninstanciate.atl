@@ -534,7 +534,7 @@ lazy rule createCallSequence
 
 helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
 	if( impl.callSequenceFromImpl().oclIsUndefined() ) then
-		if(impl.callSequenceFromComputeEntryPoint().oclIsUndefined) then
+		if(impl.callSequenceFromComputeEntryPoint().oclIsUndefined()) then
 			OclUndefined
 		else
 			thisModule.mapComputeEntrypoint(impl)
