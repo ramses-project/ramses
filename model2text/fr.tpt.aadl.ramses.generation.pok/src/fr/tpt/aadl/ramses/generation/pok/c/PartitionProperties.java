@@ -1,6 +1,8 @@
 package fr.tpt.aadl.ramses.generation.pok.c;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.BlackBoardInfo;
@@ -19,14 +21,14 @@ public class PartitionProperties
   
   public boolean hasSample = false ;
   
-  public Set<BlackBoardInfo> blackboardInfo = new HashSet<BlackBoardInfo>() ;
+  public List<BlackBoardInfo> blackboardInfo = new ArrayList<BlackBoardInfo>() ;
   
-  public Set<String> eventNames = new HashSet<String>() ;
+  public List<String> eventNames = new ArrayList<String>() ;
   
-  public Set<QueueInfo> bufferInfo = new HashSet<QueueInfo>() ;
+  public List<QueueInfo> bufferInfo = new ArrayList<QueueInfo>() ;
   
-  public Set<QueueInfo> queueInfo = new HashSet<QueueInfo>();
+  public List<QueueInfo> queueInfo = new ArrayList<QueueInfo>();
   
-  public Set<SampleInfo> sampleInfo = new HashSet<SampleInfo>();
+  public List<SampleInfo> sampleInfo = new ArrayList<SampleInfo>();
   
 }
