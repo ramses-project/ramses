@@ -59,9 +59,11 @@ import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.parsesupport.LocationReference;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver ;
+import fr.tpt.aadl.annex.behavior.utils.AadlBaLocationReference ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
@@ -240,14 +242,32 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   {
     INode node = NodeModelUtils.findActualNodeFor(source) ;
     int line=-1;
+    
     if(node!=null)
     	line = node.getStartLine() ;
     else if(source.getLocationReference() != null)
     {
     	line = source.getLocationReference().getLine();
     }
-    LocationReference lr =
-          new LocationReference(source.eResource().getURI().lastSegment(), line) ;
+    
+    String filename = source.eResource().getURI().lastSegment() ;
+    
+    LocationReference lr ;
+    
+    if(source instanceof BehaviorElement &&
+       target instanceof BehaviorElement &&
+       source.getLocationReference() != null )
+    {
+      AadlBaLocationReference src = (AadlBaLocationReference) 
+                                                 source.getLocationReference() ;
+      lr = src.clone() ;
+      lr.setFilename(filename) ;
+    }
+    else
+    {
+      lr = new LocationReference(filename, line) ;
+    }
+    
     target.setLocationReference(lr) ;
   }
 
