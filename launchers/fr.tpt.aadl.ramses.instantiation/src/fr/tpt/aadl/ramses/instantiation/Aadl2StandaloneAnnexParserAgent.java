@@ -54,9 +54,6 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
   protected void afterModelLinked(EObject model,
                                   IDiagnosticConsumer diagnosticsConsumer)
   {
-    INode node = NodeModelUtils.findActualNodeFor(model) ;
-    int offset = node.getTotalOffset() ;
-    int line = node.getTotalStartLine() ;
     String filename = model.eResource().getURI().toString() ;
     // set up reporter for ParseErrors
     ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
@@ -71,9 +68,23 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
     {
       String annexText = defaultAnnexSubclause.getSourceText() ;
       String annexName = defaultAnnexSubclause.getName() ;
-
+      INode node = NodeModelUtils.findActualNodeFor(defaultAnnexSubclause) ;
+      
+      int offset = node.getOffset();
+      int line = node.getStartLine();
+      String sourceText = defaultAnnexSubclause.getSourceText();
+      if (sourceText == null) break;
+      int nlength = node.getLength();
+      int sourcelength = sourceText.length();
+      offset = offset + (nlength-sourcelength-1)+3;
+      
       if(annexText != null && annexName != null)
       {
+        
+        if (annexText.length() > 6) {
+          annexText = annexText.substring(3, annexText.length() - 3);
+        }
+        
         AnnexParser ap = registry.getParser(annexName) ;
         AnnexResolver ar = registry.getResolver(annexName) ;
         _jobHandler.addJob(new AnnexJob(defaultAnnexSubclause, filename, line,
