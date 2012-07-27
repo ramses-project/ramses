@@ -23,7 +23,7 @@ package fr.tpt.aadl.ramses.util.generation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,13 +44,13 @@ import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 
 public class RoutingProperties implements TargetProperties {
   
-  public Set<FeatureInstance> globalPort = new HashSet<FeatureInstance>();
+  public Set<FeatureInstance> globalPort = new LinkedHashSet<FeatureInstance>();
 
-	public Set<ComponentInstance> processes = new HashSet<ComponentInstance>();
+	public Set<ComponentInstance> processes = new LinkedHashSet<ComponentInstance>();
 
-	public Set<ComponentInstance> processors = new HashSet<ComponentInstance>();
+	public Set<ComponentInstance> processors = new LinkedHashSet<ComponentInstance>();
 	
-	public Set<ComponentInstance> buses = new HashSet<ComponentInstance>();
+	public Set<ComponentInstance> buses = new LinkedHashSet<ComponentInstance>();
 	
 	public Map<ComponentInstance, List<FeatureInstance>> portPerProcess = 
 	                      new HashMap<ComponentInstance, List<FeatureInstance>>();
@@ -152,7 +152,7 @@ public class RoutingProperties implements TargetProperties {
 							processPerProcessor.get(processor).add(process);
 						else
 						{
-							Set<ComponentInstance> processes  =new HashSet<ComponentInstance>();
+							Set<ComponentInstance> processes  =new LinkedHashSet<ComponentInstance>();
 							processes.add(process);
 							processPerProcessor.put(processor, processes);
 						}

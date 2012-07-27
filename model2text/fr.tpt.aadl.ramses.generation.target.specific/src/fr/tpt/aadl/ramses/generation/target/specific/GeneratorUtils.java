@@ -22,8 +22,8 @@
 package fr.tpt.aadl.ramses.generation.target.specific;
 
 import java.util.ArrayList ;
-import java.util.HashSet ;
 import java.util.Iterator ;
+import java.util.LinkedHashSet;
 import java.util.List ;
 import java.util.Set ;
 
@@ -190,7 +190,7 @@ public class GeneratorUtils
 
   public static Set<String> getListOfReferencedObjects(ProcessImplementation aProcessImplementation)
   {
-    Set<String> result = new HashSet<String>() ;
+    Set<String> result = new LinkedHashSet<String>() ;
 
     for(ThreadSubcomponent aTheadSubcomponent : aProcessImplementation
           .getOwnedThreadSubcomponents())
