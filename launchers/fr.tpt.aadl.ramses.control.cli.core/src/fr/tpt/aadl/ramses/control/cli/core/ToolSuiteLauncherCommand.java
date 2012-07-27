@@ -23,8 +23,10 @@ package fr.tpt.aadl.ramses.control.cli.core ;
 
 import java.io.File ;
 import java.util.ArrayList ;
+import java.util.HashMap ;
 import java.util.Iterator ;
 import java.util.List ;
+import java.util.Map ;
 import java.util.Set ;
 
 
@@ -65,6 +67,11 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String RAMSES_RESOURCES_VAR = "RAMSES_DIR";
   private static final String RAMSES_DIR = System.getenv(RAMSES_RESOURCES_VAR) ;
   private static final String GENERATION_OPTION_ID = "target_platform" ;
+  
+  private static final String PARAMETER_SEPARATOR = "=" ;
+  private static final String PARAMETER_OPTION_ID = "key"+ 
+                                                           PARAMETER_SEPARATOR +
+                                                             "value" ;
 
   private static Switch helpOnlyMode ;
   private static Switch parseOnlyMode ;
@@ -234,7 +241,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     FlaggedOption post_transformation_files =
           new FlaggedOption(POST_TRANSFORMATION_FILES_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                .setLongFlag("post-transformation").setShortFlag('p')
+                .setLongFlag("post-transformation").setShortFlag('x')
                 .setList(true).setListSeparator(',')
                 .setAllowMultipleDeclarations(false) ;
     post_transformation_files
@@ -254,10 +261,19 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
             .setAllowMultipleDeclarations(false) ;
                   xml_path.setHelp("The specified XML file contains the workflow") ;
 
-    
+    FlaggedOption parameters =
+           new FlaggedOption(PARAMETER_OPTION_ID)
+                  .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+                  .setLongFlag("parameter").setShortFlag('p').setList(true)
+                  .setListSeparator(',')
+                  .setAllowMultipleDeclarations(false) ;
+                  
+    parameters.setHelp("additional parameters given as key=value format") ;
+                  
     jsapParse.registerParameter(model) ;
     jsapParse.registerParameter(includes) ;
     jsapParse.registerParameter(parseOnlyMode) ;
+    jsapParse.registerParameter(parameters);
     
     jsapAnalysis.registerParameter(analysis) ;
     jsapAnalysis.registerParameter(model) ;
@@ -265,6 +281,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapAnalysis.registerParameter(analysisOnlyMode) ;
     jsapAnalysis.registerParameter(system_to_instantiate) ;
     jsapAnalysis.registerParameter(generated_file_path) ;
+    jsapAnalysis.registerParameter(parameters);
+    jsapAnalysis.registerParameter(helpOnlyMode) ;
     
     jsapTransfo.registerParameter(analysisOnlyMode) ;
     jsapTransfo.registerParameter(helpOnlyMode) ;
@@ -276,6 +294,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapTransfo.registerParameter(post_transformation_files) ;
     jsapTransfo.registerParameter(generated_file_path) ;
     jsapTransfo.registerParameter(analysis) ;
+    jsapTransfo.registerParameter(parameters);
     
     FlaggedOption generation =
           new FlaggedOption(GENERATION_OPTION_ID)
@@ -293,8 +312,42 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapGen.registerParameter(generated_file_path) ;
     jsapGen.registerParameter(generation) ;
     jsapGen.registerParameter(xml_path) ;
+    jsapGen.registerParameter(parameters);
   }
 
+  private static Map<String, Object> parametersHandler(JSAPResult config)
+        throws Exception
+  {
+    String[] unparsedParameters = config.getStringArray(PARAMETER_OPTION_ID) ;
+
+    Map<String, Object> result = null ;
+
+    if(unparsedParameters.length != 0)
+    {
+      result = new HashMap<String, Object>() ;
+
+      for(String tmp : unparsedParameters)
+      {
+        String[] splited = tmp.split(PARAMETER_SEPARATOR) ;
+
+        if(splited.length == 2)
+        {
+          result.put(splited[0], splited[1]) ;
+        }
+        else
+        // Wrong parameters format.
+        {
+          String errorMsg =
+                "wrong parameters format : must be " + PARAMETER_OPTION_ID ;
+          System.err.println(errorMsg) ;
+          throw new Exception(errorMsg) ;
+        }
+      }
+    }
+
+    return result ;
+  }
+  
   @SuppressWarnings("rawtypes")
   private static void reportError(Iterator errs,
                                   String message)
@@ -397,7 +450,10 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
       try
       {
-        launcher.performAnalysis(mainModelFiles, systemToInstantiate) ;
+        Map<String, Object> parameters = parametersHandler(analysisConfig) ;
+        
+        launcher.performAnalysis(mainModelFiles, systemToInstantiate,
+                                 parameters) ;
       }
       catch(AnalysisResultException e)
       {
@@ -489,6 +545,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       String xml_path =
             genConf.getString(XML_OPTION_ID) ;
 
+      Map<String, Object> parameters = parametersHandler(genConf) ;
+      
       if(xml_path == null)
       {
         launcher.initializeGeneration(targetName) ;
@@ -496,19 +554,21 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                                        systemToInstantiate,
                                        outputDir,
                                        targetName,
-                                       atlResourceDir) ;
+                                       atlResourceDir,
+                                       parameters) ;
       }
       else
       {
         XMLPilot xmlPilot = new XMLPilot(genConf.getString(XML_OPTION_ID));
-
+        
         launcher.initializeGeneration(targetName) ;
         launcher.launchModelGenerationXML(mainModelFiles,
                                           systemToInstantiate,
                                           outputDir,
                                           targetName,
                                           atlResourceDir,
-                                          xmlPilot) ;
+                                          xmlPilot,
+                                          parameters) ;
       }
     }
     catch(Exception e)

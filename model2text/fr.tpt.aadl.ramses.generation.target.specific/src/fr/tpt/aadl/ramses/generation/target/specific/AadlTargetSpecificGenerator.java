@@ -185,10 +185,8 @@ public class AadlTargetSpecificGenerator implements Generator
     }
   }
 
-  
   @Override
-  public void setParameters(Map<Enum<?>, Object> parameters)
-        throws Exception
+  public void setParameters(Map<String, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }

@@ -42,6 +42,5 @@ public interface Generator extends NamedPlugin
                           XMLPilot xmlPilot) throws GenerationException ;
 
   
-  public void setParameters(Map<Enum<?>, Object> parameters)
-        throws Exception ;
+  public void setParameters(Map<String, Object> parameters) ;
 }

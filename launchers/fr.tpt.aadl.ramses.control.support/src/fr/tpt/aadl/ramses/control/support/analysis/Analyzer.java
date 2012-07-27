@@ -33,10 +33,9 @@ public interface Analyzer extends NamedPlugin
 {
   // TODO : return generic analysis results. Any ideas ? Return Resource ???
   public void performAnalysis(SystemInstance instance,
-                              AnalysisErrorReporterManager errReporterManager,
-                              IProgressMonitor monitor)
+                               AnalysisErrorReporterManager errReporterManager,
+                               IProgressMonitor monitor)
         throws AnalysisResultException ;
 
-  public void setParameters(Map<Enum<?>, String> parameters)
-        throws Exception ;
+  public void setParameters(Map<String, Object> parameters) ;
 }

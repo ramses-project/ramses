@@ -146,11 +146,9 @@ public class GenerateAction extends AbstractAnalyzer
   }
 
   @Override
-  public void setParameters(Map<Enum<?>, String> parameters)
-        throws Exception
+  public void setParameters(Map<String, Object> parameters)
   {
-    // TODO Auto-generated method stub
-    
+    throw new UnsupportedOperationException () ;
   }
 
   @Override

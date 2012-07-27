@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.control.core ;
 import java.io.File ;
 import java.util.ArrayList ;
 import java.util.List ;
+import java.util.Map ;
 import java.util.Set ;
 
 import org.eclipse.core.runtime.NullProgressMonitor ;
@@ -32,6 +33,7 @@ import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
@@ -110,7 +112,8 @@ public class ToolSuiteLauncher
     return result ;
   }
 
-  private void performAnalysis(SystemInstance instance)
+  private void performAnalysis(SystemInstance instance,
+                                Map<String, Object> parameters)
         throws AnalysisResultException
   {
     if(_analysisToPerform != null && _analysisToPerform.isEmpty() == false)
@@ -118,8 +121,11 @@ public class ToolSuiteLauncher
       // to be completed with exceptions in case analysis goes wrong
       for(String analysisName : _analysisToPerform)
       {
-        _registry.getAnalyzer(analysisName)
-              .performAnalysis(instance,
+        Analyzer analyzer = _registry.getAnalyzer(analysisName) ;
+        
+        // Set parameters to null in order to reset analyzer's parameters.
+        analyzer.setParameters(parameters) ;
+        analyzer.performAnalysis(instance,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                new NullProgressMonitor()) ;
       }
@@ -149,7 +155,8 @@ public class ToolSuiteLauncher
                                      String systemToInstantiate,
                                      File generatedFilePath,
                                      String targetName,
-                                     File resourceFilePath)
+                                     File resourceFilePath,
+                                     Map<String, Object> parameters)
                                                       throws GenerationException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
@@ -168,6 +175,8 @@ public class ToolSuiteLauncher
     
     Generator generator = registry.getGenerator(targetName) ;
     
+    generator.setParameters(parameters) ;
+    
     generator.generate(instance, resourceFilePath,
                        generatedFilePath) ;
   }
@@ -177,7 +186,8 @@ public class ToolSuiteLauncher
                                         File generatedFilePath,
                                         String targetName,
                                         File resourceFilePath,
-                                        XMLPilot xmlPilot)
+                                        XMLPilot xmlPilot,
+                                        Map<String, Object> parameters)
                                               throws GenerationException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
@@ -196,20 +206,23 @@ public class ToolSuiteLauncher
 
     Generator generator = registry.getGenerator(targetName) ;
     System.out.println("Generator.generateXML called");
-
+    
+    generator.setParameters(parameters) ;
+    
     generator.generateXML(instance, resourceFilePath,
                           generatedFilePath, xmlPilot) ;
   }
   
   
   public void performAnalysis(List<File> mainModelFiles,
-                              String systemToInstantiate)
+                               String systemToInstantiate,
+                               Map<String, Object> parameters)
         throws AnalysisResultException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModelFiles) ;
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
-    this.performAnalysis(instance) ;
+    this.performAnalysis(instance, parameters) ;
   }
 
   public void parsePredefinedPackages()

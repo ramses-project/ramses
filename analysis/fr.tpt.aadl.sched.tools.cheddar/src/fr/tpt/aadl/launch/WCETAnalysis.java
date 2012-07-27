@@ -60,8 +60,7 @@ public class WCETAnalysis extends AbstractAnalyzer
   }
 
   @Override
-  public void setParameters(Map<Enum<?>, String> parameters)
-        throws Exception
+  public void setParameters(Map<String, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }
