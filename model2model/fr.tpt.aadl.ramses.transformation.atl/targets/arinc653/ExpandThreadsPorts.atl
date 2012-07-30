@@ -1496,32 +1496,6 @@ rule addEventCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!Subprogr
 	}
 }
 
-rule initSubprogramCallSequence(implImg: AADLBA!ThreadIplementation, impl: AADLI!ThreadImplementation)
-{
-	using
-	{
-		result: AADLBA!SubprogramCallSequence = OclUndefined;
-	}
-	do
-	{
-		result <- thisModule.copyCallSequence(OclUndefined, impl,implImg);
-		if(not result.oclIsUndefined())
-		{
-			if(implImg.callSequence().ownedCallSpecification->isEmpty())
- 			{
-				if(impl.ownedSubprogramCallSequence->isEmpty())
-				{
-					implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(thisModule.copyCallSequence(OclUndefined, impl,implImg)));
-				}
-				else
-				{
-					implImg.ownedSubprogramCallSequence.add(result);
-				}
- 			}
-		}
-	}
-}
-
 rule addSubprogramCall(f:AADLBA!Feature, implImg: AADLBA!ComponentImplementation, call: AADLBA!SubprogramCall)
 {
 	using

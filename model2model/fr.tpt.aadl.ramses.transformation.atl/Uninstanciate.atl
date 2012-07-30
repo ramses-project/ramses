@@ -521,7 +521,7 @@ helper def : getContainingImplementation(cnx: AADLI!Connection) : AADLBA!Compone
 --  RULES FOR SUBPROGRAM CALLS
 -------------------------------------------------------------------------------------
 
-lazy rule createCallSequence
+unique lazy rule createCallSequence
 {
 	from
 		call: AADLBA!SubprogramCall
@@ -532,6 +532,32 @@ lazy rule createCallSequence
 		)
 }
 
+rule initSubprogramCallSequence(implImg: AADLBA!ThreadIplementation, impl: AADLI!ThreadImplementation)
+{
+	using
+	{
+		result: AADLBA!SubprogramCallSequence = OclUndefined;
+	}
+	do
+	{
+		result <- thisModule.copyCallSequence(OclUndefined, impl,implImg);
+		if(not result.oclIsUndefined())
+		{
+			if(implImg.callSequence().ownedCallSpecification->isEmpty())
+ 			{
+				if(impl.ownedSubprogramCallSequence->isEmpty())
+				{
+					implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(result));
+				}
+				else
+				{
+					implImg.ownedSubprogramCallSequence.add(result);
+				}
+ 			}
+		}
+	}
+}
+
 helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
 	if( impl.callSequenceFromImpl().oclIsUndefined() ) then
 		if(impl.callSequenceFromComputeEntryPoint().oclIsUndefined()) then
@@ -540,11 +566,11 @@ helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!Componen
 			thisModule.mapComputeEntrypoint(impl)
 		endif
 	else
-		thisModule.mapCallSequence(c, impl, implImg)
+		thisModule.mapCallSequence(implImg, c, impl)
 	endif
 ;
 
-lazy rule mapComputeEntrypoint
+unique lazy rule mapComputeEntrypoint
 {
 	from
 		impl : AADLI!ComponentImplementation
@@ -567,7 +593,12 @@ lazy rule mapComputeEntrypoint
 	}
 }
 
-rule mapCallSequence (c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) {
+unique lazy rule mapCallSequence
+{
+	from
+		implImg : AABDLBA!ComponentImplementation,
+		c : AADLI!ComponentInstance,
+		impl : AADLI!ComponentImplementation
 	using
 	{
 		callImg : AADLBA!SubprogramCall = OclUndefined;
