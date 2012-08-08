@@ -9,9 +9,9 @@
       <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>
       <useProjectArtifact>true</useProjectArtifact>
-      <excludes>
+<!--      <excludes>
 	<exclude>org.osate:org.osate.aadl2:jar</exclude>
-      </excludes>
+      </excludes> -->
     </dependencySet>
   </dependencySets>
 <!--  <dependencySets> -->
