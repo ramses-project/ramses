@@ -188,8 +188,6 @@ public class AadlTargetSpecificGenerator implements Generator
   @Override
   public void setParameters(Map<String, Object> parameters)
   {
-    // TODO: if the setParamaters is useful here, implement it instead
-	// of blocking everything on this exception throw...
-	//  throw new UnsupportedOperationException() ;
+    // AadlTargetSpecificGenerator does not take any parameters: nothing to do.
   }
 }
