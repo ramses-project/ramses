@@ -5,11 +5,13 @@
          point="org.osate.pluginsupport.aadlcontribution">
 
       <!-- Contributed packages -->
+      <!-- Now added by osate 
       <aadlcontribution
             file="aadl_resources/package/base_types.aadl2"
             id="fr.tpt.aadl.packages.base_types.aadlcontribution"
             name="Base-Types">
       </aadlcontribution>
+      -->
       <aadlcontribution
             file="aadl_resources/package/OSEK_runtime.aadl2"
             id="fr.tpt.aadl.packages.osek_runtime.aadlcontribution"
@@ -22,11 +24,13 @@
       </aadlcontribution>
 
       <!-- Contributed properties -->
+      <!-- Now added by osate
       <aadlcontribution
             file="aadl_resources/propertyset/ARINC653.aadl2"
             id="fr.tpt.aadl.propetries.arinc653.aadlcontribution"
             name="ARINC653-Properties">
       </aadlcontribution>
+      -->
       <aadlcontribution
             file="aadl_resources/propertyset/pok_properties.aadl2"
             id="fr.tpt.aadl.propetries.pok.aadlcontribution"
@@ -42,11 +46,12 @@
             id="fr.tpt.aadl.propetries.oseknxt.aadlcontribution"
             name="OSEK-NXT-Properties">
       </aadlcontribution>
+      <!-- Now added by osate
       <aadlcontribution
             file="aadl_resources/propertyset/data_model.aadl2"
             id="fr.tpt.aadl.propetries.data.model.aadlcontribution"
             name="Data-Model-Properties">
-      </aadlcontribution>
+      </aadlcontribution> -->
       <aadlcontribution
             file="aadl_resources/propertyset/Generation_Properties.aadl2"
             id="fr.tpt.aadl.propetries.generation.aadlcontribution"
