@@ -21,8 +21,7 @@
 
 package test_sampling
 public
-  with POK,Data_Model,ARINC653,Base_Types;
-  
+ with POK, ARINC653, Data_Model;
   system root
   end root;
 
@@ -113,6 +112,7 @@ public
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
+    Priority => 5;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
@@ -142,6 +142,7 @@ public
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 200 Ms;
+    Priority => 10;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;

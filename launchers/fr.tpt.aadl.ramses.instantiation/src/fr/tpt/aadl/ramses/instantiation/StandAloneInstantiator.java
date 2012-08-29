@@ -28,8 +28,7 @@ import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.HashMap;
 import java.util.List ;
-import java.util.Map;
-
+import java.util.Map ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.Diagnostic ;
 import org.eclipse.emf.common.util.URI ;
@@ -38,10 +37,8 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.emf.ecore.util.Diagnostician ;
-import org.eclipse.xtext.resource.SaveOptions;
 import org.eclipse.xtext.resource.XtextResource ;
 import org.eclipse.xtext.resource.XtextResourceSet ;
-import org.eclipse.xtext.serializer.impl.Serializer;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.NamedElement ;
@@ -52,11 +49,13 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl ;
 import org.osate.aadl2.util.Aadl2ResourceImpl ;
 import org.osate.core.OsateCorePlugin ;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
+
 import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
 
-import com.google.inject.Injector ;
+import com.google.inject.Injector;
 
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 
 public class StandAloneInstantiator
 {
@@ -80,6 +79,8 @@ public class StandAloneInstantiator
                 ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
           .put("aaxl2", new Aadl2ResourceFactoryImpl()) ;
+    PropertiesLinkingService pls = new PropertiesLinkingService(); 
+    pls.setStandAloneResourceSet(resourceSet);
   }
 
   public static StandAloneInstantiator getInstantiator()
@@ -113,6 +114,7 @@ public class StandAloneInstantiator
         continue ;
       }
 
+      boolean found = false;
       for(NamedElement member : aadlPackage.getOwnedPublicSection()
             .getOwnedMembers())
       {
@@ -122,6 +124,7 @@ public class StandAloneInstantiator
 
           if(toInstantiate.getName().equals(systemToInstantiate))
           {
+        	found = true;
             URI instanceURI =
                   OsateResourceUtil.getInstanceModelURI(toInstantiate) ;
             
@@ -138,10 +141,14 @@ public class StandAloneInstantiator
 
             SystemInstance instance = instantiateModel.createSystemInstanceInt(toInstantiate,
                                                             aadlResource) ;
+
             return instance;
+
           }
         }
       }
+      if(found == false)
+    	  System.err.println("ERROR: "+systemToInstantiate+ " was not found in the instance model");
     }
 
     return null ;
@@ -151,6 +158,7 @@ public class StandAloneInstantiator
   {
     // Must specify file protocol. Otherwise, got resource doesn't exist when
     // using OSGi mechanism.
+
     //TODO: implement test osgi and add "file:" in case osgi is used
     URI uri = URI.createFileURI(aadlFile.getAbsolutePath().toString()) ;
     Resource input_resource = resourceSet.getResource(uri, true) ;
@@ -184,9 +192,8 @@ public class StandAloneInstantiator
                               boolean loadOption)
   {
     List<Resource> result = new ArrayList<Resource>() ;
-    resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, loadOption) ;
     boolean existParsingErrors = false ;
-
+    resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL, loadOption) ;
     for(File s : aadlFiles)
     {
       Resource r = this.parse(s) ;
@@ -200,20 +207,23 @@ public class StandAloneInstantiator
         existParsingErrors = true ;
       }
     }
-
+    
     this.validate() ;
-    Aadl2StandaloneAnnexParserAgent._jobHandler.parseAllAnnexes() ;
-
-    if(!existParsingErrors &&
-          ServiceRegistry.PARSE_ERR_REPORTER.getNumErrors() == 0)
+    if(loadOption)
     {
-      Aadl2StandaloneAnnexParserAgent._jobHandler.resolveAllAnnexes() ;
+      Aadl2StandaloneAnnexParserAgent._jobHandler.parseAllAnnexes() ;
+      if(!existParsingErrors &&
+              ServiceRegistry.PARSE_ERR_REPORTER.getNumErrors() == 0)
+        {
+          Aadl2StandaloneAnnexParserAgent._jobHandler.resolveAllAnnexes() ;
+        }
+        else
+        {
+          System.err.println("Exit on parse error") ;
+          java.lang.System.exit(-1) ;
+        }
     }
-    else
-    {
-      System.err.println("Exit on parse error") ;
-      java.lang.System.exit(-1) ;
-    }
+    
 
     return result ;
   }
@@ -267,7 +277,13 @@ public class StandAloneInstantiator
 	  
 //	  Serializer serializer = injector.getInstance(Serializer.class);
 //	  String resultFileContent = serializer.serialize(transfoResult.getContents().get(0));
-    String resultFileContent =
+	try {
+		transfoResult.load(null);
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	String resultFileContent =
             Aadl2StandaloneUnparser.getAadlUnparser()
                   .doUnparse((Element) transfoResult.getContents().get(0)) ;
     try

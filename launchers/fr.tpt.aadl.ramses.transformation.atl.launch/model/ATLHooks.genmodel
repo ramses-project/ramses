@@ -13,15 +13,6 @@
   <genPackages prefix="AtlHooks" basePackage="fr.tpt.aadl.ramses.transformation.atl"
       resource="XML" disposableProviderFactory="true" ecorePackage="ATLHooks.ecore#/">
     <genClasses ecoreClass="ATLHooks.ecore#//HookAccess">
-      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/createBehaviorAnnex">
-        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/createBehaviorAnnex/threadImpl"/>
-      </genOperations>
-      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/setDirectionIn">
-        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/setDirectionIn/feature"/>
-      </genOperations>
-      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/resolveBANames">
-        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/resolveBANames/ba"/>
-      </genOperations>
       <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/orderFeatures">
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/orderFeatures/cpt"/>
       </genOperations>
@@ -36,6 +27,19 @@
       <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc">
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc/state"/>
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc/transition"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getCurrentPerionReadTable">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getCurrentPerionReadTable/port"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getCurrentDeadlineWriteTable">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getCurrentDeadlineWriteTable/port"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getCurrentDeadlineWriteTable/destinationPort"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getBufferSize">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getBufferSize/destinationFeatureInstance"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/setInDirection">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/setInDirection/feature"/>
       </genOperations>
     </genClasses>
   </genPackages>

@@ -3,7 +3,7 @@ public
 
 with ARINC653;
 with POK;
-with Base_Types, Data_Model;
+with Base_Types, data_model;
 
   data PingPongMessage
     properties
@@ -239,18 +239,6 @@ end SEQ;
       cnx8: data access call_Monitor_activate.state_baKeywords -> state_baKeywords;
       cnx9: parameter call_Monitor_activate.mode_C1 -> call_C1_mode.mode_aadlkeywords;
       cnxx11: data access call_C1_mode.seqNb -> seqNb;
-
-annex behavior_specification {**
-		variables 
-			replyPong: PingPongMessage;
-		states 
-			switch: initial state;
-			ret: final state;
-		transitions 
-			switch -[]-> switch;
-
-    **};
-
   end a1.impl;
   
   thread a2

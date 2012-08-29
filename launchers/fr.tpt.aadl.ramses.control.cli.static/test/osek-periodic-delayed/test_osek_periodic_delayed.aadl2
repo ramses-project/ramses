@@ -1,0 +1,76 @@
+package periodic_delayed
+public
+
+with Data_Model, OSEK;
+
+data Int
+properties
+  Data_Model::Data_Representation => integer;
+end Int;
+
+thread producer
+features
+  p_out: out event data port Int;
+end producer;
+
+
+thread implementation producer.impl
+properties
+  dispatch_protocol => Periodic;
+end producer.impl;
+
+thread consumer
+features
+  p_in: in event data port Int {dequeue_protocol => AllItems;};
+end consumer;
+
+thread implementation consumer.impl
+properties
+  dispatch_protocol => Periodic;
+end consumer.impl;
+
+process proc
+end proc;
+
+process implementation proc.impl
+subcomponents
+  T1: thread producer.impl {Period => 5 ms; Deadline => 5 ms; Priority => 3; };
+  T2: thread producer.impl {Period => 7 ms; Deadline => 7 ms; Priority => 2; };
+  T3: thread consumer.impl {Period => 10 ms; Deadline => 10 ms; Priority => 1; };
+  T4: thread producer.impl {Period => 10 ms; Deadline => 10 ms; Priority => 2; };
+connections 
+  cnx1: port T1.p_out -> T3.p_in {Timing=>Delayed;};
+  cnx2: port T2.p_out -> T3.p_in {Timing=>Delayed;};
+  cnx3: port T4.p_out -> T3.p_in {Timing=>Delayed;};
+end proc.impl;
+
+---------------
+-- Processor --
+---------------
+
+processor arm
+end arm;
+
+processor implementation arm.impl
+end arm.impl;
+
+---------------
+--  System   --
+---------------
+
+system root
+end root;
+
+system implementation root.impl
+subcomponents
+  p: process proc.impl;
+  nxt_cpu: processor arm.impl;
+properties
+  Actual_Processor_Binding => (reference (nxt_cpu)) applies to p;
+  OSEK::SystemCounter_Source => "it_timer1";
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
+end root.impl;
+
+end periodic_delayed;

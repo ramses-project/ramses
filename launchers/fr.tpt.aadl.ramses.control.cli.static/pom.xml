@@ -189,6 +189,20 @@
       <scope>runtime</scope>
     </dependency>
 
+	<dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.util.math</artifactId>
+      <version>0.0.1</version>
+      <scope>runtime</scope>
+    </dependency>
+
+	<dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.communication.periodic.delayed</artifactId>
+      <version>0.0.1</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.core</artifactId>

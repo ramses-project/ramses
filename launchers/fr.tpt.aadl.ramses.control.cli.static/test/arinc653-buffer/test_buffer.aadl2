@@ -21,7 +21,7 @@
 
 package test_buffer
 public
-  with POK, Data_Model;
+with POK, Data_Model;
   system root
   end root;
 
@@ -31,8 +31,8 @@ public
     the_proc: process proc.impl;
     the_mem: memory mem.impl;
   properties
-    actual_processor_binding => (reference (the_cpu.the_part)) applies to the_proc;
     actual_memory_binding => (reference (the_mem)) applies to the_proc;
+    actual_processor_binding => (reference (the_cpu.the_part)) applies to the_proc;
   end root.impl;
 
   processor cpu
@@ -87,6 +87,7 @@ public
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
+    Priority => 5;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
@@ -116,6 +117,7 @@ public
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 200 Ms;
+    Priority => 10;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;

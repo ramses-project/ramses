@@ -27,22 +27,19 @@
  */
 package fr.tpt.aadl.ramses.transformation.atl.hooks ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DirectedFeature;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.Feature;
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.instance.ConnectionInstance;
+import org.osate.aadl2.instance.FeatureInstance;
+import org.osate.aadl2.instance.InstanceObject;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
-
-import org.eclipse.emf.common.util.EList ;
-import org.eclipse.emf.ecore.EObject ;
-
-import org.osate.aadl2.ComponentType ;
-import org.osate.aadl2.DirectedFeature ;
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.Feature ;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.ThreadImplementation ;
-import org.osate.aadl2.instance.InstanceObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -58,68 +55,68 @@ public interface HookAccess extends EObject
 {
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model required="true" threadImplRequired="true"
-   * @generated NOT
-   */
-  void setPredefinedPackagesManager(PredefinedPackagesManager p) ;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @model required="true" threadImplRequired="true"
-   * @generated
-   */
-  BehaviorAnnex createBehaviorAnnex(ThreadImplementation threadImpl) ;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @model featureRequired="true"
-   * @generated
-   */
-  void setDirectionIn(DirectedFeature feature) ;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @model baRequired="true"
-   * @generated
-   */
-  void resolveBANames(BehaviorAnnex ba) ;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @model
-   * @generated
-   */
+	 * @model
+	 * @generated
+	 */
   EList<Feature> orderFeatures(ComponentType cpt) ;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model targetRequired="true" sourceRequired="true"
-   * @generated
-   */
+	 * @model targetRequired="true" sourceRequired="true"
+	 * @generated
+	 */
   void copyLocationReference(Element target,
                              Element source) ;
 
     /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model targetDeclarativeRequired="true" sourceInstanceRequired="true"
-   * @generated
-   */
+	 * @model targetDeclarativeRequired="true" sourceInstanceRequired="true"
+	 * @generated
+	 */
   void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance);
 
     /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model stateRequired="true" transitionRequired="true"
-   * @generated
-   */
+	 * @model stateRequired="true" transitionRequired="true"
+	 * @generated
+	 */
   void putTransitionWhereSrc(BehaviorState state, BehaviorTransition transition);
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model portRequired="true"
+	 * @generated
+	 */
+	EList<Long> getCurrentPerionReadTable(FeatureInstance port);
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model portRequired="true"
+	 * @generated
+	 */
+	EList<Long> getCurrentDeadlineWriteTable(FeatureInstance port, FeatureInstance destinationPort);
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model required="true" destinationFeatureInstanceRequired="true"
+	 * @generated
+	 */
+	long getBufferSize(FeatureInstance destinationFeatureInstance);
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model featureRequired="true"
+	 * @generated
+	 */
+	void setInDirection(DirectedFeature feature);
 
 } // HookAccess

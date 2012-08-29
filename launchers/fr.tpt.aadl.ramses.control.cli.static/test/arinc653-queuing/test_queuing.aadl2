@@ -21,7 +21,7 @@
 
 package test_queuing
 public
-  with POK, Data_Model;
+with POK, Data_Model;
   system root
   end root;
 
@@ -66,7 +66,8 @@ public
 
   process proc1
   features
-    p: out event data port Integer;
+    p: out event data port Integer {Queue_Size => 5; 
+    							    Queue_Processing_Protocol => FIFO;};
   properties
     POK::Needed_Memory_Size => 200 kbyte;
   end proc1;
@@ -80,7 +81,8 @@ public
 
   process proc2
   features
-    p: in event data port Integer;
+    p: in event data port Integer{Queue_Size => 10; 
+    							  Queue_Processing_Protocol => FIFO;};
   properties
     POK::Needed_Memory_Size => 200 kbyte;
   end proc2;
@@ -99,6 +101,7 @@ public
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
+    Priority => 5;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
@@ -128,6 +131,7 @@ public
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 200 Ms;
+    Priority => 10;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;

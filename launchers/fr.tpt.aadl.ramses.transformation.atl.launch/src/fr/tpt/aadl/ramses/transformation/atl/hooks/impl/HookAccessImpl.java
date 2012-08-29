@@ -27,50 +27,41 @@
  */
 package fr.tpt.aadl.ramses.transformation.atl.hooks.impl ;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import org.eclipse.emf.common.util.BasicEList ;
-import org.eclipse.emf.common.util.EList ;
-import org.eclipse.emf.ecore.EClass ;
-import org.eclipse.emf.ecore.impl.EObjectImpl ;
-import org.osate.aadl2.ComponentType ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.m2m.atl.core.ATLCoreException ;
-import org.eclipse.xtext.nodemodel.INode ;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
-import org.osate.aadl2.AnnexSubclause ;
-import org.osate.aadl2.ComponentImplementation ;
-import org.osate.aadl2.DirectedFeature ;
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.Feature ;
-import org.osate.aadl2.DirectionType ;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.xtext.nodemodel.INode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DirectedFeature;
+import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.instance.ConnectionInstance;
+import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.parsesupport.LocationReference;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
-import fr.tpt.aadl.annex.behavior.analyzers.AadlBaNameResolver ;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaLocationReference ;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
-import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess ;
-import fr.tpt.aadl.utils.Aadl2Utils ;
+import fr.tpt.aadl.annex.behavior.utils.AadlBaLocationReference;
+import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
+import fr.tpt.aadl.utils.Aadl2Utils;
+import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
+import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning;
 
 /**
  * <!-- begin-user-doc -->
@@ -85,140 +76,25 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 {
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
-   */
-  private Map<String, BehaviorAnnex> createdThreadAnnexes =
-        new HashMap<String, BehaviorAnnex>() ;
-  PredefinedPackagesManager predefinedPackagesManager ;
-
-  public void setPredefinedPackagesManager(PredefinedPackagesManager p)
-  {
-    predefinedPackagesManager = p ;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected HookAccessImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return AtlHooksPackage.Literals.HOOK_ACCESS;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated NOT
-   */
-  public BehaviorAnnex createBehaviorAnnex(ThreadImplementation threadImpl)
-  {
-    if(createdThreadAnnexes.isEmpty())
-    {
-      AtlTransfoLauncher atlLauncher ;
-
-      try
-      {
-        atlLauncher = new AtlTransfoLauncher() ;
-      }
-      catch(Exception e1)
-      {
-        // TODO Auto-generated catch block
-        e1.printStackTrace() ;
-        return null ;
-      }
-
-      Resource inputResource = threadImpl.eResource() ;
-      // TODO: replace ${workspace} by an ocarina specific environment variable
-      String transformationFileName =
-            AtlTransfoLauncher.getTransformationDirName() +
-                  "CreateThreadsBehavior.asm" ;
-      File transformationFile = new File(transformationFileName) ;
-      List<File> transformationFileList = new ArrayList<File>() ;
-      transformationFileList.add(transformationFile) ;
-
-      try
-      {
-        Resource outputResource =
-        		atlLauncher.doGeneration(inputResource, transformationFileList, "") ;
-        
-        
-        for(Object o : outputResource.getContents())
-        {
-          if(o instanceof ThreadImplementation)
-          {
-            ThreadImplementation t = (ThreadImplementation) o ;
-            for (AnnexSubclause as: t.getOwnedAnnexSubclauses())
-            if(as instanceof BehaviorAnnex)
-            {
-              BehaviorAnnex ba =
-                    (BehaviorAnnex) as ;
-              createdThreadAnnexes.put(t.getName(), ba) ;
-            }
-          }
-        }
-      }
-      catch(FileNotFoundException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace() ;
-      }
-      catch(IOException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace() ;
-      }
-      catch(ATLCoreException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace() ;
-      }
-      catch(Exception e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace() ;
-      }
-    }
-
-    BehaviorAnnex ba = createdThreadAnnexes.get(threadImpl.getQualifiedName()) ;
-    return ba ;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated NOT
-   */
-  public void setDirectionIn(DirectedFeature feature)
-  {
-    feature.setDirection(DirectionType.IN) ;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated NOT
-   */
-  public void resolveBANames(BehaviorAnnex ba)
-  {
-    AadlBaNameResolver nameResolver =
-          new AadlBaNameResolver(ba,
-                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
-    nameResolver.resolveNames() ;
-  }
+		return AtlHooksPackage.Literals.HOOK_ACCESS;
+	}
 
   /**
    * <!-- begin-user-doc -->
@@ -278,9 +154,9 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
    */
     private static Map<NamedElement, InstanceObject> _transformationTrace = new HashMap<NamedElement, InstanceObject>();
     
-  public void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance) {
-    _transformationTrace.put(targetDeclarative, sourceInstance);
-  }
+    public void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance) {
+      _transformationTrace.put(targetDeclarative, sourceInstance);
+    }
   
   /**
    * <!-- begin-user-doc -->
@@ -292,9 +168,110 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     AadlBaVisitors.putTransitionWhereSrc(state, transition);
   }
 
-  public static InstanceObject getTransformationTrace(NamedElement targetDeclarative)
+  
+  /**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public EList<Long> getCurrentPerionReadTable(FeatureInstance port) {
+		EList<Long> CPRTable = new BasicEList<Long>();
+		try {
+			EventDataPortCommunicationDimensioning EDPCD = 
+					EventDataPortCommunicationDimensioning.create(port);
+			
+			String CPRString = "";
+			long CPRSize = EDPCD.getCPRSize();
+			System.out.println("CPRSize "+CPRSize);
+			for(int iteration=0;iteration<CPRSize;iteration++)
+			{
+				long CPR_iteration = EDPCD.getCurrentPeriodReadIndex(iteration);
+				CPRString = CPRString + String.valueOf(CPR_iteration);
+				if(iteration<CPRSize-1)
+					CPRString = CPRString + ", ";
+				CPRTable.add(CPR_iteration);
+			}
+			System.out.println("CPR Table "+CPRString);
+		} catch (DimensioningException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return CPRTable;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public EList<Long> getCurrentDeadlineWriteTable(FeatureInstance port, FeatureInstance destinationPort) {
+		EList<Long> CDWTable = new BasicEList<Long>();
+		try {
+			EventDataPortCommunicationDimensioning EDPCD = 
+					EventDataPortCommunicationDimensioning.create(destinationPort);
+			System.out.println(port.getInstanceObjectPath());
+			long CDWSize = EDPCD.getCDWSize(port);
+			System.out.println("CDWSize " + CDWSize);
+			String CDWString = "";
+			for(int iteration=0;iteration<CDWSize;iteration++)
+			{
+				long CDW_iteration = EDPCD.getCurrentDeadlineWriteIndex(port, iteration);
+				CDWString = CDWString + String.valueOf(CDW_iteration);
+				if(iteration < CDWSize-1)
+					CDWString = CDWString + ", ";
+				CDWTable.add(CDW_iteration);
+			}
+			System.out.println("CDW Table "+CDWString);
+		} catch (DimensioningException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return CDWTable;
+	}
+
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public long getBufferSize(FeatureInstance destinationFeatureInstance) {
+		try {
+			EventDataPortCommunicationDimensioning EDPCD =
+					EventDataPortCommunicationDimensioning.create(destinationFeatureInstance);
+			long size = EDPCD.getBufferSize();
+			System.out.println("Buffer size " + size);
+			return size;
+		} catch (DimensioningException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public void setInDirection(DirectedFeature feature) {
+		feature.setDirection(DirectionType.IN);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+		public static InstanceObject getTransformationTrace(NamedElement targetDeclarative)
   {
-    return _transformationTrace.get(targetDeclarative);
+	for(NamedElement ne: _transformationTrace.keySet())
+	{
+	  if(ne.getQualifiedName().equals(targetDeclarative.getQualifiedName()))
+		  return _transformationTrace.get(ne);
+	}
+    return null;
   }
   
   public static List<NamedElement> getTransformationTracesFromSource(InstanceObject sourceInstance)

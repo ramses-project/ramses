@@ -34,7 +34,7 @@ public class Aadl2StandaloneRuntimeModule extends org.osate.xtext.aadl2.Abstract
   
   @Override
   public Class<? extends org.eclipse.xtext.naming.IQualifiedNameProvider> bindIQualifiedNameProvider() {
-    return org.osate.xtext.aadl2.naming.Aadl2QualifiedNameProvider.class;
+    return Aadl2StandAloneQualifiedNameProvider.class;
   }
 
   @Override
@@ -43,6 +43,7 @@ public class Aadl2StandaloneRuntimeModule extends org.osate.xtext.aadl2.Abstract
   }
   
   @Override
+
   public Class<? extends org.eclipse.xtext.linking.ILinker> bindILinker()
   {
     return Aadl2StandaloneAnnexParserAgent.class ;

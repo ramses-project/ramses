@@ -4,15 +4,6 @@
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="hooks"
     nsURI="http://fr.tpt.aadl.ramses.transformation.atl.launch" nsPrefix="hooks">
   <eClassifiers xsi:type="ecore:EClass" name="HookAccess">
-    <eOperations name="createBehaviorAnnex" lowerBound="1" eType="ecore:EClass ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//BehaviorAnnex">
-      <eParameters name="threadImpl" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//ThreadImplementation"/>
-    </eOperations>
-    <eOperations name="setDirectionIn">
-      <eParameters name="feature" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//DirectedFeature"/>
-    </eOperations>
-    <eOperations name="resolveBANames">
-      <eParameters name="ba" lowerBound="1" eType="ecore:EClass ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//BehaviorAnnex"/>
-    </eOperations>
     <eOperations name="orderFeatures" upperBound="-1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Feature">
       <eParameters name="cpt" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//ComponentType"/>
     </eOperations>
@@ -27,6 +18,19 @@
     <eOperations name="putTransitionWhereSrc" lowerBound="1">
       <eParameters name="state" lowerBound="1" eType="ecore:EClass ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//BehaviorState"/>
       <eParameters name="transition" lowerBound="1" eType="ecore:EClass ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//BehaviorTransition"/>
+    </eOperations>
+    <eOperations name="getCurrentPerionReadTable" upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
+      <eParameters name="port" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//FeatureInstance"/>
+    </eOperations>
+    <eOperations name="getCurrentDeadlineWriteTable" upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
+      <eParameters name="port" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//FeatureInstance"/>
+      <eParameters name="destinationPort" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//FeatureInstance"/>
+    </eOperations>
+    <eOperations name="getBufferSize" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
+      <eParameters name="destinationFeatureInstance" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//FeatureInstance"/>
+    </eOperations>
+    <eOperations name="setInDirection" lowerBound="1">
+      <eParameters name="feature" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//DirectedFeature"/>
     </eOperations>
   </eClassifiers>
 </ecore:EPackage>

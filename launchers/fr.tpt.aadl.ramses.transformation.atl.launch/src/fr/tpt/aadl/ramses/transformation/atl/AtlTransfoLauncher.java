@@ -101,7 +101,6 @@ public class AtlTransfoLauncher
   /*
    * The parameters of the transformation: asm file, input and a-output path.
    */
-  private static String dataTargetfilepath ;
   private static PredefinedPackagesManager predefinedPackagesManager ;
   private static PredefinedPropertiesManager predefinedPropertiesManager; 
 
@@ -158,23 +157,27 @@ public class AtlTransfoLauncher
 		  String workspaceURI = inputResource.getURI().toString();
 		  if(workspaceURI.startsWith("platform:/resource"))
 		    	workspaceURI = workspaceURI.substring(18);
-		  String aaxlGeneratedFileName = workspaceURI.replaceFirst(".aaxl2", "_extended.aaxl2");
-
-		  Resource expandedResult = this.doGeneration(inputResource,
-				  atlFiles, aaxlGeneratedFileName);
-
+		  
 		  String aadlGeneratedFileName = inputResource.getURI().lastSegment();
 		  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 				  ".aaxl2", "_extended.aadl2");
 
+		  Resource expandedResult = this.doGeneration(inputResource,
+				  atlFiles, aadlGeneratedFileName);
+		  
 		  File outputModelDir =  new File(generatedFilePath.getAbsolutePath()+"/refined-models");
 		  if(outputModelDir.exists()==false)
 			  outputModelDir.mkdir();
 		  StandAloneInstantiator instantiator = StandAloneInstantiator
 				  .getInstantiator();
-		  instantiator.serialize(expandedResult, outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName);
+		  String outputFilePath=outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName;
+		  instantiator.serialize(expandedResult, outputFilePath);
 
-		  return expandedResult;
+		  File outputFile = new File(outputFilePath);
+		  URI uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
+		  SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
+		  Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
+		  return xtextResource;
 	  } catch (Exception e) {
 		  e.printStackTrace();
 		  throw new GenerationException(e.getMessage());
@@ -194,15 +197,13 @@ public class AtlTransfoLauncher
 
     this.transformationFilepath = transformationFileName ;
 
-    if(dataTargetfilepath != "")
-    {
-      AtlTransfoLauncher.dataTargetfilepath = dataTargetfilepath ;
-    }
 
-    return doTransformation(inputResource) ;
+    return doTransformation(inputResource, dataTargetfilepath) ;
+
   }
   
-  private Resource doTransformation(Resource inputResource)
+  private Resource doTransformation(Resource inputResource,
+		  String dataTargetfilepath)
         throws FileNotFoundException, IOException, ATLCoreException
   {
     boolean workingWithInstances =
@@ -230,8 +231,7 @@ public class AtlTransfoLauncher
           StandAloneInstantiator.getInstantiator().getAadlResourceSet() ;
     
     Resource outputResource =
-          rs.createResource(URI.createURI(dataTargetfilepath
-                .replaceAll(".aaxl2", ".aadl2"))) ;
+          rs.createResource(URI.createURI(dataTargetfilepath)) ;
     
     injector.inject(targetModel, outputResource) ;
     // create ATLHook
@@ -292,7 +292,13 @@ public class AtlTransfoLauncher
             launcher.loadModule(asmSuperImposeFile.openStream()) ;
       atlModules.add(loadedSuperImposeModule) ;
     }
+    
 
+    URL moduleFile =
+    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/EventDataPorts" + ".asm") ;
+    Object loadedModule = launcher.loadModule(moduleFile.openStream()) ;
+	atlModules.add(loadedModule) ;
+    
     Map<String, Object> options = new HashMap<String, Object>() ;
     options.put("allowInterModelReferences", "true") ;
     URL libraryFile ;
@@ -301,6 +307,7 @@ public class AtlTransfoLauncher
     fileName.add("/helpers/AADLCopyHelpers") ;
     fileName.add("/helpers/AADLICopyHelpers") ;
     fileName.add("/tools/PropertiesTools") ;
+    fileName.add("/tools/PackagesTools") ;
     fileName.add("/tools/FeaturesTools") ;
     fileName.add("/tools/BehaviorAnnexTools") ;
     fileName.add("/uninstanciate/Features") ;
@@ -322,15 +329,32 @@ public class AtlTransfoLauncher
                     atlModules.toArray()) ;
 
     // Save the resulting model
-    if(targetModel.getResource() == null ||
-          targetModel.getResource().getContents().isEmpty())
+    if(System.getProperty("DEBUG")!=null)
     {
-      extractor.extract(sourceModel, dataTargetfilepath) ;
+      String aadlGeneratedFileName = inputResource.getURI().path();
+      if(aadlGeneratedFileName.startsWith("file:"))
+    	aadlGeneratedFileName = aadlGeneratedFileName.substring("file:".length());
+      else if (aadlGeneratedFileName.startsWith("platform:/resource"))
+    	aadlGeneratedFileName = aadlGeneratedFileName.substring("platform:/resource".length());
+	  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
+				  ".aaxl2", "_extended.aaxl2");
+      if(targetModel.getResource() == null ||
+          targetModel.getResource().getContents().isEmpty())
+      {
+        extractor.extract(sourceModel, aadlGeneratedFileName) ;
+      }
+      else
+      {
+        extractor.extract(targetModel, aadlGeneratedFileName) ;
+      }
+    }
+    if(targetModel.getResource() == null ||
+            targetModel.getResource().getContents().isEmpty())
+    {
       return sourceModel.getResource() ;
     }
     else
     {
-      extractor.extract(targetModel, dataTargetfilepath) ;
       return targetModel.getResource() ;
     }
   }
@@ -367,6 +391,7 @@ public DataSubcomponentType getRuntimeData(String dataName)
       launcher.addInModel(rModel, name.toUpperCase(), "AADLBA") ;
     }
   }
+
   
   private void registerPredefinedPropertiesInLauncher(EMFVMLauncher launcher)
   {
@@ -382,9 +407,10 @@ public DataSubcomponentType getRuntimeData(String dataName)
   
   private void registerContributedAadl(EMFVMLauncher launcher) {
 	  List<URI> contributedResourceUriList = PluginSupportUtil.getContributedAadl();
+	  ResourceSet resourceSet = new ResourceSetImpl();
 	  for(URI contributedResourceUri : contributedResourceUriList)
 	  {
-		  ResourceSet resourceSet = new ResourceSetImpl();
+		  
 		  Resource resource = resourceSet.getResource(contributedResourceUri, true);
 		  
 		  EMFModel rModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;

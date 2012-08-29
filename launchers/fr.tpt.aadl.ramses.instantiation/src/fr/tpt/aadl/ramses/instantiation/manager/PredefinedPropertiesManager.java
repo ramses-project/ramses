@@ -21,25 +21,27 @@
 
 package fr.tpt.aadl.ramses.instantiation.manager ;
 
-import java.io.File ;
-import java.io.FilenameFilter ;
-import java.util.ArrayList ;
-import java.util.Arrays ;
-import java.util.HashMap ;
-import java.util.List ;
-import java.util.Map ;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.emf.common.util.TreeIterator ;
-import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.BooleanLiteral;
-import org.osate.aadl2.Element;
 import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.Property ;
-import org.osate.aadl2.PropertySet ;
+import org.osate.aadl2.Parameter;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertySet;
 
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
+import fr.tpt.aadl.utils.PropertyUtils;
 
 public class PredefinedPropertiesManager
 {
@@ -95,7 +97,8 @@ public class PredefinedPropertiesManager
       {
         String fileName = r.getURI().lastSegment() ;
 
-        if(fileName.equalsIgnoreCase(resourceName + ".aadl2"))
+        if(fileName.equalsIgnoreCase(resourceName + ".aadl2")||
+        		fileName.equalsIgnoreCase(resourceName + ".aadl"))
         {
           predefinedPropertySets.put(resourceName, r) ;
           break ;
@@ -169,35 +172,48 @@ public class PredefinedPropertiesManager
 
     return res ;
   }
-
-  public static boolean getDefaultBooleanValue(String PropertySetName,
-          String PropertyName)
+  
+  public static PropertySet getPropertySet(String name)
   {
-	  boolean res = false ;
-	  Resource r = predefinedPropertySets.get(PropertySetName) ;
-	  TreeIterator<EObject> it = r.getAllContents() ;
-	  while(it.hasNext())
+	  for(Resource r : predefinedPropertySets.values())
 	  {
-		  Element elt = (Element) it.next() ;
-		  if(elt instanceof Property)
+		  if(r.getContents().get(0) instanceof PropertySet)
 		  {
-			  Property p = (Property) elt ;
-
-			  if(p.getName().equalsIgnoreCase(PropertyName))
+			  PropertySet ps = (PropertySet) r.getContents().get(0);
+			  if(ps.getName().equalsIgnoreCase(name))
 			  {
-				  if(p.getDefaultValue() != null &&
-						  p.getDefaultValue() instanceof BooleanLiteral)
-				  {
-					  BooleanLiteral sl = (BooleanLiteral) p.getDefaultValue() ;
-					  return sl.getValue() ;
-				  }
+				  return ps;
 			  }
 		  }
 	  }
-
-	  return res ;
+	  return null;
   }
   
+  public static boolean isReturnParameter(Parameter p)
+  {
+	  boolean isReturnParam=false;
+	  try {
+		  isReturnParam =
+				  PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
+	  } catch (Exception e) {
+		  PropertySet ps = getPropertySet("Generation_Properties");
+		  if(ps==null)
+			  return isReturnParam;
+		  NamedElement ne = ps.findNamedElement("Return_Parameter");
+		  try
+		  {
+			  Property prop = (Property) ne ;
+			  BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
+			  isReturnParam = bl.getValue();
+		  }
+		  catch (Exception exp)
+		  {
+			  isReturnParam = false;
+		  } 
+	  }
+	  return isReturnParam;
+  }
+
   public int getPropertiesCount()
   {
     return predefinedPropertySets.size() ;

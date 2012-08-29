@@ -23,7 +23,7 @@ public class ProcessMessageDisplay
     InputStream is = makeProcess.getErrorStream();
     BufferedReader in = new BufferedReader(new InputStreamReader(is));
     String line = null;
-    while ((line = in.readLine()) != null) {
+    while ((line = in.readLine()) != null && !line.isEmpty()) {
       System.err.println(line);
     }
   }

@@ -28,6 +28,9 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0",
  org.osate.pluginsupport;bundle-version="1.0.0",
  org.osate.workspace,
- org.eclipse.core.resources;bundle-version="3.7.101"
+ org.eclipse.core.resources;bundle-version="3.7.101",
+ fr.tpt.aadl.ramses.communication.periodic.delayed
 Bundle-ActivationPolicy: lazy
+Import-Package: fr.tpt.aadl.ramses.communication.dimensioning,
+ org.osate.xtext.aadl2.properties.linking
 

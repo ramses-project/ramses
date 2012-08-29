@@ -21,7 +21,7 @@
 
 package test_events
 public
-  with POK, Data_Model;
+with POK, Data_Model;
   system root
   end root;
 
@@ -87,6 +87,7 @@ public
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
+    Priority => 5;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
@@ -101,6 +102,7 @@ public
   properties
     Dispatch_Protocol => Periodic;
     Period => 200 Ms;
+    Priority => 10;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;

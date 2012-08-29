@@ -288,6 +288,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
 
         processOptionalSection(object.getOwnedPrototypes(), "prototypes",
                                AadlConstants.emptyString) ;
+        processOptionalEList(object.getOwnedPrototypeBindings(), ",") ;
         processOptionalSection(object.getOwnedFeatures(), "features",
                                AadlConstants.emptyString) ;
         processOptionalSection(object.getOwnedFlowSpecifications(), "flows",
@@ -1627,9 +1628,9 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
       public String caseDataAccess(DataAccess object)
       {
         processComments(object) ;
-        /*
+        
         String d ;
-        if(object.getKind() == AccessType.REQUIRED)
+        if(object.getKind() == AccessType.REQUIRES)
         {
           d = "requires" ;
         }
@@ -1637,13 +1638,10 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         {
           d = "provides" ;
         }
-        */
-        aadlText
-              .addOutput((object.getRefined() == null
-                                              ? (object.getName() + ": ")
-                                              : (object.getRefined()
-                                                .getName() + ": refined to ")) +
-                    " data access ") ;
+        
+        aadlText.addOutput(object.getName() + ": "
+				+ (object.getRefined() != null ? "refined to " : "") + d
+				+ " data access ");
         aadlText.addOutput(AadlUtil.getClassifierName(object.getClassifier(),
                                                       object)) ;
         processCurlyList(object.getOwnedPropertyAssociations()) ;
@@ -2642,7 +2640,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     {
       aadlText.addOutput("(") ;
       processEList(list, ",") ;
-      aadlText.addOutput(")") ;
+      aadlText.addOutputNewline(")") ;
     }
   }
 
