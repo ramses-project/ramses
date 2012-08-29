@@ -40,6 +40,32 @@ uses FHSHelpers;
 uses AADLRuntimeHelpers;
 uses Services;
 
+rule addSubprogramCall(f:AADLBA!Feature, implImg: AADLBA!ComponentImplementation, call: AADLBA!SubprogramCall)
+{
+	using
+	{
+		
+	}
+	do
+	{
+		if(implImg.ownedSubprogramCallSequence->isEmpty())
+		{
+			implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(call));
+		}
+		else
+		{
+			for(seq in implImg.getOwnedSubprogramCallSequences())
+			{
+				if(f.direction.toString()='in' or f.direction=#inOut)
+					seq.getOwnedCallSpecifications().add(0, call);
+				if (f.direction=#out or f.direction=#inOut)
+					seq.getOwnedCallSpecifications().add(call);
+			}
+		}
+		
+	}
+}
+
 rule CreateEventPort(portName: String, dir: String){
  to
    p : AADLBA!EventPort(name <- portName, direction <- dir)

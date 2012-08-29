@@ -77,6 +77,15 @@ rule Implementation (c : AADLI!ComponentInstance,
 			  implImg.debug('  declare type');
 			  thisModule.public().getOwnedClassifiers().add(implImg);
 			}
+
+			if (implImg.isDeclared())
+			  implImg.debug('  previously declared type');
+			else
+			{
+			  implImg.debug('  declare type');
+			  thisModule.public().getOwnedClassifiers().add(implImg);
+			}
+
 		}
 		implImg;
 	}

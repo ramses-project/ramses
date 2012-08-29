@@ -532,8 +532,8 @@
 		<constant value="ownedParameter"/>
 		<constant value="J.Parameter(J):J"/>
 		<constant value="J.DataAccess(J):J"/>
+		<constant value="J.mapOwnedPropertyAssociationList():J"/>
 		<constant value="ownedPropertyAssociation"/>
-		<constant value="J.PropertyAssociation(J):J"/>
 		<constant value="194:12-194:16"/>
 		<constant value="194:12-194:21"/>
 		<constant value="194:4-194:21"/>
@@ -552,27 +552,18 @@
 		<constant value="196:22-196:79"/>
 		<constant value="196:3-196:79"/>
 		<constant value="197:31-197:35"/>
-		<constant value="197:31-197:60"/>
-		<constant value="197:73-197:83"/>
-		<constant value="197:104-197:106"/>
-		<constant value="197:73-197:107"/>
-		<constant value="197:31-197:108"/>
-		<constant value="197:3-197:108"/>
+		<constant value="197:31-197:69"/>
+		<constant value="197:3-197:69"/>
 		<constant value="193:3-198:3"/>
 		<constant value="p"/>
-		<constant value="pa"/>
 		<constant value="MAADLI!DataType;"/>
-		<constant value="58"/>
+		<constant value="48"/>
 		<constant value="223:11-223:15"/>
 		<constant value="223:11-223:20"/>
 		<constant value="223:3-223:20"/>
 		<constant value="224:30-224:34"/>
-		<constant value="224:30-224:59"/>
-		<constant value="224:72-224:82"/>
-		<constant value="224:103-224:105"/>
-		<constant value="224:72-224:106"/>
-		<constant value="224:30-224:107"/>
-		<constant value="224:2-224:107"/>
+		<constant value="224:30-224:68"/>
+		<constant value="224:2-224:68"/>
 		<constant value="221:5-225:3"/>
 	</cp>
 	<field name="1" type="2"/>
@@ -2321,7 +2312,7 @@
 			<if arg="236"/>
 			<load arg="19"/>
 			<call arg="25"/>
-			<goto arg="254"/>
+			<goto arg="286"/>
 			<getasm/>
 			<get arg="1"/>
 			<push arg="238"/>
@@ -2385,20 +2376,10 @@
 			<set arg="450"/>
 			<dup/>
 			<getasm/>
-			<push arg="28"/>
-			<push arg="8"/>
-			<new/>
 			<load arg="19"/>
-			<get arg="531"/>
-			<iterate/>
-			<store arg="43"/>
-			<getasm/>
-			<load arg="43"/>
-			<call arg="532"/>
-			<call arg="257"/>
-			<enditerate/>
+			<call arg="531"/>
 			<call arg="30"/>
-			<set arg="531"/>
+			<set arg="532"/>
 			<pop/>
 			<load arg="29"/>
 		</code>
@@ -2420,28 +2401,23 @@
 			<lne id="547" begin="65" end="67"/>
 			<lne id="548" begin="58" end="69"/>
 			<lne id="549" begin="56" end="71"/>
-			<lne id="550" begin="77" end="77"/>
-			<lne id="551" begin="77" end="78"/>
-			<lne id="552" begin="81" end="81"/>
-			<lne id="553" begin="82" end="82"/>
-			<lne id="554" begin="81" end="83"/>
-			<lne id="555" begin="74" end="85"/>
-			<lne id="556" begin="72" end="87"/>
-			<lne id="557" begin="33" end="88"/>
+			<lne id="550" begin="74" end="74"/>
+			<lne id="551" begin="74" end="75"/>
+			<lne id="552" begin="72" end="77"/>
+			<lne id="553" begin="33" end="78"/>
 		</linenumbertable>
 		<localvariabletable>
-			<lve slot="3" name="558" begin="48" end="52"/>
-			<lve slot="3" name="558" begin="64" end="68"/>
-			<lve slot="3" name="559" begin="80" end="84"/>
-			<lve slot="2" name="231" begin="29" end="89"/>
-			<lve slot="0" name="17" begin="0" end="89"/>
-			<lve slot="1" name="233" begin="0" end="89"/>
+			<lve slot="3" name="554" begin="48" end="52"/>
+			<lve slot="3" name="554" begin="64" end="68"/>
+			<lve slot="2" name="231" begin="29" end="79"/>
+			<lve slot="0" name="17" begin="0" end="79"/>
+			<lve slot="1" name="233" begin="0" end="79"/>
 		</localvariabletable>
 	</operation>
 	<operation name="69">
 		<context type="6"/>
 		<parameters>
-			<parameter name="19" type="560"/>
+			<parameter name="19" type="555"/>
 		</parameters>
 		<code>
 			<getasm/>
@@ -2454,7 +2430,7 @@
 			<if arg="236"/>
 			<load arg="19"/>
 			<call arg="25"/>
-			<goto arg="561"/>
+			<goto arg="556"/>
 			<getasm/>
 			<get arg="1"/>
 			<push arg="238"/>
@@ -2486,41 +2462,26 @@
 			<set arg="38"/>
 			<dup/>
 			<getasm/>
-			<push arg="28"/>
-			<push arg="8"/>
-			<new/>
 			<load arg="19"/>
-			<get arg="531"/>
-			<iterate/>
-			<store arg="43"/>
-			<getasm/>
-			<load arg="43"/>
-			<call arg="532"/>
-			<call arg="257"/>
-			<enditerate/>
+			<call arg="531"/>
 			<call arg="30"/>
-			<set arg="531"/>
+			<set arg="532"/>
 			<pop/>
 			<load arg="29"/>
 		</code>
 		<linenumbertable>
-			<lne id="562" begin="36" end="36"/>
-			<lne id="563" begin="36" end="37"/>
-			<lne id="564" begin="34" end="39"/>
-			<lne id="565" begin="45" end="45"/>
-			<lne id="566" begin="45" end="46"/>
-			<lne id="567" begin="49" end="49"/>
-			<lne id="568" begin="50" end="50"/>
-			<lne id="569" begin="49" end="51"/>
-			<lne id="570" begin="42" end="53"/>
-			<lne id="571" begin="40" end="55"/>
-			<lne id="572" begin="33" end="56"/>
+			<lne id="557" begin="36" end="36"/>
+			<lne id="558" begin="36" end="37"/>
+			<lne id="559" begin="34" end="39"/>
+			<lne id="560" begin="42" end="42"/>
+			<lne id="561" begin="42" end="43"/>
+			<lne id="562" begin="40" end="45"/>
+			<lne id="563" begin="33" end="46"/>
 		</linenumbertable>
 		<localvariabletable>
-			<lve slot="3" name="559" begin="48" end="52"/>
-			<lve slot="2" name="231" begin="29" end="57"/>
-			<lve slot="0" name="17" begin="0" end="57"/>
-			<lve slot="1" name="233" begin="0" end="57"/>
+			<lve slot="2" name="231" begin="29" end="47"/>
+			<lve slot="0" name="17" begin="0" end="47"/>
+			<lve slot="1" name="233" begin="0" end="47"/>
 		</localvariabletable>
 	</operation>
 </asm>

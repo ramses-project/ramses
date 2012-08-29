@@ -48,26 +48,14 @@ rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstancs, implImg: AADLB
  			thisModule.addPeriodicWaitCall(seq);
  		}
  	}
- 	if(inst.isSporadicThread())
+ 	if(inst.isPeriodicThread())
  	{
  	}
- 	if(inst.isAperiodicThread())
+ 	if(inst.isPeriodicThread())
  	{
  	}
  }
 }
-
-helper context AADLI!ComponentInstance def: isPeriodicThread() : Boolean =
-	self.getModalPropertyValue('dispatch_protocol').ownedValue.namedValue.name.toLower() = 'periodic'
-;
-
-helper context AADLI!ComponentInstance def: isSporadicThread() : Boolean =
-	self.getModalPropertyValue('dispatch_protocol').ownedValue.namedValue.name.toLower() = 'sporadic'
-;
-
-helper context AADLI!ComponentInstance def: isAperiodicThread() : Boolean =
-	self.getModalPropertyValue('dispatch_protocol').ownedValue.namedValue.name.toLower() = 'aperiodic'
-;
 
 unique lazy rule addPeriodicWaitCall
 {

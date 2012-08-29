@@ -104,8 +104,8 @@ rule System_Instance {
 			ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
 			ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
 			ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data'),
-			--ownedPortConnection				  <- impl.ownedPortConnection->collect(co|thisModule.PortConnectionUninst(co)),
-			ownedPropertyAssociation          <- s.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation          <- s.mapOwnedPropertyAssociationList()->union(s.mapSubcomponentsReferenceList())
+			
 		),
 		
 		section : AADLBA!PublicPackageSection (
@@ -121,6 +121,7 @@ rule System_Instance {
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(impl, s);
+		
 	}
 }
 
@@ -131,7 +132,7 @@ rule Memory_Instance {
 		sub : AADLBA!MemorySubcomponent(
 			name <- c.name.debug('memory instance'),
 			memorySubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -146,7 +147,7 @@ rule Bus_Instance {
 		sub : AADLBA!BusSubcomponent(
 			name <- c.name.debug('bus instance'),
 			busSubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -161,7 +162,7 @@ rule Device_Instance {
 		sub : AADLBA!DeviceSubcomponent(
 			name <- c.name.debug('device instance'),
 			deviceSubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -176,7 +177,7 @@ rule Processor_Instance {
 		sub : AADLBA!ProcessorSubcomponent(
 			name <- c.name.debug('processor instance'),
 			processorSubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -191,7 +192,7 @@ rule VirtualProcessor_Instance {
 		sub : AADLBA!VirtualProcessorSubcomponent (
 			name <- c.name.debug('virtual processor instance'),
 			virtualProcessorSubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -206,7 +207,7 @@ rule Thread_Instance {
 		sub : AADLBA!ThreadSubcomponent(
 			name <- c.name.debug('thread instance'),
 			threadSubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -222,7 +223,7 @@ rule Process_Instance {
 		sub : AADLBA!ProcessSubcomponent(
 			name <- c.name.debug('process instance'),
 			processSubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -240,7 +241,7 @@ rule Data_Instance {
 		sub : AADLBA!DataSubcomponent (
 			name <- c.name.debug('data instance'),
 			dataSubcomponentType <- c.createOrSetTypeAndImplementation(),
-			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do
 	{
@@ -589,6 +590,10 @@ unique lazy rule mapComputeEntrypoint
 		)
 	do
 	{
+		if (referencedSubprogram.oclIsKindOf(AADLI!SubprogramType))
+			call.calledSubprogram <- thisModule.Type(OclUndefined,referencedSubprogram);
+		else if(referencedSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
+			call.calledSubprogram <- thisModule.Implementation(OclUndefined,referencedSubprogram, thisModule.Type(OclUndefined,referencedSubprogram.getOwnedRealization().implemented));
 		seq;
 	}
 }
@@ -629,12 +634,20 @@ rule SubprogramCall (c: AADLI!ComponentInstance,
 		)
 	do
 	{
-		if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType))
-			s2.calledSubprogram <- thisModule.Type(OclUndefined,s.calledSubprogram);
-		else if(s.calledSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
-			s2.calledSubprogram <- thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented));
-		else if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramAccess))
-			s2.calledSubprogram <- c.featureInstance->any(f|f.name = s.calledSubprogram.name).getFeatureImg();
+		if(not s.calledSubprogram.getPropertyAssociation('Source_Name').oclIsUndefined()
+					and not s.calledSubprogram.getPropertyAssociation('Source_Text').oclIsUndefined())
+		{
+			s2.calledSubprogram <- s.calledSubprogram;
+		}
+		else
+		{
+			if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType))
+				s2.calledSubprogram <- thisModule.Type(OclUndefined,s.calledSubprogram);
+			else if(s.calledSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
+				s2.calledSubprogram <- thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented));
+			else if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramAccess))
+				s2.calledSubprogram <- c.featureInstance->any(f|f.name = s.calledSubprogram.name).getFeatureImg();
+		}
 		s2; 
 	}
 }

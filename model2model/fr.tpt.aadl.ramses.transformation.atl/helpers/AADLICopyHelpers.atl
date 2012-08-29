@@ -221,5 +221,9 @@ helper def : createOrSetTypeAndImplementation (s : AADLI!Subcomponent) : AADLBA!
 ;
 
 helper context AADLI!NamedElement def : mapOwnedPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
-	self.ownedPropertyAssociation->collect (e|thisModule.PropertyAssociation (e))
+	self.ownedPropertyAssociation->collect (e|thisModule.PropertyAssociation (e,false))->select(e| not e.oclIsUndefined())
+;
+
+helper context AADLI!NamedElement def : mapSubcomponentsReferenceList() : Sequence (AADLBA!PropertyAssociation) =
+	self.componentInstance->collect(e|e.ownedPropertyAssociation->collect (f|thisModule.PropertyAssociation (f, true)))->select(e| not e.oclIsUndefined())
 ;

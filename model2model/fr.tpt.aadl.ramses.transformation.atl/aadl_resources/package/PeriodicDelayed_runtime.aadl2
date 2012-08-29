@@ -1,0 +1,75 @@
+package PeriodicDelayed_runtime
+public
+
+with Base_Types, Data_Model;
+
+  data ArrayDataType
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(Base_Types::Integer_16));
+  end ArrayDataType;
+
+  subprogram Receive_Input
+    features
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      CPR: in parameter ArrayDataType;
+      CPRSize: in parameter Base_Types::Integer_16;
+      first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+    annex behavior_specification {**
+      states
+        s: initial final state;
+      transitions
+        t: s -[]-> s 
+        {
+          first := CPR[iteration_counter]+1;
+          iteration_counter := (iteration_counter+1) mod CPRSize;
+          last := CPR[iteration_counter]
+        };
+    **};
+  end Receive_Input;
+  
+  subprogram Next_Value
+    prototypes
+      output_type: data;
+    features
+      first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      last: requires data access Base_Types::Integer_16 {Access_Right=>read_only;};
+      buffer: requires data access ArrayDataType {Access_Right=>read_only;};
+      output: requires data access output_type {Access_Right=>write_only;};
+    annex behavior_specification {**
+      states
+    	s: initial final state;
+      transitions
+        t: s -[]-> s
+        {
+          output := buffer[first];
+          if(first<last)
+        	first := first+1 
+          end if -- TODO : else: should have an error port and send and error
+        };
+    **};
+  end Next_Value;
+
+  subprogram Put_Value
+    prototypes
+      value_type: data;
+    features
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      CDW: in parameter ArrayDataType;
+      CDWSize: in parameter Base_Types::Integer_16;
+      value: in parameter value_type;
+      buffer: requires data access ArrayDataType {Access_Right=>write_only;};
+    annex behavior_specification {**
+      states
+        s: initial final state;
+      transitions
+        t: s -[]-> s
+        {
+          buffer[CDW[iteration_counter]] := value;
+          iteration_counter := (iteration_counter+1) mod CDWSize
+        };
+    **};
+  end Put_Value;
+
+end PeriodicDelayed_runtime;

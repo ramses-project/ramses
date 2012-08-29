@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CommunicationDimensioning
+Bundle-SymbolicName: fr.tpt.aadl.ramses.communication.periodic.delayed
+Bundle-Version: 0.0.1
+Bundle-Activator: fr.tpt.aadl.ramses.communication.dimensioning.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.osate.aadl2;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.util.math;bundle-version="0.0.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: fr.tpt.aadl.ramses.communication.dimensioning,
+ fr.tpt.aadl.ramses.communication.periodic.delayed

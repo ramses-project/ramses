@@ -13,6 +13,27 @@ uses AADLICopyHelpers;
 uses Uninstanciate;
 uses PropertiesTools;
 
+rule PortConnection_Instance
+{
+	from
+		cnxInst: AADLI!ConnectionInstance
+		(
+			false
+		)
+}
+
+rule EventDataPort_Instance
+{
+	from
+		port: AADLI!FeatureInstance
+		(
+			false
+		)
+		
+}
+
+
+
 unique lazy rule ThreadImplementation {
  from 
     c : AADLI!ComponentInstance,
@@ -39,8 +60,7 @@ rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
 	{
 		if(c.category=#thread and c.featureInstance->last() = fi)
 		{
-			--implImg.ownedParameterConnection <- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co, implImg));
-			thisModule.OsekThreadCallSequence (c, impl, implImg);
+			thisModule.expandThreadDispatchProtocol (c, implImg);
 			thisModule.mapSubprogramParameters(implImg, impl);
 			implImg.ownedAccessConnection    <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
 			thisModule.createThreadBehavior(implImg);
@@ -133,10 +153,11 @@ helper context AADLBA!SubprogramImplementation def: getSubprogramParameters() : 
 	self.type.ownedParameter
 ;
 
-rule OsekThreadCallSequence (c : AADLI!ComponentInstance, impl : AADLI!ThreadImplementation, implImg : AABDLBA!ThreadImplementation) {
+rule expandThreadDispatchProtocol (c : AADLI!ComponentInstance, implImg : AABDLBA!ThreadImplementation) {
 	using
 	{
 		callImg : AADLBA!SubprogramCall = OclUndefined;
+		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
 	}
 	to
 		terminateTaskCall: AADLBA!SubprogramCall
@@ -156,5 +177,8 @@ rule OsekThreadCallSequence (c : AADLI!ComponentInstance, impl : AADLI!ThreadImp
 		
 		s2.getOwnedCallSpecifications().add(terminateTaskCall);
 		implImg.ownedSubprogramCallSequence <- s2;
+		
+		thisModule.addImportedUnit(thisModule.public(), 'OSEK_RUNTIME', 'OSEK_runtime');
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
 	}
 }

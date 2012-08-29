@@ -194,7 +194,7 @@ unique lazy rule SubprogramType {
  		name <- type.name,
 		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
 		ownedDataAccess <- type.ownedDataAccess->collect(p|thisModule.DataAccess(p)),
-		ownedPropertyAssociation <- type.ownedPropertyAssociation->collect(pa|thisModule.PropertyAssociation(pa))
+		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
 	)
 }
 
@@ -221,6 +221,6 @@ unique lazy rule DataType {
  to typeImg : AADLBA!DataType 
  (
  	name <- type.name,
-	ownedPropertyAssociation <- type.ownedPropertyAssociation->collect(pa|thisModule.PropertyAssociation(pa))
+	ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
  )
 }

@@ -60,9 +60,13 @@ helper context String def : asEnumeration(model : String) : AADLBA!EnumerationLi
 	AADLBA!EnumerationLiteral->allInstancesFrom(model)->any(e|e.name=self)
 ;
 
+helper context String def : asClassifier(model : String) : AADLBA!Classifier =
+	AADLBA!Classifier->allInstancesFrom(model)->any(p|p.name=self)
+;
+
 helper def : getProperty(propertyName : String) : AADLBA!Property =
 	AADLBA!PropertySet->allInstances()->collect(ps|ps.ownedProperty)
-						->flatten()->any(p|p.name=propertyName)
+						->flatten()->any(p|p.name.toLower()=propertyName.toLower())
 ;
 
 helper context AADLBA!NamedElement def : getPropertyAssociation(propertyType : String) : AADLBA!PropertyAssociation =
@@ -111,5 +115,37 @@ rule CreateStringLiteralPropertyExpression (value : String) {
 	do
 	{
 		pr;
+	}
+}
+
+rule CreateIntegerLiteralPropertyExpression (value: Integer)
+{
+	to
+		pr : AADLBA!IntegerLiteral(value<-value)
+	do
+	{
+		pr;
+	}
+}
+
+rule CreateListValueFromInteger (value: Integer)
+{
+	to
+		il : AADLBA!IntegerLiteral(value<-value),
+		lv : AADLBA!ListValue(ownedListElement<-Sequence{il})
+	do
+	{
+		lv;
+	}
+}
+
+rule CreateListValueFromClassifier (value: AADLBA!Classifier)
+{
+	to
+		cv : AADLBA!ClassifierValue(classifier<-value),
+		lv : AADLBA!ListValue(ownedListElement<-Sequence{cv})
+	do
+	{
+		lv;
 	}
 }

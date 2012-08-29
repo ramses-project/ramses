@@ -21,6 +21,14 @@
 
 library Services;
 
+
+helper def: dataSubcomponentSuffix(): String = '_Instance';
+helper def: dataAccessSuffix(): String ='_PortIdAccess_';
+helper def: callPrefix(): String ='call_';
+
+
+helper def: theHOOK : ATLHOOKS!HookAccess = ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first();
+
 helper context AADLBA!ThreadImplementation def : callSequence() : AADLBA!SubprogramCallSequence =
 	self.ownedSubprogramCallSequence->first()
 ;
@@ -44,13 +52,49 @@ helper context AADLBA!ComponentImplementation def: getComponentType(): AADLBA!Co
 helper def:getProgrammationLanguageIdentifier(identifier:String): String =
 	identifier.replaceAll('.','_').replaceAll('::','__');
 
-helper context AADLI!Port def : isThreadPort() : Boolean =
-	self.eContainer().oclIsTypeOf(AADLBA!ThreadType)
+helper context AADLI!FeatureInstance def : isThreadPort() : Boolean =
+	self.eContainer().category = #thread
 ;
 
-helper context AADLI!Port def : isProcessPort() : Boolean =
-	self.eContainer().oclIsTypeOf(AADLBA!ProcessType)
+helper context AADLI!FeatureInstance def : isProcessPort() : Boolean =
+	self.eContainer().category=#process
 ;
 
-helper context AADLI!Port def : isDataOrEventDataPort() : Boolean =
+helper context AADLI!FeatureInstance def : isDataOrEventDataPort() : Boolean =
 	(self.oclIsTypeOf(AADLI!EventDataPort) or self.oclIsTypeOf(AADLI!DataPort)); 
+
+
+helper context AADLI!ComponentInstance def: isPeriodicThread() : Boolean =
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
+	if(mpv.oclIsUndefined()) then
+		false
+	else
+		mpv.ownedValue.namedValue.name.toLower() = 'periodic'
+	endif
+;
+
+helper context AADLI!ComponentInstance def: isSporadicThread() : Boolean =
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
+	if(mpv.oclIsUndefined()) then
+		false
+	else
+		mpv.ownedValue.namedValue.name.toLower() = 'sporadic'
+	endif
+;
+
+helper context AADLI!ComponentInstance def: isAperiodicThread() : Boolean =
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
+	if(mpv.oclIsUndefined()) then
+		false
+	else
+		mpv.ownedValue.namedValue.name.toLower() = 'aperiodic'
+	endif
+;
+
+helper context AADLI!FeatureInstance def: isPeriodicThreadPort(): Boolean =
+	self.isThreadPort() and self.eContainer().isPeriodicThread()
+;
+
+helper context AADLI!ConnectionInstance def: isIntraProcessConnection() : Boolean =
+	self.source.eContainer().eContainer() = self.destination.eContainer().eContainer() 
+;

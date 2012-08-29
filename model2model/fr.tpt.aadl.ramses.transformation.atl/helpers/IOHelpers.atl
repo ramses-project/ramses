@@ -23,6 +23,69 @@
 
 library IOHelpers;
 
+helper context AADLI!ConnectionInstance def: isDelayedConnection() : Boolean =
+	let mpv: AADLI!ModalPropertyValue = self.getModalPropertyValue('timing') in
+	if(not mpv.oclIsUndefined()) then
+		mpv.ownedValue.namedValue.name.toLower() = 'delayed'
+	else
+		false -- should consider default valuer here
+	endif
+;
+
+helper context AADLI!FeatureInstance def: isDefinedDelayedPort() : Boolean =
+	-- TODO: consider default value here
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('timing') in
+	if(not mpv.oclIsUndefined()) then
+		mpv.ownedValue.namedValue.name.toLower() = 'delayed'
+	else
+		false
+	endif
+;
+
+helper context AADLI!FeatureInstance def: isDelayedPort() : Boolean =
+	if (self.isDefinedDelayedPort()) then
+		true
+	else if(self.direction.toString()='in' and self.dstConnectionInstance->forAll(e|e.isDelayedConnection())) then
+			true
+		else 
+			if(self.direction.toString()='out' and self.srcConnectionInstance->forAll(e|e.isDelayedConnection())) then
+				true
+			else
+				if(self.direction.toString()='in' and self.dstConnectionInstance->forAll(e|e.source.isDefinedDelayedPort())) then
+					true
+				else
+					if(self.direction.toString()='out' and self.srcConnectionInstance->forAll(e|e.destination.isDefinedDelayedPort())) then
+						true
+					else
+						false
+					endif
+				endif
+			endif
+		endif
+	endif
+;
+
+
+helper context AADLI!ConnectionInstance def: isImmediateConnection() : Boolean =
+	self.getModalPropertyValue('timing').ownedValue.namedValue.name.toLower() = 'immediate'
+;
+
+helper context AADLI!FeatureInstance def: isImmediatePort() : Boolean =
+	if(self.getModalPropertyValue('timing').ownedValue.namedValue.name.toLower() = 'immediate')
+	then
+		true
+	else if(self.direction.toString()='in' and self.dstConnectionInstance->forAll(e|e.isImmediateConnection())) then
+			true
+			else if(self.direction.toString()='out' and self.srcConnectionInstance->forAll(e|e.isImmediateConnection())) then
+				true
+			else
+				false
+			endif
+		endif
+	endif
+;
+
+
 helper context AADLI!ComponentInstance def : memoryBinding() : AADLBA!ProcessorSubcomponent =
 	self.ownedPropertyAssociation->any(pa|pa.property.name='Actual_Memory_Binding')
 		.ownedValue->first().ownedValue.ownedListElement->first().referencedInstanceObject
@@ -94,10 +157,88 @@ helper context AADLI!FeatureInstance def : getInputRatePeriodFactor() : Real =
 	endif
 ;
 
+helper context AADLI!ComponentInstance def: isPeriodicDelayedPort(): Boolean =
+	false
+;
+
+helper context AADLI!ComponentInstance def: isDefinedDelayedPort(): Boolean =
+	false
+;
+
+helper context AADLI!FeatureInstance def: isPeriodicDelayedPort(): Boolean =
+	if(self.direction = #out) then
+		self.category=#eventDataPort and
+		self.isPeriodicThreadPort() and
+		self.srcConnectionInstance->forAll(e|e.destination.isPeriodicThreadPort()) and
+		self.srcConnectionInstance->forAll(e|e.isIntraProcessConnection()) and
+		(self.isDelayedPort() or self.isTimeBasedOutputPort() ) and
+		-- We should also deal with the output time property even though we consider here it is replaced by the
+		-- 'timing=Delayed' property
+		self.isOnePerDispatchOutputRate() -- Value_Range = '1.0 .. 1.0' and Rate_Unit = 'PerDispatch' and Rate_Distribution = 'Fixed'
+	else
+		self.direction.toString()='in' and
+		self.category=#eventDataPort and
+		self.isPeriodicThreadPort() and
+		self.dstConnectionInstance->forAll(e|e.source.isPeriodicThreadPort()) and
+		self.dstConnectionInstance->forAll(e|e.isIntraProcessConnection()) and
+		(self.isDelayedPort() or self.isTimeBasedInputPort() ) and
+		self.getDequeueProtocol() = 'AllItems'.toLower()
+	endif
+;
+
+helper context AADLI!FeatureInstance def: isTimeBasedOutputPort(): Boolean =
+	self.getOutputTimeKind() = 'Deadline' and self.getOutputTimeOffset().minimum = self.getOutputTimeOffset().maximum
+;
+
+helper context AADLI!FeatureInstance def: isTimeBasedInputPort(): Boolean =
+	self.getInputTimeKind() = 'Dispatch' and self.getInputTimeOffset().minimum = self.getOutputTimeOffset().maximum
+;
+
+helper context AADLI!FeatureInstance def: getDequeueProtocol() : String =
+	let property:AADLBA!PropertyAssociation = self.ownedPropertyAssociation->any(pa|pa.property.name.toLower()='dequeue_protocol') 
+	in
+	if (property.oclIsUndefined()) then
+		thisModule.getProperty('dequeue_protocol').defaultValue.namedValue.name.toLower()
+	else
+		property.ownedValue->first().ownedValue.namedValue.name.toLower()
+	endif
+;
+
+helper context AADLBA!PropertyExpression def: isFixedRateDistribution() : Boolean =
+	self.ownedFieldValue->any(fv|fv.property.name='Rate_Distribution').ownedValue.namedValue.name.toLower() = 'fixed'
+;
+
+helper context AADLBA!PropertyExpression def: isPerDispatchRateUnit() : Boolean =
+	self.ownedFieldValue->any(fv|fv.property.name='Rate_Unit').ownedValue.namedValue.name.toLower() = 'perdispatch'
+;
+
+helper context AADLBA!PropertyExpression def: isOnePerDispatchOutputRate() : Boolean =
+	self.ownedFieldValue->any(fv|fv.property.name='Value_Range').ownedValue.minimum.value = 1.0
+	and
+	self.ownedFieldValue->any(fv|fv.property.name='Value_Range').ownedValue.maximum.value = 1.0
+	and
+	self.isPerDispatchRateUnit()
+	and
+	self.isFixedRateDistribution()
+;
+
+helper context AADLI!FeatureInstance def : isOnePerDispatchOutputRate() : Boolean =
+	let property:AADLBA!PropertyAssociation = self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Rate') 
+	in
+	if (property.oclIsUndefined()) then
+		thisModule.getProperty('Output_Rate').defaultValue.isOnePerDispatchOutputRate()
+	else
+		property.ownedValue->first().ownedValue.isOnePerDispatchOutputRate()
+	endif
+;
+
+-- EB: the helper bellow is not precise enough, it abstracts away most of the semantical capabilities of the 
+-- Output_Rate property; reason why I wrote the helpers above
+
 helper context AADLI!FeatureInstance def : getOutputRate() : Real =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Rate')
 		.oclIsUndefined()) then
-		1
+		1 -- should look at the default value in the property set
 	else
 		self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Rate')
 		.ownedValue->first().ownedValue.ownedFieldValue->any(fv|fv.property.name='Value_Range')
@@ -106,19 +247,45 @@ helper context AADLI!FeatureInstance def : getOutputRate() : Real =
 ;
 
 helper context AADLI!FeatureInstance def : getOutputTime() : AADLI!RecordValue =
-	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time').oclIsUndefined()) then
-		OclUndefined
+	let pa: AADLI!PropertyAssociation = self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time') in 
+	if (pa.oclIsUndefined()) then
+		thisModule.getDefaultOutputTime()
 	else
-		self.ownedPropertyAssociation->any(pa|pa.property.name='Output_Time')
-		.ownedValue->first().ownedValue
+		pa.ownedValue->first().ownedValue
 	endif
+;
+
+helper def : getDefaultOutputTime() : AADLI!RecordValue =
+	thisModule.getProperty('Output_Time').defaultValue
+;
+
+helper context AADLI!FeatureInstance def : getInputTime() : AADLI!RecordValue =
+	let pa: AADLI!PropertyAssociation = self.ownedPropertyAssociation->any(pa|pa.property.name='Intput_Time') in 
+	if (pa.oclIsUndefined()) then
+		thisModule.getDefaultOutputTime()
+	else
+		pa.ownedValue->first().ownedValue
+	endif
+;
+
+helper def : getDefaultInputTime() : AADLI!RecordValue =
+	thisModule.getProperty('Input_Time').defaultValue
 ;
 
 helper context AADLI!FeatureInstance def : getOutputTimeKind() : String =
 	if (self.getOutputTime().oclIsUndefined()) then
 		OclUndefined
 	else
-		self.getOutputTime().ownedFieldValue
+		self.getOutputTime().ownedListElement.get(0).ownedFieldValue
+			->any(fv|fv.property.name='Time').ownedValue.namedValue.name
+	endif
+;
+
+helper context AADLI!FeatureInstance def : getInputTimeKind() : String =
+	if (self.getInputTime().oclIsUndefined()) then
+		OclUndefined
+	else
+		self.getInputTime().ownedListElement.get(0).ownedFieldValue
 			->any(fv|fv.property.name='Time').ownedValue.namedValue.name
 	endif
 ;
@@ -127,7 +294,16 @@ helper context AADLI!FeatureInstance def : getOutputTimeOffset() : AADLI!RealLit
 	if (self.getOutputTime().oclIsUndefined()) then
 		OclUndefined
 	else
-		self.getOutputTime().ownedFieldValue
+		self.getOutputTime().ownedListElement.get(0).ownedFieldValue
+			->any(fv|fv.property.name='Offset').ownedValue
+	endif
+;
+
+helper context AADLI!FeatureInstance def : getInputTimeOffset() : AADLI!RealLiteral =
+	if (self.getInputTime().oclIsUndefined()) then
+		OclUndefined
+	else
+		self.getInputTime().ownedListElement.get(0).ownedFieldValue
 			->any(fv|fv.property.name='Offset').ownedValue
 	endif
 ;
