@@ -150,7 +150,7 @@ public class Os {
 
 		code.addOutputNewline("APP_NAME = \"" + appName + "\";");
 
-		if (trampolineBasePath != null)
+		if (trampolineBasePath != null && !trampolineBasePath.isEmpty())
 			code.addOutputNewline("TRAMPOLINE_BASE_PATH =\"" + trampolineBasePath + "\";");
 		else
 			code.addOutputNewline("TRAMPOLINE_BASE_PATH =");

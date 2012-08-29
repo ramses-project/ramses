@@ -34,6 +34,7 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
@@ -82,6 +83,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                                           "pok_runtime::Buffer_Id_Type" ;
   
   private ProcessorProperties _processorProp;
+
+  private final String destinationPackageSuffix = "_refined::";
   
   public void process(ProcessorSubcomponent processor,
                       File generatedFilePath,
@@ -131,31 +134,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  private void locaCommunicattionHandler(ProcessImplementation processImpl, 
-                                 PartitionProperties pp)
-  {
-    EList<Subcomponent> subcmpts = processImpl.getAllSubcomponents() ;
-    
-    for(Subcomponent s : subcmpts)
-    {
-      if(s instanceof DataSubcomponent)
-      {
-        if(s.getClassifier().getQualifiedName()
-              .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
-        {
-          blackBoardHandler(s.getName(), 
-                            (FeatureInstance) HookAccessImpl.
-                            getTransformationTrace(s), pp);
-        }
-        else if(s.getClassifier().getQualifiedName()
-              .equalsIgnoreCase(EVENT_AADL_TYPE))
-        {
-          pp.eventNames.add(s.getName());
-        }
-      }
-    }
-  }
-  
 //TODO : be refactored with generic interfaces.
   private void blackBoardHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
@@ -172,8 +150,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-        blackboardInfo.dataType =GenerationUtilsC.getGenerationCIdentifier(p.getDataFeatureClassifier()
-                                                                           .getQualifiedName()) ;
+    	NamedElement pkg = (NamedElement) p.getDataFeatureClassifier().eContainer();
+    	blackboardInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
+    											destinationPackageSuffix +
+            									p.getDataFeatureClassifier().getName()) ;
       }
     }
     pp.blackboardInfo.add(blackboardInfo); 
@@ -200,8 +180,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-        queueInfo.dataType =GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier()
-                                                                           .getQualifiedName()) ;
+    	NamedElement pkg = (NamedElement) port.getDataFeatureClassifier().eContainer();
+    	queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
+    											destinationPackageSuffix+
+              									port.getDataFeatureClassifier().getName()) ;
       }
     }
     
@@ -229,8 +211,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-        queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier()
-                                                                           .getQualifiedName()) ;
+    	NamedElement pkg = (NamedElement) port.getDataFeatureClassifier().eContainer();
+        queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
+        									destinationPackageSuffix+
+        									port.getDataFeatureClassifier().getName()) ;
       }
     }
     
@@ -326,8 +310,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-        sampleInfo.dataType =GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier()
-                                                                           .getQualifiedName()) ;
+    	NamedElement pkg = (NamedElement) port.getDataFeatureClassifier().eContainer();
+    	sampleInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
+    										destinationPackageSuffix+
+          									port.getDataFeatureClassifier().getName()) ;
       }
     }
     
@@ -467,12 +453,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                                           process.getComponentImplementation() ;
     
     this.findCommunicationMechanism(processImpl, pp);
-    
-    if(pp.hasBlackboard 
-          || pp.hasEvent)
-    {
-      locaCommunicattionHandler(processImpl, pp);
-    }
     
     // Generate main.h
     UnparseText mainHeaderCode = new UnparseText() ;
@@ -690,7 +670,27 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       mainImplCode.addOutput("  tattr.TIME_CAPACITY = ") ;
       mainImplCode.addOutputNewline(timeCapacity + ';') ;
     }
+    
+    String priority;
+    
+    try
+    {
+      float value =
+            PropertyUtils.getIntValue(thread, "Priority") ;
+      priority = Integer.toString((int) value) ;
+    }
+    catch(Exception e)
+    {
+      priority = null ;
+    }
 
+    // If priority is not set, don't generate.
+    if(priority != null)
+    {
+      mainImplCode.addOutput("  tattr.BASE_PRIORITY = ") ;
+      mainImplCode.addOutputNewline(priority + ';') ;
+    }
+    
     mainImplCode
           .addOutput("  CREATE_PROCESS (&(tattr), &(arinc_threads[") ;
     mainImplCode.addOutput(Integer.toString(threadIndex)) ;

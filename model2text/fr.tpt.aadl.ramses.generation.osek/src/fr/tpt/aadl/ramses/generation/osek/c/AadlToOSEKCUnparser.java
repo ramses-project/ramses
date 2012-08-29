@@ -46,6 +46,7 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status;
 import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
+import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
 import fr.tpt.aadl.utils.PropertyNotFound;
@@ -151,7 +152,6 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		_oilCode = new UnparseText();
 		_mainCCode = new UnparseText();
 		_mainHCode = new UnparseText();
-		
 		resources = new Resources(new File(configurationPath, compilationFile));
 		_startupHook = new Hook();
 		_shutdownHook = new Hook();
@@ -538,7 +538,12 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 				/* Begin Alarm */
 
 				int period = (int) PropertyUtils.getIntValue(thread, "Period");
-				int alarmTime = (int) PropertyUtils.getIntValue(thread, "First_Dispatch_Time");
+				int alarmTime=0;
+				try{
+					alarmTime = (int) PropertyUtils.getIntValue(thread, "First_Dispatch_Time");
+				} catch(Exception exc)
+				{
+				}
 				Alarm alarm = new Alarm(counter, task, cpu);
 
 				alarm.setName("wakeUp" + thread.getName());
@@ -605,14 +610,14 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		// TODO 
 		for(File header : oil.getCpu().getOs().getAppHeaders())
 		  _mainHCode.addOutput("#include \"" + header.getName() + "\"\n");
-
-
+		
+		_mainHCode.addOutputNewline("#include \"gtypes.h\"");
 		_mainHCode.addOutputNewline("#endif");
 		
 	}
 
 	/**
-	 * Génération du code C d'une data
+	 * OSEK/C code generation for a data subcomponent 
 	 * 
 	 * @param thread
 	 *            L'AST du thread.
@@ -622,9 +627,14 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		_mainCCode.addOutputNewline("#include \"tpl_memmap.h\"");
 		_mainCCode.addOutputNewline("");
 
-		_mainCCode.addOutputNewline("VAR(" + GenerationUtilsC.getGenerationCIdentifier(data.getAllClassifier().getName())
-				+ ", OS_VAR) " + data.getName() + " = FORWARD;");
-
+		_mainCCode.addOutput("VAR(" + GenerationUtilsC.getGenerationCIdentifier(data.getAllClassifier().getQualifiedName())
+				+ ", OS_VAR) " + data.getName());
+		String init="";
+		init = GeneratorUtils.getInitialValue(data.getDataSubcomponentType());
+		if(! init.isEmpty())
+			_mainCCode.addOutput(" = "+init);
+		_mainCCode.addOutputNewline(";");
+		
 		_mainCCode.addOutputNewline("");
 		_mainCCode.addOutputNewline("#define OS_STOP_SEC_VAR_UNSPECIFIED");
 		_mainCCode.addOutputNewline("#include \"tpl_memmap.h\"");

@@ -190,4 +190,5 @@ public class AadlTargetSpecificGenerator implements Generator
   {
     // AadlTargetSpecificGenerator does not take any parameters: nothing to do.
   }
+
 }

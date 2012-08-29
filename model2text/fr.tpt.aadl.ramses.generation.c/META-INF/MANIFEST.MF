@@ -22,5 +22,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.generation.c,
  fr.tpt.aadl.ramses.generation.c.annex.behavior
-Import-Package: org.eclipse.xtext.nodemodel
+Import-Package: org.eclipse.xtext.nodemodel,
+ org.osate.xtext.aadl2.properties.linking
 Bundle-Vendor: TELECOM Paristech

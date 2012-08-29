@@ -21,37 +21,90 @@
 
 package fr.tpt.aadl.ramses.generation.c ;
 
-import java.io.BufferedWriter ;
-import java.io.File ;
-import java.io.FileWriter ;
-import java.io.IOException ;
-import java.util.ArrayList ;
-import java.util.HashMap ;
-import java.util.HashSet ;
-import java.util.Iterator ;
-import java.util.List ;
-import java.util.Map ;
-import java.util.Set ;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.eclipse.emf.common.util.EList ;
-import org.osate.aadl2.* ;
-import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
-import org.osate.aadl2.util.Aadl2Switch ;
-import org.osate.annexsupport.AnnexUnparser ;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AccessCategory;
+import org.osate.aadl2.AccessConnection;
+import org.osate.aadl2.AccessType;
+import org.osate.aadl2.AnnexLibrary;
+import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.BehavioredImplementation;
+import org.osate.aadl2.CallSpecification;
+import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ClassifierValue;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentPrototypeActual;
+import org.osate.aadl2.ComponentPrototypeBinding;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.Connection;
+import org.osate.aadl2.ConnectionEnd;
+import org.osate.aadl2.DataAccess;
+import org.osate.aadl2.DataImplementation;
+import org.osate.aadl2.DataPrototype;
+import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.DataSubcomponentType;
+import org.osate.aadl2.DataType;
+import org.osate.aadl2.DefaultAnnexLibrary;
+import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.EnumerationLiteral;
+import org.osate.aadl2.Feature;
+import org.osate.aadl2.IntegerLiteral;
+import org.osate.aadl2.ListValue;
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NamedValue;
+import org.osate.aadl2.Parameter;
+import org.osate.aadl2.ProcessImplementation;
+import org.osate.aadl2.ProcessSubcomponent;
+import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.PrototypeBinding;
+import org.osate.aadl2.StringLiteral;
+import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.Subprogram;
+import org.osate.aadl2.SubprogramAccess;
+import org.osate.aadl2.SubprogramCall;
+import org.osate.aadl2.SubprogramCallSequence;
+import org.osate.aadl2.SubprogramClassifier;
+import org.osate.aadl2.SubprogramGroupAccess;
+import org.osate.aadl2.SubprogramImplementation;
+import org.osate.aadl2.SubprogramSubcomponentType;
+import org.osate.aadl2.SubprogramType;
+import org.osate.aadl2.ThreadImplementation;
+import org.osate.aadl2.ThreadSubcomponent;
+import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
+import org.osate.aadl2.util.Aadl2Switch;
+import org.osate.annexsupport.AnnexUnparser;
 
-import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser ;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
-import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser ;
-import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction ;
-import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
-import fr.tpt.aadl.utils.Aadl2Utils ;
-import fr.tpt.aadl.utils.PropertyUtils ;
-import fr.tpt.aadl.utils.names.DataModelProperties ;
-import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
-import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
+import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
+import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
+import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder;
+import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils;
+import fr.tpt.aadl.annex.behavior.utils.DimensionException;
+import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser;
+import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
+import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
+import fr.tpt.aadl.utils.Aadl2Utils;
+import fr.tpt.aadl.utils.PropertyUtils;
+import fr.tpt.aadl.utils.names.DataModelProperties;
 
 public class AadlToCUnparser extends AadlProcessingSwitch
                              implements AadlGenericUnparser
@@ -127,6 +180,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     _deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
     
     _deploymentHeaderCode = new AadlToCSwitchProcess(this) ;
+    _deploymentHeaderCode.addOutputNewline("#include \"gtypes.h\"") ;
     
     _processedTypes = new ArrayList<String>() ;
     
@@ -137,8 +191,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   
   public void saveGeneratedFilesContent(File targetDirectory)
   {
-    _currentHeaderUnparser = _gtypesHeaderCode ;
-
+    
     for(NamedElement ne : _delayedDataDeclarations)
     {
       getCTypeDeclarator(ne, false) ;
@@ -272,7 +325,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
     List<String> sourceText =
           PropertyUtils.getStringListValue(ne, "Source_Text") ;
-    sourceNameDest.addOutput(sourceName) ;
+    if(sourceNameDest!=null)
+      sourceNameDest.addOutput(sourceName) ;
 
     for(String s : sourceText)
     {
@@ -300,6 +354,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 		  AadlToCSwitchProcess sourceNameDest, 
 		  AadlToCSwitchProcess sourceTextDest)
   {
+	  processDataSubcomponentType(null, dst, sourceNameDest, sourceTextDest);
+  }
+  
+  protected void processDataSubcomponentType(Classifier owner,
+		  DataSubcomponentType dst,
+		  AadlToCSwitchProcess sourceNameDest, 
+		  AadlToCSwitchProcess sourceTextDest)
+  {
 
     try
     {
@@ -307,10 +369,142 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
     catch(Exception e)
     {
-      sourceNameDest.addOutput(GenerationUtilsC.getGenerationCIdentifier(dst
-          .getQualifiedName())) ;
+      if(dst instanceof DataPrototype && owner!=null)
+      {
+    	for(PrototypeBinding pb: owner.getOwnedPrototypeBindings())
+    	{
+    	  if(pb instanceof ComponentPrototypeBinding
+    			&& pb.getFormal().getName().equalsIgnoreCase(dst.getName()))
+    	  {
+  		    for(ComponentPrototypeActual pa: ((ComponentPrototypeBinding) pb).getActuals())
+    		{
+    		  if(pa.getSubcomponentType() instanceof DataSubcomponentType)
+    	      {
+    		    DataSubcomponentType dstActual = (DataSubcomponentType) pa.getSubcomponentType();
+    		    processDataSubcomponentType(owner, dstActual, sourceNameDest, sourceTextDest);
+    	        break;
+    	      }
+    	    }
+    	  }
+    	}
+      } else
+    	sourceNameDest.addOutput(GenerationUtilsC.getGenerationCIdentifier(dst
+    	  .getQualifiedName())) ;
     }
   }
+  
+  boolean processBehavioredType(ComponentType type)
+  {
+	  return processBehavioredType(type, type);
+  }
+  
+  boolean processBehavioredType(ComponentType type, ComponentType owner)
+  {
+	  boolean foundRestrictedAnnex = false;
+	  for(AnnexSubclause annex : type.getOwnedAnnexSubclauses())
+      {
+        if(annex.getName().equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
+        {
+        	foundRestrictedAnnex = true;
+        	processAnnexSubclause(annex, owner) ;
+        	break;
+        }
+      }
+	  if(!foundRestrictedAnnex && type.getExtended()!=null)
+		  foundRestrictedAnnex = processBehavioredType(type.getExtended(), owner);
+	  return foundRestrictedAnnex;
+  }
+  
+  /**
+   * unparses annex subclause
+   *
+   * @param as
+   *            AnnexSubclause object
+   */
+  public String processAnnexSubclause(AnnexSubclause as, NamedElement owner)
+  {
+	AadlToCSwitchProcess codeUnparser;
+	AadlToCSwitchProcess headerUnparser;
+	if(owner instanceof SubprogramClassifier)
+	{
+	  codeUnparser = _subprogramImplCode;
+	  headerUnparser = _subprogramHeaderCode;
+	}
+	else
+	{
+	  codeUnparser = _activityImplCode;
+	  headerUnparser = _subprogramHeaderCode;
+	}
+    String annexName = as.getName() ;
+    	if(annexName.equalsIgnoreCase(AadlBaUnParserAction.ANNEX_NAME))
+    		annexName = "restricted_"+annexName;
+    AnnexUnparser unparser =
+          ServiceRegistryProvider.getServiceRegistry()
+                .getUnparser(annexName) ;
+    
+    // XXX May AadlBaToCUnparser have its own interface ???
+    if(unparser != null && unparser instanceof AadlBaToCUnparserAction )
+    {
+      AadlBaToCUnparserAction baToCUnparserAction =
+            (AadlBaToCUnparserAction) unparser ;
+      
+      AadlBaToCUnparser baToCUnparser =
+            (AadlBaToCUnparser) baToCUnparserAction.getUnparser() ;
+      
+      baToCUnparser.setDataAccessMapping(_dataAccessMapping) ;
+      baToCUnparser.setOwner(owner);
+      
+      baToCUnparserAction.unparseAnnexSubclause(as,
+    		  codeUnparser.getIndent()) ;
+      
+      
+      
+      baToCUnparser.addIndent_C(codeUnparser.getIndent()) ;
+      baToCUnparser.addIndent_H(headerUnparser.getIndent()) ;
+      codeUnparser.addOutput(baToCUnparser.getCContent()) ;
+      headerUnparser.addOutput(baToCUnparser.getHContent()) ;
+
+      if(_additionalHeaders.get(headerUnparser) == null)
+      {
+        Set<String> t = new HashSet<String>() ;
+        _additionalHeaders.put(headerUnparser, t) ;
+      }
+
+      _additionalHeaders.get(headerUnparser)
+            .addAll(baToCUnparser.getAdditionalHeaders()) ;
+    }
+
+    return DONE ;
+  }
+  
+  boolean processBehavioredImplementation(BehavioredImplementation object)
+  {
+	  return processBehavioredImplementation(object, object);
+  }
+  
+  boolean processBehavioredImplementation(BehavioredImplementation object, BehavioredImplementation owner)
+  {
+	  boolean foundRestrictedAnnex = false;
+	  for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
+      {
+        if(annex.getName().equalsIgnoreCase(AadlBaToCUnparserAction.ANNEX_NAME))
+        {
+        	foundRestrictedAnnex = true;
+        	processAnnexSubclause(annex, owner) ;
+        	break;
+        }
+      }
+	  if(!foundRestrictedAnnex && !object.getOwnedSubprogramCallSequences().isEmpty())
+	  {
+	  	for(SubprogramCallSequence scs: object.getOwnedSubprogramCallSequences())
+	  		process(scs);
+	  	foundRestrictedAnnex=true;
+	  }
+	  if(!foundRestrictedAnnex && object.getExtended()!=null)
+		  foundRestrictedAnnex = processBehavioredImplementation((BehavioredImplementation)object.getExtended(), object);
+	  return foundRestrictedAnnex;
+  }
+  
   
   protected void getCTypeDeclarator(NamedElement object,
                                     boolean delayComplexTypes)
@@ -343,6 +537,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         NamedValue el = (NamedValue) n ;
         numberRepresentationValue =
               ((EnumerationLiteral) el.getNamedValue()).getName().toLowerCase() ;
+        break;
       }
     }
 
@@ -377,29 +572,29 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     {
     // Simple types
       case BOOLEAN :
-        _currentHeaderUnparser.addOutputNewline("typedef char " + id + ";") ;
+        _gtypesHeaderCode.addOutputNewline("typedef char " + id + ";") ;
         break ;
       case CHARACTER :
       {
-        _currentHeaderUnparser.addOutput("typedef ") ;
-        _currentHeaderUnparser.addOutputNewline(numberRepresentationValue + " char " +
+    	  _gtypesHeaderCode.addOutput("typedef ") ;
+    	  _gtypesHeaderCode.addOutputNewline(numberRepresentationValue + " char " +
               id + ";") ;
         break ;
       }
       case FIXED :
         break ;
       case FLOAT :
-        _currentHeaderUnparser.addOutputNewline("typedef float " + id + ";") ;
+    	  _gtypesHeaderCode.addOutputNewline("typedef float " + id + ";") ;
         break ;
       case INTEGER :
       {
-        _currentHeaderUnparser.addOutput("typedef ") ;
-        _currentHeaderUnparser.addOutputNewline(numberRepresentationValue + " int " +
+    	_gtypesHeaderCode.addOutput("typedef ") ;
+    	_gtypesHeaderCode.addOutputNewline(numberRepresentationValue + " int " +
               id + ";") ;
         break ;
       }
       case STRING :
-        _currentHeaderUnparser.addOutputNewline("typedef char * " + id + ";") ;
+        _gtypesHeaderCode.addOutputNewline("typedef char * " + id + ";") ;
         break ;
       // Complex types
       case ENUM :
@@ -410,8 +605,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           break ;
         }
 
-        _currentHeaderUnparser.addOutputNewline("typedef enum e_" + id + " {") ;
-        _currentHeaderUnparser.incrementIndent() ;
+        _gtypesHeaderCode.addOutputNewline("typedef enum e_" + id + " {") ;
+        _gtypesHeaderCode.incrementIndent() ;
         List<String> stringifiedRepresentation = new ArrayList<String>() ;
         EList<PropertyExpression> dataRepresentation =
               PropertyUtils
@@ -470,15 +665,15 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                   rep += "," ;
                 }
 
-                _currentHeaderUnparser.addOutputNewline(id + "_" +
+                _gtypesHeaderCode.addOutputNewline(id + "_" +
                       enumString.getValue() + rep) ;
               }
             }
           }
         }
 
-        _currentHeaderUnparser.decrementIndent() ;
-        _currentHeaderUnparser.addOutputNewline("} " + id + ";") ;
+        _gtypesHeaderCode.decrementIndent() ;
+        _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case STRUCT :
@@ -489,8 +684,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           break ;
         }
 
-        _currentHeaderUnparser.addOutputNewline("typedef struct " + id + " {") ;
-        _currentHeaderUnparser.incrementIndent() ;
+        _gtypesHeaderCode.addOutputNewline("typedef struct " + id + " {") ;
+        _gtypesHeaderCode.incrementIndent() ;
         EList<PropertyExpression> elementNames =
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -533,7 +728,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 String type =
                       GenerationUtilsC.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
-                _currentHeaderUnparser.addOutputNewline(type +
+                _gtypesHeaderCode.addOutputNewline(type +
                       " " +
                       stringifiedElementNames.get(lv.getOwnedListElements()
                             .indexOf(v)) + ";") ;
@@ -542,8 +737,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
         }
 
-        _currentHeaderUnparser.decrementIndent() ;
-        _currentHeaderUnparser.addOutputNewline("} " + id + ";") ;
+        _gtypesHeaderCode.decrementIndent() ;
+        _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case UNION :
@@ -554,8 +749,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           break ;
         }
 
-        _currentHeaderUnparser.addOutputNewline("typedef union " + id + " {") ;
-        _currentHeaderUnparser.incrementIndent() ;
+        _gtypesHeaderCode.addOutputNewline("typedef union " + id + " {") ;
+        _gtypesHeaderCode.incrementIndent() ;
         EList<PropertyExpression> elementNames =
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -598,7 +793,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 String type =
                       GenerationUtilsC.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
-                _currentHeaderUnparser.addOutputNewline(type +
+                _gtypesHeaderCode.addOutputNewline(type +
                       " " +
                       stringifiedElementNames.get(lv.getOwnedListElements()
                             .indexOf(v)) + ";") ;
@@ -607,13 +802,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
         }
 
-        _currentHeaderUnparser.decrementIndent() ;
-        _currentHeaderUnparser.addOutputNewline("}" + id + ";") ;
+        _gtypesHeaderCode.decrementIndent() ;
+        _gtypesHeaderCode.addOutputNewline("}" + id + ";") ;
         break ;
       }
       case ARRAY :
       {
-        _currentHeaderUnparser.addOutput("typedef ") ;
+    	_gtypesHeaderCode.addOutput("typedef ") ;
         EList<PropertyExpression> baseType =
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -630,7 +825,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               if(v instanceof ClassifierValue)
               {
                 ClassifierValue cv = (ClassifierValue) v ;
-                _currentHeaderUnparser.addOutput(GenerationUtilsC
+                _gtypesHeaderCode.addOutput(GenerationUtilsC
                       .getGenerationCIdentifier(cv.getClassifier()
                             .getQualifiedName())) ;
               }
@@ -638,8 +833,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
         }
 
-        _currentHeaderUnparser.addOutput(" ") ;
-        _currentHeaderUnparser.addOutput(id) ;
+        _gtypesHeaderCode.addOutput(" ") ;
+        _gtypesHeaderCode.addOutput(id) ;
         EList<PropertyExpression> arrayDimensions =
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -655,28 +850,28 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             {
               if(v instanceof IntegerLiteral)
               {
-                _currentHeaderUnparser.addOutput("[") ;
+            	_gtypesHeaderCode.addOutput("[") ;
                 IntegerLiteral dimension = (IntegerLiteral) v ;
-                _currentHeaderUnparser.addOutput(Long.toString(dimension.getValue())) ;
-                _currentHeaderUnparser.addOutput("]") ;
+                _gtypesHeaderCode.addOutput(Long.toString(dimension.getValue())) ;
+                _gtypesHeaderCode.addOutput("]") ;
               }
             }
           }
         }
 
-        _currentHeaderUnparser.addOutputNewline(";") ;
+        _gtypesHeaderCode.addOutputNewline(";") ;
         break ;
       }
       case UNKNOWN :
       {
         try
         {
-          _currentHeaderUnparser.addOutput("typedef ") ;
+          _gtypesHeaderCode.addOutput("typedef ") ;
           resolveExistingCodeDependencies(object, _gtypesHeaderCode,
                                           _gtypesHeaderCode) ;
-          _currentHeaderUnparser.addOutput(" ") ;
-          _currentHeaderUnparser.addOutput(id) ;
-          _currentHeaderUnparser.addOutputNewline(";") ;
+          _gtypesHeaderCode.addOutput(" ") ;
+          _gtypesHeaderCode.addOutput(id) ;
+          _gtypesHeaderCode.addOutputNewline(";") ;
         }
         catch(Exception e)
         {
@@ -701,7 +896,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           return DONE ;
         }
         _processedTypes.add(object.getQualifiedName());
-        _currentHeaderUnparser = _gtypesHeaderCode ;
         _gtypesHeaderCode.processComments(object) ;
         getCTypeDeclarator((NamedElement) object, true) ;
         return DONE ;
@@ -753,53 +947,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
 
-      /**
-       * unparses annex subclause
-       *
-       * @param as
-       *            AnnexSubclause object
-       */
-      public String caseAnnexSubclause(AnnexSubclause as)
-      {
-        String annexName = "restricted_" + as.getName() ;
-        AnnexUnparser unparser =
-              ServiceRegistryProvider.getServiceRegistry()
-                    .getUnparser(annexName) ;
-        
-        // XXX May AadlBaToCUnparser have its own interface ???
-        if(unparser != null && unparser instanceof AadlBaToCUnparserAction )
-        {
-          AadlBaToCUnparserAction baToCUnparserAction =
-                (AadlBaToCUnparserAction) unparser ;
-
-          AadlBaToCUnparser baToCUnparser =
-                (AadlBaToCUnparser) baToCUnparserAction.getUnparser() ;
-          
-          baToCUnparser.setDataAccessMapping(_dataAccessMapping) ;
-          
-          baToCUnparserAction.unparseAnnexSubclause(as,
-                                             _currentImplUnparser.getIndent()) ;
-          
-          
-          
-          baToCUnparser.addIndent_C(_currentImplUnparser.getIndent()) ;
-          baToCUnparser.addIndent_H(_currentHeaderUnparser.getIndent()) ;
-          _currentImplUnparser.addOutput(baToCUnparser.getCContent()) ;
-          _currentHeaderUnparser.addOutput(baToCUnparser.getHContent()) ;
-
-          if(_additionalHeaders.get(_currentHeaderUnparser) == null)
-          {
-            Set<String> t = new HashSet<String>() ;
-            _additionalHeaders.put(_currentHeaderUnparser, t) ;
-          }
-
-          _additionalHeaders.get(_currentHeaderUnparser)
-                .addAll(baToCUnparser.getAdditionalHeaders()) ;
-        }
-
-        return DONE ;
-      }
-
       public String caseDataImplementation(DataImplementation object)
       {
         _currentHeaderUnparser = _gtypesHeaderCode ;
@@ -838,9 +985,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           process(object.getDataSubcomponentType());
         }
 
-        return null ;
+        return DONE ;
       }
-      
+            
       public String caseProcessImplementation(ProcessImplementation object)
       {
         buildDataAccessMapping(object) ;
@@ -856,6 +1003,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         	  processDataSubcomponentType(ds.getDataSubcomponentType(), _deploymentImplCode, _deploymentHeaderCode);
         	  _deploymentImplCode.addOutputNewline(" "+ds.getName()+";") ;
           }
+          process(ds.getDataSubcomponentType());
         }
         // *** Generate deployment.c ***
         if(false == _dataAccessMapping.isEmpty())
@@ -944,31 +1092,39 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         process(object.getComponentImplementation()) ;
         return DONE ;
       }
-
+      
       public String caseThreadImplementation(ThreadImplementation object)
       {
+    	if(_processedTypes.contains(object.getQualifiedName()))
+        {
+          return DONE ;
+        }
+        _processedTypes.add(object.getQualifiedName());
+    	_currentImplUnparser = _activityImplCode ;
+        _currentHeaderUnparser = _activityHeaderCode ;
         buildDataAccessMapping(object) ;
         process(object.getType()) ;
-        _activityImplCode.addOutput("void* ") ;
-        _activityImplCode.addOutput(GenerationUtilsC
+        _currentImplUnparser.addOutput("void* ") ;
+        _currentImplUnparser.addOutput(GenerationUtilsC
               .getGenerationCIdentifier(object.getQualifiedName())) ;
-        _activityImplCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + "()") ;
-        _activityImplCode.addOutputNewline("{") ;
-        _activityImplCode.incrementIndent() ;
+        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + "()") ;
+        _currentImplUnparser.addOutputNewline("{") ;
+        _currentImplUnparser.incrementIndent() ;
 
+        _currentImplUnparser.addOutputNewline("while (1) {") ;
+        _currentImplUnparser.incrementIndent() ;
+        
         for(DataSubcomponent d : object.getOwnedDataSubcomponents())
         {
           process(d) ;
         }
-
-        _currentImplUnparser = _activityImplCode ;
-        _currentHeaderUnparser = _activityHeaderCode ;
         
-        for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
-        {
-          process(annex) ;
-        }
-
+        processBehavioredImplementation(object);
+        
+        _activityImplCode.decrementIndent() ;
+        _activityImplCode.addOutputNewline("}") ;
+        
+        _activityImplCode.addOutputNewline("return 0;") ;
         _activityImplCode.decrementIndent() ;
         _activityImplCode.addOutputNewline("}") ;
         
@@ -980,6 +1136,302 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return null ;
       }
 
+      public String caseSubprogramCallSequence(SubprogramCallSequence object)
+      {
+    	for(CallSpecification cs : object.getOwnedCallSpecifications())
+    	{
+    		if(cs instanceof SubprogramCall)
+    		{
+    			SubprogramCall sc = (SubprogramCall) cs;
+    			process(sc);
+    		}
+    	}
+    	return null ;
+      }
+      
+      public String caseSubprogramType(SubprogramType object)
+      {
+    	if(_processedTypes.contains(object.getQualifiedName()))
+        {
+          return DONE ;
+        }
+        _processedTypes.add(object.getQualifiedName());
+    	
+        try {
+          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
+        } catch (Exception e1) {
+          caseSubprogramClassifier((SubprogramClassifier) object);
+                
+          processBehavioredType(object) ;
+          	    
+          _subprogramImplCode.decrementIndent();
+          _subprogramImplCode.addOutputNewline("}");	
+        }
+  	    
+  	    return DONE;
+      }
+      
+      public String caseSubprogramClassifier(SubprogramClassifier object)
+      {
+        
+      	Parameter returnParameter = null;
+        List<Feature> orderedFeatureList = null;
+        if(object instanceof SubprogramImplementation)
+        {
+          SubprogramImplementation si = (SubprogramImplementation) object;
+          orderedFeatureList = Aadl2Utils.orderFeatures(si.getType()) ;
+        }
+        else if (object instanceof SubprogramType)
+        {
+          SubprogramType st = (SubprogramType) object;
+          orderedFeatureList = Aadl2Utils.orderFeatures(st) ;
+        }
+        boolean isReturnParam=false;
+        for(Feature param: orderedFeatureList)
+        {
+          if(param instanceof Parameter)
+          {
+        	Parameter p = (Parameter) param ;
+        	isReturnParam = PredefinedPropertiesManager.isReturnParameter(p);
+          }
+        }
+        if(!isReturnParam)
+        {
+          _subprogramImplCode.addOutput("void ");
+          _subprogramHeaderCode.addOutput("void ");
+        }
+
+        _subprogramImplCode.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()));
+        _subprogramHeaderCode.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()));
+
+        _subprogramImplCode.addOutput("(");
+        _subprogramHeaderCode.addOutput("(");
+      	
+    	boolean first = true;
+    	for(Feature f: orderedFeatureList)
+    	{
+    	  if(f instanceof Parameter)
+  		  {
+  		    Parameter p = (Parameter) f ;
+  			if(p==returnParameter)
+  			  continue;
+  			if(first==false)
+  			{
+  			  _subprogramImplCode.addOutput(", ") ;
+  			  _subprogramHeaderCode.addOutput(", ") ;
+  			}
+  			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramImplCode, _subprogramImplCode);
+  			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramHeaderCode, _subprogramHeaderCode);
+  			if(Aadl2Utils.isInOutParameter(p) ||
+  					Aadl2Utils.isOutParameter(p))
+  			{
+  			  _subprogramImplCode.addOutput(" * ") ;
+  			  _subprogramHeaderCode.addOutput(" * ") ;
+  			}
+  			_subprogramImplCode.addOutput(" "+p.getName());
+  			_subprogramHeaderCode.addOutput(" "+p.getName());
+  			first=false;
+  			
+  			process(p.getDataFeatureClassifier());
+  		  }
+  		  else if(f instanceof DataAccess)
+  		  {
+  			DataAccess da = (DataAccess) f ;
+  			if(first==false)
+  			{
+  			  _subprogramImplCode.addOutput(", ") ;
+  			  _subprogramHeaderCode.addOutput(", ") ;
+  			}
+  			processDataSubcomponentType(object, da.getDataFeatureClassifier(), _subprogramImplCode, _currentImplUnparser);
+  			processDataSubcomponentType(object, da.getDataFeatureClassifier(), _subprogramHeaderCode, _subprogramHeaderCode);
+  			if(da.getKind().equals(AccessType.REQUIRES))
+  			{
+  			  if(Aadl2Utils.isReadWriteDataAccess(da) ||
+  					  Aadl2Utils.isWriteOnlyDataAccess(da))
+  			  {
+  				_subprogramImplCode.addOutput(" * ") ;
+  			    _subprogramHeaderCode.addOutput(" * ") ;
+  			  }
+  			  _subprogramImplCode.addOutput(" "+da.getName());
+  			  _subprogramHeaderCode.addOutput(" "+da.getName());
+  			}
+  			first=false;
+  			
+  			process(da.getDataFeatureClassifier());
+  		  }
+    	}
+
+    	_subprogramImplCode.addOutputNewline(")");
+    	_subprogramHeaderCode.addOutputNewline(");");
+    	_subprogramHeaderCode.addOutputNewline("");
+  	  
+  	    _subprogramImplCode.addOutputNewline("{");
+  	    _subprogramImplCode.incrementIndent();
+      	
+    	return null;
+      }
+      
+      public String caseSubprogramImplementation(SubprogramImplementation object)
+      {
+    	if(_processedTypes.contains(object.getQualifiedName()))
+        {
+          return DONE ;
+        }
+        _processedTypes.add(object.getQualifiedName());
+        try {
+          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
+        } catch (Exception e1) {
+      	  caseSubprogramClassifier((SubprogramClassifier) object);
+        
+    	  for(DataSubcomponent d : object.getOwnedDataSubcomponents())
+          {
+            process(d) ;
+          }
+
+          processBehavioredImplementation(object) ;
+
+          _subprogramImplCode.decrementIndent();
+          _subprogramImplCode.addOutputNewline("}");
+        }
+    	  
+    	return DONE;
+      }
+      
+      public String caseSubprogramCall(SubprogramCall object)
+      {
+    	  Parameter returnParameter = null;
+
+    	  if(object.getCalledSubprogram() != null)
+    	  {
+    		  SubprogramType st = null ;
+    		  
+    		  SubprogramSubcomponentType sct;
+    		  if(object.getCalledSubprogram() instanceof SubprogramAccess)
+    			  sct = ((SubprogramAccess)object.getCalledSubprogram()).getSubprogramFeatureClassifier();
+    		  else
+    			  sct = (SubprogramSubcomponentType) object.getCalledSubprogram() ;
+
+
+    		  if(sct instanceof SubprogramType)
+    		  {
+    			  st = (SubprogramType) sct ;
+    		  }
+    		  else
+    		  {
+    			  SubprogramImplementation si = (SubprogramImplementation) sct ;
+    			  st = si.getType() ;
+    		  }
+
+    		  List<Feature> orderedFeatureList = Aadl2Utils.orderFeatures(st) ;
+    		  List<ConnectionEnd> orderedParamValue = new ArrayList<ConnectionEnd>();
+    		  for(Feature f: orderedFeatureList)
+    		  {
+    			  ConnectionEnd ce = Aadl2Utils.getConnectedEnd(object, f);
+    			  orderedParamValue.add(ce);
+    		  }
+
+    		  for(Feature param: orderedFeatureList)
+    		  {
+    			  if(param instanceof Parameter)
+    			  {
+    				  Parameter p = (Parameter) param ;
+    				  boolean isReturnParam = PredefinedPropertiesManager.isReturnParameter(p);;
+    				  
+    				  if(isReturnParam)
+    				  {
+    					  returnParameter = p;
+    					  ConnectionEnd ce = orderedParamValue.get(orderedFeatureList.indexOf(p));
+						  processConnectionEnd(ce);
+    					  break;
+    				  }
+    			  }
+    		  }
+
+    		  try {
+    			resolveExistingCodeDependencies(sct, _currentImplUnparser, _currentHeaderUnparser);
+    		  } catch (Exception e1) {
+    			_currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(sct.getQualifiedName()));
+    		  }
+    		  
+    		  if(st != null)
+    		  {  
+    			  _currentImplUnparser.addOutput(" (") ;
+    			  boolean first = true;
+    			  for(Feature feature: orderedFeatureList)
+    			  {
+    				  if(feature instanceof Parameter)
+    				  {
+    					  Parameter p = (Parameter) feature ;
+    					  if(p==returnParameter)
+    						  continue;
+    					  if(first==false)
+    						  _currentImplUnparser.addOutput(", ") ;
+    					  if(Aadl2Utils.isInOutParameter(p) ||
+    							  Aadl2Utils.isOutParameter(p))
+    					  {
+    						  _currentImplUnparser.addOutput("&") ;
+    					  }
+    					  ConnectionEnd ce = orderedParamValue.get(orderedFeatureList.indexOf(p));
+    					  if(ce != null)
+						    processConnectionEnd(ce);
+    					  first=false;
+    				  }
+    				  else if(feature instanceof DataAccess)
+    				  {
+    					  DataAccess da = (DataAccess) feature ;
+    					  if(first==false)
+    						  _currentImplUnparser.addOutput(", ") ;
+    					  if(da.getKind().equals(AccessType.REQUIRES))
+    					  {
+    						  if(Aadl2Utils.isReadWriteDataAccess(da)
+    								  || Aadl2Utils.isWriteOnlyDataAccess(da))
+    						  {
+    							  _currentImplUnparser.addOutput("&") ;
+    						  }
+    					  }
+
+    					  String name = null ;
+
+    					  // If a data access mapping is provided:
+    					  // Transforms any data access into the right data subcomponent
+    					  // 's name thanks to the given data access mapping.
+    					  ConnectionEnd parentAccess = orderedParamValue.get(orderedFeatureList.indexOf(da));
+    					  if(_dataAccessMapping != null && parentAccess instanceof DataAccess)
+    					  {
+    						  name = _dataAccessMapping.get((DataAccess)parentAccess);
+    					  }
+
+    					  if (name != null)
+    					  {
+    						  _currentImplUnparser.addOutput(name);
+    					  }
+    					  else
+    					  {
+    						  processConnectionEnd(parentAccess);
+    					  }
+    					  first=false;
+    				  }
+
+    			  }
+
+    			  _currentImplUnparser.addOutputNewline(");") ;
+    		  }
+    		  process(sct);
+    	  }
+    	  return DONE ;
+      }
+      
+      private void processConnectionEnd(ConnectionEnd ce)
+      {
+		  if(ce instanceof DataSubcomponent)
+			  _currentImplUnparser.addOutput(
+					  GenerationUtilsC.getGenerationCIdentifier(ce.getQualifiedName()));
+		  else
+		  {
+			_currentImplUnparser.addOutput(ce.getName());
+		  }
+      }
+      
       public String caseThreadSubcomponent(ThreadSubcomponent object)
       {
         process(object.getComponentImplementation()) ;

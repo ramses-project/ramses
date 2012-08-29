@@ -48,7 +48,6 @@ import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.modelsupport.AadlConstants;
 import org.osate.aadl2.modelsupport.UnparseText;
-
 import fr.tpt.aadl.annex.behavior.aadlba.Any;
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
@@ -81,6 +80,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.ElseStatement;
 import fr.tpt.aadl.annex.behavior.aadlba.Factor;
 import fr.tpt.aadl.annex.behavior.aadlba.ForOrForAllStatement;
 import fr.tpt.aadl.annex.behavior.aadlba.IfStatement;
+import fr.tpt.aadl.annex.behavior.aadlba.IndexableElement;
 import fr.tpt.aadl.annex.behavior.aadlba.IntegerRange;
 import fr.tpt.aadl.annex.behavior.aadlba.IntegerValue;
 import fr.tpt.aadl.annex.behavior.aadlba.IntegerValueConstant;
@@ -120,6 +120,7 @@ import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 
+
 public class AadlBaToCUnparser extends AadlBaUnparser
 {
 
@@ -127,6 +128,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   protected UnparseText _cFileContent = null ;
   protected UnparseText _headerFileContent = null ;
   protected List<String> _additionalHeaders = new ArrayList<String>() ;
+  private NamedElement _owner ;
   
   public AadlBaToCUnparser(AnnexSubclause subclause,
                            String indent,
@@ -361,14 +363,15 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseBehaviorAnnex(BehaviorAnnex object)
       {
+    	BehaviorAnnex ba = (BehaviorAnnex) object ;
+    	NamedElement aadlComponent = _owner ;
+    	String aadlComponentCId =
+    		  GenerationUtilsC.getGenerationCIdentifier(aadlComponent
+                  .getQualifiedName()) ;
+        
         _cFileContent = new UnparseText() ;
         _headerFileContent = new UnparseText() ;
         
-        BehaviorAnnex ba = (BehaviorAnnex) object ;
-        NamedElement aadlComponent = (NamedElement) ba.eContainer() ;
-        String aadlComponentCId =
-              GenerationUtilsC.getGenerationCIdentifier(aadlComponent
-                    .getQualifiedName()) ;
         _cFileContent.addOutputNewline(aadlComponentCId +
               "_BA_State_t current_state = " + aadlComponentCId + "_" +
               AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
@@ -441,8 +444,12 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutput(sourceName);
         _cFileContent.addOutput(" " + object.getName()) ;
         caseArrayDimensions(object.getArrayDimensions()) ;
-        GeneratorUtils.getInitialValue(object.getDataClassifier()) ;
-        _cFileContent.addOutputNewline("") ;
+        String init = GeneratorUtils.getInitialValue(object.getDataClassifier()) ;
+        if(!init.isEmpty())
+        {
+        	_cFileContent.addOutput(" = "+init) ;
+        }
+        _cFileContent.addOutputNewline(";") ;
         return DONE ;
       }
 
@@ -474,8 +481,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseBehaviorState(BehaviorState object)
       {
-        NamedElement aadlComponent =
-              (NamedElement) object.eContainer().eContainer() ;
+        NamedElement aadlComponent = _owner ;
         String aadlComponentCId =
               GenerationUtilsC.getGenerationCIdentifier(aadlComponent
                     .getQualifiedName()) ;
@@ -891,15 +897,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             if(pce instanceof Parameter)
             {
               Parameter p = (Parameter) pce ;
-              boolean isReturnParam=false;
-              try {
-                isReturnParam =
-                      PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
-              } catch (Exception e) {
-                isReturnParam  = PredefinedPropertiesManager
-                      .getDefaultBooleanValue("Generation_Properties",
-                            "Return_Parameter") ;
-              }
+              boolean isReturnParam= PredefinedPropertiesManager.isReturnParameter(p);
               if(isReturnParam)
               {
                 returnParameter = p;
@@ -929,8 +927,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   continue;
                 if(first==false)
                   _cFileContent.addOutput(", ") ;
-                if(p.getDirection().equals(DirectionType.OUT) ||
-                      p.getDirection().equals(DirectionType.IN_OUT))
+                if(Aadl2Utils.isInOutParameter(p) ||
+                		Aadl2Utils.isOutParameter(p))
                 {
                   _cFileContent.addOutput("&") ;
                 }
@@ -945,22 +943,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   _cFileContent.addOutput(", ") ;
                 if(da.getKind().equals(AccessType.REQUIRES))
                 {
-                  String accessRight = null ;
-
-                  try
-                  {
-                    accessRight =
-                          PropertyUtils.getEnumValue(da, "Access_Right") ;
-                  }
-                  catch(Exception e)
-                  {
-                    accessRight =
-                          PredefinedPropertiesManager
-                          .getDefaultStringValue("Memory_Properties",
-                                "Access_Right") ;
-                  }
-
-                  if(accessRight.equalsIgnoreCase("Read_Write"))
+                  
+                  if(Aadl2Utils.isReadWriteDataAccess(da)
+                		  || Aadl2Utils.isWriteOnlyDataAccess(da))
                   {
                     _cFileContent.addOutput("&") ;
                   }
@@ -985,13 +970,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 }
                 else // Otherwise, process parameter label as usual.
                 {
-                  if(pl instanceof DataSubcomponentHolder)
-                  {
-                    DataSubcomponent ds = ((DataSubcomponentHolder)pl).getDataSubcomponent();
-                    _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(ds.getQualifiedName()));
-                  }
-                  else
-                    process((ParameterLabel) pl) ;
+                  process((ParameterLabel) pl) ;
                 }
                 first=false;
               }
@@ -1016,8 +995,40 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseElementHolder(ElementHolder object)
       {
-        String id = object.getElement().getQualifiedName();
-        aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(id));
+    	NamedElement elt = object.getElement();
+    	String id;
+    	if(elt instanceof Parameter)
+		{
+			Parameter p = (Parameter) elt;
+			if(Aadl2Utils.isInOutParameter(p)
+					|| Aadl2Utils.isOutParameter(p))
+				aadlbaText.addOutput("*");
+			id = elt.getName();
+		}
+		else if (elt instanceof DataAccess)
+		{
+		  DataAccess da = (DataAccess) elt;
+		  
+		  if(Aadl2Utils.isReadWriteDataAccess(da)
+				  || Aadl2Utils.isWriteOnlyDataAccess(da))
+  		  {
+  			aadlbaText.addOutput("*");
+  		  }
+  		  id = elt.getName();
+		}
+    	else	
+    		id = elt.getQualifiedName();
+    	aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(id));
+    	if(object instanceof IndexableElement)
+    	{	
+    	  IndexableElement ie = (IndexableElement) object;
+    	  for(IntegerValue iv: ie.getArrayIndexes())
+    	  {
+    		aadlbaText.addOutput("[");
+    		process(iv);
+    		aadlbaText.addOutput("]");
+    	  }
+    	}
         return DONE ;
       }
       
@@ -1289,4 +1300,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       _headerFileContent.incrementIndent() ;
     }
   }
+
+  public void setOwner(NamedElement owner) {
+	this._owner = owner;
+  }
+  
 }
