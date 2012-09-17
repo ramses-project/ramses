@@ -79,8 +79,6 @@ public class StandAloneInstantiator
                 ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
           .put("aaxl2", new Aadl2ResourceFactoryImpl()) ;
-    PropertiesLinkingService pls = new PropertiesLinkingService(); 
-    pls.setStandAloneResourceSet(resourceSet);
   }
 
   public static StandAloneInstantiator getInstantiator()
