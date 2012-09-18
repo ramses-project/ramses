@@ -1,0 +1,254 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+module CommonRefinementSteps;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									POK_RUNTIME: AADLBA;
+
+
+-------------------------------------------------------------------------------------------
+----	TO BE SUPERIMPOSED
+
+-- addNextValueSubprogramCall
+-- addPutValueSubprogramCall
+
+-------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------
+----	OVERRIDEN RULES
+-------------------------------------------------------------------------------------------
+
+
+unique lazy rule ThreadType {
+ from 
+ 	c : AADLI!ComponentInstance,
+ 	type : AADLI!ThreadType
+ to 
+ 	typeImg : AADLBA!ThreadType (
+ 	 name <- c.uniqueName().debug('thread type'),
+	 ownedDataAccess <- c.featureInstance->
+										select(e| (e.category=#dataPort or e.category=#eventDataPort
+													or e.category=#eventPort or e.category=#dataAccess) )->
+										collect(f| f.getFeatureImg())
+ 	)
+}
+
+unique lazy rule ThreadImplementation {
+ from 
+    c : AADLI!ComponentInstance,
+ 	typeImg : AADLBA!ThreadType,
+ 	impl : AADLI!ThreadImplementation
+ to 
+ 	implImg : AADLBA!ThreadImplementation (
+ 		name <- c.uniqueName().concat('.impl'),
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
+		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c,impl,implImg)
+	)
+}
+
+unique lazy rule mapCallSequence
+{
+	from
+		implImg : AABDBA!ComponentImplementation,
+		c : AADLI!ComponentInstance,
+		impl : AADLI!ComponentImplementation
+	using
+	{
+		callImg : AADLBA!SubprogramCall = OclUndefined;
+		fi: AADLI!FeatureInstance = OclUndefined;
+		calledSubprogram: AADLBA!SubprogramClassifier = OclUndefined;
+	}
+	to
+		s2 : AADLBA!SubprogramCallSequence (name <- impl.callSequenceFromImpl().name)
+	do
+	{
+		impl.callSequenceFromImpl().debug('  copy call sequence');
+		
+		for(call in impl.callSequenceFromImpl().ownedCallSpecification)
+		{
+			callImg <- thisModule.SubprogramCall(c, call, impl, implImg);
+			if(call.calledSubprogram.oclIsKindOf(AADLBA!SubprogramAccess))
+				calledSubprogram<-call.calledSubprogram.subprogramFeatureClassifier;
+			else
+				calledSubprogram<-call.calledSubprogram;
+			-- if an in parameter is connected to an in data port or event data port
+			-- we must call next_value here
+			for(paramCnx in impl.ownedParameterConnection)
+			{
+				if(paramCnx.destination.getContext() = call 
+						and calledSubprogram.ownedParameter.contains(paramCnx.destination.connectionEnd)
+						and paramCnx.destination.connectionEnd.isInputFeature())
+				{
+					fi<-c.featureInstance->any(e|e.name = paramCnx.source.connectionEnd.name);
+					if(not fi.oclIsUndefined())
+					{
+						if(fi.isDataOrEventDataPort())
+						{
+							thisModule.addNextValueSubprogramCall(s2, impl, implImg, fi);
+						}
+				 	}
+				}
+			}
+			s2.getOwnedCallSpecifications().add(callImg);
+			-- if an ou parameter is connected to an in data port or event data port
+			-- we must call put_value here
+			for(paramCnx in impl.ownedParameterConnection)
+			{
+				if(paramCnx.source.getContext() = call 
+						and calledSubprogram.ownedParameter.contains(paramCnx.source.connectionEnd)
+						and paramCnx.source.connectionEnd.isOutputFeature())
+				{
+					fi<-c.featureInstance->any(e|e.name = paramCnx.destination.connectionEnd.name);
+					if(not fi.oclIsUndefined())
+					{
+						if(fi.isDataOrEventDataPort())
+						{
+							thisModule.addPutValueSubprogramCall(s2, impl, implImg, fi);
+						}
+					}
+				}
+			}
+			callImg.debug('  copy subprogram call');
+		}
+		s2;
+	}
+}
+
+rule SubprogramCall (c: AADLI!ComponentInstance,
+					 s : AADLI!SubprogramCall, 
+					 impl : AADLI!ComponentImplementation, 
+					 implImg : AADLBA!ComponentImplementation) {
+	using
+	{
+		constantValue: Sequence(AADLBA!StringLiteral) = OclUndefined;
+		constantValueParameters: Sequence(AADLBA!StringLiteral) = OclUndefined;
+		parameterConstantValue: String = '';
+	}
+	to
+		s2 : AADLBA!SubprogramCall (
+			name <- s.name
+		)
+	do
+	{
+--		if(not s.calledSubprogram.getPropertyAssociation('Source_Name').oclIsUndefined()
+--					and not s.calledSubprogram.getPropertyAssociation('Source_Text').oclIsUndefined())
+--		{
+--			s2.calledSubprogram <- s.calledSubprogram;
+--			thisModule.addImportedUnitFromElt(thisModule.public(), s.calledSubprogram);
+--		}
+--		else
+--		{
+			if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType))
+				s2.calledSubprogram <- thisModule.Type(OclUndefined,s.calledSubprogram);
+			else if(s.calledSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
+				s2.calledSubprogram <- thisModule.Implementation(OclUndefined,s.calledSubprogram, thisModule.Type(OclUndefined,s.calledSubprogram.getOwnedRealization().implemented));
+			else if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramAccess))
+				if(s.calledSubprogram.subprogramFeatureClassifier.oclIsKindOf(AADLI!SubprogramType))
+					s2.calledSubprogram <-  thisModule.Type(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier);
+				else if (s.calledSubprogram.subprogramFeatureClassifier.oclIsKindOf(AADLI!SubprogramType))
+					s2.calledSubprogram <-  thisModule.Implementation(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier, thisModule.Type(OclUndefined,s.calledSubprogram.subprogramFeatureClassifier.getOwnedRealization().implemented));
+		
+			if(not s.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').oclIsUndefined()
+				and not s.calledSubprogram.getModalPropertyValue('Constant_Value').oclIsUndefined())
+			{
+				constantValue <- s.calledSubprogram.getModalPropertyValue('Constant_Value').ownedValue;
+				constantValueParameters <- s.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').ownedValue;
+				-- WARNING : We use both s (from input model) and s2 (from output model)
+				-- in this code
+				-- It is ok if: 
+					-- 1) parameter constant values ('Constant_Value') and 
+					-- parameters ('Constant_Value_Parameters') are identified 
+					-- by strings in the property set
+					-- 2) properties are copied from source to target model
+					-- 3) parameters have the same name in the source and target model
+				for(p in s2.calledSubprogram.getSubprogramParameters())
+				{
+					for(constantParamString in constantValueParameters.ownedListElement)
+					{
+						if(constantParamString.value=p.name)
+						{
+							parameterConstantValue <- constantValue.ownedListElement->at(constantValueParameters.ownedListElement->indexOf(constantParamString)).value;
+							thisModule.mapConstantParameter(p, parameterConstantValue, s2, implImg);
+						}
+					}	
+				}
+			} else
+			{
+				if(not s2.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').oclIsUndefined()
+					and not s2.calledSubprogram.getModalPropertyValue('Constant_Value').oclIsUndefined())
+				{
+					constantValue <- s2.calledSubprogram.getModalPropertyValue('Constant_Value').ownedValue;
+					constantValueParameters <- s2.calledSubprogram.getModalPropertyValue('Constant_Value_Parameters').ownedValue;
+					for(p in s2.calledSubprogram.getSubprogramParameters())
+					{
+						for(constantParamString in constantValueParameters.ownedListElement)
+						{
+							if(constantParamString.value=p.name)
+							{
+								parameterConstantValue <- constantValue.ownedListElement->at(constantValueParameters.ownedListElement->indexOf(constantParamString)).value;
+								thisModule.mapConstantParameter(p, parameterConstantValue, s2, implImg);
+							}
+						}	
+					}
+				}
+			}
+		--}
+		s2;
+	}
+}
+
+rule addDataAccessConnection(implImg: AADLBA!ComponentImplementation,
+							 name: String,
+							 param: AADLBA!DataAccess,
+							 ctx:AADLBA!Context,
+							 variable: AADLBA!DataSubcomponent)
+{
+  to
+	connectedParam: AADLBA!ConnectedElement
+	(
+		connectionEnd<-param,
+		context<-ctx
+	),
+	connectedSubcomponent: AADLBA!ConnectedElement
+	(
+		connectionEnd<-variable
+	),
+	accessConnection: AADLBA!AccessConnection
+	(
+		name<-name,
+		source<-connectedParam,
+		accessCategory<-#data,
+		destination<-connectedSubcomponent
+	)
+  do
+  {
+  	implImg.ownedAccessConnection.add(accessConnection);
+  }
+}

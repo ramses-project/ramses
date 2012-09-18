@@ -21,26 +21,28 @@
 
 package fr.tpt.aadl.ramses.generation.target.specific;
 
-import java.io.File ;
-import java.util.ArrayList ;
-import java.util.List ;
-import java.util.Map ;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
-import javax.swing.JOptionPane ;
+import javax.swing.JOptionPane;
 
-import org.eclipse.core.runtime.NullProgressMonitor ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.osate.aadl2.instance.SystemInstance ;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.osate.aadl2.PackageSection;
+import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.instance.SystemInstance;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
-import fr.tpt.aadl.ramses.control.support.XMLPilot ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
-import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl ;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
-
+import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.XMLPilot;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException;
+import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -160,10 +162,13 @@ public class AadlTargetSpecificGenerator implements Generator
         Resource result = _targetTrans.transformXML(r, resourceFilePath, resourceFileNameList, 
                                                     generatedFilePath);
 
-        List<Resource> rList = new ArrayList<Resource>();
-        rList.add(result);
+        InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+        PropertiesLinkingService pls = new PropertiesLinkingService ();
+        SystemImplementation si = (SystemImplementation) pls.
+        		findNamedElementInsideAadlPackage(systemToInstantiate, 
+        				(PackageSection) result.getContents().get(0));
         SystemInstance newInstance =
-              StandAloneInstantiator.getInstantiator().instantiate(rList, systemToInstantiate) ;
+        		instantiator.instantiate(si);
         r = newInstance.eResource();
       }
       else if(operation.equals("errorstate"))

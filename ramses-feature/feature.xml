@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="fr.tpt.aadl.ramses.feature"
+      label="RamsesFeature"
+      version="0.5.0"
+      provider-name="TELECOM-ParisTech">
+
+   <description url="http://aadl.telecom-paristech.fr/">
+      RAMSES (Refinement of AADL Models for Synthesis of Embedded Systems) is a model transformation and code generation tool that produces C code for ARINC653-compliant operating systems and OSEK-compliant operating systems.
+   </description>
+
+   <copyright url="http://aadl.telecom-paristech.fr/">
+      AADL-RAMSES Copyright © 2011 TELECOM ParisTech and CNRS TELECOM ParisTech/LTCI
+   </copyright>
+
+   <license url="http://www.eclipse.org/org/documents/epl-v10.ph">
+      This program is free software: you can redistribute it and/or modify  it under the terms of the Eclipse Public License as published by Eclipse, either version 1.0 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License for more details.
+You should have received a copy of the Eclipse Public License along with this program. If not, see http://www.eclipse.org/org/documents/epl-v10.ph
+   </license>
+
+   <url>
+      <discovery label="TELECOM ParisTech AADL corner" url="http://aadl.telecom-paristech.fr/"/>
+   </url>
+
+   <requires>
+      <import plugin="fr.tpt.aadl.annex.behavior"/>
+      <import plugin="fr.tpt.aadl.utils"/>
+      <import plugin="org.osate.aadl2"/>
+      <import plugin="org.osate.aadl2.edit"/>
+      <import plugin="org.osate.aadl2.instantiation"/>
+      <import plugin="org.osate.aadl2.model.editor"/>
+      <import plugin="org.osate.aadl2.modelsupport"/>
+      <import plugin="org.osate.annexsupport"/>
+      <import plugin="org.osate.branding"/>
+      <import plugin="org.osate.contribution.sei"/>
+      <import plugin="org.osate.core"/>
+      <import plugin="org.osate.pluginsupport"/>
+      <import plugin="org.osate.reporter"/>
+      <import plugin="org.osate.ui"/>
+      <import plugin="org.osate.wizards"/>
+      <import plugin="org.osate.workspace"/>
+      <import plugin="org.osate.xtext.aadl2"/>
+      <import plugin="org.osate.xtext.aadl2.properties"/>
+      <import plugin="org.osate.xtext.aadl2.properties.ui"/>
+      <import plugin="org.osate.xtext.aadl2.propertyset"/>
+      <import plugin="org.osate.xtext.aadl2.propertyset.ui"/>
+      <import plugin="org.osate.xtext.aadl2.ui"/>
+   </requires>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.communication.periodic.delayed"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.osate"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.support"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.c"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.osek"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.pok"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.target.specific"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.atl"
+         download-size="0"
+         install-size="0"
+         version="0.0.1"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.atl.launch"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.util.generation"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.util.math"
+         download-size="0"
+         install-size="0"
+         version="0.0.1"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.engine.emfvm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.util.properties"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

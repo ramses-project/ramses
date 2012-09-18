@@ -100,8 +100,8 @@ with POK, Data_Model;
   properties
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
-    Period => 1000 Ms;
-    Priority => 5;
+    Period => 200 Ms;
+    Priority => 10;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
@@ -130,8 +130,8 @@ with POK, Data_Model;
   properties
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
-    Period => 200 Ms;
-    Priority => 10;
+    Period => 1000 Ms;
+    Priority => 5;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
@@ -139,9 +139,15 @@ with POK, Data_Model;
 
   thread implementation receiver.impl
   calls
-    call : { c : subprogram receiver_spg;};
+    call : { 
+    	c1 : subprogram receiver_spg;
+    	c2 : subprogram receiver_spg;
+    	c3 : subprogram receiver_spg;
+    };
   connections
-    cnx: parameter p -> c.input;
+    cnx1: parameter p -> c1.input;
+    cnx2: parameter p -> c2.input;
+    cnx3: parameter p -> c3.input;
   end receiver.impl;
 
   subprogram receiver_spg

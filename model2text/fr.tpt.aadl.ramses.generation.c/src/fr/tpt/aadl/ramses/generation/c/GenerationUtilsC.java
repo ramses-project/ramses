@@ -21,6 +21,13 @@
 
 package fr.tpt.aadl.ramses.generation.c ;
 
+import org.osate.aadl2.BooleanLiteral;
+import org.osate.aadl2.Parameter;
+import org.osate.aadl2.Property;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
+
+import fr.tpt.aadl.utils.PropertyUtils;
+
 
 public class GenerationUtilsC
 {
@@ -114,5 +121,19 @@ public class GenerationUtilsC
   {
     return "\n/******************************************************************************/" ;
   }
-                
+   
+  
+  public static boolean isReturnParameter(Parameter p)
+  {
+	  boolean isReturnParam=false;
+	  try {
+		isReturnParam =
+				  PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
+	  } catch (Exception e) {
+	    Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
+		BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
+		isReturnParam = bl.getValue();
+	  }
+	  return isReturnParam;
+  }
 }

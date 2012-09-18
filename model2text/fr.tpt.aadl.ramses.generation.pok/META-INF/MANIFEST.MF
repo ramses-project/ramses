@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.annex.behavior;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.target.specific;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.transformation.atl.launch;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.util.generation;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
@@ -24,3 +23,4 @@ Export-Package: fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.pok.makefile,
  fr.tpt.aadl.ramses.generation.pokTT
 Bundle-Vendor: TELECOM Paristech
+Import-Package: org.osate.xtext.aadl2.properties.linking

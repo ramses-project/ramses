@@ -13,15 +13,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.ecore.resource.Resource ;
-
 public class FileUtils {
 
-  
-  public static File getContainingDirectory(Resource r)
-  {
-    return new File(r.getURI().toFileString()).getParentFile().getParentFile();
-  }
   
   public static void saveFile(File directory,
                               String fileName,

@@ -42,8 +42,6 @@ properties
 end ActivateTask;
 
 subprogram TerminateTask
-features
-  STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "TerminateTask";
   Programming_properties::Source_Text => ("tpl_os_task.h");

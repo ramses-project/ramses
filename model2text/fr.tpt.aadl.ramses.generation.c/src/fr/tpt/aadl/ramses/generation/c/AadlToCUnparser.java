@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessCategory;
 import org.osate.aadl2.AccessConnection;
@@ -59,7 +58,6 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.DefaultAnnexLibrary;
-import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.Feature;
@@ -74,7 +72,6 @@ import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PrototypeBinding;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.Subprogram;
 import org.osate.aadl2.SubprogramAccess;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramCallSequence;
@@ -101,7 +98,6 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 import fr.tpt.aadl.utils.names.DataModelProperties;
@@ -1111,13 +1107,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentImplUnparser.addOutputNewline("{") ;
         _currentImplUnparser.incrementIndent() ;
 
-        _currentImplUnparser.addOutputNewline("while (1) {") ;
-        _currentImplUnparser.incrementIndent() ;
-        
         for(DataSubcomponent d : object.getOwnedDataSubcomponents())
         {
           process(d) ;
         }
+        
+        _currentImplUnparser.addOutputNewline("while (1) {") ;
+        _currentImplUnparser.incrementIndent() ;
         
         processBehavioredImplementation(object);
         
@@ -1192,7 +1188,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           if(param instanceof Parameter)
           {
         	Parameter p = (Parameter) param ;
-        	isReturnParam = PredefinedPropertiesManager.isReturnParameter(p);
+        	isReturnParam = GenerationUtilsC.isReturnParameter(p);
           }
         }
         if(!isReturnParam)
@@ -1335,13 +1331,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     			  if(param instanceof Parameter)
     			  {
     				  Parameter p = (Parameter) param ;
-    				  boolean isReturnParam = PredefinedPropertiesManager.isReturnParameter(p);;
+    				  boolean isReturnParam = GenerationUtilsC.isReturnParameter(p);;
     				  
     				  if(isReturnParam)
     				  {
     					  returnParameter = p;
     					  ConnectionEnd ce = orderedParamValue.get(orderedFeatureList.indexOf(p));
 						  processConnectionEnd(ce);
+						  _currentImplUnparser.addOutput(" = ");
     					  break;
     				  }
     			  }

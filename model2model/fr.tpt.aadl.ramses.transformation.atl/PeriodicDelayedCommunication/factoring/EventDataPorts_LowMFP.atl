@@ -1,0 +1,202 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+
+module EventDataPorts_LowMFP;
+create OUT: AADLBA from IN: AADLI, AADL_RUNTIME: AADLBA, DATA_MODEL: AADLBA,
+		PROGRAMMING_PROPERTIES: AADLBA, HOOKS: ATLHOOKS, PERIODICDELAYED_RUNTIME: AADLBA,
+		POK_RUNTIME: AADLBA;
+
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses Uninstanciate;
+uses PropertiesTools;
+uses Services;
+
+helper def : Put_Value_Name     : String = 'Put_Value_LowFP';
+helper def : Receive_Input_Name : String = 'Receive_Input_LowFP';
+
+-- TODO: rule for out port ==> add to expandThreadDispatchProtocol in rules for input and
+		-- output data port
+helper context AADLI!ComponentInstance def: computeThreadID(): Integer =
+	let threads: Sequence(AADLI!ComponentInstance) =
+		AADLI!ComponentInstance -> allInstances() -> select(c | c.category=#thread)
+	in
+		threads.indexOf(self) - 1;
+
+helper context AADLI!FeatureInstance def: computeBufferID() : Integer =
+	let buffers: Sequence (AADLI!FeatureInstance) =
+		AADLI!FeatureInstance -> allInstances() 
+		  -> select (port |port.direction.toString() = 'in' and port.isPeriodicDelayedPort())
+    in
+		buffers.indexOf(self) - 1;
+
+unique lazy rule createThreadID
+{
+	from
+		thrd: AADLI!ComponentInstance (
+			thrd.category = #thread
+		)
+	to
+		thrdIDSub: AADLBA!DataSubcomponent (
+			name <- 'ID',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence{
+				thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', ID)
+			}
+		),
+		ID: AADLBA!IntegerLiteral (
+			value <- thrd.computeThreadID().longValue()
+		)
+	do {
+		thrdIDSub;
+	}
+}
+
+unique lazy rule createBufferID
+{
+	from
+		thread: AADLI!ComponentInstance,
+		port: AADLI!FeatureInstance (
+			port.direction.toString() = 'in' and port.isPeriodicDelayedPort()
+		)
+	to
+		bufferIDSub: AADLBA!DataSubcomponent (
+			name <- port.name.concat('_').concat(port.eContainer().name).concat(port.name.concat('ID')),
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence{
+				thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', ID)
+			}
+		),
+		ID: AADLBA!IntegerLiteral (
+			value <- port.computeBufferID().longValue()
+		)
+	do {
+		bufferIDSub;
+	}
+}
+
+rule createCDWTable (cnxInst:AADLI!ConnectionInstance, 
+					 putValueCall: AADLBA!SubprogramCall)
+{
+	using
+	{
+		srcThreadImg: AADLBA!ThreadImplementation = OclUndefined;
+		port: AADLI!FeatureInstance = cnxInst.source;
+		thrdID: AADLBA!DataSubcomponent = thisModule.createThreadID(port.eContainer());
+		bufferID : AADLBA!DataSubcomponent = thisModule.createBufferID(port.eContainer(),cnxInst.destination);
+		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		connected_TaskID_PutValueAccess: AADLBA!ConnectedElement (
+			connectionEnd <- Put_Value_PrototypeSpg.ownedParameter -> any(e | e.name
+					= 'taskID'),
+			context <- putValueCall
+		),
+		connected_TaskID_ThreadAccess: AADLBA!ConnectedElement (
+			connectionEnd <- thrdID
+		),
+		accessTaskIDConnectionPutValue: AADLBA!ParameterConnection (
+			name <- port.name + '_to_ReceiveInput_taskID',
+			source <- connected_TaskID_ThreadAccess,
+			destination <- connected_TaskID_PutValueAccess
+		),
+		
+		connected_BufferID_PutValueAccess: AADLBA!ConnectedElement (
+			connectionEnd <- Put_Value_PrototypeSpg.ownedParameter -> any (e | e.name = 'bufferID'),
+			context <- putValueCall
+		),
+		connected_BufferID_ThreadAccess: AADLBA!ConnectedElement (
+			connectionEnd <- bufferID
+		),
+		accessBufferIDConnectionPutValue: AADLBA!ParameterConnection (
+			name <- port.name + '_to_ReceiveInput_bufferID',
+			source <- connected_BufferID_ThreadAccess,
+			destination <- connected_BufferID_PutValueAccess
+		)
+	do
+	{
+		srcThreadImg<-cnxInst.source.eContainer().getSubcomponentImg().classifier;
+		if (not srcThreadImg.ownedDataSubcomponent->contains(thrdID))
+		{
+			srcThreadImg.ownedDataSubcomponent.add(thrdID);
+		}
+		if (not srcThreadImg.ownedDataSubcomponent->contains(bufferID))
+		{
+			srcThreadImg.ownedDataSubcomponent.add(bufferID);
+		}
+		srcThreadImg.ownedParameterConnection.add(accessTaskIDConnectionPutValue);
+		srcThreadImg.ownedParameterConnection.add(accessBufferIDConnectionPutValue);
+	}
+}
+
+
+rule createCPRTable (port: AADLI!FeatureInstance, 
+					 receiveInputCall: AADLBA!SubprogramCall)
+{
+	using
+	{
+		dstThreadImg: AADLBA!ThreadImplementation = OclUndefined;
+	
+		CurrentPerionReadTable: Sequence(Integer) = thisModule.getCurrentPerionReadTable(port);
+		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = thisModule.Receive_Input_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+	
+		thrdID: AADLBA!DataSubcomponent = thisModule.createThreadID(port.eContainer());
+		bufferID : AADLBA!DataSubcomponent = thisModule.createBufferID(port.eContainer(),port);
+	}
+	to
+		connected_TaskID_ReceiveInputAccess: AADLBA!ConnectedElement (
+			connectionEnd <- Receive_Input_PrototypeSpg.ownedParameter -> any(e | e.name
+					= 'taskID'),
+			context <- receiveInputCall
+		),
+		connected_TaskID_ThreadAccess: AADLBA!ConnectedElement (
+			connectionEnd <- thrdID
+		),
+		accessTaskIDConnectionReceiveInput: AADLBA!ParameterConnection (
+			name <- port.name + '_to_ReceiveInput_taskID',
+			source <- connected_TaskID_ThreadAccess,
+			destination <- connected_TaskID_ReceiveInputAccess
+		),
+		connected_BufferID_ReceiveInputAccess: AADLBA!ConnectedElement (
+			connectionEnd <- Receive_Input_PrototypeSpg.ownedParameter -> any (e | e.name = 'bufferID'),
+			context <- receiveInputCall
+		),
+		connected_BufferID_ThreadAccess: AADLBA!ConnectedElement (
+			connectionEnd <- bufferID
+		),
+		accessBufferIDConnectionReceiveInput: AADLBA!ParameterConnection (
+			name <- port.name + '_to_ReceiveInput_bufferID',
+			source <- connected_BufferID_ThreadAccess,
+			destination <- connected_BufferID_ReceiveInputAccess
+		)
+	do
+	{
+		dstThreadImg.ownedParameterConnection.add(accessTaskIDConnectionReceiveInput);
+		if (not dstThreadImg.ownedDataSubcomponent->contains(thrdID))
+		{
+			dstThreadImg.ownedDataSubcomponent.add(thrdID);
+		}
+		dstThreadImg.ownedDataSubcomponent.add(bufferID);
+		dstThreadImg.ownedParameterConnection.add(accessBufferIDConnectionReceiveInput);
+	}
+}

@@ -2,9 +2,7 @@ package nxt_use_case
 public
 
 with Data_Model;
-with OSEK;
-with Generation_Properties;
-with OSEKNXT;
+with OSEK, Generation_Properties, OSEKNXT;
 
 ----------
 -- Data --
@@ -35,7 +33,7 @@ properties
   Source_language => (C);
   Source_text => ("in_robot.h");
   Source_name => "computePID";
-  OSEK::Source_Location => ("in_robot.c");
+  OSEK::Source_Location => "in_robot.c";
 end computePID;
 
 subprogram computeSpeed
@@ -48,7 +46,7 @@ properties
   Source_language => (C);
   Source_text => ("in_robot.h");
   Source_name => "computeSpeed";
-  OSEK::Source_Location => ("in_robot.c");
+  OSEK::Source_Location => "in_robot.c";
 end computeSpeed;
 
 subprogram select_State
@@ -59,7 +57,7 @@ properties
   Source_language => (C);
   Source_text => ("in_robot.h");
   Source_name => "selectState";
-  OSEK::Source_Location => ("in_robot.c");
+  OSEK::Source_Location => "in_robot.c";
 end select_State;
   
 
@@ -173,8 +171,7 @@ end arm.impl;
 
 subprogram ecrobotGetLightSensorLib
 features
-  portNb: in parameter Int;-- {Generation_Properties::Constant_Value => "NXT_PORT_S4";};
-  light : out parameter Int;-- {Generation_Properties::Return_Parameter => true;};
+  light : out parameter Int;
 properties
   Source_language => (C);
   Source_text => ("ecrobot_interface.h");

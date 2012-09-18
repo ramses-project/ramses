@@ -11,11 +11,14 @@ Require-Bundle: org.eclipse.ui,
  org.osate.aadl2,
  org.osate.aadl2.modelsupport,
  org.osate.ui,
- fr.tpt.aadl.ramses.control.support
+ org.osate.annexsupport,
+ fr.tpt.aadl.ramses.control.support,
+ org.osate.xtext.aadl2.properties,
+ fr.tpt.aadl.annex.behavior;bundle-version="0.9.5"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: fr.tpt.aadl.ramses.control.core,
- fr.tpt.aadl.ramses.control.support.generator,
+Import-Package: fr.tpt.aadl.ramses.control.support.generator,
+ fr.tpt.aadl.ramses.generation.c.annex.behavior,
  org.eclipse.emf.ecore.resource,
  org.eclipse.ui.dialogs,
  org.osate.aadl2,

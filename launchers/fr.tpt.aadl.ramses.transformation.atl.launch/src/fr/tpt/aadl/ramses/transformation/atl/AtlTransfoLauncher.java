@@ -36,7 +36,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -54,29 +60,23 @@ import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
 import org.eclipse.m2m.atl.core.emf.EMFReferenceModel;
 import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
 import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.DataSubcomponentType;
-import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
-import org.osate.pluginsupport.PluginSupportUtil;
 
 import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
+import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
-
 public class AtlTransfoLauncher
 {
 
   private static File resourcesDir = null ;
-
-  private static AtlTransfoLauncher launched = null ;
 
   private static final EMFInjector injector = new EMFInjector() ;
   private static final EMFExtractor extractor = new EMFExtractor() ;
@@ -100,27 +100,14 @@ public class AtlTransfoLauncher
 
   /*
    * The parameters of the transformation: asm file, input and a-output path.
-   */
-  private static PredefinedPackagesManager predefinedPackagesManager ;
-  private static PredefinedPropertiesManager predefinedPropertiesManager; 
-
-  public AtlTransfoLauncher()
-        throws Exception
-  {
-    launched = this ;
-  }
-
-  public static AtlTransfoLauncher getInstance()
-  {
-    return launched ;
-  }
+   */ 
 
   public static File getTransformationDirName()
   {
     return AtlTransfoLauncher.resourcesDir ;
   }
 
-  private void initTransformation(File transformationDir)
+  private static void initTransformation()
         throws ATLCoreException
   {
     EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
@@ -151,13 +138,14 @@ public class AtlTransfoLauncher
 		  File generatedFilePath) throws GenerationException
   {
 	  try {
+		  if(!Platform.isRunning())
+		  {
+			  RamsesConfiguration.getPredefinedResourcesManager()
+			  	.setPredefinedResourcesDir(resourceFilePath);
+			  
+		  }
+		  setPredefinedResourcesDirectory(resourceFilePath);
 
-		  this.setResourcesDirectory(resourceFilePath);
-
-		  String workspaceURI = inputResource.getURI().toString();
-		  if(workspaceURI.startsWith("platform:/resource"))
-		    	workspaceURI = workspaceURI.substring(18);
-		  
 		  String aadlGeneratedFileName = inputResource.getURI().lastSegment();
 		  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 				  ".aaxl2", "_extended.aadl2");
@@ -168,15 +156,56 @@ public class AtlTransfoLauncher
 		  File outputModelDir =  new File(generatedFilePath.getAbsolutePath()+"/refined-models");
 		  if(outputModelDir.exists()==false)
 			  outputModelDir.mkdir();
-		  StandAloneInstantiator instantiator = StandAloneInstantiator
-				  .getInstantiator();
+		  InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
 		  String outputFilePath=outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName;
-		  instantiator.serialize(expandedResult, outputFilePath);
-
 		  File outputFile = new File(outputFilePath);
-		  URI uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
+
+		  instantiator.serialize(expandedResult, outputFilePath);
+		  
+		  URI uri;
 		  SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
+		  if(Platform.isRunning())
+		  {
+			String workspaceLocation = ResourcesPlugin.getWorkspace()
+						.getRoot().getLocationURI().getPath();
+			int outputPathHeaderIndex = workspaceLocation.length();
+			
+			String outputAbsolutePath = outputFile.getAbsolutePath().toString();
+			String outputPlatformRelativePath = "";
+			if(outputPathHeaderIndex>0)
+				outputPlatformRelativePath = outputAbsolutePath.substring(outputPathHeaderIndex);
+			IResource rootMember=null;
+			while(ResourcesPlugin.getWorkspace().getRoot().findMember(outputPlatformRelativePath)==null
+					&& outputPlatformRelativePath.contains("/"))
+			{
+				if(rootMember==null)
+				{
+					String rootMemberPath = outputPlatformRelativePath.substring(0,outputPlatformRelativePath.indexOf("/"));
+					rootMember = ResourcesPlugin.getWorkspace().getRoot().findMember(rootMemberPath);
+					if(rootMember!=null)
+						rootMember.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+				}
+				outputPlatformRelativePath=outputPlatformRelativePath.substring(outputPlatformRelativePath.indexOf("/")+1);
+			}
+				
+			uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
+			
+			ResourceSet rs = OsateResourceUtil.getResourceSet();
+			Resource xtextResource = rs.getResource(uri, true);
+			
+			URI inputURI = si.getSystemImplementation().eResource().getURI();
+			IPath path = new Path(inputURI.toString().substring(18));
+			File inputDir = new File (workspaceLocation+path.toOSString());
+			RamsesConfiguration.setInputDirectory(inputDir.getParentFile());
+			return xtextResource;
+		  }else
+		  {
+			uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
+			RamsesConfiguration.setInputDirectory(new File(si.getSystemImplementation().eResource().getURI().toFileString()).getParentFile());
+		  }
+		  
 		  Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
+		  xtextResource.load(null);
 		  return xtextResource;
 	  } catch (Exception e) {
 		  e.printStackTrace();
@@ -227,11 +256,11 @@ public class AtlTransfoLauncher
 
     injector.inject(sourceModel, inputResource) ;
     EMFModel targetModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
-    ResourceSet rs =
-          StandAloneInstantiator.getInstantiator().getAadlResourceSet() ;
+    ResourceSet rs = inputResource.getResourceSet();
+    
     
     Resource outputResource =
-          rs.createResource(URI.createURI(dataTargetfilepath)) ;
+          rs.getResource(URI.createURI(dataTargetfilepath), false) ;
     
     injector.inject(targetModel, outputResource) ;
     // create ATLHook
@@ -257,15 +286,8 @@ public class AtlTransfoLauncher
     }
 
     launcher.addInModel(atlHookModel, "HOOKS", "ATLHOOKS") ;
-    if(Platform.isRunning())
-    {
-    	registerContributedAadl(launcher);
-    }
-    else
-    {
-    	registerPredefinedPackagesInLauncher(launcher) ;
-        registerPredefinedPropertiesInLauncher(launcher) ;
-    }
+    registerPredefinedResourcesInLauncher(launcher) ;
+    
     launcher.addOutModel(targetModel, "OUT", "AADLBA") ;
 
     if(workingWithInstances)
@@ -297,8 +319,12 @@ public class AtlTransfoLauncher
     URL moduleFile =
     	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/EventDataPorts" + ".asm") ;
     Object loadedModule = launcher.loadModule(moduleFile.openStream()) ;
-	atlModules.add(loadedModule) ;
-    
+    atlModules.add(loadedModule) ;
+    URL moduleFileCommon =
+        	new URL("file:" + resourcesDir.getAbsolutePath() + "/targets/shared/CommonRefinementSteps" + ".asm") ;
+    Object loadedmoduleCommon = launcher.loadModule(moduleFileCommon.openStream()) ;
+    atlModules.add(loadedmoduleCommon) ;
+	
     Map<String, Object> options = new HashMap<String, Object>() ;
     options.put("allowInterModelReferences", "true") ;
     URL libraryFile ;
@@ -359,33 +385,17 @@ public class AtlTransfoLauncher
     }
   }
 
-public DataSubcomponentType getRuntimeData(String dataName)
+  private void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher)
   {
-    DataSubcomponentType result = null ;
-    Resource aadlRuntime = predefinedPackagesManager.getRuntimeResource() ;
-
-    for(EObject c : aadlRuntime.getContents())
+    for(Resource r: RamsesConfiguration.getPredefinedResourcesManager()
+    		.getPredefinedResources())
     {
-      if(c instanceof DataSubcomponentType)
-      {
-        result = (DataSubcomponentType) c ;
-
-        if(result.getName() == dataName)
-        {
-          return result ;
-        }
-      }
-    }
-
-    return null ;
-  }
-
-  private void registerPredefinedPackagesInLauncher(EMFVMLauncher launcher)
-  {
-    for(int p = 0 ; p < predefinedPackagesManager.getPackagesCount() ; p++)
-    {
-      String name = predefinedPackagesManager.getPackageName(p) ;
-      Resource r = predefinedPackagesManager.getPackageResource(name) ;
+      String name;
+      EObject obj = r.getContents().get(0);
+      if(obj instanceof PropertySet)
+    	  name = ((PropertySet)obj).getName() ;
+      else
+    	name = ((AadlPackage)obj).getName() ;
       EMFModel rModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
       injector.inject(rModel, r) ;
       launcher.addInModel(rModel, name.toUpperCase(), "AADLBA") ;
@@ -393,57 +403,11 @@ public DataSubcomponentType getRuntimeData(String dataName)
   }
 
   
-  private void registerPredefinedPropertiesInLauncher(EMFVMLauncher launcher)
-  {
-    for(int p = 0 ; p < predefinedPropertiesManager.getPropertiesCount() ; p++)
-    {
-      String name = predefinedPropertiesManager.getPropertySetName(p) ;
-      Resource r = predefinedPropertiesManager.getPropertySetResource(name) ;
-      EMFModel rModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
-      injector.inject(rModel, r) ;
-      launcher.addInModel(rModel, name.toUpperCase(), "AADLBA") ;
-    }
-  }
-  
-  private void registerContributedAadl(EMFVMLauncher launcher) {
-	  List<URI> contributedResourceUriList = PluginSupportUtil.getContributedAadl();
-	  ResourceSet resourceSet = new ResourceSetImpl();
-	  for(URI contributedResourceUri : contributedResourceUriList)
-	  {
-		  
-		  Resource resource = resourceSet.getResource(contributedResourceUri, true);
-		  
-		  EMFModel rModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
-	      injector.inject(rModel, resource) ;
-	      NamedElement elt=null;
-	      if(resource.getContents().get(0) instanceof PropertySet)
-	    	  elt = (PropertySet) resource.getContents().get(0);
-	      else if (resource.getContents().get(0) instanceof AadlPackage)
-	    	  elt = (AadlPackage) resource.getContents().get(0);
-	      launcher.addInModel(rModel, elt.getName().toUpperCase(), "AADLBA") ;
-		  
-	  }
-  }
-  
-  public void setResourcesDirectory(File resourcesDir)
+  private void setPredefinedResourcesDirectory(File dir)
                                               throws ATLCoreException, Exception
   {
-    AtlTransfoLauncher.resourcesDir = resourcesDir ;
-    if(!Platform.isRunning())
-    {
-    	predefinedPackagesManager =
-    			new PredefinedPackagesManager(new File(resourcesDir
-    					.getAbsolutePath() +
-    					"/aadl_resources")) ;
-
-    	if(!predefinedPackagesManager.allPackagesFound())
-    		throw new Exception(
-    				"Illegal initialization of ATL transformation launcher: " +
-    						"some predefined packages not found: " +
-    						predefinedPackagesManager.getPackagesNotFound()) ;
-
-    	predefinedPropertiesManager = new PredefinedPropertiesManager();
-    }
-    this.initTransformation(resourcesDir) ;
+	if(resourcesDir==null)
+	initTransformation() ;
+    AtlTransfoLauncher.resourcesDir = dir ;
   }
 }

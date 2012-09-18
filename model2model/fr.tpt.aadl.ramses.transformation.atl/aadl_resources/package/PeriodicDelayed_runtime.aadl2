@@ -71,5 +71,100 @@ with Base_Types, Data_Model;
         };
     **};
   end Put_Value;
+  
+  
+  
+  
+  ------------------------------------------------------------------------
+  --                 LOW MEMORY FOOTPRINT VERSION
+  ------------------------------------------------------------------------
+  
+  -- Compute_First
+  subprogram Compute_CPR
+  features
+    taskID : in parameter Base_Types::Integer_16;
+    iteration_counter : in parameter Base_Types::Integer_16;
+    bufferID : in parameter Base_Types::Integer_16;
+    
+    CPR : out parameter Base_Types::Integer_16;
+  properties
+    Source_Name => "Compute_CPR";
+    Source_Text => ("TBD.h");
+  end Compute_CPR;
+  
+  -- Compute_Last
+  subprogram Compute_PPR
+  features
+    taskID : in parameter Base_Types::Integer_16;
+    iteration_counter : in parameter Base_Types::Integer_16;
+    bufferID: in parameter Base_Types::Integer_16;
+    
+    PPR : out parameter Base_Types::Integer_16;
+  properties
+    Source_Name => "Compute_PPR";
+    Source_Text => ("TBD.h");
+  end Compute_PPR;
+  
+  subprogram Compute_CDW
+  features
+    taskID : in parameter Base_Types::Integer_16;
+    iteration_counter : in parameter Base_Types::Integer_16;
+    bufferID : in parameter Base_Types::Integer_16;
+    
+    CDW : out parameter Base_Types::Integer_16;
+  properties
+    Source_Name => "Compute_CDW";
+    Source_Text => ("TBD.h");
+  end Compute_CDW;
+
+  subprogram Receive_Input_LowFP
+    features
+      taskID : in parameter Base_Types::Integer_16;
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      --CPR: in parameter ArrayDataType;
+      CPRSize: in parameter Base_Types::Integer_16;
+      bufferID: in parameter Base_Types::Integer_16;
+      first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+    annex behavior_specification {**
+      states
+        s: initial final state;
+      transitions
+        t: s -[]-> s 
+        {
+          Compute_CPR!(taskID, iteration_counter, bufferID, first);
+          Compute_PPR!(taskID, iteration_counter, bufferID, last);
+          iteration_counter := (iteration_counter+1) mod CPRSize
+        };
+    **};
+  end Receive_Input_LowFP;
+
+  subprogram Put_Value_LowFP
+    prototypes
+      value_type: data;
+    features
+      taskID : in parameter Base_Types::Integer_16;
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      --CDW: in parameter ArrayDataType;
+      CDWSize: in parameter Base_Types::Integer_16;
+      value: in parameter value_type;
+      buffer: requires data access ArrayDataType {Access_Right=>write_only;};
+      bufferID : in parameter Base_Types::Integer;
+    annex behavior_specification {**
+      variables
+        CDWIndex : Base_Types::Integer_16;
+      states
+        s: initial final state;
+      transitions
+        t: s -[]-> s
+        {
+          --buffer[CDW[iteration_counter]] := value;
+          
+          Compute_CDW!(taskID, iteration_counter, bufferID, CDWIndex);
+          buffer[CDWIndex] := value;
+          iteration_counter := (iteration_counter+1) mod CDWSize
+        };
+    **};
+  end Put_Value_LowFP;
 
 end PeriodicDelayed_runtime;

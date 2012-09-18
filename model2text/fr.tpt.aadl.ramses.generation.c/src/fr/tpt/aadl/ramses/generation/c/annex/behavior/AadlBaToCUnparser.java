@@ -37,8 +37,6 @@ import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
-import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
@@ -116,7 +114,6 @@ import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 
@@ -897,7 +894,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             if(pce instanceof Parameter)
             {
               Parameter p = (Parameter) pce ;
-              boolean isReturnParam= PredefinedPropertiesManager.isReturnParameter(p);
+              boolean isReturnParam= GenerationUtilsC.isReturnParameter(p);
               if(isReturnParam)
               {
                 returnParameter = p;

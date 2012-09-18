@@ -124,12 +124,12 @@ rule addSuprogramCallParameterConnection(implImg:AADLBA!ThreadImplementation, pa
 	}
 	do
 	{
-		thisModule.addParameterConnection(implImg, 'dest_'+paramConnection.destination.connectionEnd.name,
+		thisModule.addParameterConnection(implImg, 'dest_'+paramConnection.destination.connectionEnd.name+'_'+paramConnection.source.connectionEnd.name,
 							paramConnection.destination.getConnFeatureImg(implImg),
 							paramConnection.destination.getConnContextImg(implImg),
 							dataSubcomponent);
 			
-		thisModule.addParameterConnection(implImg, 'src_'+paramConnection.source.connectionEnd.name ,
+		thisModule.addParameterConnection(implImg, 'src_'+paramConnection.source.connectionEnd.name+'_'+paramConnection.destination.connectionEnd.name,
 							paramConnection.source.getConnFeatureImg(implImg),
 							paramConnection.source.getConnContextImg(implImg),
 							dataSubcomponent);
@@ -202,28 +202,6 @@ lazy rule mapConstantParameter
 							dataSubcomponent);
 	}
 }
-
-helper context AADLBA!SubprogramType def: getOrderedFeature() : Sequence(AADLBA!Feauture) =
-	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().orderFeatures(self);
-
-
-helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String) = 
-	v.ownedValue.getOwnedListElements()->collect(e|e.getValue())
-;
-
-
-
-helper context AADLBA!SubprogramSubcomponentType def: getSubprogramType() : AADLBA!SubprogramType = 
-	if(self.oclIsKindOf(AADLBA!SubprogramType)) then
-		self
-	else 
-		if(self.oclIsKindOf(AADLBA!SubprogramImplementation)) then
-			self.type
-		else
-			OclUndefined
-		endif
-	endif
-;
 
 helper context AADLBA!SubprogramCall def:getConnectedParamDataSubcomponent(p: AADLBA!Parameter) : AADLBA!DataSubcomponent =
 	if(not self.eContainer().eContainer().getOwnedParameterConnections()->any

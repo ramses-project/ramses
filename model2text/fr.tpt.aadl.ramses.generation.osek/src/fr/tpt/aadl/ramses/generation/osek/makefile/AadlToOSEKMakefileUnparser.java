@@ -30,6 +30,7 @@ import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.SystemImplementation;
 
 import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
@@ -63,12 +64,12 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
       FileUtils.copyFile(header, generatedFilePath);
     }
 
-    File preparemake = new File(FileUtils.getContainingDirectory(process.eResource()), "/preparemake.sh");
+    File preparemake = new File(RamsesConfiguration.getInputDirectory(), "/preparemake.sh");
     
     preparemake = FileUtils.copyFile(preparemake, generatedFilePath);
     preparemake.setExecutable(true);
 
-    File refineOil = new File(FileUtils.getContainingDirectory(process.eResource()), "/refine_oil.sh");
+    File refineOil = new File(RamsesConfiguration.getInputDirectory(), "/refine_oil.sh");
     refineOil = FileUtils.copyFile(refineOil, generatedFilePath);
     refineOil.setExecutable(true);
     

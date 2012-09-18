@@ -64,6 +64,21 @@ helper context String def : asClassifier(model : String) : AADLBA!Classifier =
 	AADLBA!Classifier->allInstancesFrom(model)->any(p|p.name=self)
 ;
 
+rule toStringLiteral(input: String)
+{
+	to
+		output : AADLBA!StringLiteral (value <- input)
+	do
+	{
+		output;
+	}
+}
+
+helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String) = 
+	v.ownedValue.getOwnedListElements()->collect(e|e.getValue())
+;
+
+
 helper def : getProperty(propertyName : String) : AADLBA!Property =
 	AADLBA!PropertySet->allInstances()->collect(ps|ps.ownedProperty)
 						->flatten()->any(p|p.name.toLower()=propertyName.toLower())
@@ -125,6 +140,21 @@ rule CreateIntegerLiteralPropertyExpression (value: Integer)
 	do
 	{
 		pr;
+	}
+}
+
+lazy rule createListValueFromPropertyExpression
+{
+	from
+		initValuePE: AADLBA!PropertyExpression
+	to
+		lv: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{initValuePE}
+		)
+	do
+	{
+		lv;
 	}
 }
 

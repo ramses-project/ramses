@@ -32,16 +32,12 @@ import java.util.Map;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.EnumerationLiteral;
-import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.Parameter;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.PropertySet;
 
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 public class PredefinedPropertiesManager
 {
@@ -173,47 +169,6 @@ public class PredefinedPropertiesManager
     return res ;
   }
   
-  public static PropertySet getPropertySet(String name)
-  {
-	  for(Resource r : predefinedPropertySets.values())
-	  {
-		  if(r.getContents().get(0) instanceof PropertySet)
-		  {
-			  PropertySet ps = (PropertySet) r.getContents().get(0);
-			  if(ps.getName().equalsIgnoreCase(name))
-			  {
-				  return ps;
-			  }
-		  }
-	  }
-	  return null;
-  }
-  
-  public static boolean isReturnParameter(Parameter p)
-  {
-	  boolean isReturnParam=false;
-	  try {
-		  isReturnParam =
-				  PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
-	  } catch (Exception e) {
-		  PropertySet ps = getPropertySet("Generation_Properties");
-		  if(ps==null)
-			  return isReturnParam;
-		  NamedElement ne = ps.findNamedElement("Return_Parameter");
-		  try
-		  {
-			  Property prop = (Property) ne ;
-			  BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
-			  isReturnParam = bl.getValue();
-		  }
-		  catch (Exception exp)
-		  {
-			  isReturnParam = false;
-		  } 
-	  }
-	  return isReturnParam;
-  }
-
   public int getPropertiesCount()
   {
     return predefinedPropertySets.size() ;

@@ -45,9 +45,29 @@ helper context AADLBA!DirectedFeature def: isInputFeature(): Boolean =
 helper context AADLBA!DirectedFeature def: getDirection(): AADLBA!DirectionType =
 	self.direction;
 
+helper context AADLBA!SubprogramType def: getOrderedFeature() : Sequence(AADLBA!Feauture) =
+	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().orderFeatures(self);
 
 helper context AADLBA!ComponentImplementation def: getComponentType(): AADLBA!ComponentType = 
 	self.type;
+
+helper context AADLBA!SubprogramSubcomponentType def: getSubprogramType() : AADLBA!SubprogramType = 
+	if(self.oclIsKindOf(AADLBA!SubprogramType)) then
+		self
+	else 
+		if(self.oclIsKindOf(AADLBA!SubprogramImplementation)) then
+			self.type
+		else
+			OclUndefined
+		endif
+	endif
+;
+
+helper context AADLBA!SubprogramType def: getSubprogramParameters() : Sequence(AADLBA!Parameter) = 
+	self.ownedParameter;
+
+helper context AADLBA!SubprogramImplementation def: getSubprogramParameters() : Sequence(AADLBA!Parameter) = 
+	self.type.ownedParameter;
 
 helper def:getProgrammationLanguageIdentifier(identifier:String): String =
 	identifier.replaceAll('.','_').replaceAll('::','__');
@@ -61,7 +81,7 @@ helper context AADLI!FeatureInstance def : isProcessPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def : isDataOrEventDataPort() : Boolean =
-	(self.oclIsTypeOf(AADLI!EventDataPort) or self.oclIsTypeOf(AADLI!DataPort)); 
+	(self.feature.oclIsTypeOf(AADLI!EventDataPort) or self.feature.oclIsTypeOf(AADLI!DataPort)); 
 
 
 helper context AADLI!ComponentInstance def: isPeriodicThread() : Boolean =

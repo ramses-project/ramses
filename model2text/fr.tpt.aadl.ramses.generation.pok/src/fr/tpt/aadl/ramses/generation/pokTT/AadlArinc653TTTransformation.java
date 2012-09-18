@@ -31,10 +31,12 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
+import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
@@ -170,13 +172,15 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 	
 	private SystemInstance instanciate (Resource r)
 	{
-		StandAloneInstantiator instantiator = StandAloneInstantiator
-				.getInstantiator();
-		ArrayList<Resource> res = new ArrayList<Resource>();
-		res.add(r);
-
-		SystemInstance s = instantiator.instantiate(res, findSystemName(r));
-		return s;
+		InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+        PropertiesLinkingService pls = new PropertiesLinkingService ();
+        AadlPackage pkg = (AadlPackage) r.getContents().get(0);
+        SystemImplementation si = (SystemImplementation) pls.
+        		findNamedElementInsideAadlPackage(findSystemName(r), 
+        				pkg.getOwnedPublicSection());
+        SystemInstance newInstance =
+        		instantiator.instantiate(si);
+		return newInstance;
 	}
 
 	private Resource transform(Resource inputResource, File resourceFilePath,

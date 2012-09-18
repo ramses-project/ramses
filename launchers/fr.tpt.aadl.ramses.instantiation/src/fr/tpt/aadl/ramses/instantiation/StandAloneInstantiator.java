@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright Â© 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -21,49 +21,40 @@
 
 package fr.tpt.aadl.ramses.instantiation ;
 
-import java.io.BufferedWriter ;
-import java.io.File ;
-import java.io.FileWriter ;
-import java.io.IOException ;
-import java.util.ArrayList ;
-import java.util.HashMap;
-import java.util.List ;
-import java.util.Map ;
-import org.eclipse.core.runtime.NullProgressMonitor ;
-import org.eclipse.emf.common.util.Diagnostic ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
-import org.eclipse.emf.ecore.util.Diagnostician ;
-import org.eclipse.xtext.resource.XtextResource ;
-import org.eclipse.xtext.resource.XtextResourceSet ;
-import org.osate.aadl2.AadlPackage ;
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.SystemImplementation ;
-import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.instantiation.InstantiateModel ;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
-import org.osate.aadl2.util.Aadl2ResourceFactoryImpl ;
-import org.osate.aadl2.util.Aadl2ResourceImpl ;
-import org.osate.core.OsateCorePlugin ;
-import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
+import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.Diagnostician;
+import org.eclipse.xtext.resource.IResourceServiceProvider;
+import org.eclipse.xtext.resource.XtextResource;
+import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
+import org.osate.core.OsateCorePlugin;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
+import org.osate.xtext.aadl2.properties.util.EMFIndexRetrieval;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 
+import fr.tpt.aadl.ramses.control.support.InstantiationManagerImpl;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.instantiation.manager.ContributedAadlRegistration;
 
-public class StandAloneInstantiator
+public class StandAloneInstantiator extends InstantiationManagerImpl
 {
   OsateCorePlugin corePlugin = new OsateCorePlugin();
   
+  
   private static StandAloneInstantiator _instantiator ;
-  private InstantiateModel instantiateModel ;
-  private ResourceSet aadlResourceSet = new ResourceSetImpl() ;
   private static final Aadl2StandaloneLinking aadlStandAloneSetup =
         new Aadl2StandaloneLinking() ;
   private static final Injector injector = aadlStandAloneSetup
@@ -71,14 +62,26 @@ public class StandAloneInstantiator
   private static final XtextResourceSet resourceSet = injector
         .getInstance(XtextResourceSet.class) ;
   
+  @Inject
+  private ResourceDescriptionsProvider rdp = injector.getInstance(ResourceDescriptionsProvider.class); 
+	 
+  @Inject 
+  private IResourceServiceProvider.Registry rspr = injector.getInstance(IResourceServiceProvider.Registry.class);
+  
   // Singleton
   protected StandAloneInstantiator()
   {
-    instantiateModel =
-          new InstantiateModel(new NullProgressMonitor(),
-                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
-    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+	try {
+	  corePlugin.registerInjectorFor("org.osate.xtext.aadl2.properties.Properties", injector);
+	} catch (Exception e) {
+	  // TODO Auto-generated catch block
+	  e.printStackTrace();
+	}
+	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
           .put("aaxl2", new Aadl2ResourceFactoryImpl()) ;
+    ContributedAadlRegistration predefinedResourcesAccessor = new ContributedAadlRegistration();
+    RamsesConfiguration.setPredefinedResourcesRegistration(predefinedResourcesAccessor);
+    EMFIndexRetrieval.registerResourceProviders(rdp, rspr);
   }
 
   public static StandAloneInstantiator getInstantiator()
@@ -91,73 +94,13 @@ public class StandAloneInstantiator
     return _instantiator ;
   }
 
-  public List<Resource> getAllResources()
-  {
-    return resourceSet.getResources() ;
-  }
-
-  public SystemInstance instantiate(List<Resource> models,
-                                    String systemToInstantiate)
-  {
-    for(Resource r : models)
-    {
-      AadlPackage aadlPackage ;
-
-      if(r.getContents().get(0) instanceof AadlPackage)
-      {
-        aadlPackage = (AadlPackage) r.getContents().get(0) ;
-      }
-      else
-      {
-        continue ;
-      }
-
-      boolean found = false;
-      for(NamedElement member : aadlPackage.getOwnedPublicSection()
-            .getOwnedMembers())
-      {
-        if(member instanceof SystemImplementation)
-        {
-          SystemImplementation toInstantiate = (SystemImplementation) member ;
-
-          if(toInstantiate.getName().equals(systemToInstantiate))
-          {
-        	found = true;
-            URI instanceURI =
-                  OsateResourceUtil.getInstanceModelURI(toInstantiate) ;
-            
-            Aadl2ResourceImpl aadlResource =
-                  (Aadl2ResourceImpl) aadlResourceSet.getResource(instanceURI,
-                                                                  false) ;
-
-            if(aadlResource == null)
-            {
-              aadlResource =
-                    (Aadl2ResourceImpl) aadlResourceSet
-                          .createResource(instanceURI) ;
-            }
-
-            SystemInstance instance = instantiateModel.createSystemInstanceInt(toInstantiate,
-                                                            aadlResource) ;
-
-            return instance;
-
-          }
-        }
-      }
-      if(found == false)
-    	  System.err.println("ERROR: "+systemToInstantiate+ " was not found in the instance model");
-    }
-
-    return null ;
-  }
-
+  
+  
   private Resource parse(File aadlFile)
   {
     // Must specify file protocol. Otherwise, got resource doesn't exist when
     // using OSGi mechanism.
-
-    //TODO: implement test osgi and add "file:" in case osgi is used
+    // TODO: implement test osgi and add "file:" in case osgi is used
     URI uri = URI.createFileURI(aadlFile.getAbsolutePath().toString()) ;
     Resource input_resource = resourceSet.getResource(uri, true) ;
     if(input_resource.getErrors().isEmpty() == false)
@@ -209,6 +152,7 @@ public class StandAloneInstantiator
     this.validate() ;
     if(loadOption)
     {
+      OsateResourceUtil.setResourceSet(resourceSet);
       Aadl2StandaloneAnnexParserAgent._jobHandler.parseAllAnnexes() ;
       if(!existParsingErrors &&
               ServiceRegistry.PARSE_ERR_REPORTER.getNumErrors() == 0)
@@ -258,49 +202,9 @@ public class StandAloneInstantiator
     }
   }
 
-  public void serialize(Resource transfoResult,
-                        String targetFileName)
-  {
-    // serialization code
-//    XtextResource resource = (XtextResource) resourceSet.createResource(URI.createURI(targetFileName));
-//    resource.getContents().add(transfoResult.getContents().get(0));
-//    SaveOptions.Builder sb = SaveOptions.newBuilder();
-//    Map<Object,Object> options = new HashMap<Object,Object>();
-//    sb.getOptions().addTo(options);
-//    try {
-//    	resource.save(options);
-//    } catch (IOException e) {
-//    	e.printStackTrace();
-//    }
-	  
-//	  Serializer serializer = injector.getInstance(Serializer.class);
-//	  String resultFileContent = serializer.serialize(transfoResult.getContents().get(0));
-	try {
-		transfoResult.load(null);
-	} catch (IOException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
-	}
-	String resultFileContent =
-            Aadl2StandaloneUnparser.getAadlUnparser()
-                  .doUnparse((Element) transfoResult.getContents().get(0)) ;
-    try
-    {
-      BufferedWriter out = new BufferedWriter(new FileWriter(targetFileName)) ;
-      out.write(resultFileContent) ;
-      out.close() ;
-    }
-    catch(IOException e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace() ;
-    }
-
-    java.lang.System.out.println("Serialized result in: " + targetFileName) ;
-  }
-
   public ResourceSet getAadlResourceSet()
   {
-    return aadlResourceSet ;
+    return resourceSet ;
   }
+
 }

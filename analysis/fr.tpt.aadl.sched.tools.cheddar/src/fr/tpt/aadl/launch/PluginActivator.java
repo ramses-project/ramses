@@ -15,7 +15,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin ;
 import org.osgi.framework.Bundle ;
 import org.osgi.framework.BundleContext ;
 
-import fr.tpt.aadl.ramses.control.core.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 
 @SuppressWarnings("restriction")
 public class PluginActivator extends AbstractUIPlugin

@@ -101,27 +101,16 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
 															thisModule.concatToString(CurrentDeadlineWriteTable))}
 		),
+		extendedArrayDataType: AADLBA!TypeExtension
+		(
+			extended<-ArrayDataType
+		),
 		indexArrayDataType: AADLBA!DataType
 		(
 			name <- 'IndexArrayType_'+producerPort.eContainer().name+'_'+producerPort.name,
+			ownedExtension <-  extendedArrayDataType,
 			ownedPropertyAssociation <- Sequence {
-												
-												thisModule.CreatePropertyAssociation
-												(
-												 	'Data_Representation',
-													'DATA_MODEL',
-													'Array'.asEnumeration('DATA_MODEL').asNamedValue()
-												),
-												
-												thisModule.CreatePropertyAssociation
-												(
-												 	'Base_Type',
-													'DATA_MODEL',
-													thisModule.CreateListValueFromClassifier(
-														'Integer_16'.asClassifier('BASE_TYPES')
-													)
-												),
-
+				
 												thisModule.CreatePropertyAssociation
 												(
 												 	'Dimension',

@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataType ;
 
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
 
 public class PredefinedPackagesManager
 {

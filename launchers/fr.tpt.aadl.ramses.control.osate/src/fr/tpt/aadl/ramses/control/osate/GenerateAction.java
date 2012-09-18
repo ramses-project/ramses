@@ -13,6 +13,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.URI;
 import org.osate.aadl2.Element;
@@ -102,6 +103,8 @@ public class GenerateAction extends AbstractAnalyzer
         generator.generate(root, 
                            resourceDir,
                            outputDir) ;
+        ResourcesPlugin.getWorkspace().getRoot().
+        	refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
       }
       catch(GenerationException e)
       {

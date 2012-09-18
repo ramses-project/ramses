@@ -205,7 +205,11 @@ helper context AADLI!FeatureInstance def: getDequeueProtocol() : String =
 ;
 
 helper context AADLBA!PropertyExpression def: isFixedRateDistribution() : Boolean =
-	self.ownedFieldValue->any(fv|fv.property.name='Rate_Distribution').ownedValue.namedValue.name.toLower() = 'fixed'
+	if(self.ownedFieldValue->any(fv|fv.property.name='Rate_Distribution').ownedValue.namedValue.name.oclIsUndefined()) then
+		true
+	else
+		self.ownedFieldValue->any(fv|fv.property.name='Rate_Distribution').ownedValue.namedValue.name.toLower() = 'fixed'
+	endif
 ;
 
 helper context AADLBA!PropertyExpression def: isPerDispatchRateUnit() : Boolean =

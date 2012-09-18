@@ -533,32 +533,6 @@ unique lazy rule createCallSequence
 		)
 }
 
-rule initSubprogramCallSequence(implImg: AADLBA!ThreadIplementation, impl: AADLI!ThreadImplementation)
-{
-	using
-	{
-		result: AADLBA!SubprogramCallSequence = OclUndefined;
-	}
-	do
-	{
-		result <- thisModule.copyCallSequence(OclUndefined, impl,implImg);
-		if(not result.oclIsUndefined())
-		{
-			if(implImg.callSequence().ownedCallSpecification->isEmpty())
- 			{
-				if(impl.ownedSubprogramCallSequence->isEmpty())
-				{
-					implImg.ownedSubprogramCallSequence.add(thisModule.createCallSequence(result));
-				}
-				else
-				{
-					implImg.ownedSubprogramCallSequence.add(result);
-				}
- 			}
-		}
-	}
-}
-
 helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
 	if( impl.callSequenceFromImpl().oclIsUndefined() ) then
 		if(impl.callSequenceFromComputeEntryPoint().oclIsUndefined()) then
@@ -658,4 +632,20 @@ rule Comment {
 		c : AADLI!Comment
 	to
 		c2 : AADLBA!Comment(body <- c.body, ownedComment <- c.ownedComment)
+}
+
+rule addTerminationCall(callSequenceImg : AADLBA!SubprogramCallSequence)
+{
+}
+
+endpoint rule EndRule()
+{
+	do
+	{
+		'Executing Endpoint Rule'.debug('DEBUG');
+		for(callSequence in AADLBA!SubprogramCallSequence->allInstancesFrom('OUT'))
+		{
+			thisModule.addTerminationCall(callSequence);
+		}
+	}
 }

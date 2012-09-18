@@ -37,8 +37,7 @@ import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
-import fr.tpt.aadl.ramses.control.core.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.core.ToolSuiteLauncher ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
