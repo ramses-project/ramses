@@ -83,8 +83,6 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                                           "pok_runtime::Buffer_Id_Type" ;
   
   private ProcessorProperties _processorProp;
-
-  private final String destinationPackageSuffix = "_refined::";
   
   public void process(ProcessorSubcomponent processor,
                       File generatedFilePath,
@@ -150,10 +148,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-    	NamedElement pkg = (NamedElement) p.getDataFeatureClassifier().eContainer();
-    	blackboardInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
-    											destinationPackageSuffix +
-            									p.getDataFeatureClassifier().getName()) ;
+    	blackboardInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(p.getDataFeatureClassifier().getQualifiedName()) ;
       }
     }
     pp.blackboardInfo.add(blackboardInfo); 
@@ -180,10 +175,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-    	NamedElement pkg = (NamedElement) port.getDataFeatureClassifier().eContainer();
-    	queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
-    											destinationPackageSuffix+
-              									port.getDataFeatureClassifier().getName()) ;
+    	queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
       }
     }
     
@@ -211,10 +203,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-    	NamedElement pkg = (NamedElement) port.getDataFeatureClassifier().eContainer();
-        queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
-        									destinationPackageSuffix+
-        									port.getDataFeatureClassifier().getName()) ;
+        queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
       }
     }
     
@@ -310,10 +299,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       catch(Exception e)
       {
-    	NamedElement pkg = (NamedElement) port.getDataFeatureClassifier().eContainer();
-    	sampleInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(pkg.getName()+
-    										destinationPackageSuffix+
-          									port.getDataFeatureClassifier().getName()) ;
+    	sampleInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
       }
     }
     
@@ -511,7 +497,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       // Generate external variable (declared in deployment.c).
       for(BlackBoardInfo info : pp.blackboardInfo)
       {
-        mainImplCode.addOutput("extern BLACKBOARD_ID_TYPE ") ;
+        mainImplCode.addOutput("BLACKBOARD_ID_TYPE ") ;
         mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
@@ -534,7 +520,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       // Generate external variable (declared in deployment.c).
       for(String name : pp.eventNames)
       {
-        mainImplCode.addOutput("extern EVENT_ID_TYPE ") ;
+        mainImplCode.addOutput("EVENT_ID_TYPE ") ;
         mainImplCode.addOutput(name) ;
         mainImplCode.addOutputNewline(";") ;
       }
@@ -557,7 +543,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       // Generate external variable (declared in deployment.c).
       for(QueueInfo info : pp.bufferInfo)
       {
-        mainImplCode.addOutput("extern BUFFER_ID_TYPE ") ;
+        mainImplCode.addOutput("BUFFER_ID_TYPE ") ;
         mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
@@ -568,7 +554,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       for(QueueInfo info : pp.queueInfo)
       {
-        mainImplCode.addOutput("extern QUEUING_PORT_ID_TYPE ") ;
+        mainImplCode.addOutput("QUEUING_PORT_ID_TYPE ") ;
         mainImplCode.addOutput(info.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
