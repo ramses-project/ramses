@@ -157,14 +157,14 @@ rule SubprogramCall (c: AADLI!ComponentInstance,
 		)
 	do
 	{
---		if(not s.calledSubprogram.getPropertyAssociation('Source_Name').oclIsUndefined()
---					and not s.calledSubprogram.getPropertyAssociation('Source_Text').oclIsUndefined())
---		{
---			s2.calledSubprogram <- s.calledSubprogram;
---			thisModule.addImportedUnitFromElt(thisModule.public(), s.calledSubprogram);
---		}
---		else
---		{
+		if(not s.calledSubprogram.getPropertyAssociation('Source_Name').oclIsUndefined()
+					and not s.calledSubprogram.getPropertyAssociation('Source_Text').oclIsUndefined())
+		{
+			s2.calledSubprogram <- s.calledSubprogram;
+			thisModule.addImportedUnitFromElt(thisModule.public(), s.calledSubprogram);
+		}
+		else
+		{
 			if (s.calledSubprogram.oclIsKindOf(AADLI!SubprogramType))
 				s2.calledSubprogram <- thisModule.Type(OclUndefined,s.calledSubprogram);
 			else if(s.calledSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
@@ -219,7 +219,7 @@ rule SubprogramCall (c: AADLI!ComponentInstance,
 					}
 				}
 			}
-		--}
+		}
 		s2;
 	}
 }

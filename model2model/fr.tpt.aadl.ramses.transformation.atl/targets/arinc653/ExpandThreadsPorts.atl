@@ -269,17 +269,17 @@ rule PortConnection_Instance
 		
 		thisModule.addThreadsInternalConnections(cnxInst.source);
 		thisModule.addThreadsInternalConnections(cnxInst.destination);
+		thisModule.setSourcePortAccessorParameterConnections(cnxInst.source, sourceImpl, sourceImplImg);
 		if(c_source.featureInstance->last().debug('Last Feature Instance') = cnxInst.source.debug('Current Feature Instance'))
 		{
 			true.debug('Expand Dispatch Protocol');
 			thisModule.expandThreadDispatchProtocol(c_source, sourceImplImg);
-			thisModule.setSourcePortAccessorParameterConnections(cnxInst.source, sourceImpl, sourceImplImg);
 		}
+		thisModule.setDestinationPortAccessorParameterConnections(cnxInst.destination, destinationImpl, destinationImplImg);
 		if(c_destination.featureInstance->last().debug('Last Feature Instance') = cnxInst.destination.debug('Current Feature Instance'))
 		{
 			true.debug('Expand Dispatch Protocol');
 			thisModule.expandThreadDispatchProtocol(c_destination, destinationImplImg);
-			thisModule.setDestinationPortAccessorParameterConnections(cnxInst.destination, destinationImpl, destinationImplImg);
 		}
 		
 		thisModule.addImportedUnit(thisModule.public(), 'POK_RUNTIME', 'pok_runtime');
@@ -364,17 +364,17 @@ rule intraProcess_PortConnection_Instance
 		
 		thisModule.addThreadsInternalConnections(cnxInst.destination);
 		thisModule.addThreadsInternalConnections(cnxInst.source);
+		thisModule.setSourcePortAccessorParameterConnections(cnxInst.source, impl_source, sourceImplImg);
 		if(c_source.featureInstance->last().debug('Last Feature Instance') = cnxInst.source.debug('Current Feature Instance'))
 		{
 			true.debug('Expand Dispatch Protocol');
-			thisModule.setSourcePortAccessorParameterConnections(cnxInst.source, impl_source, sourceImplImg);
 			thisModule.expandThreadDispatchProtocol(c_source, sourceImplImg);
 			
 		}
+		thisModule.setDestinationPortAccessorParameterConnections(cnxInst.destination, impl_destination, destinationImplImg);
 		if(c_destination.featureInstance->last().debug('Last Feature Instance') = cnxInst.destination.debug('Current Feature Instance'))
 		{
 			true.debug('Expand Dispatch Protocol');
-			thisModule.setDestinationPortAccessorParameterConnections(cnxInst.destination, impl_destination, destinationImplImg);
 			thisModule.expandThreadDispatchProtocol(c_destination, destinationImplImg);
 			
 		}
@@ -523,7 +523,7 @@ unique lazy rule addLengthDataSubcomponent
 		implImg : AADLBA!ThreadImplementation
 	using
 	{
-		typeId: String = port.feature.dataFeatureClassifier.getClassifierInOutput().getQualifiedName().replaceAll('::', '__').replaceAll('.','_');
+		typeId: String = port.feature.dataFeatureClassifier.getQualifiedName().replaceAll('::', '__').replaceAll('.','_');
 		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression('sizeof('+typeId+')');
 	}
 	to
@@ -541,6 +541,7 @@ unique lazy rule addLengthDataSubcomponent
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
 		implImg.ownedDataSubcomponent.add(dataSubcomponent);
+		dataSubcomponent;
 	}
 }
 
@@ -553,12 +554,13 @@ unique lazy rule addMessageAddrDataSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_MsgAddr',
-			dataSubcomponentType<-port.feature.dataFeatureClassifier.getClassifierInOutput()
+			dataSubcomponentType<-port.feature.dataFeatureClassifier
 		)
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
 		implImg.ownedDataSubcomponent.add(dataSubcomponent);
+		dataSubcomponent;
 	}
 }
 
@@ -577,6 +579,7 @@ unique lazy rule addValidityDataSubcomponent
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
 		implImg.ownedDataSubcomponent.add(dataSubcomponent);
+		dataSubcomponent;
 	}
 }
 
@@ -604,6 +607,7 @@ unique lazy rule addTimeOutSubcomponent
 		{
 			dataSubcomponent.ownedPropertyAssociation.add(thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.createListValueFromPropertyExpression(initValuePE)));
 		}
+		dataSubcomponent;
 	}
 }
 

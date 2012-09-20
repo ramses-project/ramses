@@ -240,7 +240,7 @@ rule Data_Instance {
 	to
 		sub : AADLBA!DataSubcomponent (
 			name <- c.name.debug('data instance'),
-			dataSubcomponentType <- c.createOrSetTypeAndImplementation(),
+			dataSubcomponentType <- c.getSubcomponent().getClassifier(),
 			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
 		)
 	do

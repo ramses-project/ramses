@@ -165,8 +165,7 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance {
 		),
 		value: AADLBA!DataSubcomponent (
 			name <- port.name + '_currentValue',
-			dataSubcomponentType <- port.feature.dataFeatureClassifier.
-					getClassifierInOutput()
+			dataSubcomponentType <- port.feature.dataFeatureClassifier
 		),
 		-----------------------
 		--- Thread configuration
@@ -315,7 +314,7 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance {
 	do
 	{
 		 -- next is a workaround
-		putValueOutputActual.setSubcomponentType(port.feature.dataFeatureClassifier.getClassifierInOutput());
+		putValueOutputActual.setSubcomponentType(port.feature.dataFeatureClassifier);
 		 --ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().setInDirection(CDWParam)
 				-- ;
 		
@@ -432,8 +431,7 @@ rule In_PeriodicDelayed_EventDataPort_Instance {
 		),
 		currentValue: AADLBA!DataSubcomponent (
 			name <- port.name + '_currentValue',
-			dataSubcomponentType <- port.feature.dataFeatureClassifier.
-					getClassifierInOutput()
+			dataSubcomponentType <- port.feature.dataFeatureClassifier
 		),
 		-----------------------
 		--- Thread configuration
@@ -499,8 +497,7 @@ rule In_PeriodicDelayed_EventDataPort_Instance {
 		--- Current Value
 		currentValueAccess: AADLBA!DataAccess (
 			name <- port.name + '_currentValueAccess',
-			dataFeatureClassifier <- port.feature.dataFeatureClassifier.
-					getClassifierInOutput(),
+			dataFeatureClassifier <- port.feature.dataFeatureClassifier,
 			kind<-#requires
 		),
 		connected_CurrentValue_Access: AADLBA!ConnectedElement (
@@ -710,7 +707,7 @@ rule In_PeriodicDelayed_EventDataPort_Instance {
 	do
 	{
 		 -- next is a workaround
-		nextValueOutputActual.setSubcomponentType(port.feature.dataFeatureClassifier.getClassifierInOutput());
+		nextValueOutputActual.setSubcomponentType(port.feature.dataFeatureClassifier);
 		 --ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().setInDirection(CPRParam)
 				-- ;
 		
