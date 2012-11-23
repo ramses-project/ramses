@@ -43,10 +43,13 @@ public class Aadl2StandaloneRuntimeModule extends org.osate.xtext.aadl2.Abstract
   }
   
   @Override
-
   public Class<? extends org.eclipse.xtext.linking.ILinker> bindILinker()
   {
     return Aadl2StandaloneAnnexParserAgent.class ;
   }
   
+  @Override
+  public Class<? extends org.eclipse.xtext.scoping.IGlobalScopeProvider> bindIGlobalScopeProvider() {
+	return org.osate.xtext.aadl2.scoping.Aadl2GlobalScopeProvider.class;
+  }
 }
