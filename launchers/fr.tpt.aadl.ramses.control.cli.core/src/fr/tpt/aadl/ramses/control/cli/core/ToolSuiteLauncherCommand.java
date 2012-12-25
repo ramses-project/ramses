@@ -87,6 +87,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   public static void main(String[] args)
   {
+	JSAP jsapHelp = new JSAP() ;
     JSAP jsapParse = new JSAP() ;
     JSAP jsapAnalysis = new JSAP() ;
     JSAP jsapTransfo = new JSAP() ;
@@ -95,7 +96,15 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
     try
     {
-      initSwitches(jsapParse, jsapAnalysis, jsapTransfo, jsapGen) ;
+      initSwitches(jsapHelp, jsapParse, jsapAnalysis, jsapTransfo, jsapGen) ;
+      JSAPResult helpConf = jsapHelp.parse(args) ;
+      boolean helpOnly = helpConf.getBoolean(HELP_ONLY_OPTION_ID) ;
+
+      if(helpOnly)
+      {
+    	  printHelp(jsapHelp, args);
+      }
+      
       JSAPResult parseConfig = jsapParse.parse(args) ;
       boolean parseOnly = parseConfig.getBoolean(PARSE_ONLY_OPTION_ID) ;
       jsapParse.unregisterParameter(parseOnlyMode) ;
@@ -157,9 +166,23 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     // TODO : call unparser
   }
 
+  
+  private static void printHelp(JSAP jsapHelp, String[] args)
+  {
+	  
+    StringBuilder sb =
+    		new StringBuilder("\nGeneral Configuration Usage:\n\n") ;
+    sb.append(jsapHelp.getUsage()) ;
+    sb.append("\n\n") ;
+    sb.append(jsapHelp.getHelp()) ;
+    _reporter.reportMessage(MessageStatus.INFO, sb.toString()) ;
+    System.exit(1) ; 
+  }
+  
   // Setup and register switches into the given JASP parser, analysis and
   // transformation.
-  private static void initSwitches(JSAP jsapParse,
+  private static void initSwitches(JSAP jsapHelp,
+		  						   JSAP jsapParse,
                                    JSAP jsapAnalysis,
                                    JSAP jsapTransfo,
                                    JSAP jsapGen)
@@ -260,6 +283,14 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
             .setAllowMultipleDeclarations(false) ;
                   xml_path.setHelp("The specified XML file contains the workflow") ;
 
+    FlaggedOption generation =
+    		new FlaggedOption(GENERATION_OPTION_ID)
+    			  .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+    			  .setLongFlag("generation").setShortFlag('g').setList(false)
+    			  .setAllowMultipleDeclarations(false) ;
+
+    generation.setHelp("Targeted platform for code generation (pok, etc.).") ;
+
     FlaggedOption parameters =
            new FlaggedOption(PARAMETER_OPTION_ID)
                   .setStringParser(JSAP.STRING_PARSER).setRequired(false)
@@ -268,7 +299,24 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                   .setAllowMultipleDeclarations(false) ;
                   
     parameters.setHelp("additional parameters given as key=value format") ;
-                  
+    
+    jsapHelp.registerParameter(helpOnlyMode) ;
+    jsapHelp.registerParameter(parseOnlyMode) ;
+    jsapHelp.registerParameter(model) ;
+    jsapHelp.registerParameter(includes) ;
+    
+    jsapHelp.registerParameter(analysisOnlyMode) ;
+    jsapHelp.registerParameter(analysis) ;
+    jsapHelp.registerParameter(system_to_instantiate) ;
+    jsapHelp.registerParameter(generated_file_path) ;
+    
+    jsapHelp.registerParameter(superimposition_files) ;
+    jsapHelp.registerParameter(post_transformation_files) ;
+    jsapHelp.registerParameter(generation) ;
+    jsapHelp.registerParameter(xml_path) ;
+    jsapHelp.registerParameter(parameters);
+    
+    
     jsapParse.registerParameter(model) ;
     jsapParse.registerParameter(includes) ;
     jsapParse.registerParameter(parseOnlyMode) ;
@@ -295,13 +343,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapTransfo.registerParameter(analysis) ;
     jsapTransfo.registerParameter(parameters);
     
-    FlaggedOption generation =
-          new FlaggedOption(GENERATION_OPTION_ID)
-                .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                .setLongFlag("generation").setShortFlag('g').setList(false)
-                .setAllowMultipleDeclarations(false) ;
-    
-    generation.setHelp("Targeted platform for code generation (pok, etc.).") ;
     
     jsapGen.registerParameter(helpOnlyMode) ;
     jsapGen.registerParameter(parseOnlyMode) ;
@@ -470,26 +511,15 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   {
     JSAPResult genConf = jsapGen.parse(args) ;
     
-    boolean helpOnly = genConf.getBoolean(HELP_ONLY_OPTION_ID) ;
-
-    if(helpOnly || false == genConf.success())
+    if(false == genConf.success())
     {
-      StringBuilder sb =
-            new StringBuilder("\nGeneral Configuration Usage:\n\n") ;
-      sb.append(jsapGen.getUsage()) ;
-      sb.append("\n\n") ;
-      sb.append(jsapGen.getHelp()) ;
-      _reporter.reportMessage(MessageStatus.INFO, sb.toString()) ;
-      
-      if(genConf.success())
-      {
+    	StringBuilder sb =
+                new StringBuilder("\nParsing Configuration Usage:\n\n--parse ") ;
+        sb.append(jsapGen.getUsage()) ;
+        sb.append("\n\n") ;
+        sb.append(jsapGen.getHelp()) ;
         reportError(genConf.getErrorMessageIterator(), sb.toString()) ;
         System.exit(0) ;
-      }
-      else
-      {
-        System.exit(1) ; 
-      }
     }
     
     String[] includeFolderNames =
