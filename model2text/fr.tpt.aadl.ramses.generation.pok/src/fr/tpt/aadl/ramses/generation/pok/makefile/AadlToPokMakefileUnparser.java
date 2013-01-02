@@ -85,8 +85,8 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         for(ProcessorSubcomponent aProcessorSubcomponent : object
               .getOwnedProcessorSubcomponents())
         {
-          unparserContent.addOutput("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " run") ;
+          unparserContent.addOutputNewline("\t$(MAKE) -C " +
+                aProcessorSubcomponent.getName() + " run\n") ;
         }
 
         unparserContent.addOutputNewline("test:") ;
@@ -94,7 +94,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
                 .getOwnedProcessorSubcomponents())
           {
             unparserContent.addOutput("\t$(MAKE) -C " + 
-            		aProcessorSubcomponent.getName() + " run" +
+            		aProcessorSubcomponent.getName() + " run " +
             		"QEMU_MISC=-nographic -serial /dev/stdout > " +
             		aProcessorSubcomponent.getName()+".trace") ;
           }
