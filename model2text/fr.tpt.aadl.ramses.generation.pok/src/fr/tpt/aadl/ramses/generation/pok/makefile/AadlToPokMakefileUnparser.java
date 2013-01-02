@@ -89,6 +89,16 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
                 aProcessorSubcomponent.getName() + " run") ;
         }
 
+        unparserContent.addOutputNewline("test:") ;
+        for(ProcessorSubcomponent aProcessorSubcomponent : object
+                .getOwnedProcessorSubcomponents())
+          {
+            unparserContent.addOutput("\t$(MAKE) -C " + 
+            		aProcessorSubcomponent.getName() + " run" +
+            		"QEMU_MISC=-nographic -serial /dev/stdout > " +
+            		aProcessorSubcomponent.getName()+".trace") ;
+          }
+        
         return DONE ;
       }
 
@@ -277,11 +287,11 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
   {
     Runtime runtime = Runtime.getRuntime();
     if(System.getenv("POK_PATH")!=""
-          || System.getenv("POK_PATH")!=null)
+          && System.getenv("POK_PATH")!=null)
     {
       try
       {
-        Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all") ;
+        Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all POK_PATH="+System.getenv("POK_PATH")) ;
         makeProcess.waitFor();
         if (makeProcess.exitValue() != 0) {
           System.err.println("Error when compiling generated code: ");
