@@ -95,8 +95,8 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
           {
             unparserContent.addOutput("\t$(MAKE) -C " + 
             		aProcessorSubcomponent.getName() + " run " +
-            		"QEMU_MISC=-nographic -serial /dev/stdout > " +
-            		aProcessorSubcomponent.getName()+".trace") ;
+            		"QEMU_MISC=\"-nographic -serial /dev/stdout > " +
+            		aProcessorSubcomponent.getName()+".trace\"") ;
           }
         
         return DONE ;
