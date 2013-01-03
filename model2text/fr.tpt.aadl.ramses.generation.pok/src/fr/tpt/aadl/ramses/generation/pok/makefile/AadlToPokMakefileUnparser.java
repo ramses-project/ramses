@@ -315,6 +315,14 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         }
         else
         {
+          InputStream is;
+          is = makeProcess.getInputStream();
+          BufferedReader in = new BufferedReader(new InputStreamReader(is));
+            
+          String line = null;
+          while ((line = in.readLine()) != null) {
+            System.out.println(line);
+          }
           System.out.println("Generated code was successfully built.\n" +
               "\tTo run the executable files produced, tape: \n" +
               "\t$cd "+generatedFilePath.getAbsolutePath()+"\n" +
