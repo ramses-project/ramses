@@ -293,14 +293,22 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
     {
       try
       {
-        Process makeProcess = runtime.exec("make all POK_PATH="+pokPath, null, generatedFilePath);
+        Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all POK_PATH="+pokPath) ;
         makeProcess.waitFor();
         if (makeProcess.exitValue() != 0) {
           System.err.println("Error when compiling generated code: ");
 
-          InputStream is = makeProcess.getErrorStream();
+          InputStream is;
+          is = makeProcess.getInputStream();
           BufferedReader in = new BufferedReader(new InputStreamReader(is));
+          
           String line = null;
+          while ((line = in.readLine()) != null) {
+            System.err.println(line);
+          }
+          is = makeProcess.getErrorStream();
+          in = new BufferedReader(new InputStreamReader(is));
+          line = null;
           while ((line = in.readLine()) != null) {
             System.err.println(line);
           }
