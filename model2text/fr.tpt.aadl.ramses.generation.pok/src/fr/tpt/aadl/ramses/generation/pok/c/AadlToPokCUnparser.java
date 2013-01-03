@@ -1059,6 +1059,11 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1") ;
     }
 
+    if(System.getProperty("DEBUG")!=null)
+    {
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_DEBUG 1") ;
+    }
+    
     deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED 1") ;
     // The maccro POK_CONFIG_NB_PARTITIONS indicates the amount of partitions in
     // the current system.It corresponds to the amount of process components in
