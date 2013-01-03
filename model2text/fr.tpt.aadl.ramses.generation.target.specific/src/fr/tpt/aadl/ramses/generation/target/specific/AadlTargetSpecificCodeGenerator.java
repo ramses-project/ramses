@@ -83,7 +83,6 @@ public class AadlTargetSpecificCodeGenerator
       {
         SystemImplementation si = (SystemImplementation) elt ;
         File generatedFileDir = new File(generatedFilePath + GENERATED_DIR_NAME);
-        _targetBuilderGen.process(si, generatedFileDir) ;
         
         // XXX Have AadlGenericUnparser to unparse the SystemImplementation
         // object ?
@@ -117,6 +116,11 @@ public class AadlTargetSpecificCodeGenerator
             _targetBuilderGen.process(process, processDirectory) ;
           }
         }
+        
+        // This line is at the end because it will launch the build of the generated code;
+        // Thus it is better is the code has been generated...
+        _targetBuilderGen.process(si, generatedFileDir) ;
+        
       }
     }  
   }
