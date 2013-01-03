@@ -286,12 +286,14 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
   public void executeMake(File generatedFilePath)
   {
     Runtime runtime = Runtime.getRuntime();
-    if(System.getenv("POK_PATH")!=""
-          && System.getenv("POK_PATH")!=null)
+    String pokPath = System.getenv("POK_PATH");
+	if(pokPath==null || pokPath=="")
+		pokPath = System.getProperty("POK_PATH");
+	if(pokPath!=null && pokPath!="")
     {
       try
       {
-        Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all POK_PATH="+System.getenv("POK_PATH")) ;
+        Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all POK_PATH=\""+pokPath+"\"") ;
         makeProcess.waitFor();
         if (makeProcess.exitValue() != 0) {
           System.err.println("Error when compiling generated code: ");
