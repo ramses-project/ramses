@@ -341,6 +341,10 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
       }
       
     }
+	else
+	{
+		System.out.println("ERROR: could not build generated code, runtime path not found");
+	}
   }
 
   @Override

@@ -681,6 +681,12 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
           .addOutput("  CREATE_PROCESS (&(tattr), &(arinc_threads[") ;
     mainImplCode.addOutput(Integer.toString(threadIndex)) ;
     mainImplCode.addOutputNewline("]), &(ret));") ;
+    
+    mainImplCode
+    	  .addOutput("  START (arinc_threads[") ;
+    mainImplCode.addOutput(Integer.toString(threadIndex)) ;
+    mainImplCode.addOutputNewline("], &(ret));") ;
+    
   }
   
   private void genBlackboardMainImpl(UnparseText mainImplCode,
