@@ -1202,7 +1202,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       {
         deploymentHeaderCode
                     .addOutputNewline("#define POK_NEEDS_PORTS_SAMPLING 1");
-             
+            
         sampleAlreadyAdded = true ;
       }
       
@@ -1215,6 +1215,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
     }
 
+    if(sampleAlreadyAdded || queueAlreadyAdded)
+    	deploymentHeaderCode
+        .addOutputNewline("#define POK_NEEDS_THREAD_ID 1") ;
     deploymentHeaderCode
           .addOutput("#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS {") ;
     for(ProcessSubcomponent ps : bindedProcess)
