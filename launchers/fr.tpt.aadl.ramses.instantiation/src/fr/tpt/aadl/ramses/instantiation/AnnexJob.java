@@ -56,6 +56,8 @@ public class AnnexJob
   private List<?> _annexElements ;
 
   private AnalysisErrorReporterManager _errManager ;
+  
+  private boolean _hasParsingError = false ;
 
   // DEBUG
   private String _parentContainer ;
@@ -115,6 +117,7 @@ public class AnnexJob
       else
       {
         result = false ;
+        _hasParsingError = true ;
       }
     }
     catch(RecognitionException e)
@@ -137,7 +140,7 @@ public class AnnexJob
   */
   public boolean resolve()
   {
-    if(_annexElements != null)
+    if(_annexElements != null && ! _hasParsingError)
     {
       //DEBUG
       String filename = (new File(_filename)).getName() ;
@@ -148,6 +151,9 @@ public class AnnexJob
     }
     else
     {
+      // DEBUG
+      String filename = (new File(_filename)).getName() ;
+      System.out.println("### " + filename + " has parsing errors. Skip resolving for this annex.") ;
       return false ;
     }
   }

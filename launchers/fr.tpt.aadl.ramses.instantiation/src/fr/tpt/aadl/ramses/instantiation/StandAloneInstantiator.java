@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright ï¿½ 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -38,7 +38,6 @@ import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
 import org.osate.core.OsateCorePlugin;
-import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 import org.osate.xtext.aadl2.properties.util.EMFIndexRetrieval;
 
 import com.google.inject.Inject;
@@ -154,18 +153,20 @@ public class StandAloneInstantiator extends InstantiationManagerImpl
     {
       OsateResourceUtil.setResourceSet(resourceSet);
       Aadl2StandaloneAnnexParserAgent._jobHandler.parseAllAnnexes() ;
-      if(!existParsingErrors &&
-              ServiceRegistry.PARSE_ERR_REPORTER.getNumErrors() == 0)
-        {
-          Aadl2StandaloneAnnexParserAgent._jobHandler.resolveAllAnnexes() ;
-        }
-        else
-        {
-          System.err.println("Exit on parse error") ;
-          java.lang.System.exit(-1) ;
-        }
+      
+      // It doesn't resolve annex in case of AADL main code parsing errors.
+      // Annex resolution is delegated to the job task but will not be performed
+      // at any annex parsing error.
+      if(!existParsingErrors)
+      {
+        Aadl2StandaloneAnnexParserAgent._jobHandler.resolveAllAnnexes() ;
+      }
+      else
+      {
+        System.err.println("Exit on parse error") ;
+        java.lang.System.exit(-1) ;
+      }
     }
-    
 
     return result ;
   }
@@ -206,5 +207,4 @@ public class StandAloneInstantiator extends InstantiationManagerImpl
   {
     return resourceSet ;
   }
-
 }
