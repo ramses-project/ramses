@@ -1178,12 +1178,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
         findCommunicationMechanism(process, pp) ;
       }
       PartitionProperties pp = _processorProp.partitionProperties.get(process) ;
-      if(pp.hasBlackboard)
-      {
-        deploymentHeaderCode
-              .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;
-      }
-      else if(pp.hasBuffer)
+      if(pp.hasBlackboard || pp.hasBuffer || pp.hasEvent)
       {
         deploymentHeaderCode
               .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;
@@ -1227,7 +1222,8 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
                   .getComponentImplementation()) ;
       deploymentHeaderCode.addOutput(Integer
             .toString(pp.blackboardInfo.size()
-                      + pp.bufferInfo.size())) ;
+                      + pp.bufferInfo.size()+
+                      pp.eventNames.size())) ;
       if(bindedProcess.indexOf(ps) < bindedProcess.size() - 1)
       {
         deploymentHeaderCode.addOutput(",") ;
