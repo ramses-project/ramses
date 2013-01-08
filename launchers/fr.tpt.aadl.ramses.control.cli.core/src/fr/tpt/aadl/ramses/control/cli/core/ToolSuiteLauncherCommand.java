@@ -433,7 +433,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     launcher.parsePredefinedPackages() ;
     launcher.parse(mainModelFiles) ;
     MessageStatus ms = MessageStatus.INFO ;
-    _reporter.reportMessage(ms, "Parsing terminated normally") ;
+    _reporter.reportMessage(ms, "Parsing terminated") ;
   }
 
   private static void analyse(ToolSuiteLauncher launcher,
