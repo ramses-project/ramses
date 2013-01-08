@@ -78,8 +78,6 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
       int sourcelength = sourceText.length();
       offset = offset + (nlength-sourcelength-1)+3;
       
-      System.out.println(node.getTotalOffset());
-      
       if(annexText != null && annexName != null)
       {
         
