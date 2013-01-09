@@ -29,9 +29,6 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
-import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter ;
-
-
 import com.martiansoftware.jsap.FlaggedOption ;
 import com.martiansoftware.jsap.JSAP ;
 import com.martiansoftware.jsap.JSAPException ;

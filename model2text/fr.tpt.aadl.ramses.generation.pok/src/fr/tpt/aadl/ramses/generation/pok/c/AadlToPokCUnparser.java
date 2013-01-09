@@ -34,7 +34,6 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
-import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;

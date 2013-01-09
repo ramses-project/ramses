@@ -34,7 +34,6 @@ import org.osate.aadl2.DirectedFeature;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceObject;
 

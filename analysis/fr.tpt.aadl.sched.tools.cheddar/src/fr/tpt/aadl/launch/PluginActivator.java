@@ -3,15 +3,10 @@ package fr.tpt.aadl.launch ;
 import java.io.BufferedReader ;
 import java.io.FileReader ;
 import java.io.IOException ;
-import java.io.InputStreamReader ;
-import java.net.URL ;
 
-import org.eclipse.core.runtime.FileLocator ;
-import org.eclipse.core.runtime.Path ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.osgi.baseadaptor.BaseData ;
-import org.eclipse.osgi.framework.internal.core.BundleHost ;
 import org.eclipse.ui.plugin.AbstractUIPlugin ;
+
 import org.osgi.framework.Bundle ;
 import org.osgi.framework.BundleContext ;
 

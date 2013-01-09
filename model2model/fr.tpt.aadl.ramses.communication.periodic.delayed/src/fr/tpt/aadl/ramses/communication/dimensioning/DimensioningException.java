@@ -1,7 +1,5 @@
 package fr.tpt.aadl.ramses.communication.dimensioning;
 
-import org.osate.aadl2.Element;
-
 public class DimensioningException extends Exception {
 
 	/**

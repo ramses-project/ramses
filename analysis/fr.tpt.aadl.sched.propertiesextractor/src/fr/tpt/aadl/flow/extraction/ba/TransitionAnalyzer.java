@@ -13,7 +13,6 @@ import fr.tpt.aadl.annex.behavior.aadlba.BasicAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSet ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions ;
 import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference ;
 import fr.tpt.aadl.annex.behavior.aadlba.ElementValues ;
 import fr.tpt.aadl.annex.behavior.aadlba.ForOrForAllStatement ;
