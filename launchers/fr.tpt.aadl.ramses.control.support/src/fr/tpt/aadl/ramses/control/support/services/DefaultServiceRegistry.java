@@ -31,7 +31,7 @@ import org.osate.annexsupport.AnnexUnparser ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 
-public class DefaultServiceRegistry implements ServiceRegistry
+public class DefaultServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {
   @Override
   public AnnexParser getParser(String name)

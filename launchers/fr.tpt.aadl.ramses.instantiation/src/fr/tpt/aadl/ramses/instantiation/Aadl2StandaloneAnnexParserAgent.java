@@ -87,6 +87,19 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
         
         AnnexParser ap = registry.getParser(annexName) ;
         AnnexResolver ar = registry.getResolver(annexName) ;
+        
+        if(ap == null)
+        {
+          System.err.println("RAMSES doesn't parse " + annexName +
+                             "annex subclause ") ; 
+        }
+        
+        if(ar == null)
+        {
+          System.err.println("RAMSES doesn't resolve " + annexName +
+                             "annex subclause ") ; 
+        }
+        
         _jobHandler.addJob(new AnnexJob(defaultAnnexSubclause, filename, line,
               offset, ap, errReporter, ar, resolveErrManager)) ;
       }

@@ -29,6 +29,8 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter ;
+
 
 import com.martiansoftware.jsap.FlaggedOption ;
 import com.martiansoftware.jsap.JSAP ;
@@ -433,7 +435,21 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     launcher.parsePredefinedPackages() ;
     launcher.parse(mainModelFiles) ;
     MessageStatus ms = MessageStatus.INFO ;
-    _reporter.reportMessage(ms, "Parsing terminated") ;
+    
+    String msg = "instanciation has " ;
+    
+    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+    
+    if(sr.getNbError() > 0)
+    {
+      msg += "FAILED" ;
+    }
+    else
+    {
+      msg += "succeded" ;
+    }
+    
+    _reporter.reportMessage(ms, msg) ;
   }
 
   private static void analyse(ToolSuiteLauncher launcher,

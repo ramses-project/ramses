@@ -10,10 +10,11 @@ import org.osate.annexsupport.AnnexUnparser;
 
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 
-public class OsateServiceRegistry implements ServiceRegistry {
+public class OsateServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry {
 
 	
 	public OsateServiceRegistry() {

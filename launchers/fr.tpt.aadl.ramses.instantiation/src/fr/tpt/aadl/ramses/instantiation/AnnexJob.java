@@ -80,50 +80,54 @@ public class AnnexJob
 
   public boolean parse()
   {
-    boolean result ;
+    boolean result = false ;
     AnnexSubclause as ;
-    String annexText = _annex.getSourceText() ;
-    String annexName = _annex.getName() ;
-
-    try
+    
+    if(_parser != null)
     {
-      //DEBUG
-      String filename = (new File(_filename)).getName() ;
-      _parentContainer = ((ComponentClassifier) _annex.eContainer()).getName() ;
-      System.out.println("*** try to parse " + annexName + " in " +
-            _parentContainer + " from " + filename) ;
+      String annexText = _annex.getSourceText() ;
+      String annexName = _annex.getName() ;
 
-      if(annexText.length() > 6)
+      try
       {
-        annexText = annexText.substring(3, annexText.length() - 3) ;
+        //DEBUG
+        String filename = (new File(_filename)).getName() ;
+        _parentContainer = ((ComponentClassifier) _annex.eContainer()).getName() ;
+        System.out.println("*** try to parse " + annexName + " in " +
+              _parentContainer + " from " + filename) ;
+
+        if(annexText.length() > 6)
+        {
+          annexText = annexText.substring(3, annexText.length() - 3) ;
+        }
+
+        as =
+              _parser.parseAnnexSubclause(annexName, annexText, _filename, _line,
+                                          _offset, _parserErrReporter) ;
+
+        if(as != null && _parserErrReporter.getNumErrors() == 0)
+        {
+          as.setName(annexName) ;
+          // replace default annex library with the new one.
+          EList<AnnexSubclause> ael =
+                ((Classifier) _annex.eContainer()).getOwnedAnnexSubclauses() ;
+          int idx = ael.indexOf(_annex) ;
+          ael.add(idx, as) ;
+          ael.remove(_annex) ;
+          _annexElements = Collections.singletonList(as) ;
+          result = true ;
+        }
+        else
+        {
+          result = false ;
+          _hasParsingError = true ;
+        }
       }
-
-      as =
-            _parser.parseAnnexSubclause(annexName, annexText, _filename, _line,
-                                        _offset, _parserErrReporter) ;
-
-      if(as != null && _parserErrReporter.getNumErrors() == 0)
+      catch(RecognitionException e)
       {
-        as.setName(annexName) ;
-        // replace default annex library with the new one.
-        EList<AnnexSubclause> ael =
-              ((Classifier) _annex.eContainer()).getOwnedAnnexSubclauses() ;
-        int idx = ael.indexOf(_annex) ;
-        ael.add(idx, as) ;
-        ael.remove(_annex) ;
-        _annexElements = Collections.singletonList(as) ;
-        result = true ;
-      }
-      else
-      {
+        e.printStackTrace() ;
         result = false ;
-        _hasParsingError = true ;
       }
-    }
-    catch(RecognitionException e)
-    {
-      e.printStackTrace() ;
-      result = false ;
     }
 
     return result ;
@@ -140,20 +144,27 @@ public class AnnexJob
   */
   public boolean resolve()
   {
-    if(_annexElements != null && ! _hasParsingError)
+    if(_resolver != null)
     {
-      //DEBUG
-      String filename = (new File(_filename)).getName() ;
-      System.out.println("*** try to resolve " + _annex.getName() + " in " +
-            _parentContainer + " from " + filename) ;
-      _resolver.resolveAnnex(_annex.getName(), _annexElements, _errManager) ;
-      return _errManager.getNumErrors() == 0 ;
+      if(_annexElements != null && ! _hasParsingError)
+      {
+        //DEBUG
+        String filename = (new File(_filename)).getName() ;
+        System.out.println("*** try to resolve " + _annex.getName() + " in " +
+              _parentContainer + " from " + filename) ;
+        _resolver.resolveAnnex(_annex.getName(), _annexElements, _errManager) ;
+        return _errManager.getNumErrors() == 0 ;
+      }
+      else
+      {
+        // DEBUG
+        String filename = (new File(_filename)).getName() ;
+        System.out.println("### " + filename + " has parsing errors. Skip resolving for this annex.") ;
+        return false ;
+      }
     }
     else
     {
-      // DEBUG
-      String filename = (new File(_filename)).getName() ;
-      System.out.println("### " + filename + " has parsing errors. Skip resolving for this annex.") ;
       return false ;
     }
   }

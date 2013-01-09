@@ -70,4 +70,6 @@ public interface ServiceRegistry
   public Set<String> getAvailableGeneratorNames() ;
 
   public Generator getGenerator(String generator) ;
+  
+  public int getNbError() ;
 }

@@ -45,7 +45,7 @@ import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
-public class OSGiServiceRegistry implements ServiceRegistry
+public class OSGiServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {
   private AnnexParserRegistry _parserRegistry ;
   private AnnexResolverRegistry _resolverRegistry ;

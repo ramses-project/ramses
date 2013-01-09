@@ -37,13 +37,14 @@ import fr.tpt.aadl.launch.WCETAnalysis;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.pokTT.PokTTGeneratorFactory ;
 
-public class StaticServiceRegistry implements ServiceRegistry
+public class StaticServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {
 
   private Map<String, AnnexParser> _parsers =
