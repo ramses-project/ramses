@@ -93,19 +93,21 @@ public class AnnexJob
         //DEBUG
         String filename = (new File(_filename)).getName() ;
         _parentContainer = ((ComponentClassifier) _annex.eContainer()).getName() ;
-        System.out.println("*** try to parse " + annexName + " in " +
+        System.out.println("info: Parse " + annexName + " in " +
               _parentContainer + " from " + filename) ;
 
         if(annexText.length() > 6)
         {
           annexText = annexText.substring(3, annexText.length() - 3) ;
         }
-
+        
+        int nb_errors = _parserErrReporter.getNumErrors() ;
+        
         as =
               _parser.parseAnnexSubclause(annexName, annexText, _filename, _line,
                                           _offset, _parserErrReporter) ;
 
-        if(as != null && _parserErrReporter.getNumErrors() == 0)
+        if(as != null && _parserErrReporter.getNumErrors() == nb_errors)
         {
           as.setName(annexName) ;
           // replace default annex library with the new one.
@@ -150,16 +152,14 @@ public class AnnexJob
       {
         //DEBUG
         String filename = (new File(_filename)).getName() ;
-        System.out.println("*** try to resolve " + _annex.getName() + " in " +
+        System.out.println("info: Resolve " + _annex.getName() + " in " +
               _parentContainer + " from " + filename) ;
         _resolver.resolveAnnex(_annex.getName(), _annexElements, _errManager) ;
         return _errManager.getNumErrors() == 0 ;
       }
       else
       {
-        // DEBUG
-        String filename = (new File(_filename)).getName() ;
-        System.out.println("### " + filename + " has parsing errors. Skip resolving for this annex.") ;
+        System.err.println("info: " + _parentContainer + " has parsing errors. Skip resolving for this annex.") ;
         return false ;
       }
     }

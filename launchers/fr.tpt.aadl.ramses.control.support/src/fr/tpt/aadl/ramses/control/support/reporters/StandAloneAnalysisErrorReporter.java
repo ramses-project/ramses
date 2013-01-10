@@ -30,7 +30,7 @@ public class StandAloneAnalysisErrorReporter extends
 {
 
   private MessageReporter _reporter ;
-  private final static String STAGE = "Resolver" ;
+  private final static String STAGE = "resolver" ;
 
   public StandAloneAnalysisErrorReporter(
                                          Resource rsrc, MessageReporter reporter)

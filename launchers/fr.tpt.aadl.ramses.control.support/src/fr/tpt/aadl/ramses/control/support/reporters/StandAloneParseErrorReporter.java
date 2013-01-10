@@ -26,7 +26,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AbstractParseErrorReporter ;
 public class StandAloneParseErrorReporter extends AbstractParseErrorReporter
 {
   private MessageReporter _reporter ;
-  private final static String STAGE = "Parser" ;
+  private final static String STAGE = "parser" ;
 
   public StandAloneParseErrorReporter(
                                       MessageReporter reporter)

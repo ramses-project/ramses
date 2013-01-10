@@ -39,11 +39,11 @@ public enum MessageStatus
   {
     if(this._stage != null && (!this._stage.isEmpty()))
     {
-      return this._stage + " " + this._literal ;
+      return this._stage + " " + this._literal + ':';
     }
     else
     {
-      return this._literal ;
+      return this._literal + ':';
     }
   }
 }
