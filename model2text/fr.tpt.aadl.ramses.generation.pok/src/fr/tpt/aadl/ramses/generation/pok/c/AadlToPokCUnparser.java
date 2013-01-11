@@ -1347,6 +1347,34 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       // TODO Auto-generated catch block
       e.printStackTrace() ;
     }
+    try
+    {
+    	String portsFlushTime = PropertyUtils.getEnumValue(processor, "Ports_Flush_Time");
+    	if (portsFlushTime.equalsIgnoreCase("Minor_Frame_Switch"))
+    	{
+    		try
+    	    {
+    	    	long minorFrame = PropertyUtils.getIntValue(processor, "Module_Minor_Frame");
+    	    	deploymentHeaderCode
+    	    			.addOutputNewline("#define POK_FLUSH_PERIOD " + 
+    	    					Long.toString(minorFrame)) ;
+    	    }
+    	    catch(Exception e)
+    	    {
+    	      // TODO Auto-generated catch block
+    	      e.printStackTrace() ;
+    	    }
+    	}
+    	else if (portsFlushTime.equalsIgnoreCase("Partition_Slot_Switch"))
+    		deploymentHeaderCode
+    			.addOutputNewline("#define POK_NEEDS_FLUSH_ON_WINDOWS") ;
+    }
+    catch(Exception e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace() ;
+    }
+
 
     for(ProcessSubcomponent ps : bindedProcess)
     {

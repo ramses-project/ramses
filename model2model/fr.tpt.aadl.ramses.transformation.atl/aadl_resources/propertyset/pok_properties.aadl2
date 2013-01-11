@@ -116,4 +116,10 @@ property set POK is
   Supported_POK_Protocols: type enumeration (ceasar,des,blowfish,unknown);
 
   Protocol : POK::Supported_POK_Protocols applies to (virtual bus);
+  
+  Supported_Ports_Flush_Time: type enumeration (Major_Frame_Switch, Minor_Frame_Switch, Partition_Slot_Switch);
+
+  Ports_Flush_Time: POK::Supported_Ports_Flush_Time => Major_Frame_Switch applies to (processor);
+
+  Module_Minor_Frame: Time applies to (processor);
 end POK;
