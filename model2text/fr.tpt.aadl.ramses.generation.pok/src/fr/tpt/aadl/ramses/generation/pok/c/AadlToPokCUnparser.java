@@ -1361,8 +1361,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     	    }
     	    catch(Exception e)
     	    {
-    	      // TODO Auto-generated catch block
-    	      e.printStackTrace() ;
+    	    	System.out.println("ERROR: Ports_Flush_Time was set to Minor_Frame_Switch for "
+    	    			+processor.getName()
+    	      		  	+", but property Module_Minor_Frame.");
     	    }
     	}
     	else if (portsFlushTime.equalsIgnoreCase("Partition_Slot_Switch"))
@@ -1371,8 +1372,8 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     }
     catch(Exception e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace() ;
+      System.out.println("WARNING: Ports_Flush_Time was not set on "+processor.getName()
+    		  +", default flush policy will be used.");
     }
 
 
