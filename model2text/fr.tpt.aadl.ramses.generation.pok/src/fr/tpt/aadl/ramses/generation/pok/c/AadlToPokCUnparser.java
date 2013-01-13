@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
+import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
@@ -1482,40 +1483,43 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
 			  Integer.toString(routeProp.processors.size())) ;
 
-	  int idx=0;
-	  if(!localPorts.isEmpty())
-    {
-	    routingHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_PORTS {");
-	  
-	    idx=0;
-	    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-      {
-        for(FeatureInstance f: routeProp.portPerProcess.get(deployedProcess))
-        {
-          List<ComponentInstance> bindedVP = PropertyUtils.getComponentInstanceList(deployedProcess,
-                "Actual_Processor_Binding") ;
-          for(ComponentInstance virtualProcessor:bindedVP)
-          {
-            if(processor.getComponentInstances().contains(virtualProcessor))
-            {
-              int partitionIndex = processor.getComponentInstances().indexOf(virtualProcessor);
-              routingHeaderCode.addOutput(Integer.toString(partitionIndex));
-            }
-          }
-          routingHeaderCode.addOutput(",");
+	  List<VirtualProcessorSubcomponent> bindedVPS =
+	          new ArrayList<VirtualProcessorSubcomponent>() ;
 
-        }
-        idx++;
-	    }
+	  for(Subcomponent sub : processor.getSubcomponent().getComponentImplementation()
+	          .getOwnedSubcomponents())
+	  {
+		  if(sub instanceof VirtualProcessorSubcomponent)
+	      {
+	        bindedVPS.add((VirtualProcessorSubcomponent) sub) ;
+	      }
 	  }
-	  routingHeaderCode.addOutputNewline("}");
+	  
+	  
+	  if(!localPorts.isEmpty())
+      {
+	    routingHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_PORTS {");
+	    for(FeatureInstance fi: localPorts)
+	    {
+		  ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance().eContainer();
+		  if(processInstance.getCategory() == ComponentCategory.PROCESS)
+		  {
+	        List<ComponentInstance> bindedVP = PropertyUtils.getComponentInstanceList(processInstance,
+	        		"Actual_Processor_Binding") ;
+	        int partitionIndex = bindedVPS.indexOf(bindedVP.get(0).getSubcomponent());
+			routingHeaderCode.addOutput(Integer.toString(partitionIndex));
+		  }
+		  routingHeaderCode.addOutput(",");
+	    }
+	    routingHeaderCode.addOutputNewline("}");
+      }
 	  
 	  
 	  routingHeaderCode.addOutputNewline("typedef enum") ;
 	  routingHeaderCode.addOutputNewline("{") ;
 	  routingHeaderCode.incrementIndent() ;
 	  
-	  idx=0;
+	  int idx=0;
 	  for(ComponentInstance node : routeProp.processors)
 	  {
 		routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(node)) ;
