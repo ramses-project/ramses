@@ -36,7 +36,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 
 -- addNextValueSubprogramCall
 -- addPutValueSubprogramCall
-
+-- 
 -------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------
@@ -71,7 +71,144 @@ unique lazy rule ThreadImplementation {
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
 		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c,impl,implImg)
 	)
+ do
+ {
+ 	if(implImg.ownedSubprogramCallSequence->isEmpty())
+ 		implImg.ownedSubprogramCallSequence<-thisModule.createSubprogramCallSequence(implImg);
+ 	for(f in c.featureInstance)
+	{
+ 		if(f.direction=#out and f.category=#eventPort)
+ 		{
+ 			thisModule.addPutValueSubprogramCall(implImg.ownedSubprogramCallSequence->first(), impl, implImg, f);
+ 		}
+	}	
+ }
 }
+
+unique lazy rule createSubprogramCallSequence {
+ from
+ 	implImg: AADLBA!ThreadImplementation
+ to
+	seq: AADLBA!SubprogramCallSequence(
+			name <- 'callSeq_Default'
+		)
+}
+
+unique lazy rule mapOrphanOutputEventPorts
+{
+	from
+		fi: AADLI!FeatureInstance,
+		implImg : AADLBA!ThreadImplementation
+	using
+	{
+		seq: AADLBA!SubprogramCallSequence = OclUndefined;
+	}
+	to 
+		call: AADLBA!SubprogramCall
+	do
+	{
+		call;
+	}
+}
+
+unique lazy rule mapComputeEntrypoint
+{
+	from
+		implImg : AABDBA!ComponentImplementation,
+		c : AADLI!ComponentInstance,
+		impl : AADLI!ComponentImplementation
+	using
+	{
+		callImg : AADLBA!SubprogramCall = OclUndefined;
+		fi: AADLI!FeatureInstance = OclUndefined;
+		calledSubprogram: AADLBA!SubprogramClassifier = OclUndefined;
+		referencedSubprogram: AADLI!Subprogram = impl.callSequenceFromComputeEntryPoint();
+	}
+	to
+		seq: AADLBA!SubprogramCallSequence(
+			name <- 'callSeq_'+referencedSubprogram.name,
+			ownedCallSpecification <- Sequence{call}
+		),
+		call : AADLBA!SubprogramCall (
+			name <- 'call_'+referencedSubprogram.name,
+			calledSubprogram <- referencedSubprogram
+		)
+	do
+	{
+		
+		if(not impl.type.ownedEventPort->first().getModalPropertyValue('Compute_Entrypoint').oclIsUndefined())
+		{
+			fi<-c.featureInstance->any(e|e.name = impl.type.ownedEventPort->first().name);
+			thisModule.addNextValueSubprogramCall(seq, impl, implImg, fi);
+		}
+		if (referencedSubprogram.oclIsKindOf(AADLI!SubprogramType))
+			call.calledSubprogram <- thisModule.Type(OclUndefined,referencedSubprogram);
+		else if(referencedSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
+			call.calledSubprogram <- thisModule.Implementation(OclUndefined,referencedSubprogram, thisModule.Type(OclUndefined,referencedSubprogram.getOwnedRealization().implemented));
+		seq;
+	}
+}
+
+rule mapInputParameterConnection(s2 : AADLBA!SubprogramCallSequence,
+								 impl : AADLI!ComponentImplementation,
+								 implImg : AABDBA!ComponentImplementation,
+								 fi: AADLI!FeatureInstance,
+								 call : AADLI!SubprogramCall,
+								 calledSubprogram: AADLBA!SubprogramClassifier,
+								 c : AADLI!ComponentInstance)
+{
+	do
+	{
+		for(paramCnx in impl.ownedParameterConnection)
+		{
+			if(paramCnx.destination.getContext() = call 
+					and calledSubprogram.ownedParameter.contains(paramCnx.destination.connectionEnd)
+					and paramCnx.destination.connectionEnd.isInputFeature())
+			{
+				fi<-c.featureInstance->any(e|e.name = paramCnx.source.connectionEnd.name);
+				if(not fi.oclIsUndefined())
+				{
+					if(fi.feature.oclIsKindOf(AADLI!Port))
+					{
+						thisModule.addNextValueSubprogramCall(s2, impl, implImg, fi);
+					}
+			 	}
+			}
+		}
+	}	
+}
+
+
+rule mapOutputParameterConnection(s2 : AADLBA!SubprogramCallSequence,
+								 impl : AADLI!ComponentImplementation,
+								 implImg : AABDBA!ComponentImplementation,
+								 fi: AADLI!FeatureInstance,
+								 call : AADLI!SubprogramCall,
+								 calledSubprogram: AADLBA!SubprogramClassifier,
+								 c : AADLI!ComponentInstance)
+{
+	do
+	{
+		for(paramCnx in impl.ownedParameterConnection)
+		{
+			if(paramCnx.source.getContext() = call 
+					and calledSubprogram.ownedParameter.contains(paramCnx.source.connectionEnd)
+					and paramCnx.source.connectionEnd.isOutputFeature())
+			{
+				fi<-c.featureInstance->any(e|e.name = paramCnx.destination.connectionEnd.name);
+				if(not fi.oclIsUndefined())
+				{
+					if(fi.feature.oclIsKindOf(AADLI!Port))
+					{
+						thisModule.addPutValueSubprogramCall(s2, impl, implImg, fi);
+					}
+				}
+			}
+		}
+	}
+}
+
+
 
 unique lazy rule mapCallSequence
 {
@@ -93,53 +230,29 @@ unique lazy rule mapCallSequence
 		
 		for(call in impl.callSequenceFromImpl().ownedCallSpecification)
 		{
-			callImg <- thisModule.SubprogramCall(c, call, impl, implImg);
+			callImg <- thisModule.SubprogramCall(c, call, impl, implImg, call);
 			if(call.calledSubprogram.oclIsKindOf(AADLBA!SubprogramAccess))
 				calledSubprogram<-call.calledSubprogram.subprogramFeatureClassifier;
 			else
 				calledSubprogram<-call.calledSubprogram;
-			-- if an in parameter is connected to an in data port or event data port
+			-- if an in parameter is connected to an input port
 			-- we must call next_value here
-			for(paramCnx in impl.ownedParameterConnection)
-			{
-				if(paramCnx.destination.getContext() = call 
-						and calledSubprogram.ownedParameter.contains(paramCnx.destination.connectionEnd)
-						and paramCnx.destination.connectionEnd.isInputFeature())
-				{
-					fi<-c.featureInstance->any(e|e.name = paramCnx.source.connectionEnd.name);
-					if(not fi.oclIsUndefined())
-					{
-						if(fi.isDataOrEventDataPort())
-						{
-							thisModule.addNextValueSubprogramCall(s2, impl, implImg, fi);
-						}
-				 	}
-				}
-			}
+			
+			thisModule.mapInputParameterConnection(s2, impl, implImg, fi, call, calledSubprogram, c);
+			
 			s2.getOwnedCallSpecifications().add(callImg);
 			-- if an ou parameter is connected to an in data port or event data port
 			-- we must call put_value here
-			for(paramCnx in impl.ownedParameterConnection)
-			{
-				if(paramCnx.source.getContext() = call 
-						and calledSubprogram.ownedParameter.contains(paramCnx.source.connectionEnd)
-						and paramCnx.source.connectionEnd.isOutputFeature())
-				{
-					fi<-c.featureInstance->any(e|e.name = paramCnx.destination.connectionEnd.name);
-					if(not fi.oclIsUndefined())
-					{
-						if(fi.isDataOrEventDataPort())
-						{
-							thisModule.addPutValueSubprogramCall(s2, impl, implImg, fi);
-						}
-					}
-				}
-			}
+			
+			thisModule.mapOutputParameterConnection(s2, impl, implImg, fi, call, calledSubprogram, c);
+			
 			callImg.debug('  copy subprogram call');
 		}
 		s2;
 	}
 }
+
+
 
 rule SubprogramCall (c: AADLI!ComponentInstance,
 					 s : AADLI!SubprogramCall, 

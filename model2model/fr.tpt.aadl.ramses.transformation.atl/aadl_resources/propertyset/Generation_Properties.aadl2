@@ -2,7 +2,7 @@ property set Generation_Properties is
 
   Is_Generated: aadlboolean => true applies to (Classifier);
   
-  Parameter_Usage: enumeration (By_Value,By_Reference) applies to (data access);
+  Parameter_Usage: enumeration (By_Value,By_Reference) applies to (data access, parameter);
 
   Return_Parameter: aadlboolean => false applies to (parameter);
 

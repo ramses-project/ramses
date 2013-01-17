@@ -533,12 +533,12 @@ unique lazy rule createCallSequence
 		)
 }
 
-helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCall =
+helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AABDLBA!ComponentImplementation) : AADLBA!SubprogramCallSequence =
 	if( impl.callSequenceFromImpl().oclIsUndefined() ) then
 		if(impl.callSequenceFromComputeEntryPoint().oclIsUndefined()) then
 			OclUndefined
 		else
-			thisModule.mapComputeEntrypoint(impl)
+			thisModule.mapComputeEntrypoint(implImg, c, impl)
 		endif
 	else
 		thisModule.mapCallSequence(implImg, c, impl)
@@ -548,6 +548,8 @@ helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!Componen
 unique lazy rule mapComputeEntrypoint
 {
 	from
+		implImg : AABDLBA!ComponentImplementation,
+		c : AADLI!ComponentInstance,
 		impl : AADLI!ComponentImplementation
 	using
 	{

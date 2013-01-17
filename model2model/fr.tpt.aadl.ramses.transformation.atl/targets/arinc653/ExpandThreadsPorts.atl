@@ -101,6 +101,7 @@ rule EventPort_Instance
 			)
 	do
 	{
+		f.debug('HHHHHHHH');
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
 		
 		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
@@ -441,7 +442,7 @@ helper context AADLI!FeatureInstance def : retreiveValidityValue(threadImplImg: 
 ;
 
 helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
-	threadImplImg.type.ownedDataAccess->any(e| e.name=self.name+thisModule.dataAccessSuffix()+self.direction)
+	threadImplImg.type.ownedDataAccess->any(e| e.name.debug('!!!!!!')=(self.name+thisModule.dataAccessSuffix()+self.direction).debug('????'))
 ;
 
 helper context AADLI!FeatureInstance def : retreiveIdValue(processImplImg: AADLBA!ProcessImplementation) : AADLBA!DataAccess =
@@ -942,6 +943,7 @@ rule addBlackBoardCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!Sub
 ---                EVENT                 ---
 --------------------------------------------
 
+
 rule addWaitEvent(seq : AADLBA!SubprogramCallSequence,
 				  fi: AADLI!FeatureInstance,
 				  impl:  AADLI!ComponentImplementation,
@@ -953,8 +955,9 @@ rule addWaitEvent(seq : AADLBA!SubprogramCallSequence,
 		-- add call to Wait_Event
 		thisModule.addWaitEventCallSpecification
 		(
+			seq,
 			'Wait_Event'.asSubprogramType('POK_RUNTIME'),
-			impl.type.ownedEventPort->any(e| e.name = fi.feature.name),
+			fi,
 			implImg
 		);
 	}
@@ -974,8 +977,9 @@ rule addSetEvent(seq : AADLBA!SubprogramCallSequence,
 				-- add call to Set_Event
 				thisModule.addSetEventCallSpecification
 				(
+					seq,
 					'Set_Event'.asSubprogramType('POK_RUNTIME'),
-					impl.type.ownedEventPort->any(e| e.name = fi.name),
+					fi,
 					implImg
 				);
 				
@@ -985,7 +989,10 @@ rule addSetEvent(seq : AADLBA!SubprogramCallSequence,
 }
 
 
-rule addWaitEventCallSpecification(spg: AADLBA!SubprogramType, p: AADLI!Port, implImg: AADLBA!ThreadImplementation)
+rule addWaitEventCallSpecification(seq : AADLBA!SubprogramCallSequence,
+								   spg: AADLBA!SubprogramType,
+								   p: AADLI!FeatureInstance,
+								   implImg: AADLBA!ThreadImplementation)
 {
 	using
 	{
@@ -1013,13 +1020,17 @@ rule addWaitEventCallSpecification(spg: AADLBA!SubprogramType, p: AADLI!Port, im
 		)
 	do
 	{
+		seq.getOwnedCallSpecifications().add(call);
 		thisModule.addEventCallSpecification(call, spg, p, implImg);
 		connectedParam_TIME_OUT.setContext(call);
 		implImg.getOwnedParameterConnections().add(paramConnection_TIME_OUT);
 	}
 }
 
-rule addSetEventCallSpecification(spg: AADLBA!SubprogramType, p: AADLI!Port, implImg: AADLBA!ThreadImplementation)
+rule addSetEventCallSpecification(seq : AADLBA!SubprogramCallSequence,
+								  spg: AADLBA!SubprogramType,
+								  p: AADLI!FeatureInstance,
+								  implImg: AADLBA!ThreadImplementation)
 {
 	to
 		call: AADLBA!SubprogramCall
@@ -1030,14 +1041,15 @@ rule addSetEventCallSpecification(spg: AADLBA!SubprogramType, p: AADLI!Port, imp
 	do
 	{
 		thisModule.addEventCallSpecification(call, spg, p, implImg);
+		seq.getOwnedCallSpecifications().add(call);
 	}
 }
 
-rule addEventCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!SubprogramType, p: AADLI!Port, implImg: AADLBA!ThreadImplementation)
+rule addEventCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!SubprogramType, p: AADLI!FeatureInstance, implImg: AADLBA!ThreadImplementation)
 {
 	using
 	{
-		EVENT_ID: AADLBA!DataAccess = p.retreiveIdAccess(implImg); 
+		EVENT_ID: AADLBA!DataAccess = p.getFeatureImg(); 
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
 	}
 	to
