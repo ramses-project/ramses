@@ -126,8 +126,7 @@ unique lazy rule mapComputeEntrypoint
 	}
 	to
 		seq: AADLBA!SubprogramCallSequence(
-			name <- 'callSeq_'+referencedSubprogram.name,
-			ownedCallSpecification <- Sequence{call}
+			name <- 'callSeq_'+referencedSubprogram.name
 		),
 		call : AADLBA!SubprogramCall (
 			name <- 'call_'+referencedSubprogram.name,
@@ -141,6 +140,7 @@ unique lazy rule mapComputeEntrypoint
 			fi<-c.featureInstance->any(e|e.name = impl.type.ownedEventPort->first().name);
 			thisModule.addNextValueSubprogramCall(seq, impl, implImg, fi);
 		}
+		seq.ownedCallSpecification->add(call);
 		if (referencedSubprogram.oclIsKindOf(AADLI!SubprogramType))
 			call.calledSubprogram <- thisModule.Type(OclUndefined,referencedSubprogram);
 		else if(referencedSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))

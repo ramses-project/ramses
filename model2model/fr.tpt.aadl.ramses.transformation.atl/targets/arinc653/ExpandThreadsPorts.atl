@@ -442,7 +442,7 @@ helper context AADLI!FeatureInstance def : retreiveValidityValue(threadImplImg: 
 ;
 
 helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
-	threadImplImg.type.ownedDataAccess->any(e| e.name.debug('!!!!!!')=(self.name+thisModule.dataAccessSuffix()+self.direction).debug('????'))
+	threadImplImg.type.ownedDataAccess->any(e| e.name=(self.name+thisModule.dataAccessSuffix()+self.direction))
 ;
 
 helper context AADLI!FeatureInstance def : retreiveIdValue(processImplImg: AADLBA!ProcessImplementation) : AADLBA!DataAccess =
