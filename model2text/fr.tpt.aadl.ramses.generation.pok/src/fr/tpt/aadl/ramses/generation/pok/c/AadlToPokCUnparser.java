@@ -676,7 +676,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       mainImplCode.addOutput("  tattr.BASE_PRIORITY = ") ;
       mainImplCode.addOutputNewline(priority + ';') ;
     }
-    
+    mainImplCode
+    	  .addOutputNewline("  strcpy(tattr.NAME, \""+thread.getName()+"\");");
     mainImplCode
           .addOutput("  CREATE_PROCESS (&(tattr), &(arinc_threads[") ;
     mainImplCode.addOutput(Integer.toString(threadIndex)) ;
