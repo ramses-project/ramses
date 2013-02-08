@@ -24,28 +24,49 @@ You should have received a copy of the Eclipse Public License along with this pr
    </url>
 
    <requires>
-      <import plugin="fr.tpt.aadl.annex.behavior"/>
-      <import plugin="fr.tpt.aadl.utils"/>
-      <import plugin="org.osate.aadl2"/>
-      <import plugin="org.osate.aadl2.edit"/>
-      <import plugin="org.osate.aadl2.instantiation"/>
-      <import plugin="org.osate.aadl2.model.editor"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.osate.aadl2" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.util.properties" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.osate.aadl2.modelsupport"/>
-      <import plugin="org.osate.annexsupport"/>
-      <import plugin="org.osate.branding"/>
-      <import plugin="org.osate.contribution.sei"/>
-      <import plugin="org.osate.core"/>
-      <import plugin="org.osate.pluginsupport"/>
-      <import plugin="org.osate.reporter"/>
       <import plugin="org.osate.ui"/>
-      <import plugin="org.osate.wizards"/>
-      <import plugin="org.osate.workspace"/>
-      <import plugin="org.osate.xtext.aadl2"/>
+      <import plugin="org.osate.annexsupport"/>
       <import plugin="org.osate.xtext.aadl2.properties"/>
-      <import plugin="org.osate.xtext.aadl2.properties.ui"/>
-      <import plugin="org.osate.xtext.aadl2.propertyset"/>
-      <import plugin="org.osate.xtext.aadl2.propertyset.ui"/>
-      <import plugin="org.osate.xtext.aadl2.ui"/>
+      <import plugin="fr.tpt.aadl.annex.behavior" version="0.9.5" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.aadl2.modelsupport" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.annexsupport" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.m2m.atl.core" version="3.2.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext" version="2.1.1" match="greaterOrEqual"/>
+      <import plugin="org.osate.aadl2.instantiation"/>
+      <import plugin="org.osate.xtext.aadl2"/>
+      <import plugin="fr.tpt.aadl.utils" version="0.9.5" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.control.support" version="0.5.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.generation.target.specific" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.generation.c" version="0.5.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.transformation.atl.launch" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.util.generation" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.pluginsupport"/>
+      <import plugin="org.eclipse.ui.workbench" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore.xmi"/>
+      <import plugin="org.eclipse.m2m.atl.engine.emfvm" version="3.2.1" match="greaterOrEqual"/>
+      <import plugin="org.osate.pluginsupport" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.workspace"/>
+      <import plugin="org.eclipse.m2m.atl.common"/>
+      <import plugin="org.eclipse.m2m.atl.core.emf"/>
+      <import plugin="org.eclipse.core.runtime" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.6.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.xtext.aadl2.properties" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.jdom" version="1.1.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -133,6 +154,13 @@ You should have received a copy of the Eclipse Public License along with this pr
 
    <plugin
          id="fr.tpt.aadl.ramses.util.properties"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.jdom"
          download-size="0"
          install-size="0"
          version="0.0.0"
