@@ -108,8 +108,8 @@ public class GenerateAction extends AbstractAnalyzer
       }
       catch(GenerationException e)
       {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        Dialog.showError("Code Generation Error ",
+                  e.getStackTrace().toString());
       }
       catch(URISyntaxException e)
       {
@@ -123,15 +123,15 @@ public class GenerateAction extends AbstractAnalyzer
       }
       catch(IOException e)
       {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+    	  Dialog.showError("I/O Error ",
+                  e.getStackTrace().toString());
       }
       
     }
     catch(CoreException e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    	Dialog.showError("Internal Error ",
+                e.getStackTrace().toString());
     }
     
     
