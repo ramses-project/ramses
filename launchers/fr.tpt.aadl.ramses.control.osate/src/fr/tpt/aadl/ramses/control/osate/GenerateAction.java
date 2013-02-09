@@ -111,24 +111,14 @@ public class GenerateAction extends AbstractAnalyzer
         Dialog.showError("Code Generation Error ",
                   e.getStackTrace().toString());
       }
-      catch(URISyntaxException e)
+      catch(Exception e)
       {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      catch(MalformedURLException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      catch(IOException e)
-      {
-    	  Dialog.showError("I/O Error ",
+    	  Dialog.showError("Internal Error ",
                   e.getStackTrace().toString());
       }
       
     }
-    catch(CoreException e)
+    catch(Exception e)
     {
     	Dialog.showError("Internal Error ",
                 e.getStackTrace().toString());
