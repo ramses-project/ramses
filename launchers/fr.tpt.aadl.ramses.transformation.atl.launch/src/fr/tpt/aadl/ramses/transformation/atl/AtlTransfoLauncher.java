@@ -388,6 +388,7 @@ public class AtlTransfoLauncher
     for(Resource r: RamsesConfiguration.getPredefinedResourcesManager()
     		.getPredefinedResources())
     {
+      System.out.println(r.getURI());
       String name;
       EObject obj = r.getContents().get(0);
       if(obj instanceof PropertySet)
