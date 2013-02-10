@@ -108,20 +108,20 @@ public class GenerateAction extends AbstractAnalyzer
       }
       catch(GenerationException e)
       {
-        Dialog.showError("Code Generation Error ",
-                  e.getStackTrace().toString());
+        Dialog.showError("Code Generation Error ", "See stack trace in console");
+  	  	e.printStackTrace();
       }
       catch(Exception e)
       {
-    	  Dialog.showError("Internal Error ",
-                  e.getStackTrace().toString());
+    	  Dialog.showError("Internal Error", "See stack trace in console");
+    	  e.printStackTrace();
       }
       
     }
     catch(Exception e)
     {
-    	Dialog.showError("Internal Error ",
-                e.getStackTrace().toString());
+    	Dialog.showError("Internal Error ", "See stack trace in console");
+  	  	e.printStackTrace();
     }
     
     
