@@ -14,6 +14,11 @@
             name="POK-Runtime">
       </aadlcontribution>
       <aadlcontribution
+            file="aadl_resources/package/PeriodicDelayed_runtime.aadl2"
+            id="fr.tpt.aadl.packages.periodicdelayed_runtime.aadlcontribution"
+            name="PeriodicDelayed-Runtime">
+      </aadlcontribution>
+      <aadlcontribution
             file="aadl_resources/propertyset/pok_properties.aadl2"
             id="fr.tpt.aadl.propetries.pok.aadlcontribution"
             name="POK-Properties">
@@ -32,11 +37,6 @@
             file="aadl_resources/propertyset/Generation_Properties.aadl2"
             id="fr.tpt.aadl.propetries.generation.aadlcontribution"
             name="Generation-Properties">
-      </aadlcontribution>
-      <aadlcontribution
-            file="aadl_resources/package/PeriodicDelayed_runtime.aadl2"
-            id="fr.tpt.aadl.propetries.generation.aadlcontribution"
-            name="PeriodicDelayed-Runtime">
       </aadlcontribution>
    </extension>
 </plugin>
