@@ -294,31 +294,6 @@ end SEQ;
       source_language => (C);
       POK::source_location => "../../../pingpong.o";
       source_text => ("../../../pingpong.h");
-    annex behavior_specification {**
-		variables 
-			replyPong: PingPongMessage;
-		states 
-			switch: initial state;
-			ret: final state;
-		transitions 
-			switch -[ mode_aadlKeywords = ROLE.enumerators#PING]-> switch
-			{
-				if (true) IPingOrPong_storePong!(PongIn, replyPong) end if;
-				if (true) IPingOrPong_ping!(replyPong, PingOut, badSequenceNumber, seqNb, seqNb) end if;
-				if (true) IPingOrPong_noPong!(PongOut) end if
-			};
-			switch -[ mode_aadlKeywords = ROLE.enumerators#PONG]-> switch
-			{
-				--if (PingIn_fresh = true) IPingOrPong_pong!(PingIn, PongOut) end if;
-				if (true) IPingOrPong_pong!(PingIn, PongOut) end if;
-				if (true) IPingOrPong_noPing!(PingOut, badSequenceNumber, seqNb) end if
-			};
-			switch -[ mode_aadlKeywords = ROLE.enumerators#UNCONNECTED]-> switch
-			{
-				if (true) IPingOrPong_noPingPong!(PingOut, PongOut, badSequenceNumber, seqNb) end if
-			};
-
-    **};
   end IPingOrPong_mode;
 
   subprogram IPingOrPong_storePong
@@ -415,21 +390,6 @@ end SEQ;
       source_language => (C);
       POK::source_location => "../../../pingpong.o";
       source_text => ("../../../pingpong.h");
-    annex behavior_specification {**
-		variables 
-			errorC1: Exception;
-			errorC2: Exception;
-		states 
-			switch: initial state;
-			ret: final state;
-		transitions 
-			switch -[ ]-> ret
-			{
-				if (true) Monitor_storeErrorC1!(error_C1, errorC1) end if;
-				if (true) Monitor_storeErrorC2!(error_C2, errorC2) end if;
-				if (true) Monitor_changeState!(errorC1, errorC2, mode_C1, mode_C2, state_baKeywords, state_baKeywords) end if
-			};
-    **};
   end Monitor_activate;
 
   
