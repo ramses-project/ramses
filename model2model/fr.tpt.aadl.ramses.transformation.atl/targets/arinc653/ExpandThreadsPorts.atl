@@ -599,7 +599,7 @@ rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
 	using
 	{
 		c : AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLBA!ComponentImplementation = c.debug('!!!!!').getSubcomponentImg().subcomponentType;
+		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
 		impl: AADLBA!ComponentImplementation = c.getImpl();
 	}
 	do
