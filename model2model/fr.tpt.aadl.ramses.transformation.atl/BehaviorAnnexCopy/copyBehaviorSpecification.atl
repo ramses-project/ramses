@@ -1,0 +1,103 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @path AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+
+module copyBehaviorSpecification;
+create OUT : AADLBA 	from 	IN : AADLBA,
+								HOOKS: ATLHOOKS;
+
+uses BehaviorAnnexServices;
+
+
+unique lazy rule copyBehaviorAnnex
+{
+	from
+		c: AADLI!ComponentInstance,
+		src_ba: AADLBA!BehaviorAnnex
+		
+	to
+		target_ba: AADLBA!BehaviorAnnex
+		(
+			name        <- src_ba.name,
+			states      <- src_ba.states->collect(e| thisModule.copyBehaviorState(c, e)),
+			variables   <- src_ba.variables->collect(e| thisModule.copyBehaviorVariable(e))
+		)
+		
+	do
+	{
+		target_ba.transitions <- src_ba.transitions->collect(e| thisModule.copyBehaviorTransition(c, e, target_ba));
+		target_ba;
+	}
+}
+
+unique lazy rule copyBehaviorState
+{
+	from
+		c: AADLI!ComponentInstance,
+		src_state: AADLBA!BehaviorState
+	to
+		target_state: AADLBA!BehaviorState
+		(
+			name           <- src_state.name,
+			complete       <- src_state.complete,
+			final          <- src_state.final,
+			initial        <- src_state.initial
+		)
+	do
+	{
+		target_state;
+	}
+}
+
+
+
+lazy rule copyBehaviorTransition
+{
+	from
+		c: AADLI!ComponentInstance,
+		src_transition: AADLBA!BehaviorTransition,
+		target_ba: AADLBA!BehaviorAnnex
+		
+	to
+		target_transition: AADLBA!BehaviorTransition
+		(
+			actionBlock       <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock),
+			condition         <- thisModule.copyBehaviorCondition(src_transition.condition),
+			destinationState  <- target_ba.getState(src_transition.destinationState.name),
+			priority          <- src_transition.priority,
+			sourceState       <- target_ba.getState(src_transition.sourceState.name)
+			
+		)
+}
+
+lazy rule copyBehaviorVariable
+{
+	from
+		src_variable: AADLBA!BehaviorVariable
+	to
+		target_variable: AADLBA!BehaviorVariable
+		(
+			name           <- src_variable.name,
+			dataClassifier <- src_variable.dataClassifier.getClassifierInOutput()
+		)
+}

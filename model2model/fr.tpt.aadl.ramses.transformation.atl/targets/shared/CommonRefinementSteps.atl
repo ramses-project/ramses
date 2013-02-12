@@ -36,12 +36,290 @@ create OUT : AADLBA 	from 		IN : AADLI,
 
 -- addNextValueSubprogramCall
 -- addPutValueSubprogramCall
--- 
+-- featureInstanceMappingPostTreatment(implImg: AADLBA!ThreadImplementation)
+
 -------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------
-----	OVERRIDEN RULES
+----	ADDED MATCHED RULES
 -------------------------------------------------------------------------------------------
+
+rule DataPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataPort
+									and fi.eContainer().category=#thread
+									and not fi.isPeriodicDelayedPort()
+									and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		-- local variable that will be initialized in the "do" section.
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- creation of a data access feature, to be added to the target thread component, 
+		-- this data access represents an access to the global variable representing the
+		-- communication 'port variable'.
+		
+		-- target data access must be called 'f' to be retreived with resolveTemp
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		-- target data access must be called 'f_entrypoint' to be retreived with resolveTemp
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		thisModule.featureInstanceMappingPostTreatment(implImg);
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+
+rule EventPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventPort 
+									and fi.eContainer().category = #thread
+									and not fi.isPeriodicDelayedPort()
+									and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+		
+		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		thisModule.featureInstanceMappingPostTreatment(implImg);
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+rule EventDataPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
+								and fi.eContainer().category=#thread
+								and not fi.isPeriodicDelayedPort()
+								and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp 
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+		
+		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		thisModule.featureInstanceMappingPostTreatment(implImg);
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+rule DataAccess_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataAccess
+			 and fi.eContainer().category=#thread
+			 and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined; 
+		processImplImg: AADLI!ProcessImplementation = OclUndefined;
+	}
+	to
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name,
+				kind <- #requires,
+				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+			),
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name,
+				kind <- #requires,
+				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+			)
+	do
+	{
+		if(c.category=#thread)
+		{
+			processImplImg <- c.eContainer().subcomponent.subcomponentType;
+		}
+		thisModule.addThreadsInternalConnections(fi);
+		implImg <- thisModule.resolveTemp(c, 'sub').subcomponentType.debug('Retreived Component Implementation');
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+
+
+
+
+-------------------------------------------------------------------------------------------
+----	OVERRIDEN MATCHED RULES
+-------------------------------------------------------------------------------------------
+
+rule DataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataPort
+									and fi.eContainer().category=#thread
+									and not fi.isPeriodicDelayedPort()
+									and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		-- local variable that will be initialized in the "do" section.
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- creation of a data access feature, to be added to the target thread component, 
+		-- this data access represents an access to the global variable representing the
+		-- communication 'port variable'.
+		
+		-- target data access must be called 'f' to be retreived with resolveTemp
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		thisModule.featureInstanceMappingPostTreatment(implImg);
+	}
+}
+
+
+rule EventPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventPort 
+									and fi.eContainer().category = #thread
+									and not fi.isPeriodicDelayedPort()
+									and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+		
+		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		thisModule.featureInstanceMappingPostTreatment(implImg);
+	}
+}
+
+rule EventDataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
+								and fi.eContainer().category=#thread
+								and not fi.isPeriodicDelayedPort()
+								and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp 
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+		
+		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		thisModule.featureInstanceMappingPostTreatment(implImg);
+	}
+}
+
+rule DataAccess_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataAccess
+			 and fi.eContainer().category=#thread
+			 and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined; 
+		processImplImg: AADLI!ProcessImplementation = OclUndefined;
+	}
+	to
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name,
+				kind <- #requires,
+				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+			)--,
+--		d: AADLBA!DataSubcomponent
+--			(name<-fi.name+thisModule.dataSubcomponentSuffix())
+	do
+	{
+		if(c.category=#thread)
+		{
+			processImplImg <- c.eContainer().subcomponent.subcomponentType;
+		}
+		thisModule.addThreadsInternalConnections(fi);
+		implImg <- thisModule.resolveTemp(c, 'sub').subcomponentType.debug('Retreived Component Implementation');
+	}
+}
 
 
 unique lazy rule ThreadType {
@@ -58,7 +336,147 @@ unique lazy rule ThreadType {
  	)
 }
 
-unique lazy rule ThreadImplementation {
+helper context AADLBA!Classifier def: hasBehaviorAnnex(): Boolean =
+	not self.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined()
+;
+
+helper def: ThreadImplementation(c : AADLI!ComponentInstance, typeImg : AADLBA!ThreadType, impl : AADLI!ThreadImplementation) : AADLBA!ThreadImplementation =
+	if(impl.hasBehaviorAnnex()) then
+		thisModule.ThreadImplementationWithBA(c, typeImg, impl)
+	else
+		thisModule.ThreadImplementationWithoutBA(c, typeImg, impl)
+	endif
+;
+
+unique lazy rule ThreadImplementationWithBA {
+ from 
+    c : AADLI!ComponentInstance,
+ 	typeImg : AADLBA!ThreadType,
+ 	impl : AADLI!ThreadImplementation
+ using
+ {
+ 	implBA: AADLBA!BehaviorAnnex = impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex));
+ }
+ to 
+ 	implImg : AADLBA!ThreadImplementation (
+ 		name <- c.uniqueName().concat('.impl'),
+		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
+		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c,impl,implImg),
+		ownedAccessConnection           <- Sequence{accessConnection_CURRENT_STATE}
+	),
+	entryPointImg: AADLBA!SubprogramType
+	(
+		name <- c.uniqueName().concat('_entrypoint'),
+		ownedDataAccess <- Sequence{currentStateAccess}
+	),
+	callEntryPoint: AADLBA!SubprogramCall
+	(
+		name<-thisModule.callPrefix()+entryPointImg.name,
+		calledSubprogram<-entryPointImg
+	),
+	stateType: AADLBA!DataType
+	(
+		ownedPropertyAssociation <- Sequence {
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Data_Representation',
+													'DATA_MODEL',
+													'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
+												),
+												thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													 thisModule.getBAInitialStateIdentifier(implBA) )
+									},
+		name <- c.uniqueName().concat('_currentState')
+	),
+	currentState: AADLBA!DataSubcomponent
+	(
+		name <- 'Parent_BA_currentState',
+		dataSubcomponentType <- stateType
+	),
+	currentStateAccess: AADLBA!DataAccess
+	(
+		name <- 'Parent_BA_currentState_Access',
+		dataFeatureClassifier <- stateType,
+		kind <- #requires
+	),
+	
+	
+	-- connect currentState feature of entryPointImg to the data subcomponent of the implImg that
+	-- represents the state of implImg
+	connectedAccess_CURRENT_STATE: AADLBA!ConnectedElement
+	(
+		connectionEnd<-currentStateAccess,
+		context<-callEntryPoint
+	),
+	connectedSubcomponent_CURRENT_STATE: AADLBA!ConnectedElement
+	(
+		connectionEnd<-currentState
+	),
+	accessConnection_CURRENT_STATE: AADLBA!AccessConnection
+	(
+		name<-'CNX_CURRENT_STATE_BA',
+		source<-connectedAccess_CURRENT_STATE,
+		destination<-connectedSubcomponent_CURRENT_STATE,
+		accessCategory <- #data
+	)
+ do
+ {
+ 	-- set ownership
+	-- add current state to thread implementation implImg
+ 	implImg.ownedDataSubcomponent->add(currentState);
+ 	-- add data type to package
+	thisModule.public().getOwnedClassifiers()->add(stateType);
+ 	-- add subprogram type to package
+	thisModule.public().getOwnedClassifiers()->add(entryPointImg);
+ 	
+ 	if(implImg.ownedSubprogramCallSequence->isEmpty())
+ 		implImg.ownedSubprogramCallSequence<-thisModule.createSubprogramCallSequence(implImg);
+	
+ 	-- add call to entryPointImg
+	implImg.ownedSubprogramCallSequence->first().getOwnedCallSpecifications().add(callEntryPoint);
+
+ 	-- add data accesses created from c.featureInstance
+	entryPointImg.ownedDataAccess->addAll(c.featureInstance->collect(e|e.retreiveEntrypointFeature()));
+ 	
+	entryPointImg.ownedAnnexSubclause->add(thisModule.copyBehaviorAnnex(c, implBA));
+	
+	-- add BA in entryPointImg
+	
+ 	for(f in c.featureInstance)
+	{
+ 		if(f.direction=#out and f.category=#eventPort)
+ 		{
+ 			thisModule.addPutValueSubprogramCall(implImg.ownedSubprogramCallSequence->first(), impl, implImg, f);
+ 		}
+ 		
+ 		-- connect each feature of implImg to each copy of this feature in entryPointImg
+		thisModule.addDataAccessConnection(	implImg,
+							 		   	   	f.name.concat('_to_EntryPoint'),
+							 			   	f.retreiveEntrypointFeature(),
+							 			   	callEntryPoint,
+							 				f.getFeatureImg());
+	}	
+ }
+}
+
+helper def: getBAInitialStateIdentifier(implBA: AADLBA!BehaviorAnnex) : String =
+	thisModule.CreateStringLiteralPropertyExpression (implBA.states->any(s|s.initial=true).toString())
+;
+
+helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
+	self.getFeatureImg()
+;
+
+helper context AADLI!FeatureInstance def : retreiveEntrypointFeature() : AADLBA!DataAccess =
+	thisModule.resolveTemp(self, 'f_entrypoint')
+;
+
+unique lazy rule ThreadImplementationWithoutBA {
  from 
     c : AADLI!ComponentInstance,
  	typeImg : AADLBA!ThreadType,
@@ -75,7 +493,7 @@ unique lazy rule ThreadImplementation {
  {
  	if(implImg.ownedSubprogramCallSequence->isEmpty())
  		implImg.ownedSubprogramCallSequence<-thisModule.createSubprogramCallSequence(implImg);
- 	for(f in c.featureInstance)
+  	for(f in c.featureInstance)
 	{
  		if(f.direction=#out and f.category=#eventPort)
  		{
@@ -341,7 +759,7 @@ rule addDataAccessConnection(implImg: AADLBA!ComponentImplementation,
 							 name: String,
 							 param: AADLBA!DataAccess,
 							 ctx:AADLBA!Context,
-							 variable: AADLBA!DataSubcomponent)
+							 variable: AADLBA!DataAccessConnectionEnd)
 {
   to
 	connectedParam: AADLBA!ConnectedElement

@@ -73,11 +73,19 @@ helper def:getProgrammationLanguageIdentifier(identifier:String): String =
 	identifier.replaceAll('.','_').replaceAll('::','__');
 
 helper context AADLI!FeatureInstance def : isThreadPort() : Boolean =
-	self.eContainer().category = #thread
+	self.eContainer().category = #thread and self.category.oclIsTypeOf(AADLBA!Port)
+;
+
+helper context AADLI!ComponentInstance def : isThreadPort() : Boolean =
+	false
 ;
 
 helper context AADLI!FeatureInstance def : isProcessPort() : Boolean =
-	self.eContainer().category=#process
+	self.eContainer().category=#process  and self.category.oclIsTypeOf(AADLBA!Port)
+;
+
+helper context AADLI!ComponentInstance def : isProcessPort() : Boolean =
+	false
 ;
 
 helper context AADLI!FeatureInstance def : isDataOrEventDataPort() : Boolean =
@@ -113,6 +121,10 @@ helper context AADLI!ComponentInstance def: isAperiodicThread() : Boolean =
 
 helper context AADLI!FeatureInstance def: isPeriodicThreadPort(): Boolean =
 	self.isThreadPort() and self.eContainer().isPeriodicThread()
+;
+
+helper context AADLI!ComponentInstance def: isPeriodicThreadPort(): Boolean =
+	false
 ;
 
 helper context AADLI!ConnectionInstance def: isIntraProcessConnection() : Boolean =

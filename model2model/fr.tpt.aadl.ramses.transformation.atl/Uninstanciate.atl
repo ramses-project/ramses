@@ -216,6 +216,22 @@ rule Thread_Instance {
 	}
 }
 
+rule Subprogram_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #subprogram)
+	to 
+		sub : AADLBA!SubprogramSubcomponent(
+			name <- c.name.debug('subprogram instance'),
+			subprogramSubcomponentType <- c.subcomponent.subprogramSubcomponentType,
+			ownedPropertyAssociation <- c.mapOwnedPropertyAssociationList()->union(c.mapSubcomponentsReferenceList())
+		)
+	do
+	{
+		
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
 rule Process_Instance {
 	from
 		c : AADLI!ComponentInstance (c.category = #process)
@@ -496,14 +512,35 @@ rule AccessConnection_Instance
 
 rule defaultAccessConnection_mapping(cnxInst: AADLI!ConnectionInstance)
 {
+	using
+	{
+		source : AADLI!AccessConnectionEnd = OclUndefined;
+		destination : AADLI!AccessConnectionEnd = OclUndefined;
+		co : AADLI!AccessConnection = OclUndefined;
+		ownerImplImg : AADLBA!ComponentImplementation = OclUndefined;
+	}
 	do
 	{
+		
 		for(cnxRef in cnxInst.connectionReference)
 		{
+			ownerImplImg <- thisModule.getContainingImplementation(cnxRef);
+			co <- cnxRef.connection;
+			
+			source <- cnxRef.source.getFeatureImg();
+			if(source.oclIsUndefined())
+				source <- co.source.getConnFeatureImg(ownerImplImg);
+			
+			destination <- cnxRef.destination.getFeatureImg();
+			if(destination.oclIsUndefined())
+				destination <- co.destination.getConnFeatureImg(ownerImplImg);
+			
 			thisModule.getContainingImplementation(cnxRef).ownedAccessConnection->add(
-				thisModule.AccessConnection(
-					cnxRef.connection,
-					thisModule.getContainingImplementation(cnxRef)
+				thisModule.AccessConnectionInstance(
+					co,
+					source,
+					destination,
+					ownerImplImg
 				)
 			);
 		}

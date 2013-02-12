@@ -150,6 +150,28 @@ lazy rule Parameter {
 -------------------------------------------------------------------------------------
 --  RULES FOR KINDS OF CONNECTIONS
 -------------------------------------------------------------------------------------
+rule AccessConnectionInstance (co: AADLI!Connection,
+					   source : AADLI!AccessConnectionEnd,
+					   destination : AADLI!AccessConnectionEnd,
+					   ownerImplImg : AADLBA!ComponentImplementation){
+  to
+    co2 : AADLBA!AccessConnection(
+		name <- co.name,
+		source <- co2source,
+		destination <- co2destination,
+		accessCategory <- co.accessCategory
+	),
+	co2source : AADLBA!ConnectedElement(
+		connectionEnd <- source,
+		context <- co.source.getConnContextImg(ownerImplImg)
+	),
+	co2destination : AADLBA!ConnectedElement(
+		connectionEnd <- destination,
+		context <- co.destination.getConnContextImg(ownerImplImg)
+	)
+	do { co2; }
+}
+
 rule AccessConnection (co : AADLI!AccessConnection,
 					 ownerImplImg : AADLBA!ComponentImplementation){
   to
@@ -169,7 +191,6 @@ rule AccessConnection (co : AADLI!AccessConnection,
 	)
 	do { co2; }
 }
-
 
 rule ParameterConnection (co : AADLI!ParameterConnection,
 							   ownerImplImg : AADLBA!ComponentImplementation){

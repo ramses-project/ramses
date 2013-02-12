@@ -107,9 +107,25 @@ lazy rule ModalPropertyValueRule {
 	do { v2; }
 }
 
+
 -------------------------------------------------------------------------------------
 --  RULES FOR KINDS OF PROPERTY VALUES
 -------------------------------------------------------------------------------------
+
+-- PropertyExpression: PropertyValue: 
+-- 			Operation
+--			ListValue
+-- PropertyValue: 
+--			NumberValue
+--			ClassifierValue
+--			ReferenceValue
+--			BooleanLiteral
+--			RangeValue
+--			RecordValue
+--			ComputedValue
+--			NamedValue
+--			StringLiteral
+
 
 helper context AADLI!ListValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ListValue =
 	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression(referencesOnly))

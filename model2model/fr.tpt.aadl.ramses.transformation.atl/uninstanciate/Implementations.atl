@@ -78,14 +78,6 @@ rule Implementation (c : AADLI!ComponentInstance,
 			  thisModule.public().getOwnedClassifiers().add(implImg);
 			}
 
-			if (implImg.isDeclared())
-			  implImg.debug('  previously declared type');
-			else
-			{
-			  implImg.debug('  declare type');
-			  thisModule.public().getOwnedClassifiers().add(implImg);
-			}
-
 		}
 		implImg;
 	}
@@ -225,6 +217,16 @@ unique lazy rule ThreadImplementation {
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
 		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c, impl,implImg)
 	)
+ do
+ {
+ 	if(not impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined())
+	{
+		implImg.ownedAnnexSubclause.add
+		(
+			thisModule.copyBehaviorAnnex(c, impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)) )
+		);
+	}
+ }
 }
 
 unique lazy rule SubprogramImplementation {
@@ -239,6 +241,16 @@ unique lazy rule SubprogramImplementation {
 		ownedSubprogramCallSequence <- thisModule.copyCallSequence(OclUndefined, impl,implImg),
 		ownedAccessConnection		<- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg))
 	)
+ do
+ {
+ 	if(not impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined())
+	{
+		implImg.ownedAnnexSubclause.add
+		(
+			thisModule.copyBehaviorAnnex(OclUndefined, impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)) )
+		);
+	}
+ }
 }
 
 unique lazy rule DataImplementation {

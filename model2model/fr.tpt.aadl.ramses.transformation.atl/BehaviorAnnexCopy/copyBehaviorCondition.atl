@@ -1,0 +1,186 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+
+module CopyBehaviorCondition;
+create OUT : AADLBA 	from 	IN : AADLBA,
+								HOOKS: ATLHOOKS;
+
+
+helper def: copyBehaviorCondition(behaviorCondition: AADLBA!BehaviorCondition)  : AADLBA!BehaviorCondition =
+	if(behaviorCondition.oclIsUndefined()) then
+		OclUndefined
+	else
+		behaviorCondition.copyBehaviorCondition()
+	endif
+;
+
+helper context AADLBA!DispatchCondition def: copyBehaviorCondition() : AADLBA!BehaviorCondition = 
+	thisModule.copyDispatchCondition(self)
+;
+
+helper context AADLBA!ExecutionTimeoutCatch def: copyBehaviorCondition() : AADLBA!BehaviorCondition = 
+	thisModule.copyExecutionTimeoutCatch(self)
+;
+
+helper context AADLBA!Otherwise def: copyBehaviorCondition() : AADLBA!BehaviorCondition =
+	thisModule.copyOtherwise(self)
+;
+
+helper context AADLBA!ValueExpression def: copyBehaviorCondition() : AADLBA!BehaviorCondition =
+	thisModule.copyValueExpression(self)
+;
+
+helper context AADLBA!ExecuteCondition def: copyBehaviorCondition() : AADLBA!BehaviorCondition =
+	thisModule.copyExecuteCondition(self)
+;
+
+lazy rule copyExecuteCondition 
+{
+	from
+		src_behaviorCondition: AADLBA!ExecuteCondition
+	to
+		target_ExecuteCondition: AADLBA!ExecuteCondition
+	do
+	{
+		target_ExecuteCondition;
+	}
+}
+
+lazy rule copyExecutionTimeoutCatch 
+{
+	from
+		src_behaviorCondition: AADLBA!ExecutionTimeoutCatch
+	to
+		target_ExecutionTimeoutCatch: AADLBA!ExecutionTimeoutCatch
+	do
+	{
+		target_ExecutionTimeoutCatch;
+	}
+}
+
+lazy rule copyOtherwise
+{
+	from
+		src_behaviorCondition: AADLBA!Otherwise
+	to
+		target_Otherwise: AADLBA!Otherwise
+	do
+	{
+		target_Otherwise;
+	}
+}
+
+lazy rule copyDispatchCondition
+{
+	from
+		src_DispatchCondition: AADLBA!DispatchCondition
+	to
+		target_DispatchCondition: AADLBA!DispatchCondition
+		(
+			dispatchTriggerCondition <- thisModule.copyDispatchTriggerCondition(src_DispatchCondition.dispatchTriggerCondition),
+			frozenPorts              <- src_DispatchCondition.frozenPorts->collect(e| thisModule.copyPortHolder(e))
+		)
+	do
+	{
+		target_DispatchCondition;
+	}
+}
+
+helper def: copyDispatchTriggerCondition(dispatchTriggerCondition: AADLBA!DispatchTriggerCondition)  : AADLBA!DispatchTriggerCondition =
+	if(dispatchTriggerCondition.oclIsUndefined()) then
+		OclUndefined
+	else
+		dispatchTriggerCondition.copyDispatchTriggerCondition()
+	endif
+;
+
+helper context AADLBA!DispatchTriggerConditionStop def: copyDispatchTriggerCondition() : AADLBA!DispatchTriggerCondition = 
+	thisModule.copyDispatchTriggerConditionStop(self)
+;
+
+helper context AADLBA!DispatchTriggerLogicalExpression def: copyDispatchTriggerCondition() : AADLBA!DispatchTriggerCondition = 
+	thisModule.copyDispatchTriggerLogicalExpression(self)
+;
+
+helper context AADLBA!DispatchRelativeTimeout def: copyDispatchTriggerCondition() : AADLBA!DispatchTriggerCondition = 
+	thisModule.copyDispatchRelativeTimeout(self)
+;
+
+helper context AADLBA!SubprogramAccessHolder def: copyDispatchTriggerCondition() : AADLBA!DispatchTriggerCondition = 
+	thisModule.copySubprogramAccessHolder(self)
+;
+
+lazy rule copyDispatchTriggerConditionStop
+{
+	from
+		src_DispatchTriggerConditionStop: AADLBA!DispatchTriggerConditionStop
+	to
+		target_DispatchTriggerConditionStop: AADLBA!DispatchTriggerConditionStop
+}
+
+lazy rule copyDispatchRelativeTimeout
+{
+	from
+		src_DispatchRelativeTimeout: AADLBA!DispatchRelativeTimeout
+	to
+		target_DispatchRelativeTimeout: AADLBA!DispatchRelativeTimeout
+}
+
+lazy rule copyDispatchTriggerLogicalExpression
+{
+	from
+		src_DispatchTriggerLogicalExpression: AADLBA!DispatchTriggerLogicalExpression
+	to
+		target_DispatchTriggerLogicalExpression: AADLBA!DispatchTriggerLogicalExpression
+		(
+			dispatchConjunctions <- src_DispatchTriggerLogicalExpression
+										.dispatchConjunctions->collect(e | thisModule.copyDispatchConjunction(e))
+		)
+}
+
+lazy rule copyDispatchConjunction
+{
+	from
+		src_DispatchConjunction : AADLBA!DispatchConjunction
+	to
+		target_DispatchConjunction:AADLBA!DispatchConjunction
+		(
+			dispatchTriggers <- src_DispatchConjunction
+									.dispatchTriggers->collect(e | thisModule.copyDispatchTrigger(e))
+		)
+}
+
+helper def: copyDispatchTrigger(dispatchTrigger: AADLBA!DispatchTrigger)  : AADLBA!DispatchTrigger =
+	if(dispatchTrigger.oclIsUndefined()) then
+		OclUndefined
+	else
+		dispatchTrigger.copyDispatchTrigger()
+	endif
+;
+
+helper context AADLBA!EventDataPortHolder def: copyDispatchTrigger() : AADLBA!DispatchTrigger = 
+	thisModule.copyEventDataPortHolder(self)
+;
+
+helper context AADLBA!EventPortHolder def: copyDispatchTrigger() : AADLBA!DispatchTrigger = 
+	thisModule.copyEventPortHolder(self)
+;

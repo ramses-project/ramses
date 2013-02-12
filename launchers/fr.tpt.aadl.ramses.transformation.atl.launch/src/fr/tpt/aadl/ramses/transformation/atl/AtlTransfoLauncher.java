@@ -340,6 +340,12 @@ public class AtlTransfoLauncher
     fileName.add("/uninstanciate/Properties") ;
     fileName.add("/uninstanciate/Types") ;
     fileName.add("/helpers/Services") ;
+    fileName.add("/BehaviorAnnexCopy/BehaviorAnnexServices") ;
+    fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
+    fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
+    fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
+    fileName.add("/BehaviorAnnexCopy/copyElementHolders") ;
+    fileName.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
 
     for(String s : fileName)
     {
@@ -390,6 +396,7 @@ public class AtlTransfoLauncher
     {
       System.out.println(r.getURI());
       String name;
+      System.out.println(r.getURI());
       EObject obj = r.getContents().get(0);
       if(obj instanceof PropertySet)
     	  name = ((PropertySet)obj).getName() ;

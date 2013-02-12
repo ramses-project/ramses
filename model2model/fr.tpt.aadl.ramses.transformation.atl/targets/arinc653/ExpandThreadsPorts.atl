@@ -45,126 +45,12 @@ rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstancs, implImg: AADLB
 {
 }
 	
--------------------------------------------------------------------------------------------
-----	OVERRIDEN MATCHED RULES
--------------------------------------------------------------------------------------------
 
-rule DataPort_Instance
+rule featureInstanceMappingPostTreatment(implImg: AADLBA!ThreadImplementation)
 {
-	from
-		fi: AADLI!FeatureInstance (fi.category=#dataPort
-									and fi.eContainer().category=#thread
-									and not fi.isPeriodicDelayedPort())
-	using
-	{
-		c: AADLI!ComponentInstance = fi.eContainer();
-		-- local variable that will be initialized in the "do" section.
-		implImg: AADLI!ComponentImplementation = OclUndefined;
-	}
-	to
-		-- creation of a data access feature, to be added to the target thread component, 
-		-- this data access represent is an access to the global variable representing the
-		-- ARINC653 communication identifier.
-		
-		-- target data access must be called 'f' to be retreived with resolveTemp
-		f: AADLBA!DataAccess
-			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
-				kind <- #requires
-			)
 	do
 	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
-		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
 		thisModule.addReturnCodeDataSubcomponent(implImg);
-	}
-}
-
-
-rule EventPort_Instance
-{
-	from
-		fi: AADLI!FeatureInstance (fi.category=#eventPort 
-									and fi.eContainer().category = #thread
-									and not fi.isPeriodicDelayedPort())
-	using
-	{
-		c: AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLI!ComponentImplementation = OclUndefined;
-	}
-	to
-		-- target data access must be called 'f' to be retreived with resolveTemp
-		f: AADLBA!DataAccess
-			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
-				kind <- #requires
-			)
-	do
-	{
-		f.debug('HHHHHHHH');
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
-		
-		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
-		thisModule.addReturnCodeDataSubcomponent(implImg);
-	}
-}
-
-rule EventDataPort_Instance
-{
-	from
-		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
-								and fi.eContainer().category=#thread
-								and not fi.isPeriodicDelayedPort())
-	using
-	{
-		c: AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLI!ComponentImplementation = OclUndefined;
-	}
-	to
-		-- target data access must be called 'f' to be retreived with resolveTemp 
-		f: AADLBA!DataAccess
-			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
-				kind <- #requires
-			)
-	do
-	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
-		
-		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
-		thisModule.addReturnCodeDataSubcomponent(implImg);
-		
-	}
-}
-
-rule DataAccess_Instance
-{
-	from
-		fi: AADLI!FeatureInstance (fi.category=#dataAccess)
-	using
-	{
-		c: AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLI!ComponentImplementation = OclUndefined; 
-		processImplImg: AADLI!ProcessImplementation = OclUndefined;
-	}
-	to
-		f: AADLBA!DataAccess
-			(
-				name <- fi.name,
-				kind <- #requires,
-				dataFeatureClassifier <- fi.feature.mapClassifier(),
-				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
-			),
-		d: AADLBA!DataSubcomponent
-			(name<-fi.name+thisModule.dataSubcomponentSuffix())
-	do
-	{
-		if(c.category=#thread)
-		{
-			processImplImg <- c.eContainer().subcomponent.subcomponentType;
-		}
-		thisModule.addThreadsInternalConnections(fi);
-		implImg = thisModule.resolveTemp(c, 'sub').subcomponentType.debug('Retreived Component Implementation');
 	}
 }
 
@@ -441,10 +327,6 @@ helper context AADLI!FeatureInstance def : retreiveValidityValue(threadImplImg: 
 	threadImplImg.ownedDataSubcomponent->any(e| e.name=self.name+'_Validity')
 ;
 
-helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
-	threadImplImg.type.ownedDataAccess->any(e| e.name=(self.name+thisModule.dataAccessSuffix()+self.direction))
-;
-
 helper context AADLI!FeatureInstance def : retreiveIdValue(processImplImg: AADLBA!ProcessImplementation) : AADLBA!DataAccess =
 	processImplImg.ownedDataSubcomponent->any(e| e.name=self.name+thisModule.dataSubcomponentSuffix())
 ;
@@ -717,7 +599,7 @@ rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
 	using
 	{
 		c : AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
+		implImg: AADLBA!ComponentImplementation = c.debug('!!!!!').getSubcomponentImg().subcomponentType;
 		impl: AADLBA!ComponentImplementation = c.getImpl();
 	}
 	do
@@ -732,7 +614,10 @@ rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
 					thisModule.addSuprogramCallParameterConnection(implImg, cnx);
 				}
 			}
-			implImg.ownedAccessConnection <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
+			implImg.ownedAccessConnection <- impl.ownedAccessConnection
+					->select(co| 	not co.source.getConnFeatureImg(implImg).oclIsUndefined() and
+									not co.destination.getConnFeatureImg(implImg).oclIsUndefined())
+					->collect(co|thisModule.AccessConnection(co, implImg));
 		}
 	}
 }

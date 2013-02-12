@@ -22,7 +22,11 @@
 library AADLICopyHelpers;
 
 helper context AADLI!Subcomponent def : getType() : AADLI!ComponentType =
-	self.getClassifier().getOwnedRealization().implemented
+	if(self.getClassifier().oclIsKindOf(AADLI!ComponentType)) then
+		self.getClassifier()
+	else
+		self.getClassifier().getOwnedRealization().implemented
+	endif
 ;
 
 helper context AADLI!ComponentImplementation def : getType() : AADLI!ComponentType =
@@ -93,7 +97,7 @@ helper context AADLI!ComponentInstance def : getSubcomponentImg() : AADLBA!Subco
 	thisModule.resolveTemp(self, 'sub')
 ;
 
-helper context AADLI!FeatureInstance def : getFeatureImg() : AADLBA!Feature =
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg() : AADLBA!Feature =
 	thisModule.resolveTemp(self, 'f')
 ;
 
