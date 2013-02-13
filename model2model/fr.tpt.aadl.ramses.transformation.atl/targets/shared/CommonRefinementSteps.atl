@@ -803,6 +803,7 @@ rule addDataAccessConnection(implImg: AADLBA!ComponentImplementation,
 	)
   do
   {
-  	implImg.ownedAccessConnection.add(accessConnection);
+  	if(implImg.ownedAccessConnection->any(e|e.name=name).oclIsUndefined())
+	  	implImg.ownedAccessConnection.add(accessConnection);
   }
 }
