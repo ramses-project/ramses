@@ -46,7 +46,8 @@ unique lazy rule copyBehaviorAnnexFromThread
 			-- TODO implement mapBehaviorVariable
 			variables   <- src_ba.variables->collect(e| thisModule.mapBehaviorVariable(e)),
 			transitions <- Sequence{computationTransition},
-			actions     <- thisModule.mapBehaviorActionBlockFromThread(c, src_ba, currentStateAccess, stateType, subprogram)
+			actions     <- Sequence{thisModule.mapBehaviorActionBlockFromThread(c, src_ba, currentStateAccess, stateType, subprogram)}
+								->union(src_ba.transitions->collect(e|thisModule.copyBehaviorActionBlock(e.actionBlock, c)))
 		),
 		sourceState: AADLBA!BehaviorState
 		(
@@ -70,7 +71,7 @@ unique lazy rule copyBehaviorAnnexFromThread
 		)
 		
 	do
-	{ 
+	{
 		target_ba;
 	}
 }
@@ -120,10 +121,7 @@ unique lazy rule mapBehaviorActionsFromThread
 		elif <- false,
 		behaviorActions <- ifStatementActionSequence
 	),
-	ifStatementActionSequence: AADLBA!BehaviorActionSequence
-	(
-		--thisModule.copyBehaviorActions(src_transition.behaviorActions)
-	),
+	ifStatementActionSequence: AADLBA!BehaviorActionSequence,
 	isStateSource: AADLBA!ValueExpression
 	(
 		relations <- Sequence{comparisonRelation}	
@@ -221,6 +219,7 @@ unique lazy rule mapBehaviorActionsFromThread
   			}
   		}
   	}
+  	ifStatementActionSequence.actions.add(thisModule.copyBehaviorActionBlock(src_transition.actionBlock,c).content);
   	ifStatementActionSequence.actions.add(updateState);
   	
   	
@@ -237,4 +236,68 @@ unique lazy rule mapBehaviorActionsFromThread
 	}
 	ifStatement;
   }
+}
+
+lazy rule copyEventPortHolder
+{
+	from
+		src_EventPortHolder: AADLBA!EventPortHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_EventPortHolder: AADLBA!EventPortHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventPortHolder.element.name), 'f_entrypoint')	
+		)
+	do
+	{
+		target_EventPortHolder;
+	}
+}
+
+lazy rule copyEventDataPortHolder
+{
+	from
+		src_EventDataPortHolder:AADLBA!EventDataPortHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_EventDataPortHolder: AADLBA!EventDataPortHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventDataPortHolder.element.name), 'f_entrypoint')	
+		)
+	do
+	{
+		target_EventDataPortHolder;
+	}
+}
+
+lazy rule copyDataPortHolder
+{
+	from
+		src_DataPortHolder:AADLBA!DataPortHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_DataPortHolder: AADLBA!DataPortHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'f_entrypoint')	
+		)
+	do
+	{
+		target_DataPortHolder;
+	}
+}
+
+lazy rule copyDataAccessHolder
+{
+	from
+		src_DataAccessHolder:AADLBA!DataAccessHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_DataAccessHolder: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataAccessHolder.element.name), 'f_entrypoint')	
+		)
+	do
+	{
+		target_DataAccessHolder;
+	}
 }

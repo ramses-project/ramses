@@ -27,7 +27,8 @@ create OUT : AADLBA 	from 	IN : AADLBA,
 lazy rule copySubprogramAccessHolder
 {
 	from
-		src_SubprogramAccessHolder: AADLBA!SubprogramAccessHolder
+		src_SubprogramAccessHolder: AADLBA!SubprogramAccessHolder,
+		c: AADLI!ComponentInstance
 	to
 		target_SubprogramAccessHolder: AADLBA!SubprogramAccessHolder
 		(
@@ -42,7 +43,8 @@ lazy rule copySubprogramAccessHolder
 lazy rule copyEventPortHolder
 {
 	from
-		src_EventPortHolder: AADLBA!EventPortHolder
+		src_EventPortHolder: AADLBA!EventPortHolder,
+		c: AADLI!ComponentInstance
 	to
 		target_EventPortHolder: AADLBA!EventPortHolder
 		(
@@ -57,7 +59,8 @@ lazy rule copyEventPortHolder
 lazy rule copyEventDataPortHolder
 {
 	from
-		src_EventDataPortHolder:AADLBA!EventDataPortHolder
+		src_EventDataPortHolder:AADLBA!EventDataPortHolder,
+		c: AADLI!ComponentInstance
 	to
 		target_EventDataPortHolder: AADLBA!EventDataPortHolder
 		(
@@ -72,7 +75,8 @@ lazy rule copyEventDataPortHolder
 lazy rule copyDataPortHolder
 {
 	from
-		src_DataPortHolder:AADLBA!DataPortHolder
+		src_DataPortHolder:AADLBA!DataPortHolder,
+		c: AADLI!ComponentInstance
 	to
 		target_DataPortHolder: AADLBA!DataPortHolder
 		(
@@ -87,7 +91,8 @@ lazy rule copyDataPortHolder
 lazy rule copyCalledSubprogramHolder
 {
 	from
-		src_CalledSubprogramHolder:AADLBA!CalledSubprogramHolder
+		src_CalledSubprogramHolder:AADLBA!CalledSubprogramHolder,
+		c: AADLI!ComponentInstance
 	to
 		target_CalledSubprogramHolder:AADLBA!CalledSubprogramHolder
 		(
@@ -102,7 +107,8 @@ lazy rule copyCalledSubprogramHolder
 lazy rule copyDataAccessHolder
 {
 	from
-		src_DataAccessHolder:AADLBA!DataAccessHolder
+		src_DataAccessHolder:AADLBA!DataAccessHolder,
+		c: AADLI!ComponentInstance
 	to
 		target_DataAccessHolder:AADLBA!DataAccessHolder
 		(
