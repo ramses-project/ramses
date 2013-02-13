@@ -24,6 +24,9 @@ package fr.tpt.aadl.ramses.control.support.reporters ;
 import java.io.File ;
 
 import org.osate.aadl2.Element ;
+import org.osate.aadl2.parsesupport.LocationReference ;
+
+import fr.tpt.aadl.utils.Aadl2Utils ;
 
 public abstract class AbstractMessageReporter implements MessageReporter
 {
@@ -62,7 +65,9 @@ public abstract class AbstractMessageReporter implements MessageReporter
                             Element where,
                             String message)
   {
-    String filename = where.getLocationReference().getFilename() ;
+    LocationReference locref = Aadl2Utils.getLocationReference(where) ; 
+    
+    String filename = locref.getFilename() ;
 
     if(filename.contains("null"))
     {
@@ -71,7 +76,7 @@ public abstract class AbstractMessageReporter implements MessageReporter
 
     File file = new File(filename) ;
     filename = file.getName() ;
-    int line = where.getLocationReference().getLine() ;
+    int line = locref.getLine() ;
     StringBuilder sb = new StringBuilder(status.toString()) ;
     sb.append(" in ") ;
     sb.append(filename) ;
