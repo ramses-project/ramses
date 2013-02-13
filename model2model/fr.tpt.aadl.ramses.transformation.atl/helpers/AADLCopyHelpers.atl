@@ -23,6 +23,14 @@ library AADLCopyHelpers;
 
 helper def : public() : AADLBA!PublicPackageSection = AADLBA!PublicPackageSection->allInstancesFrom('OUT')->first();
 
+helper context AADLBA!NamedElement def : getContainingPackage() :AADLBA!AadlPackage =
+	if(self.oclIsTypeOf(AADLBA!AadlPackage)) then
+		self
+	else
+		self.eContainer().getContainingPackage()
+	endif
+;
+
 helper context AADLBA!ComponentClassifier def : getClassifierInOutput() : AADLBA!ComponentClassifier =
 	if(self.oclIsKindOf(AADLBA!ComponentImplementation)) then 
 		thisModule.Implementation(OclUndefined, self, thisModule.Type(OclUndefined, self.getType()))

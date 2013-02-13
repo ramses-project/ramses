@@ -1,0 +1,240 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+module BehaviorAnnexCommonRefinementSteps;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+									POK_RUNTIME: AADLBA;
+
+
+unique lazy rule copyBehaviorAnnexFromThread
+{
+	from
+		c: AADLI!ComponentInstance,
+		src_ba: AADLBA!BehaviorAnnex,
+		currentStateAccess: AADLBA!DataAccess,
+		stateType: AADLBA!DataAccess,
+		subprogram: AADLBA!SubprogramImplementation
+	to
+		target_ba: AADLBA!BehaviorAnnex
+		(
+			name        <- src_ba.name,
+			states      <- Sequence{sourceState,finalState},
+			-- TODO implement mapBehaviorVariable
+			variables   <- src_ba.variables->collect(e| thisModule.mapBehaviorVariable(e)),
+			transitions <- Sequence{computationTransition},
+			actions     <- thisModule.mapBehaviorActionBlockFromThread(c, src_ba, currentStateAccess, stateType, subprogram)
+		),
+		sourceState: AADLBA!BehaviorState
+		(
+			initial  <- true,
+			final    <- false,
+			complete <- false,
+			name     <- 'BA_entrypoint_s'
+		),
+		finalState: AADLBA!BehaviorState
+		(
+			initial  <- false,
+			final    <- true,
+			complete <- false,
+			name     <- 'BA_entrypoint_f'
+		),
+		computationTransition: AADLBA!BehaviorTransition
+		(
+			actionBlock       <- thisModule.mapBehaviorActionBlockFromThread(c, src_ba, currentStateAccess, stateType, subprogram),
+			destinationState  <- finalState,
+			sourceState       <- sourceState
+		)
+		
+	do
+	{ 
+		target_ba;
+	}
+}
+
+unique lazy rule mapBehaviorActionBlockFromThread
+{
+  from
+	c: AADLI!ComponentInstance,
+	src_ba: AADLBA!BehaviorAnnex,
+	currentStateAccess: AADLBA!DataAccess,
+	stateType: AADLBA!DataAccess,
+	subprogram: AADLBA!SubprogramImplementation
+	
+  to
+	target_actionBlock: AADLBA!BehaviorActionBlock
+	(content<-target_actions),
+	target_actions: AADLBA!BehaviorActionSequence
+  do
+  {
+  	target_actions.actions.addAll(src_ba.transitions->collect(e| thisModule.mapBehaviorActionsFromThread(c, e, currentStateAccess, stateType, subprogram)));
+  	if(thisModule.baNeedsElif(src_ba))
+  	{
+  		
+  	}
+  	
+  	target_actionBlock;
+  }
+}
+
+helper def: baNeedsElif(src_ba: AADLBA!BehaviorAnnex) : Boolean =
+	src_ba.transitions->size()>2
+;
+
+unique lazy rule mapBehaviorActionsFromThread
+{
+  from
+	c: AADLI!ComponentInstance,
+	src_transition: AADLBA!BehaviorTransition,
+	currentStateAccess: AADLBA!DataAccess,
+	stateType: AADLBA!DataAccess,
+	subprogram: AADLBA!SubprogramImplementation
+	
+  to
+	ifStatement: AADLBA!IfStatement
+	(
+		logicalValueExpression <- isStateSource,
+		elif <- false,
+		behaviorActions <- ifStatementActionSequence
+	),
+	ifStatementActionSequence: AADLBA!BehaviorActionSequence
+	(
+		--thisModule.copyBehaviorActions(src_transition.behaviorActions)
+	),
+	isStateSource: AADLBA!ValueExpression
+	(
+		relations <- Sequence{comparisonRelation}	
+	),
+	comparisonRelation: AADLBA!Relation
+	(
+		relationalOperator<-#Equal,
+		firstExpression<-comparisonFirstExpression,
+		secondExpression<-comparisonSecondExpression
+	),
+	comparisonFirstExpression: AADLBA!SimpleExpression
+	(
+		terms <- Sequence{currentStateAccessTerm}
+	),
+	comparisonSecondExpression: AADLBA!SimpleExpression
+	(
+		terms <- Sequence{enumValueSourceStateTerm}
+	),
+	currentStateAccessTerm: AADLBA!Term
+	(
+		factors <- Sequence{currentStateAccessFactor}
+	),
+	enumValueSourceStateTerm: AADLBA!Term
+	(
+		factors <- Sequence{enumValueSourceStateFactor}
+	),
+	currentStateAccessFactor: AADLBA!Factor
+	(
+		firstValue <- Sequence{currentStateAccessHolder}
+	),
+	currentStateAccessHolder:AADLBA!DataAccessHolder
+	(
+		element <- currentStateAccess
+	),
+	enumValueSourceStateFactor: AADLBA!Factor
+	(
+		firstValue <- Sequence{sourceStateID}
+	),
+	sourceStateID: AADLBA!BehaviorEnumerationLiteral
+	(
+		enumLiteral<-enumSourceStringLiteral,
+		component<-stateType
+	),
+	enumSourceStringLiteral: AADLBA!StringLiteral
+	(
+		value <- src_transition.sourceState.name
+	),
+	updateState: AADLBA!AssignmentAction
+	(
+		target <- updateStateAccessHolder,
+		valueExpression <- updateValueExpression
+	),
+	updateStateAccessHolder:AADLBA!DataAccessHolder
+	(
+		element <- currentStateAccess
+	),
+	updateValueExpression: AADLBA!ValueExpression
+	(
+		relations <- Sequence{updateRelation}	
+	),
+	updateRelation: AADLBA!Relation
+	(
+		firstExpression<-updateFirstExpression
+	),
+	updateFirstExpression: AADLBA!SimpleExpression
+	(
+		terms <- Sequence{enumValueTargetStateTerm}
+	),
+	enumValueTargetStateTerm: AADLBA!Term
+	(
+		factors <- Sequence{enumValueTargetStateFactor}
+	),
+	enumValueTargetStateFactor: AADLBA!Factor
+	(
+		firstValue <- Sequence{targetStateID}
+	),
+	targetStateID: AADLBA!BehaviorEnumerationLiteral
+	(
+		enumLiteral<-enumTargetStringLiteral,
+		component<-stateType
+	),
+	enumTargetStringLiteral: AADLBA!StringLiteral
+	(
+		value <- src_transition.sourceState.name
+	)
+  do
+  {
+  	if(src_transition.sourceState.complete=true)
+  	{
+  		for(fi in c.featureInstance)
+  		{
+  			if(fi.category=#dataPort and (fi.direction.toString()='in' or fi.direction.toString()='inout'))
+  			{
+  				thisModule.addNextValueSubprogramCallAction(ifStatementActionSequence.actions, fi, subprogram);
+  			}
+  		}
+  	}
+  	ifStatementActionSequence.actions.add(updateState);
+  	
+  	
+	if(src_transition.destinationState.complete=true)
+	{
+		for(fi in c.featureInstance)
+  		{
+  			if(fi.category=#dataPort and (fi.direction.toString()='out' or fi.direction.toString()='inout'))
+  			{
+  				thisModule.addPutValueSubprogramCallAction(ifStatementActionSequence.actions, fi, subprogram);
+  			}
+  		}
+		thisModule.expandThreadDispatchProtocolInBA(c, subprogram, ifStatementActionSequence.actions);
+	}
+	ifStatement;
+  }
+}

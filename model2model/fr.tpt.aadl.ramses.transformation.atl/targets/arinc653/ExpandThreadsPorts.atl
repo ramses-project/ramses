@@ -136,8 +136,10 @@ rule PortConnection_Instance
 		process_destinationImplImg <- c_destination.eContainer().getSubcomponentImg().subcomponentType.debug('Retreived Process Implementation');
 		sourceFeatureImg <- cnxInst.source.getFeatureImg().debug('Retreived Feature Image');
 		destinationFeatureImg <- cnxInst.destination.getFeatureImg().debug('Retreived Feature Image');
-		process_destinationImplImg.ownedDataSubcomponent.add(communicationDstID);
-		process_sourceImplImg.ownedDataSubcomponent.add(communicationSrcID);
+		if(process_destinationImplImg.ownedDataSubcomponent->any(e|e.name=communicationDstID.name).oclIsUndefined())
+			process_destinationImplImg.ownedDataSubcomponent.add(communicationDstID);
+		if(process_sourceImplImg.ownedDataSubcomponent->any(e|e.name=communicationSrcID.name).oclIsUndefined())
+			process_sourceImplImg.ownedDataSubcomponent.add(communicationSrcID);
 		
 		if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
 		{
@@ -209,7 +211,8 @@ rule intraProcess_PortConnection_Instance
 		processImplImg <- c_source.eContainer().getSubcomponentImg().subcomponentType.debug('Retreived Process Implementation');
 		sourceFeatureImg <- cnxInst.source.getFeatureImg().debug('Retreived Feature Image');
 		destinationFeatureImg <- cnxInst.destination.getFeatureImg().debug('Retreived Feature Image'); 
-		processImplImg.ownedDataSubcomponent.add(d);
+		if(processImplImg.ownedDataSubcomponent->any(e|e.name=d.name).oclIsUndefined())
+			processImplImg.ownedDataSubcomponent.add(d);
 		
 		-- add and connect data subcomponent, Id of the communication protocol
 		if(cnxInst.source.category=#eventPort)
@@ -515,6 +518,44 @@ unique lazy rule addReturnCodeDataSubcomponent
 ---      ADDED CALLED RULES     ----
 ------------------------------------
 
+rule addNextValueSubprogramCallAction(actions:AADLBA!Actions,
+								fi: AADLI!FeatureInstance,
+								implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		for(cnxInst in fi.dstConnectionInstance)
+		{
+			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addReceiveQueuingAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addReadSamplingAction(actions, fi, implImg);
+				}
+			}
+			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort)
+				{
+					thisModule.addWaitEventAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addReceiveBufferAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addReadBlackBoardAction(actions, fi, implImg);
+				}
+			}
+		}
+	}
+}
+
 rule addNextValueSubprogramCall(seq : AADLBA!SubprogramCallSequence,
 								impl : AADLBA!ComponentImplementation,
 								implImg : AADLBA!ComponentImplementation,
@@ -548,6 +589,44 @@ rule addNextValueSubprogramCall(seq : AADLBA!SubprogramCallSequence,
 				else if(cnxInst.source.category=#dataPort)
 				{
 					thisModule.addReadBlackBoard(seq, fi, impl, implImg);
+				}
+			}
+		}
+	}
+}
+
+rule addPutValueSubprogramCallAction(actions:AADLBA!Actions,
+								fi: AADLI!FeatureInstance,
+								implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		for(cnxInst in fi.dstConnectionInstance)
+		{
+			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addSendQueuingAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addWriteSamplingAction(actions, fi, implImg);
+				}
+			}
+			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort)
+				{
+					thisModule.addSetEventAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addSendBufferAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addDisplayBlackBoardAction(actions, fi, implImg);
 				}
 			}
 		}
@@ -653,6 +732,27 @@ rule addReadBlackBoard(seq : AADLBA!SubprogramCallSequence,
 	}
 }
 
+rule addReadBlackBoardAction(actions : AADLBA!Actions,
+					   fi: AADLI!FeatureInstance, 
+					   implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi, implImg);
+		thisModule.addMessageAddrDataSubcomponent(fi, implImg);
+		thisModule.addTimeOutSubcomponent(fi, implImg);	
+		-- add call to Read_Blackboard
+		thisModule.addReadBlackBoardCallAction
+		(
+			actions,
+			'Read_Blackboard'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+		
+	}
+}
+
 rule addDisplayBlackBoard(seq : AADLBA!SubprogramCallSequence,
 						  fi: AADLI!FeatureInstance,
 						  impl:  AADLI!ComponentImplementation, 
@@ -676,6 +776,26 @@ rule addDisplayBlackBoard(seq : AADLBA!SubprogramCallSequence,
 	}
 }
 
+rule addDisplayBlackBoardAction(actions : AADLBA!Actions,
+					   			fi: AADLI!FeatureInstance, 
+					   			implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		-- add call to Read_Blackboard
+		thisModule.addDisplayBlackBoardCallAction
+		(
+			actions,
+			'Display_Blackboard'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+		
+	}
+}
 
 rule addDisplayBlackBoardCallSpecification(seq : AADLBA!SubprogramCallSequence,
 										   spg: AADLBA!SubprogramType,
@@ -692,6 +812,104 @@ rule addDisplayBlackBoardCallSpecification(seq : AADLBA!SubprogramCallSequence,
 	{
 		thisModule.addBlackBoardCallSpecification(call, spg, p, implImg);
 		seq.getOwnedCallSpecifications().add(call);
+	}
+}
+
+
+rule addReadBlackBoardCallAction ( 	actions:AADLBA!Actions,
+									spg: AADLBA!SubprogramType, 
+								    p: AADLI!Port, 
+									implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		BLACKBOARD_ID: AADLBA!DataAccess = p.getFeatureImg(); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+	}
+	to
+	
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,TIMEOUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BLACKBOARD_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIMEOUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+
+rule addDisplayBlackBoardCallAction ( actions:AADLBA!Actions,
+									  spg: AADLBA!SubprogramType, 
+								      p: AADLI!Port, 
+									  implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		BLACKBOARD_ID: AADLBA!DataAccess = p.getFeatureImg(); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+	}
+	to
+	
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BLACKBOARD_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
 	}
 }
 
@@ -1061,6 +1279,28 @@ rule addReadSampling(seq : AADLBA!SubprogramCallSequence,
 	}
 }
 
+rule addReadSamplingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
+		thisModule.addValidityDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addReadSamplingMessageCallAction
+		(
+			actions,
+			'Read_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
 rule addWriteSampling(seq : AADLBA!SubprogramCallSequence,
 					  fi: AADLI!FeatureInstance, 
 					  impl:  AADLI!ComponentImplementation,
@@ -1084,6 +1324,71 @@ rule addWriteSampling(seq : AADLBA!SubprogramCallSequence,
 	}
 }
 
+rule addWriteSamplingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addReadSamplingMessageCallAction
+		(
+			actions,
+			'Write_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
+rule addWriteSamplingMessageCallAction ( actions:AADLBA!Actions,
+									    spg: AADLBA!SubprogramType, 
+									    p: AADLI!Port, 
+										implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{SAMPLING_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-SAMPLING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
 rule addSamplingGlobalVariable(fi: AADLI!FeatureInstance, 
 					 communicationID: AADLBA!DataSubcomponent,
 					 processImplImg: AADLBA!ComponentImplementation,
@@ -1092,7 +1397,6 @@ rule addSamplingGlobalVariable(fi: AADLI!FeatureInstance,
 	do
 	{
 		communicationID.dataSubcomponentType<-'Sampling_Port_Id_Type'.asDataType('POK_RUNTIME');
-		processImplImg.ownedDataSubcomponent.add(communicationID);
 		thisModule.addDataAccessConnection(
 			processImplImg,
 			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,
@@ -1156,6 +1460,56 @@ rule addReadSamplingMessageCallSpecification (seq : AADLBA!SubprogramCallSequenc
 		connectedParam_VALIDITY.setContext(call);
 		implImg.getOwnedParameterConnections().add(paramConnection_VALIDITY);
 		seq.getOwnedCallSpecifications().add(call);
+	}
+}
+
+
+rule addReadSamplingMessageCallAction ( actions:AADLBA!Actions,
+									    spg: AADLBA!SubprogramType, 
+									    p: AADLI!Port, 
+										implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		VALIDITY: AADLBA!DataSubcomponent = p.retreiveValidityValue(implImg);
+		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{SAMPLING_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,VALIDITY_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-SAMPLING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		VALIDITY_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- VALIDITY
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
 	}
 }
 
@@ -1312,7 +1666,6 @@ rule addQueuingGlobalVariable(fi: AADLI!FeatureInstance,
 	do
 	{
 		communicationID.dataSubcomponentType<-'Queuing_Port_Id_Type'.asDataType('POK_RUNTIME');
-		processImplImg.ownedDataSubcomponent.add(communicationID);
 		thisModule.addDataAccessConnection(
 			processImplImg,
 			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,

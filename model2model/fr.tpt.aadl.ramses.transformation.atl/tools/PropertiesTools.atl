@@ -169,6 +169,31 @@ rule CreateListValueFromInteger (value: Integer)
 	}
 }
 
+rule CreateListValueFromString (value: String)
+{
+	to
+		lv : AADLBA!ListValue
+	do
+	{
+		lv.ownedListElement.add(thisModule.CreateStringLiteralPropertyExpression(value));
+		lv;
+	}
+}
+
+rule CreateListValueFromListOfString(value: Sequence(String))
+{
+	to
+		lv:AADLBA!ListValue
+	do
+	{
+		for(s in value)
+		{
+			lv.ownedListElement.add(thisModule.CreateStringLiteralPropertyExpression(value));
+		}
+		lv;
+	}
+}
+
 rule CreateListValueFromClassifier (value: AADLBA!Classifier)
 {
 	to

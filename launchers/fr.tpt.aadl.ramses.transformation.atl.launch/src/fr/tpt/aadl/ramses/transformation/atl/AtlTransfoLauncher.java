@@ -322,7 +322,12 @@ public class AtlTransfoLauncher
         	new URL("file:" + resourcesDir.getAbsolutePath() + "/targets/shared/CommonRefinementSteps" + ".asm") ;
     Object loadedmoduleCommon = launcher.loadModule(moduleFileCommon.openStream()) ;
     atlModules.add(loadedmoduleCommon) ;
-	
+    URL moduleFileBACommon =
+        	new URL("file:" + resourcesDir.getAbsolutePath() + "/targets/shared/BehaviorAnnexCommonRefinementSteps" + ".asm") ;
+    Object loadedmoduleBACommon = launcher.loadModule(moduleFileBACommon.openStream()) ;
+    atlModules.add(loadedmoduleBACommon) ;
+    
+    
     Map<String, Object> options = new HashMap<String, Object>() ;
     options.put("allowInterModelReferences", "true") ;
     URL libraryFile ;

@@ -38,6 +38,9 @@ create OUT : AADLBA 	from 		IN : AADLI,
 -- addPutValueSubprogramCall
 -- featureInstanceMappingPostTreatment(implImg: AADLBA!ThreadImplementation)
 
+rule featureInstanceMappingPostTreatment(implImg: AADLBA!ThreadImplementation){
+	
+}
 -------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------
@@ -188,6 +191,7 @@ rule DataAccess_Instance_with_BA
 		thisModule.addThreadsInternalConnections(fi);
 		implImg <- thisModule.resolveTemp(c, 'sub').subcomponentType.debug('Retreived Component Implementation');
 		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
 	}
 }
 
@@ -316,6 +320,7 @@ rule DataAccess_Instance
 		{
 			processImplImg <- c.eContainer().subcomponent.subcomponentType;
 		}
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
 		thisModule.addThreadsInternalConnections(fi);
 		implImg <- thisModule.resolveTemp(c, 'sub').subcomponentType.debug('Retreived Component Implementation');
 	}
@@ -371,10 +376,15 @@ unique lazy rule ThreadImplementationWithBA {
 		name <- c.uniqueName().concat('_entrypoint'),
 		ownedDataAccess <- Sequence{currentStateAccess}
 	),
+	entryPointImplImg: AADLBA!SubprogramImplementation
+	(
+		name <- entryPointImg.name.concat('.impl'),
+		ownedRealization<-thisModule.Realization(entryPointImg, entryPointImplImg)
+	),
 	callEntryPoint: AADLBA!SubprogramCall
 	(
 		name<-thisModule.callPrefix()+entryPointImg.name,
-		calledSubprogram<-entryPointImg
+		calledSubprogram<-entryPointImplImg
 	),
 	stateType: AADLBA!DataType
 	(
@@ -386,10 +396,18 @@ unique lazy rule ThreadImplementationWithBA {
 													'DATA_MODEL',
 													'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
 												),
-												thisModule.CreatePropertyAssociation(
+												thisModule.CreatePropertyAssociation
+												(
 												 	'Initial_Value',
 													'DATA_MODEL',
-													 thisModule.getBAInitialStateIdentifier(implBA) )
+													 thisModule.CreateListValueFromString(thisModule.getBAInitialStateIdentifier(implBA))
+												),
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Enumerators',
+													'DATA_MODEL',
+													 thisModule.CreateListValueFromListOfString(implBA.states->collect(e|e.name))
+												)
 									},
 		name <- c.uniqueName().concat('_currentState')
 	),
@@ -433,6 +451,7 @@ unique lazy rule ThreadImplementationWithBA {
 	thisModule.public().getOwnedClassifiers()->add(stateType);
  	-- add subprogram type to package
 	thisModule.public().getOwnedClassifiers()->add(entryPointImg);
+ 	thisModule.public().getOwnedClassifiers()->add(entryPointImplImg);
  	
  	if(implImg.ownedSubprogramCallSequence->isEmpty())
  		implImg.ownedSubprogramCallSequence<-thisModule.createSubprogramCallSequence(implImg);
@@ -443,7 +462,11 @@ unique lazy rule ThreadImplementationWithBA {
  	-- add data accesses created from c.featureInstance
 	entryPointImg.ownedDataAccess->addAll(c.featureInstance->collect(e|e.retreiveEntrypointFeature()));
  	
-	entryPointImg.ownedAnnexSubclause->add(thisModule.copyBehaviorAnnex(c, implBA));
+	entryPointImplImg.ownedAnnexSubclause->add(thisModule.copyBehaviorAnnexFromThread(c, 
+															implBA, 
+															currentStateAccess,
+															stateType,
+															entryPointImplImg));
 	
 	-- add BA in entryPointImg
 	
@@ -465,7 +488,7 @@ unique lazy rule ThreadImplementationWithBA {
 }
 
 helper def: getBAInitialStateIdentifier(implBA: AADLBA!BehaviorAnnex) : String =
-	thisModule.CreateStringLiteralPropertyExpression (implBA.states->any(s|s.initial=true).toString())
+	implBA.states->any(s|s.initial=true).name
 ;
 
 helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
@@ -692,7 +715,7 @@ rule SubprogramCall (c: AADLI!ComponentInstance,
 					and not s.calledSubprogram.getPropertyAssociation('Source_Text').oclIsUndefined())
 		{
 			s2.calledSubprogram <- s.calledSubprogram;
-			thisModule.addImportedUnitFromElt(thisModule.public(), s.calledSubprogram);
+			thisModule.addImportedUnitFromInputModel(thisModule.public(), s.calledSubprogram);
 		}
 		else
 		{

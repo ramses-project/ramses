@@ -38,7 +38,57 @@ uses Uninstanciate;
 uses PropertiesTools;
 
 
-rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstancs, implImg: AADLBA!ThreadImplementation) 
+rule expandThreadDispatchProtocolInBA(inst: AADLBA!ComponentInstance,
+									  spg: AADLBA!SuprogramImplementation,
+									  actions: AADLBA!Actions) 
+{
+ do{
+ 	if(inst.isPeriodicThread())
+ 	{
+ 		thisModule.addPeriodicWaitCallAction(actions, spg);
+ 	}
+ 	if(inst.isPeriodicThread())
+ 	{
+ 	}
+ 	if(inst.isPeriodicThread())
+ 	{
+ 	}
+ }
+}
+
+unique lazy rule addPeriodicWaitCallAction
+{
+	from
+		actions: AADLBA!Actions,
+		spgImg: AADLBA!SuprogramImplementation
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(spgImg);
+		spg : AADL!SubprogramType = 'Periodic_Wait'.asSubprogramType('POK_RUNTIME');
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+
+rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstance, implImg: AADLBA!ThreadImplementation) 
 {
  do{
  	if(inst.isPeriodicThread())

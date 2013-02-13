@@ -56,16 +56,16 @@ rule addImportedUnit(packageImg: AADLBA!PackageSection,	model: String,	importedP
 	}
 }
 
-rule addImportedUnitFromElt(packageImg: AADLBA!PackageSection, elt: AADLBA!NamedElement)
+rule addImportedUnitFromInputModel(packageImg: AADLBA!PackageSection, elt: AADLBA!NamedElement)
 {
 	using
 	{
-		src_package : AADLI!AadlPackage = elt.getNamespace().getOwner();
-		unit: AADLBA!ModelUnit = AADLBA!ModelUnit->allInstancesFrom('IN')->any(e|e.name = src_package.name);
+		src_package : AADLI!AadlPackage = elt.getContainingPackage();
 		isNotYetImported: Boolean =  packageImg.importedUnit->any(e|e.name = src_package.name).oclIsUndefined();
 	}
 	do
 	{
+		
 		if(isNotYetImported)
 		{
 			packageImg.importedUnit.add(src_package);
