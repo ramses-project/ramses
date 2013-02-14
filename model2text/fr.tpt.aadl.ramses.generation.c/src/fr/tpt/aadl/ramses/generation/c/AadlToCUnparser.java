@@ -483,7 +483,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	  boolean foundRestrictedAnnex = false;
 	  for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
       {
-        if(annex.getName().equalsIgnoreCase(AadlBaToCUnparserAction.ANNEX_NAME))
+        if(annex.getName().equalsIgnoreCase(AadlBaUnParserAction.ANNEX_NAME))
         {
         	foundRestrictedAnnex = true;
         	processAnnexSubclause(annex, owner) ;
