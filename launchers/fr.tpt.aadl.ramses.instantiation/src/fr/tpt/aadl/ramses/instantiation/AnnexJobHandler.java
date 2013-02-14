@@ -53,7 +53,9 @@ public class AnnexJobHandler
     {
       result &= job.resolve() ;
     }
-
+    
+    _jobList.clear() ;
+    
     return result ;
   }
 }
