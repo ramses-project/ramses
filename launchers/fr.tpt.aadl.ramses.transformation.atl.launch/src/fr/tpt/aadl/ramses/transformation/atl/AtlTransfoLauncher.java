@@ -31,8 +31,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +44,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -49,6 +52,7 @@ import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.eclipse.m2m.atl.core.ATLCoreException;
 import org.eclipse.m2m.atl.core.emf.EMFExtractor;
@@ -57,17 +61,30 @@ import org.eclipse.m2m.atl.core.emf.EMFModel;
 import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
 import org.eclipse.m2m.atl.core.emf.EMFReferenceModel;
 import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
+import org.osate.aadl2.Aadl2Package;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.Classifier;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
+import org.osate.annexsupport.AnnexParser;
+import org.osate.annexsupport.AnnexResolver;
 
+import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
@@ -196,15 +213,54 @@ public class AtlTransfoLauncher
 			File inputDir = new File (workspaceLocation+path.toOSString());
 			RamsesConfiguration.setInputDirectory(inputDir.getParentFile());
 			return xtextResource;
-		  }else
+		  }
+		  else
 		  {
 			uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
 			RamsesConfiguration.setInputDirectory(new File(si.getSystemImplementation().eResource().getURI().toFileString()).getParentFile());
+			Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
+			xtextResource.load(null);
+			ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+			ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
+			AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
+			Iterator<EObject> iter = xtextResource.getAllContents();
+			while(iter.hasNext())
+			{
+				Collection<Object> dasList = EcoreUtil.getObjectsByType(iter.next().eContents(), Aadl2Package.eINSTANCE.getDefaultAnnexSubclause()); 
+				for (Object o : dasList)
+				{
+					DefaultAnnexSubclause das = (DefaultAnnexSubclause) o;
+					String annexName = das.getName();
+					if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
+					{
+						AnnexParser ap = sr.getParser(annexName);
+						ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
+						AnnexSubclause as = ap.parseAnnexSubclause(annexName,
+								das.getSourceText(), 
+								outputFile.getName(), 
+								node.getStartLine(), 
+								node.getOffset(), 
+								errReporter);
+						AnnexResolver ar = sr.getResolver(annexName) ;
+						if(as != null && errReporter.getNumErrors() == 0)
+					    {
+					      as.setName(annexName) ;
+					      // replace default annex library with the new one.
+					      EList<AnnexSubclause> ael =
+					            ((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
+					      int idx = ael.indexOf(das) ;
+					      ael.add(idx, as) ;
+					      ael.remove(das) ;
+					      List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
+					      ar.resolveAnnex(das.getName(), annexElements, errManager) ;
+					    }
+					}
+					
+				}
+			}
+			
+			return xtextResource;
 		  }
-		  
-		  Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
-		  xtextResource.load(null);
-		  return xtextResource;
 	  } catch (Exception e) {
 		  e.printStackTrace();
 		  throw new GenerationException(e.getMessage());
