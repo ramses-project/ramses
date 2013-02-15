@@ -235,8 +235,13 @@ public class AtlTransfoLauncher
 					{
 						AnnexParser ap = sr.getParser(annexName);
 						ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
+						String annexText = das.getSourceText();
+						if(annexText.length() > 6)
+					      {
+					        annexText = annexText.substring(3, annexText.length() - 3) ;
+					      }
 						AnnexSubclause as = ap.parseAnnexSubclause(annexName,
-								das.getSourceText(), 
+								annexText, 
 								outputFile.getName(), 
 								node.getStartLine(), 
 								node.getOffset(), 
