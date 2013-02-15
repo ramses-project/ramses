@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
@@ -166,7 +167,7 @@ public class AadlTargetSpecificGenerator implements Generator
         PropertiesLinkingService pls = new PropertiesLinkingService ();
         SystemImplementation si = (SystemImplementation) pls.
         		findNamedElementInsideAadlPackage(systemToInstantiate, 
-        				(PackageSection) result.getContents().get(0));
+        				((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
         SystemInstance newInstance =
         		instantiator.instantiate(si);
         r = newInstance.eResource();
