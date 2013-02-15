@@ -135,6 +135,12 @@ public class GeneratorUtils
           PropertyUtils.findProperty("Actual_Processor_Binding",
                                      aProcessSubcomponent) ;
 
+    if(aPropertyAssociation == null)
+    {
+    	System.out.println("ERROR: Actual_Processor_Binding property not set for component instance "+
+    			aProcessSubcomponent.getName());
+    	return null;
+    }
     for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
           .getOwnedValues())
     {
