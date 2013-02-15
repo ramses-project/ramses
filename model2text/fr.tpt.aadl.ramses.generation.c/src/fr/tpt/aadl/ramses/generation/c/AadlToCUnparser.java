@@ -1147,6 +1147,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseSubprogramType(SubprogramType object)
       {
+    	_currentImplUnparser = _subprogramImplCode;
+      	_currentHeaderUnparser = _subprogramHeaderCode; 
+      	
     	if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;
@@ -1269,6 +1272,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseSubprogramImplementation(SubprogramImplementation object)
       {
+    	_currentImplUnparser = _subprogramImplCode;
+    	_currentHeaderUnparser = _subprogramHeaderCode; 
     	if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;

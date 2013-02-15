@@ -66,6 +66,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryNumericOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.CalledSubprogramHolder;
+import fr.tpt.aadl.annex.behavior.aadlba.DataAccessHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
 import fr.tpt.aadl.annex.behavior.aadlba.DataSubcomponentHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchCondition;
@@ -372,11 +373,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutputNewline(aadlComponentCId +
               "_BA_State_t current_state = " + aadlComponentCId + "_" +
               AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
-        _cFileContent.addOutputNewline("char final = 0;") ;
         processEList(_cFileContent, ba.getVariables()) ;
-        _cFileContent.addOutputNewline("while(final != 1)") ;
-        _cFileContent.addOutputNewline("{") ;
-        _cFileContent.incrementIndent() ;
         _cFileContent.addOutputNewline("switch(current_state)") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
@@ -482,16 +479,18 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         String aadlComponentCId =
               GenerationUtilsC.getGenerationCIdentifier(aadlComponent
                     .getQualifiedName()) ;
-        _cFileContent.addOutputNewline("current_state = " + aadlComponentCId +
-              "_" + object.getName() + ";") ;
         //if (object.isComplete())
 
         if(object.isFinal())
         {
-          _cFileContent.addOutputNewline("final = 1;") ;
+          _cFileContent.addOutputNewline("return;") ;
         }
-
-        _cFileContent.addOutputNewline("break;") ;
+        else
+        {
+          _cFileContent.addOutputNewline("current_state = " + aadlComponentCId +
+                    "_" + object.getName() + ";") ;
+          _cFileContent.addOutputNewline("break;") ;
+        }
         return DONE ;
       }
 
@@ -955,10 +954,18 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 // 's name thanks to the given data access mapping.
                 if(_dataAccessMapping != null)
                 {
-                  Relation r = ((ValueExpression)pl).getRelations().get(0);
-                  Term t = r.getFirstExpression().getTerms().get(0);
-                  DataSubcomponentHolder dsh = (DataSubcomponentHolder) t.getFactors().get(0).getFirstValue();
-                  name = _dataAccessMapping.get((DataAccess)dsh.getElement());
+                  DataAccessHolder dah = null;
+                  if(pl instanceof ValueExpression)
+                  {
+                	  Relation r = ((ValueExpression)pl).getRelations().get(0);
+                      Term t = r.getFirstExpression().getTerms().get(0);
+                      dah = (DataAccessHolder) t.getFactors().get(0).getFirstValue();  
+                  }
+                  else if(pl instanceof DataAccessHolder)
+                  {
+                	dah = (DataAccessHolder) pl;
+                  }
+                  name = _dataAccessMapping.get((DataAccess)dah.getElement());
                 }
 
                 if (name != null)
