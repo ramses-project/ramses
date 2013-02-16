@@ -493,7 +493,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	  if(!foundRestrictedAnnex && !object.getOwnedSubprogramCallSequences().isEmpty())
 	  {
 	  	for(SubprogramCallSequence scs: object.getOwnedSubprogramCallSequences())
+	  	{
 	  		process(scs);
+	  	}
 	  	foundRestrictedAnnex=true;
 	  }
 	  if(!foundRestrictedAnnex && object.getExtended()!=null)
@@ -1140,6 +1142,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     		{
     			SubprogramCall sc = (SubprogramCall) cs;
     			process(sc);
+    			if(cs.eContainer().eContainer() instanceof ThreadImplementation)
+    	  		{
+    	  			_currentImplUnparser = _activityImplCode ;
+    	  	        _currentHeaderUnparser = _activityHeaderCode ;
+    	  		}
     		}
     	}
     	return null ;
