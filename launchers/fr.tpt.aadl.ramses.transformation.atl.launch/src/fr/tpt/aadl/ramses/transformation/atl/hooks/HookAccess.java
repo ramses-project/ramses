@@ -34,9 +34,11 @@ import org.osate.aadl2.DirectedFeature;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.Port;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceObject;
 
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 
@@ -117,5 +119,13 @@ public interface HookAccess extends EObject
 	 * @generated
 	 */
 	void setInDirection(DirectedFeature feature);
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	Boolean isUsedInFreshClause(BehaviorAnnex ba, Port p);
+
 
 } // HookAccess

@@ -45,12 +45,14 @@ import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.Port;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.parsesupport.LocationReference;
 
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
@@ -302,6 +304,10 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		  }
 	  }
 	  return l;
+  }
+
+  public Boolean isUsedInFreshClause(BehaviorAnnex ba, Port p) {
+	return AadlBaVisitors.isFresh(ba, p);
   }
 
 } //HookAccessImpl
