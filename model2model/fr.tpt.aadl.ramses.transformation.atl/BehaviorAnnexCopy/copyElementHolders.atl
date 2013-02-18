@@ -119,3 +119,35 @@ lazy rule copyDataAccessHolder
 		target_DataAccessHolder;
 	}
 }
+
+lazy rule copyBehaviorVariableHolder
+{
+	from
+		src_behaviorVariableHolder: AADLBA!BehaviorVariableHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_behaviorVariableHolder: AADLBA!BehaviorVariableHolder
+		(
+			element<-thisModule.copyBehaviorVariable(src_behaviorVariableHolder.element)
+		)
+	do
+	{
+		target_behaviorVariableHolder;
+	}
+}
+
+lazy rule copyPortFreshValue
+{
+	from
+		src_PortFreshValue: AADLBA!PortFreshValue,
+		c: AADLI!ComponentInstance
+	to
+		target_PortFreshValue: AADLBA!PortFreshValue
+		(
+			element<-src_PortFreshValue.element	
+		)
+	do
+	{
+		target_PortFreshValue;
+	}
+}

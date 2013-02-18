@@ -46,7 +46,7 @@ rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstancs, implImg: AADLB
 }
 	
 
-rule featureInstanceMappingPostTreatment(implImg: AADLBA!ThreadImplementation)
+rule threadImplementationPostTreatment(implImg: AADLBA!BehavioredImplementation)
 {
 	do
 	{
@@ -306,7 +306,7 @@ helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpress
 ;
 
 helper context AADLI!FeatureInstance def : retreiveMessageAddress(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataSubcomponent =
-	threadImplImg.ownedDataSubcomponent->any(e| e.name=self.name+'_MsgAddr')
+	thisModule.resolveTemp(self, 'dataSubcomponent')
 ;
 
 helper context AADLI!FeatureInstance def : retreiveLengthValue(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataSubcomponent =
@@ -422,25 +422,6 @@ unique lazy rule addLengthDataSubcomponent
 			name<-port.feature.name+'_Length',
 			dataSubcomponentType<-'Unsigned_8'.asBaseType(),
 			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
-		)
-	do
-	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
-		implImg.ownedDataSubcomponent.add(dataSubcomponent);
-		dataSubcomponent;
-	}
-}
-
-unique lazy rule addMessageAddrDataSubcomponent
-{
-	from
-		port : AADLI!FeatureInstance,
-		implImg : AADLBA!ThreadImplementation
-	to
-		dataSubcomponent: AADLBA!DataSubcomponent
-		(
-			name<-port.feature.name+'_MsgAddr',
-			dataSubcomponentType<-port.feature.dataFeatureClassifier
 		)
 	do
 	{
@@ -719,7 +700,6 @@ rule addReadBlackBoard(seq : AADLBA!SubprogramCallSequence,
 	do
 	{
 		thisModule.addLengthDataSubcomponent(fi, implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi, implImg);
 		thisModule.addTimeOutSubcomponent(fi, implImg);	
 		-- add call to Read_Blackboard
 		thisModule.addReadBlackBoardCallSpecification
@@ -739,7 +719,6 @@ rule addReadBlackBoardAction(actions : AADLBA!Actions,
 	do
 	{
 		thisModule.addLengthDataSubcomponent(fi, implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi, implImg);
 		thisModule.addTimeOutSubcomponent(fi, implImg);	
 		-- add call to Read_Blackboard
 		thisModule.addReadBlackBoardCallAction
@@ -761,7 +740,6 @@ rule addDisplayBlackBoard(seq : AADLBA!SubprogramCallSequence,
 	do
 	{
 		thisModule.addLengthDataSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addTimeOutSubcomponent(fi,implImg);
 					
 		-- add call to Display_Blackboard
@@ -783,7 +761,6 @@ rule addDisplayBlackBoardAction(actions : AADLBA!Actions,
 	do
 	{
 		thisModule.addLengthDataSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addTimeOutSubcomponent(fi,implImg);
 		-- add call to Read_Blackboard
 		thisModule.addDisplayBlackBoardCallAction
@@ -1214,7 +1191,6 @@ rule addReceiveBuffer(seq : AADLBA!SubprogramCallSequence,
 	do
 	{
 		thisModule.addTimeOutSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addLengthDataSubcomponent(fi,implImg);
 					
 		-- add call to Receive_Buffer
@@ -1236,7 +1212,6 @@ rule addSendBuffer(seq : AADLBA!SubprogramCallSequence,
 {
 	do
 	{
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addLengthDataSubcomponent(fi,implImg);
 		thisModule.addTimeOutSubcomponent(fi,implImg);
 		
@@ -1264,7 +1239,6 @@ rule addReadSampling(seq : AADLBA!SubprogramCallSequence,
 	do
 	{
 		thisModule.addLengthDataSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addValidityDataSubcomponent(fi,implImg);
 					
 		-- add call to Read_Sampling_Message
@@ -1286,7 +1260,6 @@ rule addReadSamplingAction(actions:AADLBA!Actions,
 	do
 	{
 		thisModule.addLengthDataSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addValidityDataSubcomponent(fi,implImg);
 					
 		-- add call to Read_Sampling_Message
@@ -1310,7 +1283,6 @@ rule addWriteSampling(seq : AADLBA!SubprogramCallSequence,
 	{
 		-- add data subcomponents for Write_Sampling_Message
 		thisModule.addLengthDataSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 					
 		-- add call to Write_Sampling_Message
 		thisModule.addWriteSamplingMessageCallSpecification
@@ -1331,7 +1303,6 @@ rule addWriteSamplingAction(actions:AADLBA!Actions,
 	do
 	{
 		thisModule.addLengthDataSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 					
 		-- add call to Read_Sampling_Message
 		thisModule.addReadSamplingMessageCallAction
@@ -1620,7 +1591,6 @@ rule addReceiveQueuing(seq : AADLBA!SubprogramCallSequence,
 	{
 		-- add data subcomponents for Receive_Queing_Message
 		thisModule.addTimeOutSubcomponent(fi,implImg);
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addLengthDataSubcomponent(fi,implImg);
 		
 		-- add call to Receive_Queing_Message
@@ -1642,7 +1612,6 @@ rule addSendQueuing(seq : AADLBA!SubprogramCallSequence,
 {
 	do
 	{
-		thisModule.addMessageAddrDataSubcomponent(fi,implImg);
 		thisModule.addLengthDataSubcomponent(fi,implImg);
 		thisModule.addTimeOutSubcomponent(fi,implImg);
 		

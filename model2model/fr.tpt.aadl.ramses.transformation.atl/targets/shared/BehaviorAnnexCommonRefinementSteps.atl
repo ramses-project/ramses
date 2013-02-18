@@ -44,7 +44,7 @@ unique lazy rule copyBehaviorAnnexFromThread
 			name        <- src_ba.name,
 			states      <- Sequence{sourceState,finalState},
 			-- TODO implement mapBehaviorVariable
-			variables   <- src_ba.variables->collect(e| thisModule.mapBehaviorVariable(e)),
+			variables   <- src_ba.variables->collect(e| thisModule.copyBehaviorVariable(e)),
 			transitions <- Sequence{computationTransition},
 			actions     <- Sequence{thisModule.mapBehaviorActionBlockFromThread(c, src_ba, currentStateAccess, stateType, subprogram)}
 								->union(src_ba.transitions->collect(e|thisModule.copyBehaviorActionBlock(e.actionBlock, c)))
@@ -105,6 +105,7 @@ helper def: baNeedsElif(src_ba: AADLBA!BehaviorAnnex) : Boolean =
 	src_ba.transitions->size()>2
 ;
 
+
 unique lazy rule mapBehaviorActionsFromThread
 {
   from
@@ -113,7 +114,10 @@ unique lazy rule mapBehaviorActionsFromThread
 	currentStateAccess: AADLBA!DataAccess,
 	stateType: AADLBA!DataAccess,
 	subprogram: AADLBA!SubprogramImplementation
-	
+  using
+  {
+	bab_content: AADLBA!BehaviorActions = OclUndefined;
+  }
   to
 	ifStatement: AADLBA!IfStatement
 	(
@@ -219,7 +223,11 @@ unique lazy rule mapBehaviorActionsFromThread
   			}
   		}
   	}
-  	ifStatementActionSequence.actions.add(thisModule.copyBehaviorActionBlock(src_transition.actionBlock,c).content);
+  	bab_content <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock,c).content;
+  	if(bab_content.oclIsKindOf(AADLBA!BehaviorActionCollection))
+	  	ifStatementActionSequence.actions.addAll(bab_content.actions);
+  	else if (not bab_content.oclIsUndefined())
+  		ifStatementActionSequence.actions.add(bab_content.debug(bab_content.getClass().toString()));
   	ifStatementActionSequence.actions.add(updateState);
   	
   	
@@ -299,5 +307,79 @@ lazy rule copyDataAccessHolder
 	do
 	{
 		target_DataAccessHolder;
+	}
+}
+
+lazy rule copyPortFreshValue
+{
+	from
+		src_PortFreshValue: AADLBA!PortFreshValue,
+		c: AADLI!ComponentInstance
+	using
+	{
+		portImgSubcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(
+							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'dataSubcomponent'
+						);
+		portImgFresh_prev: AADLBA!DataAccess = thisModule.resolveTemp(
+							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'fresh_previous_access'
+						);
+		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(
+							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'struct_freshness_data_subcomponent'
+						);
+	}
+	to
+		isFresh: AADLBA!ValueExpression
+		(
+			relations <- Sequence{comparisonRelation}
+		),
+		comparisonRelation: AADLBA!Relation
+		(
+			relationalOperator<-#NotEqual,
+			firstExpression<-comparisonFirstExpression,
+			secondExpression<-comparisonSecondExpression
+		),
+		comparisonFirstExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{currentFreshnessTerm}
+		),
+		comparisonSecondExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{previousFreshnessTerm}
+		),
+		currentFreshnessTerm: AADLBA!Term
+		(
+			factors <- Sequence{currentFreshnessFactor}
+		),
+		previousFreshnessTerm: AADLBA!Term
+		(
+			factors <- Sequence{previousFreshnessFactor}
+		),
+		currentFreshnessFactor: AADLBA!Factor
+		(
+			firstValue <- Sequence{portImgFreshPrevComponentReference}
+		),
+		portImgSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- portImgSubcomponent
+		),
+		previousFreshnessFactor: AADLBA!Factor
+		(
+			firstValue <- Sequence{portImgFreshPrevAccessHolder}
+		),
+		portImgFreshPrevComponentReference: AADLBA!DataComponentReference
+		(
+			data <- Sequence{portImgSubcomponentHolder, portImgFreshPrevSubcomponentHolder}
+		),
+		portImgFreshPrevAccessHolder: AADLBA!DataAccessHolder
+		(
+			element <- portImgFresh_prev
+		),
+		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- struct_freshness_data_subcomponent.debug('######')
+		)
+	do
+	{
+		isFresh;
 	}
 }

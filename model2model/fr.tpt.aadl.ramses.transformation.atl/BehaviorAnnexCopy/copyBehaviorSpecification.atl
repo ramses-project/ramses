@@ -90,7 +90,7 @@ lazy rule copyBehaviorTransition
 		)
 }
 
-lazy rule copyBehaviorVariable
+unique lazy rule copyBehaviorVariable
 {
 	from
 		src_variable: AADLBA!BehaviorVariable

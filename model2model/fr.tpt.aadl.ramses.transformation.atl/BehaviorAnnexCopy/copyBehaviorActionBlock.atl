@@ -20,7 +20,7 @@
 --
 
 
-module CopyBehaviorActionBlock;
+module copyBehaviorActionBlock;
 create OUT : AADLBA 	from 	IN : AADLBA,
 								HOOKS: ATLHOOKS;
 
@@ -83,13 +83,17 @@ helper def: copyBehaviorAction(behaviorAction: AADLBA!BehaviorAction, c: AADLI!C
 	if(behaviorAction.oclIsUndefined()) then
 		OclUndefined
 	else
-		behaviorAction.copyBehaviorAction(c)
+		behaviorAction.debug(behaviorAction.getClass().toString()).copyBehaviorAction(c)
 	endif
 ;
 
 
 helper context AADLBA!IfStatement def: copyBehaviorAction(c: AADLI!ComponentInstance) : AADLBA!IfStatement =
 	thisModule.copyIfStatement(self,c)
+;
+
+helper context AADLBA!SubprogramCallAction def: copyBehaviorAction(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
+	thisModule.copySubprogramCallAction(self,c)
 ;
 
 lazy rule copyIfStatement
@@ -234,7 +238,7 @@ helper def: copyValue(v: AADLBA!Value,c: AADLI!ComponentInstance): AADLBA!Value 
 	if(v.oclIsUndefined()) then
 		OclUndefined
 	else
-		v.debug(v.getClass().toString()).copyValue(c)
+		v.debug('copyValue: '+v.getClass().toString()).copyValue(c)
 	endif
 ;
 
@@ -258,6 +262,10 @@ helper context AADLBA!DataAccessHolder def: copyValue(c: AADLI!ComponentInstance
 	thisModule.copyDataAccessHolder(self,c)
 ;
 
+helper context AADLBA!BehaviorVariableHolder def: copyValue(c: AADLI!ComponentInstance): AADLBA!BehaviorVariableHolder =
+	thisModule.copyBehaviorVariableHolder(self,c)
+;
+
 helper context AADLBA!BehaviorEnumerationLiteral def: copyValue(c: AADLI!ComponentInstance): AADLBA!BehaviorEnumerationLiteral =
 	thisModule.copyBehaviorEnumerationLiteral(self,c)
 ;
@@ -268,6 +276,9 @@ helper context AADLBA!DataComponentReference def: copyValue(c: AADLI!ComponentIn
 	thisModule.copyDataComponentReference(self,c)
 ;
 
+helper context AADLBA!PortFreshValue def: copyValue(c: AADLI!ComponentInstance): AADLBA!PortFreshValue =
+	thisModule.copyPortFreshValue(self,c)
+;
 
 lazy rule copySubprogramCallAction
 {

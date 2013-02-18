@@ -165,6 +165,7 @@
 		<constant value="82:3-90:4"/>
 		<constant value="copyBehaviorVariable"/>
 		<constant value="MAADLBA!BehaviorVariable;"/>
+		<constant value="49"/>
 		<constant value="src_variable"/>
 		<constant value="target_variable"/>
 		<constant value="BehaviorVariable"/>
@@ -682,6 +683,17 @@
 		<code>
 			<getasm/>
 			<get arg="1"/>
+			<push arg="162"/>
+			<load arg="19"/>
+			<call arg="44"/>
+			<dup/>
+			<call arg="23"/>
+			<if arg="45"/>
+			<load arg="19"/>
+			<call arg="25"/>
+			<goto arg="164"/>
+			<getasm/>
+			<get arg="1"/>
 			<push arg="47"/>
 			<push arg="8"/>
 			<new/>
@@ -689,12 +701,12 @@
 			<push arg="162"/>
 			<pcall arg="48"/>
 			<dup/>
-			<push arg="164"/>
+			<push arg="165"/>
 			<load arg="19"/>
 			<pcall arg="50"/>
 			<dup/>
-			<push arg="165"/>
 			<push arg="166"/>
+			<push arg="167"/>
 			<push arg="54"/>
 			<new/>
 			<dup/>
@@ -712,27 +724,27 @@
 			<dup/>
 			<getasm/>
 			<load arg="19"/>
-			<get arg="167"/>
-			<call arg="168"/>
+			<get arg="168"/>
+			<call arg="169"/>
 			<call arg="30"/>
-			<set arg="167"/>
+			<set arg="168"/>
 			<pop/>
 			<load arg="29"/>
 		</code>
 		<linenumbertable>
-			<lne id="169" begin="25" end="25"/>
-			<lne id="170" begin="25" end="26"/>
-			<lne id="171" begin="23" end="28"/>
-			<lne id="172" begin="31" end="31"/>
-			<lne id="173" begin="31" end="32"/>
-			<lne id="174" begin="31" end="33"/>
-			<lne id="175" begin="29" end="35"/>
-			<lne id="176" begin="22" end="36"/>
+			<lne id="170" begin="36" end="36"/>
+			<lne id="171" begin="36" end="37"/>
+			<lne id="172" begin="34" end="39"/>
+			<lne id="173" begin="42" end="42"/>
+			<lne id="174" begin="42" end="43"/>
+			<lne id="175" begin="42" end="44"/>
+			<lne id="176" begin="40" end="46"/>
+			<lne id="177" begin="33" end="47"/>
 		</linenumbertable>
 		<localvariabletable>
-			<lve slot="2" name="165" begin="18" end="37"/>
-			<lve slot="0" name="17" begin="0" end="37"/>
-			<lve slot="1" name="164" begin="0" end="37"/>
+			<lve slot="2" name="166" begin="29" end="48"/>
+			<lve slot="0" name="17" begin="0" end="48"/>
+			<lve slot="1" name="165" begin="0" end="48"/>
 		</localvariabletable>
 	</operation>
 </asm>
