@@ -147,7 +147,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       DataPort p  = (DataPort) fi.getFeature() ;
       if(isUsedInFresh(fi))
-    		  blackboardInfo.dataType=fi.getQualifiedName()+"_freshness_t_impl" ;
+    		  blackboardInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
       else
       {
     	  try
@@ -366,10 +366,10 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
       DataPort port  = (DataPort) fi.getFeature() ;
       if(isUsedInFresh(fi))
       {
-    	  sampleInfo.dataType=fi.getQualifiedName()+"_freshness_t_impl" ;
+    	  sampleInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
       }
       else
-    	  {
+      {
     	  try
     	  {
     		  sampleInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
@@ -409,7 +409,8 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     {
       System.err.println("ERROR: sampling port "+port.getQualifiedName()+" should have property" +
       		" Sampling_Refresh_Period");
-      result = false ;
+      info.refresh = 10;
+      //TODO: restore and resolve issue with pingpong-ba result = false ;
     }  
     
     return result ;
@@ -511,7 +512,8 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
   public void process(ProcessSubcomponent process, File generatedFilePath,
                       TargetProperties tarProp)
   {
-    PartitionProperties pp = new PartitionProperties();
+	StringBuilder sb = new StringBuilder(process.getQualifiedName());
+    PartitionProperties pp = new PartitionProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
     
     ProcessImplementation processImpl = (ProcessImplementation) 
                                           process.getComponentImplementation() ;
@@ -1252,7 +1254,8 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
             (ProcessImplementation) ps.getComponentImplementation() ;
       if(!_processorProp.partitionProperties.containsKey(process))
       {
-        PartitionProperties pp = new PartitionProperties() ;
+    	StringBuilder sb = new StringBuilder(process.getQualifiedName());
+        PartitionProperties pp = new PartitionProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
         _processorProp.partitionProperties.put(process, pp) ;
         findCommunicationMechanism(process, pp) ;
       }

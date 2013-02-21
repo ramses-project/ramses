@@ -9,6 +9,14 @@ import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.SampleInfo;
 
 public class PartitionProperties
 {
+	
+  public PartitionProperties(String prefix)
+  {
+	this.prefix=prefix;
+  }
+  
+  public String prefix = "";
+  
   public boolean hasBlackboard = false ; 
   
   public boolean hasQueue = false ;
