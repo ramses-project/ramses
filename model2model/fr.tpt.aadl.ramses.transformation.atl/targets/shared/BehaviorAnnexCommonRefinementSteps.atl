@@ -117,6 +117,7 @@ unique lazy rule mapBehaviorActionsFromThread
   using
   {
 	bab_content: AADLBA!BehaviorActions = OclUndefined;
+	ba: AADLBA!BehaviorAnnex = c.subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification');
   }
   to
 	ifStatement: AADLBA!IfStatement
@@ -230,6 +231,27 @@ unique lazy rule mapBehaviorActionsFromThread
   		ifStatementActionSequence.actions.add(bab_content.debug(bab_content.getClass().toString()));
   	ifStatementActionSequence.actions.add(updateState);
   	
+  	for(fi in c.featureInstance)
+  	{
+  		if(fi.category=#dataPort or fi.category=#eventDataPort or fi.category=#eventPort)
+  		{
+  			if(ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause(ba, fi.feature))
+			{
+				for(trans in ba.transitions)
+				{
+					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshness'));
+				}
+			}
+  			else if(fi.isUsedInFresh())
+  			{
+  				for(trans in ba.transitions)
+				{
+					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshnessOutput'));
+					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'sendFreshnessOutput'));
+				}
+  			}
+  		}
+  	}
   	
 	if(src_transition.destinationState.complete=true)
 	{
@@ -252,9 +274,9 @@ lazy rule copyEventPortHolder
 		src_EventPortHolder: AADLBA!EventPortHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_EventPortHolder: AADLBA!EventPortHolder
+		target_EventPortHolder: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventPortHolder.element.name), 'f_entrypoint')	
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventPortHolder.element.name), 'dataSubcomponent')	
 		)
 	do
 	{
@@ -268,9 +290,9 @@ lazy rule copyEventDataPortHolder
 		src_EventDataPortHolder:AADLBA!EventDataPortHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_EventDataPortHolder: AADLBA!EventDataPortHolder
+		target_EventDataPortHolder: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventDataPortHolder.element.name), 'f_entrypoint')	
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventDataPortHolder.element.name), 'dataSubcomponent')	
 		)
 	do
 	{
@@ -278,15 +300,50 @@ lazy rule copyEventDataPortHolder
 	}
 }
 
-lazy rule copyDataPortHolder
+helper def: copyDataPortHolder(src_DataPortHolder:AADLBA!DataPortHolder, c: AADLI!ComponentInstance) : AADLBA!ValueVariable =
+	let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_DataPortHolder.element.name) in 
+	if (f.isUsedInFresh()) then
+		thisModule.copyDataPortHolder_withFresh(src_DataPortHolder, c)
+	else
+		thisModule.copyDataPortHolder_withoutFresh(src_DataPortHolder, c)
+	endif
+;
+
+lazy rule copyDataPortHolder_withFresh
 {
 	from
 		src_DataPortHolder:AADLBA!DataPortHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_DataPortHolder: AADLBA!DataPortHolder
+		target_DataPortHolder: AADLBA!DataComponentReference
 		(
-			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'f_entrypoint')	
+			data <- Sequence{dataSubcomponentHolder,functionalPartHolder}
+			
+				
+		),
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'dataSubcomponent')
+		),
+		functionalPartHolder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'struct_functional_data_subcomponent')
+		)
+	do
+	{
+		target_DataPortHolder;
+	}
+}
+
+lazy rule copyDataPortHolder_withoutFresh
+{
+	from
+		src_DataPortHolder:AADLBA!DataPortHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_DataPortHolder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'dataSubcomponent')	
 		)
 	do
 	{
@@ -383,3 +440,25 @@ lazy rule copyPortFreshValue
 		isFresh;
 	}
 }
+
+helper context AADLI!FeatureInstance def: isDirectlyUsedInFresh() : Boolean =
+	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
+		(self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification'),
+		self.feature)
+;
+
+helper context AADLI!FeatureInstance def: isUsedInFresh() : Boolean =
+	--if(self.direction=#out or self.direction=#inOut) then
+		self.isDirectlyUsedInFresh()
+		or 
+		not self.srcConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).oclIsUndefined()
+	--else
+	--	self.isUsedInFreshClause(ba)
+		or
+		not self.dstConnectionInstance->any(e|e.destination.isDirectlyUsedInFresh()).oclIsUndefined()
+		or
+		not self.srcConnectionInstance->any(e|e.destination.isDirectlyUsedInFresh()).oclIsUndefined()
+		or
+		not self.dstConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).oclIsUndefined()
+	--endif
+;

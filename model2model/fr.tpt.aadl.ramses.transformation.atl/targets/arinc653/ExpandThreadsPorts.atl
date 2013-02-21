@@ -409,7 +409,7 @@ unique lazy rule addLengthDataSubcomponent
 		implImg : AADLBA!ThreadImplementation
 	using
 	{
-		typeId: String = port.feature.dataFeatureClassifier.getQualifiedName().replaceAll('::', '__').replaceAll('.','_');
+		typeId: String = port.feature.dataFeatureClassifier.get_C_Identifier();
 		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression('sizeof('+typeId+')');
 	}
 	to
@@ -582,8 +582,9 @@ rule addPutValueSubprogramCallAction(actions:AADLBA!Actions,
 {
 	do
 	{
-		for(cnxInst in fi.dstConnectionInstance)
+		for(cnxInst in fi.srcConnectionInstance)
 		{
+			thisModule.toBeTransformedInterProcessConnection(cnxInst).debug(fi.name+'  @@@@@@@');
 			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
 			{
 				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
@@ -1305,7 +1306,7 @@ rule addWriteSamplingAction(actions:AADLBA!Actions,
 		thisModule.addLengthDataSubcomponent(fi,implImg);
 					
 		-- add call to Read_Sampling_Message
-		thisModule.addReadSamplingMessageCallAction
+		thisModule.addWriteSamplingMessageCallAction
 		(
 			actions,
 			'Write_Sampling_Message'.asSubprogramType('POK_RUNTIME'),

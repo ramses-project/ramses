@@ -165,19 +165,17 @@
 		<constant value="82:3-90:4"/>
 		<constant value="copyBehaviorVariable"/>
 		<constant value="MAADLBA!BehaviorVariable;"/>
-		<constant value="49"/>
+		<constant value="48"/>
 		<constant value="src_variable"/>
 		<constant value="target_variable"/>
 		<constant value="BehaviorVariable"/>
 		<constant value="dataClassifier"/>
-		<constant value="J.getClassifierInOutput():J"/>
 		<constant value="100:22-100:34"/>
 		<constant value="100:22-100:39"/>
 		<constant value="100:4-100:39"/>
 		<constant value="101:22-101:34"/>
 		<constant value="101:22-101:49"/>
-		<constant value="101:22-101:73"/>
-		<constant value="101:4-101:73"/>
+		<constant value="101:4-101:49"/>
 		<constant value="98:3-102:4"/>
 	</cp>
 	<field name="1" type="2"/>
@@ -725,26 +723,24 @@
 			<getasm/>
 			<load arg="19"/>
 			<get arg="168"/>
-			<call arg="169"/>
 			<call arg="30"/>
 			<set arg="168"/>
 			<pop/>
 			<load arg="29"/>
 		</code>
 		<linenumbertable>
-			<lne id="170" begin="36" end="36"/>
-			<lne id="171" begin="36" end="37"/>
-			<lne id="172" begin="34" end="39"/>
-			<lne id="173" begin="42" end="42"/>
-			<lne id="174" begin="42" end="43"/>
-			<lne id="175" begin="42" end="44"/>
-			<lne id="176" begin="40" end="46"/>
-			<lne id="177" begin="33" end="47"/>
+			<lne id="169" begin="36" end="36"/>
+			<lne id="170" begin="36" end="37"/>
+			<lne id="171" begin="34" end="39"/>
+			<lne id="172" begin="42" end="42"/>
+			<lne id="173" begin="42" end="43"/>
+			<lne id="174" begin="40" end="45"/>
+			<lne id="175" begin="33" end="46"/>
 		</linenumbertable>
 		<localvariabletable>
-			<lve slot="2" name="166" begin="29" end="48"/>
-			<lve slot="0" name="17" begin="0" end="48"/>
-			<lve slot="1" name="165" begin="0" end="48"/>
+			<lve slot="2" name="166" begin="29" end="47"/>
+			<lve slot="0" name="17" begin="0" end="47"/>
+			<lve slot="1" name="165" begin="0" end="47"/>
 		</localvariabletable>
 	</operation>
 </asm>

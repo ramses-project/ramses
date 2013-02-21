@@ -29,6 +29,10 @@ helper def: callPrefix(): String ='call_';
 
 helper def: theHOOK : ATLHOOKS!HookAccess = ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first();
 
+helper context AADLBA!NamedElement def: get_C_Identifier(): String =
+	self.getQualifiedName().replaceAll('::', '__').replaceAll('.','_')
+;
+
 helper context AADLBA!ThreadImplementation def : callSequence() : AADLBA!SubprogramCallSequence =
 	self.ownedSubprogramCallSequence->first()
 ;

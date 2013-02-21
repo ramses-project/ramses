@@ -98,6 +98,6 @@ unique lazy rule copyBehaviorVariable
 		target_variable: AADLBA!BehaviorVariable
 		(
 			name           <- src_variable.name,
-			dataClassifier <- src_variable.dataClassifier.getClassifierInOutput()
+			dataClassifier <- src_variable.dataClassifier
 		)
 }

@@ -111,7 +111,7 @@ rule DataPort_Instance_with_BA
 		fresh_data_impl_wrapper:AADLBA!DataImplementation
 		(
 			name<-fresh_data_type_wrapper.name+'.impl',
-			ownedDataSubcomponent<-Sequence{struct_freshness_data_subcomponent, struct_functional_data_subcomponent}
+			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
 		),
 		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
 		(
@@ -122,7 +122,144 @@ rule DataPort_Instance_with_BA
 		(
 			name <- 'value',
 			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+		),
+		updateFreshness: AADLBA!AssignmentAction
+		(
+			target <- updatePreviousFreshAccessHolder,
+			valueExpression <- updateValueExpression
+		),
+		updatePreviousFreshAccessHolder:AADLBA!DataAccessHolder
+		(
+			element <- fresh_previous_access
+		),
+		updateValueExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateRelation}	
+		),
+		updateRelation: AADLBA!Relation
+		(
+			firstExpression<-updateFirstExpression
+		),
+		updateFirstExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateFreshTerm}
+		),
+		updateFreshTerm: AADLBA!Term
+		(
+			factors <- Sequence{updateFreshFactor}
+		),
+		updateFreshFactor: AADLBA!Factor
+		(
+			firstValue <- Sequence{updateFreshCDR}
+		),
+		updateFreshCDR: AADLBA!DataComponentReference
+		(
+			data <- Sequence{dataSubcomponentHolder,dataFreshnessSubcomponentHolder}
+		),
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- dataSubcomponent
+		),
+		dataFreshnessSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- struct_freshness_data_subcomponent
+		),
+		
+		
+		
+		-------- Emitter freshness update
+		sendFreshnessOutput: AADLBA!AssignmentAction
+		(
+			target <- sendFreshDataComponentReference,
+			valueExpression <- sendValueExpressionOutput
+		),
+		sendFreshDataComponentReference: AADLBA!DataComponentReference
+		(
+			data<-Sequence{dataSubcomponentSend,dataSubcomponentStructSend}
+		),
+		dataSubcomponentSend: AADLBA!DataSubcomponentHolder
+		(
+			element<-dataSubcomponent
+		),
+		dataSubcomponentStructSend: AADLBA!DataSubcomponentHolder
+		(
+			element<-struct_freshness_data_subcomponent
+		),
+		sendValueExpressionOutput: AADLBA!ValueExpression
+		(
+			relations <- Sequence{sendRelationOutput}	
+		),
+		sendRelationOutput: AADLBA!Relation
+		(
+			firstExpression<-sendFirstExpressionOutput
+		),
+		sendFirstExpressionOutput: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{sendFreshTermOutput}
+		),
+		sendFreshTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{sendFreshFactorOutput}
+		),
+		sendFreshFactorOutput: AADLBA!Factor
+		(
+			firstValue <- Sequence{dataAccessHolderSend}
+		),
+		dataAccessHolderSend: AADLBA!DataSubcomponentHolder
+		(
+			element <- fresh_previous_access
+		),
+		
+		
+		
+		updateFreshnessOutput: AADLBA!AssignmentAction
+		(
+			target <- updatePreviousFreshAccessHolderOutput,
+			valueExpression <- updateValueExpressionOutput
+		),
+		updatePreviousFreshAccessHolderOutput:AADLBA!DataAccessHolder
+		(
+			element <- fresh_previous_access
+		),
+		updateValueExpressionOutput: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateRelationOutput}	
+		),
+		updateRelationOutput: AADLBA!Relation
+		(
+			firstExpression<-updateFirstExpressionOutput
+		),
+		updateFirstExpressionOutput: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateFreshTermOutput, updateConstantTermOutput},
+			binaryAddingOperators <- Sequence{#Plus}
+		),
+		updateFreshTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{updateFreshFactorOutput}
+		),
+		updateFreshFactorOutput: AADLBA!Factor
+		(
+			firstValue <- Sequence{dataAccessHolderOutput}
+		),
+		dataAccessHolderOutput: AADLBA!DataSubcomponentHolder
+		(
+			element <- fresh_previous_access
+		),
+		updateConstantTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{updateConstantFactorOutput}
+		),
+		updateConstantFactorOutput: AADLBA!Factor
+		(
+			firstValue <- Sequence{valueConstantOutput}
+		),
+		valueConstantOutput: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 1.longValue()
 		)
+		
+		
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
@@ -130,7 +267,7 @@ rule DataPort_Instance_with_BA
 		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
 		
 		
-		if(ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause(ba, fi.feature))
+		if(fi.isUsedInFresh())
  		{
 			dataSubcomponent.dataSubcomponentType <- fresh_data_impl_wrapper;
  		}
@@ -418,7 +555,30 @@ helper def: ThreadImplementation(c : AADLI!ComponentInstance, typeImg : AADLBA!T
 	endif
 ;
 
-unique lazy rule ThreadImplementationWithBA {
+lazy rule duplicateSubprogramSubcomponent {
+	from
+		e: AADLI!ComponentInstance
+	to
+		copy: AADLBA!SubprogramSubcomponent
+		(
+			name <- e.subcomponent.name,
+			subprogramSubcomponentType <- e.subcomponent.subprogramSubcomponentType
+		)
+}
+
+lazy rule duplicateDataSubcomponent {
+	from
+		e: AADLI!ComponentInstance
+	to
+		copy: AADLBA!DataSubcomponent
+		(
+			name <- e.subcomponent.name,
+			dataSubcomponentType <- e.subcomponent.dataSubcomponentType
+		)
+		
+}
+
+lazy rule ThreadImplementationWithBA {
  from 
     c : AADLI!ComponentInstance,
  	typeImg : AADLBA!ThreadType,
@@ -436,8 +596,8 @@ unique lazy rule ThreadImplementationWithBA {
  	implImg : AADLBA!ThreadImplementation (
  		name <- c.uniqueName().concat('.impl'),
 		ownedRealization 				<- thisModule.Realization(typeImg, implImg),
-		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
-		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram')->collect(e|thisModule.duplicateSubprogramSubcomponent(e)),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')->collect(e|thisModule.duplicateDataSubcomponent(e)),
 		ownedSubprogramCallSequence     <- thisModule.copyCallSequence(c,impl,implImg),
 		ownedAccessConnection           <- Sequence{accessConnection_CURRENT_STATE}
 	),
@@ -458,6 +618,7 @@ unique lazy rule ThreadImplementationWithBA {
 	),
 	stateType: AADLBA!DataType
 	(
+		name <- c.uniqueName().concat('_currentState'),
 		ownedPropertyAssociation <- Sequence {
 												
 												thisModule.CreatePropertyAssociation
@@ -468,18 +629,11 @@ unique lazy rule ThreadImplementationWithBA {
 												),
 												thisModule.CreatePropertyAssociation
 												(
-												 	'Initial_Value',
-													'DATA_MODEL',
-													 thisModule.CreateListValueFromString(thisModule.getBAInitialStateIdentifier(implBA))
-												),
-												thisModule.CreatePropertyAssociation
-												(
 												 	'Enumerators',
 													'DATA_MODEL',
 													 thisModule.CreateListValueFromListOfString(implBA.states->collect(e|e.name))
 												)
-									},
-		name <- c.uniqueName().concat('_currentState')
+									}
 	),
 	currentState: AADLBA!DataSubcomponent
 	(
@@ -519,6 +673,16 @@ unique lazy rule ThreadImplementationWithBA {
  	implImg.ownedDataSubcomponent->add(currentState);
  	-- add data type to package
 	thisModule.public().getOwnedClassifiers()->add(stateType);
+ 	
+ 	-- add initial value to statType; must be set after adding stateType to the package
+ 	-- otherwise the qualified name is incorrect.
+ 	stateType.ownedPropertyAssociation.add(thisModule.CreatePropertyAssociation
+												(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													 thisModule.CreateListValueFromString(stateType.get_C_Identifier().concat('_')+thisModule.getBAInitialStateIdentifier(implBA))
+												));
+ 	
  	-- add subprogram type to package
 	thisModule.public().getOwnedClassifiers()->add(entryPointImg);
  	thisModule.public().getOwnedClassifiers()->add(entryPointImplImg);
@@ -551,7 +715,7 @@ unique lazy rule ThreadImplementationWithBA {
 							 				f.getFeatureImg());
  		if(f.feature.oclIsKindOf(AADLBA!Port))
 		{
- 			if(ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause(implBA, f.feature))
+ 			if(f.isUsedInFresh())
  			{
  				fresh_data_previous <- thisModule.resolveTemp(f, 'fresh_data_previous');
 				fresh_data_type_wrapper <- thisModule.resolveTemp(f, 'fresh_data_type_wrapper');
@@ -566,11 +730,8 @@ unique lazy rule ThreadImplementationWithBA {
 							 			fresh_previous_access,
 							 			callEntryPoint,
 							 			fresh_data_previous);
-				if(thisModule.public().ownedClassifier->any(e|e.name = fresh_data_type_wrapper.name).oclIsUndefined())
-				{
-					thisModule.public().ownedClassifier.add(fresh_data_type_wrapper);
-					thisModule.public().ownedClassifier.add(fresh_data_impl_wrapper);
-				}
+				thisModule.public().ownedClassifier.add(fresh_data_type_wrapper);
+				thisModule.public().ownedClassifier.add(fresh_data_impl_wrapper);
  			}
 		}
 	}
