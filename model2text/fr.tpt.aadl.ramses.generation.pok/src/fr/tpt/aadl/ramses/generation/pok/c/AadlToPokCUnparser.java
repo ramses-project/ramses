@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
+import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataPort;
@@ -52,6 +53,8 @@ import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
 
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
+import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
@@ -60,6 +63,7 @@ import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
+import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
@@ -142,20 +146,87 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     if(fi.getCategory() == FeatureCategory.DATA_PORT)
     {
       DataPort p  = (DataPort) fi.getFeature() ;
-      try
+      if(isUsedInFresh(fi))
+    		  blackboardInfo.dataType=fi.getQualifiedName()+"_freshness_t_impl" ;
+      else
       {
-        blackboardInfo.dataType=PropertyUtils.getStringValue(p.getDataFeatureClassifier(), "Source_Name") ;
-      }
-      catch(Exception e)
-      {
-    	blackboardInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(p.getDataFeatureClassifier().getQualifiedName()) ;
+    	  try
+
+    	  {
+    		  blackboardInfo.dataType=PropertyUtils.getStringValue(p.getDataFeatureClassifier(), "Source_Name") ;
+    	  }
+    	  catch(Exception e)
+    	  {
+    		  blackboardInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(p.getDataFeatureClassifier().getQualifiedName()) ;
+    	  }
       }
     }
     pp.blackboardInfo.add(blackboardInfo); 
 
   }
   
-  //TODO : be refactored with generic interfaces.
+  private boolean isUsedInFresh(FeatureInstance fi) {
+	  Port p = (Port) fi.getFeature();
+	  ComponentInstance ci = (ComponentInstance) fi.eContainer();
+      BehaviorAnnex ba = getBa(fi);
+      if(ba!=null)
+      {
+    	  if(AadlBaVisitors.isFresh(ba, p))
+    		  return true;
+    	  for(ConnectionInstance cnxi : fi.getSrcConnectionInstances())
+    	  {
+    		  if(cnxi.getSource() instanceof FeatureInstance)
+    		  {
+    			  FeatureInstance f = (FeatureInstance) cnxi.getSource();
+    			  ba = getBa(f);
+    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+    				  return true;
+    		  }
+    		  if(cnxi.getDestination() instanceof FeatureInstance)
+    		  {
+    			  FeatureInstance f = (FeatureInstance) cnxi.getDestination();
+    			  ba = getBa(f);
+    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+    				  return true;
+    		  }
+    				  
+    	  }
+    	  for(ConnectionInstance cnxi : fi.getDstConnectionInstances())
+    	  {
+    		  if(cnxi.getSource() instanceof FeatureInstance)
+    		  {
+    			  FeatureInstance f = (FeatureInstance) cnxi.getSource();
+    			  ba = getBa(f);
+    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+    				  return true;
+    		  }
+    		  if(cnxi.getDestination() instanceof FeatureInstance)
+    		  {
+    			  FeatureInstance f = (FeatureInstance) cnxi.getDestination();
+    			  ba = getBa(f);
+    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+    				  return true;
+    		  }
+    	  }
+      }
+      return false;
+}
+
+private BehaviorAnnex getBa(FeatureInstance fi) {
+	ComponentInstance ci = (ComponentInstance) fi.eContainer();
+    BehaviorAnnex ba = null;
+	for(AnnexSubclause as : ci.getSubcomponent().getClassifier().getOwnedAnnexSubclauses())
+    {
+  	  if(as.getName().equalsIgnoreCase("behavior_specification"))
+  	  {
+  		  ba = (BehaviorAnnex) as;
+  		  break;
+  	  }
+    }
+	return ba;
+}
+
+//TODO : be refactored with generic interfaces.
   private void queueHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
     Port p = getProcessPort(fi) ;
@@ -293,13 +364,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     if(fi.getCategory() == FeatureCategory.DATA_PORT)
     {
       DataPort port  = (DataPort) fi.getFeature() ;
-      try
+      if(isUsedInFresh(fi))
       {
-        sampleInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+    	  sampleInfo.dataType=fi.getQualifiedName()+"_freshness_t_impl" ;
       }
-      catch(Exception e)
-      {
-    	sampleInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+      else
+    	  {
+    	  try
+    	  {
+    		  sampleInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+    	  }
+    	  catch(Exception e)
+    	  {
+    		  sampleInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+    	  }
       }
     }
     
