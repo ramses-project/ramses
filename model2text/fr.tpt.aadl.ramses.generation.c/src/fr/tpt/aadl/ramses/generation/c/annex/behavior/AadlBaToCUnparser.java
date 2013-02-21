@@ -959,8 +959,10 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   continue;
                 if(first==false)
                   _cFileContent.addOutput(", ") ;
+                String usageP = Aadl2Utils.getParameter_Usage(p);
                 if(Aadl2Utils.isInOutParameter(p) ||
-                		Aadl2Utils.isOutParameter(p))
+                		Aadl2Utils.isOutParameter(p) ||
+                		usageP.equalsIgnoreCase("by_reference"))
                 {
                   if(pl instanceof ParameterHolder)
                   {
@@ -975,7 +977,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 		  
                   }
                   else if (pl instanceof DataSubcomponentHolder
-                		  || pl instanceof BehaviorVariableHolder)
+                		  || pl instanceof BehaviorVariableHolder 
+                		  || pl instanceof ValueExpression)
                 	  _cFileContent.addOutput("&") ;
                   else if (pl instanceof DataComponentReference)
                   {
@@ -991,9 +994,11 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 			&& !usage.equalsIgnoreCase("by_reference"))
                     {
                 		ParameterHolder ph = (ParameterHolder) pl;
+                		String usagePH = Aadl2Utils.getParameter_Usage(p);
                 		// in to inout
                 		if(Aadl2Utils.isOutParameter(ph.getParameter()) ||
-                    		Aadl2Utils.isInOutParameter(ph.getParameter()))
+                    		Aadl2Utils.isInOutParameter(ph.getParameter()) ||
+                    		usagePH.equalsIgnoreCase("by_reference"))
                 			_cFileContent.addOutput("&") ;
                     }
                 			

@@ -1267,6 +1267,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     	  if(f instanceof Parameter)
   		  {
   		    Parameter p = (Parameter) f ;
+  		    String paramUsage = Aadl2Utils.getParameter_Usage(p);
   			if(p==returnParameter)
   			  continue;
   			if(first==false)
@@ -1277,7 +1278,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramImplCode, _subprogramImplCode);
   			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramHeaderCode, _subprogramHeaderCode);
   			if(Aadl2Utils.isInOutParameter(p) ||
-  					Aadl2Utils.isOutParameter(p))
+  					Aadl2Utils.isOutParameter(p)
+  					|| paramUsage.equalsIgnoreCase("by_reference"))
   			{
   			  _subprogramImplCode.addOutput(" * ") ;
   			  _subprogramHeaderCode.addOutput(" * ") ;
