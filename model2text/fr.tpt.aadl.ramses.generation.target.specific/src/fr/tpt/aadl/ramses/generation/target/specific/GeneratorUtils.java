@@ -51,6 +51,8 @@ import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.SubprogramCall ;
 import org.osate.aadl2.SubprogramCallSequence ;
 import org.osate.aadl2.SubprogramImplementation ;
+import org.osate.aadl2.SubprogramSubcomponent;
+import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
@@ -231,9 +233,33 @@ public class GeneratorUtils
         getListOfReferencedObjects(aCallSpecification, result) ;
       }
     }
+    for(SubprogramSubcomponent sc:aThreadImplementation.getOwnedSubprogramSubcomponents())
+    {
+    	getListOfReferencedObjects(sc, result) ;
+    }
   }
 
-  public static void getListOfReferencedObjects(CallSpecification aCallSpecification,
+  private static void getListOfReferencedObjects(SubprogramSubcomponent sc,
+		Set<String> result) {
+	SubprogramSubcomponentType sst = sc.getSubprogramSubcomponentType();
+	for(PropertyAssociation aPropertyAssociation : sst
+            .getOwnedPropertyAssociations())
+    {
+       getListOfReferencedObjects(aPropertyAssociation, result) ;
+    }
+	if (sst instanceof SubprogramImplementation)
+	{
+		SubprogramImplementation si = (SubprogramImplementation) sst;
+		for(PropertyAssociation aPropertyAssociation : si.getType()
+	            .getOwnedPropertyAssociations())
+	    {
+	       getListOfReferencedObjects(aPropertyAssociation, result) ;
+	    }
+	}
+	
+}
+
+public static void getListOfReferencedObjects(CallSpecification aCallSpecification,
                                                 Set<String> result)
   {
     if(aCallSpecification instanceof SubprogramCall)

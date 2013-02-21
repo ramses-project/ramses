@@ -78,6 +78,7 @@ import org.osate.aadl2.SubprogramCallSequence;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramGroupAccess;
 import org.osate.aadl2.SubprogramImplementation;
+import org.osate.aadl2.SubprogramSubcomponent;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
@@ -688,53 +689,76 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ELEMENT_NAMES) ;
-        List<String> stringifiedElementNames = new ArrayList<String>() ;
-
-        for(PropertyExpression elementNameProperty : elementNames)
+        if(elementNames.isEmpty()==false)
         {
-          if(elementNameProperty instanceof ListValue)
-          {
-            ListValue lv = (ListValue) elementNameProperty ;
+          List<String> stringifiedElementNames = new ArrayList<String>() ;
 
-            for(PropertyExpression v : lv.getOwnedListElements())
+          for(PropertyExpression elementNameProperty : elementNames)
+          {
+            if(elementNameProperty instanceof ListValue)
             {
-              if(v instanceof StringLiteral)
+              ListValue lv = (ListValue) elementNameProperty ;
+
+              for(PropertyExpression v : lv.getOwnedListElements())
               {
-                StringLiteral eltName = (StringLiteral) v ;
-                stringifiedElementNames.add(eltName.getValue()) ;
+                if(v instanceof StringLiteral)
+                {
+                  StringLiteral eltName = (StringLiteral) v ;
+                  stringifiedElementNames.add(eltName.getValue()) ;
+                }
+              }
+            }
+          }
+
+          EList<PropertyExpression> elementTypes =
+                PropertyUtils
+                      .getPropertyExpression(dataTypeHolder.klass,
+                                             DataModelProperties.BASE_TYPE) ;
+
+          for(PropertyExpression elementTypeProperty : elementTypes)
+          {
+        	if(elementTypeProperty instanceof ListValue)
+        	{
+              ListValue lv = (ListValue) elementTypeProperty ;
+
+              for(PropertyExpression v : lv.getOwnedListElements())
+              {
+                if(v instanceof ClassifierValue)
+                {
+                  ClassifierValue cv = (ClassifierValue) v ;
+                  String type =
+                        GenerationUtilsC.getGenerationCIdentifier(cv
+                              .getClassifier().getQualifiedName()) ;
+                  _gtypesHeaderCode.addOutputNewline(type +
+                        " " +
+                        stringifiedElementNames.get(lv.getOwnedListElements()
+                              .indexOf(v)) + ";") ;
+                }
               }
             }
           }
         }
-
-        EList<PropertyExpression> elementTypes =
-              PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
-                                           DataModelProperties.BASE_TYPE) ;
-
-        for(PropertyExpression elementTypeProperty : elementTypes)
+        else
         {
-          if(elementTypeProperty instanceof ListValue)
+          if(object instanceof DataImplementation)
           {
-            ListValue lv = (ListValue) elementTypeProperty ;
-
-            for(PropertyExpression v : lv.getOwnedListElements())
-            {
-              if(v instanceof ClassifierValue)
-              {
-                ClassifierValue cv = (ClassifierValue) v ;
-                String type =
-                      GenerationUtilsC.getGenerationCIdentifier(cv
-                            .getClassifier().getQualifiedName()) ;
-                _gtypesHeaderCode.addOutputNewline(type +
-                      " " +
-                      stringifiedElementNames.get(lv.getOwnedListElements()
-                            .indexOf(v)) + ";") ;
-              }
-            }
+        	for(DataSubcomponent ds:((DataImplementation)object).getOwnedDataSubcomponents())
+        	{
+        	  DataSubcomponentType dst = ds.getDataSubcomponentType();
+        	  process(dst);
+        	  String sourceName;
+        	  try
+        	  {
+        		sourceName = PropertyUtils.getStringValue(dst, "Source_Name") ;  
+        	  }
+        	  catch(Exception e)
+        	  {
+        		sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
+        	  }
+        	  _gtypesHeaderCode.addOutputNewline(sourceName+" "+ds.getName()+";");
+        	}
           }
         }
-
         _gtypesHeaderCode.decrementIndent() ;
         _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         break ;
@@ -993,9 +1017,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         processEList(object.getOwnedThreadSubcomponents()) ;
         
         _currentImplUnparser = _deploymentImplCode;
-        
+        List<String> dataSubcomponentNames = new ArrayList<String>();
         for(DataSubcomponent ds: object.getOwnedDataSubcomponents())
         {
+          dataSubcomponentNames.add(ds.getName());
           if(false == _dataAccessMapping.containsValue(ds.getName()))
           {
         	  processDataSubcomponentType(ds.getDataSubcomponentType(), _deploymentImplCode, _deploymentHeaderCode);
@@ -1013,7 +1038,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         	{
         		continue;
         	}
-        	else
+        	else if(dataSubcomponentNames.contains(_dataAccessMapping.get(d)))
         	{
         	  DataSubcomponentType dst = d.getDataFeatureClassifier();
         	  String declarationID = _dataAccessMapping.get(d);
@@ -1045,13 +1070,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           }
         }
         
-        // Binds data subcomponent names with DataAcess objects.
+        // Binds data subcomponent names with DataAcess objects
+        // of threads.
         // See process implementation's connections.
         for(Connection connect : cptImpl.getAllConnections())
         {
           if (connect instanceof AccessConnection &&
-             ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA &&
-             connect.getAllDestination() instanceof DataSubcomponent)
+             ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
           {
 
         	if(connect.getAllDestination() instanceof DataSubcomponent)
@@ -1066,20 +1091,33 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 _dataAccessMapping.put(da, destination.getName()) ; 
               }
         	}
-            else
+            else if(connect.getAllSource() instanceof DataSubcomponent)
             {
-              if(connect.getAllSource() instanceof DataSubcomponent)
+              DataSubcomponent source =  (DataSubcomponent) connect.
+              		getAllSource() ;
+              if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
               {
-            	DataSubcomponent source =  (DataSubcomponent) connect.
-              			getAllSource() ;
-              	if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
-                {
-                  ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
-                  
-                  DataAccess da = (DataAccess) dest.getConnectionEnd() ;
-                  _dataAccessMapping.put(da, source.getName()) ;
-                }
+                ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
+                 
+                DataAccess da = (DataAccess) dest.getConnectionEnd() ;
+                _dataAccessMapping.put(da, source.getName()) ;
               }
+            }
+            else if(connect.getAllDestination() instanceof DataAccess
+            		&& connect.getAllSource() instanceof DataAccess)
+            {
+            	if(!(connect.getAllDestination().eContainer() instanceof Thread)
+            		&& !(connect.getAllSource().eContainer() instanceof Thread))
+            		continue;
+            	DataAccess destination = (DataAccess) connect.getAllDestination();
+            	DataAccess source = (DataAccess) connect.getAllSource();
+            	if(_dataAccessMapping.containsKey(destination) &&
+            			!_dataAccessMapping.containsKey(source))
+            		_dataAccessMapping.put(source, _dataAccessMapping.get(destination)) ;
+            	if(_dataAccessMapping.containsKey(source) &&
+            			!_dataAccessMapping.containsKey(destination))
+            		_dataAccessMapping.put(destination, _dataAccessMapping.get(source)) ;
+            	
             }
           }
         }
@@ -1091,8 +1129,18 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
       
+      public String caseSubprogramSubcomponent(SubprogramSubcomponent object)
+      {
+    	  process(object.getSubprogramSubcomponentType());
+    	  return DONE;
+      }
+      
       public String caseThreadImplementation(ThreadImplementation object)
       {
+    	for(SubprogramSubcomponent sc:object.getOwnedSubprogramSubcomponents())
+    	{
+    		process(sc);
+    	}
     	if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;

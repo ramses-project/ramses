@@ -35,8 +35,10 @@ import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
+import org.osate.aadl2.Data;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
+import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
@@ -63,11 +65,13 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorStringLiteral;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTime;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariableHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryNumericOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.CalledSubprogramHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataAccessHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
+import fr.tpt.aadl.annex.behavior.aadlba.DataHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataSubcomponentHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchCondition;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchConjunction;
@@ -88,6 +92,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.LockAction;
 import fr.tpt.aadl.annex.behavior.aadlba.LogicalOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.MultiplyingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.Otherwise;
+import fr.tpt.aadl.annex.behavior.aadlba.ParameterHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.ParameterLabel;
 import fr.tpt.aadl.annex.behavior.aadlba.PortCountValue;
 import fr.tpt.aadl.annex.behavior.aadlba.PortDequeueAction;
@@ -413,8 +418,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         _cFileContent.decrementIndent() ;
-        _cFileContent.addOutputNewline("}") ;
-        _cFileContent.addOutputNewline("") ;
         return DONE ;
       }
 
@@ -465,7 +468,38 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseBehaviorEnumerationLiteral(BehaviorEnumerationLiteral object)
       {
         // ComponentPropertyValue is defined to refer Enumerated data
-        _cFileContent.addOutput(object.getEnumLiteral().getValue());
+    	NamedElement component = object.getComponent();
+    	if(component!=null)
+    	{
+    		try
+    	    {
+    	      String sourceName = PropertyUtils.getStringValue(component, "Source_Name") ;
+    	      _cFileContent.addOutput(object.getEnumLiteral().getValue());
+    	    }
+    		catch(Exception e)
+    		{
+    			_cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(component.getQualifiedName())+"_"+object.getEnumLiteral().getValue());
+    		}
+    	}
+    	else
+    		_cFileContent.addOutput(object.getEnumLiteral().getValue());
+        
+        return DONE ;
+      }
+      
+      /**
+       * Unparse DataComponentReference
+       */
+      public String caseDataComponentReference(DataComponentReference object)
+      {
+    	Iterator<DataHolder> itDataHolder = object.getData().iterator() ;
+    	process(itDataHolder.next());
+        while(itDataHolder.hasNext())
+        {
+        	_cFileContent.addOutput(".");
+        	_cFileContent.addOutput(((DataHolder)itDataHolder.next()).getElement().getName());
+        }
+
         return DONE ;
       }
 
@@ -623,18 +657,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         ValueExpression ve = object.getLogicalValueExpression() ;
         BehaviorActions lba = object.getBehaviorActions() ;
 
-        if(object.eContainer() instanceof IfStatement)
-        {
-          _cFileContent.addOutput("elsif (") ;
-          process(ve) ;
-          _cFileContent.addOutput(") ") ;
-        }
+        if(object.isElif())
+          _cFileContent.addOutput("else if (") ;
         else
-        {
           _cFileContent.addOutput("if (") ;
-          process(ve) ;
-          _cFileContent.addOutput(") ") ;
-        }
+        
+        process(ve) ;
+        _cFileContent.addOutput(") ") ;
+
         
         _cFileContent.addOutputNewline("{") ;
         process(lba) ;
@@ -857,7 +887,12 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseCalledSubprogramHolder(CalledSubprogramHolder object)
       {
         aadlbaText = _cFileContent;
-        resolveExistingCodeDependencies(object.getElement());
+        boolean referencingExistingCode = resolveExistingCodeDependencies(object.getElement());
+        if(!referencingExistingCode)
+        {
+        	_cFileContent.addOutput(GenerationUtilsC.
+        			getGenerationCIdentifier(object.getElement().getQualifiedName()));
+        }
         return DONE ;
       }
       
@@ -893,7 +928,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             if(pce instanceof Parameter)
             {
               Parameter p = (Parameter) pce ;
-              boolean isReturnParam= GenerationUtilsC.isReturnParameter(p);
+              boolean isReturnParam = GenerationUtilsC.isReturnParameter(p);
               if(isReturnParam)
               {
                 returnParameter = p;
@@ -910,6 +945,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           {
             _cFileContent.addOutput(" (") ;
             boolean first = true;
+            boolean remainingParenthesis = false;
             for(ParameterLabel pl : object.getParameterLabels())
             {
               ParameterConnectionEnd pce =
@@ -926,10 +962,49 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 if(Aadl2Utils.isInOutParameter(p) ||
                 		Aadl2Utils.isOutParameter(p))
                 {
-                  _cFileContent.addOutput("&") ;
+                  if(pl instanceof ParameterHolder)
+                  {
+                	  ParameterHolder ph = (ParameterHolder) pl;
+                	  String usage = Aadl2Utils.getParameter_Usage(ph.getParameter());
+                	  // in out passed to in
+                	  if(!Aadl2Utils.isOutParameter(ph.getParameter()) &&
+                		!Aadl2Utils.isInOutParameter(ph.getParameter())
+                		&& !usage.equalsIgnoreCase("by_reference"))
+                		// and ph.getParameter not by reference
+                		  _cFileContent.addOutput("*") ;
+                		  
+                  }
+                  else if (pl instanceof DataSubcomponentHolder
+                		  || pl instanceof BehaviorVariableHolder)
+                	  _cFileContent.addOutput("&") ;
+                  else if (pl instanceof DataComponentReference)
+                  {
+                	  _cFileContent.addOutput("&(") ;
+                	  remainingParenthesis=true;
+                  }
+                }
+                else
+                {
+                	// if p not by_reference
+                	String usage = Aadl2Utils.getParameter_Usage(p);
+                	if(pl instanceof ParameterHolder
+                			&& !usage.equalsIgnoreCase("by_reference"))
+                    {
+                		ParameterHolder ph = (ParameterHolder) pl;
+                		// in to inout
+                		if(Aadl2Utils.isOutParameter(ph.getParameter()) ||
+                    		Aadl2Utils.isInOutParameter(ph.getParameter()))
+                			_cFileContent.addOutput("&") ;
+                    }
+                			
                 }
 
                 process(pl) ;
+                if(remainingParenthesis)
+                {
+                	_cFileContent.addOutput(")");
+                	remainingParenthesis=false;
+                }
                 first=false;
               }
               else if(pce instanceof DataAccess)
@@ -943,8 +1018,37 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   if(Aadl2Utils.isReadWriteDataAccess(da)
                 		  || Aadl2Utils.isWriteOnlyDataAccess(da))
                   {
-                    _cFileContent.addOutput("&") ;
+                	if(pl instanceof DataAccessHolder)
+                	{
+                	  DataAccessHolder dah = (DataAccessHolder) pl;
+                	  // in out passed to in
+                  	  if(!Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
+                  		!Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
+                  		//TODO: and dah.getAccess not by reference
+                  		  _cFileContent.addOutput("*") ;
+                	}
+                	else if(pl instanceof DataSubcomponentHolder
+                			|| pl instanceof BehaviorVariableHolder)
+                		_cFileContent.addOutput("&") ;
+                	else if (pl instanceof DataComponentReference)
+                    {
+                  	  _cFileContent.addOutput("&(") ;
+                  	  remainingParenthesis=true;
+                    }
                   }
+                  else
+                  {
+                	//TODO: if da not by_reference
+                	if(pl instanceof DataAccessHolder)
+                  	{
+                  		DataAccessHolder dah = (DataAccessHolder) pl;
+                  		// in to inout
+                		if(Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()) ||
+                    		Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()))
+                			_cFileContent.addOutput("&") ;
+                  	}
+                  }
+                	  
                 }
 
                 String name = null ;
@@ -976,6 +1080,11 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 {
                   process((ParameterLabel) pl) ;
                 }
+                if(remainingParenthesis)
+                {
+                	_cFileContent.addOutput(")");
+                	remainingParenthesis=false;
+                }
                 first=false;
               }
 
@@ -1004,20 +1113,26 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     	if(elt instanceof Parameter)
 		{
 			Parameter p = (Parameter) elt;
-			if(Aadl2Utils.isInOutParameter(p)
+			if(false==(object.eContainer() instanceof SubprogramCallAction))
+			{
+				if(Aadl2Utils.isInOutParameter(p)
 					|| Aadl2Utils.isOutParameter(p))
 				aadlbaText.addOutput("*");
+			}
 			id = elt.getName();
 		}
 		else if (elt instanceof DataAccess)
 		{
 		  DataAccess da = (DataAccess) elt;
 		  
-		  if(Aadl2Utils.isReadWriteDataAccess(da)
-				  || Aadl2Utils.isWriteOnlyDataAccess(da))
-  		  {
-  			aadlbaText.addOutput("*");
-  		  }
+		  if(false==(object.eContainer() instanceof SubprogramCallAction))
+		  {
+			if(Aadl2Utils.isReadWriteDataAccess(da)
+			  || Aadl2Utils.isWriteOnlyDataAccess(da))
+			{
+  			   aadlbaText.addOutput("*");
+			}
+		  }
   		  id = elt.getName();
 		}
     	else	
@@ -1145,7 +1260,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             process(itRel.next()) ;
           }
         }
-
         return DONE ;
       }
 
