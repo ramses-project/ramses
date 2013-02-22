@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.PackageSection;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
