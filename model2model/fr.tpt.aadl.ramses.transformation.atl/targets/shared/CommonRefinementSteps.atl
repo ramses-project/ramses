@@ -265,7 +265,11 @@ rule DataPort_Instance_with_BA
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
 		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
 		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
-		
+		if(thisModule.public().ownedClassifier->any(e|e.name = fresh_data_type_wrapper.name).oclIsUndefined())
+		{
+			thisModule.public().ownedClassifier.add(fresh_data_type_wrapper);
+			thisModule.public().ownedClassifier.add(fresh_data_impl_wrapper);
+		}
 		
 		if(fi.isUsedInFresh())
  		{
@@ -730,8 +734,6 @@ lazy rule ThreadImplementationWithBA {
 							 			fresh_previous_access,
 							 			callEntryPoint,
 							 			fresh_data_previous);
-				thisModule.public().ownedClassifier.add(fresh_data_type_wrapper);
-				thisModule.public().ownedClassifier.add(fresh_data_impl_wrapper);
  			}
 		}
 	}
