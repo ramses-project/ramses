@@ -357,9 +357,11 @@ properties
 end Create_Sampling_Port;
  
 subprogram Write_Sampling_Message
+prototypes
+  MESSAGE_TYPE: data;
 features
   SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
-  MESSAGE_ADDR:  in out parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR:  in out parameter MESSAGE_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
@@ -368,9 +370,11 @@ properties
 end Write_Sampling_Message;
 
 subprogram Read_Sampling_Message
+prototypes
+  MESSAGE_TYPE: data;
 features
   SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
-  MESSAGE_ADDR: out parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR: out parameter MESSAGE_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   VALIDITY: out parameter VALIDITY_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
@@ -445,9 +449,11 @@ properties
 end Create_Blackboard;
        
 subprogram Display_Blackboard
+prototypes
+  MESSAGE_TYPE: data;
 features
    BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE {Access_Right=>read_only;};
-   MESSAGE_ADDR: in out parameter MESSAGE_ADDR_TYPE ;
+   MESSAGE_ADDR: in out parameter MESSAGE_TYPE ;
    LENGTH: in parameter MESSAGE_SIZE_TYPE ;
    RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties
@@ -456,10 +462,12 @@ properties
 end Display_Blackboard;
 
 subprogram Read_Blackboard
+prototypes
+  MESSAGE_TYPE: data;
 features
   BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE {Access_Right=>read_only;};
   TIME_OUT: in parameter SYSTEM_TIME_TYPE ;
-  MESSAGE_ADDR: out parameter MESSAGE_ADDR_TYPE ;
+  MESSAGE_ADDR: out parameter MESSAGE_TYPE ;
   LENGTH: out parameter MESSAGE_SIZE_TYPE ;
   RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties

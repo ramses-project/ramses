@@ -47,6 +47,14 @@ rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation){
 ----	ADDED MATCHED RULES
 -------------------------------------------------------------------------------------------
 
+helper def: assignPortVariableType(fi: AADLI!FeatureInstance, fresh_data_impl_wrapper: AADLBA!DataSubcomponentType): AADLBA!DataSubcomponentType =
+	if(fi.isUsedInFresh()) then
+ 		fresh_data_impl_wrapper
+	else 		
+		fi.feature.dataFeatureClassifier
+	endif
+;
+
 rule DataPort_Instance_with_BA
 {
 	from
@@ -76,6 +84,8 @@ rule DataPort_Instance_with_BA
 		(
 			name<-fi.feature.name+'_MsgAddr'
 		),
+		actualParam: AADLBA!Parameter,
+		
 		-- target data access must be called 'f_entrypoint' to be retreived with resolveTemp
 		f_entrypoint: AADLBA!DataAccess
 			(
@@ -90,14 +100,15 @@ rule DataPort_Instance_with_BA
 					thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', FRESH_INIT)
 				}
 			),
+		FRESH_INIT: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression('0')}
+		),
 		fresh_previous_access: AADLBA!DataAccess
 		(
 			name<-fi.name+'_freshness_previous_access',
 			dataFeatureClassifier<-'Integer_16'.asClassifier('BASE_TYPES'),
 			kind <- #requires
-		),
-		FRESH_INIT: AADLBA!StringLiteral (
-			value <- '0'
 		),
 		fresh_data_type_wrapper:AADLBA!DataType
 		(
@@ -270,15 +281,8 @@ rule DataPort_Instance_with_BA
 			thisModule.public().ownedClassifier.add(fresh_data_type_wrapper);
 			thisModule.public().ownedClassifier.add(fresh_data_impl_wrapper);
 		}
-		
-		if(fi.isUsedInFresh())
- 		{
-			dataSubcomponent.dataSubcomponentType <- fresh_data_impl_wrapper;
- 		}
-		else
-		{
-			dataSubcomponent.dataSubcomponentType<-fi.feature.dataFeatureClassifier;
-		}
+		dataSubcomponent.dataSubcomponentType <- thisModule.assignPortVariableType(fi, fresh_data_impl_wrapper);
+		actualParam.dataFeatureClassifier <- dataSubcomponent.dataSubcomponentType;
 	}
 }
 

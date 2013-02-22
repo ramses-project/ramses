@@ -305,7 +305,7 @@ helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpress
 	endif
 ;
 
-helper context AADLI!FeatureInstance def : retreiveMessageAddress(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataSubcomponent =
+helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
 	thisModule.resolveTemp(self, 'dataSubcomponent')
 ;
 
@@ -366,10 +366,10 @@ rule setDestinationPortAccessorParameterConnections(port: AADLI!FeatureInstance,
 				thisModule.addParameterConnection
 				(
 					implImg,
-					'transfer_'+port.retreiveMessageAddress(implImg).name+'_to_'+cnx.destination.getConnContextImg(implImg).name+'_'+cnx.destination.getConnFeatureImg(implImg).name,
+					'transfer_'+port.retreiveMessageAddress().name+'_to_'+cnx.destination.getConnContextImg(implImg).name+'_'+cnx.destination.getConnFeatureImg(implImg).name,
 					cnx.destination.getConnFeatureImg(implImg),
 					cnx.destination.getConnContextImg(implImg),
-					port.retreiveMessageAddress(implImg)
+					port.retreiveMessageAddress()
 				);
 			}
 		}
@@ -390,12 +390,12 @@ rule setSourcePortAccessorParameterConnections(port: AADLI!FeatureInstance,
 				(
 					implImg,
 					'transfer_'+
-						port.retreiveMessageAddress(implImg).name+
+						port.retreiveMessageAddress().name+
 						'_to_'+cnx.source.getConnContextImg(implImg).name+'_'+
 						cnx.source.getConnFeatureImg(implImg).name,
 					cnx.source.getConnFeatureImg(implImg),
 					cnx.source.getConnContextImg(implImg),
-					port.retreiveMessageAddress(implImg)
+					port.retreiveMessageAddress()
 				);
 			}
 		}
@@ -584,7 +584,6 @@ rule addPutValueSubprogramCallAction(actions:AADLBA!Actions,
 	{
 		for(cnxInst in fi.srcConnectionInstance)
 		{
-			thisModule.toBeTransformedInterProcessConnection(cnxInst).debug(fi.name+'  @@@@@@@');
 			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
 			{
 				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
@@ -803,9 +802,10 @@ rule addReadBlackBoardCallAction ( 	actions:AADLBA!Actions,
 	{
 		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
 		BLACKBOARD_ID: AADLBA!DataAccess = p.getFeatureImg(); 
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
 	}
 	to
 	
@@ -816,7 +816,7 @@ rule addReadBlackBoardCallAction ( 	actions:AADLBA!Actions,
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- spg
+			element <- resolvedSpg
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
@@ -844,6 +844,36 @@ rule addReadBlackBoardCallAction ( 	actions:AADLBA!Actions,
 	}
 }
 
+unique lazy rule createResolvedSpg
+{
+	from
+		p: AADLI!Port,
+		spg: AADLBA!SubprogramType
+	using
+	{
+		param: AADLBA!Parameter = spg.ownedParameter->any(e|e.name = 'MESSAGE_ADDR');
+		actualParam : AADLBA!Parameter = thisModule.resolveTemp(p, 'actualParam');
+	}
+	to
+		spg_ResolvedType: AADLBA!SubprogramType
+		(
+			name <- spg.name+'_'+p.name,
+			ownedExtension <- extendedMessageType,
+			ownedParameter <- Sequence{actualParam}
+		),
+		extendedMessageType: AADLBA!TypeExtension
+		(
+			extended<-spg
+		)
+	do
+	{
+		actualParam.refined <- param;
+		actualParam.direction <- param.direction;
+		if(thisModule.public().ownedClassifier->any(e|e.name = spg_ResolvedType.name).oclIsUndefined())
+			thisModule.public().ownedClassifier.add(spg_ResolvedType);
+		spg_ResolvedType;
+	}
+}
 
 rule addDisplayBlackBoardCallAction ( actions:AADLBA!Actions,
 									  spg: AADLBA!SubprogramType, 
@@ -854,12 +884,12 @@ rule addDisplayBlackBoardCallAction ( actions:AADLBA!Actions,
 	{
 		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
 		BLACKBOARD_ID: AADLBA!DataAccess = p.getFeatureImg(); 
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
 	}
 	to
-	
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
@@ -867,7 +897,7 @@ rule addDisplayBlackBoardCallAction ( actions:AADLBA!Actions,
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- spg
+			element <- resolvedSpg
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
@@ -934,7 +964,7 @@ rule addBlackBoardCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!Sub
 	using
 	{
 		BLACKBOARD_ID: AADLBA!DataAccess = p.getFeatureImg(); 
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
 	}
@@ -1325,9 +1355,10 @@ rule addWriteSamplingMessageCallAction ( actions:AADLBA!Actions,
 	using
 	{
 		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -1337,7 +1368,7 @@ rule addWriteSamplingMessageCallAction ( actions:AADLBA!Actions,
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- spg
+			element <- resolvedSpg
 		),
 		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
 		(
@@ -1445,9 +1476,10 @@ rule addReadSamplingMessageCallAction ( actions:AADLBA!Actions,
 	{
 		VALIDITY: AADLBA!DataSubcomponent = p.retreiveValidityValue(implImg);
 		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -1457,7 +1489,7 @@ rule addReadSamplingMessageCallAction ( actions:AADLBA!Actions,
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- spg
+			element <- resolvedSpg
 		),
 		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
 		(
@@ -1493,7 +1525,7 @@ rule addSamplingCallSpecification(call: AADLBA!SubprogramCall,
 	using
 	{
 		SAMPLING_ID: AADLBA!DataAccess = p.getFeatureImg(); 
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
 	}
@@ -1655,7 +1687,7 @@ rule addQueuingMessageCallSpecification(seq : AADLBA!SubprogramCallSequence,
 	{
 		QUEUING_PORT_ID: AADLBA!DataAccess = p.getFeatureImg();
 		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
 	}

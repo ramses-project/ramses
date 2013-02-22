@@ -35,6 +35,9 @@ import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
+import org.osate.aadl2.ComponentClassifier;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.Data;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
@@ -118,6 +121,7 @@ import fr.tpt.aadl.annex.behavior.unparser.AadlBaUnparser;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException;
+import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
 import fr.tpt.aadl.utils.Aadl2Utils;
@@ -238,6 +242,18 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     }
     catch(Exception e)
     {
+      if(object instanceof ComponentType)
+      {
+        ComponentType c = (ComponentType) object;
+        if(c.getOwnedExtension()!=null)
+    	  return resolveExistingCodeDependencies(c.getOwnedExtension().getExtended());
+      }
+      else
+      {
+        ComponentImplementation ci = (ComponentImplementation) object;
+        if(ci.getOwnedExtension()!=null)
+    	  return resolveExistingCodeDependencies(ci.getOwnedExtension().getExtended());
+      }
       return false ;
     }
   }
@@ -351,7 +367,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   {
     aadlbaSwitch = new AadlBaSwitch<String>()
     {
-      /**
+
+	/**
        * Top-level method to unparse "behavior_specification"
        * annexsubclause
        */
@@ -418,6 +435,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         _cFileContent.decrementIndent() ;
+        
         return DONE ;
       }
 
@@ -906,14 +924,15 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           SubprogramSubcomponentType sct =
                 (SubprogramSubcomponentType) object.getSubprogram().getElement() ;
 
-
           if(sct instanceof SubprogramType)
           {
             st = (SubprogramType) sct ;
+            AadlToCUnparser.getAadlToCUnparser().delayedUnparsing.add(st);
           }
           else
           {
             SubprogramImplementation si = (SubprogramImplementation) sct ;
+            AadlToCUnparser.getAadlToCUnparser().delayedUnparsing.add(si);
             st = si.getType() ;
           }
 
@@ -1120,8 +1139,10 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 			Parameter p = (Parameter) elt;
 			if(false==(object.eContainer() instanceof SubprogramCallAction))
 			{
+				String usageP = Aadl2Utils.getParameter_Usage(p);
 				if(Aadl2Utils.isInOutParameter(p)
-					|| Aadl2Utils.isOutParameter(p))
+					|| Aadl2Utils.isOutParameter(p)
+					|| usageP.equalsIgnoreCase("by_reference"))
 				aadlbaText.addOutput("*");
 			}
 			id = elt.getName();

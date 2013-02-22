@@ -134,6 +134,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
   private List<String> _processedTypes  ;
 
+  public List<NamedElement> delayedUnparsing = new ArrayList<NamedElement>();
+  
   private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
   // Map Data Access with their relative Data Subcomponent. Relations 
   // are defined in the process implementation via connections.
@@ -193,7 +195,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     {
       getCTypeDeclarator(ne, false) ;
     }
-    
+
     _gtypesHeaderCode.addOutputNewline("\n#endif\n") ;
     _subprogramHeaderCode.addOutputNewline("\n#endif\n") ;
     _activityHeaderCode.addOutputNewline("\n#endif\n") ;
@@ -468,7 +470,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       }
 
       _additionalHeaders.get(headerUnparser)
-            .addAll(baToCUnparser.getAdditionalHeaders()) ;
+            .addAll(baToCUnparser.getAdditionalHeaders()) ; 
     }
 
     return DONE ;
@@ -479,7 +481,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	  return processBehavioredImplementation(object, object);
   }
   
-  boolean processBehavioredImplementation(BehavioredImplementation object, BehavioredImplementation owner)
+  public boolean processBehavioredImplementation(BehavioredImplementation object, BehavioredImplementation owner)
   {
 	  boolean foundRestrictedAnnex = false;
 	  for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
@@ -1048,7 +1050,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         	}
           }
         }
-
         return DONE ;
       }
       
@@ -1126,6 +1127,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
         process(object.getComponentImplementation()) ;
+        for(NamedElement ne: delayedUnparsing)
+        	process(ne);
+        delayedUnparsing.clear();
         return DONE ;
       }
       
