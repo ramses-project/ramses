@@ -973,6 +973,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
       public String caseDataImplementation(DataImplementation object)
       {
+    	if(_processedTypes.contains(object.getQualifiedName()))
+        {
+          return DONE ;
+        }
+        _processedTypes.add(object.getQualifiedName());
         _currentHeaderUnparser = _gtypesHeaderCode ;
         _gtypesHeaderCode.processComments(object) ;
         getCTypeDeclarator((NamedElement) object, true) ;
