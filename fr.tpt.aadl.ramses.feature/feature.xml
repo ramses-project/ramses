@@ -43,9 +43,9 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.osate.annexsupport" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.m2m.atl.core" version="3.2.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.xtext" version="2.1.1" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.utils" version="0.9.5" match="greaterOrEqual"/>
       <import plugin="org.osate.aadl2.instantiation"/>
       <import plugin="org.osate.xtext.aadl2"/>
-      <import plugin="fr.tpt.aadl.utils" version="0.9.5" match="greaterOrEqual"/>
       <import plugin="fr.tpt.aadl.ramses.control.support" version="0.5.0" match="greaterOrEqual"/>
       <import plugin="fr.tpt.aadl.ramses.generation.target.specific" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
@@ -66,6 +66,32 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.osate.xtext.aadl2.properties" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.jdom" version="1.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt"/>
+      <import plugin="org.eclipse.cdt.codan.checkers"/>
+      <import plugin="org.eclipse.cdt.codan.checkers.ui"/>
+      <import plugin="org.eclipse.cdt.codan.core"/>
+      <import plugin="org.eclipse.cdt.codan.core.cxx"/>
+      <import plugin="org.eclipse.cdt.codan.ui"/>
+      <import plugin="org.eclipse.cdt.codan.ui.cxx"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.debug.core"/>
+      <import plugin="org.eclipse.cdt.debug.mi.core"/>
+      <import plugin="org.eclipse.cdt.debug.mi.ui"/>
+      <import plugin="org.eclipse.cdt.debug.ui"/>
+      <import plugin="org.eclipse.cdt.doc.user"/>
+      <import plugin="org.eclipse.cdt.dsf"/>
+      <import plugin="org.eclipse.cdt.dsf.gdb"/>
+      <import plugin="org.eclipse.cdt.dsf.gdb.ui"/>
+      <import plugin="org.eclipse.cdt.dsf.ui"/>
+      <import plugin="org.eclipse.cdt.gdb"/>
+      <import plugin="org.eclipse.cdt.gdb.ui"/>
+      <import plugin="org.eclipse.cdt.launch"/>
+      <import plugin="org.eclipse.cdt.make.core"/>
+      <import plugin="org.eclipse.cdt.make.ui"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.core"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.gnu.ui"/>
+      <import plugin="org.eclipse.cdt.managedbuilder.ui"/>
+      <import plugin="org.eclipse.cdt.ui"/>
    </requires>
 
    <plugin
