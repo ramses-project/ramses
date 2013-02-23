@@ -8,6 +8,7 @@ import org.osate.annexsupport.AnnexParser;
 import org.osate.annexsupport.AnnexResolver;
 import org.osate.annexsupport.AnnexUnparser;
 
+import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry ;
@@ -20,6 +21,8 @@ public class OsateServiceRegistry extends AbstractServiceRegistry implements Ser
 	public OsateServiceRegistry() {
 		_unparsers.put(AadlBaToCUnparserAction.ANNEX_NAME,
 		  		(AnnexUnparser) new AadlBaToCUnparserAction()) ;
+		_unparsers.put(AadlBaUnParserAction.ANNEX_NAME,
+		  		(AnnexUnparser) new AadlBaUnParserAction()) ;
 	}
 
 	private Map<String, AnnexUnparser> _unparsers =
