@@ -345,10 +345,11 @@ rule EventDataPort_Instance_with_BA
 			dataSubcomponentType<-fi.feature.dataFeatureClassifier
 		),
 		f_entrypoint: AADLBA!DataAccess
-			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
-				kind <- #requires
-			)
+		(
+			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+			kind <- #requires
+		),
+		actualParam: AADLBA!Parameter
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
@@ -434,11 +435,13 @@ rule DataPort_Instance
 		(
 			name<-fi.feature.name+'_MsgAddr',
 			dataSubcomponentType<-fi.feature.dataFeatureClassifier
-		)
+		),
+		actualParam: AADLBA!Parameter
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
 		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		actualParam.dataFeatureClassifier <- dataSubcomponent.dataSubcomponentType;
 	}
 }
 
@@ -493,12 +496,13 @@ rule EventDataPort_Instance
 		(
 			name<-fi.feature.name+'_MsgAddr',
 			dataSubcomponentType<-fi.feature.dataFeatureClassifier
-		)
+		),
+		actualParam: AADLBA!Parameter
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
-		
 		implImg <- c.getSubcomponentImg().subcomponentType.debug('Retreived Component Implementation');
+		actualParam.dataFeatureClassifier <- dataSubcomponent.dataSubcomponentType;
 	}
 }
 
@@ -516,14 +520,12 @@ rule DataAccess_Instance
 	}
 	to
 		f: AADLBA!DataAccess
-			(
-				name <- fi.name,
-				kind <- #requires,
-				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
-				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
-			)--,
---		d: AADLBA!DataSubcomponent
---			(name<-fi.name+thisModule.dataSubcomponentSuffix())
+		(
+			name <- fi.name,
+			kind <- #requires,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+		)
 	do
 	{
 		if(c.category=#thread)

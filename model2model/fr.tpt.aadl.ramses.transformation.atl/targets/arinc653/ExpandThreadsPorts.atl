@@ -1214,6 +1214,78 @@ rule addEventCallSpecification(call: AADLBA!SubprogramCall, spg: AADLBA!Subprogr
 ---               BUFFER                 ---
 --------------------------------------------
 
+rule addReceiveBufferAction(	seq : AADLBA!SubprogramCallSequence,
+							fi: AADLI!FeatureInstance, 
+							impl:  AADLI!ComponentImplementation,
+							implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		
+		-- add call to Receive_Buffer
+		thisModule.addReceiveBufferCallAction
+		(
+			seq,
+			'Receive_Buffer'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+	}
+}
+
+rule addReceiveBufferCallAction(actions:AADLBA!Actions,
+								spg: AADLBA!SubprogramType, 
+								p: AADLI!Port, 
+								implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER,TIME_OUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BUFFER_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BUFFER_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+
 rule addReceiveBuffer(seq : AADLBA!SubprogramCallSequence,
 					  fi: AADLI!FeatureInstance,
 					  impl:  AADLI!ComponentImplementation,
@@ -1233,6 +1305,80 @@ rule addReceiveBuffer(seq : AADLBA!SubprogramCallSequence,
 			implImg
 		);
 
+	}
+}
+
+rule addSendBufferAction(seq : AADLBA!SubprogramCallSequence,
+						 fi: AADLI!FeatureInstance, 
+						 impl:  AADLI!ComponentImplementation,
+						 implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		
+		-- add call to Send_Buffer
+		thisModule.addQueuingMessageCallAction
+		(
+			seq,
+			'Send_Buffer'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+				
+	}
+}
+
+
+
+rule addSendBufferCallAction(actions:AADLBA!Actions,
+							 spg: AADLBA!SubprogramType, 
+							 p: AADLI!Port, 
+							 implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,TIME_OUT_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BUFFER_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BUFFER_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
 	}
 }
 
@@ -1415,11 +1561,15 @@ rule addWriteSamplingMessageCallSpecification(seq : AADLBA!SubprogramCallSequenc
 											  p: AADLI!Port, 
 											  implImg: AADLBA!ThreadImplementation)
 {
+	using
+	{
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
 	to
 		call: AADLBA!SubprogramCall
 		(
 			name<-thisModule.callPrefix()+spg.name+p.name,
-			calledSubprogram<-spg
+			calledSubprogram<-resolvedSpg
 		)
 	do
 	{
@@ -1436,12 +1586,13 @@ rule addReadSamplingMessageCallSpecification (seq : AADLBA!SubprogramCallSequenc
 	using
 	{
 		VALIDITY: AADLBA!DataSubcomponent = p.retreiveValidityValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
 	}
 	to
 		call: AADLBA!SubprogramCall
 		(
 			name<-thisModule.callPrefix()+spg.name+p.name,
-			calledSubprogram<-spg
+			calledSubprogram<-resolvedSpg
 		),
 		connectedParam_VALIDITY: AADLBA!ConnectedElement
 		(
@@ -1615,6 +1766,28 @@ rule addSamplingCallSpecification(call: AADLBA!SubprogramCall,
 ---               QUEUING                ---
 --------------------------------------------
 
+rule addReceiveQueuingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		-- add data subcomponents for Receive_Queing_Message
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addValidityDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addReceiveQueuingMessageCallAction
+		(
+			actions,
+			'Receive_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
 rule addReceiveQueuing(seq : AADLBA!SubprogramCallSequence,
 					   fi: AADLI!FeatureInstance, 
 					   impl:  AADLI!ComponentImplementation,
@@ -1635,6 +1808,26 @@ rule addReceiveQueuing(seq : AADLBA!SubprogramCallSequence,
 			implImg
 		);
 		
+	}
+}
+
+rule addSendQueuingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addSendQueuingMessageCallAction
+		(
+			actions,
+			'Send_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
 	}
 }
 
@@ -1678,6 +1871,107 @@ rule addQueuingGlobalVariable(fi: AADLI!FeatureInstance,
 	}
 }
 
+rule addReceiveQueuingMessageCallAction ( actions:AADLBA!Actions,
+									    spg: AADLBA!SubprogramType, 
+									    p: AADLI!Port, 
+										implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		QUEUING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{QEUEING_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,TIME_OUT_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		QEUEING_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-QUEUING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+rule addSendQueuingMessageCallAction ( actions:AADLBA!Actions,
+									   spg: AADLBA!SubprogramType, 
+									   p: AADLI!Port, 
+									   implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		QUEUING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{QEUEING_HOLDER,TIME_OUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		QEUEING_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-QUEUING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+
 rule addQueuingMessageCallSpecification(seq : AADLBA!SubprogramCallSequence,
 										spg: AADLBA!SubprogramType, 
 										p: AADLI!FeatureInstance, 
@@ -1690,12 +1984,13 @@ rule addQueuingMessageCallSpecification(seq : AADLBA!SubprogramCallSequence,
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
 	}
 	to
 		call: AADLBA!SubprogramCall
 		(
 			name<-thisModule.callPrefix()+spg.name+'_'+p.name+seq.getOwnedCallSpecifications().size(),
-			calledSubprogram<-spg
+			calledSubprogram<-resolvedSpg
 		),
 		
 		connected_QUEUING_ID_Access: AADLBA!ConnectedElement

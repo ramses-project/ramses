@@ -91,9 +91,11 @@ properties
 end Create_Buffer;
 
 subprogram Send_Buffer
+prototypes
+  MESSAGE_TYPE: data;
 features
   BUFFER_ID: requires data access BUFFER_ID_TYPE {Access_Right=>read_only;};
-  MESSAGE_ADDR: in out parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR: in out parameter MESSAGE_TYPE;
   LENGTH: in parameter MESSAGE_SIZE_TYPE;
   TIME_OUT: in parameter SYSTEM_TIME_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
@@ -103,10 +105,12 @@ properties
 end Send_Buffer;
  
 subprogram Receive_Buffer
+prototypes
+  MESSAGE_TYPE: data;
 features
   BUFFER_ID: requires data access BUFFER_ID_TYPE {Access_Right=>read_only;};
   TIME_OUT: in parameter SYSTEM_TIME_TYPE;
-  MESSAGE_ADDR: out parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR: out parameter MESSAGE_TYPE;
   LENGTH: out parameter MESSAGE_SIZE_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
@@ -270,9 +274,11 @@ end Create_Queuing_Port;
 
 
 subprogram Send_Queuing_Message
+prototypes
+  MESSAGE_TYPE: data;
 features
   QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;};
-  MESSAGE_ADDR: in out parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR: in out parameter MESSAGE_TYPE;
   LENGTH: in parameter MESSAGE_SIZE_TYPE;
   TIME_OUT: in parameter SYSTEM_TIME_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
@@ -282,10 +288,12 @@ properties
 end Send_Queuing_Message;
 
 subprogram Receive_Queuing_Message
+prototypes
+  MESSAGE_TYPE: data;
 features
   QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;};
   TIME_OUT: in parameter SYSTEM_TIME_TYPE;
-  MESSAGE_ADDR: out parameter MESSAGE_ADDR_TYPE;
+  MESSAGE_ADDR: out parameter MESSAGE_TYPE;
   LENGTH: out parameter MESSAGE_SIZE_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
