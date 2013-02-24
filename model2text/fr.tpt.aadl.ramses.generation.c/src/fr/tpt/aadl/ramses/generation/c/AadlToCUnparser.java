@@ -317,7 +317,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
   public boolean resolveExistingCodeDependencies(NamedElement object,
           AadlToCSwitchProcess sourceNameDest,
-          AadlToCSwitchProcess sourceTextDest)
+          AadlToCSwitchProcess sourceTextDest) throws Exception
   {
 	Set<String> l;
 	if(_additionalHeaders.containsKey(sourceTextDest) == false)
@@ -336,7 +336,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	  return true;
 	}
 	else
-	  return false;
+		throw new Exception("In component "+object.getName()+": Source_Text " +
+	      		"property should also reference a header (.h extension) file");
   }
   
   protected void processDataSubcomponentType(DataSubcomponentType dst,
