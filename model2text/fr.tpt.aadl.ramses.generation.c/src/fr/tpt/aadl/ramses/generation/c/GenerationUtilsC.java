@@ -21,7 +21,13 @@
 
 package fr.tpt.aadl.ramses.generation.c ;
 
+import java.util.List;
+import java.util.Set;
+
 import org.osate.aadl2.BooleanLiteral;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.Property;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
@@ -135,5 +141,44 @@ public class GenerationUtilsC
 		isReturnParam = bl.getValue();
 	  }
 	  return isReturnParam;
+  }
+  
+  public static String resolveExistingCodeDependencies(NamedElement object,
+		  										 Set<String> additionalHeaders)
+  {
+    try
+    {
+      NamedElement ne = object ;
+      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+      List<String> sourceText =
+            PropertyUtils.getStringListValue(ne, "Source_Text") ;
+      
+      for(String s : sourceText)
+      {
+        if(s.endsWith(".h"))
+        {
+          additionalHeaders.add(s) ;
+          return sourceName;
+        }
+      }
+      throw new Exception("In component "+ne.getName()+": Source_Text " +
+      		"property should also reference a header (.h extension) file");
+    }
+    catch(Exception e)
+    {
+      if(object instanceof ComponentType)
+      {
+        ComponentType c = (ComponentType) object;
+        if(c.getOwnedExtension()!=null)
+    	  return resolveExistingCodeDependencies(c.getOwnedExtension().getExtended(), additionalHeaders);
+      }
+      else
+      {
+        ComponentImplementation ci = (ComponentImplementation) object;
+        if(ci.getOwnedExtension()!=null)
+    	  return resolveExistingCodeDependencies(ci.getOwnedExtension().getExtended(), additionalHeaders);
+      }
+      return null ;
+    }
   }
 }

@@ -26,9 +26,11 @@
 package fr.tpt.aadl.ramses.generation.c.annex.behavior ;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.AbstractEnumerator;
 import org.eclipse.emf.common.util.EList;
@@ -134,7 +136,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   protected Map<DataAccess, String> _dataAccessMapping = null ;
   protected UnparseText _cFileContent = null ;
   protected UnparseText _headerFileContent = null ;
-  protected List<String> _additionalHeaders = new ArrayList<String>() ;
+  protected Set<String> _additionalHeaders = new HashSet<String>() ;
   private NamedElement _owner ;
   
   public AadlBaToCUnparser(AnnexSubclause subclause,
@@ -165,7 +167,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     return _headerFileContent.getParseOutput() ;
   }
 
-  public List<String> getAdditionalHeaders()
+  public Set<String> getAdditionalHeaders()
   {
     return _additionalHeaders ;
   }
@@ -219,44 +221,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     }
   }
 
-  public boolean resolveExistingCodeDependencies(NamedElement object)
-  {
-    try
-    {
-      NamedElement ne = object ;
-      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-      List<String> sourceText =
-            PropertyUtils.getStringListValue(ne, "Source_Text") ;
-      aadlbaText.addOutput(sourceName) ;
-      
-      for(String s : sourceText)
-      {
-        if(s.endsWith(".h"))
-        {
-          _additionalHeaders.add(s) ;
-          return true;
-        }
-      }
-      throw new Exception("In component "+ne.getName()+": Source_Text " +
-      		"property should also reference a header (.h extension) file");
-    }
-    catch(Exception e)
-    {
-      if(object instanceof ComponentType)
-      {
-        ComponentType c = (ComponentType) object;
-        if(c.getOwnedExtension()!=null)
-    	  return resolveExistingCodeDependencies(c.getOwnedExtension().getExtended());
-      }
-      else
-      {
-        ComponentImplementation ci = (ComponentImplementation) object;
-        if(ci.getOwnedExtension()!=null)
-    	  return resolveExistingCodeDependencies(ci.getOwnedExtension().getExtended());
-      }
-      return false ;
-    }
-  }
+  
 
   protected static String getInitialStateIdentifier(BehaviorAnnex ba)
   {
@@ -737,7 +702,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
           try
           {
-            resolveExistingCodeDependencies(iterativeVariableClassifier);
+            GenerationUtilsC.resolveExistingCodeDependencies(iterativeVariableClassifier,_additionalHeaders);
           } catch(Exception e)
           {
             _cFileContent.addOutput(GenerationUtilsC.
@@ -785,7 +750,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
           try
           {
-            resolveExistingCodeDependencies(iterativeVariableClassifier);
+            String existing = GenerationUtilsC.resolveExistingCodeDependencies(iterativeVariableClassifier, _additionalHeaders);
+            aadlbaText.addOutput(existing);
           }
           catch(Exception e)
           {
@@ -905,8 +871,10 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public String caseCalledSubprogramHolder(CalledSubprogramHolder object)
       {
         aadlbaText = _cFileContent;
-        boolean referencingExistingCode = resolveExistingCodeDependencies(object.getElement());
-        if(!referencingExistingCode)
+        String referencingExistingCode = GenerationUtilsC.resolveExistingCodeDependencies(object.getElement(), _additionalHeaders);
+        if(referencingExistingCode!=null)
+        	aadlbaText.addOutput(referencingExistingCode);
+        else
         {
         	_cFileContent.addOutput(GenerationUtilsC.
         			getGenerationCIdentifier(object.getElement().getQualifiedName()));

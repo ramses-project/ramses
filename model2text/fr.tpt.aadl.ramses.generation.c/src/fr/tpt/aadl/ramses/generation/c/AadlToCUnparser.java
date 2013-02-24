@@ -316,39 +316,29 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   }
 
   public boolean resolveExistingCodeDependencies(NamedElement object,
-                                                 AadlToCSwitchProcess sourceNameDest,
-                                                 AadlToCSwitchProcess sourceTextDest)
-        throws Exception
+          AadlToCSwitchProcess sourceNameDest,
+          AadlToCSwitchProcess sourceTextDest)
   {
-    NamedElement ne = object ;
-    String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-    List<String> sourceText =
-          PropertyUtils.getStringListValue(ne, "Source_Text") ;
-    if(sourceNameDest!=null)
-      sourceNameDest.addOutput(sourceName) ;
-
-    for(String s : sourceText)
-    {
-      if(s.endsWith(".h"))
-      {
-        if(_additionalHeaders.containsKey(sourceTextDest) == false)
-        {
-          Set<String> l = new HashSet<String>() ;
-          l.add(s) ;
-          _additionalHeaders.put(sourceTextDest, l) ;
-        }
-        else
-        {
-          _additionalHeaders.get(sourceTextDest).add(s) ;
-        }
-
-        return true ;
-      }
-    }
-
-    return false ;
+	Set<String> l;
+	if(_additionalHeaders.containsKey(sourceTextDest) == false)
+	{
+	  l = new HashSet<String>() ;
+	  _additionalHeaders.put(sourceTextDest, l) ;
+	}
+	else
+	{
+	  l = _additionalHeaders.get(sourceTextDest) ;
+	}
+	String sourceName = GenerationUtilsC.resolveExistingCodeDependencies(object, l);
+	if(sourceName!=null)
+	{
+	  sourceNameDest.addOutput(sourceName);
+	  return true;
+	}
+	else
+	  return false;
   }
-
+  
   protected void processDataSubcomponentType(DataSubcomponentType dst,
 		  AadlToCSwitchProcess sourceNameDest, 
 		  AadlToCSwitchProcess sourceTextDest)
