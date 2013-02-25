@@ -240,16 +240,20 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
     {
       EventDataPort port  = (EventDataPort) fi.getFeature() ;
-      try
+      if(isUsedInFresh(fi))
+    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
+      else
       {
-        queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
-      }
-      catch(Exception e)
-      {
-    	queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+        try
+        {
+          queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+        }
+        catch(Exception e)
+        {
+    	  queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+        }
       }
     }
-    
     if(getQueueInfo(p, queueInfo))
     {
       pp.queueInfo.add(queueInfo) ;
@@ -268,13 +272,18 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
     {
       EventDataPort port  = (EventDataPort) fi.getFeature() ;
-      try
+      if(isUsedInFresh(fi))
+    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
+      else
       {
-        queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
-      }
-      catch(Exception e)
-      {
-        queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+        try
+        {
+          queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+        }
+        catch(Exception e)
+        {
+          queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+        }
       }
     }
     
