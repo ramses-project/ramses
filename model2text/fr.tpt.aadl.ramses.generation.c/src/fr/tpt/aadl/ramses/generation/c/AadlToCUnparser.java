@@ -284,6 +284,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       {
         res.append("#include \"" + s + "\"\n") ;
       }
+      additionalTypeHeaders.clear();
     }
 
     return res.toString() ;
