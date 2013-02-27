@@ -28,8 +28,7 @@
             visible="true">
          <menu
                id="menu.ramses"
-               label="RAMSES"
-               path="project/additions">
+               label="RAMSES">
                <separator name="generation"/>
                <groupMarker name="top.grp"/>
          </menu>
