@@ -462,7 +462,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       }
 
       _additionalHeaders.get(headerUnparser)
-            .addAll(baToCUnparser.getAdditionalHeaders()) ; 
+            .addAll(baToCUnparser.getAdditionalHeaders()) ;
+      baToCUnparser.getAdditionalHeaders().clear();
     }
 
     return DONE ;
