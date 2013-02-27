@@ -149,20 +149,18 @@ public class GenerationUtilsC
     try
     {
       NamedElement ne = object ;
-      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
       List<String> sourceText =
-            PropertyUtils.getStringListValue(ne, "Source_Text") ;
-      
+              PropertyUtils.getStringListValue(ne, "Source_Text") ;
+        
       for(String s : sourceText)
       {
         if(s.endsWith(".h"))
         {
           additionalHeaders.add(s) ;
-          return sourceName;
         }
       }
-      throw new Exception("In component "+ne.getName()+": Source_Text " +
-      		"property should also reference a header (.h extension) file");
+      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+      return sourceName;
     }
     catch(Exception e)
     {

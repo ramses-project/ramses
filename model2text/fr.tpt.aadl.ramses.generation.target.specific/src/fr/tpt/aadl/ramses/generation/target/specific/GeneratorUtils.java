@@ -311,8 +311,32 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
             .getOwnedValues())
       {
-        result.add(((StringLiteral) aModalPropertyValue.getOwnedValue())
-              .getValue()) ;
+    	PropertyExpression aPE = aModalPropertyValue.getOwnedValue();
+    	if(aPE instanceof StringLiteral)
+    	{
+    	  StringLiteral sl = (StringLiteral) aPE;
+    	  String value = sl.getValue();
+    	  if(value.endsWith(".c"))
+    	  {
+    		value = value.substring(0,value.length()-2);  
+    		value = value.concat(".o");
+    	  }
+    	  result.add(value);
+    	}
+    	else if(aPE instanceof ListValue)
+    	{
+    	  for(PropertyExpression pe: ((ListValue) aPE).getOwnedListElements())
+    	  {
+    		StringLiteral sl = (StringLiteral) pe;
+        	String value = sl.getValue();
+        	if(value.endsWith(".c"))
+      	  	{
+      		  value = value.substring(0,value.length()-2);  
+      		  value = value.concat(".o");
+      	    }
+        	result.add(value) ;
+    	  }
+        }
       }
     }
   }

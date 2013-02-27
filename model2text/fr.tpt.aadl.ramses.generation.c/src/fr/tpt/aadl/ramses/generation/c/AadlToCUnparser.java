@@ -739,16 +739,17 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         	{
         	  DataSubcomponentType dst = ds.getDataSubcomponentType();
         	  process(dst);
-        	  String sourceName;
+        	  
         	  try
-        	  {
-        		sourceName = PropertyUtils.getStringValue(dst, "Source_Name") ;  
+        	  { 
+        		  resolveExistingCodeDependencies(dst, _gtypesHeaderCode, _gtypesHeaderCode);
         	  }
-        	  catch(Exception e)
+        	  catch (Exception e)
         	  {
-        		sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
+        		String sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
+        		_gtypesHeaderCode.addOutput(sourceName);
         	  }
-        	  _gtypesHeaderCode.addOutputNewline(sourceName+" "+ds.getName()+";");
+        	  _gtypesHeaderCode.addOutputNewline(" "+ds.getName()+";");
         	}
           }
         }

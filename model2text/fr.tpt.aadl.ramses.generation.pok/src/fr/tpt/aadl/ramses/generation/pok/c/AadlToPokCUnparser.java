@@ -582,13 +582,14 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
       }
 
       mainImplCode.addOutputNewline("};") ;
-      
+      int i = 0;
       // Generate external variable (declared in deployment.c).
       for(BlackBoardInfo info : pp.blackboardInfo)
       {
         mainImplCode.addOutput("BLACKBOARD_ID_TYPE ") ;
         mainImplCode.addOutput(info.id) ;
-        mainImplCode.addOutputNewline(";") ;
+        mainImplCode.addOutputNewline("=" + Integer.toString(i) +";") ;
+        i++;
       }
     }
     
