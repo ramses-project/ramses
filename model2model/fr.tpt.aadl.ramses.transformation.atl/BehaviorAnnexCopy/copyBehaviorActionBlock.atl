@@ -175,8 +175,7 @@ lazy rule copyBehaviorEnumerationLiteral
 		)
 	do
 	{
-		if(not src_behaviorEnumerationLiteral.property.oclIsUndefined())
-			src_behaviorEnumerationLiteral.property.PropertyExpression(c);
+		target_behaviorEnumerationLiteral;
 	}
 }
 

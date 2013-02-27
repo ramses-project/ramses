@@ -409,7 +409,7 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 		if(p.eContainer().eContainer() = self.eContainer().eContainer()) then
 			thisModule.public().name.concat('::'+p.getFreshnessType()+thisModule.impl_suffix).get_C_Identifier()
 		else
-			self.feature.dataFeatureClassifier.qualifiedName.get_C_Identifier()
+			thisModule.public().name.concat('::'+self.getFreshnessType()+thisModule.impl_suffix).get_C_Identifier()
 		endif
 	else
 		self.feature.dataFeatureClassifier.get_C_Identifier()
