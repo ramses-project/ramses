@@ -10,7 +10,7 @@
    			<action
    				class="fr.tpt.aadl.flow.CheddarBackgroundExecution"
    				icon="icon/SchedulerPr.gif"
-   				id="fr.tpt.aadl.cheddar.Main"
+   				id="fr.tpt.aadl.cheddar.scheduling"
    				label="Scheduling simulation with Cheddar"
    				state="true"
    				style="push"
@@ -19,7 +19,7 @@
       <action
             class="fr.tpt.aadl.flow.LaunchCheddarUI"
             icon="icon/timeline_marker2.png"
-            id="fr.tpt.aadl.cheddar.Main"
+            id="fr.tpt.aadl.cheddar.launch"
             label="Open Cheddar environment"
             state="true"
             style="push"
