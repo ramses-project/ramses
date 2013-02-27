@@ -96,6 +96,10 @@ helper context AADLBA!SubprogramCallAction def: copyBehaviorAction(c: AADLI!Comp
 	thisModule.copySubprogramCallAction(self,c)
 ;
 
+helper context AADLBA!AssignmentAction def: copyBehaviorAction(c: AADLI!ComponentInstance): AADLBA!AssignmentAction =
+	thisModule.copyAssignmentAction(self,c)
+;
+
 lazy rule copyIfStatement
 {
 	from
@@ -114,6 +118,19 @@ lazy rule copyIfStatement
 			target_ifStatement.elseStatement <- thisModule.copyElseStatement(src_ifStatement.elseStatement,c);
 		target_ifStatement;
 	}
+}
+
+lazy rule copyAssignmentAction
+{
+	from
+		src_assignmentAction: AADLBA!AssignmentAction,
+		c: AADLI!ComponentInstance
+	to
+		target_assignmentAction: AADLBA!AssignmentAction
+		(
+			target <- thisModule.copyParameterLabel(src_assignmentAction.target,c),
+			valueExpression <- thisModule.copyValueExpression(src_assignmentAction.valueExpression,c)
+		)
 }
 
 lazy rule copyElseStatement

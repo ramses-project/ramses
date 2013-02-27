@@ -939,6 +939,93 @@
 		<constant value="462:7-462:91"/>
 		<constant value="462:3-462:91"/>
 		<constant value="452:3-462:91"/>
+		<constant value="getDirectlyUsedInFresh"/>
+		<constant value="164"/>
+		<constant value="145"/>
+		<constant value="37"/>
+		<constant value="126"/>
+		<constant value="57"/>
+		<constant value="107"/>
+		<constant value="77"/>
+		<constant value="88"/>
+		<constant value="106"/>
+		<constant value="102"/>
+		<constant value="125"/>
+		<constant value="121"/>
+		<constant value="144"/>
+		<constant value="140"/>
+		<constant value="163"/>
+		<constant value="159"/>
+		<constant value="165"/>
+		<constant value="467:5-467:9"/>
+		<constant value="467:5-467:33"/>
+		<constant value="470:10-470:14"/>
+		<constant value="470:10-470:36"/>
+		<constant value="470:44-470:45"/>
+		<constant value="470:44-470:52"/>
+		<constant value="470:44-470:76"/>
+		<constant value="470:10-470:77"/>
+		<constant value="470:10-470:94"/>
+		<constant value="470:6-470:94"/>
+		<constant value="473:11-473:15"/>
+		<constant value="473:11-473:37"/>
+		<constant value="473:45-473:46"/>
+		<constant value="473:45-473:58"/>
+		<constant value="473:45-473:82"/>
+		<constant value="473:11-473:83"/>
+		<constant value="473:11-473:100"/>
+		<constant value="473:7-473:100"/>
+		<constant value="476:12-476:16"/>
+		<constant value="476:12-476:38"/>
+		<constant value="476:46-476:47"/>
+		<constant value="476:46-476:59"/>
+		<constant value="476:46-476:83"/>
+		<constant value="476:12-476:84"/>
+		<constant value="476:12-476:101"/>
+		<constant value="476:8-476:101"/>
+		<constant value="479:13-479:17"/>
+		<constant value="479:13-479:39"/>
+		<constant value="479:47-479:48"/>
+		<constant value="479:47-479:55"/>
+		<constant value="479:47-479:79"/>
+		<constant value="479:13-479:80"/>
+		<constant value="479:13-479:97"/>
+		<constant value="479:9-479:97"/>
+		<constant value="482:7-482:19"/>
+		<constant value="480:7-480:11"/>
+		<constant value="480:7-480:33"/>
+		<constant value="480:41-480:42"/>
+		<constant value="480:41-480:49"/>
+		<constant value="480:41-480:73"/>
+		<constant value="480:7-480:74"/>
+		<constant value="480:7-480:81"/>
+		<constant value="479:6-483:11"/>
+		<constant value="477:6-477:10"/>
+		<constant value="477:6-477:32"/>
+		<constant value="477:40-477:41"/>
+		<constant value="477:40-477:53"/>
+		<constant value="477:40-477:77"/>
+		<constant value="477:6-477:78"/>
+		<constant value="477:6-477:90"/>
+		<constant value="476:5-484:10"/>
+		<constant value="474:5-474:9"/>
+		<constant value="474:5-474:31"/>
+		<constant value="474:39-474:40"/>
+		<constant value="474:39-474:52"/>
+		<constant value="474:39-474:76"/>
+		<constant value="474:5-474:77"/>
+		<constant value="474:5-474:89"/>
+		<constant value="473:4-485:9"/>
+		<constant value="471:4-471:8"/>
+		<constant value="471:4-471:30"/>
+		<constant value="471:38-471:39"/>
+		<constant value="471:38-471:46"/>
+		<constant value="471:38-471:70"/>
+		<constant value="471:4-471:71"/>
+		<constant value="471:4-471:78"/>
+		<constant value="470:3-486:8"/>
+		<constant value="468:3-468:7"/>
+		<constant value="467:2-487:7"/>
 	</cp>
 	<field name="1" type="2"/>
 	<field name="3" type="4"/>
@@ -3809,6 +3896,260 @@
 			<lve slot="1" name="33" begin="48" end="55"/>
 			<lve slot="1" name="33" begin="68" end="75"/>
 			<lve slot="0" name="17" begin="0" end="81"/>
+		</localvariabletable>
+	</operation>
+	<operation name="938">
+		<context type="872"/>
+		<parameters>
+		</parameters>
+		<code>
+			<load arg="873"/>
+			<call arg="893"/>
+			<if arg="939"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="894"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="895"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="26"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<call arg="298"/>
+			<call arg="299"/>
+			<if arg="940"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="896"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="897"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="941"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<call arg="298"/>
+			<call arg="299"/>
+			<if arg="942"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="894"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="897"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="943"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<call arg="298"/>
+			<call arg="299"/>
+			<if arg="944"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="896"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="895"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="945"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<call arg="298"/>
+			<call arg="299"/>
+			<if arg="946"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<call arg="208"/>
+			<goto arg="947"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="896"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="895"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="948"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<get arg="895"/>
+			<goto arg="949"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="894"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="897"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="950"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<get arg="897"/>
+			<goto arg="951"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="896"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="897"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="952"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<get arg="897"/>
+			<goto arg="953"/>
+			<push arg="28"/>
+			<push arg="8"/>
+			<new/>
+			<load arg="873"/>
+			<get arg="894"/>
+			<iterate/>
+			<store arg="19"/>
+			<load arg="19"/>
+			<get arg="895"/>
+			<call arg="893"/>
+			<call arg="214"/>
+			<if arg="954"/>
+			<load arg="19"/>
+			<call arg="74"/>
+			<enditerate/>
+			<call arg="216"/>
+			<call arg="208"/>
+			<get arg="895"/>
+			<goto arg="955"/>
+			<load arg="873"/>
+		</code>
+		<linenumbertable>
+			<lne id="956" begin="0" end="0"/>
+			<lne id="957" begin="0" end="1"/>
+			<lne id="958" begin="6" end="6"/>
+			<lne id="959" begin="6" end="7"/>
+			<lne id="960" begin="10" end="10"/>
+			<lne id="961" begin="10" end="11"/>
+			<lne id="962" begin="10" end="12"/>
+			<lne id="963" begin="3" end="19"/>
+			<lne id="964" begin="3" end="20"/>
+			<lne id="965" begin="3" end="21"/>
+			<lne id="966" begin="26" end="26"/>
+			<lne id="967" begin="26" end="27"/>
+			<lne id="968" begin="30" end="30"/>
+			<lne id="969" begin="30" end="31"/>
+			<lne id="970" begin="30" end="32"/>
+			<lne id="971" begin="23" end="39"/>
+			<lne id="972" begin="23" end="40"/>
+			<lne id="973" begin="23" end="41"/>
+			<lne id="974" begin="46" end="46"/>
+			<lne id="975" begin="46" end="47"/>
+			<lne id="976" begin="50" end="50"/>
+			<lne id="977" begin="50" end="51"/>
+			<lne id="978" begin="50" end="52"/>
+			<lne id="979" begin="43" end="59"/>
+			<lne id="980" begin="43" end="60"/>
+			<lne id="981" begin="43" end="61"/>
+			<lne id="982" begin="66" end="66"/>
+			<lne id="983" begin="66" end="67"/>
+			<lne id="984" begin="70" end="70"/>
+			<lne id="985" begin="70" end="71"/>
+			<lne id="986" begin="70" end="72"/>
+			<lne id="987" begin="63" end="79"/>
+			<lne id="988" begin="63" end="80"/>
+			<lne id="989" begin="63" end="81"/>
+			<lne id="990" begin="83" end="86"/>
+			<lne id="991" begin="91" end="91"/>
+			<lne id="992" begin="91" end="92"/>
+			<lne id="993" begin="95" end="95"/>
+			<lne id="994" begin="95" end="96"/>
+			<lne id="995" begin="95" end="97"/>
+			<lne id="996" begin="88" end="104"/>
+			<lne id="997" begin="88" end="105"/>
+			<lne id="998" begin="63" end="105"/>
+			<lne id="999" begin="110" end="110"/>
+			<lne id="1000" begin="110" end="111"/>
+			<lne id="1001" begin="114" end="114"/>
+			<lne id="1002" begin="114" end="115"/>
+			<lne id="1003" begin="114" end="116"/>
+			<lne id="1004" begin="107" end="123"/>
+			<lne id="1005" begin="107" end="124"/>
+			<lne id="1006" begin="43" end="124"/>
+			<lne id="1007" begin="129" end="129"/>
+			<lne id="1008" begin="129" end="130"/>
+			<lne id="1009" begin="133" end="133"/>
+			<lne id="1010" begin="133" end="134"/>
+			<lne id="1011" begin="133" end="135"/>
+			<lne id="1012" begin="126" end="142"/>
+			<lne id="1013" begin="126" end="143"/>
+			<lne id="1014" begin="23" end="143"/>
+			<lne id="1015" begin="148" end="148"/>
+			<lne id="1016" begin="148" end="149"/>
+			<lne id="1017" begin="152" end="152"/>
+			<lne id="1018" begin="152" end="153"/>
+			<lne id="1019" begin="152" end="154"/>
+			<lne id="1020" begin="145" end="161"/>
+			<lne id="1021" begin="145" end="162"/>
+			<lne id="1022" begin="3" end="162"/>
+			<lne id="1023" begin="164" end="164"/>
+			<lne id="1024" begin="0" end="164"/>
+		</linenumbertable>
+		<localvariabletable>
+			<lve slot="1" name="33" begin="9" end="16"/>
+			<lve slot="1" name="33" begin="29" end="36"/>
+			<lve slot="1" name="33" begin="49" end="56"/>
+			<lve slot="1" name="33" begin="69" end="76"/>
+			<lve slot="1" name="33" begin="94" end="101"/>
+			<lve slot="1" name="33" begin="113" end="120"/>
+			<lve slot="1" name="33" begin="132" end="139"/>
+			<lve slot="1" name="33" begin="151" end="158"/>
+			<lve slot="0" name="17" begin="0" end="164"/>
 		</localvariabletable>
 	</operation>
 </asm>

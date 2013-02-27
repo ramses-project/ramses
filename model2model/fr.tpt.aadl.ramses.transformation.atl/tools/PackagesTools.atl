@@ -61,14 +61,17 @@ rule addImportedUnitFromInputModel(packageImg: AADLBA!PackageSection, elt: AADLB
 	using
 	{
 		src_package : AADLI!AadlPackage = elt.getContainingPackage();
-		isNotYetImported: Boolean =  packageImg.importedUnit->any(e|e.name = src_package.name).oclIsUndefined();
+		isNotYetImported: Boolean = false;
 	}
 	do
 	{
-		
-		if(isNotYetImported)
+		if(not src_package.oclIsUndefined())
 		{
-			packageImg.importedUnit.add(src_package);
+			isNotYetImported <- packageImg.importedUnit->any(e|e.name = src_package.name).oclIsUndefined(); 
+			if(isNotYetImported and not src_package.equals(packageImg))
+			{
+				packageImg.importedUnit.add(src_package);
+			}
 		}
 	}
 }

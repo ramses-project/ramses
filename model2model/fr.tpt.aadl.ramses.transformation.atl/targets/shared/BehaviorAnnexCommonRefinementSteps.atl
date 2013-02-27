@@ -462,3 +462,27 @@ helper context AADLI!FeatureInstance def: isUsedInFresh() : Boolean =
 		not self.dstConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).oclIsUndefined()
 	--endif
 ;
+
+helper context AADLI!FeatureInstance def: getDirectlyUsedInFresh() : AADLI!FeatureInstance =
+	if(self.isDirectlyUsedInFresh()) then
+		self
+	else
+		if(not self.srcConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).oclIsUndefined()) then
+			self.srcConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).source
+		else
+			if(not self.dstConnectionInstance->any(e|e.destination.isDirectlyUsedInFresh()).oclIsUndefined()) then
+				self.dstConnectionInstance->any(e|e.destination.isDirectlyUsedInFresh()).destination
+			else
+				if(not self.srcConnectionInstance->any(e|e.destination.isDirectlyUsedInFresh()).oclIsUndefined()) then
+					self.srcConnectionInstance->any(e|e.destination.isDirectlyUsedInFresh()).destination
+				else
+					if(not self.dstConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).oclIsUndefined()) then
+						self.dstConnectionInstance->any(e|e.source.isDirectlyUsedInFresh()).source
+					else
+						OclUndefined
+					endif
+				endif
+			endif
+		endif
+	endif
+;

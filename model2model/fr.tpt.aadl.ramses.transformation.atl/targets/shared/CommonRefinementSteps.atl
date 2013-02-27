@@ -41,6 +41,12 @@ create OUT : AADLBA 	from 		IN : AADLI,
 rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation){
 	
 }
+
+helper def: freshness_suffix : String = '_freshness_t';
+helper def: impl_suffix : String = '.impl';
+helper context AADLI!FeatureInstance def: getFreshnessType() : String =
+	self.name+thisModule.freshness_suffix
+;
 -------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------
@@ -55,6 +61,24 @@ helper def: assignPortVariableType(fi: AADLI!FeatureInstance, fresh_data_impl_wr
 	endif
 ;
 
+helper context AADLI!FeatureInstance def: getBehaviorAnnex():  AADLBA!BehaviorAnnex = 
+	self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification')
+;
+
+lazy rule createFreshnessImplIdentifier
+{
+	from
+		fresh_data_type_wrapper:AADLBA!DataType
+	to
+		result: String
+	do
+	{
+		result <- fresh_data_type_wrapper.name+thisModule.impl_suffix;
+		
+		result;
+	}
+}
+
 rule DataPort_Instance_with_BA
 {
 	from
@@ -67,7 +91,7 @@ rule DataPort_Instance_with_BA
 		c: AADLI!ComponentInstance = fi.eContainer();
 		-- local variable that will be initialized in the "do" section.
 		implImg: AADLI!ComponentImplementation = OclUndefined;
-		ba: AADLBA!BehaviorAnnex = fi.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification');
+		ba: AADLBA!BehaviorAnnex = fi.getBehaviorAnnex();
 	}
 	to
 		-- creation of a data access feature, to be added to the target thread component, 
@@ -112,7 +136,7 @@ rule DataPort_Instance_with_BA
 		),
 		fresh_data_type_wrapper:AADLBA!DataType
 		(
-			name<-fi.name+'_freshness_t',
+			name<-fi.getFreshnessType(),
 			ownedPropertyAssociation <- Sequence
 			{
 				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
@@ -121,7 +145,7 @@ rule DataPort_Instance_with_BA
 		),
 		fresh_data_impl_wrapper:AADLBA!DataImplementation
 		(
-			name<-fresh_data_type_wrapper.name+'.impl',
+			name<-thisModule.createFreshnessImplIdentifier(),
 			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
 		),
 		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
@@ -283,6 +307,7 @@ rule DataPort_Instance_with_BA
 		}
 		dataSubcomponent.dataSubcomponentType <- thisModule.assignPortVariableType(fi, fresh_data_impl_wrapper);
 		actualParam.dataFeatureClassifier <- dataSubcomponent.dataSubcomponentType;
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
 	}
 }
 

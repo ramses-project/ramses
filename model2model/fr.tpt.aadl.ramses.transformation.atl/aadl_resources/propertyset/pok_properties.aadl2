@@ -82,7 +82,7 @@ property set POK is
   -- Deployment properties
   -- Indicate which architecture we use and which bsp
 
-  Source_Location : aadlstring applies to (subprogram);
+  Source_Location : list of aadlstring applies to (subprogram);
 
   -- Indicate where is the object file
   -- that contains this subprogram.

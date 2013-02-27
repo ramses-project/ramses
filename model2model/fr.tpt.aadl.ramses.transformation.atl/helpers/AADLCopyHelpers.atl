@@ -27,7 +27,11 @@ helper context AADLBA!NamedElement def : getContainingPackage() :AADLBA!AadlPack
 	if(self.oclIsTypeOf(AADLBA!AadlPackage)) then
 		self
 	else
-		self.eContainer().getContainingPackage()
+		if(not self.eContainer().oclIsUndefined()) then
+			self.eContainer().getContainingPackage()
+		else
+			OclUndefined
+		endif
 	endif
 ;
 

@@ -38,6 +38,10 @@ helper context AADLBA!NamedElement def: get_C_Identifier(): String =
 	endif
 ;
 
+helper context String def: get_C_Identifier(): String =
+	self.replaceAll('::', '__').replaceAll('.','_')
+;
+
 helper context AADLBA!ThreadImplementation def : callSequence() : AADLBA!SubprogramCallSequence =
 	self.ownedSubprogramCallSequence->first()
 ;
