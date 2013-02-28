@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AADL-Ramses-Instantiation
-Bundle-SymbolicName: fr.tpt.aadl.ramses.instantiation
+Bundle-SymbolicName: fr.tpt.aadl.ramses.instantiation;singleton:=true
 Bundle-Version: 0.5.0
 Export-Package: fr.tpt.aadl.ramses.instantiation,
  fr.tpt.aadl.ramses.instantiation.manager
@@ -19,4 +19,5 @@ Import-Package: org.osate.xtext.aadl2.properties.linking,
  fr.tpt.aadl.utils,
  org.eclipse.xtext.ui.shared,
  org.osate.xtext.aadl2.properties.ui
+Bundle-ActivationPolicy: lazy
 

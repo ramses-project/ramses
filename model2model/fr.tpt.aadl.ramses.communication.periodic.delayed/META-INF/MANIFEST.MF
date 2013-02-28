@@ -1,9 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CommunicationDimensioning
-Bundle-SymbolicName: fr.tpt.aadl.ramses.communication.periodic.delayed
+Bundle-SymbolicName: fr.tpt.aadl.ramses.communication.periodic.delayed;singleton:=true
 Bundle-Version: 0.0.1
-Bundle-Activator: fr.tpt.aadl.ramses.communication.dimensioning.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.osate.aadl2;bundle-version="1.0.0",

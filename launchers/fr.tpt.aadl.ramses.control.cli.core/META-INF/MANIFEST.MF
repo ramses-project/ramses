@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AADL-Ramses-Cli-Core
-Bundle-SymbolicName: fr.tpt.aadl.ramses.control.cli.core
+Bundle-SymbolicName: fr.tpt.aadl.ramses.control.cli.core;singleton:=true
 Bundle-Version: 0.5.0
 Bundle-ClassPath: .,
  lib/JSAP-2.1.jar
@@ -21,3 +21,4 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  fr.tpt.aadl.ramses.instantiation
 Bundle-Vendor: TELECOM ParisTech
 Import-Package: org.osate.xtext.aadl2.properties.linking
+Bundle-ActivationPolicy: lazy
