@@ -442,9 +442,14 @@ lazy rule copyPortFreshValue
 }
 
 helper context AADLI!FeatureInstance def: isDirectlyUsedInFresh() : Boolean =
-	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
-		(self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification'),
+	let ba: AADLBA!BehaviorAnnex = self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification') in 
+	if(not ba.oclIsUndefined()) then
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
+		(ba,
 		self.feature)
+	else
+		false
+	endif
 ;
 
 helper context AADLI!FeatureInstance def: isUsedInFresh() : Boolean =
