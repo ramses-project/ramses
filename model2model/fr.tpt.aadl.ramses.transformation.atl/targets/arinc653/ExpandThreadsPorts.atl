@@ -416,15 +416,6 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	endif
 ;
 
---helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
---	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
---	if(self.isUsedInFresh()) then
---		self.feature.dataFeatureClassifier.qualifiedName.get_C_Identifier()
---	else
---		self.feature.dataFeatureClassifier.get_C_Identifier()
---	endif
---;
-
 unique lazy rule addLengthDataSubcomponent
 {
 	from
@@ -802,11 +793,15 @@ rule addDisplayBlackBoardCallSpecification(seq : AADLBA!SubprogramCallSequence,
 										   p: AADLI!FeatureInstance, 
 										   implImg: AADLBA!ThreadImplementation)
 {
+	using
+	{
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
 	to
 		call: AADLBA!SubprogramCall
 		(
 			name<-thisModule.callPrefix()+spg.name+p.name,
-			calledSubprogram<-spg
+			calledSubprogram<-resolvedSpg
 		)
 	do
 	{
@@ -952,12 +947,13 @@ rule addReadBlackBoardCallSpecification(seq : AADLBA!SubprogramCallSequence,
 	using
 	{
 		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
 	}
 	to
 		call: AADLBA!SubprogramCall
 		(
 			name<-thisModule.callPrefix()+spg.name+p.name,
-			calledSubprogram<-spg
+			calledSubprogram<-resolvedSpg
 		),
 		connectedParam_TIME_OUT: AADLBA!ConnectedElement
 		(
