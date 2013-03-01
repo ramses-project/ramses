@@ -106,7 +106,6 @@ import fr.tpt.aadl.utils.names.DataModelProperties;
 public class AadlToCUnparser extends AadlProcessingSwitch
                              implements AadlGenericUnparser
 {
-  private static AadlToCUnparser singleton;
   
   // gtype.c and .h
   protected AadlToCSwitchProcess _gtypesImplCode ;
@@ -141,17 +140,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   // are defined in the process implementation via connections.
   private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
   
-  public static AadlToCUnparser getAadlToCUnparser()
-  {
-    if(singleton==null)
-      singleton = new AadlToCUnparser();
-    return singleton;
-  }
   
-  private AadlToCUnparser()
+  private static boolean init = false;
+  public AadlToCUnparser()
   {
     super() ;
-    init() ;
+    if(init==false)
+    	init() ;
   }
   
   private void init()

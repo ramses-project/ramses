@@ -37,7 +37,7 @@ public class PokGeneratorFactory extends AbstractGeneratorFactory
   {
     AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser() ;
     
-    AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
+    AadlToCUnparser genericCUnparser = new AadlToCUnparser() ;
     
     AadlToPokMakefileUnparser pokMakefileUnparser = new AadlToPokMakefileUnparser() ;
     
