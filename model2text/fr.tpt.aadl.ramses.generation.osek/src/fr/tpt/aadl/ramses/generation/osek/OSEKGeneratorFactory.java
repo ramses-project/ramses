@@ -33,13 +33,13 @@ import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator
 
 public class OSEKGeneratorFactory extends AbstractGeneratorFactory {
 	public static String OSEK_GENERATOR_NAME = "osek";
-	
+
 	private static Generator createOSEKGenerator() {
 
 		OIL oil = new OIL();
 		
 		// Instantiate generator ADDL-- to C
-		AadlToCUnparser genericCUnparser = new AadlToCUnparser() ;
+		AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
 
 		// Instantiate generator OIL
 		AadlToOSEKCUnparser osekCUnparser = new AadlToOSEKCUnparser(oil);

@@ -27,6 +27,7 @@ import org.osate.aadl2.AnnexSubclause ;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
+import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 
 // ** AADL RESTRICTED BA HAS TO BE SET AS A STANDALONE ECLIPSE PLUGIN PROJECT ** 
 

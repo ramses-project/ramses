@@ -139,8 +139,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   protected Set<String> _additionalHeaders = new HashSet<String>() ;
   private NamedElement _owner ;
   
-  AadlToCUnparser unparser = new AadlToCUnparser();
-  
   public AadlBaToCUnparser(AnnexSubclause subclause,
                            String indent,
                            Map<DataAccess, String> dataAccessMapping)
@@ -897,12 +895,12 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           if(sct instanceof SubprogramType)
           {
             st = (SubprogramType) sct ;
-            unparser.delayedUnparsing.add(st);
+            AadlToCUnparser.getAadlToCUnparser().delayedUnparsing.add(st);
           }
           else
           {
             SubprogramImplementation si = (SubprogramImplementation) sct ;
-            unparser.delayedUnparsing.add(si);
+            AadlToCUnparser.getAadlToCUnparser().delayedUnparsing.add(si);
             st = si.getType() ;
           }
 

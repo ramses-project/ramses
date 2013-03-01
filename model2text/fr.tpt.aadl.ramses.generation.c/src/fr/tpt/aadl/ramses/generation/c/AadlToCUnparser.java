@@ -106,6 +106,7 @@ import fr.tpt.aadl.utils.names.DataModelProperties;
 public class AadlToCUnparser extends AadlProcessingSwitch
                              implements AadlGenericUnparser
 {
+  private static AadlToCUnparser singleton;
   
   // gtype.c and .h
   protected AadlToCSwitchProcess _gtypesImplCode ;
@@ -140,13 +141,17 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   // are defined in the process implementation via connections.
   private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
   
+  public static AadlToCUnparser getAadlToCUnparser()
+  {
+    if(singleton==null)
+      singleton = new AadlToCUnparser();
+    return singleton;
+  }
   
-  private static boolean init = false;
-  public AadlToCUnparser()
+  private AadlToCUnparser()
   {
     super() ;
-    if(init==false)
-    	init() ;
+    init() ;
   }
   
   private void init()
@@ -258,6 +263,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       String addDeploymentHeader_H = getAdditionalHeader(_deploymentHeaderCode) ;
       saveFile(deploymentFile_H, headerGuard, MAIN_HEADER_INCLUSION,
                addDeploymentHeader_H, _deploymentHeaderCode.getOutput()) ;
+      
+      clean();
 
     }
     catch(IOException e)
@@ -267,7 +274,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
   }
 
-  private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
+  private void clean() {
+	this._additionalHeaders.clear();
+	this._dataAccessMapping.clear();
+	this._delayedDataDeclarations.clear();
+  }
+
+private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
   {
     StringBuffer res = new StringBuffer("") ;
 
