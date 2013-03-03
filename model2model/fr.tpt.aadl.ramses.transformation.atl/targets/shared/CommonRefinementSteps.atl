@@ -62,7 +62,15 @@ helper def: assignPortVariableType(fi: AADLI!FeatureInstance, fresh_data_impl_wr
 ;
 
 helper context AADLI!FeatureInstance def: getBehaviorAnnex():  AADLBA!BehaviorAnnex = 
-	self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification')
+	self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+;
+
+helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
+	not self.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined()
+	and
+	self.getPropertyAssociation('Source_Name').oclIsUndefined()
+	and
+	self.getPropertyAssociation('Source_Text').oclIsUndefined()
 ;
 
 lazy rule createFreshnessImplIdentifier
@@ -85,7 +93,7 @@ rule DataPort_Instance_with_BA
 		fi: AADLI!FeatureInstance (fi.category=#dataPort
 									and fi.eContainer().category=#thread
 									and not fi.isPeriodicDelayedPort()
-									and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+									and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -318,7 +326,7 @@ rule EventPort_Instance_with_BA
 		fi: AADLI!FeatureInstance (fi.category=#eventPort 
 									and fi.eContainer().category = #thread
 									and not fi.isPeriodicDelayedPort()
-									and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+									and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -351,7 +359,7 @@ rule EventDataPort_Instance_with_BA
 		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
 								and fi.eContainer().category=#thread
 								and not fi.isPeriodicDelayedPort()
-								and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+								and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -389,7 +397,7 @@ rule DataAccess_Instance_with_BA
 	from
 		fi: AADLI!FeatureInstance (fi.category=#dataAccess
 			 and fi.eContainer().category=#thread
-			 and fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+			 and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -438,7 +446,7 @@ rule DataPort_Instance
 		fi: AADLI!FeatureInstance (fi.category=#dataPort
 									and fi.eContainer().category=#thread
 									and not fi.isPeriodicDelayedPort()
-									and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+									and not fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -477,7 +485,7 @@ rule EventPort_Instance
 		fi: AADLI!FeatureInstance (fi.category=#eventPort 
 									and fi.eContainer().category = #thread
 									and not fi.isPeriodicDelayedPort()
-									and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+									and not fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -504,7 +512,7 @@ rule EventDataPort_Instance
 		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
 								and fi.eContainer().category=#thread
 								and not fi.isPeriodicDelayedPort()
-								and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+								and not fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -536,7 +544,7 @@ rule DataAccess_Instance
 	from
 		fi: AADLI!FeatureInstance (fi.category=#dataAccess
 			 and fi.eContainer().category=#thread
-			 and not fi.eContainer().subcomponent.classifier.hasBehaviorAnnex())
+			 and not fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
 		c: AADLI!ComponentInstance = fi.eContainer();
@@ -578,12 +586,8 @@ unique lazy rule ThreadType {
  	)
 }
 
-helper context AADLBA!Classifier def: hasBehaviorAnnex(): Boolean =
-	not self.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined()
-;
-
 helper def: ThreadImplementation(c : AADLI!ComponentInstance, typeImg : AADLBA!ThreadType, impl : AADLI!ThreadImplementation) : AADLBA!ThreadImplementation =
-	if(impl.hasBehaviorAnnex()) then
+	if(impl.needsToMapBehaviorAnnex()) then
 		thisModule.ThreadImplementationWithBA(c, typeImg, impl)
 	else
 		thisModule.ThreadImplementationWithoutBA(c, typeImg, impl)
