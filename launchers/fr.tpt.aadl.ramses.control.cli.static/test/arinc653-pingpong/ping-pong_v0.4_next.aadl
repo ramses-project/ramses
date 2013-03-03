@@ -301,19 +301,19 @@ end SEQ;
 			switch: initial state;
 			ret: final state;
 		transitions 
-			switch -[ mode_aadlKeywords = ROLE.enumerators#PING]-> switch
+			switch -[ mode_aadlKeywords = ROLE#PING]-> switch
 			{
 				if (true) IPingOrPong_storePong!(PongIn, replyPong) end if;
 				if (true) IPingOrPong_ping!(replyPong, PingOut, badSequenceNumber, seqNb, seqNb) end if;
 				if (true) IPingOrPong_noPong!(PongOut) end if
 			};
-			switch -[ mode_aadlKeywords = ROLE.enumerators#PONG]-> switch
+			switch -[ mode_aadlKeywords = ROLE#PONG]-> switch
 			{
 				--if (PingIn_fresh = true) IPingOrPong_pong!(PingIn, PongOut) end if;
 				if (true) IPingOrPong_pong!(PingIn, PongOut) end if;
 				if (true) IPingOrPong_noPing!(PingOut, badSequenceNumber, seqNb) end if
 			};
-			switch -[ mode_aadlKeywords = ROLE.enumerators#UNCONNECTED]-> switch
+			switch -[ mode_aadlKeywords = ROLE#UNCONNECTED]-> switch
 			{
 				if (true) IPingOrPong_noPingPong!(PingOut, PongOut, badSequenceNumber, seqNb) end if
 			};
