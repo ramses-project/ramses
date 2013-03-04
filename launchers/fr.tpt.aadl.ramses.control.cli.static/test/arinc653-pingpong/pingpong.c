@@ -126,6 +126,7 @@ void mode(SEQ * seqNb,
 	  Exception * badSequenceNumber,
 	  ROLE mode_aadlKeywords)
 {
+  printf("In mode subprogram\n");
   PingPong__IPingOrPong_mode_BA_State_t current_state = PingPong__IPingOrPong_mode_switch_state;
   PingPongMessage replyPong;
   if(prev!=mode_aadlKeywords)
