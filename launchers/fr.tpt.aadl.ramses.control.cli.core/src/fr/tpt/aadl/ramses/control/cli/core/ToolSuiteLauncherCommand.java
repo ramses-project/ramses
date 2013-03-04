@@ -615,7 +615,10 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     }
     catch(Exception e)
     {
+    	if(System.getProperty("DEBUG")!=null)
+        {
             e.printStackTrace() ;
+        }
             _errorReporter.internalErrorImpl(e) ;
             System.exit(0) ;
     }
