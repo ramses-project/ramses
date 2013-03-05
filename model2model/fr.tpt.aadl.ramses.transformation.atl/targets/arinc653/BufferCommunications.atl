@@ -1,0 +1,234 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+module BufferCommunications;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									POK_RUNTIME: AADLBA;
+
+
+uses Services;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses Uninstanciate;
+uses PropertiesTools;
+
+
+--------------------------------------------
+---               BUFFER                 ---
+--------------------------------------------
+
+rule addReceiveBufferAction(	seq : AADLBA!SubprogramCallSequence,
+							fi: AADLI!FeatureInstance, 
+							impl:  AADLI!ComponentImplementation,
+							implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		
+		-- add call to Receive_Buffer
+		thisModule.addReceiveBufferCallAction
+		(
+			seq,
+			'Receive_Buffer'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+	}
+}
+
+rule addReceiveBufferCallAction(actions:AADLBA!Actions,
+								spg: AADLBA!SubprogramType, 
+								p: AADLI!Port, 
+								implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER,TIME_OUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BUFFER_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BUFFER_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+
+rule addReceiveBuffer(seq : AADLBA!SubprogramCallSequence,
+					  fi: AADLI!FeatureInstance,
+					  impl:  AADLI!ComponentImplementation,
+					  implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+					
+		-- add call to Receive_Buffer
+		thisModule.addQueuingMessageCallSpecification
+		(
+			seq,
+			'Receive_Buffer'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+
+	}
+}
+
+rule addSendBufferAction(seq : AADLBA!SubprogramCallSequence,
+						 fi: AADLI!FeatureInstance, 
+						 impl:  AADLI!ComponentImplementation,
+						 implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		
+		-- add call to Send_Buffer
+		thisModule.addQueuingMessageCallAction
+		(
+			seq,
+			'Send_Buffer'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+				
+	}
+}
+
+
+
+rule addSendBufferCallAction(actions:AADLBA!Actions,
+							 spg: AADLBA!SubprogramType, 
+							 p: AADLI!Port, 
+							 implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,TIME_OUT_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BUFFER_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BUFFER_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+rule addSendBuffer(seq : AADLBA!SubprogramCallSequence,
+				   fi: AADLI!FeatureInstance,
+				   impl:  AADLI!ComponentImplementation,
+				   implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		
+		-- add call to Send_Buffer
+		thisModule.addQueuingMessageCallSpecification
+		(
+			seq,
+			'Send_Buffer'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+		
+	}
+}
+

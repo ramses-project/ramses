@@ -1,0 +1,397 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+module SamplingCommunications;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									POK_RUNTIME: AADLBA;
+
+
+uses Services;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses Uninstanciate;
+uses PropertiesTools;
+
+--------------------------------------------
+---               SAMPLING               ---
+--------------------------------------------
+
+rule addReadSampling(seq : AADLBA!SubprogramCallSequence,
+					 fi: AADLI!FeatureInstance, 
+					 impl:  AADLI!ComponentImplementation,
+					 implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addValidityDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addReadSamplingMessageCallSpecification
+		(
+			seq,
+			'Read_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
+rule addReadSamplingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addValidityDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addReadSamplingMessageCallAction
+		(
+			actions,
+			'Read_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
+rule addWriteSampling(seq : AADLBA!SubprogramCallSequence,
+					  fi: AADLI!FeatureInstance, 
+					  impl:  AADLI!ComponentImplementation,
+					  implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		-- add data subcomponents for Write_Sampling_Message
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+					
+		-- add call to Write_Sampling_Message
+		thisModule.addWriteSamplingMessageCallSpecification
+		(
+			seq,
+			'Write_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
+rule addWriteSamplingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addWriteSamplingMessageCallAction
+		(
+			actions,
+			'Write_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
+rule addWriteSamplingMessageCallAction ( actions:AADLBA!Actions,
+									    spg: AADLBA!SubprogramType, 
+									    p: AADLI!Port, 
+										implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{SAMPLING_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-SAMPLING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+rule addSamplingGlobalVariable(fi: AADLI!FeatureInstance, 
+					 communicationID: AADLBA!DataSubcomponent,
+					 processImplImg: AADLBA!ComponentImplementation,
+					 implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		communicationID.dataSubcomponentType<-'Sampling_Port_Id_Type'.asDataType('POK_RUNTIME');
+		thisModule.addDataAccessConnection(
+			processImplImg,
+			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,
+			fi.retreiveIdAccess(implImg), 
+			fi.eContainer().getSubcomponentImg(),
+			communicationID
+		);
+	}
+}
+
+rule addWriteSamplingMessageCallSpecification(seq : AADLBA!SubprogramCallSequence,
+											  spg: AADLBA!SubprogramType,
+											  p: AADLI!Port, 
+											  implImg: AADLBA!ThreadImplementation)
+{
+	using
+	{
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCall
+		(
+			name<-thisModule.callPrefix()+spg.name+p.name,
+			calledSubprogram<-resolvedSpg
+		)
+	do
+	{
+		thisModule.addSamplingCallSpecification(call, spg, p, implImg);
+		seq.getOwnedCallSpecifications().add(call);
+	}
+}
+
+rule addReadSamplingMessageCallSpecification (seq : AADLBA!SubprogramCallSequence,
+											  spg: AADLBA!SubprogramType, 
+											  p: AADLI!Port, 
+											  implImg: AADLBA!ThreadImplementation)
+{
+	using
+	{
+		VALIDITY: AADLBA!DataSubcomponent = p.retreiveValidityValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCall
+		(
+			name<-thisModule.callPrefix()+spg.name+p.name,
+			calledSubprogram<-resolvedSpg
+		),
+		connectedParam_VALIDITY: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='VALIDITY').debug('TimeOut Parameter Connection End')
+		),
+		connectedSubcomponent_VALIDITY: AADLBA!ConnectedElement
+		(
+			connectionEnd<-VALIDITY.debug('TimeOut Subcomponent Connection End')
+		),
+		paramConnection_VALIDITY: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_Validity',
+			source<-connectedParam_VALIDITY,
+			destination<-connectedSubcomponent_VALIDITY
+		)
+	do
+	{
+		thisModule.addSamplingCallSpecification(call, spg, p, implImg);
+		connectedParam_VALIDITY.setContext(call);
+		implImg.getOwnedParameterConnections().add(paramConnection_VALIDITY);
+		seq.getOwnedCallSpecifications().add(call);
+	}
+}
+
+
+rule addReadSamplingMessageCallAction ( actions:AADLBA!Actions,
+									    spg: AADLBA!SubprogramType, 
+									    p: AADLI!Port, 
+										implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		VALIDITY: AADLBA!DataSubcomponent = p.retreiveValidityValue(implImg);
+		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{SAMPLING_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,VALIDITY_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-SAMPLING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		VALIDITY_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- VALIDITY
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+rule addSamplingCallSpecification(call: AADLBA!SubprogramCall,
+								  spg: AADLBA!SubprogramType,
+								  p: AADLI!FeatureInstance,
+								  implImg: AADLBA!ThreadImplementation)
+{
+	using
+	{
+		SAMPLING_ID: AADLBA!DataAccess = p.getFeatureImg(); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+	}
+	to
+		
+		connected_SAMPLING_ID_Access: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedDataAccess->first().debug('Id Data Access Connection End')
+		),
+		connected_SAMPLING_ID: AADLBA!ConnectedElement
+		(
+			connectionEnd<-SAMPLING_ID.debug('Id Subcomponent Connection End')
+		),
+		accessIDConnection: AADLBA!AccessConnection
+		(
+			name<-p.name+'_to_ID',
+			accessCategory<-#data,
+			source<-connected_SAMPLING_ID_Access,
+			destination<-connected_SAMPLING_ID
+		),
+		
+		connectedParam_MESSAGE_ADDR: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='MESSAGE_ADDR').debug('MessageAddr Parameter Connection End')
+		),
+		connectedSubcomponent_MESSAGE_ADDR: AADLBA!ConnectedElement
+		(
+			connectionEnd<-MESSAGE_ADDR.debug('MessageAddr Subcomponent Connection End')
+		),
+		paramConnection_MESSAGE_ADDR: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_MessageAddr',
+			source<-connectedParam_MESSAGE_ADDR,
+			destination<-connectedSubcomponent_MESSAGE_ADDR
+		),
+		
+		connectedParam_LENGTH: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='LENGTH').debug('Length Parameter Connection End')
+		),
+		connectedSubcomponent_LENGTH: AADLBA!ConnectedElement
+		(
+			connectionEnd<-LENGTH.debug('Length Subcomponent Connection End')
+		),
+		
+		paramConnection_LENGTH: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_MessageLength',
+			source<-connectedParam_LENGTH,
+			destination<-connectedSubcomponent_LENGTH
+		),
+		
+		connectedParam_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='RETURN_CODE').debug('Subprogram Parameter Connection End')
+		),
+		connectedSubcomponent_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-RETURN_CODE.debug('Subprogram Subcomponent Connection End')
+		),
+		paramConnection_RETURN_CODE: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_ReturnCode',
+			source<-connectedParam_RETURN_CODE,
+			destination<-connectedSubcomponent_RETURN_CODE
+		)
+		
+	do
+	{
+		
+		connectedParam_MESSAGE_ADDR.setContext(call);
+		connected_SAMPLING_ID_Access.setContext(call);
+		connectedParam_RETURN_CODE.setContext(call);
+		connectedParam_LENGTH.setContext(call);
+		
+		implImg.getOwnedParameterConnections().add(paramConnection_MESSAGE_ADDR);
+		implImg.getOwnedAccessConnections().add(accessIDConnection);
+		implImg.getOwnedParameterConnections().add(paramConnection_RETURN_CODE);
+		implImg.getOwnedParameterConnections().add(paramConnection_LENGTH);
+		
+		call.debug('Created Call Sequence');
+		call;
+	}
+}
+

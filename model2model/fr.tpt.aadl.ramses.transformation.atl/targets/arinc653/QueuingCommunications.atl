@@ -1,0 +1,369 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+
+module QueuingCommunications;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									POK_RUNTIME: AADLBA;
+
+
+uses Services;
+uses AADLCopyHelpers;
+uses AADLICopyHelpers;
+uses Uninstanciate;
+uses PropertiesTools;
+
+
+
+--------------------------------------------
+---               QUEUING                ---
+--------------------------------------------
+
+rule addReceiveQueuingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		-- add data subcomponents for Receive_Queing_Message
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addValidityDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addReceiveQueuingMessageCallAction
+		(
+			actions,
+			'Receive_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
+rule addReceiveQueuing(seq : AADLBA!SubprogramCallSequence,
+					   fi: AADLI!FeatureInstance, 
+					   impl:  AADLI!ComponentImplementation,
+					   implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		-- add data subcomponents for Receive_Queing_Message
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		
+		-- add call to Receive_Queing_Message
+		thisModule.addQueuingMessageCallSpecification
+		(
+			seq,
+			'Receive_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+		
+	}
+}
+
+rule addSendQueuingAction(actions:AADLBA!Actions,
+						   fi: AADLI!FeatureInstance,
+						   implImg:AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+					
+		-- add call to Read_Sampling_Message
+		thisModule.addSendQueuingMessageCallAction
+		(
+			actions,
+			'Send_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+					
+	}
+}
+
+rule addSendQueuing(seq : AADLBA!SubprogramCallSequence,
+					fi: AADLI!FeatureInstance, 
+					impl:  AADLI!ComponentImplementation,
+					implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		thisModule.addLengthDataSubcomponent(fi,implImg);
+		thisModule.addTimeOutSubcomponent(fi,implImg);
+		
+		-- add call to Send_Queuing_Message
+		thisModule.addQueuingMessageCallSpecification
+		(
+			seq,
+			'Send_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			fi,
+			implImg
+		);
+				
+	}
+}
+
+rule addQueuingGlobalVariable(fi: AADLI!FeatureInstance, 
+					 communicationID: AADLBA!DataSubcomponent,
+					 processImplImg: AADLBA!ComponentImplementation,
+					 implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		communicationID.dataSubcomponentType<-'Queuing_Port_Id_Type'.asDataType('POK_RUNTIME');
+		thisModule.addDataAccessConnection(
+			processImplImg,
+			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,
+			fi.retreiveIdAccess(implImg), 
+			fi.eContainer().getSubcomponentImg(),
+			communicationID
+		);
+	}
+}
+
+rule addReceiveQueuingMessageCallAction ( actions:AADLBA!Actions,
+									    spg: AADLBA!SubprogramType, 
+									    p: AADLI!Port, 
+										implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		QUEUING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{QEUEING_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,TIME_OUT_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		QEUEING_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-QUEUING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+rule addSendQueuingMessageCallAction ( actions:AADLBA!Actions,
+									   spg: AADLBA!SubprogramType, 
+									   p: AADLI!Port, 
+									   implImg: AADLBA!SubprogramImplementation)
+{
+	using
+	{
+		QUEUING_ID: AADLBA!DataAccess = thisModule.resolveTemp(p,'f_entrypoint'); 
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{QEUEING_HOLDER,TIME_OUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		QEUEING_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-QUEUING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		actions.add(call);
+	}
+}
+
+
+rule addQueuingMessageCallSpecification(seq : AADLBA!SubprogramCallSequence,
+										spg: AADLBA!SubprogramType, 
+										p: AADLI!FeatureInstance, 
+										implImg: AADLBA!ThreadImplementation)
+{
+	using
+	{
+		QUEUING_PORT_ID: AADLBA!DataAccess = p.getFeatureImg();
+		TIME_OUT: AADLBA!DataSubcomponent = p.retreiveTimeOutValue(implImg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = p.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = p.retreiveLengthValue	(implImg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(p, spg);
+	}
+	to
+		call: AADLBA!SubprogramCall
+		(
+			name<-thisModule.callPrefix()+spg.name+'_'+p.name+seq.getOwnedCallSpecifications().size(),
+			calledSubprogram<-resolvedSpg
+		),
+		
+		connected_QUEUING_ID_Access: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedDataAccess->first().debug('Id Data Access Connection End')
+		),
+		connected_QUEUING_ID: AADLBA!ConnectedElement
+		(
+			connectionEnd<-QUEUING_PORT_ID.debug('Id Subcomponent Connection End')
+		),
+		accessIDConnection: AADLBA!AccessConnection
+		(
+			name<-p.name+'_to_ID',
+			accessCategory<-#data,
+			source<-connected_QUEUING_ID_Access,
+			destination<-connected_QUEUING_ID
+		),
+		
+		connectedParam_TIME_OUT: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='TIME_OUT').debug('TimeOut Parameter Connection End')
+		),
+		connectedSubcomponent_TIME_OUT: AADLBA!ConnectedElement
+		(
+			connectionEnd<-TIME_OUT.debug('TimeOut Subcomponent Connection End')
+		),
+		paramConnection_TIME_OUT: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_TimeOut',
+			source<-connectedParam_TIME_OUT,
+			destination<-connectedSubcomponent_TIME_OUT
+		),
+		
+		connectedParam_MESSAGE_ADDR: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='MESSAGE_ADDR').debug('MsgAddr Parameter Connection End')
+		),
+		connectedSubcomponent_MESSAGE_ADDR: AADLBA!ConnectedElement
+		(
+			connectionEnd<-MESSAGE_ADDR.debug('MsgAddr Subcomponent Connection End')
+		),
+		paramConnection_MESSAGE_ADDR: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_MsgAddr',
+			source<-connectedParam_MESSAGE_ADDR,
+			destination<-connectedSubcomponent_MESSAGE_ADDR
+		),
+		
+		connectedParam_LENGTH: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='LENGTH').debug('MessageAddr Parameter Connection End')
+		),
+		connectedSubcomponent_LENGTH: AADLBA!ConnectedElement
+		(
+			connectionEnd<-LENGTH.debug('TimeOut Subcomponent Connection End')
+		),
+		paramConnection_LENGTH: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_Length',
+			source<-connectedParam_LENGTH,
+			destination<-connectedSubcomponent_LENGTH
+		),
+		
+		connectedParam_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='RETURN_CODE').debug('ReturnCode Parameter Connection End')
+		),
+		connectedSubcomponent_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-RETURN_CODE.debug('ReturnCode Subcomponent Connection End')
+		),
+		paramConnection_RETURN_CODE: AADLBA!ParameterConnection
+		(
+			name<-p.name+'_to_ReturnCode',
+			source<-connectedParam_RETURN_CODE,
+			destination<-connectedSubcomponent_RETURN_CODE
+		)
+		
+	do
+	{
+		
+		connected_QUEUING_ID_Access.setContext(call);
+		connectedParam_TIME_OUT.setContext(call);
+		connectedParam_MESSAGE_ADDR.setContext(call);
+		connectedParam_LENGTH.setContext(call);
+		connectedParam_RETURN_CODE.setContext(call);
+		
+		implImg.getOwnedAccessConnections().add(accessIDConnection);
+		implImg.getOwnedParameterConnections().add(paramConnection_TIME_OUT);
+		implImg.getOwnedParameterConnections().add(paramConnection_MESSAGE_ADDR);
+		implImg.getOwnedParameterConnections().add(paramConnection_LENGTH);
+		implImg.getOwnedParameterConnections().add(paramConnection_RETURN_CODE);
+		
+		seq.getOwnedCallSpecifications().add(call);
+		
+		call.debug('Created Call Sequence');
+		call;
+	}
+}
