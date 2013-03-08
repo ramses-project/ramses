@@ -73,19 +73,9 @@ helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
 	self.getPropertyAssociation('Source_Text').oclIsUndefined()
 ;
 
-lazy rule createFreshnessImplIdentifier
-{
-	from
-		fresh_data_type_wrapper:AADLBA!DataType
-	to
-		result: String
-	do
-	{
-		result <- fresh_data_type_wrapper.name+thisModule.impl_suffix;
-		
-		result;
-	}
-}
+helper def: createFreshnessImplIdentifier(fresh_data_type_wrapper:AADLBA!DataType) : String =
+  fresh_data_type_wrapper.name+thisModule.impl_suffix
+;
 
 rule DataPort_Instance_with_BA
 {
@@ -153,7 +143,7 @@ rule DataPort_Instance_with_BA
 		),
 		fresh_data_impl_wrapper:AADLBA!DataImplementation
 		(
-			name<-thisModule.createFreshnessImplIdentifier(),
+			name<-thisModule.createFreshnessImplIdentifier(fresh_data_type_wrapper),
 			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
 		),
 		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
