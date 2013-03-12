@@ -19,24 +19,40 @@
 # along with this program.  If not, see 
 # http://www.eclipse.org/org/documents/epl-v10.php
 
-LIB_PATH='../../../../build_and_test/distribution/lib'
+# Naming
 
+SCRIPT_DIR=`dirname $0`; cd ${SCRIPT_DIR}; SCRIPT_DIR=`pwd`
+LIB_PATH="${SCRIPT_DIR}/../../../../build_and_test/distribution/lib"
 LIBS='<Class-Path>'
+POM_FILE="${SCRIPT_DIR}/pom.xml"
 
-FILE='pom.xml'
+# Functions
 
-# var checking
+function die
+{
+   echo "${1}"
+   exit
+}
 
-TMP=$(ls -A $LIB_PATH) || exit
-TMP=$(ls $FILE) || exit
+# Name checking
 
-for file in $(ls -A $LIB_PATH)
+if [ ! -d ${LIB_PATH} ] ; then
+   die "lib directory is not found. Abort."
+fi
+
+if [ ! -f ${POM_FILE} ] ; then
+   die "pom.xml is not found. Abort."
+fi
+
+# Main
+
+for file in $(ls -A ${LIB_PATH})
 do
-   LIBS="$LIBS lib\/$file"
+   LIBS="${LIBS} lib\/${file}"
 done
 
-LIBS="$LIBS<\/Class-Path>"
+LIBS="${LIBS}<\/Class-Path>"
 
-sed -i "s/<Class-Path>.*<\/Class-Path>/$LIBS/" $FILE
+sed -i "s/<Class-Path>.*<\/Class-Path>/${LIBS}/" ${POM_FILE}
 
-echo "DONE"
+echo "pom.xml is updated"
