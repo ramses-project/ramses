@@ -30,18 +30,27 @@ POM_FILE="${SCRIPT_DIR}/pom.xml"
 
 function die
 {
-   echo "${1}"
+   echo -e "${1}" 1>&2
    exit
 }
 
 # Name checking
 
 if [ ! -d "${LIB_PATH}" ] ; then
-   die "lib directory is not found. Abort."
+   ERROR_MSG[0]='lib directory is not found.'
 fi
 
 if [ ! -f "${POM_FILE}" ] ; then
-   die "pom.xml is not found. Abort."
+   ERROR_MSG[1]='pom.xml is not found.'
+fi
+
+if [ ! "${#ERROR_MSG[*]}" = '0' ] ; then
+   MSG=''
+   for index in ${!ERROR_MSG[*]}
+   do
+      MSG="${MSG}${ERROR_MSG[index]}\n"
+   done
+   die "${MSG}Abort."
 fi
 
 # Main
@@ -53,6 +62,6 @@ done
 
 LIBS="${LIBS}<\/Class-Path>"
 
-sed -i "s/<Class-Path>.*<\/Class-Path>/${LIBS}/" "${POM_FILE}"
+sed -i "s/<Class-Path>.*<\/Class-Path>/${LIBS}/" "${POM_FILE}" || die 'substitution error. Abort.'
 
 echo "pom.xml is updated"
