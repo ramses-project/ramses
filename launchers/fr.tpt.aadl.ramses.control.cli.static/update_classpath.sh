@@ -36,23 +36,23 @@ function die
 
 # Name checking
 
-if [ ! -d ${LIB_PATH} ] ; then
+if [ ! -d "${LIB_PATH}" ] ; then
    die "lib directory is not found. Abort."
 fi
 
-if [ ! -f ${POM_FILE} ] ; then
+if [ ! -f "${POM_FILE}" ] ; then
    die "pom.xml is not found. Abort."
 fi
 
 # Main
 
-for file in $(ls -A ${LIB_PATH})
+for file in $(ls -A "${LIB_PATH}")
 do
    LIBS="${LIBS} lib\/${file}"
 done
 
 LIBS="${LIBS}<\/Class-Path>"
 
-sed -i "s/<Class-Path>.*<\/Class-Path>/${LIBS}/" ${POM_FILE}
+sed -i "s/<Class-Path>.*<\/Class-Path>/${LIBS}/" "${POM_FILE}"
 
 echo "pom.xml is updated"
