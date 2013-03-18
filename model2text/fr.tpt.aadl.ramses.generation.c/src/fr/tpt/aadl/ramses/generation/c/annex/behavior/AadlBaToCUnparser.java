@@ -1084,7 +1084,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   continue;
                 if(first==false)
                   _cFileContent.addOutput(", ") ;
-
+                
                 remainingParenthesis = manageParameterDirection(p, pl);
 
                 if(pl instanceof ElementHolder)
@@ -1124,19 +1124,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 if(da.getKind().equals(AccessType.REQUIRES))
                 {
                   remainingParenthesis = manageAccessDirection(da, pl);  
-                  else
-                  {
-                	//TODO: if da not by_reference
-                	if(pl instanceof DataAccessHolder)
-                  	{
-                  		DataAccessHolder dah = (DataAccessHolder) pl;
-                  		// in to inout
-                		if(Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()) ||
-                    		Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()))
-                			_cFileContent.addOutput("&") ;
-                  	}
-                  }
-                	  
                 }
 
                 String name = null ;
@@ -1193,7 +1180,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         return DONE ;
       }
-
+      
       public String caseElementHolder(ElementHolder object)
       {
     	NamedElement elt = object.getElement();
@@ -1214,8 +1201,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 			  }
 			
 			}
-		     }
-		     id = elt.getName();
+			id = elt.getName();
 			
 		}
 		else if (elt instanceof DataAccess)
