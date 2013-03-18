@@ -1,6 +1,7 @@
 package fr.tpt.aadl.sched.cheddar.model ;
 
 import java.util.ArrayList ;
+
 import java.util.Collection ;
 import java.util.List ;
 

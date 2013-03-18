@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.generation.pok.c;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
-import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
+import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils; 
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;

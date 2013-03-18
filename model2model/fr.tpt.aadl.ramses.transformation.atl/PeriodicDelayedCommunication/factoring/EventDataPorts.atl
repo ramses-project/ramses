@@ -503,6 +503,8 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 		-- looking for
 		processImg : AADLBA!Subcomponent = OclUndefined;
 		dstThreadImg: AADLBA!ThreadImplementation = OclUndefined;
+		initial: Integer = -1;
+		initialit: Integer = -1;
 		
 		CurrentPerionReadTable: Sequence(Integer) = thisModule.getCurrentPerionReadTable(port);
 		BufferSize: Integer = thisModule.getBufferSize(port);
@@ -551,6 +553,24 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			dataSubcomponentType <- bufferArrayType
 		),
 		
+		BufferSizeInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+															BufferSize.toString())}
+		),
+		
+		bufferSizeSubcomponent:AADLBA!DataSubcomponent
+		(
+			name<-port.eContainer().name+'_'+port.name+'_BufferSize',
+			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence {
+				thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													BufferSizeInit)
+			}
+		),
+		
 		CPRSizeInit: AADLBA!ListValue
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
@@ -566,13 +586,47 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 													CPRSizeInit)
 									   }
 		    ),
+		lastIndexInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initial.toString())}
+		),
 		lastIndex:AADLBA!DataSubcomponent (
 			name <- port.name+'_lastIndex',
-			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES')
+			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence {
+												thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													lastIndexInit)
+									   }
+		),
+		readIndexInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initial.toString())}
 		),
 		readIndex:AADLBA!DataSubcomponent (
 			name <- port.name+'_readIndex',
-			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES')
+			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence {
+												thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													readIndexInit)
+									   }
+		),
+		IterationCounterInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initialit.toString())}
+		),
+		IterationCounter:AADLBA!DataSubcomponent (
+			name <- port.name+'_IterationCounter',
+			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence {
+												thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													IterationCounterInit)
+									   }
 		),
 		currentValue: AADLBA!DataSubcomponent (
 			name <- port.name+'_currentValue',
@@ -606,51 +660,6 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			destination<-connected_Buffer_Data
 		),
 		
-		--- LasIndex
-		lastIndexAccess:AADLBA!DataAccess(
-			name <- port.name+'_lastIndexAccess',
-			dataFeatureClassifier <- 'Integer_16'.asDataType('BASE_TYPES'),
-			kind<-#requires
-		),
-		connected_LastIndex_Access: AADLBA!ConnectedElement
-		(
-			connectionEnd<-lastIndexAccess,
-			context<-port.eContainer().getSubcomponentImg()
-		),
-		connected_LastIndex_Data: AADLBA!ConnectedElement
-		(
-			connectionEnd<-lastIndex
-		),
-		accessLastIndexConnection: AADLBA!AccessConnection
-		(
-			name<-portAbsoluteName+'_to_lastIndex',
-			accessCategory<-#data,
-			source<-connected_LastIndex_Access,
-			destination<-connected_LastIndex_Data
-		),
-		
-		--- readIndex
-		readIndexAccess:AADLBA!DataAccess(
-			name <- port.name+'_readIndexAccess',
-			dataFeatureClassifier <- 'Integer_16'.asDataType('BASE_TYPES'),
-			kind<-#requires
-		),
-		connected_ReadIndex_Access: AADLBA!ConnectedElement
-		(
-			connectionEnd<-readIndexAccess,
-			context<-port.eContainer().getSubcomponentImg()
-		),
-		connected_ReadIndex_Data: AADLBA!ConnectedElement
-		(
-			connectionEnd<-readIndex
-		),
-		accessReadIndexConnection: AADLBA!AccessConnection
-		(
-			name<-portAbsoluteName+'_to_readIndex',
-			accessCategory<-#data,
-			source<-connected_ReadIndex_Access,
-			destination<-connected_ReadIndex_Data
-		),
 		
 		--- Current Value
 		currentValueAccess:AADLBA!DataAccess(
@@ -733,15 +742,15 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			connectionEnd<-Receive_Input_PrototypeSpg.ownedDataAccess->any(e | e.name = 'first'),
 			context<-receiveInputCall
 		),
-		connected_ReadIndex_ThreadAccess: AADLBA!ConnectedElement
+		connected_ReadIndex_ThreadSubcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-readIndexAccess
+			connectionEnd<-readIndex
 		),
 		accessReadIndexConnectionReceiveInput: AADLBA!AccessConnection
 		(
 			name<-port.name+'_to_ReceiveInput_first',
 			accessCategory<-#data,
-			source<-connected_ReadIndex_ThreadAccess,
+			source<-connected_ReadIndex_ThreadSubcomponent,
 			destination<-connected_ReadIndex_ReceiveInputAccess
 		),
 		
@@ -752,16 +761,33 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			connectionEnd<-Receive_Input_PrototypeSpg.ownedDataAccess->any(e | e.name = 'last'),
 			context<-receiveInputCall
 		),
-		connected_LastIndex_ThreadAccess: AADLBA!ConnectedElement
+		connected_LastIndex_ThreadSubcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-lastIndexAccess
+			connectionEnd<-lastIndex
 		),
 		accessLastIndexConnectionReceiveInput: AADLBA!AccessConnection
 		(
 			name<-port.name+'_to_ReceiveInput_last',
 			accessCategory<-#data,
-			source<-connected_LastIndex_ThreadAccess,
+			source<-connected_LastIndex_ThreadSubcomponent,
 			destination<-connected_LastIndex_ReceiveInputAccess
+		),
+		
+		--- connect bufferSize
+		connected_bufferSize_Parameter: AADLBA!ConnectedElement
+		(
+			connectionEnd<-Receive_Input_PrototypeSpg.ownedParameter->any(e | e.name = 'bufferSize'),
+			context<-receiveInputCall
+		),
+		connected_BufferSize_ThreadSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-bufferSizeSubcomponent
+		),
+		parameterbufferSizeConnectionReceiveInput: AADLBA!ParameterConnection
+		(
+			name<-port.name+'_to_ReceiveInput_bufferSize',
+			source<-connected_BufferSize_ThreadSubcomponent,
+			destination<-connected_bufferSize_Parameter
 		),
 		
 		-----------------------
@@ -827,15 +853,15 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			connectionEnd<-Next_Value_PrototypeSpg.ownedDataAccess->any(e | e.name = 'first'),
 			context<-nextValueCall
 		),
-		connected_ReadIndex_NextValueThreadAccess: AADLBA!ConnectedElement
+		connected_ReadIndex_NextValueThreadSubcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-readIndexAccess
+			connectionEnd<-readIndex
 		),
 		accessReadIndexConnectionNextValue: AADLBA!AccessConnection
 		(
 			name<-port.name+'_to_NextValue_first',
 			accessCategory<-#data,
-			source<-connected_ReadIndex_NextValueThreadAccess,
+			source<-connected_ReadIndex_NextValueThreadSubcomponent,
 			destination<-connected_ReadIndex_NextValueAccess
 		),
 		
@@ -846,15 +872,15 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			connectionEnd<-Next_Value_PrototypeSpg.ownedDataAccess->any(e | e.name = 'last'),
 			context<-nextValueCall
 		),
-		connected_LastIndex_NextValueThreadAccess: AADLBA!ConnectedElement
+		connected_LastIndex_NextValueThreadSubcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-lastIndexAccess
+			connectionEnd<-lastIndex
 		),
 		accessLastIndexConnectionNextValue: AADLBA!AccessConnection
 		(
 			name<-port.name+'_to_NextValue_last',
 			accessCategory<-#data,
-			source<-connected_LastIndex_NextValueThreadAccess,
+			source<-connected_LastIndex_NextValueThreadSubcomponent,
 			destination<-connected_LastIndex_NextValueAccess
 		),
 		
@@ -875,6 +901,24 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			accessCategory<-#data,
 			source<-connected_Buffer_NextValueAccess,
 			destination<-connected_Buffer_ThreadAccess
+		),
+		
+		--- connect bufferSize
+		
+		connected_bufferSize_ParameterNextValue: AADLBA!ConnectedElement
+		(
+			connectionEnd<-Next_Value_PrototypeSpg.ownedParameter->any(e | e.name = 'bufferSize'),
+			context<-nextValueCall
+		),
+		connected_bufferSize_Subcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-bufferSizeSubcomponent
+		),
+		parameterBufferSizeConnectionNextValue: AADLBA!ParameterConnection
+		(
+			name<-port.name+'_to_bufferSize',
+			source<-connected_bufferSize_ParameterNextValue,
+			destination<-connected_bufferSize_Subcomponent
 		)
 	do
 	{
@@ -886,17 +930,26 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 		dstThreadImg<-port.eContainer().getSubcomponentImg().classifier;
 		
 		--populate thread
-		dstThreadImg.type.ownedDataAccess.add(readIndexAccess);
-		dstThreadImg.type.ownedDataAccess.add(lastIndexAccess);
 		dstThreadImg.type.ownedDataAccess.add(bufferAccessThread);
 		dstThreadImg.type.ownedDataAccess.add(currentValueAccess);
 		
 		dstThreadImg.ownedDataSubcomponent.add(CPRSize);
-		dstThreadImg.ownedDataSubcomponent.add(thisModule.createIterationCounter(dstThreadImg));
-		connected_IterationCounter_Data.connectionEnd<-thisModule.createIterationCounter(dstThreadImg);
+		--dstThreadImg.ownedDataSubcomponent.add(thisModule.createIterationCounter(dstThreadImg));
+		--connected_IterationCounter_Data.connectionEnd<-thisModule.createIterationCounter(dstThreadImg);
+		dstThreadImg.ownedDataSubcomponent.add(IterationCounter);
+		dstThreadImg.ownedDataSubcomponent.add(bufferSizeSubcomponent);
+		dstThreadImg.ownedDataSubcomponent.add(lastIndex);
+		dstThreadImg.ownedDataSubcomponent.add(readIndex);
+		
+		connected_IterationCounter_Data.connectionEnd<-IterationCounter;
 		
 		dstThreadImg.ownedParameterConnection.add(paramCPRSizeConnection);
 		dstThreadImg.ownedParameterConnection.add(paramIterationCounterConnection);
+		dstThreadImg.ownedParameterConnection.add(parameterBufferSizeConnectionNextValue);
+		if(not Receive_Input_PrototypeSpg.ownedParameter->any(e | e.name = 'bufferSize').oclIsUndefined())
+		{
+			dstThreadImg.ownedParameterConnection.add(parameterbufferSizeConnectionReceiveInput);
+		}
 		dstThreadImg.ownedAccessConnection.add(accessReadIndexConnectionReceiveInput);
 		dstThreadImg.ownedAccessConnection.add(accessLastIndexConnectionReceiveInput);
 		dstThreadImg.ownedAccessConnection.add(accessBufferConnectionNextValue);
@@ -912,11 +965,7 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 		
 		-- populate process
 		processImg.ownedDataSubcomponent.add(bufferSubcomponent);
-		processImg.ownedDataSubcomponent.add(readIndex);
-		processImg.ownedDataSubcomponent.add(lastIndex);
 		processImg.ownedDataSubcomponent.add(currentValue);
-		processImg.ownedAccessConnection.add(accessLastIndexConnection);
-		processImg.ownedAccessConnection.add(accessReadIndexConnection);
 		processImg.ownedAccessConnection.add(accessBufferConnection);
 		processImg.ownedAccessConnection.add(accessCurrentValueConnection);
 		
@@ -938,6 +987,9 @@ unique lazy rule createIterationCounter
 {
 	from
 		thread: AADLBA!ThreadImplementation
+	using{
+			initial: Integer = 0;
+	}
 	to
 		IterationCounter:AADLBA!DataSubcomponent (
 		    name<-thread.type.name+'_IterationCounter',
@@ -952,7 +1004,7 @@ unique lazy rule createIterationCounter
 		),
 		CounterInit: AADLBA!ListValue
 		(
-			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(0.toString())}
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initial.toString())}
 		)
 		
 	do

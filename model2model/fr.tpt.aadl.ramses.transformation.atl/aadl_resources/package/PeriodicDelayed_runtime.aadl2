@@ -1,7 +1,7 @@
 package PeriodicDelayed_runtime
 public
 
-with Base_Types, Data_Model;
+with Base_Types, Data_Model, Generation_Properties;
 
   data ArrayDataType
     properties
@@ -16,19 +16,24 @@ with Base_Types, Data_Model;
       CPRSize: in parameter Base_Types::Integer_16;
       first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
-    annex behavior_specification {**
-      states
-        s: initial final state;
-      transitions
-        t: s -[]-> s 
-        {
-          first := CPR[iteration_counter]+1;
-          iteration_counter := (iteration_counter+1) mod CPRSize;
-          last := CPR[iteration_counter]
-        };
-    **};
-  end Receive_Input;
-  
+      bufferSize: in parameter Base_Types::Integer_16;
+     annex behavior_specification {**
+       states
+         s: initial final state;
+       transitions
+       t1: s -[iteration_counter=-1]-> s 
+       {
+         iteration_counter := 0
+       };
+       t2: s -[iteration_counter!=-1]-> s 
+       {
+         first := (last+1) mod bufferSize;
+         last := CPR[iteration_counter];
+         iteration_counter := (iteration_counter+1) mod CPRSize
+       };
+   **};
+   end Receive_Input;
+
   subprogram Next_Value
     prototypes
       output_type: data;
@@ -37,6 +42,7 @@ with Base_Types, Data_Model;
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_only;};
       buffer: requires data access ArrayDataType {Access_Right=>read_only;};
       output: requires data access output_type {Access_Right=>write_only;};
+      bufferSize: in parameter Base_Types::Integer_16;
     annex behavior_specification {**
       states
     	s: initial final state;
@@ -44,8 +50,8 @@ with Base_Types, Data_Model;
         t: s -[]-> s
         {
           output := buffer[first];
-          if(first<last)
-        	first := first+1 
+          if(first!=last)
+        	first := (first+1) mod bufferSize 
           end if -- TODO : else: should have an error port and send and error
         };
     **};
@@ -67,6 +73,8 @@ with Base_Types, Data_Model;
         t: s -[]-> s
         {
           buffer[CDW[iteration_counter]] := value;
+          -- TODO: next line should be in sed_output, otherwise iteration counter is
+          -- incremented once for each port of the thread...
           iteration_counter := (iteration_counter+1) mod CDWSize
         };
     **};
@@ -79,77 +87,121 @@ with Base_Types, Data_Model;
   --                 LOW MEMORY FOOTPRINT VERSION
   ------------------------------------------------------------------------
   
+  data component_instance_t
+    properties
+      Data_Model::Data_Representation => Struct;
+      Source_Name => "component_instance_t";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c"); 
+  end component_instance_t;
+  
+  data implementation component_instance_t.impl
+    subcomponents
+      period: data base_types::Unsigned_16;
+      deadline: data base_types::Unsigned_16;
+  end component_instance_t.impl;
+  
+  data ComponentInstanceArrayDataType
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(component_instance_t.impl));
+  end ComponentInstanceArrayDataType;
+  
+  data periodic_delayed_context_t
+    properties
+      Data_Model::Data_Representation => Struct;
+      Source_Name => "periodic_delayed_context_t";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+  end periodic_delayed_context_t;
+  
+  data implementation periodic_delayed_context_t.impl
+    subcomponents
+      reader_task_period: data base_types::Unsigned_16;
+      writer_instances: data ComponentInstanceArrayDataType;
+      writer_count: data base_types::Unsigned_16;
+      buffer_size: data base_types::Unsigned_16; 
+      hyperperiod: data base_types::Unsigned_16;
+  end periodic_delayed_context_t.impl;
+  
   -- Compute_First
   subprogram Compute_CPR
-  features
-    taskID : in parameter Base_Types::Integer_16;
-    iteration_counter : in parameter Base_Types::Integer_16;
-    bufferID : in parameter Base_Types::Integer_16;
-    
-    CPR : out parameter Base_Types::Integer_16;
-  properties
-    Source_Name => "Compute_CPR";
-    Source_Text => ("TBD.h");
+    prototypes
+  	  context_prototype : data;
+    features
+      iteration_counter : in parameter Base_Types::Integer_16;
+      periodic_delayed_context : in parameter context_prototype	{
+    					Generation_Properties::Parameter_Usage => By_Reference;
+  						};
+      CPR : out parameter Base_Types::Integer_16;
+    properties
+      Source_Name => "Compute_CPR";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end Compute_CPR;
   
   -- Compute_Last
   subprogram Compute_PPR
-  features
-    taskID : in parameter Base_Types::Integer_16;
-    iteration_counter : in parameter Base_Types::Integer_16;
-    bufferID: in parameter Base_Types::Integer_16;
-    
-    PPR : out parameter Base_Types::Integer_16;
-  properties
-    Source_Name => "Compute_PPR";
-    Source_Text => ("TBD.h");
+  	prototypes
+      context_prototype : data;
+    features
+      PPR : out parameter Base_Types::Integer_16;
+      CPR : in parameter Base_Types::Integer_16;
+      periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
+    properties
+      Source_Name => "Compute_PPR";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end Compute_PPR;
   
   subprogram Compute_CDW
-  features
-    taskID : in parameter Base_Types::Integer_16;
-    iteration_counter : in parameter Base_Types::Integer_16;
-    bufferID : in parameter Base_Types::Integer_16;
-    
-    CDW : out parameter Base_Types::Integer_16;
-  properties
-    Source_Name => "Compute_CDW";
-    Source_Text => ("TBD.h");
+    prototypes
+  	  context_prototype : data;
+    features
+      taskID: in parameter Base_Types::Integer_16;
+      iteration_counter : in parameter Base_Types::Integer_16;
+      periodic_delayed_context : in parameter context_prototype	{
+    					Generation_Properties::Parameter_Usage => By_Reference;
+  						};
+      CDW : out parameter Base_Types::Integer_16;
+    properties
+      Source_Name => "Compute_CDW";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end Compute_CDW;
 
   subprogram Receive_Input_LowFP
+    prototypes
+      context_prototype : data;
     features
-      taskID : in parameter Base_Types::Integer_16;
       iteration_counter: in out parameter Base_Types::Integer_16;
-      --CPR: in parameter ArrayDataType;
       CPRSize: in parameter Base_Types::Integer_16;
-      bufferID: in parameter Base_Types::Integer_16;
+      periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
       first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
     annex behavior_specification {**
       states
         s: initial final state;
       transitions
-        t: s -[]-> s 
-        {
-          Compute_CPR!(taskID, iteration_counter, bufferID, first);
-          Compute_PPR!(taskID, iteration_counter, bufferID, last);
-          iteration_counter := (iteration_counter+1) mod CPRSize
-        };
+        t1: s -[iteration_counter=-1]-> s 
+       {
+         iteration_counter := 1
+       };
+       t2: s -[iteration_counter!=-1]-> s 
+       {
+         Compute_PPR(first, last, periodic_delayed_context);
+         Compute_CPR!(iteration_counter, periodic_delayed_context, last);
+         iteration_counter := (iteration_counter mod CPRSize)+1
+       };
     **};
   end Receive_Input_LowFP;
 
   subprogram Put_Value_LowFP
     prototypes
       value_type: data;
+      context_prototype: data;
     features
-      taskID : in parameter Base_Types::Integer_16;
+      taskID: in parameter Base_Types::Integer_16;
       iteration_counter: in out parameter Base_Types::Integer_16;
-      --CDW: in parameter ArrayDataType;
       CDWSize: in parameter Base_Types::Integer_16;
       value: in parameter value_type;
+      periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
       buffer: requires data access ArrayDataType {Access_Right=>write_only;};
-      bufferID : in parameter Base_Types::Integer;
     annex behavior_specification {**
       variables
         CDWIndex : Base_Types::Integer_16;
@@ -158,10 +210,10 @@ with Base_Types, Data_Model;
       transitions
         t: s -[]-> s
         {
-          --buffer[CDW[iteration_counter]] := value;
-          
-          Compute_CDW!(taskID, iteration_counter, bufferID, CDWIndex);
+          Compute_CDW!(taskID, iteration_counter, periodic_delayed_context, CDWIndex);
           buffer[CDWIndex] := value;
+          -- TODO: next line should be in sed_output, otherwise iteration counter is
+          -- incremented once for each port of the thread...
           iteration_counter := (iteration_counter+1) mod CDWSize
         };
     **};

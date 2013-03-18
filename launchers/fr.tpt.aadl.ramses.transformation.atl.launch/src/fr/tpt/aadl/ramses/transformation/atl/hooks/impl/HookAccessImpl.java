@@ -49,6 +49,7 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.parsesupport.LocationReference;
 
@@ -200,6 +201,30 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		return CPRTable;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public Long getHyperperiod(FeatureInstance port) {
+		Long hyperperiod= new Long(0);
+		try {
+			EventDataPortCommunicationDimensioning EDPCD = 
+					EventDataPortCommunicationDimensioning.create(port);
+			ArrayList<ComponentInstance> threads = new ArrayList<ComponentInstance>();
+			for(ConnectionInstance fi: port.getDstConnectionInstances())
+			{
+				threads.add((ComponentInstance) fi.getSource().eContainer());
+			}
+			threads.add((ComponentInstance) port.eContainer());
+			hyperperiod = EDPCD.getHyperperiod(threads);
+		} catch (DimensioningException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return hyperperiod;
+	}
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

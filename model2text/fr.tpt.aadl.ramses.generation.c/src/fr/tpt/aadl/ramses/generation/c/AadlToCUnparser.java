@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.generation.c ;
 
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -128,8 +129,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   private AadlToCSwitchProcess _currentImplUnparser ;
   private AadlToCSwitchProcess _currentHeaderUnparser ;
 
-  private List<NamedElement> _delayedDataDeclarations ;
-
   private Map<AadlToCSwitchProcess, Set<String>> _additionalHeaders ;
 
   private List<String> _processedTypes  ;
@@ -185,16 +184,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     
     _additionalHeaders = new HashMap<AadlToCSwitchProcess, Set<String>>() ;
     
-    _delayedDataDeclarations = new ArrayList<NamedElement>() ;
   }
   
   public void saveGeneratedFilesContent(File targetDirectory)
   {
-    
-    for(NamedElement ne : _delayedDataDeclarations)
-    {
-      getCTypeDeclarator(ne, false) ;
-    }
 
     _gtypesHeaderCode.addOutputNewline("\n#endif\n") ;
     _subprogramHeaderCode.addOutputNewline("\n#endif\n") ;
@@ -277,10 +270,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   private void clean() {
 	this._additionalHeaders.clear();
 	this._dataAccessMapping.clear();
-	this._delayedDataDeclarations.clear();
   }
 
-private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
+  private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
   {
     StringBuffer res = new StringBuffer("") ;
 
@@ -341,7 +333,8 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
 	String sourceName = GenerationUtilsC.resolveExistingCodeDependencies(object, l);
 	if(sourceName!=null)
 	{
-	  sourceNameDest.addOutput(sourceName);
+	  if(sourceNameDest!=null)
+		sourceNameDest.addOutput(sourceName);
 	  return true;
 	}
 	else
@@ -508,8 +501,7 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
   }
   
   
-  protected void getCTypeDeclarator(NamedElement object,
-                                    boolean delayComplexTypes)
+  protected void getCTypeDeclarator(NamedElement object)
   {
     
     String id =
@@ -562,7 +554,7 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
             ClassifierValue cv = (ClassifierValue) v ;
             if(_processedTypes.contains(cv.getClassifier().getQualifiedName())==false && cv.getClassifier() instanceof DataSubcomponentType)
             {
-              getCTypeDeclarator(cv.getClassifier(), false);
+              getCTypeDeclarator(cv.getClassifier());
               _processedTypes.add(cv.getClassifier().getQualifiedName());
             }
           }
@@ -601,14 +593,7 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
       // Complex types
       case ENUM :
       {
-        if(delayComplexTypes)
-        {
-          _delayedDataDeclarations.add(object) ;
-          break ;
-        }
-
-        _gtypesHeaderCode.addOutputNewline("typedef enum e_" + id + " {") ;
-        _gtypesHeaderCode.incrementIndent() ;
+    	StringBuilder enumDeclaration = new StringBuilder("typedef enum e_" + id + " {\n");
         List<String> stringifiedRepresentation = new ArrayList<String>() ;
         EList<PropertyExpression> dataRepresentation =
               PropertyUtils
@@ -666,28 +651,21 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
                 {
                   rep += "," ;
                 }
-
-                _gtypesHeaderCode.addOutputNewline(id + "_" +
-                      enumString.getValue() + rep) ;
+                enumDeclaration.append("\t"+id + "_" +
+                        enumString.getValue() + rep+"\n");
               }
             }
           }
         }
 
-        _gtypesHeaderCode.decrementIndent() ;
+        _gtypesHeaderCode.addOutput(enumDeclaration.toString()) ;
         _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case STRUCT :
       {
-        if(delayComplexTypes)
-        {
-          _delayedDataDeclarations.add(object) ;
-          break ;
-        }
-
-        _gtypesHeaderCode.addOutputNewline("typedef struct " + id + " {") ;
-        _gtypesHeaderCode.incrementIndent() ;
+    	  
+        StringBuilder structDefinition = new StringBuilder("typedef struct " + id + " {\n");
         EList<PropertyExpression> elementNames =
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -732,10 +710,10 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
                   String type =
                         GenerationUtilsC.getGenerationCIdentifier(cv
                               .getClassifier().getQualifiedName()) ;
-                  _gtypesHeaderCode.addOutputNewline(type +
+                  structDefinition.append("\t"+type +
                         " " +
                         stringifiedElementNames.get(lv.getOwnedListElements()
-                              .indexOf(v)) + ";") ;
+                              .indexOf(v)) + ";\n") ;
                 }
               }
             }
@@ -757,26 +735,19 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
         	  catch (Exception e)
         	  {
         		String sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
-        		_gtypesHeaderCode.addOutput(sourceName);
+        		structDefinition.append("\t"+sourceName);
         	  }
-        	  _gtypesHeaderCode.addOutputNewline(" "+ds.getName()+";");
+        	  structDefinition.append(" "+ds.getName()+";\n");
         	}
           }
         }
-        _gtypesHeaderCode.decrementIndent() ;
+        _gtypesHeaderCode.addOutput(structDefinition.toString());
         _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case UNION :
       {
-        if(delayComplexTypes)
-        {
-          _delayedDataDeclarations.add(object) ;
-          break ;
-        }
-
-        _gtypesHeaderCode.addOutputNewline("typedef union " + id + " {") ;
-        _gtypesHeaderCode.incrementIndent() ;
+    	StringBuilder unionDeclaration = new StringBuilder("typedef union " + id + " {\n");
         EList<PropertyExpression> elementNames =
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
@@ -819,27 +790,26 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
                 String type =
                       GenerationUtilsC.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
-                _gtypesHeaderCode.addOutputNewline(type +
+                unionDeclaration.append("\t"+type +
                       " " +
                       stringifiedElementNames.get(lv.getOwnedListElements()
-                            .indexOf(v)) + ";") ;
+                            .indexOf(v)) + ";\n") ;
               }
             }
           }
         }
-
-        _gtypesHeaderCode.decrementIndent() ;
+        _gtypesHeaderCode.addOutput(unionDeclaration.toString());
         _gtypesHeaderCode.addOutputNewline("}" + id + ";") ;
         break ;
       }
       case ARRAY :
       {
-    	_gtypesHeaderCode.addOutput("typedef ") ;
+    	StringBuilder arrayDef = new StringBuilder ("typedef ");
         EList<PropertyExpression> baseType =
               PropertyUtils
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
-
+        boolean found = false;
         for(PropertyExpression baseTypeProperty : baseType)
         {
           if(baseTypeProperty instanceof ListValue)
@@ -851,14 +821,23 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
               if(v instanceof ClassifierValue)
               {
                 ClassifierValue cv = (ClassifierValue) v ;
-                _gtypesHeaderCode.addOutput(GenerationUtilsC
+               	if(false == _processedTypes.contains(cv.getClassifier().getQualifiedName()))
+               	{
+                  getCTypeDeclarator(cv.getClassifier());
+               	  _processedTypes.add(cv.getClassifier().getQualifiedName());
+               	}
+               	arrayDef.append(GenerationUtilsC
                       .getGenerationCIdentifier(cv.getClassifier()
                             .getQualifiedName())) ;
+                found=true;
+                break;
               }
             }
+            if(found)
+            	break;
           }
         }
-
+        _gtypesHeaderCode.addOutput(arrayDef.toString());
         _gtypesHeaderCode.addOutput(" ") ;
         _gtypesHeaderCode.addOutput(id) ;
         EList<PropertyExpression> arrayDimensions =
@@ -923,7 +902,7 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
         }
         _processedTypes.add(object.getQualifiedName());
         _gtypesHeaderCode.processComments(object) ;
-        getCTypeDeclarator((NamedElement) object, true) ;
+        getCTypeDeclarator((NamedElement) object) ;
         return DONE ;
       }
 
@@ -982,7 +961,7 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
         _processedTypes.add(object.getQualifiedName());
         _currentHeaderUnparser = _gtypesHeaderCode ;
         _gtypesHeaderCode.processComments(object) ;
-        getCTypeDeclarator((NamedElement) object, true) ;
+        getCTypeDeclarator((NamedElement) object) ;
         return null ;
       }
 
@@ -1027,13 +1006,20 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
         
         _currentImplUnparser = _deploymentImplCode;
         List<String> dataSubcomponentNames = new ArrayList<String>();
+        Map<String, DataSubcomponent> dataSubcomponentMapping = new HashMap<String, DataSubcomponent>();
         for(DataSubcomponent ds: object.getOwnedDataSubcomponents())
         {
           dataSubcomponentNames.add(ds.getName());
           if(false == _dataAccessMapping.containsValue(ds.getName()))
           {
         	  processDataSubcomponentType(ds.getDataSubcomponentType(), _deploymentImplCode, _deploymentHeaderCode);
-        	  _deploymentImplCode.addOutputNewline(" "+ds.getName()+";") ;
+        	  _deploymentImplCode.addOutput(" "+ds.getName()) ;
+        	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds)) ;
+        	  _deploymentImplCode.addOutputNewline(";") ;
+          }
+          else
+          {
+        	  dataSubcomponentMapping.put(ds.getName(), ds);
           }
           process(ds.getDataSubcomponentType());
         }
@@ -1052,7 +1038,11 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
         	  DataSubcomponentType dst = d.getDataFeatureClassifier();
         	  String declarationID = _dataAccessMapping.get(d);
               processDataSubcomponentType(dst, _deploymentImplCode, _deploymentHeaderCode);
-              _deploymentImplCode.addOutputNewline(" "+declarationID+";") ;
+              _deploymentImplCode.addOutput(" "+declarationID);
+              DataSubcomponent ds = dataSubcomponentMapping.get(_dataAccessMapping.get(d));
+              if(ds!=null)
+            	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds)) ;
+        	  _deploymentImplCode.addOutputNewline(";") ;
               treatedDeclarations.add(declarationID);
         	}
           }
@@ -1436,8 +1426,10 @@ private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
     						  continue;
     					  if(first==false)
     						  _currentImplUnparser.addOutput(", ") ;
+    					  String paramUsage = Aadl2Utils.getParameter_Usage(p);
     					  if(Aadl2Utils.isInOutParameter(p) ||
-    							  Aadl2Utils.isOutParameter(p))
+    							  Aadl2Utils.isOutParameter(p)
+    							  || paramUsage.equalsIgnoreCase("by_reference"))
     					  {
     						  _currentImplUnparser.addOutput("&") ;
     					  }

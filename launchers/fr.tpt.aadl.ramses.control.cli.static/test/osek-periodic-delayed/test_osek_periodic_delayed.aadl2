@@ -10,7 +10,7 @@ end Int;
 
 thread producer
 features
-  p_out: out event data port Int;
+  p_out: out event data port Int {Output_Time => ([Time => Deadline; Offset => 0 ns .. 0 ns;]);};
 end producer;
 
 

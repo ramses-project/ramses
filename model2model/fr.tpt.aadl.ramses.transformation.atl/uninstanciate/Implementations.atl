@@ -70,14 +70,21 @@ rule Implementation (c : AADLI!ComponentInstance,
 			else if (impl.oclIsKindOf(AADLI!SubprogramImplementation)) { implImg <- thisModule.SubprogramImplementation(typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!DataImplementation)) { implImg <- thisModule.DataImplementation(typeImg,impl); }
 			
-			if (implImg.isDeclared())
-			  implImg.debug('  previously declared type');
-			else
+			if(not impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined())
 			{
-			  implImg.debug('  declare type');
-			  thisModule.public().getOwnedClassifiers().add(implImg);
+				implImg.ownedAnnexSubclause.add
+				(
+					thisModule.copyBehaviorAnnex(c, impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)) )
+				);
 			}
 
+			if (implImg.isDeclared())
+			  implImg.debug('  previously declared implementation');
+			else
+			{
+			  implImg.debug('  declare implementation');
+			  thisModule.public().getOwnedClassifiers().add(implImg);
+			}
 		}
 		implImg;
 	}

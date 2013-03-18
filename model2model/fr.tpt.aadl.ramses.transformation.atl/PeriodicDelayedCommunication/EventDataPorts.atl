@@ -471,13 +471,36 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 													CPRSizeInit)
 									   }
 		    ),
+		lastIndexInit: AADLBA!ListValue 
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(0.toString())}
+		),
 		lastIndex:AADLBA!DataSubcomponent (
 			name <- port.name+'_lastIndex',
-			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES')
+			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence {
+													thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													lastIndexInit
+													)
+									   			}
+		), 
+		
+		readIndexInit: AADLBA!ListValue 
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(0.toString())}
 		),
 		readIndex:AADLBA!DataSubcomponent (
 			name <- port.name+'_readIndex',
-			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES')
+			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence {
+													thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													readIndexInit
+													)
+									   			}
 		),
 		currentValue: AADLBA!DataSubcomponent (
 			name <- port.name+'_currentValue',
@@ -865,6 +888,7 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 
 unique lazy rule createIterationCounter
 {
+	
 	from
 		thread: AADLBA!ThreadImplementation
 	to

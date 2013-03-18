@@ -1,6 +1,7 @@
 package fr.tpt.aadl.ramses.communication.periodic.delayed;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,7 @@ import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 
 public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDelayedDimensioning {
 
-	private EventDataPortCommunicationDimensioning(FeatureInstance receiverPort) throws DimensioningException
+	protected EventDataPortCommunicationDimensioning(FeatureInstance receiverPort) throws DimensioningException
 	{
 		boolean isInOrInOutFeature = receiverPort.getDirection().equals(DirectionType.IN)
 				|| receiverPort.getDirection().equals(DirectionType.IN_OUT);
@@ -65,46 +66,55 @@ public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDela
 
 	}
 
-	private long computeBufferSize() throws DimensioningException
+	protected long computeBufferSize() throws DimensioningException
 	{
-		long result=0;
-		long readerPeriod = AadlUtil.getInfoTaskPeriod(readerReceivingTaskInstance);
+		long result = 0;
+		long maxDeadline = 0;
 		for(ComponentInstance writerTaskInstance: this.writerInstances)
 		{
-			long writerTaskPeriod = getPeriod(writerTaskInstance);
-			// Following code increment the result with
-			// the ceil of the division readerPeriod/writerTaskPeriod
-			// + 1
-			// see computation of the circular arrar size in RTNS 2012
-			long d = result+readerPeriod/writerTaskPeriod+1;
-			if(Math.IEEEremainder(readerPeriod , writerTaskPeriod)>0)
-				result = d+1;
-			else
-				result = d;
+			if(getDeadline(writerTaskInstance) > maxDeadline){
+				maxDeadline = getDeadline(writerTaskInstance);
+			}
 		}
-		result = 2*result;
+		long readerPeriod = AadlUtil.getInfoTaskPeriod(readerReceivingTaskInstance);
+		long writerPeriod = 0;
+
+		for(ComponentInstance writerTaskInstance: this.writerInstances)
+		{
+			writerPeriod = getDeadline(writerTaskInstance);
+
+			result += ((2 * readerPeriod + maxDeadline) / writerPeriod) + 1;
+		}
 		return result;
 	}
 
-	private void setCurrentPeriodReadIndex() throws DimensioningException
+
+	protected void setCurrentPeriodReadIndex() throws DimensioningException
 	{
-		for(int iteration=0; iteration < CPRSize; iteration++)
+
+		long readerTaskPeriod = getPeriod(this.readerReceivingTaskInstance);
+		// pour chaque pŽriode de l'HP
+		for(int iteration= 1; iteration <= CPRSize; iteration++)
 		{
-			long CPR = 0;
-			long deliveredAtIteration = 0;
-			long readerTaskPeriod = getPeriod(this.readerReceivingTaskInstance);
+			long SEJDprev = 0;
+			long readingTime = iteration*readerTaskPeriod;
+			
+			for(ComponentInstance otherWriter : this.writerInstances)
+			{
+				long otherPeriod = getPeriod(otherWriter);
+				long otherDeadline = getDeadline(otherWriter);
+				SEJDprev += ((readingTime - otherDeadline) / otherPeriod) + 1;
+			}
+			SEJDprev=(SEJDprev-1)%bufferSize;
+			CurrentPeriodRead.add(SEJDprev);
 
-			deliveredAtIteration = deliveredAt(iteration*readerTaskPeriod);
-			CPR = deliveredAtIteration%bufferSize;
-
-			CurrentPeriodRead.add(CPR);
 		}
 	}
 
-	private void setCurrentDeadlineWriteIndex() throws DimensioningException
+
+	protected void setCurrentDeadlineWriteIndex() throws DimensioningException
 	{
-		long offset=0;
-		boolean first = true;
+		boolean first=true;
 		for(FeatureInstance writerFeatureInstance:this.writerFeatureInstances)
 		{
 			if(!this.writerFeatureInstances.contains(writerFeatureInstance))
@@ -113,42 +123,48 @@ public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDela
 			ComponentInstance writerTaskInstance = (ComponentInstance) writerFeatureInstance.eContainer();
 			for(int iteration=0;iteration<this.CDWSize.get(writerFeatureInstance);iteration++)
 			{
-				long CDW = 0;
+				long CDW = 0, SEJD = 0;
 				long writerTaskPeriod = getPeriod(writerTaskInstance);
 				long writerTaskDeadline = getDeadline(writerTaskInstance);
-				long writingTime = iteration*writerTaskPeriod+writerTaskDeadline;
-				// we had hyperperiod to avoid negative values
-				writingTime = writingTime+this.hyperperiod;
+				long writingTime = iteration*writerTaskPeriod + writerTaskDeadline;
 
 				int simultaneousWriters = 0;
+
+				boolean found = false;
+				
 				for(ComponentInstance otherWriter : this.writerInstances)
 				{
-					if(otherWriter.equals(writerTaskInstance))
-						break;
 					long otherPeriod = getPeriod(otherWriter);
 					long otherDeadline = getDeadline(otherWriter);
 
-					if(Math.IEEEremainder(writingTime-otherDeadline, otherPeriod)==0)
-						simultaneousWriters++;
-				}
+					// formule
+					if(otherWriter.equals(writerTaskInstance)){
+						found = true;
+					}
 
-				CDW = (deliveredAt(writingTime)-simultaneousWriters);
-				if(iteration==0 && first)
-				{
-					offset = CDW - 1;
-					first = false;
+					SEJD += ((writingTime - otherDeadline) / otherPeriod) + 1;
+					if((((writingTime - otherDeadline) % otherPeriod) == 0) 
+							&& (found)){
+						simultaneousWriters++;
+					}
 				}
-				CDW = CDW - offset;
-				// Since result can be negative, we wrap it up as follows:
-				CDW = (CDW%bufferSize+bufferSize)%bufferSize ;
+				CDW = SEJD - simultaneousWriters;
+				CDW = CDW%bufferSize;
+				if(first && (CDW <= 1)){
+					this.CurrentDeadlineWriteMap.get(writerFeatureInstance).add((long) 0);
+					first = false;
+					continue;
+				}
 				this.CurrentDeadlineWriteMap.get(writerFeatureInstance).add(CDW);
 			}
 		}
 	}
 
-	private static final Map<FeatureInstance, EventDataPortCommunicationDimensioning> _instances =
-			new HashMap<FeatureInstance, EventDataPortCommunicationDimensioning>();
 	
+
+	protected static final Map<FeatureInstance, EventDataPortCommunicationDimensioning> _instances =
+			new HashMap<FeatureInstance, EventDataPortCommunicationDimensioning>();
+
 	public static EventDataPortCommunicationDimensioning create(FeatureInstance port) 
 			throws DimensioningException {
 		if(_instances.get(port)!=null)

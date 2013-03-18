@@ -115,6 +115,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.UnaryAddingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryBooleanOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryNumericOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.UnlockAction;
+import fr.tpt.aadl.annex.behavior.aadlba.Value;
 import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression;
 import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement;
 import fr.tpt.aadl.annex.behavior.aadlba.util.AadlBaSwitch;
@@ -868,6 +869,143 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
       
+      public boolean manageParameterDirection(Parameter formal, ParameterLabel actual)
+      {
+    	  boolean remainingParenthesis = false;
+    	  String usageP = Aadl2Utils.getParameter_Usage(formal);
+          if(Aadl2Utils.isInOutParameter(formal) ||
+          		Aadl2Utils.isOutParameter(formal) ||
+          		usageP.equalsIgnoreCase("by_reference"))
+          {
+            if(actual instanceof ParameterHolder)
+            {
+          	  ParameterHolder ph = (ParameterHolder) actual;
+          	  String usage = Aadl2Utils.getParameter_Usage(ph.getParameter());
+          	  // in out passed to in
+          	  if(!Aadl2Utils.isOutParameter(ph.getParameter()) &&
+          		!Aadl2Utils.isInOutParameter(ph.getParameter())
+          		&& !usage.equalsIgnoreCase("by_reference"))
+          		// and ph.getParameter not by reference
+          		  _cFileContent.addOutput("*") ;
+          		  
+            }
+            else if (actual instanceof DataSubcomponentHolder
+          		  || actual instanceof BehaviorVariableHolder)
+          	  _cFileContent.addOutput("&") ;
+            else if (actual instanceof DataComponentReference)
+            {
+          	  _cFileContent.addOutput("&(") ;
+          	  remainingParenthesis=true;
+            }
+            else if(actual instanceof DataAccessHolder)
+            {
+              DataAccessHolder dah = (DataAccessHolder) actual;
+              if(!Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
+            		  !Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
+            	  //TODO: and dah.getAccess not by reference
+            	  _cFileContent.addOutput("*") ;
+            }
+            else if(actual instanceof ValueExpression)
+            {
+          	  ValueExpression ve = (ValueExpression) actual;
+            	  Value v = ve.getRelations().get(0).
+            			  getFirstExpression().getTerms().get(0).
+            			  getFactors().get(0).
+            			  getFirstValue();
+          	  if(v instanceof DataAccessHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+          	  else if (v instanceof ParameterHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+          	  else
+          	  {
+          		_cFileContent.addOutput("&") ;
+          	  }
+            }
+          }
+          else
+          {
+          	// if p not by_reference
+          	if(actual instanceof ParameterHolder)
+            {
+          	  ParameterHolder ph = (ParameterHolder) actual;
+          	  String usagePH = Aadl2Utils.getParameter_Usage(ph.getElement());
+          	  // in to inout
+          	  if(Aadl2Utils.isOutParameter(ph.getParameter()) ||
+              	Aadl2Utils.isInOutParameter(ph.getParameter()) ||
+              	  usagePH.equalsIgnoreCase("by_reference"))
+          		  _cFileContent.addOutput("*") ;
+            }
+          	else if(actual instanceof DataAccessHolder)
+            {
+              DataAccessHolder dah = (DataAccessHolder) actual;
+              if(Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
+            		  Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
+            	  //TODO: and dah.getAccess not by reference
+            	  _cFileContent.addOutput("*") ;
+            }
+            else if(actual instanceof ValueExpression)
+            {
+          	  ValueExpression ve = (ValueExpression) actual;
+            	  Value v = ve.getRelations().get(0).
+            			  getFirstExpression().getTerms().get(0).
+            			  getFactors().get(0).
+            			  getFirstValue();
+          	  if(v instanceof DataAccessHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+          	  else if (v instanceof ParameterHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+            }
+          }
+          return remainingParenthesis;
+      }
+      
+      public boolean manageAccessDirection(DataAccess formal, ParameterLabel actual)
+      {
+    	  boolean remainingParenthesis=false;
+    	  if(Aadl2Utils.isReadWriteDataAccess(formal)
+        		  || Aadl2Utils.isWriteOnlyDataAccess(formal))
+          {
+        	if(actual instanceof DataAccessHolder)
+        	{
+        	  DataAccessHolder dah = (DataAccessHolder) actual;
+        	  // in out passed to in
+          	  if(!Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
+          		!Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
+          		//TODO: and dah.getAccess not by reference
+          		  _cFileContent.addOutput("*") ;
+        	}
+        	else if(actual instanceof DataSubcomponentHolder
+        			|| actual instanceof BehaviorVariableHolder)
+        		_cFileContent.addOutput("&") ;
+        	else if (actual instanceof DataComponentReference)
+            {
+          	  _cFileContent.addOutput("&(") ;
+          	  remainingParenthesis=true;
+            }
+          }
+          else
+          {
+        	//TODO: if da not by_reference
+        	if(actual instanceof DataAccessHolder)
+          	{
+          		DataAccessHolder dah = (DataAccessHolder) actual;
+          		// in to inout
+        		if(Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()) ||
+            		Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()))
+        			_cFileContent.addOutput("*") ;
+          	}
+          }
+    	  return remainingParenthesis;
+      }
+      
       public String caseCalledSubprogramHolder(CalledSubprogramHolder object)
       {
         aadlbaText = _cFileContent;
@@ -946,52 +1084,31 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   continue;
                 if(first==false)
                   _cFileContent.addOutput(", ") ;
-                String usageP = Aadl2Utils.getParameter_Usage(p);
-                if(Aadl2Utils.isInOutParameter(p) ||
-                		Aadl2Utils.isOutParameter(p) ||
-                		usageP.equalsIgnoreCase("by_reference"))
+
+                remainingParenthesis = manageParameterDirection(p, pl);
+
+                if(pl instanceof ElementHolder)
                 {
-                  if(pl instanceof ParameterHolder)
-                  {
-                	  ParameterHolder ph = (ParameterHolder) pl;
-                	  String usage = Aadl2Utils.getParameter_Usage(ph.getParameter());
-                	  // in out passed to in
-                	  if(!Aadl2Utils.isOutParameter(ph.getParameter()) &&
-                		!Aadl2Utils.isInOutParameter(ph.getParameter())
-                		&& !usage.equalsIgnoreCase("by_reference"))
-                		// and ph.getParameter not by reference
-                		  _cFileContent.addOutput("*") ;
-                		  
-                  }
-                  else if (pl instanceof DataSubcomponentHolder
-                		  || pl instanceof BehaviorVariableHolder 
-                		  || pl instanceof ValueExpression)
-                	  _cFileContent.addOutput("&") ;
-                  else if (pl instanceof DataComponentReference)
-                  {
-                	  _cFileContent.addOutput("&(") ;
-                	  remainingParenthesis=true;
-                  }
+                  ElementHolder eh = (ElementHolder) pl;
+                  _cFileContent.addOutput(eh.getElement().getName());
+                } 
+                else if(pl instanceof ValueExpression)
+                {
+              	  ValueExpression ve = (ValueExpression) pl;
+              	  Value v = ve.getRelations().get(0).
+              			  getFirstExpression().getTerms().get(0).
+              			  getFactors().get(0).
+              			  getFirstValue();
+              	  if(v instanceof ElementHolder)
+              	  {
+              		ElementHolder el = (ElementHolder) v;
+              		_cFileContent.addOutput(el.getElement().getName());
+              	  }
                 }
                 else
                 {
-                	// if p not by_reference
-                	String usage = Aadl2Utils.getParameter_Usage(p);
-                	if(pl instanceof ParameterHolder
-                			&& !usage.equalsIgnoreCase("by_reference"))
-                    {
-                		ParameterHolder ph = (ParameterHolder) pl;
-                		String usagePH = Aadl2Utils.getParameter_Usage(p);
-                		// in to inout
-                		if(Aadl2Utils.isOutParameter(ph.getParameter()) ||
-                    		Aadl2Utils.isInOutParameter(ph.getParameter()) ||
-                    		usagePH.equalsIgnoreCase("by_reference"))
-                			_cFileContent.addOutput("&") ;
-                    }
-                			
+                  process(pl) ;
                 }
-
-                process(pl) ;
                 if(remainingParenthesis)
                 {
                 	_cFileContent.addOutput(")");
@@ -1006,28 +1123,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   _cFileContent.addOutput(", ") ;
                 if(da.getKind().equals(AccessType.REQUIRES))
                 {
-                  
-                  if(Aadl2Utils.isReadWriteDataAccess(da)
-                		  || Aadl2Utils.isWriteOnlyDataAccess(da))
-                  {
-                	if(pl instanceof DataAccessHolder)
-                	{
-                	  DataAccessHolder dah = (DataAccessHolder) pl;
-                	  // in out passed to in
-                  	  if(!Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
-                  		!Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
-                  		//TODO: and dah.getAccess not by reference
-                  		  _cFileContent.addOutput("*") ;
-                	}
-                	else if(pl instanceof DataSubcomponentHolder
-                			|| pl instanceof BehaviorVariableHolder)
-                		_cFileContent.addOutput("&") ;
-                	else if (pl instanceof DataComponentReference)
-                    {
-                  	  _cFileContent.addOutput("&(") ;
-                  	  remainingParenthesis=true;
-                    }
-                  }
+                  remainingParenthesis = manageAccessDirection(da, pl);  
                   else
                   {
                 	//TODO: if da not by_reference
@@ -1102,18 +1198,25 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       {
     	NamedElement elt = object.getElement();
     	String id;
+    	boolean pointer=false;
     	if(elt instanceof Parameter)
 		{
 			Parameter p = (Parameter) elt;
 			if(false==(object.eContainer() instanceof SubprogramCallAction))
 			{
-				String usageP = Aadl2Utils.getParameter_Usage(p);
-				if(Aadl2Utils.isInOutParameter(p)
-					|| Aadl2Utils.isOutParameter(p)
-					|| usageP.equalsIgnoreCase("by_reference"))
-				aadlbaText.addOutput("*");
+			  String usageP = Aadl2Utils.getParameter_Usage(p);
+			  if(Aadl2Utils.isInOutParameter(p)
+				  || Aadl2Utils.isOutParameter(p)
+				  || usageP.equalsIgnoreCase("by_reference"))
+			  {
+			    aadlbaText.addOutput("(*");
+			    pointer=true;
+			  }
+			
 			}
-			id = elt.getName();
+		     }
+		     id = elt.getName();
+			
 		}
 		else if (elt instanceof DataAccess)
 		{
@@ -1124,7 +1227,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 			if(Aadl2Utils.isReadWriteDataAccess(da)
 			  || Aadl2Utils.isWriteOnlyDataAccess(da))
 			{
-  			   aadlbaText.addOutput("*");
+  			   aadlbaText.addOutput("(*");
+			   pointer=true;		
 			}
 		  }
   		  id = elt.getName();
@@ -1132,6 +1236,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     	else	
     		id = elt.getQualifiedName();
     	aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(id));
+    	if(pointer)
+    		aadlbaText.addOutput(")");
     	if(object instanceof IndexableElement)
     	{	
     	  IndexableElement ie = (IndexableElement) object;

@@ -2,6 +2,7 @@ package fr.tpt.aadl.ramses.communication.periodic.delayed;
 
 import org.osate.aadl2.instance.ComponentInstance;
 
+
 import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 
 public class ComparableThreadByDeadline implements Comparable<ComparableThreadByDeadline> 

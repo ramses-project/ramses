@@ -86,7 +86,7 @@ helper def:getProgrammationLanguageIdentifier(identifier:String): String =
 	identifier.replaceAll('.','_').replaceAll('::','__');
 
 helper context AADLI!FeatureInstance def : isThreadPort() : Boolean =
-	self.eContainer().category = #thread and self.category.oclIsTypeOf(AADLBA!Port)
+	self.eContainer().category = #thread and self.feature.oclIsKindOf(AADLBA!Port)
 ;
 
 helper context AADLI!ComponentInstance def : isThreadPort() : Boolean =
@@ -94,7 +94,7 @@ helper context AADLI!ComponentInstance def : isThreadPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def : isProcessPort() : Boolean =
-	self.eContainer().category=#process  and self.category.oclIsTypeOf(AADLBA!Port)
+	self.eContainer().category=#process  and self.feature.oclIsKindOf(AADLBA!Port)
 ;
 
 helper context AADLI!ComponentInstance def : isProcessPort() : Boolean =
@@ -142,4 +142,19 @@ helper context AADLI!ComponentInstance def: isPeriodicThreadPort(): Boolean =
 
 helper context AADLI!ConnectionInstance def: isIntraProcessConnection() : Boolean =
 	self.source.eContainer().eContainer() = self.destination.eContainer().eContainer() 
+;
+
+
+helper context AADLI!ComponentInstance def: getPeriod() : Integer = 
+	-- should call java code (PropertyUtils class) instead
+	self.getModalPropertyValue('Period').ownedValue.value
+;
+
+helper context AADLI!ComponentInstance def: getDeadline() : Integer = 
+	-- should call java code (PropertyUtils class) instead
+	if(self.getModalPropertyValue('Deadline').oclIsUndefined()) then
+		self.getModalPropertyValue('Period').ownedValue.value
+	else
+		self.getModalPropertyValue('Deadline').ownedValue.value
+	endif
 ;

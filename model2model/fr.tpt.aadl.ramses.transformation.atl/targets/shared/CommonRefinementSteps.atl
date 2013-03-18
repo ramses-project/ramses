@@ -1101,3 +1101,4 @@ rule addDataAccessConnection(implImg: AADLBA!ComponentImplementation,
 	  	implImg.ownedAccessConnection.add(accessConnection);
   }
 }
+

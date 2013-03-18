@@ -1,6 +1,7 @@
 package fr.tpt.aadl.sched.cheddar ;
 
 import java.util.ArrayList ;
+
 import java.util.List ;
 
 import org.jdom.Document ;

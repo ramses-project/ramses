@@ -15,8 +15,7 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 
 	public static final String[] ATL_FILE_NAMES = new String[] { "targets/osek/ExpandThreadsPorts.asm", "ExpandSubprogramCalls.asm", "CreateThreadsBehavior.asm" };
 
-	public static final List<File> ATL_FILES = new ArrayList<File>(
-			ATL_FILE_NAMES.length);
+	public static final List<File> ATL_FILES = new ArrayList<File>(ATL_FILE_NAMES.length);
 
 
 
@@ -25,7 +24,6 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 	                          File resourceFilePath,
 	                          File generatedFilePath)
 	                                throws GenerationException {
-
 	  for (String fileName : ATL_FILE_NAMES) {
 	    ATL_FILES.add(new File(resourceFilePath.getAbsolutePath() +"/"+ fileName));
 	  }

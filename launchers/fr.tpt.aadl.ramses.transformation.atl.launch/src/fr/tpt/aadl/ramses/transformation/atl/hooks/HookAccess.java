@@ -35,6 +35,7 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
+import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceObject;
 
@@ -95,7 +96,15 @@ public interface HookAccess extends EObject
 	 * @generated
 	 */
 	EList<Long> getCurrentPerionReadTable(FeatureInstance port);
-
+	
+	/**
+	* <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model portRequired="true"
+	 * @generated
+	 */
+	Long getHyperperiod(FeatureInstance port);
+	
 				/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

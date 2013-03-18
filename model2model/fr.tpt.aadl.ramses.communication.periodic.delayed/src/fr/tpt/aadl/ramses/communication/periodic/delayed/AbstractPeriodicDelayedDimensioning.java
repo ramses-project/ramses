@@ -1,6 +1,8 @@
 package fr.tpt.aadl.ramses.communication.periodic.delayed;
 
 import java.util.ArrayList;
+
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +13,9 @@ import org.osate.aadl2.instance.FeatureInstance;
 import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
 import fr.tpt.aadl.ramses.util.math.LeastCommonMultiple;
 import fr.tpt.aadl.ramses.util.properties.AadlUtil;
-
+  
 public abstract class AbstractPeriodicDelayedDimensioning {
-	
+
 	protected ComponentInstance readerReceivingTaskInstance;
 	protected List<ComponentInstance> writerInstances;
 	protected List<FeatureInstance> writerFeatureInstances =
@@ -25,12 +27,12 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 			new HashMap<FeatureInstance, List<Long>>();
 	protected long bufferSize;
 	protected long hyperperiod;
-	
+
 	public long getBufferSize()
 	{
 		return bufferSize;
 	}
-	
+
 	public long getPreviousPeriodReadIndex(int iteration) throws DimensioningException
 	{
 		if(iteration > 0)
@@ -43,34 +45,43 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 	{
 		return this.CurrentPeriodRead.size();
 	}
-	
+
 	public long getCurrentPeriodReadIndex(int iteration) throws DimensioningException
 	{
 		return this.CurrentPeriodRead.get(iteration);
 	}
-	
+
 	public long getCDWSize(FeatureInstance writer) throws DimensioningException
 	{
 		return this.CDWSize.get(writer);
 	}
-	
+
 	public long getCurrentDeadlineWriteIndex(FeatureInstance writer, int iteration) throws DimensioningException
 	{
 		return this.CurrentDeadlineWriteMap.get(writer).get(iteration);
 	}
 	
-	protected long deliveredAt(long t) throws DimensioningException {
+	protected long deliveredAt(long t)throws DimensioningException
+	{
 		long deliveredAtIteration = 0;
 		for(ComponentInstance writerTaskInstance: this.writerInstances)
 		{
 			long writerTaskPeriod = getPeriod(writerTaskInstance);
 			long writerTaskDeadline = getDeadline(writerTaskInstance);
-			long readingTime = t-writerTaskDeadline;
+			long Pi=getPeriod(readerReceivingTaskInstance);
+			long readingTime = ((t/writerTaskPeriod) * writerTaskPeriod + writerTaskDeadline) ;
+			if(readingTime%Pi==0)
+				readingTime=readingTime/Pi;
+			else
+				readingTime= readingTime/Pi +1;
+			readingTime*=Pi;
 			deliveredAtIteration = deliveredAtIteration+Math.max(0, readingTime/writerTaskPeriod + 1);
+		//deliveredAtIteration=Math.max(0, readingTime/writerTaskPeriod + 1);// question prof
 		}
 		return deliveredAtIteration;
+
 	}
-	
+		
 	protected long getPeriod(ComponentInstance ci) throws DimensioningException
 	{
 		long taskPeriod = AadlUtil.getInfoTaskPeriod(ci);
@@ -80,7 +91,7 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 					+ ci.getComponentInstancePath());
 		return taskPeriod;
 	}
-	
+
 	protected long getDeadline(ComponentInstance ci) throws DimensioningException {
 		long taskDeadline = AadlUtil.getInfoTaskDeadline(ci);
 		taskDeadline  = AadlUtil.getInfoTaskPeriod(ci);
@@ -91,6 +102,7 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 		return taskDeadline;
 	}
 	
+	
 	protected void setCDWSize(FeatureInstance writer) throws DimensioningException
 	{
 		long WritersHyperperiod = getHyperperiod(this.writerInstances);
@@ -100,6 +112,7 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 			long writerPeriod = getPeriod(w);
 			MessageNumbers=MessageNumbers+WritersHyperperiod/writerPeriod;
 		}
+		
 		long writerCDWSize = (LeastCommonMultiple.lcm(MessageNumbers, bufferSize)/MessageNumbers)
 				*WritersHyperperiod/getPeriod((ComponentInstance) writer.eContainer());
 		this.CDWSize.put(writer, writerCDWSize); 
@@ -113,20 +126,21 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 		long AccessingTasksHyperperiod = getHyperperiod(accessingTasks);
 		long MessageNumbers=0;
 		
-		for(ComponentInstance a: accessingTasks)
+		for(ComponentInstance w: this.writerInstances)
 		{
-			long accessingPeriod = getPeriod(a);
-			MessageNumbers=MessageNumbers+AccessingTasksHyperperiod/accessingPeriod;
+			long writerPeriod = getPeriod(w);
+			MessageNumbers=MessageNumbers+AccessingTasksHyperperiod/writerPeriod;
 		}
+		
 		this.CPRSize = (LeastCommonMultiple.lcm(MessageNumbers, bufferSize)/MessageNumbers)
 				*AccessingTasksHyperperiod/getPeriod(this.readerReceivingTaskInstance);
-		
+
 		this.hyperperiod = AccessingTasksHyperperiod;
-		
+
 	}
 
 
-	private long getHyperperiod(List<ComponentInstance> consideredTasks) throws DimensioningException
+	public long getHyperperiod(List<ComponentInstance> consideredTasks) throws DimensioningException
 	{
 		Long[] periods = new Long[consideredTasks.size()];
 		ArrayList<Long> consideredPeriods = new ArrayList<Long>();
@@ -137,5 +151,5 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 		consideredPeriods.toArray(periods);
 		return LeastCommonMultiple.lcm(periods);
 	}
-	
+
 }

@@ -376,9 +376,16 @@ public class AtlTransfoLauncher
     
 
     URL moduleFile =
-    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/EventDataPorts" + ".asm") ;
+    		new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/factoring/EventDataPorts" + ".asm") ;
+
     Object loadedModule = launcher.loadModule(moduleFile.openStream()) ;
     atlModules.add(loadedModule) ;
+    moduleFile =
+    		new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/factoring/EventDataPorts_LowMFP" + ".asm") ;
+    Object loadedModuleMFP = launcher.loadModule(moduleFile.openStream()) ;
+    atlModules.add(loadedModuleMFP) ;
+    
+
     URL moduleFileCommon =
         	new URL("file:" + resourcesDir.getAbsolutePath() + "/targets/shared/CommonRefinementSteps" + ".asm") ;
     Object loadedmoduleCommon = launcher.loadModule(moduleFileCommon.openStream()) ;

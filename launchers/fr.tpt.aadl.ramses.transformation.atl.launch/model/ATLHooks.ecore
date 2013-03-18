@@ -36,5 +36,8 @@
       <eParameters name="ba" lowerBound="1" eType="ecore:EClass ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//BehaviorAnnex"/>
       <eParameters name="p" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Port"/>
     </eOperations>
+    <eOperations name="getHyperperiod" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
+      <eParameters name="port" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//FeatureInstance"/>
+    </eOperations>
   </eClassifiers>
 </ecore:EPackage>

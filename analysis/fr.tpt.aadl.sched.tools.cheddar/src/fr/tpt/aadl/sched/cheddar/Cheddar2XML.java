@@ -1,6 +1,7 @@
 package fr.tpt.aadl.sched.cheddar ;
 
 import org.jdom.Attribute ;
+
 import org.jdom.Document ;
 import org.jdom.Element ;
 
