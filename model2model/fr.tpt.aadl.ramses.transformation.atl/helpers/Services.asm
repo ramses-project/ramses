@@ -171,18 +171,18 @@
 		<constant value="J.eContainer():J"/>
 		<constant value="category"/>
 		<constant value="thread"/>
+		<constant value="feature"/>
 		<constant value="Port"/>
-		<constant value="J.oclIsTypeOf(J):J"/>
 		<constant value="89:2-89:6"/>
 		<constant value="89:2-89:19"/>
 		<constant value="89:2-89:28"/>
 		<constant value="89:31-89:38"/>
 		<constant value="89:2-89:38"/>
 		<constant value="89:43-89:47"/>
-		<constant value="89:43-89:56"/>
-		<constant value="89:69-89:80"/>
-		<constant value="89:43-89:81"/>
-		<constant value="89:2-89:81"/>
+		<constant value="89:43-89:55"/>
+		<constant value="89:68-89:79"/>
+		<constant value="89:43-89:80"/>
+		<constant value="89:2-89:80"/>
 		<constant value="MAADLI!ComponentInstance;"/>
 		<constant value="93:2-93:7"/>
 		<constant value="isProcessPort"/>
@@ -193,15 +193,15 @@
 		<constant value="97:29-97:37"/>
 		<constant value="97:2-97:37"/>
 		<constant value="97:43-97:47"/>
-		<constant value="97:43-97:56"/>
-		<constant value="97:69-97:80"/>
-		<constant value="97:43-97:81"/>
-		<constant value="97:2-97:81"/>
+		<constant value="97:43-97:55"/>
+		<constant value="97:68-97:79"/>
+		<constant value="97:43-97:80"/>
+		<constant value="97:2-97:80"/>
 		<constant value="101:2-101:7"/>
 		<constant value="isDataOrEventDataPort"/>
-		<constant value="feature"/>
 		<constant value="EventDataPort"/>
 		<constant value="AADLI"/>
+		<constant value="J.oclIsTypeOf(J):J"/>
 		<constant value="DataPort"/>
 		<constant value="J.or(J):J"/>
 		<constant value="105:3-105:7"/>
@@ -294,6 +294,31 @@
 		<constant value="144:42-144:71"/>
 		<constant value="144:42-144:84"/>
 		<constant value="144:2-144:84"/>
+		<constant value="getPeriod"/>
+		<constant value="Period"/>
+		<constant value="150:2-150:6"/>
+		<constant value="150:29-150:37"/>
+		<constant value="150:2-150:38"/>
+		<constant value="150:2-150:49"/>
+		<constant value="150:2-150:55"/>
+		<constant value="getDeadline"/>
+		<constant value="Deadline"/>
+		<constant value="11"/>
+		<constant value="155:5-155:9"/>
+		<constant value="155:32-155:42"/>
+		<constant value="155:5-155:43"/>
+		<constant value="155:5-155:60"/>
+		<constant value="158:3-158:7"/>
+		<constant value="158:30-158:40"/>
+		<constant value="158:3-158:41"/>
+		<constant value="158:3-158:52"/>
+		<constant value="158:3-158:58"/>
+		<constant value="156:3-156:7"/>
+		<constant value="156:30-156:38"/>
+		<constant value="156:3-156:39"/>
+		<constant value="156:3-156:50"/>
+		<constant value="156:3-156:56"/>
+		<constant value="155:2-159:7"/>
 	</cp>
 	<field name="1" type="2"/>
 	<operation name="3">
@@ -719,11 +744,11 @@
 			<set arg="84"/>
 			<call arg="85"/>
 			<load arg="26"/>
-			<get arg="168"/>
-			<push arg="170"/>
+			<get arg="170"/>
+			<push arg="171"/>
 			<push arg="128"/>
 			<findme/>
-			<call arg="171"/>
+			<call arg="129"/>
 			<call arg="99"/>
 		</code>
 		<linenumbertable>
@@ -772,11 +797,11 @@
 			<set arg="84"/>
 			<call arg="85"/>
 			<load arg="26"/>
-			<get arg="168"/>
-			<push arg="170"/>
+			<get arg="170"/>
+			<push arg="171"/>
 			<push arg="128"/>
 			<findme/>
-			<call arg="171"/>
+			<call arg="129"/>
 			<call arg="99"/>
 		</code>
 		<linenumbertable>
@@ -815,17 +840,17 @@
 		</parameters>
 		<code>
 			<load arg="26"/>
-			<get arg="198"/>
+			<get arg="170"/>
+			<push arg="198"/>
 			<push arg="199"/>
-			<push arg="200"/>
 			<findme/>
-			<call arg="171"/>
+			<call arg="200"/>
 			<load arg="26"/>
-			<get arg="198"/>
+			<get arg="170"/>
 			<push arg="201"/>
-			<push arg="200"/>
+			<push arg="199"/>
 			<findme/>
-			<call arg="171"/>
+			<call arg="200"/>
 			<call arg="202"/>
 		</code>
 		<linenumbertable>
@@ -1041,6 +1066,71 @@
 		</linenumbertable>
 		<localvariabletable>
 			<lve slot="0" name="14" begin="0" end="8"/>
+		</localvariabletable>
+	</operation>
+	<operation name="293">
+		<context type="182"/>
+		<parameters>
+		</parameters>
+		<code>
+			<load arg="26"/>
+			<push arg="294"/>
+			<call arg="214"/>
+			<get arg="40"/>
+			<get arg="41"/>
+		</code>
+		<linenumbertable>
+			<lne id="295" begin="0" end="0"/>
+			<lne id="296" begin="1" end="1"/>
+			<lne id="297" begin="0" end="2"/>
+			<lne id="298" begin="0" end="3"/>
+			<lne id="299" begin="0" end="4"/>
+		</linenumbertable>
+		<localvariabletable>
+			<lve slot="0" name="14" begin="0" end="4"/>
+		</localvariabletable>
+	</operation>
+	<operation name="300">
+		<context type="182"/>
+		<parameters>
+		</parameters>
+		<code>
+			<load arg="26"/>
+			<push arg="301"/>
+			<call arg="214"/>
+			<call arg="30"/>
+			<if arg="302"/>
+			<load arg="26"/>
+			<push arg="301"/>
+			<call arg="214"/>
+			<get arg="40"/>
+			<get arg="41"/>
+			<goto arg="219"/>
+			<load arg="26"/>
+			<push arg="294"/>
+			<call arg="214"/>
+			<get arg="40"/>
+			<get arg="41"/>
+		</code>
+		<linenumbertable>
+			<lne id="303" begin="0" end="0"/>
+			<lne id="304" begin="1" end="1"/>
+			<lne id="305" begin="0" end="2"/>
+			<lne id="306" begin="0" end="3"/>
+			<lne id="307" begin="5" end="5"/>
+			<lne id="308" begin="6" end="6"/>
+			<lne id="309" begin="5" end="7"/>
+			<lne id="310" begin="5" end="8"/>
+			<lne id="311" begin="5" end="9"/>
+			<lne id="312" begin="11" end="11"/>
+			<lne id="313" begin="12" end="12"/>
+			<lne id="314" begin="11" end="13"/>
+			<lne id="315" begin="11" end="14"/>
+			<lne id="316" begin="11" end="15"/>
+			<lne id="317" begin="0" end="15"/>
+		</linenumbertable>
+		<localvariabletable>
+			<lve slot="0" name="14" begin="0" end="15"/>
 		</localvariabletable>
 	</operation>
 </asm>
