@@ -122,7 +122,6 @@ with Base_Types, Data_Model, Generation_Properties;
       hyperperiod: data base_types::Unsigned_16;
   end periodic_delayed_context_t.impl;
   
-  -- Compute_First
   subprogram Compute_CPR
     prototypes
   	  context_prototype : data;
@@ -137,7 +136,6 @@ with Base_Types, Data_Model, Generation_Properties;
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end Compute_CPR;
   
-  -- Compute_Last
   subprogram Compute_PPR
   	prototypes
       context_prototype : data;
@@ -184,7 +182,7 @@ with Base_Types, Data_Model, Generation_Properties;
        };
        t2: s -[iteration_counter!=-1]-> s 
        {
-         Compute_PPR(first, last, periodic_delayed_context);
+         Compute_PPR!(first, last, periodic_delayed_context);
          Compute_CPR!(iteration_counter, periodic_delayed_context, last);
          iteration_counter := (iteration_counter mod CPRSize)+1
        };
