@@ -81,7 +81,7 @@ lazy rule copyBehaviorTransition
 	to
 		target_transition: AADLBA!BehaviorTransition
 		(
-			actionBlock       <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock),
+			actionBlock       <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock, c),
 			condition         <- thisModule.copyBehaviorCondition(src_transition.condition),
 			destinationState  <- target_ba.getState(src_transition.destinationState.name),
 			priority          <- src_transition.priority,

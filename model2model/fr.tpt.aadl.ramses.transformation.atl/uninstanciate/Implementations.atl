@@ -70,13 +70,6 @@ rule Implementation (c : AADLI!ComponentInstance,
 			else if (impl.oclIsKindOf(AADLI!SubprogramImplementation)) { implImg <- thisModule.SubprogramImplementation(typeImg,impl); }
 			else if (impl.oclIsKindOf(AADLI!DataImplementation)) { implImg <- thisModule.DataImplementation(typeImg,impl); }
 			
-			if(not impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined())
-			{
-				implImg.ownedAnnexSubclause.add
-				(
-					thisModule.copyBehaviorAnnex(c, impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)) )
-				);
-			}
 
 			if (implImg.isDeclared())
 			  implImg.debug('  previously declared implementation');
