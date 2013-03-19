@@ -30,6 +30,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlLauncher;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public class AadlArinc653Transformation implements
@@ -72,7 +73,7 @@ public class AadlArinc653Transformation implements
 
       AtlTransfoLauncher atlLauncher;
 	  try {
-		  atlLauncher = new AtlTransfoLauncher();
+		  atlLauncher = new Aadl2AadlLauncher();
 		  return atlLauncher.generationEntryPoint(inputResource,
 				  resourceFilePath,
 				  atlFiles,
@@ -105,7 +106,7 @@ public class AadlArinc653Transformation implements
 
       AtlTransfoLauncher atlLauncher;
 	  try {
-		  atlLauncher = new AtlTransfoLauncher();
+		  atlLauncher = new Aadl2AadlLauncher();
 		  return atlLauncher.generationEntryPoint(inputResource,
 				  resourceFilePath,
 				  atlFiles,

@@ -37,6 +37,7 @@ import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlLauncher;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
@@ -115,7 +116,7 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
       
       AtlTransfoLauncher atlLauncher;
 	  try {
-		  atlLauncher = new AtlTransfoLauncher();
+		  atlLauncher = new Aadl2AadlLauncher();
 		  r1 = atlLauncher.generationEntryPoint(inputResource,
 				  resourceFilePath,
 				  atlFiles,
@@ -196,7 +197,7 @@ public class AadlArinc653TTTransformation implements AadlToTargetSpecificAadl
 
 	  AtlTransfoLauncher atlLauncher;
 	  try {
-		  atlLauncher = new AtlTransfoLauncher();
+		  atlLauncher = new Aadl2AadlLauncher();
 		  return atlLauncher.generationEntryPoint(inputResource,
 				  resourceFilePath,
 				  atlFiles,
