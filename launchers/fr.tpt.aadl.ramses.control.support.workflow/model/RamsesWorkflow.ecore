@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="workflow"
+    nsURI="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0" nsPrefix="rwf">
+  <eClassifiers xsi:type="ecore:EClass" name="Workflow">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="element" lowerBound="1"
+        eType="#//WorkflowElement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="WorkflowElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Transformation" eSuperTypes="#//WorkflowElement #//AnalysisElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="element" lowerBound="1"
+        eType="#//AnalysisElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="list" lowerBound="1" eType="#//List"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" eType="#//ModelIdentifier"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"
+        eType="#//ModelIdentifier"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AnalysisElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Generation" eSuperTypes="#//WorkflowElement #//AnalysisElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Analysis" eSuperTypes="#//WorkflowElement #//AnalysisElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="method" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="mode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="yesOption" lowerBound="1"
+        eType="#//AnalysisOption" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" eType="#//ModelIdentifier"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="noOption" lowerBound="1"
+        eType="#//AnalysisOption" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ErrorState" eSuperTypes="#//AnalysisElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="List">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="file" lowerBound="1" upperBound="-1"
+        eType="#//File" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="File">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AnalysisOption">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="element" eType="#//AnalysisElement"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ModelIdentifier"/>
+</ecore:EPackage>
