@@ -401,6 +401,13 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 	    atlModules.add(loadedmoduleCommon) ;
 		
 
+	    URL moduleFileCommonBA =
+	        	new URL("file:" + resourcesDir.getAbsolutePath() + "/targets/shared/BehaviorAnnexCommonRefinementSteps" + ".asm") ;
+	    Object loadedmoduleCommonBA = launcher.loadModule(moduleFileCommonBA.openStream()) ;
+	    
+	    atlModules.add(loadedmoduleCommonBA) ;
+
+	    
 	    URL libraryFile ;
 	    List<String> fileName = new ArrayList<String>() ;
 	    fileName.add("/helpers/IOHelpers") ;
