@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 -------------------------------------------------------------------------------------------

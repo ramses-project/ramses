@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 uses Services;
@@ -57,7 +57,7 @@ rule addReceiveQueuingAction(actions:AADLBA!Actions,
 		thisModule.addReceiveQueuingMessageCallAction
 		(
 			actions,
-			'Receive_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			'Receive_Queuing_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -80,7 +80,7 @@ rule addReceiveQueuing(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addQueuingMessageCallSpecification
 		(
 			seq,
-			'Receive_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			'Receive_Queuing_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -100,7 +100,7 @@ rule addSendQueuingAction(actions:AADLBA!Actions,
 		thisModule.addSendQueuingMessageCallAction
 		(
 			actions,
-			'Send_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			'Send_Queuing_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -122,7 +122,7 @@ rule addSendQueuing(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addQueuingMessageCallSpecification
 		(
 			seq,
-			'Send_Queuing_Message'.asSubprogramType('POK_RUNTIME'),
+			'Send_Queuing_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -137,7 +137,7 @@ rule addQueuingGlobalVariable(fi: AADLI!FeatureInstance,
 {
 	do
 	{
-		communicationID.dataSubcomponentType<-'Queuing_Port_Id_Type'.asDataType('POK_RUNTIME');
+		communicationID.dataSubcomponentType<-'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME');
 		thisModule.addDataAccessConnection(
 			processImplImg,
 			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,

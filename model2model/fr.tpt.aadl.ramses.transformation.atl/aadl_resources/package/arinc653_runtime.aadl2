@@ -1,4 +1,4 @@
-package pok_runtime
+package arinc653_runtime
 public
 
 --------------------------------------------
@@ -512,4 +512,4 @@ properties
   Programming_Properties::Source_Text => ("arinc653/blackboard.h");
 end Get_Blackboard_Status;
 
-end pok_runtime;
+end arinc653_runtime;

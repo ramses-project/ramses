@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 uses Services;
@@ -54,7 +54,7 @@ rule addReadBlackBoard(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addReadBlackBoardCallSpecification
 		(
 			seq,
-			'Read_Blackboard'.asSubprogramType('POK_RUNTIME'),
+			'Read_Blackboard'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -73,7 +73,7 @@ rule addReadBlackBoardAction(actions : AADLBA!Actions,
 		thisModule.addReadBlackBoardCallAction
 		(
 			actions,
-			'Read_Blackboard'.asSubprogramType('POK_RUNTIME'),
+			'Read_Blackboard'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -95,7 +95,7 @@ rule addDisplayBlackBoard(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addDisplayBlackBoardCallSpecification
 		(
 			seq,
-			'Display_Blackboard'.asSubprogramType('POK_RUNTIME'),
+			'Display_Blackboard'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -115,7 +115,7 @@ rule addDisplayBlackBoardAction(actions : AADLBA!Actions,
 		thisModule.addDisplayBlackBoardCallAction
 		(
 			actions,
-			'Display_Blackboard'.asSubprogramType('POK_RUNTIME'),
+			'Display_Blackboard'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);

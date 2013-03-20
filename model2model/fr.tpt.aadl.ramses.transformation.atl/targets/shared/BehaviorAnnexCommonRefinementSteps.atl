@@ -27,7 +27,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									DATA_MODEL: AADLBA,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 unique lazy rule copyBehaviorAnnexFromThread

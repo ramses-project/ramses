@@ -73,19 +73,19 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   // TODO: factorization with ATL transformation into a naming class or enum. 
   public final static String BLACKBOARD_AADL_TYPE = 
-                                             "pok_runtime::Blackboard_Id_Type" ;
+                                             "arinc653_runtime::Blackboard_Id_Type" ;
   
   public final static String QUEUING_AADL_TYPE =
-                                           "pok_runtime::Queuing_Port_Id_Type" ;
+                                           "arinc653_runtime::Queuing_Port_Id_Type" ;
 
   public final static String SAMPLING_AADL_TYPE =
-                                          "pok_runtime::Sampling_Port_Id_Type" ;
+                                          "arinc653_runtime::Sampling_Port_Id_Type" ;
   
   public final static String EVENT_AADL_TYPE =
-                                          "pok_runtime::Event_Id_Type" ;
+                                          "arinc653_runtime::Event_Id_Type" ;
   
   public final static String BUFFER_AADL_TYPE =
-                                          "pok_runtime::Buffer_Id_Type" ;
+                                          "arinc653_runtime::Buffer_Id_Type" ;
   
   private ProcessorProperties _processorProp;
   

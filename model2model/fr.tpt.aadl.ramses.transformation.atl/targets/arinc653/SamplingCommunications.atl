@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 uses Services;
@@ -55,7 +55,7 @@ rule addReadSampling(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addReadSamplingMessageCallSpecification
 		(
 			seq,
-			'Read_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			'Read_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -76,7 +76,7 @@ rule addReadSamplingAction(actions:AADLBA!Actions,
 		thisModule.addReadSamplingMessageCallAction
 		(
 			actions,
-			'Read_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			'Read_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -98,7 +98,7 @@ rule addWriteSampling(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addWriteSamplingMessageCallSpecification
 		(
 			seq,
-			'Write_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			'Write_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -118,7 +118,7 @@ rule addWriteSamplingAction(actions:AADLBA!Actions,
 		thisModule.addWriteSamplingMessageCallAction
 		(
 			actions,
-			'Write_Sampling_Message'.asSubprogramType('POK_RUNTIME'),
+			'Write_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -178,7 +178,7 @@ rule addSamplingGlobalVariable(fi: AADLI!FeatureInstance,
 {
 	do
 	{
-		communicationID.dataSubcomponentType<-'Sampling_Port_Id_Type'.asDataType('POK_RUNTIME');
+		communicationID.dataSubcomponentType<-'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME');
 		thisModule.addDataAccessConnection(
 			processImplImg,
 			'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,

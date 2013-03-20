@@ -9,8 +9,8 @@
             name="OSEK-Runtime">
       </aadlcontribution>
       <aadlcontribution
-            file="aadl_resources/package/pok_runtime.aadl2"
-            id="fr.tpt.aadl.packages.pok_runtime.aadlcontribution"
+            file="aadl_resources/package/arinc653_runtime.aadl2"
+            id="fr.tpt.aadl.packages.arinc653_runtime.aadlcontribution"
             name="POK-Runtime">
       </aadlcontribution>
       <aadlcontribution

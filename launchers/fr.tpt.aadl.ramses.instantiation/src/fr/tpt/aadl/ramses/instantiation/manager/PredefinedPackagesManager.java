@@ -41,7 +41,7 @@ public class PredefinedPackagesManager
 
   // File names without their extension.
   private static String[] names =
-  {"base_types", "aadl_runtime", "pok_runtime", "OSEK_runtime", "PeriodicDelayed_runtime"
+  {"base_types", "aadl_runtime", "arinc653_runtime", "OSEK_runtime", "PeriodicDelayed_runtime"
   //        "Scheduler_Interfaces",
   //        "Scheduler_Realizations"
   //        "Scheduler_Runtime"

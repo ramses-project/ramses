@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 uses Services;
@@ -143,15 +143,15 @@ rule PortConnection_Instance
 		
 		if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
 		{
-			sourceFeatureImg.dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('POK_RUNTIME');
-			destinationFeatureImg.dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('POK_RUNTIME');
+			sourceFeatureImg.dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME');
+			destinationFeatureImg.dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME');
 			thisModule.addQueuingGlobalVariable(cnxInst.source, communicationSrcID, process_sourceImplImg, sourceImplImg);
 			thisModule.addQueuingGlobalVariable(cnxInst.destination, communicationDstID, process_destinationImplImg, destinationImplImg);
 		}
 		else if(cnxInst.source.category=#dataPort)
 		{
-			sourceFeatureImg.dataFeatureClassifier<-'Sampling_Port_Id_Type'.asDataType('POK_RUNTIME');
-			destinationFeatureImg.dataFeatureClassifier<-'Sampling_Port_Id_Type'.asDataType('POK_RUNTIME');
+			sourceFeatureImg.dataFeatureClassifier<-'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME');
+			destinationFeatureImg.dataFeatureClassifier<-'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME');
 			thisModule.addSamplingGlobalVariable(cnxInst.source, communicationSrcID, process_sourceImplImg, sourceImplImg);
 			thisModule.addSamplingGlobalVariable(cnxInst.destination, communicationDstID, process_destinationImplImg, destinationImplImg);
 		}
@@ -171,7 +171,7 @@ rule PortConnection_Instance
 			thisModule.expandThreadDispatchProtocol(c_destination, destinationImplImg);
 		}
 		
-		thisModule.addImportedUnit(thisModule.public(), 'POK_RUNTIME', 'pok_runtime');
+		thisModule.addImportedUnit(thisModule.public(), 'ARINC653_RUNTIME', 'arinc653_runtime');
 		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
 	}
 }
@@ -217,22 +217,22 @@ rule intraProcess_PortConnection_Instance
 		-- add and connect data subcomponent, Id of the communication protocol
 		if(cnxInst.source.category=#eventPort)
 		{
-			d.dataSubcomponentType<-'Event_Id_Type'.asDataType('POK_RUNTIME');
-			sourceFeatureImg.dataFeatureClassifier <- 'Event_Id_Type'.asDataType('POK_RUNTIME');
-			destinationFeatureImg.dataFeatureClassifier <- 'Event_Id_Type'.asDataType('POK_RUNTIME');
+			d.dataSubcomponentType<-'Event_Id_Type'.asDataType('ARINC653_RUNTIME');
+			sourceFeatureImg.dataFeatureClassifier <- 'Event_Id_Type'.asDataType('ARINC653_RUNTIME');
+			destinationFeatureImg.dataFeatureClassifier <- 'Event_Id_Type'.asDataType('ARINC653_RUNTIME');
 		}
 		else if(cnxInst.source.category=#eventDataPort)
 		{
-			d.dataSubcomponentType<-'Buffer_Id_Type'.asDataType('POK_RUNTIME');
-			sourceFeatureImg.dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('POK_RUNTIME');
-			destinationFeatureImg.dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('POK_RUNTIME');
+			d.dataSubcomponentType<-'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME');
+			sourceFeatureImg.dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME');
+			destinationFeatureImg.dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME');
 		}
 		else if(cnxInst.source.category=#dataPort)
 		{
 			-- add data subcomponents for Blackboard
-			destinationFeatureImg.dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('POK_RUNTIME');
-			sourceFeatureImg.dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('POK_RUNTIME');
-			d.dataSubcomponentType<-'Blackboard_Id_Type'.asDataType('POK_RUNTIME');
+			destinationFeatureImg.dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME');
+			sourceFeatureImg.dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME');
+			d.dataSubcomponentType<-'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME');
 		}
 		
 		thisModule.addDataAccessConnection(
@@ -268,7 +268,7 @@ rule intraProcess_PortConnection_Instance
 			thisModule.expandThreadDispatchProtocol(c_destination, destinationImplImg);
 			
 		}
-		thisModule.addImportedUnit(thisModule.public(), 'POK_RUNTIME', 'pok_runtime');
+		thisModule.addImportedUnit(thisModule.public(), 'ARINC653_RUNTIME', 'arinc653_runtime');
 		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
 	}
 }
@@ -434,7 +434,7 @@ unique lazy rule addLengthDataSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_Length',
-			dataSubcomponentType<-'Message_Size_Type'.asDataType('POK_RUNTIME'),
+			dataSubcomponentType<-'Message_Size_Type'.asDataType('ARINC653_RUNTIME'),
 			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
 		)
 	do
@@ -454,7 +454,7 @@ unique lazy rule addValidityDataSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_Validity',
-			dataSubcomponentType<-'Validity_Type'.asDataType('POK_RUNTIME')
+			dataSubcomponentType<-'Validity_Type'.asDataType('ARINC653_RUNTIME')
 		)
 	do
 	{
@@ -478,7 +478,7 @@ unique lazy rule addTimeOutSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_TimeOut',
-			dataSubcomponentType<-'System_Time_Type'.asDataType('POK_RUNTIME')
+			dataSubcomponentType<-'System_Time_Type'.asDataType('ARINC653_RUNTIME')
 		)
 	do
 	{
@@ -500,7 +500,7 @@ unique lazy rule addReturnCodeDataSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name <- 'runtime_call_ret',
-			dataSubcomponentType<-'Return_Code_Type'.asDataType('POK_RUNTIME')
+			dataSubcomponentType<-'Return_Code_Type'.asDataType('ARINC653_RUNTIME')
 		)
 	do
 	{

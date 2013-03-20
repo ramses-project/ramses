@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 uses Services;
@@ -64,7 +64,7 @@ unique lazy rule addPeriodicWaitCallAction
 	using
 	{
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(spgImg);
-		spg : AADL!SubprogramType = 'Periodic_Wait'.asSubprogramType('POK_RUNTIME');
+		spg : AADL!SubprogramType = 'Periodic_Wait'.asSubprogramType('ARINC653_RUNTIME');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -115,7 +115,7 @@ unique lazy rule addPeriodicWaitCall
 	{
 		implImg: AADLBA!ThreadImplementation = sequence.eContainer();
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(implImg);
-		spg : AADL!SubprogramType = 'Periodic_Wait'.asSubprogramType('POK_RUNTIME');
+		spg : AADL!SubprogramType = 'Periodic_Wait'.asSubprogramType('ARINC653_RUNTIME');
 	}
 	to
 		call: AADLBA!SubprogramCall

@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 uses Services;
@@ -55,7 +55,7 @@ rule addWaitEvent(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addWaitEventCallSpecification
 		(
 			seq,
-			'Wait_Event'.asSubprogramType('POK_RUNTIME'),
+			'Wait_Event'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -77,7 +77,7 @@ rule addSetEvent(seq : AADLBA!SubprogramCallSequence,
 				thisModule.addSetEventCallSpecification
 				(
 					seq,
-					'Set_Event'.asSubprogramType('POK_RUNTIME'),
+					'Set_Event'.asSubprogramType('ARINC653_RUNTIME'),
 					fi,
 					implImg
 				);

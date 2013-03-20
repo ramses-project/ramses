@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
 
-									POK_RUNTIME: AADLBA;
+									ARINC653_RUNTIME: AADLBA;
 
 
 uses Services;
@@ -56,7 +56,7 @@ rule addReceiveBufferAction(	seq : AADLBA!SubprogramCallSequence,
 		thisModule.addReceiveBufferCallAction
 		(
 			seq,
-			'Receive_Buffer'.asSubprogramType('POK_RUNTIME'),
+			'Receive_Buffer'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -128,7 +128,7 @@ rule addReceiveBuffer(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addQueuingMessageCallSpecification
 		(
 			seq,
-			'Receive_Buffer'.asSubprogramType('POK_RUNTIME'),
+			'Receive_Buffer'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -150,7 +150,7 @@ rule addSendBufferAction(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addQueuingMessageCallAction
 		(
 			seq,
-			'Send_Buffer'.asSubprogramType('POK_RUNTIME'),
+			'Send_Buffer'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
@@ -224,7 +224,7 @@ rule addSendBuffer(seq : AADLBA!SubprogramCallSequence,
 		thisModule.addQueuingMessageCallSpecification
 		(
 			seq,
-			'Send_Buffer'.asSubprogramType('POK_RUNTIME'),
+			'Send_Buffer'.asSubprogramType('ARINC653_RUNTIME'),
 			fi,
 			implImg
 		);
