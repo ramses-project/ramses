@@ -434,7 +434,7 @@ unique lazy rule addLengthDataSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_Length',
-			dataSubcomponentType<-'Unsigned_8'.asBaseType(),
+			dataSubcomponentType<-'Message_Size_Type'.asDataType('POK_RUNTIME'),
 			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
 		)
 	do
