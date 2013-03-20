@@ -79,7 +79,7 @@
 		<constant value="spgImg"/>
 		<constant value="J.retreiveReturnCodeValue(J):J"/>
 		<constant value="Periodic_Wait"/>
-		<constant value="POK_RUNTIME"/>
+		<constant value="ARINC653_RUNTIME"/>
 		<constant value="J.asSubprogramType(J):J"/>
 		<constant value="call"/>
 		<constant value="SubprogramCallAction"/>
@@ -102,8 +102,8 @@
 		<constant value="66:77-66:83"/>
 		<constant value="66:42-66:84"/>
 		<constant value="67:31-67:46"/>
-		<constant value="67:64-67:77"/>
-		<constant value="67:31-67:78"/>
+		<constant value="67:64-67:82"/>
+		<constant value="67:31-67:83"/>
 		<constant value="72:18-72:28"/>
 		<constant value="72:4-72:28"/>
 		<constant value="73:32-73:50"/>
@@ -171,8 +171,8 @@
 		<constant value="117:77-117:84"/>
 		<constant value="117:42-117:85"/>
 		<constant value="118:31-118:46"/>
-		<constant value="118:64-118:77"/>
-		<constant value="118:31-118:78"/>
+		<constant value="118:64-118:82"/>
+		<constant value="118:31-118:83"/>
 		<constant value="123:10-123:29"/>
 		<constant value="123:4-123:29"/>
 		<constant value="124:22-124:25"/>

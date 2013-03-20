@@ -47,7 +47,7 @@
 		<constant value="4"/>
 		<constant value="J.addTimeOutSubcomponent(JJ):J"/>
 		<constant value="Wait_Event"/>
-		<constant value="POK_RUNTIME"/>
+		<constant value="ARINC653_RUNTIME"/>
 		<constant value="J.asSubprogramType(J):J"/>
 		<constant value="J.addWaitEventCallSpecification(JJJJ):J"/>
 		<constant value="53:3-53:13"/>
@@ -57,8 +57,8 @@
 		<constant value="55:3-55:13"/>
 		<constant value="57:4-57:7"/>
 		<constant value="58:4-58:16"/>
-		<constant value="58:34-58:47"/>
-		<constant value="58:4-58:48"/>
+		<constant value="58:34-58:52"/>
+		<constant value="58:4-58:53"/>
 		<constant value="59:4-59:6"/>
 		<constant value="60:4-60:11"/>
 		<constant value="55:3-61:5"/>
@@ -88,8 +88,8 @@
 		<constant value="77:5-77:15"/>
 		<constant value="79:6-79:9"/>
 		<constant value="80:6-80:17"/>
-		<constant value="80:35-80:48"/>
-		<constant value="80:6-80:49"/>
+		<constant value="80:35-80:53"/>
+		<constant value="80:6-80:54"/>
 		<constant value="81:6-81:8"/>
 		<constant value="82:6-82:13"/>
 		<constant value="77:5-83:7"/>

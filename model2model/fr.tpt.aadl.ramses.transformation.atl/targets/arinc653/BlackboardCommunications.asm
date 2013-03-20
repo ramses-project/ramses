@@ -48,7 +48,7 @@
 		<constant value="J.addLengthDataSubcomponent(JJ):J"/>
 		<constant value="J.addTimeOutSubcomponent(JJ):J"/>
 		<constant value="Read_Blackboard"/>
-		<constant value="POK_RUNTIME"/>
+		<constant value="ARINC653_RUNTIME"/>
 		<constant value="J.asSubprogramType(J):J"/>
 		<constant value="J.addReadBlackBoardCallSpecification(JJJJ):J"/>
 		<constant value="51:3-51:13"/>
@@ -62,8 +62,8 @@
 		<constant value="54:3-54:13"/>
 		<constant value="56:4-56:7"/>
 		<constant value="57:4-57:21"/>
-		<constant value="57:39-57:52"/>
-		<constant value="57:4-57:53"/>
+		<constant value="57:39-57:57"/>
+		<constant value="57:4-57:58"/>
 		<constant value="58:4-58:6"/>
 		<constant value="59:4-59:11"/>
 		<constant value="54:3-60:5"/>
@@ -85,8 +85,8 @@
 		<constant value="73:3-73:13"/>
 		<constant value="75:4-75:11"/>
 		<constant value="76:4-76:21"/>
-		<constant value="76:39-76:52"/>
-		<constant value="76:4-76:53"/>
+		<constant value="76:39-76:57"/>
+		<constant value="76:4-76:58"/>
 		<constant value="77:4-77:6"/>
 		<constant value="78:4-78:11"/>
 		<constant value="73:3-79:5"/>
@@ -106,8 +106,8 @@
 		<constant value="95:3-95:13"/>
 		<constant value="97:4-97:7"/>
 		<constant value="98:4-98:24"/>
-		<constant value="98:42-98:55"/>
-		<constant value="98:4-98:56"/>
+		<constant value="98:42-98:60"/>
+		<constant value="98:4-98:61"/>
 		<constant value="99:4-99:6"/>
 		<constant value="100:4-100:11"/>
 		<constant value="95:3-101:5"/>
@@ -125,8 +125,8 @@
 		<constant value="115:3-115:13"/>
 		<constant value="117:4-117:11"/>
 		<constant value="118:4-118:24"/>
-		<constant value="118:42-118:55"/>
-		<constant value="118:4-118:56"/>
+		<constant value="118:42-118:60"/>
+		<constant value="118:4-118:61"/>
 		<constant value="119:4-119:6"/>
 		<constant value="120:4-120:11"/>
 		<constant value="115:3-121:5"/>

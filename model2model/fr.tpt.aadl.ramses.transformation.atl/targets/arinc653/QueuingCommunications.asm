@@ -47,7 +47,7 @@
 		<constant value="J.addLengthDataSubcomponent(JJ):J"/>
 		<constant value="J.addValidityDataSubcomponent(JJ):J"/>
 		<constant value="Receive_Queuing_Message"/>
-		<constant value="POK_RUNTIME"/>
+		<constant value="ARINC653_RUNTIME"/>
 		<constant value="J.asSubprogramType(J):J"/>
 		<constant value="J.addReceiveQueuingMessageCallAction(JJJJ):J"/>
 		<constant value="53:3-53:13"/>
@@ -61,8 +61,8 @@
 		<constant value="57:3-57:13"/>
 		<constant value="59:4-59:11"/>
 		<constant value="60:4-60:29"/>
-		<constant value="60:47-60:60"/>
-		<constant value="60:4-60:61"/>
+		<constant value="60:47-60:65"/>
+		<constant value="60:4-60:66"/>
 		<constant value="61:4-61:6"/>
 		<constant value="62:4-62:11"/>
 		<constant value="57:3-63:5"/>
@@ -85,8 +85,8 @@
 		<constant value="80:3-80:13"/>
 		<constant value="82:4-82:7"/>
 		<constant value="83:4-83:29"/>
-		<constant value="83:47-83:60"/>
-		<constant value="83:4-83:61"/>
+		<constant value="83:47-83:65"/>
+		<constant value="83:4-83:66"/>
 		<constant value="84:4-84:6"/>
 		<constant value="85:4-85:11"/>
 		<constant value="80:3-86:5"/>
@@ -103,8 +103,8 @@
 		<constant value="100:3-100:13"/>
 		<constant value="102:4-102:11"/>
 		<constant value="103:4-103:26"/>
-		<constant value="103:44-103:57"/>
-		<constant value="103:4-103:58"/>
+		<constant value="103:44-103:62"/>
+		<constant value="103:4-103:63"/>
 		<constant value="104:4-104:6"/>
 		<constant value="105:4-105:11"/>
 		<constant value="100:3-106:5"/>
@@ -121,8 +121,8 @@
 		<constant value="122:3-122:13"/>
 		<constant value="124:4-124:7"/>
 		<constant value="125:4-125:26"/>
-		<constant value="125:44-125:57"/>
-		<constant value="125:4-125:58"/>
+		<constant value="125:44-125:62"/>
+		<constant value="125:4-125:63"/>
 		<constant value="126:4-126:6"/>
 		<constant value="127:4-127:11"/>
 		<constant value="122:3-128:5"/>
@@ -140,9 +140,9 @@
 		<constant value="J.addDataAccessConnection(JJJJJ):J"/>
 		<constant value="140:3-140:18"/>
 		<constant value="140:41-140:63"/>
-		<constant value="140:75-140:88"/>
-		<constant value="140:41-140:89"/>
-		<constant value="140:3-140:90"/>
+		<constant value="140:75-140:93"/>
+		<constant value="140:41-140:94"/>
+		<constant value="140:3-140:95"/>
 		<constant value="141:3-141:13"/>
 		<constant value="142:4-142:18"/>
 		<constant value="143:4-143:21"/>

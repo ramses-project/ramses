@@ -48,7 +48,7 @@
 		<constant value="J.addLengthDataSubcomponent(JJ):J"/>
 		<constant value="J.addValidityDataSubcomponent(JJ):J"/>
 		<constant value="Read_Sampling_Message"/>
-		<constant value="POK_RUNTIME"/>
+		<constant value="ARINC653_RUNTIME"/>
 		<constant value="J.asSubprogramType(J):J"/>
 		<constant value="J.addReadSamplingMessageCallSpecification(JJJJ):J"/>
 		<constant value="51:3-51:13"/>
@@ -62,8 +62,8 @@
 		<constant value="55:3-55:13"/>
 		<constant value="57:4-57:7"/>
 		<constant value="58:4-58:27"/>
-		<constant value="58:45-58:58"/>
-		<constant value="58:4-58:59"/>
+		<constant value="58:45-58:63"/>
+		<constant value="58:4-58:64"/>
 		<constant value="59:4-59:6"/>
 		<constant value="60:4-60:11"/>
 		<constant value="55:3-61:5"/>
@@ -85,8 +85,8 @@
 		<constant value="76:3-76:13"/>
 		<constant value="78:4-78:11"/>
 		<constant value="79:4-79:27"/>
-		<constant value="79:45-79:58"/>
-		<constant value="79:4-79:59"/>
+		<constant value="79:45-79:63"/>
+		<constant value="79:4-79:64"/>
 		<constant value="80:4-80:6"/>
 		<constant value="81:4-81:11"/>
 		<constant value="76:3-82:5"/>
@@ -102,8 +102,8 @@
 		<constant value="98:3-98:13"/>
 		<constant value="100:4-100:7"/>
 		<constant value="101:4-101:28"/>
-		<constant value="101:46-101:59"/>
-		<constant value="101:4-101:60"/>
+		<constant value="101:46-101:64"/>
+		<constant value="101:4-101:65"/>
 		<constant value="102:4-102:6"/>
 		<constant value="103:4-103:11"/>
 		<constant value="98:3-104:5"/>
@@ -117,8 +117,8 @@
 		<constant value="118:3-118:13"/>
 		<constant value="120:4-120:11"/>
 		<constant value="121:4-121:28"/>
-		<constant value="121:46-121:59"/>
-		<constant value="121:4-121:60"/>
+		<constant value="121:46-121:64"/>
+		<constant value="121:4-121:65"/>
 		<constant value="122:4-122:6"/>
 		<constant value="123:4-123:11"/>
 		<constant value="118:3-124:5"/>
@@ -214,9 +214,9 @@
 		<constant value="J.addDataAccessConnection(JJJJJ):J"/>
 		<constant value="181:3-181:18"/>
 		<constant value="181:41-181:64"/>
-		<constant value="181:76-181:89"/>
-		<constant value="181:41-181:90"/>
-		<constant value="181:3-181:91"/>
+		<constant value="181:76-181:94"/>
+		<constant value="181:41-181:95"/>
+		<constant value="181:3-181:96"/>
 		<constant value="182:3-182:13"/>
 		<constant value="183:4-183:18"/>
 		<constant value="184:4-184:21"/>

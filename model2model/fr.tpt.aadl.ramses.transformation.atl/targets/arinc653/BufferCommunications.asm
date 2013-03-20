@@ -48,7 +48,7 @@
 		<constant value="J.addLengthDataSubcomponent(JJ):J"/>
 		<constant value="J.addTimeOutSubcomponent(JJ):J"/>
 		<constant value="Receive_Buffer"/>
-		<constant value="POK_RUNTIME"/>
+		<constant value="ARINC653_RUNTIME"/>
 		<constant value="J.asSubprogramType(J):J"/>
 		<constant value="J.addReceiveBufferCallAction(JJJJ):J"/>
 		<constant value="52:3-52:13"/>
@@ -62,8 +62,8 @@
 		<constant value="56:3-56:13"/>
 		<constant value="58:4-58:7"/>
 		<constant value="59:4-59:20"/>
-		<constant value="59:38-59:51"/>
-		<constant value="59:4-59:52"/>
+		<constant value="59:38-59:56"/>
+		<constant value="59:4-59:57"/>
 		<constant value="60:4-60:6"/>
 		<constant value="61:4-61:11"/>
 		<constant value="56:3-62:5"/>
@@ -174,8 +174,8 @@
 		<constant value="128:3-128:13"/>
 		<constant value="130:4-130:7"/>
 		<constant value="131:4-131:20"/>
-		<constant value="131:38-131:51"/>
-		<constant value="131:4-131:52"/>
+		<constant value="131:38-131:56"/>
+		<constant value="131:4-131:57"/>
 		<constant value="132:4-132:6"/>
 		<constant value="133:4-133:11"/>
 		<constant value="128:3-134:5"/>
@@ -194,8 +194,8 @@
 		<constant value="150:3-150:13"/>
 		<constant value="152:4-152:7"/>
 		<constant value="153:4-153:17"/>
-		<constant value="153:35-153:48"/>
-		<constant value="153:4-153:49"/>
+		<constant value="153:35-153:53"/>
+		<constant value="153:4-153:54"/>
 		<constant value="154:4-154:6"/>
 		<constant value="155:4-155:11"/>
 		<constant value="150:3-156:5"/>
@@ -257,8 +257,8 @@
 		<constant value="224:3-224:13"/>
 		<constant value="226:4-226:7"/>
 		<constant value="227:4-227:17"/>
-		<constant value="227:35-227:48"/>
-		<constant value="227:4-227:49"/>
+		<constant value="227:35-227:53"/>
+		<constant value="227:4-227:54"/>
 		<constant value="228:4-228:6"/>
 		<constant value="229:4-229:11"/>
 		<constant value="224:3-230:5"/>
