@@ -9,24 +9,19 @@
       <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>
       <useProjectArtifact>true</useProjectArtifact>
-<!--      <excludes>
-	<exclude>org.osate:org.osate.aadl2:jar</exclude>
-      </excludes> -->
     </dependencySet>
   </dependencySets>
-<!--  <dependencySets> -->
-<!--    <dependencySet>
-      <outputDirectory>/lib</outputDirectory>  
-      <unpack>false</unpack>
-    </dependencySet>
-  </dependencySets>
- <fileSets>
+
+<!--   <fileSets>
   <fileSet>
     <directory>target/classes</directory>
     <outputDirectory></outputDirectory>
   </fileSet>
-</fileSets> -->
-<!--
+  <fileSet>
+    <directory>extra-resources</directory>
+    <outputDirectory></outputDirectory>
+  </fileSet>
+</fileSets>
   <fileSets>
     <fileSet>
       <directory>${project.build.directory}</directory>

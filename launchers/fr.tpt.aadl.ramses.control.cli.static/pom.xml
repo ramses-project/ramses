@@ -1,17 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>ramses</groupId>
-    <artifactId>ramses-maven-build</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../../../build_and_test/ramses-maven-build/pom.xml</relativePath>
-  </parent>
   <groupId>ramses</groupId>
   <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>jar</packaging>
+
+  <repositories>
+    <repository>
+      <snapshots>
+	<enabled>true</enabled>
+      </snapshots>
+      <id>TPT</id>
+      <name>TPT Internal Repo</name>
+      <url>http://aadl.telecom-paristech.fr/download/maven-site</url>
+    </repository>
+  </repositories>
 
   <build>
+    <sourceDirectory>src</sourceDirectory>
     <finalName>ramses</finalName>
     <plugins>
       <plugin>  
@@ -26,10 +32,13 @@
               <addClasspath>true</addClasspath>  
               <mainClass>fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher</mainClass>
             </manifest>
-	    <manifestEntries>
-	      <Class-Path>lib/org.eclipse.emf.common_2.7.0.v20120127-1122.jar lib/org.eclipse.emf.ecore_2.7.0.v20120127-1122.jar lib/org.eclipse.core.runtime_3.7.0.v20110110.jar lib/org.eclipse.equinox.common_3.6.0.v20110523.jar lib/org.eclipse.uml2.uml_3.2.100.v201108110105.jar lib/org.eclipse.emf.ecore.xmi_2.7.0.v20120127-1122.jar lib/org.eclipse.ui_3.7.0.I20110602-0100.jar lib/org.eclipse.ui.workbench_3.7.0.I20110519-0100.jar lib/org.eclipse.emf.transaction_1.4.0.v20100331-1738.jar com.google.guava.jar lib/org.eclipse.xtext_2.3.0.v201206120633.jar lib/org.eclipse.xtext.util_2.3.0.v201206120633.jar lib/org.eclipse.xtext.ui_2.3.0.v201206120633.jar lib/org.eclipse.uml2.common_1.6.0.v201105021727.jar lib/org.eclipse.ocl_3.1.0.v20110913-1213.jar lib/org.eclipse.ocl.ecore_3.1.1.v20110823-1646.jar lib/lpg.runtime.java_2.0.17.v201004271640.jar lib/org.eclipse.m2m.atl_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.core_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.core.emf_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.common_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.engine.emfvm_3.2.1.v20110914-0724.jar lib/org.eclipse.m2m.atl.engine.emfvm.launch_3.2.1.v20110914-0724.jar</Class-Path>
-	      
-	    </manifestEntries>
+            <manifestEntries>
+              <Class-Path>org.eclipse.emf.ecore/runtime/ecore.resources.jar</Class-Path>
+            </manifestEntries>
+	   <!-- <manifestEntries>
+	   	  Keep this in case we have to backtrack to such packaging 
+	      <Class-Path>lib/org.eclipse.emf.common_2.7.0.v20120127-1122.jar</Class-Path>
+	    </manifestEntries> -->
           </archive>
         </configuration>  
         <executions>
@@ -47,10 +56,41 @@
 
   <dependencies>
 
+	<!-- 
+	This dependency must be first to copy
+	the plugin.properties in the root folder 
+	of our ramses jar 
+	 -->
+	<dependency>
+      <groupId>org.eclipse.emf</groupId>
+      <artifactId>ecore</artifactId>
+      <version>2.7.0.v20120127-1122</version>
+    </dependency>
+
+
+	<dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.control.support</artifactId>
+      <version>0.5.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.core</groupId>
+      <artifactId>runtime</artifactId>
+      <version>3.7.0.v20110110</version>
+    </dependency>
+
     <dependency>
       <groupId>org.eclipse.core</groupId>
       <artifactId>resources</artifactId>
-      <version>3.3.0-v20070604</version>
+      <version>3.7.100.v20110510-0712</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.c</artifactId>
+      <version>0.5.0</version>
     </dependency>
 
     <dependency>
@@ -59,65 +99,58 @@
       <version>3.2.0-v20060603</version>
     </dependency>
 
+	<dependency>
+      <groupId>org.eclipse.equinox</groupId>
+      <artifactId>preferences</artifactId>
+      <version>3.5.1.v20121031-182809</version>
+    </dependency>
 
-    <dependency>
-      <groupId>eclipse</groupId>
-      <artifactId>eclipse-runtime</artifactId>
-      <version>2.1.0</version>
+	<dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>osgi</artifactId>
+      <version>3.8.2.v20130124-134944</version>
     </dependency>
 
     <dependency>
-      <groupId>swt</groupId>
+      <groupId>org.eclipse</groupId>
       <artifactId>jface</artifactId>
-      <version>3.0.1</version>
+      <version>3.7.0.v20110928-1505</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.annex.behavior</artifactId>
       <version>0.9.5</version>
-      <scope></scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.instantiation</artifactId>
       <version>0.5.0</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.transformation.atl.launch</artifactId>
       <version>1.0.0.qualifier</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.generation</artifactId>
       <version>1.0.0.qualifier</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <version>1.0.0</version>
       <artifactId>PropertiesExtractor</artifactId>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.properties</artifactId>
       <version>1.0.0</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ramses</groupId>
-	<artifactId>fr.tpt.aadl.sched.tools.cheddar</artifactId>
-	<version>1.0.0</version>
     </dependency>
 
     <dependency>
@@ -130,91 +163,61 @@
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.cli.core</artifactId>
       <version>0.5.0</version>
-      <scope>runtime</scope>
     </dependency>
    
-    <dependency>
-      <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.ramses.control.support</artifactId>
-      <version>0.5.0</version>
-      <scope>runtime</scope>
-    </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.tools.cheddar</artifactId>
       <version>1.0.0</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.ramses.generation.c</artifactId>
-      <version>0.5.0</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.target.specific</artifactId>
       <version>1.0.0.qualifier</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.annex.behavior</artifactId>
-      <version>0.9.5</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.osek</artifactId>
       <version>0.5.0</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.pok</artifactId>
       <version>0.5.0</version>
-      <scope>runtime</scope>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.math</artifactId>
       <version>0.0.1</version>
-      <scope>runtime</scope>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.communication.periodic.delayed</artifactId>
       <version>0.0.1</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.core</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.aadl2.instantiation</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.annexsupport</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
 
@@ -222,14 +225,12 @@
       <groupId>org.osate</groupId>
       <artifactId>org.osate.ui</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.workspace</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
 
@@ -237,49 +238,42 @@
       <groupId>org.osate</groupId>
       <artifactId>org.osate.aadl2.modelsupport</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.aadl2</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.xtext.aadl2.properties.ui</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.xtext.aadl2.properties</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.xtext.aadl2</artifactId>
       <version>1.0.0-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr</artifactId>
       <version>3.1.3</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>${swt.groupId}</groupId>
       <artifactId>${swt.artifactId}</artifactId>
       <version>3.3.0-v3346</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -321,6 +315,132 @@
       <version>2.1</version>
     </dependency>
 
+	<dependency>
+      <groupId>lpg</groupId>
+      <artifactId>lpg.runtime.java</artifactId>
+      <version>2.0.17.v201004271640</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse.emf</groupId>
+      <artifactId>common</artifactId>
+      <version>2.7.0.v20120127-1122</version>
+    </dependency>
+    	
+	<dependency>
+      <groupId>org.eclipse.emf</groupId>
+      <artifactId>ecore.xmi</artifactId>
+      <version>2.7.0.v20120127-1122</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.emf</groupId>
+      <artifactId>transaction</artifactId>
+      <version>1.4.0.v20100331-1738</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.equinox</groupId>
+      <artifactId>common</artifactId>
+      <version>3.6.100.v20120522-1841</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl</artifactId>
+      <version>3.2.1.v20110914-0724</version>
+    </dependency>
+    
+	<dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl.common</artifactId>
+      <version>3.2.1.v20110914-0724</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl.core.emf</artifactId>
+      <version>3.2.1.v20110914-0724</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl.core</artifactId>
+      <version>3.2.1.v20110914-0724</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl.engine.emfvm</artifactId>
+      <version>3.2.1.v20110914-0724</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl.engine.emfvm.launch</artifactId>
+      <version>3.2.1.v20110914-0724</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>ocl.ecore</artifactId>
+      <version>3.1.2.v20111015-2027</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>ocl</artifactId>
+      <version>3.1.0.v20120206-0606</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>uml2.uml</artifactId>
+      <version>4.0.2.v20130114-0902</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>uml2.types</artifactId>
+      <version>1.0.0.v20130114-0902</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>uml2.common</artifactId>
+      <version>1.7.0.v20121112-0901</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>xtext.util</artifactId>
+      <version>2.3.1.v201208210947</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>xtext.ui</artifactId>
+      <version>2.3.0.v201206120633</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>xtext</artifactId>
+      <version>2.3.1.v201208210947</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.ui</groupId>
+      <artifactId>ui</artifactId>
+      <version>3.7.0.I20110602-0100</version>
+    </dependency>
+
+	<dependency>
+      <groupId>org.eclipse.ui</groupId>
+      <artifactId>ui.workbench</artifactId>
+      <version>3.7.0.I20110519-0100</version>
+    </dependency>
+	
   </dependencies>
 
   <profiles>

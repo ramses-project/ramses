@@ -83,37 +83,32 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _gen.put(genOsek.getRegistryName(), genOsek) ;
   }
 
-  @Override
   public AnnexParser getParser(String annexName)
   {
     return _parsers.get(annexName.toLowerCase()) ;
   }
 
-  @Override
+  
   public AnnexResolver getResolver(String annexName)
   {
     return _resolvers.get(annexName.toLowerCase()) ;
   }
 
-  @Override
   public AnnexUnparser getUnparser(String annexName)
   {
     return _unparsers.get(annexName.toLowerCase()) ;
   }
 
-  @Override
   public Set<String> getAvailableAnalysisNames()
   {
     return _analyzers.keySet() ;
   }
 
-  @Override
   public Set<String> getAvailableGeneratorNames()
   {
     return _gen.keySet() ;
   }
 
-  @Override
   public Analyzer getAnalyzer(String analyzerName)
   {
     return _analyzers.get(analyzerName) ;
@@ -123,8 +118,7 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
   {
     return _gen.get(TransformationName) ;
   }
-
-  @Override
+  
   public boolean isOSGi()
   {
     return false ;
