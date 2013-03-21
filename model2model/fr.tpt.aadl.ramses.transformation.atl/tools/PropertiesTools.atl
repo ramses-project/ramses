@@ -84,6 +84,18 @@ helper def : getProperty(propertyName : String) : AADLBA!Property =
 						->flatten()->any(p|p.name.toLower()=propertyName.toLower())
 ;
 
+helper context AADLBA!NamedElement def : getPropertyIntValue(
+	propertyName : String, defaultValue : Integer) : Integer =
+	let v : AADLBA!ModalPropertyValue = self.ownedPropertyAssociation
+			->any(pa|pa.property.name=propertyName)
+	in 
+		if (v.oclIsUndefined()) then
+			defaultValue
+		else
+			v.ownedValue->first().ownedValue.value
+		endif
+;
+
 helper context AADLBA!NamedElement def : getPropertyAssociation(propertyType : String) : AADLBA!PropertyAssociation =
 	let propertyAssociations : Sequence(AADLBA!PropertyAssociation) = self.ownedPropertyAssociation.debug(self.name+' available property associations') in
 	propertyAssociations->select(p | p.isIdentifiedPropertyAssociation(propertyType.toLower())=true)->first();
@@ -116,6 +128,22 @@ rule CreatePropertyAssociation (propertyName : String, model : String, value : A
 		p : AADLBA!PropertyAssociation (
 			property <- propertyName.asProperty(model),
 			ownedValue <- Sequence {mpv}
+		),
+		
+		mpv : AADLBA!ModalPropertyValue (
+			ownedValue <- value
+		)
+	do { p; }
+}
+
+rule CreatePropertyAssociationAppliesTo (propertyName : String, model : String, 
+		value : AADLBA!PropertyExpression, 
+		appliesTo: AADLBA!ContainedNamedElement) {
+	to
+		p : AADLBA!PropertyAssociation (
+			property <- propertyName.asProperty(model),
+			ownedValue <- Sequence {mpv},
+			appliesTo <- Sequence {appliesTo}
 		),
 		
 		mpv : AADLBA!ModalPropertyValue (
