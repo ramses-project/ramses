@@ -72,15 +72,25 @@ with Base_Types, Data_Model, Generation_Properties;
       transitions
         t: s -[]-> s
         {
-          buffer[CDW[iteration_counter]] := value;
-          -- TODO: next line should be in sed_output, otherwise iteration counter is
-          -- incremented once for each port of the thread...
-          iteration_counter := (iteration_counter+1) mod CDWSize
+          buffer[CDW[iteration_counter]] := value
         };
     **};
   end Put_Value;
   
-  
+  subprogram Send_Output
+  features
+    iteration_counter: in out parameter Base_Types::Integer_16;
+    CDWSize: in parameter Base_Types::Integer_16;
+  annex behavior_specification {**
+  	states
+  	  s: initial final state;
+  	transitions
+  	  t: s -[]-> s
+  	  {
+  	    iteration_counter := (iteration_counter+1) mod CDWSize
+  	  };
+  **};
+  end Send_Output;
   
   
   ------------------------------------------------------------------------
@@ -209,10 +219,7 @@ with Base_Types, Data_Model, Generation_Properties;
         t: s -[]-> s
         {
           Compute_CDW!(taskID, iteration_counter, periodic_delayed_context, CDWIndex);
-          buffer[CDWIndex] := value;
-          -- TODO: next line should be in sed_output, otherwise iteration counter is
-          -- incremented once for each port of the thread...
-          iteration_counter := (iteration_counter+1) mod CDWSize
+          buffer[CDWIndex] := value
         };
     **};
   end Put_Value_LowFP;
