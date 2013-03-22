@@ -26,8 +26,6 @@ import org.eclipse.swt.layout.GridLayout ;
 import org.eclipse.swt.widgets.Button ;
 import org.eclipse.swt.widgets.Composite ;
 import org.eclipse.swt.widgets.Control ;
-import org.eclipse.swt.widgets.DirectoryDialog ;
-import org.eclipse.swt.widgets.Display ;
 import org.eclipse.swt.widgets.Event ;
 import org.eclipse.swt.widgets.Label ;
 import org.eclipse.swt.widgets.Listener ;
@@ -46,7 +44,9 @@ public class RamsesPropertyPage extends PropertyPage {
 	public static final String TARGET_ID = "target";
 	
 	private String DEFAULT_PATH;
-	private static final int TEXT_FIELD_WIDTH = 50;
+	private String PROJECT_NAME;	
+	
+	private static final int TEXT_FIELD_WIDTH = 43;
 
 	private IResource instanceModel = null;
 	private Text outputDirText;
@@ -84,9 +84,12 @@ public class RamsesPropertyPage extends PropertyPage {
     button.setText("Select instance model...");
     button.setAlignment(SWT.LEFT);
     selectedInstanceModel = new Label(composite, SWT.BOLD);
-    selectedInstanceName = new Text(composite, SWT.BOLD);
+    selectedInstanceName = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
     selectedInstanceName.setEditable(false);
-    selectedInstanceName.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+    GridData gd = new GridData();
+    gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+    selectedInstanceName.setLayoutData(gd) ;
+    
     if(instanceModel==null)
     {
       selectedInstanceModel.setText("No instance model selected");
@@ -130,9 +133,6 @@ public class RamsesPropertyPage extends PropertyPage {
         }
       }
     });
-    
-    
-    
   }
 	
 	private void populateInstanceModelList(IContainer container, List<IResource> instanceModelList)
@@ -182,15 +182,17 @@ public class RamsesPropertyPage extends PropertyPage {
 		Label ownerLabel = new Label(composite, SWT.BOLD);
 		ownerLabel.setText(PATH_TITLE);
 
-    
 		// output Directory button field
 		outputDirText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		GridData gd = new GridData();
 		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
 		outputDirText.setLayoutData(gd);
+		outputDirText.setEditable(false) ;
 		
 		// Populate output dir text field
 		DEFAULT_PATH = ((IResource) getElement()).getLocation().makeAbsolute().toOSString();
+		PROJECT_NAME = (((IResource) getElement()).getName()) ;
+		
 		IResource resource = instanceModel;
 		if(instanceModel!=null)
 		{
@@ -228,37 +230,26 @@ public class RamsesPropertyPage extends PropertyPage {
           Object[] result = browseWorkspace.getResult();
           if (result != null && result.length > 0) {
             Path outputDir = (Path) result[0];
-            outputDirText.setText(outputDir.toOSString());
+            outputDirText.setText(convertToAbsolutePath(outputDir));
           }
         }
       }
     });
-    
-		
-    Button fileButton = new Button(composite, SWT.PUSH);
-    fileButton.setText("Browse...");
-    fileButton.setAlignment(SWT.LEFT);
-    
-    fileButton.addSelectionListener( new SelectionAdapter() 
-    {
-      public void widgetSelected(SelectionEvent e) 
-      {
-        DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.CENTER);
-        dialog.setText("Select output directory for generated code");
-        String path = dialog.open();
-        
-        if(path!=null)
-        {
-          File file = new File(path);
-          if (file!=null && file.isDirectory())
-            outputDirText.setText(file.getAbsolutePath());
-        }
-        
-        
-      }
-    }
-          );
-    
+	}
+	
+	private String convertToAbsolutePath(Path relativePath)
+	{
+	  String root = File.separator + PROJECT_NAME ;
+	    
+	  if(root.equals(relativePath.toOSString()))
+	  {
+	    return DEFAULT_PATH ;
+	  }
+	  else
+	  {
+	    return DEFAULT_PATH + File.separator +
+	           relativePath.removeFirstSegments(1).toOSString() ;
+	  }
 	}
 
   private Composite createDefaultComposite(Composite parent) {
@@ -406,5 +397,4 @@ public class RamsesPropertyPage extends PropertyPage {
                             "\t 3 - and a target platform.\n\n" +
                             "One of these elements was not configured properly.");
 	}
-
 }
