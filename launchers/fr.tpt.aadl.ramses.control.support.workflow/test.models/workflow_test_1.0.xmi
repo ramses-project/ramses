@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="ASCII"?>
-<rwf:Workflow xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rwf="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0">
-  <element xsi:type="rwf:Analysis">
-    <noOption>
-      <element xsi:type="rwf:Generation"/>
-    </noOption>
-  </element>
-</rwf:Workflow>
