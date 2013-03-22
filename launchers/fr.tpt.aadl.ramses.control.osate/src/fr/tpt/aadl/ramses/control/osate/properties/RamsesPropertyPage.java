@@ -212,6 +212,9 @@ public class RamsesPropertyPage extends PropertyPage {
 		  outputDirText.setText(DEFAULT_PATH);
 		}
 	
+		// Move the cursor to the end.
+		outputDirText.setSelection(outputDirText.getText().length()) ;
+		
     Button button = new Button(composite, SWT.PUSH);
     button.setText("Browse existing directories in workspace...");
     button.setAlignment(SWT.LEFT);
@@ -231,6 +234,8 @@ public class RamsesPropertyPage extends PropertyPage {
           if (result != null && result.length > 0) {
             Path outputDir = (Path) result[0];
             outputDirText.setText(convertToAbsolutePath(outputDir));
+            // Move the cursor to the end.
+            outputDirText.setSelection(outputDirText.getText().length()) ;
           }
         }
       }
