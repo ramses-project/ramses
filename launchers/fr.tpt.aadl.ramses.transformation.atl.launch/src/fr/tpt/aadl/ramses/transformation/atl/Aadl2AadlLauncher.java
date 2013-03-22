@@ -382,13 +382,13 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
   protected void registerDefaultTransformations(List<Object> atlModules, EMFVMLauncher launcher) throws IOException{
 
 	    URL moduleFile =
-	    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/factoring/EventDataPorts" + ".asm") ;
+	    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/EventDataPorts" + ".asm") ;
 	    Object loadedModule = launcher.loadModule(moduleFile.openStream()) ;
 	    atlModules.add(loadedModule) ;
 	    /**** � decommenter modeles differents ****/
 	    
 	    //URL moduleFile_LowMFP =
-	    //    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/factoring/EventDataPorts_LowMFP" + ".asm") ;
+	    //    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/EventDataPorts_LowMFP" + ".asm") ;
 	    //Object loadedModule_LowMFP = launcher.loadModule(moduleFile_LowMFP.openStream()) ;
 	    //atlModules.add(loadedModule_LowMFP) ;
 
