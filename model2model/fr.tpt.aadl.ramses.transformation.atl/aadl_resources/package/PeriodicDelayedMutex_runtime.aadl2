@@ -124,7 +124,7 @@ annex behavior_specification {**
          CurrentLink.Timestamp := CurrentDeadline;
          CurrentLink.Priority  := Priority;
          CurrentLink.Consumed  := FALSE;
-        
+         
          PortVariable.UsedSize := PortVariable.UsedSize + 1
       }
       else
@@ -157,6 +157,8 @@ annex behavior_specification {**
 end Put_Value;
 
 subprogram Receive_Input
+prototypes
+  t_request: data;
 features
   Period : requires data access Base_Types::Integer_16;
   CurrentPeriod : requires data access Base_Types::Integer_16;
@@ -227,6 +229,11 @@ annex behavior_specification {**
     };
 **};
 end Next_Value;
+
+subprogram Send_Output
+features
+  PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
+end Send_Output;
 
 subprogram Compute_Deadline
 features 
