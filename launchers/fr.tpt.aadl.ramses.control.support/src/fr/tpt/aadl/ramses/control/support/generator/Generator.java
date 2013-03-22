@@ -26,6 +26,7 @@ import java.util.Map ;
 
 import org.osate.aadl2.instance.SystemInstance ;
 
+import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
@@ -36,10 +37,10 @@ public interface Generator extends NamedPlugin
                        File resourceFilePath,
                        File generatedFilePath) throws GenerationException ;
 
-  public void generateXML(SystemInstance instance,
-                          File resourceFilePath,
-                          File generatedFilePath,
-                          XMLPilot xmlPilot) throws GenerationException ;
+  public void generateWorkflow(SystemInstance instance,
+                               File resourceFilePath,
+                               File generatedFilePath,
+                               WorkflowPilot xmlPilot) throws GenerationException ;
 
   
   public void setParameters(Map<String, Object> parameters) ;

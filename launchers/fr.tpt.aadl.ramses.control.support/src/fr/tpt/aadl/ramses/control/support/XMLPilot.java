@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 
 
-public class XMLPilot
+public class XMLPilot implements WorkflowPilot
 {
 
 	SAXBuilder sxb;

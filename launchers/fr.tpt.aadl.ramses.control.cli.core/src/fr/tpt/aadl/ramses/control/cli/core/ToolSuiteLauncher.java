@@ -36,6 +36,7 @@ import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
@@ -187,13 +188,13 @@ public class ToolSuiteLauncher
                        generatedFilePath) ;
   }
 
-  public void launchModelGenerationXML (List<File> mainModels,
-                                        String systemToInstantiate,
-                                        File generatedFilePath,
-                                        String targetName,
-                                        File resourceFilePath,
-                                        XMLPilot xmlPilot,
-                                        Map<String, Object> parameters)
+  public void launchModelGenerationWorkflow (List<File> mainModels,
+                                        	 String systemToInstantiate,
+                                        	 File generatedFilePath,
+                                        	 String targetName,
+                                        	 File resourceFilePath,
+                                        	 WorkflowPilot xmlPilot,
+                                        	 Map<String, Object> parameters)
                                               throws GenerationException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
@@ -215,7 +216,7 @@ public class ToolSuiteLauncher
     
     generator.setParameters(parameters) ;
     
-    generator.generateXML(instance, resourceFilePath,
+    generator.generateWorkflow(instance, resourceFilePath,
                           generatedFilePath, xmlPilot) ;
   }
   

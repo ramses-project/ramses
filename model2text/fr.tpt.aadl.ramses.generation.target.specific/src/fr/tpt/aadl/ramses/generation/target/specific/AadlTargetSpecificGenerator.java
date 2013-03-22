@@ -36,6 +36,7 @@ import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.XMLPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
@@ -104,21 +105,21 @@ public class AadlTargetSpecificGenerator implements Generator
   }
 
   @Override
-  public void generateXML(SystemInstance instance,
+  public void generateWorkflow(SystemInstance instance,
                           File resourceFilePath,
                           File generatedFilePath,
-                          XMLPilot xmlPilot) throws GenerationException
+                          WorkflowPilot workflowPilot) throws GenerationException
   {
     Resource r = instance.eResource() ;
     String systemToInstantiate = instance.getSystemImplementation().getName();
 
-    while(xmlPilot.hasNextOperation())
+    while(workflowPilot.hasNextOperation())
     {
-      String operation = xmlPilot.getNextOperation();
+      String operation = workflowPilot.getNextOperation();
       if(operation.equals("analysis"))
       {
-        String analysisName = xmlPilot.getNextAnalysisName();
-        String analysisMode = xmlPilot.getNextAnalysisMode();
+        String analysisName = workflowPilot.getNextAnalysisName();
+        String analysisMode = workflowPilot.getNextAnalysisMode();
         System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
         try {       
           ServiceRegistryProvider.getServiceRegistry().getAnalyzer(analysisName)
@@ -137,26 +138,26 @@ public class AadlTargetSpecificGenerator implements Generator
 
         if(analysisMode.equals("automatic"))
         {
-          xmlPilot.setAnalysisResult(true);
+          workflowPilot.setAnalysisResult(true);
           System.out.println(">> " + analysisName + " result set at true");
         }
         else if(analysisMode.equals("manual")) {
           int res = JOptionPane.showConfirmDialog(null, "Was the analysis " + analysisName + " successfull?", "Confirmation", JOptionPane.YES_NO_OPTION);
           if(res == JOptionPane.YES_OPTION) 
           {
-            xmlPilot.setAnalysisResult(true);
+        	workflowPilot.setAnalysisResult(true);
             System.out.println(">> " + analysisName + " result set at true");
           }
           else
           {
-            xmlPilot.setAnalysisResult(false);
+        	workflowPilot.setAnalysisResult(false);
             System.out.println(">> " + analysisName + " result set at false");
           }
         }
       }
       else if(operation.equals("transformation"))
       {
-        List<String> resourceFileNameList = xmlPilot.getNextTransformationFileNameList();
+        List<String> resourceFileNameList = workflowPilot.getNextTransformationFileNameList();
         System.out.println("Transformation launched : " + resourceFileNameList);
 
         Resource result = _targetTrans.transformXML(r, resourceFilePath, resourceFileNameList, 
@@ -186,7 +187,7 @@ public class AadlTargetSpecificGenerator implements Generator
 
       }
 
-      xmlPilot.goForward();
+      workflowPilot.goForward();
     }
   }
 

@@ -36,6 +36,7 @@ import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
+import fr.tpt.aadl.ramses.control.support.EcorePilot;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
@@ -77,6 +78,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static QualifiedSwitch analysis ;
   
   private static final String XML_OPTION_ID = "xml_path" ;
+  private static final String WORKFLOW_OPTION_ID = "workflow_path" ;
   
   public final static String DEFAULT_RESOURCES_DIR = 
                     "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ; 
@@ -279,8 +281,16 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
           new FlaggedOption(XML_OPTION_ID)
                   .setStringParser(JSAP.STRING_PARSER).setRequired(false)
                   .setLongFlag("xml").setShortFlag(JSAP.NO_SHORTFLAG).setList(false)
-            .setAllowMultipleDeclarations(false) ;
-                  xml_path.setHelp("The specified XML file contains the workflow") ;
+                  .setAllowMultipleDeclarations(false) ;
+    xml_path.setHelp("The specified XML file contains the workflow") ;
+
+                  
+   FlaggedOption workflow_path =
+   		  new FlaggedOption(WORKFLOW_OPTION_ID)
+                  .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+                  .setLongFlag("workflow").setShortFlag(JSAP.NO_SHORTFLAG).setList(false)
+                  .setAllowMultipleDeclarations(false) ;
+   workflow_path.setHelp("The specified ecore file contains the workflow") ;
 
     FlaggedOption generation =
     		new FlaggedOption(GENERATION_OPTION_ID)
@@ -313,6 +323,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapHelp.registerParameter(post_transformation_files) ;
     jsapHelp.registerParameter(generation) ;
     jsapHelp.registerParameter(xml_path) ;
+    jsapHelp.registerParameter(workflow_path) ;
     jsapHelp.registerParameter(parameters);
     
     
@@ -351,6 +362,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapGen.registerParameter(generated_file_path) ;
     jsapGen.registerParameter(generation) ;
     jsapGen.registerParameter(xml_path) ;
+    jsapGen.registerParameter(workflow_path) ;
     jsapGen.registerParameter(parameters);
   }
 
@@ -584,33 +596,49 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
     try
     {
+      String workflow_path =
+            genConf.getString(WORKFLOW_OPTION_ID) ;
+      
       String xml_path =
             genConf.getString(XML_OPTION_ID) ;
 
       Map<String, Object> parameters = parametersHandler(genConf) ;
       
-      if(xml_path == null)
+      if(workflow_path != null)
       {
-        launcher.initializeGeneration(targetName) ;
-        launcher.launchModelGeneration(mainModelFiles,
-                                       systemToInstantiate,
-                                       outputDir,
-                                       targetName,
-                                       atlResourceDir,
-                                       parameters) ;
-      }
-      else
-      {
-        XMLPilot xmlPilot = new XMLPilot(genConf.getString(XML_OPTION_ID));
+        EcorePilot xmlPilot = new EcorePilot(genConf.getString(WORKFLOW_OPTION_ID));
         
         launcher.initializeGeneration(targetName) ;
-        launcher.launchModelGenerationXML(mainModelFiles,
+        launcher.launchModelGenerationWorkflow(mainModelFiles,
                                           systemToInstantiate,
                                           outputDir,
                                           targetName,
                                           atlResourceDir,
                                           xmlPilot,
                                           parameters) ;
+      }
+      else if(xml_path != null)
+      {
+    	XMLPilot xmlPilot = new XMLPilot(genConf.getString(XML_OPTION_ID));
+          
+        launcher.initializeGeneration(targetName) ;
+        launcher.launchModelGenerationWorkflow(mainModelFiles,
+                                          systemToInstantiate,
+                                          outputDir,
+                                          targetName,
+                                          atlResourceDir,
+                                          xmlPilot,
+                                          parameters) ;
+      }
+      else
+      {
+    	launcher.initializeGeneration(targetName) ;
+        launcher.launchModelGeneration(mainModelFiles,
+                                       systemToInstantiate,
+                                       outputDir,
+                                       targetName,
+                                       atlResourceDir,
+                                       parameters) ;
       }
     }
     catch(Exception e)
