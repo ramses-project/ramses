@@ -718,11 +718,16 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               }
             }
           }
+          _gtypesHeaderCode.addOutput(structDefinition.toString());
+          _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         }
         else
         {
+          _gtypesHeaderCode.addOutput(structDefinition.toString());
+          _gtypesHeaderCode.incrementIndent();
           if(object instanceof DataImplementation)
           {
+        	
         	for(DataSubcomponent ds:((DataImplementation)object).getOwnedDataSubcomponents())
         	{
         	  DataSubcomponentType dst = ds.getDataSubcomponentType();
@@ -735,14 +740,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         	  catch (Exception e)
         	  {
         		String sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
-        		structDefinition.append("\t"+sourceName);
+        		_gtypesHeaderCode.addOutput(sourceName);
         	  }
-        	  structDefinition.append(" "+ds.getName()+";\n");
+        	  _gtypesHeaderCode.addOutputNewline(" "+ds.getName()+";");
         	}
           }
+          _gtypesHeaderCode.decrementIndent();
+          _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         }
-        _gtypesHeaderCode.addOutput(structDefinition.toString());
-        _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case UNION :
