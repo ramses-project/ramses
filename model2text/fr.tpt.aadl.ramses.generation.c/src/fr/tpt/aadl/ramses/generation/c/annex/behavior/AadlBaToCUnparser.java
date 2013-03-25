@@ -1090,7 +1090,11 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 if(pl instanceof ElementHolder)
                 {
                   ElementHolder eh = (ElementHolder) pl;
-                  _cFileContent.addOutput(eh.getElement().getName());
+                  if(eh instanceof ParameterHolder
+                		  || eh instanceof DataAccessHolder)
+                	  _cFileContent.addOutput(eh.getElement().getName());
+                  else
+                	  _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(eh.getElement().getQualifiedName()));
                 } 
                 else if(pl instanceof ValueExpression)
                 {
@@ -1101,8 +1105,32 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               			  getFirstValue();
               	  if(v instanceof ElementHolder)
               	  {
-              		ElementHolder el = (ElementHolder) v;
-              		_cFileContent.addOutput(el.getElement().getName());
+              		ElementHolder eh = (ElementHolder) v;
+              		if(eh instanceof ParameterHolder
+                  		  || eh instanceof DataAccessHolder)
+                  	  _cFileContent.addOutput(eh.getElement().getName());
+                    else
+                  	  _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(eh.getElement().getQualifiedName()));
+              	  }
+              	  else if(v instanceof DataComponentReference)
+              	  {
+              		DataComponentReference dcr = (DataComponentReference) v;
+              		boolean firstElement = true;
+              		for(DataHolder dh: dcr.getData())
+              		{
+              		  boolean lastElement = (dcr.getData().indexOf(dh)==dcr.getData().size()-1);
+              		  if(dh instanceof ParameterHolder
+                            || dh instanceof DataAccessHolder
+                            || firstElement == false)
+                        _cFileContent.addOutput(dh.getElement().getName());
+                      else
+                      {
+                        _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(dh.getElement().getQualifiedName()));
+                        firstElement=false;
+                      }
+              		  if(!lastElement)
+              			  _cFileContent.addOutput(".");
+              		}
               	  }
                 }
                 else
