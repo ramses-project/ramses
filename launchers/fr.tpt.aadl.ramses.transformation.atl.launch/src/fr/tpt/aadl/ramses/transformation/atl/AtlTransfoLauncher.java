@@ -114,51 +114,6 @@ public abstract class AtlTransfoLauncher
     AtlTransfoLauncher.resourcesDir = dir ;
   }
   
-  protected void registerDefaultTransformations(List<Object> atlModules, EMFVMLauncher launcher) throws IOException{
-
-	    URL moduleFile =
-	    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/factoring/EventDataPorts" + ".asm") ;
-	    Object loadedModule = launcher.loadModule(moduleFile.openStream()) ;
-	    atlModules.add(loadedModule) ;
-	    /**** � decommenter modeles differents ****/
-	    
-	    //URL moduleFile_LowMFP =
-	    //    	new URL("file:" + resourcesDir.getAbsolutePath() + "/PeriodicDelayedCommunication/factoring/EventDataPorts_LowMFP" + ".asm") ;
-	    //Object loadedModule_LowMFP = launcher.loadModule(moduleFile_LowMFP.openStream()) ;
-	    //atlModules.add(loadedModule_LowMFP) ;
-
-	    
-	    URL moduleFileCommon =
-	        	new URL("file:" + resourcesDir.getAbsolutePath() + "/targets/shared/CommonRefinementSteps" + ".asm") ;
-	    Object loadedmoduleCommon = launcher.loadModule(moduleFileCommon.openStream()) ;
-	    
-	    
-	    atlModules.add(loadedmoduleCommon) ;
-		
-
-	    URL libraryFile ;
-	    List<String> fileName = new ArrayList<String>() ;
-	    fileName.add("/helpers/IOHelpers") ;
-	    fileName.add("/helpers/AADLCopyHelpers") ;
-	    fileName.add("/helpers/AADLICopyHelpers") ;
-	    fileName.add("/tools/PropertiesTools") ;
-	    fileName.add("/tools/PackagesTools") ;
-	    fileName.add("/tools/FeaturesTools") ;
-	    fileName.add("/tools/BehaviorAnnexTools") ;
-	    fileName.add("/uninstanciate/Features") ;
-	    fileName.add("/uninstanciate/Implementations") ;
-	    fileName.add("/uninstanciate/NonInstanciated");
-	    fileName.add("/uninstanciate/Properties") ;
-	    fileName.add("/uninstanciate/Types") ;
-	    fileName.add("/helpers/Services") ;
-	    
-	    for(String s : fileName)
-	    {
-	      libraryFile =
-	            new URL("file:" + resourcesDir.getAbsolutePath() + s + ".asm") ;
-	      Object loadedLibrary = launcher.loadModule(libraryFile.openStream()) ;
-	      launcher.addLibrary(s, loadedLibrary) ;
-	    }
-	  
-  }
+  protected abstract void registerDefaultTransformations(List<Object> atlModules, EMFVMLauncher launcher) throws IOException;
+  
 }
