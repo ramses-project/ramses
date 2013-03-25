@@ -353,6 +353,8 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
       Object loadedMainModule = launcher.loadModule(asmMainFile.openStream()) ;
       atlModules.add(loadedMainModule) ;
       
+      registerDefaultTransformations(atlModules, launcher);
+      
       for(File f : transformationFilepath)
       {
         URL asmSuperImposeFile = new URL("file:" + f.toString()) ;
@@ -363,7 +365,6 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
     }
     else
     {
-      // new invocation added
       registerDefaultTransformations(atlModules, launcher);
       URL asmSuperImposeFile =
             new URL("file:" + transformationFilepath.get(0).toString()) ;
@@ -378,8 +379,7 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 
     Map<String, Object> options = new HashMap<String, Object>() ;
     options.put("allowInterModelReferences", "true") ;
- // new invocation added
-    registerDefaultTransformations(atlModules, launcher);
+ 
     launcher.launch(EMFVMLauncher.RUN_MODE, new NullProgressMonitor(), options,
                     atlModules.toArray()) ;
 
