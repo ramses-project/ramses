@@ -41,13 +41,15 @@ public class AadlArinc653Transformation implements
   
   public static final String[] ATL_FILE_NAMES = new String[]
         {"targets/arinc653/ExpandThreadsPorts.asm",
-	  	 "targets/arinc653/BlackboardCommunications.asm",
-	  	 "targets/arinc653/BufferCommunications.asm",
-	  	 "targets/arinc653/EventsCommunications.asm",
-	  	 "targets/arinc653/QueuingCommunications.asm",
-	  	 "targets/arinc653/SamplingCommunications.asm",
-	  	 "ExpandSubprogramCalls.asm",
-         "targets/arinc653/ExpandThreadsDispatchProtocol.asm","CreateThreadsBehavior.asm"};
+  			 "targets/shared/CommonRefinementSteps.asm",
+  			 "targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
+	  	   "targets/arinc653/BlackboardCommunications.asm",
+	  	   "targets/arinc653/BufferCommunications.asm",
+	  	   "targets/arinc653/EventsCommunications.asm",
+	  	   "targets/arinc653/QueuingCommunications.asm",
+	  	   "targets/arinc653/SamplingCommunications.asm",
+	  	   "targets/arinc653/ExpandThreadsDispatchProtocol.asm",
+	  	   "ExpandSubprogramCalls.asm"};
   
   
   // The transform method for a non workflow based execution
