@@ -38,22 +38,6 @@ create OUT : AADLBA 	from 		IN : AADLI,
 -- addPutValueSubprogramCall
 -- threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation)
 
-rule addPutValueSubprogramCall(seq : AADLBA!SubprogramCallSequence,
-								impl : AADLBA!ComponentImplementation,
-								implImg : AADLBA!ComponentImplementation,
-								fi: AADLI!FeatureInstance)
-{
-	
-}
-
-rule addNextValueSubprogramCall(seq : AADLBA!SubprogramCallSequence,
-								impl : AADLBA!ComponentImplementation,
-								implImg : AADLBA!ComponentImplementation,
-								fi: AADLI!FeatureInstance)
-{
-	
-}
-
 rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation){
 	
 }
