@@ -529,9 +529,13 @@ rule defaultAccessConnection_mapping(cnxInst: AADLI!ConnectionInstance)
 			
 			source <- cnxRef.source.getFeatureImg();
 			if(source.oclIsUndefined())
+				source <- cnxRef.source.getSubcomponentImg();
+			if(source.oclIsUndefined())
 				source <- co.source.getConnFeatureImg(ownerImplImg);
 			
 			destination <- cnxRef.destination.getFeatureImg();
+			if(destination.oclIsUndefined())
+				destination <- cnxRef.destination.getSubcomponentImg();
 			if(destination.oclIsUndefined())
 				destination <- co.destination.getConnFeatureImg(ownerImplImg);
 			

@@ -93,7 +93,7 @@ helper context AADLI!ComponentInstance def : ownerTypeImg() : AADLBA!ComponentIm
 	self.ownerImplImg().getOwnedRealization().implemented
 ;
 
-helper context AADLI!ComponentInstance def : getSubcomponentImg() : AADLBA!Subcomponent =
+helper context AADLI!ConnectionInstanceEnd def : getSubcomponentImg() : AADLBA!Subcomponent =
 	thisModule.resolveTemp(self, 'sub')
 ;
 

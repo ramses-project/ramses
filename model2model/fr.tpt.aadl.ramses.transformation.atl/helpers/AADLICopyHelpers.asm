@@ -169,12 +169,12 @@
 		<constant value="93:2-93:43"/>
 		<constant value="93:2-93:55"/>
 		<constant value="getSubcomponentImg"/>
+		<constant value="MAADLI!ConnectionInstanceEnd;"/>
 		<constant value="97:2-97:12"/>
 		<constant value="97:25-97:29"/>
 		<constant value="97:31-97:36"/>
 		<constant value="97:2-97:37"/>
 		<constant value="getFeatureImg"/>
-		<constant value="MAADLI!ConnectionInstanceEnd;"/>
 		<constant value="f"/>
 		<constant value="101:2-101:12"/>
 		<constant value="101:25-101:29"/>
@@ -984,7 +984,7 @@
 		</localvariabletable>
 	</operation>
 	<operation name="167">
-		<context type="30"/>
+		<context type="168"/>
 		<parameters>
 		</parameters>
 		<code>
@@ -994,17 +994,17 @@
 			<call arg="62"/>
 		</code>
 		<linenumbertable>
-			<lne id="168" begin="0" end="0"/>
-			<lne id="169" begin="1" end="1"/>
-			<lne id="170" begin="2" end="2"/>
-			<lne id="171" begin="0" end="3"/>
+			<lne id="169" begin="0" end="0"/>
+			<lne id="170" begin="1" end="1"/>
+			<lne id="171" begin="2" end="2"/>
+			<lne id="172" begin="0" end="3"/>
 		</linenumbertable>
 		<localvariabletable>
 			<lve slot="0" name="3" begin="0" end="3"/>
 		</localvariabletable>
 	</operation>
-	<operation name="172">
-		<context type="173"/>
+	<operation name="173">
+		<context type="168"/>
 		<parameters>
 		</parameters>
 		<code>
