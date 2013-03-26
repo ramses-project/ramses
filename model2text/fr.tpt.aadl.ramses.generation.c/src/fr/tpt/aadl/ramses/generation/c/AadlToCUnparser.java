@@ -718,36 +718,39 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               }
             }
           }
-          _gtypesHeaderCode.addOutput(structDefinition.toString());
-          _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         }
         else
         {
-          _gtypesHeaderCode.addOutput(structDefinition.toString());
-          _gtypesHeaderCode.incrementIndent();
-          if(object instanceof DataImplementation)
-          {
-        	
-        	for(DataSubcomponent ds:((DataImplementation)object).getOwnedDataSubcomponents())
+        	if(object instanceof DataImplementation)
         	{
-        	  DataSubcomponentType dst = ds.getDataSubcomponentType();
-        	  process(dst);
-        	  
-        	  try
-        	  { 
-        		  resolveExistingCodeDependencies(dst, _gtypesHeaderCode, _gtypesHeaderCode);
-        	  }
-        	  catch (Exception e)
-        	  {
-        		String sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
-        		_gtypesHeaderCode.addOutput(sourceName);
-        	  }
-        	  _gtypesHeaderCode.addOutputNewline(" "+ds.getName()+";");
+        		for(DataSubcomponent ds:((DataImplementation)object).getOwnedDataSubcomponents())
+        		{
+        			DataSubcomponentType dst = ds.getDataSubcomponentType();
+        			Set<String> l;
+        			if(_additionalHeaders.containsKey(_gtypesHeaderCode) == false)
+        			{
+        				l = new HashSet<String>() ;
+        				_additionalHeaders.put(_gtypesHeaderCode, l) ;
+        			}
+        			else
+        			{
+        				l = _additionalHeaders.get(_gtypesHeaderCode) ;
+        			}
+        			String sourceName = GenerationUtilsC.resolveExistingCodeDependencies(dst, l);
+        			if(sourceName!=null)
+        				structDefinition.append("\t"+sourceName);
+        			else
+        			{
+        				process(dst);
+        				sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
+        				structDefinition.append("\t"+sourceName);
+        			}
+        			structDefinition.append(" "+ds.getName()+";\n");
+        		}
         	}
-          }
-          _gtypesHeaderCode.decrementIndent();
-          _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         }
+        _gtypesHeaderCode.addOutput(structDefinition.toString());
+        _gtypesHeaderCode.addOutputNewline("} " + id + ";") ;
         break ;
       }
       case UNION :
