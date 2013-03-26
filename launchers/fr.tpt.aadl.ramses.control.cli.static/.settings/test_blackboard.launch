@@ -9,10 +9,8 @@
 <mapAttribute key="org.eclipse.debug.core.environmentVariables">
 <mapEntry key="RAMSES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
 </mapAttribute>
-<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m test/arinc653-blackboard/test_blackboard.aadl2  -g pok -s root.impl -o test/arinc653-blackboard -i test/"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
-<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&#10;-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl&#10;-Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
 </launchConfiguration>
