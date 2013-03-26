@@ -433,7 +433,7 @@ lazy rule copyPortFreshValue
 		),
 		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- struct_freshness_data_subcomponent.debug('######')
+			element <- struct_freshness_data_subcomponent
 		)
 	do
 	{
