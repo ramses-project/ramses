@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<rwf:Workflow xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rwf="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0" xsi:schemaLocation="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0 ../../../../fr.tpt.aadl.ramses.control.support/model/RamsesWorkflow.ecore">
+  <element xsi:type="rwf:Transformation">
+    <element xsi:type="rwf:Generation"/>
+    <list>
+      <file path="targets/shared/CommonRefinementSteps.asm"/>
+      <file path="PeriodicDelayedCommunication/EventDataPorts.asm"/>
+      <file path="PeriodicDelayedCommunication/EventDataPorts_LowMFP.asm"/>
+    </list>
+  </element>
+</rwf:Workflow>

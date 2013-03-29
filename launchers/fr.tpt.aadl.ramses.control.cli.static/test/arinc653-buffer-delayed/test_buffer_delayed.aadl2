@@ -19,7 +19,7 @@
 -- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
-package test_buffer
+package test_buffer_delayed
 public
 
   system root
@@ -78,17 +78,13 @@ public
   memory implementation mem.impl
   properties
     Byte_Count => 80000;
-    Read_Time => (Fixed => 0.005 ms; PerByte => 0.005 ms;);
-    Write_Time => (Fixed => 0.005 ms; PerByte => 0.005 ms;);
+    --Read_Time => [Fixed => 0.005 ms; PerByte => 0.005 ms;];
+    --Write_Time => {Fixed => 0.005 ms; PerByte => 0.005 ms;};
   end mem.impl;
 
   thread sender
   features
-    p: out event data port Integer
-    {
-      Output_Rate => (Value_Range => 2.5;);
-   	  Output_Time => (Time => Deadline; Offset => 200.0 ms;);
-    };
+    p: out event data port Integer { Timing => Delayed; };
   properties
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
@@ -117,10 +113,7 @@ public
 
   thread receiver
   features
-    p: in event data port Integer
-    {
-      Input_Rate => (Value_Range => 2.0;);
-    };
+    p: in event data port Integer { Timing => Delayed; };
   properties
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
@@ -153,4 +146,4 @@ public
     Source_Data_Size => 4 Bytes;
   end Integer;
 
-end test_buffer;
+end test_buffer_delayed;
