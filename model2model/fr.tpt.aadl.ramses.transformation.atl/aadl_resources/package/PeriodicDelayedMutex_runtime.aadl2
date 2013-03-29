@@ -54,7 +54,6 @@ properties
 end t_aadl_linkedlist_link_ptr.impl;
 
 
-
 -- Linked list structure
 
 data t_aadl_thread_data_queue
@@ -73,7 +72,33 @@ subcomponents
   Free: data t_aadl_linkedlist_link_ptr.impl;
 end t_aadl_thread_data_queue.impl;
 
-
+subprogram Init_LinkedList
+features
+  PortVariable: requires data access t_aadl_thread_data_queue.impl;
+  Size : in parameter Base_Types::Integer;
+annex behavior_specification {**
+  variables
+    --i : Base_Types::Integer_16;
+    j : Base_Types::Integer_16;
+    iMax: Base_Types::Integer_16;
+  states
+    s : initial final state;
+  transitions
+    t: s-[]->s {
+    	PortVariable.Size  := Size;
+    	PortVariable.First := PortVariable[0];
+    	PortVariable.Free  := PortVariable[0];
+    	
+    	iMax := Size - 2;
+    	for(i : Base_Types::Integer_16 in 0 .. iMax)
+    	{
+    	   j := i + 1;
+    	   PortVariable[i].Next := PortVariable[j];
+    	   PortVariable[j].Previous := PortVariable[i]
+    	}
+    };
+**};
+end Init_LinkedList;
 
 ---------------------------------------------------------------
 -- Runtime Services
@@ -102,6 +127,7 @@ annex behavior_specification {**
   variables
     CurrentLink   : t_aadl_linkedlist_link_ptr.impl;
     AvailableLink : t_aadl_linkedlist_link_ptr.impl;
+    iterations    : Base_Types::Integer;
   states
     s: initial final state;
   transitions
@@ -110,51 +136,61 @@ annex behavior_specification {**
       Get_Resource! (PortVariable);
       
       CurrentLink := PortVariable.First;
-      while (not CurrentLink.Consumed and (CurrentLink.Timestamp < CurrentDeadline 
-  			or (CurrentLink.Timestamp=CurrentDeadline and CurrentLink.Priority>Priority)))
+      iterations := 0;
+      while (not CurrentLink.Consumed 
+             and (CurrentLink.Timestamp < CurrentDeadline 
+  			         or (CurrentLink.Timestamp=CurrentDeadline 
+  			             and CurrentLink.Priority>Priority))
+  			 and (iterations < PortVariable.Size))
       {
-  	     CurrentLink := CurrentLink.Next
+  	     CurrentLink := CurrentLink.Next;
+  	     iterations := iterations + 1
       };
       
-      if (CurrentLink.Consumed)
-      {
-         -- The list is empty or the new data is the most recent
-        
-         CurrentLink.DataPtr   := DataValue;
-         CurrentLink.Timestamp := CurrentDeadline;
-         CurrentLink.Priority  := Priority;
-         CurrentLink.Consumed  := FALSE;
-         
-         PortVariable.UsedSize := PortVariable.UsedSize + 1
-      }
-      else
-      {
-        -- Find a free link
-        
-         AvailableLink := CurrentLink.Next;
-         while (not AvailableLink.Consumed)
-         {
-            AvailableLink := AvailableLink.Next
-         };
-         
-         AvailableLink.DataPtr     := DataValue;
-         AvailableLink.Timestamp   := CurrentDeadline;
-         AvailableLink.Priority    := Priority;
-         AvailableLink.Consumed    := FALSE;
-         AvailableLink.Next        := CurrentLink;
-         AvailableLink.Previous    := CurrentLink.Previous; 
-         
-         CurrentLink.Previous.Next := AvailableLink;
-         CurrentLink.Previous      := AvailableLink; 
-         
-         PortVariable.UsedSize     := PortVariable.UsedSize + 1
-      }
-      end if;
+      if (iterations < PortVariable.Size and PortVariable.Free.Consumed)
+  	  {
+  	     AvailableLink             := PortVariable.Free;
+  	     
+	     AvailableLink.DataPtr     := DataValue;
+	     AvailableLink.Timestamp   := CurrentDeadline;
+	     AvailableLink.Priority    := Priority;
+	     AvailableLink.Consumed    := FALSE;
+	       
+	     if (not CurrentLink.Consumed)
+	     {  
+	       Insert_Link!(AvailableLink, CurrentLink)
+	     }
+	     end if;
+	           
+	     PortVariable.Free         := PortVariable.Free.Next;
+	     PortVariable.UsedSize     := PortVariable.UsedSize + 1
+  	  }
+  	  end if;
       
       Release_Resource! (PortVariable)
     };
 **};
 end Put_Value;
+
+subprogram Insert_Link
+features
+  Link        : in out parameter t_aadl_linkedlist_link_ptr.impl;
+  Follower    : in out parameter t_aadl_linkedlist_link_ptr.impl;
+annex behavior_specification {**
+  states
+    s: initial final state;
+  transitions
+    t: s -[]-> s
+    {
+      Link.Next.Previous     := Link.Previous;
+      Link.Previous.Next     := Link.Next;
+      Link.Next              := Follower;
+	  Link.Previous          := Follower.Previous; 
+	  Follower.Previous.Next := Link;
+	  Follower.Previous      := Link
+    };
+**};
+end Insert_Link;
 
 subprogram Receive_Input
 prototypes
@@ -168,6 +204,8 @@ annex behavior_specification {**
   variables
     LastPeriod  : Base_Types::Integer_16;
     CurrentLink : t_aadl_linkedlist_link_ptr.impl;
+    Next : t_aadl_linkedlist_link_ptr.impl;
+    i : Base_Types::Integer_16;
   states
     s: initial final state;
   transitions
@@ -175,33 +213,55 @@ annex behavior_specification {**
       -- Skip elements received before previous period 
       -- and not already consumed.
     
+      Get_Resource! (PortVariable);
+    
       if (CurrentPeriod > 0)
       {
         LastPeriod := CurrentPeriod - Period;
+        i := 0;
+        
         CurrentLink := First;
-        while (CurrentLink.Timestamp <= LastPeriod)
+        while ((CurrentLink.Timestamp <= LastPeriod)
+               and (i < PortVariable.Size))
         {
-           CurrentLink.Consumed := TRUE;
-           
-           -- remove link
-           CurrentLink.Previous.Next := CurrentLink.Next;
-           CurrentLink.Next.Previous := CurrentLink.Previous;
-           
-           -- add link at the end of the chain
-           CurrentLink.Previous := PortVariable.Free;
-           CurrentLink.Next := PortVariable.Free.Next;
-           PortVariable.Free.Next := CurrentLink;
-           
-           PortVariable.Free := CurrentLink;
-           CurrentLink := CurrentLink.Next
+           Next := CurrentLink.Next;
+           Remove_Link! (CurrentLink, PortVariable);
+           CurrentLink := Next;
+           i := i + 1
         };
         First := CurrentLink
       }
-      end if
+      end if;
+      
+      Release_Resource!(PortVariable)
     };
 **};
 end Receive_Input;
 
+subprogram Remove_Link
+features
+  CurrentLink : in out parameter t_aadl_linkedlist_link_ptr.impl;
+  PortVariable : requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
+annex behavior_specification {**
+  states
+    s: initial final state;
+  transitions
+    t: s -[]-> s
+    {
+      CurrentLink.Consumed := TRUE;
+           
+      -- remove link
+      CurrentLink.Previous.Next := CurrentLink.Next;
+      CurrentLink.Next.Previous := CurrentLink.Previous;
+       
+      -- add link at the end of the chain
+      CurrentLink.Previous := PortVariable.Free;
+      CurrentLink.Next := PortVariable.Free.Next;
+      PortVariable.Free.Next.Previous := CurrentLink;
+      PortVariable.Free.Next := CurrentLink
+    };
+**};
+end Remove_Link;
 
 subprogram Next_Value
 prototypes
@@ -210,9 +270,10 @@ features
   PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
   DataValue: out parameter t_request; -- Reference to value being retrieved
   First : in out parameter t_aadl_linkedlist_link_ptr.impl;
+  CurrentPeriod : requires data access Base_Types::Integer_16; 
 annex behavior_specification {**
   variables
-    CurrentLink : t_aadl_linkedlist_link_ptr.impl;
+    Next : t_aadl_linkedlist_link_ptr.impl;
   states
     s: initial final state;
   transitions
@@ -220,10 +281,16 @@ annex behavior_specification {**
     {
       Get_Resource! (PortVariable);
       
-      DataValue := First.DataPtr;
-      First.Consumed := TRUE;
-      First := First.Next;
-      PortVariable.UsedSize := PortVariable.UsedSize - 1;
+      Next := First.Next;
+      
+      if ((Next.Timestamp <= CurrentPeriod) and (Next.Consumed=FALSE))
+      {
+        DataValue := Next.DataPtr;
+        Remove_Link! (First, PortVariable);
+        First := Next;
+        PortVariable.UsedSize := PortVariable.UsedSize - 1
+      }
+      end if; -- else DataValue is unchanged (use previous value)
       
       Release_Resource! (PortVariable)
     };
