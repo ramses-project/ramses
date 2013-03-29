@@ -88,44 +88,6 @@ helper context AADLBA!ThreadImplementation def : getSubcomponent(name : String) 
 ;
 
 
-
---unique lazy rule createSpg_GetReferenceValue
---{
---	from
---		data : AADLI!DataClassifier
---	using
---	{
---		GetReferenceValue_Prototype: AADLBA!SubprogramType = 'Get_Reference_Value'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
---	}
---	to
---		GetReferenceValue: AADLBA!SubprogramType 
---		(
---			name <- GetReferenceValue_Prototype.name.concat('_').concat(data.name),
---			ownedExtension <- extendedGetReferenceValue,
---			ownedPrototypeBinding <- Sequence {GetReferenceValuePrototypeBinding}
---		),
---		extendedGetReferenceValue: AADLBA!TypeExtension
---		(
---			extended <- GetReferenceValue_Prototype
---		),
---		GetReferenceValuePrototypeBinding: AADLBA!ComponentPrototypeBinding
---		(
---			formal <- GetReferenceValue_Prototype.ownedPrototype
---						->any(e|e.name = 't_request').debug('GetReferenceValue.formal'),
---			actual <- Sequence {GetReferenceValue_Actual}
---		),
---		GetReferenceValue_Actual: AADLBA!ComponentPrototypeActual
---		(
---			category <- #data
---		)
---	do
---	{
---		GetReferenceValue_Actual.setSubcomponentType(data);
---		thisModule.public().ownedClassifier.add(GetReferenceValue);
---		GetReferenceValue;
---	}
---}
-
 rule Thread_Instance {
 	from
 		c : AADLI!ComponentInstance (c.category = #thread)
@@ -338,12 +300,13 @@ rule EventDataPort_Instance
 		receiveInputBufferAccessConnection: AADLBA!AccessConnection
 		(
 			name <- 'cnx_Receive_Input_PortVariable_' + bufferSubcomponent.name,
+			accessCategory <- #data,
 			source <- receiveInputBufferAccessConnection_Source,
 			destination <- receiveInputBufferAccessConnection_Destination
 		),
 		receiveInputBufferAccessConnection_Source: AADLBA!ConnectedElement
 		(
-			connectionEnd <- bufferSubcomponent
+			connectionEnd <- bufferAccess
 		),
 		receiveInputBufferAccessConnection_Destination: AADLBA!ConnectedElement
 		(
@@ -406,6 +369,7 @@ rule EventDataPort_Instance
 		
 		dstThreadImg.ownedAccessConnection.add(receiveInputPeriodAccessConnection);
 		dstThreadImg.ownedAccessConnection.add(receiveInputCurrentPeriodAccessConnection);
+		dstThreadImg.ownedAccessConnection.add(receiveInputBufferAccessConnection);
 		dstThreadImg.ownedAccessConnection.add(nextValueBufferAccessConnection);
 		dstThreadImg.ownedParameterConnection.add(nextValueFirstParameterConnection);
 		dstThreadImg.ownedParameterConnection.add(receiveInputFirstAccessConnection);
