@@ -56,21 +56,42 @@ end t_aadl_linkedlist_link_ptr.impl;
 
 -- Linked list structure
 
-data t_aadl_thread_data_queue
+data t_aadl_thread_data_queue_content
 properties
   Data_Model::Data_Representation => Array;
   Data_Model::Base_Type => (classifier(t_aadl_linkedlist_link.impl));
+end t_aadl_thread_data_queue_content;
+
+-- data implementation t_aadl_thread_data_queue_content.impl
+-- prototypes
+--   t_request: data;
+-- end t_aadl_thread_data_queue_content.impl;
+
+data t_aadl_thread_data_queue
+properties
+  Data_Model::Data_Representation => Struct;
 end t_aadl_thread_data_queue;
 
 data implementation t_aadl_thread_data_queue.impl
 prototypes
   t_request: data;
 subcomponents
+  Values: data t_aadl_thread_data_queue_content;
   Size: data Base_Types::Integer;
   UsedSize: data Base_Types::Integer;
   First: data t_aadl_linkedlist_link_ptr.impl;
   Free: data t_aadl_linkedlist_link_ptr.impl;
 end t_aadl_thread_data_queue.impl;
+
+-- data implementation t_aadl_thread_data_queue.impl
+-- prototypes
+--   t_request: data;
+-- subcomponents
+--   Size: data Base_Types::Integer;
+--   UsedSize: data Base_Types::Integer;
+--   First: data t_aadl_linkedlist_link_ptr.impl;
+--   Free: data t_aadl_linkedlist_link_ptr.impl;
+-- end t_aadl_thread_data_queue.impl;
 
 subprogram Init_LinkedList
 features
@@ -86,15 +107,15 @@ annex behavior_specification {**
   transitions
     t: s-[]->s {
     	PortVariable.Size  := Size;
-    	PortVariable.First := PortVariable[0];
-    	PortVariable.Free  := PortVariable[0];
+    	PortVariable.First := PortVariable.Values[0];
+    	PortVariable.Free  := PortVariable.Values[0];
     	
     	iMax := Size - 2;
     	for(i : Base_Types::Integer_16 in 0 .. iMax)
     	{
     	   j := i + 1;
-    	   PortVariable[i].Next := PortVariable[j];
-    	   PortVariable[j].Previous := PortVariable[i]
+    	   PortVariable.Values[i].Next := PortVariable.Values[j];
+    	   PortVariable.Values[j].Previous := PortVariable.Values[i]
     	}
     };
 **};
@@ -220,7 +241,7 @@ annex behavior_specification {**
         LastPeriod := CurrentPeriod - Period;
         i := 0;
         
-        CurrentLink := First;
+        CurrentLink := PortVariable.First;
         while ((CurrentLink.Timestamp <= LastPeriod)
                and (i < PortVariable.Size))
         {
@@ -298,6 +319,8 @@ annex behavior_specification {**
 end Next_Value;
 
 subprogram Send_Output
+prototypes
+  t_request: data;
 features
   PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
 end Send_Output;
