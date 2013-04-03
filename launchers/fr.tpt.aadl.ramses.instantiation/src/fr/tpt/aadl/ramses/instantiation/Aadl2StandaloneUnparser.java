@@ -2577,10 +2577,10 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
       public String caseRecordValue(RecordValue object)
       {
         aadlText.incrementIndent() ;
-        aadlText.addOutputNewline("(") ;
+        aadlText.addOutputNewline("[") ;
         processEList(object.getOwnedFieldValues()) ;
         aadlText.decrementIndent() ;
-        aadlText.addOutput(")") ;
+        aadlText.addOutput("]") ;
         return DONE ;
       }
 
