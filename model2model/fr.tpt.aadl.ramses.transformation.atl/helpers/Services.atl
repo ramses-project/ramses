@@ -105,7 +105,7 @@ helper context AADLI!FeatureInstance def : isDataOrEventDataPort() : Boolean =
 	(self.feature.oclIsTypeOf(AADLI!EventDataPort) or self.feature.oclIsTypeOf(AADLI!DataPort)); 
 
 
-helper context AADLI!ComponentInstance def: isPeriodicThread() : Boolean =
+helper context AADLI!NamedElement def: isPeriodicThread() : Boolean =
 	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
 	if(mpv.oclIsUndefined()) then
 		false
@@ -114,7 +114,7 @@ helper context AADLI!ComponentInstance def: isPeriodicThread() : Boolean =
 	endif
 ;
 
-helper context AADLI!ComponentInstance def: isSporadicThread() : Boolean =
+helper context AADLI!NamedElement def: isSporadicThread() : Boolean =
 	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
 	if(mpv.oclIsUndefined()) then
 		false
@@ -123,7 +123,7 @@ helper context AADLI!ComponentInstance def: isSporadicThread() : Boolean =
 	endif
 ;
 
-helper context AADLI!ComponentInstance def: isAperiodicThread() : Boolean =
+helper context AADLI!NamedElement def: isAperiodicThread() : Boolean =
 	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
 	if(mpv.oclIsUndefined()) then
 		false
