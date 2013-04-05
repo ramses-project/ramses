@@ -41,7 +41,8 @@ public class AadlArinc653Transformation implements
   
   public static final String[] ATL_FILE_NAMES = new String[]
         {"targets/arinc653/ExpandThreadsPorts.asm",
-  			 "targets/shared/CommonRefinementSteps.asm",
+  			 "targets/shared/PortsCommonRefinementSteps.asm",
+  			 "targets/shared/DispatchCommonRefinementSteps.asm",
   			 "targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
 	  	   "targets/arinc653/BlackboardCommunications.asm",
 	  	   "targets/arinc653/BufferCommunications.asm",

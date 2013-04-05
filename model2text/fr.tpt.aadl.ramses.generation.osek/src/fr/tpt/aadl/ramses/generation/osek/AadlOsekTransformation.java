@@ -17,8 +17,11 @@ public class AadlOsekTransformation implements AadlToTargetSpecificAadl {
 	public static final String[] ATL_FILE_NAMES = new String[] 
 			{ 
 		"targets/osek/ExpandThreadsPorts.asm", 
-		"targets/shared/CommonRefinementSteps.asm",
-		 "targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
+		"targets/osek/ExpandThreadsDispatchProtocol.asm",
+		"targets/shared/PortsCommonRefinementSteps.asm",
+		"targets/shared/DispatchCommonRefinementSteps.asm",
+		"targets/shared/DispatchHWCommonRefinementSteps.asm",
+		"targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
 		 "ExpandSubprogramCalls.asm", "CreateThreadsBehavior.asm" };
 
 	public static final List<File> ATL_FILES = new ArrayList<File>(ATL_FILE_NAMES.length);
