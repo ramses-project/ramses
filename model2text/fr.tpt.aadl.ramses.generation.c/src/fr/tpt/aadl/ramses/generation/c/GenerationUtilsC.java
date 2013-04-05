@@ -26,7 +26,9 @@ import java.util.Set;
 
 import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentPrototype;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DataPrototype;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.Property;
@@ -170,7 +172,8 @@ public class GenerationUtilsC
         if(c.getOwnedExtension()!=null)
     	  return resolveExistingCodeDependencies(c.getOwnedExtension().getExtended(), additionalHeaders);
       }
-      else
+      /*else   FIXME: ComponentPrototype */
+      else if (object instanceof ComponentImplementation)
       {
         ComponentImplementation ci = (ComponentImplementation) object;
         if(ci.getOwnedExtension()!=null)
