@@ -668,34 +668,6 @@ rule addPutValueSubprogramCall(seq : AADLBA!SubprogramCallSequence,
 	}
 }
 
-rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
-{
-	using
-	{
-		c : AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
-		impl: AADLBA!ComponentImplementation = c.getImpl();
-	}
-	do
-	{
-		if(c.category=#thread and c.featureInstance->last() = fi)
-		{
-			for(cnx in impl.ownedParameterConnection)
-			{
-				if(cnx.source.connectionEnd.oclIsKindOf(AADLI!Parameter) 
-						and cnx.destination.connectionEnd.oclIsKindOf(AADLI!Parameter))
-				{
-					thisModule.addSuprogramCallParameterConnection(implImg, cnx);
-				}
-			}
-			implImg.ownedAccessConnection <- impl.ownedAccessConnection
-					->select(co| 	not co.source.getConnFeatureImg(implImg).oclIsUndefined() and
-									not co.destination.getConnFeatureImg(implImg).oclIsUndefined())
-					->collect(co|thisModule.AccessConnection(co, implImg));
-		}
-	}
-}
-
 unique lazy rule createResolvedSpg
 {
 	from
