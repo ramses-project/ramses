@@ -2275,6 +2275,61 @@
 		<constant value="param"/>
 		<constant value="ctx"/>
 		<constant value="variable"/>
+		<constant value="addThreadsInternalConnections"/>
+		<constant value="J.getImpl():J"/>
+		<constant value="J.last():J"/>
+		<constant value="69"/>
+		<constant value="J.mapSubprogramParameters(JJ):J"/>
+		<constant value="J.getConnFeatureImg(J):J"/>
+		<constant value="59"/>
+		<constant value="J.AccessConnection(JJ):J"/>
+		<constant value="1109:33-1109:35"/>
+		<constant value="1109:33-1109:48"/>
+		<constant value="1110:45-1110:46"/>
+		<constant value="1110:45-1110:67"/>
+		<constant value="1110:45-1110:84"/>
+		<constant value="1111:42-1111:43"/>
+		<constant value="1111:42-1111:53"/>
+		<constant value="1115:6-1115:7"/>
+		<constant value="1115:6-1115:16"/>
+		<constant value="1115:17-1115:24"/>
+		<constant value="1115:6-1115:24"/>
+		<constant value="1115:29-1115:30"/>
+		<constant value="1115:29-1115:46"/>
+		<constant value="1115:29-1115:54"/>
+		<constant value="1115:57-1115:59"/>
+		<constant value="1115:29-1115:59"/>
+		<constant value="1115:6-1115:59"/>
+		<constant value="1117:4-1117:14"/>
+		<constant value="1117:39-1117:46"/>
+		<constant value="1117:48-1117:52"/>
+		<constant value="1117:4-1117:54"/>
+		<constant value="1118:4-1118:11"/>
+		<constant value="1118:37-1118:41"/>
+		<constant value="1118:37-1118:63"/>
+		<constant value="1119:24-1119:26"/>
+		<constant value="1119:24-1119:33"/>
+		<constant value="1119:52-1119:59"/>
+		<constant value="1119:24-1119:60"/>
+		<constant value="1119:24-1119:77"/>
+		<constant value="1119:20-1119:77"/>
+		<constant value="1120:14-1120:16"/>
+		<constant value="1120:14-1120:28"/>
+		<constant value="1120:47-1120:54"/>
+		<constant value="1120:14-1120:55"/>
+		<constant value="1120:14-1120:72"/>
+		<constant value="1120:10-1120:72"/>
+		<constant value="1119:20-1120:72"/>
+		<constant value="1118:37-1120:73"/>
+		<constant value="1121:19-1121:29"/>
+		<constant value="1121:47-1121:49"/>
+		<constant value="1121:51-1121:58"/>
+		<constant value="1121:19-1121:59"/>
+		<constant value="1118:37-1121:60"/>
+		<constant value="1118:4-1121:61"/>
+		<constant value="1115:3-1122:4"/>
+		<constant value="1113:2-1123:3"/>
+		<constant value="co"/>
 	</cp>
 	<field name="1" type="2"/>
 	<field name="3" type="4"/>
@@ -9345,6 +9400,140 @@
 			<lve slot="3" name="2271" begin="0" end="82"/>
 			<lve slot="4" name="2272" begin="0" end="82"/>
 			<lve slot="5" name="2273" begin="0" end="82"/>
+		</localvariabletable>
+	</operation>
+	<operation name="2274">
+		<context type="8"/>
+		<parameters>
+			<parameter name="25" type="4"/>
+		</parameters>
+		<code>
+			<load arg="25"/>
+			<call arg="99"/>
+			<store arg="35"/>
+			<load arg="35"/>
+			<call arg="384"/>
+			<get arg="385"/>
+			<store arg="172"/>
+			<load arg="35"/>
+			<call arg="2275"/>
+			<store arg="175"/>
+			<load arg="35"/>
+			<get arg="159"/>
+			<push arg="160"/>
+			<push arg="10"/>
+			<new/>
+			<dup/>
+			<push arg="163"/>
+			<set arg="44"/>
+			<call arg="162"/>
+			<load arg="35"/>
+			<get arg="1144"/>
+			<call arg="2276"/>
+			<load arg="25"/>
+			<call arg="162"/>
+			<call arg="127"/>
+			<if arg="320"/>
+			<goto arg="2277"/>
+			<getasm/>
+			<load arg="172"/>
+			<load arg="175"/>
+			<pcall arg="2278"/>
+			<load arg="172"/>
+			<push arg="34"/>
+			<push arg="10"/>
+			<new/>
+			<push arg="34"/>
+			<push arg="10"/>
+			<new/>
+			<load arg="175"/>
+			<get arg="1248"/>
+			<iterate/>
+			<store arg="305"/>
+			<load arg="305"/>
+			<get arg="1262"/>
+			<load arg="172"/>
+			<call arg="2279"/>
+			<call arg="123"/>
+			<call arg="124"/>
+			<load arg="305"/>
+			<get arg="1263"/>
+			<load arg="172"/>
+			<call arg="2279"/>
+			<call arg="123"/>
+			<call arg="124"/>
+			<call arg="127"/>
+			<call arg="106"/>
+			<if arg="2280"/>
+			<load arg="305"/>
+			<call arg="108"/>
+			<enditerate/>
+			<iterate/>
+			<store arg="305"/>
+			<getasm/>
+			<load arg="305"/>
+			<load arg="172"/>
+			<call arg="2281"/>
+			<call arg="108"/>
+			<enditerate/>
+			<set arg="1248"/>
+		</code>
+		<linenumbertable>
+			<lne id="2282" begin="0" end="0"/>
+			<lne id="2283" begin="0" end="1"/>
+			<lne id="2284" begin="3" end="3"/>
+			<lne id="2285" begin="3" end="4"/>
+			<lne id="2286" begin="3" end="5"/>
+			<lne id="2287" begin="7" end="7"/>
+			<lne id="2288" begin="7" end="8"/>
+			<lne id="2289" begin="10" end="10"/>
+			<lne id="2290" begin="10" end="11"/>
+			<lne id="2291" begin="12" end="17"/>
+			<lne id="2292" begin="10" end="18"/>
+			<lne id="2293" begin="19" end="19"/>
+			<lne id="2294" begin="19" end="20"/>
+			<lne id="2295" begin="19" end="21"/>
+			<lne id="2296" begin="22" end="22"/>
+			<lne id="2297" begin="19" end="23"/>
+			<lne id="2298" begin="10" end="24"/>
+			<lne id="2299" begin="27" end="27"/>
+			<lne id="2300" begin="28" end="28"/>
+			<lne id="2301" begin="29" end="29"/>
+			<lne id="2302" begin="27" end="30"/>
+			<lne id="2303" begin="31" end="31"/>
+			<lne id="2304" begin="38" end="38"/>
+			<lne id="2305" begin="38" end="39"/>
+			<lne id="2306" begin="42" end="42"/>
+			<lne id="2307" begin="42" end="43"/>
+			<lne id="2308" begin="44" end="44"/>
+			<lne id="2309" begin="42" end="45"/>
+			<lne id="2310" begin="42" end="46"/>
+			<lne id="2311" begin="42" end="47"/>
+			<lne id="2312" begin="48" end="48"/>
+			<lne id="2313" begin="48" end="49"/>
+			<lne id="2314" begin="50" end="50"/>
+			<lne id="2315" begin="48" end="51"/>
+			<lne id="2316" begin="48" end="52"/>
+			<lne id="2317" begin="48" end="53"/>
+			<lne id="2318" begin="42" end="54"/>
+			<lne id="2319" begin="35" end="59"/>
+			<lne id="2320" begin="62" end="62"/>
+			<lne id="2321" begin="63" end="63"/>
+			<lne id="2322" begin="64" end="64"/>
+			<lne id="2323" begin="62" end="65"/>
+			<lne id="2324" begin="32" end="67"/>
+			<lne id="2325" begin="31" end="68"/>
+			<lne id="2326" begin="10" end="68"/>
+			<lne id="2327" begin="10" end="68"/>
+		</linenumbertable>
+		<localvariabletable>
+			<lve slot="5" name="2328" begin="41" end="58"/>
+			<lve slot="5" name="2328" begin="61" end="66"/>
+			<lve slot="2" name="170" begin="2" end="68"/>
+			<lve slot="3" name="73" begin="6" end="68"/>
+			<lve slot="4" name="1197" begin="9" end="68"/>
+			<lve slot="0" name="23" begin="0" end="68"/>
+			<lve slot="1" name="96" begin="0" end="68"/>
 		</localvariabletable>
 	</operation>
 </asm>
