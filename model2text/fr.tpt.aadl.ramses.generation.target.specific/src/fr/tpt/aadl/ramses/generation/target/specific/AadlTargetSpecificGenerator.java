@@ -37,13 +37,14 @@ import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.XMLPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import fr.tpt.aadl.sched.aadlAST.ASTAnalysis;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -111,6 +112,7 @@ public class AadlTargetSpecificGenerator implements Generator
                           WorkflowPilot workflowPilot) throws GenerationException
   {
     Resource r = instance.eResource() ;
+    SystemInstance currentInstance = instance;
     String systemToInstantiate = instance.getSystemImplementation().getName();
 
     while(workflowPilot.hasNextOperation())
@@ -121,12 +123,21 @@ public class AadlTargetSpecificGenerator implements Generator
         String analysisName = workflowPilot.getNextAnalysisName();
         String analysisMode = workflowPilot.getNextAnalysisMode();
         System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
-        try {       
-          ServiceRegistryProvider.getServiceRegistry().getAnalyzer(analysisName)
-          .performAnalysis(instance,
-                           ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
-                           new NullProgressMonitor()) ;
-        } catch (AnalysisResultException e) {
+        try {
+          ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+          Analyzer a = sr.getAnalyzer(analysisName);
+          if (a == null)
+          {
+        	  System.err.println("Unknown analysis: " + analysisName);
+          }
+          else
+          {
+        	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+                      new NullProgressMonitor()) ;
+          }
+          
+        } catch (Exception e) {
+        //} catch (AnalysisResultException e) {
           e.printStackTrace();
         }
 
@@ -171,6 +182,7 @@ public class AadlTargetSpecificGenerator implements Generator
         SystemInstance newInstance =
         		instantiator.instantiate(si);
         r = newInstance.eResource();
+        currentInstance = newInstance;
       }
       else if(operation.equals("errorstate"))
       {
@@ -190,7 +202,7 @@ public class AadlTargetSpecificGenerator implements Generator
       workflowPilot.goForward();
     }
   }
-
+  
   @Override
   public void setParameters(Map<String, Object> parameters)
   {

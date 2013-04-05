@@ -21,25 +21,24 @@
 
 package fr.tpt.aadl.ramses.generation.target.specific;
 
-import java.io.File ;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
-import java.util.List ;
-import java.util.Map ;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.ProcessSubcomponent;
+import org.osate.aadl2.ProcessorSubcomponent;
+import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.instance.SystemInstance;
 
-import org.eclipse.emf.common.util.TreeIterator ;
-import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.resource.Resource ;
-
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.ProcessSubcomponent ;
-import org.osate.aadl2.ProcessorSubcomponent ;
-import org.osate.aadl2.SystemImplementation ;
-
-import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser ;
-import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
+import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
+import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
+import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
 
 
 public class AadlTargetSpecificCodeGenerator
@@ -78,6 +77,11 @@ public class AadlTargetSpecificCodeGenerator
     while(iter.hasNext())
     {
       Element elt = (Element) iter.next() ;
+      
+      if (elt instanceof SystemInstance)
+      {
+    	  elt = ((SystemInstance) elt).getSystemImplementation();
+      }
       
       if(elt instanceof SystemImplementation)
       {
