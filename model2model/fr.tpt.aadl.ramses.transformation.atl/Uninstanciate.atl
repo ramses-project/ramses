@@ -676,19 +676,3 @@ rule Comment {
 	to
 		c2 : AADLBA!Comment(body <- c.body, ownedComment <- c.ownedComment)
 }
-
-rule addTerminationCall(callSequenceImg : AADLBA!SubprogramCallSequence)
-{
-}
-
-endpoint rule EndRule()
-{
-	do
-	{
-		'Executing Endpoint Rule'.debug('DEBUG');
-		for(callSequence in AADLBA!SubprogramCallSequence->allInstancesFrom('OUT'))
-		{
-			thisModule.addTerminationCall(callSequence);
-		}
-	}
-}
