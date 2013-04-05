@@ -66,7 +66,7 @@ public class EcorePilot  implements WorkflowPilot {
 			if (racine instanceof Transformation) {
 				return "transformation";
 			} else if (racine instanceof Analysis) {
-				return "transformation";
+				return "analysis";
 			} else if (racine instanceof Generation) {
 				return "generation";
 			}
