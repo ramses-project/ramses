@@ -74,46 +74,6 @@ rule setDestinationPortAccessorParameterConnections(port: AADLI!FeatureInstance,
 	}
 }
 
-rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
-{
-	using
-	{
-		c : AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
-		impl: AADLBA!ComponentImplementation = c.getImpl();
-	}
-	do
-	{
-		if(c.category=#thread and c.featureInstance->last() = fi)
-		{
-			thisModule.mapSubprogramParameters(implImg, impl);
-			implImg.ownedAccessConnection <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
-		}
-	}
-}
-
-unique lazy rule addTerminationCall
-{
-	from
-		callSequenceImg : AADLBA!SubprogramCallSequence
-	using
-	{
-		implImg: AADLBA!BehaviouredImplementation = callSequenceImg.eContainer();
-		spg: AADLBA!SubprogramType = 'TerminateTask'.asSubprogramType('OSEK_RUNTIME');
-	}
-	to
-		terminateTaskCall: AADLBA!SubprogramCall
-		(
-			name<-'call_TerminateTask',
-			calledSubprogram <- spg
-		)
-	do
-	{
-		callSequenceImg.getOwnedCallSpecifications().add(terminateTaskCall);
-		thisModule.addImportedUnit(thisModule.public(), 'OSEK_RUNTIME', 'OSEK_runtime');
-	}
-}
-
 unique lazy rule addStatusType
 {
 	from
