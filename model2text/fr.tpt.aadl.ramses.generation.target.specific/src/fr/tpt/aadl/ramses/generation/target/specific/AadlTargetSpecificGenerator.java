@@ -37,14 +37,12 @@ import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
-import fr.tpt.aadl.sched.aadlAST.ASTAnalysis;
 
 
 public class AadlTargetSpecificGenerator implements Generator
