@@ -105,6 +105,15 @@ helper context AADLI!FeatureInstance def : isDataOrEventDataPort() : Boolean =
 	(self.feature.oclIsTypeOf(AADLI!EventDataPort) or self.feature.oclIsTypeOf(AADLI!DataPort)); 
 
 
+helper context AADLI!NamedElement def: getPeriodValue(): Integer =
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Period') in
+	if(mpv.oclIsUndefined()) then
+		false
+	else
+		mpv.ownedValue.value
+	endif
+;
+
 helper context AADLI!NamedElement def: isPeriodicThread() : Boolean =
 	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
 	if(mpv.oclIsUndefined()) then
