@@ -1,0 +1,242 @@
+-- TODO
+-- _ timed Await_Dispatch.
+
+package Minimal_Runtime_Dispatch
+
+public
+
+with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Types,
+      Minimal_Runtime_Port, Minimal_Runtime_Sync ;
+
+
+subprogram Compute_Dispatched_Port
+
+   features
+   
+   DispatchPorts : requires data access Minimal_Runtime_Types::Natural_List.impl ; 
+   UpdatedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   DispatchedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   
+   annex behavior_specification
+   {**
+      variables
+      
+      it_index, add_index : Base_Types::Unsigned_8 ;
+      continue : Base_Types::Boolean ;
+      
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         add_index := 0 ;
+         
+         for(i : Base_Types::Natural in UpdatedPort)
+         {
+            continue := TRUE ;
+            it_index := 0 ;
+            
+            while(continue AND it_index < DispatchPorts.Nb_Items)
+            {
+               if(i = DispatchPorts[it_index])
+               {
+                  continue := FALSE ;
+                  DispatchedPort[add_index] := i ;
+                  add_index := add_index + 1
+               }
+               end if ;
+               
+               it_index := it_index + 1
+            }
+         }
+      } ; 
+   **} ;
+
+end Compute_Dispatched_Port ;
+
+
+subprogram Dispatch_Condition_Function
+
+   features
+   
+   DispatchPorts : requires data access Minimal_Runtime_Types::Natural_List.impl ; 
+   DispatchedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ; 
+   Is_Dispatched : out parameter Base_Types::Boolean ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+
+end Dispatch_Condition_Function ;
+
+
+subprogram Wrapper_Freeze
+
+   prototypes
+   
+   Ports_Type : data ;
+   Mutex_Type : data ;
+   
+   features
+   
+   Ports : requires data access Ports_Type ;
+   Mutex : requires data access Mutex_Type ;
+   Port_Id : in parameter Base_Types::Unsigned_8 ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   
+end Wrapper_Freeze ;
+
+
+subprogram Await_Dispatch
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Ports_Type : data ;
+   Mutex_Type : data ;
+   Dispatch_Condition_Function : subprogram Dispatch_Condition_Function;
+   Wrapper_Freeze : subprogram Wrapper_Freeze ;
+   Wait_For_Signal : subprogram Minimal_Runtime_Sync::Wait_For_Signal ;
+   Unset_ICCP : subprogram Minimal_Runtime_Sync::Unset_ICCP ;
+   Set_ICCP : subprogram Minimal_Runtime_Sync::Set_ICCP ;
+      
+   features
+   
+   Ports : requires data access Ports_Type ;
+   Input_Monitor : requires data access Monitor_Type ;
+   Port_Mutex : requires data access Mutex_Type ;
+   Pending_Event_Chain : requires data access Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+   DispatchPorts : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   UpdatedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   DispatchedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   
+   annex behavior_specification
+   {**
+      variables
+      
+      is_dispatched, continue : Base_Types::Boolean ;
+      tmp_index : Base_Types::Natural ;
+      
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         Set_ICCP ! ;
+         
+         do
+         {
+            Wait_For_Signal ! (Input_Monitor) ;
+            Minimal_Runtime_Port::Get_Updated_Port ! (Pending_Event_Chain,
+                                                       UpdatedPort,
+                                                       Port_Mutex) ;
+            Compute_Dispatched_Port ! (DispatchPorts,
+                                       UpdatedPort,
+                                       DispatchedPort) ;
+            Dispatch_Condition_Function ! (DispatchPorts,
+                                           DispatchedPort,
+                                           is_dispatched)
+         }
+         until(NOT is_dispatched) ;
+         
+         -- Freeze the updated ports.
+         for(i : Base_Types::Integer_8 in UpdatedPort)
+         {
+            Wrapper_Freeze ! (Ports,
+                              Port_Mutex,
+                              i)
+         } ;
+         
+         Unset_ICCP !
+      } ; 
+   **} ;
+
+end Await_Dispatch ;
+
+
+subprogram Compute_Next_Activation_Date
+
+   prototypes
+   
+   Get_Current_Date : subprogram Minimal_Runtime_Sync::Get_Current_Date ;
+   Next_Period : subprogram Minimal_Runtime_Sync::Next_Period ;
+   Date_Type: data;
+   
+   features
+   
+   Period : in parameter Minimal_Runtime_Types::Date ;
+   Next_Period_Date : requires data access Date_Type;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   
+   annex behavior_specification
+   {**
+            
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         Get_Current_Date ! (Next_Period_Date) ;
+         Next_Period ! (Next_Period_Date, Period)
+      } ; 
+   **} ;
+
+end Compute_Next_Activation_Date ;
+
+
+subprogram Periodic_Dispatch
+
+   prototypes
+   
+   Wait_Next_Period : subprogram Minimal_Runtime_Sync::Wait_Next_Period ;
+   Date_Type: data;
+   
+   features
+   
+   Next_Period_Date : in parameter Date_Type ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   
+   annex behavior_specification
+   {**
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         Wait_Next_Period ! (Next_Period_Date)         
+      } ; 
+   **} ;
+
+end Periodic_Dispatch ;
+
+  
+end  Minimal_Runtime_Dispatch ;
