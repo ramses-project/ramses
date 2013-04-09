@@ -72,19 +72,19 @@ public abstract class AtlTransfoLauncher
   protected abstract void initTransformation() throws ATLCoreException;
   
   public abstract Resource generationEntryPoint(Resource inputResource,
-		  File resourceFilePath,
-		  List<File> atlFiles,
-		  File generatedFilePath) throws GenerationException;
+		  File resourceDir,
+		  List<File> transformationFileList,
+		  File outputDir) throws GenerationException;
 
   public abstract Resource doGeneration(Resource inputResource,
-                               List<File> transformationFileName,
-                               String dataTargetfilepath)
+                               List<File> transformationFileList,
+                               String outputDirPathName)
         throws FileNotFoundException, IOException, ATLCoreException, Exception;
   
   
   
-  protected abstract Resource doTransformation(List<File> transformationFilepath, Resource inputResource,
-		  String dataTargetfilepath)
+  protected abstract Resource doTransformation(List<File> transformationFileList, Resource inputResource,
+		  String outputDirPathName)
         throws FileNotFoundException, IOException, ATLCoreException;
 
   

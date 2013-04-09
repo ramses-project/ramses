@@ -22,22 +22,19 @@
 package fr.tpt.aadl.ramses.control.support.generator;
 
 import java.io.File ;
-import java.util.List ;
 import java.util.Map ;
 
 import org.eclipse.emf.ecore.resource.Resource ;
 
-public interface AadlToTargetSpecificAadl
+
+public interface AadlToAadl
 {
+	public void initAtlFileNameList(File resourceFilePath);
+	
   public Resource transform(Resource inputResource,
-                            File resourceFilePath,
-                            File generatedFilePath) throws GenerationException ;
+                            File resourceDir,
+                            File generatedDir) throws GenerationException;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
-
-  public Resource transformXML(Resource r,
-                               File resourceFilePath,
-                               List<String> resourceFileNameList,
-                               File generatedFilePath) throws GenerationException ;
 
 }

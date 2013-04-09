@@ -95,14 +95,10 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 
 	private static final EMFExtractor extractor = new EMFExtractor() ;
 
-	// Load the input file resource
 	private static final EMFModelFactory factory = new EMFModelFactory() ;
 	private static EMFReferenceModel aadlMetamodel ;
-	//  private static EMFReferenceModel aadlbaMetamodel ;
 	private static EMFReferenceModel aadliMetamodel ;
 	private static EMFReferenceModel ATLHookMetamodel ;
-
-	// private List<File> transformationFilepath ;
 
 	private static final String AADLBA_MM_URI =
 			fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage.eNS_URI ;
@@ -112,10 +108,7 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 			org.osate.aadl2.instance.InstancePackage.eNS_URI ;
 	private static final String ATLHOOKS_MM_URI = AtlHooksPackage.eNS_URI ;
 
-	/*
-	 * The parameters of the transformation: asm file, input and a-output path.
-	 */ 
-
+	
 	public static File getTransformationDirName()
 	{
 		return Aadl2AadlLauncher.resourcesDir ;
@@ -147,26 +140,26 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 			}
 
 	public Resource generationEntryPoint(Resource inputResource,
-			File resourceFilePath,
-			List<File> atlFiles,
-			File generatedFilePath) throws GenerationException
+			File resourceDir,
+			List<File> transformationFileList,
+			File outputDir) throws GenerationException
 			{
 		try {
 			if(!Platform.isRunning())
 			{
 				RamsesConfiguration.getPredefinedResourcesManager()
-				.setPredefinedResourcesDir(resourceFilePath);
+				.setPredefinedResourcesDir(resourceDir);
 
 			}
-			setPredefinedResourcesDirectory(resourceFilePath);
+			setPredefinedResourcesDirectory(resourceDir);
 			String aadlGeneratedFileName = inputResource.getURI().lastSegment();
 			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 					".aaxl2", "_extended.aadl2");
 
 			Resource expandedResult = this.doGeneration(inputResource,
-					atlFiles, aadlGeneratedFileName);
+					transformationFileList, aadlGeneratedFileName);
 
-			File outputModelDir =  new File(generatedFilePath.getAbsolutePath()+"/refined-models");
+			File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 			if(outputModelDir.exists()==false)
 				outputModelDir.mkdir();
 			InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
@@ -269,8 +262,8 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 			}
 
 	public Resource doGeneration(Resource inputResource,
-			List<File> transformationFileName,
-			String dataTargetfilepath)
+			List<File> transformationFileList,
+			String outputDirPathName)
 					throws FileNotFoundException, IOException, ATLCoreException, Exception
 					{
 
@@ -282,12 +275,12 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 		//this.transformationFilepath = transformationFileName ;
 
 
-		return doTransformation(transformationFileName, inputResource, dataTargetfilepath) ;
+		return doTransformation(transformationFileList, inputResource, outputDirPathName) ;
 
 					}
 
-	protected Resource doTransformation(List<File> transformationFilepath, Resource inputResource,
-			String dataTargetfilepath)
+	protected Resource doTransformation(List<File> transformationFileList, Resource inputResource,
+			String outputDirPathName)
 					throws FileNotFoundException, IOException, ATLCoreException
 					{
 		boolean workingWithInstances =
@@ -315,7 +308,7 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 
 
 		Resource outputResource =
-				rs.getResource(URI.createURI(dataTargetfilepath), false) ;
+				rs.getResource(URI.createURI(outputDirPathName), false) ;
 
 		injector.inject(targetModel, outputResource) ;
 		// create ATLHook
@@ -355,7 +348,7 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 
 			registerDefaultTransformations(atlModules, launcher);
 			
-			for(File f : transformationFilepath)
+			for(File f : transformationFileList)
 			{
 				URL asmSuperImposeFile = new URL("file:" + f.toString()) ;
 				Object loadedSuperImposeModule =
@@ -367,7 +360,7 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 		{
 			registerDefaultTransformations(atlModules, launcher);
 			URL asmSuperImposeFile =
-					new URL("file:" + transformationFilepath.get(0).toString()) ;
+					new URL("file:" + transformationFileList.get(0).toString()) ;
 			Object loadedSuperImposeModule =
 					launcher.loadModule(asmSuperImposeFile.openStream()) ;
 			atlModules.add(loadedSuperImposeModule) ;

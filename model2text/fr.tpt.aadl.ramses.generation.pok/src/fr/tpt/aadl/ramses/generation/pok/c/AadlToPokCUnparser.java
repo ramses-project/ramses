@@ -64,7 +64,6 @@ import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
-import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
@@ -89,14 +88,14 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   private ProcessorProperties _processorProp;
   
-  public void process(ProcessorSubcomponent processor,
-                      File generatedFilePath,
+  public void process(ProcessorSubcomponent processorSubcomponent,
+                      File outputDir,
                       TargetProperties tarProp) 
                                                      throws GenerationException
   { 
     ProcessorProperties processorProp = new ProcessorProperties() ;
     ComponentInstance processorInst = (ComponentInstance) HookAccessImpl.
-                                             getTransformationTrace(processor) ;
+                                             getTransformationTrace(processorSubcomponent) ;
     RoutingProperties routing = (RoutingProperties) tarProp ;
     
     // Discard older processor properties !
@@ -104,11 +103,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     // Generate deployment.h
     UnparseText deploymentHeaderCode = new UnparseText() ;
-    genDeploymentHeader(processor, deploymentHeaderCode, routing) ;
+    genDeploymentHeader(processorSubcomponent, deploymentHeaderCode, routing) ;
     
     // Generate deployment.c
     UnparseText deploymentImplCode = new UnparseText() ;
-    genDeploymentImpl(processor, deploymentImplCode, processorProp) ;
+    genDeploymentImpl(processorSubcomponent, deploymentImplCode, processorProp) ;
     
     // Generate routing.h
     UnparseText routingHeaderCode = new UnparseText() ;
@@ -120,15 +119,15 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     try
     {
-      FileUtils.saveFile(generatedFilePath, "deployment.h",
+      FileUtils.saveFile(outputDir, "deployment.h",
                deploymentHeaderCode.getParseOutput()) ;
       
-      FileUtils.saveFile(generatedFilePath, "deployment.c",
+      FileUtils.saveFile(outputDir, "deployment.c",
                deploymentImplCode.getParseOutput()) ;
       
-      FileUtils.saveFile(generatedFilePath, "routing.h", routingHeaderCode.getParseOutput()) ;
+      FileUtils.saveFile(outputDir, "routing.h", routingHeaderCode.getParseOutput()) ;
 
-      FileUtils.saveFile(generatedFilePath, "routing.c", routingImplCode.getParseOutput()) ;
+      FileUtils.saveFile(outputDir, "routing.c", routingImplCode.getParseOutput()) ;
     }
     catch(IOException e)
     {
@@ -137,7 +136,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-//TODO : be refactored with generic interfaces.
+  //TODO : be refactored with generic interfaces.
   private void blackBoardHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
 
@@ -167,50 +166,49 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private boolean isUsedInFresh(FeatureInstance fi) {
-	  Port p = (Port) fi.getFeature();
-	  ComponentInstance ci = (ComponentInstance) fi.eContainer();
-      BehaviorAnnex ba = getBa(fi);
-      if(ba!=null)
-      {
-    	  if(AadlBaVisitors.isFresh(ba, p))
-    		  return true;
-    	  for(ConnectionInstance cnxi : fi.getSrcConnectionInstances())
-    	  {
-    		  if(cnxi.getSource() instanceof FeatureInstance)
-    		  {
-    			  FeatureInstance f = (FeatureInstance) cnxi.getSource();
-    			  ba = getBa(f);
-    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-    				  return true;
-    		  }
-    		  if(cnxi.getDestination() instanceof FeatureInstance)
-    		  {
-    			  FeatureInstance f = (FeatureInstance) cnxi.getDestination();
-    			  ba = getBa(f);
-    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-    				  return true;
-    		  }
-    				  
-    	  }
-    	  for(ConnectionInstance cnxi : fi.getDstConnectionInstances())
-    	  {
-    		  if(cnxi.getSource() instanceof FeatureInstance)
-    		  {
-    			  FeatureInstance f = (FeatureInstance) cnxi.getSource();
-    			  ba = getBa(f);
-    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-    				  return true;
-    		  }
-    		  if(cnxi.getDestination() instanceof FeatureInstance)
-    		  {
-    			  FeatureInstance f = (FeatureInstance) cnxi.getDestination();
-    			  ba = getBa(f);
-    			  if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-    				  return true;
-    		  }
-    	  }
-      }
-      return false;
+  	Port p = (Port) fi.getFeature();
+  	BehaviorAnnex ba = getBa(fi);
+  	if(ba!=null)
+  	{
+  		if(AadlBaVisitors.isFresh(ba, p))
+  			return true;
+  		for(ConnectionInstance cnxi : fi.getSrcConnectionInstances())
+  		{
+  			if(cnxi.getSource() instanceof FeatureInstance)
+  			{
+  				FeatureInstance f = (FeatureInstance) cnxi.getSource();
+  				ba = getBa(f);
+  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+  					return true;
+  			}
+  			if(cnxi.getDestination() instanceof FeatureInstance)
+  			{
+  				FeatureInstance f = (FeatureInstance) cnxi.getDestination();
+  				ba = getBa(f);
+  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+  					return true;
+  			}
+
+  		}
+  		for(ConnectionInstance cnxi : fi.getDstConnectionInstances())
+  		{
+  			if(cnxi.getSource() instanceof FeatureInstance)
+  			{
+  				FeatureInstance f = (FeatureInstance) cnxi.getSource();
+  				ba = getBa(f);
+  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+  					return true;
+  			}
+  			if(cnxi.getDestination() instanceof FeatureInstance)
+  			{
+  				FeatureInstance f = (FeatureInstance) cnxi.getDestination();
+  				ba = getBa(f);
+  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
+  					return true;
+  			}
+  		}
+  	}
+  	return false;
 }
 
 private BehaviorAnnex getBa(FeatureInstance fi) {

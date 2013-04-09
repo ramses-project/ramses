@@ -34,12 +34,12 @@ import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 public interface Generator extends NamedPlugin
 {
   public void generate(SystemInstance instance,
-                       File resourceFilePath,
-                       File generatedFilePath) throws GenerationException ;
+                       File resourceDir,
+                       File outputDir) throws GenerationException ;
 
   public void generateWorkflow(SystemInstance instance,
-                               File resourceFilePath,
-                               File generatedFilePath,
+                               File resourceDir,
+                               File outputDir,
                                WorkflowPilot xmlPilot) throws GenerationException ;
 
   

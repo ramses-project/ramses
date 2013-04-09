@@ -38,7 +38,7 @@ import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
-import fr.tpt.aadl.ramses.control.support.generator.AadlToTargetSpecificAadl;
+import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
@@ -90,12 +90,12 @@ public class AadlTargetSpecificGenerator implements Generator
   }
 
   @Override
-  public void generate(SystemInstance instance,
+  public void generate(SystemInstance systemInstance,
                        File resourceFilePath,
                        File generatedFilePath)
                                                       throws GenerationException
   {
-    Resource inputResource = instance.eResource() ;
+    Resource inputResource = systemInstance.eResource() ;
     
     Resource r = _targetTrans.transform(inputResource, resourceFilePath,
                                         generatedFilePath);
@@ -104,14 +104,14 @@ public class AadlTargetSpecificGenerator implements Generator
   }
 
   @Override
-  public void generateWorkflow(SystemInstance instance,
-                          File resourceFilePath,
-                          File generatedFilePath,
+  public void generateWorkflow(SystemInstance systemInstance,
+                          File resourceDir,
+                          File generatedDir,
                           WorkflowPilot workflowPilot) throws GenerationException
   {
-    Resource r = instance.eResource() ;
-    SystemInstance currentInstance = instance;
-    String systemToInstantiate = instance.getSystemImplementation().getName();
+    Resource r = systemInstance.eResource() ;
+    SystemInstance currentInstance = systemInstance;
+    String systemToInstantiate = systemInstance.getSystemImplementation().getName();
 
     while(workflowPilot.hasNextOperation())
     {
@@ -169,8 +169,8 @@ public class AadlTargetSpecificGenerator implements Generator
         List<String> resourceFileNameList = workflowPilot.getNextTransformationFileNameList();
         System.out.println("Transformation launched : " + resourceFileNameList);
 
-        Resource result = _targetTrans.transformXML(r, resourceFilePath, resourceFileNameList, 
-                                                    generatedFilePath);
+        Resource result = _targetTrans.transformXML(r, resourceDir, resourceFileNameList, 
+                                                    generatedDir);
 
         InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
         PropertiesLinkingService pls = new PropertiesLinkingService ();
@@ -189,7 +189,7 @@ public class AadlTargetSpecificGenerator implements Generator
       else if(operation.equals("generation"))
       {
         System.out.println("Generation launched");
-        _codeGen.generate(r, generatedFilePath) ;
+        _codeGen.generate(r, generatedDir) ;
       }   
       else
       {
