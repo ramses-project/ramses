@@ -17,7 +17,8 @@ public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 			"targets/shared/DispatchCommonRefinementSteps.asm",
 			"targets/shared/DispatchHWCommonRefinementSteps.asm",
 			"targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
-			 "ExpandSubprogramCalls.asm", "CreateThreadsBehavior.asm" };
+			 "targets/shared/SubprogramCallsCommonRefinementSteps.asm",
+			 "CreateThreadsBehavior.asm" };
 		super.initAtlFileNameList(resourceFilePath);
 	}
 

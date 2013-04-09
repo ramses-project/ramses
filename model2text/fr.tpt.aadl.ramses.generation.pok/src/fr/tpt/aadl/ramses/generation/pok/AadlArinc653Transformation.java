@@ -52,7 +52,7 @@ public class AadlArinc653Transformation extends
 	  	   "targets/arinc653/QueuingCommunications.asm",
 	  	   "targets/arinc653/SamplingCommunications.asm",
 	  	   "targets/arinc653/ExpandThreadsDispatchProtocol.asm",
-	  	   "ExpandSubprogramCalls.asm"};
+	  	   "targets/arinc653/SubprogramCallsCommonRefinementSteps.asm"};
 		super.initAtlFileNameList(resourceFilePath);
 	}
 }
