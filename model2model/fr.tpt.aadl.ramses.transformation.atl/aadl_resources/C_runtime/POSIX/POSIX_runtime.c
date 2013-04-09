@@ -1,13 +1,7 @@
 #include <pthread.h>
 #include <sched.h>
 
-struct periodic_thread_info
-{
-	const unsigned int period;
-	int sig;
-	sigset_t alarm_sig;
-	int wakeups_missed;
-};
+#include "POSIX_runtime.h"
 
 pthread_t create_thread (unsigned int priority,
 						 unsigned int stack_size,
@@ -44,7 +38,7 @@ pthread_t create_thread (unsigned int priority,
 }
 
 
-static int make_periodic (struct periodic_info *info)
+int init_periodic_config (periodic_thread_config_t *info)
 {
 	static int next_sig;
 	int ret;
@@ -89,7 +83,7 @@ static int make_periodic (struct periodic_info *info)
 	return ret;
 }
 
-static void wait_period (struct periodic_info *info)
+void wait_next_period (periodic_thread_config_t *info)
 {
 	int sig;
 	sigwait (&(info->alarm_sig), &sig);
