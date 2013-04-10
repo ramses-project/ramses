@@ -46,13 +46,15 @@ public class AadlArinc653Transformation extends
   			 "targets/shared/PortsCommonRefinementSteps.asm",
   			 "targets/shared/DispatchCommonRefinementSteps.asm",
   			 "targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
+        "targets/shared/SubprogramCallsCommonRefinementSteps.asm",
 	  	   "targets/arinc653/BlackboardCommunications.asm",
 	  	   "targets/arinc653/BufferCommunications.asm",
 	  	   "targets/arinc653/EventsCommunications.asm",
 	  	   "targets/arinc653/QueuingCommunications.asm",
 	  	   "targets/arinc653/SamplingCommunications.asm",
-	  	   "targets/arinc653/ExpandThreadsDispatchProtocol.asm",
-	  	   "targets/arinc653/SubprogramCallsCommonRefinementSteps.asm"};
+	  	   "targets/arinc653/ExpandThreadsDispatchProtocol.asm"
+        };
+	  	   
 		super.initAtlFileNameList(resourceFilePath);
 	}
 }
