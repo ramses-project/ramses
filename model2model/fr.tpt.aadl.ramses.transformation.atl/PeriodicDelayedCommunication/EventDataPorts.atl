@@ -70,7 +70,25 @@ rule concatToString(list: Sequence(Integer))
 -- TODO: rule for out port ==> add to expandThreadDispatchProtocol in rules for input and output data port
 
 helper def : Put_Value_Name     : String = 'Put_Value';
+helper def : Send_Output_Name   : String = 'Send_Output';
 helper def : Receive_Input_Name : String = 'Receive_Input';
+helper def : Next_Value_Name    : String = 'Next_Value';
+
+rule addPutValueSubprogramCall(seq : AADLBA!SubprogramCallSequence,
+								impl : AADLBA!ComponentImplementation,
+								implImg : AADLBA!ComponentImplementation,
+								fi: AADLI!FeatureInstance)
+{
+	
+}
+
+rule addNextValueSubprogramCall(seq : AADLBA!SubprogramCallSequence,
+								impl : AADLBA!ComponentImplementation,
+								implImg : AADLBA!ComponentImplementation,
+								fi: AADLI!FeatureInstance)
+{
+	
+}
 
 rule createCDWTable (cnxInst:AADLI!ConnectionInstance, 
 					 putValueCall: AADLBA!SubprogramCall)
@@ -82,6 +100,7 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 		port: AADLI!FeatureInstance = cnxInst.source;
 		CurrentDeadlineWriteTable: Sequence(Integer) = thisModule.getCurrentDeadlineWriteTable(producerPort, cnxInst.destination);
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Array_Prototype : AADLBA!DataClassifier = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 	}
 	to
 		-----------------------
@@ -126,14 +145,18 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 													'DATA_MODEL',
 													CDWInit
 												)
-									   }
+									   },
+			ownedExtension <- indexArrayDataTypeExtension
+		),
+		indexArrayDataTypeExtension: AADLBA!TypeExtension
+		(
+			extended <- Array_Prototype
 		),
 		CurrentDeadlineWrite:AADLBA!DataSubcomponent
 		(
 			name<-producerPort.eContainer().name+'_'+producerPort.name+'_CDWTable',
 			dataSubcomponentType <- indexArrayDataType
-		),
-		
+		),		
 		--- CDW parameter
 		CDWParam: AADLBA!Parameter
 		(
@@ -141,7 +164,6 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'CDW'),
 			dataFeatureClassifier <- indexArrayDataType
 		),
-		
 		--- connect CDWTable
 		connected_CDWTable_Param: AADLBA!ConnectedElement
 		(
@@ -171,13 +193,16 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 	}
 }
 
-rule intraProcess_PeriodicDelayed_PortConnection_Instance
+rule PortConnection_Instance
 {
 	from
 		cnxInst: AADLI!ConnectionInstance
 		(
-			cnxInst.destination.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED DESTINATION') and
-			cnxInst.source.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED SOURCE')
+			--cnxInst.destination.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED DESTINATION') and
+			--cnxInst.source.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED SOURCE')
+			cnxInst.destination.debug('PortConnection_Instance').isDelayedPort()
+			and cnxInst.source.eContainer().category = #thread
+			and cnxInst.destination.eContainer().category = #thread
 		)
 	using
 	{
@@ -192,6 +217,7 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 		port: AADLI!FeatureInstance = cnxInst.source;
 		ArrayDataType: AADLBA!SubprogramType = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Send_Output_Spg: AADLBA!SubprogramType = thisModule.Send_Output_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath()); 
 	}
 	to
@@ -258,7 +284,7 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 			name <- Put_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath()),
 			ownedExtension <- extendedPutValueSpg,
 			ownedPrototypeBinding <- Sequence{putValueOutputPrototypeBinding},
-			ownedParameter <- Sequence{}, -- CDWParam
+			ownedParameter <- Sequence{putValueValueParam}, -- CDWParam
 			ownedDataAccess <- Sequence{BufferAccess}
 		),
 		putValueCall: AADLBA!SubprogramCall
@@ -276,6 +302,16 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 			actual <- Sequence{putValueOutputActual}
 		),
 		
+		--- FIXME: fix for osate connection 
+		--- resolution warning ('XXX is missing a classifier' when prototype binding is used)
+		putValueValueParam: AADLBA!Parameter
+		(
+			name <- 'value',
+			direction <- 'in',
+			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'value'),
+			dataFeatureClassifier <-  port.feature.dataFeatureClassifier
+		),
+		
 		BufferAccess: AADLBA!DataAccess
 		(
 			name <- 'buffer',
@@ -283,7 +319,6 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayType'),
 			kind<-#requires
 		),
-		
 		
 		--- connect CDWSize
 		connected_CDWSize_Param: AADLBA!ConnectedElement
@@ -352,6 +387,45 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 			accessCategory<-#data,
 			source<-connected_Buffer_PutValueAccess,
 			destination<-connected_Buffer_ThreadAccess
+		),
+		
+		-----------------------
+		--- Send_Output
+		-----------------------
+		sendOutputCall: AADLBA!SubprogramCall
+		(
+			name <- thisModule.callPrefix() + Send_Output_Spg.name,
+			calledSubprogram<-Send_Output_Spg
+		),
+		
+		--- connect CDWSize
+		connected_CDWSize_Param_SendOutput: AADLBA!ConnectedElement
+		(
+			connectionEnd<-Send_Output_Spg.ownedParameter->any(e|e.name='CDWSize'),
+			context<-sendOutputCall
+		),
+		connected_CDWSize_Data_SendOutput: AADLBA!ConnectedElement
+		(
+			connectionEnd<-CDWSize
+		),
+		paramCDWSizeConnectionSendOutput: AADLBA!ParameterConnection
+		(
+			name<-port.name+'_to_CDWSize_Send',
+			source<-connected_CDWSize_Param_SendOutput,
+			destination<-connected_CDWSize_Data_SendOutput
+		),
+		--- connect IterationCounter
+		connected_IterationCounter_Param_SendOutput: AADLBA!ConnectedElement
+		(
+			connectionEnd<-Send_Output_Spg.ownedParameter->any(e|e.name = 'iteration_counter'),
+			context<-sendOutputCall
+		),
+		connected_IterationCounter_Data_SendOutput: AADLBA!ConnectedElement,
+		paramIterationCounterConnectionSendOutput: AADLBA!ParameterConnection
+		(
+			name<-port.name+'_to_IterationCounter_Send',
+			source<-connected_IterationCounter_Param_SendOutput,
+			destination<-connected_IterationCounter_Data_SendOutput
 		)
 		
 		
@@ -372,10 +446,14 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 		srcThreadImg.ownedParameterConnection.add(paramIterationCounterConnection);
 		srcThreadImg.ownedParameterConnection.add(paramCDWSizeConnection);
 		srcThreadImg.ownedParameterConnection.add(paramValueConnectionPutValue);
+		srcThreadImg.ownedParameterConnection.add(paramIterationCounterConnectionSendOutput);
+		srcThreadImg.ownedParameterConnection.add(paramCDWSizeConnectionSendOutput);
 		srcThreadImg.ownedAccessConnection.add(accessBufferConnectionNextValue);
 		
 		connected_IterationCounter_Data.connectionEnd<-thisModule.createIterationCounter(srcThreadImg);
+		connected_IterationCounter_Data_SendOutput.connectionEnd<-connected_IterationCounter_Data.connectionEnd;
 		thisModule.addSubprogramCall(port.feature, srcThreadImg, putValueCall);
+		thisModule.addSubprogramCall(port.feature, srcThreadImg, sendOutputCall);
 		
 		-- populate process
 		processImg.ownedAccessConnection.add(accessBufferConnection);
@@ -488,13 +566,15 @@ rule createCPRTable (port: AADLI!FeatureInstance,
 	}
 }
 
-rule In_PeriodicDelayed_EventDataPort_Instance
+rule EventDataPort_Instance
 {
 	from
 		port: AADLI!FeatureInstance
 		(
-			port.direction.toString()='in' and
-			port.isPeriodicDelayedPort()
+			--port.direction.toString()='in' and
+			--port.isPeriodicDelayedPort()
+			port.debug('EventDataPort_Instance').direction.toString()='in' 
+			and port.isDelayedPort().debug('EventDataPort_Instance')
 		)
 	using
 	{
@@ -510,8 +590,10 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 		BufferSize: Integer = thisModule.getBufferSize(port);
 		ArrayDataType: AADLBA!SubprogramType = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = thisModule.Receive_Input_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
-		Next_Value_PrototypeSpg: AADLBA!SubprogramType = 'Next_Value'.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Next_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Next_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath());
+		
+		Array_Prototype : AADLBA!DataClassifier = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 	}
 	to
 		-----------------------
@@ -545,7 +627,12 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 													thisModule.CreateListValueFromInteger(
 														CurrentPerionReadTable->size().longValue())
 												)
-									   }
+									   },
+			ownedExtension <- indexArrayDataTypeExtension
+		),
+		indexArrayDataTypeExtension: AADLBA!TypeExtension
+		(
+			extended <- Array_Prototype
 		),
 		bufferSubcomponent:AADLBA!DataSubcomponent
 		(
@@ -802,8 +889,19 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 			name <- Next_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath()),
 			ownedExtension <- extendedNextValueSpg,
 			ownedPrototypeBinding <- Sequence{nextValueOutputPrototypeBinding},
-			ownedDataAccess <- Sequence{BufferAccess}
+			ownedDataAccess <- Sequence{BufferAccess, nextValueValueParam}
 		),
+		
+		--- FIXME: fix for osate connection 
+		--- resolution warning ('XXX is missing a classifier' when prototype binding is used)
+		nextValueValueParam: AADLBA!DataAccess
+		(
+			name <- 'output',
+			kind <- #requires,
+			refined <- Next_Value_PrototypeSpg.ownedDataAccess->any(d|d.name = 'output'),
+			dataFeatureClassifier <- port.feature.dataFeatureClassifier
+		),
+		
 		nextValueCall: AADLBA!SubprogramCall
 		(
 			name<-thisModule.callPrefix()+nextValueSpg.name,

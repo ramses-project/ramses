@@ -33,7 +33,9 @@ uses PropertiesTools;
 uses Services;
 
 helper def : Put_Value_Name     : String = 'Put_Value_LowFP';
+helper def : Send_Output_Name   : String = 'Send_Output';
 helper def : Receive_Input_Name : String = 'Receive_Input_LowFP';
+helper def : Next_Value_Name     : String = 'Next_Value';
 helper def : Component_Instance_Type_Name : String = 'component_instance_t.impl';
 helper def : Component_Instance_Array_Type_Name: String = 'ComponentInstanceArrayDataType';
 helper def : Periodic_Delayed_Context_Type_Name : String = 'periodic_delayed_context_t';
@@ -44,13 +46,16 @@ helper def: getHyperperiod(destinationPort: AADLI!FeatureInstance) : Integer =
 ;
 
 
-rule intraProcess_PeriodicDelayed_PortConnection_Instance
+rule PortConnection_Instance
 {
 	from
 		cnxInst: AADLI!ConnectionInstance
 		(
-			cnxInst.destination.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED DESTINATION') and
-			cnxInst.source.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED SOURCE')
+			--cnxInst.destination.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED DESTINATION') and
+			--cnxInst.source.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED SOURCE')
+			cnxInst.destination.debug('PortConnection_Instance').isDelayedPort()
+			and cnxInst.source.eContainer().category = #thread
+			and cnxInst.destination.eContainer().category = #thread
 		)
 	using
 	{
@@ -65,6 +70,7 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
 		ArrayDataType: AADLBA!SubprogramType = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Send_Output_Spg: AADLBA!SubprogramType = thisModule.Send_Output_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		Periodic_Delayed_Context_Prototype: AADLBA!DataImplementation = thisModule.Periodic_Delayed_Context_Impl_Name.asDataType('PERIODICDELAYED_RUNTIME'); 
 		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath());
 	}
@@ -238,6 +244,44 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 			accessCategory<-#data,
 			source<-connected_Buffer_PutValueAccess,
 			destination<-connected_Buffer_ThreadAccess
+		),
+		-----------------------
+		--- Send_Output
+		-----------------------
+		sendOutputCall: AADLBA!SubprogramCall
+		(
+			name <- thisModule.callPrefix() + Send_Output_Spg.name,
+			calledSubprogram<-Send_Output_Spg
+		),
+		
+		--- connect CDWSize
+		connected_CDWSize_Param_SendOutput: AADLBA!ConnectedElement
+		(
+			connectionEnd<-Send_Output_Spg.ownedParameter->any(e|e.name='CDWSize'),
+			context<-sendOutputCall
+		),
+		connected_CDWSize_Data_SendOutput: AADLBA!ConnectedElement
+		(
+			connectionEnd<-CDWSize
+		),
+		paramCDWSizeConnectionSendOutput: AADLBA!ParameterConnection
+		(
+			name<-port.name+'_to_CDWSize_Send',
+			source<-connected_CDWSize_Param_SendOutput,
+			destination<-connected_CDWSize_Data_SendOutput
+		),
+		--- connect IterationCounter
+		connected_IterationCounter_Param_SendOutput: AADLBA!ConnectedElement
+		(
+			connectionEnd<-Send_Output_Spg.ownedParameter->any(e|e.name = 'iteration_counter'),
+			context<-sendOutputCall
+		),
+		connected_IterationCounter_Data_SendOutput: AADLBA!ConnectedElement,
+		paramIterationCounterConnectionSendOutput: AADLBA!ParameterConnection
+		(
+			name<-port.name+'_to_IterationCounter_Send',
+			source<-connected_IterationCounter_Param_SendOutput,
+			destination<-connected_IterationCounter_Data_SendOutput
 		)
 		
 	do
@@ -259,10 +303,14 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 		srcThreadImg.ownedParameterConnection.add(paramIterationCounterConnection);
 		srcThreadImg.ownedParameterConnection.add(paramCDWSizeConnection);
 		srcThreadImg.ownedParameterConnection.add(paramValueConnectionPutValue);
+		srcThreadImg.ownedParameterConnection.add(paramIterationCounterConnectionSendOutput);
+		srcThreadImg.ownedParameterConnection.add(paramCDWSizeConnectionSendOutput);
 		srcThreadImg.ownedAccessConnection.add(accessBufferConnectionNextValue);
 		
 		connected_IterationCounter_Data.connectionEnd<-thisModule.createIterationCounter(srcThreadImg);
+		connected_IterationCounter_Data_SendOutput.connectionEnd<-connected_IterationCounter_Data.connectionEnd;
 		thisModule.addSubprogramCall(port.feature, srcThreadImg, putValueCall);
+		thisModule.addSubprogramCall(port.feature, srcThreadImg, sendOutputCall);
 		
 		-- populate process
 		processImg.ownedAccessConnection.add(accessBufferConnection);
@@ -281,13 +329,15 @@ rule intraProcess_PeriodicDelayed_PortConnection_Instance
 	}
 }
 
-rule In_PeriodicDelayed_EventDataPort_Instance
+rule EventDataPort_Instance
 {
 	from
 		port: AADLI!FeatureInstance
 		(
-			port.direction.toString()='in' and
-			port.isPeriodicDelayedPort()
+			--port.direction.toString()='in' and
+			--port.isPeriodicDelayedPort()
+			port.debug('EventDataPort_Instance').direction.toString()='in' 
+			and port.isDelayedPort().debug('EventDataPort_Instance')
 		)
 	using
 	{
@@ -303,7 +353,7 @@ rule In_PeriodicDelayed_EventDataPort_Instance
 		BufferSize: Integer = thisModule.getBufferSize(port);
 		ArrayDataType: AADLBA!SubprogramType = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = thisModule.Receive_Input_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
-		Next_Value_PrototypeSpg: AADLBA!SubprogramType = 'Next_Value'.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Next_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Next_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		Component_Instance_Type: AADLBA!DataImplementation = thisModule.Component_Instance_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
 		Component_Instance_Array_Type: AADLBA!DataType = thisModule.Component_Instance_Array_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
 		Periodic_Delayed_Context_Prototype_Type: AADLBA!DataType = thisModule.Periodic_Delayed_Context_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
@@ -911,7 +961,6 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 		Periodic_Delayed_Context_Impl: AADLBA!DataImplementation = thisModule.resolveTemp(consumerPort, 'Periodic_Delayed_Context_Impl');
 		-- context data subcomponent
 		contextSubcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(consumerPort, 'contextSubcomponent');
-	
 		
 		-- POUR AJOUT taskID
 		thrdID: AADLBA!DataSubcomponent = thisModule.createThreadID(port.eContainer());
@@ -929,8 +978,9 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 		-------------------------------------------------------
 		connected_periodic_Delayed_ParameterForPutValue: AADLBA!ConnectedElement
 		(
-			connectionEnd<-putValueCall.calledSubprogram.ownedExtension.extended.ownedDataAccess->any(e|e.name='periodic_delayed_context'),
-			context<-putValueCall
+			connectionEnd<-putValueCall.calledSubprogram.ownedExtension.extended.ownedDataAccess
+						->any(e|e.name='periodic_delayed_context').debug('Put_Value_periodic_delayed_context.connectionEnd'),
+			context<-putValueCall.debug('Put_Value_periodic_delayed_context.context')
 		),
 		
 		connected_periodic_Delayed_ContextAccessForPutValue: AADLBA!ConnectedElement
@@ -959,7 +1009,7 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 		
 		connected_periodic_Delayed_ContextData: AADLBA!ConnectedElement
 		(
-			connectionEnd<-contextSubcomponent
+			connectionEnd<-contextSubcomponent.debug('connected_periodic_Delayed_ContextData')
 		),
 		
 		access_Periodic_Delayed_ContextConnection: AADLBA!AccessConnection
@@ -988,6 +1038,8 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 		srcThreadImg<-cnxInst.source.eContainer().getSubcomponentImg().classifier;
 		processImg<-cnxInst.source.eContainer().eContainer().getSubcomponentImg().classifier;
 
+		connected_periodic_Delayed_ContextData.connectionEnd <- 
+			thisModule.resolveTemp(consumerPort, 'contextSubcomponent').debug('test');
 		
 		-- Add require data access to Periodic_Delayed_Context in Writer Threads
 		srcThreadImg.type.ownedDataAccess.add(periodic_Delayed_ContextAccess);

@@ -79,11 +79,11 @@ helper context AADLI!ComponentInstance def : getImgSubcomponent(name : String) :
 			->any(s|s.name=name)
 ;
 
-helper context AADLBA!ThreadSubcomponent def : getSubcomponent(name : String) :
-	AADLBA!Subcomponent = self.threadSubcomponentType.getSubcomponent(name)
+helper context AADLBA!Subcomponent def : getSubcomponent(name : String) :
+	AADLBA!Subcomponent = self.getComponentImplementation().getSubcomponent(name)
 ;
 
-helper context AADLBA!ThreadImplementation def : getSubcomponent(name : String) :
+helper context AADLBA!ComponentImplementation def : getSubcomponent(name : String) :
 	AADLBA!Subcomponent = self.getOwnedSubcomponents()->any(s|s.name=name)
 ;
 
@@ -227,7 +227,21 @@ rule EventDataPort_Instance
 			ownedRealization <- thisModule.Realization(bufferQueueType,bufferQueueImpl),
 			ownedExtension <- bufferQueueImplExtension,
 			ownedPrototypeBinding <- Sequence {bufferQueueImplPrototypeBinding},
-			ownedDataSubcomponent <- Sequence {bufferQueueImplValuesSub}
+			ownedDataSubcomponent <- Sequence {bufferQueueImplValuesSub},
+			ownedPropertyAssociation <- Sequence {
+				thisModule.CreatePropertyAssociationAppliesTo(
+							'Initial_Value',
+							'DATA_MODEL',
+							thisModule.CreateListValueFromString(port.getQueueSize().longValue().toString()),
+							bufferQueueSizeAppliesTo
+						)
+			}
+		),
+		bufferQueueSizeAppliesTo: AADLBA!ContainedNamedElement (
+			containmentPathElement <- Sequence{bufferQueueSizePE}
+		),
+		bufferQueueSizePE : AADLBA!ContainmentPathElement (
+			namedElement <- Queue_Prototype_Impl.getSubcomponent('Size')
 		),
 		bufferQueueImplExtension: AADLBA!ImplementationExtension
 		(
@@ -285,38 +299,36 @@ rule EventDataPort_Instance
 			calledSubprogram <- thisModule.Receive_Input_Mapper(port),
 			name <- receiveInputCall.calledSubprogram.name + '_' + port.name
 		),
-		receiveInputPeriodAccessConnection: AADLBA!AccessConnection
+		receiveInputPeriodParameterConnection: AADLBA!ParameterConnection
 		(
 			name <- 'cnx_Receive_Input_Period_' + bufferSubcomponent.name,
-			accessCategory <- #data,
-			source <- receiveInputPeriodAccessConnection_Source,
-			destination <- receiveInputPeriodAccessConnection_Destination
+			source <- receiveInputPeriodParameterConnection_Source,
+			destination <- receiveInputPeriodParameterConnection_Destination
 		),
-		receiveInputPeriodAccessConnection_Source: AADLBA!ConnectedElement
+		receiveInputPeriodParameterConnection_Source: AADLBA!ConnectedElement
 		(
 			connectionEnd <- OclUndefined
 		),
-		receiveInputPeriodAccessConnection_Destination: AADLBA!ConnectedElement
+		receiveInputPeriodParameterConnection_Destination: AADLBA!ConnectedElement
 		(
 			context <- receiveInputCall,
-			connectionEnd <- Receive_Input_PrototypeSpg.ownedDataAccess
+			connectionEnd <- Receive_Input_PrototypeSpg.ownedParameter
 								->any(a|a.name='Period')
 		),
-		receiveInputCurrentPeriodAccessConnection: AADLBA!AccessConnection
+		receiveInputCurrentPeriodParameterConnection: AADLBA!ParameterConnection
 		(
 			name <- 'cnx_Receive_Input_CurrentPeriod_' + bufferSubcomponent.name,
-			accessCategory <- #data,
-			source <- receiveInputCurrentPeriodAccessConnection_Source,
-			destination <- receiveInputCurrentPeriodAccessConnection_Destination
+			source <- receiveInputCurrentPeriodParameterConnection_Source,
+			destination <- receiveInputCurrentPeriodParameterConnection_Destination
 		),
-		receiveInputCurrentPeriodAccessConnection_Source: AADLBA!ConnectedElement
+		receiveInputCurrentPeriodParameterConnection_Source: AADLBA!ConnectedElement
 		(
 			connectionEnd <- OclUndefined
 		),
-		receiveInputCurrentPeriodAccessConnection_Destination: AADLBA!ConnectedElement
+		receiveInputCurrentPeriodParameterConnection_Destination: AADLBA!ConnectedElement
 		(
 			context <- receiveInputCall,
-			connectionEnd <- Receive_Input_PrototypeSpg.ownedDataAccess
+			connectionEnd <- Receive_Input_PrototypeSpg.ownedParameter
 								->any(a|a.name='CurrentPeriod')
 		),
 		receiveInputFirstAccessConnection: AADLBA!ParameterConnection
@@ -408,20 +420,20 @@ rule EventDataPort_Instance
 		dstThreadImg.type.ownedDataAccess.add(bufferAccess);
 		dstThreadImg.ownedDataSubcomponent.add(firstSubcomponent);
 		
-		dstThreadImg.ownedAccessConnection.add(receiveInputPeriodAccessConnection);
-		dstThreadImg.ownedAccessConnection.add(receiveInputCurrentPeriodAccessConnection);
 		dstThreadImg.ownedAccessConnection.add(receiveInputBufferAccessConnection);
 		dstThreadImg.ownedAccessConnection.add(nextValueBufferAccessConnection);
+		dstThreadImg.ownedParameterConnection.add(receiveInputPeriodParameterConnection);
+		dstThreadImg.ownedParameterConnection.add(receiveInputCurrentPeriodParameterConnection);
 		dstThreadImg.ownedParameterConnection.add(nextValueFirstParameterConnection);
 		dstThreadImg.ownedParameterConnection.add(receiveInputFirstAccessConnection);
 		
 		bufferConnection_Dest.context 
 			<- port.eContainer().getSubcomponentImg().debug('bufferConnection_Dest.context');
 		
-		receiveInputPeriodAccessConnection_Source.connectionEnd
+		receiveInputPeriodParameterConnection_Source.connectionEnd
 			<- dstThreadImg.ownedDataSubcomponent->any(d|d.name='Period');
 		
-		receiveInputCurrentPeriodAccessConnection_Source.connectionEnd
+		receiveInputCurrentPeriodParameterConnection_Source.connectionEnd
 			<- dstThreadImg.ownedDataSubcomponent->any(d|d.name='CurrentPeriod');
 		
 		thisModule.addSubprogramCall(port.feature, dstThreadImg, nextValueCall);
@@ -549,37 +561,35 @@ rule PortConnection_Instance
 			context <- putValueCall,
 			connectionEnd <- Put_Value_PrototypeSpg.ownedDataAccess->any(a|a.name='PortVariable')
 		),
-		putValueMsgPriorityAccessConnection: AADLBA!AccessConnection 
+		putValueMsgPriorityParameterConnection: AADLBA!ParameterConnection 
 		(
 			name <- 'cnx_Put_Value_' + portSimpleName +'_Priority',
-			accessCategory <- #data,
-			source <- putValueMsgPriorityAccessConnection_Source,
-			destination <- putValueMsgPriorityAccessConnection_Destination
+			source <- putValueMsgPriorityParameterConnection_Source,
+			destination <- putValueMsgPriorityParameterConnection_Destination
 		),
-		putValueMsgPriorityAccessConnection_Source: AADLBA!ConnectedElement
+		putValueMsgPriorityParameterConnection_Source: AADLBA!ConnectedElement
 		(
 			connectionEnd <- port.eContainer().getImgSubcomponent('MsgPriority')
 		),
-		putValueMsgPriorityAccessConnection_Destination : AADLBA!ConnectedElement
+		putValueMsgPriorityParameterConnection_Destination : AADLBA!ConnectedElement
 		(
 			context <- putValueCall,
-			connectionEnd <- Put_Value_PrototypeSpg.ownedDataAccess->any(a|a.name='Priority')
+			connectionEnd <- Put_Value_PrototypeSpg.ownedParameter->any(a|a.name='Priority')
 		),
-		putValueCurrentDeadlineAccessConnection: AADLBA!AccessConnection 
+		putValueCurrentDeadlineParameterConnection: AADLBA!ParameterConnection 
 		(
 			name <- 'cnx_Put_Value_' + portSimpleName +'_CurrentDeadline',
-			accessCategory <- #data,
-			source <- putValueCurrentDeadlineAccessConnection_Source,
-			destination <- putValueCurrentDeadlineAccessConnection_Destination
+			source <- putValueCurrentDeadlineParameterConnection_Source,
+			destination <- putValueCurrentDeadlineParameterConnection_Destination
 		),
-		putValueCurrentDeadlineAccessConnection_Source: AADLBA!ConnectedElement
+		putValueCurrentDeadlineParameterConnection_Source: AADLBA!ConnectedElement
 		(
 			connectionEnd <- port.eContainer().getImgSubcomponent('CurrentDeadline')
 		),
-		putValueCurrentDeadlineAccessConnection_Destination : AADLBA!ConnectedElement
+		putValueCurrentDeadlineParameterConnection_Destination : AADLBA!ConnectedElement
 		(
 			context <- putValueCall,
-			connectionEnd <- Put_Value_PrototypeSpg.ownedDataAccess->any(a|a.name='CurrentDeadline')
+			connectionEnd <- Put_Value_PrototypeSpg.ownedParameter->any(a|a.name='CurrentDeadline')
 		),
 		sendOutputCall: AADLBA!SubprogramCall
 		(
@@ -618,9 +628,10 @@ rule PortConnection_Instance
 		thisModule.JobParametersToPortDataValue(cnxInst,dstThreadImg,portDataAccess);
 		dstThreadImg.ownedAccessConnection.add(putValueDataAccessConnection);
 		dstThreadImg.ownedAccessConnection.add(putValueBufferAccessConnection);
-		dstThreadImg.ownedAccessConnection.add(putValueMsgPriorityAccessConnection);
-		dstThreadImg.ownedAccessConnection.add(putValueCurrentDeadlineAccessConnection);
 		dstThreadImg.ownedAccessConnection.add(sendOutputBufferConnection);
+		
+		dstThreadImg.ownedParameterConnection.add(putValueCurrentDeadlineParameterConnection);
+		dstThreadImg.ownedParameterConnection.add(putValueMsgPriorityParameterConnection);
 		
 		dstThreadImg.type.ownedDataAccess.add(bufferAccess);
 		dstThreadImg.type.ownedDataAccess.add(portDataAccess);
@@ -997,9 +1008,8 @@ rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation)
 			name <- 'Compute_Deadline',
 			calledSubprogram <- Compute_Deadline
 		),
-		computeDeadlineCallPeriod : AADLBA!AccessConnection (
+		computeDeadlineCallPeriod : AADLBA!ParameterConnection (
 			name <- 'cnx_Compute_Deadline_Period',
-			accessCategory <- #data,
 			source <- computeDeadlineCallPeriod_Source,
 			destination <- computeDeadlineCallPeriod_Destination
 		),
@@ -1008,12 +1018,11 @@ rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation)
 		),
 		computeDeadlineCallPeriod_Destination : AADLBA!ConnectedElement (
 			context <- computeDeadlineCall,
-			connectionEnd <- Compute_Deadline.ownedDataAccess
+			connectionEnd <- Compute_Deadline.ownedParameter
 								->any(a|a.name='Period')
 		),
-		computeDeadlineCallDeadline : AADLBA!AccessConnection (
+		computeDeadlineCallDeadline : AADLBA!ParameterConnection (
 			name <- 'cnx_Compute_Deadline_Deadline',
-			accessCategory <- #data,
 			source <- computeDeadlineCallDeadline_Source,
 			destination <- computeDeadlineCallDeadline_Destination
 		),
@@ -1022,12 +1031,11 @@ rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation)
 		),
 		computeDeadlineCallDeadline_Destination : AADLBA!ConnectedElement (
 			context <- computeDeadlineCall,
-			connectionEnd <- Compute_Deadline.ownedDataAccess
+			connectionEnd <- Compute_Deadline.ownedParameter
 								->any(a|a.name='Deadline')
 		),
-		computeDeadlineCallCurrentPeriod : AADLBA!AccessConnection (
+		computeDeadlineCallCurrentPeriod : AADLBA!ParameterConnection (
 			name <- 'cnx_Compute_Deadline_CurrentPeriod',
-			accessCategory <- #data,
 			source <- computeDeadlineCallCurrentPeriod_Source,
 			destination <- computeDeadlineCallCurrentPeriod_Destination
 		),
@@ -1036,12 +1044,11 @@ rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation)
 		),
 		computeDeadlineCallCurrentPeriod_Destination : AADLBA!ConnectedElement (
 			context <- computeDeadlineCall,
-			connectionEnd <- Compute_Deadline.ownedDataAccess
+			connectionEnd <- Compute_Deadline.ownedParameter
 								->any(a|a.name='CurrentPeriod')
 		),
-		computeDeadlineCallCurrentDeadline : AADLBA!AccessConnection (
+		computeDeadlineCallCurrentDeadline : AADLBA!ParameterConnection (
 			name <- 'cnx_Compute_Deadline_CurrentDeadline',
-			accessCategory <- #data,
 			source <- computeDeadlineCallCurrentDeadline_Source,
 			destination <- computeDeadlineCallCurrentDeadline_Destination
 		),
@@ -1050,7 +1057,7 @@ rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation)
 		),
 		computeDeadlineCallCurrentDeadline_Destination : AADLBA!ConnectedElement (
 			context <- computeDeadlineCall,
-			connectionEnd <- Compute_Deadline.ownedDataAccess
+			connectionEnd <- Compute_Deadline.ownedParameter
 								->any(a|a.name='CurrentDeadline')
 		)
 	do
@@ -1062,10 +1069,10 @@ rule threadImplementationPostTreatment(implImg: AADLBA!ThreadImplementation)
 		implImg.ownedDataSubcomponent.add(currentDeadlineSub);
 		
 		thisModule.addSubprogramCall(OclUndefined, implImg, computeDeadlineCall);
-		implImg.ownedAccessConnection.add(computeDeadlineCallPeriod);
-		implImg.ownedAccessConnection.add(computeDeadlineCallDeadline);
-		implImg.ownedAccessConnection.add(computeDeadlineCallCurrentPeriod);
-		implImg.ownedAccessConnection.add(computeDeadlineCallCurrentDeadline);
+		implImg.ownedParameterConnection.add(computeDeadlineCallPeriod);
+		implImg.ownedParameterConnection.add(computeDeadlineCallDeadline);
+		implImg.ownedParameterConnection.add(computeDeadlineCallCurrentPeriod);
+		implImg.ownedParameterConnection.add(computeDeadlineCallCurrentDeadline);
 		
 		implImg.getType().ownedEventDataPort.debug('test');
 	}

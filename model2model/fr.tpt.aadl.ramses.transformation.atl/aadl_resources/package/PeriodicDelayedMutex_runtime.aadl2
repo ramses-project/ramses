@@ -142,8 +142,8 @@ prototypes
 features
   PortVariable    : requires data access t_aadl_thread_data_queue.impl; 
   DataValue       : requires data access t_request;
-  CurrentDeadline : requires data access Base_Types::Integer_16;
-  Priority        : requires data access Base_Types::Integer_16;
+  CurrentDeadline : in parameter Base_Types::Integer_16;
+  Priority        : in parameter Base_Types::Integer_16;
 annex behavior_specification {**
   variables
     CurrentLink   : t_aadl_linkedlist_link_ptr.impl;
@@ -217,8 +217,8 @@ subprogram Receive_Input
 prototypes
   t_request: data;
 features
-  Period : requires data access Base_Types::Integer_16;
-  CurrentPeriod : requires data access Base_Types::Integer_16;
+  Period : in parameter Base_Types::Integer_16;
+  CurrentPeriod : in parameter Base_Types::Integer_16;
   PortVariable : requires data access t_aadl_thread_data_queue.impl;
   First : in out parameter t_aadl_linkedlist_link_ptr.impl;
 annex behavior_specification {**
@@ -291,7 +291,7 @@ features
   PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
   DataValue: out parameter t_request; -- Reference to value being retrieved
   First : in out parameter t_aadl_linkedlist_link_ptr.impl;
-  CurrentPeriod : requires data access Base_Types::Integer_16; 
+  CurrentPeriod : in parameter Base_Types::Integer_16; 
 annex behavior_specification {**
   variables
     Next : t_aadl_linkedlist_link_ptr.impl;
@@ -327,10 +327,10 @@ end Send_Output;
 
 subprogram Compute_Deadline
 features 
-  Period          : requires data access Base_Types::Integer_16;
-  Deadline        : requires data access Base_Types::Integer_16;
-  CurrentPeriod   : requires data access Base_Types::Integer_16;
-  CurrentDeadline : requires data access Base_Types::Integer_16;
+  Period          : in out parameter Base_Types::Integer_16;
+  Deadline        : in out parameter Base_Types::Integer_16;
+  CurrentPeriod   : in out parameter Base_Types::Integer_16;
+  CurrentDeadline : in out parameter Base_Types::Integer_16;
 annex behavior_specification {**
   states
     s : initial final state;
