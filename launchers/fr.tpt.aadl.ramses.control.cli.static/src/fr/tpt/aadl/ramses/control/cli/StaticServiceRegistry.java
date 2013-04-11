@@ -27,22 +27,22 @@ import java.util.Map;
 import java.util.Set;
 
 import org.osate.annexsupport.AnnexParser;
-import org.osate.annexsupport.AnnexUnparser;
 import org.osate.annexsupport.AnnexResolver;
+import org.osate.annexsupport.AnnexUnparser;
 
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.annex.behavior.AadlBaResolver;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
-import fr.tpt.aadl.launch.WCETAnalysis;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory;
-import fr.tpt.aadl.ramses.generation.pokTT.PokTTGeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.pokTT.PokTTGeneratorFactory;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis;
 
 public class StaticServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {
@@ -68,7 +68,7 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _unparsers.put(AadlBaUnParserAction.ANNEX_NAME, new AadlBaUnParserAction()) ;
     _unparsers.put(AadlBaToCUnparserAction.ANNEX_NAME,
                    new AadlBaToCUnparserAction()) ;
-    _analyzers.put(WCETAnalysis.ANALYZER_NAME, new WCETAnalysis()) ;
+    _analyzers.put(WcetAnalysis.ANALYZER_NAME, new WcetAnalysis());
     
     AbstractGeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
     AbstractGeneratorFactory pokTTGeneratorFactory = new PokTTGeneratorFactory();

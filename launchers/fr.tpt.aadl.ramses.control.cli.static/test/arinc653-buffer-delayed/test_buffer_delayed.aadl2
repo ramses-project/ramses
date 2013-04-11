@@ -22,6 +22,10 @@
 package test_buffer_delayed
 public
 
+with Base_Types;
+with Data_Model;
+with POK;
+
   system root
   end root;
 
@@ -113,7 +117,11 @@ public
 
   thread receiver
   features
-    p: in event data port Integer { Timing => Delayed; };
+    p: in event data port Integer 
+    { 
+    	Timing => Delayed;
+    	Queue_Size => 5; 
+    };
   properties
     Dispatch_Protocol => Periodic;
     Compute_Execution_Time => 0 ms .. 1 ms;
