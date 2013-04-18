@@ -227,7 +227,6 @@ rule EventDataPort_Instance
 			ownedRealization <- thisModule.Realization(bufferQueueType,bufferQueueImpl),
 			ownedExtension <- bufferQueueImplExtension,
 			ownedPrototypeBinding <- Sequence {bufferQueueImplPrototypeBinding},
-			ownedDataSubcomponent <- Sequence {bufferQueueImplValuesSub},
 			ownedPropertyAssociation <- Sequence {
 				thisModule.CreatePropertyAssociationAppliesTo(
 							'Initial_Value',
@@ -255,12 +254,6 @@ rule EventDataPort_Instance
 		bufferQueueImplPrototypeActual : AADLBA!ComponentPrototypeActual
 		(
 			category <-  #data
-		),
-		bufferQueueImplValuesSub: AADLBA!DataSubcomponent 
-		(
-			name <- 'Values',
-			dataSubcomponentType <- bufferArrayType,
-			refined <- Queue_Prototype_Impl.ownedDataSubcomponent->any(d|d.name='Values')
 		),
 		bufferSubcomponent:AADLBA!DataSubcomponent
 		(
@@ -936,7 +929,8 @@ unique lazy rule Queue_Element_Type_Ptr
 		dataImplPtr : AADLBA!DataImplementation 
 		(
 			name <- dataClassifier.name.concat('_Link_Ptr.impl'),
-			ownedExtension <- extendedPointerImpl
+			ownedExtension <- extendedPointerImpl,
+			ownedPrototypeBinding <- Sequence{pointerTypePrototypeBinding}
 		),
 	    dataTypePtr : AADLBA!DataType 
 		(
