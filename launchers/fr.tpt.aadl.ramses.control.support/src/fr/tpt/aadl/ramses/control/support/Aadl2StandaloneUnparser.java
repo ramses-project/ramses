@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright ï¿½ 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -241,6 +241,9 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
 
         processOptionalSection(object.getOwnedPrototypes(), "prototypes",
                                AadlConstants.emptyString) ;
+        
+        processOptionalEList(object.getOwnedPrototypeBindings(), ",") ;
+        
         processOptionalSection(object.getOwnedSubcomponents(), "subcomponents",
                                AadlConstants.emptyString) ;
 
