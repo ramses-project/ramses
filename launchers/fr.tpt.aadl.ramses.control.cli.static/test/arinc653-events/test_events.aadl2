@@ -116,7 +116,7 @@ with POK, Data_Model;
     source_name => "receive";
     source_language => (C);
     source_text => ("../../../user_code.h");
-    POK::source_location => "../../../user_code.o";
+    POK::source_location => ("../../../user_code.o");
   end receiver_spg;
 
   data Integer

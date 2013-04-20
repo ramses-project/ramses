@@ -292,7 +292,7 @@ end SEQ;
     properties
       source_name => "mode";
       source_language => (C);
-      POK::source_location => "../../../pingpong.o";
+      POK::source_location => ("../../../pingpong.o");
       source_text => ("../../../pingpong.h");
     annex behavior_specification {**
 		variables 
@@ -328,7 +328,7 @@ end SEQ;
     properties
      source_name => "storePong";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end IPingOrPong_storePong;
   
@@ -342,7 +342,7 @@ end SEQ;
     properties
      source_name => "ping";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end IPingOrPong_ping;
   
@@ -352,7 +352,7 @@ end SEQ;
     properties
      source_name => "noPong";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end IPingOrPong_noPong;
   
@@ -363,7 +363,7 @@ end SEQ;
     properties
      source_name => "pong";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end IPingOrPong_pong;
   
@@ -375,7 +375,7 @@ end SEQ;
     properties
      source_name => "noPing";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end IPingOrPong_noPing;
   
@@ -388,7 +388,7 @@ end SEQ;
     properties
      source_name => "noPingPong";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end IPingOrPong_noPingPong;
   
@@ -399,7 +399,7 @@ end SEQ;
     properties
      source_name => "storeError";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end Monitor_storeErrorC1;
 
@@ -413,7 +413,7 @@ end SEQ;
     properties
       source_name => "activate";
       source_language => (C);
-      POK::source_location => "../../../pingpong.o";
+      POK::source_location => ("../../../pingpong.o");
       source_text => ("../../../pingpong.h");
     annex behavior_specification {**
 		variables 
@@ -440,7 +440,7 @@ end SEQ;
     properties
      source_name => "storeError";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end Monitor_storeErrorC2;
   
@@ -455,7 +455,7 @@ end SEQ;
     properties
      source_name => "changeState";
      source_language => (C);
-     POK::source_location => "../../../pingpong.o";
+     POK::source_location => ("../../../pingpong.o");
      source_text => ("../../../pingpong.h");
   end Monitor_changeState;
 end PingPong;

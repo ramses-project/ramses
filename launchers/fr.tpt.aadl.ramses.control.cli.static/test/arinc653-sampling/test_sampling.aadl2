@@ -132,7 +132,7 @@ public
     source_name => "send";
     source_language => (C);
     source_text => ("../../../user_send.h");
-    POK::source_location => "../../../user_send.o";
+    POK::source_location => ("../../../user_send.o");
   end sender_spg;
 
   thread receiver
@@ -162,7 +162,7 @@ public
     source_name => "receive";
     source_language => (C);
     source_text => ("../../../user_receive.h");
-    POK::source_location => "../../../user_receive.o";
+    POK::source_location => ("../../../user_receive.o");
   end receiver_spg;
 
   data Integer
