@@ -12,7 +12,6 @@ import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
-import org.osate.ui.dialogs.Dialog;
 
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody;
@@ -56,7 +55,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 	protected void analyzeDeclarativeModel(IProgressMonitor monitor,
 			AnalysisErrorReporterManager errManager, Element declarativeObject) 
 	{
-		Dialog.showError("WCET Computation Error", "Please select an instance model");
+		//Dialog.showError("WCET Computation Error", "Please select an instance model");
 	}
 
 	@Override
