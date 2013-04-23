@@ -73,6 +73,7 @@ import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PrototypeBinding;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
+import org.osate.aadl2.SubcomponentType;
 import org.osate.aadl2.SubprogramAccess;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramCallSequence;
@@ -140,6 +141,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   // are defined in the process implementation via connections.
   private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
   
+  /**
+   * Stack of subprogram classifiers currently uunparsed.
+   * Used to resolve prototype dependencies between subprogram calls.
+   */
+  private List<SubprogramClassifier> subprogramsUnparsingStack = new ArrayList<SubprogramClassifier>();
+  
   public static AadlToCUnparser getAadlToCUnparser()
   {
     if(singleton==null)
@@ -184,6 +191,27 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     
     _additionalHeaders = new HashMap<AadlToCSwitchProcess, Set<String>>() ;
     
+  }
+  
+  public List<PrototypeBinding> getCurrentPrototypeBindings(String ctxt)
+  {
+	  System.out.println("Inherited prototype bindings for " + ctxt);
+	  
+	  List<PrototypeBinding> bindings = new ArrayList<PrototypeBinding>();
+	  for(SubprogramClassifier c: subprogramsUnparsingStack)
+	  {
+		  System.out.println("  prototype bindings from " + c.getName());
+		  List<PrototypeBinding> cBindings = c.getOwnedPrototypeBindings();
+		  for(PrototypeBinding b : cBindings)
+		  {
+			  ComponentPrototypeBinding cpb = (ComponentPrototypeBinding) b;
+			  SubcomponentType st = cpb.getActuals().get(0).getSubcomponentType();
+			  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
+		  }
+		  
+		  bindings.addAll(cBindings);
+	  }
+	  return bindings;
   }
   
   public void saveGeneratedFilesContent(File targetDirectory)
@@ -465,6 +493,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       _additionalHeaders.get(headerUnparser)
             .addAll(baToCUnparser.getAdditionalHeaders()) ;
       baToCUnparser.getAdditionalHeaders().clear();
+    }
+    
+    if (owner instanceof SubprogramType)
+    {
+    	subprogramsUnparsingStack.remove(subprogramsUnparsingStack.size()-1);
     }
 
     return DONE ;
@@ -1236,8 +1269,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseSubprogramClassifier(SubprogramClassifier object)
       {
-        
-      	Parameter returnParameter = null;
+    	subprogramsUnparsingStack.add(object);
+    	  
+        Parameter returnParameter = null;
         List<Feature> orderedFeatureList = null;
         if(object instanceof SubprogramImplementation)
         {

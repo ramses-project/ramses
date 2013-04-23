@@ -37,22 +37,19 @@ import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
-import org.osate.aadl2.ComponentClassifier;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.Data;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
-import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.ParameterConnectionEnd;
+import org.osate.aadl2.PrototypeBinding;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.modelsupport.AadlConstants;
 import org.osate.aadl2.modelsupport.UnparseText;
+
 import fr.tpt.aadl.annex.behavior.aadlba.Any;
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
@@ -1030,19 +1027,23 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           SubprogramSubcomponentType sct =
                 (SubprogramSubcomponentType) object.getSubprogram().getElement() ;
 
+          AadlToCUnparser aadlCUnparser = AadlToCUnparser.getAadlToCUnparser(); 
+          
           if(sct instanceof SubprogramType)
           {
             st = (SubprogramType) sct ;
-            AadlToCUnparser.getAadlToCUnparser().delayedUnparsing.add(st);
+            aadlCUnparser.delayedUnparsing.add(st);
           }
           else
           {
             SubprogramImplementation si = (SubprogramImplementation) sct ;
-            AadlToCUnparser.getAadlToCUnparser().delayedUnparsing.add(si);
+            aadlCUnparser.delayedUnparsing.add(si);
             st = si.getType() ;
           }
 
-          List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st) ;
+          List<PrototypeBinding> currentBindings = aadlCUnparser.getCurrentPrototypeBindings(
+        		  object.getSubprogram().getElement().getName());
+          List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st, currentBindings) ;
 
           for(ParameterLabel pl : object.getParameterLabels())
           {
