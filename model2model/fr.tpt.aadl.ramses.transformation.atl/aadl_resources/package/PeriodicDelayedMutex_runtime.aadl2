@@ -62,11 +62,6 @@ properties
   Data_Model::Base_Type => (classifier(t_aadl_linkedlist_link.impl));
 end t_aadl_thread_data_queue_content;
 
--- data implementation t_aadl_thread_data_queue_content.impl
--- prototypes
---   t_request: data;
--- end t_aadl_thread_data_queue_content.impl;
-
 data t_aadl_thread_data_queue
 properties
   Data_Model::Data_Representation => Struct;
@@ -82,16 +77,6 @@ subcomponents
   First: data t_aadl_linkedlist_link_ptr.impl;
   Free: data t_aadl_linkedlist_link_ptr.impl;
 end t_aadl_thread_data_queue.impl;
-
--- data implementation t_aadl_thread_data_queue.impl
--- prototypes
---   t_request: data;
--- subcomponents
---   Size: data Base_Types::Integer;
---   UsedSize: data Base_Types::Integer;
---   First: data t_aadl_linkedlist_link_ptr.impl;
---   Free: data t_aadl_linkedlist_link_ptr.impl;
--- end t_aadl_thread_data_queue.impl;
 
 subprogram Init_LinkedList
 features
@@ -245,9 +230,12 @@ annex behavior_specification {**
         while ((CurrentLink.Timestamp <= LastPeriod)
                and (i < PortVariable.Size))
         {
-           Next := CurrentLink.Next;
-           Remove_Link! (CurrentLink, PortVariable);
-           CurrentLink := Next;
+           --Next := CurrentLink.Next;
+           --Remove_Link! (CurrentLink, PortVariable);
+           --CurrentLink := Next;
+           
+           CurrentLink.Consumed := TRUE;
+           CurrentLink := CurrentLink.Next;
            i := i + 1
         };
         First := CurrentLink
@@ -300,20 +288,17 @@ annex behavior_specification {**
   transitions
     t: s -[]-> s
     {
-      Get_Resource! (PortVariable);
-      
       Next := First.Next;
       
       if ((Next.Timestamp <= CurrentPeriod) and (Next.Consumed=FALSE))
       {
         DataValue := Next.DataPtr;
-        Remove_Link! (First, PortVariable);
+        --Remove_Link! (First, PortVariable);
+        First.Consumed := TRUE;
         First := Next;
         PortVariable.UsedSize := PortVariable.UsedSize - 1
       }
       end if; -- else DataValue is unchanged (use previous value)
-      
-      Release_Resource! (PortVariable)
     };
 **};
 end Next_Value;
