@@ -440,6 +440,7 @@ rule PortConnection_Instance
 		-- populate thread
 		srcThreadImg.type.ownedDataAccess.add(bufferAccessThread);
 		srcThreadImg.ownedDataSubcomponent.add(thisModule.createIterationCounter(srcThreadImg));
+		thisModule.JobParametersToPortDataValue(cnxInst,srcThreadImg,value);
 		
 		srcThreadImg.ownedDataSubcomponent.add(CDWSize);
 		srcThreadImg.ownedDataSubcomponent.add(value);
@@ -1069,6 +1070,7 @@ rule EventDataPort_Instance
 		
 		-- populate package
 		-- add Next_Value_<p> to the package
+		thisModule.NextValueToJobParameters(port,dstThreadImg, currentValueAccess);
 		thisModule.public().ownedClassifier.add(nextValueSpg);
 		thisModule.public().ownedClassifier.add(receiveInputSpg);
 		thisModule.public().ownedClassifier.add(bufferArrayType);
@@ -1109,4 +1111,127 @@ unique lazy rule createIterationCounter
 	{
 		IterationCounter;
 	}
+}
+
+-- duplicated from EventDataPorts_Mutex.atl
+helper context AADLBA!ThreadImplementation def : getCall(name: String) : AADLBA!SubprogramCall =
+	self.getOwnedSubprogramCallSequences()
+	     ->first().ownedCallSpecification->any(call|call.name=name)
+;
+
+-- duplicated from EventDataPorts_Mutex.atl
+helper context AADLI!FeatureInstance def : getAllInternalConnections() : Sequence(AADLI!Connection) =
+	if (self.direction = #out) then
+		self.eContainer().subcomponent.classifier.getOwnedConnections()
+			->select(c|c.destination.connectionEnd.name=self.feature.name)
+	else
+		self.eContainer().subcomponent.classifier.getOwnedConnections()
+			->select(c|c.source.connectionEnd.name=self.feature.name)
+	endif
+;
+
+-- duplicated from EventDataPorts_Mutex.atl
+rule NextValueToJobParameters (port : AADLI!FeatureInstance,
+						 	  dstThreadImg : AADLBA!ThreadImplementation,
+							  currentValue: AADLBA!DataSubcomponent)
+{
+	do
+	{
+		port.debug('NextValueToJobParameters.port');
+		dstThreadImg.debug('NextValueToJobParameters.dstThreadImg');
+		currentValue.debug('NextValueToJobParameters.currentValueAccess');
+		for(co in port.getAllInternalConnections())
+		{
+			dstThreadImg.ownedParameterConnection.add(
+				thisModule.NextValueToJobParameter(
+					co, dstThreadImg, currentValue)
+			);
+		}
+	}
+}
+
+-- duplicated from EventDataPorts_Mutex.atl
+rule NextValueToJobParameter         (co : AADLI!Connection, -- parameter connected to the port
+									 dstThreadImg : AADLBA!ThreadImplementation, -- output thread impl,
+									 currentValue: AADLBA!DataSubcomponent)
+{
+	using
+	{
+		callName  : String = co.destination.context.name;
+		call    : AADLBA!SubprogramCall =  dstThreadImg.getCall(callName);
+	}
+	to
+		conn: AADLBA!ParameterConnection
+		(
+			name <- 'cnx_' + currentValue.name + '_to_' 
+			         + callName + '_' + co.destination.connectionEnd.name,
+			source <- conn_source,
+			destination <- conn_dest
+		),
+		conn_source : AADLBA!ConnectedElement
+		(
+			connectionEnd <- currentValue
+								.debug('NextValueToJobParameter.source.connectionEnd')
+		),
+		conn_dest : AADLBA!ConnectedElement
+		(
+			context <- call,
+			connectionEnd <- call.calledSubprogram.ownedParameter
+			        ->any(p|p.name=co.destination.connectionEnd.name)
+					.debug('NextValueToJobParameter.destination.connectionEnd')
+		)
+	do 
+	{ 
+		call.debug('NextValueToJobParameter.call');
+		conn;
+	}
+	
+}
+
+-- duplicated from EventDataPorts_Mutex.atl
+rule JobParametersToPortDataValue (cnxInst : AADLI!ConnectionInstance,
+								   dstThreadImg : AADLBA!ThreadImplementation,
+								   portDataSubcomponent : AADLBA!DataSubcomponent)
+{
+	do
+	{
+		for(co in cnxInst.source.getAllInternalConnections())
+		{
+			dstThreadImg.ownedParameterConnection.add(
+				thisModule.JobParameterToPortDataValue(
+					co, dstThreadImg, portDataSubcomponent)
+			);
+		}
+	}
+}
+
+-- duplicated from EventDataPorts_Mutex.atl
+rule JobParameterToPortDataValue    (co : AADLI!Connection,
+									 dstThreadImg : AADLBA!ThreadImplementation,
+									 portDataSubcomponent : AADLBA!DataSubcomponent)
+{
+	using
+	{
+		callName  : String = co.source.context.name;
+		call    : AADLBA!SubprogramCall =  dstThreadImg.getCall(callName);
+	}
+	to
+		conn_source : AADLBA!ConnectedElement 
+		(
+			context <- call,
+			connectionEnd <- call.calledSubprogram.ownedParameter
+		           ->any(p|p.name=co.source.connectionEnd.name)
+		),
+		conn_dest : AADLBA!ConnectedElement
+		(
+			connectionEnd <- portDataSubcomponent
+		),
+		conn: AADLBA!ParameterConnection 
+		(
+			name <- 'cnx_' + callName + '_' + conn_source.connectionEnd.name 
+			               + '_to_' + portDataSubcomponent.name,
+			source <- conn_source,
+			destination <- conn_dest
+		)
+	do { conn; }
 }
