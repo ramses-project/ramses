@@ -298,7 +298,7 @@ annex behavior_specification {**
         First := Next;
         PortVariable.UsedSize := PortVariable.UsedSize - 1
       }
-      end if; -- else DataValue is unchanged (use previous value)
+      end if -- else DataValue is unchanged (use previous value)
     };
 **};
 end Next_Value;
