@@ -143,7 +143,7 @@ with Base_Types, Data_Model, Generation_Properties;
       CPR : out parameter Base_Types::Integer_16;
     properties
       Source_Name => "Compute_CPR";
-      --Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end Compute_CPR;
   
   subprogram Compute_PPR
@@ -155,7 +155,7 @@ with Base_Types, Data_Model, Generation_Properties;
       periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
     properties
       Source_Name => "Compute_PPR";
-      --Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end Compute_PPR;
   
   subprogram Compute_CDW
@@ -170,7 +170,7 @@ with Base_Types, Data_Model, Generation_Properties;
       CDW : out parameter Base_Types::Integer_16;
     properties
       Source_Name => "Compute_CDW";
-      --Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end Compute_CDW;
 
   subprogram Receive_Input_LowFP
