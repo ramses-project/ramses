@@ -182,6 +182,8 @@ rule createCDWTable (cnxInst:AADLI!ConnectionInstance,
 		)
 	do
 	{
+		CurrentDeadlineWrite.debug('createCDWTable');
+		
 		srcThreadImg<-cnxInst.source.eContainer().getSubcomponentImg().classifier;
 		
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().setInDirection(CDWParam);
@@ -556,6 +558,7 @@ rule createCPRTable (port: AADLI!FeatureInstance,
 		)
 	do
 	{
+		CurrentPeriodReadTable.debug('createCPRTable');
 		dstThreadImg<-port.eContainer().getSubcomponentImg().classifier;
 		
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().setInDirection(CPRParam);
@@ -750,27 +753,27 @@ rule EventDataPort_Instance
 		
 		
 		--- Current Value
-		currentValueAccess:AADLBA!DataAccess(
-			name <- port.name+'_currentValueAccess',
-			dataFeatureClassifier <- port.feature.dataFeatureClassifier,
-			kind<-#requires
-		),
-		connected_CurrentValue_Access: AADLBA!ConnectedElement
-		(
-			connectionEnd<-currentValueAccess,
-			context<-port.eContainer().getSubcomponentImg()
-		),
-		connected_CurrentValue_Data: AADLBA!ConnectedElement
-		(
-			connectionEnd<-currentValue
-		),
-		accessCurrentValueConnection: AADLBA!AccessConnection
-		(
-			name<-portAbsoluteName+'_to_currentValue',
-			accessCategory<-#data,
-			source<-connected_CurrentValue_Access,
-			destination<-connected_CurrentValue_Data
-		),
+--		currentValueAccess:AADLBA!DataAccess(
+--			name <- port.name+'_currentValueAccess',
+--			dataFeatureClassifier <- port.feature.dataFeatureClassifier,
+--			kind<-#requires
+--		),
+--		connected_CurrentValue_Access: AADLBA!ConnectedElement
+--		(
+--			connectionEnd<-currentValueAccess,
+--			context<-port.eContainer().getSubcomponentImg()
+--		),
+--		connected_CurrentValue_Data: AADLBA!ConnectedElement
+--		(
+--			connectionEnd<-currentValue
+--		),
+--		accessCurrentValueConnection: AADLBA!AccessConnection
+--		(
+--			name<-portAbsoluteName+'_to_currentValue',
+--			accessCategory<-#data,
+--			source<-connected_CurrentValue_Access,
+--			destination<-connected_CurrentValue_Data
+--		),
 		
 		-----------------------
 		--- Receive_Input
@@ -935,7 +938,8 @@ rule EventDataPort_Instance
 		),
 		connected_CurrentValue_ThreadAccess: AADLBA!ConnectedElement
 		(
-			connectionEnd<-currentValueAccess
+			--connectionEnd<-currentValueAccess
+			connectionEnd<-currentValue
 		),
 		accessOutputConnectionNextValue: AADLBA!AccessConnection
 		(
@@ -1030,7 +1034,7 @@ rule EventDataPort_Instance
 		
 		--populate thread
 		dstThreadImg.type.ownedDataAccess.add(bufferAccessThread);
-		dstThreadImg.type.ownedDataAccess.add(currentValueAccess);
+		--dstThreadImg.type.ownedDataAccess.add(currentValueAccess);
 		
 		dstThreadImg.ownedDataSubcomponent.add(CPRSize);
 		--dstThreadImg.ownedDataSubcomponent.add(thisModule.createIterationCounter(dstThreadImg));
@@ -1039,6 +1043,7 @@ rule EventDataPort_Instance
 		dstThreadImg.ownedDataSubcomponent.add(bufferSizeSubcomponent);
 		dstThreadImg.ownedDataSubcomponent.add(lastIndex);
 		dstThreadImg.ownedDataSubcomponent.add(readIndex);
+		dstThreadImg.ownedDataSubcomponent.add(currentValue);
 		
 		connected_IterationCounter_Data.connectionEnd<-IterationCounter;
 		
@@ -1064,13 +1069,12 @@ rule EventDataPort_Instance
 		
 		-- populate process
 		processImg.ownedDataSubcomponent.add(bufferSubcomponent);
-		processImg.ownedDataSubcomponent.add(currentValue);
 		processImg.ownedAccessConnection.add(accessBufferConnection);
-		processImg.ownedAccessConnection.add(accessCurrentValueConnection);
+		--processImg.ownedAccessConnection.add(accessCurrentValueConnection);
 		
 		-- populate package
 		-- add Next_Value_<p> to the package
-		thisModule.NextValueToJobParameters(port,dstThreadImg, currentValueAccess);
+		thisModule.NextValueToJobParameters(port,dstThreadImg, currentValue);
 		thisModule.public().ownedClassifier.add(nextValueSpg);
 		thisModule.public().ownedClassifier.add(receiveInputSpg);
 		thisModule.public().ownedClassifier.add(bufferArrayType);
@@ -1079,6 +1083,7 @@ rule EventDataPort_Instance
 		thisModule.addImportedUnit(thisModule.public(), 'PERIODICDELAYED_RUNTIME', 'PeriodicDelayed_runtime');
 		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
 		
+		thisModule.createCPRTable(port, receiveInputCall);
 	}
 		
 }
