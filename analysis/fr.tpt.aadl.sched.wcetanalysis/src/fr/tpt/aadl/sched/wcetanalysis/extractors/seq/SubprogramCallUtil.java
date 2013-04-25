@@ -54,7 +54,7 @@ public class SubprogramCallUtil {
 			{
 				ConnectedElement ceSrc = (ConnectedElement) c.getSource();
 				ConnectionEnd ce = ceSrc.getConnectionEnd();
-				Context srcCtxt = ceSrc.getContext();
+//				Context srcCtxt = ceSrc.getContext();
 				
 				String neName = ((NamedElement) ce).getName();
 				

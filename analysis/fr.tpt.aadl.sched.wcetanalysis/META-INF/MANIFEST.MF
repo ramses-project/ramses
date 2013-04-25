@@ -1,9 +1,10 @@
 Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
 Bundle-Name: WCET Analysis
-Bundle-SymbolicName: fr.tpt.aadl.sched.wcetanalysis;singleton=true
+Bundle-SymbolicName: fr.tpt.aadl.sched.wcetanalysis;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Vendor: TELECOM Paristech
-Provide-Package: fr.tpt.aadl.sched.wcetanalysis,
+Export-Package: fr.tpt.aadl.sched.wcetanalysis,
  fr.tpt.aadl.sched.wcetanalysis.extractors,
  fr.tpt.aadl.sched.wcetanalysis.extractors.ba,
  fr.tpt.aadl.sched.wcetanalysis.extractors.seq,
@@ -13,17 +14,10 @@ Require-Bundle: org.eclipse.emf.common,
  org.eclipse.core.runtime;bundle-version="3.6.0",
  org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.modelsupport;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
+ fr.tpt.aadl.utils;bundle-version="0.9.5",
  fr.tpt.aadl.annex.behavior;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
- fr.tpt.aadl.utils
-Export-Package: fr.tpt.aadl.sched.wcetanalysis,
- fr.tpt.aadl.sched.wcetanalysis.extractors,
- fr.tpt.aadl.sched.wcetanalysis.extractors.ba,
- fr.tpt.aadl.sched.wcetanalysis.extractors.seq,
- fr.tpt.aadl.sched.wcetanalysis.util
+ fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-Activator: fr.tpt.aadl.sched.wcetanalysis.Activator
 Bundle-ClassPath: resources/lib/jgrapht-jdk1.6.jar,
  .

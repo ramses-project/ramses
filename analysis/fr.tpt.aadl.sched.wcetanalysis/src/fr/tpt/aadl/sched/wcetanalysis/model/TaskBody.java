@@ -124,7 +124,6 @@ public class TaskBody
     priority = computePriority() ;
   }
 
-  @SuppressWarnings("restriction")
   private int computePriority()
   {
     try

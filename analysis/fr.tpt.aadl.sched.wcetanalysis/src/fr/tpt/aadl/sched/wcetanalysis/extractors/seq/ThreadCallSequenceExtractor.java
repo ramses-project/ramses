@@ -11,7 +11,6 @@ import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody;
 import fr.tpt.aadl.utils.PropertyUtils;
 
-@SuppressWarnings("restriction")
 public class ThreadCallSequenceExtractor extends CallSequenceExtractor
 {
 	public ThreadCallSequenceExtractor(ExtractionContext ctxt)

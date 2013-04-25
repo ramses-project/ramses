@@ -36,7 +36,6 @@ import fr.tpt.aadl.sched.wcetanalysis.util.Aadl2ASTUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator;
 import fr.tpt.aadl.utils.PropertyUtils;
 
-@SuppressWarnings("restriction")
 public class AssignmentActionUtil
 {
 	private ComponentInstance taskInstance = null;

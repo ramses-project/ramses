@@ -1,45 +1,36 @@
 package fr.tpt.aadl.sched.wcetanalysis.extractors.ba.util;
 
-import java.util.List;
+import java.util.List ;
 
-import org.osate.aadl2.BehavioredImplementation;
-import org.osate.aadl2.ConnectedElement;
-import org.osate.aadl2.Connection;
-import org.osate.aadl2.ConnectionEnd;
-import org.osate.aadl2.Context;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.SubprogramCall;
-import org.osate.aadl2.SubprogramCallSequence;
-import org.osate.aadl2.SubprogramType;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.ConnectionInstanceEnd;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.instance.ComponentInstance ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorIntegerLiteral;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariableHolder;
-import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator;
-import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
-import fr.tpt.aadl.annex.behavior.aadlba.DataHolder;
-import fr.tpt.aadl.annex.behavior.aadlba.Factor;
-import fr.tpt.aadl.annex.behavior.aadlba.LogicalOperator;
-import fr.tpt.aadl.annex.behavior.aadlba.Relation;
-import fr.tpt.aadl.annex.behavior.aadlba.RelationalOperator;
-import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression;
-import fr.tpt.aadl.annex.behavior.aadlba.Target;
-import fr.tpt.aadl.annex.behavior.aadlba.Term;
-import fr.tpt.aadl.annex.behavior.aadlba.Value;
-import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression;
-import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement;
-import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
-import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
-import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
-import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
-import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator;
-import fr.tpt.aadl.utils.PropertyUtils;
+import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorIntegerLiteral ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable ;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariableHolder ;
+import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator ;
+import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference ;
+import fr.tpt.aadl.annex.behavior.aadlba.DataHolder ;
+import fr.tpt.aadl.annex.behavior.aadlba.Factor ;
+import fr.tpt.aadl.annex.behavior.aadlba.LogicalOperator ;
+import fr.tpt.aadl.annex.behavior.aadlba.Relation ;
+import fr.tpt.aadl.annex.behavior.aadlba.RelationalOperator ;
+import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression ;
+import fr.tpt.aadl.annex.behavior.aadlba.Target ;
+import fr.tpt.aadl.annex.behavior.aadlba.Term ;
+import fr.tpt.aadl.annex.behavior.aadlba.Value ;
+import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression ;
+import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement ;
+import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext ;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug ;
+import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode ;
+import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind ;
+import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator ;
+import fr.tpt.aadl.utils.PropertyUtils ;
+
 
 public class WhileLoopUtil
 {	
@@ -181,7 +172,6 @@ public class WhileLoopUtil
 	{
 		try
 		{
-			@SuppressWarnings("restriction")
 			List<String> values = PropertyUtils.getStringListValue(data, "Initial_Value");
 			if (values!=null && values.size()>0)
 			{

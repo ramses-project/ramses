@@ -115,7 +115,9 @@ public class SubprogramCallSequenceExtractor extends CallSequenceExtractor
 			if (eCall instanceof SubprogramCall)
 			{
 				SubprogramCall call = (SubprogramCall) eCall;
+				/* DEBUG
 				Subprogram called = (Subprogram) call.getCalledSubprogram();
+				
 				SubprogramClassifier cl = null;
 
 				if (called instanceof SubprogramClassifier)
@@ -127,7 +129,7 @@ public class SubprogramCallSequenceExtractor extends CallSequenceExtractor
 					cl = (SubprogramClassifier) ((SubprogramSubcomponent) called)
 							.getClassifier();
 				}
-
+        */
 				lastAction = ctxt.subprogramExtractor.caseSubprogramCall(
 						call, lastAction);
 				final float assignTime = computeParametersAssignmentTime(
