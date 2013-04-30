@@ -20,6 +20,14 @@
     <sourceDirectory>src</sourceDirectory>
     <finalName>ramses</finalName>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
       <plugin>  
         <groupId>org.apache.maven.plugins</groupId>  
         <artifactId>maven-assembly-plugin</artifactId>  
@@ -40,6 +48,9 @@
 	      <Class-Path>lib/org.eclipse.emf.common_2.7.0.v20120127-1122.jar</Class-Path>
 	    </manifestEntries> -->
           </archive>
+          <source>1.6</source>
+          <target>1.6</target>
+          <compilerArgument></compilerArgument>
         </configuration>  
         <executions>
           <execution>  
