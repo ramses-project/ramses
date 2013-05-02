@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -56,7 +57,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.eclipse.m2m.atl.core.ATLCoreException;
 import org.eclipse.m2m.atl.core.emf.EMFExtractor;
-import org.eclipse.m2m.atl.core.emf.EMFInjector;
 import org.eclipse.m2m.atl.core.emf.EMFModel;
 import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
 import org.eclipse.m2m.atl.core.emf.EMFReferenceModel;
@@ -78,6 +78,7 @@ import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
 import org.osate.annexsupport.AnnexParser;
 import org.osate.annexsupport.AnnexResolver;
 
+import antlr.RecognitionException;
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
@@ -140,6 +141,135 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 			}
 
 	public Resource generationEntryPoint(Resource inputResource,
+			File resourceDir,
+			List<File> transformationFileList,
+			File outputDir) throws GenerationException
+			{
+		try {
+			if(!Platform.isRunning())
+			{
+				RamsesConfiguration.getPredefinedResourcesManager()
+				.setPredefinedResourcesDir(resourceDir);
+
+			}
+			setPredefinedResourcesDirectory(resourceDir);
+			String aadlGeneratedFileName = inputResource.getURI().lastSegment();
+			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
+					".aaxl2", "_extended.aadl2");
+
+			Resource expandedResult = this.doGeneration(inputResource,
+					transformationFileList, aadlGeneratedFileName);
+
+			File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
+			if(outputModelDir.exists()==false)
+				outputModelDir.mkdir();
+			InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+			String outputFilePath=outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName;
+			File outputFile = new File(outputFilePath);
+
+			instantiator.serialize(expandedResult, outputFilePath);
+
+			return extractXtextResource(inputResource, outputFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new GenerationException(e.getMessage());
+		}
+	}
+
+	public static Resource extractXtextResource(Resource inputResource,
+			File outputFile) throws CoreException, IOException,
+			RecognitionException {
+		URI uri;
+		SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
+		if(Platform.isRunning())
+		{
+			String workspaceLocation = ResourcesPlugin.getWorkspace()
+					.getRoot().getLocationURI().getPath();
+			int outputPathHeaderIndex = workspaceLocation.length();
+
+			String outputAbsolutePath = outputFile.getAbsolutePath().toString();
+			String outputPlatformRelativePath = "";
+			if(outputPathHeaderIndex>0)
+				outputPlatformRelativePath = outputAbsolutePath.substring(outputPathHeaderIndex);
+			IResource rootMember=null;
+			while(ResourcesPlugin.getWorkspace().getRoot().findMember(outputPlatformRelativePath)==null
+					&& outputPlatformRelativePath.contains("/"))
+			{
+				if(rootMember==null)
+				{
+					String rootMemberPath = outputPlatformRelativePath.substring(0,outputPlatformRelativePath.indexOf("/"));
+					rootMember = ResourcesPlugin.getWorkspace().getRoot().findMember(rootMemberPath);
+					if(rootMember!=null)
+						rootMember.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+				}
+				outputPlatformRelativePath=outputPlatformRelativePath.substring(outputPlatformRelativePath.indexOf("/")+1);
+			}
+
+			uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
+
+			ResourceSet rs = OsateResourceUtil.getResourceSet();
+			Resource xtextResource = rs.getResource(uri, true);
+
+			URI inputURI = si.getSystemImplementation().eResource().getURI();
+			IPath path = new Path(inputURI.toString().substring(18));
+			File inputDir = new File (workspaceLocation+path.toOSString());
+			RamsesConfiguration.setInputDirectory(inputDir.getParentFile());
+			return xtextResource;
+		}
+		else
+		{
+			uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
+			RamsesConfiguration.setInputDirectory(new File(si.getSystemImplementation().eResource().getURI().toFileString()).getParentFile());
+			Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
+			xtextResource.load(null);
+			ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+			ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
+			AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
+			Iterator<EObject> iter = xtextResource.getAllContents();
+			while(iter.hasNext())
+			{
+				Collection<Object> dasList = EcoreUtil.getObjectsByType(iter.next().eContents(), Aadl2Package.eINSTANCE.getDefaultAnnexSubclause()); 
+				for (Object o : dasList)
+				{
+					DefaultAnnexSubclause das = (DefaultAnnexSubclause) o;
+					String annexName = das.getName();
+					if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
+					{
+						AnnexParser ap = sr.getParser(annexName);
+						ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
+						String annexText = das.getSourceText();
+						if(annexText.length() > 6)
+						{
+							annexText = annexText.substring(3, annexText.length() - 3) ;
+						}
+						AnnexSubclause as = ap.parseAnnexSubclause(annexName,
+								annexText, 
+								outputFile.getName(), 
+								node.getStartLine(), 
+								node.getOffset(), 
+								errReporter);
+						AnnexResolver ar = sr.getResolver(annexName) ;
+						if(as != null && errReporter.getNumErrors() == 0)
+						{
+							as.setName(annexName) ;
+							// replace default annex library with the new one.
+							EList<AnnexSubclause> ael =
+									((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
+							int idx = ael.indexOf(das) ;
+							ael.add(idx, as) ;
+							ael.remove(das) ;
+							List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
+							ar.resolveAnnex(das.getName(), annexElements, errManager) ;
+						}
+					}
+				}
+			}
+			return xtextResource;
+		}
+	}
+	
+	/* Old version with automatic unparse */
+	/*public Resource generationEntryPoint(Resource inputResource,
 			File resourceDir,
 			List<File> transformationFileList,
 			File outputDir) throws GenerationException
@@ -259,7 +389,7 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 			e.printStackTrace();
 			throw new GenerationException(e.getMessage());
 		}
-			}
+	}*/
 
 	public Resource doGeneration(Resource inputResource,
 			List<File> transformationFileList,
@@ -306,7 +436,7 @@ public class Aadl2AadlLauncher extends AtlTransfoLauncher
 		EMFModel targetModel = (EMFModel) factory.newModel(aadlbaMetamodel) ;
 		ResourceSet rs = inputResource.getResourceSet();
 
-
+		System.out.println("outputDirPathName = " + outputDirPathName);
 		Resource outputResource =
 				rs.getResource(URI.createURI(outputDirPathName), false) ;
 

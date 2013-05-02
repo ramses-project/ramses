@@ -21,16 +21,17 @@
 
 package fr.tpt.aadl.ramses.transformation.atl;
 
-import java.io.File ;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.List ;
-import java.util.Map ;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.Resource;
+
+import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlLauncher;
-import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 {
@@ -78,6 +79,30 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
     	e.printStackTrace();
     	return null;
     }
+  }
+  
+  public Resource unparse(Resource inputResource, 
+          Resource expandedResult, File outputDir)
+  {
+	    String aadlGeneratedFileName = inputResource.getURI().lastSegment();
+		aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
+				".aaxl2", "_extended.aadl2");
+		
+		File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
+		if(outputModelDir.exists()==false)
+			outputModelDir.mkdir();
+		InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+		String outputFilePath=outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName;
+		File outputFile = new File(outputFilePath);
+
+		instantiator.serialize(expandedResult, outputFilePath);
+
+		try {
+			return Aadl2AadlLauncher.extractXtextResource(inputResource, outputFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
   }
   
   abstract public void setParameters(Map<Enum<?>, Object> parameters) ;
