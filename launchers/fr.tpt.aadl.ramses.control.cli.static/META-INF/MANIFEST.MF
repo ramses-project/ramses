@@ -15,4 +15,5 @@ Require-Bundle: org.osate.annexsupport;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.c;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.osek;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.pok;bundle-version="0.5.0",
- fr.tpt.aadl.sched.tools.cheddar;bundle-version="1.0.0"
+ fr.tpt.aadl.sched.tools.cheddar;bundle-version="1.0.0",
+ fr.tpt.aadl.sched.wcetanalysis;bundle-version="1.0.0"
