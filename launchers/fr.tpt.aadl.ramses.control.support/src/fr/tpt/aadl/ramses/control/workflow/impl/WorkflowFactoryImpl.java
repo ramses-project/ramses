@@ -9,9 +9,7 @@ package fr.tpt.aadl.ramses.control.workflow.impl;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
-
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
 import fr.tpt.aadl.ramses.control.workflow.Analysis;
@@ -23,11 +21,11 @@ import fr.tpt.aadl.ramses.control.workflow.Generation;
 import fr.tpt.aadl.ramses.control.workflow.List;
 import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier;
 import fr.tpt.aadl.ramses.control.workflow.Transformation;
+import fr.tpt.aadl.ramses.control.workflow.Unparse;
 import fr.tpt.aadl.ramses.control.workflow.Workflow;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowElement;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
-
 
 /**
  * <!-- begin-user-doc -->
@@ -83,6 +81,7 @@ public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory
 			case WorkflowPackage.FILE: return createFile();
 			case WorkflowPackage.ANALYSIS_OPTION: return createAnalysisOption();
 			case WorkflowPackage.MODEL_IDENTIFIER: return createModelIdentifier();
+			case WorkflowPackage.UNPARSE: return createUnparse();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -196,6 +195,16 @@ public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory
 	public ModelIdentifier createModelIdentifier() {
 		ModelIdentifierImpl modelIdentifier = new ModelIdentifierImpl();
 		return modelIdentifier;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Unparse createUnparse() {
+		UnparseImpl unparse = new UnparseImpl();
+		return unparse;
 	}
 
 	/**

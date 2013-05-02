@@ -8,12 +8,14 @@ package fr.tpt.aadl.ramses.control.workflow;
 
 import org.eclipse.emf.ecore.EFactory;
 
+import fr.tpt.aadl.ramses.control.workflow.impl.WorkflowFactoryImpl;
+
 /**
  * <!-- begin-user-doc -->
  * The <b>Factory</b> for the model.
  * It provides a create method for each non-abstract class of the model.
  * <!-- end-user-doc -->
- * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage
+ * @see workflow.WorkflowPackage
  * @generated
  */
 public interface WorkflowFactory extends EFactory {
@@ -23,7 +25,7 @@ public interface WorkflowFactory extends EFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	WorkflowFactory eINSTANCE = fr.tpt.aadl.ramses.control.workflow.impl.WorkflowFactoryImpl.init();
+	WorkflowFactory eINSTANCE = WorkflowFactoryImpl.init();
 
 	/**
 	 * Returns a new object of class '<em>Workflow</em>'.
@@ -123,6 +125,15 @@ public interface WorkflowFactory extends EFactory {
 	 * @generated
 	 */
 	ModelIdentifier createModelIdentifier();
+
+	/**
+	 * Returns a new object of class '<em>Unparse</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Unparse</em>'.
+	 * @generated
+	 */
+	Unparse createUnparse();
 
 	/**
 	 * Returns the package supported by this factory.

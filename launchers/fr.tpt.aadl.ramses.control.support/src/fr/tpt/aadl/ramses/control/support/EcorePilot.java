@@ -1,5 +1,6 @@
 package fr.tpt.aadl.ramses.control.support;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,7 @@ import fr.tpt.aadl.ramses.control.workflow.Analysis;
 import fr.tpt.aadl.ramses.control.workflow.AnalysisElement;
 import fr.tpt.aadl.ramses.control.workflow.Generation;
 import fr.tpt.aadl.ramses.control.workflow.Transformation;
+import fr.tpt.aadl.ramses.control.workflow.*;
 import fr.tpt.aadl.ramses.control.workflow.Workflow;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
 
@@ -45,6 +47,11 @@ public class EcorePilot  implements WorkflowPilot {
 
 		final Resource resource;
 		URI workflow_uri = URI.createFileURI(this.workflowFileName);
+		File testExist = new File(this.workflowFileName);
+		if (!testExist.exists())
+		{
+			System.out.println("Workflow file does not exist: " + testExist.getAbsolutePath());
+		}
 
 		if (getResourceSet().getURIConverter().exists(workflow_uri, null)) {
 			resource = getResourceSet().getResource(workflow_uri, true);
@@ -69,6 +76,8 @@ public class EcorePilot  implements WorkflowPilot {
 				return "analysis";
 			} else if (racine instanceof Generation) {
 				return "generation";
+			} else if (racine instanceof Unparse) {
+				return "unparse";
 			}
 		}
 		return null;
@@ -131,6 +140,10 @@ public class EcorePilot  implements WorkflowPilot {
 
 			racine = ((Transformation) racine).getElement();
 
+		} else if (racine instanceof Unparse) {
+			
+			racine = ((Unparse) racine).getElement();
+			
 		} else {
 			racine = null;
 		}

@@ -11,6 +11,8 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
+import fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl;
+
 /**
  * <!-- begin-user-doc -->
  * The <b>Package</b> for the model.
@@ -22,7 +24,7 @@ import org.eclipse.emf.ecore.EReference;
  *   <li>and each data type</li>
  * </ul>
  * <!-- end-user-doc -->
- * @see fr.tpt.aadl.ramses.control.workflow.WorkflowFactory
+ * @see workflow.WorkflowFactory
  * @model kind="package"
  * @generated
  */
@@ -57,14 +59,14 @@ public interface WorkflowPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	WorkflowPackage eINSTANCE = fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl.init();
+	WorkflowPackage eINSTANCE = WorkflowPackageImpl.init();
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl <em>Workflow</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.WorkflowImpl <em>Workflow</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getWorkflow()
+	 * @see workflow.impl.WorkflowImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getWorkflow()
 	 * @generated
 	 */
 	int WORKFLOW = 0;
@@ -88,11 +90,11 @@ public interface WorkflowPackage extends EPackage {
 	int WORKFLOW_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowElementImpl <em>Element</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.WorkflowElementImpl <em>Element</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowElementImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getWorkflowElement()
+	 * @see workflow.impl.WorkflowElementImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getWorkflowElement()
 	 * @generated
 	 */
 	int WORKFLOW_ELEMENT = 1;
@@ -107,11 +109,11 @@ public interface WorkflowPackage extends EPackage {
 	int WORKFLOW_ELEMENT_FEATURE_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl <em>Transformation</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.TransformationImpl <em>Transformation</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getTransformation()
+	 * @see workflow.impl.TransformationImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getTransformation()
 	 * @generated
 	 */
 	int TRANSFORMATION = 2;
@@ -162,11 +164,11 @@ public interface WorkflowPackage extends EPackage {
 	int TRANSFORMATION_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisElementImpl <em>Analysis Element</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.AnalysisElementImpl <em>Analysis Element</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.AnalysisElementImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getAnalysisElement()
+	 * @see workflow.impl.AnalysisElementImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getAnalysisElement()
 	 * @generated
 	 */
 	int ANALYSIS_ELEMENT = 3;
@@ -181,11 +183,11 @@ public interface WorkflowPackage extends EPackage {
 	int ANALYSIS_ELEMENT_FEATURE_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.GenerationImpl <em>Generation</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.GenerationImpl <em>Generation</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.GenerationImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getGeneration()
+	 * @see workflow.impl.GenerationImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getGeneration()
 	 * @generated
 	 */
 	int GENERATION = 4;
@@ -200,11 +202,11 @@ public interface WorkflowPackage extends EPackage {
 	int GENERATION_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl <em>Analysis</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.AnalysisImpl <em>Analysis</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getAnalysis()
+	 * @see workflow.impl.AnalysisImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getAnalysis()
 	 * @generated
 	 */
 	int ANALYSIS = 5;
@@ -264,11 +266,11 @@ public interface WorkflowPackage extends EPackage {
 	int ANALYSIS_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 5;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ErrorStateImpl <em>Error State</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.ErrorStateImpl <em>Error State</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.ErrorStateImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getErrorState()
+	 * @see workflow.impl.ErrorStateImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getErrorState()
 	 * @generated
 	 */
 	int ERROR_STATE = 6;
@@ -292,11 +294,11 @@ public interface WorkflowPackage extends EPackage {
 	int ERROR_STATE_FEATURE_COUNT = ANALYSIS_ELEMENT_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ListImpl <em>List</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.ListImpl <em>List</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.ListImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getList()
+	 * @see workflow.impl.ListImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getList()
 	 * @generated
 	 */
 	int LIST = 7;
@@ -320,11 +322,11 @@ public interface WorkflowPackage extends EPackage {
 	int LIST_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.FileImpl <em>File</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.FileImpl <em>File</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.FileImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getFile()
+	 * @see workflow.impl.FileImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getFile()
 	 * @generated
 	 */
 	int FILE = 8;
@@ -348,11 +350,11 @@ public interface WorkflowPackage extends EPackage {
 	int FILE_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisOptionImpl <em>Analysis Option</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.AnalysisOptionImpl <em>Analysis Option</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.AnalysisOptionImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getAnalysisOption()
+	 * @see workflow.impl.AnalysisOptionImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getAnalysisOption()
 	 * @generated
 	 */
 	int ANALYSIS_OPTION = 9;
@@ -376,11 +378,11 @@ public interface WorkflowPackage extends EPackage {
 	int ANALYSIS_OPTION_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ModelIdentifierImpl <em>Model Identifier</em>}' class.
+	 * The meta object id for the '{@link workflow.impl.ModelIdentifierImpl <em>Model Identifier</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.ModelIdentifierImpl
-	 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getModelIdentifier()
+	 * @see workflow.impl.ModelIdentifierImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getModelIdentifier()
 	 * @generated
 	 */
 	int MODEL_IDENTIFIER = 10;
@@ -394,270 +396,319 @@ public interface WorkflowPackage extends EPackage {
 	 */
 	int MODEL_IDENTIFIER_FEATURE_COUNT = 0;
 
+	/**
+	 * The meta object id for the '{@link workflow.impl.UnparseImpl <em>Unparse</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see workflow.impl.UnparseImpl
+	 * @see workflow.impl.WorkflowPackageImpl#getUnparse()
+	 * @generated
+	 */
+	int UNPARSE = 11;
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.Workflow <em>Workflow</em>}'.
+	 * The feature id for the '<em><b>Element</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNPARSE__ELEMENT = WORKFLOW_ELEMENT_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Unparse</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNPARSE_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 1;
+
+
+	/**
+	 * Returns the meta object for class '{@link workflow.Workflow <em>Workflow</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Workflow</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Workflow
+	 * @see workflow.Workflow
 	 * @generated
 	 */
 	EClass getWorkflow();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Workflow#getElement <em>Element</em>}'.
+	 * Returns the meta object for the containment reference '{@link workflow.Workflow#getElement <em>Element</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Element</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Workflow#getElement()
+	 * @see workflow.Workflow#getElement()
 	 * @see #getWorkflow()
 	 * @generated
 	 */
 	EReference getWorkflow_Element();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.WorkflowElement <em>Element</em>}'.
+	 * Returns the meta object for class '{@link workflow.WorkflowElement <em>Element</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Element</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowElement
+	 * @see workflow.WorkflowElement
 	 * @generated
 	 */
 	EClass getWorkflowElement();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.Transformation <em>Transformation</em>}'.
+	 * Returns the meta object for class '{@link workflow.Transformation <em>Transformation</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Transformation</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Transformation
+	 * @see workflow.Transformation
 	 * @generated
 	 */
 	EClass getTransformation();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getElement <em>Element</em>}'.
+	 * Returns the meta object for the containment reference '{@link workflow.Transformation#getElement <em>Element</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Element</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Transformation#getElement()
+	 * @see workflow.Transformation#getElement()
 	 * @see #getTransformation()
 	 * @generated
 	 */
 	EReference getTransformation_Element();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getList <em>List</em>}'.
+	 * Returns the meta object for the containment reference '{@link workflow.Transformation#getList <em>List</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>List</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Transformation#getList()
+	 * @see workflow.Transformation#getList()
 	 * @see #getTransformation()
 	 * @generated
 	 */
 	EReference getTransformation_List();
 
 	/**
-	 * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getInputModelIdentifier <em>Input Model Identifier</em>}'.
+	 * Returns the meta object for the reference '{@link workflow.Transformation#getInputModelIdentifier <em>Input Model Identifier</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Input Model Identifier</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Transformation#getInputModelIdentifier()
+	 * @see workflow.Transformation#getInputModelIdentifier()
 	 * @see #getTransformation()
 	 * @generated
 	 */
 	EReference getTransformation_InputModelIdentifier();
 
 	/**
-	 * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}'.
+	 * Returns the meta object for the reference '{@link workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Output Model Identifier</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier()
+	 * @see workflow.Transformation#getOutputModelIdentifier()
 	 * @see #getTransformation()
 	 * @generated
 	 */
 	EReference getTransformation_OutputModelIdentifier();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.AnalysisElement <em>Analysis Element</em>}'.
+	 * Returns the meta object for class '{@link workflow.AnalysisElement <em>Analysis Element</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Analysis Element</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.AnalysisElement
+	 * @see workflow.AnalysisElement
 	 * @generated
 	 */
 	EClass getAnalysisElement();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.Generation <em>Generation</em>}'.
+	 * Returns the meta object for class '{@link workflow.Generation <em>Generation</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Generation</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Generation
+	 * @see workflow.Generation
 	 * @generated
 	 */
 	EClass getGeneration();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.Analysis <em>Analysis</em>}'.
+	 * Returns the meta object for class '{@link workflow.Analysis <em>Analysis</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Analysis</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis
+	 * @see workflow.Analysis
 	 * @generated
 	 */
 	EClass getAnalysis();
 
 	/**
-	 * Returns the meta object for the attribute '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getMethod <em>Method</em>}'.
+	 * Returns the meta object for the attribute '{@link workflow.Analysis#getMethod <em>Method</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Method</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis#getMethod()
+	 * @see workflow.Analysis#getMethod()
 	 * @see #getAnalysis()
 	 * @generated
 	 */
 	EAttribute getAnalysis_Method();
 
 	/**
-	 * Returns the meta object for the attribute '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getMode <em>Mode</em>}'.
+	 * Returns the meta object for the attribute '{@link workflow.Analysis#getMode <em>Mode</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Mode</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis#getMode()
+	 * @see workflow.Analysis#getMode()
 	 * @see #getAnalysis()
 	 * @generated
 	 */
 	EAttribute getAnalysis_Mode();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getYesOption <em>Yes Option</em>}'.
+	 * Returns the meta object for the containment reference '{@link workflow.Analysis#getYesOption <em>Yes Option</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Yes Option</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis#getYesOption()
+	 * @see workflow.Analysis#getYesOption()
 	 * @see #getAnalysis()
 	 * @generated
 	 */
 	EReference getAnalysis_YesOption();
 
 	/**
-	 * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getInputModelIdentifier <em>Input Model Identifier</em>}'.
+	 * Returns the meta object for the reference '{@link workflow.Analysis#getInputModelIdentifier <em>Input Model Identifier</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Input Model Identifier</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis#getInputModelIdentifier()
+	 * @see workflow.Analysis#getInputModelIdentifier()
 	 * @see #getAnalysis()
 	 * @generated
 	 */
 	EReference getAnalysis_InputModelIdentifier();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getNoOption <em>No Option</em>}'.
+	 * Returns the meta object for the containment reference '{@link workflow.Analysis#getNoOption <em>No Option</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>No Option</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis#getNoOption()
+	 * @see workflow.Analysis#getNoOption()
 	 * @see #getAnalysis()
 	 * @generated
 	 */
 	EReference getAnalysis_NoOption();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.ErrorState <em>Error State</em>}'.
+	 * Returns the meta object for class '{@link workflow.ErrorState <em>Error State</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Error State</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.ErrorState
+	 * @see workflow.ErrorState
 	 * @generated
 	 */
 	EClass getErrorState();
 
 	/**
-	 * Returns the meta object for the attribute '{@link fr.tpt.aadl.ramses.control.workflow.ErrorState#getType <em>Type</em>}'.
+	 * Returns the meta object for the attribute '{@link workflow.ErrorState#getType <em>Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Type</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.ErrorState#getType()
+	 * @see workflow.ErrorState#getType()
 	 * @see #getErrorState()
 	 * @generated
 	 */
 	EAttribute getErrorState_Type();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.List <em>List</em>}'.
+	 * Returns the meta object for class '{@link workflow.List <em>List</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>List</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.List
+	 * @see workflow.List
 	 * @generated
 	 */
 	EClass getList();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link fr.tpt.aadl.ramses.control.workflow.List#getFile <em>File</em>}'.
+	 * Returns the meta object for the containment reference list '{@link workflow.List#getFile <em>File</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>File</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.List#getFile()
+	 * @see workflow.List#getFile()
 	 * @see #getList()
 	 * @generated
 	 */
 	EReference getList_File();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.File <em>File</em>}'.
+	 * Returns the meta object for class '{@link workflow.File <em>File</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>File</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.File
+	 * @see workflow.File
 	 * @generated
 	 */
 	EClass getFile();
 
 	/**
-	 * Returns the meta object for the attribute '{@link fr.tpt.aadl.ramses.control.workflow.File#getPath <em>Path</em>}'.
+	 * Returns the meta object for the attribute '{@link workflow.File#getPath <em>Path</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Path</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.File#getPath()
+	 * @see workflow.File#getPath()
 	 * @see #getFile()
 	 * @generated
 	 */
 	EAttribute getFile_Path();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.AnalysisOption <em>Analysis Option</em>}'.
+	 * Returns the meta object for class '{@link workflow.AnalysisOption <em>Analysis Option</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Analysis Option</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.AnalysisOption
+	 * @see workflow.AnalysisOption
 	 * @generated
 	 */
 	EClass getAnalysisOption();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.AnalysisOption#getElement <em>Element</em>}'.
+	 * Returns the meta object for the containment reference '{@link workflow.AnalysisOption#getElement <em>Element</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Element</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.AnalysisOption#getElement()
+	 * @see workflow.AnalysisOption#getElement()
 	 * @see #getAnalysisOption()
 	 * @generated
 	 */
 	EReference getAnalysisOption_Element();
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.ModelIdentifier <em>Model Identifier</em>}'.
+	 * Returns the meta object for class '{@link workflow.ModelIdentifier <em>Model Identifier</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Model Identifier</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.ModelIdentifier
+	 * @see workflow.ModelIdentifier
 	 * @generated
 	 */
 	EClass getModelIdentifier();
+
+	/**
+	 * Returns the meta object for class '{@link workflow.Unparse <em>Unparse</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Unparse</em>'.
+	 * @see workflow.Unparse
+	 * @generated
+	 */
+	EClass getUnparse();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link workflow.Unparse#getElement <em>Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Element</em>'.
+	 * @see workflow.Unparse#getElement()
+	 * @see #getUnparse()
+	 * @generated
+	 */
+	EReference getUnparse_Element();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -682,11 +733,11 @@ public interface WorkflowPackage extends EPackage {
 	 */
 	interface Literals {
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl <em>Workflow</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.WorkflowImpl <em>Workflow</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getWorkflow()
+		 * @see workflow.impl.WorkflowImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getWorkflow()
 		 * @generated
 		 */
 		EClass WORKFLOW = eINSTANCE.getWorkflow();
@@ -700,21 +751,21 @@ public interface WorkflowPackage extends EPackage {
 		EReference WORKFLOW__ELEMENT = eINSTANCE.getWorkflow_Element();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowElementImpl <em>Element</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.WorkflowElementImpl <em>Element</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowElementImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getWorkflowElement()
+		 * @see workflow.impl.WorkflowElementImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getWorkflowElement()
 		 * @generated
 		 */
 		EClass WORKFLOW_ELEMENT = eINSTANCE.getWorkflowElement();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl <em>Transformation</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.TransformationImpl <em>Transformation</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getTransformation()
+		 * @see workflow.impl.TransformationImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getTransformation()
 		 * @generated
 		 */
 		EClass TRANSFORMATION = eINSTANCE.getTransformation();
@@ -752,31 +803,31 @@ public interface WorkflowPackage extends EPackage {
 		EReference TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER = eINSTANCE.getTransformation_OutputModelIdentifier();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisElementImpl <em>Analysis Element</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.AnalysisElementImpl <em>Analysis Element</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.AnalysisElementImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getAnalysisElement()
+		 * @see workflow.impl.AnalysisElementImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getAnalysisElement()
 		 * @generated
 		 */
 		EClass ANALYSIS_ELEMENT = eINSTANCE.getAnalysisElement();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.GenerationImpl <em>Generation</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.GenerationImpl <em>Generation</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.GenerationImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getGeneration()
+		 * @see workflow.impl.GenerationImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getGeneration()
 		 * @generated
 		 */
 		EClass GENERATION = eINSTANCE.getGeneration();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl <em>Analysis</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.AnalysisImpl <em>Analysis</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getAnalysis()
+		 * @see workflow.impl.AnalysisImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getAnalysis()
 		 * @generated
 		 */
 		EClass ANALYSIS = eINSTANCE.getAnalysis();
@@ -822,11 +873,11 @@ public interface WorkflowPackage extends EPackage {
 		EReference ANALYSIS__NO_OPTION = eINSTANCE.getAnalysis_NoOption();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ErrorStateImpl <em>Error State</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.ErrorStateImpl <em>Error State</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.ErrorStateImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getErrorState()
+		 * @see workflow.impl.ErrorStateImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getErrorState()
 		 * @generated
 		 */
 		EClass ERROR_STATE = eINSTANCE.getErrorState();
@@ -840,11 +891,11 @@ public interface WorkflowPackage extends EPackage {
 		EAttribute ERROR_STATE__TYPE = eINSTANCE.getErrorState_Type();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ListImpl <em>List</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.ListImpl <em>List</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.ListImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getList()
+		 * @see workflow.impl.ListImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getList()
 		 * @generated
 		 */
 		EClass LIST = eINSTANCE.getList();
@@ -858,11 +909,11 @@ public interface WorkflowPackage extends EPackage {
 		EReference LIST__FILE = eINSTANCE.getList_File();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.FileImpl <em>File</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.FileImpl <em>File</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.FileImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getFile()
+		 * @see workflow.impl.FileImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getFile()
 		 * @generated
 		 */
 		EClass FILE = eINSTANCE.getFile();
@@ -876,11 +927,11 @@ public interface WorkflowPackage extends EPackage {
 		EAttribute FILE__PATH = eINSTANCE.getFile_Path();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisOptionImpl <em>Analysis Option</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.AnalysisOptionImpl <em>Analysis Option</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.AnalysisOptionImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getAnalysisOption()
+		 * @see workflow.impl.AnalysisOptionImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getAnalysisOption()
 		 * @generated
 		 */
 		EClass ANALYSIS_OPTION = eINSTANCE.getAnalysisOption();
@@ -894,14 +945,32 @@ public interface WorkflowPackage extends EPackage {
 		EReference ANALYSIS_OPTION__ELEMENT = eINSTANCE.getAnalysisOption_Element();
 
 		/**
-		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ModelIdentifierImpl <em>Model Identifier</em>}' class.
+		 * The meta object literal for the '{@link workflow.impl.ModelIdentifierImpl <em>Model Identifier</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.ModelIdentifierImpl
-		 * @see fr.tpt.aadl.ramses.control.workflow.impl.WorkflowPackageImpl#getModelIdentifier()
+		 * @see workflow.impl.ModelIdentifierImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getModelIdentifier()
 		 * @generated
 		 */
 		EClass MODEL_IDENTIFIER = eINSTANCE.getModelIdentifier();
+
+		/**
+		 * The meta object literal for the '{@link workflow.impl.UnparseImpl <em>Unparse</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see workflow.impl.UnparseImpl
+		 * @see workflow.impl.WorkflowPackageImpl#getUnparse()
+		 * @generated
+		 */
+		EClass UNPARSE = eINSTANCE.getUnparse();
+
+		/**
+		 * The meta object literal for the '<em><b>Element</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference UNPARSE__ELEMENT = eINSTANCE.getUnparse_Element();
 
 	}
 

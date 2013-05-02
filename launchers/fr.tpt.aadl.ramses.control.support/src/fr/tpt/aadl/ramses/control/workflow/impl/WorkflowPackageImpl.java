@@ -6,11 +6,12 @@
  */
 package fr.tpt.aadl.ramses.control.workflow.impl;
 
+import java.util.List;
+
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 import fr.tpt.aadl.ramses.control.workflow.Analysis;
@@ -19,14 +20,13 @@ import fr.tpt.aadl.ramses.control.workflow.AnalysisOption;
 import fr.tpt.aadl.ramses.control.workflow.ErrorState;
 import fr.tpt.aadl.ramses.control.workflow.File;
 import fr.tpt.aadl.ramses.control.workflow.Generation;
-import fr.tpt.aadl.ramses.control.workflow.List;
 import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier;
 import fr.tpt.aadl.ramses.control.workflow.Transformation;
+import fr.tpt.aadl.ramses.control.workflow.Unparse;
 import fr.tpt.aadl.ramses.control.workflow.Workflow;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowElement;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
-
 
 /**
  * <!-- begin-user-doc -->
@@ -113,6 +113,13 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	private EClass modelIdentifierEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass unparseEClass = null;
+
+	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
 	 * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
 	 * package URI value.
@@ -123,7 +130,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.eclipse.emf.ecore.EPackage.Registry
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#eNS_URI
+	 * @see workflow.WorkflowPackage#eNS_URI
 	 * @see #init()
 	 * @generated
 	 */
@@ -403,6 +410,24 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getUnparse() {
+		return unparseEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getUnparse_Element() {
+		return (EReference)unparseEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public WorkflowFactory getWorkflowFactory() {
 		return (WorkflowFactory)getEFactoryInstance();
 	}
@@ -461,6 +486,9 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		createEReference(analysisOptionEClass, ANALYSIS_OPTION__ELEMENT);
 
 		modelIdentifierEClass = createEClass(MODEL_IDENTIFIER);
+
+		unparseEClass = createEClass(UNPARSE);
+		createEReference(unparseEClass, UNPARSE__ELEMENT);
 	}
 
 	/**
@@ -494,6 +522,8 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		analysisEClass.getESuperTypes().add(this.getWorkflowElement());
 		analysisEClass.getESuperTypes().add(this.getAnalysisElement());
 		errorStateEClass.getESuperTypes().add(this.getAnalysisElement());
+		unparseEClass.getESuperTypes().add(this.getWorkflowElement());
+		unparseEClass.getESuperTypes().add(this.getAnalysisElement());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(workflowEClass, Workflow.class, "Workflow", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -531,6 +561,9 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		initEReference(getAnalysisOption_Element(), this.getAnalysisElement(), null, "element", null, 0, 1, AnalysisOption.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(modelIdentifierEClass, ModelIdentifier.class, "ModelIdentifier", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(unparseEClass, Unparse.class, "Unparse", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getUnparse_Element(), this.getAnalysisElement(), null, "element", null, 1, 1, Unparse.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

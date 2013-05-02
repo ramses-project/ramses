@@ -43,4 +43,8 @@
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ModelIdentifier"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Unparse" eSuperTypes="#//WorkflowElement #//AnalysisElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="element" lowerBound="1"
+        eType="#//AnalysisElement" containment="true"/>
+  </eClassifiers>
 </ecore:EPackage>

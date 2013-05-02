@@ -29,11 +29,15 @@ import org.eclipse.emf.ecore.resource.Resource ;
 
 public interface AadlToAadl
 {
-	public void initAtlFileNameList(File resourceFilePath);
+  public void initAtlFileNameList(File resourceFilePath);
 	
   public Resource transform(Resource inputResource,
                             File resourceDir,
                             File generatedDir) throws GenerationException;
+  
+  public Resource unparse(Resource inputResource, 
+		                  Resource expandedResult, 
+		                  File outputDir);
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
 
