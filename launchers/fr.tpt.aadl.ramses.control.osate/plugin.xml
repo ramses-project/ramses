@@ -65,5 +65,16 @@
    		 <instanceModel selectRootObject="true"/>
    	  </analysis>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="org.eclipse.ui.Examples/org.osate.Wizard.category.examples"
+            class="fr.tpt.aadl.ramses.osate.wizards.RamsesExamplesWizard"
+            icon="icons/RAMSES.gif"
+            id="fr.tpt.aadl.ramses.osate.wizard.examples"
+            name="RAMSES"
+            project="true">
+      </wizard>
+   </extension>
    
 </plugin>

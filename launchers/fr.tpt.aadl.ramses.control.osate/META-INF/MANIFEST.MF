@@ -4,24 +4,18 @@ Bundle-Name: Ramses4Osate
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.osate;singleton:=true
 Bundle-Version: 0.0.1
 Bundle-Activator: fr.tpt.aadl.ramses.control.osate.Activator
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.emf.ecore,
  org.osate.aadl2,
- org.osate.aadl2.modelsupport,
  org.osate.ui,
+ org.osate.aadl2.modelsupport,
  org.osate.annexsupport,
- fr.tpt.aadl.ramses.control.support,
  org.osate.xtext.aadl2.properties,
- fr.tpt.aadl.annex.behavior;bundle-version="0.9.5"
+ org.eclipse.ui.ide,
+ fr.tpt.aadl.utils,
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.annex.behavior;bundle-version="0.9.5",
+ fr.tpt.aadl.ramses.generation.c;bundle-version="0.5.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: fr.tpt.aadl.ramses.control.support.generator,
- fr.tpt.aadl.ramses.generation.c.annex.behavior,
- org.eclipse.emf.ecore.resource,
- org.eclipse.ui.dialogs,
- org.osate.aadl2,
- org.osate.aadl2.modelsupport.errorreporting,
- org.osate.ui.actions,
- org.osate.xtext.aadl2.properties.util
