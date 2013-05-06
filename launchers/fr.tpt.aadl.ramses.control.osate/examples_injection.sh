@@ -22,11 +22,15 @@
 # Naming
 
 SCRIPT_DIR=`dirname $0`; cd ${SCRIPT_DIR}; SCRIPT_DIR=`pwd`
-TESTS_ROOT_DIRECTORY="${SCRIPT_DIR}/../../../../build_and_test/junit_tests/tests"
 EXAMPLE_DIRECTORY="${SCRIPT_DIR}/examples"
 OUTPUTREF_DIR_NAME="output_ref"
 CLEAN="FALSE"
 CP_OPTIONS="-rp"
+
+if [ "$2" != "" ]
+   then TESTS_ROOT_DIRECTORY="$2"
+   else TESTS_ROOT_DIRECTORY="${SCRIPT_DIR}/../../../../build_and_test/junit_tests/tests"
+fi
 
 if [ "$1" == "--force" ]
    then CLEAN="TRUE"
