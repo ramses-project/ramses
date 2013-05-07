@@ -589,8 +589,17 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
     launcher.parsePredefinedRessources() ;
     launcher.parsePredefinedPackages() ;
-    File outputDir =
-          ToolSuiteLauncherCommand.getVerifiedPath(generated_file_path) ;
+    File outputDir = new File(generated_file_path) ;
+    
+    try
+    {
+      outputDir.mkdirs() ;
+    }
+    catch (Exception e)
+    {
+      _errorReporter.internalErrorImpl(e) ;
+      System.exit(0) ;
+    }
     
     RamsesConfiguration.setOutputDir(outputDir);
     
@@ -654,8 +663,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
   }
   
-  private static File getVerifiedPath(String filePath)
-        throws Exception
+  private static File getVerifiedPath(String filePath) throws Exception
   {
     File potentialFile = new File(filePath) ;
 
