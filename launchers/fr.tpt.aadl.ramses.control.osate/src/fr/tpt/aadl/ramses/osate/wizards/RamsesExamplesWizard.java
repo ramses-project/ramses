@@ -62,7 +62,8 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
         
         for(File f : rootPath.listFiles())
         {
-          if (f.isDirectory())
+          if (f.isDirectory() &&
+              ! Aadl2Utils.contains(f.getName(), _EXCLUDED_DIRECTORIES))
           {
             String key = f.getName() ;
             key = key.replaceAll(_NAME_SEPARATOR, " ") ;
@@ -75,7 +76,8 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
               
               for (File inside : contain)
               {
-                if (inside.isDirectory())
+                if (inside.isDirectory() &&
+                    ! Aadl2Utils.contains(inside.getName(), _EXCLUDED_DIRECTORIES))
                 {
                   index.add(count) ;
                   _fileMapping.add(key) ;
