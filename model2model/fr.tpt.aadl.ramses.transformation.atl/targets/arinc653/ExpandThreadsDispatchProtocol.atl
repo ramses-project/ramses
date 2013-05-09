@@ -87,26 +87,6 @@ unique lazy rule addPeriodicWaitCallAction
 	}
 }
 
-
-rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstance, implImg: AADLBA!ThreadImplementation) 
-{
- do{
- 	if(inst.isPeriodicThread())
- 	{
- 		for(seq in implImg.ownedSubprogramCallSequence)
- 		{
- 			thisModule.addPeriodicWaitCall(seq);
- 		}
- 	}
- 	if(inst.isPeriodicThread())
- 	{
- 	}
- 	if(inst.isPeriodicThread())
- 	{
- 	}
- }
-}
-
 unique lazy rule addPeriodicWaitCall
 {
 	from
@@ -145,3 +125,23 @@ unique lazy rule addPeriodicWaitCall
 		call;
 	}
 }
+
+--@Use rule with same name defined in DispatchCommonRefinementSteps
+--rule expandThreadDispatchProtocol(inst: AADLBA!ComponentInstance, implImg: AADLBA!ThreadImplementation) 
+--{
+-- do{
+-- 	if(inst.isPeriodicThread())
+-- 	{
+-- 		for(seq in implImg.ownedSubprogramCallSequence)
+-- 		{
+-- 			thisModule.addPeriodicWaitCall(seq);
+-- 		}
+-- 	}
+-- 	if(inst.isPeriodicThread())
+-- 	{
+-- 	}
+-- 	if(inst.isPeriodicThread())
+-- 	{
+-- 	}
+-- }
+--}
