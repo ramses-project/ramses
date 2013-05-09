@@ -21,7 +21,7 @@
 
 -- nsURI AADLBA=http:///AADLBA
 
-module ExpandThreadsDispatchProtocol_HW;
+module DispatchCommonRefinementSteps;
 create OUT : AADLBA 	from 		IN : AADLI,
 									AADL_RUNTIME: AADLBA,
 									DATA_MODEL: AADLBA,
@@ -85,6 +85,16 @@ rule expandThreadDispatchProtocol(inst: AADLBA!NamedElement, implImg: AADLBA!Thr
  }
 }
 
+--@TODO: actually, isPeriodicThread() is not working on ThreadImplementation
+-- because Dispatch_Protocol property is generated on the thread subcomponent
+-- instead of the thread type/implementation. This helper fix the problem
+-- waiting to find a better solution
+helper context AADLBA!NamedElement def : isPeriodic() : Boolean =
+	self.isPeriodicThread() or 
+		AADLBA!ThreadSubcomponent->allInstances()
+			->select(s|s.threadSubcomponentType=self)
+			->select(s|not s.isPeriodic())->isEmpty()
+;
 
 endpoint rule EndRule()
 {
@@ -97,14 +107,15 @@ endpoint rule EndRule()
 						e.type.ownedEventDataPort->isEmpty()
 						and
 						e.type.ownedEventDataPort->isEmpty()
-						and
-						e.type.ownedDataAccess->isEmpty()
+						--and
+						--e.type.ownedDataAccess->isEmpty()
 					))
 		{
-			if(thread.isPeriodicThread())
+			if(thread.isPeriodic())
 			{
 				for(seq in thread.ownedSubprogramCallSequence)
  				{
+					thread.debug('addPeriodicWaitCall()');
  					thisModule.addPeriodicWaitCall(seq);
  				}
 			}
@@ -127,10 +138,10 @@ endpoint rule EndRule()
 	}
 }
 
-endpoint rule SecondEndRule()
-{
-	do
-	{
-		'Executing Endpoint Rule'.debug('####');
-	}
-}
+--endpoint rule SecondEndRule()
+--{
+--	do
+--	{
+--		'Executing Endpoint Rule'.debug('####');
+--	}
+--}
