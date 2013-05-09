@@ -121,7 +121,6 @@ rule System_Instance {
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(impl, s);
-		
 	}
 }
 
@@ -676,3 +675,5 @@ rule Comment {
 	to
 		c2 : AADLBA!Comment(body <- c.body, ownedComment <- c.ownedComment)
 }
+
+endpoint rule EndRule(){}
