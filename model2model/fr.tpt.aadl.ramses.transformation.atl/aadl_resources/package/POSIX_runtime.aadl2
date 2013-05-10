@@ -2,6 +2,8 @@ package POSIX_runtime
 public
 
 with minimal_runtime_dispatch;
+with Minimal_Runtime_Sync;
+with Data_Model;
 
 data mutex
 properties
@@ -35,20 +37,19 @@ subprogram cond_wait
 properties
   Source_Name => "pthread_cond_wait";
   Source_Text => ("pthread.h", "libpthread.a"); 
-end cond_wait
+end cond_wait;
 
 subprogram cond_timedwait
 properties
   Source_Name => "pthread_cond_timedwait";
   Source_Text => ("pthread.h", "libpthread.a"); 
-end cond_timedwait
+end cond_timedwait;
 
 subprogram cond_signal
-features
 properties
   Source_Name => "pthread_cond_signal";
   Source_Text => ("pthread.h", "libpthread.a"); 
-end cond_signal
+end cond_signal;
 
 data periodic_config
 properties
@@ -96,9 +97,10 @@ properties
   Source_Text => ("POSIX_runtime.h", "POSIX_runtime.c"); 
 end wait_next_period;
 
-subprogram refined_periodic_wait extends minimal_runtime_dispatch::Periodic_Dispatch
-	(Wait_Next_Period => wait_next_period;
-	Date_Type => periodic_thread_config_t;)
-end refined_periodic_wait
+--subprogram refined_periodic_wait 
+--extends minimal_runtime_dispatch::Periodic_Dispatch
+--	(Wait_Next_Period => subprogram wait_next_period,
+--	Date_Type => data periodic_thread_config_t)
+--end refined_periodic_wait;
 
 end POSIX_runtime;
