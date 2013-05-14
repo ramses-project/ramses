@@ -104,7 +104,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
           break ;
         }
       }
-      
+      System.out.println(found) ;
       if(found)
       {
         RAMSES_DIR = "." ;
@@ -742,7 +742,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     File transformationDir =
           ToolSuiteLauncherCommand.getVerifiedPath(transformationDirName) ;
     File aadlResourcesDir =
-          new File(transformationDir.getAbsolutePath() + 
+          new File(transformationDir.getAbsolutePath() + '/' +
                    Names.AADL_RESOURCE_DIRECTORY_NAME) ;
 
     if(aadlResourcesDir.exists() == false)

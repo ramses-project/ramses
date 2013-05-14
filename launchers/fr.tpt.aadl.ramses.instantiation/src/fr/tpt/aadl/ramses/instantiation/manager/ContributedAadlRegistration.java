@@ -18,7 +18,7 @@ public class ContributedAadlRegistration implements PredefinedResourcesAccess {
   public void setPredefinedResourcesDir(File resourceDir) throws Exception {
 	predefinedPackagesManager =
 			new PredefinedPackagesManager(new File(resourceDir
-	  					.getAbsolutePath() + Names.AADL_RESOURCE_DIRECTORY_NAME)) ;
+	  					.getAbsolutePath() + '/' + Names.AADL_RESOURCE_DIRECTORY_NAME)) ;
 
 	if(!predefinedPackagesManager.allPackagesFound())
 		throw new Exception(
