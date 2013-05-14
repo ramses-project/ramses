@@ -84,7 +84,11 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   static
   {
-    String tmp = System.getenv(RAMSES_RESOURCES_VAR) ;
+    String tmp = System.getProperty(RAMSES_RESOURCES_VAR) ;
+    if (tmp == null || tmp.isEmpty())
+    {
+      tmp = System.getenv(RAMSES_RESOURCES_VAR) ;
+    }
     if(! (tmp == null || tmp.isEmpty()))
     {
       RAMSES_DIR = tmp ;
@@ -104,7 +108,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
           break ;
         }
       }
-      System.out.println(found) ;
+      
       if(found)
       {
         RAMSES_DIR = "." ;
