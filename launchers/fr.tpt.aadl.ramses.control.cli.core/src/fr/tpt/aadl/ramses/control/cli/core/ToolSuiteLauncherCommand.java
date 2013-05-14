@@ -49,7 +49,6 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
 public class ToolSuiteLauncherCommand extends RamsesConfiguration
 {
-
   private static final String HELP_ONLY_OPTION_ID = "help_only" ;
   private static final String PARSE_ONLY_OPTION_ID = "parse_only" ;
   private static final String ANALYSIS_ONLY_OPTION_ID = "analysis_only" ;
@@ -64,14 +63,13 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
         "system_to_instantiate" ;
   private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
   private static final String RAMSES_RESOURCES_VAR = "RAMSES_DIR";
-  private static final String RAMSES_DIR = System.getenv(RAMSES_RESOURCES_VAR) ;
+  private static final String RAMSES_DIR ;
   private static final String GENERATION_OPTION_ID = "target_platform" ;
   
   private static final String PARAMETER_SEPARATOR = "=" ;
   private static final String PARAMETER_OPTION_ID = "key"+ 
                                                            PARAMETER_SEPARATOR +
                                                              "value" ;
-
   private static Switch helpOnlyMode ;
   private static Switch parseOnlyMode ;
   private static Switch analysisOnlyMode ;
@@ -80,11 +78,42 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String XML_OPTION_ID = "xml_path" ;
   private static final String WORKFLOW_OPTION_ID = "workflow_path" ;
   
-  public final static String DEFAULT_RESOURCES_DIR = 
-                    "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ; 
-  
   private final static StdOutputMessageReporter _reporter = new StdOutputMessageReporter();
   private final static StandAloneInternalErrorReporter _errorReporter = new StandAloneInternalErrorReporter(_reporter);
+  
+  static
+  {
+    String tmp = System.getenv(RAMSES_RESOURCES_VAR) ;
+    if(! (tmp == null || tmp.isEmpty()))
+    {
+      RAMSES_DIR = tmp ;
+    }
+    else // try to found out where it is ...
+    {
+      File workingDirectory = new File(System.getProperty("user.dir")) ;
+      boolean found = false ;
+      for (File f : workingDirectory.listFiles())
+      {
+        // RAMSES resources are in the current working directory: this is the
+        // case for the regular RAMSES deployment.
+        if(f.isDirectory() && f.getName().equalsIgnoreCase("aadl_resources"))
+        {
+          found = true ;
+          break ;
+        }
+      }
+      
+      if(found)
+      {
+        RAMSES_DIR = "." ;
+      }
+      else // finally affect it the default directory for development environment.
+      {
+        RAMSES_DIR = 
+            "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
+      }
+    }
+  }
   
   public static void main(String[] args)
   {
@@ -423,17 +452,9 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     String[] includeFolderNames =
           parseConfig.getStringArray(INCLUDES_OPTION_ID) ;
     String[] mainModels = parseConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-    String resourcesDirName = RAMSES_DIR ;
-    
-    if(resourcesDirName == null || resourcesDirName.isEmpty() )
-    {
-      resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
-      if(resourcesDirName == null || resourcesDirName.isEmpty())
-        resourcesDirName = DEFAULT_RESOURCES_DIR ;
-    }
     
     File aadlResourcesDir =
-          ToolSuiteLauncherCommand.getAADLResourcesDir(resourcesDirName) ;
+          ToolSuiteLauncherCommand.getAADLResourcesDir(RAMSES_DIR) ;
     RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
     
     List<File> mainModelFiles ;
@@ -482,17 +503,9 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
             ToolSuiteLauncherCommand.getVerifiedPath(analysis_output_path) ;
       RamsesConfiguration.setOutputDir(outputDir);
     }
-    String resourcesDirName = RAMSES_DIR;
-    
-    if(resourcesDirName == null || resourcesDirName.isEmpty())
-    {
-      resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
-      if(resourcesDirName == null || resourcesDirName.isEmpty())
-        resourcesDirName = DEFAULT_RESOURCES_DIR ;
-    }
-    
+        
     File aadlResourcesDir =
-          ToolSuiteLauncherCommand.getAADLResourcesDir(resourcesDirName) ;
+          ToolSuiteLauncherCommand.getAADLResourcesDir(RAMSES_DIR) ;
     RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
     
     List<File> mainModelFiles =
@@ -556,14 +569,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     String generated_file_path =
           genConf.getString(OUTPUT_DIR_OPTION_ID) ;
     String resourcesDirName = RAMSES_DIR ;
-    
-    // Optional switch.
-    if(resourcesDirName == null || resourcesDirName.isEmpty() )
-    {
-      resourcesDirName = System.getProperty(RAMSES_RESOURCES_VAR);
-      if(resourcesDirName == null || resourcesDirName.isEmpty())
-        resourcesDirName = DEFAULT_RESOURCES_DIR ;
-    }
     
     String targetName = genConf.getString(GENERATION_OPTION_ID) ;
 

@@ -6,6 +6,9 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="RAMSES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
+</mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--parse -m base_types.aadl2,aadlBaTestTypes.aadl,aadlBaTestPropertySet.aadl,aadlBaTestSubprogram.aadl,aadlBaTest001.aadl,aadlBaTest002.aadl,aadlBaTest003.aadl,aadlBaTest004.aadl,aadlBaTest005.aadl,sr_D4_6.aadl,sr_D3_18.aadl,lr_D6_L8.aadl,lr_D6_L3_L4.aadl,lr_D6_L2_nr_D6_N1.aadl,lr_D4_L1_L2.aadl,lr_D3_L6_L7_L8.aadl,lr_D3_L5.aadl,lr_D3_L3_L4.aadl,lr_D3_L1_L2.aadl,cr_D3_C4.aadl&#10; -i ../../../../aadlba/trunk/fr.tpt.aadl.annex.behavior/examples/covering_syntaxe,../../../../aadlba/trunk/fr.tpt.aadl.annex.behavior/examples/covering_semantic,../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/package"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
