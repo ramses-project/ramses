@@ -37,6 +37,7 @@ import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
 import fr.tpt.aadl.ramses.control.support.EcorePilot;
+import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
@@ -96,7 +97,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       {
         // RAMSES resources are in the current working directory: this is the
         // case for the regular RAMSES deployment.
-        if(f.isDirectory() && f.getName().equalsIgnoreCase("aadl_resources"))
+        if(f.isDirectory() && f.getName().equalsIgnoreCase(
+                                            Names.AADL_RESOURCE_DIRECTORY_NAME))
         {
           found = true ;
           break ;
@@ -740,12 +742,14 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     File transformationDir =
           ToolSuiteLauncherCommand.getVerifiedPath(transformationDirName) ;
     File aadlResourcesDir =
-          new File(transformationDir.getAbsolutePath() + "/aadl_resources") ;
+          new File(transformationDir.getAbsolutePath() + 
+                   Names.AADL_RESOURCE_DIRECTORY_NAME) ;
 
     if(aadlResourcesDir.exists() == false)
     {
       throw new Exception("ERROR: file " + transformationDirName +
-            " does not contain aadl_resources directory") ;
+            " does not contain " + Names.AADL_RESOURCE_DIRECTORY_NAME +
+            " directory") ;
     }
 
     return aadlResourcesDir ;

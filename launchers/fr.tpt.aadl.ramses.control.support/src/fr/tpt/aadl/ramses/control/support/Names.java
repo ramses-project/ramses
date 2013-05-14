@@ -37,4 +37,6 @@ public class Names
   public static final String ATT_NAME = "name" ;
   public static final String ATT_ANNEXNAME = "annexName" ;
   public static final String ATT_CLASS = "class" ;
+  
+  public static final String AADL_RESOURCE_DIRECTORY_NAME="aadl_resources" ;
 }

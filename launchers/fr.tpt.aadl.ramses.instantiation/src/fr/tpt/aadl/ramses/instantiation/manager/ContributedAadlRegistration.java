@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.resource.Resource;
 
+import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess;
 
 public class ContributedAadlRegistration implements PredefinedResourcesAccess { 
@@ -17,8 +18,7 @@ public class ContributedAadlRegistration implements PredefinedResourcesAccess {
   public void setPredefinedResourcesDir(File resourceDir) throws Exception {
 	predefinedPackagesManager =
 			new PredefinedPackagesManager(new File(resourceDir
-	  					.getAbsolutePath() +
-	  					"/aadl_resources")) ;
+	  					.getAbsolutePath() + Names.AADL_RESOURCE_DIRECTORY_NAME)) ;
 
 	if(!predefinedPackagesManager.allPackagesFound())
 		throw new Exception(
