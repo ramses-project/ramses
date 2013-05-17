@@ -39,4 +39,5 @@ public class Names
   public static final String ATT_CLASS = "class" ;
   
   public static final String AADL_RESOURCE_DIRECTORY_NAME="aadl_resources" ;
+  public static final String RAMSES_RESOURCES_VAR = "RAMSES_DIR";
 }

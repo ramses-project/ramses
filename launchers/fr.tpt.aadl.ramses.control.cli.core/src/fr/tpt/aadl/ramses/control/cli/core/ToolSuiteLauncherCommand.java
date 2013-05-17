@@ -63,7 +63,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
         "system_to_instantiate" ;
   private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
-  private static final String RAMSES_RESOURCES_VAR = "RAMSES_DIR";
   private static final String RAMSES_DIR ;
   private static final String GENERATION_OPTION_ID = "target_platform" ;
   
@@ -84,10 +83,10 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   static
   {
-    String tmp = System.getProperty(RAMSES_RESOURCES_VAR) ;
+    String tmp = System.getProperty(Names.RAMSES_RESOURCES_VAR) ;
     if (tmp == null || tmp.isEmpty())
     {
-      tmp = System.getenv(RAMSES_RESOURCES_VAR) ;
+      tmp = System.getenv(Names.RAMSES_RESOURCES_VAR) ;
     }
     if(! (tmp == null || tmp.isEmpty()))
     {
