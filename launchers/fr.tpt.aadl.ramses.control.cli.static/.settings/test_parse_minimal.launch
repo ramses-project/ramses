@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/fr.tpt.aadl.ramses.control.cli.static/src/fr/tpt/aadl/ramses/control/cli/ToolSuiteLauncher.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--parse -m minimal_runtime_types.aadl2,minimal_runtime_sync.aadl2,minimal_runtime_port.aadl2,minimal_runtime_transport.aadl2,minimal_runtime_dispatch.aadl2,minimal_common_example.aadl2,minimal_example.aadl2,minimal_periodic_example.aadl2,minimal_aperiodic_example.aadl2,minimal_system_example.aadl2 -i ../../../../build_and_test/junit_tests/tests/minimal_runtime/input,../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/package"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&#10;-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl&#10;-Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
+</launchConfiguration>
