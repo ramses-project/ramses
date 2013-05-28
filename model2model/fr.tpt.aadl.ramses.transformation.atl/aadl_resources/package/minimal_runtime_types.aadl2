@@ -5,6 +5,10 @@ public
 with Data_Model, Base_Types ;
 
 
+data Date
+end Date ;
+
+
 data Byte
 
    properties

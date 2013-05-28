@@ -26,7 +26,7 @@ subprogram Wait_Next_Period
    
    features
    
-   Next_Period : in parameter Minimal_Runtime_Types::Date ;
+   Period : in parameter Minimal_Runtime_Types::Date ;
    
    properties
    
