@@ -36,12 +36,12 @@ import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneAnalysisErrorReporterFactory ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneParseErrorReporter ;
-import fr.tpt.aadl.ramses.control.support.reporters.StdOutputMessageReporter ;
+import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 
 public interface ServiceRegistry
 {
   public final static MessageReporter MSG_REPORTER =
-        new StdOutputMessageReporter() ;
+        new DefaultMessageReporter() ;
 
   public final static InternalErrorReporter INT_ERR_REPORTER =
         new StandAloneInternalErrorReporter(MSG_REPORTER) ;

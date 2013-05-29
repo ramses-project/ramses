@@ -29,6 +29,8 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.eclipse.emf.ecore.resource.Resource ;
+
 import com.martiansoftware.jsap.FlaggedOption ;
 import com.martiansoftware.jsap.JSAP ;
 import com.martiansoftware.jsap.JSAPException ;
@@ -43,7 +45,7 @@ import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
-import fr.tpt.aadl.ramses.control.support.reporters.StdOutputMessageReporter ;
+import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
@@ -78,7 +80,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String XML_OPTION_ID = "xml_path" ;
   private static final String WORKFLOW_OPTION_ID = "workflow_path" ;
   
-  private final static StdOutputMessageReporter _reporter = new StdOutputMessageReporter();
+  private final static DefaultMessageReporter _reporter = new DefaultMessageReporter();
   private final static StandAloneInternalErrorReporter _errorReporter = new StandAloneInternalErrorReporter(_reporter);
   
   static
@@ -360,11 +362,11 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapHelp.registerParameter(workflow_path) ;
     jsapHelp.registerParameter(parameters);
     
-    
     jsapParse.registerParameter(model) ;
     jsapParse.registerParameter(includes) ;
     jsapParse.registerParameter(parseOnlyMode) ;
     jsapParse.registerParameter(parameters);
+    jsapParse.registerParameter(generated_file_path);
     
     jsapAnalysis.registerParameter(analysis) ;
     jsapAnalysis.registerParameter(model) ;
@@ -468,7 +470,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                                                    includeFolderNames) ;
     launcher.parsePredefinedRessources() ;
     launcher.parsePredefinedPackages() ;
-    launcher.parse(mainModelFiles) ;
+    List<Resource> modelResources = launcher.parse(mainModelFiles) ;
     MessageStatus ms = MessageStatus.INFO ;
     
     String msg = "instanciation has " ;
@@ -485,6 +487,22 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     }
     
     _reporter.reportMessage(ms, msg) ;
+    
+    // Unparse if --output option is set.
+    String unparse_file_path =
+        parseConfig.getString(OUTPUT_DIR_OPTION_ID) ;
+    
+    if( ! (
+            unparse_file_path == null ||
+            unparse_file_path.isEmpty()
+          )
+      )
+    {
+      File outputPath = ToolSuiteLauncherCommand.
+                                            getVerifiedPath(unparse_file_path) ;
+      
+      launcher.unparse(modelResources, outputPath) ;
+    }
   }
 
   private static void analyse(ToolSuiteLauncher launcher,

@@ -21,10 +21,29 @@
 
 package fr.tpt.aadl.ramses.control.support.reporters ;
 
-public class StdOutputMessageReporter extends AbstractMessageReporter
+import java.io.PrintStream ;
+
+public class DefaultMessageReporter extends AbstractMessageReporter
 {
-  protected void printMessage(String msg)
+  protected void printMessage(String msg, MessageStatus status)
   {
-    System.err.println(msg) ;
+    this.getStream(status).println(msg) ;
+  }
+  
+  protected PrintStream getStream(MessageStatus status)
+  {
+    PrintStream result ;
+    
+    switch(status)
+    {
+      case ERROR :
+      case INTERNAL_ERROR :
+      case WARNING : {result = System.err ; break ;}
+      
+      case INFO :
+      default : {result = System.out ; break ;}
+    }
+    
+    return result ;
   }
 }

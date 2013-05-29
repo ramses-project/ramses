@@ -30,7 +30,7 @@ import fr.tpt.aadl.utils.Aadl2Utils ;
 
 public abstract class AbstractMessageReporter implements MessageReporter
 {
-  abstract protected void printMessage(String msg) ;
+  abstract protected void printMessage(String msg, MessageStatus status) ;
 
   @Override
   public void reportMessage(MessageStatus status,
@@ -47,7 +47,7 @@ public abstract class AbstractMessageReporter implements MessageReporter
     sb.append(line) ;
     sb.append(": ") ;
     sb.append(message) ;
-    printMessage(sb.toString()) ;
+    printMessage(sb.toString(), status) ;
   }
 
   @Override
@@ -55,9 +55,9 @@ public abstract class AbstractMessageReporter implements MessageReporter
                             String message)
   {
     StringBuilder sb = new StringBuilder(status.toString()) ;
-    sb.append(": ") ;
+    sb.append(' ') ;
     sb.append(message) ;
-    printMessage(sb.toString()) ;
+    printMessage(sb.toString(), status) ;
   }
 
   @Override
@@ -88,6 +88,6 @@ public abstract class AbstractMessageReporter implements MessageReporter
     sb.append(line) ;
     sb.append(": ") ;
     sb.append(message) ;
-    printMessage(sb.toString()) ;
+    printMessage(sb.toString(), status) ;
   }
 }

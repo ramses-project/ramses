@@ -22,6 +22,8 @@
 package fr.tpt.aadl.ramses.control.cli.core ;
 
 import java.io.File ;
+import java.io.IOException ;
+import java.io.PrintStream ;
 import java.util.ArrayList ;
 import java.util.List ;
 import java.util.Map ;
@@ -30,18 +32,20 @@ import java.util.Set ;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
+import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
@@ -256,5 +260,40 @@ void parsePredefinedPackages()
   {
     File aadlResourcesDir = RamsesConfiguration.getRamsesResourcesDir();
     new PredefinedPackagesManager(aadlResourcesDir);
+  }
+
+  public void unparse(List<Resource> resources, File outputPath) throws IOException
+  {
+    String fileName ;
+    String outputFilePath ;
+    File outputFile ;
+    PrintStream ps ;
+    String msg ;
+    
+    for(Resource r : resources)
+    {
+      fileName = r.getURI().toFileString() ;
+      fileName = fileName.substring(fileName.lastIndexOf(File.separator)) ;
+      outputFilePath = outputPath.getAbsolutePath() + fileName ; 
+      outputFile = new File(outputFilePath);
+      
+      if(outputFile.exists())
+      {
+        outputFile.delete() ;
+      }
+      
+      outputFile.createNewFile() ;
+      
+      Aadl2StandaloneUnparser unparser = new Aadl2StandaloneUnparser() ;
+      NamedElement el = (NamedElement) r.getContents().get(0);
+      
+      msg = "Unparse " + el.getName() + " into " + outputFile.getAbsolutePath() ;
+      ServiceRegistry.MSG_REPORTER.reportMessage(MessageStatus.INFO, msg) ;      
+      
+      unparser.doUnparse(el) ;
+      ps = new PrintStream(outputFile) ;
+      ps.append(unparser.getOutput()) ;
+      ps.close() ;
+    }
   }
 }
