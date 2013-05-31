@@ -28,6 +28,8 @@ import java.util.List ;
 import java.util.Set ;
 
 import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.ecore.EObject;
+import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Data ;
 import org.osate.aadl2.DataClassifier ;
@@ -48,6 +50,7 @@ import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.ReferenceValue ;
 import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.Subcomponent ;
+import org.osate.aadl2.Subprogram;
 import org.osate.aadl2.SubprogramCall ;
 import org.osate.aadl2.SubprogramCallSequence ;
 import org.osate.aadl2.SubprogramImplementation ;
@@ -59,6 +62,10 @@ import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement;
+import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
@@ -264,29 +271,48 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
   {
     if(aCallSpecification instanceof SubprogramCall)
     {
-      getListOfReferencedObjects((SubprogramCall) aCallSpecification, result) ;
+    	SubprogramCall sc = (SubprogramCall) aCallSpecification;
+      getListOfReferencedObjects((Subprogram) sc.getCalledSubprogram(), result) ;
     }
   }
 
-  public static void getListOfReferencedObjects(SubprogramCall aSubprogramCall,
-                                                Set<String> result)
+  public static void getListOfReferencedObjects(Subprogram aSubprogram,
+      Set<String> result)
   {
-    if(aSubprogramCall.getCalledSubprogram() instanceof SubprogramType)
+  	if(aSubprogram instanceof SubprogramType)
     {
       SubprogramType aSubprogramType =
-            (SubprogramType) aSubprogramCall.getCalledSubprogram() ;
+            (SubprogramType) aSubprogram ;
 
+      for(AnnexSubclause annex: aSubprogramType.getAllAnnexSubclauses())
+      {
+      	if(annex instanceof BehaviorAnnex)
+      	{
+      		BehaviorAnnex ba = (BehaviorAnnex) annex;
+      		getListOfReferencedObjects(ba,
+              	result);
+      	}
+      }
       for(PropertyAssociation aPropertyAssociation : aSubprogramType
             .getOwnedPropertyAssociations())
       {
         getListOfReferencedObjects(aPropertyAssociation, result) ;
       }
     }
-    else if(aSubprogramCall.getCalledSubprogram() instanceof SubprogramImplementation)
+    else if(aSubprogram instanceof SubprogramImplementation)
     {
       SubprogramImplementation aSubprogramImplementation =
-            (SubprogramImplementation) aSubprogramCall.getCalledSubprogram() ;
+            (SubprogramImplementation) aSubprogram ;
 
+      for(AnnexSubclause annex: aSubprogramImplementation.getAllAnnexSubclauses())
+      {
+      	if(annex instanceof BehaviorAnnex)
+      	{
+      		BehaviorAnnex ba = (BehaviorAnnex) annex;
+      		getListOfReferencedObjects(ba,
+              	result);
+      	}
+      }
       for(PropertyAssociation aPropertyAssociation : aSubprogramImplementation
             .getOwnedPropertyAssociations())
       {
@@ -300,8 +326,26 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       }
     }
   }
+  
+  private static void getListOfReferencedObjects(BehaviorAnnex ba,
+			Set<String> result)
+	{
+		for(BehaviorActionBlock bab: ba.getActions())
+		{
+			Iterator<EObject> iter = bab.eAllContents();
+			while(iter.hasNext())
+			{
+				EObject next = iter.next();
+				if(next instanceof SubprogramCallAction)
+				{
+					SubprogramCallAction sca = (SubprogramCallAction) next;
+					getListOfReferencedObjects((Subprogram) sca.getSubprogram().getElement(), result);
+				}
+			}
+		}
+	}
 
-  public static void getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
+	public static void getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
                                                 Set<String> result)
   {
     if(aPropertyAssociation.getProperty().getName() != null &&
