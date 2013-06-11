@@ -1,0 +1,8 @@
+Bundle-Vendor: TELECOM ParisTech
+Bundle-SymbolicName: AADLInspectorSimulationAnalysis
+Bundle-Version: 1.0.0
+Bundle-Name: AADLInspector-Simulation-Analysis
+Require-Bundle: fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
+Provide-Package: fr.tpt.aadl.launch,
+ fr.tpt.aadl.sched.aadlinspector,
+ fr.tpt.aadl.sched.aadlinspector.output
