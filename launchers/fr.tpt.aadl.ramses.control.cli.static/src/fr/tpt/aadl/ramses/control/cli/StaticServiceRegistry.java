@@ -33,6 +33,7 @@ import org.osate.annexsupport.AnnexUnparser;
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.annex.behavior.AadlBaResolver;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
+import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
@@ -70,6 +71,7 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _unparsers.put(AadlBaToCUnparserAction.ANNEX_NAME,
                    new AadlBaToCUnparserAction()) ;
     _analyzers.put(WcetAnalysis.ANALYZER_NAME, new WcetAnalysis());
+    _analyzers.put(AADLInspectorSchedulingAnalysis.ANALYZER_NAME, new AADLInspectorSchedulingAnalysis());
     
     AbstractGeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
     AbstractGeneratorFactory pokTTGeneratorFactory = new PokTTGeneratorFactory();
