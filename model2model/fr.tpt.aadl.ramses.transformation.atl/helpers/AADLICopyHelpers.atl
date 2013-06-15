@@ -19,6 +19,8 @@
 -- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
+-- @atlcompiler emftvm
+
 library AADLICopyHelpers;
 
 helper context AADLI!Subcomponent def : getType() : AADLI!ComponentType =
@@ -43,7 +45,7 @@ helper context AADLI!ComponentInstance def : getType() : AADLI!ComponentType =
 
 helper context AADLI!ComponentInstance def : getImpl() : AADLI!ComponentImplementation =
 	if (self.category = #system) then
-		thisModule.resolveTemp(self, 'impl')
+		self.systemImplementation
 	else
 		if (self.getSubcomponent().getClassifier().oclIsKindOf(AADLI!ComponentImplementation)) then
 			self.getSubcomponent().getClassifier()
@@ -83,7 +85,7 @@ helper context AADLI!ComponentInstance def : owner() : AADLI!ComponentInstance =
 
 helper context AADLI!ComponentInstance def : ownerImplImg() : AADLBA!ComponentImplementation = 
 	if (self.eContainer().category = #system) then
-		thisModule.resolveTemp(self.eContainer(), 'impl')
+		thisModule.resolveTemp(self.eContainer().systemImplementation, 'implImg')
 	else
 		thisModule.resolveTemp(self.eContainer(), 'sub').getSubcomponentType()
 	endif
@@ -101,9 +103,48 @@ helper context AADLI!ConnectionInstanceEnd def : getFeatureImg() : AADLBA!Featur
 	thisModule.resolveTemp(self, 'f')
 ;
 
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
+		thisModule.resolveTemp(Sequence{self,cnxInst.connectionReference->first()}, 'f')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature() : AADLBA!DataAccess =
+	thisModule.resolveTemp(self, 'f_entrypoint')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
+		thisModule.resolveTemp(Sequence{self,cnxInst.connectionReference->first()}, 'f_entrypoint')
+;
+
+helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
+	self.ownedPropertyAssociation->collectSelfPropertyAssociationImg()
+;
+
+helper context Sequence(AADLBA!PropertyAssociation) def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
+	self->select(e|(e.collectInstanceReferenceValue()->isEmpty()))
+								 ->union(self->select(e|not e.collectInstanceReferenceValue()->isEmpty() 
+								 											  and e.collectInstanceReferenceValue()->select(f| not f.referencedInstanceObject.isContainedIn(f.eContainer().eContainer().eContainer().eContainer()))->isEmpty())) -- econtainer() 4 times retreives container component instance; recursive helper would be better...
+													 ->collect ( p |  thisModule.resolveTemp(p, 'p2'))
+;
+
 helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(category : String) : Sequence(AADLI!ComponentInstance) =
-	AADLI!ComponentInstance->allInstances()->any(c|c.getImpl()=self).componentInstance
-	                        ->select(c|c.category.toString()=category)
+	let instance : AADLI!ComponentInstance = AADLI!ComponentInstance->allInstancesFrom('IN')->any(c|c.getImpl()=self)
+	in
+	if(not instance.oclIsUndefined()) then
+		instance.componentInstance
+	                        ->select(c|c.category.getName()=category)
+	else
+		Sequence{}
+	endif
+;
+	
+helper context AADLI!Feature def : getFeaturesInstances(category : String) : AADLI!FeatureInstance =
+	let featureInstance : AADLI!FeatureInstance = AADLI!FeatureInstance->allInstancesFrom('IN')->any(f|f.feature=self)
+	in
+	if(not featureInstance.oclIsUndefined()) then
+		featureInstance
+	else
+		OclUndefined
+	endif
 ;
 
 helper context AADLI!ConnectedElement def : getConnContextImg(owner : AADLBA!ComponentImplementation) : AADLBA!Context =
@@ -111,7 +152,7 @@ helper context AADLI!ConnectedElement def : getConnContextImg(owner : AADLBA!Com
 		OclUndefined
 	else
 		if (self.context.oclIsKindOf(AADLI!SubprogramCall).debug('Context is subprogram call')) then
-			owner.ownedSubprogramCallSequence->first().ownedCallSpecification->any(call|call.name = self.context.name)
+			owner.debug('1111').ownedSubprogramCallSequence.debug('222')->first().ownedCallSpecification->any(call|call.name = self.context.name)
 		else
 			-- can return OclUndefined if the subcomponent is not yet mapped
 			owner.getAllSubcomponents()->any(s|s.name = self.context.name)
@@ -149,7 +190,7 @@ helper context AADLI!SubprogramAccess def : getConnFeatureImg(connectedElt: AADL
 	self.subprogramFeatureClassifier.ownedParameter->any(p|p.name.debug('Param1')=connectedElt.connectionEnd.name.debug('Param2'))
 ;
 
-helper context AADLI!ComponentImplementation def : callSequenceFromComputeEntryPoint() : AADLI!Subrpogram =
+helper context AADLI!ComponentImplementation def : callSequenceFromComputeEntryPoint() : AADLI!Subprogram =
 	if(self.getModalPropertyValue('Compute_Entrypoint') = OclUndefined) then
 		if(self.type.getModalPropertyValue('Compute_Entrypoint') = OclUndefined) then
 			if(self.type.callSequenceFromComputeEntryPoint() = OclUndefined) then
@@ -165,7 +206,7 @@ helper context AADLI!ComponentImplementation def : callSequenceFromComputeEntryP
 	endif
 ;
 
-helper context AADLI!ComponentType def : callSequenceFromComputeEntryPoint() : AADLI!Subrpogram =
+helper context AADLI!ComponentType def : callSequenceFromComputeEntryPoint() : AADLI!Subprogram =
 	if(self.ownedEventPort->first() = OclUndefined) then
 		OclUndefined
 	else
@@ -175,10 +216,6 @@ helper context AADLI!ComponentType def : callSequenceFromComputeEntryPoint() : A
 			self.ownedEventPort->first().getModalPropertyValue('Compute_Entrypoint').ownedValue.classifier.debug('Retreived Call Sequence from Compute_Entrypoint')
 		endif
 	endif
-;
-
-helper context AADLI!ComponentImplementation def : callSequenceFromImpl() : AADLI!SubprogramCallSequence =
-	self.ownedElement->any(e|e.oclIsKindOf(AADLI!SubprogramCallSequence)).debug('Retreived Call Sequence from Impl')
 ;
 
 helper context AADLI!SubprogramCallSequence def : getAllOutParameters() : Sequence(AADLI!Parameter) =
@@ -210,24 +247,3 @@ helper context AADLI!DataClassifier def : mapDataClassifier() : AADLBA!DataClass
 	endif
 ;
 
-helper context AADLI!ComponentInstance def : createOrSetTypeAndImplementation() : AADLBA!ComponentClassifier =
-	if (self.getImpl().oclIsUndefined()) then
-	   thisModule.Type(self,self.getType())
-	else
-	   thisModule.Implementation(self,self.getImpl(), thisModule.Type(self,self.getType()))
-	endif
-;
-
-helper def : createOrSetTypeAndImplementation (s : AADLI!Subcomponent) : AADLBA!ComponentClassifier =
-	thisModule.Implementation (OclUndefined, 
-							   s.getComponentImplementation(), 
-							   thisModule.Type(OclUndefined, s.getComponentType()))
-;
-
-helper context AADLI!NamedElement def : mapOwnedPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
-	self.ownedPropertyAssociation->collect (e|thisModule.PropertyAssociation (e,false))->select(e| not e.oclIsUndefined())
-;
-
-helper context AADLI!NamedElement def : mapSubcomponentsReferenceList() : Sequence (AADLBA!PropertyAssociation) =
-	self.componentInstance->collect(e|e.ownedPropertyAssociation->collect (f|thisModule.PropertyAssociation (f, true)))->select(e| not e.oclIsUndefined())
-;
