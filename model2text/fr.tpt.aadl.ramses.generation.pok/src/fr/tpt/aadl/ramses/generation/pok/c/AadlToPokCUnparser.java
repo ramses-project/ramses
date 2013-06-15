@@ -228,7 +228,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
 //TODO : be refactored with generic interfaces.
   private void queueHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
-    Port p = getProcessPort(fi) ;
+    Port p = (Port) fi.getFeature() ;
     
     QueueInfo queueInfo = new QueueInfo() ;
     
@@ -299,33 +299,6 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     
   }
   
-  private Port getProcessPort(FeatureInstance fi)
-  {
-    ConnectionInstance ci = null ;
-    ConnectionReference cf = null ;
-    ConnectedElement c = null ;
-    
-    // TODO : queue information are not always in process, recursively fetch
-    // these informations.
-    if(DirectionType.OUT == fi.getDirection())
-    {
-      ci = fi.getSrcConnectionInstances().get(0) ;
-      cf = ci.getConnectionReferences().get(0) ; 
-      c = (ConnectedElement)(cf.getConnection().getDestination()) ;
-    }
-    else
-    {
-      ci = fi.getDstConnectionInstances().get(0) ;
-      EList<ConnectionReference> crl = ci.getConnectionReferences() ;
-      cf = crl.get(crl.size() -1) ;
-      c = (ConnectedElement)(cf.getConnection()).getSource() ;
-    }
-    
-    Port p = (Port) c.getConnectionEnd() ;
-    
-    return p ;
-  }
-  
   // Return false QueueInfo object is not completed.
   private boolean getQueueInfo(Port port, QueueInfo info)
   {
@@ -364,7 +337,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
   // TODO : be refactored with generic interfaces. 
   private void sampleHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
-    Port p = getProcessPort(fi) ;
+    Port p = (Port) fi.getFeature() ;
     
     SampleInfo sampleInfo = new SampleInfo() ;
     sampleInfo.direction = p.getDirection() ;
@@ -865,7 +838,7 @@ private void findCommunicationMechanism(ProcessImplementation process,
     {
       if(s instanceof DataSubcomponent)
       {
-        if(s.getClassifier().getQualifiedName()
+        if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
               .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
         {
           blackBoardHandler(s.getName(),
@@ -873,7 +846,7 @@ private void findCommunicationMechanism(ProcessImplementation process,
                             getTransformationTrace(s), pp);
           pp.hasBlackboard = true;
         }
-        else if(s.getClassifier().getQualifiedName()
+        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
               .equalsIgnoreCase(QUEUING_AADL_TYPE))
         {
           queueHandler(s.getName(),
@@ -882,20 +855,20 @@ private void findCommunicationMechanism(ProcessImplementation process,
           
           pp.hasQueue = true ;
         }
-        else if(s.getClassifier().getQualifiedName()
+        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
               .equalsIgnoreCase(SAMPLING_AADL_TYPE))
         {
           sampleHandler(s.getName(), (FeatureInstance) HookAccessImpl.
                        getTransformationTrace(s), pp);
           pp.hasSample = true ;
         }
-        else if(s.getClassifier().getQualifiedName()
+        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
               .equalsIgnoreCase(EVENT_AADL_TYPE))
         {
           pp.eventNames.add(s.getName());
           pp.hasEvent = true ;
         }
-        else if(s.getClassifier().getQualifiedName()
+        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
               .equalsIgnoreCase(BUFFER_AADL_TYPE))
         {
           bufferHandler(s.getName(),
