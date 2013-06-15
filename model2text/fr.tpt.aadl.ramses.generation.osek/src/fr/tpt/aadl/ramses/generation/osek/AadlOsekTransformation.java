@@ -1,25 +1,26 @@
 package fr.tpt.aadl.ramses.generation.osek;
 
-import java.io.File;
 import java.util.Map;
 
 import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
 
 public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 
-	public void initAtlFileNameList(File resourceFilePath)
+	
+	public AadlOsekTransformation()
 	{
 		ATL_FILE_NAMES = new String[] 
-				{ 
-			"targets/osek/ExpandThreadsPorts.asm", 
-			"targets/osek/ExpandThreadsDispatchProtocol.asm",
-			"targets/shared/PortsCommonRefinementSteps.asm",
-			"targets/shared/DispatchCommonRefinementSteps.asm",
-			"targets/shared/DispatchHWCommonRefinementSteps.asm",
-			"targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
-			 "targets/shared/SubprogramCallsCommonRefinementSteps.asm",
-			 "CreateThreadsBehavior.asm" };
-		super.initAtlFileNameList(resourceFilePath);
+				{
+			"ACG/targets/shared/UninstanciateOverride",
+ 			"ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
+ 			"ACG/targets/shared/PortsCommonRefinementSteps",
+ 			"ACG/targets/shared/DispatchCommonRefinementSteps",
+ 			"ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
+			"ACG/targets/osek/ExpandThreadsPorts", 
+			"ACG/targets/osek/ExpandThreadsDispatchProtocol",
+			"ACG/targets/shared/PortsCommonRefinementSteps",
+			"ACG/PeriodicDelayedCommunication/SharedRules",
+			"CreateThreadsBehavior" };
 	}
 
 	@Override

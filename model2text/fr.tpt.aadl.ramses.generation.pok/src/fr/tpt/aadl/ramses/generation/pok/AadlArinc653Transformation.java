@@ -21,7 +21,6 @@
 
 package fr.tpt.aadl.ramses.generation.pok ;
 
-import java.io.File;
 import java.util.Map;
 
 import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
@@ -38,23 +37,23 @@ public class AadlArinc653Transformation extends
   }
 
 
-	@Override
-	public void initAtlFileNameList(File resourceFilePath)
-	{
-		ATL_FILE_NAMES = new String[]
-        {"targets/arinc653/ExpandThreadsPorts.asm",
-  			 "targets/shared/PortsCommonRefinementSteps.asm",
-  			 "targets/shared/DispatchCommonRefinementSteps.asm",
-  			 "targets/shared/BehaviorAnnexCommonRefinementSteps.asm",
-        "targets/shared/SubprogramCallsCommonRefinementSteps.asm",
-	  	   "targets/arinc653/BlackboardCommunications.asm",
-	  	   "targets/arinc653/BufferCommunications.asm",
-	  	   "targets/arinc653/EventsCommunications.asm",
-	  	   "targets/arinc653/QueuingCommunications.asm",
-	  	   "targets/arinc653/SamplingCommunications.asm",
-	  	   "targets/arinc653/ExpandThreadsDispatchProtocol.asm"
+  public AadlArinc653Transformation()
+  {
+  	ATL_FILE_NAMES = new String[]
+        {"ACG/targets/shared/UninstanciateOverride",
+  			 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
+  			 "ACG/targets/shared/PortsCommonRefinementSteps",
+  			 "ACG/targets/shared/DispatchCommonRefinementSteps",
+  			 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
+  			 "ACG/targets/arinc653/ExpandThreadsPorts",
+	  	   "ACG/targets/arinc653/BlackboardCommunications",
+	  	   "ACG/targets/arinc653/BufferCommunications",
+	  	   "ACG/targets/arinc653/EventsCommunications",
+	  	   "ACG/targets/arinc653/QueuingCommunications",
+	  	   "ACG/targets/arinc653/SamplingCommunications",
+	  	   "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
+	  	   "ACG/PeriodicDelayedCommunication/SharedRules"
         };
-	  	   
-		super.initAtlFileNameList(resourceFilePath);
-	}
+  }
+  
 }
