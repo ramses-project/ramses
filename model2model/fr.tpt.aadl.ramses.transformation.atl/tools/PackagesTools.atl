@@ -20,6 +20,7 @@
 --
 
 -- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
 
 module PackagesTools;
 
@@ -34,12 +35,6 @@ from
 	SCHEDULER_REALIZATIONS : AADLBA,
 	SCHEDULER_RUNTIME	   : AADLBA;
 
-uses AADLCopyHelpers;
-uses AADLICopyHelpers;
-uses FHSHelpers;
-uses AADLRuntimeHelpers;
-uses Services;
-
 
 rule addImportedUnit(packageImg: AADLBA!PackageSection,	model: String,	importedPackage:String) {
 	using
@@ -51,7 +46,7 @@ rule addImportedUnit(packageImg: AADLBA!PackageSection,	model: String,	importedP
 	{
 		if(isNotYetImported)
 		{
-			packageImg.importedUnit.add(unit);
+			thisModule.allImportedUnits <- thisModule.allImportedUnits->including(unit);
 		}
 	}
 }
@@ -61,16 +56,14 @@ rule addImportedUnitFromInputModel(packageImg: AADLBA!PackageSection, elt: AADLB
 	using
 	{
 		src_package : AADLI!AadlPackage = elt.getContainingPackage();
-		isNotYetImported: Boolean = false;
 	}
 	do
 	{
-		if(not src_package.oclIsUndefined())
+		if(not src_package.oclIsUndefined() and not packageImg.importedUnit->exists(e|e.name = src_package.name))
 		{
-			isNotYetImported <- packageImg.importedUnit->any(e|e.name = src_package.name).oclIsUndefined(); 
-			if(isNotYetImported and not src_package.equals(packageImg))
+			if(not src_package.equals(packageImg))
 			{
-				packageImg.importedUnit.add(src_package);
+				thisModule.allImportedUnits <- thisModule.allImportedUnits->including(src_package);
 			}
 		}
 	}
