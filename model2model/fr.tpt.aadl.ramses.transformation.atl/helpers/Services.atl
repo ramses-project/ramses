@@ -19,31 +19,48 @@
 -- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
+-- @atlcompiler emftvm
+
 library Services;
 
-
-helper def: dataSubcomponentSuffix(): String = '_Instance';
 helper def: dataAccessSuffix(): String ='_PortIdAccess_';
-helper def: callPrefix(): String ='call_';
+helper def: callPrefix(): String ='call';
 
 
 helper def: theHOOK : ATLHOOKS!HookAccess = ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first();
 
-helper context AADLBA!NamedElement def: get_C_Identifier(): String =
+helper context Sequence(AADLBA!Element) def: add(elt: AADLBA!Element) : Boolean =
+	thisModule.theHOOK.add(self, elt)
+;
+
+helper context AADLBA!NamedElement def: getProgrammationLanguageIdentifier(): String =
 	let pa: AADLBA!PropertyAssociation = self.getPropertyAssociation('Source_Name') in
 	if(not pa.oclIsUndefined()) then
 		pa.ownedValue->first().ownedValue.value
 	else
-		self.getQualifiedName().replaceAll('::', '__').replaceAll('.','_')
+		self.getQualifiedName().replaceAll('::', '__').replaceAll('\\.','_')
 	endif
 ;
 
-helper context String def: get_C_Identifier(): String =
-	self.replaceAll('::', '__').replaceAll('.','_')
+helper context String def: getProgrammationLanguageIdentifier(): String =
+	self.replaceAll('::', '__').replaceAll('\\.','_')
 ;
+
+helper def:getProgrammationLanguageIdentifier(identifier:String): String =
+	identifier.replaceAll('\\.','_').replaceAll('::','__');
+
 
 helper context AADLBA!ThreadImplementation def : callSequence() : AADLBA!SubprogramCallSequence =
 	self.ownedSubprogramCallSequence->first()
+;
+
+helper context AADLI!SubprogramCallSequence def: isComputeEntryPointOf(c: AADLI!ComponentInstance): Boolean =
+	c.ownedPropertyAssociation->exists(
+				e | 
+				e.property.name = 'Compute_Entrypoint_Call_Sequence'
+				and
+				e.ownedValue->exists(f|f.ownedValue.containmentPathElement->first().namedElement=self)
+			)
 ;
 
 helper context AADLBA!DirectedFeature def: isOutputFeature(): Boolean =
@@ -55,11 +72,20 @@ helper context AADLBA!DirectedFeature def: isInputOutputFeature(): Boolean =
 helper context AADLBA!DirectedFeature def: isInputFeature(): Boolean =
 	(not self.isOutputFeature() and not self.isInputOutputFeature());
 
-helper context AADLBA!DirectedFeature def: getDirection(): AADLBA!DirectionType =
-	self.direction;
+helper context AADLI!FeatureInstance def: isOutputFeature(): Boolean =
+	self.feature.oclIsKindOf(AADLBA!DirectedFeature) and self.direction = #out;
+		
+helper context AADLI!FeatureInstance def: isInputOutputFeature(): Boolean =
+	self.feature.oclIsKindOf(AADLBA!DirectedFeature) and self.direction = #inOut;
+
+helper context AADLI!FeatureInstance def: isInputFeature(): Boolean =
+	(self.feature.oclIsKindOf(AADLBA!DirectedFeature) and not self.isOutputFeature() and not self.isInputOutputFeature());
 
 helper context AADLBA!SubprogramType def: getOrderedFeature() : Sequence(AADLBA!Feauture) =
 	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().orderFeatures(self);
+
+helper context AADLBA!SubprogramImplementation def: getOrderedFeature() : Sequence(AADLBA!Feauture) =
+	self.getComponentType().getOrderedFeature();
 
 helper context AADLBA!ComponentImplementation def: getComponentType(): AADLBA!ComponentType = 
 	self.type;
@@ -82,8 +108,6 @@ helper context AADLBA!SubprogramType def: getSubprogramParameters() : Sequence(A
 helper context AADLBA!SubprogramImplementation def: getSubprogramParameters() : Sequence(AADLBA!Parameter) = 
 	self.type.ownedParameter;
 
-helper def:getProgrammationLanguageIdentifier(identifier:String): String =
-	identifier.replaceAll('.','_').replaceAll('::','__');
 
 helper context AADLI!FeatureInstance def : isThreadPort() : Boolean =
 	self.eContainer().category = #thread and self.feature.oclIsKindOf(AADLBA!Port)
@@ -102,8 +126,29 @@ helper context AADLI!ComponentInstance def : isProcessPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def : isDataOrEventDataPort() : Boolean =
-	(self.feature.oclIsTypeOf(AADLI!EventDataPort) or self.feature.oclIsTypeOf(AADLI!DataPort)); 
+	(self.isEventDataPort() or self.isDataPort()); 
 
+helper context AADLI!FeatureInstance def : isEventOrEventDataPort() : Boolean =
+	(self.isEventDataPort() or self.isEventDataPort());
+
+helper context AADLI!FeatureInstance def : isEventPort(): Boolean =
+	self.feature.oclIsTypeOf(AADLI!EventPort);
+
+helper context AADLI!FeatureInstance def : isEventDataPort(): Boolean =
+	self.feature.oclIsTypeOf(AADLI!EventDataPort);
+
+helper context AADLI!FeatureInstance def : isDataPort(): Boolean =
+	self.feature.oclIsTypeOf(AADLI!DataPort);
+
+helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Boolean =
+	not self.srcConnectionInstance->exists(e| not (e.destination.getProcess() = self.getProcess()))
+	and
+	not self.dstConnectionInstance->exists(e| not (e.source.getProcess() = self.getProcess()))
+;
+
+helper context AADLI!FeatureInstance def : getProcess(): AADLI!ComponentInstance =
+	self.eContainer().eContainer()
+;
 
 helper context AADLI!NamedElement def: getPeriodValue(): Integer =
 	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Period') in
@@ -166,4 +211,12 @@ helper context AADLI!ComponentInstance def: getDeadline() : Integer =
 	else
 		self.getModalPropertyValue('Deadline').ownedValue.value
 	endif
+;
+
+helper def: getBAInitialStateIdentifier(implBA: AADLBA!BehaviorAnnex) : String =
+	implBA.states->any(s|s.initial=true).name
+;
+
+helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
+	self.getFeatureImg()
 ;
