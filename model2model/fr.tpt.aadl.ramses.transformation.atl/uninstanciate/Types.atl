@@ -20,6 +20,7 @@
 --
 
 -- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
 
 module Types;
 
@@ -31,196 +32,173 @@ create
 from 
 	IN 				: AADLI;
 
-uses AADLCopyHelpers;
-uses AADLICopyHelpers;
 
--- Cannot be a matched rule since ComponentType does not appears as a member of the instance tree.
--- Must be called from the component instance which has a reference to it.
-rule Type (c : AADLI!ComponentInstance,
-		   type : AADLI!ComponentType) {
-	using
-	{
-		typeImg : AADLBA!ComponentType = type.getComponentType();
-	}
-	do
-	{
-		if(typeImg.oclIsUndefined())
-		{
-			if (type.oclIsKindOf(AADLI!BusType)) { typeImg <- thisModule.BusType(type); }
-			else if (type.oclIsKindOf(AADLI!VirtualBusType)) { typeImg <- thisModule.VirtualBusType(type); }	
-			else if (type.oclIsKindOf(AADLI!DeviceType)) { typeImg <- thisModule.DeviceType(type); }
-			else if (type.oclIsKindOf(AADLI!ProcessorType)) { typeImg <- thisModule.ProcessorType(type); }
-			else if (type.oclIsKindOf(AADLI!VirtualProcessorType)) { typeImg <- thisModule.VirtualProcessorType(type); }
-			else if (type.oclIsKindOf(AADLI!MemoryType)) { typeImg <- thisModule.MemoryType(type); }
-			else if (type.oclIsKindOf(AADLI!ProcessType)) 
-			{ 
-				if (c.oclIsUndefined())
-					typeImg <- thisModule.ProcessTypeWithoutInst(type);
-				else
-					typeImg <- thisModule.ProcessType(c,type);
-			}
-			else if (type.oclIsKindOf(AADLI!ThreadGroupType)) { typeImg <- thisModule.ThreadGroupType(type); }
-			else if (type.oclIsKindOf(AADLI!ThreadType)) 
-			{ 
-				if (c.oclIsUndefined())
-					typeImg <- thisModule.ThreadTypeWithoutInst(type);
-				else
-					typeImg <- thisModule.ThreadType(c,type);
-			}
-			else if (type.oclIsKindOf(AADLI!SubprogramType)) { typeImg <- thisModule.SubprogramType(type); }
-			else if (type.oclIsKindOf(AADLI!DataType)) { typeImg <- thisModule.DataType(type); }
-			
-		
-			if (typeImg.isDeclared())
-			  typeImg.debug('  previously declared type');
-			else
-			{
-			  typeImg.debug('  declare type');
-			  thisModule.public().getOwnedClassifiers().add(typeImg);
-			}
-		
-		}
-		
-		typeImg;
-	}
+helper context AADLI!ComponentType def : defaultEventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.ownedEventPort->collect(e|thisModule.EventPort(e))
+;
+
+helper context AADLI!ProcessorType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!VirtualProcessorType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!ProcessType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!ThreadType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+abstract rule m_Component_Type {
+  from
+  	type : AADLI!ComponentType
+  to
+    typeImg : AADLBA!ComponentType
+	(
+ 		name <- type.name
+ 	)
 }
 
-unique lazy rule BusType {
+-- @extends m_Component_Type
+rule m_Bus_Type {
  from
  	type : AADLI!BusType
  to
- 	typeImg : AADLBA!BusType (
- 		name <- type.name
- 	)
+ 	typeImg : AADLBA!BusType
 }
 
-unique lazy rule VirtualBusType {
+-- @extends m_Component_Type
+rule m_VirtualBus_Type {
  from
  	type : AADLI!VirtualBusType
  to
- 	typeImg : AADLBA!VirtualBusType (
- 		name <- type.name
- 	)
+ 	typeImg : AADLBA!VirtualBusType
 }
 
-unique lazy rule DeviceType {
+-- @extends m_Component_Type
+rule m_Device_Type {
  from
  	type : AADLI!DeviceType
  to
  	typeImg : AADLBA!DeviceType (
- 		name <- type.name,
-		ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
-	 	ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
-	 	ownedEventPort <- type.ownedEventPort->collect(e|thisModule.Port(e))
+		ownedEventDataPort <- type.ownedEventDataPort,
+	 	ownedDataPort <- type.ownedDataPort,
+	 	ownedEventPort <- type.ownedEventPort
  	)
 }
 
-unique lazy rule ProcessorType {
- from 
+-- @extends m_Component_Type
+rule m_Processor_Type {
+  from 
     type : AADLI!ProcessorType 
- to 
+  to 
     typeImg : AADLBA!ProcessorType (
-     name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
-	 ownedEventPort <- type.eventPortsMapping()
- )
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))
+  )
 }
 
-unique lazy rule VirtualProcessorType {
+-- @extends m_Component_Type
+rule m_VirtualProcessor_Type {
  from 
     type : AADLI!VirtualProcessorType 
  to 
     typeImg : AADLBA!VirtualProcessorType (
-     name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
-	 ownedEventPort <- type.eventPortsMapping()
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))
 	)
 }
 
-unique lazy rule MemoryType {
- from type : AADLI!MemoryType to typeImg : AADLBA!MemoryType (name <- type.name)
+-- @extends m_Component_Type
+rule m_Memory_Type {
+  from 
+ 	type : AADLI!MemoryType
+  to 
+  	typeImg : AADLBA!MemoryType
 }
 
-
-
-unique lazy rule ProcessType {
+-- @extends m_Component_Type
+rule m_Process_Type {
  from
- 	c : AADLI!ComponentInstance,
  	type : AADLI!ProcessType
  to 
  	typeImg : AADLBA!ProcessType (
- 	 name <- c.uniqueName(),
-	 ownedEventDataPort <- c.featureInstance->select(e| e.category=#eventDataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
-	 ownedDataPort <- c.featureInstance->select(e| e.category=#dataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
-	 ownedEventPort <- c.featureInstance->select(e| e.category=#eventPort)->collect(f| thisModule.resolveTemp(f, 'f')),
-	 ownedSubprogramAccess <- c.featureInstance->select(e| e.category=#subprogramAccess)->collect(f| thisModule.resolveTemp(f, 'f').debug('Retreive mapped subprogram access'))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
 	)
 }
 
-unique lazy rule ThreadGroupType {
+-- @extends m_Component_Type
+rule m_ThreadGroup_Type {
  from 
  	type : AADLI!ThreadGroupType
  to 
  	typeImg : AADLBA!ThreadGroupType (
- 	 name <- type.name,
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|thisModule.Port(e)),
-	 ownedDataPort <- type.ownedDataPort->collect(e|thisModule.Port(e)),
-	 ownedEventPort <- type.ownedEventPort->collect(e|thisModule.Port(e))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
 	)
 }
 
-unique lazy rule ThreadType {
+-- @extends m_Component_Type
+rule m_Thread_Type {
  from 
- 	c : AADLI!ComponentInstance,
  	type : AADLI!ThreadType
  to 
  	typeImg : AADLBA!ThreadType (
- 	 name <- c.uniqueName().debug('thread type'),
-	 ownedEventDataPort <- c.featureInstance->select(e| e.category=#eventDataPort)->collect(f| thisModule.resolveTemp(f, 'f').debug('Retreive mapped feature')),
-	 ownedDataPort <- c.featureInstance->select(e| e.category=#dataPort)->collect(f| thisModule.resolveTemp(f, 'f')),
-	 ownedEventPort <- c.featureInstance->select(e| e.category=#eventPort)->collect(f| thisModule.resolveTemp(f, 'f')),
-	 ownedDataAccess <- c.featureInstance->select(e| e.category=#dataAccess)->collect(f| thisModule.resolveTemp(f, 'f')),
-	 ownedSubprogramAccess <- c.featureInstance->select(e| e.category=#subprogramAccess)->collect(f| thisModule.resolveTemp(f, 'f').debug('Retreive mapped subprogram access'))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
  	)
 }
 
-unique lazy rule SubprogramType {
+-- @extends m_Component_Type
+rule m_Subprogram_Type {
  from 
  	type : AADLI!SubprogramType 
  to 
  	typeImg : AADLBA!SubprogramType (
- 		name <- type.name,
 		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
 		ownedDataAccess <- type.ownedDataAccess->collect(p|thisModule.DataAccess(p)),
 		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
 	)
 }
 
---rule addOrderedSubprogramFeatures(type: AADLBA!SubprogramType, typeImg: AADLBA!SubprogramType)
---{
---	do
---	{
---		for(f in type.ownedFeature)
---		{
---			if(f.oclIsKindOf(AADLBA!Parameter))
---			{
---				typeImg.ownedParameter.add(thisModule.Parameter(f));
---			}
---			else if(f.oclIsKindOf(AADLBA!DataAccess))
---			{
---				typeImg.ownedDataAccess.add(thisModule.DataAccess(f));
---			}
---		}
---	}
---}
+-- @extends m_Component_Type
+rule m_System_Type {
+ from 
+ 	type : AADLI!SystemType 
+ to 
+ 	typeImg : AADLBA!SystemType (
+		ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+		ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+		ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+		ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+		ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess')),
+		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+	)
+}
 
-unique lazy rule DataType {
- from type : AADLI!DataType 
- to typeImg : AADLBA!DataType 
- (
- 	name <- type.name,
-	ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
- )
+-- @extends m_Component_Type
+rule m_Data_Type {
+ from 
+   type : AADLI!DataType 
+ to 
+   typeImg : AADLBA!DataType 
+   (
+	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+   )
 }
