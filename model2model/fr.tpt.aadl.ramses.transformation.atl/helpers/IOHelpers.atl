@@ -20,6 +20,7 @@
 --
 
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
 
 library IOHelpers;
 
@@ -32,33 +33,20 @@ helper context AADLI!ConnectionInstance def: isDelayedConnection() : Boolean =
 	endif
 ;
 
-helper context AADLI!FeatureInstance def: isDefinedDelayedPort() : Boolean =
-	-- TODO: consider default value here
-	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('timing') in
-	if(not mpv.oclIsUndefined()) then
-		mpv.ownedValue.namedValue.name.toLower() = 'delayed'
-	else
-		false
-	endif
-;
-
 helper context AADLI!FeatureInstance def: isDelayedPort() : Boolean =
-	if (self.isDefinedDelayedPort()) then
+	if(self.direction.getName()='in' and self.dstConnectionInstance->forAll(e|e.isDelayedConnection())) then
 		true
-	else if(self.direction.toString()='in' and self.dstConnectionInstance->forAll(e|e.isDelayedConnection())) then
+	else 
+		if(self.direction.getName()='out' and self.srcConnectionInstance->forAll(e|e.isDelayedConnection())) then
 			true
-		else 
-			if(self.direction.toString()='out' and self.srcConnectionInstance->forAll(e|e.isDelayedConnection())) then
+		else
+			if(self.direction.getName()='in' and self.dstConnectionInstance->forAll(e|e.source.isDefinedDelayedPort())) then
 				true
 			else
-				if(self.direction.toString()='in' and self.dstConnectionInstance->forAll(e|e.source.isDefinedDelayedPort())) then
+				if(self.direction.getName()='out' and self.srcConnectionInstance->forAll(e|e.destination.isDefinedDelayedPort())) then
 					true
 				else
-					if(self.direction.toString()='out' and self.srcConnectionInstance->forAll(e|e.destination.isDefinedDelayedPort())) then
-						true
-					else
-						false
-					endif
+					false
 				endif
 			endif
 		endif
@@ -74,9 +62,9 @@ helper context AADLI!FeatureInstance def: isImmediatePort() : Boolean =
 	if(self.getModalPropertyValue('timing').ownedValue.namedValue.name.toLower() = 'immediate')
 	then
 		true
-	else if(self.direction.toString()='in' and self.dstConnectionInstance->forAll(e|e.isImmediateConnection())) then
+	else if(self.direction.getName()='in' and self.dstConnectionInstance->forAll(e|e.isImmediateConnection())) then
 			true
-			else if(self.direction.toString()='out' and self.srcConnectionInstance->forAll(e|e.isImmediateConnection())) then
+			else if(self.direction.getName()='out' and self.srcConnectionInstance->forAll(e|e.isImmediateConnection())) then
 				true
 			else
 				false
@@ -170,18 +158,16 @@ helper context AADLI!FeatureInstance def: isPeriodicDelayedPort(): Boolean =
 		self.category=#eventDataPort and
 		self.isPeriodicThreadPort() and
 		self.srcConnectionInstance->forAll(e|e.destination.isPeriodicThreadPort()) and
-		self.srcConnectionInstance->forAll(e|e.isIntraProcessConnection()) and
 		(self.isDelayedPort() or self.isTimeBasedOutputPort() ) and
 		-- We should also deal with the output time property even though we consider here it is replaced by the
 		-- 'timing=Delayed' property
 		self.isOnePerDispatchOutputRate() -- Value_Range = '1.0 .. 1.0' and Rate_Unit = 'PerDispatch' and Rate_Distribution = 'Fixed'
 	else
-		self.direction.toString()='in' and
+		self.direction.getName()='in' and
 		self.category=#eventDataPort and
 		self.isPeriodicThreadPort() and
 		self.dstConnectionInstance->forAll(e|e.source.isPeriodicThreadPort()) and
-		self.dstConnectionInstance->forAll(e|e.isIntraProcessConnection()) and
-		(self.isDelayedPort() or self.isTimeBasedInputPort() ) and
+		(self.isDelayedPort() or self.isTimeBasedInputPort())  and
 		self.getDequeueProtocol() = 'AllItems'.toLower()
 	endif
 ;
