@@ -542,7 +542,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 				int period = (int) PropertyUtils.getIntValue(thread, "Period");
 				int alarmTime=0;
 				try{
-					alarmTime = (int) PropertyUtils.getIntValue(thread, "First_Dispatch_Time");
+					alarmTime = 1;
 				} catch(Exception exc)
 				{
 				}
