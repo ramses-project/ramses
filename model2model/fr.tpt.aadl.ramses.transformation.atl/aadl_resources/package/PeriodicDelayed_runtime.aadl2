@@ -3,6 +3,11 @@ public
 
 with Base_Types, Data_Model, Generation_Properties;
 
+  data ReturnCodeType
+    properties
+      Source_Name => "periodic_delayed_return_t";
+  end ReturnCodeType;
+
   data ArrayDataType
     properties
       Data_Model::Data_Representation => Array;
@@ -18,6 +23,8 @@ with Base_Types, Data_Model, Generation_Properties;
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       bufferSize: in parameter Base_Types::Integer_16;
      annex behavior_specification {**
+       variables
+       	 prev : Base_Types::Integer_16;
        states
          s: initial final state;
        transitions
@@ -27,8 +34,14 @@ with Base_Types, Data_Model, Generation_Properties;
        };
        t2: s -[iteration_counter!=-1]-> s 
        {
-         first := (last+1) mod bufferSize;
-         last := CPR[iteration_counter];
+         prev := (iteration_counter-1) mod CPRSize;
+         if(CPR[prev] != CPR[iteration_counter])
+           first := (last+1) mod bufferSize;
+           last  := CPR[iteration_counter]
+         else
+           first := -1;
+	   	   last  := -1
+         end if;
          iteration_counter := (iteration_counter+1) mod CPRSize
        };
    **};
@@ -49,10 +62,12 @@ with Base_Types, Data_Model, Generation_Properties;
       transitions
         t: s -[]-> s
         {
-          output := buffer[first];
-          if(first!=last)
+	  if(first>=0)
+            output := buffer[first];
+            if(first!=last)
         	first := (first+1) mod bufferSize 
-          end if -- TODO : else: should have an error port and send and error
+            end if -- TODO : else: should have an error port and send and error
+          end if
         };
     **};
   end Next_Value;

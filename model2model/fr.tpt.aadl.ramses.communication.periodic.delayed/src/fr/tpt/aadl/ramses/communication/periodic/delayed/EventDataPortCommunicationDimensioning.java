@@ -93,7 +93,6 @@ public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDela
 	{
 
 		long readerTaskPeriod = getPeriod(this.readerReceivingTaskInstance);
-		// pour chaque période de l'HP
 		for(int iteration= 1; iteration <= CPRSize; iteration++)
 		{
 			long SEJDprev = 0;
@@ -103,9 +102,9 @@ public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDela
 			{
 				long otherPeriod = getPeriod(otherWriter);
 				long otherDeadline = getDeadline(otherWriter);
-				SEJDprev += ((readingTime - otherDeadline) / otherPeriod) + 1;
+				SEJDprev += ((this.hyperperiod+readingTime - otherDeadline) / otherPeriod) + 1;
 			}
-			SEJDprev=(SEJDprev-1)%bufferSize;
+			SEJDprev=SEJDprev%bufferSize;
 			CurrentPeriodRead.add(SEJDprev);
 
 		}
