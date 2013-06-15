@@ -1,0 +1,664 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module PortsCommonRefinementSteps;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									ARINC653_RUNTIME: AADLBA;
+
+------------------------------------------------------------
+--- Beginning of refactoring
+------------------------------------------------------------
+
+helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!DataSubcomponent =
+	thisModule.resolveTemp(self,'globalVariable')
+;
+
+-- @extends m_Feature_Instance
+rule m_Thread_Port_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isThreadPort())
+	to
+		f: AADLBA!DataAccess
+		(
+			name <- fi.feature.name,
+			kind <- #requires
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- fi.feature.name,
+			kind <- #requires
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+-- @extends m_Thread_Port_Instance
+rule m_Thread_Output_Port_Instance
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!ConnectionReference
+		(
+			fi.isOutputFeature()
+			and
+			cnxRef.source = fi
+		)
+	to
+		f: AADLBA!DataAccess,
+		f_entrypoint: AADLBA!DataAccess,
+		accessConnection: AADLBA!AccessConnection
+		(
+			name <- 'Id_instance_to_'+cnxRef.source.eContainer().name+'_'+cnxRef.source.name,
+			source<-connectedAccess,
+			accessCategory<-#data,
+			destination<-connectedSubcomponent
+		),
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-cnxRef.destination.getGlobalVariableImg()
+		),
+		connectedAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-f
+		)
+	do
+	{
+		connectedAccess.setContext(thisModule.resolveTemp(fi.eContainer(), 'sub'));
+	}
+}
+
+rule m_Process_Output_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isProcessPort()
+			and
+			fi.isOutputFeature()
+		)
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(name <- fi.name+'_globalVariable')
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+	}
+}
+
+-- @extends m_Thread_Port_Instance
+rule m_Thread_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isInputFeature()
+		)
+	to
+		f:AADLBA!DataAccess,
+		connectedSubcomponent: AADLBA!ConnectedElement,
+		accessConnection: AADLBA!AccessConnection
+		(
+			name <- 'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,
+			source<-connectedAccess,
+			accessCategory<-#data,
+			destination<-connectedSubcomponent
+		),
+		connectedAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-f
+		)
+	do
+	{
+		connectedAccess.setContext(thisModule.resolveTemp(fi.eContainer(), 'sub'));
+	}
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_InterProcess_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			not fi.isIntraProcessFeatureInstance()
+		)
+	to
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-fi.dstConnectionInstance->first().connectionReference->first().destination.getGlobalVariableImg()
+		)
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isIntraProcessFeatureInstance()
+		)
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(name <- fi.name+'_globalVariable'),
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-globalVariable
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+	}
+}
+
+rule m_Process_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isInputFeature()
+			and
+			fi.isProcessPort()
+		)
+	to
+		globalVariable:AADLBA!DataSubcomponent
+		(name <- fi.name+'globalVariable')
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+	}
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_DataOrEventDataPort_Input_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataOrEventDataPort()
+		and fi.isInputFeature()
+		and fi.isThreadPort()
+		)
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+		(
+			name <- fi.name+'_localVariable',
+			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+		)
+}
+
+-- @extends m_Thread_Port_Instance
+rule m_Thread_DataOrEventDataPort_Output_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(
+			fi.isDataOrEventDataPort()
+			and
+			fi.isThreadPort()
+			and
+			fi.isOutputFeature()
+		)
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+		(
+			name <- fi.name+'_localVariable',
+			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+		)
+}
+
+-- @extends m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_DataOrEventDataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+}
+
+-- @extends m_Thread_InterProcess_Input_Port_Instance
+rule m_Thread_InterProcess_Input_DataOrEventDataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+}
+
+------------------------------------------------------------
+--- End of refactoring
+------------------------------------------------------------
+
+helper def: freshness_suffix : String = '_freshness_t';
+helper def: impl_suffix : String = '.impl';
+helper context AADLI!FeatureInstance def: getFreshnessType() : String =
+	self.name+thisModule.freshness_suffix
+;
+-------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------
+----	ADDED MATCHED RULES
+-------------------------------------------------------------------------------------------
+
+
+helper def: assignPortVariableType(fi: AADLI!FeatureInstance, fresh_data_impl_wrapper: AADLBA!DataSubcomponentType): AADLBA!DataSubcomponentType =
+	if(fi.isUsedInFresh()) then
+ 		fresh_data_impl_wrapper
+	else 		
+		fi.feature.dataFeatureClassifier
+	endif
+;
+
+helper context AADLI!FeatureInstance def: getBehaviorAnnex():  AADLBA!BehaviorAnnex = 
+	self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+;
+
+helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
+	self.ownedAnnexSubclause->exists(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+	and
+	self.getPropertyAssociation('Source_Name').oclIsUndefined()
+	and
+	self.getPropertyAssociation('Source_Text').oclIsUndefined()
+;
+
+helper def: createFreshnessImplIdentifier(fresh_data_type_wrapper:AADLBA!DataType) : String =
+  fresh_data_type_wrapper.name+thisModule.impl_suffix
+;
+
+helper def: ports_processImplImg: AADLI!ProcessImplementation = OclUndefined;
+
+-- @extends m_Feature_Instance
+rule m_DataPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataPort
+									and fi.eContainer().category=#thread
+									and not fi.isPeriodicDelayedPort()
+									and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		-- local variable that will be initialized in the "do" section.
+		ba: AADLBA!BehaviorAnnex = fi.getBehaviorAnnex();
+	}
+	to
+		-- creation of a data access feature, to be added to the target thread component, 
+		-- this data access represents an access to the global variable representing the
+		-- communication 'port variable'.
+		
+		-- target data access must be called 'f' to be retreived with resolveTemp
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-fi.feature.name+'_MsgAddr'
+		),
+		actualParam: AADLBA!Parameter,
+		
+		-- target data access must be called 'f_entrypoint' to be retreived with resolveTemp
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		fresh_data_previous: AADLBA!DataSubcomponent
+			(
+				name<-fi.name+'_freshness_previous',
+				dataSubcomponentType<-'Integer_16'.asClassifier('BASE_TYPES'),
+				ownedPropertyAssociation <- Sequence{
+					thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', FRESH_INIT)
+				}
+			),
+		FRESH_INIT: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression('0')}
+		),
+		fresh_previous_access: AADLBA!DataAccess
+		(
+			name<-fi.name+'_freshness_previous_access',
+			dataFeatureClassifier<-'Integer_16'.asClassifier('BASE_TYPES'),
+			kind <- #requires
+		),
+		fresh_data_type_wrapper:AADLBA!DataType
+		(
+			name<-fi.getFreshnessType(),
+			ownedPropertyAssociation <- Sequence
+			{
+				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
+					'Struct'.asEnumeration('DATA_MODEL').asNamedValue())
+			}
+		),
+		fresh_data_impl_wrapper:AADLBA!DataImplementation
+		(
+			name<-thisModule.createFreshnessImplIdentifier(fresh_data_type_wrapper),
+			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
+		),
+		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name<-'fresh_ba',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
+		),
+		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name <- 'value',
+			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+		),
+		updateFreshness: AADLBA!AssignmentAction
+		(
+			target <- updatePreviousFreshAccessHolder,
+			valueExpression <- updateValueExpression
+		),
+		updatePreviousFreshAccessHolder:AADLBA!DataAccessHolder
+		(
+			element <- fresh_previous_access
+		),
+		updateValueExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateRelation}	
+		),
+		updateRelation: AADLBA!Relation
+		(
+			firstExpression<-updateFirstExpression
+		),
+		updateFirstExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateFreshTerm}
+		),
+		updateFreshTerm: AADLBA!Term
+		(
+			factors <- Sequence{updateFreshFactor}
+		),
+		updateFreshFactor: AADLBA!Factor
+		(
+			firstValue <- Sequence{updateFreshCDR}
+		),
+		updateFreshCDR: AADLBA!DataComponentReference
+		(
+			data <- Sequence{dataSubcomponentHolder,dataFreshnessSubcomponentHolder}
+		),
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- dataSubcomponent
+		),
+		dataFreshnessSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- struct_freshness_data_subcomponent
+		),
+		
+		
+		
+		-------- Emitter freshness update
+		sendFreshnessOutput: AADLBA!AssignmentAction
+		(
+			target <- sendFreshDataComponentReference,
+			valueExpression <- sendValueExpressionOutput
+		),
+		sendFreshDataComponentReference: AADLBA!DataComponentReference
+		(
+			data<-Sequence{dataSubcomponentSend,dataSubcomponentStructSend}
+		),
+		dataSubcomponentSend: AADLBA!DataSubcomponentHolder
+		(
+			element<-dataSubcomponent
+		),
+		dataSubcomponentStructSend: AADLBA!DataSubcomponentHolder
+		(
+			element<-struct_freshness_data_subcomponent
+		),
+		sendValueExpressionOutput: AADLBA!ValueExpression
+		(
+			relations <- Sequence{sendRelationOutput}	
+		),
+		sendRelationOutput: AADLBA!Relation
+		(
+			firstExpression<-sendFirstExpressionOutput
+		),
+		sendFirstExpressionOutput: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{sendFreshTermOutput}
+		),
+		sendFreshTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{sendFreshFactorOutput}
+		),
+		sendFreshFactorOutput: AADLBA!Factor
+		(
+			firstValue <- Sequence{dataAccessHolderSend}
+		),
+		dataAccessHolderSend: AADLBA!DataSubcomponentHolder
+		(
+			element <- fresh_previous_access
+		),
+		
+		
+		
+		updateFreshnessOutput: AADLBA!AssignmentAction
+		(
+			target <- updatePreviousFreshAccessHolderOutput,
+			valueExpression <- updateValueExpressionOutput
+		),
+		updatePreviousFreshAccessHolderOutput:AADLBA!DataAccessHolder
+		(
+			element <- fresh_previous_access
+		),
+		updateValueExpressionOutput: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateRelationOutput}	
+		),
+		updateRelationOutput: AADLBA!Relation
+		(
+			firstExpression<-updateFirstExpressionOutput
+		),
+		updateFirstExpressionOutput: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateFreshTermOutput, updateConstantTermOutput},
+			binaryAddingOperators <- Sequence{#Plus}
+		),
+		updateFreshTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{updateFreshFactorOutput}
+		),
+		updateFreshFactorOutput: AADLBA!Factor
+		(
+			firstValue <- Sequence{dataAccessHolderOutput}
+		),
+		dataAccessHolderOutput: AADLBA!DataSubcomponentHolder
+		(
+			element <- fresh_previous_access
+		),
+		updateConstantTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{updateConstantFactorOutput}
+		),
+		updateConstantFactorOutput: AADLBA!Factor
+		(
+			firstValue <- Sequence{valueConstantOutput}
+		),
+		valueConstantOutput: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 1.longValue()
+		)
+		
+		
+	do
+	{
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+		if(thisModule.public().ownedClassifier->any(e|e.name = fresh_data_type_wrapper.name).oclIsUndefined())
+		{
+			thisModule.public().ownedClassifier.add(fresh_data_type_wrapper);
+			thisModule.public().ownedClassifier.add(fresh_data_impl_wrapper);
+		}
+		dataSubcomponent.dataSubcomponentType <- thisModule.assignPortVariableType(fi, fresh_data_impl_wrapper);
+		actualParam.dataFeatureClassifier <- dataSubcomponent.dataSubcomponentType;
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
+	}
+}
+
+-- @extends m_Feature_Instance
+rule m_EventPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventPort 
+									and fi.eContainer().category = #thread
+									and not fi.isPeriodicDelayedPort()
+									and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+-- @extends m_Feature_Instance
+rule m_EventDataPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
+								and fi.eContainer().category=#thread
+								and not fi.isPeriodicDelayedPort()
+								and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp 
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-fi.feature.name+'_MsgAddr',
+			dataSubcomponentType<-fi.feature.dataFeatureClassifier
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+			kind <- #requires
+		),
+		actualParam: AADLBA!Parameter
+	do
+	{
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+-- @extends m_Feature_Instance
+rule m_DataAccess_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataAccess
+			 and fi.eContainer().category=#thread
+			 and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		implImg: AADLI!ComponentImplementation = OclUndefined; 
+		processImplImg: AADLI!ProcessImplementation = OclUndefined;
+	}
+	to
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name,
+				kind <- #requires,
+				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+			),
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name,
+				kind <- #requires,
+				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+			)
+	do
+	{
+		if(c.category=#thread)
+		{
+			thisModule.ports_processImplImg <- c.eContainer().subcomponent.subcomponentType;
+		}
+		thisModule.addThreadsInternalConnections(fi);
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
+	}
+}
+
+---- @extends m_Feature_Instance
+--rule DataAccess_Instance
+--{
+--	from
+--		fi: AADLI!FeatureInstance (fi.category=#dataAccess
+--			 and fi.eContainer().category=#thread
+--			 and not fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+--	using
+--	{
+--		c: AADLI!ComponentInstance = fi.eContainer();
+--	}
+--	to
+--		f: AADLBA!DataAccess
+--		(
+--			name <- fi.name,
+--			kind <- #requires,
+--			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+--			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+--		)
+--	do
+--	{
+--		if(c.category=#thread)
+--		{
+--			thisModule.ports_processImplImg <- c.eContainer().subcomponent.subcomponentType;
+--		}
+--		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
+--		thisModule.addThreadsInternalConnections(fi);
+--	}
+--}
+--
+

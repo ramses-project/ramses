@@ -1,0 +1,93 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- nsURI AADLBA=http:///AADLBA
+-- @atlcompiler emftvm
+
+module ExpandThreadsPorts;
+create OUT : AADLBA								-- Detailed model : org.osate.aadl2/model/addl2.ecore
+from 		IN : AADLI,							-- Simplified model : org.osate.aadl2/model/instance.ecore
+			AADL_RUNTIME: AADLBA,
+			DATA_MODEL: AADLBA,
+			PROGRAMMING_PROPERTIES: AADLBA,
+			HOOKS: ATLHOOKS,						
+			OSEK_RUNTIME: AADLBA;
+
+
+helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+	callSequences->collect(e | thisModule.resolveTemp(Sequence{c,e}, 'returnData'))
+	->union
+	(
+		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 
+				paramCnx.isParamToParamConnection()
+				and
+				paramCnx.isPartOfCallSequence(callSequence)
+				and
+				callSequence.isComputeEntryPointOf(c)
+			)->collect(
+				paramCnx | thisModule.resolveTemp(Sequence{c, callSequence, paramCnx}, 'paramCnxVariable')
+			)
+		)
+	)
+	->flatten()
+;
+
+
+rule PortConnection_Instance
+{
+	from
+		cnxInst: AADLI!ConnectionInstance
+		(
+			false
+		)
+}
+
+rule EventDataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataPort
+									and fi.eContainer().category=#thread
+									and not fi.isPeriodicDelayedPort())
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp 
+		f: AADLBA!DataAccess
+		(
+			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+			kind <- #requires
+		)
+}
+
+unique lazy rule addStatusType
+{
+	from
+		implImg : AADLBA!BehavioredImplementation
+	to
+		status: AADLBA!DataSubcomponent
+		(
+			name <- 'osek_calls_status',
+			dataSubcomponentType <- 'StatusType'.asSubprogramType('OSEK_RUNTIME')
+		)
+	do
+	{
+		implImg.ownedDataSubcomponent.add(status);
+		status;
+	}	
+}

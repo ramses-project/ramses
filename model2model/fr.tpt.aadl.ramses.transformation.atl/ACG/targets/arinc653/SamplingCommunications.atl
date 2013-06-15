@@ -1,0 +1,157 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module SamplingCommunications;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									ARINC653_RUNTIME: AADLBA;
+
+
+--------------------------------------------
+---               SAMPLING               ---
+--------------------------------------------
+
+-- @extends m_Not_PeriodicDelayed_Port
+rule m_SamplingCallSpecification
+{
+	from
+		fi: AADLI!FeatureInstance,
+		callSequence: AADLI!SubprogramCallSequence
+		(
+			fi.isDataPort()
+			and
+			callSequence.isComputeEntryPointOf(fi.eContainer())
+			and
+			not fi.isIntraProcessFeatureInstance()
+		)
+	using
+	{
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+}
+
+-- @extends m_SamplingCallSpecification,m_Input_DataPort_ComputeEntrypointCallSequence
+rule m_Input_Sampling_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		callSequence: AADLI!SubprogramCallSequence
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Read_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi, spg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		VALIDITY: AADLBA!DataSubcomponent = thisModule.CreateValidityDataSubcomponent(fi);
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{SAMPLING_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,VALIDITY_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-SAMPLING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		VALIDITY_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- VALIDITY
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+
+-- @extends m_SamplingCallSpecification,m_Output_DataPort_ComputeEntrypointCallSequence
+rule m_Output_Sampling_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		callSequence: AADLI!SubprogramCallSequence,
+		cnxRef: AADLI!ConnectionReference		
+		(
+			fi.srcConnectionInstance->exists(e|e.connectionReference->first() = cnxRef)
+		)
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Write_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi, spg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{SAMPLING_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		SAMPLING_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-SAMPLING_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}

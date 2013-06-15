@@ -1,0 +1,93 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- nsURI AADLBA=http:///AADLBA
+-- @atlcompiler emftvm
+
+module DispatchCommonRefinementSteps;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS;
+
+
+-- @extends m_ComputeEntrypointCallSequence
+rule m_ComputeEntrypointCallSequence_Periodic
+{
+	from
+		c: AADLI!ComponentInstance,
+		callSequence: AADLI!SubprogramCallSequence
+		(c.isPeriodicThread()
+		and 
+		callSequence.isComputeEntryPointOf(c)
+		)
+	using
+	{
+		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
+	}
+	to
+		callSequenceImg: AADLBA!SubprogramCallSequence,
+		returnData: AADLBA!DataSubcomponent,
+		waitDispatchCall: AADLBA!SubprogramCallAction
+		(
+			subprogram<-dispatchHolder,
+			parameterLabels <- Sequence{RETURN_DATA_Holder}
+		),
+		dispatchHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		RETURN_DATA_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-returnData
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
+	}
+}
+
+------------------------------------------------------------------------------------------------
+--- TODO: change next rule to matched rule (like m_ComputeEntrypointCallSequence_Periodic)
+------------------------------------------------------------------------------------------------
+
+
+rule expandThreadDispatchProtocolInBA(inst: AADLI!ComponentInstance,
+									  spg: AADLBA!SubprogramImplementation,
+									  actionSequence: AADLBA!BehaviorActionSequence) 
+{
+ do{
+ 	if(inst.isPeriodicThread())
+ 	{
+ 		actionSequence.actions <- actionSequence.actions->including(thisModule.getPeriodicWaitCallAction(spg));
+ 	}
+ 	if(inst.isSporadicThread())
+ 	{
+ 		thisModule.addSporadicWaitCallAction(spg);
+ 	}
+ 	if(inst.isAperiodicThread())
+ 	{
+ 		thisModule.addAperiodicWaitCallAction(spg);
+ 	}
+ }
+}
+
