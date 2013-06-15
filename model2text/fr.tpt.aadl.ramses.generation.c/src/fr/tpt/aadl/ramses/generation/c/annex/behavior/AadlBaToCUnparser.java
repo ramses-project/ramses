@@ -39,6 +39,8 @@ import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
+import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
@@ -1160,20 +1162,27 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                 // If a data access mapping is provided:
                 // Transforms any data access into the right data subcomponent
                 // 's name thanks to the given data access mapping.
+                
                 if(_dataAccessMapping != null)
                 {
-                  DataAccessHolder dah = null;
+                  ElementHolder eh = null;
                   if(pl instanceof ValueExpression)
                   {
                 	  Relation r = ((ValueExpression)pl).getRelations().get(0);
-                      Term t = r.getFirstExpression().getTerms().get(0);
-                      dah = (DataAccessHolder) t.getFactors().get(0).getFirstValue();  
+                	  Term t = r.getFirstExpression().getTerms().get(0);
+                	  eh = (ElementHolder) t.getFactors().get(0).getFirstValue();  
                   }
                   else if(pl instanceof DataAccessHolder)
                   {
-                	dah = (DataAccessHolder) pl;
+                  	eh = (ElementHolder) pl;
                   }
-                  name = _dataAccessMapping.get((DataAccess)dah.getElement());
+                  if(eh instanceof DataAccessHolder)
+                  	name = _dataAccessMapping.get((DataAccess)eh.getElement());
+                  else if(eh instanceof DataSubcomponentHolder)
+                  {
+                  	DataSubcomponent ds = (DataSubcomponent) ((DataSubcomponentHolder) eh).getElement(); 
+                  	name = GenerationUtilsC.getGenerationCIdentifier(ds.getQualifiedName());
+                  }
                 }
 
                 if (name != null)
@@ -1322,11 +1331,11 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         //FIXME : TODO : update location reference
         if(object.isValue())
         {
-          _cFileContent.addOutput("'1'") ;
+          _cFileContent.addOutput("1") ;
         }
         else
         {
-          _cFileContent.addOutput("'0'") ;
+          _cFileContent.addOutput("0") ;
         }
 
         return DONE ;
