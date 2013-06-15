@@ -32,6 +32,8 @@ import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlAtlLauncher;
+import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 {
@@ -59,17 +61,15 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
       resourceDir = new File(DEFAULT_ATL_FILE_PATH) ;
     }
 
-    
-    ArrayList<File> atlFiles = new ArrayList<File>(ATL_FILE_NAMES.length) ;
-    
-    for(String fileName : ATL_FILE_NAMES)
-    {
-      atlFiles.add(new File(resourceDir + "/" + fileName)) ;
-    }
-
     AtlTransfoLauncher atlLauncher;
     try {
-    	atlLauncher = new Aadl2AadlLauncher();
+    	atlLauncher = new Aadl2AadlEMFTVMLauncher();
+    	ArrayList<File> atlFiles = new ArrayList<File>(ATL_FILE_NAMES.length) ;
+      
+      for(String fileName : ATL_FILE_NAMES)
+      {
+        atlFiles.add(new File(resourceDir + "/" + fileName)) ;
+      }
     	return atlLauncher.generationEntryPoint(inputResource,
     			resourceDir,
     			atlFiles,
@@ -125,7 +125,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 
   	AtlTransfoLauncher atlLauncher;
   	try {
-  		atlLauncher = new Aadl2AadlLauncher();
+  		atlLauncher = new Aadl2AadlAtlLauncher();
   		return atlLauncher.generationEntryPoint(inputResource,
   				resourceDir,
   				atlFiles,
