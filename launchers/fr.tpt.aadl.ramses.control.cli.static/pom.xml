@@ -67,19 +67,19 @@
 
   <dependencies>
 
-	<!-- 
-	This dependency must be first to copy
-	the plugin.properties in the root folder 
-	of our ramses jar 
-	 -->
-	<dependency>
+    <!-- 
+	 This dependency must be first to copy
+	 the plugin.properties in the root folder 
+	 of our ramses jar 
+    -->
+    <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>ecore</artifactId>
       <version>2.7.0.v20120127-1122</version>
     </dependency>
 
 
-	<dependency>
+    <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.support</artifactId>
       <version>0.5.0</version>
@@ -306,6 +306,12 @@
     </dependency>
 
     <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>3.1</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>10.0.1</version>
@@ -344,7 +350,7 @@
       <version>2.1</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>lpg</groupId>
       <artifactId>lpg.runtime.java</artifactId>
       <version>2.0.17.v201004271640</version>
@@ -356,37 +362,49 @@
       <version>2.7.0.v20120127-1122</version>
     </dependency>
     	
-	<dependency>
+    <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>ecore.xmi</artifactId>
       <version>2.7.0.v20120127-1122</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>org.eclipse.emf</groupId>
       <artifactId>transaction</artifactId>
       <version>1.4.0.v20100331-1738</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>org.eclipse.equinox</groupId>
       <artifactId>common</artifactId>
       <version>3.6.100.v20120522-1841</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl</artifactId>
       <version>3.2.1.v20110914-0724</version>
     </dependency>
     
-	<dependency>
+    <dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl.emftvm</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.m2m</groupId>
+      <artifactId>atl.emftvm.trace</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.common</artifactId>
       <version>3.2.1.v20110914-0724</version>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.core.emf</artifactId>
       <version>3.2.1.v20110914-0724</version>
