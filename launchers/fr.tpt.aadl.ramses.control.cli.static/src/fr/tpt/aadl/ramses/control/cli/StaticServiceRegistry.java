@@ -42,7 +42,6 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory;
-import fr.tpt.aadl.ramses.generation.pokTT.PokTTGeneratorFactory;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis;
 
 
@@ -74,15 +73,12 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _analyzers.put(AADLInspectorSchedulingAnalysis.ANALYZER_NAME, new AADLInspectorSchedulingAnalysis());
     
     AbstractGeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
-    AbstractGeneratorFactory pokTTGeneratorFactory = new PokTTGeneratorFactory();
     AbstractGeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();
     
     Generator genPok = pokGeneratorFactory.createGenerator() ;
-    Generator genPokTT = pokTTGeneratorFactory.createGenerator() ;
     Generator genOsek = oSEKGeneratorFactory.createGenerator();
     
     _gen.put(genPok.getRegistryName(), genPok) ;
-    _gen.put(genPokTT.getRegistryName(), genPokTT) ;
     _gen.put(genOsek.getRegistryName(), genOsek) ;
   }
 
