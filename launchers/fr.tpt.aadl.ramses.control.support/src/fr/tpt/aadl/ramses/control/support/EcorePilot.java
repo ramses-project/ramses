@@ -1,6 +1,7 @@
 package fr.tpt.aadl.ramses.control.support;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,13 +12,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
-import fr.tpt.aadl.ramses.control.workflow.Analysis;
-import fr.tpt.aadl.ramses.control.workflow.AnalysisElement;
-import fr.tpt.aadl.ramses.control.workflow.Generation;
-import fr.tpt.aadl.ramses.control.workflow.Transformation;
 import fr.tpt.aadl.ramses.control.workflow.*;
-import fr.tpt.aadl.ramses.control.workflow.Workflow;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
 
 //import workflow.WorkflowElement;
 
@@ -32,7 +27,7 @@ public class EcorePilot  implements WorkflowPilot {
 
 	boolean analysisResult;
 
-	public EcorePilot(String _workflowFileName) {
+	public EcorePilot(String _workflowFileName) throws FileNotFoundException{
 
 		this.workflowFileName = _workflowFileName;
 
@@ -51,6 +46,7 @@ public class EcorePilot  implements WorkflowPilot {
 		if (!testExist.exists())
 		{
 			System.out.println("Workflow file does not exist: " + testExist.getAbsolutePath());
+			throw new FileNotFoundException();
 		}
 
 		if (getResourceSet().getURIConverter().exists(workflow_uri, null)) {
