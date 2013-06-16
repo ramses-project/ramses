@@ -26,8 +26,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.osate.pluginsupport;bundle-version="1.0.0",
  org.osate.workspace,
  org.eclipse.core.resources,
- fr.tpt.aadl.ramses.communication.periodic.delayed
+ fr.tpt.aadl.ramses.communication.periodic.delayed,
+ org.eclipse.m2m.atl.emftvm
 Bundle-ActivationPolicy: lazy
 Import-Package: fr.tpt.aadl.ramses.communication.dimensioning,
+ org.eclipse.m2m.atl.emftvm.util,
  org.osate.xtext.aadl2.properties.linking
 
