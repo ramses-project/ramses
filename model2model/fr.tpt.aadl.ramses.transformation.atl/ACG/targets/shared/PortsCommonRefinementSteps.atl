@@ -234,24 +234,6 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
 		)
 }
 
--- @extends m_Thread_IntraProcess_Input_Port_Instance
-rule m_Thread_IntraProcess_Input_DataOrEventDataPort_Instance
-{
-  	from
-		fi: AADLI!FeatureInstance
-  	to
-  		localVariable: AADLBA!DataSubcomponent
-}
-
--- @extends m_Thread_InterProcess_Input_Port_Instance
-rule m_Thread_InterProcess_Input_DataOrEventDataPort_Instance
-{
-  	from
-		fi: AADLI!FeatureInstance
-  	to
-  		localVariable: AADLBA!DataSubcomponent
-}
-
 ------------------------------------------------------------
 --- End of refactoring
 ------------------------------------------------------------

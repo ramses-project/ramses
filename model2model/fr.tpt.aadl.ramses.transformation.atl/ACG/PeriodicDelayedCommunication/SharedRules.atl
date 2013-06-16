@@ -353,7 +353,7 @@ rule CreateDataComponentPrototypeActual(d: AADLBA!DataClassifier)
 	}
 }
 
--- @extends m_Output_Port_ComputeEntrypointCallSequence
+-- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
 rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
 {
 	from
@@ -395,7 +395,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		)
 }
 
--- @extends m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+-- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue
 {
 	from
@@ -724,7 +724,7 @@ rule m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance
 		fi.isIntraProcessFeatureInstance())
 }
 
--- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Thread_IntraProcess_Input_DataOrEventDataPort_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Input_PeriodicDelayed_Port
+-- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Input_PeriodicDelayed_Port
 rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance
 {
   	from
@@ -811,7 +811,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	)
 }
 
--- @extends m_Input_EventDataPort_ComputeEntrypointCallSequence
+-- @extends m_PeriodicDelayed_Port,m_Input_EventDataPort_ComputeEntrypointCallSequence
 rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
 {
   from

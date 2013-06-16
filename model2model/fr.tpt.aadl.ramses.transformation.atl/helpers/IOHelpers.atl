@@ -153,6 +153,16 @@ helper context AADLI!ComponentInstance def: isDefinedDelayedPort(): Boolean =
 	false
 ;
 
+helper context AADLI!FeatureInstance def: isDefinedDelayedPort() : Boolean =
+        -- TODO: consider default value here
+        let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('timing') in
+        if(not mpv.oclIsUndefined()) then
+                mpv.ownedValue.namedValue.name.toLower() = 'delayed'
+        else
+                false
+        endif
+;
+
 helper context AADLI!FeatureInstance def: isPeriodicDelayedPort(): Boolean =
 	if(self.direction = #out) then
 		self.category=#eventDataPort and

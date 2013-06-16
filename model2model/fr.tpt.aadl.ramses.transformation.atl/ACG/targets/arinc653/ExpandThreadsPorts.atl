@@ -202,12 +202,13 @@ rule m_Process_Output_EventPort_Instance
 		fi: AADLI!FeatureInstance
 		(fi.isEventPort())
 	to
+		connectedSubcomponent: AADLBA!ConnectedElement,
 		globalVariable: AADLBA!DataSubcomponent
 		(dataSubcomponentType <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
 }
 
 
--- @extends m_Thread_IntraProcess_Input_DataOrEventDataPort_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
 rule m_Thread_IntraProcess_Input_DataPort_Instance
 {
   	from
@@ -225,12 +226,12 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 		)
 }
 
--- @extends m_Thread_IntraProcess_Input_DataOrEventDataPort_Instance,m_Not_PeriodicDelayed_Port
-rule m_Thread_IntraProcess_Input_EventOrEventDataPort_Instance
+-- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
-		(fi.isEventOrEventDataPort()
+		(fi.isEventDataPort()
 		and
 		fi.isIntraProcessFeatureInstance())
   	to
@@ -245,12 +246,32 @@ rule m_Thread_IntraProcess_Input_EventOrEventDataPort_Instance
 		)
 }
 
--- @extends m_Thread_InterProcess_Input_DataOrEventDataPort_Instance,m_Thread_Input_Port_Instance
-rule m_Thread_InterProcess_Input_EventOrEventDataPort_Instance
+-- @extends m_Not_PeriodicDelayed_Port,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_EventPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
-		(fi.isEventOrEventDataPort()
+		(fi.isEventPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent,
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')
+		)
+}
+
+-- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance
+rule m_Thread_InterProcess_Input_EventDataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort()
 		and
 		not fi.isIntraProcessFeatureInstance())
   	to
@@ -260,7 +281,23 @@ rule m_Thread_InterProcess_Input_EventOrEventDataPort_Instance
 		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
 }
 
--- @extends m_Thread_InterProcess_Input_DataOrEventDataPort_Instance,m_Thread_DataOrEventDataPort_Input_Instance
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_InterProcess_Input_EventOrEventDataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort()
+		and
+		not fi.isIntraProcessFeatureInstance())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent
+}
+
+-- @extends m_Thread_DataOrEventDataPort_Input_Instance
 rule m_Thread_InterProcess_Input_DataPort_Instance
 {
   	from
@@ -275,6 +312,7 @@ rule m_Thread_InterProcess_Input_DataPort_Instance
 		(dataFeatureClassifier <- 'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent
 }
+
 
 --	- m_Thread_Output_IntraProcess_DataPort_Instance extends m_Thread_Output_Port_Instance for each pair of (port instance,connection reference)
 --		such that
