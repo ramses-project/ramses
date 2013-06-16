@@ -1,8 +1,20 @@
 Bundle-Vendor: TELECOM ParisTech
-Bundle-SymbolicName: AADLInspectorSimulationAnalysis
+Bundle-SymbolicName: fr.tpt.aadl.sched.tools.aadlinspector;singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Name: AADLInspector-Simulation-Analysis
-Require-Bundle: fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
+Bundle-Name: AADLInspector-Interface
 Provide-Package: fr.tpt.aadl.launch,
  fr.tpt.aadl.sched.aadlinspector,
  fr.tpt.aadl.sched.aadlinspector.output
+Bundle-ManifestVersion: 2
+Export-Package: fr.tpt.aadl.launch,
+ fr.tpt.aadl.sched.aadlinspector,
+ fr.tpt.aadl.sched.aadlinspector.output
+Bundle-ActivationPolicy: lazy
+Import-Package: fr.tpt.aadl.ramses.control.support.analysis,
+ org.eclipse.emf.ecore.resource,
+ org.osate.aadl2,
+ org.osate.aadl2.instance,
+ org.osate.aadl2.modelsupport.errorreporting
+Require-Bundle: org.osate.aadl2,
+ org.osate.aadl2.modelsupport,
+ org.osate.ui;bundle-version="1.0.0"
