@@ -327,21 +327,21 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/tools/PackagesTools") ;
 		fileName.add("/tools/FeaturesTools") ;
 		fileName.add("/tools/SubprogramsTools") ;
-		fileName.add("/tools/BehaviorAnnexTools") ;
 		fileName.add("/uninstanciate/Features") ;
 		fileName.add("/uninstanciate/Implementations") ;
-		fileName.add("/uninstanciate/NonInstanciated");
 		fileName.add("/uninstanciate/Properties") ;
 		fileName.add("/uninstanciate/Types") ;
 		fileName.add("/uninstanciate/SubprogramCalls") ;
 		fileName.add("/uninstanciate/Connections") ;
 		fileName.add("/helpers/Services") ;
-		fileName.add("/BehaviorAnnexCopy/BehaviorAnnexServices") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
-		fileName.add("/BehaviorAnnexCopy/copyElementHolders") ;
+		// Fixme: next will be added when tested with emftvm
+		//fileName.add("/tools/BehaviorAnnexTools") ;
+		//fileName.add("/BehaviorAnnexCopy/BehaviorAnnexServices") ;
+		//fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
+		//fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
+		//fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
+		//fileName.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
+		//fileName.add("/BehaviorAnnexCopy/copyElementHolders") ;
 		//fileName.add("/PeriodicDelayedCommunication/EventDataPorts");
 		//fileName.add("/PeriodicDelayedCommunication/EventDataPorts_LowMFP");
 		
