@@ -249,7 +249,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 
       AtlTransfoLauncher atlLauncher;
       try {
-          atlLauncher = new Aadl2AadlAtlLauncher();
+          atlLauncher = new Aadl2AadlEMFTVMLauncher();
           return atlLauncher.generationEntryPoint(inputResource,
                   resourceDir,
                   atlFiles,
