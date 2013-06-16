@@ -172,6 +172,12 @@
 
     <dependency>
       <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.sched.tools.aadlinspector</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
       <version>0.9.5</version>
       <artifactId>fr.tpt.aadl.utils</artifactId>
     </dependency>
