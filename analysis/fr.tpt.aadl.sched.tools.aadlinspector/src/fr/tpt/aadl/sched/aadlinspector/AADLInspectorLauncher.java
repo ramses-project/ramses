@@ -22,10 +22,10 @@ public class AADLInspectorLauncher
 	private final static String ENV_VAR = "AADLINSPECTOR_PATH";
 	
 	private final static String PATH = getPath();
-	private final static String BIN_PATH = PATH + "bin.l32/";
+	private static String BIN_PATH;
 	private final static String OUTPUT_FILE_PATH = PATH + "output.xml";
 	
-	private AADLInspectorLauncher(){}
+	private AADLInspectorLauncher() {}
 	
 	private static String getPath()
 	{
@@ -43,7 +43,7 @@ public class AADLInspectorLauncher
 		return "";
 	}
 	
-	public static AnalysisResult launchAnalysis(String[] aadlModelsPath)
+	public static AnalysisResult launchAnalysis(String[] aadlModelsPath, String mode)
 		throws Exception
 	{
 		if (PATH.isEmpty())
@@ -63,11 +63,17 @@ public class AADLInspectorLauncher
 		}
 		modelList = modelList.substring(0,modelList.length()-1);
 		
+		String modeOption="";
+		if(mode.equalsIgnoreCase("automatic"))
+		{
+			modeOption = " --show false";
+		}
+		
 		final String command = BIN_PATH + "AADLInspector"
 				+ " -a " + modelList
 				+ " --plugin " + PATH + "config/plugins.common/cheddar.aip"
 				+ " --result " + OUTPUT_FILE_PATH
-				+ " --show false";
+				+ modeOption;
 		
 		System.out.println(command);
 		
@@ -91,9 +97,14 @@ public class AADLInspectorLauncher
 	}
 	
 	
-	public static AnalysisResult launchAnalysis(SystemInstance root)
+	public static AnalysisResult launchAnalysis(SystemInstance root, String mode)
 			throws Exception
 	{
+		String OS = (String) System.getProperties().get("os.name");
+		if(OS.equalsIgnoreCase("linux"))
+		  BIN_PATH = PATH + "bin.l32/";
+		else
+		  BIN_PATH = PATH + "bin.w32/";
 		final SystemImplementation si = root.getSystemImplementation();
 		final PublicPackageSection pps = (PublicPackageSection) si.eContainer();
 		final List<String> paths = new ArrayList<String>();
@@ -103,7 +114,7 @@ public class AADLInspectorLauncher
 		loadResourcePaths(pps, paths);
 		String[] modelList = paths.toArray(new String[paths.size()]);
 		
-		return launchAnalysis(modelList);
+		return launchAnalysis(modelList, mode);
 	}
 	
 	private static void loadResourcePaths(PublicPackageSection pps, List<String> pathList)

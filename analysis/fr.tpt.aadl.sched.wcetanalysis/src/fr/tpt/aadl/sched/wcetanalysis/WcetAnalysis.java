@@ -28,7 +28,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 
 	@Override
 	public void setParameters(Map<String, Object> parameters) {
-		throw new UnsupportedOperationException();
+		// do nothing: this is not an error but there is no parameter to be set here
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 			{
 				TaskBody tb = helper.getAST(ci);
 				tb.updateAADL();
-				ast2dot.visit(tb);
+				//ast2dot.visit(tb);
 			}
 		}
 	}

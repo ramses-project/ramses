@@ -15,10 +15,10 @@ import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult;
 public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	
 	public final static String ACTION_NAME = "AADLInspector Scheduling Simulation";
-	public final static String ANALYZER_NAME = "AADLInspector-Simulation";
+	public final static String ANALYZER_NAME = "AADLInspector";
 	public final static String PLUGIN_NAME = "AADLInspector-Simulation";
 	public final static String PLUGIN_ID = "AADLInspector-Simulation";
-	
+	private String mode = "manual";
 	@Override
 	public String getRegistryName() 
 	{
@@ -48,7 +48,10 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			AnalysisErrorReporterManager errManager, Element declarativeObject) {}
 
 	@Override
-	public void setParameters(Map<String, Object> parameters) {}
+	public void setParameters(Map<String, Object> parameters) 
+	{
+	  mode = (String) parameters.get("mode");
+	}
 
 	@Override
 	protected void analyzeInstanceModel(IProgressMonitor monitor,
@@ -59,7 +62,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 		try
 		{
-			AnalysisResult r = AADLInspectorLauncher.launchAnalysis(root);
+			AnalysisResult r = AADLInspectorLauncher.launchAnalysis(root, mode);
 			schedulable = r.isSchedulable();
 		}
 		catch (Exception e)
