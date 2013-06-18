@@ -101,9 +101,10 @@ public class AADLInspectorLauncher
 			throws Exception
 	{
 		String OS = (String) System.getProperties().get("os.name");
+		System.out.println("OS :" + OS);
 		if(OS.equalsIgnoreCase("linux"))
 		  BIN_PATH = PATH + "bin.l32/";
-		else
+		else if(OS.toLowerCase().contains("windows"))
 		  BIN_PATH = PATH + "bin.w32/";
 		final SystemImplementation si = root.getSystemImplementation();
 		final PublicPackageSection pps = (PublicPackageSection) si.eContainer();
