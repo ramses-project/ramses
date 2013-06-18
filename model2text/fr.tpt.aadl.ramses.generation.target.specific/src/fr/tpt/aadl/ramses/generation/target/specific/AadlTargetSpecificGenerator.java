@@ -116,6 +116,8 @@ public class AadlTargetSpecificGenerator implements Generator
     while(workflowPilot.hasNextOperation())
     {
       String operation = workflowPilot.getNextOperation();
+      if(operation == null)
+    	  return;
       if(operation.equals("analysis"))
       {
         String analysisName = workflowPilot.getNextAnalysisName();
