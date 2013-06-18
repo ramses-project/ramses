@@ -48,6 +48,12 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
 	@Override
   public void process(ProcessSubcomponent process, File generatedFilePath) throws GenerationException {
     
+	String OS = (String) System.getProperties().get("os.name");	
+	if(OS.toLowerCase().contains("windows"))
+	{
+	  System.out.println("Deployment to osek supported from UNIX systems only");
+	  return;
+	}
     Runtime runtime = Runtime.getRuntime();
     
     System.out.println("* Prepare Make ...");
