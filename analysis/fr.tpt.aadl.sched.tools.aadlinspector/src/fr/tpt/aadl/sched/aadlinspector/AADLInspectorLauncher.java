@@ -1,6 +1,7 @@
 package fr.tpt.aadl.sched.aadlinspector;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class AADLInspectorLauncher
 	private final static String PATH = getPath();
 	private static String BIN_PATH;
 	private final static String OUTPUT_FILE_PATH = PATH + "output.xml";
-	
+	private static String extension = "";
 	private AADLInspectorLauncher() {}
 	
 	private static String getPath()
@@ -61,21 +62,15 @@ public class AADLInspectorLauncher
 		}
 		modelList = modelList.substring(0,modelList.length()-1);
 		
-		String modeOption="";
+		String modeOption="true";
 		if(mode.equalsIgnoreCase("automatic"))
 		{
 			modeOption = " --show false";
 		}
 		
-		final String command = BIN_PATH + "AADLInspector"
-				+ " -a " + modelList
-				+ " --plugin " + PATH + "config/plugins.common/cheddar.aip"
-				+ " --result " + OUTPUT_FILE_PATH
-				+ modeOption;
+		final String command = BIN_PATH + "AADLInspector" + extension;
 		
-		System.out.println(command);
-		
-		Process p = Runtime.getRuntime().exec(command);
+		Process p = Runtime.getRuntime().exec(new String[] {command, "-a", modelList, "--plugin", PATH + "config/plugins.common/cheddar.aip", "--result", OUTPUT_FILE_PATH, "--show", modeOption});
 		int exitValue = p.waitFor();
 		if (exitValue!=0)
 		{
@@ -99,11 +94,14 @@ public class AADLInspectorLauncher
 			throws Exception
 	{
 		String OS = (String) System.getProperties().get("os.name");
-		System.out.println("OS :" + OS);
 		if(OS.equalsIgnoreCase("linux"))
-		  BIN_PATH = PATH + "bin.l32/";
+		  BIN_PATH = PATH + "bin.l32";
 		else if(OS.toLowerCase().contains("windows"))
+		{
 		  BIN_PATH = PATH + "bin.w32/";
+		  extension = ".exe";
+		  BIN_PATH = BIN_PATH.replace('/', '\\');
+		}
 		final SystemImplementation si = root.getSystemImplementation();
 		final PublicPackageSection pps = (PublicPackageSection) si.eContainer();
 		final List<String> paths = new ArrayList<String>();
