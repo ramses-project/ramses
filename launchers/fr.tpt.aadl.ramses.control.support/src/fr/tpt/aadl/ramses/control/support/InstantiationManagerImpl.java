@@ -35,14 +35,12 @@ public class InstantiationManagerImpl implements InstantiationManager {
 	  URI instanceURI =
 	       OsateResourceUtil.getInstanceModelURI(si) ;
 	  
-	  Aadl2ResourceImpl aadlResource =
-	      (Aadl2ResourceImpl) aadlResourceSet.getResource(instanceURI,
+	  Resource aadlResource = aadlResourceSet.getResource(instanceURI,
 	                                                      false) ;
 
 	  if(aadlResource == null)
 	  {
-	    aadlResource =
-	        (Aadl2ResourceImpl) aadlResourceSet
+	    aadlResource = aadlResourceSet
 	              .createResource(instanceURI) ;
 	  }
 
