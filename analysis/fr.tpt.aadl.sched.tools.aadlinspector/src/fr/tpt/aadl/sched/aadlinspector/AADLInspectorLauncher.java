@@ -29,15 +29,13 @@ public class AADLInspectorLauncher
 	
 	private static String getPath()
 	{
-		Map<String,String> variables = System.getenv();
-		for(Map.Entry<String, String> entry : variables.entrySet())
+		String aIPath = System.getenv(ENV_VAR);
+		if (aIPath == null)
+			aIPath = System.getProperty(ENV_VAR);
+		if(aIPath != null)
 		{
-			if (entry.getKey().equals(ENV_VAR))
-			{
-				String path = entry.getValue();
-				path = path.endsWith("/") ? path : path + "/";
-				return path;
-			}
+		  aIPath = aIPath.endsWith("/") ? aIPath : aIPath + "/";
+		  return aIPath;
 		}
 		System.err.println("AADLINSPECTOR_PATH environment variable should be initialized.");
 		return "";
