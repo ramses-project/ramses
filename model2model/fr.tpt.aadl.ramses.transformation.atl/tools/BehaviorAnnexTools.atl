@@ -20,6 +20,7 @@
 --
 
 -- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
 
 module BehaviorAnnexTools;
 
@@ -28,10 +29,6 @@ create
 from 
 	IN 					   : AADLI;
 
-uses AADLCopyHelpers;
-uses AADLICopyHelpers;
-uses FHSHelpers;
-uses Services;
 
 helper context String def : asLiteral() : AADLBA!StringLiteral =
 	thisModule.CreateStringLiteral(self)
@@ -169,11 +166,8 @@ lazy rule CreateIntegerVariable {
  	s : String
  to
  	v : AADLBA!BehaviorVariable (
-		DataUniqueComponentClassifierReference <- type,
-		LocalVariableDeclarators <- Sequence{decl}
-	),
-	type : AADLBA!UniqueComponentClassifierReference (aadlRef <- 'Integer'.asBaseType()),
-	decl : AADLBA!Declarator (identifierOwned <- thisModule.CreateIdentifier(s, OclUndefined))
+		dataClassifier <- 'Integer'.asBaseType()
+	)
  do { v; }
 }
 

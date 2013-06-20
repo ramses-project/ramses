@@ -297,7 +297,7 @@ rule m_Thread_InterProcess_Input_EventOrEventDataPort_Instance
 		localVariable:AADLBA!DataSubcomponent
 }
 
--- @extends m_Thread_DataOrEventDataPort_Input_Instance
+-- @extends m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_InterProcess_Input_Port_Instance
 rule m_Thread_InterProcess_Input_DataPort_Instance
 {
   	from

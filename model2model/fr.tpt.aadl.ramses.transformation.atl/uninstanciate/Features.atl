@@ -199,7 +199,7 @@ rule m_Parameter_Instance
 		f: AADLBA!Parameter
 		(
 			direction <- fi.feature.direction,
-			dataFeatureClassifier <- fi.feature.dataClassifier
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
 		)
 }
 

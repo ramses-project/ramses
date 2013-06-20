@@ -203,9 +203,11 @@ rule CreateListValueFromString (value: String)
 {
 	to
 		lv : AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(value)}
+		)
 	do
 	{
-		lv.ownedListElement.add(thisModule.CreateStringLiteralPropertyExpression(value));
 		lv;
 	}
 }
@@ -214,12 +216,11 @@ rule CreateListValueFromListOfString(value: Sequence(String))
 {
 	to
 		lv:AADLBA!ListValue
+		(
+			ownedListElement <- value->collect(e | thisModule.CreateStringLiteralPropertyExpression(e))
+		)
 	do
 	{
-		for(s in value)
-		{
-			lv.ownedListElement.add(thisModule.CreateStringLiteralPropertyExpression(value));
-		}
 		lv;
 	}
 }

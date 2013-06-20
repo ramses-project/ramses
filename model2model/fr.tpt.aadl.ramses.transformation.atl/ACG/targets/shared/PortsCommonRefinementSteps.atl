@@ -270,13 +270,7 @@ helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
 	self.getPropertyAssociation('Source_Text').oclIsUndefined()
 ;
 
-helper def: createFreshnessImplIdentifier(fresh_data_type_wrapper:AADLBA!DataType) : String =
-  fresh_data_type_wrapper.name+thisModule.impl_suffix
-;
-
-helper def: ports_processImplImg: AADLI!ProcessImplementation = OclUndefined;
-
--- @extends m_Feature_Instance
+-- @extends m_Feature_Instance,m_Thread_DataOrEventDataPort_Output_Instance
 rule m_DataPort_Instance_with_BA
 {
 	from
@@ -297,10 +291,10 @@ rule m_DataPort_Instance_with_BA
 		
 		-- target data access must be called 'f' to be retreived with resolveTemp
 		f: AADLBA!DataAccess
-			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
-				kind <- #requires
-			),
+		(
+			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
+			kind <- #requires
+		),
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-fi.feature.name+'_MsgAddr'
@@ -309,18 +303,18 @@ rule m_DataPort_Instance_with_BA
 		
 		-- target data access must be called 'f_entrypoint' to be retreived with resolveTemp
 		f_entrypoint: AADLBA!DataAccess
-			(
-				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
-				kind <- #requires
-			),
+		(
+			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
+			kind <- #requires
+		),
 		fresh_data_previous: AADLBA!DataSubcomponent
-			(
-				name<-fi.name+'_freshness_previous',
-				dataSubcomponentType<-'Integer_16'.asClassifier('BASE_TYPES'),
-				ownedPropertyAssociation <- Sequence{
-					thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', FRESH_INIT)
-				}
-			),
+		(
+			name<-fi.name+'_freshness_previous',
+			dataSubcomponentType<-'Integer_16'.asClassifier('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence{
+				thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', FRESH_INIT)
+			}
+		),
 		FRESH_INIT: AADLBA!ListValue
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression('0')}
@@ -342,7 +336,7 @@ rule m_DataPort_Instance_with_BA
 		),
 		fresh_data_impl_wrapper:AADLBA!DataImplementation
 		(
-			name<-thisModule.createFreshnessImplIdentifier(fresh_data_type_wrapper),
+			name<-fi.getFreshnessType()+thisModule.impl_suffix,
 			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
 		),
 		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
@@ -382,7 +376,7 @@ rule m_DataPort_Instance_with_BA
 		),
 		updateFreshFactor: AADLBA!Factor
 		(
-			firstValue <- Sequence{updateFreshCDR}
+			firstValue <- updateFreshCDR
 		),
 		updateFreshCDR: AADLBA!DataComponentReference
 		(
@@ -435,7 +429,7 @@ rule m_DataPort_Instance_with_BA
 		),
 		sendFreshFactorOutput: AADLBA!Factor
 		(
-			firstValue <- Sequence{dataAccessHolderSend}
+			firstValue <- dataAccessHolderSend
 		),
 		dataAccessHolderSend: AADLBA!DataSubcomponentHolder
 		(
@@ -472,7 +466,7 @@ rule m_DataPort_Instance_with_BA
 		),
 		updateFreshFactorOutput: AADLBA!Factor
 		(
-			firstValue <- Sequence{dataAccessHolderOutput}
+			firstValue <- dataAccessHolderOutput
 		),
 		dataAccessHolderOutput: AADLBA!DataSubcomponentHolder
 		(
@@ -484,7 +478,7 @@ rule m_DataPort_Instance_with_BA
 		),
 		updateConstantFactorOutput: AADLBA!Factor
 		(
-			firstValue <- Sequence{valueConstantOutput}
+			firstValue <- valueConstantOutput
 		),
 		valueConstantOutput: AADLBA!BehaviorIntegerLiteral
 		(
@@ -573,7 +567,7 @@ rule m_EventDataPort_Instance_with_BA
 	}
 }
 
--- @extends m_Feature_Instance
+-- @extends m_DataAccess_Instance
 rule m_DataAccess_Instance_with_BA
 {
 	from
@@ -587,13 +581,6 @@ rule m_DataAccess_Instance_with_BA
 		processImplImg: AADLI!ProcessImplementation = OclUndefined;
 	}
 	to
-		f: AADLBA!DataAccess
-			(
-				name <- fi.name,
-				kind <- #requires,
-				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
-				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
-			),
 		f_entrypoint: AADLBA!DataAccess
 			(
 				name <- fi.name,
@@ -603,44 +590,7 @@ rule m_DataAccess_Instance_with_BA
 			)
 	do
 	{
-		if(c.category=#thread)
-		{
-			thisModule.ports_processImplImg <- c.eContainer().subcomponent.subcomponentType;
-		}
-		thisModule.addThreadsInternalConnections(fi);
-		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
 		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
 	}
 }
-
----- @extends m_Feature_Instance
---rule DataAccess_Instance
---{
---	from
---		fi: AADLI!FeatureInstance (fi.category=#dataAccess
---			 and fi.eContainer().category=#thread
---			 and not fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
---	using
---	{
---		c: AADLI!ComponentInstance = fi.eContainer();
---	}
---	to
---		f: AADLBA!DataAccess
---		(
---			name <- fi.name,
---			kind <- #requires,
---			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
---			ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
---		)
---	do
---	{
---		if(c.category=#thread)
---		{
---			thisModule.ports_processImplImg <- c.eContainer().subcomponent.subcomponentType;
---		}
---		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
---		thisModule.addThreadsInternalConnections(fi);
---	}
---}
---
 

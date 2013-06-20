@@ -148,6 +148,26 @@ rule m_PortConnection_Reference
 		cnxRef: AADLI!ConnectionReference (cnxRef.eContainer().kind = #portConnection)
 }
 
+-- @extends m_Connection_Reference
+rule m_AccessConnection_Reference
+{
+	from
+		cnxRef: AADLI!ConnectionReference (
+			cnxRef.eContainer().kind = #accessConnection
+			and
+			not (cnxRef.connection.accessCategory=#subprogram)
+			)
+	to
+		cnxImg: AADLBA!AccessConnection
+		(accessCategory <- cnxRef.connection.accessCategory)
+}
+
+rule m_SubprogramAccessConnection_Reference
+{
+	from
+		cnxRef: AADLI!ConnectionReference (cnxRef.eContainer().kind = #accessConnection and cnxRef.connection.accessCategory=#subprogram)
+}
+
 rule m_ParameterConnection_Reference
 {
 	from
@@ -177,7 +197,13 @@ rule m_create_Thread_BA
 			ownedRealization <- thisModule.Realization(typeImg),
 			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
 			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data),
-			ownedSubprogramCallSequence     <- impl.ownedSubprogramCallSequence->select(e|e.isComputeEntryPointOf(c))->collect(e| thisModule.resolveTemp(Sequence{c,e}, 'callSequenceImg')),
+			ownedSubprogramCallSequence     <- if (c.subcomponent.subcomponentType.needsToMapBehaviorAnnex()) then
+												Sequence{thisModule.resolveTemp(c,'callSequenceImg')}
+											   else
+											   	impl.ownedSubprogramCallSequence
+												->select(e|e.isComputeEntryPointOf(c))
+												->collect(e| thisModule.resolveTemp(Sequence{c,e}, 'callSequenceImg'))
+											   endif,
 			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
 												e.source.oclIsKindOf(AADLI!Parameter) and e.destination.oclIsKindOf(AADLI!Parameter))
 												->collect(e| thisModule.ParameterConnection(e))
@@ -262,152 +288,6 @@ rule m_Thread_Instance {
 		implImg : AADLBA!ThreadImplementation,
 		typeImg : AADLBA!ThreadType
 		
-}
-
--- @extends m_Component_Instance,m_create_Thread_BA
-rule m_Thread_Instance_WithBA {
- from 
-    c : AADLI!ComponentInstance ( c.category = #thread 
-			and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
-			and c.subcomponent.subcomponentType.needsToMapBehaviorAnnex())
- using
- {
-    impl: AADLI!Thread = c.subcomponent.subcomponentType;
- 	implBA: AADLBA!BehaviorAnnex = c.subcomponent.subcomponentType.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex));
- }
- to 
- 	sub : AADLBA!ThreadSubcomponent,
-	implImg : AADLBA!ThreadImplementation,
-	typeImg : AADLBA!ThreadType,
-	entryPointImg: AADLBA!SubprogramType,
-	entryPointImplImg: AADLBA!SubprogramImplementation,
-	callEntryPoint: AADLBA!SubprogramCall,
-	callEntryPointCallSequence: AADLBA!SubprogramCallSequence,
-	stateType: AADLBA!DataType
-	(
-		name <- c.uniqueName().concat('_currentState'),
-		ownedPropertyAssociation <- Sequence {
-												
-												thisModule.CreatePropertyAssociation
-												(
-												 	'Data_Representation',
-													'DATA_MODEL',
-													'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
-												),
-												thisModule.CreatePropertyAssociation
-												(
-												 	'Enumerators',
-													'DATA_MODEL',
-													 thisModule.CreateListValueFromListOfString(implBA.states->collect(e|e.name))
-												)
-									}
-	),
-	currentState: AADLBA!DataSubcomponent
-	(
-		name <- 'Parent_BA_currentState',
-		dataSubcomponentType <- stateType
-	),
-	currentStateAccess: AADLBA!DataAccess
-	(
-		name <- 'Parent_BA_currentState_Access',
-		dataFeatureClassifier <- stateType,
-		kind <- #requires
-	),
-	
-	
-	-- connect currentState feature of entryPointImg to the data subcomponent of the implImg that
-	-- represents the state of implImg
-	connectedAccess_CURRENT_STATE: AADLBA!ConnectedElement
-	(
-		connectionEnd<-currentStateAccess,
-		context<-callEntryPoint
-	),
-	connectedSubcomponent_CURRENT_STATE: AADLBA!ConnectedElement
-	(
-		connectionEnd<-currentState
-	),
-	accessConnection_CURRENT_STATE: AADLBA!AccessConnection
-	(
-		name<-'CNX_CURRENT_STATE_BA',
-		source<-connectedAccess_CURRENT_STATE,
-		destination<-connectedSubcomponent_CURRENT_STATE,
-		accessCategory <- #data
-	)
- do
- {
- 	-- set ownership
-	-- add current state to thread implementation implImg
- 	implImg.ownedDataSubcomponent->add(currentState);
- 	-- add data type to package
-	thisModule.public().getOwnedClassifiers()->add(stateType);
- 	
- 	-- add initial value to statType; must be set after adding stateType to the package
- 	-- otherwise the qualified name is incorrect.
- 	stateType.ownedPropertyAssociation.add(thisModule.CreatePropertyAssociation
-												(
-												 	'Initial_Value',
-													'DATA_MODEL',
-													 thisModule.CreateListValueFromString(stateType.getProgrammationLanguageIdentifier().concat('_')+thisModule.getBAInitialStateIdentifier(implBA))
-												));
- 	
- 	-- add subprogram type to package
-	thisModule.public().getOwnedClassifiers()->add(entryPointImg);
- 	thisModule.public().getOwnedClassifiers()->add(entryPointImplImg);
- 	
- 	if(implImg.ownedSubprogramCallSequence->isEmpty())
- 		implImg.ownedSubprogramCallSequence<-thisModule.createSubprogramCallSequence(implImg);
-	
- 	-- add call to entryPointImg
-	implImg.ownedSubprogramCallSequence->first().getOwnedCallSpecifications().add(callEntryPoint);
-
- 	-- add data accesses created from c.featureInstance
-	entryPointImg.ownedDataAccess->addAll(c.featureInstance->collect(e|e.retreiveEntrypointFeature()));
-	
- 	for(f in c.featureInstance)
-	{
- 		thisModule.ports_dataSubcomponent <- thisModule.resolveTemp(f, 'dataSubcomponent');
- 		if(not thisModule.ports_dataSubcomponent.oclIsUndefined())
- 			entryPointImplImg.ownedDataSubcomponent.add(thisModule.ports_dataSubcomponent);
- 	
- 		if(f.direction=#out and f.category=#eventPort)
- 		{
- 			thisModule.addPutValueSubprogramCall(implImg.ownedSubprogramCallSequence->first(), impl, implImg, f);
- 		}
- 		
- 		-- connect each feature of implImg to each copy of this feature in entryPointImg
-		thisModule.addDataAccessConnection(	implImg,
-							 		   	   	f.name.concat('_to_EntryPoint'),
-							 			   	f.retreiveEntrypointFeature(),
-							 			   	callEntryPoint,
-							 				f.getFeatureImg());
- 		if(f.feature.oclIsKindOf(AADLBA!Port))
-		{
- 			if(f.isUsedInFresh())
- 			{
- 				thisModule.ports_fresh_data_previous <- thisModule.resolveTemp(f, 'fresh_data_previous');
-				thisModule.ports_fresh_data_type_wrapper <- thisModule.resolveTemp(f, 'fresh_data_type_wrapper');
-				thisModule.ports_fresh_data_impl_wrapper <- thisModule.resolveTemp(f, 'fresh_data_impl_wrapper');
-				thisModule.ports_fresh_previous_access <- thisModule.resolveTemp(f, 'fresh_previous_access');
-				implImg.ownedDataSubcomponent.add(thisModule.ports_fresh_data_previous);
-				-- add fresh_current_access to subprogram
-				entryPointImg.ownedDataAccess.add(thisModule.ports_fresh_previous_access);
-				-- add connection to call
-				thisModule.addDataAccessConnection(implImg,
-							 			f.name+'_freshness_cnx',
-							 			thisModule.ports_fresh_previous_access,
-							 			callEntryPoint,
-							 			thisModule.ports_fresh_data_previous);
- 			}
-		}
-	}
- 	
- 	-- add BA in entryPointImg
-	entryPointImplImg.ownedAnnexSubclause->add(thisModule.copyBehaviorAnnexFromThread(c, 
-															implBA, 
-															currentStateAccess,
-															stateType,
-															entryPointImplImg));
- }
 }
 
 

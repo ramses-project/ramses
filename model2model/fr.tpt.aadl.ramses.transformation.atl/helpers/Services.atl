@@ -29,9 +29,6 @@ helper def: callPrefix(): String ='call';
 
 helper def: theHOOK : ATLHOOKS!HookAccess = ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first();
 
-helper context Sequence(AADLBA!Element) def: add(elt: AADLBA!Element) : Boolean =
-	thisModule.theHOOK.add(self, elt)
-;
 
 helper context AADLBA!NamedElement def: getProgrammationLanguageIdentifier(): String =
 	let pa: AADLBA!PropertyAssociation = self.getPropertyAssociation('Source_Name') in

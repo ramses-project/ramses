@@ -32,7 +32,9 @@ from
 
 
 helper context AADLI!Classifier def : getConnectionsInstancesImg(connectionKind: String) : Sequence(AADLBA!Connection) =
-	let connectionReferenceList : Sequence(AADLI!ConnectionReference) = AADLI!ConnectionInstance->allInstancesFrom('IN')->select(e| e.kind.getName()=connectionKind)->collect(c | c.connectionReference->select(f| self.ownedConnection->includes(f.connection)))->flatten()-->collect(e|e.connectionReference)
+	let connectionReferenceList : Sequence(AADLI!ConnectionReference) = AADLI!ConnectionInstance->allInstancesFrom('IN')
+	->select(e| e.kind.getName()=connectionKind and not(e.kind=#accessConnection and e.connectionReference->first().connection.accessCategory=#subprogram ))
+	->collect(c | c.connectionReference->select(f| self.ownedConnection->includes(f.connection)))->flatten()-->collect(e|e.connectionReference)
 	in
 	connectionReferenceList->collect(e|e.getConnectionsReferencesImg())
 ;
@@ -221,43 +223,3 @@ rule addDataAccessConnection(implImg: AADLBA!ComponentImplementation, name: Stri
   }
 }
 
-rule addThreadsInternalConnections(fi: AADLI!FeatureInstance)
-{
-	using
-	{
-		c : AADLI!ComponentInstance = fi.eContainer();
-		implImg: AADLBA!ComponentImplementation = c.getSubcomponentImg().subcomponentType;
-		impl: AADLBA!ComponentImplementation = c.getImpl();
-	}
-	do
-	{
-		if(c.category=#thread and c.featureInstance->last() = fi)
-		{
-			implImg.ownedParameterConnection <- impl.ownedParameterConnection->collect(co|thisModule.ParameterConnection(co, implImg));
-			implImg.ownedAccessConnection    <- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg));
-		}
-	}
-}
-
-rule defaultThreadDataOrEventDataPortConnection_mapping(cnxInst: AADLI!ConnectionInstance)
-{
-	using
-	{
-		impl : AADLBA!ThreadImplementation = cnxInst.source.eContainer().subcomponent.subcomponentType;
-	}
-	do
-	{
-		if(impl.oclIsTypeOf(AADLI!ThreadImplementation) and
-				(cnxInst.source.category=#eventDataPort
-				or cnxInst.source.category=#dataPort))
-		{
-			thisModule.mapAllParameterConnections(thisModule.resolveTemp(cnxInst.source.eContainer(), 'sub').subcomponentType, impl);
-		}
-		if(impl.oclIsTypeOf(AADLI!ThreadImplementation) and
-				(cnxInst.destination.category=#eventDataPort
-				or cnxInst.destination.category=#dataPort))
-		{
-			thisModule.mapAllParameterConnections(thisModule.resolveTemp(cnxInst.destination.eContainer(), 'sub').subcomponentType, impl);
-		}
-	}
-}

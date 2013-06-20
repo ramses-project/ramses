@@ -45,6 +45,7 @@ subprogram TerminateTask
 properties
   Programming_Properties::Source_Name => "TerminateTask";
   Programming_properties::Source_Text => ("tpl_os_task.h");
+  Compute_Execution_Time => 2 ms .. 3 ms; 
 end TerminateTask;
 
 -- TODO: ChainTask
@@ -183,7 +184,7 @@ end EventDataType;
 subprogram SetOSEKEventData
 features
   EV_DATA_QUEUE_ID: in parameter EventQueueIdType;
-  VALUE: in parameter EventDataType;
+  VALUE_IN: in parameter EventDataType;
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "SetEventData";
@@ -193,7 +194,7 @@ end SetOSEKEventData;
 subprogram WaitOSEKEventData
 features
   EV_DATA_QUEUE_ID: in parameter EventQueueIdType;
-  VALUE: out parameter EventDataType;
+  VALUE_OUT: out parameter EventDataType;
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "WaitEventData";
