@@ -116,7 +116,7 @@ with Base_Types, Data_Model, Generation_Properties;
     properties
       Data_Model::Data_Representation => Struct;
       Source_Name => "component_instance_t";
-      --Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c"); 
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c"); 
   end component_instance_t;
   
   data implementation component_instance_t.impl
@@ -135,7 +135,7 @@ with Base_Types, Data_Model, Generation_Properties;
     properties
       Data_Model::Data_Representation => Struct;
       Source_Name => "periodic_delayed_context_t";
-      --Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
   end periodic_delayed_context_t;
   
   data implementation periodic_delayed_context_t.impl
