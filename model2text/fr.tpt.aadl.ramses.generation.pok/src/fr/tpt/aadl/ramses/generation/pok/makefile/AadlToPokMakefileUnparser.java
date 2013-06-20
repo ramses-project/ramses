@@ -29,9 +29,11 @@ import java.io.FileWriter ;
 import java.io.IOException ;
 import java.io.InputStream ;
 import java.io.InputStreamReader ;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils ;
@@ -121,13 +123,26 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
       {
         unparserContent
               .addOutput("OBJS = main.o activity.o subprograms.o gtypes.o deployment.o ") ;
-
-        for(String cpuName : GeneratorUtils.getListOfReferencedObjects(object))
+        
+        boolean runtime_PeriodicDelayed_added = false;
+        List<String> includeDirList = new ArrayList<String>();
+        for(String sourceFile : GeneratorUtils.getListOfReferencedObjects(object))
         {
-          unparserContent.addOutput(cpuName + " ") ;
+          if(sourceFile.equalsIgnoreCase("PeriodicDelayed_runtime.o") && runtime_PeriodicDelayed_added==false)
+          {
+        	unparserContent.addOutput(RamsesConfiguration.getRamsesResourcesDir()+"/aadl_resources/PeriodicDelayed_runtime/PeriodicDelayed_runtime.o") ;
+        	includeDirList.add(RamsesConfiguration.getRamsesResourcesDir()+"/aadl_resources/PeriodicDelayed_runtime/");
+          }
+          else
+            unparserContent.addOutput(sourceFile + " ") ;
         }
-
         unparserContent.addOutput("\n") ;
+        if(false==includeDirList.isEmpty())
+          unparserContent.addOutput("CFLAGS+=");
+        for (String include: includeDirList)
+        {
+          unparserContent.addOutput("-I"+include+" ");
+        }
         unparserContent.addOutputNewline("all: libpok $(TARGET)\n") ;
         unparserContent.addOutputNewline("clean: common-clean\n") ;
         unparserContent
