@@ -150,13 +150,11 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     	  
         processComments(object) ;
         aadlText.addOutputNewline("package " + pkgName) ;
-        java.lang.System.out.println("package " + pkgName);
         process(object.getOwnedPublicSection()) ;
         process(object.getOwnedPrivateSection()) ;
         processOptionalSection(object.getOwnedPropertyAssociations(),
                                "properties", AadlConstants.emptyString) ;
         aadlText.addOutputNewline("end " + pkgName + ";") ;
-        java.lang.System.out.println("end " + pkgName);
         return DONE ;
       }
 
@@ -2621,7 +2619,6 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
   public void setCustomPackageName(String pkgName)
   {
 	  this.customPkgName = pkgName;
-	  java.lang.System.out.println("pkg = " + pkgName);
   }
   
   /**
