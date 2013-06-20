@@ -70,15 +70,16 @@ features
   s : requires data access Robot_state;
   getLight: requires subprogram access ecrobotGetLightSensorLib;
   setSpeedLeft: requires subprogram access nxtMotorSetSpeedLib;
-  setSpeedRight: requires subprogram access nxtMotorSetSpeedLib
-  {
-  Generation_Properties::Constant_Value => ("NXT_PORT_A", "0");
-  Generation_Properties::Constant_Value_Parameters => ("portNb", "brake");
-  };
+  setSpeedRight: requires subprogram access nxtMotorSetSpeedLib;
 end ContrThread;
 
 thread implementation ContrThread.Impl
-calls call1:
+  subcomponents
+    rightSpeedPort: data Int {Data_Model::Initial_Value => ("NXT_PORT_C");};
+    rightBrake: data Int {Data_Model::Initial_Value => ("0");};
+    leftSpeedPort: data Int {Data_Model::Initial_Value => ("NXT_PORT_A");};
+    leftBrake: data Int {Data_Model::Initial_Value => ("0");};
+  calls call1:
   {
   cl   : subprogram getLight;
   cp   : subprogram computePID;
@@ -92,13 +93,18 @@ connections
   cc2 : parameter cs.speedL -> ssL.speed;
   cc3 : parameter cs.speedR -> ssR.speed;
   cc4 : data access s -> cs.s;
+  cc5 : parameter ssL.portNb -> leftSpeedPort;
+  cc6 : parameter ssL.brake -> leftBrake;
+  cc7 : parameter ssR.portNb -> rightSpeedPort;
+  cc8 : parameter ssR.brake -> rightBrake;
 properties
   Dispatch_Protocol                  => periodic;
   Period                             => 100 ms;
-  Compute_Execution_time             => 0 ms .. 50 ms; -- arbitraire... mais a son importance si mecanisme de detection d'overrrun. 
+  Compute_Execution_time             => 0 ms .. 100 ms; -- arbitraire... mais a son importance si mecanisme de detection d'overrrun. 
   Deadline                           => 100 ms;
   Priority                           => 1;
-  First_Dispatch_Time                => 1ms;
+  Compute_Entrypoint_Call_Sequence => reference (call1);
+  POSIX_Scheduling_Policy => SCHED_FIFO;
 end ContrThread.Impl;
 
 thread EventThread
@@ -108,21 +114,25 @@ features
 end EventThread;
 
 thread implementation EventThread.Impl
-calls call2:
+  subcomponents
+    DistancePortNb: data Int {Data_Model::Initial_Value => ("NXT_PORT_S4");}; 
+  calls call2:
   {
   d : subprogram getDistance;
   se : subprogram select_State;
   };
 connections
   ce1 : parameter d.distance -> se.distance;
-  ce2 : data access s -> se.s;
+  ce2 : parameter d.portNb -> DistancePortNb;
+  ce3 : data access s -> se.s;
 properties
   Dispatch_Protocol                  => periodic;
   Period                             => 50 ms;
   Compute_Execution_time             => 0 ms .. 25 ms;
   Deadline                           => 50 ms;
   Priority                           => 2;
-  First_Dispatch_Time                => 1ms;
+  Compute_Entrypoint_Call_Sequence => reference (call2);
+  POSIX_Scheduling_Policy => SCHED_FIFO;
 end EventThread.Impl;
 
 ---------------
@@ -159,6 +169,8 @@ processor arm
 end arm;
 
 processor implementation arm.impl
+properties
+  Scheduling_Protocol => (Rate_Monotonic_Protocol) ;
 end arm.impl;
 
 -------------
@@ -267,9 +279,9 @@ end Motor;
 
 subprogram nxtMotorSetSpeedLib
 features
-  portNb: in parameter Int; --{Generation_Properties::Constant_Value => "NXT_PORT_A";};
+  portNb: in parameter Int;
   speed : in parameter Int;
-  brake : in parameter Int;--{Generation_Properties::Constant_Value => "0";};
+  brake : in parameter Int;
 properties
   Source_language => (C);
   Source_text => ("nxt_motors.h");
