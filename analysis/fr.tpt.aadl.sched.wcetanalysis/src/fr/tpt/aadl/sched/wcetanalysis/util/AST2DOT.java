@@ -3,6 +3,7 @@ package fr.tpt.aadl.sched.wcetanalysis.util;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +28,13 @@ public class AST2DOT implements TaskBodyVisitor
 
 	private HashMap<String, String> actionToResource = new HashMap<String, String>();
 	private final DOTLayout layout;
+	private final boolean programFound;
 	
 	public AST2DOT(String outputDir, DOTLayout layout)
 	{
 		this.outputDir = outputDir;
 		this.layout = layout;
+		this.programFound = commandExists(layout.name());
 
 		if (!outputDir.endsWith("/"))
 		{
@@ -48,6 +51,7 @@ public class AST2DOT implements TaskBodyVisitor
 	public AST2DOT(File outputDir, DOTLayout layout)
 	{
 		this.layout = layout;
+		this.programFound = commandExists(layout.name());
 		initDirectory(outputDir);
 	}
 	
@@ -80,19 +84,29 @@ public class AST2DOT implements TaskBodyVisitor
 		final String MAIN_AST_PATH = outputDir + TASK_NAME + "_ast.dot";
 		final String MAIN_REDUCED_AST_PATH = outputDir + TASK_NAME + "_ast_reduced.dot";
 
-		try
+		if (programFound)
 		{
-			if (exportInit)
+			try
 			{
-				saveFlowModelAsPng(INIT_AST, INIT_AST_PATH, priority);
-			}
+				if (exportInit)
+				{
+					saveFlowModelAsPng(INIT_AST, INIT_AST_PATH, priority);
+				}
 
-			saveFlowModelAsPng(MAIN_AST, MAIN_AST_PATH, priority);
-			saveFlowModelAsPng(MAIN_REDUCED_AST, MAIN_REDUCED_AST_PATH, priority);
+				saveFlowModelAsPng(MAIN_AST, MAIN_AST_PATH, priority);
+				saveFlowModelAsPng(MAIN_REDUCED_AST, MAIN_REDUCED_AST_PATH, priority);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
-		catch (Exception e)
+		else
 		{
-			e.printStackTrace();
+			System.out.flush();
+			System.err.println("Cannot export AST to image: command " 
+					+ layout.name() + " is not found");
+			System.err.flush();
 		}
 	}
 
@@ -255,4 +269,19 @@ public class AST2DOT implements TaskBodyVisitor
 		}
 	}
 
+	
+	private static boolean commandExists(String cmd)
+	{
+		boolean exist = true;
+		try
+		{
+			Process p = Runtime.getRuntime().exec(new String[]{cmd});
+			p.destroy();
+		}
+		catch (IOException e)
+		{
+			exist = false;
+		}
+		return exist;
+	}
 }
