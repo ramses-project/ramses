@@ -74,9 +74,8 @@ public class InstantiationManagerImpl implements InstantiationManager {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		String resultFileContent =
-	            new Aadl2StandaloneUnparser()
-	                  .doUnparse((Element) transfoResult.getContents().get(0)) ;
+		Aadl2StandaloneUnparser unparser = Aadl2StandaloneUnparser.getAadlUnparser();
+		String resultFileContent = unparser.doUnparse((Element) transfoResult.getContents().get(0)) ;
 	    try
 	    {
 	      File clean = new File(targetFileName);
@@ -93,6 +92,4 @@ public class InstantiationManagerImpl implements InstantiationManager {
 
 	    java.lang.System.out.println("Serialized result in: " + targetFileName) ;
 	  }
-
-
 }

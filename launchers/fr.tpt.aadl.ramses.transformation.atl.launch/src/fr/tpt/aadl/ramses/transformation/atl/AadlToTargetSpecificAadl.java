@@ -116,11 +116,11 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
     }
   }
   public Resource unparse(Resource inputResource, 
-		  Resource expandedResult, File outputDir)
+		  Resource expandedResult, File outputDir, String pkgName)
   {
-	  String aadlGeneratedFileName = inputResource.getURI().lastSegment();
+	  String aadlGeneratedFileName = expandedResult.getURI().lastSegment();
 	  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
-			  ".aaxl2", "_extended.aadl2");
+	  		  ".aaxl2", ".aadl2");
 
 	  File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 	  if(outputModelDir.exists()==false)

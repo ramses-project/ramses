@@ -284,7 +284,7 @@ void parsePredefinedPackages()
       
       outputFile.createNewFile() ;
       
-      Aadl2StandaloneUnparser unparser = new Aadl2StandaloneUnparser() ;
+      Aadl2StandaloneUnparser unparser = Aadl2StandaloneUnparser.getAadlUnparser();
       NamedElement el = (NamedElement) r.getContents().get(0);
       
       msg = "Unparse " + el.getName() + " into " + outputFile.getAbsolutePath() ;

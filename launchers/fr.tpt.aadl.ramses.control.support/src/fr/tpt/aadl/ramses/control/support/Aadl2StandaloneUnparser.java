@@ -106,6 +106,8 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
   private static final String NEWLINE = AadlConstants.newlineChar ;
 
   private UnparseText aadlText ;
+  
+  private String customPkgName = null;
 
   private static ServiceRegistry serviceRegistry ;
 
@@ -121,7 +123,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     return unparser ;
   }
 
-  public Aadl2StandaloneUnparser()
+  private Aadl2StandaloneUnparser()
   {
     super(PROCESS_PRE_ORDER_ALL) ;
     aadlText = new UnparseText() ;
@@ -144,13 +146,17 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     {
       public String caseAadlPackage(AadlPackage object)
       {
+    	String pkgName = customPkgName==null? object.getName() : customPkgName;  
+    	  
         processComments(object) ;
-        aadlText.addOutputNewline("package " + object.getName()) ;
+        aadlText.addOutputNewline("package " + pkgName) ;
+        java.lang.System.out.println("package " + pkgName);
         process(object.getOwnedPublicSection()) ;
         process(object.getOwnedPrivateSection()) ;
         processOptionalSection(object.getOwnedPropertyAssociations(),
                                "properties", AadlConstants.emptyString) ;
-        aadlText.addOutputNewline("end " + object.getName() + ";") ;
+        aadlText.addOutputNewline("end " + pkgName + ";") ;
+        java.lang.System.out.println("end " + pkgName);
         return DONE ;
       }
 
@@ -2609,6 +2615,16 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
   }
 
   /**
+   * Define the name of the package.
+   * @param pkgName name of the package.
+   */
+  public void setCustomPackageName(String pkgName)
+  {
+	  this.customPkgName = pkgName;
+	  java.lang.System.out.println("pkg = " + pkgName);
+  }
+  
+  /**
    * Set the model name as the name of the object and unparse the (sub)-model
    *
    * @param obj
@@ -2916,6 +2932,8 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    */
   public String doUnparse(Element as)
   {
+	aadlText = new UnparseText();  
+	
     this.unparse(as) ;
     return this.getOutput() ;
   }

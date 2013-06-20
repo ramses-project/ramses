@@ -30,10 +30,12 @@ import javax.swing.JOptionPane;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
+import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
@@ -113,7 +115,13 @@ public class AadlTargetSpecificGenerator implements Generator
   {
 	Resource r = systemInstance.eResource() ;
     SystemInstance currentInstance = systemInstance;
-    String systemToInstantiate = systemInstance.getSystemImplementation().getName();
+    final String systemToInstantiate = systemInstance.getSystemImplementation().getName();
+    
+    PublicPackageSection pps = (PublicPackageSection) systemInstance.getSystemImplementation().getOwner();
+    AadlPackage p = (AadlPackage) pps.getOwner();
+    final String initialPackageName = p.getName();
+    
+    int transfoCounter = 0;
     
     while(workflowPilot.hasNextOperation())
     {
@@ -132,8 +140,13 @@ public class AadlTargetSpecificGenerator implements Generator
     	r = currentInstance.eResource();
       }
       else if(operation.equals("unparse"))
-      {
-    	  doUnparse(currentInstance.eResource(), currentImplResource, generatedDir);
+      {  
+    	  String pkgName = initialPackageName + "_" + transfoCounter;
+    	  
+    	  doUnparse(currentInstance.eResource(), currentImplResource, 
+    			  generatedDir, pkgName);
+    	  
+    	  transfoCounter++;
       }
       else if(operation.equals("errorstate"))
       {
@@ -221,9 +234,20 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private void doUnparse(Resource inputResource, Resource expandedResult,
-		  File outputDir)
+		  File outputDir, String pkgName)
   {
-	  _targetTrans.unparse(inputResource, expandedResult, outputDir);
+	  Aadl2StandaloneUnparser.getAadlUnparser().setCustomPackageName(pkgName);
+	  
+	  if (expandedResult != null)
+	  {
+		  _targetTrans.unparse(inputResource, expandedResult, outputDir, pkgName);
+	  }
+	  else
+	  {
+		  System.out.flush();
+		  System.err.println("Cannot unparse model: expanded result is null");
+		  System.err.flush();
+	  }
   }
   
   private void doGeneration(File generatedDir, Resource r)
