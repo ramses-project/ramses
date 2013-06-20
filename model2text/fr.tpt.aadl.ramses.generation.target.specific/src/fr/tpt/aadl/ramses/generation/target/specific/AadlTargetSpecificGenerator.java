@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.generation.target.specific;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -173,12 +174,15 @@ public class AadlTargetSpecificGenerator implements Generator
       try {
         ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
         Analyzer a = sr.getAnalyzer(analysisName);
+        Map<String, Object> modeParam = new HashMap<String, Object>();
+        modeParam.put("mode", analysisMode);
         if (a == null)
         {
       	  System.err.println("Unknown analysis: " + analysisName);
         }
         else
         {
+          a.setParameters(modeParam);
       	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                     new NullProgressMonitor()) ;
         }
