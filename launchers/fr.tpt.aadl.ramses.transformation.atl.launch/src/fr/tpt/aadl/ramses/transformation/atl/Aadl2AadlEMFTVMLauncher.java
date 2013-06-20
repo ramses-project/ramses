@@ -326,7 +326,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/tools/PropertiesTools") ;
 		fileName.add("/tools/PackagesTools") ;
 		fileName.add("/tools/FeaturesTools") ;
-		fileName.add("/tools/SubprogramsTools") ;
+		//fileName.add("/tools/SubprogramsTools") ;
 		fileName.add("/uninstanciate/Features") ;
 		fileName.add("/uninstanciate/Implementations") ;
 		fileName.add("/uninstanciate/Properties") ;
@@ -335,7 +335,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/uninstanciate/Connections") ;
 		fileName.add("/helpers/Services") ;
 		// Fixme: next will be added when tested with emftvm
-		//fileName.add("/tools/BehaviorAnnexTools") ;
+		fileName.add("/tools/BehaviorAnnexTools") ;
 		//fileName.add("/BehaviorAnnexCopy/BehaviorAnnexServices") ;
 		//fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
 		//fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
