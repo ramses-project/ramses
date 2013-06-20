@@ -6,6 +6,7 @@
  */
 package fr.tpt.aadl.ramses.control.workflow.util;
 
+import fr.tpt.aadl.ramses.control.workflow.*;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
@@ -168,6 +169,14 @@ public class WorkflowSwitch {
 			case WorkflowPackage.MODEL_IDENTIFIER: {
 				ModelIdentifier modelIdentifier = (ModelIdentifier)theEObject;
 				Object result = caseModelIdentifier(modelIdentifier);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case WorkflowPackage.UNPARSE: {
+				Unparse unparse = (Unparse)theEObject;
+				Object result = caseUnparse(unparse);
+				if (result == null) result = caseWorkflowElement(unparse);
+				if (result == null) result = caseAnalysisElement(unparse);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -337,6 +346,21 @@ public class WorkflowSwitch {
 	 * @generated
 	 */
 	public Object caseModelIdentifier(ModelIdentifier object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Unparse</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Unparse</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public Object caseUnparse(Unparse object) {
 		return null;
 	}
 

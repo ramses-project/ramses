@@ -15,11 +15,11 @@ package fr.tpt.aadl.ramses.control.workflow;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link workflow.Unparse#getElement <em>Element</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Unparse#getElement <em>Element</em>}</li>
  * </ul>
  * </p>
  *
- * @see workflow.WorkflowPackage#getUnparse()
+ * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getUnparse()
  * @model
  * @generated
  */
@@ -35,14 +35,14 @@ public interface Unparse extends WorkflowElement, AnalysisElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Element</em>' containment reference.
 	 * @see #setElement(AnalysisElement)
-	 * @see workflow.WorkflowPackage#getUnparse_Element()
+	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getUnparse_Element()
 	 * @model containment="true" required="true"
 	 * @generated
 	 */
 	AnalysisElement getElement();
 
 	/**
-	 * Sets the value of the '{@link workflow.Unparse#getElement <em>Element</em>}' containment reference.
+	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Unparse#getElement <em>Element</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Element</em>' containment reference.

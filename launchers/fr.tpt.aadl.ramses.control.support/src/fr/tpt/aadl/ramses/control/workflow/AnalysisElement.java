@@ -15,7 +15,7 @@ import org.eclipse.emf.ecore.EObject;
  *
  *
  * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAnalysisElement()
- * @model
+ * @model abstract="true"
  * @generated
  */
 public interface AnalysisElement extends EObject {

@@ -14,7 +14,7 @@ import fr.tpt.aadl.ramses.control.workflow.Generation;
 import fr.tpt.aadl.ramses.control.workflow.List;
 import fr.tpt.aadl.ramses.control.workflow.Transformation;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory;
-import fr.tpt.aadl.ramses.control.workflow.util.WorkflowUtils;
+//import fr.tpt.aadl.ramses.control.workflow.util.WorkflowUtils;
 
 public class WorkflowUtilsTest {
 
@@ -45,7 +45,8 @@ public class WorkflowUtilsTest {
 		t.setElement(g);
 		t.setList(l);
 		
-		WorkflowUtils.createNewWorkflow(workflowPath, t);
+		// Fixme: restore WorkflowUtils class
+		//WorkflowUtils.createNewWorkflow(workflowPath, t);
 
 		//-----workflow with Analysis element--------
 /*		Analysis a = WorkflowFactory.eINSTANCE.createAnalysis();

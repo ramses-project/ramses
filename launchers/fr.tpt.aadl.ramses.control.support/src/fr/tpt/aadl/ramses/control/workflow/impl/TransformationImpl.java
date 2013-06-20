@@ -69,7 +69,7 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 	protected ModelIdentifier inputModelIdentifier;
 
 	/**
-	 * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' reference.
+	 * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getOutputModelIdentifier()
@@ -226,14 +226,6 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 	 * @generated
 	 */
 	public ModelIdentifier getOutputModelIdentifier() {
-		if (outputModelIdentifier != null && outputModelIdentifier.eIsProxy()) {
-			InternalEObject oldOutputModelIdentifier = (InternalEObject)outputModelIdentifier;
-			outputModelIdentifier = (ModelIdentifier)eResolveProxy(oldOutputModelIdentifier);
-			if (outputModelIdentifier != oldOutputModelIdentifier) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, outputModelIdentifier));
-			}
-		}
 		return outputModelIdentifier;
 	}
 
@@ -242,8 +234,14 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ModelIdentifier basicGetOutputModelIdentifier() {
-		return outputModelIdentifier;
+	public NotificationChain basicSetOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier, NotificationChain msgs) {
+		ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
+		outputModelIdentifier = newOutputModelIdentifier;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, newOutputModelIdentifier);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -252,10 +250,17 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 	 * @generated
 	 */
 	public void setOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier) {
-		ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
-		outputModelIdentifier = newOutputModelIdentifier;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, outputModelIdentifier));
+		if (newOutputModelIdentifier != outputModelIdentifier) {
+			NotificationChain msgs = null;
+			if (outputModelIdentifier != null)
+				msgs = ((InternalEObject)outputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+			if (newOutputModelIdentifier != null)
+				msgs = ((InternalEObject)newOutputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+			msgs = basicSetOutputModelIdentifier(newOutputModelIdentifier, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER, newOutputModelIdentifier, newOutputModelIdentifier));
 	}
 
 	/**
@@ -269,6 +274,8 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 				return basicSetElement(null, msgs);
 			case WorkflowPackage.TRANSFORMATION__LIST:
 				return basicSetList(null, msgs);
+			case WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER:
+				return basicSetOutputModelIdentifier(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -288,8 +295,7 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 				if (resolve) return getInputModelIdentifier();
 				return basicGetInputModelIdentifier();
 			case WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER:
-				if (resolve) return getOutputModelIdentifier();
-				return basicGetOutputModelIdentifier();
+				return getOutputModelIdentifier();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}

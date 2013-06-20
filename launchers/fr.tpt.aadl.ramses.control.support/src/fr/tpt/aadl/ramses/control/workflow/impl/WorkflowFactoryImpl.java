@@ -6,6 +6,7 @@
  */
 package fr.tpt.aadl.ramses.control.workflow.impl;
 
+import fr.tpt.aadl.ramses.control.workflow.*;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -73,7 +74,6 @@ public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory
 			case WorkflowPackage.WORKFLOW: return createWorkflow();
 			case WorkflowPackage.WORKFLOW_ELEMENT: return createWorkflowElement();
 			case WorkflowPackage.TRANSFORMATION: return createTransformation();
-			case WorkflowPackage.ANALYSIS_ELEMENT: return createAnalysisElement();
 			case WorkflowPackage.GENERATION: return createGeneration();
 			case WorkflowPackage.ANALYSIS: return createAnalysis();
 			case WorkflowPackage.ERROR_STATE: return createErrorState();
@@ -115,16 +115,6 @@ public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory
 	public Transformation createTransformation() {
 		TransformationImpl transformation = new TransformationImpl();
 		return transformation;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public AnalysisElement createAnalysisElement() {
-		AnalysisElementImpl analysisElement = new AnalysisElementImpl();
-		return analysisElement;
 	}
 
 	/**

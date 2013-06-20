@@ -130,7 +130,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.eclipse.emf.ecore.EPackage.Registry
-	 * @see workflow.WorkflowPackage#eNS_URI
+	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#eNS_URI
 	 * @see #init()
 	 * @generated
 	 */
@@ -196,6 +196,15 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 */
 	public EReference getWorkflow_Element() {
 		return (EReference)workflowEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getWorkflow_InputModelIdentifier() {
+		return (EReference)workflowEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -410,6 +419,15 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getModelIdentifier_Id() {
+		return (EAttribute)modelIdentifierEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getUnparse() {
 		return unparseEClass;
 	}
@@ -453,6 +471,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		// Create classes and their features
 		workflowEClass = createEClass(WORKFLOW);
 		createEReference(workflowEClass, WORKFLOW__ELEMENT);
+		createEReference(workflowEClass, WORKFLOW__INPUT_MODEL_IDENTIFIER);
 
 		workflowElementEClass = createEClass(WORKFLOW_ELEMENT);
 
@@ -486,6 +505,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		createEReference(analysisOptionEClass, ANALYSIS_OPTION__ELEMENT);
 
 		modelIdentifierEClass = createEClass(MODEL_IDENTIFIER);
+		createEAttribute(modelIdentifierEClass, MODEL_IDENTIFIER__ID);
 
 		unparseEClass = createEClass(UNPARSE);
 		createEReference(unparseEClass, UNPARSE__ELEMENT);
@@ -528,6 +548,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		// Initialize classes and features; add operations and parameters
 		initEClass(workflowEClass, Workflow.class, "Workflow", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getWorkflow_Element(), this.getWorkflowElement(), null, "element", null, 1, 1, Workflow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getWorkflow_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 0, 1, Workflow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workflowElementEClass, WorkflowElement.class, "WorkflowElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -535,9 +556,9 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		initEReference(getTransformation_Element(), this.getAnalysisElement(), null, "element", null, 1, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTransformation_List(), this.getList(), null, "list", null, 1, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTransformation_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 0, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTransformation_OutputModelIdentifier(), this.getModelIdentifier(), null, "outputModelIdentifier", null, 0, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTransformation_OutputModelIdentifier(), this.getModelIdentifier(), null, "outputModelIdentifier", null, 0, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(analysisElementEClass, AnalysisElement.class, "AnalysisElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(analysisElementEClass, AnalysisElement.class, "AnalysisElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(generationEClass, Generation.class, "Generation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -561,6 +582,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		initEReference(getAnalysisOption_Element(), this.getAnalysisElement(), null, "element", null, 0, 1, AnalysisOption.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(modelIdentifierEClass, ModelIdentifier.class, "ModelIdentifier", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getModelIdentifier_Id(), ecorePackage.getEString(), "id", null, 0, 1, ModelIdentifier.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(unparseEClass, Unparse.class, "Unparse", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUnparse_Element(), this.getAnalysisElement(), null, "element", null, 1, 1, Unparse.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

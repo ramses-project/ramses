@@ -23,7 +23,7 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link workflow.impl.UnparseImpl#getElement <em>Element</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.UnparseImpl#getElement <em>Element</em>}</li>
  * </ul>
  * </p>
  *

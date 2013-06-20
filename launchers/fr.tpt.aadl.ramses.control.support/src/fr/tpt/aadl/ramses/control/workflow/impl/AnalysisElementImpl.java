@@ -23,7 +23,7 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  *
  * @generated
  */
-public class AnalysisElementImpl extends EObjectImpl implements AnalysisElement {
+public abstract class AnalysisElementImpl extends EObjectImpl implements AnalysisElement {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

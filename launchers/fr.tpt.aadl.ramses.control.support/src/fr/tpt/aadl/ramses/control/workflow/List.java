@@ -38,7 +38,7 @@ public interface List extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>File</em>' containment reference list.
 	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getList_File()
-	 * @model type="workflow.File" containment="true" required="true"
+	 * @model type="fr.tpt.aadl.ramses.control.workflow.File" containment="true" required="true"
 	 * @generated
 	 */
 	EList getFile();

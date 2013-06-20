@@ -6,6 +6,7 @@
  */
 package fr.tpt.aadl.ramses.control.workflow.impl;
 
+import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
@@ -28,6 +29,7 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  * The following features are implemented:
  * <ul>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl#getElement <em>Element</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
  * </ul>
  * </p>
  *
@@ -43,6 +45,16 @@ public class WorkflowImpl extends EObjectImpl implements Workflow {
 	 * @ordered
 	 */
 	protected WorkflowElement element;
+
+	/**
+	 * The cached value of the '{@link #getInputModelIdentifier() <em>Input Model Identifier</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInputModelIdentifier()
+	 * @generated
+	 * @ordered
+	 */
+	protected ModelIdentifier inputModelIdentifier;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -110,10 +122,55 @@ public class WorkflowImpl extends EObjectImpl implements Workflow {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public ModelIdentifier getInputModelIdentifier() {
+		return inputModelIdentifier;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetInputModelIdentifier(ModelIdentifier newInputModelIdentifier, NotificationChain msgs) {
+		ModelIdentifier oldInputModelIdentifier = inputModelIdentifier;
+		inputModelIdentifier = newInputModelIdentifier;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, newInputModelIdentifier);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInputModelIdentifier(ModelIdentifier newInputModelIdentifier) {
+		if (newInputModelIdentifier != inputModelIdentifier) {
+			NotificationChain msgs = null;
+			if (inputModelIdentifier != null)
+				msgs = ((InternalEObject)inputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER, null, msgs);
+			if (newInputModelIdentifier != null)
+				msgs = ((InternalEObject)newInputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER, null, msgs);
+			msgs = basicSetInputModelIdentifier(newInputModelIdentifier, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER, newInputModelIdentifier, newInputModelIdentifier));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case WorkflowPackage.WORKFLOW__ELEMENT:
 				return basicSetElement(null, msgs);
+			case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
+				return basicSetInputModelIdentifier(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -127,6 +184,8 @@ public class WorkflowImpl extends EObjectImpl implements Workflow {
 		switch (featureID) {
 			case WorkflowPackage.WORKFLOW__ELEMENT:
 				return getElement();
+			case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
+				return getInputModelIdentifier();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -140,6 +199,9 @@ public class WorkflowImpl extends EObjectImpl implements Workflow {
 		switch (featureID) {
 			case WorkflowPackage.WORKFLOW__ELEMENT:
 				setElement((WorkflowElement)newValue);
+				return;
+			case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
+				setInputModelIdentifier((ModelIdentifier)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -155,6 +217,9 @@ public class WorkflowImpl extends EObjectImpl implements Workflow {
 			case WorkflowPackage.WORKFLOW__ELEMENT:
 				setElement((WorkflowElement)null);
 				return;
+			case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
+				setInputModelIdentifier((ModelIdentifier)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -168,6 +233,8 @@ public class WorkflowImpl extends EObjectImpl implements Workflow {
 		switch (featureID) {
 			case WorkflowPackage.WORKFLOW__ELEMENT:
 				return element != null;
+			case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
+				return inputModelIdentifier != null;
 		}
 		return super.eIsSet(featureID);
 	}

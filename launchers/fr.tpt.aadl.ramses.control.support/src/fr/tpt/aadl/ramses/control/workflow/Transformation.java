@@ -106,26 +106,26 @@ public interface Transformation extends WorkflowElement, AnalysisElement {
 	void setInputModelIdentifier(ModelIdentifier value);
 
 	/**
-	 * Returns the value of the '<em><b>Output Model Identifier</b></em>' reference.
+	 * Returns the value of the '<em><b>Output Model Identifier</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Output Model Identifier</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Output Model Identifier</em>' reference.
+	 * @return the value of the '<em>Output Model Identifier</em>' containment reference.
 	 * @see #setOutputModelIdentifier(ModelIdentifier)
 	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_OutputModelIdentifier()
-	 * @model
+	 * @model containment="true"
 	 * @generated
 	 */
 	ModelIdentifier getOutputModelIdentifier();
 
 	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}' reference.
+	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Output Model Identifier</em>' reference.
+	 * @param value the new value of the '<em>Output Model Identifier</em>' containment reference.
 	 * @see #getOutputModelIdentifier()
 	 * @generated
 	 */
