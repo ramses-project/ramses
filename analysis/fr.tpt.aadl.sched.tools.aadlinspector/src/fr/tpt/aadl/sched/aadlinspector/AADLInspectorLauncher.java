@@ -65,12 +65,17 @@ public class AADLInspectorLauncher
 		String modeOption="true";
 		if(mode.equalsIgnoreCase("automatic"))
 		{
-			modeOption = " --show false";
+			modeOption = "false";
 		}
 		
 		final String command = BIN_PATH + "AADLInspector" + extension;
 		
-		Process p = Runtime.getRuntime().exec(new String[] {command, "-a", modelList, "--plugin", PATH + "config/plugins.common/cheddar.aip", "--result", OUTPUT_FILE_PATH, "--show", modeOption});
+		Process p = Runtime.getRuntime().exec(new String[] {
+				command, 
+				"-a", modelList, 
+				"--plugin", PATH + "config/plugins.common/cheddar.aip", 
+				"--result", OUTPUT_FILE_PATH, 
+				"--show", modeOption});
 		int exitValue = p.waitFor();
 		if (exitValue!=0)
 		{
@@ -95,7 +100,7 @@ public class AADLInspectorLauncher
 	{
 		String OS = (String) System.getProperties().get("os.name");
 		if(OS.equalsIgnoreCase("linux"))
-		  BIN_PATH = PATH + "bin.l32";
+		  BIN_PATH = PATH + "bin.l32/";
 		else if(OS.toLowerCase().contains("windows"))
 		{
 		  BIN_PATH = PATH + "bin.w32/";
