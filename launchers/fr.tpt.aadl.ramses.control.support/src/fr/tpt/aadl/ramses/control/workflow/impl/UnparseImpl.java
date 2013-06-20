@@ -13,6 +13,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import fr.tpt.aadl.ramses.control.workflow.AnalysisElement;
+import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier;
 import fr.tpt.aadl.ramses.control.workflow.Unparse;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
 
@@ -24,6 +25,7 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  * The following features are implemented:
  * <ul>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.UnparseImpl#getElement <em>Element</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.UnparseImpl#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
  * </p>
  *
@@ -39,6 +41,16 @@ public class UnparseImpl extends WorkflowElementImpl implements Unparse {
 	 * @ordered
 	 */
 	protected AnalysisElement element;
+
+	/**
+	 * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getOutputModelIdentifier()
+	 * @generated
+	 * @ordered
+	 */
+	protected ModelIdentifier outputModelIdentifier;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -106,10 +118,55 @@ public class UnparseImpl extends WorkflowElementImpl implements Unparse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public ModelIdentifier getOutputModelIdentifier() {
+		return outputModelIdentifier;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier, NotificationChain msgs) {
+		ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
+		outputModelIdentifier = newOutputModelIdentifier;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, newOutputModelIdentifier);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier) {
+		if (newOutputModelIdentifier != outputModelIdentifier) {
+			NotificationChain msgs = null;
+			if (outputModelIdentifier != null)
+				msgs = ((InternalEObject)outputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+			if (newOutputModelIdentifier != null)
+				msgs = ((InternalEObject)newOutputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+			msgs = basicSetOutputModelIdentifier(newOutputModelIdentifier, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER, newOutputModelIdentifier, newOutputModelIdentifier));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case WorkflowPackage.UNPARSE__ELEMENT:
 				return basicSetElement(null, msgs);
+			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+				return basicSetOutputModelIdentifier(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -123,6 +180,8 @@ public class UnparseImpl extends WorkflowElementImpl implements Unparse {
 		switch (featureID) {
 			case WorkflowPackage.UNPARSE__ELEMENT:
 				return getElement();
+			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+				return getOutputModelIdentifier();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -136,6 +195,9 @@ public class UnparseImpl extends WorkflowElementImpl implements Unparse {
 		switch (featureID) {
 			case WorkflowPackage.UNPARSE__ELEMENT:
 				setElement((AnalysisElement)newValue);
+				return;
+			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+				setOutputModelIdentifier((ModelIdentifier)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -151,6 +213,9 @@ public class UnparseImpl extends WorkflowElementImpl implements Unparse {
 			case WorkflowPackage.UNPARSE__ELEMENT:
 				setElement((AnalysisElement)null);
 				return;
+			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+				setOutputModelIdentifier((ModelIdentifier)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -164,6 +229,8 @@ public class UnparseImpl extends WorkflowElementImpl implements Unparse {
 		switch (featureID) {
 			case WorkflowPackage.UNPARSE__ELEMENT:
 				return element != null;
+			case WorkflowPackage.UNPARSE__OUTPUT_MODEL_IDENTIFIER:
+				return outputModelIdentifier != null;
 		}
 		return super.eIsSet(featureID);
 	}

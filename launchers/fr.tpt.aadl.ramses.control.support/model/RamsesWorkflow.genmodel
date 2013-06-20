@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.control.support/src" modelPluginID="fr.tpt.aadl.ramses.control.support.workflow"
-    modelName="RamsesWorkflow" importerID="org.eclipse.emf.importer.ecore" copyrightFields="false">
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.control.support/src"
+    modelPluginID="fr.tpt.aadl.ramses.control.support.workflow" modelName="RamsesWorkflow"
+    importerID="org.eclipse.emf.importer.ecore" copyrightFields="false">
   <foreignModel>RamsesWorkflow.ecore</foreignModel>
   <genPackages prefix="Workflow" basePackage="fr.tpt.aadl.ramses.control" disposableProviderFactory="true"
       ecorePackage="RamsesWorkflow.ecore#/">
     <genClasses ecoreClass="RamsesWorkflow.ecore#//Workflow">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Workflow/element"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Workflow/inputModelIdentifier"/>
     </genClasses>
-    <genClasses ecoreClass="RamsesWorkflow.ecore#//WorkflowElement">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//WorkflowElement/inputModel"/>
-    </genClasses>
+    <genClasses ecoreClass="RamsesWorkflow.ecore#//WorkflowElement"/>
     <genClasses ecoreClass="RamsesWorkflow.ecore#//Transformation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Transformation/element"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Transformation/list"/>
@@ -38,9 +39,12 @@
     <genClasses ecoreClass="RamsesWorkflow.ecore#//AnalysisOption">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//AnalysisOption/element"/>
     </genClasses>
-    <genClasses ecoreClass="RamsesWorkflow.ecore#//ModelIdentifier"/>
+    <genClasses ecoreClass="RamsesWorkflow.ecore#//ModelIdentifier">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RamsesWorkflow.ecore#//ModelIdentifier/id"/>
+    </genClasses>
     <genClasses ecoreClass="RamsesWorkflow.ecore#//Unparse">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Unparse/element"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Unparse/outputModelIdentifier"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

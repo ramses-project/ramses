@@ -1405,6 +1405,17 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         processComments(object) ;
         aadlText.addOutput(object.getName() + ": " + "subprogram ") ;
         CallContext cxt = object.getContext() ;
+        
+        //FIXED: why for subprogram implementation, generated output is "s.s.impl" for a name "s.impl"
+        // cxt is defined to its subprogram type itself.
+        if (object.getCalledSubprogram() instanceof SubprogramImplementation)
+        {
+        	SubprogramImplementation si = (SubprogramImplementation) object.getCalledSubprogram();
+        	if (si.getOwnedRealization().getImplemented() == cxt)
+        	{
+        		cxt = null;
+        	}
+        }
 
         if(cxt != null)
         {
@@ -2580,10 +2591,10 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
       public String caseRecordValue(RecordValue object)
       {
         aadlText.incrementIndent() ;
-        aadlText.addOutputNewline("(") ;
+        aadlText.addOutputNewline("[") ;
         processEList(object.getOwnedFieldValues()) ;
         aadlText.decrementIndent() ;
-        aadlText.addOutput(")") ;
+        aadlText.addOutput("]") ;
         return DONE ;
       }
 

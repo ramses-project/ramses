@@ -446,6 +446,15 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getUnparse_OutputModelIdentifier() {
+		return (EReference)unparseEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public WorkflowFactory getWorkflowFactory() {
 		return (WorkflowFactory)getEFactoryInstance();
 	}
@@ -509,6 +518,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 
 		unparseEClass = createEClass(UNPARSE);
 		createEReference(unparseEClass, UNPARSE__ELEMENT);
+		createEReference(unparseEClass, UNPARSE__OUTPUT_MODEL_IDENTIFIER);
 	}
 
 	/**
@@ -586,6 +596,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 
 		initEClass(unparseEClass, Unparse.class, "Unparse", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUnparse_Element(), this.getAnalysisElement(), null, "element", null, 1, 1, Unparse.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getUnparse_OutputModelIdentifier(), this.getModelIdentifier(), null, "outputModelIdentifier", null, 0, 1, Unparse.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

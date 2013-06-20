@@ -68,10 +68,12 @@ public abstract class AbstractMessageReporter implements MessageReporter
     LocationReference locref = Aadl2Utils.getLocationReference(where) ; 
     
     String filename = locref.getFilename() ;
-    /*if (filename==null)
+    if (filename==null)
     {
+    	System.err.println(where + " -> " + message);
+    	System.err.flush();
     	return;
-    }*/
+    }
 
     if(filename.contains("null"))
     {

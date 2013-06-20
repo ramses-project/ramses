@@ -434,13 +434,22 @@ public interface WorkflowPackage extends EPackage {
 	int UNPARSE__ELEMENT = WORKFLOW_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Output Model Identifier</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNPARSE__OUTPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Unparse</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int UNPARSE_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 1;
+	int UNPARSE_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 2;
 
 
 	/**
@@ -751,6 +760,17 @@ public interface WorkflowPackage extends EPackage {
 	EReference getUnparse_Element();
 
 	/**
+	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Unparse#getOutputModelIdentifier <em>Output Model Identifier</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Output Model Identifier</em>'.
+	 * @see fr.tpt.aadl.ramses.control.workflow.Unparse#getOutputModelIdentifier()
+	 * @see #getUnparse()
+	 * @generated
+	 */
+	EReference getUnparse_OutputModelIdentifier();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1027,6 +1047,14 @@ public interface WorkflowPackage extends EPackage {
 		 * @generated
 		 */
 		EReference UNPARSE__ELEMENT = eINSTANCE.getUnparse_Element();
+
+		/**
+		 * The meta object literal for the '<em><b>Output Model Identifier</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference UNPARSE__OUTPUT_MODEL_IDENTIFIER = eINSTANCE.getUnparse_OutputModelIdentifier();
 
 	}
 
