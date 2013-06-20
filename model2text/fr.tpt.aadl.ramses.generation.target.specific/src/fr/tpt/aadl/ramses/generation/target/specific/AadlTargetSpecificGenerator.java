@@ -38,11 +38,11 @@ import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
-import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -52,6 +52,8 @@ public class AadlTargetSpecificGenerator implements Generator
   protected AadlTargetSpecificCodeGenerator _codeGen ;
   
   protected String _registryName = null ;
+  
+  private Resource currentImplResource = null;
   
   protected AadlTargetSpecificGenerator()
   {
@@ -109,10 +111,10 @@ public class AadlTargetSpecificGenerator implements Generator
                           File generatedDir,
                           WorkflowPilot workflowPilot) throws GenerationException
   {
-    Resource r = systemInstance.eResource() ;
+	Resource r = systemInstance.eResource() ;
     SystemInstance currentInstance = systemInstance;
     String systemToInstantiate = systemInstance.getSystemImplementation().getName();
-
+    
     while(workflowPilot.hasNextOperation())
     {
       String operation = workflowPilot.getNextOperation();
@@ -120,90 +122,121 @@ public class AadlTargetSpecificGenerator implements Generator
     	  return;
       if(operation.equals("analysis"))
       {
-        String analysisName = workflowPilot.getNextAnalysisName();
-        String analysisMode = workflowPilot.getNextAnalysisMode();
-        System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
-        try {
-          ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
-          Analyzer a = sr.getAnalyzer(analysisName);
-          if (a == null)
-          {
-        	  System.err.println("Unknown analysis: " + analysisName);
-          }
-          else
-          {
-        	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
-                      new NullProgressMonitor()) ;
-          }
-          
-        } catch (Exception e) {
-        //} catch (AnalysisResultException e) {
-          e.printStackTrace();
-        }
-
-
-        // Here is the line where to catch the analysis result
-        // Then just send it to the xmlPilot
-
-
-
-        if(analysisMode.equals("automatic"))
-        {
-          workflowPilot.setAnalysisResult(true);
-          System.out.println(">> " + analysisName + " result set at true");
-        }
-        else if(analysisMode.equals("manual")) {
-          int res = JOptionPane.showConfirmDialog(null, "Was the analysis " + analysisName + " successfull?", "Confirmation", JOptionPane.YES_NO_OPTION);
-          if(res == JOptionPane.YES_OPTION) 
-          {
-        	workflowPilot.setAnalysisResult(true);
-            System.out.println(">> " + analysisName + " result set at true");
-          }
-          else
-          {
-        	workflowPilot.setAnalysisResult(false);
-            System.out.println(">> " + analysisName + " result set at false");
-          }
-        }
+        doAnalysis(workflowPilot, currentInstance);
       }
       else if(operation.equals("transformation"))
       {
-        List<String> resourceFileNameList = workflowPilot.getNextTransformationFileNameList();
-        System.out.println("Transformation launched : " + resourceFileNameList);
-
-        Resource result = _targetTrans.transformXML(r, resourceDir, resourceFileNameList, 
-                                                    generatedDir);
-
-        InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
-        PropertiesLinkingService pls = new PropertiesLinkingService ();
-        SystemImplementation si = (SystemImplementation) pls.
-        		findNamedElementInsideAadlPackage(systemToInstantiate, 
-        				((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
-        SystemInstance newInstance =
-        		instantiator.instantiate(si);
-        r = newInstance.eResource();
-        currentInstance = newInstance;
+    	currentInstance = doTransformation(workflowPilot,r,
+    			resourceDir,generatedDir,systemToInstantiate);
+    	
+    	r = currentInstance.eResource();
+      }
+      else if(operation.equals("unparse"))
+      {
+    	  doUnparse(currentInstance.eResource(), currentImplResource, generatedDir);
       }
       else if(operation.equals("errorstate"))
       {
-        System.err.println("\n\nXML piloting achieved in errorstate");
+        doErrorState();
       }
       else if(operation.equals("generation"))
       {
-        System.out.println("Generation launched");
-        _codeGen.generate(r, generatedDir) ;
+        doGeneration(generatedDir, r);
       }   
       else
       {
         System.err.println("Undefined operation : " + operation);
-
       }
 
       workflowPilot.goForward();
     }
   }
+
+  private void doAnalysis(WorkflowPilot workflowPilot, SystemInstance currentInstance)
+  {
+	  String analysisName = workflowPilot.getNextAnalysisName();
+      String analysisMode = workflowPilot.getNextAnalysisMode();
+      System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
+      try {
+        ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+        Analyzer a = sr.getAnalyzer(analysisName);
+        if (a == null)
+        {
+      	  System.err.println("Unknown analysis: " + analysisName);
+        }
+        else
+        {
+      	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+                    new NullProgressMonitor()) ;
+        }
+        
+      } catch (Exception e) {
+      //} catch (AnalysisResultException e) {
+        e.printStackTrace();
+      }
+
+
+      // Here is the line where to catch the analysis result
+      // Then just send it to the xmlPilot
+
+
+      if(analysisMode.equals("automatic"))
+      {
+        workflowPilot.setAnalysisResult(true);
+        System.out.println(">> " + analysisName + " result set at true");
+      }
+      else if(analysisMode.equals("manual")) {
+        int res = JOptionPane.showConfirmDialog(null, "Was the analysis " + analysisName + " successfull?", "Confirmation", JOptionPane.YES_NO_OPTION);
+        if(res == JOptionPane.YES_OPTION) 
+        {
+      	workflowPilot.setAnalysisResult(true);
+          System.out.println(">> " + analysisName + " result set at true");
+        }
+        else
+        {
+      	workflowPilot.setAnalysisResult(false);
+          System.out.println(">> " + analysisName + " result set at false");
+        }
+      }
+  }
   
-  @Override
+  private SystemInstance doTransformation(WorkflowPilot workflowPilot, Resource r, 
+		  File resourceDir, File generatedDir, String systemToInstantiate) throws GenerationException
+  {
+	  List<String> resourceFileNameList = workflowPilot.getNextTransformationFileNameList();
+      System.out.println("Transformation launched : " + resourceFileNameList);
+
+      Resource result = _targetTrans.transformXML(r, resourceDir, resourceFileNameList, 
+                                                  generatedDir);
+
+      InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+      PropertiesLinkingService pls = new PropertiesLinkingService ();
+      SystemImplementation si = (SystemImplementation) pls.
+      		findNamedElementInsideAadlPackage(systemToInstantiate, 
+      				((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
+      
+      currentImplResource = result;
+      
+      return instantiator.instantiate(si);
+  }
+  
+  private void doUnparse(Resource inputResource, Resource expandedResult,
+		  File outputDir)
+  {
+	  _targetTrans.unparse(inputResource, expandedResult, outputDir);
+  }
+  
+  private void doGeneration(File generatedDir, Resource r)
+		throws GenerationException {
+	System.out.println("Generation launched from " + r.getURI().toFileString());
+	_codeGen.generate(r, generatedDir) ;
+}
+
+private void doErrorState() {
+	System.err.println("\n\nXML piloting achieved in errorstate");
+}
+
+@Override
   public void setParameters(Map<String, Object> parameters)
   {
     // AadlTargetSpecificGenerator does not take any parameters: nothing to do.
