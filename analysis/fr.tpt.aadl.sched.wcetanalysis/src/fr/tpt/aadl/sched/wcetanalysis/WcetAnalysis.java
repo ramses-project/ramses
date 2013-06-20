@@ -101,7 +101,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 			{
 				TaskBody tb = helper.getAST(ci);
 				tb.updateAADL();
-				//ast2dot.visit(tb);
+				ast2dot.visit(tb);
 			}
 		}
 	}
