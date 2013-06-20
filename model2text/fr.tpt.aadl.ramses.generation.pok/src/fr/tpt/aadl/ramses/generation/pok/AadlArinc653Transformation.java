@@ -41,18 +41,18 @@ public class AadlArinc653Transformation extends
   {
   	ATL_FILE_NAMES = new String[]
         {"ACG/targets/shared/UninstanciateOverride",
-  			 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
-  			 "ACG/targets/shared/PortsCommonRefinementSteps",
-  			 "ACG/targets/shared/DispatchCommonRefinementSteps",
-  			 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
-  			 "ACG/targets/arinc653/ExpandThreadsPorts",
-	  	   "ACG/targets/arinc653/BlackboardCommunications",
-	  	   "ACG/targets/arinc653/BufferCommunications",
-	  	   "ACG/targets/arinc653/EventsCommunications",
-	  	   "ACG/targets/arinc653/QueuingCommunications",
-	  	   "ACG/targets/arinc653/SamplingCommunications",
-	  	   "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
-	  	   "ACG/PeriodicDelayedCommunication/SharedRules"
+  		 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
+  		 "ACG/targets/shared/PortsCommonRefinementSteps",
+  		 "ACG/targets/shared/DispatchCommonRefinementSteps",
+  		 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
+  		 "ACG/targets/arinc653/ExpandThreadsPorts",
+  		 "ACG/targets/arinc653/BlackboardCommunications",
+  		 "ACG/targets/arinc653/BufferCommunications",
+  		 "ACG/targets/arinc653/EventsCommunications",
+  		 "ACG/targets/arinc653/QueuingCommunications",
+  		 "ACG/targets/arinc653/SamplingCommunications",
+  		 "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
+  		 "ACG/PeriodicDelayedCommunication/SharedRules"
         };
   }
   
