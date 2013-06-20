@@ -63,8 +63,10 @@ import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
 import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlAtlLauncher;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
@@ -183,6 +185,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 		  RamsesConfiguration.setInputDirectory(new File(si.getSystemImplementation().eResource().getURI().toFileString()).getParentFile());
 		  Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
 		  xtextResource.load(null);
+		  StandAloneInstantiator.getInstantiator().validate();
 		  ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
 		  ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
 		  AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
