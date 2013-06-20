@@ -28,7 +28,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  fr.tpt.aadl.ramses.communication.periodic.delayed,
  org.eclipse.m2m.atl.emftvm,
- org.objectweb.asm;bundle-version="3.3.1"
+ org.objectweb.asm;bundle-version="3.3.1",
+ fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0"
 Bundle-ActivationPolicy: lazy
 Import-Package: fr.tpt.aadl.ramses.communication.dimensioning,
  org.eclipse.m2m.atl.emftvm.util,
