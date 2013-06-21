@@ -22,7 +22,6 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
-import fr.tpt.aadl.ramses.analysis.AnalysisPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 

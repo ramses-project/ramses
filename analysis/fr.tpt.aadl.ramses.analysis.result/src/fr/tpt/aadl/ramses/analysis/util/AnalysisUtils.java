@@ -9,8 +9,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
-import fr.tpt.aadl.ramses.analysis.AnalysisFactory;
-import fr.tpt.aadl.ramses.analysis.AnalysisPackage;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
@@ -34,8 +33,8 @@ public class AnalysisUtils {
 		
 		URI analysis_uri = URI.createFileURI(analysisPath);
 
-		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(AnalysisPackage.eNS_URI, AnalysisPackage.eINSTANCE);
+		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
+		getResourceSet().getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
 
 		if (!getResourceSet().getURIConverter().exists(analysis_uri, null)){
 			resource = getResourceSet().createResource(analysis_uri);
@@ -60,12 +59,12 @@ public class AnalysisUtils {
 
 		AnalysisArtifact analysisSpec = AnalysisParser.parse(_analysisPath);
 
-		QuantitativeAnalysisResult resultObj = AnalysisFactory.eINSTANCE.createQuantitativeAnalysisResult();
+		QuantitativeAnalysisResult resultObj = AnalysisResultFactory.eINSTANCE.createQuantitativeAnalysisResult();
 		if (_nfpId != null){
 			resultObj.setNfpId(_nfpId);
 		}
 		if (_scope != null){
-			AnalysisSource sourceObj = AnalysisFactory.eINSTANCE.createAnalysisSource();
+			AnalysisSource sourceObj = AnalysisResultFactory.eINSTANCE.createAnalysisSource();
 			sourceObj.setScope(_scope);
 			if (_iterationId > -1){
 				sourceObj.setIterationId(_iterationId);
@@ -92,12 +91,12 @@ public class AnalysisUtils {
 
 		AnalysisArtifact analysisSpec = AnalysisParser.parse(_analysisPath);
 
-		QualitativeAnalysisResult resultObj = AnalysisFactory.eINSTANCE.createQualitativeAnalysisResult();
+		QualitativeAnalysisResult resultObj = AnalysisResultFactory.eINSTANCE.createQualitativeAnalysisResult();
 		if (_nfpId != null){
 			resultObj.setNfpId(_nfpId);
 		}
 		if (_scope != null){
-			AnalysisSource sourceObj = AnalysisFactory.eINSTANCE.createAnalysisSource();
+			AnalysisSource sourceObj = AnalysisResultFactory.eINSTANCE.createAnalysisSource();
 			sourceObj.setScope(_scope);
 			if (_iterationId > -1){
 				sourceObj.setIterationId(_iterationId);
@@ -152,8 +151,8 @@ public class AnalysisUtils {
 	protected static Resource getResource(String analysisPath){
 		URI p_uri = URI.createFileURI(analysisPath);
 
-		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(AnalysisPackage.eNS_URI, AnalysisPackage.eINSTANCE);
+		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
+		getResourceSet().getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
 		
 		resource = getResourceSet().getResource(p_uri, true);
 

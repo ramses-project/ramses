@@ -7,7 +7,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
-import fr.tpt.aadl.ramses.analysis.AnalysisPackage;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 
 public class AnalysisParser {
 
@@ -19,8 +19,8 @@ public class AnalysisParser {
 		
 		URI p_uri = URI.createFileURI(analysisPath);
 		
-		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(AnalysisPackage.eNS_URI, AnalysisPackage.eINSTANCE);
+		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
+		getResourceSet().getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
 		
 		if (getResourceSet().getURIConverter().exists(p_uri, null)) {
 			resource = getResourceSet().getResource(p_uri, true);			

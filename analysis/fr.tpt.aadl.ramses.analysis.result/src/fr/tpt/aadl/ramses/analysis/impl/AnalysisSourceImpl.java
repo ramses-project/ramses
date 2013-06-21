@@ -15,7 +15,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource;
 
 /**
