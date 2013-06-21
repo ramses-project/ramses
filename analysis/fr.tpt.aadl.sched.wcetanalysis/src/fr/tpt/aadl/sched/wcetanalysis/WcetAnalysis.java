@@ -104,6 +104,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 				TaskBody tb = helper.getAST(ci);
 				AadlPropertiesUpdate.update(tb);
 				ast2dot.visit(tb);
+				threadsFound = true;
 			}
 		}
 		

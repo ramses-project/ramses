@@ -18,6 +18,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable;
 import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
 import fr.tpt.aadl.annex.behavior.aadlba.DataHolder;
+import fr.tpt.aadl.annex.behavior.aadlba.DataSubcomponentHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.ParameterHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.ParameterLabel;
 import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression;
@@ -291,7 +292,8 @@ public class AssignmentActionUtil
 	private static boolean needsCopy(ParameterLabel l)
 	{
 		return ((l instanceof ActualPortHolder)
-				|| (l instanceof ParameterHolder));
+				|| (l instanceof ParameterHolder)
+				|| (l instanceof DataSubcomponentHolder));
 	}
 
 	public double computeParametersAssignmentTime(SubprogramCallAction callAction)
@@ -327,8 +329,7 @@ public class AssignmentActionUtil
 			
 						//assignTime += computeAssignTime(pType);
 						
-						IOTime time = Aadl2ASTUtil.getWriteTime(
-								(ComponentInstance) taskInstance.eContainer());
+						IOTime time = Aadl2ASTUtil.getWriteTime(taskInstance);
 						
 						assignTime += time.getTime(dataSize);
 					}
