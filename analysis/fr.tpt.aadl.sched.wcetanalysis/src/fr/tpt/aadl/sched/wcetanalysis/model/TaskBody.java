@@ -1,18 +1,7 @@
 package fr.tpt.aadl.sched.wcetanalysis.model ;
 
-import org.osate.aadl2.Aadl2Factory;
-import org.osate.aadl2.IntegerLiteral;
-import org.osate.aadl2.ModalPropertyValue;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.NumberValue;
-import org.osate.aadl2.PropertyAssociation;
-import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.RangeValue;
-import org.osate.aadl2.RealLiteral;
-import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.instance.ComponentInstance;
 
-import fr.tpt.aadl.sched.wcetanalysis.ASTRegistry;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.AST2AccessDates;
 import fr.tpt.aadl.sched.wcetanalysis.util.LongestAndShortestPath;
 import fr.tpt.aadl.utils.PropertyUtils;
@@ -23,7 +12,6 @@ public class TaskBody
   private ASTNode initAST = null ;
   private ASTNode mainLoopAST = null ;
   private ASTNode reducedMainLoopAST = null ;
-  private ASTRegistry registry ;
 
   private int priority = -1 ;
 
@@ -98,11 +86,6 @@ public class TaskBody
     return new AST2AccessDates(mainLoopAST.reduceFromMe()) ;
   }
 
-  public ASTRegistry getRegistry()
-  {
-    return registry ;
-  }
-
   public void recomputeMainLoop()
   {
     reducedMainLoopAST = mainLoopAST.reduceFromMe() ;
@@ -136,11 +119,6 @@ public class TaskBody
     {
       return 0 ;
     }
-  }
-
-  public void setRegistry(ASTRegistry registry)
-  {
-    this.registry = registry ;
   }
 
   public String toString()
