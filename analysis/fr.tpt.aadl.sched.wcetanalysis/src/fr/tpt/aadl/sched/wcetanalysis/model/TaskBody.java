@@ -1,7 +1,9 @@
 package fr.tpt.aadl.sched.wcetanalysis.model ;
 
 import org.osate.aadl2.Aadl2Factory;
+import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ModalPropertyValue;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NumberValue;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
@@ -25,9 +27,9 @@ public class TaskBody
 
   private int priority = -1 ;
 
-  private float startTime = -1 ;
-  private float BCET = -1;
-  private float WCET = -1 ;
+  private double startTime = -1 ;
+  private double BCET = -1;
+  private double WCET = -1 ;
 
   public final ComponentInstance getTask()
   {
@@ -59,7 +61,7 @@ public class TaskBody
     return reducedMainLoopAST ;
   }
 
-  public float getStartTime()
+  public double getStartTime()
   {
     if(startTime == -1)
     {
@@ -70,7 +72,7 @@ public class TaskBody
     return startTime ;
   }
 
-  public float getBCET()
+  public double getBCET()
   {
 	if (BCET == -1)
 	{
@@ -80,7 +82,7 @@ public class TaskBody
 	return BCET;
   }
   
-  public float getWCET()
+  public double getWCET()
   {
     if(WCET == -1)
     {
@@ -146,64 +148,5 @@ public class TaskBody
     return "Initialization graph : \n" + initAST + "\n\n" +
           "Iteration graph : \n" + mainLoopAST + "\n\n" +
           "Steady state sequence : \n" + getReducedMainLoopAST() + "\n\n" ;
-  }
-  
-  
-  public void updateAADL()
-  {
-	  final ComponentInstance t = mainLoopAST.getElement();
-	  final float bcet = getBCET();
-	  final float wcet = getWCET();
-	  
-	  PropertyAssociation pa = PropertyUtils.getPropertyAssociation(t, "Compute_Execution_Time");
-	  if (pa != null)
-	  {
-		  ModalPropertyValue mpv = pa.getOwnedValues().get(0);
-		  PropertyExpression value = mpv.getOwnedValue();
-		  if (value instanceof RangeValue)
-		  {
-			  updateRange((RangeValue) value, bcet, wcet);
-		  }
-		  else if (value instanceof NumberValue)
-		  {
-			  UnitLiteral unit = ((NumberValue) value).getUnit();
-			  RangeValue rv = createRange(unit, bcet, wcet);
-			  
-			  mpv.setOwnedValue(rv);
-		  }
-	  }
-  }
-  
-  private static void updateRange(RangeValue rv, float bcet, float wcet)
-  {
-	  UnitLiteral unit = rv.getMinimumValue().getUnit();
-	  
-	  RealLiteral min = Aadl2Factory.eINSTANCE.createRealLiteral();
-	  RealLiteral max = Aadl2Factory.eINSTANCE.createRealLiteral();
-	  
-	  min.setUnit(unit);
-	  min.setValue((double) bcet);
-	  max.setUnit(unit);
-	  max.setValue((double) wcet);
-	  
-	  rv.setMinimum(min);
-	  rv.setMaximum(max);
-  }
-  
-  private static RangeValue createRange(UnitLiteral unit, float bcet, float wcet)
-  {
-	  RangeValue  rv  = Aadl2Factory.eINSTANCE.createRangeValue();
-	  RealLiteral min = Aadl2Factory.eINSTANCE.createRealLiteral();
-	  RealLiteral max = Aadl2Factory.eINSTANCE.createRealLiteral();
-	  
-	  min.setUnit(unit);
-	  min.setValue((double) bcet);
-	  max.setUnit(unit);
-	  max.setValue((double) wcet);
-	  
-	  rv.setMinimum(min);
-	  rv.setMaximum(max);
-	  
-	  return rv;
   }
 }

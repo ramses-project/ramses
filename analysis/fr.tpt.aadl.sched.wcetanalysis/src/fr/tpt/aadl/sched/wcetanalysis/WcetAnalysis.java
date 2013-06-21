@@ -56,6 +56,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 			AnalysisErrorReporterManager errManager, Element declarativeObject) 
 	{
 		//Dialog.showError("WCET Computation Error", "Please select an instance model");
+		System.err.println("WCET Computation Error: Please select an instance model");
 	}
 
 	@Override
@@ -95,14 +96,20 @@ public class WcetAnalysis extends AbstractAnalyzer {
 		WcetAnalysisDebug.println("Source file: " + outputPath);
 
 		ExtractionContext helper = ExtractionContext.createNewInstance(root, null);
+		boolean threadsFound = false;
 		for (ComponentInstance ci : root.getAllComponentInstances()) 
 		{
 			if (ci.getCategory() == ComponentCategory.THREAD) 
 			{
 				TaskBody tb = helper.getAST(ci);
-				tb.updateAADL();
+				AadlPropertiesUpdate.update(tb);
 				ast2dot.visit(tb);
 			}
+		}
+		
+		if (!threadsFound)
+		{
+			WcetAnalysisDebug.error("No thread found !");
 		}
 	}
 

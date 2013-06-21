@@ -2,7 +2,6 @@ package fr.tpt.aadl.sched.wcetanalysis.extractors.ba.util;
 
 import java.util.List;
 
-import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.DataSubcomponent;
@@ -10,11 +9,9 @@ import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
-import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.InstanceReferenceValue;
 
 import fr.tpt.aadl.annex.behavior.aadlba.ActualPortHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
@@ -28,9 +25,10 @@ import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
 import fr.tpt.aadl.annex.behavior.aadlba.Target;
 import fr.tpt.aadl.annex.behavior.aadlba.Value;
 import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression;
-import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
+import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.util.Aadl2ASTUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator;
@@ -87,55 +85,26 @@ public class AssignmentActionUtil
 		}
 	}
 
-	private float computeAssignTime(DataClassifier dataClassifier)
+	/*private double computeAssignTime(DataClassifier dataClassifier)
 	{
-		final float mSpeed     = getMemorySpeed();
+		//final double mSpeed     = getMemorySpeed();
 		final long  size       = getSourceDataSize(dataClassifier);
-		final float assignTime = mSpeed * (float) size;
+		//final double assignTime = mSpeed * (double) size;
 		
-		return assignTime;
-	}
+		return Aadl2ASTUtil.getWriteTime(taskInstance, (int) size);
+	}*/
 	
-	private void setAssignTime(final float assignTime, ASTNode action)
+	private void setAssignTime(final double assignTime, ASTNode action)
 	{
 		action.setMinExecutionTime(assignTime);
 		action.setMaxExecutionTime(assignTime);
 	}
 	
-	private float getMemorySpeed()
+	/*private double getMemorySpeed()
 	{
-		/**
-		 * TODO fix memory speed property
-		 */
-		if (true)
-		{
-			return 0.005f;
-		}
-		
-		
-		ComponentInstance process = (ComponentInstance) taskInstance
-				.eContainer();
-		if (process.getCategory() == ComponentCategory.PROCESS)
-		{
-			try
-			{
-				PropertyExpression pe = PropertyUtils.getPropertyValue(
-						"Actual_Memory_Binding", process);
-				if (pe instanceof InstanceReferenceValue)
-				{
-					InstanceReferenceValue irv = (InstanceReferenceValue) pe;
-					ComponentInstance mem = (ComponentInstance) irv
-							.getReferencedInstanceObject();
-					return PropertyUtils.getFloatValue(mem, "Write_Time");
-				}
-			}
-			catch (Exception e)
-			{
-				return 0f;
-			}
-		}
-		return 0f;
-	}
+		long bytes = getSourceDataSize();
+		return Aadl2ASTUtil.getWriteTime(thread, bytes);
+	}*/
 
 	private static long getSourceDataSize(DataClassifier dataClassifier)
 	{
@@ -235,6 +204,8 @@ public class AssignmentActionUtil
 	public ASTNode computeAssignment(AssignmentAction aa, ASTNode lastAction)
 	{
 		final ComponentInstance element = lastAction.getElement();
+		final IOTime time = Aadl2ASTUtil.getWriteTime(element);
+		
 		final NamedElement eTarget = getTargetElement(aa.getTarget());
 		
 		final String name = "Assignment_" + eTarget.getName();		
@@ -244,7 +215,7 @@ public class AssignmentActionUtil
 		WcetAnalysisDebug.print("[Assignment]Target " + eTarget.getName() + " (" + eTarget.getClass().getSimpleName()+")");
 		
 		
-		float assignTime = 0f;
+		double assignTime = 0d;
 		
 		/* Get target data classifier */
 		
@@ -257,10 +228,11 @@ public class AssignmentActionUtil
 			
 			/* Computes assignment time considering target size */
 			
-			assignTime = computeAssignTime(assignType);
+			//assignTime = computeAssignTime(assignType);
+			assignTime = time.getTime(dataSize);
 		}
 		
-		if (assignTime == 0f)
+		if (assignTime == 0d)
 		{
 			/* No property found to obtain target size. 
 			 * Trying on value expression */
@@ -278,15 +250,17 @@ public class AssignmentActionUtil
 				DataClassifier valueType = getNamedElementClassifier(dataValue);
 				long dataSize = getSourceDataSize(assignType);
 				
-				assignTime = computeAssignTime(valueType);
+				//assignTime = computeAssignTime(valueType);
+				assignTime = time.getTime(dataSize);
 				
-				debug(dataValue.getName() + " classifier is " + valueType.getName() + " with a size of " + dataSize, "*");
+				//FIXME: valueType null
+				//debug(dataValue.getName() + " classifier is " + valueType.getName() + " with a size of " + dataSize, "*");
 			}
 		}
 		
 		setAssignTime(assignTime,assignAction);
 		
-		debug("Assignment time is " + assignTime + " (memory speed: " + getMemorySpeed()+")","*");
+		debug("Assignment time is " + assignTime + " (memory speed: " + time.Fixed + "+" + time.PerByte +" PerByte)","*");
 		
 		lastAction.addNext(assignAction);
 		lastAction = assignAction;
@@ -320,13 +294,13 @@ public class AssignmentActionUtil
 				|| (l instanceof ParameterHolder));
 	}
 
-	public float computeParametersAssignmentTime(SubprogramCallAction callAction)
+	public double computeParametersAssignmentTime(SubprogramCallAction callAction)
 	{
 		final SubprogramClassifier s = (SubprogramClassifier) 
 				callAction.getSubprogram().getElement();
 		final List<ParameterLabel> labels = callAction.getParameterLabels();
 		
-		float assignTime = 0f;
+		double assignTime = 0d;
 		
 		if (labels != null)
 		{
@@ -345,13 +319,18 @@ public class AssignmentActionUtil
 						final Target t = (Target) l;
 						final NamedElement ne = getTargetElement(t);
 						final DataClassifier pType = getNamedElementClassifier(ne);
-						final float dataSize = getSourceDataSize(pType);
+						final long dataSize = getSourceDataSize(pType);
 						
 						debug("Parameter " + ne.getName() + " classifier is " 
 														   + pType.getName() + " with a size of " + dataSize,
 														   "SubprogramCall Parameter");
 			
-						assignTime += computeAssignTime(pType);
+						//assignTime += computeAssignTime(pType);
+						
+						IOTime time = Aadl2ASTUtil.getWriteTime(
+								(ComponentInstance) taskInstance.eContainer());
+						
+						assignTime += time.getTime(dataSize);
 					}
 					
 				}

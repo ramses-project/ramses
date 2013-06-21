@@ -62,7 +62,7 @@ public class BehaviorAnnexUtil
     SubprogramCallAction c = (SubprogramCallAction) a ;
     return c.getSubprogram().getElement() ;
   }
-
+  
   public static String getSharedDataNameFromSubprogramCall(SubprogramCallAction a)
   {
     List<ParameterLabel> labels = a.getParameterLabels();

@@ -1,6 +1,7 @@
 package fr.tpt.aadl.sched.wcetanalysis.extractors.ba;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,14 @@ public abstract class BehaviorAnnexExtractor extends ASTExtractor
 	protected static List<BehaviorAction> getActions(BehaviorTransition tran)
 	{
 		List<BehaviorAction> actions;
-		BehaviorActions bactions = ((BehaviorActionBlock) tran.getActionBlock())
-				.getContent();
+		BehaviorActionBlock block = ((BehaviorActionBlock) tran.getActionBlock());
+		
+		if (block == null)
+		{
+			return Collections.emptyList();
+		}
+		
+		BehaviorActions bactions = block.getContent();
 
 		if (tran.getActionBlock() == null)
 		{
@@ -83,6 +90,22 @@ public abstract class BehaviorAnnexExtractor extends ASTExtractor
 	{
 		BehaviorState bs = t.getDestinationState();
 		return (bs.getName().equals(stateID) && bs.isFinal());
+	}
+	
+	protected static BehaviorState getFinalState(BehaviorAnnex ba)
+	{
+		for(BehaviorState st : ba.getStates())
+		{
+			boolean isFinal = true;
+			for(BehaviorTransition t : ba.getTransitions())
+			{
+				if (t.getSourceState() == st)
+					isFinal = false;
+			}
+			if (isFinal)
+				return st;
+		}
+		return null;
 	}
 	
 	protected static boolean isInitialFinalTran(BehaviorTransition t)

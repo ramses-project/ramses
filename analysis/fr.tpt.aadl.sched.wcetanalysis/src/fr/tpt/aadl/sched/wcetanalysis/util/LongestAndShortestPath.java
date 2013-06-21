@@ -85,7 +85,7 @@ public class LongestAndShortestPath
 
   @SuppressWarnings(
   {"unchecked", "rawtypes"})
-  public static float getLongestPath(ASTNode source,
+  public static double getLongestPath(ASTNode source,
                                      ASTNode end)
   {
     if(source == end)
@@ -99,11 +99,11 @@ public class LongestAndShortestPath
     GraphPath<ASTNode, TaskActionEdge> path =
           FloywdWarshallShortestPaths(g, source, end) ;
     List<TaskActionEdge> edgeList = path.getEdgeList() ;
-    float size = 0 ;
+    double size = 0d ;
 
     for(TaskActionEdge edge : edgeList)
     {
-      size += edge.source.getMaxExecutionTime() ;
+      size += edge.source.getMaxExecutionTime();
     }
 
     return size ;
@@ -113,7 +113,7 @@ public class LongestAndShortestPath
 
   @SuppressWarnings(
   {"unchecked", "rawtypes"})
-  public static float getShortestPath(ASTNode source,
+  public static double getShortestPath(ASTNode source,
                                       ASTNode end)
   {
     DefaultDirectedWeightedGraph<ASTNode, TaskActionEdge> g =
@@ -122,7 +122,7 @@ public class LongestAndShortestPath
     GraphPath<ASTNode, TaskActionEdge> path =
           FloywdWarshallShortestPaths(g, source, end) ;
     List<TaskActionEdge> edgeList = path.getEdgeList() ;
-    float size = 0 ;
+    double size = 0 ;
 
     for(TaskActionEdge edge : edgeList)
     {

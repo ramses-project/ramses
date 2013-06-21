@@ -3,11 +3,19 @@ package fr.tpt.aadl.sched.wcetanalysis.extractors.ba.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.RealLiteral;
+import org.osate.aadl2.SubprogramCall;
+import org.osate.aadl2.SubprogramCallSequence;
+import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ConnectionInstance;
+import org.osate.aadl2.instance.ConnectionKind;
+import org.osate.aadl2.instance.FeatureInstance;
 
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction;
@@ -25,8 +33,8 @@ import fr.tpt.aadl.annex.behavior.aadlba.IntegerValue;
 import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
 import fr.tpt.aadl.annex.behavior.aadlba.TimedAction;
 import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement;
-import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.ba.BehaviorAnnexExtractor;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
@@ -188,7 +196,7 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 		final ComponentInstance element = lastAction.getElement();
 
 		IntegerValue min, max;
-		float minVal, maxVal;
+		double minVal, maxVal;
 		min = ta.getLowerTime().getIntegerValue();
 		max = ta.getUpperTime().getIntegerValue();
 
@@ -198,7 +206,7 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 		}
 		else
 		{
-			minVal = (float) ((RealLiteral) min).getValue();
+			minVal = ((RealLiteral) min).getValue();
 		}
 
 		if (max instanceof IntegerLiteral)
@@ -207,7 +215,7 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 		}
 		else
 		{
-			maxVal = (float) ((RealLiteral) max).getValue();
+			maxVal = (double) ((RealLiteral) max).getValue();
 		}
 
 		ASTNode comp = new ASTNode(IDGenerator.getNewIdForName("computation"),
@@ -233,7 +241,9 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 		if ((type == StatementKind.GetResource)
 				|| (type == StatementKind.ReleaseResource))
 		{
-			String res = BehaviorAnnexUtil.getSharedDataNameFromSubprogramCall(callAction);
+			String accessID = BehaviorAnnexUtil.getSharedDataNameFromSubprogramCall(callAction);
+			NamedElement currentVisiting = ctxt.getCurrentVisitedElement(); // subprogram call Put_Value
+			String res = getResourceID(currentVisiting, accessID);
 			lastAction.setResourceID(res);
 		}
 
@@ -242,6 +252,54 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 			lastAction.setType(StatementKind.AwaitDispatch);
 		}
 		return lastAction;
+	}
+	
+	private String getResourceID(NamedElement e, String accessID)
+	{
+		ComponentInstance thread  = ctxt.getCurrentVisitedThread();
+		ComponentInstance process = (ComponentInstance) thread.eContainer();
+		
+		if (e instanceof SubprogramCall)
+		{
+			SubprogramCall call = (SubprogramCall) e;
+			SubprogramCallSequence seq = (SubprogramCallSequence) call.eContainer();
+			ThreadImplementation ti = (ThreadImplementation) seq.eContainer();
+			accessID = getResourceID(ti, accessID, call);
+			/*for(ConnectionInstance ci: process.getConnectionInstances())
+			{
+				if ((ci.getKind()==ConnectionKind.ACCESS_CONNECTION))
+				{
+					FeatureInstance dst = (FeatureInstance) ci.getDestination();
+					if (dst.eContainer()==thread && dst.getName().equals(accessID)
+							&& (ci.getSource() instanceof ComponentInstance))
+					{
+						ComponentInstance src = (ComponentInstance) ci.getSource();
+						return src.getName();
+					}
+				}
+			}*/
+			return accessID;
+		}
+		return accessID;
+	}
+	
+	private String getResourceID(NamedElement e, String resourceID, SubprogramCall call)
+	{
+		if (e instanceof ThreadImplementation)
+		{
+			ThreadImplementation ti = (ThreadImplementation) e;
+			for(AccessConnection ac : ti.getOwnedAccessConnections())
+			{
+				ConnectedElement dstCE = (ConnectedElement) ac.getDestination();
+				if (dstCE.getContext()==call && dstCE.getConnectionEnd().getName().equals(resourceID))
+				{
+					ConnectedElement srcCE = (ConnectedElement) ac.getSource();
+					return srcCE.getConnectionEnd().getName();
+				}
+			}
+			
+		}
+		return resourceID;
 	}
 
 	private ASTNode caseIf(IfStatement action, ASTNode lastAction)

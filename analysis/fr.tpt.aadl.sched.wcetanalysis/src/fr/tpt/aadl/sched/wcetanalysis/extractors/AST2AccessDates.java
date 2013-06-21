@@ -10,15 +10,15 @@ import fr.tpt.aadl.sched.wcetanalysis.util.SequenceUtil;
 public class AST2AccessDates
 {
 
-  private float inputTime = 0 ;
-  private float computationTime = 0 ;
-  private float afterWrite = 0 ;
+  private double inputTime = 0 ;
+  private double computationTime = 0 ;
+  private double afterWrite = 0 ;
 
-  private float dGet = 0 ;
-  private float dRelease = 0 ;
+  private double dGet = 0 ;
+  private double dRelease = 0 ;
 
-  private float readTime = 0 ;
-  private float writeTime = 0 ;
+  private double readTime = 0 ;
+  private double writeTime = 0 ;
 
   private List<ResourceAccess> readAccesses = new ArrayList<ResourceAccess>() ;
   private List<ResourceAccess> writeAccesses = new ArrayList<ResourceAccess>() ;
@@ -126,8 +126,8 @@ public class AST2AccessDates
   private void computeReleaseRead(ASTNode firstRelease)
   {
     ASTNode current = firstRelease ;
-    float startDate = getStartDateOfFirstReleaseRead() ;
-    float releaseTime = 0 ;
+    double startDate = getStartDateOfFirstReleaseRead() ;
+    double releaseTime = 0 ;
 
     while(current != null)
     {
@@ -150,7 +150,7 @@ public class AST2AccessDates
     }
   }
 
-  private float getStartDateOfFirstReleaseRead()
+  private double getStartDateOfFirstReleaseRead()
   {
     if(readAccesses.size() > 0)
     {
@@ -185,8 +185,8 @@ public class AST2AccessDates
   private void computeWaitWrite(ASTNode wait)
   {
     ASTNode current = wait ;
-    float waitTime = 0 ;
-    final float startDate = getStartDateOfFirstWaitWrite() ;
+    double waitTime = 0 ;
+    final double startDate = getStartDateOfFirstWaitWrite() ;
 
     while(current != null)
     {
@@ -210,9 +210,9 @@ public class AST2AccessDates
     }
   }
 
-  private float getStartDateOfFirstWaitWrite()
+  private double getStartDateOfFirstWaitWrite()
   {
-    float res = 0 ;
+    double res = 0 ;
 
     if(readAccesses.size() > 0)
     {
@@ -249,8 +249,8 @@ public class AST2AccessDates
   private void computeReleaseWrite(ASTNode firstRelease)
   {
     ASTNode current = firstRelease ;
-    float startDate = getStartDateOfFirstReleaseWrite() ;
-    float releaseTime = 0 ;
+    double startDate = getStartDateOfFirstReleaseWrite() ;
+    double releaseTime = 0 ;
 
     while(current != null)
     {
@@ -272,7 +272,7 @@ public class AST2AccessDates
     }
   }
 
-  private float getStartDateOfFirstReleaseWrite()
+  private double getStartDateOfFirstReleaseWrite()
   {
     ResourceAccess ra = writeAccesses.get(writeAccesses.size() - 1) ;
     return ra.getStart() + dGet + writeTime ;
@@ -307,7 +307,7 @@ public class AST2AccessDates
   /**
    * @return the beforeRead
    */
-  public float getInputTime()
+  public double getInputTime()
   {
     return inputTime ;
   }
@@ -315,7 +315,7 @@ public class AST2AccessDates
   /**
    * @return the computationTime
    */
-  public float getComputationTime()
+  public double getComputationTime()
   {
     return computationTime ;
   }
@@ -323,7 +323,7 @@ public class AST2AccessDates
   /**
    * @return the afterWrite
    */
-  public float getAfterWrite()
+  public double getAfterWrite()
   {
     return afterWrite ;
   }
@@ -331,7 +331,7 @@ public class AST2AccessDates
   /**
    * @return the dGet
    */
-  public float getdGet()
+  public double getdGet()
   {
     return dGet ;
   }
@@ -339,7 +339,7 @@ public class AST2AccessDates
   /**
    * @return the dRelease
    */
-  public float getdRelease()
+  public double getdRelease()
   {
     return dRelease ;
   }
@@ -347,7 +347,7 @@ public class AST2AccessDates
   /**
    * @return the readTime
    */
-  public float getReadTime()
+  public double getReadTime()
   {
     return readTime ;
   }
@@ -355,7 +355,7 @@ public class AST2AccessDates
   /**
    * @return the writeTime
    */
-  public float getWriteTime()
+  public double getWriteTime()
   {
     return writeTime ;
   }
@@ -382,15 +382,15 @@ public class AST2AccessDates
   public class ResourceAccess
   {
 
-    private float start = 0 ;
-    private float end = 0 ;
+    private double start = 0 ;
+    private double end = 0 ;
 
     private String resourceID ;
 
     /**
      * @return the start
      */
-    public float getStart()
+    public double getStart()
     {
       return start ;
     }
@@ -398,7 +398,7 @@ public class AST2AccessDates
     /**
      * @param start the start to set
      */
-    void setStart(float start)
+    void setStart(double start)
     {
       this.start = start ;
     }
@@ -406,7 +406,7 @@ public class AST2AccessDates
     /**
      * @return the end
      */
-    public float getEnd()
+    public double getEnd()
     {
       return end ;
     }
@@ -414,7 +414,7 @@ public class AST2AccessDates
     /**
      * @param end the end to set
      */
-    void setEnd(float end)
+    void setEnd(double end)
     {
       this.end = end ;
     }

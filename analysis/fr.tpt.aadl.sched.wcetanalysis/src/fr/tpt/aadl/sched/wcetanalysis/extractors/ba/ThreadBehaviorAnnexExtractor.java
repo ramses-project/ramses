@@ -146,20 +146,4 @@ public class ThreadBehaviorAnnexExtractor extends BehaviorAnnexExtractor
       }
     }
   }
-  
-  private static BehaviorState getFinalState(BehaviorAnnex ba)
-  {
-	  for(BehaviorState st : ba.getStates())
-	  {
-		  boolean isFinal = true;
-		  for(BehaviorTransition t : ba.getTransitions())
-		  {
-			  if (t.getSourceState() == st)
-				  isFinal = false;
-		  }
-		  if (isFinal)
-			  return st;
-	  }
-	  return null;
-  }
 }

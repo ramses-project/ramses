@@ -132,7 +132,7 @@ public class SubprogramCallSequenceExtractor extends CallSequenceExtractor
         */
 				lastAction = ctxt.subprogramExtractor.caseSubprogramCall(
 						call, lastAction);
-				final float assignTime = computeParametersAssignmentTime(
+				final double assignTime = computeParametersAssignmentTime(
 						call, conns);
 				
 				lastAction.addExecutionTime(assignTime);
@@ -176,13 +176,13 @@ public class SubprogramCallSequenceExtractor extends CallSequenceExtractor
 		}
 	}
 	
-	private static float computeParametersAssignmentTime(
+	private static double computeParametersAssignmentTime(
 			SubprogramCall call, List<Connection> allConnections)
 	{
 		final SubprogramClassifier spgC = (SubprogramClassifier)
 				call.getCalledSubprogram();
 		
-		float assignTime = 0f;
+		double assignTime = 0;
 		
 		for(Connection c : allConnections)
 		{

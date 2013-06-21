@@ -1,6 +1,7 @@
 package fr.tpt.aadl.sched.wcetanalysis.extractors.ba;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +12,13 @@ import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.util.BehaviorAnnexUtil;
 
@@ -74,21 +77,44 @@ public class SubprogramBehaviorAnnexExtractor extends BehaviorAnnexExtractor
 		for (int indexTr = 0; indexTr < transitions.size(); indexTr++)
 		{
 			BehaviorTransition tran = transitions.get(indexTr);
-			BehaviorActions bActions = tran.getActionBlock().getContent();
+			BehaviorActionBlock block = tran.getActionBlock();
 			List<BehaviorAction> actions = null;
-
-			if (bActions instanceof BehaviorAction)
+			
+			if (block == null)
 			{
-				actions = new ArrayList<BehaviorAction>();
-				actions.add((BehaviorAction) bActions);
+				actions = Collections.emptyList();
 			}
-			else if (bActions instanceof BehaviorActionSequence)
+			else
 			{
-				actions = ((BehaviorActionSequence) bActions).getActions();
+				BehaviorActions bActions = block.getContent();
+
+				if (bActions instanceof BehaviorAction)
+				{
+					actions = new ArrayList<BehaviorAction>();
+					actions.add((BehaviorAction) bActions);
+				}
+				else if (bActions instanceof BehaviorActionSequence)
+				{
+					actions = ((BehaviorActionSequence) bActions).getActions();
+				}
 			}
 
 			String srcState = tran.getSourceState().getName();
 			String dstState = tran.getDestinationState().getName();
+			
+			/**
+			 * There is a (direct) loop in the subprogram.
+			 * Check if this is the main loop of thread.
+			 *   - The subprogram is called by the thread directly.
+			 */
+			if (srcState.equals(dstState) && isCalledByThread())
+			{
+				dstState = getFinalState(ba).getName();
+				WcetAnalysisDebug.println(
+						"Loop on behavior transition of subprogram " +
+						ctxt.getCurrentVisitedElement().getName() +
+						" is the main loop of the thread -> IGNORED");
+			}
 			
 			ASTNode srcStart = stateToStart.get(srcState);
 			ASTNode srcEnd   = stateToEnd.get(srcState);
@@ -109,4 +135,9 @@ public class SubprogramBehaviorAnnexExtractor extends BehaviorAnnexExtractor
 		return endAction;
 	}
 
+	private boolean isCalledByThread()
+	{
+		return ctxt.getCurrentVisitedThread()
+				== ctxt.getParentVisitedElement();
+	}
 }

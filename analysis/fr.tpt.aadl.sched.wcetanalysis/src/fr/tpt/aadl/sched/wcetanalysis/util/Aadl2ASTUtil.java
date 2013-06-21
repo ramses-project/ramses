@@ -3,9 +3,11 @@ package fr.tpt.aadl.sched.wcetanalysis.util;
 import java.util.List;
 
 import org.osate.aadl2.AccessSpecification;
+import org.osate.aadl2.BasicPropertyAssociation;
 import org.osate.aadl2.BehavioredImplementation;
 import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentPrototypeActual;
 import org.osate.aadl2.ComponentPrototypeBinding;
 import org.osate.aadl2.DataClassifier;
@@ -13,14 +15,21 @@ import org.osate.aadl2.DataPrototype;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.FeaturePrototypeActual;
 import org.osate.aadl2.FeaturePrototypeBinding;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PrototypeBinding;
+import org.osate.aadl2.RangeValue;
+import org.osate.aadl2.RecordValue;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.ConnectionInstanceEnd;
 import org.osate.aadl2.instance.ConnectionKind;
 import org.osate.aadl2.instance.FeatureInstance;
+import org.osate.aadl2.instance.InstanceReferenceValue;
 import org.osate.aadl2.instance.SystemInstance;
+
+import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
+import fr.tpt.aadl.utils.PropertyUtils;
 
 public class Aadl2ASTUtil
 {
@@ -122,5 +131,59 @@ public class Aadl2ASTUtil
 			}
 		}
 		return null;
+	}
+	
+	public static IOTime getWriteTime(ComponentInstance thread)
+	{
+		return getMemoryIOTime((ComponentInstance) thread.eContainer(), 
+				"Write_Time");
+	}
+	
+	public static IOTime getReadTime(ComponentInstance thread)
+	{
+		return getMemoryIOTime((ComponentInstance) thread.eContainer(), 
+				"Read_Time");
+	}
+	
+	private static IOTime getMemoryIOTime(ComponentInstance process,
+			String property)
+	{
+		if (process.getCategory() == ComponentCategory.PROCESS)
+		{
+			try
+			{
+				PropertyExpression pe = PropertyUtils.getPropertyValue(
+						"Actual_Memory_Binding", process);
+				if (pe instanceof InstanceReferenceValue)
+				{
+					InstanceReferenceValue irv = (InstanceReferenceValue) pe;
+					ComponentInstance mem = (ComponentInstance) irv
+							.getReferencedInstanceObject();
+					RecordValue rv = PropertyUtils.getRecordValue(mem, property);
+					
+					double fixed = 0d;
+					double perByte = 0d;
+					
+					for(BasicPropertyAssociation value : rv.getOwnedFieldValues())
+					{
+						String propertyName = value.getProperty().getName();
+						if (propertyName.equalsIgnoreCase("Fixed"))
+						{
+							RangeValue range = (RangeValue) value.getOwnedValue();
+							fixed = range.getMaximumValue().getScaledValue("ms");
+						}
+						else if (propertyName.equalsIgnoreCase("PerByte"))
+						{
+							RangeValue range = (RangeValue) value.getOwnedValue();
+							perByte = range.getMaximumValue().getScaledValue("ms");
+						}
+					}
+					
+					return new IOTime(fixed,perByte);
+				}
+			}
+			catch (Exception e){}
+		}
+		return new IOTime();
 	}
 }

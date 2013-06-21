@@ -41,22 +41,22 @@ public class ASTNode
   private ResourceKind resourceType = ResourceKind.None ;
 
   /** Minimum execution time. */
-  private float minExecutionTime = 0 ;
+  private double minExecutionTime = 0 ;
 
   /** Maximum execution time. */
-  private float maxExecutionTime = 0 ;
+  private double maxExecutionTime = 0 ;
 
   public static ASTNode createEmptyAction(String name,
                                            final ComponentInstance task)
   {
     ASTNode start = new ASTNode(name, StatementKind.Empty, task)
     {
-      public float getMinExecutionTime()
+      public double getMinExecutionTime()
       {
         return 0 ;
       }
 
-      public float getMaxExecutionTime()
+      public double getMaxExecutionTime()
       {
         return 0 ;
       }
@@ -125,6 +125,19 @@ public class ASTNode
   public ASTNode getJoin()
   {
     return join ;
+  }
+  
+  public double getMinStartTime()
+  {
+	  double prevTime = 0d;
+	  List<ASTNode> previousList = previous;
+	  while (!previousList.isEmpty())
+	  {
+		  ASTNode prev = previousList.get(0);
+		  prevTime += prev.getMinExecutionTime();
+		  previousList = prev.previous;
+	  }
+	  return prevTime;
   }
 
   public void addNext(ASTNode t)
@@ -232,28 +245,28 @@ public class ASTNode
 	  this.type = type;
   }
 
-  public void setMinExecutionTime(float time)
+  public void setMinExecutionTime(double time)
   {
     minExecutionTime = time ;
   }
 
-  public void setMaxExecutionTime(float time)
+  public void setMaxExecutionTime(double time)
   {
-    maxExecutionTime = time ;
+	maxExecutionTime = time ;
   }
   
-  public void addExecutionTime(float time)
+  public void addExecutionTime(double time)
   {
 	  minExecutionTime = minExecutionTime + time;
 	  maxExecutionTime = maxExecutionTime + time;
   }
 
-  public float getMinExecutionTime()
+  public double getMinExecutionTime()
   {
     return minExecutionTime ;
   }
 
-  public float getMaxExecutionTime()
+  public double getMaxExecutionTime()
   {
     return maxExecutionTime ;
   }
@@ -287,8 +300,8 @@ public class ASTNode
   {
     if((type != StatementKind.Empty) || (!hideEmptyActions))
     {
-      float tmin = getMinExecutionTime() ;
-      float t = getMaxExecutionTime() ;
+      double tmin = getMinExecutionTime() ;
+      double t = getMaxExecutionTime() ;
       String formatType = fillWithBlank(getType().name(), 15 + tab) ;
       String concName =
             getName() + (resourceID != null ? "(" + resourceID + ")" : "") ;
@@ -347,8 +360,8 @@ public class ASTNode
       {
         ASTNode clone = new ASTNode(IDGenerator.getNewIdForName(
         		"ComputationBlocks"), StatementKind.Compute, task) ;
-        float min = LongestAndShortestPath.getShortestPath(this, this.join) ;
-        float max = LongestAndShortestPath.getLongestPath(this, this.join) ;
+        double min = LongestAndShortestPath.getShortestPath(this, this.join) ;
+        double max = LongestAndShortestPath.getLongestPath(this, this.join) ;
         clone.setMinExecutionTime(min) ;
         clone.setMaxExecutionTime(max) ;
 

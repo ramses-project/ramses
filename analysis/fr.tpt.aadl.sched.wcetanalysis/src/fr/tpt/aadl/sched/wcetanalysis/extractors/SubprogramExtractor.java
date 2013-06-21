@@ -1,13 +1,14 @@
 package fr.tpt.aadl.sched.wcetanalysis.extractors;
 
+import org.osate.aadl2.CalledSubprogram;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
-import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.ba.SubprogramBehaviorAnnexExtractor;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.seq.SubprogramCallSequenceExtractor;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTExtractor;
@@ -79,7 +80,15 @@ public class SubprogramExtractor extends ASTExtractor
 
 	public ASTNode caseSubprogramCall(SubprogramCall call, ASTNode lastAction)
 	{
-		Classifier spg = (SubprogramClassifier) call.getCalledSubprogram();
+		CalledSubprogram called = call.getCalledSubprogram();
+		if (!(called instanceof SubprogramClassifier))
+		{
+			System.err.println("caseSubprogramCall: not supported CalledSubprogram type: " 
+					+ called.getClass().getSimpleName());
+			return lastAction;
+		}
+		
+		Classifier spg = (SubprogramClassifier) called;
 		BehaviorAnnex ba = BehaviorAnnexUtil.getBehaviorAnnex(spg);
 		ASTNode ast = null;
 		

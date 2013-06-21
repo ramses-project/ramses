@@ -257,8 +257,8 @@ public class AST2DOT implements TaskBodyVisitor
 
 			for (ASTNode next : flow.getNext())
 			{
-				float min = flow.getMinExecutionTime();
-				float max = flow.getMaxExecutionTime();
+				double min = flow.getMinExecutionTime();
+				double max = flow.getMaxExecutionTime();
 				String name = smoothName(flow.getName())
 						+ " -> "
 						+ smoothName(next.getName() + "[label=\"[" + min + ","

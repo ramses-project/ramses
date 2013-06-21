@@ -99,6 +99,15 @@ public class ExtractionContext
 		return e;
 	}
 	
+	public NamedElement getParentVisitedElement()
+	{
+		if (visiting.size()>1)
+		{
+			return visiting.get(1);
+		}
+		return null;
+	}
+	
 	public NamedElement getCurrentVisitedElement()
 	{
 		return visiting.peek();
