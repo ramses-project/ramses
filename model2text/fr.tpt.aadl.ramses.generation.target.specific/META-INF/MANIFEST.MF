@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.annex.behavior;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
  fr.tpt.aadl.sched.wcetanalysis;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.analysis.result;bundle-version="1.0.0"
+ fr.tpt.aadl.ramses.analysis.result;bundle-version="0.0.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.generation.target.specific
