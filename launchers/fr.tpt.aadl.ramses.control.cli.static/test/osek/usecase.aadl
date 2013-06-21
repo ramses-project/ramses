@@ -244,6 +244,7 @@ properties
   OSEKNXT::nxtport => "NXT_PORT_S4";
   Generation_Properties::Constant_Value => ("NXT_PORT_S4");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
+  Compute_Execution_Time => 0 ms .. 1 ms;
 end ecrobotGetSonarSensorLib;
 
 subprogram ecrobotInitSonarSensorLib
@@ -256,6 +257,7 @@ properties
   OSEKNXT::nxtport => "NXT_PORT_S4";
   Generation_Properties::Constant_Value => ("NXT_PORT_S4");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
+  Compute_Execution_Time => 1 ms .. 2 ms;
 end ecrobotInitSonarSensorLib;
 
 subprogram ecrobotTermSonarSensorLib
@@ -268,6 +270,7 @@ properties
   OSEKNXT::nxtport => "NXT_PORT_S4";
   Generation_Properties::Constant_Value => ("NXT_PORT_S4");
   Generation_Properties::Constant_Value_Parameters => ("portNb");
+  Compute_Execution_Time => 2 ms .. 3 ms;
 end ecrobotTermSonarSensorLib;
 
 -- MOTOR
@@ -289,6 +292,7 @@ properties
   OSEKNXT::nxtport => "NXT_PORT_C";
   Generation_Properties::Constant_Value => ("NXT_PORT_C", "0");
   Generation_Properties::Constant_Value_Parameters => ("portNb", "brake");
+  Compute_Execution_Time => 1 ms .. 2 ms;
 end nxtMotorSetSpeedLib;
 
 ------------
