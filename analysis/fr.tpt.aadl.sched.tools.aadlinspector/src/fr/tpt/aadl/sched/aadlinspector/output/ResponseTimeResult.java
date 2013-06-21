@@ -42,6 +42,11 @@ public class ResponseTimeResult
 	{
 		return results.get(taskName);
 	}
+	
+	public Map<String, TaskResponseTimeResult> getResponseTimes()
+	{
+		return results;
+	}
 
 	public String getScheduler() {
 		return scheduler;

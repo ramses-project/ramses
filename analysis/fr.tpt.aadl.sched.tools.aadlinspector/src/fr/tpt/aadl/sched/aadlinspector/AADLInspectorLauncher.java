@@ -42,7 +42,8 @@ public class AADLInspectorLauncher
 		return "";
 	}
 	
-	public static AnalysisResult launchAnalysis(String[] aadlModelsPath, String mode)
+	private static AnalysisResult launchAnalysis(String[] aadlModelsPath, 
+			String mode, SystemInstance model)
 		throws Exception
 	{
 		if (PATH.isEmpty())
@@ -91,7 +92,7 @@ public class AADLInspectorLauncher
 		}
 		
 		/** If output format change, modify here the name of the class */
-		return new XMLResultsProvider(f).getResult(); 
+		return new XMLResultsProvider(f).getResult(model); 
 	}
 	
 	
@@ -116,7 +117,7 @@ public class AADLInspectorLauncher
 		loadResourcePaths(pps, paths);
 		String[] modelList = paths.toArray(new String[paths.size()]);
 		
-		return launchAnalysis(modelList, mode);
+		return launchAnalysis(modelList, mode, root);
 	}
 	
 	private static void loadResourcePaths(PublicPackageSection pps, List<String> pathList)

@@ -8,6 +8,7 @@ import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 
+import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher;
 import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult;
@@ -18,7 +19,11 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	public final static String ANALYZER_NAME = "AADLInspector";
 	public final static String PLUGIN_NAME = "AADLInspector-Simulation";
 	public final static String PLUGIN_ID = "AADLInspector-Simulation";
-	private String mode = "manual";
+	private String mode = "automatic";
+	
+	private AnalysisArtifact currentResult = null;
+	
+	
 	@Override
 	public String getRegistryName() 
 	{
@@ -51,6 +56,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	public void setParameters(Map<String, Object> parameters) 
 	{
 	  mode = (String) parameters.get("mode");
+	  parameters.put("AnalysisResult", currentResult);
 	}
 
 	@Override
@@ -63,7 +69,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		try
 		{
 			AnalysisResult r = AADLInspectorLauncher.launchAnalysis(root, mode);
-			schedulable = r.isSchedulable();
+			currentResult = r.normalize();
 		}
 		catch (Exception e)
 		{

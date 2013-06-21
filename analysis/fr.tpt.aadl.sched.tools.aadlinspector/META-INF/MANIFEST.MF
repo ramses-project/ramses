@@ -17,4 +17,6 @@ Import-Package: fr.tpt.aadl.ramses.control.support.analysis,
  org.osate.aadl2.modelsupport.errorreporting
 Require-Bundle: org.osate.aadl2,
  org.osate.aadl2.modelsupport,
- org.osate.ui;bundle-version="1.0.0"
+ org.osate.ui;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.analysis.result;bundle-version="0.0.1",
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0"
