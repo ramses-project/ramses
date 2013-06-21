@@ -36,6 +36,10 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
+import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
+import fr.tpt.aadl.ramses.analysis.AnalysisResult;
+import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
+import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
@@ -57,6 +61,8 @@ public class AadlTargetSpecificGenerator implements Generator
   protected String _registryName = null ;
   
   private Resource currentImplResource = null;
+  
+  private Resource _analysisResults = null;
   
   protected AadlTargetSpecificGenerator()
   {
@@ -114,6 +120,8 @@ public class AadlTargetSpecificGenerator implements Generator
                           File generatedDir,
                           WorkflowPilot workflowPilot) throws GenerationException
   {
+	if(_analysisResults==null)
+	  _analysisResults = AnalysisUtils.createNewAnalysisArtifact(generatedDir.getAbsolutePath()+systemInstance.getName()+".ares");
 	Resource r = systemInstance.eResource() ;
     SystemInstance currentInstance = systemInstance;
     final String systemToInstantiate = systemInstance.getSystemImplementation().getName();
@@ -171,18 +179,20 @@ public class AadlTargetSpecificGenerator implements Generator
 	  String analysisName = workflowPilot.getNextAnalysisName();
       String analysisMode = workflowPilot.getNextAnalysisMode();
       System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
+      ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+      Analyzer a = sr.getAnalyzer(analysisName);
       try {
-        ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
-        Analyzer a = sr.getAnalyzer(analysisName);
-        Map<String, Object> modeParam = new HashMap<String, Object>();
-        modeParam.put("mode", analysisMode);
+        Map<String, Object> anaysisParam = new HashMap<String, Object>();
+        anaysisParam.put("Mode", analysisMode);
+        anaysisParam.put("AnalysisResult", _analysisResults);
         if (a == null)
         {
       	  System.err.println("Unknown analysis: " + analysisName);
         }
         else
         {
-          a.setParameters(modeParam);
+          
+          a.setParameters(anaysisParam);
       	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                     new NullProgressMonitor()) ;
         }
@@ -190,6 +200,7 @@ public class AadlTargetSpecificGenerator implements Generator
       } catch (Exception e) {
       //} catch (AnalysisResultException e) {
         e.printStackTrace();
+        return;
       }
 
 
@@ -199,8 +210,27 @@ public class AadlTargetSpecificGenerator implements Generator
 
       if(analysisMode.equals("automatic"))
       {
-        workflowPilot.setAnalysisResult(true);
-        System.out.println(">> " + analysisName + " result set at true");
+    	AnalysisArtifact aa = (AnalysisArtifact) _analysisResults.getContents().get(0);
+    	QualitativeAnalysisResult result = null;
+    	for(int j=aa.getResults().size()-1; j>=0; j++)
+    	{
+    	  AnalysisResult r = (AnalysisResult) aa.getResults().get(j);
+    	  if(r.getSource().getMethodName().toLowerCase().equals(a.getPluginName().toLowerCase()))
+    	  {
+    		if(aa.getResults().get(j) instanceof QualitativeAnalysisResult)
+    		{
+    		  result = (QualitativeAnalysisResult) aa.getResults().get(j); 
+    		  workflowPilot.setAnalysisResult(result.isValidated());
+    		}
+    	  }
+    	}
+    	if(result == null)
+    	{
+    	  System.out.println(">> " + analysisName + " result not found");
+    	  workflowPilot.setAnalysisResult(false);
+    	}
+    	if(result != null)
+          System.out.println(">> " + analysisName + " result set at " + result.isValidated());
       }
       else if(analysisMode.equals("manual")) {
         int res = JOptionPane.showConfirmDialog(null, "Was the analysis " + analysisName + " successfull?", "Confirmation", JOptionPane.YES_NO_OPTION);
