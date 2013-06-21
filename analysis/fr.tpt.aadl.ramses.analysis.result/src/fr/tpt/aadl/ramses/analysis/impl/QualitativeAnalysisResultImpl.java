@@ -7,6 +7,7 @@
 package fr.tpt.aadl.ramses.analysis.impl;
 
 
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
@@ -23,7 +24,7 @@ import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.QualitativeAnalysisResultImpl#isEvalValue <em>Eval Value</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.QualitativeAnalysisResultImpl#isValidated <em>Validated</em>}</li>
  * </ul>
  * </p>
  *
@@ -31,24 +32,24 @@ import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
  */
 public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements QualitativeAnalysisResult {
 	/**
-	 * The default value of the '{@link #isEvalValue() <em>Eval Value</em>}' attribute.
+	 * The default value of the '{@link #isValidated() <em>Validated</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isEvalValue()
+	 * @see #isValidated()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final boolean EVAL_VALUE_EDEFAULT = false;
+	protected static final boolean VALIDATED_EDEFAULT = false;
 
 	/**
-	 * The cached value of the '{@link #isEvalValue() <em>Eval Value</em>}' attribute.
+	 * The cached value of the '{@link #isValidated() <em>Validated</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isEvalValue()
+	 * @see #isValidated()
 	 * @generated
 	 * @ordered
 	 */
-	protected boolean evalValue = EVAL_VALUE_EDEFAULT;
+	protected boolean validated = VALIDATED_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -65,7 +66,7 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return AnalysisPackage.Literals.QUALITATIVE_ANALYSIS_RESULT;
+		return AnalysisResultPackage.Literals.QUALITATIVE_ANALYSIS_RESULT;
 	}
 
 	/**
@@ -73,8 +74,8 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean isEvalValue() {
-		return evalValue;
+	public boolean isValidated() {
+		return validated;
 	}
 
 	/**
@@ -82,11 +83,11 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setEvalValue(boolean newEvalValue) {
-		boolean oldEvalValue = evalValue;
-		evalValue = newEvalValue;
+	public void setValidated(boolean newValidated) {
+		boolean oldValidated = validated;
+		validated = newValidated;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisPackage.QUALITATIVE_ANALYSIS_RESULT__EVAL_VALUE, oldEvalValue, evalValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED, oldValidated, validated));
 	}
 
 	/**
@@ -96,8 +97,8 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 	 */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case AnalysisPackage.QUALITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				return isEvalValue() ? Boolean.TRUE : Boolean.FALSE;
+			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+				return isValidated() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -109,8 +110,8 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 	 */
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case AnalysisPackage.QUALITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				setEvalValue(((Boolean)newValue).booleanValue());
+			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+				setValidated(((Boolean)newValue).booleanValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -123,8 +124,8 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 	 */
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.QUALITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				setEvalValue(EVAL_VALUE_EDEFAULT);
+			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+				setValidated(VALIDATED_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -137,8 +138,8 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 	 */
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.QUALITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				return evalValue != EVAL_VALUE_EDEFAULT;
+			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT__VALIDATED:
+				return validated != VALIDATED_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -152,8 +153,8 @@ public class QualitativeAnalysisResultImpl extends AnalysisResultImpl implements
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (evalValue: ");
-		result.append(evalValue);
+		result.append(" (validated: ");
+		result.append(validated);
 		result.append(')');
 		return result.toString();
 	}

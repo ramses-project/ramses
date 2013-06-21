@@ -15,39 +15,39 @@ package fr.tpt.aadl.ramses.analysis;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult#getEvalValue <em>Eval Value</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult#getMargin <em>Margin</em>}</li>
  * </ul>
  * </p>
  *
- * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getQuantitativeAnalysisResult()
+ * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getQuantitativeAnalysisResult()
  * @model
  * @generated
  */
 public interface QuantitativeAnalysisResult extends AnalysisResult {
 	/**
-	 * Returns the value of the '<em><b>Eval Value</b></em>' attribute.
+	 * Returns the value of the '<em><b>Margin</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Eval Value</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Margin</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Eval Value</em>' attribute.
-	 * @see #setEvalValue(float)
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getQuantitativeAnalysisResult_EvalValue()
+	 * @return the value of the '<em>Margin</em>' attribute.
+	 * @see #setMargin(float)
+	 * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getQuantitativeAnalysisResult_Margin()
 	 * @model
 	 * @generated
 	 */
-	float getEvalValue();
+	float getMargin();
 
 	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult#getEvalValue <em>Eval Value</em>}' attribute.
+	 * Sets the value of the '{@link fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult#getMargin <em>Margin</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Eval Value</em>' attribute.
-	 * @see #getEvalValue()
+	 * @param value the new value of the '<em>Margin</em>' attribute.
+	 * @see #getMargin()
 	 * @generated
 	 */
-	void setEvalValue(float value);
+	void setMargin(float value);
 
 } // QuantitativeAnalysisResult

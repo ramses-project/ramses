@@ -7,6 +7,7 @@
 package fr.tpt.aadl.ramses.analysis.impl;
 
 
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
@@ -23,7 +24,7 @@ import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.QuantitativeAnalysisResultImpl#getEvalValue <em>Eval Value</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.QuantitativeAnalysisResultImpl#getMargin <em>Margin</em>}</li>
  * </ul>
  * </p>
  *
@@ -31,24 +32,24 @@ import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
  */
 public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implements QuantitativeAnalysisResult {
 	/**
-	 * The default value of the '{@link #getEvalValue() <em>Eval Value</em>}' attribute.
+	 * The default value of the '{@link #getMargin() <em>Margin</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getEvalValue()
+	 * @see #getMargin()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final float EVAL_VALUE_EDEFAULT = 0.0F;
+	protected static final float MARGIN_EDEFAULT = 0.0F;
 
 	/**
-	 * The cached value of the '{@link #getEvalValue() <em>Eval Value</em>}' attribute.
+	 * The cached value of the '{@link #getMargin() <em>Margin</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getEvalValue()
+	 * @see #getMargin()
 	 * @generated
 	 * @ordered
 	 */
-	protected float evalValue = EVAL_VALUE_EDEFAULT;
+	protected float margin = MARGIN_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -65,7 +66,7 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return AnalysisPackage.Literals.QUANTITATIVE_ANALYSIS_RESULT;
+		return AnalysisResultPackage.Literals.QUANTITATIVE_ANALYSIS_RESULT;
 	}
 
 	/**
@@ -73,8 +74,8 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public float getEvalValue() {
-		return evalValue;
+	public float getMargin() {
+		return margin;
 	}
 
 	/**
@@ -82,11 +83,11 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setEvalValue(float newEvalValue) {
-		float oldEvalValue = evalValue;
-		evalValue = newEvalValue;
+	public void setMargin(float newMargin) {
+		float oldMargin = margin;
+		margin = newMargin;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisPackage.QUANTITATIVE_ANALYSIS_RESULT__EVAL_VALUE, oldEvalValue, evalValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.QUANTITATIVE_ANALYSIS_RESULT__MARGIN, oldMargin, margin));
 	}
 
 	/**
@@ -96,8 +97,8 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 	 */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case AnalysisPackage.QUANTITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				return new Float(getEvalValue());
+			case AnalysisResultPackage.QUANTITATIVE_ANALYSIS_RESULT__MARGIN:
+				return new Float(getMargin());
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -109,8 +110,8 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 	 */
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case AnalysisPackage.QUANTITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				setEvalValue(((Float)newValue).floatValue());
+			case AnalysisResultPackage.QUANTITATIVE_ANALYSIS_RESULT__MARGIN:
+				setMargin(((Float)newValue).floatValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -123,8 +124,8 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 	 */
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.QUANTITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				setEvalValue(EVAL_VALUE_EDEFAULT);
+			case AnalysisResultPackage.QUANTITATIVE_ANALYSIS_RESULT__MARGIN:
+				setMargin(MARGIN_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -137,8 +138,8 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 	 */
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.QUANTITATIVE_ANALYSIS_RESULT__EVAL_VALUE:
-				return evalValue != EVAL_VALUE_EDEFAULT;
+			case AnalysisResultPackage.QUANTITATIVE_ANALYSIS_RESULT__MARGIN:
+				return margin != MARGIN_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -152,8 +153,8 @@ public class QuantitativeAnalysisResultImpl extends AnalysisResultImpl implement
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (evalValue: ");
-		result.append(evalValue);
+		result.append(" (margin: ");
+		result.append(margin);
 		result.append(')');
 		return result.toString();
 	}

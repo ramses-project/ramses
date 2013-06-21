@@ -18,10 +18,11 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link fr.tpt.aadl.ramses.analysis.AnalysisSource#getIterationId <em>Iteration Id</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.analysis.AnalysisSource#getScope <em>Scope</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.analysis.AnalysisSource#getMethodName <em>Method Name</em>}</li>
  * </ul>
  * </p>
  *
- * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getAnalysisSource()
+ * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getAnalysisSource()
  * @model
  * @generated
  */
@@ -36,7 +37,7 @@ public interface AnalysisSource extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Iteration Id</em>' attribute.
 	 * @see #setIterationId(int)
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getAnalysisSource_IterationId()
+	 * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getAnalysisSource_IterationId()
 	 * @model
 	 * @generated
 	 */
@@ -62,7 +63,7 @@ public interface AnalysisSource extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Scope</em>' attribute.
 	 * @see #setScope(String)
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getAnalysisSource_Scope()
+	 * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getAnalysisSource_Scope()
 	 * @model
 	 * @generated
 	 */
@@ -77,5 +78,31 @@ public interface AnalysisSource extends EObject {
 	 * @generated
 	 */
 	void setScope(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Method Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Method Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Method Name</em>' attribute.
+	 * @see #setMethodName(String)
+	 * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getAnalysisSource_MethodName()
+	 * @model
+	 * @generated
+	 */
+	String getMethodName();
+
+	/**
+	 * Sets the value of the '{@link fr.tpt.aadl.ramses.analysis.AnalysisSource#getMethodName <em>Method Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Method Name</em>' attribute.
+	 * @see #getMethodName()
+	 * @generated
+	 */
+	void setMethodName(String value);
 
 } // AnalysisSource

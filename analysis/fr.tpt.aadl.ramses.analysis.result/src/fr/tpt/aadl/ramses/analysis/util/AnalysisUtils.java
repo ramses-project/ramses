@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.analysis.AnalysisFactory;
 import fr.tpt.aadl.ramses.analysis.AnalysisPackage;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
@@ -25,10 +26,11 @@ public class AnalysisUtils {
 	 * Creates a new Analysis artifact of a specified path 
 	 *
 	 * @param analysisPath   	String representing the artifact path
+	 * @return 
 	 */
-	public static void createNewAnalysisArtifact(String analysisPath){
+	public static Resource createNewAnalysisArtifact(String analysisPath){
 		
-		AnalysisArtifact analysisSpec = AnalysisFactory.eINSTANCE.createAnalysisArtifact(); 
+		AnalysisArtifact analysisSpec = AnalysisResultFactory.eINSTANCE.createAnalysisArtifact(); 
 		
 		URI analysis_uri = URI.createFileURI(analysisPath);
 
@@ -37,10 +39,12 @@ public class AnalysisUtils {
 
 		if (!getResourceSet().getURIConverter().exists(analysis_uri, null)){
 			resource = getResourceSet().createResource(analysis_uri);
-			saveAnalysisArtifact(resource, analysisSpec);
+			resource.getContents().add(analysisSpec);
+			return resource;
 		} else {
 			System.out.println("Analysis artifact of the specified path: "+analysisPath+" already exists.");
-		}		
+		}
+		return null;
 	}
 	
 	/**
@@ -68,11 +72,10 @@ public class AnalysisUtils {
 			}
 			resultObj.setSource(sourceObj);
 		}
-		resultObj.setEvalValue(_evalValue);
+		resultObj.setMargin(_evalValue);
 		
 		analysisSpec.getResults().add(resultObj);
-		
-		saveAnalysisArtifact(getResource(_analysisPath), analysisSpec);			
+					
 	}
 	
 
@@ -101,11 +104,10 @@ public class AnalysisUtils {
 			}
 			resultObj.setSource(sourceObj);
 		}
-		resultObj.setEvalValue(_evalValue);
+		resultObj.setValidated(_evalValue);
 		
 		analysisSpec.getResults().add(resultObj);
-		
-		saveAnalysisArtifact(getResource(_analysisPath), analysisSpec);			
+					
 	}
 
 	
@@ -117,9 +119,8 @@ public class AnalysisUtils {
 	 * @param resource   	Resource object associated with the specific disk location
 	 * @param specification	AnalysisArtifact object to be saved
 	 */
-	private static void saveAnalysisArtifact(Resource resource, AnalysisArtifact specification){
+	public static void saveAnalysisArtifact(Resource resource){
 		resource.unload();
-		resource.getContents().add(specification);
 		
 		try {
 			resource.save(null);

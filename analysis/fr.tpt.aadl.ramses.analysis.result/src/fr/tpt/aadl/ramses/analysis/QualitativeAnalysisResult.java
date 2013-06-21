@@ -15,39 +15,39 @@ package fr.tpt.aadl.ramses.analysis;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult#isEvalValue <em>Eval Value</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult#isValidated <em>Validated</em>}</li>
  * </ul>
  * </p>
  *
- * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getQualitativeAnalysisResult()
+ * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getQualitativeAnalysisResult()
  * @model
  * @generated
  */
 public interface QualitativeAnalysisResult extends AnalysisResult {
 	/**
-	 * Returns the value of the '<em><b>Eval Value</b></em>' attribute.
+	 * Returns the value of the '<em><b>Validated</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Eval Value</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Validated</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Eval Value</em>' attribute.
-	 * @see #setEvalValue(boolean)
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getQualitativeAnalysisResult_EvalValue()
+	 * @return the value of the '<em>Validated</em>' attribute.
+	 * @see #setValidated(boolean)
+	 * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getQualitativeAnalysisResult_Validated()
 	 * @model
 	 * @generated
 	 */
-	boolean isEvalValue();
+	boolean isValidated();
 
 	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult#isEvalValue <em>Eval Value</em>}' attribute.
+	 * Sets the value of the '{@link fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult#isValidated <em>Validated</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Eval Value</em>' attribute.
-	 * @see #isEvalValue()
+	 * @param value the new value of the '<em>Validated</em>' attribute.
+	 * @see #isValidated()
 	 * @generated
 	 */
-	void setEvalValue(boolean value);
+	void setValidated(boolean value);
 
 } // QualitativeAnalysisResult

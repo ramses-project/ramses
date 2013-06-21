@@ -19,10 +19,6 @@
   <children xmi:type="notation:Node" xmi:id="_z-KZHrYnEeKEc7MU9cFH5w" type="1001">
     <children xmi:type="notation:Node" xmi:id="_z-KZIbYnEeKEc7MU9cFH5w" type="4001"/>
     <children xmi:type="notation:Node" xmi:id="_z-KZIrYnEeKEc7MU9cFH5w" type="5001">
-      <children xmi:type="notation:Node" xmi:id="_z-KZKrYnEeKEc7MU9cFH5w" type="2001">
-        <element xmi:type="ecore:EAttribute" href="AnalysisResult.ecore#//AnalysisResult/resultId"/>
-        <layoutConstraint xmi:type="notation:Location" xmi:id="_z-KZK7YnEeKEc7MU9cFH5w"/>
-      </children>
       <children xmi:type="notation:Node" xmi:id="_z-KZLLYnEeKEc7MU9cFH5w" type="2001">
         <element xmi:type="ecore:EAttribute" href="AnalysisResult.ecore#//AnalysisResult/nfpId"/>
         <layoutConstraint xmi:type="notation:Location" xmi:id="_z-KZLbYnEeKEc7MU9cFH5w"/>

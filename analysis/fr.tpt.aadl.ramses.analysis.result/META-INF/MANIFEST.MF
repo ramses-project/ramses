@@ -12,3 +12,7 @@ Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.emf.ecore.xmi.impl,
  org.junit;version="4.10.0"
+Export-Package: fr.tpt.aadl.ramses.analysis,
+ fr.tpt.aadl.ramses.analysis.impl,
+ fr.tpt.aadl.ramses.analysis.util,
+ fr.tpt.ramses.analysis

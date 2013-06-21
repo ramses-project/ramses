@@ -17,6 +17,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource;
 
 /**
@@ -26,7 +27,7 @@ import fr.tpt.aadl.ramses.analysis.AnalysisSource;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.AnalysisResultImpl#getResultId <em>Result Id</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.AnalysisResultImpl#getResultUUId <em>Result UU Id</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.AnalysisResultImpl#getNfpId <em>Nfp Id</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.analysis.impl.AnalysisResultImpl#getSource <em>Source</em>}</li>
  * </ul>
@@ -36,24 +37,24 @@ import fr.tpt.aadl.ramses.analysis.AnalysisSource;
  */
 public abstract class AnalysisResultImpl extends EObjectImpl implements AnalysisResult {
 	/**
-	 * The default value of the '{@link #getResultId() <em>Result Id</em>}' attribute.
+	 * The default value of the '{@link #getResultUUId() <em>Result UU Id</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getResultId()
+	 * @see #getResultUUId()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String RESULT_ID_EDEFAULT = null;
+	protected static final String RESULT_UU_ID_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getResultId() <em>Result Id</em>}' attribute.
+	 * The cached value of the '{@link #getResultUUId() <em>Result UU Id</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getResultId()
+	 * @see #getResultUUId()
 	 * @generated
 	 * @ordered
 	 */
-	protected String resultId = RESULT_ID_EDEFAULT;
+	protected String resultUUId = RESULT_UU_ID_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getNfpId() <em>Nfp Id</em>}' attribute.
@@ -100,7 +101,7 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return AnalysisPackage.Literals.ANALYSIS_RESULT;
+		return AnalysisResultPackage.Literals.ANALYSIS_RESULT;
 	}
 
 	/**
@@ -108,8 +109,8 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getResultId() {
-		return resultId;
+	public String getResultUUId() {
+		return resultUUId;
 	}
 
 	/**
@@ -130,7 +131,7 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 		String oldNfpId = nfpId;
 		nfpId = newNfpId;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisPackage.ANALYSIS_RESULT__NFP_ID, oldNfpId, nfpId));
+			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID, oldNfpId, nfpId));
 	}
 
 	/**
@@ -144,7 +145,7 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 			source = (AnalysisSource)eResolveProxy(oldSource);
 			if (source != oldSource) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, AnalysisPackage.ANALYSIS_RESULT__SOURCE, oldSource, source));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, oldSource, source));
 			}
 		}
 		return source;
@@ -168,7 +169,7 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 		AnalysisSource oldSource = source;
 		source = newSource;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisPackage.ANALYSIS_RESULT__SOURCE, oldSource, source));
+			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, oldSource, source));
 	}
 
 	/**
@@ -178,11 +179,11 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 	 */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_RESULT__RESULT_ID:
-				return getResultId();
-			case AnalysisPackage.ANALYSIS_RESULT__NFP_ID:
+			case AnalysisResultPackage.ANALYSIS_RESULT__RESULT_UU_ID:
+				return getResultUUId();
+			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
 				return getNfpId();
-			case AnalysisPackage.ANALYSIS_RESULT__SOURCE:
+			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
 				if (resolve) return getSource();
 				return basicGetSource();
 		}
@@ -196,10 +197,10 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 	 */
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_RESULT__NFP_ID:
+			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
 				setNfpId((String)newValue);
 				return;
-			case AnalysisPackage.ANALYSIS_RESULT__SOURCE:
+			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
 				setSource((AnalysisSource)newValue);
 				return;
 		}
@@ -213,10 +214,10 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 	 */
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_RESULT__NFP_ID:
+			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
 				setNfpId(NFP_ID_EDEFAULT);
 				return;
-			case AnalysisPackage.ANALYSIS_RESULT__SOURCE:
+			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
 				setSource((AnalysisSource)null);
 				return;
 		}
@@ -230,11 +231,11 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 	 */
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_RESULT__RESULT_ID:
-				return RESULT_ID_EDEFAULT == null ? resultId != null : !RESULT_ID_EDEFAULT.equals(resultId);
-			case AnalysisPackage.ANALYSIS_RESULT__NFP_ID:
+			case AnalysisResultPackage.ANALYSIS_RESULT__RESULT_UU_ID:
+				return RESULT_UU_ID_EDEFAULT == null ? resultUUId != null : !RESULT_UU_ID_EDEFAULT.equals(resultUUId);
+			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
 				return NFP_ID_EDEFAULT == null ? nfpId != null : !NFP_ID_EDEFAULT.equals(nfpId);
-			case AnalysisPackage.ANALYSIS_RESULT__SOURCE:
+			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
 				return source != null;
 		}
 		return super.eIsSet(featureID);
@@ -249,8 +250,8 @@ public abstract class AnalysisResultImpl extends EObjectImpl implements Analysis
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (resultId: ");
-		result.append(resultId);
+		result.append(" (resultUUId: ");
+		result.append(resultUUId);
 		result.append(", nfpId: ");
 		result.append(nfpId);
 		result.append(')');

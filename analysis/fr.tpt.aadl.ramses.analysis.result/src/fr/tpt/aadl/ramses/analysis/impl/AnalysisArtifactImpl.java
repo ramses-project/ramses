@@ -24,6 +24,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.analysis.AnalysisPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -64,7 +65,7 @@ public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifac
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return AnalysisPackage.Literals.ANALYSIS_ARTIFACT;
+		return AnalysisResultPackage.Literals.ANALYSIS_ARTIFACT;
 	}
 
 	/**
@@ -74,7 +75,7 @@ public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifac
 	 */
 	public EList getResults() {
 		if (results == null) {
-			results = new EObjectContainmentEList(AnalysisResult.class, this, AnalysisPackage.ANALYSIS_ARTIFACT__RESULTS);
+			results = new EObjectContainmentEList(AnalysisResult.class, this, AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS);
 		}
 		return results;
 	}
@@ -86,7 +87,7 @@ public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifac
 	 */
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_ARTIFACT__RESULTS:
+			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
 				return ((InternalEList)getResults()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -99,7 +100,7 @@ public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifac
 	 */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_ARTIFACT__RESULTS:
+			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
 				return getResults();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -112,7 +113,7 @@ public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifac
 	 */
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_ARTIFACT__RESULTS:
+			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
 				getResults().clear();
 				getResults().addAll((Collection)newValue);
 				return;
@@ -127,7 +128,7 @@ public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifac
 	 */
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_ARTIFACT__RESULTS:
+			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
 				getResults().clear();
 				return;
 		}
@@ -141,7 +142,7 @@ public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifac
 	 */
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case AnalysisPackage.ANALYSIS_ARTIFACT__RESULTS:
+			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
 				return results != null && !results.isEmpty();
 		}
 		return super.eIsSet(featureID);

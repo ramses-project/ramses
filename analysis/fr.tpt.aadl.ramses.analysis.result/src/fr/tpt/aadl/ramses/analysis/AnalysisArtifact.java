@@ -22,7 +22,7 @@ import org.eclipse.emf.ecore.EObject;
  * </ul>
  * </p>
  *
- * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getAnalysisArtifact()
+ * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getAnalysisArtifact()
  * @model
  * @generated
  */
@@ -37,8 +37,8 @@ public interface AnalysisArtifact extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Results</em>' containment reference list.
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisPackage#getAnalysisArtifact_Results()
-	 * @model type="analysis.AnalysisResult" containment="true"
+	 * @see fr.tpt.aadl.ramses.analysis.AnalysisResultPackage#getAnalysisArtifact_Results()
+	 * @model type="fr.tpt.aadl.ramses.analysis.AnalysisResult" containment="true"
 	 * @generated
 	 */
 	EList getResults();
