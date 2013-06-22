@@ -352,16 +352,24 @@ rule m_Thread_InterProcess_Input_DataPort_Instance
 --			(i) refine data access f type to Queuing_Id_Type
 
 
+helper context AADLBA!Connection def: otherFeature(feature: AADLBA!Feature): AADLBA!Feature =
+	if(self.source.connectionEnd = feature) then
+		self.destination.connectionEnd
+	else
+		self.source.connectionEnd
+	endif
+;
+
 -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
 rule m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!ConnectionReference
+		cnxRef: AADLI!PortConnection
 		(
 			fi.isEventOrEventDataPort()
 			and
-			cnxRef.destination.isThreadPort()
+			cnxRef.otherFeature(fi.feature).isThreadPort()
 		)
   	to
   		f: AADLBA!DataAccess
@@ -370,16 +378,16 @@ rule m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance
 		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME'))
 }
 
--- @extends m_Thread_Output_Port_Instance,m_Thread_Port_Instance,m_Not_PeriodicDelayed_Port
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
 rule m_Thread_Output_IntraProcess_DataPort_Instance
 {
 	from
 		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!ConnectionReference
+		cnxRef: AADLI!PortConnection
 		(
 			fi.isDataPort()
 			and
-			cnxRef.destination.isThreadPort()
+			cnxRef.otherFeature(fi.feature).isThreadPort()
 		)
   	to
   		f: AADLBA!DataAccess
@@ -393,11 +401,11 @@ rule m_Thread_InterProcess_EventDataPort_Output_Instance
 {
 	from
 		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!ConnectionReference
+		cnxRef: AADLI!PortConnection
 		(
 			fi.isEventOrEventDataPort()
 			and
-			cnxRef.destination.isProcessPort()
+			cnxRef.destination.connectionEnd.isProcessPort()
 		)
   	to
   		f: AADLBA!DataAccess
@@ -406,16 +414,16 @@ rule m_Thread_InterProcess_EventDataPort_Output_Instance
 		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
 }
 
--- @extends m_Thread_Output_Port_Instance
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
 rule m_Thread_InterProcess_DataPort_Output_Instance
 {
 	from
 		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!ConnectionReference
+		cnxRef: AADLI!PortConnection
 		(
 			fi.isDataPort()
 			and
-			cnxRef.destination.isProcessPort()
+			cnxRef.otherFeature(fi.feature).isProcessPort()
 		)
   	to
   		f: AADLBA!DataAccess

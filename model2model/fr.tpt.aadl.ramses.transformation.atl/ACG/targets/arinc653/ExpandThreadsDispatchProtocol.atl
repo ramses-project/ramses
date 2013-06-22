@@ -44,31 +44,6 @@ helper def: getRuntimeName: String =
 	'arinc653_runtime'
 ;
 
---rule Thread_Instance_after_Connections_src {
---	from
---		cnxInst: AADLI!ConnectionInstance (cnxInst.source.isLastFeatureInstance()) 
---	using
---	{
---		c: AADLI!ComponentInstance = cnxInst.source.eContainer();
---	}
---	do
---	{
---		thisModule.expandThreadDispatchProtocol(c.getSubcomponentImg(), c.getSubcomponentImg().subcomponentType);
---	}
---}
---
---rule Thread_Instance_after_Connections_dest {
---	from
---		cnxInst: AADLI!ConnectionInstance (cnxInst.destination.isLastFeatureInstance()) 
---	using
---	{
---		c: AADLI!ComponentInstance = cnxInst.source.eContainer();
---	}
---	do
---	{
---		thisModule.expandThreadDispatchProtocol(c.getSubcomponentImg(), c.getSubcomponentImg().subcomponentType);
---	}
---}
 
 rule expandThreadDispatchProtocolInBA(inst: AADLI!ComponentInstance,
 									  spg: AADLBA!SubprogramImplementation,

@@ -67,25 +67,31 @@ rule m_Thread_Output_Port_Instance
 {
 	from
 		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!ConnectionReference
+		cnxRef: AADLI!PortConnection
 		(
 			fi.isOutputFeature()
 			and
-			cnxRef.source = fi
+			fi.srcConnectionInstance->exists(e| e.connectionReference->exists(f|f.connection = cnxRef))
 		)
 	to
-		f: AADLBA!DataAccess,
-		f_entrypoint: AADLBA!DataAccess,
+		f: AADLBA!DataAccess
+		(
+			name <- cnxRef.name+'_'+fi.feature.name
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- cnxRef.name+'_'+fi.feature.name
+		),
 		accessConnection: AADLBA!AccessConnection
 		(
-			name <- 'Id_instance_to_'+cnxRef.source.eContainer().name+'_'+cnxRef.source.name,
+			name <- cnxRef.name+'_'+cnxRef.destination.connectionEnd.name+'_to_globalVariable',
 			source<-connectedAccess,
 			accessCategory<-#data,
 			destination<-connectedSubcomponent
 		),
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-cnxRef.destination.getGlobalVariableImg()
+			connectionEnd<-fi.srcConnectionInstance->any(e| e.connectionReference->exists(f|f.connection = cnxRef)).connectionReference->any(e|e.source=fi).destination.getGlobalVariableImg()
 		),
 		connectedAccess: AADLBA!ConnectedElement
 		(
@@ -108,7 +114,7 @@ rule m_Process_Output_Port_Instance
 		)
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(name <- fi.name+'_globalVariable')
+		(name <- fi.eContainer().name+'_'+fi.name+'_globalVariable')
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
@@ -154,7 +160,7 @@ rule m_Thread_InterProcess_Input_Port_Instance
 	to
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-fi.dstConnectionInstance->first().connectionReference->first().destination.getGlobalVariableImg()
+			connectionEnd<-fi.dstConnectionInstance->first().connectionReference->last().source.getGlobalVariableImg()
 		)
 }
 
@@ -168,7 +174,7 @@ rule m_Thread_IntraProcess_Input_Port_Instance
 		)
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(name <- fi.name+'_globalVariable'),
+		(name <- fi.eContainer().name+'_'+fi.name+'_globalVariable'),
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
 			connectionEnd<-globalVariable
@@ -190,7 +196,7 @@ rule m_Process_Input_Port_Instance
 		)
 	to
 		globalVariable:AADLBA!DataSubcomponent
-		(name <- fi.name+'globalVariable')
+		(name <- fi.eContainer().name+'_'+fi.name+'globalVariable')
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
@@ -241,7 +247,7 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
 helper def: freshness_suffix : String = '_freshness_t';
 helper def: impl_suffix : String = '.impl';
 helper context AADLI!FeatureInstance def: getFreshnessType() : String =
-	self.name+thisModule.freshness_suffix
+	self.uniqueName()+thisModule.freshness_suffix
 ;
 -------------------------------------------------------------------------------------------
 
@@ -270,7 +276,7 @@ helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
 	self.getPropertyAssociation('Source_Text').oclIsUndefined()
 ;
 
--- @extends m_Feature_Instance,m_Thread_DataOrEventDataPort_Output_Instance
+-- @extends m_Thread_DataOrEventDataPort_Output_Instance
 rule m_DataPort_Instance_with_BA
 {
 	from
@@ -283,30 +289,19 @@ rule m_DataPort_Instance_with_BA
 		c: AADLI!ComponentInstance = fi.eContainer();
 		-- local variable that will be initialized in the "do" section.
 		ba: AADLBA!BehaviorAnnex = fi.getBehaviorAnnex();
+		freshnesStruct: AADLBA!DataImplementation = thisModule.createFreshnessDataStructure(fi);
 	}
 	to
 		-- creation of a data access feature, to be added to the target thread component, 
 		-- this data access represents an access to the global variable representing the
 		-- communication 'port variable'.
 		
-		-- target data access must be called 'f' to be retreived with resolveTemp
-		f: AADLBA!DataAccess
-		(
-			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
-			kind <- #requires
-		),
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-fi.feature.name+'_MsgAddr'
 		),
 		actualParam: AADLBA!Parameter,
 		
-		-- target data access must be called 'f_entrypoint' to be retreived with resolveTemp
-		f_entrypoint: AADLBA!DataAccess
-		(
-			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction.getName(),
-			kind <- #requires
-		),
 		fresh_data_previous: AADLBA!DataSubcomponent
 		(
 			name<-fi.name+'_freshness_previous',
@@ -324,30 +319,6 @@ rule m_DataPort_Instance_with_BA
 			name<-fi.name+'_freshness_previous_access',
 			dataFeatureClassifier<-'Integer_16'.asClassifier('BASE_TYPES'),
 			kind <- #requires
-		),
-		fresh_data_type_wrapper:AADLBA!DataType
-		(
-			name<-fi.getFreshnessType(),
-			ownedPropertyAssociation <- Sequence
-			{
-				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
-					'Struct'.asEnumeration('DATA_MODEL').asNamedValue())
-			}
-		),
-		fresh_data_impl_wrapper:AADLBA!DataImplementation
-		(
-			name<-fi.getFreshnessType()+thisModule.impl_suffix,
-			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
-		),
-		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
-		(
-			name<-'fresh_ba',
-			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
-		),
-		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
-		(
-			name <- 'value',
-			dataSubcomponentType <- fi.feature.dataFeatureClassifier
 		),
 		updateFreshness: AADLBA!AssignmentAction
 		(
@@ -388,7 +359,7 @@ rule m_DataPort_Instance_with_BA
 		),
 		dataFreshnessSubcomponentHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- struct_freshness_data_subcomponent
+			element <- thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
 		),
 		
 		
@@ -409,7 +380,7 @@ rule m_DataPort_Instance_with_BA
 		),
 		dataSubcomponentStructSend: AADLBA!DataSubcomponentHolder
 		(
-			element<-struct_freshness_data_subcomponent
+			element<-thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
 		),
 		sendValueExpressionOutput: AADLBA!ValueExpression
 		(
@@ -488,15 +459,45 @@ rule m_DataPort_Instance_with_BA
 		
 	do
 	{
-		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
-		if(thisModule.public().ownedClassifier->any(e|e.name = fresh_data_type_wrapper.name).oclIsUndefined())
-		{
-			thisModule.public().ownedClassifier.add(fresh_data_type_wrapper);
-			thisModule.public().ownedClassifier.add(fresh_data_impl_wrapper);
-		}
-		dataSubcomponent.dataSubcomponentType <- thisModule.assignPortVariableType(fi, fresh_data_impl_wrapper);
+		dataSubcomponent.dataSubcomponentType <- thisModule.assignPortVariableType(fi, freshnesStruct);
 		actualParam.dataFeatureClassifier <- dataSubcomponent.dataSubcomponentType;
 		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
+	}
+}
+
+unique lazy rule createFreshnessDataStructure
+{
+	from
+		fi: AADLI!FeatureInstance
+	to
+		fresh_data_type_wrapper:AADLBA!DataType
+		(
+			name<-fi.getFreshnessType(),
+			ownedPropertyAssociation <- Sequence
+			{
+				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
+					'Struct'.asEnumeration('DATA_MODEL').asNamedValue())
+			}
+		),
+		fresh_data_impl_wrapper:AADLBA!DataImplementation
+		(
+			name<-fi.getFreshnessType()+thisModule.impl_suffix,
+			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
+		),
+				struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name<-'fresh_ba',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
+		),
+		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name <- 'value',
+			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+		)
+	do
+	{
+		fresh_data_impl_wrapper;
 	}
 }
 

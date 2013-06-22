@@ -37,7 +37,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 --------------------------------------------
 
 -- @extends m_Not_PeriodicDelayed_Port
-rule m_SamplingCallSpecification
+abstract rule m_SamplingCallSpecification
 {
 	from
 		fi: AADLI!FeatureInstance,
@@ -49,16 +49,6 @@ rule m_SamplingCallSpecification
 			and
 			not fi.isIntraProcessFeatureInstance()
 		)
-	using
-	{
-		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
-		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
-	}
-	to
-		call: AADLBA!SubprogramCallAction
 }
 
 -- @extends m_SamplingCallSpecification,m_Input_DataPort_ComputeEntrypointCallSequence
@@ -115,9 +105,9 @@ rule m_Output_Sampling_ComputeEntrypointCallSequence
 	from
 		fi: AADLI!FeatureInstance,
 		callSequence: AADLI!SubprogramCallSequence,
-		cnxRef: AADLI!ConnectionReference		
+		cnxRef: AADLI!PortConnection		
 		(
-			fi.srcConnectionInstance->exists(e|e.connectionReference->first() = cnxRef)
+			fi.srcConnectionInstance->exists(e|e.connectionReference->first().connection = cnxRef)
 		)
 	using
 	{

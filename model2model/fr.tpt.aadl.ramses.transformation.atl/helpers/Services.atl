@@ -106,12 +106,20 @@ helper context AADLBA!SubprogramImplementation def: getSubprogramParameters() : 
 	self.type.ownedParameter;
 
 
+helper context AADLI!Feature def : isThreadPort() : Boolean =
+	self.eContainer().oclIsKindOf(AADLBA!Thread) and self.oclIsKindOf(AADLBA!Port)
+;
+
 helper context AADLI!FeatureInstance def : isThreadPort() : Boolean =
 	self.eContainer().category = #thread and self.feature.oclIsKindOf(AADLBA!Port)
 ;
 
 helper context AADLI!ComponentInstance def : isThreadPort() : Boolean =
 	false
+;
+
+helper context AADLI!Feature def : isProcessPort() : Boolean =
+	self.eContainer().oclIsKindOf(AADLBA!Process) and self.oclIsKindOf(AADLBA!Port)
 ;
 
 helper context AADLI!FeatureInstance def : isProcessPort() : Boolean =

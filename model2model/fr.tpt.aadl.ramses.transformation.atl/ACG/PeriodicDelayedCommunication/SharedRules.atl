@@ -149,13 +149,15 @@ abstract rule m_PeriodicDelayed_Port
 	}
 }
 
--- @extends m_Thread_Output_Port_Instance,m_PeriodicDelayed_Port
+-- @extends m_PeriodicDelayed_Port
 rule m_Thread_Output_PeriodicDelayed_Port
 {
 	from
 		fi: AADLI!FeatureInstance,
 		cnxRef: AADLI!ConnectionReference
 		(fi.isPeriodicDelayedPort()
+		and
+		fi.isOutputFeature()
 		and
 		cnxRef.destination.isThreadPort())
 	using
@@ -270,11 +272,6 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath());
 	}
 	to
-		
---		value: AADLBA!DataSubcomponent (
---			name <- port.name+'_currentValue',
---			dataSubcomponentType <- port.feature.dataFeatureClassifier
---		),
 		
 		-----------------------
 		--- Thread configuration
@@ -704,7 +701,7 @@ rule m_Input_PeriodicDelayed_Port
 }
 
 
--- @extends m_Input_PeriodicDelayed_Port
+-- @extends m_Input_PeriodicDelayed_Port,m_Thread_IntraProcess_Input_Port_Instance
 rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance
 {
   	from

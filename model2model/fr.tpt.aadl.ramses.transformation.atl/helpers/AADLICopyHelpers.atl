@@ -111,8 +111,8 @@ helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature() : A
 	thisModule.resolveTemp(self, 'f_entrypoint')
 ;
 
-helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
-		thisModule.resolveTemp(Sequence{self,cnxInst.connectionReference->first()}, 'f_entrypoint')
+helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnx: AADLI!PortConnection) : AADLBA!Feature =
+		thisModule.resolveTemp(Sequence{self,cnx}, 'f_entrypoint')
 ;
 
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =

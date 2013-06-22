@@ -180,6 +180,7 @@ rule m_FeatureGroupConnection_Reference
 		cnxRef: AADLI!ConnectionReference (cnxRef.eContainer().kind = #featureGroupConnection)
 }
 
+-- @extends m_Component_Instance
 rule m_create_Thread_BA
 {
 	from
@@ -198,7 +199,9 @@ rule m_create_Thread_BA
 			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
 			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data),
 			ownedSubprogramCallSequence     <- if (c.subcomponent.subcomponentType.needsToMapBehaviorAnnex()) then
-												Sequence{thisModule.resolveTemp(c,'callSequenceImg')}
+												c.subcomponent.subcomponentType.ownedAnnexSubclause
+													->select(ba | ba.oclIsTypeOf(AADLBA!BehaviorAnnex))
+													->collect(ba | thisModule.resolveTemp(Sequence{c,ba},'callSequenceImg'))
 											   else
 											   	impl.ownedSubprogramCallSequence
 												->select(e|e.isComputeEntryPointOf(c))
@@ -235,7 +238,29 @@ rule m_create_Thread_BA
 			ownedAccessConnection			<- c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
 												->collect(fi| impl.ownedSubprogramCallSequence
 													->collect(callSequence|
-														thisModule.resolveTemp(Sequence{fi,callSequence}, 'f_connection')
+														if(fi.isInputFeature()) then
+															thisModule.resolveTemp(Sequence{fi,callSequence}, 'f_connection')
+														else
+															fi.srcConnectionInstance->collect( cnxInst |
+																thisModule.resolveTemp(Sequence{fi,callSequence,cnxInst.connectionReference->first().connection}, 'f_connection')
+															)
+														endif
+													)
+												)
+												->flatten()
+												->union(
+													c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
+													->collect(fi|
+														impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
+														->collect(ba |
+															if(fi.isInputFeature()) then
+																thisModule.resolveTemp(Sequence{fi,ba}, 'f_connection')
+															else
+																fi.srcConnectionInstance->collect( cnxInst |
+																	thisModule.resolveTemp(Sequence{fi,ba,cnxInst.connectionReference->first().connection}, 'f_connection')
+																)
+															endif
+														)
 													)
 												)
 												->flatten()
@@ -266,19 +291,20 @@ rule m_create_Thread_BA
 														c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
 														->collect(
 	 														f| f.srcConnectionInstance->collect(cnxInst |
-																thisModule.resolveTemp(Sequence{f,cnxInst.connectionReference->first()}, 'f')
+																thisModule.resolveTemp(Sequence{f,cnxInst.connectionReference->first().connection}, 'f')
 															)
 														)
-													)->flatten()
+													)->flatten()->asSet()
  		)
 }
 
--- @extends m_Component_Instance,m_create_Thread_BA
+-- @extends m_create_Thread_BA
 rule m_Thread_Instance {
 	from
-		c : AADLI!ComponentInstance (c.category = #thread 
+		c : AADLI!ComponentInstance (
+			c.category = #thread 
 			and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
-			and (not c.subcomponent.subcomponentType.needsToMapBehaviorAnnex()))
+		)
 	using
  	{
  		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
@@ -338,8 +364,8 @@ rule m_Process_Implementation {
 														->collect(fi |
 															fi.srcConnectionInstance
 															->collect(cnxInst |
-																thisModule.resolveTemp(Sequence{fi,cnxInst.connectionReference->first()}, 'accessConnection')
-															)	
+																thisModule.resolveTemp(Sequence{fi,cnxInst.connectionReference->first().connection}, 'accessConnection')
+															)->asSet()	
 														)
 													)
 												)->flatten()
