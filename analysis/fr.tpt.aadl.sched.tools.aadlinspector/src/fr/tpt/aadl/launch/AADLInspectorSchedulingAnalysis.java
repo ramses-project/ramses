@@ -55,7 +55,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	@Override
 	public void setParameters(Map<String, Object> parameters) 
 	{
-	  mode = (String) parameters.get("mode");
+	  mode = (String) parameters.get("Mode");
 	  parameters.put("AnalysisResult", currentResult);
 	}
 
