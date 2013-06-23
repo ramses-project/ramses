@@ -105,10 +105,7 @@ rule m_Output_Sampling_ComputeEntrypointCallSequence
 	from
 		fi: AADLI!FeatureInstance,
 		callSequence: AADLI!SubprogramCallSequence,
-		cnxRef: AADLI!PortConnection		
-		(
-			fi.srcConnectionInstance->exists(e|e.connectionReference->first().connection = cnxRef)
-		)
+		cnxRef: AADLI!PortConnection
 	using
 	{
 		spg: AADLBA!SubprogramType = 'Write_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
