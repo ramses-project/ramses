@@ -323,6 +323,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/helpers/IOHelpers") ;
 		fileName.add("/helpers/AADLCopyHelpers") ;
 		fileName.add("/helpers/AADLICopyHelpers") ;
+		fileName.add("/helpers/BehaviorAnnexServices") ;
 		fileName.add("/tools/PropertiesTools") ;
 		fileName.add("/tools/PackagesTools") ;
 		fileName.add("/tools/FeaturesTools") ;
@@ -336,7 +337,6 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/helpers/Services") ;
 		// Fixme: next will be added when tested with emftvm
 		fileName.add("/tools/BehaviorAnnexTools") ;
-		//fileName.add("/BehaviorAnnexCopy/BehaviorAnnexServices") ;
 		//fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
 		//fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
 		//fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
