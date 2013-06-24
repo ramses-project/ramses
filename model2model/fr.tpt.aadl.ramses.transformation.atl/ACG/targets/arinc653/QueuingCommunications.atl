@@ -42,12 +42,12 @@ abstract rule m_QueueingCallSpecification
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence,
+		behavior: AADLI!SubprogramCallSequence,
 		paramCnx: AADLI!ParameterConnection
 		(
 			fi.isEventOrEventDataPort()
 			and
-			callSequence.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.eContainer())
 			and
 			not fi.isIntraProcessFeatureInstance()
 		)
@@ -58,7 +58,7 @@ rule m_Input_Queuing_ComputeEntrypointCallSequence
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence,
+		behavior: AADLI!SubprogramCallSequence,
 		paramCnx: AADLI!ParameterConnection
 	using
 	{
@@ -68,7 +68,7 @@ rule m_Input_Queuing_ComputeEntrypointCallSequence
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
 		QUEUE_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -107,7 +107,7 @@ rule m_Output_Queuing_ComputeEntrypointCallSequence
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence,
+		behavior: AADLI!SubprogramCallSequence,
 		paramCnx: AADLI!ParameterConnection,
 		cnxRef: AADLI!PortConnection		
 		(
@@ -120,8 +120,8 @@ rule m_Output_Queuing_ComputeEntrypointCallSequence
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
-		QUEUE_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
+		QUEUE_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction

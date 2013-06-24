@@ -31,19 +31,99 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									ARINC653_RUNTIME: AADLBA;
 
 
--- @extends m_ThreadEntrypoint
+abstract rule m_Port_BehaviorAnnex
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!AnnexSubclause
+		(
+			behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
+			and
+			fi.isThreadPort()
+			and
+			fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e=behavior)
+		)
+}
+
+-- @extends m_Port_BehaviorAnnex
+rule m_Input_Port_BehaviorAnnex
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!AnnexSubclause
+		(
+			fi.isInputFeature()
+		)
+	to
+		f_connection: AADLBA!AccessConnection
+		(
+			source <- sourceCE,
+			destination <- destinationCE,
+			name <- fi.name+'_accessCnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString(),
+			accessCategory <- #data
+		),
+		sourceCE: AADLBA!ConnectedElement
+		(
+			connectionEnd <- thisModule.resolveTemp(fi, 'f')
+		),
+		destinationCE: AADLBA!ConnectedElement
+		(
+			connectionEnd <- thisModule.resolveTemp(fi, 'f_entrypoint')
+		)
+	do
+	{
+		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),behavior}, 'callEntryPoint'));
+	}
+}
+
+-- @extends m_Port_BehaviorAnnex
+rule m_Output_Port_BehaviorAnnex
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!AnnexSubclause,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isOutputFeature()
+			and
+			fi.srcConnectionInstance->exists(e|e.connectionReference->exists(cnx| cnx.connection = cnxRef))
+		)
+	to
+		f_connection: AADLBA!AccessConnection
+		(
+			source <- sourceCE,
+			destination <- destinationCE,
+			name <- cnxRef.name+'_'+fi.name+'_accessCnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString(),
+			accessCategory <- #data
+		),
+		sourceCE: AADLBA!ConnectedElement
+		(
+			connectionEnd <- fi.retreiveEntrypointFeature(cnxRef)
+		),
+		destinationCE: AADLBA!ConnectedElement
+		(
+			connectionEnd <- thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint')
+		)
+	do
+	{
+		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),behavior}, 'callEntryPoint'));
+	}
+}
+
+
+-- @extends m_ThreadEntrypoint,m_ThreadBehavior
 rule m_Compute_EntryPoint_from_BA {
  from 
     c : AADLI!ComponentInstance,
-	ba: AADLI!AnnexSubclause
+	behavior: AADLI!AnnexSubclause
 	( 	
 		c.category = #thread 
 		and
-		ba.name.toLower() = 'behavior_specification'
+		behavior.name.toLower() = 'behavior_specification'
 	  	and
-	  	ba.oclIsTypeOf(AADLBA!BehaviorAnnex)
+	  	behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
 	  	and
-	  	c.subcomponent.classifier.ownedAnnexSubclause->exists(e| e=ba)
+	  	c.subcomponent.classifier.ownedAnnexSubclause->exists(e| e=behavior)
 	  	and
 		c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
 		and
@@ -57,9 +137,9 @@ rule m_Compute_EntryPoint_from_BA {
  }
  to 
 	entryPointImg: AADLBA!SubprogramType
-	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(ba).toString()),
+	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(behavior).toString()),
 	entryPointImplImg: AADLBA!SubprogramImplementation
-	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(ba).toString()+'.impl'),
+	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(behavior).toString()+'.impl'),
 	callEntryPoint: AADLBA!SubprogramCall,
 	callSequenceImg: AADLBA!SubprogramCallSequence,
 	stateType: AADLBA!DataType
@@ -117,6 +197,11 @@ rule m_Compute_EntryPoint_from_BA {
 		source<-connectedAccess_CURRENT_STATE,
 		destination<-connectedSubcomponent_CURRENT_STATE,
 		accessCategory <- #data
+	),
+	loop_target_actions: AADLBA!BehaviorActionSequence
+	(
+		-- FIXME: to be sorted by priority
+		actions <- behavior.transitions->collect(e | thisModule.resolveTemp(Sequence{c, e}, 'ifStatement'))
 	)
  do
  {
@@ -124,186 +209,52 @@ rule m_Compute_EntryPoint_from_BA {
  }
 }
 
-abstract rule m_Port_BehaviorAnnex
-{
-	from
-		fi: AADLI!FeatureInstance,
-		ba: AADLI!AnnexSubclause
-		(
-			ba.oclIsTypeOf(AADLBA!BehaviorAnnex)
-			and
-			fi.isThreadPort()
-			and
-			fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e=ba)
-		)
-}
 
--- @extends m_Port_BehaviorAnnex
-rule m_Input_Port_BehaviorAnnex
-{
-	from
-		fi: AADLI!FeatureInstance,
-		ba: AADLI!AnnexSubclause
-		(
-			fi.isInputFeature()
-		)
-	to
-		f_connection: AADLBA!AccessConnection
-		(
-			source <- sourceCE,
-			destination <- destinationCE,
-			name <- fi.name+'_accessCnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(ba).toString(),
-			accessCategory <- #data
-		),
-		sourceCE: AADLBA!ConnectedElement
-		(
-			connectionEnd <- thisModule.resolveTemp(fi, 'f')
-		),
-		destinationCE: AADLBA!ConnectedElement
-		(
-			connectionEnd <- thisModule.resolveTemp(fi, 'f_entrypoint')
-		)
-	do
-	{
-		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),ba}, 'callEntryPoint'));
-	}
-}
-
--- @extends m_Port_BehaviorAnnex
-rule m_Output_Port_BehaviorAnnex
-{
-	from
-		fi: AADLI!FeatureInstance,
-		ba: AADLI!AnnexSubclause,
-		cnxRef: AADLI!PortConnection
-		(
-			fi.isOutputFeature()
-			and
-			fi.srcConnectionInstance->exists(e|e.connectionReference->exists(cnx| cnx.connection = cnxRef))
-		)
-	to
-		f_connection: AADLBA!AccessConnection
-		(
-			source <- sourceCE,
-			destination <- destinationCE,
-			name <- cnxRef.name+'_'+fi.name+'_accessCnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(ba).toString(),
-			accessCategory <- #data
-		),
-		sourceCE: AADLBA!ConnectedElement
-		(
-			connectionEnd <- fi.retreiveEntrypointFeature(cnxRef)
-		),
-		destinationCE: AADLBA!ConnectedElement
-		(
-			connectionEnd <- thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint')
-		)
-	do
-	{
-		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),ba}, 'callEntryPoint'));
-	}
-}
-
-rule m_BehaviorAnnexFromThread
-{
-	from
-		c: AADLI!ComponentInstance,
-		ba: AADLBA!BehaviorAnnex
-		(false)
-	using
-	{
-		currentStateAccess: AADLBA!DataAccess = OclUndefined;
-		stateType: AADLBA!DataAccess = OclUndefined;
-		subprogram: AADLBA!SubprogramImplementation = OclUndefined;
-	}
-	to
-		target_ba: AADLBA!BehaviorAnnex
-		(
-			name        <- ba.name,
-			states      <- Sequence{sourceState,finalState},
-			-- TODO implement mapBehaviorVariable
-			variables   <- ba.variables->collect(e| thisModule.copyBehaviorVariable(e)),
-			transitions <- Sequence{computationTransition},
-			actions     <- Sequence{thisModule.mapBehaviorActionBlockFromThread(c, ba, currentStateAccess, stateType, subprogram)}
-								->union(ba.transitions->collect(e|thisModule.copyBehaviorActionBlock(e.actionBlock, c)))
-		),
-		sourceState: AADLBA!BehaviorState
-		(
-			initial  <- true,
-			final    <- false,
-			complete <- false,
-			name     <- 'BA_entrypoint_s'
-		),
-		finalState: AADLBA!BehaviorState
-		(
-			initial  <- false,
-			final    <- true,
-			complete <- false,
-			name     <- 'BA_entrypoint_f'
-		),
-		computationTransition: AADLBA!BehaviorTransition
-		(
-			actionBlock       <- thisModule.mapBehaviorActionBlockFromThread(c, ba, currentStateAccess, stateType, subprogram),
-			destinationState  <- finalState,
-			sourceState       <- sourceState
-		)
-		
-	do
-	{
-		target_ba;
-	}
-}
-
-unique lazy rule mapBehaviorActionBlockFromThread
+rule m_BehaviorActionsFromThread
 {
   from
 	c: AADLI!ComponentInstance,
-	src_ba: AADLBA!BehaviorAnnex,
-	currentStateAccess: AADLBA!DataAccess,
-	stateType: AADLBA!DataAccess,
-	subprogram: AADLBA!SubprogramImplementation
-	
-  to
-	target_actionBlock: AADLBA!BehaviorActionBlock
-	(content<-target_actions),
-	target_actions: AADLBA!BehaviorActionSequence
-  do
-  {
-  	target_actions.actions.addAll(src_ba.transitions->collect(e| thisModule.mapBehaviorActionsFromThread(c, e, currentStateAccess, stateType, subprogram)));
-  	if(thisModule.baNeedsElif(src_ba))
-  	{
-  		
-  	}
-  	
-  	target_actionBlock;
-  }
-}
-
-helper def: baNeedsElif(src_ba: AADLBA!BehaviorAnnex) : Boolean =
-	src_ba.transitions->size()>2
-;
-
-helper def: bab_content: AADLBA!BehaviorActions = OclUndefined;
-
-unique lazy rule mapBehaviorActionsFromThread
-{
-  from
-	c: AADLI!ComponentInstance,
-	src_transition: AADLBA!BehaviorTransition,
-	currentStateAccess: AADLBA!DataAccess,
-	stateType: AADLBA!DataAccess,
-	subprogram: AADLBA!SubprogramImplementation
+	src_transition: AADLBA!BehaviorTransition
+	(
+		c.category = #thread
+		and
+		c.subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e = src_transition.eContainer())
+	)
   using
   {
-	ba: AADLBA!BehaviorAnnex = c.subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification');
+	ba: AADLBA!BehaviorAnnex = src_transition.eContainer();
+	currentStateAccess: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{c,ba},'currentStateAccess');
+	stateType: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{c,ba},'stateType');
+	-- FIXME: to be sorted according to priority.
+	sortedTransitions: Sequence(AADLBA!BehaviorTransition) = ba.transitions;
   }
   to
 	ifStatement: AADLBA!IfStatement
 	(
 		logicalValueExpression <- isStateSource,
-		elif <- false,
+		elif <- if(sortedTransitions->first() = src_transition) then false else true endif,
 		behaviorActions <- ifStatementActionSequence
 	),
-	ifStatementActionSequence: AADLBA!BehaviorActionSequence,
+	ifStatementActionSequence: AADLBA!BehaviorActionSequence
+	(
+		actions <- 	if(src_transition.sourceState.complete=true)
+					then
+					c.featureInstance->select(f | (f.isInputFeature() or f.isInputOutputFeature()) and f.oclIsTypeOf(AADLI!DataPort))
+					->collect(port | thisModule.resolveTemp(Sequence{port, src_transition.eContainer()}, 'call'))
+					else
+					Sequence{}
+					endif
+					->union
+					(
+						if(src_transition.actionBlock.content.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
+							src_transition.actionBlock.content.actions.resolve().debug(' NNNNN ')
+						else
+							Sequence{src_transition.actionBlock}
+						endif
+					)
+					->append
+					(updateState)
+	),
 	isStateSource: AADLBA!ValueExpression
 	(
 		relations <- Sequence{comparisonRelation}	
@@ -332,7 +283,7 @@ unique lazy rule mapBehaviorActionsFromThread
 	),
 	currentStateAccessFactor: AADLBA!Factor
 	(
-		firstValue <- Sequence{currentStateAccessHolder}
+		firstValue <- currentStateAccessHolder
 	),
 	currentStateAccessHolder:AADLBA!DataAccessHolder
 	(
@@ -340,7 +291,7 @@ unique lazy rule mapBehaviorActionsFromThread
 	),
 	enumValueSourceStateFactor: AADLBA!Factor
 	(
-		firstValue <- Sequence{sourceStateID}
+		firstValue <- sourceStateID
 	),
 	sourceStateID: AADLBA!BehaviorEnumerationLiteral
 	(
@@ -378,7 +329,7 @@ unique lazy rule mapBehaviorActionsFromThread
 	),
 	enumValueTargetStateFactor: AADLBA!Factor
 	(
-		firstValue <- Sequence{targetStateID}
+		firstValue <- targetStateID
 	),
 	targetStateID: AADLBA!BehaviorEnumerationLiteral
 	(
@@ -389,60 +340,50 @@ unique lazy rule mapBehaviorActionsFromThread
 	(
 		value <- src_transition.sourceState.name
 	)
-  do
-  {
-  	if(src_transition.sourceState.complete=true)
-  	{
-  		for(fi in c.featureInstance)
-  		{
-  			if(fi.category=#dataPort and (fi.direction.getName()='in' or fi.direction.getName()='inout'))
-  			{
-  				thisModule.addNextValueSubprogramCallAction(ifStatementActionSequence.actions, fi, subprogram);
-  			}
-  		}
-  	}
-  	thisModule.bab_content <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock,c).content;
-  	if(thisModule.bab_content.oclIsKindOf(AADLBA!BehaviorActionCollection))
-	  	ifStatementActionSequence.actions.addAll(thisModule.bab_content.actions);
-  	else if (not thisModule.bab_content.oclIsUndefined())
-  		ifStatementActionSequence.actions.add(thisModule.bab_content.debug(thisModule.bab_content.getClass().toString()));
-  	ifStatementActionSequence.actions.add(updateState);
-  	
-  	for(fi in c.featureInstance)
-  	{
-  		if(fi.category=#dataPort or fi.category=#eventDataPort or fi.category=#eventPort)
-  		{
-  			if(ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause(ba, fi.feature))
-			{
-				for(trans in ba.transitions)
-				{
-					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshness'));
-				}
-			}
-  			else if(fi.isUsedInFresh())
-  			{
-  				for(trans in ba.transitions)
-				{
-					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshnessOutput'));
-					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'sendFreshnessOutput'));
-				}
-  			}
-  		}
-  	}
-  	
-	if(src_transition.destinationState.complete=true)
-	{
-		for(fi in c.featureInstance)
-  		{
-  			if(fi.category=#dataPort and (fi.direction.getName()='out' or fi.direction.getName()='inout'))
-  			{
-  				thisModule.addPutValueSubprogramCallAction(ifStatementActionSequence.actions, fi, subprogram);
-  			}
-  		}
-		thisModule.expandThreadDispatchProtocolInBA(c, subprogram, ifStatementActionSequence);
-	}
-	ifStatement;
-  }
+--  do
+--  {
+--  	thisModule.bab_content <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock,c).content;
+--  	if(thisModule.bab_content.oclIsKindOf(AADLBA!BehaviorActionCollection))
+--	  	ifStatementActionSequence.actions.addAll(thisModule.bab_content.actions);
+--  	else if (not thisModule.bab_content.oclIsUndefined())
+--  		ifStatementActionSequence.actions.add(thisModule.bab_content.debug(thisModule.bab_content.getClass().toString()));
+--  	ifStatementActionSequence.actions.add(updateState);
+--  	
+--  	for(fi in c.featureInstance)
+--  	{
+--  		if(fi.category=#dataPort or fi.category=#eventDataPort or fi.category=#eventPort)
+--  		{
+--  			if(ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause(ba, fi.feature))
+--			{
+--				for(trans in ba.transitions)
+--				{
+--					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshness'));
+--				}
+--			}
+--  			else if(fi.isUsedInFresh())
+--  			{
+--  				for(trans in ba.transitions)
+--				{
+--					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshnessOutput'));
+--					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'sendFreshnessOutput'));
+--				}
+--  			}
+--  		}
+--  	}
+--  	
+--	if(src_transition.destinationState.complete=true)
+--	{
+--		for(fi in c.featureInstance)
+--  		{
+--  			if(fi.category=#dataPort and (fi.direction.getName()='out' or fi.direction.getName()='inout'))
+--  			{
+--  				thisModule.addPutValueSubprogramCallAction(ifStatementActionSequence.actions, fi);
+--  			}
+--  		}
+--		thisModule.expandThreadDispatchProtocolInBA(c, ifStatementActionSequence);
+--	}
+--	ifStatement;
+--  }
 }
 
 

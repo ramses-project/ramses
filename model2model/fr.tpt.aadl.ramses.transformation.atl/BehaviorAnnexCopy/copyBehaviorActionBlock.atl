@@ -20,391 +20,158 @@
 --
 
 
+-- @atlcompiler emftvm
+
 module copyBehaviorActionBlock;
 create OUT : AADLBA 	from 	IN : AADLBA,
 								HOOKS: ATLHOOKS;
 
-lazy rule copyBehaviorActionBlock
+rule m_BehaviorActionBlock
 {
 	from
-		src_actionBlock: AADLBA!BehaviorActionBlock,
-		c:AADLI!ComponentInstance
+		src_actionBlock: AADLBA!BehaviorActionBlock
 	to
 		target_actionBlock: AADLBA!BehaviorActionBlock
 		(
-			content <- thisModule.copyBehaviorActions(src_actionBlock.content, c)
+			content <- src_actionBlock.content,
+			timeout <- src_actionBlock.timeout
 		)
-	do
-	{
-		if(not src_actionBlock.timeout.oclIsUndefined())
-			target_actionBlock.timeout <- thisModule.copyBehaviorTime(src_actionBlock.timeout);
-		target_actionBlock;
-	}
 }
 
-helper def: copyBehaviorActions(behaviorActions: AADLBA!BehaviorActions, c: AADLI!ComponentInstance)  : AADLBA!BehaviorCondition =
-	if(behaviorActions.oclIsUndefined()) then
-		OclUndefined
-	else
-		behaviorActions.debug(behaviorActions.getClass().toString()).copyBehaviorActions(c)
-	endif
-;
 
-
-helper context AADLBA!BehaviorActionSequence def: copyBehaviorActions(c: AADLI!ComponentInstance) : AADLBA!BehaviorActionSequence =
-	thisModule.copyBehaviorActionSequence(self,c)
-;
-
-helper context AADLBA!SubprogramCallAction def: copyBehaviorActions(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
-	thisModule.copySubprogramCallAction(self,c)
-;
-
-helper context AADLBA!IfStatement def: copyBehaviorActions(c: AADLI!ComponentInstance): AADLBA!IfStatement =
-	thisModule.copyIfStatement(self,c)
-;
-
-lazy rule copyBehaviorActionSequence
+rule m_BehaviorActionSequence
 {
 	from
-		src_behaviorActionSequence: AADLBA!BehaviorActionSequence,
-		c: AADLI!ComponentInstance
+		src_behaviorActionSequence: AADLBA!BehaviorActionSequence
 	to
 		target_behaviorActionSequence: AADLBA!BehaviorActionSequence
 		(
-			actions <- src_behaviorActionSequence.actions->collect(e| thisModule.copyBehaviorAction(e,c))
+			actions <- src_behaviorActionSequence.actions
 		)
-	do
-	{
-		target_behaviorActionSequence;
-	}
 }
 
-helper def: copyBehaviorAction(behaviorAction: AADLBA!BehaviorAction, c: AADLI!ComponentInstance)  : AADLBA!BehaviorAction =
-	if(behaviorAction.oclIsUndefined()) then
-		OclUndefined
-	else
-		behaviorAction.debug(behaviorAction.getClass().toString()).copyBehaviorAction(c)
-	endif
-;
-
-
-helper context AADLBA!IfStatement def: copyBehaviorAction(c: AADLI!ComponentInstance) : AADLBA!IfStatement =
-	thisModule.copyIfStatement(self,c)
-;
-
-helper context AADLBA!SubprogramCallAction def: copyBehaviorAction(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
-	thisModule.copySubprogramCallAction(self,c)
-;
-
-helper context AADLBA!AssignmentAction def: copyBehaviorAction(c: AADLI!ComponentInstance): AADLBA!AssignmentAction =
-	thisModule.copyAssignmentAction(self,c)
-;
-
-lazy rule copyIfStatement
+rule m_IfStatement
 {
 	from
-		src_ifStatement: AADLBA!IfStatement,
-		c: AADLI!ComponentInstance
+		src_ifStatement: AADLBA!IfStatement
+		(not src_ifStatement.oclIsTypeOf(AADLBA!ElseStatement))
 	to
 		target_ifStatement: AADLBA!IfStatement
 		(
-			logicalValueExpression <- thisModule.copyValueExpression(src_ifStatement.logicalValueExpression, c),
+			logicalValueExpression <- src_ifStatement.logicalValueExpression,
 			elif <- src_ifStatement.elif,
-			behaviorActions <- thisModule.copyBehaviorActions(src_ifStatement.behaviorActions, c)
+			behaviorActions <- src_ifStatement.behaviorActions,
+			elseStatement <- src_ifStatement.elseStatement
 		)
-	do
-	{
-		if(not src_ifStatement.elseStatement.oclIsUndefined())
-			target_ifStatement.elseStatement <- thisModule.copyElseStatement(src_ifStatement.elseStatement,c);
-		target_ifStatement;
-	}
 }
 
-lazy rule copyAssignmentAction
+rule m_AssignmentAction
 {
 	from
-		src_assignmentAction: AADLBA!AssignmentAction,
-		c: AADLI!ComponentInstance
+		src_assignmentAction: AADLBA!AssignmentAction
 	to
 		target_assignmentAction: AADLBA!AssignmentAction
 		(
-			target <- thisModule.copyParameterLabel(src_assignmentAction.target,c),
-			valueExpression <- thisModule.copyValueExpression(src_assignmentAction.valueExpression,c)
+			target <- src_assignmentAction.target,
+			valueExpression <- src_assignmentAction.valueExpression
 		)
 }
 
-lazy rule copyElseStatement
+rule m_ElseStatement
 {
 	from
-		src_elseStatement: AADLBA!ElseStatement,
-		c: AADLI!ComponentInstance
+		src_elseStatement: AADLBA!ElseStatement
+		(not src_elseStatement.oclIsTypeOf(AADLBA!IfStatement))
 	to
 		target_elseStatement: AADLBA!ElseStatement
 		(
-			behaviorActions <- thisModule.copyBehaviorActions(src_elseStatement.behaviorActions,c)
+			behaviorActions <- src_elseStatement.behaviorActions
 		)
 }
 
-lazy rule copyValueExpression
+rule m_ValueExpression
 {
 	from
-		src_valueExpression: AADLBA!ValueExpression,
-		c: AADLI!ComponentInstance
+		src_valueExpression: AADLBA!ValueExpression
 	to
 		target_valueExpression: AADLBA!ValueExpression
 		(
-			relations <- src_valueExpression.relations->collect(e|thisModule.copyRelation(e,c)),
+			relations <- src_valueExpression.relations,
 			logicalOperators <- src_valueExpression.logicalOperators
 		)
-	do
-	{
-		target_valueExpression;
-	}
 }
 
-lazy rule copyBehaviorEnumerationLiteral
+rule m_BehaviorEnumerationLiteral
 {
 	from
-		src_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral,
-		c: AADLI!ComponentInstance
+		src_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
 	to
 		target_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
 		(
 			component <- src_behaviorEnumerationLiteral.component,
-			enumLiteral <- thisModule.CreateStringLiteralPropertyExpression(src_behaviorEnumerationLiteral.enumLiteral.value,c)
+			enumLiteral <- src_behaviorEnumerationLiteral.enumLiteral
 		)
-	do
-	{
-		target_behaviorEnumerationLiteral;
-	}
 }
 
-lazy rule copyRelation
+rule m_Relation
 {
 	from
-		src_relation: AADLBA!Relation,
-		c: AADLI!ComponentInstance
+		src_relation: AADLBA!Relation
 	to
 		target_relation: AADLBA!Relation
 		(
-			firstExpression <- thisModule.copySimpleExpression(src_relation.firstExpression,c),
-			relationalOperator <- src_relation.relationalOperator
+			firstExpression <- src_relation.firstExpression,
+			relationalOperator <- src_relation.relationalOperator,
+			secondExpression <- src_relation.secondExpression
 		)
-	do
-	{
-		if(not src_relation.secondExpression.oclIsUndefined())
-			target_relation.secondExpression <- thisModule.copySimpleExpression(src_relation.secondExpression,c);
-		target_relation;
-	}
 }
 
-lazy rule copySimpleExpression {
+rule m_SimpleExpression {
 	from
-		src_simpleExpression : AADLBA!SimpleExpression,
-		c: AADLI!ComponentInstance
+		src_simpleExpression : AADLBA!SimpleExpression
 	to 
 		target_simpleExpression : AADLBA!SimpleExpression
 		(
 			unaryAddingOperator <- src_simpleExpression.unaryAddingOperator,
-			terms <- src_simpleExpression.terms->collect(e|thisModule.copyTerm(e,c)),
+			terms <- src_simpleExpression.terms,
 			binaryAddingOperators <- src_simpleExpression.binaryAddingOperators
 		)
-	do
-	{
-		target_simpleExpression;
-	}
 }
 
-lazy rule copyTerm {
+rule m_Term {
 	from
-		src_term: AADLBA!Term,
-		c: AADLI!ComponentInstance
+		src_term: AADLBA!Term
 	to
 		target_term: AADLBA!Term
 		(
-			factors <- src_term.factors->collect(e|thisModule.copyFactor(e,c)),
+			factors <- src_term.factors,
 			multiplyingOperators <- src_term.multiplyingOperators
 		)
-	do
-	{
-		target_term;
-	}
 }
 
-lazy rule copyFactor {
+rule m_Factor {
 	from
-		src_factor: AADLBA!Factor,
-		c: AADLI!ComponentInstance
+		src_factor: AADLBA!Factor
 	to
 		target_factor: AADLBA!Factor
 		(
-			firstValue <- thisModule.copyValue(src_factor.firstValue,c),
-			secondValue <- thisModule.copyValue(src_factor.secondValue,c),
+			firstValue <- src_factor.firstValue,
+			secondValue <- src_factor.secondValue,
 			binaryNumericOperator <- src_factor.binaryNumericOperator,
 			unaryNumericOperator <- src_factor.unaryNumericOperator,
 			unaryBooleanOperator <- src_factor.unaryBooleanOperator
 		)
-	do
-	{
-		target_factor;
-	}
 }
 
-helper def: copyValue(v: AADLBA!Value,c: AADLI!ComponentInstance): AADLBA!Value =
-	if(v.oclIsUndefined()) then
-		OclUndefined
-	else
-		v.debug('copyValue: '+v.getClass().toString()).copyValue(c)
-	endif
-;
-
--- Value: ValueExpression, ValueVariable, ValueConstant
--- ValueVariable: PortHolder, IntegerValueVariable, DataHolder, DataComponentReference
--- ValueConstant: Literal, IntegerValueConstant, BehaviorProperty
-
--- ValueExpression
-
-helper context AADLBA!ValueExpression def: copyValue(c: AADLI!ComponentInstance): AADLBA!ValueExpression =
-	thisModule.copyValueExpression(self,c)
-;
-
--- PortHolder: DataPortHolder, etc...
-
-helper context AADLBA!DataPortHolder def: copyValue(c: AADLI!ComponentInstance): AADLBA!DataPortHolder =
-	thisModule.copyDataPortHolder(self,c)
-;
-
-helper context AADLBA!DataAccessHolder def: copyValue(c: AADLI!ComponentInstance): AADLBA!DataAccessHolder =
-	thisModule.copyDataAccessHolder(self,c)
-;
-
-helper context AADLBA!BehaviorVariableHolder def: copyValue(c: AADLI!ComponentInstance): AADLBA!BehaviorVariableHolder =
-	thisModule.copyBehaviorVariableHolder(self,c)
-;
-
-helper context AADLBA!BehaviorEnumerationLiteral def: copyValue(c: AADLI!ComponentInstance): AADLBA!BehaviorEnumerationLiteral =
-	thisModule.copyBehaviorEnumerationLiteral(self,c)
-;
-
--- DataComponentReference
-
-helper context AADLBA!DataComponentReference def: copyValue(c: AADLI!ComponentInstance): AADLBA!DataComponentReference =
-	thisModule.copyDataComponentReference(self,c)
-;
-
-helper context AADLBA!PortFreshValue def: copyValue(c: AADLI!ComponentInstance): AADLBA!PortFreshValue =
-	thisModule.copyPortFreshValue(self,c)
-;
-
-lazy rule copySubprogramCallAction
+rule m_SubprogramCallAction
 {
 	from
-		src_subprogramCallAction: AADLBA!SubprogramCallAction,
-		c: AADLI!ComponentInstance
+		src_subprogramCallAction: AADLBA!SubprogramCallAction
 	to
 		target_subprogramCallAction: AADLBA!SubprogramCallAction
 		(
-			subprogram <- thisModule.copyCalledSubprogramHolder(src_subprogramCallAction.subprogram, c),
-			parameterLabels <- src_subprogramCallAction.parameterLabels->collect(e|thisModule.copyParameterLabel(e, c))
+			subprogram <- src_subprogramCallAction.subprogram,
+			parameterLabels <- src_subprogramCallAction.parameterLabels,
+			dataAccess <- src_subprogramCallAction.dataAccess
 		)
-	do
-	{
-		if(not src_subprogramCallAction.dataAccess.oclIsUndefined())
-		{
-			target_subprogramCallAction.dataAccess <- thisModule.copyDataAccessHolder(src_subprogramCallAction.dataAccess, c);
-		}
-		target_subprogramCallAction;
-	}
 }
-
-helper def: copyParameterLabel(parameterLabel: AADLBA!ParameterLabel, c: AADLI!ComponentInstance)  : AADLBA!ParameterLabel =
-	if(parameterLabel.oclIsUndefined()) then
-		OclUndefined
-	else
-		parameterLabel.copyParameterLabel(c)
-	endif
-;
-
--- ParameterLabel: Target, ValueExpression
--- Target: 	BehaviorVariableHolder,
---			DataAccessHolder, DataAccessPrototypeHolder, DataComponentReference,
---			DataPortHolder, DataSubcomponentHolder, EventDataPortHolder, EventPortHolder,
---			FeaturePrototypeHolder, ParameterHolder, PortPrototypeHolder, StructUnionElementHolder
-
--- BehaviorVariableHolder
-
-helper context AADLBA!BehaviorVariableHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!BehaviorVariableHolder =
-	thisModule.copyBehaviorVariableHolder(self,c)
-;
-
--- DataAccessHolder
-
-helper context AADLBA!DataAccessHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!DataAccessHolder =
-	thisModule.copyDataAccessHolder(self,c)
-;
-
--- DataAccessPrototypeHolder
-
-helper context AADLBA!DataAccessPrototypeHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!DataAccessPrototypeHolder =
-	thisModule.copyDataAccessPrototypeHolder(self,c)
-;
-
--- DataComponentReference
-
-helper context AADLBA!DataComponentReference def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!DataComponentReference =
-	thisModule.copyDataComponentReference(self,c)
-;
-
--- DataPortHolder
-
-helper context AADLBA!DataPortHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!DataPortHolder =
-	thisModule.copyDataPortHolder(self,c)
-;
-
--- DataSubcomponentHolder
-
-helper context AADLBA!DataSubcomponentHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!DataSubcomponentHolder =
-	thisModule.copyDataSubcomponentHolder(self,c)
-;
-
--- EventDataPortHolder
-
-helper context AADLBA!EventDataPortHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!EventDataPortHolder =
-	thisModule.copyEventDataPortHolder(self,c)
-;
-
--- EventPortHolder
-
-helper context AADLBA!EventPortHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!EventPortHolder =
-	thisModule.copyEventPortHolder(self,c)
-;
-
--- FeaturePrototypeHolder
-
-helper context AADLBA!FeaturePrototypeHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!FeaturePrototypeHolder =
-	thisModule.copyFeaturePrototypeHolder(self,c)
-;
-
--- ParameterHolder
-
-helper context AADLBA!ParameterHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!ParameterHolder =
-	thisModule.copyParameterHolder(self,c)
-;
-
--- PortPrototypeHolder
-
-helper context AADLBA!PortPrototypeHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!PortPrototypeHolder =
-	thisModule.copyPortPrototypeHolder(self,c)
-;
-
--- StructUnionElementHolder
-
-helper context AADLBA!StructUnionElementHolder def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!StructUnionElementHolder =
-	thisModule.copyStructUnionElementHolder(self,c)
-;
-
---ValueExpression
-
-helper context AADLBA!ValueExpression def: copyParameterLabel(c: AADLI!ComponentInstance)  : AADLBA!ValueExpression =
-	thisModule.copyValueExpression(self,c)
-;

@@ -20,16 +20,20 @@
 --
 
 -- @path AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
-
+-- @atlcompiler emftvm
 
 module copyBehaviorTime;
 create OUT : AADLBA 	from 	IN : AADLBA,
 								HOOKS: ATLHOOKS;
 
-lazy rule copyBehaviorTime
+rule m_BehaviorTime
 {
 	from
-		src_behaviorTime: AADLBA!BehaviorTime
+		src_BehaviorTime: AADLBA!BehaviorTime
 	to
-		target_behaviorTime: AADLBA!BehaviorTime
+		target_BehaviorTime: AADLBA!BehaviorTime
+		(
+			integerValue <- src_BehaviorTime.integerValue,
+			unit <- src_BehaviorTime.unit
+		)
 }

@@ -44,6 +44,7 @@ rule Comment {
 -------------------------------------------------------------------------------------
 
 helper def: allImportedUnits : Sequence(AADLBA!ModelUnit) = Sequence{};
+helper def: packageSuffix : String = '_refined';
 
 rule m_RootSystem_Instance {
 	from
@@ -57,7 +58,7 @@ rule m_RootSystem_Instance {
 			ownedClassifier <- AADLI!Classifier.allInstancesFrom('OUT')
 		),
 		pkg : AADLBA!AadlPackage (
-			name <- src_package.name+'_refined',
+			name <- src_package.name+thisModule.packageSuffix,
 			ownedPublicSection <- section
 		)
 	do

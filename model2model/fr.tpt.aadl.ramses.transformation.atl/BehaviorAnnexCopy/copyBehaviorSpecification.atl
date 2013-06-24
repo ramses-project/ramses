@@ -20,40 +20,30 @@
 --
 
 -- @path AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
-
+-- @atlcompiler emftvm
 
 module copyBehaviorSpecification;
 create OUT : AADLBA 	from 	IN : AADLBA,
 								HOOKS: ATLHOOKS;
 
-uses BehaviorAnnexServices;
 
-
-unique lazy rule copyBehaviorAnnex
+rule m_BehaviorAnnex
 {
 	from
-		c: AADLI!ComponentInstance,
 		src_ba: AADLBA!BehaviorAnnex
-		
 	to
 		target_ba: AADLBA!BehaviorAnnex
 		(
 			name        <- src_ba.name,
-			states      <- src_ba.states->collect(e| thisModule.copyBehaviorState(c, e)),
-			variables   <- src_ba.variables->collect(e| thisModule.copyBehaviorVariable(e))
+			states      <- src_ba.states,
+			variables   <- src_ba.variables,
+			transitions <- src_ba.transitions
 		)
-		
-	do
-	{
-		target_ba.transitions <- src_ba.transitions->collect(e| thisModule.copyBehaviorTransition(c, e, target_ba));
-		target_ba;
-	}
 }
 
-unique lazy rule copyBehaviorState
+rule m_BehaviorState
 {
 	from
-		c: AADLI!ComponentInstance,
 		src_state: AADLBA!BehaviorState
 	to
 		target_state: AADLBA!BehaviorState
@@ -63,34 +53,27 @@ unique lazy rule copyBehaviorState
 			final          <- src_state.final,
 			initial        <- src_state.initial
 		)
-	do
-	{
-		target_state;
-	}
 }
 
 
 
-lazy rule copyBehaviorTransition
+rule m_BehaviorTransition
 {
 	from
-		c: AADLI!ComponentInstance,
-		src_transition: AADLBA!BehaviorTransition,
-		target_ba: AADLBA!BehaviorAnnex
+		src_transition: AADLBA!BehaviorTransition
 		
 	to
 		target_transition: AADLBA!BehaviorTransition
 		(
-			actionBlock       <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock, c),
-			condition         <- thisModule.copyBehaviorCondition(src_transition.condition),
-			destinationState  <- target_ba.getState(src_transition.destinationState.name),
+			actionBlock       <- src_transition.actionBlock,
+			condition         <- src_transition.condition,
+			destinationState  <- src_transition.destinationState,
 			priority          <- src_transition.priority,
-			sourceState       <- target_ba.getState(src_transition.sourceState.name)
-			
+			sourceState       <- src_transition.sourceState
 		)
 }
 
-unique lazy rule copyBehaviorVariable
+rule m_BehaviorVariable
 {
 	from
 		src_variable: AADLBA!BehaviorVariable

@@ -37,26 +37,33 @@ create OUT : AADLBA 	from 		IN : AADLI,
 --------------------------------------------
 
 -- @extends m_Not_PeriodicDelayed_Port
-abstract rule m_SamplingCallSpecification
+abstract rule m_Sampling
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence
+		behavior: AADLI!Element
 		(
 			fi.isDataPort()
 			and
-			callSequence.isComputeEntryPointOf(fi.eContainer())
-			and
 			not fi.isIntraProcessFeatureInstance()
+			and
+			(
+				behavior.oclIsKindOf(AADLBA!SubprogramCallSequence)
+				or
+				behavior.oclIsKindOf(AADLBA!BehaviorAnnex)
+			)
 		)
 }
 
--- @extends m_SamplingCallSpecification,m_Input_DataPort_ComputeEntrypointCallSequence
-rule m_Input_Sampling_ComputeEntrypointCallSequence
+-- @extends m_Sampling
+abstract rule m_Input_Sampling
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence
+		behavior: AADLI!Element
+		(
+			fi.isInputFeature()
+		)
 	using
 	{
 		spg: AADLBA!SubprogramType = 'Read_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
@@ -65,7 +72,6 @@ rule m_Input_Sampling_ComputeEntrypointCallSequence
 		VALIDITY: AADLBA!DataSubcomponent = thisModule.CreateValidityDataSubcomponent(fi);
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -94,26 +100,64 @@ rule m_Input_Sampling_ComputeEntrypointCallSequence
 			element <- VALIDITY
 		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+}
+
+
+-- @extends m_Input_Sampling,m_Input_DataPort_ComputeEntrypointCallSequence
+rule m_Input_Sampling_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence
+		(
+			behavior.isComputeEntryPointOf(fi.eContainer())
+		)
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+	}
+	to
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
 		)
 }
 
--- @extends m_SamplingCallSpecification,m_Output_DataPort_ComputeEntrypointCallSequence
-rule m_Output_Sampling_ComputeEntrypointCallSequence
+-- @extends m_Input_Sampling,m_Input_Port_BehaviorAnnex
+rule m_Input_Sampling_BehaviorAnnex
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence,
+		behavior: AADLBA!BehaviorAnnex,
 		cnxRef: AADLI!PortConnection
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+	}
+	to
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+
+-- @extends m_Sampling
+abstract rule m_Output_Sampling
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!Element,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isOutputFeature()
+		)
 	using
 	{
 		spg: AADLBA!SubprogramType = 'Write_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
+		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -137,6 +181,43 @@ rule m_Output_Sampling_ComputeEntrypointCallSequence
 		(
 			element <- LENGTH
 		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+}
+
+-- @extends m_Output_Sampling,m_Output_DataPort_ComputeEntrypointCallSequence
+rule m_Output_Sampling_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		cnxRef: AADLI!PortConnection
+		(
+			behavior.isComputeEntryPointOf(fi.eContainer())
+		)
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+	}
+	to
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+
+
+-- @extends m_Output_Sampling,m_Output_Port_BehaviorAnnex
+rule m_Output_Sampling_BehaviorAnnex
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLBA!BehaviorAnnex,
+		cnxRef: AADLI!PortConnection
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+	}
+	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE

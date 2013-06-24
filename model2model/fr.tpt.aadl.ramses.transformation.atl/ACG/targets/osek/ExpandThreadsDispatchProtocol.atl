@@ -37,10 +37,10 @@ rule m_ComputeEntrypointCallSequence_Periodic
 {
 	from
 		c: AADLI!ComponentInstance,
-		callSequence: AADLI!SubprogramCallSequence
+		behavior: AADLI!SubprogramCallSequence
 		(c.isPeriodicThread()
 		and 
-		callSequence.isComputeEntryPointOf(c)
+		behavior.isComputeEntryPointOf(c)
 		)
 	using
 	{
