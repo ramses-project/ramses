@@ -42,8 +42,113 @@ abstract rule m_Port_BehaviorAnnex
 			fi.isThreadPort()
 			and
 			fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e=behavior)
+			and not fi.isPeriodicDelayedPort()
 		)
 }
+
+unique lazy rule createUpdateFreshnessToSend
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnx: AADLI!PortConnection
+	to		
+		-------- Emitter freshness update
+		sendFreshnessOutput: AADLBA!AssignmentAction
+		(
+			target <- sendFreshDataComponentReference,
+			valueExpression <- sendValueExpressionOutput
+		),
+		sendFreshDataComponentReference: AADLBA!DataComponentReference
+		(
+			data<-Sequence{dataSubcomponentSend,dataSubcomponentStructSend}
+		),
+		dataSubcomponentSend: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(fi, 'localVariable')
+		),
+		dataSubcomponentStructSend: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
+		),
+		sendValueExpressionOutput: AADLBA!ValueExpression
+		(
+			relations <- Sequence{sendRelationOutput}	
+		),
+		sendRelationOutput: AADLBA!Relation
+		(
+			firstExpression<-sendFirstExpressionOutput
+		),
+		sendFirstExpressionOutput: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{sendFreshTermOutput}
+		),
+		sendFreshTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{sendFreshFactorOutput}
+		),
+		sendFreshFactorOutput: AADLBA!Factor
+		(
+			firstValue <- dataAccessHolderSend
+		),
+		dataAccessHolderSend: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.createFreshnessIndicatorAccess(fi)
+		),
+		
+		
+		-- to be put before a the previous action
+		updateFreshnessOutput: AADLBA!AssignmentAction
+		(
+			target <- updatePreviousFreshAccessHolderOutput,
+			valueExpression <- updateValueExpressionOutput
+		),
+		updatePreviousFreshAccessHolderOutput:AADLBA!DataAccessHolder
+		(
+			element <- thisModule.createFreshnessIndicatorAccess(fi)
+		),
+		updateValueExpressionOutput: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateRelationOutput}	
+		),
+		updateRelationOutput: AADLBA!Relation
+		(
+			firstExpression<-updateFirstExpressionOutput
+		),
+		updateFirstExpressionOutput: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateFreshTermOutput, updateConstantTermOutput},
+			binaryAddingOperators <- Sequence{#Plus}
+		),
+		updateFreshTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{updateFreshFactorOutput}
+		),
+		updateFreshFactorOutput: AADLBA!Factor
+		(
+			firstValue <- dataAccessHolderOutput
+		),
+		dataAccessHolderOutput: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.createFreshnessIndicatorAccess(fi)
+		),
+		updateConstantTermOutput: AADLBA!Term
+		(
+			factors <- Sequence{updateConstantFactorOutput}
+		),
+		updateConstantFactorOutput: AADLBA!Factor
+		(
+			firstValue <- valueConstantOutput
+		),
+		valueConstantOutput: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 1.longValue()
+		)
+	do
+	{
+		Sequence{updateFreshnessOutput,sendFreshnessOutput};
+	}
+}
+
 
 -- @extends m_Port_BehaviorAnnex
 rule m_Input_Port_BehaviorAnnex
@@ -119,9 +224,7 @@ rule m_Compute_EntryPoint_from_BA {
 	( 	
 		c.category = #thread 
 		and
-		behavior.name.toLower() = 'behavior_specification'
-	  	and
-	  	behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
+		behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
 	  	and
 	  	c.subcomponent.classifier.ownedAnnexSubclause->exists(e| e=behavior)
 	  	and
@@ -140,6 +243,10 @@ rule m_Compute_EntryPoint_from_BA {
 	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(behavior).toString()),
 	entryPointImplImg: AADLBA!SubprogramImplementation
 	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(behavior).toString()+'.impl'),
+	behaviorAnnex: AADLBA!BehaviorAnnex
+	(
+		variables <- behavior.variables
+	),
 	callEntryPoint: AADLBA!SubprogramCall,
 	callSequenceImg: AADLBA!SubprogramCallSequence,
 	stateType: AADLBA!DataType
@@ -167,11 +274,13 @@ rule m_Compute_EntryPoint_from_BA {
 												)
 									}
 	),
+	-- To be added in entryPointImg
 	currentState: AADLBA!DataSubcomponent
 	(
 		name <- 'Parent_BA_currentState',
 		dataSubcomponentType <- stateType
 	),
+	-- to be added in implImg
 	currentStateAccess: AADLBA!DataAccess
 	(
 		name <- 'Parent_BA_currentState_Access',
@@ -206,9 +315,103 @@ rule m_Compute_EntryPoint_from_BA {
  do
  {
  	thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
+ 	for(fi in c.featureInstance->select(fi | fi.feature.oclIsKindOf(AADLBA!Port) and fi.isUsedInFresh()))
+ 	{
+ 		thisModule.resolveTemp(fi, 'createFreshnessIndicator', 'freshnessIndicator_CnxDestination').setContext(callEntryPoint);
+ 	}
  }
 }
 
+helper context OclAny def: resolve(c: AADLI!ComponentInstance): OclAny =
+	if(self.oclIsUndefined()) then
+		OclUndefined
+	else
+		self.debug(' WARNING, untreatead type')
+	endif
+;
+
+helper context AADLBA!BehaviorActionSequence def: resolve(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorActions) =
+	self.actions->collect(e| e.resolve(c))
+;
+
+helper context AADLBA!SubprogramCallAction def: resolve(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_communicationAction')
+;
+
+helper context AADLBA!IfStatement def: resolve(c: AADLI!ComponentInstance): AADLBA!IfStatement =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_ifStatement')
+;
+
+helper context AADLBA!ElementHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_Holder')
+;
+
+lazy rule getValueComponentReference
+{
+	from
+		fi:AADLI!FeatureInstance
+	using
+	{
+		inderectlyUsed: AADLBA!DataImplementation = thisModule.createFreshnessDataStructure(fi);
+		portImgSubcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi, 'localVariable');
+	}
+	to
+		valueDCR: AADLBA!DataComponentReference
+		(
+			data <- Sequence{portImgSubcomponentHolder, portImgFreshPrevSubcomponentHolder}
+		),
+		portImgSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- portImgSubcomponent
+		),
+		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(
+							fi, 'createFreshnessDataStructure', 'struct_functional_data_subcomponent'
+						)
+		)
+	do
+	{
+		valueDCR;
+	}
+}
+
+helper context AADLBA!PortHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
+	let fi:AADLI!FeatureInstance = c.featureInstance->any(e| e.feature = self.element) in
+	if(fi.isUsedInFresh()) then 
+		thisModule.getValueComponentReference(fi)
+	else
+		thisModule.resolveTemp(Sequence{self,c}, 'target_Holder')
+	endif
+;
+
+helper context AADLBA!BehaviorEnumerationLiteral def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorEnumerationLiteral =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_behaviorEnumerationLiteral')
+;
+
+helper context AADLBA!PortFreshValue def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
+	thisModule.resolveTemp(Sequence{self,c}, 'isFresh')
+;
+
+helper context AADLBA!Factor def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_factor')
+;
+
+helper context AADLBA!Term def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_term')
+;
+
+helper context AADLBA!ValueExpression def: resolve(c: AADLI!ComponentInstance): AADLBA!ValueExpression =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_valueExpression')
+;
+
+helper context AADLBA!Relation def: resolve(c: AADLI!ComponentInstance): AADLBA!Relation =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_relation')
+;
+
+helper context AADLBA!SimpleExpression def: resolve(c: AADLI!ComponentInstance): AADLBA!SimpleExpression =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_simpleExpression')
+;
 
 rule m_BehaviorActionsFromThread
 {
@@ -239,21 +442,50 @@ rule m_BehaviorActionsFromThread
 	(
 		actions <- 	if(src_transition.sourceState.complete=true)
 					then
-					c.featureInstance->select(f | (f.isInputFeature() or f.isInputOutputFeature()) and f.oclIsTypeOf(AADLI!DataPort))
-					->collect(port | thisModule.resolveTemp(Sequence{port, src_transition.eContainer()}, 'call'))
+					c.featureInstance->select(f | (f.isInputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort))
+					->collect
+					(port | 
+						thisModule.resolveTemp(Sequence{port, src_transition.eContainer()}, 'call')
+					)
+					->union(
+						c.featureInstance->select(f| (f.isInputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort) and f.isUsedInFresh())
+						->collect( e | 
+							thisModule.createFreshnessIndicatorUpdateAction(e)
+						)
+					)
 					else
 					Sequence{}
 					endif
+					
 					->union
 					(
-						if(src_transition.actionBlock.content.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
-							src_transition.actionBlock.content.actions.resolve().debug(' NNNNN ')
+						Sequence{src_transition.actionBlock.content.resolve(c)}
+					)
+					->flatten()
+					->union(
+						c.featureInstance->select(f| (f.isOutputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort) and f.isUsedInFresh())
+						->collect( e | 
+							e.srcConnectionInstance->collect(
+								cnx| thisModule.createUpdateFreshnessToSend(e, cnx.connectionReference->first().connection))
+						)
+					)
+					->union
+					(
+						if(src_transition.destinationState.complete=true)
+						then
+						c.featureInstance->select(f | (f.isOutputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort))
+						->collect(port | 
+							port.srcConnectionInstance->collect
+							(
+								cnxInst | thisModule.resolveTemp(Sequence{port, src_transition.eContainer(), cnxInst.connectionReference->first().connection}, 'call'))
+							)
 						else
-							Sequence{src_transition.actionBlock}
+						Sequence{}
 						endif
 					)
 					->append
 					(updateState)
+					->flatten()
 	),
 	isStateSource: AADLBA!ValueExpression
 	(
@@ -340,224 +572,418 @@ rule m_BehaviorActionsFromThread
 	(
 		value <- src_transition.sourceState.name
 	)
---  do
---  {
---  	thisModule.bab_content <- thisModule.copyBehaviorActionBlock(src_transition.actionBlock,c).content;
---  	if(thisModule.bab_content.oclIsKindOf(AADLBA!BehaviorActionCollection))
---	  	ifStatementActionSequence.actions.addAll(thisModule.bab_content.actions);
---  	else if (not thisModule.bab_content.oclIsUndefined())
---  		ifStatementActionSequence.actions.add(thisModule.bab_content.debug(thisModule.bab_content.getClass().toString()));
---  	ifStatementActionSequence.actions.add(updateState);
---  	
---  	for(fi in c.featureInstance)
---  	{
---  		if(fi.category=#dataPort or fi.category=#eventDataPort or fi.category=#eventPort)
---  		{
---  			if(ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause(ba, fi.feature))
---			{
---				for(trans in ba.transitions)
---				{
---					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshness'));
---				}
---			}
---  			else if(fi.isUsedInFresh())
---  			{
---  				for(trans in ba.transitions)
---				{
---					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'updateFreshnessOutput'));
---					ifStatementActionSequence.actions.add(thisModule.resolveTemp(fi, 'sendFreshnessOutput'));
---				}
---  			}
---  		}
---  	}
---  	
---	if(src_transition.destinationState.complete=true)
---	{
---		for(fi in c.featureInstance)
---  		{
---  			if(fi.category=#dataPort and (fi.direction.getName()='out' or fi.direction.getName()='inout'))
---  			{
---  				thisModule.addPutValueSubprogramCallAction(ifStatementActionSequence.actions, fi);
---  			}
---  		}
---		thisModule.expandThreadDispatchProtocolInBA(c, ifStatementActionSequence);
---	}
---	ifStatement;
---  }
+}
+
+unique lazy rule createFreshnessIndicatorUpdateAction
+{
+	from
+		fi: AADLI!FeatureInstance
+	to
+		updateFreshness: AADLBA!AssignmentAction
+		(
+			target <- updatePreviousFreshAccessHolder,
+			valueExpression <- updateValueExpression
+		),
+		updatePreviousFreshAccessHolder:AADLBA!DataAccessHolder
+		(
+			element <- thisModule.createFreshnessIndicatorAccess(fi)
+		),
+		updateValueExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateRelation}	
+		),
+		updateRelation: AADLBA!Relation
+		(
+			firstExpression<-updateFirstExpression
+		),
+		updateFirstExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateFreshTerm}
+		),
+		updateFreshTerm: AADLBA!Term
+		(
+			factors <- Sequence{updateFreshFactor}
+		),
+		updateFreshFactor: AADLBA!Factor
+		(
+			firstValue <- updateFreshCDR
+		),
+		updateFreshCDR: AADLBA!DataComponentReference
+		(
+			data <- Sequence{dataSubcomponentHolder,dataFreshnessSubcomponentHolder}
+		),
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(fi, 'localVariable')
+		),
+		dataFreshnessSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
+		)
+	do
+	{
+		updateFreshness;
+	}
 }
 
 
--- To be checked
---
---rule m_EventPortHolder
---{
---	from
---		src_EventPortHolder: AADLBA!EventPortHolder,
---		c: AADLI!ComponentInstance
---	to
---		target_EventPortHolder: AADLBA!DataSubcomponentHolder
---		(
---			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventPortHolder.element.name), 'dataSubcomponent')	
---		)
---	do
---	{
---		target_EventPortHolder;
---	}
---}
---
---rule m_EventDataPortHolder
---{
---	from
---		src_EventDataPortHolder:AADLBA!EventDataPortHolder,
---		c: AADLI!ComponentInstance
---	to
---		target_EventDataPortHolder: AADLBA!DataSubcomponentHolder
---		(
---			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_EventDataPortHolder.element.name), 'dataSubcomponent')	
---		)
---	do
---	{
---		target_EventDataPortHolder;
---	}
---}
---
---helper def: copyDataPortHolder(src_DataPortHolder:AADLBA!DataPortHolder, c: AADLI!ComponentInstance) : AADLBA!ValueVariable =
---	let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_DataPortHolder.element.name) in 
---	if (f.isUsedInFresh()) then
---		thisModule.copyDataPortHolder_withFresh(src_DataPortHolder, c)
---	else
---		thisModule.copyDataPortHolder_withoutFresh(src_DataPortHolder, c)
---	endif
---;
---
---rule m_DataPortHolder_withFresh
---{
---	from
---		src_DataPortHolder:AADLBA!DataPortHolder,
---		c: AADLI!ComponentInstance
---	to
---		target_DataPortHolder: AADLBA!DataComponentReference
---		(
---			data <- Sequence{dataSubcomponentHolder,functionalPartHolder}
---			
---				
---		),
---		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
---		(
---			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'dataSubcomponent')
---		),
---		functionalPartHolder: AADLBA!DataSubcomponentHolder
---		(
---			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'struct_functional_data_subcomponent')
---		)
---	do
---	{
---		target_DataPortHolder;
---	}
---}
---
---rule m_DataPortHolder_withoutFresh
---{
---	from
---		src_DataPortHolder:AADLBA!DataPortHolder,
---		c: AADLI!ComponentInstance
---	to
---		target_DataPortHolder: AADLBA!DataSubcomponentHolder
---		(
---			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataPortHolder.element.name), 'dataSubcomponent')	
---		)
---	do
---	{
---		target_DataPortHolder;
---	}
---}
---
---rule m_DataAccessHolder
---{
---	from
---		src_DataAccessHolder:AADLBA!DataAccessHolder,
---		c: AADLI!ComponentInstance
---	to
---		target_DataAccessHolder: AADLBA!DataAccessHolder
---		(
---			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_DataAccessHolder.element.name), 'f_entrypoint')	
---		)
---	do
---	{
---		target_DataAccessHolder;
---	}
---}
---
---rule m_PortFreshValue
---{
---	from
---		src_PortFreshValue: AADLBA!PortFreshValue,
---		c: AADLI!ComponentInstance
---	using
---	{
---		portImgSubcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(
---							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'dataSubcomponent'
---						);
---		portImgFresh_prev: AADLBA!DataAccess = thisModule.resolveTemp(
---							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'fresh_previous_access'
---						);
---		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(
---							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'struct_freshness_data_subcomponent'
---						);
---	}
---	to
---		isFresh: AADLBA!ValueExpression
---		(
---			relations <- Sequence{comparisonRelation}
---		),
---		comparisonRelation: AADLBA!Relation
---		(
---			relationalOperator<-#NotEqual,
---			firstExpression<-comparisonFirstExpression,
---			secondExpression<-comparisonSecondExpression
---		),
---		comparisonFirstExpression: AADLBA!SimpleExpression
---		(
---			terms <- Sequence{currentFreshnessTerm}
---		),
---		comparisonSecondExpression: AADLBA!SimpleExpression
---		(
---			terms <- Sequence{previousFreshnessTerm}
---		),
---		currentFreshnessTerm: AADLBA!Term
---		(
---			factors <- Sequence{currentFreshnessFactor}
---		),
---		previousFreshnessTerm: AADLBA!Term
---		(
---			factors <- Sequence{previousFreshnessFactor}
---		),
---		currentFreshnessFactor: AADLBA!Factor
---		(
---			firstValue <- Sequence{portImgFreshPrevComponentReference}
---		),
---		portImgSubcomponentHolder: AADLBA!DataSubcomponentHolder
---		(
---			element <- portImgSubcomponent
---		),
---		previousFreshnessFactor: AADLBA!Factor
---		(
---			firstValue <- Sequence{portImgFreshPrevAccessHolder}
---		),
---		portImgFreshPrevComponentReference: AADLBA!DataComponentReference
---		(
---			data <- Sequence{portImgSubcomponentHolder, portImgFreshPrevSubcomponentHolder}
---		),
---		portImgFreshPrevAccessHolder: AADLBA!DataAccessHolder
---		(
---			element <- portImgFresh_prev
---		),
---		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
---		(
---			element <- struct_freshness_data_subcomponent
---		)
---	do
---	{
---		isFresh;
---	}
---}
+rule m_IfStatement
+{
+	from
+		src_ifStatement: AADLBA!IfStatement,
+		c: AADLI!ComponentInstance
+		(
+			not src_ifStatement.oclIsTypeOf(AADLBA!ElseStatement)
+			and
+			src_ifStatement.isThreadBehaviorElement()
+			and
+			src_ifStatement.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_ifStatement: AADLBA!IfStatement
+		(
+			logicalValueExpression <- src_ifStatement.logicalValueExpression.resolve(c),
+			elif <- src_ifStatement.elif.resolve(c),
+			behaviorActions <- src_ifStatement.behaviorActions.resolve(c),
+			elseStatement <- src_ifStatement.elseStatement.resolve(c)
+		)
+}
+
+rule m_BehaviorActionBlock
+{
+	from
+		src_actionBlock: AADLBA!BehaviorActionBlock
+}
+
+rule m_BehaviorActionSequence
+{
+	from
+		src_behaviorActionSequence: AADLBA!BehaviorActionSequence,
+		c: AADLI!ComponentInstance
+		(
+			src_behaviorActionSequence.isThreadBehaviorElement()
+			and
+			src_behaviorActionSequence.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_behaviorActionSequence: AADLBA!BehaviorActionSequence
+		(
+			actions <- src_behaviorActionSequence.actions->collect(e| e.resolve(c))
+		)
+}
+
+rule m_EventPortHolder
+{
+	from
+		src_Holder: AADLBA!EventPortHolder,
+		c: AADLI!ComponentInstance
+		(
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+		)
+	to
+		target_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+		)
+}
+
+rule m_EventDataPortHolder
+{
+	from
+		src_Holder:AADLBA!EventDataPortHolder,
+		c: AADLI!ComponentInstance
+		(
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+		)
+	to
+		target_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+		)
+}
+
+rule m_BehaviorVariableHolder
+{
+	from
+		src_Holder: AADLBA!BehaviorVariableHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_Holder: AADLBA!BehaviorVariableHolder
+		(
+			element <- src_Holder.element
+		)
+}
+
+rule m_SubprogramHolder
+{
+	from
+		src_Holder: AADLBA!SubprogramHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_Holder: AADLBA!SubprogramHolder
+		(
+			element <- src_Holder.element
+		)
+}
+
+rule m_DataPortHolder_withFresh
+{
+	from
+		src_Holder:AADLBA!DataPortHolder,
+		c: AADLI!ComponentInstance
+		(
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.feature.name=src_Holder.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+			and
+			f.isUsedInFresh()
+		)
+	to
+		target_Holder: AADLBA!DataComponentReference
+		(
+			data <- Sequence{dataSubcomponentHolder,functionalPartHolder}
+		),
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')
+		),
+		functionalPartHolder: AADLBA!DataSubcomponentHolder
+	do
+	{
+		functionalPartHolder.element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_Holder.element.name), 'createFreshnessDataStructure','struct_functional_data_subcomponent');
+	}
+}
+
+-- @extends m_ElementHolder
+rule m_DataPortHolder
+{
+	from
+		src_Holder:AADLBA!DataPortHolder,
+		c: AADLI!ComponentInstance
+		(
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+			and
+			not f.isUsedInFresh()
+		)
+	to
+		target_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+		)
+}
+
+rule m_BehaviorEnumerationLiteral
+{
+	from
+		src_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral,
+		c: AADLI!ComponentInstance
+		(
+			src_behaviorEnumerationLiteral.isThreadBehaviorElement()
+			and
+			src_behaviorEnumerationLiteral.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
+		(
+			component <- src_behaviorEnumerationLiteral.component,
+			enumLiteral <- src_behaviorEnumerationLiteral.enumLiteral
+		)
+}
+
+-- @extends m_CommunicationAction
+rule m_SubprogramCallAction
+{
+	from
+		src_communicationAction: AADLBA!SubprogramCallAction,
+		c: AADLI!ComponentInstance
+		(
+			src_communicationAction.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_communicationAction: AADLBA!SubprogramCallAction
+		(
+			subprogram <- src_communicationAction.subprogram.resolve(c),
+			parameterLabels <- src_communicationAction.parameterLabels
+								->collect(param | param.resolve(c)),
+			dataAccess <- src_communicationAction.dataAccess.resolve(c)
+		)
+}
+
+
+rule m_Term {
+	from
+		src_term: AADLBA!Term,
+		c: AADLI!ComponentInstance
+		(	
+			src_term.isThreadBehaviorElement()
+			and
+			src_term.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_term: AADLBA!Term
+		(
+			factors <- src_term.factors->collect(factor| factor.resolve(c)),
+			multiplyingOperators <- src_term.multiplyingOperators
+		)
+}
+
+
+rule m_Factor {
+	from
+		src_factor: AADLBA!Factor,
+		c: AADLI!ComponentInstance
+		(
+			src_factor.isThreadBehaviorElement()
+			and
+			src_factor.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_factor: AADLBA!Factor
+		(
+			firstValue <- src_factor.firstValue.resolve(c),
+			secondValue <- src_factor.secondValue.resolve(c),
+			binaryNumericOperator <- src_factor.binaryNumericOperator,
+			unaryNumericOperator <- src_factor.unaryNumericOperator,
+			unaryBooleanOperator <- src_factor.unaryBooleanOperator
+		)
+}
+
+rule m_ValueExpression
+{
+	from
+		src_valueExpression: AADLBA!ValueExpression,
+		c: AADLI!ComponentInstance
+		(
+			src_valueExpression.isThreadBehaviorElement()
+			and
+			src_valueExpression.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_valueExpression: AADLBA!ValueExpression
+		(
+			relations <- src_valueExpression.relations->collect(e|e.resolve(c)),
+			logicalOperators <- src_valueExpression.logicalOperators
+		)
+}
+
+rule m_Relation
+{
+	from
+		src_relation: AADLBA!Relation,
+		c: AADLI!ComponentInstance
+		(
+			src_relation.isThreadBehaviorElement()
+			and
+			src_relation.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_relation: AADLBA!Relation
+		(
+			firstExpression <- src_relation.firstExpression.resolve(c),
+			relationalOperator <- src_relation.relationalOperator,
+			secondExpression <- src_relation.secondExpression.resolve(c)
+		)
+}
+
+rule m_SimpleExpression {
+	from
+		src_simpleExpression : AADLBA!SimpleExpression,
+		c: AADLI!ComponentInstance
+		(
+			src_simpleExpression.isThreadBehaviorElement()
+			and
+			src_simpleExpression.isPartOfBehaviorAnnexOf(c)
+		)
+	to 
+		target_simpleExpression : AADLBA!SimpleExpression
+		(
+			unaryAddingOperator <- src_simpleExpression.unaryAddingOperator,
+			terms <- src_simpleExpression.terms->collect(e|e.resolve(c)),
+			binaryAddingOperators <- src_simpleExpression.binaryAddingOperators
+		)
+}
+
+rule m_DataAccessHolder
+{
+	from
+		src_Holder:AADLBA!DataAccessHolder,
+		c: AADLI!ComponentInstance
+		(src_Holder.isPartOfBehaviorAnnexOf(c))
+	to
+		target_Holder: AADLBA!DataAccessHolder
+		(
+			element<-c.featureInstance->any(e|e.name=src_Holder.element.name)	
+		)
+}
+
+rule m_PortFreshValue
+{
+	from
+		src_PortFreshValue: AADLBA!PortFreshValue,
+		c: AADLI!ComponentInstance
+		(c.featureInstance->exists(e| e.feature = src_PortFreshValue.element))
+	using
+	{
+		portImgSubcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(
+							c.featureInstance->any(e|e.name = src_PortFreshValue.element.name), 'localVariable'
+						);
+	}
+	to
+		isFresh: AADLBA!ValueExpression
+		(
+			relations <- Sequence{comparisonRelation}
+		),
+		comparisonRelation: AADLBA!Relation
+		(
+			relationalOperator<-#NotEqual,
+			firstExpression<-comparisonFirstExpression,
+			secondExpression<-comparisonSecondExpression
+		),
+		comparisonFirstExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{currentFreshnessTerm}
+		),
+		comparisonSecondExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{previousFreshnessTerm}
+		),
+		currentFreshnessTerm: AADLBA!Term
+		(
+			factors <- Sequence{currentFreshnessFactor}
+		),
+		previousFreshnessTerm: AADLBA!Term
+		(
+			factors <- Sequence{previousFreshnessFactor}
+		),
+		currentFreshnessFactor: AADLBA!Factor
+		(
+			firstValue <- portImgFreshPrevComponentReference
+		),
+		portImgSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- portImgSubcomponent
+		),
+		previousFreshnessFactor: AADLBA!Factor
+		(
+			firstValue <- portImgFreshPrevAccessHolder
+		),
+		portImgFreshPrevComponentReference: AADLBA!DataComponentReference
+		(
+			data <- Sequence{portImgSubcomponentHolder, portImgFreshPrevSubcomponentHolder}
+		),
+		portImgFreshPrevAccessHolder: AADLBA!DataAccessHolder
+		(
+			element <- thisModule.createFreshnessIndicatorAccess(
+							c.featureInstance->any(e|e.feature = src_PortFreshValue.element)
+						)
+		),
+		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
+	do
+	{
+		portImgFreshPrevSubcomponentHolder.element <- thisModule.resolveTemp(
+							c.featureInstance->any(e|e.feature = src_PortFreshValue.element), 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent'
+						);
+	}
+}

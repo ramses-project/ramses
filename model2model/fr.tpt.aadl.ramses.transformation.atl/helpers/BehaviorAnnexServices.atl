@@ -31,6 +31,29 @@ helper context AADLBA!BehaviorElement def : getBehaviorAnnex() : AADLBA!Behavior
 	endif
 ;
 
+helper context AADLBA!BehaviorElement def: getContainingClassfier(): AADLBA!Classifier =
+	if(self.eContainer().oclIsKindOf(AADLBA!Classifier)) then
+		self.eContainer()
+	else
+		self.eContainer().getContainingClassfier()
+	endif
+;
+
+helper context AADLBA!BehaviorElement def: isThreadBehaviorElement(): Boolean =
+	self.getContainingClassfier().oclIsKindOf(AADLBA!ThreadClassifier)
+;
+
+helper context AADLBA!BehaviorElement def: isPartOfBehaviorAnnexOf(c: AADLI!ComponentInstance): Boolean =
+	if(c.oclIsKindOf(AADLI!SystemInstance)) then
+		c.systemImplementation.ownedAnnexSubclause
+		->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
+		->exists(ba | ba = self.getBehaviorAnnex())
+	else
+		c.subcomponent.subcomponentType.ownedAnnexSubclause
+		->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
+		->exists(ba | ba = self.getBehaviorAnnex())
+	endif
+;
 
 helper context AADLI!FeatureInstance def: isDirectlyUsedInFresh() : Boolean =
 	let ba: AADLBA!BehaviorAnnex = self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification') in 

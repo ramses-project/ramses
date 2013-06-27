@@ -56,23 +56,9 @@ abstract rule m_ThreadEntrypoint {
 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
 	}
 	to
-		entryPointImg: AADLBA!SubprogramType
-		(
-			name <- c.uniqueName()+'_entrypoint',
-			ownedDataAccess <- c.featureInstance->select(e| e.isInputFeature())
-									->collect(e| thisModule.resolveTemp(e, 'f_entrypoint'))
-									->union
-									(
-										c.featureInstance->select(e| e.isOutputFeature())
-										->collect
-										(
-											e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveTemp(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
-										)
-									)->flatten()->asSet()
-		),
+		entryPointImg: AADLBA!SubprogramType,
 		entryPointImplImg: AADLBA!SubprogramImplementation
 		(
-			name <- c.uniqueName()+'_entrypoint'.concat('.impl'),
 			ownedRealization<-thisModule.Realization(entryPointImg),
 			ownedAnnexSubclause <- Sequence{behaviorAnnex}
 		),
@@ -139,8 +125,12 @@ abstract rule m_ThreadBehavior
 		entryPointImg: AADLBA!SubprogramType
 		(
 			name <- c.uniqueName().concat(behavior.name),
-			ownedDataAccess <- c.featureInstance->select(e| e.isInputFeature())
-									->collect(e| thisModule.resolveTemp(e, 'f_entrypoint'))
+			ownedDataAccess <- c.featureInstance->select(e| e.feature.oclIsKindOf(AADLI!DataAccess))
+									->union
+									(
+										c.featureInstance->select(e| e.isInputFeature())
+										->collect(e| thisModule.resolveTemp(e, 'f_entrypoint'))
+									)
 									->union
 									(
 										c.featureInstance->select(e| e.isOutputFeature())
@@ -148,13 +138,30 @@ abstract rule m_ThreadBehavior
 										(
 											e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveTemp(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
 										)
-									)->union
+									)
+									->union
 									(
 										impl.ownedAccessConnection->select(accessCnx | accessCnx.isPartOfCallSequence(behavior))
 										->collect
 										(
 											accessCnx| thisModule.resolveTemp(Sequence{c,behavior,accessCnx}, 'dataAccess')
-										)	
+										)
+									)
+									->union
+									(
+										impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
+										->collect
+										(
+											ba | thisModule.resolveTemp(Sequence{c,ba},'currentStateAccess')
+										)
+									)
+									->union
+									(
+										c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
+										->collect
+										(
+											fi| thisModule.createFreshnessIndicatorAccess(fi)
+										)
 									)
 									->flatten()->asSet(),
 			ownedParameter <- impl.ownedParameterConnection

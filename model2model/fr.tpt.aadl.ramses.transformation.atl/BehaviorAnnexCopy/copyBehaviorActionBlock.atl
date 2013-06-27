@@ -30,6 +30,7 @@ rule m_BehaviorActionBlock
 {
 	from
 		src_actionBlock: AADLBA!BehaviorActionBlock
+		(src_actionBlock.isThreadBehaviorElement())
 	to
 		target_actionBlock: AADLBA!BehaviorActionBlock
 		(
@@ -43,6 +44,7 @@ rule m_BehaviorActionSequence
 {
 	from
 		src_behaviorActionSequence: AADLBA!BehaviorActionSequence
+		(src_behaviorActionSequence.isThreadBehaviorElement())
 	to
 		target_behaviorActionSequence: AADLBA!BehaviorActionSequence
 		(
@@ -54,7 +56,11 @@ rule m_IfStatement
 {
 	from
 		src_ifStatement: AADLBA!IfStatement
-		(not src_ifStatement.oclIsTypeOf(AADLBA!ElseStatement))
+		(
+			not src_ifStatement.oclIsTypeOf(AADLBA!ElseStatement)
+			and
+			src_ifStatement.isThreadBehaviorElement()
+		)
 	to
 		target_ifStatement: AADLBA!IfStatement
 		(
@@ -69,6 +75,7 @@ rule m_AssignmentAction
 {
 	from
 		src_assignmentAction: AADLBA!AssignmentAction
+		(src_assignmentAction.isThreadBehaviorElement())
 	to
 		target_assignmentAction: AADLBA!AssignmentAction
 		(
@@ -81,7 +88,11 @@ rule m_ElseStatement
 {
 	from
 		src_elseStatement: AADLBA!ElseStatement
-		(not src_elseStatement.oclIsTypeOf(AADLBA!IfStatement))
+		(
+			not src_elseStatement.oclIsTypeOf(AADLBA!IfStatement)
+			and
+			src_elseStatement.isThreadBehaviorElement()
+		)
 	to
 		target_elseStatement: AADLBA!ElseStatement
 		(
@@ -89,22 +100,11 @@ rule m_ElseStatement
 		)
 }
 
-rule m_ValueExpression
-{
-	from
-		src_valueExpression: AADLBA!ValueExpression
-	to
-		target_valueExpression: AADLBA!ValueExpression
-		(
-			relations <- src_valueExpression.relations,
-			logicalOperators <- src_valueExpression.logicalOperators
-		)
-}
-
 rule m_BehaviorEnumerationLiteral
 {
 	from
 		src_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
+		(src_behaviorEnumerationLiteral.isThreadBehaviorElement())
 	to
 		target_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
 		(
@@ -113,10 +113,24 @@ rule m_BehaviorEnumerationLiteral
 		)
 }
 
+rule m_ValueExpression
+{
+	from
+		src_valueExpression: AADLBA!ValueExpression
+		(src_valueExpression.isThreadBehaviorElement())
+	to
+		target_valueExpression: AADLBA!ValueExpression
+		(
+			relations <- src_valueExpression.relations,
+			logicalOperators <- src_valueExpression.logicalOperators
+		)
+}
+
 rule m_Relation
 {
 	from
 		src_relation: AADLBA!Relation
+		(src_relation.isThreadBehaviorElement())
 	to
 		target_relation: AADLBA!Relation
 		(
@@ -129,6 +143,7 @@ rule m_Relation
 rule m_SimpleExpression {
 	from
 		src_simpleExpression : AADLBA!SimpleExpression
+		(src_simpleExpression.isThreadBehaviorElement())
 	to 
 		target_simpleExpression : AADLBA!SimpleExpression
 		(
@@ -141,6 +156,7 @@ rule m_SimpleExpression {
 rule m_Term {
 	from
 		src_term: AADLBA!Term
+		(src_term.isThreadBehaviorElement())
 	to
 		target_term: AADLBA!Term
 		(
@@ -152,6 +168,7 @@ rule m_Term {
 rule m_Factor {
 	from
 		src_factor: AADLBA!Factor
+		(src_factor.isThreadBehaviorElement())
 	to
 		target_factor: AADLBA!Factor
 		(
@@ -163,15 +180,51 @@ rule m_Factor {
 		)
 }
 
+abstract rule m_CommunicationAction
+{
+	from
+		src_communicationAction: AADLBA!CommunicationAction
+		(src_communicationAction.isThreadBehaviorElement())
+	to
+		target_communicationAction: AADLBA!CommunicationAction
+}
+
+-- @extends m_CommunicationAction
 rule m_SubprogramCallAction
 {
 	from
-		src_subprogramCallAction: AADLBA!SubprogramCallAction
+		src_communicationAction: AADLBA!SubprogramCallAction
 	to
-		target_subprogramCallAction: AADLBA!SubprogramCallAction
+		target_communicationAction: AADLBA!SubprogramCallAction
 		(
-			subprogram <- src_subprogramCallAction.subprogram,
-			parameterLabels <- src_subprogramCallAction.parameterLabels,
-			dataAccess <- src_subprogramCallAction.dataAccess
+			subprogram <- src_communicationAction.subprogram,
+			parameterLabels <- src_communicationAction.parameterLabels,
+			dataAccess <- src_communicationAction.dataAccess
+		)
+}
+
+-- @extends m_CommunicationAction
+rule m_PortDequeueAction
+{
+	from
+		src_communicationAction: AADLBA!PortDequeueAction
+	to
+		target_communicationAction: AADLBA!PortDequeueAction
+		(
+			port   <- src_communicationAction.port,
+			target <- src_communicationAction.target
+		)
+}
+
+-- @extends m_CommunicationAction
+rule m_PortSendAction
+{
+	from
+		src_communicationAction: AADLBA!PortSendAction
+	to
+		target_communicationAction: AADLBA!PortSendAction
+		(
+			port   			<- src_communicationAction.port,
+			valueExpression <- src_communicationAction.valueExpression
 		)
 }

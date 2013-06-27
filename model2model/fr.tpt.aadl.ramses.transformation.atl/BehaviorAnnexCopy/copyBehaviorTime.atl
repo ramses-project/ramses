@@ -30,6 +30,7 @@ rule m_BehaviorTime
 {
 	from
 		src_BehaviorTime: AADLBA!BehaviorTime
+		(src_BehaviorTime.isThreadBehaviorElement())
 	to
 		target_BehaviorTime: AADLBA!BehaviorTime
 		(

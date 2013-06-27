@@ -197,7 +197,21 @@ rule m_create_Thread_BA
  			name <- c.uniqueName().concat('.impl'),
 			ownedRealization <- thisModule.Realization(typeImg),
 			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
-			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data),
+			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data)
+												->union
+												(
+													impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
+													->collect
+													(
+														ba | thisModule.resolveTemp(Sequence{c,ba},'currentState')
+													)
+												)
+												->union
+												(
+													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
+													->collect(e|thisModule.createFreshnessIndicator(e))
+												)
+												->flatten(),
 			ownedSubprogramCallSequence     <- if (c.subcomponent.subcomponentType.needsToMapBehaviorAnnex()) then
 												c.subcomponent.subcomponentType.ownedAnnexSubclause
 													->select(ba | ba.oclIsTypeOf(AADLBA!BehaviorAnnex))
@@ -278,7 +292,27 @@ rule m_create_Thread_BA
 														)
 													)
 												)->flatten()
-													
+												->union
+												(
+													c.featureInstance->select(e | e.feature.oclIsKindOf(AADLBA!DataAccess))
+													->collect
+													(
+														fi | impl.ownedAnnexSubclause->collect(e| thisModule.createAccessConnectionFromBA(fi, e))
+													)
+												)
+												->union
+												(
+													impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
+													->collect
+													(
+														ba | thisModule.resolveTemp(Sequence{c,ba},'accessConnection_CURRENT_STATE')
+													)
+												)
+												->union
+												(
+													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
+													->collect(e|thisModule.resolveTemp(e, 'createFreshnessIndicator','freshnessIndicator_Connection'))	
+												)->flatten()
 		),
 		typeImg : AADLBA!ThreadType (
  	 		name <- c.uniqueName(),
@@ -297,6 +331,91 @@ rule m_create_Thread_BA
 													)->flatten()->asSet()
  		)
 }
+
+unique lazy rule createAccessConnectionFromBA
+{
+	from
+		fi: AADLI!FeatureInstance,
+		ba: AADLBA!BehaviorAnnex
+	to
+		accessCnx: AADLBA!AccessConnection
+		(
+			name <- fi.name+'_BA_cnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(ba).toString(),
+			source <- accessCnx_Source,
+			destination <- accessCnx_Destination,
+			accessCategory <- #data
+		),
+		accessCnx_Source: AADLBA!ConnectedElement
+		(
+			connectionEnd <- thisModule.resolveTemp(fi, 'f_entrypoint')
+		),
+		accessCnx_Destination: AADLBA!ConnectedElement
+		(
+			connectionEnd <- fi.getFeatureImg()
+		)
+	do
+	{
+		accessCnx_Source.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),ba}, 'callEntryPoint'));
+		accessCnx;
+	}
+}
+
+unique lazy rule createFreshnessIndicator
+{
+	from
+		fi: AADLI!FeatureInstance
+	to
+		freshnessIndicator: AADLBA!DataSubcomponent
+		(
+			name <- fi.name+'_persistentFreshnessIndicator',
+			dataSubcomponentType<-'Integer_16'.asClassifier('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence{
+				thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', freshnessIndicator_Init)
+			}
+		),
+		freshnessIndicator_Init: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression('0')}
+		),
+		freshnessIndicator_Connection: AADLBA!AccessConnection
+		(
+			name <- fi.name+'_to_persistentFreshnessIndicator',
+			accessCategory <- #data,
+			source <- freshnessIndicator_CnxSource,
+			destination <- freshnessIndicator_CnxDestination
+		),
+		freshnessIndicator_CnxSource: AADLBA!ConnectedElement
+		(
+			connectionEnd <- freshnessIndicator
+		),
+		freshnessIndicator_CnxDestination: AADLBA!ConnectedElement
+		(
+			connectionEnd <- thisModule.createFreshnessIndicatorAccess(fi)
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
+		freshnessIndicator;
+	}
+}
+
+unique lazy rule createFreshnessIndicatorAccess
+{
+	from
+		fi:AADLI!FeatureInstance
+	to
+		freshnessIndicator_Access: AADLBA!DataAccess
+		(
+			name<-fi.name+'_freshnessIndicator_access',
+			dataFeatureClassifier<-'Integer_16'.asClassifier('BASE_TYPES'),
+			kind <- #requires
+		)
+	do
+	{
+		freshnessIndicator_Access;
+	}
+}
+
 
 -- @extends m_create_Thread_BA
 rule m_Thread_Instance {

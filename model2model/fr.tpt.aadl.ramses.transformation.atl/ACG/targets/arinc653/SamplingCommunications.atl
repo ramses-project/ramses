@@ -67,7 +67,7 @@ abstract rule m_Input_Sampling
 	using
 	{
 		spg: AADLBA!SubprogramType = 'Read_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
-		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi, spg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		VALIDITY: AADLBA!DataSubcomponent = thisModule.CreateValidityDataSubcomponent(fi);
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
@@ -128,8 +128,7 @@ rule m_Input_Sampling_BehaviorAnnex
 {
 	from
 		fi: AADLI!FeatureInstance,
-		behavior: AADLBA!BehaviorAnnex,
-		cnxRef: AADLI!PortConnection
+		behavior: AADLBA!AnnexSubclause
 	using
 	{
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
@@ -154,7 +153,7 @@ abstract rule m_Output_Sampling
 	using
 	{
 		spg: AADLBA!SubprogramType = 'Write_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
-		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi, spg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
@@ -211,7 +210,7 @@ rule m_Output_Sampling_BehaviorAnnex
 {
 	from
 		fi: AADLI!FeatureInstance,
-		behavior: AADLBA!BehaviorAnnex,
+		behavior: AADLBA!AnnexSubclause,
 		cnxRef: AADLI!PortConnection
 	using
 	{

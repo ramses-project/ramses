@@ -29,6 +29,7 @@ abstract rule m_ElementHolder
 {
 	from
 		src_Holder: AADLBA!ElementHolder
+		(src_Holder.isThreadBehaviorElement())
 	to
 		target_Holder: AADLBA!ElementHolder
 		(

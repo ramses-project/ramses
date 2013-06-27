@@ -26,18 +26,11 @@ create OUT : AADLBA 	from 	IN : AADLBA,
 								HOOKS: ATLHOOKS;
 
 
-abstract rule m_ExecuteCondition 
-{
-	from
-		src_behaviorCondition: AADLBA!ExecuteCondition
-	to
-		target_ExecuteCondition: AADLBA!ExecuteCondition
-}
-
 rule m_ExecutionTimeoutCatch 
 {
 	from
 		src_behaviorCondition: AADLBA!ExecutionTimeoutCatch
+		(src_behaviorCondition.isThreadBehaviorElement())
 	to
 		target_ExecutionTimeoutCatch: AADLBA!ExecutionTimeoutCatch
 }
@@ -46,6 +39,7 @@ rule m_Otherwise
 {
 	from
 		src_behaviorCondition: AADLBA!Otherwise
+		(src_behaviorCondition.isThreadBehaviorElement())
 	to
 		target_Otherwise: AADLBA!Otherwise
 }
@@ -54,6 +48,7 @@ rule m_DispatchCondition
 {
 	from
 		src_DispatchCondition: AADLBA!DispatchCondition
+		(src_DispatchCondition.isThreadBehaviorElement())
 	to
 		target_DispatchCondition: AADLBA!DispatchCondition
 		(
@@ -67,6 +62,7 @@ rule m_DispatchTriggerConditionStop
 {
 	from
 		src_DispatchTriggerConditionStop: AADLBA!DispatchTriggerConditionStop
+		(src_DispatchTriggerConditionStop.isThreadBehaviorElement())
 	to
 		target_DispatchTriggerConditionStop: AADLBA!DispatchTriggerConditionStop
 }
@@ -75,6 +71,7 @@ rule m_DispatchRelativeTimeout
 {
 	from
 		src_DispatchRelativeTimeout: AADLBA!DispatchRelativeTimeout
+		(src_DispatchRelativeTimeout.isThreadBehaviorElement())
 	to
 		target_DispatchRelativeTimeout: AADLBA!DispatchRelativeTimeout
 }
@@ -83,6 +80,7 @@ rule m_DispatchTriggerLogicalExpression
 {
 	from
 		src_DispatchTriggerLogicalExpression: AADLBA!DispatchTriggerLogicalExpression
+		(src_DispatchTriggerLogicalExpression.isThreadBehaviorElement())
 	to
 		target_DispatchTriggerLogicalExpression: AADLBA!DispatchTriggerLogicalExpression
 		(
@@ -95,6 +93,7 @@ rule m_DispatchConjunction
 {
 	from
 		src_DispatchConjunction : AADLBA!DispatchConjunction
+		(src_DispatchConjunction.isThreadBehaviorElement())
 	to
 		target_DispatchConjunction:AADLBA!DispatchConjunction
 		(

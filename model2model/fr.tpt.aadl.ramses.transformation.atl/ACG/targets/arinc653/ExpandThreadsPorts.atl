@@ -455,7 +455,7 @@ helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!Dat
 unique lazy rule createResolvedSpg
 {
 	from
-		fi: AADLI!FeatureInstance,
+		classifier: AADLI!DataClassifier,
 		spg: AADLBA!SubprogramType
 	using
 	{
@@ -464,7 +464,7 @@ unique lazy rule createResolvedSpg
 	to
 		spg_ResolvedType: AADLBA!SubprogramType
 		(
-			name <- spg.name+'_'+fi.name,
+			name <- spg.name+'_'+thisModule.getProgrammationLanguageIdentifier(classifier.name),
 			ownedExtension <- extendedMessageType,
 			ownedParameter <- Sequence{actualParam}
 		),
@@ -476,7 +476,7 @@ unique lazy rule createResolvedSpg
 		(
 			refined <- param,
 			direction <- param.direction,
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+			dataFeatureClassifier <- classifier
 		)
 	do
 	{

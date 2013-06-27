@@ -105,7 +105,7 @@ rule m_Input_Event_ComputeEntrypointCallSequence
 	{
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
 		spg: AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('ARINC653_RUNTIME');
-		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi, spg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -155,7 +155,7 @@ rule m_Output_Event_ComputeEntrypointCallSequence
 	using
 	{
 		spg: AADLBA!SubprogramType = 'Set_Event'.asSubprogramType('ARINC653_RUNTIME');
-		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi, spg);
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 	}
 	to
 		call: AADLBA!SubprogramCallAction

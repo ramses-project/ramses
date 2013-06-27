@@ -63,8 +63,8 @@ helper def: collectPeriodicDelayedCommunicationsLocalVariables(c: AADLI!Componen
 			fi.srcConnectionInstance->collect(cnxInst|
 				Sequence
 				{
-					thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first()}, 'CurrentDeadlineWrite'),
-					thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first()}, 'CDWSize')
+					thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'CurrentDeadlineWrite'),
+					thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'CDWSize')
 				}
 			)
 		)
@@ -149,20 +149,23 @@ abstract rule m_PeriodicDelayed_Port
 	}
 }
 
--- @extends m_PeriodicDelayed_Port
+-- @extends m_PeriodicDelayed_Port,m_Thread_Output_Port_Instance
 rule m_Thread_Output_PeriodicDelayed_Port
 {
 	from
 		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!ConnectionReference
-		(fi.isPeriodicDelayedPort()
-		and
-		fi.isOutputFeature()
-		and
-		cnxRef.destination.isThreadPort())
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isPeriodicDelayedPort()
+			and
+			fi.isOutputFeature()
+			and
+			(cnxRef.destination.connectionEnd.isThreadPort()
+				or cnxRef.source.connectionEnd.isThreadPort() ) 
+		)
 	using
 	{
-		CurrentDeadlineWriteTable: Sequence(Integer) = thisModule.getCurrentDeadlineWriteTable(fi, cnxRef.eContainer().destination);
+		CurrentDeadlineWriteTable: Sequence(Integer) = thisModule.getCurrentDeadlineWriteTable(fi, fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef).destination);
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		Array_Prototype : AADLBA!DataClassifier = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 	}
@@ -255,21 +258,21 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!ConnectionReference
+		cnxRef: AADLI!PortConnection
 		(
 			fi.isEventOrEventDataPort()
 			and
-			cnxRef.destination.isThreadPort()
+			(cnxRef.destination.connectionEnd.isThreadPort()
+				or cnxRef.source.connectionEnd.isThreadPort())
 		)
 	using
 	{
-		cnxInst: AADLI!ComponentInstance = cnxRef.eContainer();
+		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
 		producerPort: AADLI!FeatureInstance = cnxInst.source;
-		port: AADLI!FeatureInstance = cnxInst.source;
 		ArrayDataType: AADLBA!SubprogramType = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		Send_Output_Spg: AADLBA!SubprogramType = thisModule.Send_Output_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
-		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath());
+		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(producerPort.getComponentInstancePath());
 	}
 	to
 		
@@ -311,7 +314,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		(
 			name <- 'value',
 			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'value'),
-			dataFeatureClassifier <-  port.feature.dataFeatureClassifier
+			dataFeatureClassifier <-  producerPort.feature.dataFeatureClassifier
 		),
 		BufferAccess: AADLBA!DataAccess
 		(
@@ -322,7 +325,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		),
 		putValueSpg: AADLBA!SubprogramType
 		(
-			name <- Put_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath()),
+			name <- Put_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(producerPort.getComponentInstancePath()),
 			ownedExtension <- extendedPutValueSpg,
 			ownedPrototypeBinding <- Sequence{putValueOutputPrototypeBinding},
 			ownedParameter <- Sequence{putValueValueParam}, -- CDWParam
@@ -332,7 +335,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 	{
 		-- next is a workaround
 		thisModule.theHOOK.setInDirection(putValueValueParam);
-		putValueOutputPrototypeBinding.actual <- Sequence{thisModule.CreateDataComponentPrototypeActual(port.feature.dataFeatureClassifier)};
+		putValueOutputPrototypeBinding.actual <- Sequence{thisModule.CreateDataComponentPrototypeActual(producerPort.feature.dataFeatureClassifier)};
 	}
 }
 
@@ -355,10 +358,10 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence,
-		cnxRef: AADLI!ConnectionReference
+		behavior: AADLI!SubprogramCallSequence,
+		cnxRef: AADLI!PortConnection
 		(
-			callSequence.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.eContainer()).debug('####')
 		)
 	using
 	{
@@ -397,11 +400,11 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 {
 	from
 		fi: AADLI!FeatureInstance,
-		callSequence: AADLI!SubprogramCallSequence,
+		behavior: AADLI!SubprogramCallSequence,
 		paramCnx: AADLI!ParameterConnection,
-		cnxRef: AADLI!ConnectionReference
+		cnxRef: AADLI!PortConnection
 		(
-			fi.srcConnectionInstance->exists(e|e.connectionReference->first() = cnxRef)
+			fi.srcConnectionInstance->exists(e|e.connectionReference->first().connection = cnxRef)
 		)
 	to
 		call: AADLBA!SubprogramCallAction
@@ -746,9 +749,9 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 {
   from
   	fi: AADLI!FeatureInstance,
-	callSequence: AADLI!SubprogramCallSequence
+	behavior: AADLI!SubprogramCallSequence
 	(
-		(callSequence.isComputeEntryPointOf(fi.eContainer())
+		(behavior.isComputeEntryPointOf(fi.eContainer())
 		and
 		fi.isInputFeature()
 		and
@@ -813,7 +816,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 {
   from
   	fi: AADLI!FeatureInstance,
-	callSequence: AADLI!SubprogramCallSequence,
+	behavior: AADLI!SubprogramCallSequence,
 	paramCnx: AADLI!ParameterConnection
   using
   {

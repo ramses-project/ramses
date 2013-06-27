@@ -216,7 +216,11 @@ rule m_Thread_DataOrEventDataPort_Input_Instance
   		localVariable: AADLBA!DataSubcomponent
 		(
 			name <- fi.name+'_localVariable',
-			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+			dataSubcomponentType <- if(not fi.isUsedInFresh()) then	
+										fi.feature.dataFeatureClassifier
+									else
+										thisModule.createFreshnessDataStructure(fi)
+									endif
 		)
 }
 
@@ -236,8 +240,48 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
   		localVariable: AADLBA!DataSubcomponent
 		(
 			name <- fi.name+'_localVariable',
+			dataSubcomponentType <- if(not fi.isUsedInFresh()) then	
+										fi.feature.dataFeatureClassifier
+									else
+										thisModule.createFreshnessDataStructure(fi)
+									endif
+		)
+}
+
+
+unique lazy rule createFreshnessDataStructure
+{
+	from
+		fi: AADLI!FeatureInstance
+	to
+		fresh_data_type_wrapper:AADLBA!DataType
+		(
+			name<-fi.getFreshnessType(),
+			ownedPropertyAssociation <- Sequence
+			{
+				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
+					'Struct'.asEnumeration('DATA_MODEL').asNamedValue())
+			}
+		),
+		fresh_data_impl_wrapper:AADLBA!DataImplementation
+		(
+			name<-fi.getFreshnessType()+thisModule.impl_suffix,
+			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
+		),
+		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name<-'fresh_ba',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
+		),
+		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name <- 'value',
 			dataSubcomponentType <- fi.feature.dataFeatureClassifier
 		)
+	do
+	{
+		fresh_data_impl_wrapper;
+	}
 }
 
 ------------------------------------------------------------
@@ -275,231 +319,6 @@ helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
 	and
 	self.getPropertyAssociation('Source_Text').oclIsUndefined()
 ;
-
--- @extends m_Thread_DataOrEventDataPort_Output_Instance
-rule m_DataPort_Instance_with_BA
-{
-	from
-		fi: AADLI!FeatureInstance (fi.category=#dataPort
-									and fi.eContainer().category=#thread
-									and not fi.isPeriodicDelayedPort()
-									and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
-	using
-	{
-		c: AADLI!ComponentInstance = fi.eContainer();
-		-- local variable that will be initialized in the "do" section.
-		ba: AADLBA!BehaviorAnnex = fi.getBehaviorAnnex();
-		freshnesStruct: AADLBA!DataImplementation = thisModule.createFreshnessDataStructure(fi);
-	}
-	to
-		-- creation of a data access feature, to be added to the target thread component, 
-		-- this data access represents an access to the global variable representing the
-		-- communication 'port variable'.
-		
-		dataSubcomponent: AADLBA!DataSubcomponent
-		(
-			name<-fi.feature.name+'_MsgAddr'
-		),
-		actualParam: AADLBA!Parameter,
-		
-		fresh_data_previous: AADLBA!DataSubcomponent
-		(
-			name<-fi.name+'_freshness_previous',
-			dataSubcomponentType<-'Integer_16'.asClassifier('BASE_TYPES'),
-			ownedPropertyAssociation <- Sequence{
-				thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', FRESH_INIT)
-			}
-		),
-		FRESH_INIT: AADLBA!ListValue
-		(
-			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression('0')}
-		),
-		fresh_previous_access: AADLBA!DataAccess
-		(
-			name<-fi.name+'_freshness_previous_access',
-			dataFeatureClassifier<-'Integer_16'.asClassifier('BASE_TYPES'),
-			kind <- #requires
-		),
-		updateFreshness: AADLBA!AssignmentAction
-		(
-			target <- updatePreviousFreshAccessHolder,
-			valueExpression <- updateValueExpression
-		),
-		updatePreviousFreshAccessHolder:AADLBA!DataAccessHolder
-		(
-			element <- fresh_previous_access
-		),
-		updateValueExpression: AADLBA!ValueExpression
-		(
-			relations <- Sequence{updateRelation}	
-		),
-		updateRelation: AADLBA!Relation
-		(
-			firstExpression<-updateFirstExpression
-		),
-		updateFirstExpression: AADLBA!SimpleExpression
-		(
-			terms <- Sequence{updateFreshTerm}
-		),
-		updateFreshTerm: AADLBA!Term
-		(
-			factors <- Sequence{updateFreshFactor}
-		),
-		updateFreshFactor: AADLBA!Factor
-		(
-			firstValue <- updateFreshCDR
-		),
-		updateFreshCDR: AADLBA!DataComponentReference
-		(
-			data <- Sequence{dataSubcomponentHolder,dataFreshnessSubcomponentHolder}
-		),
-		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
-		(
-			element <- dataSubcomponent
-		),
-		dataFreshnessSubcomponentHolder: AADLBA!DataSubcomponentHolder
-		(
-			element <- thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
-		),
-		
-		
-		
-		-------- Emitter freshness update
-		sendFreshnessOutput: AADLBA!AssignmentAction
-		(
-			target <- sendFreshDataComponentReference,
-			valueExpression <- sendValueExpressionOutput
-		),
-		sendFreshDataComponentReference: AADLBA!DataComponentReference
-		(
-			data<-Sequence{dataSubcomponentSend,dataSubcomponentStructSend}
-		),
-		dataSubcomponentSend: AADLBA!DataSubcomponentHolder
-		(
-			element<-dataSubcomponent
-		),
-		dataSubcomponentStructSend: AADLBA!DataSubcomponentHolder
-		(
-			element<-thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
-		),
-		sendValueExpressionOutput: AADLBA!ValueExpression
-		(
-			relations <- Sequence{sendRelationOutput}	
-		),
-		sendRelationOutput: AADLBA!Relation
-		(
-			firstExpression<-sendFirstExpressionOutput
-		),
-		sendFirstExpressionOutput: AADLBA!SimpleExpression
-		(
-			terms <- Sequence{sendFreshTermOutput}
-		),
-		sendFreshTermOutput: AADLBA!Term
-		(
-			factors <- Sequence{sendFreshFactorOutput}
-		),
-		sendFreshFactorOutput: AADLBA!Factor
-		(
-			firstValue <- dataAccessHolderSend
-		),
-		dataAccessHolderSend: AADLBA!DataSubcomponentHolder
-		(
-			element <- fresh_previous_access
-		),
-		
-		
-		
-		updateFreshnessOutput: AADLBA!AssignmentAction
-		(
-			target <- updatePreviousFreshAccessHolderOutput,
-			valueExpression <- updateValueExpressionOutput
-		),
-		updatePreviousFreshAccessHolderOutput:AADLBA!DataAccessHolder
-		(
-			element <- fresh_previous_access
-		),
-		updateValueExpressionOutput: AADLBA!ValueExpression
-		(
-			relations <- Sequence{updateRelationOutput}	
-		),
-		updateRelationOutput: AADLBA!Relation
-		(
-			firstExpression<-updateFirstExpressionOutput
-		),
-		updateFirstExpressionOutput: AADLBA!SimpleExpression
-		(
-			terms <- Sequence{updateFreshTermOutput, updateConstantTermOutput},
-			binaryAddingOperators <- Sequence{#Plus}
-		),
-		updateFreshTermOutput: AADLBA!Term
-		(
-			factors <- Sequence{updateFreshFactorOutput}
-		),
-		updateFreshFactorOutput: AADLBA!Factor
-		(
-			firstValue <- dataAccessHolderOutput
-		),
-		dataAccessHolderOutput: AADLBA!DataSubcomponentHolder
-		(
-			element <- fresh_previous_access
-		),
-		updateConstantTermOutput: AADLBA!Term
-		(
-			factors <- Sequence{updateConstantFactorOutput}
-		),
-		updateConstantFactorOutput: AADLBA!Factor
-		(
-			firstValue <- valueConstantOutput
-		),
-		valueConstantOutput: AADLBA!BehaviorIntegerLiteral
-		(
-			value <- 1.longValue()
-		)
-		
-		
-	do
-	{
-		dataSubcomponent.dataSubcomponentType <- thisModule.assignPortVariableType(fi, freshnesStruct);
-		actualParam.dataFeatureClassifier <- dataSubcomponent.dataSubcomponentType;
-		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
-		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
-	}
-}
-
-unique lazy rule createFreshnessDataStructure
-{
-	from
-		fi: AADLI!FeatureInstance
-	to
-		fresh_data_type_wrapper:AADLBA!DataType
-		(
-			name<-fi.getFreshnessType(),
-			ownedPropertyAssociation <- Sequence
-			{
-				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
-					'Struct'.asEnumeration('DATA_MODEL').asNamedValue())
-			}
-		),
-		fresh_data_impl_wrapper:AADLBA!DataImplementation
-		(
-			name<-fi.getFreshnessType()+thisModule.impl_suffix,
-			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
-		),
-				struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
-		(
-			name<-'fresh_ba',
-			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
-		),
-		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
-		(
-			name <- 'value',
-			dataSubcomponentType <- fi.feature.dataFeatureClassifier
-		)
-	do
-	{
-		fresh_data_impl_wrapper;
-	}
-}
 
 -- @extends m_Feature_Instance
 rule m_EventPort_Instance_with_BA

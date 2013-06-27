@@ -26,11 +26,11 @@ module copyBehaviorSpecification;
 create OUT : AADLBA 	from 	IN : AADLBA,
 								HOOKS: ATLHOOKS;
 
-
 rule m_BehaviorAnnex
 {
 	from
 		src_ba: AADLBA!BehaviorAnnex
+		(src_ba.isThreadBehaviorElement())
 	to
 		target_ba: AADLBA!BehaviorAnnex
 		(
@@ -45,6 +45,7 @@ rule m_BehaviorState
 {
 	from
 		src_state: AADLBA!BehaviorState
+		(src_state.isThreadBehaviorElement())
 	to
 		target_state: AADLBA!BehaviorState
 		(
@@ -61,7 +62,7 @@ rule m_BehaviorTransition
 {
 	from
 		src_transition: AADLBA!BehaviorTransition
-		
+		(src_transition.isThreadBehaviorElement())
 	to
 		target_transition: AADLBA!BehaviorTransition
 		(
@@ -77,6 +78,7 @@ rule m_BehaviorVariable
 {
 	from
 		src_variable: AADLBA!BehaviorVariable
+		(src_variable.isThreadBehaviorElement())
 	to
 		target_variable: AADLBA!BehaviorVariable
 		(
