@@ -335,13 +335,13 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/uninstanciate/SubprogramCalls") ;
 		fileName.add("/uninstanciate/Connections") ;
 		fileName.add("/helpers/Services") ;
-		// Fixme: next will be added when tested with emftvm
 		fileName.add("/tools/BehaviorAnnexTools") ;
-		//fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
-		//fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
-		//fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
-		//fileName.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
-		//fileName.add("/BehaviorAnnexCopy/copyElementHolders") ;
+		fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
+		fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
+		fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
+		fileName.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
+		fileName.add("/BehaviorAnnexCopy/copyElementHolders") ;
+		// Fixme: next will be added when tested with emftvm
 		//fileName.add("/PeriodicDelayedCommunication/EventDataPorts");
 		//fileName.add("/PeriodicDelayedCommunication/EventDataPorts_LowMFP");
 		
