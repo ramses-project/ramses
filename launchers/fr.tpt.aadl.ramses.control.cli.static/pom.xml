@@ -178,6 +178,12 @@
 
     <dependency>
       <groupId>ramses</groupId>
+      <version>0.0.1</version>
+      <artifactId>fr.tpt.aadl.ramses.analysis.result</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
       <version>0.9.5</version>
       <artifactId>fr.tpt.aadl.utils</artifactId>
     </dependency>
