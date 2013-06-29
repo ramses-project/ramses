@@ -198,7 +198,7 @@
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.target.specific</artifactId>
-      <version>1.0.0.qualifier</version>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
