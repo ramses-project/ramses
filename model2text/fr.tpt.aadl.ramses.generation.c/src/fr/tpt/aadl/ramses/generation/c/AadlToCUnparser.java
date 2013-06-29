@@ -886,20 +886,27 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.DIMENSION) ;
 
-        for(PropertyExpression dimensionProperty : arrayDimensions)
+        if(arrayDimensions.isEmpty())
         {
-          if(dimensionProperty instanceof ListValue)
+          _gtypesHeaderCode.addOutput("[]") ;
+        }
+        else
+        {
+          for(PropertyExpression dimensionProperty : arrayDimensions)
           {
-            ListValue lv = (ListValue) dimensionProperty ;
-
-            for(PropertyExpression v : lv.getOwnedListElements())
+            if(dimensionProperty instanceof ListValue)
             {
-              if(v instanceof IntegerLiteral)
+              ListValue lv = (ListValue) dimensionProperty ;
+ 
+              for(PropertyExpression v : lv.getOwnedListElements())
               {
-            	_gtypesHeaderCode.addOutput("[") ;
-                IntegerLiteral dimension = (IntegerLiteral) v ;
-                _gtypesHeaderCode.addOutput(Long.toString(dimension.getValue())) ;
-                _gtypesHeaderCode.addOutput("]") ;
+                if(v instanceof IntegerLiteral)
+                {
+              	  _gtypesHeaderCode.addOutput("[") ;
+                  IntegerLiteral dimension = (IntegerLiteral) v ;
+                  _gtypesHeaderCode.addOutput(Long.toString(dimension.getValue())) ;
+                  _gtypesHeaderCode.addOutput("]") ;
+                }
               }
             }
           }
