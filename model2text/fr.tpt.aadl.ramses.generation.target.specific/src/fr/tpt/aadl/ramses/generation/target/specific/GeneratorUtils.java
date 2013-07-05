@@ -206,7 +206,6 @@ public class GeneratorUtils
   public static Set<String> getListOfReferencedObjects(ProcessImplementation aProcessImplementation)
   {
     Set<String> result = new LinkedHashSet<String>() ;
-
     for(ThreadSubcomponent aTheadSubcomponent : aProcessImplementation
           .getOwnedThreadSubcomponents())
     {
@@ -231,7 +230,7 @@ public class GeneratorUtils
                                      ThreadImplementation aThreadImplementation,
                                      Set<String> result)
   {
-    for(SubprogramCallSequence aCallSequence : aThreadImplementation
+	for(SubprogramCallSequence aCallSequence : aThreadImplementation
           .getOwnedSubprogramCallSequences())
     {
       for(CallSpecification aCallSpecification : aCallSequence
@@ -271,7 +270,7 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
   {
     if(aCallSpecification instanceof SubprogramCall)
     {
-    	SubprogramCall sc = (SubprogramCall) aCallSpecification;
+      SubprogramCall sc = (SubprogramCall) aCallSpecification;
       getListOfReferencedObjects((Subprogram) sc.getCalledSubprogram(), result) ;
     }
   }
@@ -349,8 +348,12 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
                                                 Set<String> result)
   {
     if(aPropertyAssociation.getProperty().getName() != null &&
-          aPropertyAssociation.getProperty().getName()
-                .equals("Source_Location"))
+          (aPropertyAssociation.getProperty().getName()
+                .equals("Source_Location")
+                ||
+                aPropertyAssociation.getProperty().getName()
+                .equals("Source_Text"))
+                )
     {
       for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
             .getOwnedValues())
@@ -360,11 +363,13 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
     	{
     	  StringLiteral sl = (StringLiteral) aPE;
     	  String value = sl.getValue();
-    	  if(value.endsWith(".c"))
+    	  if(value.endsWith(".c") || value.endsWith(".o"))
     	  {
     		value = value.substring(0,value.length()-2);  
     		value = value.concat(".o");
     	  }
+    	  else
+      	    continue;
     	  result.add(value);
     	}
     	else if(aPE instanceof ListValue)
@@ -373,11 +378,13 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
     	  {
     		StringLiteral sl = (StringLiteral) pe;
         	String value = sl.getValue();
-        	if(value.endsWith(".c"))
+        	if(value.endsWith(".c") || value.endsWith(".o"))
       	  	{
       		  value = value.substring(0,value.length()-2);  
       		  value = value.concat(".o");
       	    }
+        	else
+        	  continue;
         	result.add(value) ;
     	  }
         }
