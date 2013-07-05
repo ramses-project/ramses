@@ -32,6 +32,7 @@ import java.io.InputStreamReader ;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map ;
+import java.util.Set;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
@@ -126,27 +127,32 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         
         boolean runtime_PeriodicDelayed_added = false;
         List<String> includeDirList = new ArrayList<String>();
-        for(String sourceFile : GeneratorUtils.getListOfReferencedObjects(object))
+        Set<String> sourceFileList = GeneratorUtils.getListOfReferencedObjects(object); 
+        for(String sourceFile : sourceFileList)
         {
-          if(sourceFile.equalsIgnoreCase("PeriodicDelayed_runtime.o") && runtime_PeriodicDelayed_added==false)
+          if(sourceFile.toLowerCase().contains("periodicdelayed_runtime") && runtime_PeriodicDelayed_added==false)
           {
-        	unparserContent.addOutput(RamsesConfiguration.getRamsesResourcesDir()+"/aadl_resources/PeriodicDelayed_runtime/PeriodicDelayed_runtime.o") ;
-        	includeDirList.add(RamsesConfiguration.getRamsesResourcesDir()+"/aadl_resources/PeriodicDelayed_runtime/");
+        	unparserContent.addOutput(RamsesConfiguration.getRamsesResourcesDir()+"/C_runtime/PeriodicDelayed_runtime/PeriodicDelayed_runtime.o ") ;
+        	includeDirList.add(RamsesConfiguration.getRamsesResourcesDir()+"/C_runtime/PeriodicDelayed_runtime/ ");
+        	runtime_PeriodicDelayed_added=true;
           }
           else
-            unparserContent.addOutput(sourceFile + " ") ;
+          {
+        	unparserContent.addOutput(sourceFile + " ") ;
+          }
         }
         unparserContent.addOutput("\n") ;
-        if(false==includeDirList.isEmpty())
-          unparserContent.addOutput("CFLAGS+=");
-        for (String include: includeDirList)
-        {
-          unparserContent.addOutput("-I"+include+" ");
-        }
         unparserContent.addOutputNewline("all: libpok $(TARGET)\n") ;
         unparserContent.addOutputNewline("clean: common-clean\n") ;
         unparserContent
               .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
+        if(false==includeDirList.isEmpty())
+          unparserContent.addOutput("export USER_INCLUDES=");
+        for (String include: includeDirList)
+        {
+          unparserContent.addOutput("-I"+include+" ");
+        }
+        unparserContent.addOutput("\n") ;
         unparserContent
               .addOutputNewline("include $(POK_PATH)/misc/mk/rules-partition.mk") ;
         unparserContent
