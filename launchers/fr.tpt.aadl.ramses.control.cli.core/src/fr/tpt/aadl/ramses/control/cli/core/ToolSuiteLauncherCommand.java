@@ -489,6 +489,9 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     _reporter.reportMessage(ms, msg) ;
     
     // Unparse if --output option is set.
+    // Unparsing will crash if the model have name resolution errors. But it 
+    // still can't be possible to discriminate the nature of the errors.
+    // So unparse anyway.
     String unparse_file_path =
         parseConfig.getString(OUTPUT_DIR_OPTION_ID) ;
     
