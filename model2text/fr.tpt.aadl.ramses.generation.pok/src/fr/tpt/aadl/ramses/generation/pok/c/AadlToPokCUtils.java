@@ -21,6 +21,9 @@
 
 package fr.tpt.aadl.ramses.generation.pok.c;
 
+import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.ProcessClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
 
@@ -28,9 +31,22 @@ import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
 
 public class AadlToPokCUtils
 {
+  private static String getProcessPortName(FeatureInstance fi)
+  {
+	if(((ComponentInstance)fi.eContainer()).getCategory()==ComponentCategory.PROCESS)
+	  return ((ComponentInstance) fi.eContainer()).getName();
+	if(fi.getDirection() == DirectionType.IN)
+	{
+	  int last = fi.getDstConnectionInstances().get(0).getConnectionReferences().size()-1;
+	  return ((ComponentInstance)fi.getDstConnectionInstances().get(0).getConnectionReferences().get(last).getSource().eContainer()).getName();
+	}
+	else
+	  return ((ComponentInstance)fi.getSrcConnectionInstances().get(0).getConnectionReferences().get(0).getDestination().eContainer()).getName();
+  }
   public static String getFeatureLocalIdentifier(FeatureInstance fi)
   {
-    return GenerationUtilsC.getGenerationCIdentifier(fi.getComponentInstancePath()+"_"+fi.getName());
+	
+    return GenerationUtilsC.getGenerationCIdentifier(getProcessPortName(fi)+"_"+fi.getName());
   }
   
   public static String getFeatureGlobalIdentifier(FeatureInstance fi)
