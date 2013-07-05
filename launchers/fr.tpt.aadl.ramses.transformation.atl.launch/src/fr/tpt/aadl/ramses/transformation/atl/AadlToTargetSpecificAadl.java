@@ -29,6 +29,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List ;
 import java.util.Map ;
+import java.util.concurrent.Callable ;
+import java.util.concurrent.ExecutionException ;
+import java.util.concurrent.FutureTask ;
+import java.util.concurrent.TimeUnit ;
+import java.util.concurrent.TimeoutException ;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -63,11 +68,9 @@ import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
-import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlAtlLauncher;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public abstract class AadlToTargetSpecificAadl implements AadlToAadl
@@ -141,7 +144,8 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
   
   public static Resource extractXtextResource(Resource inputResource,
 		  File outputFile) throws CoreException, IOException,
-		  RecognitionException {
+		  RecognitionException, InterruptedException, ExecutionException
+  {
 	  URI uri;
 	  SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
 	  if(Platform.isRunning())
@@ -185,7 +189,31 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 		  RamsesConfiguration.setInputDirectory(new File(si.getSystemImplementation().eResource().getURI().toFileString()).getParentFile());
 		  Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
 		  xtextResource.load(null);
-		  StandAloneInstantiator.getInstantiator().validate();
+		  
+		  // Implements a timeout of 10s.
+		  
+		  Callable<Boolean> app = new Callable<Boolean>(){
+
+        @Override
+        public Boolean call() throws Exception
+        {
+          StandAloneInstantiator.getInstantiator().validate();
+          return true ;
+        }
+		    
+		  } ;
+		  
+		  FutureTask<Boolean> ft = new FutureTask<Boolean>(app) ;
+		  
+		  try
+      {
+		    ft.get(10, TimeUnit.SECONDS) ;
+      }
+      catch (TimeoutException ee)
+		  {
+		    // Nothing to do, just continue.
+		  }
+		  		  
 		  ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
 		  ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
 		  AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
