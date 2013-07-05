@@ -469,7 +469,7 @@ rule m_Process_Implementation {
 													(
 														impl.getSubcomponentsInstances('thread')
 															->collect(c| c.eContainer().featureInstance
-																->select(e| e.isProcessPort() and e.isOutputFeature())
+																->select(e| e.isProcessPort())
 																->collect(fi |
 																	thisModule.resolveTemp(fi, 'globalVariable')
 																)
