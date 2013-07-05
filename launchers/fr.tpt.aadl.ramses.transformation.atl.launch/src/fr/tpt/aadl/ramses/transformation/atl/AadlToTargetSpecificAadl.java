@@ -205,6 +205,8 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 		  
 		  FutureTask<Boolean> ft = new FutureTask<Boolean>(app) ;
 		  
+		  new Thread(ft).start() ;		  
+		  
 		  try
       {
 		    ft.get(10, TimeUnit.SECONDS) ;
