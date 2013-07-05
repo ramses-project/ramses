@@ -28,11 +28,7 @@ with Base_Types, Data_Model, Generation_Properties;
        states
          s: initial final state;
        transitions
-       t1: s -[iteration_counter=-1]-> s 
-       {
-         iteration_counter := 0
-       };
-       t2: s -[iteration_counter!=-1]-> s 
+       t2: s -[]-> s 
        {
          prev := (iteration_counter-1) mod CPRSize;
          if(CPR[prev] != CPR[iteration_counter])
@@ -40,7 +36,7 @@ with Base_Types, Data_Model, Generation_Properties;
            last  := CPR[iteration_counter]
          else
            first := -1;
-	   	   last  := -1
+	       last  := -1
          end if;
          iteration_counter := (iteration_counter+1) mod CPRSize
        };
@@ -201,15 +197,11 @@ with Base_Types, Data_Model, Generation_Properties;
       states
         s: initial final state;
       transitions
-        t1: s -[iteration_counter=-1]-> s 
+       t: s -[]-> s 
        {
-         iteration_counter := 1
-       };
-       t2: s -[iteration_counter!=-1]-> s 
-       {
-         Compute_PPR!(first, last, periodic_delayed_context);
-         Compute_CPR!(iteration_counter, periodic_delayed_context, last);
-         iteration_counter := (iteration_counter mod CPRSize)+1
+		 Compute_CPR!(iteration_counter, periodic_delayed_context, first);
+         iteration_counter := (iteration_counter+1) mod CPRSize;
+         Compute_CPR!(iteration_counter, periodic_delayed_context, last)
        };
     **};
   end Receive_Input_LowFP;

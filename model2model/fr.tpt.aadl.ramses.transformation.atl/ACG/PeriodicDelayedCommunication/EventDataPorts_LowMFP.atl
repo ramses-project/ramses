@@ -1,0 +1,771 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright � 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+-- TODO: make iteration_counter a global variable
+-- TODO: remove CPRTable and CDWTable from SharedRules
+
+module EventDataPorts_LowMFP;
+
+create OUT: AADLBA from IN: AADLI;
+
+
+helper def : Put_Value_Name     : String = 'Put_Value_LowFP';
+helper def : Send_Output_Name   : String = 'Send_Output';
+helper def : Receive_Input_Name : String = 'Receive_Input_LowFP';
+helper def : Next_Value_Name     : String = 'Next_Value';
+helper def : Component_Instance_Type_Name : String = 'component_instance_t.impl';
+helper def : Component_Instance_Array_Type_Name: String = 'ComponentInstanceArrayDataType';
+helper def : Periodic_Delayed_Context_Type_Name : String = 'periodic_delayed_context_t';
+helper def : Periodic_Delayed_Context_Impl_Name : String = 'periodic_delayed_context_t.impl';
+
+helper def : collectPeriodicDelayed_GlobalVariables_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
+	c.featureInstance->select(fi | 	fi.isInputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi | 
+						Sequence
+						{
+							thisModule.resolveTemp(fi, 'contextSubcomponent'),
+							thisModule.resolveTemp(fi, 'componentInstancesArray')
+						}
+					)
+					->flatten()
+;
+
+helper def : collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	c.featureInstance->select(fi | 	fi.isInputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi | thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Access'))
+	->union
+	(
+		c.featureInstance->select(fi | 	fi.isOutputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi |
+						fi.srcConnectionInstance->collect
+						(
+							cnxInst | thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Access'))
+						)
+						
+	)
+;
+
+helper def : collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	c.featureInstance->select(fi | 	fi.isInputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi | thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Connection'))
+	->union
+	(
+		c.featureInstance->select(fi | 	fi.isOutputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi |
+						fi.srcConnectionInstance->collect
+						(
+							cnxInst | thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Connection')
+						)
+					)
+						
+	)
+;
+
+helper def : collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	c.featureInstance->select(fi | 	fi.isInputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi | thisModule.resolveTemp(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointAccess'))
+	->union
+	(
+		c.featureInstance->select(fi | 	fi.isOutputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi |
+						fi.srcConnectionInstance->collect
+						(
+							cnxInst | thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointAccess'))
+						)
+						
+	)
+;
+
+helper def : collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	c.featureInstance->select(fi | 	fi.isInputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi | thisModule.resolveTemp(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointConnection'))
+	->union
+	(
+		c.featureInstance->select(fi | 	fi.isOutputFeature()
+									and
+									fi.isEventOrEventDataPort() 
+									and
+									fi.isIntraProcessFeatureInstance()
+									and
+									fi.isPeriodicDelayedPort())
+					->collect(fi |
+						fi.srcConnectionInstance->collect
+						(
+							cnxInst | thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointConnection'))
+						)
+						
+	)
+;
+
+helper def: collectPeriodicDelayed_LocalVariables_LowMFP(c: AADLI!ComponentInstance, behavior: AADLI!SubprogramCallSequence): Sequence(AADLBA!DataSubcomponent) =
+	Sequence{thisModule.createThreadID(c)}
+;
+
+helper def: getHyperperiod(destinationPort: AADLI!FeatureInstance) : Integer = 
+	thisModule.theHOOK.getHyperperiod(destinationPort)
+;
+
+helper context AADLI!FeatureInstance def: initWriterContext() : String =
+	thisModule.concatToString(
+	    self.dstConnectionInstance->collect(e| e.source.eContainer())->asOrderedSet()
+																	->collect(e|e.initWriterContext())
+    )
+;
+
+helper context AADLI!ComponentInstance def: initWriterContext() : String = 
+	'{'+self.getPeriod().toString()+
+    ','+
+	self.getDeadline().toString()+'}'
+;
+
+	
+
+unique lazy rule initComponentInstanceSubcomponent
+{
+	from
+		thread: AADLI!ComponentInstance
+	using
+	{
+		Component_Instance_Type: AADLBA!DataImplementation = thisModule.Component_Instance_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		componentInstance: AADLBA!DataSubcomponent
+		(
+			name <- 'writer_instance_'+thread.name,
+			dataSubcomponentType <- Component_Instance_Type,
+			ownedPropertyAssociation <- Sequence {
+				thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													ComponentInstanceInit
+												)
+			}
+		),
+		ComponentInstanceInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+															thread.initWriterContext())}
+		)
+}
+
+helper context AADLI!ComponentInstance def: computeThreadID(): Integer =
+	let threads: Sequence(AADLI!ComponentInstance) =
+		AADLI!ComponentInstance->allInstances()->select(c | c.category=#thread)
+	in
+		threads.indexOf(self);
+
+
+unique lazy rule createThreadID
+{
+	from
+		thrd: AADLI!ComponentInstance (
+			thrd.category = #thread
+		)
+	to
+		thrdIDSub: AADLBA!DataSubcomponent (
+			name <- 'ID',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence{
+				thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', ID)
+			}
+		),
+		ID: AADLBA!ListValue (
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+												thrd.computeThreadID().toString()
+											)}
+		)
+	do {
+		thrdIDSub;
+	}
+}
+
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
+rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP
+{
+  	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isEventOrEventDataPort()
+			and
+			(cnxRef.destination.connectionEnd.isThreadPort()
+				or cnxRef.source.connectionEnd.isThreadPort())
+		)
+	using
+	{
+		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
+		producerPort: AADLI!FeatureInstance = cnxInst.source;
+		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
+		PeriodicDelayedContext_Impl: AADLBA!DataImplementation = thisModule.resolveTemp(consumerPort, 'PeriodicDelayedContext_Impl');
+		ArrayDataType: AADLBA!SubprogramType = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
+		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Send_Output_Spg: AADLBA!SubprogramType = thisModule.Send_Output_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(producerPort.getComponentInstancePath());
+		Periodic_Delayed_Context_Prototype: AADLBA!DataImplementation = thisModule.Periodic_Delayed_Context_Impl_Name.asDataType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		---------------------------------------------------------------------------
+		--- Add PeriodicDelayedContext thread's access
+		---------------------------------------------------------------------------
+		PeriodicDelayedContext_Access: AADLBA!DataAccess
+		(
+			name <- fi.name+'_Periodic_Delayed_ContextAccess',
+			dataFeatureClassifier <- PeriodicDelayedContext_Impl, 
+			kind<-#requires
+		),
+		
+		---------------------------------------------------------------------------
+		--- Connect PeriodicDelayedContext thread's access to global variable
+		---------------------------------------------------------------------------
+		connected_PeriodicDelayedContext_Access: AADLBA!ConnectedElement
+		(
+			connectionEnd<-PeriodicDelayedContext_Access,
+			context<-fi.eContainer().getSubcomponentImg()
+		),
+		connected_PeriodicDelayedContext_Subcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-thisModule.resolveTemp(consumerPort, 'contextSubcomponent')
+		),
+		PeriodicDelayedContext_Connection: AADLBA!AccessConnection
+		(
+			name<-cnxRef.name+'_'+fi.name+'_to_periodic_Delayed_Context',
+			accessCategory<-#data,
+			source<-connected_PeriodicDelayedContext_Access,
+			destination<-connected_PeriodicDelayedContext_Subcomponent
+		),
+		
+		---------------------------------------------------------------------
+		--- Refine Put_Value to precise the data type of prototypes
+		---------------------------------------------------------------------
+		extendedPutValueSpg: AADLBA!TypeExtension
+		(
+			extended<-Put_Value_PrototypeSpg
+		),
+		putValueOutputPrototypeBinding: AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'value_type')
+		),
+		putValueValueParam: AADLBA!Parameter
+		(
+			name <- 'value',
+			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'value'),
+			dataFeatureClassifier <-  producerPort.feature.dataFeatureClassifier
+		),
+		BufferAccess: AADLBA!DataAccess
+		(
+			name <- 'buffer',
+			refined <- Put_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'buffer'),
+			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayType'),
+			kind<-#requires
+		),
+		putValueSpg: AADLBA!SubprogramType
+		(
+			name <- Put_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(producerPort.getComponentInstancePath()),
+			ownedExtension <- extendedPutValueSpg,
+			ownedPrototypeBinding <- Sequence{putValueOutputPrototypeBinding,putValueContextPrototypeBinding},
+			ownedParameter <- Sequence{putValueValueParam}, -- CDWParam
+			ownedDataAccess <- Sequence{BufferAccess}
+		),
+		putValueOutputActual: AADLBA!ComponentPrototypeActual
+		(
+			category<-#data
+		),
+		
+		putValueContextPrototypeBinding: AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'context_prototype'),
+			actual <- Sequence{putValueContextActual}
+		),
+		putValueContextActual: AADLBA!ComponentPrototypeActual
+		(
+			category<-#data
+		),
+		extensionPeriodicDelayedContext: AADLBA!ImplementationExtension
+		(
+			extended<-Periodic_Delayed_Context_Prototype
+		)
+	do
+	{
+		putValueOutputActual.setSubcomponentType(fi.feature.dataFeatureClassifier);
+		putValueContextActual.setSubcomponentType(thisModule.resolveTemp(consumerPort, 'PeriodicDelayedContext_Impl'));
+	}
+}
+
+-- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowMFP
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		cnxRef: AADLI!PortConnection
+	using
+	{
+		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
+		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
+	}
+	to
+		PeriodicDelayedContext_EntryPointAccess: AADLBA!DataAccess
+		(
+			name <- fi.name+'_Periodic_Delayed_ContextAccess',
+			dataFeatureClassifier <- thisModule.resolveTemp(consumerPort, 'PeriodicDelayedContext_Impl'), 
+			kind<-#requires
+		),
+		connected_PeriodicDelayedContext_Access: AADLBA!ConnectedElement
+		(
+			connectionEnd<-PeriodicDelayedContext_EntryPointAccess,
+			context<-thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'callEntryPoint')
+		),
+		connected_PeriodicDelayedContext_Subcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-thisModule.resolveTemp(Sequence{fi,cnxRef}, 'PeriodicDelayedContext_Access')
+		),
+		PeriodicDelayedContext_EntryPointConnection: AADLBA!AccessConnection
+		(
+			name<-cnxRef.name+'_'+fi.name+'_to_periodic_Delayed_Context',
+			accessCategory<-#data,
+			source<-connected_PeriodicDelayedContext_Access,
+			destination<-connected_PeriodicDelayedContext_Subcomponent
+		)
+}
+
+
+-- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowMFP
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection,
+		cnxRef: AADLI!PortConnection
+	using
+	{
+		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
+		producerPort: AADLI!FeatureInstance = cnxInst.source;
+		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
+		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Periodic_Delayed_Context_Prototype_Type: AADLBA!DataType = thisModule.Periodic_Delayed_Context_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- putValueSpgHolder,
+			parameterLabels <- Sequence{
+				TaskID_Holder,
+				IterationCounter_Holder,
+				CDWSize_Holder,
+				Value_Holder,
+				PeriodicDelayedContext_Holder,
+				Buffer_Holder
+			}
+		),
+		putValueSpgHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- thisModule.resolveTemp(Sequence{fi, cnxRef}, 'putValueSpg')
+		),
+		--- connect taskID: in parameter Base_Types::Integer_16;
+		TaskID_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.createThreadID(fi.eContainer())
+		),
+      	--- connect iteration_counter: in out parameter Base_Types::Integer_16;
+      	IterationCounter_Holder: AADLBA!DataAccessHolder
+		(
+			element <- thisModule.createIterationCounter(fi.eContainer())
+		),
+      	
+        --- connect CDWSize: in parameter Base_Types::Integer_16;
+		CDWSize_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(Sequence{fi, cnxRef}, 'CDWSize')
+		),
+
+		--- connect value: in parameter value_type;
+		Value_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(fi, 'localVariable')	
+		),
+        --- connect periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
+		PeriodicDelayedContext_Holder: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveTemp(Sequence{fi, cnxRef}, 'PeriodicDelayedContext_Access')
+		),
+		
+     	--- connect buffer: requires data access ArrayDataType {Access_Right=>write_only;};
+		Buffer_Holder: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveTemp(Sequence{fi, cnxRef} ,'f_entrypoint')
+		)
+}
+
+
+-- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance
+rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventOrEventDataPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+	using
+	{
+		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = thisModule.Receive_Input_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Periodic_Delayed_Context_Prototype_Type: AADLBA!DataType = thisModule.Periodic_Delayed_Context_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
+		Periodic_Delayed_Context_Prototype_Impl: AADLBA!DataImplementation = thisModule.Periodic_Delayed_Context_Impl_Name.asDataType('PERIODICDELAYED_RUNTIME');
+		Component_Instance_Type: AADLBA!DataImplementation = thisModule.Component_Instance_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
+		Component_Instance_Array_Type: AADLBA!DataType = thisModule.Component_Instance_Array_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
+		writerPortsImg: Sequence(AADLBA!DataSubcomponent) = fi.dstConnectionInstance->collect(e| thisModule.initComponentInstanceSubcomponent(e.source.eContainer()));
+	}
+	to
+		------------------------------------------------------------
+		--- Define PeriodicDelayedContext data type
+		------------------------------------------------------------
+		
+		PeriodicDelayedContext_Type: AADLBA!DataType
+		(
+			name <- Periodic_Delayed_Context_Prototype_Type.name,
+			ownedExtension <- extensionPeriodicDelayedContextType
+		),
+		PeriodicDelayedContext_Impl: AADLBA!DataImplementation
+		(
+			name <- Periodic_Delayed_Context_Prototype_Impl.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
+			ownedExtension <- extensionPeriodicDelayedContext,
+			ownedDataSubcomponent <- Sequence{ContextWriters_Subcomponent}
+		),
+		ContextWriters_Subcomponent: AADLBA!DataSubcomponent
+		(
+			name <- 'writer_instances',
+			refined <- Periodic_Delayed_Context_Prototype_Impl.ownedDataSubcomponent->any(e|e.name = 'writer_instances'),
+			dataSubcomponentType <- ComponentInstanceArrayDataType
+		),
+		ComponentInstanceArrayDataTypeExtension: AADLBA!TypeExtension
+		(
+			extended<-Component_Instance_Array_Type
+		),
+		ComponentInstanceArrayDataType: AADLBA!DataType
+		(
+			name <- 'ComponentInstanceArrayDataType_'+fi.eContainer().name+'_'+fi.name,
+			ownedExtension <- ComponentInstanceArrayDataTypeExtension,
+			ownedPropertyAssociation <- Sequence {
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Data_Representation',
+													'DATA_MODEL',
+													'Array'.asEnumeration('DATA_MODEL').asNamedValue()
+												),
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Base_Type',
+													'DATA_MODEL',
+													thisModule.CreateListValueFromClassifier(
+														Component_Instance_Type
+													)
+												),
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Dimension',
+													'DATA_MODEL',
+													thisModule.CreateListValueFromInteger(
+														fi.dstConnectionInstance->size()
+													)
+												)
+									   }
+		),
+		extensionPeriodicDelayedContext: AADLBA!ImplementationExtension
+		(
+			extended<-Periodic_Delayed_Context_Prototype_Impl
+		),
+		extensionPeriodicDelayedContextType: AADLBA!TypeExtension
+		(
+			extended<-Periodic_Delayed_Context_Prototype_Type
+		),
+
+		------------------------------------------------------------
+		--- Add Require Data Accesses to PeriodicDelayedContext
+		------------------------------------------------------------
+		
+		PeriodicDelayedContext_Access:AADLBA!DataAccess(
+			name <- fi.name+'_Periodic_Delayed_ContextAccess',
+			dataFeatureClassifier <- thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Impl'), 
+			kind<-#requires
+		),		
+		
+		------------------------------------------------------------
+		--- Add PeriodicDelayedContext subcomponent
+		------------------------------------------------------------
+		
+		contextSubcomponent: AADLBA!DataSubcomponent
+		(
+			name <- 'context_'+fi.eContainer().name+'_'+fi.name,
+			dataSubcomponentType <- PeriodicDelayedContext_Impl,
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													contextInit
+												)}
+		),
+		contextInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+																'{'+
+																fi.eContainer().getPeriod().toString()+
+																','+
+																'writer_instances_'+fi.eContainer().name+'_'+fi.name+
+																','+
+																writerPortsImg->size().toString()+
+																','+
+																thisModule.getBufferSize(fi).toString()+
+																','+
+																thisModule.getHyperperiod(fi).toString()+
+																'}'
+															)}
+		),
+		componentInstancesInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+																fi.initWriterContext())
+																}
+		),
+		componentInstancesArray: AADLBA!DataSubcomponent
+		(
+			name <- 'writer_instances_'+fi.eContainer().name+'_'+fi.name,
+			dataSubcomponentType <- ComponentInstanceArrayDataType,
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													componentInstancesInit
+												)}
+		),
+		
+		---------------------------------------------------------------------
+		--- Connect PeriodicDelayedContext to thread's DataAccess
+		---------------------------------------------------------------------
+		
+		connected_periodic_Delayed_ContextAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-PeriodicDelayedContext_Access,
+			context<-fi.eContainer().getSubcomponentImg()
+		),
+		connected_periodic_Delayed_ContextData: AADLBA!ConnectedElement
+		(
+			connectionEnd<-contextSubcomponent
+		),
+		PeriodicDelayedContext_Connection: AADLBA!AccessConnection
+		(
+			name<-fi.name+'_to_periodic_Delayed_Context',
+			accessCategory<-#data,
+			source<-connected_periodic_Delayed_ContextAccess,
+			destination<-connected_periodic_Delayed_ContextData
+		),
+		
+		----------------------------------------------
+		--- Receive_Input subprogram refinement
+		----------------------------------------------
+		extendedReceiveInputSpg: AADLBA!TypeExtension
+		(
+			extended<-Receive_Input_PrototypeSpg
+		),
+		receiveInputSpg: AADLBA!SubprogramType
+		(
+			name <- Receive_Input_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
+			ownedExtension <- extendedReceiveInputSpg,
+			ownedPrototypeBinding <- Sequence{receiveInputContextPrototypeBinding},
+			ownedParameter <- Sequence{}
+		),
+		receiveInputContextPrototypeBinding: AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name = 'context_prototype'),
+			actual <- Sequence{receiveInputContextActual}
+		),
+		receiveInputContextActual: AADLBA!ComponentPrototypeActual
+		(
+			category<-#data
+		)
+	do
+	{
+		receiveInputContextActual.setSubcomponentType(fi.feature.dataFeatureClassifier);
+	}
+}
+
+-- @extends m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance
+rule m_Thread_IntraProcess_Input_DataPort_PeriodicDelayed_Instance_LowMFP
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+}
+
+-- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
+rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowMFP
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+}
+
+-- @extends m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance,m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
+rule m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance_LowMFP
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+}
+
+-- @extends m_Input_Port_ComputeEntrypointCallSequence,m_PeriodicDelayed_Port
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs
+{
+  from
+  	fi: AADLI!FeatureInstance,
+	behavior: AADLI!SubprogramCallSequence
+	(
+		(behavior.isComputeEntryPointOf(fi.eContainer())
+		and
+		fi.isInputFeature()
+		and
+		(fi.isEventPort() or fi.isEventDataPort()))
+	)
+  to
+  	PeriodicDelayedContext_EntryPointAccess:AADLBA!DataAccess(
+		name <- fi.name+'_Periodic_Delayed_ContextAccess',
+		dataFeatureClassifier <- thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Impl'), 
+		kind<-#requires
+	),
+	connected_PeriodicDelayedContext_Access: AADLBA!ConnectedElement
+	(
+		connectionEnd<-PeriodicDelayedContext_EntryPointAccess,
+		context<-thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'callEntryPoint')
+	),
+	connected_PeriodicDelayedContext_Subcomponent: AADLBA!ConnectedElement
+	(
+		connectionEnd<-thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Access')
+	),
+	PeriodicDelayedContext_EntryPointConnection: AADLBA!AccessConnection
+	(
+		name<-fi.name+'_to_periodic_Delayed_Context',
+		accessCategory<-#data,
+		source<-connected_PeriodicDelayedContext_Access,
+		destination<-connected_PeriodicDelayedContext_Subcomponent
+	),
+	
+	------------------------
+	--- Receive_Input call
+	------------------------
+	callReceiveInputs: AADLBA!SubprogramCallAction
+	(
+		subprogram<-receiveInput_Holder,
+		parameterLabels <- Sequence{IterationCounter_Holder,
+									CPRSize_Holder,
+									PeriodicDelayedContext_Holder,
+									ReadIndex_Holder,
+									LastIndex_Holder}
+	),	  
+	receiveInput_Holder: AADLBA!SubprogramHolder
+	(
+		element <- thisModule.resolveTemp(fi,'receiveInputSpg')
+	),
+	
+	--- connect iteration_counter: in out parameter Base_Types::Integer_16;
+  	IterationCounter_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element <- thisModule.createIterationCounter(fi.eContainer())
+	),
+	
+    --- connect CPRSize: in parameter Base_Types::Integer_16;
+    PeriodicDelayedContext_Holder: AADLBA!DataAccessHolder
+	(
+		element <- thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Access')
+	),
+  
+    --- connect periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
+    CPRSize_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveTemp(fi, 'CPRSize')
+	),
+	
+    --- connect first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+    ReadIndex_Holder: AADLBA!DataAccessHolder
+	(
+		element<-thisModule.resolveTemp(fi,'readIndex')
+	),
+	
+    --- connect last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+	LastIndex_Holder: AADLBA!DataAccessHolder
+	(
+		element<-thisModule.resolveTemp(fi,'lastIndex')
+	)
+}

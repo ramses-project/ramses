@@ -24,7 +24,7 @@ typedef struct periodic_delayed_context_t
 
 void Compute_CDW(int taskID, int  iteration_counter, periodic_delayed_context_t *context, int * CDW);
 void Compute_CPR(int iteration_counter, periodic_delayed_context_t *context, int * CPR);
-void Compute_PPR(int * PPR, int CPR, periodic_delayed_context_t * context);
+void Compute_PPR(int * PPR, int * CPR, periodic_delayed_context_t * context);
 
 #endif
 

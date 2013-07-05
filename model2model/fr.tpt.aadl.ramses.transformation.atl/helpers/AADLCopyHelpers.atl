@@ -35,14 +35,6 @@ helper context AADLBA!NamedElement def : getContainingPackage() :AADLBA!AadlPack
 	endif
 ;
 
-helper context AADLBA!ComponentClassifier def : getClassifierInOutput() : AADLBA!ComponentClassifier =
-	if(self.oclIsKindOf(AADLBA!ComponentImplementation)) then 
-		thisModule.Implementation(OclUndefined, self, thisModule.Type(OclUndefined, self.getType()))
-	else
-		thisModule.Type(OclUndefined, self)
-	endif
-;
-
 helper context AADLBA!ComponentImplementation def : getComponentImplementation() : AADLBA!ComponentImplementation = 
 	AADLBA!ComponentImplementation->allInstancesFrom('OUT')->any(e | e.qualifiedName = self.qualifiedName)
 ;

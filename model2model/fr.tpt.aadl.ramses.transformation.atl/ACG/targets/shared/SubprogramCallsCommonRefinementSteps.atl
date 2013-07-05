@@ -163,6 +163,10 @@ abstract rule m_ThreadBehavior
 											fi| thisModule.createFreshnessIndicatorAccess(fi)
 										)
 									)
+									->union
+									(
+										thisModule.collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c, behavior)
+									)
 									->flatten()->asSet(),
 			ownedParameter <- impl.ownedParameterConnection
 								->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
@@ -189,7 +193,7 @@ abstract rule m_ThreadBehavior
 												)
 												->union
 												(
-													thisModule.collectPeriodicDelayedCommunicationsLocalVariables
+													thisModule.collectPeriodicDelayed_LocalVariables
 													(c,impl.ownedSubprogramCallSequence)
 												)
 												->append(returnData)
@@ -940,7 +944,7 @@ rule m_Output_Port_ComputeEntrypointCallSequence
 --  			(ii) a connection from image f of feature instance to parameter of putValue
 --  			(iii) a connection from image localVariable of feature instance to parameter of putValue
 
-
+-- @extends m_Port_ComputeEntrypointCallSequence
 rule m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 {
 	from

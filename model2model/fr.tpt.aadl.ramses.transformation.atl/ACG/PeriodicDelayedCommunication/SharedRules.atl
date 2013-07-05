@@ -22,6 +22,8 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
+-- TODO: size of globalVariable (number of elements in array) is not properly initialized
+
 module SharedRules;
 create OUT : AADLBA from IN : AADLI;
 
@@ -30,20 +32,51 @@ helper def : Send_Output_Name   : String = 'Send_Output';
 helper def : Receive_Input_Name : String = 'Receive_Input';
 helper def : Next_Value_Name    : String = 'Next_Value';
 
-helper def: getCurrentPerionReadTable(port: AADLI!FeatureInstance) : Sequence(Integer) = 
-	thisModule.theHOOK.getCurrentPerionReadTable(port)
+helper def : collectPeriodicDelayed_GlobalVariables_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
 ;
 
-helper def: getCurrentDeadlineWriteTable(sourcePort: AADLI!FeatureInstance, destinationPort: AADLI!FeatureInstance) : Sequence(Integer) = 
-	thisModule.theHOOK.getCurrentDeadlineWriteTable(sourcePort, destinationPort)
+helper def : collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	Sequence{}
 ;
 
-helper def: getBufferSize(destinationPort: AADLI!FeatureInstance) : Integer = 
-	thisModule.theHOOK.getBufferSize(destinationPort)
+helper def : collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!AccessConnection) =
+	Sequence{}
 ;
 
+helper def : collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
 
-helper def: collectPeriodicDelayedCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+helper def : collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!AccessConnection) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_LocalVariables_LowMFP(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_GlobalVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
+	thisModule.collectPeriodicDelayed_GlobalVariables_LowMFP(c)
+;
+
+helper def : collectPeriodicDelayed_GlobalVariablesAccesses(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	thisModule.collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c)
+;
+
+helper def : collectPeriodicDelayed_GlobalVariablesConnections(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	thisModule.collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c)
+;
+
+helper def : collectPeriodicDelayed_LocalVariablesAccesses(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	thisModule.collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c, behavior)
+;
+
+helper def : collectPeriodicDelayed_LocalVariablesConnections(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	thisModule.collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c, behavior)
+;
+
+helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
 	if(not c.featureInstance->exists(e|e.isPeriodicDelayedPort())) then
 	Sequence{}
 	else
@@ -84,10 +117,29 @@ helper def: collectPeriodicDelayedCommunicationsLocalVariables(c: AADLI!Componen
 			}
 		)
 	)
+	->union
+	(
+		behavior->collect
+		( b |
+			thisModule.collectPeriodicDelayed_LocalVariables_LowMFP(c, b)
+		)
+	)
 	->flatten()
 	endif
 ;
 
+
+helper def: getCurrentPerionReadTable(port: AADLI!FeatureInstance) : Sequence(Integer) = 
+	thisModule.theHOOK.getCurrentPerionReadTable(port)
+;
+
+helper def: getCurrentDeadlineWriteTable(sourcePort: AADLI!FeatureInstance, destinationPort: AADLI!FeatureInstance) : Sequence(Integer) = 
+	thisModule.theHOOK.getCurrentDeadlineWriteTable(sourcePort, destinationPort)
+;
+
+helper def: getBufferSize(destinationPort: AADLI!FeatureInstance) : Integer = 
+	thisModule.theHOOK.getBufferSize(destinationPort)
+;
 
 rule concatToString(list: Sequence(Integer))
 {
@@ -131,7 +183,6 @@ unique lazy rule createIterationCounter
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initial)}
 		)
-		
 	do
 	{
 		IterationCounter;
@@ -187,11 +238,7 @@ rule m_Thread_Output_PeriodicDelayed_Port
 													'DATA_MODEL',
 													CDWSizeInit)
 									   }
-		    ),
---		value: AADLBA!DataSubcomponent (
---			name <- fi.name+'_currentValue',
---			dataSubcomponentType <- fi.feature.dataFeatureClassifier
---		),
+		),
 		CDWInit: AADLBA!ListValue
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
@@ -296,6 +343,8 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 			element<-thisModule.resolveTemp(cnxInst.destination, 'globalVariable')
 		),
 		
+		--- TODO: move next to LowET
+		
 		-----------------------
 		--- Put_Value
 		-----------------------
@@ -305,11 +354,9 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		),
 		putValueOutputPrototypeBinding: AADLBA!ComponentPrototypeBinding
 		(
-			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'value_type')--,
-			--actual <- Sequence{putValueOutputActual}
+			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'value_type'),
+			actual <- Sequence{thisModule.CreateDataComponentPrototypeActual(producerPort.feature.dataFeatureClassifier)}
 		),
-		--- FIXME: fix for osate connection 
-		--- resolution warning ('XXX is missing a classifier' when prototype binding is used)
 		putValueValueParam: AADLBA!Parameter
 		(
 			name <- 'value',
@@ -335,7 +382,6 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 	{
 		-- next is a workaround
 		thisModule.theHOOK.setInDirection(putValueValueParam);
-		putValueOutputPrototypeBinding.actual <- Sequence{thisModule.CreateDataComponentPrototypeActual(producerPort.feature.dataFeatureClassifier)};
 	}
 }
 
@@ -361,7 +407,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		behavior: AADLI!SubprogramCallSequence,
 		cnxRef: AADLI!PortConnection
 		(
-			behavior.isComputeEntryPointOf(fi.eContainer()).debug('####')
+			behavior.isComputeEntryPointOf(fi.eContainer())
 		)
 	using
 	{
@@ -452,8 +498,7 @@ rule m_Input_PeriodicDelayed_Port
 	using
 	{
 		
-		initial: String = '-1'; 
-		initialit: String = '0'; 
+		initial: String = '-1';
 		
 		CurrentPerionReadTable: Sequence(Integer) = thisModule.getCurrentPerionReadTable(fi);
 		BufferSize: Integer = thisModule.getBufferSize(fi);
@@ -617,7 +662,7 @@ rule m_Input_PeriodicDelayed_Port
 		),
 		IterationCounterInit: AADLBA!ListValue
 		(
-			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initialit)}
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initial)}
 		),
 		IterationCounter:AADLBA!DataSubcomponent (
 			name <- fi.name+'_IterationCounter',
