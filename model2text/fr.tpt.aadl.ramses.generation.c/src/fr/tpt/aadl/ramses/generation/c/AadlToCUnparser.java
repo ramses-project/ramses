@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -134,7 +135,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
   private List<String> _processedTypes  ;
 
-  public List<NamedElement> delayedUnparsing = new ArrayList<NamedElement>();
+  public Set<NamedElement> additionalUnparsing = new LinkedHashSet<NamedElement>();
   
   private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
   // Map Data Access with their relative Data Subcomponent. Relations 
@@ -1172,9 +1173,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
         process(object.getComponentImplementation()) ;
-        for(NamedElement ne: delayedUnparsing)
+        for(NamedElement ne: additionalUnparsing)
         	process(ne);
-        delayedUnparsing.clear();
+        additionalUnparsing.clear();
         return DONE ;
       }
       

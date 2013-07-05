@@ -34,9 +34,11 @@ import java.util.Set;
 
 import org.eclipse.emf.common.util.AbstractEnumerator;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.xtext.EcoreUtil2;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
+import org.osate.aadl2.BehavioredImplementation;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.DataSubcomponent;
@@ -46,6 +48,8 @@ import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.ParameterConnectionEnd;
 import org.osate.aadl2.PrototypeBinding;
+import org.osate.aadl2.Subprogram;
+import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
@@ -108,6 +112,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.Relation;
 import fr.tpt.aadl.annex.behavior.aadlba.RelationalOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression;
 import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
+import fr.tpt.aadl.annex.behavior.aadlba.SubprogramHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.Term;
 import fr.tpt.aadl.annex.behavior.aadlba.TimedAction;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryAddingOperator;
@@ -361,6 +366,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               "_BA_State_t current_state = " + aadlComponentCId + "_" +
               AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
         processEList(_cFileContent, ba.getVariables()) ;
+        _cFileContent.addOutputNewline("while(1)") ;
+        _cFileContent.addOutputNewline("{") ;
+        _cFileContent.incrementIndent() ;
         _cFileContent.addOutputNewline("switch(current_state)") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
@@ -397,6 +405,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _headerFileContent.addOutputNewline("} " + aadlComponentCId +
               "_BA_State_t;") ;
         _headerFileContent.addOutputNewline("") ;
+        _cFileContent.decrementIndent() ;
+        _cFileContent.addOutputNewline("}") ;
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         _cFileContent.decrementIndent() ;
@@ -1034,15 +1044,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           if(sct instanceof SubprogramType)
           {
             st = (SubprogramType) sct ;
-            aadlCUnparser.delayedUnparsing.add(st);
           }
           else
           {
             SubprogramImplementation si = (SubprogramImplementation) sct ;
-            aadlCUnparser.delayedUnparsing.add(si);
             st = si.getType() ;
           }
-
+          additionalSubprogramsToUnparse(sct);
           List<PrototypeBinding> currentBindings = aadlCUnparser.getCurrentPrototypeBindings(
         		  object.getSubprogram().getElement().getName());
           List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st, currentBindings) ;
@@ -1219,7 +1227,27 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
       
-      public String caseElementHolder(ElementHolder object)
+      private void additionalSubprogramsToUnparse(SubprogramSubcomponentType sct) {
+    	AadlToCUnparser aadlCUnparser = AadlToCUnparser.getAadlToCUnparser();   
+    	if(false == aadlCUnparser.additionalUnparsing.contains(sct))
+    	  aadlCUnparser.additionalUnparsing.add(sct);
+        for(AnnexSubclause as: ((SubprogramClassifier)sct).getAllAnnexSubclauses() )
+        {
+          if(as instanceof BehaviorAnnex)
+          {
+        	for(SubprogramHolder otherSpg: EcoreUtil2.getAllContentsOfType(as, SubprogramHolder.class))
+        	{
+        	  if(true == aadlCUnparser.additionalUnparsing.contains(otherSpg))
+        		continue;
+        	  aadlCUnparser.additionalUnparsing.add(otherSpg.getSubprogram());
+        	  additionalSubprogramsToUnparse((SubprogramSubcomponentType) otherSpg.getSubprogram());
+        	}
+        	return;
+          }
+        }
+	 }
+
+	public String caseElementHolder(ElementHolder object)
       {
     	NamedElement elt = object.getElement();
     	String id;
