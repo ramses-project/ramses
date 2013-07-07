@@ -296,7 +296,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		),
 		PeriodicDelayedContext_Connection: AADLBA!AccessConnection
 		(
-			name<-cnxRef.name+'_'+fi.name+'_to_periodic_Delayed_Context',
+			name<-cnxRef.uniqueName()+'_'+fi.name+'_to_periodic_Delayed_Context',
 			accessCategory<-#data,
 			source<-connected_PeriodicDelayedContext_Access,
 			destination<-connected_PeriodicDelayedContext_Subcomponent
@@ -389,7 +389,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		PeriodicDelayedContext_EntryPointConnection: AADLBA!AccessConnection
 		(
-			name<-cnxRef.name+'_'+fi.name+'_to_periodic_Delayed_Context',
+			name<-cnxRef.uniqueName()+'_'+fi.name+'_to_periodic_Delayed_Context',
 			accessCategory<-#data,
 			source<-connected_PeriodicDelayedContext_Access,
 			destination<-connected_PeriodicDelayedContext_Subcomponent

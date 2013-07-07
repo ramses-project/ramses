@@ -225,3 +225,12 @@ helper def: getBAInitialStateIdentifier(implBA: AADLBA!BehaviorAnnex) : String =
 helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
 	self.getFeatureImg()
 ;
+
+helper context AADLI!Connection def : uniqueName(): String =
+	let component : AADLI!ComponentImplementation = self.eContainer() in
+	if(not self.name.isEmpty().debug(' @@@ ')) then
+		self.name
+	else
+		'cnx_generated_id_'+component.ownedConnection.indexOf(self).toString().debug('????')
+	endif
+;

@@ -198,7 +198,7 @@ rule m_Output_Port_BehaviorAnnex
 		(
 			source <- sourceCE,
 			destination <- destinationCE,
-			name <- cnxRef.name+'_'+fi.name+'_accessCnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString(),
+			name <- cnxRef.uniqueName()+'_'+fi.name+'_accessCnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString(),
 			accessCategory <- #data
 		),
 		sourceCE: AADLBA!ConnectedElement

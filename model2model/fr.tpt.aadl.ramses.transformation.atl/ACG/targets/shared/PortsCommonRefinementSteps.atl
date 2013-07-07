@@ -76,15 +76,15 @@ rule m_Thread_Output_Port_Instance
 	to
 		f: AADLBA!DataAccess
 		(
-			name <- cnxRef.name+'_'+fi.feature.name
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name
 		),
 		f_entrypoint: AADLBA!DataAccess
 		(
-			name <- cnxRef.name+'_'+fi.feature.name
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name
 		),
 		accessConnection: AADLBA!AccessConnection
 		(
-			name <- cnxRef.name+'_'+cnxRef.destination.connectionEnd.name+'_to_globalVariable',
+			name <- cnxRef.uniqueName()+'_'+cnxRef.destination.connectionEnd.name+'_to_globalVariable',
 			source<-connectedAccess,
 			accessCategory<-#data,
 			destination<-connectedSubcomponent

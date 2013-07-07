@@ -493,7 +493,7 @@ abstract rule m_Parameter_to_DataAccess_Connection
 		),
 		accessConnection: AADLBA!AccessConnection
 		(
-			name <- accessCnx.name+'_entrypoint',
+			name <- accessCnx.uniqueName()+'_entrypoint',
 			accessCategory <- #data,
 			source <- ceSource,
 			destination <- ceDestination
@@ -527,7 +527,7 @@ rule m_Parameter_to_DataAccess_SourceConnection
 		),
 		accessConnection: AADLBA!AccessConnection
 		(
-			name <- accessCnx.name+'_entrypoint'
+			name <- accessCnx.uniqueName()+'_entrypoint'
 		),
 		ceSource: AADLBA!ConnectedElement
 		(connectionEnd <- dataAccess),
@@ -563,7 +563,7 @@ rule m_Parameter_to_DataAccess_DestinationConnection
 		),
 		accessConnection: AADLBA!AccessConnection
 		(
-			name <- accessCnx.name+'_entrypoint'
+			name <- accessCnx.uniqueName()+'_entrypoint'
 		),
 		ceSource: AADLBA!ConnectedElement
 		(connectionEnd <- accessCnx.source.connectionEnd),
@@ -655,7 +655,7 @@ rule m_Parameter_to_DataInstance_SourceConnection
 	to
 		featureImg: AADLBA!Parameter
 		(
-			name <-  paramCnx.name+'_'+paramCnx.destination.connectionEnd.name
+			name <-  paramCnx.uniqueName()+'_'+paramCnx.destination.connectionEnd.name
 		)	
 }
 
@@ -672,7 +672,7 @@ rule m_Parameter_to_DataInstance_DestinationConnection
 	to
 		featureImg: AADLBA!Parameter
 		(
-			name <-   paramCnx.name+'_'+paramCnx.source.connectionEnd.name
+			name <-   paramCnx.uniqueName()+'_'+paramCnx.source.connectionEnd.name
 		)	
 }
 
@@ -723,7 +723,7 @@ rule m_Parameter_to_Parameter_Connection
 	to
 		paramCnxVariable: AADLBA!DataSubcomponent
 		(
-			name <- paramCnx.name+'_localVariable',
+			name <- paramCnx.uniqueName()+'_localVariable',
 			dataSubcomponentType <- paramCnx.source.connectionEnd.dataFeatureClassifier
 		)
 }
