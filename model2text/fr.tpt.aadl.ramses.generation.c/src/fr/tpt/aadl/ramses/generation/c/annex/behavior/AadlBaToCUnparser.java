@@ -53,8 +53,10 @@ import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
+import org.osate.aadl2.ThreadClassifier;
 import org.osate.aadl2.modelsupport.AadlConstants;
 import org.osate.aadl2.modelsupport.UnparseText;
+import org.osate.aadl2.modelsupport.util.AadlUtil;
 
 import fr.tpt.aadl.annex.behavior.aadlba.Any;
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
@@ -1184,7 +1186,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                   {
                   	eh = (ElementHolder) pl;
                   }
-                  if(eh instanceof DataAccessHolder)
+                  if(eh instanceof DataAccessHolder && 
+                		  AadlUtil.getContainingAnnex(eh) instanceof ThreadClassifier)
                   	name = _dataAccessMapping.get((DataAccess)eh.getElement());
                   else if(eh instanceof DataSubcomponentHolder)
                   {
