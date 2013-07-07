@@ -460,11 +460,13 @@ helper context AADLI!ParameterConnection def: isParamToParamConnection(): Boolea
 ;
 
 helper context AADLI!AccessConnection def: isAccessToParamConnection(): Boolean = 
-	(self.source.context.oclIsKindOf(AADLI!SubprogramCall) and self.source.connectionEnd.oclIsTypeOf(AADLI!DataAccess)
-	and self.destination.connectionEnd.oclIsTypeOf(AADLI!DataAccess))
+	(
+		self.source.context.oclIsKindOf(AADLI!SubprogramCall) and self.source.connectionEnd.oclIsTypeOf(AADLI!DataAccess)
+	)
 	or
-	(self.destination.context.oclIsKindOf(AADLI!SubprogramCall) and self.destination.connectionEnd.oclIsTypeOf(AADLI!DataAccess)
-	and self.source.connectionEnd.oclIsTypeOf(AADLI!DataAccess))
+	(
+		self.destination.context.oclIsKindOf(AADLI!SubprogramCall) and self.destination.connectionEnd.oclIsTypeOf(AADLI!DataAccess)
+	)
 ;
 
 helper context AADLI!Connection def: isPartOfCallSequence(behavior: AADLI!Element): Boolean =
