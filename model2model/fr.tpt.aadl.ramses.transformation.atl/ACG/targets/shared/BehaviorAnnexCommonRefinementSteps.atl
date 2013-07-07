@@ -270,7 +270,7 @@ rule m_Compute_EntryPoint_from_BA {
 												(
 												 	'Initial_Value',
 													'DATA_MODEL',
-													 thisModule.CreateListValueFromString(stateTypeID.getProgrammationLanguageIdentifier().concat('_')+thisModule.getBAInitialStateIdentifier(implBA))
+													 thisModule.CreateListValueFromString(c.targetPackagePrefix()+stateTypeID.getProgrammationLanguageIdentifier().concat('_')+thisModule.getBAInitialStateIdentifier(implBA))
 												)
 									}
 	),
