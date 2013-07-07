@@ -71,6 +71,14 @@ helper context AADLI!InstanceObject def : uniqueName() : String =
 	endif
 ;
 
+helper context AADLI!InstanceObject def : targetPackagePrefix() : String =
+	if (self.subcomponent.classifier.eContainer().eContainer().debug(' !!!!! ').oclIsKindOf(AADLI!AadlPackage)) then
+		self.subcomponent.classifier.eContainer().eContainer().name+'_refined__'.debug(' !!!!! ')
+	else
+		''
+	endif
+;
+
 helper context AADLI!Element def : getOwnerComponent() : AADLI!ComponentInstance =
 	if (self.eContainer().oclIsKindOf(AADLI!ComponentInstance)) then
 		self.eContainer()
