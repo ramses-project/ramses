@@ -188,7 +188,7 @@ public class RoutingProperties implements TargetProperties {
             return true;
       }
       List<FeatureInstance> srcList = getFeatureSources(fi);
-      if(dstList!=null)
+      if(srcList!=null)
       {
         for(FeatureInstance src : srcList)
           if(false == areCollocated(fi,src))
@@ -204,11 +204,17 @@ public class RoutingProperties implements TargetProperties {
     if(src.getContainingComponentInstance().getCategory()
         .equals(ComponentCategory.THREAD))
       srcProcess = src.getContainingComponentInstance()
-        .getContainingComponentInstance();
+    		  .getContainingComponentInstance();
+    else if (src.getContainingComponentInstance().getCategory()
+            .equals(ComponentCategory.PROCESS))
+    	srcProcess = src.getContainingComponentInstance();
     if(dst.getContainingComponentInstance().getCategory()
         .equals(ComponentCategory.THREAD))
       dstProcess = dst.getContainingComponentInstance()
-        .getContainingComponentInstance();
+    		  .getContainingComponentInstance();
+    else if(dst.getContainingComponentInstance().getCategory()
+            .equals(ComponentCategory.PROCESS))
+    	dstProcess = dst.getContainingComponentInstance();
     if(srcProcess==null || dstProcess==null)
       return false;
     return srcProcess.equals(dstProcess);
@@ -216,9 +222,9 @@ public class RoutingProperties implements TargetProperties {
   
   public static List<FeatureInstance> getFeatureSources(FeatureInstance port)
   {
-    // The parameter "port" must be port of a thread component
+    // The parameter "port" must be port of a process component
     if(!port.getContainingComponentInstance().getCategory()
-        .equals(ComponentCategory.THREAD))
+        .equals(ComponentCategory.PROCESS))
       return null;
 
     List<FeatureInstance> result = new ArrayList<FeatureInstance>();
@@ -228,7 +234,7 @@ public class RoutingProperties implements TargetProperties {
       if(fi.getContainingComponentInstance().getCategory()
           .equals(ComponentCategory.THREAD))
       {
-        result.add(fi);
+        result.add((FeatureInstance)ci.getConnectionReferences().get(0).getDestination());
       }
     }
     return result;
@@ -248,7 +254,8 @@ public class RoutingProperties implements TargetProperties {
       if(fi.getContainingComponentInstance().getCategory()
           .equals(ComponentCategory.THREAD))
       {
-        result.add(fi);
+    	int last = ci.getConnectionReferences().size()-1;
+        result.add((FeatureInstance)ci.getConnectionReferences().get(last).getSource());
       }
     }
     return result;
