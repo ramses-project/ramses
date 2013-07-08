@@ -334,6 +334,10 @@ helper context AADLBA!BehaviorActionSequence def: resolve(c: AADLI!ComponentInst
 	self.actions->collect(e| e.resolve(c))
 ;
 
+helper context AADLBA!AssignmentAction def: resolve(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
+	thisModule.resolveTemp(Sequence{self,c}, 'target_assignmentAction')
+;
+
 helper context AADLBA!SubprogramCallAction def: resolve(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
 	thisModule.resolveTemp(Sequence{self,c}, 'target_communicationAction')
 ;
@@ -644,8 +648,16 @@ rule m_IfStatement
 		(
 			logicalValueExpression <- src_ifStatement.logicalValueExpression.resolve(c),
 			elif <- src_ifStatement.elif.resolve(c),
-			behaviorActions <- src_ifStatement.behaviorActions.resolve(c),
+			behaviorActions <- ifStatementActionSequence,
 			elseStatement <- src_ifStatement.elseStatement.resolve(c)
+		),
+		ifStatementActionSequence: AADLBA!BehaviorActionSequence
+		(
+			actions <- if(src_ifStatement.behaviorActions.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
+						src_ifStatement.behaviorActions.actions->collect( e| e.resolve(c))
+					   else
+					   	Sequence{src_ifStatement.behaviorActions.resolve(c)}
+					   endif
 		)
 }
 
@@ -726,6 +738,10 @@ rule m_SubprogramHolder
 		(
 			element <- src_Holder.element
 		)
+	do
+	{
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), src_Holder.element);
+	}
 }
 
 rule m_DataPortHolder_withFresh
@@ -811,6 +827,22 @@ rule m_SubprogramCallAction
 		)
 }
 
+rule m_AssignmentAction
+{
+	from
+		src_assignmentAction: AADLBA!AssignmentAction,
+		c: AADLI!ComponentInstance
+		(
+			src_assignmentAction.isThreadBehaviorElement() and
+			src_assignmentAction.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_assignmentAction: AADLBA!AssignmentAction
+		(
+			target <- src_assignmentAction.target.resolve(c),
+			valueExpression <- src_assignmentAction.valueExpression.resolve(c)
+		)
+}
 
 rule m_Term {
 	from
@@ -913,6 +945,19 @@ rule m_DataAccessHolder
 		(src_Holder.isPartOfBehaviorAnnexOf(c))
 	to
 		target_Holder: AADLBA!DataAccessHolder
+		(
+			element<-c.featureInstance->any(e|e.name=src_Holder.element.name)	
+		)
+}
+
+rule m_ParameterHolder
+{
+	from
+		src_Holder:AADLBA!ParameterHolder,
+		c: AADLI!ComponentInstance
+		(src_Holder.isPartOfBehaviorAnnexOf(c))
+	to
+		target_Holder: AADLBA!ParameterHolder
 		(
 			element<-c.featureInstance->any(e|e.name=src_Holder.element.name)	
 		)

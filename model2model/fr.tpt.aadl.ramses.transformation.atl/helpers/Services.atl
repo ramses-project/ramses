@@ -79,7 +79,12 @@ helper context AADLI!FeatureInstance def: isInputFeature(): Boolean =
 	(self.feature.oclIsKindOf(AADLBA!DirectedFeature) and not self.isOutputFeature() and not self.isInputOutputFeature());
 
 helper context AADLBA!SubprogramType def: getOrderedFeature() : Sequence(AADLBA!Feauture) =
-	ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().orderFeatures(self);
+	if(self.oclIsUndefined()) then
+		OclUndefined
+	else
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().orderFeatures(self)
+	endif
+;
 
 helper context AADLBA!SubprogramImplementation def: getOrderedFeature() : Sequence(AADLBA!Feauture) =
 	self.getComponentType().getOrderedFeature();
@@ -228,9 +233,9 @@ helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLB
 
 helper context AADLI!Connection def : uniqueName(): String =
 	let component : AADLI!ComponentImplementation = self.eContainer() in
-	if(not self.name.isEmpty().debug(' @@@ ')) then
+	if(not self.name.isEmpty()) then
 		self.name
 	else
-		'cnx_generated_id_'+component.ownedConnection.indexOf(self).toString().debug('????')
+		'cnx_generated_id_'+component.ownedConnection.indexOf(self).toString()
 	endif
 ;

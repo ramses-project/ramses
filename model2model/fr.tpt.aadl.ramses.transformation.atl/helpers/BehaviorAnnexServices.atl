@@ -31,16 +31,20 @@ helper context AADLBA!BehaviorElement def : getBehaviorAnnex() : AADLBA!Behavior
 	endif
 ;
 
-helper context AADLBA!BehaviorElement def: getContainingClassfier(): AADLBA!Classifier =
+helper context AADLBA!BehaviorElement def: getContainingClassifier(): AADLBA!Classifier =
 	if(self.eContainer().oclIsKindOf(AADLBA!Classifier)) then
 		self.eContainer()
 	else
-		self.eContainer().getContainingClassfier()
+		if(not self.eContainer().oclIsUndefined()) then
+			self.eContainer().getContainingClassifier()
+		else
+			OclUndefined
+		endif
 	endif
 ;
 
 helper context AADLBA!BehaviorElement def: isThreadBehaviorElement(): Boolean =
-	self.getContainingClassfier().oclIsKindOf(AADLBA!ThreadClassifier)
+	self.getContainingClassifier().oclIsKindOf(AADLBA!ThreadClassifier)
 ;
 
 helper context AADLBA!BehaviorElement def: isPartOfBehaviorAnnexOf(c: AADLI!ComponentInstance): Boolean =
