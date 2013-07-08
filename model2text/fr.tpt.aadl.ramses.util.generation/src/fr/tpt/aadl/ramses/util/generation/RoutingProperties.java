@@ -222,9 +222,9 @@ public class RoutingProperties implements TargetProperties {
   
   public static List<FeatureInstance> getFeatureSources(FeatureInstance port)
   {
-    // The parameter "port" must be port of a process component
+    // The parameter "port" must be port of a thread component
     if(!port.getContainingComponentInstance().getCategory()
-        .equals(ComponentCategory.PROCESS))
+        .equals(ComponentCategory.THREAD))
       return null;
 
     List<FeatureInstance> result = new ArrayList<FeatureInstance>();
