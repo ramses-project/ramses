@@ -156,9 +156,6 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 					"Illegal initialization of ATL transformation launcher: "
 							+ "directory containing .asm files is undefined") ;
 
-		//this.transformationFilepath = transformationFileName ;
-
-
 		return doTransformation(transformationFileList, inputResource, outputDirPathName) ;
 
 					}
@@ -237,18 +234,13 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			aadlGeneratedFileName = aadlGeneratedFileName.substring("platform:/resource".length());
 		aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 				".aaxl2", "_extended.aaxl2");
-		Resource outputResource = rs.createResource(URI.createURI(aadlGeneratedFileName));
-//				rs.getResource(URI.createURI(outputDirPathName), false) ;
+		URI uri = URI.createURI(aadlGeneratedFileName);
+		Resource outputResource = rs.getResource(uri, false);
+		if(outputResource==null)
+		  outputResource = rs.createResource(uri);
 		Model outModel = EmftvmFactory.eINSTANCE.createModel();
 		outModel.setResource(outputResource);
 		env.registerInOutModel("OUT", outModel);
-
-		
-
-		
-		// Load transformation module
-		//ModuleResolver mr = new DefaultModuleResolver("file:" + resourcesDir.getAbsolutePath(), rs);
-		//env.loadModule(mr, "Uninstanciate");
 
 		ModuleResolver mr = new ModuleResolver() {
 			@Override
@@ -287,14 +279,6 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			}
 		}
 		
-//		for(File f : transformationFileList)
-//		{
-//			URL asmSuperImposeFile = new URL("file:" + f.toString()) ;
-//			Object loadedSuperImposeModule =
-//					launcher.loadModule(asmSuperImposeFile.openStream()) ;
-//			atlModules.add(loadedSuperImposeModule) ;
-//		}
-		
 		// Run transformation
 		TimingData td = new TimingData();
 		td.finishLoading();
@@ -327,12 +311,10 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/tools/PropertiesTools") ;
 		fileName.add("/tools/PackagesTools") ;
 		fileName.add("/tools/FeaturesTools") ;
-		//fileName.add("/tools/SubprogramsTools") ;
 		fileName.add("/uninstanciate/Features") ;
 		fileName.add("/uninstanciate/Implementations") ;
 		fileName.add("/uninstanciate/Properties") ;
 		fileName.add("/uninstanciate/Types") ;
-		fileName.add("/uninstanciate/SubprogramCalls") ;
 		fileName.add("/uninstanciate/Connections") ;
 		fileName.add("/helpers/Services") ;
 		fileName.add("/tools/BehaviorAnnexTools") ;
@@ -341,9 +323,6 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
 		fileName.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
 		fileName.add("/BehaviorAnnexCopy/copyElementHolders") ;
-		// Fixme: next will be added when tested with emftvm
-		//fileName.add("/PeriodicDelayedCommunication/EventDataPorts");
-		//fileName.add("/PeriodicDelayedCommunication/EventDataPorts_LowMFP");
 		
 		for(String s : fileName)
 		{
