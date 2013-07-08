@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.ModelUnit;
@@ -70,7 +73,6 @@ public class AADLInspectorLauncher
 		}
 		
 		final String command = BIN_PATH + "AADLInspector" + extension;
-		
 		Process p = Runtime.getRuntime().exec(new String[] {
 				command, 
 				"-a", modelList, 
@@ -111,8 +113,16 @@ public class AADLInspectorLauncher
 		final SystemImplementation si = root.getSystemImplementation();
 		final PublicPackageSection pps = (PublicPackageSection) si.eContainer();
 		final List<String> paths = new ArrayList<String>();
-		
-		paths.add(si.eResource().getURI().toFileString());
+		URI uri = si.eResource().getURI();
+		String path = uri.toFileString();
+		if(path!=null)
+		  paths.add(path);
+		else
+		{
+		  String filePath = Platform.getLocation().toOSString();
+		  filePath = filePath + uri.toPlatformString(true) ;
+		  paths.add(filePath);
+		}
 		
 		loadResourcePaths(pps, paths);
 		String[] modelList = paths.toArray(new String[paths.size()]);
@@ -126,8 +136,13 @@ public class AADLInspectorLauncher
 		for(ModelUnit u : imports)
 		{
 			final Resource r = u.eResource();
-			final String path = r.getURI().toFileString();
-			
+			URI uri = r.getURI();
+			String path = uri.toFileString();
+			if(path==null)
+			{
+			  path = Platform.getLocation().toOSString();
+			  path = path + uri.toPlatformString(true) ;
+			}
 			if (! pathList.contains(path))
 			{
 				pathList.add(path);
