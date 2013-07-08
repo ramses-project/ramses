@@ -5,6 +5,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 
 /**
@@ -33,7 +34,7 @@ public class Activator extends AbstractUIPlugin {
 		plugin = this;
 		ContributedAadlRegistration car = new ContributedAadlRegistration();
 		RamsesConfiguration.setPredefinedResourcesRegistration(car);
-		ServiceRegistryProvider.setDefault(new OsateServiceRegistry()) ;
+		ServiceRegistryProvider.setDefault(new OSGiServiceRegistry()) ;
 	}
 
 	/*
