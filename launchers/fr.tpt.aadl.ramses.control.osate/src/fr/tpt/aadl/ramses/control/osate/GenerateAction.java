@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
@@ -20,6 +21,8 @@ import org.osate.ui.dialogs.Dialog;
 import org.osgi.framework.Bundle;
 
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
+import fr.tpt.aadl.ramses.control.support.EcorePilot;
+import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
@@ -96,9 +99,25 @@ public class GenerateAction extends AbstractAnalyzer
         System.out.println("\nURI: " + uri + "\nFile URL: " + url);
 
         File resourceDir = new File(url.toURI()); 
-        generator.generate(root, 
-                           resourceDir,
-                           outputDir) ;
+        
+        // look for a wokflow file
+        Resource r = root.eResource();
+        String s = r.getURI().segment(1);
+        File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
+        String workflow = this.findWorkflow(rootDir);
+        if(workflow==null)
+          generator.generate(root, 
+                             resourceDir,
+                             outputDir) ;
+        else
+        {
+          EcorePilot xmlPilot = new EcorePilot(workflow);
+          generator.generateWorkflow(root,
+        		                     resourceDir,
+        		                     outputDir,
+        		                     xmlPilot);
+          
+        }
         ResourcesPlugin.getWorkspace().getRoot().
         	refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
       }
@@ -123,6 +142,28 @@ public class GenerateAction extends AbstractAnalyzer
     
   }
 
+  private String findWorkflow(File rootDirectory)
+  {
+	File[] list = rootDirectory.listFiles();
+
+    if (list == null) return null;
+
+      for ( File f : list ) {
+        if ( f.isDirectory() ) {
+          String result = findWorkflow( f );
+          if(result == null)
+        	continue;
+          else
+        	return result;
+        }
+        else {
+          if(f.getPath().endsWith(".workflow"))
+        	return f.getAbsolutePath(); 
+        }
+      }
+	return null;
+  }
+  
   @Override
   protected String getActionName()
   {
