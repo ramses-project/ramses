@@ -193,6 +193,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 //      transformation(launcher, jsapTransfo, args) ;
       
       generation(launcher, jsapGen, args) ;
+      System.exit(0);
     }
     catch(Exception e)
     {
