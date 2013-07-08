@@ -1679,7 +1679,16 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	    if(fi.getDirection().equals(DirectionType.OUT)
 	          || fi.getDirection().equals(DirectionType.IN_OUT))
 	    {
-	      List<FeatureInstance> destinations = RoutingProperties.getFeatureDestinations(fi);
+	      List<FeatureInstance> destinations = new ArrayList<FeatureInstance>();
+	      for(ConnectionInstance ci: fi.getSrcConnectionInstances())
+	      {
+	        FeatureInstance dest = (FeatureInstance)ci.getDestination();
+	        if(dest.getContainingComponentInstance().getCategory()
+	            .equals(ComponentCategory.THREAD))
+	        {
+	      	  destinations.add(dest);
+	        }
+	      }
 	      routingImplCode.addOutput("uint8_t ");
 	      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
 	                                "_deployment_destinations["+
