@@ -43,6 +43,7 @@ import org.osate.xtext.aadl2.properties.util.EMFIndexRetrieval;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
+import fr.tpt.aadl.ramses.control.support.AadlResourceValidator;
 import fr.tpt.aadl.ramses.control.support.InstantiationManagerImpl;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
@@ -148,7 +149,7 @@ public class StandAloneInstantiator extends InstantiationManagerImpl
       }
     }
     
-    this.validate() ;
+    AadlResourceValidator.validate(resourceSet) ;
     if(loadOption)
     {
       OsateResourceUtil.setResourceSet(resourceSet);
@@ -169,38 +170,6 @@ public class StandAloneInstantiator extends InstantiationManagerImpl
     }
 
     return result ;
-  }
-
-  public void validate()
-  {
-    for(Resource input_resource : resourceSet.getResources())
-    {
-      for(EObject myModel : input_resource.getContents())
-      {
-        Diagnostic diagnostic = Diagnostician.INSTANCE.validate(myModel) ;
-
-        switch ( diagnostic.getSeverity() )
-        {
-          case Diagnostic.ERROR :
-
-            for(Diagnostic d : diagnostic.getChildren())
-            {
-              System.err.println("Model has errors: "
-                    + input_resource.getURI().lastSegment() + " " + d.getMessage()) ;
-            }
-
-            break ;
-          case Diagnostic.WARNING :
-
-            for(Diagnostic d : diagnostic.getChildren())
-            {
-              System.err.println("Model has warnings: " + d.getMessage()) ;
-            }
-
-            break ;
-        }
-      }
-    }
   }
 
   public ResourceSet getAadlResourceSet()
