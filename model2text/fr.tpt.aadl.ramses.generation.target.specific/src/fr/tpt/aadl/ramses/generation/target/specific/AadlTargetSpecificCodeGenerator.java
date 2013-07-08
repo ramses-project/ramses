@@ -22,17 +22,21 @@
 package fr.tpt.aadl.ramses.generation.target.specific;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.xtext.EcoreUtil2;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.util.Aadl2Util;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
@@ -68,24 +72,24 @@ public class AadlTargetSpecificCodeGenerator
   public void generate(Resource inputResource,
                        File generatedFilePath) throws GenerationException
   {
-    TreeIterator<EObject> iter = inputResource.getAllContents() ;
-      
+	SystemInstance systemInstance = (SystemInstance) inputResource.getContents().get(0);
+	List<SystemInstance> systemInstanceList = this.getListOfSystemInstance(systemInstance);
     File generatedCodeDirectory =
           new File(generatedFilePath + GENERATED_DIR_NAME) ;
     generatedCodeDirectory.mkdir() ;
 
-    while(iter.hasNext())
+    for(SystemInstance iter: systemInstanceList)
     {
-      Element elt = (Element) iter.next() ;
-      
+      Element elt = iter;
+      SystemImplementation sys=null;
       if (elt instanceof SystemInstance)
       {
-    	  elt = ((SystemInstance) elt).getSystemImplementation();
+    	  sys = ((SystemInstance) elt).getSystemImplementation();
       }
       
-      if(elt instanceof SystemImplementation)
+      if(sys!=null)
       {
-        SystemImplementation si = (SystemImplementation) elt ;
+        SystemImplementation si = (SystemImplementation) sys ;
         File generatedFileDir = new File(generatedFilePath + GENERATED_DIR_NAME);
         
         // XXX Have AadlGenericUnparser to unparse the SystemImplementation
@@ -128,4 +132,18 @@ public class AadlTargetSpecificCodeGenerator
       }
     }  
   }
+
+private List<SystemInstance> getListOfSystemInstance(
+		SystemInstance systemInstance) {
+	List<SystemInstance> systemInstanceList = new ArrayList<SystemInstance>();
+	systemInstanceList.add(systemInstance);
+	for(ComponentInstance ci : systemInstance.getComponentInstances())
+	{
+	  if(ci instanceof SystemInstance)
+	  {
+		systemInstanceList.addAll(getListOfSystemInstance((SystemInstance) ci));
+	  }
+	}
+	return systemInstanceList;
+}
 }
