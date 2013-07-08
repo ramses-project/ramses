@@ -35,7 +35,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -62,6 +64,8 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
+
+import antlr.RecognitionException;
 
 import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
@@ -137,7 +141,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			File outputFile = new File(outputFilePath);
 
 			instantiator.serialize(expandedResult, outputFilePath);
-			return AadlToTargetSpecificAadl.extractXtextResource(inputResource, outputFile);
+			return AadlToTargetSpecificAadl.extractAadlResource(inputResource, outputFile);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

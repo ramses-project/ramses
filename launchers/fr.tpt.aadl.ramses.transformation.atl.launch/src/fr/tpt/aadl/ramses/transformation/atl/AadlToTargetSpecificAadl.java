@@ -64,22 +64,24 @@ import org.osate.annexsupport.AnnexResolver;
 import antlr.RecognitionException;
 
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
+import fr.tpt.aadl.ramses.control.support.AadlResourceValidator;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
+//import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
 import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 {
+	protected static AadlResourceValidator extractor;
     protected String[] ATL_FILE_NAMES;
     public List<File> ATL_FILES;
     private static final String DEFAULT_ATL_FILE_PATH =
       "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
-   
+    
     public void initAtlFileNameList(File resourceDir)
     {
         ATL_FILES = new ArrayList<File>(ATL_FILE_NAMES.length);
@@ -99,15 +101,14 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
       resourceDir = new File(DEFAULT_ATL_FILE_PATH) ;
     }
 
-    AtlTransfoLauncher atlLauncher;
     try {
-        atlLauncher = new Aadl2AadlEMFTVMLauncher();
         ArrayList<File> atlFiles = new ArrayList<File>(ATL_FILE_NAMES.length) ;
      
       for(String fileName : ATL_FILE_NAMES)
       {
         atlFiles.add(new File(resourceDir + "/" + fileName)) ;
       }
+      Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher();
         return atlLauncher.generationEntryPoint(inputResource,
                 resourceDir,
                 atlFiles,
@@ -135,16 +136,14 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 	  instantiator.serialize(expandedResult, outputFilePath);
 
 	  try {
-		  return extractXtextResource(inputResource, outputFile);
+		  return extractAadlResource(inputResource, outputFile);
 	  } catch (Exception e) {
 		  e.printStackTrace();
 		  return null;
 	  }
   }
-  
-  public static Resource extractXtextResource(Resource inputResource,
-		  File outputFile) throws CoreException, IOException,
-		  RecognitionException, InterruptedException, ExecutionException
+
+  public static Resource extractAadlResource(Resource inputResource, File outputFile) throws InterruptedException, ExecutionException, CoreException, IOException, RecognitionException
   {
 	  URI uri;
 	  SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
@@ -187,7 +186,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 	  {
 		  uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
 		  RamsesConfiguration.setInputDirectory(new File(si.getSystemImplementation().eResource().getURI().toFileString()).getParentFile());
-		  Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
+		  final Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
 		  xtextResource.load(null);
 		  
 		  // Implements a timeout of 10s.
@@ -197,7 +196,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
         @Override
         public Boolean call() throws Exception
         {
-          StandAloneInstantiator.getInstantiator().validate();
+          AadlResourceValidator.validate(xtextResource.getResourceSet());
           return true ;
         }
 		    
@@ -262,8 +261,13 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 	  }
   }
 
-     abstract public void setParameters(Map<Enum<?>, Object> parameters) ;
-
+abstract public void setParameters(Map<Enum<?>, Object> parameters);
+ 
+  public static void validate(ResourceSet rs) throws RecognitionException, CoreException, IOException, InterruptedException, ExecutionException
+  {
+	AadlResourceValidator.validate(rs);
+  }
+  
   public Resource transformXML(Resource inputResource,
                                                            File resourceDir,
                                                            List<String> resourceFileNameList,
@@ -280,9 +284,8 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
           atlFiles.add(new File(resourceDir + "/" + resourceFileName)) ;
       }
 
-      AtlTransfoLauncher atlLauncher;
       try {
-          atlLauncher = new Aadl2AadlEMFTVMLauncher();
+    	  Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher();
           return atlLauncher.generationEntryPoint(inputResource,
                   resourceDir,
                   atlFiles,

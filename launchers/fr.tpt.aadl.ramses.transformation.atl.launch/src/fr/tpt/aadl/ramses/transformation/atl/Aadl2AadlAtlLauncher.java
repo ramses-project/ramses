@@ -91,7 +91,7 @@ import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
 
 
-public class Aadl2AadlAtlLauncher extends AtlTransfoLauncher
+public abstract class Aadl2AadlAtlLauncher extends AtlTransfoLauncher
 {
 
 	private static final EMFExtractor extractor = new EMFExtractor() ;
