@@ -29,16 +29,21 @@ import java.util.Map;
 import java.util.Set;
 
 import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.ModalPropertyValue;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance ;
+import org.osate.aadl2.instance.ConnectionReference;
 import org.osate.aadl2.instance.FeatureCategory ;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceReferenceValue;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.util.Aadl2Util;
+
+import fr.tpt.aadl.utils.*;
 
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 
@@ -102,9 +107,10 @@ public class RoutingProperties implements TargetProperties {
 				{
 					if(RoutingProperties.needsRoutage(f))
 					{
-						processPorts.add(f);
-						globalPort.add(f);
-						processorPort.put(f, getProcessorBinding(process));
+						FeatureInstance fi = Aadl2Utils.getContainingProcessPort(f);
+						processPorts.add(fi);
+						globalPort.add(fi);
+						processorPort.put(fi, getProcessorBinding(process));
 					}
 				}
 			}
@@ -222,19 +228,38 @@ public class RoutingProperties implements TargetProperties {
   
   public static List<FeatureInstance> getFeatureSources(FeatureInstance port)
   {
-    // The parameter "port" must be port of a thread component
-    if(!port.getContainingComponentInstance().getCategory()
-        .equals(ComponentCategory.THREAD))
-      return null;
-
     List<FeatureInstance> result = new ArrayList<FeatureInstance>();
-    for(ConnectionInstance ci: port.getDstConnectionInstances())
+	if(port.getContainingComponentInstance().getCategory()
+        .equals(ComponentCategory.THREAD))
     {
-      FeatureInstance fi = (FeatureInstance)ci.getSource();
-      if(fi.getContainingComponentInstance().getCategory()
-          .equals(ComponentCategory.THREAD))
+      for(ConnectionInstance ci: port.getDstConnectionInstances())
       {
-        result.add((FeatureInstance)ci.getConnectionReferences().get(0).getDestination());
+        FeatureInstance fi = (FeatureInstance)ci.getSource();
+        if(fi.getContainingComponentInstance().getCategory()
+            .equals(ComponentCategory.THREAD))
+        {
+          result.add((FeatureInstance)ci.getConnectionReferences().get(0).getDestination());
+        }
+      }
+    }
+    else if(port.getContainingComponentInstance().getCategory()
+            .equals(ComponentCategory.PROCESS))
+    {
+      ComponentInstance process = port.getContainingComponentInstance();
+      for(ComponentInstance thread: process.getComponentInstances())
+      {
+        if(!thread.getCategory().equals(ComponentCategory.THREAD))
+          continue;
+    	for(FeatureInstance fi: thread.getFeatureInstances())
+    	{
+    	  int last = fi.getDstConnectionInstances().size()-1;
+    	  if(fi.getDirection() == DirectionType.IN)
+    	  for(ConnectionReference cnxRef: fi.getDstConnectionInstances().get(last).getConnectionReferences())
+    	  {
+    	    if(cnxRef.getSource() == port)
+    	      result.addAll(getFeatureSources(fi));
+    	  }
+    	}
       }
     }
     return result;
@@ -242,20 +267,41 @@ public class RoutingProperties implements TargetProperties {
   
   public static List<FeatureInstance> getFeatureDestinations(FeatureInstance port)
   {
-    // The parameter "port" must be port of a thread component
-    if(!port.getContainingComponentInstance().getCategory()
+	List<FeatureInstance> result = new ArrayList<FeatureInstance>();
+    if(port.getContainingComponentInstance().getCategory()
         .equals(ComponentCategory.THREAD))
-      return null;
-
-    List<FeatureInstance> result = new ArrayList<FeatureInstance>();
-    for(ConnectionInstance ci: port.getSrcConnectionInstances())
     {
-      FeatureInstance fi = (FeatureInstance)ci.getDestination();
-      if(fi.getContainingComponentInstance().getCategory()
-          .equals(ComponentCategory.THREAD))
+      for(ConnectionInstance ci: port.getSrcConnectionInstances())
       {
-    	int last = ci.getConnectionReferences().size()-1;
-        result.add((FeatureInstance)ci.getConnectionReferences().get(last).getSource());
+        FeatureInstance fi = (FeatureInstance)ci.getDestination();
+        if(fi.getContainingComponentInstance().getCategory()
+            .equals(ComponentCategory.THREAD))
+        {
+    	  int last = ci.getConnectionReferences().size()-1;
+          result.add((FeatureInstance)ci.getConnectionReferences().get(last).getSource());
+        }
+      }
+      return result;
+    }
+    else if(port.getContainingComponentInstance().getCategory()
+            .equals(ComponentCategory.PROCESS))
+    {
+      ComponentInstance process = port.getContainingComponentInstance();
+      for(ComponentInstance thread: process.getComponentInstances())
+      {
+    	if(!thread.getCategory().equals(ComponentCategory.THREAD))
+    	  continue;
+    	for(FeatureInstance fi: thread.getFeatureInstances())
+    	{
+    	  if(fi.getDirection() == DirectionType.OUT)
+    	  {
+    		for(ConnectionReference cnxRef: fi.getSrcConnectionInstances().get(0).getConnectionReferences())
+    		{
+    		  if(cnxRef.getDestination() == port)
+    	        result.addAll(getFeatureDestinations(fi));
+    		}
+    	  }
+    	}
       }
     }
     return result;

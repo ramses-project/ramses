@@ -4,7 +4,8 @@ Bundle-Name: Generation
 Bundle-SymbolicName: fr.tpt.aadl.ramses.util.generation;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Export-Package: fr.tpt.aadl.ramses.util.generation
-Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
+Require-Bundle: fr.tpt.aadl.utils;bundle-version="0.9.5",
+ org.osate.aadl2;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

@@ -1565,7 +1565,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	    routingHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_PORTS {");
 	    for(FeatureInstance fi: localPorts)
 	    {
-		  ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance().eContainer();
+		  ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance();
 		  if(processInstance.getCategory() == ComponentCategory.PROCESS)
 		  {
 	        List<ComponentInstance> bindedVP = PropertyUtils.getComponentInstanceList(processInstance,
@@ -1679,16 +1679,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	    if(fi.getDirection().equals(DirectionType.OUT)
 	          || fi.getDirection().equals(DirectionType.IN_OUT))
 	    {
-	      List<FeatureInstance> destinations = new ArrayList<FeatureInstance>();
-	      for(ConnectionInstance ci: fi.getSrcConnectionInstances())
-	      {
-	        FeatureInstance dest = (FeatureInstance)ci.getDestination();
-	        if(dest.getContainingComponentInstance().getCategory()
-	            .equals(ComponentCategory.THREAD))
-	        {
-	      	  destinations.add(dest);
-	        }
-	      }
+	      List<FeatureInstance> destinations = RoutingProperties.getFeatureDestinations(fi);
 	      routingImplCode.addOutput("uint8_t ");
 	      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
 	                                "_deployment_destinations["+
