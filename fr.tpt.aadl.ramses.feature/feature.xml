@@ -30,12 +30,14 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="fr.tpt.aadl.ramses.util.properties" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.emf.ecore"/>
-      <import plugin="org.osate.aadl2.modelsupport"/>
       <import plugin="org.osate.ui"/>
+      <import plugin="org.osate.aadl2.modelsupport"/>
       <import plugin="org.osate.annexsupport"/>
       <import plugin="org.osate.xtext.aadl2.properties"/>
-      <import plugin="fr.tpt.aadl.annex.behavior" version="0.9.5" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="fr.tpt.aadl.utils" version="0.9.5" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.annex.behavior" version="0.9.5" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.generation.c" version="0.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.osate.aadl2.modelsupport" version="1.0.0" match="greaterOrEqual"/>
@@ -43,22 +45,22 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.osate.annexsupport" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.m2m.atl.core" version="3.2.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.xtext" version="2.1.1" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.utils" version="0.9.5" match="greaterOrEqual"/>
       <import plugin="org.osate.aadl2.instantiation"/>
       <import plugin="org.osate.xtext.aadl2"/>
       <import plugin="fr.tpt.aadl.ramses.control.support" version="0.5.0" match="greaterOrEqual"/>
       <import plugin="fr.tpt.aadl.ramses.generation.target.specific" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.ramses.generation.c" version="0.5.0" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.ramses.transformation.atl.launch" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="fr.tpt.aadl.ramses.util.generation" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.sched.wcetanalysis" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.tpt.aadl.ramses.analysis.result" version="0.0.1" match="greaterOrEqual"/>
       <import plugin="org.osate.pluginsupport"/>
       <import plugin="org.eclipse.ui.workbench" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
       <import plugin="org.eclipse.m2m.atl.engine.emfvm" version="3.2.1" match="greaterOrEqual"/>
       <import plugin="org.osate.pluginsupport" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.osate.workspace"/>
+      <import plugin="org.objectweb.asm" version="3.3.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.m2m.atl.core.emf"/>
       <import plugin="org.eclipse.core.runtime" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.common" version="2.6.0" match="greaterOrEqual"/>
@@ -66,6 +68,17 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.osate.xtext.aadl2.properties" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.jdom" version="1.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore.xmi" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.m2m.atl.emftvm.trace"/>
+      <import plugin="org.eclipse.m2m.atl.common" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.validation" version="1.4.0" match="greaterOrEqual"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.osate.xtext.aadl2" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.aadl2.instantiation" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.ui.shared"/>
+      <import plugin="org.osate.xtext.aadl2.properties.ui"/>
+      <import plugin="fr.tpt.aadl.ramses.transformation.atl.launch" version="0.0.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -181,6 +194,34 @@ You should have received a copy of the Eclipse Public License along with this pr
 
    <plugin
          id="fr.tpt.aadl.sched.wcetanalysis"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.emftvm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.analysis.result"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.sched.tools.aadlinspector"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.emftvm.trace"
          download-size="0"
          install-size="0"
          version="0.0.0"
