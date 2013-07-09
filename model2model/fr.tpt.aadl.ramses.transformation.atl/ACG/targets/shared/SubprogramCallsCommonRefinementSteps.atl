@@ -47,6 +47,10 @@ helper def: collectGetValueCalls(c: AADLI!ComponentInstance, behavior:AADLI!Subp
 	Sequence{}
 ;
 
+helper def: collectPeriodicDelayed_LocalVariablesAccesses(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
 abstract rule m_ThreadEntrypoint { 
   from	
 	c: AADLI!ComponentInstance
@@ -165,7 +169,7 @@ abstract rule m_ThreadBehavior
 									)
 									->union
 									(
-										thisModule.collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c, behavior)
+										thisModule.collectPeriodicDelayed_LocalVariablesAccesses(c, behavior)
 									)
 									->flatten()->asSet(),
 			ownedParameter <- impl.ownedParameterConnection
