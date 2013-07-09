@@ -99,21 +99,14 @@ public class RoutingProperties implements TargetProperties {
 	{
 		List<FeatureInstance> processPorts = new ArrayList<FeatureInstance>();
 		portPerProcess.put(process, processPorts);
-		for(ComponentInstance subComponent: process.getComponentInstances())
+		for(FeatureInstance f:process.getFeatureInstances())
 		{
-			if(subComponent.getCategory().equals(ComponentCategory.THREAD))
-			{
-				for(FeatureInstance f:subComponent.getFeatureInstances())
-				{
-					if(RoutingProperties.needsRoutage(f))
-					{
-						FeatureInstance fi = Aadl2Utils.getContainingProcessPort(f);
-						processPorts.add(fi);
-						globalPort.add(fi);
-						processorPort.put(fi, getProcessorBinding(process));
-					}
-				}
-			}
+		  if(RoutingProperties.needsRoutage(f))
+		  {		  
+		    processPorts.add(f);
+			globalPort.add(f);
+			processorPort.put(f, getProcessorBinding(process));
+		  }
 		}
 	}
 

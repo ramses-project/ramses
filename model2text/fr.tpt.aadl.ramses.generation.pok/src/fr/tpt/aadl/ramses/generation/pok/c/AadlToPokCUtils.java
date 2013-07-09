@@ -36,10 +36,7 @@ public class AadlToPokCUtils
   {
 	if(((ComponentInstance)fi.eContainer()).getCategory()==ComponentCategory.PROCESS)
 	  return ((ComponentInstance) fi.eContainer()).getName();
-	else
-	{
-	  return ((ComponentInstance)Aadl2Utils.getContainingProcessPort(fi).eContainer()).getName();
-	}
+	return null;
   }
   public static String getFeatureLocalIdentifier(FeatureInstance fi)
   {
