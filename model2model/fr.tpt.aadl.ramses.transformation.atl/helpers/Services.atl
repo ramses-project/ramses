@@ -239,3 +239,27 @@ helper context AADLI!Connection def : uniqueName(): String =
 		'cnx_generated_id_'+component.ownedConnection.indexOf(self).toString()
 	endif
 ;
+
+helper def : collectPeriodicDelayed_GlobalVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_GlobalVariablesAccesses(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_GlobalVariablesConnections(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_LocalVariablesAccesses(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_LocalVariablesConnections(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+	Sequence{}
+;

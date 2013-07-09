@@ -47,10 +47,6 @@ helper def: collectGetValueCalls(c: AADLI!ComponentInstance, behavior:AADLI!Subp
 	Sequence{}
 ;
 
-helper def: collectPeriodicDelayed_LocalVariablesAccesses(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
-	Sequence{}
-;
-
 abstract rule m_ThreadEntrypoint { 
   from	
 	c: AADLI!ComponentInstance
