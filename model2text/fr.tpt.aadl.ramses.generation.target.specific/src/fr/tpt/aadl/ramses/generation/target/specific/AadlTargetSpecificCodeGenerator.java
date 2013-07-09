@@ -26,17 +26,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.EcoreUtil2;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessorSubcomponent;
+import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.util.Aadl2Util;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
@@ -72,76 +72,85 @@ public class AadlTargetSpecificCodeGenerator
   public void generate(Resource inputResource,
                        File generatedFilePath) throws GenerationException
   {
-	SystemInstance systemInstance = (SystemInstance) inputResource.getContents().get(0);
-	List<SystemInstance> systemInstanceList = this.getListOfSystemInstance(systemInstance);
-    File generatedCodeDirectory =
+	List<SystemImplementation> systemImplementationList=new ArrayList<SystemImplementation>();
+	EObject root = inputResource.getContents().get(0);
+	if(root instanceof SystemInstance)
+	{
+	  SystemInstance systemInstance = (SystemInstance) root;
+	  systemImplementationList.addAll(this.getListOfSystemImplementation(systemInstance));	    
+	}
+	else if(root instanceof AadlPackage)
+	{
+	  AadlPackage aadlPackage = (AadlPackage) root;
+	  PublicPackageSection pps = aadlPackage.getOwnedPublicSection();
+	  for(Classifier c : pps.getOwnedClassifiers())
+	  if(c instanceof SystemImplementation)
+		systemImplementationList.add((SystemImplementation)c);
+	}
+	else
+	{
+	  throw new GenerationException("Try to generate from a resources that is nto an AADL model");
+	}
+	File generatedCodeDirectory =
           new File(generatedFilePath + GENERATED_DIR_NAME) ;
     generatedCodeDirectory.mkdir() ;
 
-    for(SystemInstance iter: systemInstanceList)
+    for(SystemImplementation sys: systemImplementationList)
     {
-      Element elt = iter;
-      SystemImplementation sys=null;
-      if (elt instanceof SystemInstance)
-      {
-    	  sys = ((SystemInstance) elt).getSystemImplementation();
-      }
+      SystemImplementation si = (SystemImplementation) sys ;
+      File generatedFileDir = new File(generatedFilePath + GENERATED_DIR_NAME);
       
-      if(sys!=null)
+      // XXX Have AadlGenericUnparser to unparse the SystemImplementation
+      // object ?
+      
+      TargetProperties tarProp = _targetUnparser.process(si, generatedFilePath);
+      
+      for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
       {
-        SystemImplementation si = (SystemImplementation) sys ;
-        File generatedFileDir = new File(generatedFilePath + GENERATED_DIR_NAME);
+        // create directory with the processor subcomponent name
+        File processorFileDir =
+              new File(generatedFileDir + "/" + ps.getName()) ;
+        processorFileDir.mkdir() ;
+        _targetBuilderGen.process(ps, processorFileDir) ;
         
-        // XXX Have AadlGenericUnparser to unparse the SystemImplementation
-        // object ?
+        File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
+                  
+        _targetUnparser.process(ps, kernelFileDir, tarProp);
+        List<ProcessSubcomponent> ownedProcess = 
+                                      GeneratorUtils.getBindedProcesses(ps) ;
         
-        TargetProperties tarProp = _targetUnparser.process(si, generatedFilePath);
-        
-        for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
+        for(ProcessSubcomponent process : ownedProcess)
         {
-          // create directory with the processor subcomponent name
-          File processorFileDir =
-                new File(generatedFileDir + "/" + ps.getName()) ;
-          processorFileDir.mkdir() ;
-          _targetBuilderGen.process(ps, processorFileDir) ;
+          String generationTargetDirectory = processorFileDir +
+                                             "/" + process.getName() ;
+          File processDirectory = new File(generationTargetDirectory) ;
+          processDirectory.mkdir() ;
           
-          File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
-                    
-          _targetUnparser.process(ps, kernelFileDir, tarProp);
-          List<ProcessSubcomponent> ownedProcess = 
-                                        GeneratorUtils.getBindedProcesses(ps) ;
+          _genericUnparser.process(process, processDirectory) ;
           
-          for(ProcessSubcomponent process : ownedProcess)
-          {
-            String generationTargetDirectory = processorFileDir +
-                                               "/" + process.getName() ;
-            File processDirectory = new File(generationTargetDirectory) ;
-            processDirectory.mkdir() ;
-            
-            _genericUnparser.process(process, processDirectory) ;
-            
-            _targetUnparser.process(process, processDirectory, tarProp);
-            _targetBuilderGen.process(process, processDirectory) ;
-          }
-        }
+          _targetUnparser.process(process, processDirectory, tarProp);
+          _targetBuilderGen.process(process, processDirectory) ;
+         }
         
-        // This line is at the end because it will launch the build of the generated code;
-        // Thus it is better is the code has been generated...
-        _targetBuilderGen.process(si, generatedFileDir) ;
+       // This line is at the end because it will launch the build of the generated code;
+       // Thus it is better is the code has been generated...
+       _targetBuilderGen.process(si, generatedFileDir) ;
         
       }
     }  
   }
 
-private List<SystemInstance> getListOfSystemInstance(
+private List<SystemImplementation> getListOfSystemImplementation(
 		SystemInstance systemInstance) {
-	List<SystemInstance> systemInstanceList = new ArrayList<SystemInstance>();
-	systemInstanceList.add(systemInstance);
+
+	List<SystemImplementation> systemInstanceList = new ArrayList<SystemImplementation>();
+	if(systemInstance.getSystemImplementation() != null)
+	  systemInstanceList.add(systemInstance.getSystemImplementation());
 	for(ComponentInstance ci : systemInstance.getComponentInstances())
 	{
 	  if(ci instanceof SystemInstance)
 	  {
-		systemInstanceList.addAll(getListOfSystemInstance((SystemInstance) ci));
+		systemInstanceList.addAll(getListOfSystemImplementation((SystemInstance) ci));
 	  }
 	}
 	return systemInstanceList;
