@@ -74,7 +74,12 @@ rule m_Input_Queuing_ComputeEntrypointCallSequence
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
-			parameterLabels <- Sequence{QEUEING_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,TIME_OUT_HOLDER,RETURN_CODE_HOLDER} 
+			parameterLabels <- Sequence{
+				QEUEING_HOLDER,
+				TIME_OUT_HOLDER,
+				MESSAGE_ADDR_HOLDER,
+				LENGTH_HOLDER,
+				RETURN_CODE_HOLDER} 
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
@@ -127,7 +132,13 @@ rule m_Output_Queuing_ComputeEntrypointCallSequence
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
-			parameterLabels <- Sequence{QEUEING_HOLDER,TIME_OUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+			parameterLabels <- Sequence{
+				QEUEING_HOLDER,
+				MESSAGE_ADDR_HOLDER,
+				LENGTH_HOLDER,
+				TIME_OUT_HOLDER,
+				RETURN_CODE_HOLDER
+			}
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
