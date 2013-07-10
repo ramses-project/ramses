@@ -451,21 +451,20 @@ rule m_BehaviorActionsFromThread
 					(port | 
 						thisModule.resolveTemp(Sequence{port, src_transition.eContainer()}, 'call')
 					)
+					else
+					Sequence{}
+					endif					
+					->union
+					(
+						Sequence{src_transition.actionBlock.content.resolve(c)}
+					)
+					->flatten()
 					->union(
 						c.featureInstance->select(f| (f.isInputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort) and f.isUsedInFresh())
 						->collect( e | 
 							thisModule.createFreshnessIndicatorUpdateAction(e)
 						)
 					)
-					else
-					Sequence{}
-					endif
-					
-					->union
-					(
-						Sequence{src_transition.actionBlock.content.resolve(c)}
-					)
-					->flatten()
 					->union(
 						c.featureInstance->select(f| (f.isOutputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort) and f.isUsedInFresh())
 						->collect( e | 
