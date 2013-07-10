@@ -219,7 +219,7 @@ rule m_Thread_DataOrEventDataPort_Input_Instance
 			dataSubcomponentType <- if(not fi.isUsedInFresh()) then	
 										fi.feature.dataFeatureClassifier
 									else
-										thisModule.createFreshnessDataStructure(fi)
+										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
 									endif
 		)
 }
@@ -243,7 +243,7 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
 			dataSubcomponentType <- if(not fi.isUsedInFresh()) then	
 										fi.feature.dataFeatureClassifier
 									else
-										thisModule.createFreshnessDataStructure(fi)
+										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
 									endif
 		)
 }
@@ -252,11 +252,11 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
 unique lazy rule createFreshnessDataStructure
 {
 	from
-		fi: AADLI!FeatureInstance
+		payload: AADLI!DataClassifier
 	to
 		fresh_data_type_wrapper:AADLBA!DataType
 		(
-			name<-fi.getFreshnessType(),
+			name<-payload.getFreshnessType(),
 			ownedPropertyAssociation <- Sequence
 			{
 				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
@@ -265,7 +265,7 @@ unique lazy rule createFreshnessDataStructure
 		),
 		fresh_data_impl_wrapper:AADLBA!DataImplementation
 		(
-			name<-fi.getFreshnessType()+thisModule.impl_suffix,
+			name<-payload.getFreshnessType()+thisModule.impl_suffix,
 			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
 		),
 		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
@@ -276,7 +276,7 @@ unique lazy rule createFreshnessDataStructure
 		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
 		(
 			name <- 'value',
-			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+			dataSubcomponentType <- payload
 		)
 	do
 	{
@@ -290,8 +290,8 @@ unique lazy rule createFreshnessDataStructure
 
 helper def: freshness_suffix : String = '_freshness_t';
 helper def: impl_suffix : String = '.impl';
-helper context AADLI!FeatureInstance def: getFreshnessType() : String =
-	self.uniqueName()+thisModule.freshness_suffix
+helper context AADLI!DataClassifier def: getFreshnessType() : String =
+	self.name+thisModule.freshness_suffix
 ;
 -------------------------------------------------------------------------------------------
 

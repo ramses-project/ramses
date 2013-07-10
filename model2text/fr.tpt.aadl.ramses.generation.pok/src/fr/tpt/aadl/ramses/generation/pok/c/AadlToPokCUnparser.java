@@ -147,7 +147,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       DataPort p  = (DataPort) fi.getFeature() ;
       if(isUsedInFresh(fi))
-    		  blackboardInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
+    		  blackboardInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+p.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
       else
       {
     	  try
@@ -166,10 +166,47 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private boolean isUsedInFresh(FeatureInstance fi) {
-  	Port p = (Port) fi.getFeature();
-  	BehaviorAnnex ba = getBa(fi);
-  	if(ba!=null)
+	if(fi.getComponentInstance().getCategory()==ComponentCategory.PROCESS)
   	{
+	  ComponentInstance process = fi.getComponentInstance();
+  	  for(ComponentInstance thread: process.getComponentInstances())
+      {
+    	if(!thread.getCategory().equals(ComponentCategory.THREAD))
+    	  continue;
+    	for(FeatureInstance threadFeature: thread.getFeatureInstances())
+    	{
+    	  if(threadFeature.getDirection() == DirectionType.IN)
+    	  { 
+    		for(ConnectionInstance cnxInst: threadFeature.getDstConnectionInstances())
+    		{
+    		  int last = cnxInst.getConnectionReferences().size() - 1;
+    		  if(cnxInst.getConnectionReferences().get(last).getSource() == fi)
+    		  {
+    			if(isUsedInFresh((FeatureInstance) cnxInst.getConnectionReferences().get(last).getDestination()))
+    		      return true;
+    		  }
+    		}
+    	  }
+    	  if(threadFeature.getDirection() == DirectionType.OUT)
+    	  {
+    		for(ConnectionInstance cnxInst: threadFeature.getSrcConnectionInstances())
+      		{
+      		  if(cnxInst.getConnectionReferences().get(0).getDestination() == fi)
+      		  {
+      			if(isUsedInFresh((FeatureInstance) cnxInst.getConnectionReferences().get(0).getSource()))
+      		      return true;
+      		  }
+      		}
+    	  }
+    	}
+      }
+  	}
+	if(fi.getComponentInstance().getCategory()==ComponentCategory.THREAD)
+	{
+	  Port p = (Port) fi.getFeature();
+	  BehaviorAnnex ba = getBa(fi);
+  	  if(ba!=null)
+  	  {
   		if(AadlBaVisitors.isFresh(ba, p))
   			return true;
   		for(ConnectionInstance cnxi : fi.getSrcConnectionInstances())
@@ -207,6 +244,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   					return true;
   			}
   		}
+  	  }
   	}
   	return false;
 }
@@ -240,7 +278,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     {
       EventDataPort port  = (EventDataPort) fi.getFeature() ;
       if(isUsedInFresh(fi))
-    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
+    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
       else
       {
         try
@@ -272,7 +310,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     {
       EventDataPort port  = (EventDataPort) fi.getFeature() ;
       if(isUsedInFresh(fi))
-    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
+    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
       else
       {
         try
@@ -347,7 +385,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
       DataPort port  = (DataPort) fi.getFeature() ;
       if(isUsedInFresh(fi))
       {
-    	  sampleInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+fi.getName()+"_freshness_t_impl" ;
+    	  sampleInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
       }
       else
       {

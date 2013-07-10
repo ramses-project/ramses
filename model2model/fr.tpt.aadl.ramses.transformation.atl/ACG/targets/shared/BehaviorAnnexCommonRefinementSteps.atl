@@ -68,7 +68,7 @@ unique lazy rule createUpdateFreshnessToSend
 		),
 		dataSubcomponentStructSend: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
+			element<-thisModule.resolveTemp(fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
 		),
 		sendValueExpressionOutput: AADLBA!ValueExpression
 		(
@@ -356,7 +356,7 @@ lazy rule getValueComponentReference
 		fi:AADLI!FeatureInstance
 	using
 	{
-		inderectlyUsed: AADLBA!DataImplementation = thisModule.createFreshnessDataStructure(fi);
+		inderectlyUsed: AADLBA!DataImplementation = thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier);
 		portImgSubcomponent: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi, 'localVariable');
 	}
 	to
@@ -371,7 +371,7 @@ lazy rule getValueComponentReference
 		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
 		(
 			element <- thisModule.resolveTemp(
-							fi, 'createFreshnessDataStructure', 'struct_functional_data_subcomponent'
+							fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_functional_data_subcomponent'
 						)
 		)
 	do
@@ -622,7 +622,7 @@ unique lazy rule createFreshnessIndicatorUpdateAction
 		),
 		dataFreshnessSubcomponentHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
+			element <- thisModule.resolveTemp(fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
 		)
 	do
 	{
@@ -767,7 +767,7 @@ rule m_DataPortHolder_withFresh
 		functionalPartHolder: AADLBA!DataSubcomponentHolder
 	do
 	{
-		functionalPartHolder.element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_Holder.element.name), 'createFreshnessDataStructure','struct_functional_data_subcomponent');
+		functionalPartHolder.element<-thisModule.resolveTemp(c.featureInstance->any(e|e.name=src_Holder.element.name).feature.dataFeatureClassifier, 'createFreshnessDataStructure','struct_functional_data_subcomponent');
 	}
 }
 
@@ -1028,7 +1028,7 @@ rule m_PortFreshValue
 	do
 	{
 		portImgFreshPrevSubcomponentHolder.element <- thisModule.resolveTemp(
-							c.featureInstance->any(e|e.feature = src_PortFreshValue.element), 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent'
+							c.featureInstance->any(e|e.feature = src_PortFreshValue.element).feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent'
 						);
 	}
 }
