@@ -417,6 +417,7 @@ helper context AADLBA!SimpleExpression def: resolve(c: AADLI!ComponentInstance):
 	thisModule.resolveTemp(Sequence{self,c}, 'target_simpleExpression')
 ;
 
+
 rule m_BehaviorActionsFromThread
 {
   from
@@ -480,8 +481,10 @@ rule m_BehaviorActionsFromThread
 						->collect(port | 
 							port.srcConnectionInstance->collect
 							(
-								cnxInst | thisModule.resolveTemp(Sequence{port, src_transition.eContainer(), cnxInst.connectionReference->first().connection}, 'call'))
+								cnxInst | thisModule.resolveTemp(Sequence{port, src_transition.eContainer(), cnxInst.connectionReference->first().connection}, 'call')
 							)
+						)
+						->append(thisModule.resolveTemp(Sequence{c,src_transition},'waitDispatchCall'))
 						else
 						Sequence{}
 						endif
@@ -575,6 +578,46 @@ rule m_BehaviorActionsFromThread
 	(
 		value <- src_transition.sourceState.name
 	)
+}
+
+-- @extends m_BehaviorActionsFromThread
+rule m_BehaviorActionsFromThread_Periodic
+{
+	from
+		c: AADLI!ComponentInstance,
+		src_transition: AADLBA!BehaviorTransition
+		(
+			c.isPeriodicThread()
+			and
+			c.subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e = src_transition.eContainer())
+			and
+			src_transition.destinationState.complete=true
+		)
+	using
+	{
+		ba: AADLBA!BehaviorAnnex = src_transition.eContainer();
+		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
+	}
+	to
+		callSequenceImg: AADLBA!SubprogramCallSequence,
+		returnData: AADLBA!DataSubcomponent,
+		waitDispatchCall: AADLBA!SubprogramCallAction
+		(
+			subprogram<-dispatchHolder,
+			parameterLabels <- Sequence{RETURN_DATA_Holder}
+		),
+		dispatchHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		RETURN_DATA_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveTemp(Sequence{c,ba}, 'returnData')
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
+	}
 }
 
 unique lazy rule createFreshnessIndicatorUpdateAction
