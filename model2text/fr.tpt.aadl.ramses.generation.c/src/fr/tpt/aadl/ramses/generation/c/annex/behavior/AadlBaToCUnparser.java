@@ -132,7 +132,7 @@ import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
-import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 

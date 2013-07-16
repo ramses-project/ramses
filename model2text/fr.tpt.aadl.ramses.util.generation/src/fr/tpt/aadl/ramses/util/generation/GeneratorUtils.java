@@ -19,8 +19,9 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.generation.target.specific;
+package fr.tpt.aadl.ramses.util.generation;
 
+import java.io.File;
 import java.util.ArrayList ;
 import java.util.Iterator ;
 import java.util.LinkedHashSet;
@@ -203,16 +204,17 @@ public class GeneratorUtils
     return bindedProcess ;
   }
 
-  public static Set<String> getListOfReferencedObjects(ProcessImplementation aProcessImplementation)
+  public static Set<File> getListOfReferencedObjects(ProcessImplementation aProcessImplementation) throws Exception
   {
-    Set<String> result = new LinkedHashSet<String>() ;
+    Set<File> result = new LinkedHashSet<File>() ;
+    Set<File> includeDirList = FileUtils.getIncludeDir(aProcessImplementation);
     for(ThreadSubcomponent aTheadSubcomponent : aProcessImplementation
           .getOwnedThreadSubcomponents())
     {
       if(aTheadSubcomponent.getComponentImplementation() != null)
       {
-        getListOfReferencedObjects((ThreadImplementation) aTheadSubcomponent
-                                         .getComponentImplementation(), result) ;
+    	getListOfReferencedObjects((ThreadImplementation) aTheadSubcomponent
+                                         .getComponentImplementation(), includeDirList, result) ;
       }
       else
       {
@@ -228,7 +230,8 @@ public class GeneratorUtils
 
   public static void getListOfReferencedObjects(
                                      ThreadImplementation aThreadImplementation,
-                                     Set<String> result)
+                                     Set<File> includeDirList,
+                                     Set<File> result) throws Exception
   {
 	for(SubprogramCallSequence aCallSequence : aThreadImplementation
           .getOwnedSubprogramCallSequences())
@@ -236,22 +239,23 @@ public class GeneratorUtils
       for(CallSpecification aCallSpecification : aCallSequence
             .getOwnedCallSpecifications())
       {
-        getListOfReferencedObjects(aCallSpecification, result) ;
+        getListOfReferencedObjects(aCallSpecification, includeDirList, result) ;
       }
     }
     for(SubprogramSubcomponent sc:aThreadImplementation.getOwnedSubprogramSubcomponents())
     {
-    	getListOfReferencedObjects(sc, result) ;
+    	getListOfReferencedObjects(sc, includeDirList, result) ;
     }
   }
 
   private static void getListOfReferencedObjects(SubprogramSubcomponent sc,
-		Set<String> result) {
+		  Set<File> includeDirList,
+		  Set<File> result) throws Exception {
 	SubprogramSubcomponentType sst = sc.getSubprogramSubcomponentType();
 	for(PropertyAssociation aPropertyAssociation : sst
             .getOwnedPropertyAssociations())
     {
-       getListOfReferencedObjects(aPropertyAssociation, result) ;
+       getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
     }
 	if (sst instanceof SubprogramImplementation)
 	{
@@ -259,24 +263,26 @@ public class GeneratorUtils
 		for(PropertyAssociation aPropertyAssociation : si.getType()
 	            .getOwnedPropertyAssociations())
 	    {
-	       getListOfReferencedObjects(aPropertyAssociation, result) ;
+	       getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
 	    }
 	}
 	
 }
 
 public static void getListOfReferencedObjects(CallSpecification aCallSpecification,
-                                                Set<String> result)
+												Set<File> includeDirList,
+                                                Set<File> result) throws Exception
   {
     if(aCallSpecification instanceof SubprogramCall)
     {
       SubprogramCall sc = (SubprogramCall) aCallSpecification;
-      getListOfReferencedObjects((Subprogram) sc.getCalledSubprogram(), result) ;
+      getListOfReferencedObjects((Subprogram) sc.getCalledSubprogram(), includeDirList, result) ;
     }
   }
 
   public static void getListOfReferencedObjects(Subprogram aSubprogram,
-      Set<String> result)
+		  Set<File> includeDirList,
+		  Set<File> result) throws Exception
   {
   	if(aSubprogram instanceof SubprogramType)
     {
@@ -289,13 +295,14 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       	{
       		BehaviorAnnex ba = (BehaviorAnnex) annex;
       		getListOfReferencedObjects(ba,
+      			includeDirList,
               	result);
       	}
       }
       for(PropertyAssociation aPropertyAssociation : aSubprogramType
             .getOwnedPropertyAssociations())
       {
-        getListOfReferencedObjects(aPropertyAssociation, result) ;
+        getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
       }
     }
     else if(aSubprogram instanceof SubprogramImplementation)
@@ -309,25 +316,27 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       	{
       		BehaviorAnnex ba = (BehaviorAnnex) annex;
       		getListOfReferencedObjects(ba,
+      			includeDirList,
               	result);
       	}
       }
       for(PropertyAssociation aPropertyAssociation : aSubprogramImplementation
             .getOwnedPropertyAssociations())
       {
-        getListOfReferencedObjects(aPropertyAssociation, result) ;
+        getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
       }
 
       for(CallSpecification aCallSpecification : aSubprogramImplementation
             .getCallSpecifications())
       {
-        getListOfReferencedObjects(aCallSpecification, result) ;
+        getListOfReferencedObjects(aCallSpecification, includeDirList, result) ;
       }
     }
   }
   
   private static void getListOfReferencedObjects(BehaviorAnnex ba,
-			Set<String> result)
+		  Set<File> includeDirList,
+		  Set<File> result) throws Exception
 	{
 		for(BehaviorActionBlock bab: ba.getActions())
 		{
@@ -338,14 +347,15 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
 				if(next instanceof SubprogramCallAction)
 				{
 					SubprogramCallAction sca = (SubprogramCallAction) next;
-					getListOfReferencedObjects((Subprogram) sca.getSubprogram().getElement(), result);
+					getListOfReferencedObjects((Subprogram) sca.getSubprogram().getElement(), includeDirList, result);
 				}
 			}
 		}
 	}
 
 	public static void getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
-                                                Set<String> result)
+												Set<File> includeDirList,
+                                                Set<File> result) throws Exception
   {
     if(aPropertyAssociation.getProperty().getName() != null &&
           (aPropertyAssociation.getProperty().getName()
@@ -363,31 +373,41 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
     	{
     	  StringLiteral sl = (StringLiteral) aPE;
     	  String value = sl.getValue();
-    	  if(value.endsWith(".c") || value.endsWith(".o"))
-    	  {
-    		value = value.substring(0,value.length()-2);  
-    		value = value.concat(".o");
-    	  }
-    	  else
-      	    continue;
-    	  result.add(value);
+    	  boolean found = false;
+    	  for(File includeDir: includeDirList)
+      	  {
+      	    File foundFile = new File(includeDir.getAbsoluteFile()+value);
+      	    if(foundFile.exists())
+      	    {
+      		  result.add(foundFile);
+      		  found=true;
+      		  break;
+      	    }
+      	  }
+    	  if(!found)
+    		throw new Exception("file referenced in object "+ aPropertyAssociation.getContainingClassifier().getFullName() + " could not be found "+ value);
     	}
     	else if(aPE instanceof ListValue)
     	{
     	  for(PropertyExpression pe: ((ListValue) aPE).getOwnedListElements())
     	  {
     		StringLiteral sl = (StringLiteral) pe;
-        	String value = sl.getValue();
-        	if(value.endsWith(".c") || value.endsWith(".o"))
-      	  	{
-      		  value = value.substring(0,value.length()-2);  
-      		  value = value.concat(".o");
-      	    }
-        	else
-        	  continue;
-        	result.add(value) ;
-    	  }
-        }
+          	String value = sl.getValue();
+        	boolean found = false;
+        	for(File includeDir: includeDirList)
+        	{
+        	  File foundFile = new File(includeDir.getAbsolutePath()+"/"+value);
+        	  if(foundFile.exists())
+        	  {
+        		result.add(foundFile);
+        		found=true;
+        		break;
+        	  }
+        	}
+        	if(!found)
+        	  throw new Exception("file referenced in object "+ aPropertyAssociation.getContainingClassifier().getFullName() + " could not be found "+ value);
+          }
+    	}
       }
     }
   }

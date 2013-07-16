@@ -101,7 +101,7 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
-import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 import fr.tpt.aadl.utils.names.DataModelProperties;

@@ -18,4 +18,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.generation.target.specific
 Bundle-Vendor: TELECOM Paristech
 Import-Package: fr.tpt.aadl.ramses.transformation.atl,
+ fr.tpt.aadl.ramses.util.generation,
  org.osate.xtext.aadl2.properties.linking

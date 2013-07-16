@@ -48,8 +48,8 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status;
 import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
-import fr.tpt.aadl.ramses.generation.target.specific.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
 import fr.tpt.aadl.utils.PropertyNotFound;
 import fr.tpt.aadl.utils.PropertyUtils;
@@ -64,7 +64,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	/**
 	 * Compilation config
 	 */
-	private final static String compilationFile = "compilation.properties";
+	private final static String compilationFile = "../compilation.properties";
 
 	/**
 	 * OSEK

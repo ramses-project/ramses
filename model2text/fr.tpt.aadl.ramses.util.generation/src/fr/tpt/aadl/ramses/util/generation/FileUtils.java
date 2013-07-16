@@ -11,7 +11,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.instance.InstanceObject;
+
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.*;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
 public class FileUtils {
 
@@ -157,5 +166,18 @@ public class FileUtils {
 		}
 
 		return paths;
+	}
+	
+	public static Set<File> getIncludeDir(NamedElement object) {
+		Set<File> includesConcat = new LinkedHashSet<File>();
+		NamedElement namedElement = HookAccessImpl.getTransformationTrace(object);
+		if(namedElement!=null)
+		{
+			Set<File> includeDirSet = RamsesConfiguration.getIncludeDir(namedElement.getContainingClassifier().eResource());
+			if(!includeDirSet.isEmpty())
+				includesConcat.addAll(includeDirSet);
+			includeDirSet.addAll(getIncludeDir(namedElement.getContainingClassifier()));
+		}
+		return includesConcat;
 	}
 }
