@@ -376,7 +376,7 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
     	  boolean found = false;
     	  for(File includeDir: includeDirList)
       	  {
-      	    File foundFile = new File(includeDir.getAbsoluteFile()+value);
+      	    File foundFile = new File(includeDir.getAbsoluteFile()+"/"+value);
       	    if(foundFile.exists())
       	    {
       		  result.add(foundFile);
