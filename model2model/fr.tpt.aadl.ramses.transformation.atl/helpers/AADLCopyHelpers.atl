@@ -19,6 +19,8 @@
 -- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
+-- @atlcompiler emftvm
+
 library AADLCopyHelpers;
 
 helper def : public() : AADLBA!PublicPackageSection = AADLBA!PublicPackageSection->allInstancesFrom('OUT')->first();

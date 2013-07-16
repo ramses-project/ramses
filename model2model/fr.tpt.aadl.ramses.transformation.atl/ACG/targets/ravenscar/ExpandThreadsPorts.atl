@@ -35,6 +35,11 @@ create OUT : AADLBA 	from 		IN : AADLI,
 ---- Beginning of refactoring
 -------------------------------------------------------------------------------------------
 
+-- TODO: implement next helper
+helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+	Sequence{}
+;
+
 helper def: collectPutValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
 	c.featureInstance->
 		select(

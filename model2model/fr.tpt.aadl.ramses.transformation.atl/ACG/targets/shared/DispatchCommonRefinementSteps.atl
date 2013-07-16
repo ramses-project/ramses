@@ -30,12 +30,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									HOOKS: ATLHOOKS;
 
 
-
-helper def: getRuntimeEventType() : AADLBA!DataSubcomponentType = 'Global_Queue'.asDataType('RAVENSCAR_RUNTIME');
---helper def: getRuntimeEventType() : AADLBA!DataSubcomponentType = 'Global_Queue';
-
-
--- @extends m_ComputeEntrypointCallSequence,m_ComputeEntrypointCallSequence_SporadicThread
+-- @extends m_ComputeEntrypointCallSequence
 rule m_ComputeEntrypointCallSequence_Periodic
 {
 	from
@@ -81,16 +76,14 @@ rule m_SporadicThread_EventAcess
 		sub: AADLBA!ThreadSubcomponent,
 		f: AADLBA!DataAccess
 		(
---			name <- c.name+thisModule.dataAccessSuffix()+'GlobalQueue',
-   			name <- c.name+thisModule.dataAccessSuffix()+'GlobalQueue'+':'+'GlobalQueue',
+			name <- c.name+thisModule.dataAccessSuffix()+'GlobalQueue',
 			dataFeatureClassifier <- thisModule.getRuntimeEventType(),
 			kind <- #requires
 		)
 }
 
-helper def: getWaitEventSubprogram : AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('RAVENSCAR_RUNTIME');
 
--- @extends m_ComputeEntrypointCallSequence,m_ComputeEntrypointCallSequence_SporadicThread
+-- @extends m_ComputeEntrypointCallSequence
 rule m_ComputeEntrypointCallSequence_Sporadic
 {
 	from

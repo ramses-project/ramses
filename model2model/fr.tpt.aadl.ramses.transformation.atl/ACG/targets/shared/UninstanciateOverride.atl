@@ -469,7 +469,7 @@ rule m_Process_Implementation {
 													(
 														impl.getSubcomponentsInstances('thread')
 															->collect(c| c.eContainer().featureInstance
-																->select(e| e.isProcessPort() and e.isOutputFeature())
+																->select(e| e.isProcessPort())
 																->collect(fi |
 																	thisModule.resolveTemp(fi, 'globalVariable')
 																)
@@ -477,12 +477,9 @@ rule m_Process_Implementation {
 													)->union
 													(
 														impl.getSubcomponentsInstances('thread')
-															->collect(c| c.eContainer().featureInstance
-																->select(e| e.isProcessPort() and e.isInputFeature())
-																->collect(fi |
-																	thisModule.resolveTemp(fi, 'globalVariable')
-																)
-															)
+                                                        ->collect(c|
+                                                                thisModule.collectPeriodicDelayed_GlobalVariables(c)
+                                                       )
 													)
 													->flatten(),
 		ownedAccessConnection			<- impl.getConnectionsInstancesImg('accessConnection')
@@ -504,7 +501,14 @@ rule m_Process_Implementation {
 															thisModule.resolveTemp(fi, 'accessConnection')	
 														)
 													)
-												)->flatten()
+												)
+                                                ->union(
+                                                       impl.getSubcomponentsInstances('thread')
+                                                           ->collect(c|
+                                                                thisModule.collectPeriodicDelayed_GlobalVariablesConnections(c)
+                                                       )
+                                               )
+                                               ->flatten()
 											
 	)
 	do
