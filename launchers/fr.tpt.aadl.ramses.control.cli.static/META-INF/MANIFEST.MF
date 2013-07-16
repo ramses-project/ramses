@@ -7,14 +7,20 @@ Bundle-Vendor: %providerName
 Export-Package: fr.tpt.aadl.ramses.control.cli
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.osate.annexsupport;bundle-version="1.0.0",
- org.osate.ui;bundle-version="1.0.0",
+Require-Bundle: org.eclipse.emf.ecore;bundle-version="2.8.3",
+ org.eclipse.core.runtime,
+ org.osate.annexsupport;bundle-version="1.0.0",
  fr.tpt.aadl.annex.behavior;bundle-version="0.9.5",
+ org.osate.aadl2.modelsupport,
  fr.tpt.aadl.ramses.control.cli.core;bundle-version="0.5.0",
+ org.osate.aadl2,
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.c;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.osek;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.pok;bundle-version="0.5.0",
  fr.tpt.aadl.sched.tools.cheddar;bundle-version="1.0.0",
  fr.tpt.aadl.sched.wcetanalysis;bundle-version="1.0.0",
- fr.tpt.aadl.sched.tools.aadlinspector;bundle-version="1.0.0"
+ fr.tpt.aadl.sched.tools.aadlinspector;bundle-version="1.0.0",
+ org.osate.workspace
+Import-Package: org.osate.aadl2,
+ org.osate.aadl2.instance
