@@ -25,6 +25,7 @@ import java.io.File ;
 import java.io.IOException ;
 import java.io.PrintStream ;
 import java.util.ArrayList ;
+import java.util.LinkedHashSet;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
@@ -59,7 +60,8 @@ public class ToolSuiteLauncher
   private PredefinedPropertiesManager _predefinedPropertiesManager ;
   private StandAloneInstantiator _instantiator ;
   private List<String> _analysisToPerform ;
-
+  private Set<File> _includeDirSet;
+  
   ToolSuiteLauncher()
   {
     _registry = ServiceRegistryProvider.getServiceRegistry() ;
@@ -75,12 +77,31 @@ public class ToolSuiteLauncher
           initialize(analysisIdentifiers, _registry.getAvailableAnalysisNames()) ;
   }
   
-  void initializeGeneration(String targetName)
+  void initializeGeneration(String targetName, String[] includeDirArray)
         throws Exception
   {
     if(false == _registry.getAvailableGeneratorNames().contains(targetName))
     {
       throw new Exception ("Invalid generation target identifier: " + targetName) ;
+    }
+    String errors = "";
+    _includeDirSet = new LinkedHashSet<>();
+    // TODO: move next in a file utils
+    for(int i = 0 ; i < includeDirArray.length ; i++)
+    {
+      File potentialFile = new File(includeDirArray[i]) ;
+      
+      if(potentialFile.exists())
+      {
+    	_includeDirSet.add(potentialFile) ;
+        continue ;
+      }
+      else
+    	errors+="\t"+includeDirArray[i]+"\n";
+    }
+    if(false == errors.isEmpty())
+    {
+      throw new Exception("ERROR: could not be find directories (given in -i option):\n"+errors);
     }
   }
 
@@ -174,12 +195,14 @@ public class ToolSuiteLauncher
     
     SystemInstance instance =
           this.instantiate(aadlModels, systemToInstantiate) ;
-
+    
     if(instance == null)
     {
       throw new GenerationException("instanciation failed.") ;
     }
-
+    
+    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet);
+    
     _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
     
     ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;

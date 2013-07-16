@@ -484,7 +484,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     }
     else
     {
-      msg += "succeded" ;
+      msg += "SUCCEEDED" ;
     }
     
     _reporter.reportMessage(ms, msg) ;
@@ -634,7 +634,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     }
     
     RamsesConfiguration.setOutputDir(outputDir);
-    
+
     try
     {
       String workflow_path =
@@ -649,7 +649,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       {
         EcorePilot xmlPilot = new EcorePilot(genConf.getString(WORKFLOW_OPTION_ID));
         
-        launcher.initializeGeneration(targetName) ;
+        launcher.initializeGeneration(targetName, includeFolderNames) ;
         launcher.launchModelGenerationWorkflow(mainModelFiles,
                                           systemToInstantiate,
                                           outputDir,
@@ -662,7 +662,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       {
     	XMLPilot xmlPilot = new XMLPilot(genConf.getString(XML_OPTION_ID));
           
-        launcher.initializeGeneration(targetName) ;
+        launcher.initializeGeneration(targetName, includeFolderNames) ;
         launcher.launchModelGenerationWorkflow(mainModelFiles,
                                           systemToInstantiate,
                                           outputDir,
@@ -673,7 +673,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       }
       else
       {
-    	launcher.initializeGeneration(targetName) ;
+    	launcher.initializeGeneration(targetName, includeFolderNames) ;
         launcher.launchModelGeneration(mainModelFiles,
                                        systemToInstantiate,
                                        outputDir,
