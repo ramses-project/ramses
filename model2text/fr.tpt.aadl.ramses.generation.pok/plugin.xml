@@ -4,7 +4,7 @@
    <extension
          point="fr.tpt.aadl.ramses.control.support.generator">
       <generator
-            class="fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory"
+            class="fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory"
             id="fr.tpt.aadl.ramses.generation.target.pok"
             transformationName="pok">
       </generator>

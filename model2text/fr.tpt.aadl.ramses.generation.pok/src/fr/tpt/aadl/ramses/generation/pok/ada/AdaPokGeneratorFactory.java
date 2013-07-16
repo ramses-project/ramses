@@ -19,31 +19,32 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.generation.pok;
+
+package fr.tpt.aadl.ramses.generation.pok.ada;
 
 import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
-import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser ;
-import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
+import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
+import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Transformation;
+import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
 
-public class PokGeneratorFactory extends AbstractGeneratorFactory
+public class AdaPokGeneratorFactory extends AbstractGeneratorFactory
 {
-  public static String POK_GENERATOR_NAME = "pok" ;
+  public static String ADA_GENERATOR_NAME = "ada-pok" ;
   
   private static Generator createPokGenerator()
   {
-    AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser() ;
+    AadlToConfADAUnparser pokADAUnparser = new AadlToConfADAUnparser() ;
     
-    AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
+    AadlToADAUnparser genericADAUnparser = AadlToADAUnparser.getAadlToADAUnparser() ;
     
     AadlToPokMakefileUnparser pokMakefileUnparser = new AadlToPokMakefileUnparser() ;
     
     AadlTargetSpecificCodeGenerator tarSpecCodeGen = new 
-                    AadlTargetSpecificCodeGenerator(genericCUnparser,
-                                                    pokCUnparser,
+                    AadlTargetSpecificCodeGenerator(genericADAUnparser,
+                                                    pokADAUnparser,
                                                     pokMakefileUnparser) ;
     
     AadlArinc653Transformation targetTrans = new AadlArinc653Transformation();
@@ -52,7 +53,7 @@ public class PokGeneratorFactory extends AbstractGeneratorFactory
     AadlTargetSpecificGenerator result = 
                   new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen) ;
     
-    result.setRegistryName(POK_GENERATOR_NAME) ;
+    result.setRegistryName(ADA_GENERATOR_NAME) ;
     
     return result ;
   }
