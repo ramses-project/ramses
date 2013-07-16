@@ -85,7 +85,7 @@ public class ToolSuiteLauncher
       throw new Exception ("Invalid generation target identifier: " + targetName) ;
     }
     String errors = "";
-    _includeDirSet = new LinkedHashSet<>();
+    _includeDirSet = new LinkedHashSet<File>();
     // TODO: move next in a file utils
     for(int i = 0 ; i < includeDirArray.length ; i++)
     {
