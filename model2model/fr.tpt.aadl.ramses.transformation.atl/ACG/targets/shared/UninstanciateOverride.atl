@@ -511,6 +511,10 @@ rule m_Process_Implementation {
 												->flatten()
 											
 	)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(implImg, impl);
+	}
 }
 
 rule m_Processor_Instance {
