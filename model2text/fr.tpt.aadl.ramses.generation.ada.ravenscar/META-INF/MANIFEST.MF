@@ -17,11 +17,11 @@ Require-Bundle: org.eclipse.ui,
  fr.tpt.aadl.annex.behavior;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.target.specific;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.generation.ada;bundle-version="0.5.0",
  org.osate.xtext.aadl2.properties
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: fr.tpt.aadl.ramses.generation.ada,
- fr.tpt.aadl.ramses.transformation.atl,
+Import-Package: fr.tpt.aadl.ramses.transformation.atl,
  fr.tpt.aadl.ramses.transformation.atl.hooks.impl,
  fr.tpt.aadl.ramses.util.generation,
  org.eclipse.xtext.nodemodel,
