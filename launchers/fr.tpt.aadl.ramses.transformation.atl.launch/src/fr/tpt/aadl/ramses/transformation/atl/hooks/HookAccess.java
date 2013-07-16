@@ -79,7 +79,7 @@ public interface HookAccess extends EObject
 	 * @model targetDeclarativeRequired="true" sourceInstanceRequired="true"
 	 * @generated
 	 */
-  void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance);
+  void addTransformationBackTrace(NamedElement targetDeclarative, NamedElement sourceInstance);
 
     /**
 	 * <!-- begin-user-doc -->

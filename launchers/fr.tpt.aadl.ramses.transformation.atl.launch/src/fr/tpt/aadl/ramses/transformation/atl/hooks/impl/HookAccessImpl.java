@@ -154,9 +154,9 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
    * <!-- end-user-doc -->
    * @generated NOT
    */
-    private static Map<NamedElement, InstanceObject> _transformationTrace = new HashMap<NamedElement, InstanceObject>();
+    private static Map<NamedElement, NamedElement> _transformationTrace = new HashMap<NamedElement, NamedElement>();
     
-    public void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance) {
+    public void addTransformationBackTrace(NamedElement targetDeclarative, NamedElement sourceInstance) {
       _transformationTrace.put(targetDeclarative, sourceInstance);
     }
   
@@ -290,7 +290,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-		public static InstanceObject getTransformationTrace(NamedElement targetDeclarative)
+  public static NamedElement getTransformationTrace(NamedElement targetDeclarative)
   {
 	for(NamedElement ne: _transformationTrace.keySet())
 	{
