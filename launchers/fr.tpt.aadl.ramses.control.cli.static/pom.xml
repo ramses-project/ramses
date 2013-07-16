@@ -105,6 +105,18 @@
     </dependency>
 
     <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.ada</artifactId>
+      <version>0.5.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.ada.ravenscar</artifactId>
+      <version>0.5.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.eclipse.core</groupId>
       <artifactId>jobs</artifactId>
       <version>3.2.0-v20060603</version>
