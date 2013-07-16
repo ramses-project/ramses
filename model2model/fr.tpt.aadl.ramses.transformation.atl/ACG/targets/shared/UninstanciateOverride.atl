@@ -194,7 +194,7 @@ rule m_create_Thread_BA
 			threadSubcomponentType <- implImg
 		),
 		implImg : AADLBA!ThreadImplementation (
- 			name <- c.uniqueName().concat('.impl'),
+ 			name <- c.uniqueName().concat('.impl'), -- name thread implmentation
 			ownedRealization <- thisModule.Realization(typeImg),
 			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
 			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data)
@@ -452,7 +452,7 @@ rule m_Process_Implementation {
  	implImg : AADLBA!ProcessImplementation (
  		name 							<- impl.name,
 		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('threadgroup'),
-		ownedThreadSubcomponent 		<- impl.getSubcomponentsInstances('thread'),
+        ownedThreadSubcomponent         <- impl.getSubcomponentsInstances('thread').resolve()->select(c|c.oclIsKindOf(AADLBA!Subcomponent)),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
 												-- intraprocess input thread port
@@ -469,7 +469,7 @@ rule m_Process_Implementation {
 													(
 														impl.getSubcomponentsInstances('thread')
 															->collect(c| c.eContainer().featureInstance
-																->select(e| e.isProcessPort())
+																->select(e| e.isProcessPort() and e.isOutputFeature())
 																->collect(fi |
 																	thisModule.resolveTemp(fi, 'globalVariable')
 																)
@@ -477,9 +477,12 @@ rule m_Process_Implementation {
 													)->union
 													(
 														impl.getSubcomponentsInstances('thread')
-														->collect(c| 
-															thisModule.collectPeriodicDelayed_GlobalVariables(c)
-														)
+															->collect(c| c.eContainer().featureInstance
+																->select(e| e.isProcessPort() and e.isInputFeature())
+																->collect(fi |
+																	thisModule.resolveTemp(fi, 'globalVariable')
+																)
+															)
 													)
 													->flatten(),
 		ownedAccessConnection			<- impl.getConnectionsInstancesImg('accessConnection')
@@ -501,14 +504,7 @@ rule m_Process_Implementation {
 															thisModule.resolveTemp(fi, 'accessConnection')	
 														)
 													)
-												)
-												->union(
-													impl.getSubcomponentsInstances('thread')
-													->collect(c|
-														thisModule.collectPeriodicDelayed_GlobalVariablesConnections(c)
-													)
-												)
-												->flatten()
+												)->flatten()
 											
 	)
 	do

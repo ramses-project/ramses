@@ -14,6 +14,11 @@
             name="POK-Runtime">
       </aadlcontribution>
       <aadlcontribution
+            file="aadl_resources/package/RAVENSCAR_runtime.aadl2"
+            id="fr.tpt.aadl.packages.ravenscar_runtime.aadlcontribution"
+            name="RAVENSCAR-Runtime">
+      </aadlcontribution>
+      <aadlcontribution
             file="aadl_resources/package/PeriodicDelayed_runtime.aadl2"
             id="fr.tpt.aadl.packages.periodicdelayed_runtime.aadlcontribution"
             name="PeriodicDelayed-Runtime">

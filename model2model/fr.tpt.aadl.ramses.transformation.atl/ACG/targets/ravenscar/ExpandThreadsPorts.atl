@@ -28,7 +28,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									DATA_MODEL: AADLBA,
 									PROGRAMMING_PROPERTIES: AADLBA,
 									HOOKS: ATLHOOKS,
-									ARINC653_RUNTIME: AADLBA;
+									RAVENSCAR_RUNTIME: AADLBA;
 
 
 -------------------------------------------------------------------------------------------
@@ -68,56 +68,6 @@ helper def: collectGetValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!
 		)->flatten()
 ;
 
-helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
-	callSequences->collect(e | thisModule.resolveTemp(Sequence{c,e}, 'returnData'))
-	->union
-	(c.featureInstance->select(e|e.isDataOrEventDataPort() and not e.isPeriodicDelayedPort())
-		->collect(fi|
-			Sequence
-			{
-				fi.retreiveMessageAddress(),
-				thisModule.resolveTemp(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')
-			}
-		)
-	)
-	->union
-	(c.featureInstance->select(e|e.isDataPort() and not e.isIntraProcessFeatureInstance() and e.isInputFeature() and not e.isPeriodicDelayedPort())
-		->collect(fi|
-			Sequence
-			{
-				fi.retreiveMessageAddress(),
-				thisModule.resolveTemp(fi, 'CreateValidityDataSubcomponent', 'dataSubcomponent')
-			}
-		)
-	)
-	->union
-	(c.featureInstance->select(e|
-		not e.isEventPort() -- event ports are not yet handled in the transformation
-		and
-		(e.isInputFeature() or (e.isEventOrEventDataPort() and e.isOutputFeature()) )
-		and 
-		not(e.isDataPort() and not e.isIntraProcessFeatureInstance())
-		and
-		not e.isPeriodicDelayedPort())
-		->collect(fi|
-			thisModule.resolveTemp(fi, 'CreateTimeOutSubcomponent', 'dataSubcomponent')
-		)
-	)
-	->union
-	(
-		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 
-				paramCnx.isParamToParamConnection()
-				and
-				paramCnx.isPartOfCallSequence(callSequence)
-				and
-				callSequence.isComputeEntryPointOf(c)
-			)->collect(
-				paramCnx | thisModule.resolveTemp(Sequence{c, callSequence, paramCnx}, 'paramCnxVariable')
-			)
-		)
-	)
-	->flatten()
-;
 
 abstract rule m_Not_PeriodicDelayed_Port
 {
@@ -150,7 +100,7 @@ rule m_Process_Output_EventDataPort_Instance
 		(fi.isEventDataPort())
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(dataSubcomponentType <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Process_Output_Port_Instance
@@ -161,7 +111,7 @@ rule m_Process_Output_DataPort_Instance
 		(fi.isDataPort())
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(dataSubcomponentType <- 'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Thread_InterProcess_Input_Port_Instance
@@ -172,7 +122,7 @@ rule m_Process_Input_EventPort_Instance
 		(fi.isEventPort())
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(dataSubcomponentType <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Process_Input_Port_Instance
@@ -183,7 +133,7 @@ rule m_Process_Input_EventDataPort_Instance
 		(fi.isEventDataPort())
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(dataSubcomponentType <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Process_Input_Port_Instance
@@ -194,7 +144,7 @@ rule m_Process_Input_DataPort_Instance
 		(fi.isDataPort())
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(dataSubcomponentType <- 'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Thread_InterProcess_Input_Port_Instance
@@ -206,7 +156,7 @@ rule m_Process_Output_EventPort_Instance
 	to
 		connectedSubcomponent: AADLBA!ConnectedElement,
 		globalVariable: AADLBA!DataSubcomponent
-		(dataSubcomponentType <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 
@@ -218,13 +168,13 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 		(fi.isDataPort())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME')
+			dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')
 		)
 }
 
@@ -238,13 +188,13 @@ rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 		fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')
+			dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')
 		)
 }
 
@@ -258,13 +208,13 @@ rule m_Thread_IntraProcess_Input_EventPort_Instance
 		fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')
+			dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')
 		)
 }
 
@@ -278,9 +228,9 @@ rule m_Thread_InterProcess_Input_EventDataPort_Instance
 		not fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Thread_Input_Port_Instance
@@ -293,9 +243,9 @@ rule m_Thread_InterProcess_Input_EventOrEventDataPort_Instance
 		not fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent
 }
 
@@ -309,9 +259,9 @@ rule m_Thread_InterProcess_Input_DataPort_Instance
 		not fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent
 }
 
@@ -375,9 +325,9 @@ rule m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance
 		)
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Buffer_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
@@ -393,9 +343,9 @@ rule m_Thread_Output_IntraProcess_DataPort_Instance
 		)
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
@@ -411,9 +361,9 @@ rule m_Thread_InterProcess_EventDataPort_Output_Instance
 		)
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Queuing_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
@@ -429,9 +379,9 @@ rule m_Thread_InterProcess_DataPort_Output_Instance
 		)
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME')),
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'Sampling_Port_Id_Type'.asDataType('ARINC653_RUNTIME'))
+		(dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'))
 }
 
 
@@ -461,7 +411,7 @@ unique lazy rule createResolvedSpg
 		spg: AADLBA!SubprogramType
 	using
 	{
-		param: AADLBA!Parameter = spg.ownedParameter->any(e|e.name = 'MESSAGE_ADDR');
+		param: AADLBA!Parameter = spg.ownedParameter->any(e|e.name = 'Port_Type');
 	}
 	to
 		spg_ResolvedType: AADLBA!SubprogramType
@@ -504,7 +454,7 @@ unique lazy rule CreateLengthDataSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_Length',
-			dataSubcomponentType<-'Message_Size_Type'.asDataType('ARINC653_RUNTIME'),
+			dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'),
 			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
 		)
 	do
@@ -514,6 +464,25 @@ unique lazy rule CreateLengthDataSubcomponent
 	}
 }
 
+unique lazy rule CreatePortTypeDataSubcomponent
+{
+	from
+		port : AADLI!FeatureInstance
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-port.feature.name,
+			dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')
+--			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
+		dataSubcomponent;
+	}
+}
+
+
 unique lazy rule CreateValidityDataSubcomponent
 {
 	from
@@ -522,7 +491,7 @@ unique lazy rule CreateValidityDataSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_Validity',
-			dataSubcomponentType<-'Validity_Type'.asDataType('ARINC653_RUNTIME')
+			dataFeatureClassifier <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME')
 		)
 	do
 	{
@@ -543,7 +512,7 @@ unique lazy rule CreateTimeOutSubcomponent
 		dataSubcomponent: AADLBA!DataSubcomponent
 		(
 			name<-port.feature.name+'_TimeOut',
-			dataSubcomponentType<-'System_Time_Type'.asDataType('ARINC653_RUNTIME'),
+			dataSubcomponentType <- 'Port_Type'.asDataType('RAVENSCAR_RUNTIME'),
 			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
 		)
 	do
@@ -553,7 +522,10 @@ unique lazy rule CreateTimeOutSubcomponent
 	}
 }
 
-helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'Return_Code_Type'.asDataType('ARINC653_RUNTIME');
+-- not finish
+--helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'Port_Type'.asDataType('RAVENSCAR_RUNTIME
+--	');
+helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'Port_Type'.asDataType('RAVENSCAR_RUNTIME');
 
 
 -------------------------------------------------------------------------------------------
@@ -584,9 +556,10 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	if(not p.oclIsUndefined()) then
 		let package_name: String = p.eContainer().subcomponent.classifier.getNamespace().getOwner().name in
 		if(p.eContainer().eContainer() = self.eContainer().eContainer()) then
-			package_name+thisModule.packageSuffix.concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+			package_name+thisModule.packageSuffix.concat('::'+p.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
 		else
-			package_name+thisModule.packageSuffix.concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+			package_name+thisModule.packageSuffix.concat('::'+self.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+			
 		endif
 	else
 		self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()

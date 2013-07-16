@@ -76,11 +76,11 @@ rule m_Thread_Output_Port_Instance
 	to
 		f: AADLBA!DataAccess
 		(
-			name <- cnxRef.uniqueName()+'_'+fi.feature.name
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name --connection data access (left side) in thread implementation
 		),
 		f_entrypoint: AADLBA!DataAccess
 		(
-			name <- cnxRef.uniqueName()+'_'+fi.feature.name
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name --connection data access (right side) in thread implementation
 		),
 		accessConnection: AADLBA!AccessConnection
 		(
@@ -174,7 +174,7 @@ rule m_Thread_IntraProcess_Input_Port_Instance
 		)
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(name <- fi.eContainer().name+'_'+fi.name+'_globalVariable'),
+		(name <- fi.eContainer().name+'_'+fi.name+'_globalVariable'), -- process subcomponents Task + _ + Port P + global variable 
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
 			connectionEnd<-globalVariable
