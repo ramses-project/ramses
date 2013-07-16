@@ -40,10 +40,10 @@ import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
-import fr.tpt.aadl.ramses.generation.launcher.ada.AdaGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.launcher.adaravenscar.AdaRavenscarGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
-import fr.tpt.aadl.ramses.generation.pok.PokGeneratorFactory;
+import fr.tpt.aadl.ramses.generation.pok.ada.AdaPokGeneratorFactory;
+import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis;
 
 
@@ -76,7 +76,7 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     
     AbstractGeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
     AbstractGeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();
-    AbstractGeneratorFactory adaGeneratorFactory = new AdaGeneratorFactory();
+    AbstractGeneratorFactory adaGeneratorFactory = new AdaPokGeneratorFactory();
     AbstractGeneratorFactory adaRavenscarGeneratorFactory = new AdaRavenscarGeneratorFactory();
     
     Generator genPok = pokGeneratorFactory.createGenerator() ;
