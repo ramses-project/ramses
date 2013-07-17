@@ -40,5 +40,6 @@ public class ToolSuiteLauncher
     {
       e.printStackTrace() ;
     }
+    System.exit(0) ;
   }
 }
