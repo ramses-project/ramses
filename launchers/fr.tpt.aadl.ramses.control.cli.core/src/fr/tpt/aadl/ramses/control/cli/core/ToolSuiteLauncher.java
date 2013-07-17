@@ -234,6 +234,8 @@ public class ToolSuiteLauncher
       throw new GenerationException("instanciation failed.") ;
     }
 
+    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet);
+    
     _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
 
     ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
