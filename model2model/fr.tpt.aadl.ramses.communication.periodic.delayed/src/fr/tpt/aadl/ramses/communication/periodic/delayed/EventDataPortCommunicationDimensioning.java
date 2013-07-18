@@ -93,7 +93,7 @@ public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDela
 	{
 
 		long readerTaskPeriod = getPeriod(this.readerReceivingTaskInstance);
-		for(int iteration= 1; iteration <= CPRSize; iteration++)
+		for(int iteration= 0; iteration < CPRSize; iteration++)
 		{
 			long SEJDprev = 0;
 			long readingTime = iteration*readerTaskPeriod;
