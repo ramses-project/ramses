@@ -354,6 +354,8 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		)
 	do
 	{
+		-- next is a workaround
+		thisModule.theHOOK.setInDirection(putValueValueParam);
 		putValueOutputActual.setSubcomponentType(fi.feature.dataFeatureClassifier);
 		putValueContextActual.setSubcomponentType(thisModule.resolveTemp(consumerPort, 'PeriodicDelayedContext_Impl'));
 	}
