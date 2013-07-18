@@ -396,8 +396,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		)
 }
 
-
--- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue
+-- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowMFP
 {
 	from
