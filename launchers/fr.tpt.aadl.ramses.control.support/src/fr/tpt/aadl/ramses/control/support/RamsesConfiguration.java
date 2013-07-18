@@ -45,33 +45,27 @@ public class RamsesConfiguration
 	  IncludeDirectories.get(r).addAll(includeDirSet) ;
 	else
 	{
-		includeDirSet.add(RamsesRessourcesDir);
+	  includeDirSet.add(RamsesRessourcesDir);
 	  File periodicDelayedRuntimeDir;
-	  try {
-		
-		// Add dir in which the input resource was defined
-		URI uri = r.getURI();
-		String filePath = r.getURI().toFileString();
-		int lastIndex = filePath.indexOf(uri.lastSegment());
-		File inputResourceDir = new File(filePath.substring(0, lastIndex));
-		includeDirSet.add(inputResourceDir);
-		
-		// Add Dir of PeriodicDelayed runtime
-		periodicDelayedRuntimeDir = new File(
-				  RamsesRessourcesDir.getCanonicalPath()+"aadl_resources/C_runtime/PeriodicDelayed_rutime/");
-		includeDirSet.add(periodicDelayedRuntimeDir);
-		
-		// TODO: include other runtime directories here.
-		String pokPath = System.getenv("POK_PATH");
-		if(pokPath==null || pokPath=="")
-			pokPath = System.getProperty("POK_PATH");
-		File pokFile = new File(pokPath+"/libpok/include");
-		includeDirSet.add(pokFile);
-		
-	  } catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	  }
+
+	  // Add dir in which the input resource was defined
+	  URI uri = r.getURI();
+	  String filePath = r.getURI().toFileString();
+	  int lastIndex = filePath.indexOf(uri.lastSegment());
+	  File inputResourceDir = new File(filePath.substring(0, lastIndex));
+	  includeDirSet.add(inputResourceDir);
+
+	  // Add Dir of PeriodicDelayed runtime
+	  periodicDelayedRuntimeDir = new File(
+			  RamsesRessourcesDir.getAbsolutePath()+"/C_runtime/PeriodicDelayed_runtime/");
+	  includeDirSet.add(periodicDelayedRuntimeDir);
+
+	  // TODO: include other runtime directories here.
+	  String pokPath = System.getenv("POK_PATH");
+	  if(pokPath==null || pokPath=="")
+		pokPath = System.getProperty("POK_PATH");
+	  File pokFile = new File(pokPath+"/libpok/include");
+	  includeDirSet.add(pokFile);
 	  IncludeDirectories.put(r, includeDirSet);
 	}
   }
