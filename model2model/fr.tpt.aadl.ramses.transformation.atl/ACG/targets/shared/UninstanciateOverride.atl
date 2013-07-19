@@ -452,7 +452,7 @@ rule m_Process_Implementation {
  	implImg : AADLBA!ProcessImplementation (
  		name 							<- impl.name,
 		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('threadgroup'),
-        ownedThreadSubcomponent         <- impl.getSubcomponentsInstances('thread').resolve()->select(c|c.oclIsKindOf(AADLBA!Subcomponent)),
+        ownedThreadSubcomponent         <- impl.getSubcomponentsInstances('thread').resolve()->select(c|c.oclIsKindOf(AADLBA!ThreadSubcomponent)),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
 												-- intraprocess input thread port

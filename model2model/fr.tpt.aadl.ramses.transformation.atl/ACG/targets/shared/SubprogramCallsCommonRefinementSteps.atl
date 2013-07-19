@@ -182,8 +182,8 @@ abstract rule m_ThreadBehavior
 		entryPointImplImg: AADLBA!SubprogramImplementation
 		(
 			name <- c.uniqueName().concat(behavior.name).concat('.impl'), -- subprogram Impl
-			ownedDataSubcomponent <- --thisModule.collectCommunicationsLocalVariables(c,impl.ownedSubprogramCallSequence)
-										--		->union
+			ownedDataSubcomponent <- thisModule.collectCommunicationsLocalVariables(c,impl.ownedSubprogramCallSequence)
+												->union
 												(
 													c.featureInstance->select(e|e.isDataOrEventDataPort())
 													->collect
