@@ -30,7 +30,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									HOOKS: ATLHOOKS;
 
 
--- @extends m_ComputeEntrypointCallSequence,m_ComputeEntrypointCallSequence_SporadicThread
+-- @extends m_ComputeEntrypointCallSequence
 rule m_ComputeEntrypointCallSequence_Periodic
 {
 	from

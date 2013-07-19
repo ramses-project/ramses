@@ -304,116 +304,12 @@ rule m_ComputeEntrypointCallSequence {
 			}
 		}
         
-		if(c.isPeriodicThread())
+		if(c.isPeriodicThread() or c.isSporadicThread())
 		intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{c,behavior},'waitDispatchCall'));		
 
 		loop_target_actions.actions <- intermediateCallActionSequence;
 	}
-}	
-
--- @extends m_ThreadEntrypoint,m_ThreadBehavior
-rule m_ComputeEntrypointCallSequence_SporadicThread { 
-  from	
-	c: AADLI!ComponentInstance,
-	behavior: AADLI!SubprogramCallSequence
-	(
-		c.category=#thread 
-		and 
-		behavior.isComputeEntryPointOf(c)
-		and
-		(not c.subcomponent.subcomponentType.needsToMapBehaviorAnnex())
-	)
-	using
-	{
-		intermediateCallActionSequence: Sequence(AADLBA!SubprogramCallAction) = Sequence{};
-		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
-	}
-	to
-		callEntryPoint: AADLBA!SubprogramCall,
-		callSequenceImg: AADLBA!SubprogramCallSequence
-		(
-			name <- behavior.name
-		),
-		behaviorAnnex: AADLBA!BehaviorAnnex,
-		callSeqState: AADLBA!BehaviorState,
-		computationTransition: AADLBA!BehaviorTransition,
-		target_actionBlock: AADLBA!BehaviorActionBlock,
-		target_actions: AADLBA!BehaviorActionSequence,
-		loop_target_actions: AADLBA!BehaviorActionSequence,
-		whileTrue: AADLBA!WhileOrDoUntilStatement,
-		trueValueExpression: AADLBA!ValueExpression,
-		trueRelation: AADLBA!Relation,
-		trueSimpleExpression: AADLBA!SimpleExpression,
-		trueTerm: AADLBA!Term,
-		trueFactor: AADLBA!Factor,
-		trueValue: AADLBA!BehaviorBooleanLiteral
-	do
-	{
-		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
-		{
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior} ,'callReceiveInputs'));
-		}
-		
-		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isDataPort()))
-		{
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior} ,'call'));
-		}
-
-		for(call in behavior.ownedCallSpecification)
-		{
-			for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventOrEventDataPort()))
-			{
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = destination.feature))
-				{
-					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior, paramCnx} ,'call'));
-				}
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = destination.feature))
-				{
-					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior, paramCnx} ,'call'));
-				}
-			}
-			
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{c,behavior,call}, 'subprogramCallAction'));
-			
-			
-			for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isEventOrEventDataPort()))
-			{
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = source.feature))
-				{
-					for(cnxInst in source.srcConnectionInstance)
-					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call'));
-					}
-				}
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = source.feature))
-				{
-					for(cnxInst in source.srcConnectionInstance)
-					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call'));
-					}
-				}
-			}
-		}
-		for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isDataPort()))
-		{
-			for(cnxInst in source.srcConnectionInstance)
-			{
-				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'call'));
-			}
-		}
-		for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
-		{
-			for(cnxInst in source.srcConnectionInstance)
-			{
-				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
-			}
-		}
-        
-		if(c.isSporadicThread())
-		intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{c,behavior},'waitDispatchCall'));		
-		loop_target_actions.actions <- intermediateCallActionSequence;
-	}
-}	
+}
 
 
 lazy rule CreateParameterHolder
