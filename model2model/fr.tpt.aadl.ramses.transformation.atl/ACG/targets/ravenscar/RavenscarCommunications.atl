@@ -33,6 +33,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 
 
 
+helper def: getRuntimeEventType() : AADLBA!DataSubcomponentType = 'Global_Queue'.asDataType('RAVENSCAR_RUNTIME');
 
 -- @extends m_Not_PeriodicDelayed_Port
 abstract rule m_RavenscarCallSpecification
@@ -113,4 +114,57 @@ rule m_Output_Ravenscar_ComputeEntrypointCallSequence
 			element <- PORT_TYPE
 		)
 }
+
+-- @extends m_Not_PeriodicDelayed_Port
+abstract rule m_Ravenscar
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!Element
+		(
+			fi.isDataPort()
+			and
+			fi.isIntraProcessFeatureInstance()
+			and
+			(
+				behavior.oclIsKindOf(AADLBA!SubprogramCallSequence)
+				or
+				behavior.oclIsKindOf(AADLBA!BehaviorAnnex)
+			)
+		)
+	to
+		call: AADLBA!SubprogramCallAction
+}
+
+-- @extends m_Ravenscar
+rule m_Input_Procedure
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!Element
+	using
+	{
+		PORT_TYPE: AADLBA!DataSubcomponent = thisModule.CreatePortTypeDataSubcomponent(fi);
+		spg: AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('RAVENSCAR_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{PORT_TYPE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		PORT_TYPE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- PORT_TYPE
+		)
+}
+
+
+
+
 

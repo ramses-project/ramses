@@ -44,12 +44,9 @@ helper def: getRuntimeName: String =
 	'ravenscar_runtime'
 ;
 
-helper def: getRuntimeEventType() : AADLBA!DataSubcomponentType = 'Global_Queue'.asDataType('RAVENSCAR_RUNTIME');
-
 helper def: getWaitPeriodSubprogram : AADLBA!SubprogramType = 'Periodic_Wait'.asSubprogramType('RAVENSCAR_RUNTIME');
 
 helper def: getWaitEventSubprogram : AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('RAVENSCAR_RUNTIME');
-
 
 rule expandThreadDispatchProtocolInBA(inst: AADLI!ComponentInstance,
 									  spg: AADLBA!SubprogramImplementation,
