@@ -22,8 +22,6 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
--- TODO: size of globalVariable (number of elements in array) is not properly initialized
-
 module SharedRules;
 create OUT : AADLBA from IN : AADLI;
 
@@ -57,6 +55,10 @@ helper def : collectPeriodicDelayed_LocalVariables_LowMFP(c: AADLI!ComponentInst
 ;
 
 helper def : collectPeriodicDelayed_LocalVariables_LowET(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
 	Sequence{}
 ;
 
@@ -130,6 +132,13 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 		behavior->collect
 		( b |
 			thisModule.collectPeriodicDelayed_LocalVariables_LowET(c, b)
+		)
+	)
+	->union
+	(
+		behavior->collect
+		( b |
+			thisModule.collectPeriodicDelayed_LocalVariables_Mutex(c, b)
 		)
 	)
 	->flatten()

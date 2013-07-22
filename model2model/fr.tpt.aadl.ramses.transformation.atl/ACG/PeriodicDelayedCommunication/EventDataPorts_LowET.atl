@@ -124,7 +124,6 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 	using
 	{
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
-		Send_Output_Spg: AADLBA!SubprogramType = thisModule.Send_Output_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
 		producerPort: AADLI!FeatureInstance = cnxInst.source;
 	}
@@ -165,7 +164,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 	do
 	{
 		-- next is a workaround
-		thisModule.theHOOK.setInDirection(putValueValueParam);
+		thisModule.theHOOK.setDirection(putValueValueParam, 'in');
 	}
 }
 
