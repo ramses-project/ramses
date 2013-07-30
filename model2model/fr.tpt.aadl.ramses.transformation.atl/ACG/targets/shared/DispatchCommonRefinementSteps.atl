@@ -22,6 +22,7 @@
 -- nsURI AADLBA=http:///AADLBA
 -- @atlcompiler emftvm
 
+
 module DispatchCommonRefinementSteps;
 create OUT : AADLBA 	from 		IN : AADLI,
 									AADL_RUNTIME: AADLBA,
@@ -31,12 +32,12 @@ create OUT : AADLBA 	from 		IN : AADLI,
 
 
 -- @extends m_ComputeEntrypointCallSequence
-rule m_ComputeEntrypointCallSequence_Periodic
+rule m_ComputeEntrypointCallSequence_Periodic_or_Sporadic
 {
 	from
 		c: AADLI!ComponentInstance,
 		behavior: AADLI!SubprogramCallSequence
-		(c.isPeriodicThread()
+		((c.isPeriodicThread() or c.isSporadicThread()) 
 		and 
 		behavior.isComputeEntryPointOf(c)
 		)
