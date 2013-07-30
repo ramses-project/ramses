@@ -192,13 +192,14 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	    {
 	      NamedElement ne = object ;
 	      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+	      System.out.println("la valeur de source name"+sourceName);
 	      List<String> sourceText =
 	            PropertyUtils.getStringListValue(ne, "Source_Text") ;
 	      aadlbaText.addOutput(sourceName) ;
 	      
 	      for(String s : sourceText)
 	      {
-	        if(s.endsWith(".h"))
+	        if(s.endsWith(".ads") || s.endsWith(".h"))
 	        {
 	          _additionalADS.add(s) ;
 	          return true;
@@ -353,15 +354,10 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	              AadlBaToADAUnparser.getInitialStateIdentifier(ba) + ";") ;
 	        _adbFileContent.addOutputNewline("final : character := 0;") ;
 	        processEList(_adbFileContent, ba.getVariables()) ;
-	        _adbFileContent.addOutputNewline("Boucle_principale:") ;
 	        _adbFileContent.addOutputNewline("while (final /= 1) loop") ;
-	        //_adbFileContent.addOutputNewline("{") ;
 	        _adbFileContent.incrementIndent() ;
-	        //_adbFileContent.addOutputNewline("switch(current_state)") ;
 	        _adbFileContent.addOutputNewline("case current_state is") ;
-	        //_adbFileContent.addOutputNewline("{") ;
 	        _adbFileContent.incrementIndent() ;
-	        //_adsFileContent.addOutputNewline("typedef enum {") ;
 	        _adsFileContent.addOutputNewline("type enum is (") ;
 	        _adsFileContent.incrementIndent() ;
 

@@ -12,7 +12,7 @@ import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparser;
 
 public class AadlBaToADAUnparserAction extends AadlBaUnParserAction implements NamedPlugin
 {
-	public static final String ANNEX_NAME = "restricted_behavior_specification" ;
+	public static final String ANNEX_NAME = "ada_behavior_specification" ;
 	  protected AadlBaToADAUnparser _unparser = null ;
 	  
 	  public AadlBaToADAUnparserAction()
