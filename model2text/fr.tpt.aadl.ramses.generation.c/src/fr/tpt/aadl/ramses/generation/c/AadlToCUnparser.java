@@ -458,7 +458,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	}
     String annexName = as.getName() ;
     	if(annexName.equalsIgnoreCase(AadlBaUnParserAction.ANNEX_NAME))
-    		annexName = "restricted_"+annexName;
+    		annexName = "c_"+annexName;
     AnnexUnparser unparser =
           ServiceRegistryProvider.getServiceRegistry()
                 .getUnparser(annexName) ;

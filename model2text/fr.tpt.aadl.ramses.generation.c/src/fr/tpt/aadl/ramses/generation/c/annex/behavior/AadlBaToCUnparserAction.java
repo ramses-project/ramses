@@ -35,7 +35,7 @@ public class AadlBaToCUnparserAction extends AadlBaUnParserAction
                                      implements NamedPlugin
 {
 
-  public static final String ANNEX_NAME = "restricted_behavior_specification" ;
+  public static final String ANNEX_NAME = "c_behavior_specification" ;
   protected AadlBaToCUnparser _unparser = null ;
   
   public AadlBaToCUnparserAction()

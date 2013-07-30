@@ -148,25 +148,26 @@ public class GenerationUtilsC
   public static String resolveExistingCodeDependencies(NamedElement object,
 		  										 Set<String> additionalHeaders)
   {
-    try
+	  try
     {
       NamedElement ne = object ;
       List<String> sourceText =
               PropertyUtils.getStringListValue(ne, "Source_Text") ;
-        
       for(String s : sourceText)
       {
-        if(s.endsWith(".h"))
+        if(s.endsWith(".ads"))
         {
           additionalHeaders.add(s) ;
         }
       }
       String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+      System.out.println("sourceName : "+sourceName);
       return sourceName;
     }
     catch(Exception e)
     {
-      if(object instanceof ComponentType)
+
+    	if(object instanceof ComponentType)
       {
         ComponentType c = (ComponentType) object;
         if(c.getOwnedExtension()!=null)
