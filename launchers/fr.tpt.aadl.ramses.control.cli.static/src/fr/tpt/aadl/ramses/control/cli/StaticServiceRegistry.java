@@ -39,6 +39,7 @@ import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.generation.launcher.adaravenscar.AdaRavenscarGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
@@ -71,6 +72,9 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _unparsers.put(AadlBaUnParserAction.ANNEX_NAME, new AadlBaUnParserAction()) ;
     _unparsers.put(AadlBaToCUnparserAction.ANNEX_NAME,
                    new AadlBaToCUnparserAction()) ;
+    _unparsers.put(AadlBaToADAUnparserAction.ANNEX_NAME,
+            new AadlBaToADAUnparserAction()) ;
+    
     _analyzers.put(WcetAnalysis.ANALYZER_NAME, new WcetAnalysis());
     _analyzers.put(AADLInspectorSchedulingAnalysis.ANALYZER_NAME, new AADLInspectorSchedulingAnalysis());
     
