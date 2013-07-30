@@ -281,8 +281,13 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public void setInDirection(DirectedFeature feature) {
-		feature.setDirection(DirectionType.IN);
+	public void setDirection(DirectedFeature feature, String direction) {
+		if(direction.equals("in"))
+			feature.setDirection(DirectionType.IN);
+		else if(direction.equals("out"))
+			feature.setDirection(DirectionType.OUT);
+		else
+			feature.setDirection(DirectionType.IN_OUT);
 	}
 
 	/**

@@ -127,7 +127,7 @@ public interface HookAccess extends EObject
 	 * @model featureRequired="true"
 	 * @generated
 	 */
-	void setInDirection(DirectedFeature feature);
+	void setDirection(DirectedFeature feature, String direction);
 	
 	/**
 	 * <!-- begin-user-doc -->

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ecore:EPackage xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="hooks"
-    nsURI="http://fr.tpt.aadl.ramses.transformation.atl.launch" nsPrefix="hooks">
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="hooks" nsURI="http://fr.tpt.aadl.ramses.transformation.atl.launch"
+    nsPrefix="hooks">
   <eClassifiers xsi:type="ecore:EClass" name="HookAccess">
     <eOperations name="orderFeatures" upperBound="-1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Feature">
       <eParameters name="cpt" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//ComponentType"/>
@@ -29,8 +28,9 @@
     <eOperations name="getBufferSize" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
       <eParameters name="destinationFeatureInstance" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//FeatureInstance"/>
     </eOperations>
-    <eOperations name="setInDirection" lowerBound="1">
+    <eOperations name="setDirection" lowerBound="1">
       <eParameters name="feature" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//DirectedFeature"/>
+      <eParameters name="direction" eType="ecore:EDataType ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//String"/>
     </eOperations>
     <eOperations name="isUsedInFreshClause" lowerBound="1" eType="ecore:EDataType ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//Boolean">
       <eParameters name="ba" lowerBound="1" eType="ecore:EClass ../../fr.tpt.aadl.annex.behavior/model/aadlba.ecore#//BehaviorAnnex"/>
