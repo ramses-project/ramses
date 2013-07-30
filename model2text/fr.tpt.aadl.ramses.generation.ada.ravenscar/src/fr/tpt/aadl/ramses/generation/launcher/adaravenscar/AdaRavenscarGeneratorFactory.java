@@ -25,31 +25,38 @@ package fr.tpt.aadl.ramses.generation.launcher.adaravenscar;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
-import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator;
+import fr.tpt.aadl.ramses.generation.adaravenscar.makefile.AadlToAdaRavenscarMakefileUnparser;
+import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
 
 public class AdaRavenscarGeneratorFactory extends AbstractGeneratorFactory
 {
-  public static String ADA_RAVENSCAR_GENERATOR_NAME = "raven" ;
+  public static String ADA_RAVENSCAR_GENERATOR_NAME = "ada-ravenscar" ;
   
   private static Generator createPokGenerator()
   {
-   
+    AadlToConfAdaRavenscarUnparser AdaRavenscarUnparser = new AadlToConfAdaRavenscarUnparser() ;
+    
     AadlToADAUnparser genericADAUnparser = AadlToADAUnparser.getAadlToADAUnparser() ;
     
+    AadlToAdaRavenscarMakefileUnparser adaRavenscarMakefileUnparser = new AadlToAdaRavenscarMakefileUnparser() ;
     /*
-     * TODO: replace null, null by AadlAdaRavenscarUnparser and AadlRavenscarMakefileUnparser
-     * */
+    AadlTargetSpecificCodeGenerator tarSpecCodeGen = new 
+            AadlTargetSpecificCodeGenerator(genericADAUnparser,
+                                            pokADAUnparser) ;
+
+
+    */
     AadlTargetSpecificCodeGenerator tarSpecCodeGen = new 
                     AadlTargetSpecificCodeGenerator(genericADAUnparser,
-                                                    null,
-                                                    null) ;
+                    								null,
+                                                    adaRavenscarMakefileUnparser) ;
     
-    AadlAdaTransformation targetTrans = new AadlAdaTransformation();
+    AadlAdaRavenscarTransformation targetTrans = new AadlAdaRavenscarTransformation();
     
     
     AadlTargetSpecificGenerator result = 
-                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen) ;
+                  new AadlTargetSpecificGenerator(null, tarSpecCodeGen) ;
     
     result.setRegistryName(ADA_RAVENSCAR_GENERATOR_NAME) ;
     

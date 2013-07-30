@@ -27,7 +27,7 @@ import java.util.Map;
 
 import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
 
-public class AadlAdaTransformation extends
+public class AadlAdaRavenscarTransformation extends
                                        AadlToTargetSpecificAadl
 {
 	  @Override
@@ -37,7 +37,7 @@ public class AadlAdaTransformation extends
 	  }
 
 
-	  public AadlAdaTransformation()
+	  public AadlAdaRavenscarTransformation()
 	  {
 	  	ATL_FILE_NAMES = new String[]
 	        {
@@ -51,22 +51,6 @@ public class AadlAdaTransformation extends
 	  		 "ACG/targets/ravenscar/ExpandThreadsDispatchProtocol",
 		  	 "ACG/PeriodicDelayedCommunication/SharedRules"
 		  	 
-		  	 /*
-	  			"ACG/targets/shared/UninstanciateOverride",
-		  		 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
-		  		 "ACG/targets/shared/PortsCommonRefinementSteps",
-		  		 "ACG/targets/shared/DispatchCommonRefinementSteps",
-		  		 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
-		  		 "ACG/targets/arinc653/ExpandThreadsPorts",
-
-			     "ACG/targets/arinc653/BlackboardCommunications",
-			  	 "ACG/targets/arinc653/BufferCommunications",
-			  	 "ACG/targets/arinc653/EventsCommunications",
-			  	 "ACG/targets/arinc653/QueuingCommunications",
-			  	 "ACG/targets/arinc653/SamplingCommunications",
-			  	 "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
-			  	 "ACG/PeriodicDelayedCommunication/SharedRules"
-    */
 	        };
 	  }
 	  
