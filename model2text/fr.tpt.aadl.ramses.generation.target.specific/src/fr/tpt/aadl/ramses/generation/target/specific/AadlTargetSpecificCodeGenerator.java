@@ -103,8 +103,9 @@ public class AadlTargetSpecificCodeGenerator
       
       // XXX Have AadlGenericUnparser to unparse the SystemImplementation
       // object ?
-      
-      TargetProperties tarProp = _targetUnparser.process(si, generatedFilePath);
+      TargetProperties tarProp=null;
+      if(_targetUnparser != null)
+        tarProp = _targetUnparser.process(si, generatedFilePath);
       
       for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
       {
@@ -112,11 +113,12 @@ public class AadlTargetSpecificCodeGenerator
         File processorFileDir =
               new File(generatedFileDir + "/" + ps.getName()) ;
         processorFileDir.mkdir() ;
-        _targetBuilderGen.process(ps, processorFileDir) ;
+        if(_targetBuilderGen != null)
+          _targetBuilderGen.process(ps, processorFileDir) ;
         
         File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
-                  
-        _targetUnparser.process(ps, kernelFileDir, tarProp);
+        if(_targetUnparser != null)
+          _targetUnparser.process(ps, kernelFileDir, tarProp);
         List<ProcessSubcomponent> ownedProcess = 
                                       GeneratorUtils.getBindedProcesses(ps) ;
         
@@ -128,14 +130,16 @@ public class AadlTargetSpecificCodeGenerator
           processDirectory.mkdir() ;
           
           _genericUnparser.process(process, processDirectory) ;
-          
-          _targetUnparser.process(process, processDirectory, tarProp);
-          _targetBuilderGen.process(process, processDirectory) ;
+          if(_targetUnparser!=null)
+            _targetUnparser.process(process, processDirectory, tarProp);
+          if(_targetBuilderGen!= null)
+        	_targetBuilderGen.process(process, processDirectory) ;
          }
         
        // This line is at the end because it will launch the build of the generated code;
        // Thus it is better is the code has been generated...
-       _targetBuilderGen.process(si, generatedFileDir) ;
+       if(_targetBuilderGen!= null)
+         _targetBuilderGen.process(si, generatedFileDir) ;
         
       }
     }  

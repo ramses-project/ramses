@@ -107,9 +107,12 @@ public class AadlTargetSpecificGenerator implements Generator
                                                       throws GenerationException
   {
     Resource inputResource = systemInstance.eResource() ;
-    
-    Resource r = _targetTrans.transform(inputResource, resourceFilePath,
+    Resource r;
+    if(_targetTrans != null)
+      r = _targetTrans.transform(inputResource, resourceFilePath,
                                         generatedFilePath);
+    else
+      r = inputResource;
     
     _codeGen.generate(r, generatedFilePath) ;
   }
