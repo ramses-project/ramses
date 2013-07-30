@@ -81,12 +81,12 @@ helper def : getProperty(propertyName : String) : AADLBA!Property =
 ;
 
 helper context AADLBA!NamedElement def : getPropertyIntValue(
-	propertyName : String, defaultValue : Integer) : Integer =
+	propertyName : String) : Integer =
 	let v : AADLBA!ModalPropertyValue = self.ownedPropertyAssociation
 			->any(pa|pa.property.name=propertyName)
 	in 
 		if (v.oclIsUndefined()) then
-			defaultValue
+			OclUndefined
 		else
 			v.ownedValue->first().ownedValue.value
 		endif
