@@ -82,7 +82,7 @@ rule m_SporadicThread
 		),
 		NewInstanceData: AADLBA!DataType
 		(
-			name <- 'Global_Queue_'+c.name,
+			name <- 'Global_Queue_'+c.uniqueName(),
 			ownedExtension  <- extendedQueueType,
 			ownedDataAccess <- c.featureInstance->collect(fi|thisModule.resolveTemp(fi, 'queueFieldAccess'))
 		),
@@ -92,7 +92,7 @@ rule m_SporadicThread
 		),
     	NewInstanceDataImpl: AADLBA!DataImplementation
 		(
-			name <- 'Global_Queue_'+c.name+'.impl',
+			name <- 'Global_Queue_'+c.uniqueName()+'.impl',
 			ownedDataSubcomponent <- c.featureInstance->collect(fi|thisModule.resolveTemp(fi, 'queueSubcomponent')),
 			ownedAccessConnection <- c.featureInstance->collect(fi|thisModule.resolveTemp(fi,'f_connection'))
 		)
