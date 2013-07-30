@@ -110,7 +110,7 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 	endif
 ;
 	
--- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
+---- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
 --rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
 --{
 --	from
@@ -155,7 +155,7 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 --		)
 --}
 
--- @extends m_Thread_Instance
+-- @extends m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 rule m_Thread_With_Output_PeriodicDelayed_Port
 {
 	from
@@ -167,7 +167,6 @@ rule m_Thread_With_Output_PeriodicDelayed_Port
 		)
 	using
 	{
-		--periodValue : Integer = c.getPropertyIntValue('Period');
 		deadlineValue : Integer = if(c.getPropertyIntValue('Deadline').oclIsUndefined()) then c.getPropertyIntValue('Period') else c.getPropertyIntValue('Deadline') endif;
 		msgPriorityValue : Integer = c.getMsgPriority();	
 	}
@@ -202,7 +201,7 @@ rule m_Thread_With_Output_PeriodicDelayed_Port
 		)
 }
 
--- @extends m_Thread_Instance
+-- @extends m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 rule m_Thread_With_Input_PeriodicDelayed_Port
 {
 	from
@@ -231,11 +230,14 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		)
 }
 
--- @extends m_Thread_With_Input_PeriodicDelayed_Port,m_Thread_With_Output_PeriodicDelayed_Port
+-- @extends m_Thread_Instance
 rule m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 {
 	from
 		c: AADLI!ComponentInstance
+		(c.featureInstance->exists(e|e.isOutputFeature() and e.isPeriodicDelayedPort())
+			or 
+		 c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort()))
 	using
 	{
 		periodValue : Integer = c.getPropertyIntValue('Period');
