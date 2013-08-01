@@ -69,7 +69,7 @@ rule m_Input_Buffer_ComputeEntrypointCallSequence
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
 		BUFFER_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -122,7 +122,7 @@ rule m_Output_Buffer_ComputeEntrypointCallSequence
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
 		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction

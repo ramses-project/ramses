@@ -57,7 +57,7 @@ rule m_EventCallSpecification
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		EVENT_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), callSequence}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction,

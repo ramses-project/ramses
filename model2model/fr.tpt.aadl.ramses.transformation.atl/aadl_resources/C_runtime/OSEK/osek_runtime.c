@@ -1,10 +1,5 @@
 #include "osek_runtime.h"
 
-enum status_t {
-  E_OK,
-  E_OS_LIMIT
-};
-
 static void memcpy(char *dst, const char *src, unsigned int size)
 {
   char *p = dst + size;
@@ -108,7 +103,7 @@ StatusType GetValueOSEK(thread_queue_t * global_q, int port_id, data_t dst)
 StatusType ReceiveInputsOSEK(thread_queue_t * global_q, int port_id)
 {
   StatusType status = E_OK;
-  struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
+  struct port_queue_t * port_q = (struct port_queue_t*) global_q->port_queues[port_id];
   status = GetResource(*(global_q->rez));
   if (status != E_OK)
     return status;
@@ -127,10 +122,9 @@ StatusType ReceiveInputsOSEK(thread_queue_t * global_q, int port_id)
   return status; 
 }
 
-StatusType WaitEventOSEK(thread_queue_t * global_q, int port_id, data_t value)
+StatusType WaitEventOSEK(thread_queue_t * global_q)
 {
   StatusType status = E_OK;
-  struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
   status = GetResource(*(global_q->rez));
   if (status != E_OK)
     return status;

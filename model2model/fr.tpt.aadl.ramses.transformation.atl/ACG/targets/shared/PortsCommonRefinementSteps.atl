@@ -312,6 +312,10 @@ helper context AADLI!FeatureInstance def: getBehaviorAnnex():  AADLBA!BehaviorAn
 	self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
 ;
 
+helper context AADLI!ComponentInstance def: needsToMapBehaviorAnnex(): Boolean =
+	self.subcomponent.subcomponentType.needsToMapBehaviorAnnex()
+;
+
 helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
 	self.ownedAnnexSubclause->exists(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
 	and

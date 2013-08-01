@@ -60,6 +60,17 @@ helper context AADLI!SubprogramCallSequence def: isComputeEntryPointOf(c: AADLI!
 			)
 ;
 
+helper context AADLI!InstanceObject def: getComputeEntryPoints(): Sequence(AADLI!SubprogramCallSequence) =
+	self.ownedPropertyAssociation->select(
+				e | 
+				e.property.name = 'Compute_Entrypoint_Call_Sequence'
+			)->collect
+			(
+				owned_val| owned_val.ownedValue->collect(val|val.ownedValue.containmentPathElement->first().namedElement)
+			)->flatten()
+;
+
+
 helper context AADLBA!DirectedFeature def: isOutputFeature(): Boolean =
 	self.getDirection() = #out;
 		

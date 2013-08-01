@@ -31,22 +31,19 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									HOOKS: ATLHOOKS;
 
 
--- @extends m_ComputeEntrypointCallSequence
-rule m_ComputeEntrypointCallSequence_Periodic_or_Sporadic
+-- @extends m_ThreadEntrypoint
+rule m_PeriodicThread
 {
 	from
-		c: AADLI!ComponentInstance,
-		behavior: AADLI!SubprogramCallSequence
-		((c.isPeriodicThread() or c.isSporadicThread()) 
-		and 
-		behavior.isComputeEntryPointOf(c)
-		)
+		c: AADLI!ComponentInstance
+		(c.isPeriodicThread())
 	using
 	{
 		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
 	}
 	to
-		callSequenceImg: AADLBA!SubprogramCallSequence,
+		initState: AADLBA!BehaviorState,
+		callSeqState: AADLBA!BehaviorState,
 		returnData: AADLBA!DataSubcomponent,
 		waitDispatchCall: AADLBA!SubprogramCallAction
 		(
@@ -67,7 +64,7 @@ rule m_ComputeEntrypointCallSequence_Periodic_or_Sporadic
 	}
 }
 
--- @extends m_Thread_Instance
+-- @extends m_ThreadEntrypoint
 rule m_SporadicThread
 {
 	from
@@ -100,28 +97,3 @@ rule m_SporadicThread
 		
 }
 
-------------------------------------------------------------------------------------------------
---- TODO: change next rule to matched rule (like m_ComputeEntrypointCallSequence_Periodic)
-------------------------------------------------------------------------------------------------
-
-
-rule expandThreadDispatchProtocolInBA(inst: AADLI!ComponentInstance,
-									  spg: AADLBA!SubprogramImplementation,
-									  actionSequence: AADLBA!BehaviorActionSequence) 
-{
- do{
- 	if(inst.isPeriodicThread())
- 	{
- 		actionSequence.actions <- actionSequence.actions->including(thisModule.getPeriodicWaitCallAction(spg));
- 	}
- 	if(inst.isSporadicThread())
- 	{
- 	--	thisModule.addSporadicWaitCallAction(spg);
- 		actionSequence.actions <- actionSequence.actions->including(thisModule.getSporadicWaitCallAction(spg));
- 	}
- 	if(inst.isAperiodicThread())
- 	{
- 		thisModule.addAperiodicWaitCallAction(spg);
- 	}
- }
-}

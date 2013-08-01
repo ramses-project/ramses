@@ -212,15 +212,7 @@ rule m_create_Thread_BA
 													->collect(e|thisModule.createFreshnessIndicator(e))
 												)
 												->flatten(),
-			ownedSubprogramCallSequence     <- if (c.subcomponent.subcomponentType.needsToMapBehaviorAnnex()) then
-												c.subcomponent.subcomponentType.ownedAnnexSubclause
-													->select(ba | ba.oclIsTypeOf(AADLBA!BehaviorAnnex))
-													->collect(ba | thisModule.resolveTemp(Sequence{c,ba},'callSequenceImg'))
-											   else
-											   	impl.ownedSubprogramCallSequence
-												->select(e|e.isComputeEntryPointOf(c))
-												->collect(e| thisModule.resolveTemp(Sequence{c,e}, 'callSequenceImg'))
-											   endif,
+			ownedSubprogramCallSequence     <- Sequence{thisModule.resolveTemp(c, 'callSequenceImg')},
 			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
 												e.source.oclIsKindOf(AADLI!Parameter) and e.destination.oclIsKindOf(AADLI!Parameter))
 												->collect(e| thisModule.ParameterConnection(e))
@@ -364,7 +356,7 @@ unique lazy rule createAccessConnectionFromBA
 		)
 	do
 	{
-		accessCnx_Source.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),ba}, 'callEntryPoint'));
+		accessCnx_Source.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
 		accessCnx;
 	}
 }
@@ -452,7 +444,7 @@ rule m_Process_Implementation {
  	implImg : AADLBA!ProcessImplementation (
  		name 							<- impl.name,
 		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('threadgroup'),
-        ownedThreadSubcomponent         <- impl.getSubcomponentsInstances('thread').resolve()->select(c|c.oclIsKindOf(AADLBA!ThreadSubcomponent)),
+        ownedThreadSubcomponent         <- impl.getSubcomponentsInstances('thread')->collect(e| thisModule.resolveTemp(e, 'sub')),
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
 												-- intraprocess input thread port

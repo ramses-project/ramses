@@ -69,7 +69,7 @@ helper def: collectGetValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!
 ;
 
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
-	callSequences->collect(e | thisModule.resolveTemp(Sequence{c,e}, 'returnData'))
+	callSequences->collect(e | thisModule.resolveTemp(c, 'returnData'))
 	->union
 	(c.featureInstance->select(e|e.isDataOrEventDataPort() and not e.isPeriodicDelayedPort())
 		->collect(fi|

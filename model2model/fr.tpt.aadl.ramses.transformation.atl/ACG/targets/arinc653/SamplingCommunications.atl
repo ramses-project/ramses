@@ -114,7 +114,7 @@ rule m_Input_Sampling_ComputeEntrypointCallSequence
 		)
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
@@ -131,7 +131,7 @@ rule m_Input_Sampling_BehaviorAnnex
 		behavior: AADLBA!AnnexSubclause
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
@@ -195,7 +195,7 @@ rule m_Output_Sampling_ComputeEntrypointCallSequence
 		)
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
@@ -214,7 +214,7 @@ rule m_Output_Sampling_BehaviorAnnex
 		cnxRef: AADLI!PortConnection
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder

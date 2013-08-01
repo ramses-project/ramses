@@ -33,7 +33,7 @@ from 		IN : AADLI,							-- Simplified model : org.osate.aadl2/model/instance.ec
 
 
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
-	callSequences->collect(e | thisModule.resolveTemp(Sequence{c,e}, 'returnData'))
+	callSequences->collect(e | thisModule.resolveTemp(c, 'returnData'))
 	->union
 	(
 		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 

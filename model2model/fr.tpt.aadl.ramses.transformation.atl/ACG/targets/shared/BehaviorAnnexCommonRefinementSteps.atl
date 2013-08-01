@@ -177,7 +177,7 @@ rule m_Input_Port_BehaviorAnnex
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),behavior}, 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
 	}
 }
 
@@ -211,12 +211,12 @@ rule m_Output_Port_BehaviorAnnex
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),behavior}, 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
 	}
 }
 
 
--- @extends m_ThreadEntrypoint,m_ThreadBehavior
+-- @extends m_ThreadBehavior
 rule m_Compute_EntryPoint_from_BA {
  from 
     c : AADLI!ComponentInstance,
@@ -239,16 +239,10 @@ rule m_Compute_EntryPoint_from_BA {
 	stateTypeID: String = c.uniqueName().concat('_currentState');
  }
  to 
-	entryPointImg: AADLBA!SubprogramType
-	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(behavior).toString()),
-	entryPointImplImg: AADLBA!SubprogramImplementation
-	(name <- c.uniqueName()+'_entrypoint_'+impl.ownedAnnexSubclause->indexOf(behavior).toString()+'.impl'),
 	behaviorAnnex: AADLBA!BehaviorAnnex
 	(
 		variables <- behavior.variables
 	),
-	callEntryPoint: AADLBA!SubprogramCall,
-	callSequenceImg: AADLBA!SubprogramCallSequence,
 	stateType: AADLBA!DataType
 	(
 		name <- stateTypeID,
@@ -294,7 +288,7 @@ rule m_Compute_EntryPoint_from_BA {
 	connectedAccess_CURRENT_STATE: AADLBA!ConnectedElement
 	(
 		connectionEnd<-currentStateAccess,
-		context<-callEntryPoint
+		context<-thisModule.resolveTemp(c, 'callEntryPoint')
 	),
 	connectedSubcomponent_CURRENT_STATE: AADLBA!ConnectedElement
 	(
@@ -307,7 +301,11 @@ rule m_Compute_EntryPoint_from_BA {
 		destination<-connectedSubcomponent_CURRENT_STATE,
 		accessCategory <- #data
 	),
-	loop_target_actions: AADLBA!BehaviorActionSequence
+	computeEntryPointTransition: AADLBA!BehaviorTransition
+	(
+		name <- behavior.name+'_'+c.subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString()
+	),
+	computeEntryPointActions: AADLBA!BehaviorActionSequence
 	(
 		-- FIXME: to be sorted by priority
 		actions <- behavior.transitions->collect(e | thisModule.resolveTemp(Sequence{c, e}, 'ifStatement'))
@@ -317,7 +315,7 @@ rule m_Compute_EntryPoint_from_BA {
  	thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
  	for(fi in c.featureInstance->select(fi | fi.feature.oclIsKindOf(AADLBA!Port) and fi.isUsedInFresh()))
  	{
- 		thisModule.resolveTemp(fi, 'createFreshnessIndicator', 'freshnessIndicator_CnxDestination').setContext(callEntryPoint);
+ 		thisModule.resolveTemp(fi, 'createFreshnessIndicator', 'freshnessIndicator_CnxDestination').setContext(thisModule.resolveTemp(c, 'callEntryPoint'));
  	}
  }
 }
@@ -612,7 +610,7 @@ rule m_BehaviorActionsFromThread_Periodic
 		),
 		RETURN_DATA_Holder: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveTemp(Sequence{c,ba}, 'returnData')
+			element<-thisModule.resolveTemp(c, 'returnData')
 		)
 	do
 	{

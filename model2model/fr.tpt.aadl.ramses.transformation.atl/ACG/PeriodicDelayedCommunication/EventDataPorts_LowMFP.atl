@@ -383,7 +383,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		connected_PeriodicDelayedContext_Access: AADLBA!ConnectedElement
 		(
 			connectionEnd<-PeriodicDelayedContext_EntryPointAccess,
-			context<-thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'callEntryPoint')
+			context<-thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint')
 		),
 		connected_PeriodicDelayedContext_Subcomponent: AADLBA!ConnectedElement
 		(
@@ -709,7 +709,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	connected_PeriodicDelayedContext_Access: AADLBA!ConnectedElement
 	(
 		connectionEnd<-PeriodicDelayedContext_EntryPointAccess,
-		context<-thisModule.resolveTemp(Sequence{fi.eContainer(), behavior}, 'callEntryPoint')
+		context<-thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint')
 	),
 	connected_PeriodicDelayedContext_Subcomponent: AADLBA!ConnectedElement
 	(

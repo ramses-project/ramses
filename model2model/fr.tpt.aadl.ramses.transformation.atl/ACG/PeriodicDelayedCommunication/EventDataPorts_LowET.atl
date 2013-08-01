@@ -262,7 +262,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	--- connect IterationCounter
 	iterationCounter_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
 	(
-		element<-thisModule.resolveTemp(fi.eContainer(), 'createIterationCounter', 'IterationCounter')
+		element<-thisModule.createIterationCounter(fi.eContainer())
 	),
 	
 	--- connect firstIndex

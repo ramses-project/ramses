@@ -32,21 +32,19 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									ARINC653_RUNTIME: AADLBA;
 
 
--- @extends m_ComputeEntrypointCallSequence
-rule m_ComputeEntrypointCallSequence_Periodic_or_Sporadic
+-- @extends m_ThreadEntrypoint
+rule m_PeriodicThread
 {
 	from
-		c: AADLI!ComponentInstance,
-		behavior: AADLI!SubprogramCallSequence
-		( (c.isPeriodicThread() or c.isSporadicThread())
-		and 
-		behavior.isComputeEntryPointOf(c)
-		)
+		c: AADLI!ComponentInstance
+		( (c.isPeriodicThread() or c.isSporadicThread()) )
 	using
 	{
 		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
 	}
 	to
+		initState: AADLBA!BehaviorState,
+		callSeqState: AADLBA!BehaviorState,
 		callSequenceImg: AADLBA!SubprogramCallSequence,
 		returnData: AADLBA!DataSubcomponent,
 		waitDispatchCall: AADLBA!SubprogramCallAction

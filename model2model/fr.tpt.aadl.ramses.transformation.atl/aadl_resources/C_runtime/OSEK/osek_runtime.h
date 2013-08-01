@@ -1,9 +1,17 @@
 #ifndef OSEK_RUNTIME_H
 #define OSEK_RUNTIME_H
+
+#ifdef USE_TPL_OS 
+
 #include "tpl_os_types.h"
 #include "tpl_os_resource.h"
 #include "tpl_os_event.h"
 
+#else
+
+#include "kernel.h"
+
+#endif
 /* Queue id type */
 typedef int port_id_t;
 

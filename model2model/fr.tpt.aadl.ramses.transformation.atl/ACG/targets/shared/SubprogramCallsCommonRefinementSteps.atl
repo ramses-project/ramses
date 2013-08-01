@@ -47,84 +47,66 @@ helper def: collectGetValueCalls(c: AADLI!ComponentInstance, behavior:AADLI!Subp
 	Sequence{}
 ;
 
-abstract rule m_ThreadEntrypoint { 
+helper def: collectComputeEntryPointTransitions(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorTransition) =
+	c.featureInstance->select(fi| not fi.getComputeEntryPoints().oclIsUndefined() )
+	->collect
+	( fi |
+		fi.getComputeEntryPoints()->collect
+			(
+				cep | thisModule.resolveTemp(Sequence{fi, cep}, 'computeEntryPointTransition')
+			)
+	)
+	->union(
+			c.getComputeEntryPoints()->collect(cep | thisModule.resolveTemp(Sequence{c, cep}, 'computeEntryPointTransition'))
+		)
+	->flatten()
+;
+
+
+helper def: collectBAEntryPointTransitions(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorTransition) =
+	c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+	->collect(
+		ba | thisModule.resolveTemp(Sequence{c, ba}, 'computeEntryPointTransition')
+	)
+;
+
+helper def: collectBAEntryPointActionBlocks(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorActionBlock) =
+	c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+	->collect(
+		ba | thisModule.resolveTemp(Sequence{c, ba}, 'computeEntryPointActionBlock')
+	)
+;
+
+helper def: collectComputeEntryPointActionBlocks(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorActionBlock) =
+	c.featureInstance->select(fi| not fi.getComputeEntryPoints()->isEmpty() )
+	->collect
+	( fi |
+		fi.getComputeEntryPoints()->collect
+			(
+				cep | thisModule.resolveTemp(Sequence{fi, cep}, 'computeEntryPointActionBlock')
+			)
+	)
+	->union(
+			c.getComputeEntryPoints()->collect(cep | thisModule.resolveTemp(Sequence{c, cep}, 'computeEntryPointActionBlock'))
+		)
+	->flatten()
+;
+
+-- @extends m_Thread_Instance
+rule m_ThreadEntrypoint { 
   from	
 	c: AADLI!ComponentInstance
 	using
 	{
-		intermediateCallActionSequence: Sequence(AADLBA!SubprogramCallAction) = Sequence{};
 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+		callSequences: Sequence(AADLBA!SubprogramCallSequence) = if(not c.needsToMapBehaviorAnnex()) then impl.ownedSubprogramCallSequence->select(e|e.isComputeEntryPointOf(c))
+																 else Sequence{} endif;
 	}
 	to
-		entryPointImg: AADLBA!SubprogramType,
-		entryPointImplImg: AADLBA!SubprogramImplementation
-		(
-			ownedRealization<-thisModule.Realization(entryPointImg),
-			ownedAnnexSubclause <- Sequence{behaviorAnnex}
-		),
-		callEntryPoint: AADLBA!SubprogramCall
-		(
-			name<-thisModule.callPrefix().concat('_entrypoint'), -- callEntryPoint in thread Implementation
-			calledSubprogram<-entryPointImplImg
-		),
-		callSequenceImg: AADLBA!SubprogramCallSequence 
-		(	
-			name <- 'main_call',
-			ownedCallSpecification <- Sequence{callEntryPoint}
-		),
-		behaviorAnnex: AADLBA!BehaviorAnnex
-		(
-			name        <- 'behavior_specification',
-			states      <- Sequence{callSeqState,returnState},
-			transitions <- Sequence{computationTransition},
-			actions		<- Sequence{target_actionBlock}
-		),
-		callSeqState: AADLBA!BehaviorState
-		(
-			initial  <- true,
-			final    <- false,
-			complete <- false,
-			name     <- 'BA_entrypoint_main_state'
-		),
-		returnState: AADLBA!BehaviorState
-		(
-			initial  <- false,
-			final    <- true,
-			complete <- false,
-			name     <- 'BA_entrypoint_return_state'
-		),
-		computationTransition: AADLBA!BehaviorTransition
-		(
-			destinationState  <- callSeqState,
-			sourceState       <- callSeqState,
-			actionBlock <- target_actionBlock
-		),
-		returnData: AADLBA!DataSubcomponent
-		(
-		 	name <- 'runtime_call_ret',
-			dataSubcomponentType <- thisModule.getRuntimeReturnType()
-		),
-		target_actionBlock: AADLBA!BehaviorActionBlock
-		(content<-loop_target_actions),
-		loop_target_actions: AADLBA!BehaviorActionSequence
-}
-
-abstract rule m_ThreadBehavior
-{
-	from
-		c: AADLI!ComponentInstance,
-		behavior: AADLI!Element
-		(
-			c.category=#thread 
-		)
-	using
-	{
-		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
-	}
-	to
+		sub : AADLBA!ThreadSubcomponent mapsTo c,
 		entryPointImg: AADLBA!SubprogramType
 		(
-			name <- c.uniqueName().concat(behavior.name),
+			name <- c.uniqueName()+'_entrypoint',
 			ownedDataAccess <- c.featureInstance->select(e| e.feature.oclIsKindOf(AADLI!DataAccess))
 									->union
 									(
@@ -141,10 +123,12 @@ abstract rule m_ThreadBehavior
 									)
 									->union
 									(
-										impl.ownedAccessConnection->select(accessCnx | accessCnx.isPartOfCallSequence(behavior))
-										->collect
-										(
-											accessCnx| thisModule.resolveTemp(Sequence{c,behavior,accessCnx}, 'dataAccess')
+										callSequences->collect(behavior | 
+											impl.ownedAccessConnection->select(accessCnx | accessCnx.isPartOfCallSequence(behavior))
+											->collect
+											(
+												accessCnx| thisModule.resolveTemp(Sequence{c,behavior,accessCnx}, 'dataAccess')
+											)
 										)
 									)
 									->union
@@ -165,23 +149,34 @@ abstract rule m_ThreadBehavior
 									)
 									->union
 									(
-										thisModule.collectPeriodicDelayed_LocalVariablesAccesses(c, behavior)
+										callSequences->collect(behavior |
+											thisModule.collectPeriodicDelayed_LocalVariablesAccesses(c, behavior)
+										)
 									)
 									->flatten()->asSet(),
 			ownedParameter <- impl.ownedParameterConnection
 								->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
-								->collect(e| thisModule.resolveTemp(Sequence{c.componentInstance->any(f|f.subcomponent=e.source.connectionEnd), behavior, e},'featureImg'))
+								->collect(e|
+									callSequences->collect(behavior |
+										thisModule.resolveTemp(Sequence{c.componentInstance->any(f|f.subcomponent=e.source.connectionEnd), behavior, e},'featureImg'))
+									)
 								->union
 								(
 									impl.ownedParameterConnection
 									->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
-									->collect(e| thisModule.resolveTemp(Sequence{c.componentInstance->any(f|f.subcomponent=e.destination.connectionEnd), behavior, e},'featureImg'))
+									->collect(e|
+										callSequences->collect(behavior |
+											thisModule.resolveTemp(Sequence{c.componentInstance->any(f|f.subcomponent=e.destination.connectionEnd), behavior, e},'featureImg'))
+										)
 								)
 								->flatten()
+			
 		),
 		entryPointImplImg: AADLBA!SubprogramImplementation
 		(
-			name <- c.uniqueName().concat(behavior.name).concat('.impl'), -- subprogram Impl
+			name <- c.uniqueName()+'_entrypoint.impl',
+			ownedRealization<-thisModule.Realization(entryPointImg),
+			ownedAnnexSubclause <- Sequence{behaviorAnnex},
 			ownedDataSubcomponent <- thisModule.collectCommunicationsLocalVariables(c,impl.ownedSubprogramCallSequence)
 												->union
 												(
@@ -201,12 +196,99 @@ abstract rule m_ThreadBehavior
 		),
 		returnData: AADLBA!DataSubcomponent
 		(
-			name <- 'runtime_call_ret_'+behavior.name
-		)
-		
+			name <- c.uniqueName()+'_runtime_call_ret',
+			dataSubcomponentType <- thisModule.getRuntimeReturnType()
+		),
+		callEntryPoint: AADLBA!SubprogramCall
+		(
+			name<-thisModule.callPrefix().concat('_entrypoint'), -- callEntryPoint in thread Implementation
+			calledSubprogram<-entryPointImplImg
+		),
+		callSequenceImg: AADLBA!SubprogramCallSequence 
+		(	
+			name <- 'main_call',
+			ownedCallSpecification <- Sequence{callEntryPoint}
+		),
+		behaviorAnnex: AADLBA!BehaviorAnnex
+		(
+			name        <- 'behavior_specification',
+			states      <- Sequence{initState,callSeqState,finalState},
+			transitions <- (if(c.needsToMapBehaviorAnnex()) then
+								thisModule.collectBAEntryPointTransitions(c)
+							else
+								thisModule.collectComputeEntryPointTransitions(c)
+							endif
+							)->append(dispatchTransition),
+			actions		<- Sequence{dispatch_actionBlock}->union(
+										if(c.needsToMapBehaviorAnnex()) then
+											thisModule.collectBAEntryPointActionBlocks(c)
+										else
+											thisModule.collectComputeEntryPointActionBlocks(c)
+										endif
+									),
+			variables   <- c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+							->collect( ba | ba.variables)->flatten()
+		),
+		initState: AADLBA!BehaviorState
+		(
+			initial  <- true,
+			final    <- false,
+			complete <- false,
+			name     <- 'BA_entrypoint_init_state'
+		),
+		callSeqState: AADLBA!BehaviorState
+		(
+			initial  <- false,
+			final    <- false,
+			complete <- false,
+			name     <- 'BA_entrypoint_exec_state'
+		),
+		finalState: AADLBA!BehaviorState
+		(
+			initial  <- false,
+			final    <- true,
+			complete <- false,
+			name     <- 'BA_entrypoint_final_state'
+		),
+		dispatchTransition: AADLBA!BehaviorTransition
+		(
+			name <- 'dispatch_transition',
+			destinationState  <- initState,
+			sourceState       <- callSeqState,
+			actionBlock <- dispatch_actionBlock
+		),
+		dispatch_actionBlock: AADLBA!BehaviorActionBlock
+		(content<-dispatch_target_actions),
+		dispatch_target_actions: AADLBA!BehaviorActionSequence
+		( actions <- Sequence{thisModule.resolveTemp(c,'waitDispatchCall')} )
 }
 
--- @extends m_ThreadEntrypoint,m_ThreadBehavior
+abstract rule m_ThreadBehavior
+{
+	from
+		c: AADLI!ComponentInstance,
+		behavior: AADLI!Element
+		(
+			c.category=#thread 
+		)
+	using
+	{
+		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+	}
+	to
+		computeEntryPointTransition: AADLBA!BehaviorTransition
+		(
+			name <- behavior.name,
+			sourceState <- thisModule.resolveTemp(c, 'initState'),
+			destinationState <- thisModule.resolveTemp(c, 'callSeqState'),
+			actionBlock <- computeEntryPointActionBlock
+		),
+		computeEntryPointActionBlock: AADLBA!BehaviorActionBlock
+		(content<-computeEntryPointActions),
+		computeEntryPointActions: AADLBA!BehaviorActionSequence
+}
+
+-- @extends m_ThreadBehavior
 rule m_ComputeEntrypointCallSequence { 
   from	
 	c: AADLI!ComponentInstance,
@@ -224,24 +306,8 @@ rule m_ComputeEntrypointCallSequence {
 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
 	}
 	to
-		callEntryPoint: AADLBA!SubprogramCall,
-		callSequenceImg: AADLBA!SubprogramCallSequence
-		(
-			name <- behavior.name
-		),
-		behaviorAnnex: AADLBA!BehaviorAnnex,
-		callSeqState: AADLBA!BehaviorState,
-		computationTransition: AADLBA!BehaviorTransition,
-		target_actionBlock: AADLBA!BehaviorActionBlock,
-		target_actions: AADLBA!BehaviorActionSequence,
-		loop_target_actions: AADLBA!BehaviorActionSequence,
-		whileTrue: AADLBA!WhileOrDoUntilStatement,
-		trueValueExpression: AADLBA!ValueExpression,
-		trueRelation: AADLBA!Relation,
-		trueSimpleExpression: AADLBA!SimpleExpression,
-		trueTerm: AADLBA!Term,
-		trueFactor: AADLBA!Factor,
-		trueValue: AADLBA!BehaviorBooleanLiteral
+		computeEntryPointTransition: AADLBA!BehaviorTransition,
+		computeEntryPointActions: AADLBA!BehaviorActionSequence
 	do
 	{
 		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
@@ -304,63 +370,10 @@ rule m_ComputeEntrypointCallSequence {
 			}
 		}
         
-		if(c.isPeriodicThread() or c.isSporadicThread())
-		intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{c,behavior},'waitDispatchCall'));		
-
-		loop_target_actions.actions <- intermediateCallActionSequence;
+		computeEntryPointActions.actions <- intermediateCallActionSequence;
 	}
 }
 
---<<<<<<< .mine
----- @extends m_ThreadEntrypoint,m_ThreadBehavior,m_ComputeEntrypointCallSequence
---rule m_ComputeEntrypointCallSequence_SporadicThread { 
---  from	
---	c: AADLI!ComponentInstance,
---	behavior: AADLI!SubprogramCallSequence
---	(
---		c.category=#thread 
---		and 
---		behavior.isComputeEntryPointOf(c)
---		and
---		(not c.subcomponent.subcomponentType.needsToMapBehaviorAnnex())
---	)
---	using
---	{
---		intermediateCallActionSequence: Sequence(AADLBA!SubprogramCallAction) = Sequence{};
---		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
---	}
---	to
---		callEntryPoint: AADLBA!SubprogramCall,
---		callSequenceImg: AADLBA!SubprogramCallSequence
---		(
---			name <- behavior.name
---		),
---		behaviorAnnex: AADLBA!BehaviorAnnex,
---		callSeqState: AADLBA!BehaviorState,
---		computationTransition: AADLBA!BehaviorTransition,
---		target_actionBlock: AADLBA!BehaviorActionBlock,
---		target_actions: AADLBA!BehaviorActionSequence,
---		loop_target_actions: AADLBA!BehaviorActionSequence,
---		whileTrue: AADLBA!WhileOrDoUntilStatement,
---		trueValueExpression: AADLBA!ValueExpression,
---		trueRelation: AADLBA!Relation,
---		trueSimpleExpression: AADLBA!SimpleExpression,
---		trueTerm: AADLBA!Term,
---		trueFactor: AADLBA!Factor,
---		trueValue: AADLBA!BehaviorBooleanLiteral
---	do
---	{
---		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
---		{
---			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior} ,'callReceiveInputs'));
---		}
---		
---		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isDataPort()))
---		{
---			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior} ,'call'));
---		}
---=======
--->>>>>>> .r2668
 
 lazy rule CreateParameterHolder
 {
@@ -591,7 +604,7 @@ rule m_Parameter_to_DataAccess_SourceConnection
 		(connectionEnd <- accessCnx.destination.connectionEnd)
 	do
 	{
-		ceSource.setContext(thisModule.resolveTemp(Sequence{c,behavior},'callEntryPoint'));
+		ceSource.setContext(thisModule.resolveTemp(c,'callEntryPoint'));
 	}
 }
 
@@ -627,7 +640,7 @@ rule m_Parameter_to_DataAccess_DestinationConnection
 		(connectionEnd <- dataAccess)
 	do
 	{
-		ceDestination.setContext(thisModule.resolveTemp(Sequence{c,behavior},'callEntryPoint'));
+		ceDestination.setContext(thisModule.resolveTemp(c,'callEntryPoint'));
 	}
 }
 
@@ -693,7 +706,7 @@ abstract rule m_Parameter_to_DataInstance_Connection
 		)
 	do
 	{
-		paramConnectedElement.setContext(thisModule.resolveTemp(Sequence{c.eContainer(), behavior}, 'callEntryPoint'));
+		paramConnectedElement.setContext(thisModule.resolveTemp(c.eContainer(), 'callEntryPoint'));
 	}
 		
 }
@@ -861,7 +874,7 @@ rule m_Input_Port_ComputeEntrypointCallSequence
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),behavior}, 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
 	}
 }
 
@@ -990,7 +1003,7 @@ rule m_Output_Port_ComputeEntrypointCallSequence
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(Sequence{fi.eContainer(),behavior}, 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
 	}
 }
 
