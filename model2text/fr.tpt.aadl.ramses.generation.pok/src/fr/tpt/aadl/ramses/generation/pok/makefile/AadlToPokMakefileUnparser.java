@@ -142,11 +142,12 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         	  continue;
             unparserContent.addOutput( value + " ") ;
           }
-          unparserContent.addOutput("\n") ;
+          
 		}catch (Exception e) {
 		  // TODO Auto-generated catch block
 		  e.printStackTrace();
 		}
+		unparserContent.addOutput("\n") ;
         unparserContent.addOutputNewline("all: libpok $(TARGET)\n") ;
         unparserContent.addOutputNewline("clean: common-clean\n") ;
         unparserContent
