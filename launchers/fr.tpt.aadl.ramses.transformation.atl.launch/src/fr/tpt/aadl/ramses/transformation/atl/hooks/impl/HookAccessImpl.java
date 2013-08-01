@@ -28,6 +28,7 @@
 package fr.tpt.aadl.ramses.transformation.atl.hooks.impl ;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaLocationReference;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
+import fr.tpt.aadl.ramses.transformation.atl.ComparablePortByCriticality;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
 import fr.tpt.aadl.utils.Aadl2Utils;
@@ -339,5 +341,24 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   public Boolean isUsedInFreshClause(BehaviorAnnex ba, Port p) {
 	return AadlBaVisitors.isFresh(ba, p);
   }
-
+  
+  public List<FeatureInstance> getFeaturesOrderedByCriticality(ComponentInstance ci)
+  {
+	List<FeatureInstance> result = new ArrayList<FeatureInstance>();
+	List<ComparablePortByCriticality> cpbcList = new ArrayList<ComparablePortByCriticality>();
+	for(FeatureInstance fi: ci.getFeatureInstances())
+	{
+	  if(fi.getFeature() instanceof Port)
+	  {
+		ComparablePortByCriticality cpbc = new ComparablePortByCriticality(fi);
+		cpbcList.add(cpbc);
+	  }
+	}
+	Collections.sort(cpbcList);
+	for(ComparablePortByCriticality iter: cpbcList)
+	{
+	  result.add(iter.getFeatureInstance());
+	}
+	return result;
+  }
 } //HookAccessImpl

@@ -31,6 +31,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.objectweb.asm;bundle-version="3.3.1"
 Bundle-ActivationPolicy: lazy
 Import-Package: fr.tpt.aadl.ramses.communication.dimensioning,
+ fr.tpt.aadl.ramses.util.properties,
  org.eclipse.m2m.atl.emftvm.util,
  org.osate.xtext.aadl2.properties.linking
 
