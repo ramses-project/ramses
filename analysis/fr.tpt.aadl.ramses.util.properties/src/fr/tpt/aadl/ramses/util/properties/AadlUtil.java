@@ -36,6 +36,7 @@ import org.osate.aadl2.Subprogram ;
 import org.osate.aadl2.SubprogramCall ;
 import org.osate.aadl2.SubprogramCallSequence ;
 import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceReferenceValue ;
 
 import fr.tpt.aadl.utils.PropertyUtils ;
@@ -229,6 +230,17 @@ public class AadlUtil
     }
   }
 
+  public static long getInfoPortCriticality(FeatureInstance port) {
+	  try
+	  {
+	    return (int) PropertyUtils.getIntValue(port, "Criticality") ;
+	  }
+	  catch(Exception e)
+	  {
+	    return 0 ;
+	  }
+  }
+  
   public static float getThreadContextSwitchFor(ComponentInstance processor)
   {
     try
