@@ -155,7 +155,7 @@ public class GenerationUtilsC
               PropertyUtils.getStringListValue(ne, "Source_Text") ;
       for(String s : sourceText)
       {
-        if(s.endsWith(".ads"))
+        if(s.endsWith(".ads") || s.endsWith(".h"))
         {
           additionalHeaders.add(s) ;
         }
