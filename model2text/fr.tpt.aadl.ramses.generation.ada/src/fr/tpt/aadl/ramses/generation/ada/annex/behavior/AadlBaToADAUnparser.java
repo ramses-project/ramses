@@ -95,13 +95,13 @@ import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 
-
 public class AadlBaToADAUnparser extends AadlBaUnparser
 {
 	protected Map<DataAccess, String> _dataAccessMapping = null ;
 	  protected UnparseText _adbFileContent = null ;
 	  protected UnparseText _adsFileContent = null ;
 	  protected List<String> _additionalADS = new ArrayList<String>() ;
+	  public static String srcText =null;
 	  private NamedElement _owner ;
 	  
 	  public AadlBaToADAUnparser(AnnexSubclause subclause,
@@ -134,6 +134,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 
 	  public List<String> getAdditionalHeaders()
 	  {
+		  _adsFileContent = new UnparseText() ;
 	    return _additionalADS ;
 	  }
 
@@ -172,7 +173,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	      }
 	      else
 	      {
-	        aadlText.addOutput("processEList: OOOOHHHHH �A WAKA!!") ;
+	        aadlText.addOutput("processEList") ;
 	      }
 	    }
 	  }
@@ -187,12 +188,12 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	  }
 
 	  public boolean resolveExistingCodeDependencies(NamedElement object)
-	  {
+	  {		    
 	    try
 	    {
 	      NamedElement ne = object ;
 	      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-	      System.out.println("la valeur de source name"+sourceName);
+	      
 	      List<String> sourceText =
 	            PropertyUtils.getStringListValue(ne, "Source_Text") ;
 	      aadlbaText.addOutput(sourceName) ;
@@ -201,7 +202,8 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	      {
 	        if(s.endsWith(".ads") || s.endsWith(".h"))
 	        {
-	          _additionalADS.add(s) ;
+	        	srcText = s;
+	        	_additionalADS.add(s) ;
 	          return true;
 	        }
 	      }
@@ -214,6 +216,14 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	    }
 	  }
 
+	  /*
+	   * 
+	   * 
+	   * 
+	   */
+
+	   /* 
+	   */
 	  protected static String getInitialStateIdentifier(BehaviorAnnex ba)
 	  {
 	    for(BehaviorState s : ba.getStates())
@@ -349,16 +359,18 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	        _adbFileContent = new UnparseText() ;
 	        _adsFileContent = new UnparseText() ;
 	        
-	        _adbFileContent.addOutputNewline(aadlComponentADAId +
-	              "_BA_State_t current_state = " + aadlComponentADAId + "_" +
+	        _adbFileContent.addOutputNewline("current_state : "+aadlComponentADAId +
+	              "_BA_State_t := " + aadlComponentADAId + "_" +
 	              AadlBaToADAUnparser.getInitialStateIdentifier(ba) + ";") ;
-	        _adbFileContent.addOutputNewline("final : character := 0;") ;
+	        _adbFileContent.addOutputNewline("final : integer := 0;") ;
+	        _adbFileContent.addOutputNewline("begin");
 	        processEList(_adbFileContent, ba.getVariables()) ;
 	        _adbFileContent.addOutputNewline("while (final /= 1) loop") ;
 	        _adbFileContent.incrementIndent() ;
 	        _adbFileContent.addOutputNewline("case current_state is") ;
 	        _adbFileContent.incrementIndent() ;
-	        _adsFileContent.addOutputNewline("type enum is (") ;
+	        _adsFileContent.addOutputNewline("type "+aadlComponentADAId +
+		              "_BA_State_t"+ " is (") ;
 	        _adsFileContent.incrementIndent() ;
 
 	        for(BehaviorState state : ba.getStates())
@@ -371,6 +383,16 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	            processEList(_adbFileContent, AadlBaVisitors.
 	                         getTransitionWhereSrc(state)) ;
 	          }
+	          
+	          if(AadlBaVisitors.getTransitionWhereSrc
+		                (state).isEmpty() == true)
+		          {
+		            _adbFileContent.addOutputNewline("when " + aadlComponentADAId + "_" +
+		                  state.getName() + " => ") ;
+		            _adbFileContent.addOutputNewline("null;");
+		            processEList(_adbFileContent, AadlBaVisitors.
+		                         getTransitionWhereSrc(state)) ;
+		          }
 	          
 	          String stateADAId = GenerationUtilsADA.
 	                getGenerationADAIdentifier(aadlComponent.getQualifiedName()+
@@ -387,15 +409,20 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	          _adsFileContent.addOutputNewline("") ;
 	        }
 
+	        
 	        _adsFileContent.decrementIndent() ;
-	        _adsFileContent.addOutputNewline(") " + aadlComponentADAId +
-	              "_BA_State_t;") ;
+	        _adsFileContent.addOutputNewline(");") ;
 	        _adsFileContent.addOutputNewline("") ;
 	        _adbFileContent.decrementIndent() ;
-	        _adbFileContent.addOutputNewline(")") ;
 	        _adbFileContent.decrementIndent() ;
-	        _adbFileContent.addOutputNewline(")") ;
 	        _adbFileContent.addOutputNewline("") ;
+	        
+	        _adbFileContent.incrementIndent();
+	        _adbFileContent.addOutputNewline("end case;") ;
+
+	        _adbFileContent.decrementIndent();
+	        _adbFileContent.addOutputNewline("end loop;") ;
+	        
 	        return DONE ;
 	      }
 
@@ -463,7 +490,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	        String aadlComponentADAId =
 	              GenerationUtilsADA.getGenerationADAIdentifier(aadlComponent
 	                    .getQualifiedName()) ;
-	        _adbFileContent.addOutputNewline("current_state = " + aadlComponentADAId +
+	        _adbFileContent.addOutputNewline("current_state := " + aadlComponentADAId +
 	              "_" + object.getName() + ";") ;
 	        //if (object.isComplete())
 
@@ -472,7 +499,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	          _adbFileContent.addOutputNewline("final := 1;") ;
 	        }
 
-	        _adbFileContent.addOutputNewline("exit Boucle_principale when finale = 1;") ;
 	        return DONE ;
 	      }
 
@@ -695,6 +721,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	          _adbFileContent.addOutput(object.getIterativeVariable().getName()) ;
 	          _adbFileContent.addOutputNewline(" := iter;") ;
 	          process(object.getBehaviorActions()) ;
+
 	          _adbFileContent.decrementIndent() ;
 	          _adbFileContent.addOutputNewline("end loop;") ;
 	        }
