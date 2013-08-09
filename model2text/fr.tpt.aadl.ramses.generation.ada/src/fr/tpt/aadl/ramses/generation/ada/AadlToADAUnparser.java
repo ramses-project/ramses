@@ -12,7 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sound.sampled.Port;
+
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.jface.internal.text.source.DiffPainter;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessCategory;
 import org.osate.aadl2.AccessConnection;
@@ -23,6 +26,7 @@ import org.osate.aadl2.BehavioredImplementation;
 import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierValue;
+import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentPrototypeActual;
 import org.osate.aadl2.ComponentPrototypeBinding;
@@ -37,6 +41,7 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.DataType;
 import org.osate.aadl2.DefaultAnnexLibrary;
+import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.Feature;
@@ -62,9 +67,14 @@ import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.ConnectionInstance;
+import org.osate.aadl2.instance.FeatureInstance;
+import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.annexsupport.AnnexUnparser;
+import org.osate.xtext.aadl2.properties.util.ThreadProperties;
 
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
@@ -79,8 +89,8 @@ import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.utils.Aadl2Utils;
+import fr.tpt.aadl.utils.PropertyNotFound;
 import fr.tpt.aadl.utils.PropertyUtils;
 import fr.tpt.aadl.utils.names.DataModelProperties;
 
@@ -91,12 +101,23 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	public static String sourceName; 
 	private static ArrayList <String> activityProcedures;
 
-	private static ArrayList <String> listeTypes;
+    List<String> sporadicThreads = new ArrayList<>();;
+    List<String> periodicThreads = new ArrayList<>();;
+
+    private static ArrayList <String> listeTypes;
+    int cpt =0;
 
 	private static AadlToADAUnparser singleton;
     List<String> dataNames = new ArrayList<String>() ;
 
-
+    public static String period = null ;
+    public static String deadline = null ;
+    public static String dispatchProtocol = null;
+    public static String priority =null;
+    public static int compteurSpor=0;
+    public static int compteurPer=0;
+    int nbSporadic = 0;
+    int nbPeriodic=0;
 	// gtype.ads
 	protected AadlToADASwitchProcess _gtypesHeaderCode ;
 
@@ -180,6 +201,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			getADATypeDeclarator(ne, false) ;
 		}
 
+
 		_gtypesHeaderCode.addOutputNewline("\nend Gtypes;\n") ;
 		_subprogramHeaderCode.addOutputNewline("\nend Subprograms;\n") ;
 		_activityHeaderCode.addOutputNewline("\nend Activity;\n") ;
@@ -187,7 +209,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 		_subprogramImplCode.addOutputNewline("\nend Subprograms;\n") ;
 		_activityImplCode.addOutputNewline("\nend Activity;\n") ;
-
+		
+		
 		try
 		{
 			String headerGuard = null ;
@@ -207,11 +230,12 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			saveFile(subprogramsFile_ADB, addSubprogramHeader_ADB,
 					_subprogramImplCode.getOutput()) ;
 
+    		String sourceText = AadlBaToADAUnparser.srcText.replaceAll(".ads", "");
 			// subprogram.ads
 			FileWriter subprogramsFile_ADS =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/subprograms.ads") ;
 			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("subprograms.ads");
-			String addSubprogramsHeader_ADS = "pragma Style_Checks(\"NM32766\");\n" + headerGuard;
+		    String addSubprogramsHeader_ADS = "pragma Style_Checks(\"NM32766\");\nwith Gtypes; use Gtypes;\n"+"with "+sourceText+";\n"+ headerGuard;
 			saveFile(subprogramsFile_ADS, "", addSubprogramsHeader_ADS,
 					_subprogramHeaderCode.getOutput()) ;
 
@@ -225,8 +249,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			FileWriter activityFile_ADS =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/activity.ads") ;
 			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("activity.ads");
-			String addActivityHeader_ADS = "pragma Style_Checks(\"NM32766\");\nwith PolyORB_HI.Port_Kinds;\nwith PolyORB_HI.Thread_Interrogators;\nwith PolyORB_HI.Sporadic_Task;" +
-					"\nwith PolyORB_HI.Periodic_Task;\nwith System;\nwith Ada.Real_Time;\nwith PolyORB_HI.Errors;\nwith Subprograms;use Subprograms;\nwith Gtypes; use Gtypes;\nwith Deployment; use Deployment;\n" + headerGuard;
+			String addActivityHeader_ADS = "pragma Style_Checks(\"NM32766\");\nwith System;\nwith Ada.Real_Time;\nwith Subprograms;use Subprograms;\nwith Gtypes; use Gtypes;\n" + headerGuard;
 			saveFile(activityFile_ADS, "",
 					addActivityHeader_ADS, _activityHeaderCode.getOutput()) ;
 
@@ -298,8 +321,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 					{
 		ne = object;
 		
-//		String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-
 		List<String> sourceText =
 				PropertyUtils.getStringListValue(ne, "Source_Text") ;
 		
@@ -461,33 +482,35 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 return DONE ;
 	}
 
-	 boolean processBehavioredImplementation(BehavioredImplementation object)
-	 {
-		 return processBehavioredImplementation(object, object);
-	 }
-
-	 boolean processBehavioredImplementation(BehavioredImplementation object, BehavioredImplementation owner)
-	 {
-		 boolean foundRestrictedAnnex = false;
-		 for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
-		 {
-			 if(annex.getName().equalsIgnoreCase(AadlBaUnParserAction.ANNEX_NAME))
-			 {
-				 foundRestrictedAnnex = true;
-				 processAnnexSubclause(annex, owner) ;
-				 break;
-			 }
-		 }
-		 if(!foundRestrictedAnnex && !object.getOwnedSubprogramCallSequences().isEmpty())
-		 {
-			 for(SubprogramCallSequence scs: object.getOwnedSubprogramCallSequences())
-				 process(scs);
-			 foundRestrictedAnnex=true;
-		 }
-		 if(!foundRestrictedAnnex && object.getExtended()!=null)
-			 foundRestrictedAnnex = processBehavioredImplementation((BehavioredImplementation)object.getExtended(), object);
-		 return foundRestrictedAnnex;
-	 }
+	  boolean processBehavioredImplementation(BehavioredImplementation object)
+	  {
+		  return processBehavioredImplementation(object, object);
+	  }
+	  
+	  public boolean processBehavioredImplementation(BehavioredImplementation object, BehavioredImplementation owner)
+	  {
+		  boolean foundRestrictedAnnex = false;
+		  for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
+	      {
+	        if(annex.getName().equalsIgnoreCase(AadlBaUnParserAction.ANNEX_NAME))
+	        {
+	        	foundRestrictedAnnex = true;
+	        	processAnnexSubclause(annex, owner) ;
+	        	break;
+	        }
+	      }
+		  if(!foundRestrictedAnnex && !object.getOwnedSubprogramCallSequences().isEmpty())
+		  {
+		  	for(SubprogramCallSequence scs: object.getOwnedSubprogramCallSequences())
+		  	{
+		  		process(scs);
+		  	}
+		  	foundRestrictedAnnex=true;
+		  }
+		  if(!foundRestrictedAnnex && object.getExtended()!=null)
+			  foundRestrictedAnnex = processBehavioredImplementation((BehavioredImplementation)object.getExtended(), object);
+		  return foundRestrictedAnnex;
+	  }
 
 
 	 protected void getADATypeDeclarator(NamedElement object,
@@ -558,7 +581,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 case BOOLEAN :
 		 {
 			 _gtypesHeaderCode.incrementIndent();
-			 _gtypesHeaderCode.addOutputNewline("type " + id + " is new Boolean;") ;
+			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is Boolean;") ;
 			 _gtypesHeaderCode.decrementIndent();
 			 if (!listeTypes.contains(id))
 				 listeTypes.add(id);
@@ -567,7 +590,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 case CHARACTER :
 		 {
 			 _gtypesHeaderCode.incrementIndent();
-			 _gtypesHeaderCode.addOutputNewline("type " + id + " is new Character;") ;
+			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is Character;") ;
 			 _gtypesHeaderCode.decrementIndent();
 			 if (!listeTypes.contains(id))
 				 listeTypes.add(id);
@@ -578,7 +601,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 case FLOAT :
 		 {
 			 _gtypesHeaderCode.incrementIndent();
-			 _gtypesHeaderCode.addOutputNewline("type " + id + " is new Float;") ;
+			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is Float;") ;
 			 _gtypesHeaderCode.decrementIndent();
 			 if (!listeTypes.contains(id))
 				 listeTypes.add(id);
@@ -589,7 +612,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 //if(id.equals("Base_Types_Unsigned_8"))
 			 //{
 				 _gtypesHeaderCode.incrementIndent();
-				 _gtypesHeaderCode.addOutputNewline("type " + id + " is new Integer;") ;
+				 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is Integer;") ;
 				 _gtypesHeaderCode.decrementIndent();
 				 
 				 _gtypesHeaderCode.incrementIndent();
@@ -604,7 +627,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 case STRING :
 		 {
 			 _gtypesHeaderCode.incrementIndent();
-			 _gtypesHeaderCode.addOutputNewline("type " + id + " is new String;") ;
+			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is String;") ;
 			 _gtypesHeaderCode.decrementIndent();
 			 if (!listeTypes.contains(id))
 				 listeTypes.add(id);
@@ -622,7 +645,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 if (!listeTypes.contains(id))
 				 listeTypes.add(id);
 
-			 _gtypesHeaderCode.addOutputNewline("type e_" + id + " is ( ") ;
+			 _gtypesHeaderCode.addOutputNewline("subtype e_" + id + " is ( ") ;
 	
 			 List<String> stringifiedRepresentation = new ArrayList<String>() ;
 			 EList<PropertyExpression> dataRepresentation =
@@ -704,7 +727,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 if (!listeTypes.contains(id))
 				 listeTypes.add(id);
 
-			 _gtypesHeaderCode.addOutputNewline("type " + id + " is new record") ;
+			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is new record") ;
 			 _gtypesHeaderCode.incrementIndent() ;
 			 EList<PropertyExpression> elementNames =
 					 PropertyUtils
@@ -897,8 +920,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 {
 				 _gtypesHeaderCode.addOutputNewline("");
 				 _gtypesHeaderCode.incrementIndent();
-				 _gtypesHeaderCode.addOutput("type ") ;
-				 _gtypesHeaderCode.addOutput(id + " is new " + object.getName()) ;
+				 _gtypesHeaderCode.addOutput("subtype ") ;
+				 _gtypesHeaderCode.addOutput(id + " is " + object.getName()) ;
 
 
 				 _gtypesHeaderCode.addOutputNewline(";") ;
@@ -917,6 +940,9 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 }
 	 }
 
+	 
+  	  
+        	  
 	 @Override
 	 protected void initSwitches()
 	 {
@@ -1018,6 +1044,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 				 unparser.addOutputNewline(";") ;
 
+				 
 				 if(_processedTypes.contains(object.getDataSubcomponentType().getQualifiedName()) == false)
 				 {
 					 _processedTypes.add(object.getQualifiedName());
@@ -1030,20 +1057,543 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseProcessImplementation(ProcessImplementation object)
 			 {
-				 
-				 //Deployment Header Code
-				 _deploymentHeaderCode.addOutputNewline("pragma Preelaborate;");
-				 _deploymentHeaderCode.addOutputNewline("type Node_Type is (proc_a_K);");
-				 _deploymentHeaderCode.addOutputNewline("for Node_Type use (proc_a_K => 1);");
 
+				 //Deployment Header Code
+
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("pragma Preelaborate;");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("type Node_Type is ");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("("+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_K);");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("");				 
+
+				 _deploymentHeaderCode.addOutputNewline("for Node_Type use ");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("("+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_K => 1);");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 
+				 _deploymentHeaderCode.addOutputNewline("");				 					
+				 
 				 _deploymentHeaderCode.addOutputNewline("for Node_Type'Size use 8;");
 				 
+				 _deploymentHeaderCode.addOutputNewline("");				 					
+				 
 				 _deploymentHeaderCode.addOutputNewline("Max_Node_Image_Size : constant Standard.Integer := 8;");
-				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_Proc_A_Node_Type_Range is Node_Type range Node_Type'First .. Node_Type'Last;");
-				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_Proc_A_1_Max_Node_Image_Size is Integer range 1 .. Max_Node_Image_Size;");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");				 					
+				 
+				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_Node_Type_Range is ");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("Node_Type range Node_Type'First .. Node_Type'Last;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_1_Max_Node_Image_Size is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("Integer range 1 .. Max_Node_Image_Size;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_Node_Image_Component is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("Standard.String (UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_1_Max_Node_Image_Size);");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("type UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_Node_Image_Array is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("array (UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_Node_Type_Range)");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("of UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()).replaceAll("_refined_", "")+"_Node_Image_Component;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("Node_Image : constant UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_Node_Image_Array := ");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_Node_Image_Array'");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("("+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+" => \""+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"\");");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("My_Node : constant Node_Type :=");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+";");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 _deploymentHeaderCode.addOutputNewline("--  For each thread in the distributed application nodes, add an enumerator");
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("type Entity_Type is ");
+				 
+				 _deploymentHeaderCode.addOutput("(");
+				 
+				 int taille = object.getOwnedThreadSubcomponents().size();
+				 int taille2 = object.getOwnedThreadSubcomponents().size();
+				 int taille3 = object.getOwnedThreadSubcomponents().size();
+				 int taille4 = object.getOwnedThreadSubcomponents().size();
+
+				 for (ThreadSubcomponent th : object.getOwnedThreadSubcomponents())
+				 {
+					 taille--;
+					 if(taille >= 1)
+						 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K,");
+					 else
+						 _deploymentHeaderCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K");
+				 }
+
+				 _deploymentHeaderCode.addOutputNewline(");");
+
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("for Entity_Type use");
+				 _deploymentHeaderCode.addOutput("(");
+
+				 int cpt = 0;
+
+				 for (ThreadSubcomponent th : object.getOwnedThreadSubcomponents())
+				 {
+					 cpt++;
+					 taille2--;
+					 if(taille2 >= 1)
+					 {
+						 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K => ");
+						 _deploymentHeaderCode.incrementIndent();
+						 _deploymentHeaderCode.incrementIndent();
+						 _deploymentHeaderCode.addOutputNewline(""+cpt+",");
+						 _deploymentHeaderCode.decrementIndent();
+						 _deploymentHeaderCode.decrementIndent();
+					 }
+					 else
+					 {
+					 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K => ");
+					 _deploymentHeaderCode.incrementIndent();
+					 _deploymentHeaderCode.incrementIndent();
+					 _deploymentHeaderCode.addOutput(""+cpt);
+					 _deploymentHeaderCode.decrementIndent();
+					 _deploymentHeaderCode.decrementIndent();
+					 }
+				 }
+				 _deploymentHeaderCode.addOutputNewline(");");
+
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("for Entity_Type'Size use 8;");
+				 
+				 _deploymentHeaderCode.addOutputNewline("  --  Entity Table");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Type_Range is");
+				 _deploymentHeaderCode.addOutputNewline("Entity_Type range Entity_Type'First .. Entity_Type'Last;");
+
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("type UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Table_Array is");
+				 _deploymentHeaderCode.addOutputNewline("array (UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Type_Range)");
+				 _deploymentHeaderCode.addOutputNewline("of Node_Type");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("Entity_Table : constant UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Table_Array :=");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Table_Array'");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("(");
+
+				 	String Dispatch = null;
+				 	
+				 
+				 for (ThreadSubcomponent th : object.getOwnedThreadSubcomponents())
+				 {
+
+					    try {
+							Dispatch = PropertyUtils.getEnumValue(th, "Dispatch_Protocol");
+						} catch (Exception exception) {
+							throw new PropertyNotFound(exception);
+						}
+					 if (Dispatch.equals("Sporadic"))
+					 {
+						 nbSporadic++;
+						 sporadicThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K");
+					 }
+					 else
+					 {
+						 nbPeriodic++;
+						 periodicThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K");
+					 }
+					 
+					 taille3--;
+					 if(taille3 >= 1)
+					 {
+						 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K => ");
+						 _deploymentHeaderCode.incrementIndent();
+						 _deploymentHeaderCode.incrementIndent();		 
+						 _deploymentHeaderCode.addOutputNewline(""+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_K,");
+						 _deploymentHeaderCode.decrementIndent();
+						 _deploymentHeaderCode.decrementIndent();
+					 }
+					 else
+					 {
+					 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K => ");
+					 _deploymentHeaderCode.incrementIndent();
+					 _deploymentHeaderCode.incrementIndent();
+					 _deploymentHeaderCode.addOutputNewline(""+GenerationUtilsADA.getGenerationADAIdentifier(object.getContainingComponentImpl().getFullName())+"_K");
+					 _deploymentHeaderCode.decrementIndent();
+					 _deploymentHeaderCode.decrementIndent();
+					 }
+				 }
+				 					 
+				 _deploymentHeaderCode.addOutputNewline(");");
 				 
 				 
+				 _deploymentHeaderCode.addOutputNewline("");
 				 
+				 _deploymentHeaderCode.addOutputNewline("  Max_Entity_Image_Size : constant Standard.Integer := 14");
+				 
+				 _deploymentHeaderCode.addOutputNewline("  --  Maximal Entity_Image size for this node ");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("  --  Maximal Entity_Image size for this node ");
+
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("  --  Entity Image");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_1_Max_Entity_Image_Size is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();	 
+				 _deploymentHeaderCode.addOutputNewline("Integer range 1 .. Max_Entity_Image_Size;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+			 
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Image_Component is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("Standard.String");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("(UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_1_Max_Entity_Image_Size);");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+			 
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("type UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Image_Array is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("array (UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Type_Range)");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("of UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Image_Component;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+			 
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("Entity_Image : constant UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Image_Array :=");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Entity_Image_Array'");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("(");
+
+				 for (ThreadSubcomponent th : object.getOwnedThreadSubcomponents())
+				 {
+					 taille4--;
+					 if(taille4 >= 1)
+					 {
+						 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K => ");
+						 _deploymentHeaderCode.incrementIndent();
+						 _deploymentHeaderCode.incrementIndent();
+						 _deploymentHeaderCode.addOutputNewline("\""+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K\"");
+						 _deploymentHeaderCode.decrementIndent();
+						 _deploymentHeaderCode.decrementIndent();
+					 }
+					 else
+					 {
+					 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K => ");
+					 _deploymentHeaderCode.incrementIndent();
+					 _deploymentHeaderCode.incrementIndent();
+					 _deploymentHeaderCode.addOutputNewline("\""+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(th.getFullName())+"_K\"");
+					 _deploymentHeaderCode.decrementIndent();
+					 _deploymentHeaderCode.decrementIndent();
+
+					 }
+				 }
+				 
+				 _deploymentHeaderCode.addOutputNewline(");");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("  --  For each thread port in the distributed application nodes, add an enumerator");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("type Port_Type is");
+
+				 _deploymentHeaderCode.addOutput("(");
+
+				 int sum = 0;
+				 int sum2 = 0;
+				 int sum3 = 0;
+				 int sum4 = 0;
+				 
+				 for (ThreadSubcomponent th : object.getOwnedThreadSubcomponents())
+				 {
+					 sum =sum +th.getAllFeatures().size();
+					 sum2 =sum2 +th.getAllFeatures().size();
+					 sum3 = sum3 +th.getAllFeatures().size();
+					 sum4 = sum4 +th.getAllFeatures().size();
+
+				 }						 
+				 
+				 for(int i=0; i<object.getOwnedThreadSubcomponents().size();i++)
+				 {
+					 for(int nbPorts =0; nbPorts<object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().size();nbPorts++)
+					 {
+						sum --;
+					    if(sum >=1)
+				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K,");
+						 else
+  				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K");		 
+					 }
+				 }
+				 
+				 _deploymentHeaderCode.addOutputNewline(");");
+
+				 _deploymentHeaderCode.addOutputNewline("");
+
+
+				 _deploymentHeaderCode.addOutputNewline("for Port_Type use");
+
+				 _deploymentHeaderCode.addOutput("(");
+
+				 int cptt =0;
+				 for(int i=0; i<object.getOwnedThreadSubcomponents().size();i++)
+				 {
+					 for(int nbPorts =0; nbPorts<object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().size();nbPorts++)
+					 {
+						cptt++;
+						sum2 --;
+					    if(sum2 >=1)
+				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K => "+cptt+",");
+						 else
+  				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K => "+cptt);		 
+					 }
+				 }
+				 _deploymentHeaderCode.addOutputNewline(");");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("  --  Size of Port_Type fixed to 16 bits");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("for Port_Type'Size use 16;");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("--  Port Table");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("subtype UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Type_Range is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("Port_Type range Port_Type'First .. Port_Type'Last;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("type UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Table_Array is");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("array (UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Type_Range)");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("of Entity_Type;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("  Port_Table : constant UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Table_Array :=");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Table_Array'");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.addOutput("(");
+				 
+				 for(int i=0; i<object.getOwnedThreadSubcomponents().size();i++)
+				 {
+					 for(int nbPorts =0; nbPorts<object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().size();nbPorts++)
+					 {
+						sum3 --;
+					    if(sum3 >=1)
+					    {
+					    	 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K => ");
+							 _deploymentHeaderCode.incrementIndent();
+							 _deploymentHeaderCode.incrementIndent();
+							 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+object.getOwnedThreadSubcomponents().get(i).getFullName()+"_K"+",");
+							 _deploymentHeaderCode.decrementIndent();
+							 _deploymentHeaderCode.decrementIndent();
+					    }
+						 else
+						 {
+			  				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K => ");		 
+			  				 _deploymentHeaderCode.incrementIndent();
+							 _deploymentHeaderCode.incrementIndent();
+			  				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+object.getOwnedThreadSubcomponents().get(i).getFullName()+"_K");
+							 _deploymentHeaderCode.decrementIndent();
+							 _deploymentHeaderCode.decrementIndent();
+						 }
+					 }
+				 }
+				 _deploymentHeaderCode.addOutputNewline(");");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("Max_Port_Image_Size : constant Standard.Integer := 19;");
+				 
+				 _deploymentHeaderCode.addOutputNewline("--  Maximal Port_Image size for this node");
+
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("subtype Port_Sized_String is");
+  				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("Standard.String");
+  				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("(1 .. Deployment.Max_Port_Image_Size);");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("--  Port Image");
+				 
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("type UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Image_Array is");
+  				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("array (UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Type_Range)");
+  				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("of Port_Sized_String;");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("Port_Image : constant UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Image_Array :=");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutputNewline("UT_Deployment_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_Port_Image_Array'");
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.incrementIndent();
+				 _deploymentHeaderCode.addOutput("(");
+				 
+				 for(int i=0; i<object.getOwnedThreadSubcomponents().size();i++)
+				 {
+					 for(int nbPorts =0; nbPorts<object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().size();nbPorts++)
+					 {
+						sum4 --;
+					    if(sum4 >=1)
+					    {
+					    	 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K => ");
+							 _deploymentHeaderCode.incrementIndent();
+							 _deploymentHeaderCode.incrementIndent();
+					    	 _deploymentHeaderCode.addOutputNewline("\""+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K \""+",");
+							 _deploymentHeaderCode.decrementIndent();
+							 _deploymentHeaderCode.decrementIndent();
+					    }
+						 else
+						 {
+			  				 _deploymentHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K => ");		 
+							 _deploymentHeaderCode.incrementIndent();
+							 _deploymentHeaderCode.incrementIndent();
+			  				 _deploymentHeaderCode.addOutputNewline("\""+GenerationUtilsADA.getGenerationADAIdentifier(object.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(object.getOwnedThreadSubcomponents().get(i).getComponentImplementation().getAllFeatures().get(nbPorts).getFullName())+"_K \"");
+							 _deploymentHeaderCode.decrementIndent();
+							 _deploymentHeaderCode.decrementIndent();
+						 }
+					 }
+				 }
+				 
+				 _deploymentHeaderCode.addOutputNewline(");");
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+				 _deploymentHeaderCode.decrementIndent();
+
+
+				 _deploymentHeaderCode.addOutputNewline("");
+				 
+				 _deploymentHeaderCode.addOutputNewline("--  Maximal message payload size for this node (in bits)");
+				
+				 _deploymentHeaderCode.addOutputNewline("");
+
+				 _deploymentHeaderCode.addOutputNewline("Max_Payload_Size : constant Standard.Integer := 112;");
+
+				 _deploymentHeaderCode.addOutputNewline("");
+					
 				 /*Process Impl Code*/
 				 buildDataAccessMapping(object) ;
 
@@ -1132,49 +1682,112 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 process(object.getType()) ;
 
 				 _currentImplUnparser.incrementIndent() ;
-				 int taille =0;
+
+				 
+				 for(DataSubcomponent d : object.getOwnedDataSubcomponents())
 				 {
-					 String aide = GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName());
-					 int i=0;
-					 if (!activityProcedures.contains(aide))
-					 {   i++;
-						 activityProcedures.add(aide);
-					 }
-					 
-					 taille = activityProcedures.size()-1;
+					 process(d) ;
 				 }
 
 
-				 _currentImplUnparser.addOutputNewline("procedure " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + "_Job is") ;
+				 _currentImplUnparser.addOutputNewline("function " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + "_Job"+" return PolyORB_HI.Errors.Error_Kind "+ "is") ;
+				 				 _currentImplUnparser.addOutputNewline("Error_u : PolyORB_HI.Errors.Error_Kind;");
 				 _currentImplUnparser.addOutputNewline("begin") ;
 
+				 //testSma
+				 
 				 
 				 _currentImplUnparser.addOutputNewline("loop") ;
 				 _currentImplUnparser.incrementIndent() ;
+				 			 					 
+						processBehavioredImplementation(object);
+						 
+						 _activityImplCode.decrementIndent() ;
+						 _activityImplCode.addOutputNewline("end loop;") ;
+						 _activityImplCode.addOutputNewline("--  Return error code");
+						 _activityImplCode.addOutputNewline("return Error_u;");
+						 _activityImplCode.decrementIndent() ;
+						 _activityImplCode.addOutput("end " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + "_Job;") ;
+						 
+						 _activityImplCode.addOutputNewline("");						 
+						 
+						 _activityHeaderCode.addOutput("function " + GenerationUtilsADA
+								 .getGenerationADAIdentifier(object.getQualifiedName()) + "_Job") ;
+						 
+						 _activityHeaderCode.addOutputNewline(" return  PolyORB_HI.Errors.Error_Kind;");
 
-				 if(GeneratorUtils.getInitialValue(object).isEmpty())
-				 {
-					 String chaine = GeneratorUtils.getInitialValue(object);
-					 if (chaine.contains(" = sizeof("))
-					 {
-						 chaine = chaine.substring(10);
-						 chaine = chaine.replace(")", "");
-					 }
-				
-					 
-				 }				 
-			 			 
-				processBehavioredImplementation(object);
-				 
-				 _activityImplCode.decrementIndent() ;
-				 _activityImplCode.addOutputNewline("end loop;") ;
-				 _activityImplCode.decrementIndent() ;
-				 _activityImplCode.addOutputNewline("end " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + "_Job;") ;
-				 _activityImplCode.addOutputNewline("");
 
-				 _activityHeaderCode.addOutputNewline("");
 
-				 return null ;
+						 _activityHeaderCode.addOutput("package "+GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + "_Task");
+						 
+						 if(dispatchProtocol.equals("Periodic"))
+						 {
+							 
+							 _activityHeaderCode.addOutputNewline(" is new PolyORB_HI.Periodic_Task");
+							 _activityHeaderCode.addOutputNewline("(");
+							 
+							 _activityHeaderCode.addOutput("Entity => ");
+ 							 _activityHeaderCode.addOutputNewline("Deployment."+periodicThreads.get(compteurPer).toString()+",");
+							 compteurPer++;
+							 
+							 if(period !=null)
+							 {
+							 _activityHeaderCode.addOutputNewline("Task_period => Ada.Real_Time.Milliseconds");
+							 _activityHeaderCode.addOutputNewline("("+period+"),");
+							 }
+							 
+							 if(deadline != null)
+							 {
+							 _activityHeaderCode.addOutputNewline("Task_Deadline => Ada.Real_Time.Milliseconds");
+							 _activityHeaderCode.addOutputNewline("("+deadline+"),");
+							 }
+							 
+							 _activityHeaderCode.addOutputNewline("Task_Priority => ("+priority+")");
+							 _activityHeaderCode.addOutputNewline("Task_Stack_Size => 10000");
+							 _activityHeaderCode.addOutputNewline("Job => "+GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())); 
+							 _activityHeaderCode.addOutputNewline(");");
+
+							 _activityHeaderCode.addOutputNewline("");
+							 
+						 }
+
+						 
+						 else
+						 {
+							 _activityHeaderCode.addOutputNewline(" is new PolyORB_HI.Sporadic_Task");
+	 						 
+							 _activityHeaderCode.addOutputNewline("(");
+							 
+							 _activityHeaderCode.addOutput("Entity => ");
+
+							_activityHeaderCode.addOutputNewline("Deployment."+sporadicThreads.get(compteurSpor).toString()+",");
+							compteurSpor++;
+
+							 // a modifier 
+							 _activityHeaderCode.addOutputNewline("Port_Type => The_Receiver_2_impl_Port_Type");
+							 if(period !=null)
+							 {
+							 _activityHeaderCode.addOutputNewline("Task_period => Ada.Real_Time.Milliseconds");
+							 _activityHeaderCode.addOutputNewline("("+period+"),");
+							 }
+							 
+							 if(deadline != null)
+							 {
+							 _activityHeaderCode.addOutputNewline("Task_Deadline => Ada.Real_Time.Milliseconds");
+							 _activityHeaderCode.addOutputNewline("("+deadline+"),");
+							 }
+							 
+							 _activityHeaderCode.addOutputNewline("Task_Priority => ("+priority+")");
+							 _activityHeaderCode.addOutputNewline("Task_Stack_Size => 10000");
+							 _activityHeaderCode.addOutputNewline("Job => "+GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())); 
+							 _activityHeaderCode.addOutputNewline("Wait_For_Incoming_Events => Wait_For_Incoming_Events");
+							 _activityHeaderCode.addOutputNewline(");");
+
+							 _activityHeaderCode.addOutputNewline("");
+ 
+						 }						 						 
+
+						 return null ;
 			 }
 
 			 @Override
@@ -1254,19 +1867,17 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 						
 				 }
 
-			     _subprogramImplCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
-			     _subprogramHeaderCode.addOutputNewline(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
+				 _subprogramImplCode.decrementIndent();   
+			     _subprogramImplCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
+			     _subprogramHeaderCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
 
        	         _subprogramImplCode.addOutput("(");
 	 	         _subprogramHeaderCode.addOutput("(");
 			    		        
 				 boolean first = true;
 
-				 
-
 				 // Fetches data subcomponent names.
-
-					 
+				 
 				 for(Feature f: orderedFeatureList)
 				 {					 
 			    	  if(f instanceof Parameter)
@@ -1276,8 +1887,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			  			  continue;
 			  			if(first==false)
 			  			{
-			  			  _subprogramImplCode.addOutput(", ") ;
-			  			  _subprogramHeaderCode.addOutput(", ") ;
+			  			  _subprogramImplCode.addOutput("; ") ;
+			  			  _subprogramHeaderCode.addOutput("; ") ;
 			  			}			  			
 			 			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramImplCode, _subprogramImplCode);
 			  			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramHeaderCode, _subprogramHeaderCode);
@@ -1315,27 +1926,14 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 						 DataAccess da = (DataAccess) f ;
 						 if(first==false)
 						 {
-							 _subprogramImplCode.addOutput(", ") ;
-							 _subprogramHeaderCode.addOutput(", ") ;
+							 _subprogramImplCode.addOutput("; ") ;
+							 _subprogramHeaderCode.addOutput("; ") ;
 						 }
 
 						 if(da.getKind().equals(AccessType.REQUIRES))
 						 {
 							 _subprogramImplCode.addOutput(" "+da.getName());
 							 _subprogramHeaderCode.addOutput(" "+da.getName());
-
-							 for(NamedElement s : object.getMembers())
-							 {
-								 if (s.getName().contains("local"))
-								 {
-									 _activityHeaderCode.addOutput("type ");
-									 _activityHeaderCode.addOutput(s.getName()+" ");									 
-									 _activityHeaderCode.addOutput("is ("); 
-									 _activityHeaderCode.addOutputNewline(da.getName()+");");
-
-								 }					 
-							 }
-
 
 							 if (Aadl2Utils.isReadWriteDataAccess(da))
 							 {
@@ -1369,45 +1967,47 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 						 process(da.getDataFeatureClassifier());
 					 }
 				 }
-				 _subprogramImplCode.addOutputNewline(")");
+				 _subprogramImplCode.addOutput(")");
 				 _subprogramImplCode.addOutputNewline(" is ");
 				 _subprogramImplCode.incrementIndent();
-				 _subprogramImplCode.addOutputNewline("begin");	
 			    	
 				 _subprogramHeaderCode.addOutputNewline(");");
     		     _subprogramHeaderCode.addOutputNewline("");
 
 
     		     System.out.println("");
-				 /////			 
-				 
+ 
+    		 					 
 				 return null;
 			 }
 
 			 @Override
 			 public String caseSubprogramImplementation(SubprogramImplementation object)
 			 {
-				 String aide = GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName());
-				 if(_processedTypes.contains(object.getQualifiedName()))
-				 {
-					 return DONE ;
-				 }
-				 _processedTypes.add(object.getQualifiedName());
+				 
+				    _currentImplUnparser = _subprogramImplCode;
+			    	_currentHeaderUnparser = _subprogramHeaderCode; 
+			    	if(_processedTypes.contains(object.getQualifiedName()))
+			        {
+			          return DONE ;
+			        }
+			        _processedTypes.add(object.getQualifiedName());
+			        try {
+			          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
+			        } catch (Exception e1) {
+			      	  caseSubprogramClassifier((SubprogramClassifier) object);
+			        
+			    	  for(DataSubcomponent d : object.getOwnedDataSubcomponents())
+			          {
+			            process(d) ;
+			          }
 
-				 try {
-					 resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
-				 } catch (Exception e1) {
-					 caseSubprogramClassifier(object);
+			          processBehavioredImplementation(object) ;
 
-					 for(DataSubcomponent d : object.getOwnedDataSubcomponents())
-					 {
-						 process(d) ;
-					 }
+						 _subprogramImplCode.decrementIndent();
+			  		     _subprogramImplCode.addOutputNewline("end "+GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+";");  		   
+			        }
 
-					 processBehavioredImplementation(object) ;
-					 _subprogramImplCode.decrementIndent();
-
-				 }
 				 
 				 return DONE;
 			 }
@@ -1459,7 +2059,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 								 returnParameter = p;
 								 ConnectionEnd ce = orderedParamValue.get(orderedFeatureList.indexOf(p));
 								 processConnectionEnd(ce);
-								 _currentImplUnparser.addOutput(" = ");
+								 _currentImplUnparser.addOutput(" := ");
 								 break;
 							 }
 						 }
@@ -1545,15 +2145,58 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 if(ce instanceof DataSubcomponent)
 					 _currentImplUnparser.addOutput(
 							 GenerationUtilsADA.getGenerationADAIdentifier(ce.getQualifiedName()));
+				 
 				 else
 				 {
-					 _currentImplUnparser.addOutput(ce.getName());
-				 }
+					 _currentImplUnparser.addOutput(
+							 GenerationUtilsADA.getGenerationADAIdentifier(ce.getQualifiedName()));
+				  }
 			 }
 
 			 @Override
 			 public String caseThreadSubcomponent(ThreadSubcomponent object)
 			 {
+				    
+				    try
+				    {
+				      long value = PropertyUtils.getIntValue(object, "Period") ;
+				      period = Long.toString(value) ;
+				    }
+				    catch(Exception e)
+				    {
+				      period = null ;
+				    }
+
+				    try
+				    {
+				      long value = PropertyUtils.getIntValue(object, "Deadline") ;
+				      deadline = Long.toString(value) ;
+				    }
+				    catch(Exception e)
+				    {
+				      // If deadline is not set, use period instead.
+				      deadline = period ;
+				    }
+
+				    try
+				    {
+				      long value = PropertyUtils.getIntValue(object, "Priority") ;
+				      priority = Long.toString(value) ;
+				    }
+				    catch(Exception e)
+				    {
+				      // If deadline is not set, use period instead.
+				      deadline = period ;
+				    }
+
+				    try {
+						dispatchProtocol = PropertyUtils.getEnumValue(object, "Dispatch_Protocol");
+					} catch (Exception exception) {
+						throw new PropertyNotFound(exception);
+					}
+				    
+					
+				    
 				 process(object.getComponentImplementation()) ;
 				 return null ;
 			 }
@@ -1590,60 +2233,159 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				  return DONE ;
 			  }
 
-			  public String caseSub(SubprogramSubcomponentType object)
-			  {
-				  
-				  System.out.println("entrée dans la méthode");
-				  return DONE ;				  
-			  }
+	
 			  /**
 			   * data access
 			   */
 			  int cpt=0;
 			  @Override
-			  public String caseDataAccess(DataAccess object)
-			  {
-				  cpt++;
-				  _currentImplUnparser.addOutput("") ;
+		      public String caseDataAccess(DataAccess object)
+		      {
+		        _currentImplUnparser.addOutput("") ;
+		        String dataSubprogramName = null ;
+		        
+		        if(_dataAccessMapping != null)
+		        {
+		          dataSubprogramName = _dataAccessMapping.get(object) ;
+		        }
+		        
+		        // a modifier
+		        if(dataSubprogramName != null)
+		        {
+		          _currentImplUnparser.addOutput(dataSubprogramName);
+ 		          _activityHeaderCode.addOutputNewline("type "+dataSubprogramName+"_Port_Type"+" is(");
+ 		          _activityHeaderCode.addOutputNewline(dataSubprogramName+");");
+ 		          _activityHeaderCode.addOutputNewline("");
 
-				  String dataSubprogramName = null ;
-		
-				  if(_dataAccessMapping != null)
-				  {   
-					  dataSubprogramName = _dataAccessMapping.get(object) ;
-				  }
-				  
-				  if(dataSubprogramName != null && cpt ==1)
-				  {					  
-					  _currentImplUnparser.addOutput(dataSubprogramName);
-				  }
-				  if(dataSubprogramName != null && cpt >1)
-				  {					  
-					  _currentImplUnparser.addOutput(dataSubprogramName+cpt);
-				  }
+		        }		 
+		        else
+		        {
+		          _currentImplUnparser.addOutput(GenerationUtilsADA
+		                .getGenerationADAIdentifier(object.getQualifiedName())) ;
 
-				  _currentImplUnparser.addOutput(" : ") ;
-  
-				  try
-				  {
-				
-					  	  resolveExistingCodeDependencies(object.getDataFeatureClassifier(),
-							  _currentImplUnparser, _currentHeaderUnparser);
-				  }
-				  catch(Exception e)
-				  {
-						
-					  _currentImplUnparser.addOutput(GenerationUtilsADA
-							  .getGenerationADAIdentifier(object.getDataFeatureClassifier()
-									  .getQualifiedName())) ;
-				  }
+		          _activityHeaderCode.addOutputNewline("type "+GenerationUtilsADA
+			                .getGenerationADAIdentifier(object.getQualifiedName())+"_Port_Type"+" is(");
+ 		          _activityHeaderCode.addOutputNewline(GenerationUtilsADA
+			                .getGenerationADAIdentifier(object.getQualifiedName())+");");
+ 		          _activityHeaderCode.addOutputNewline("");
+ 		          
+		        }
+		        _currentImplUnparser.addOutput(" : ") ;
+		        
+		        try
+		        {
+		          resolveExistingCodeDependencies(object.getDataFeatureClassifier(),
+		                               _currentImplUnparser, _currentHeaderUnparser);
+		        }
+		        catch(Exception e)
+		        {
+		          _currentImplUnparser.addOutput(GenerationUtilsADA
+		                .getGenerationADAIdentifier(object.getDataFeatureClassifier()
+		                      .getQualifiedName())) ;
+		        }
 
-				  _currentImplUnparser.addOutputNewline(";") ;
 
-				  return DONE ;
-			  }
+		        _currentImplUnparser.addOutputNewline(";") ;
+
+		        boolean nl=false;
+		        
+		        if(dataSubprogramName==null)
+		        nl=true;
+		        
+		        if(nl)
+		        {
+			        if(dispatchProtocol.equals("Sporadic"))
+			          {
+			        	  _currentImplUnparser.addOutputNewline("");
+		 		          _currentImplUnparser.addOutputNewline("procedure Wait_For_Incoming_Events");
+		 		          _currentImplUnparser.addOutputNewline("(Entity : PolyORB_HI_Generated.Deployment.Entity_Type;");
+		 		          // a modifier out static
+		 		          _currentImplUnparser.addOutputNewline("Port : out "+GenerationUtilsADA
+					                .getGenerationADAIdentifier(object.getQualifiedName())+")");
+		 		          _currentImplUnparser.addOutputNewline(")");
+		 		          _currentImplUnparser.addOutputNewline("is");
+		 		          _currentImplUnparser.addOutputNewline("begin");
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("case Entity is");
+		 		          // am modifier
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("when PolyORB_HI_Generated.Deployment.proc_a_Task3_K =>");
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("null;");
+		 		          _currentImplUnparser.addOutputNewline("pragma Warnings (Off);");
+		 		          _currentImplUnparser.addOutputNewline("when others =>");
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("raise Program_Error;");
+		 		          _currentImplUnparser.decrementIndent();
+   		 		          _currentImplUnparser.addOutputNewline("pragma Warnings (On);");
+   		 		          _currentImplUnparser.decrementIndent();
+   		 		          _currentImplUnparser.addOutputNewline("end case");
+		 		          _currentImplUnparser.decrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("end Wait_For_Incoming_Events");
+		 		          
+			          }
+
+		        }
+		        else
+		        {
+			        if(dispatchProtocol.equals("Sporadic"))
+			          {
+			        	  _currentImplUnparser.addOutputNewline("");
+		 		          _currentImplUnparser.addOutputNewline("procedure Wait_For_Incoming_Events");
+		 		          _currentImplUnparser.addOutputNewline("(Entity : PolyORB_HI_Generated.Deployment.Entity_Type;");
+		 		          // a modifier out static
+		 		          _currentImplUnparser.addOutputNewline("Port : out "+dataSubprogramName);
+		 		          _currentImplUnparser.addOutputNewline(")");
+		 		          _currentImplUnparser.addOutputNewline("is");
+		 		          _currentImplUnparser.addOutputNewline("begin");
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("case Entity is");
+		 		          // am modifier
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("when PolyORB_HI_Generated.Deployment.proc_a_Task3_K =>");
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("null;");
+		 		          _currentImplUnparser.addOutputNewline("pragma Warnings (Off);");
+		 		          _currentImplUnparser.addOutputNewline("when others =>");
+		 		          _currentImplUnparser.incrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("raise Program_Error;");
+		 		          _currentImplUnparser.decrementIndent();
+   		 		          _currentImplUnparser.addOutputNewline("pragma Warnings (On);");
+   		 		          _currentImplUnparser.decrementIndent();
+   		 		          _currentImplUnparser.addOutputNewline("end case");
+		 		          _currentImplUnparser.decrementIndent();
+		 		          _currentImplUnparser.addOutputNewline("end Wait_For_Incoming_Events");
+			          }
+		        }
+		        
+		        
+		        return DONE ;
+		      }
 				 } ;
 	 }
+	 
+	  public boolean sourceTextName(NamedElement object)
+	  {		
+		 try
+	    {
+	      NamedElement ne = object ;
+	      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+	      
+	      List<String> sourceText =
+	            PropertyUtils.getStringListValue(ne, "Source_Text") ;
+	      
+	      for(String s : sourceText)
+	      {
+	    	  System.out.println("sourceText"+s);
+	    	}
+	      throw new Exception("In component "+ne.getName()+": Source_Text " +
+	      		"property should also reference a ads (.ads extension) file");
+	    }
+	    catch(Exception e)
+	    {
+	      return false ;
+	    }
+	  }
 
 	 @Override
 	 public void process(Element element, File generatedFilePath) 
@@ -1662,4 +2404,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	 }
 		NamedElement ne;
 
+
+		
 }
