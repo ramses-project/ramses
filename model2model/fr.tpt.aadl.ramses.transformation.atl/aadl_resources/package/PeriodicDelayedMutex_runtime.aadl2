@@ -18,40 +18,51 @@ end t_aadl_linkedlist_link;
 
 data implementation t_aadl_linkedlist_link.impl
 prototypes
-  t_request: data;
+  t_data: data;
+  t_link: data t_aadl_linkedlist_link.impl;
 subcomponents
-  DataPtr   : data t_request -- pointer
+  DataPtr   : data t_data -- pointer
               {
                  Data_Model::Data_Representation => Array;
                  Data_Model::Dimension => (0);
               };
               
   Timestamp : data Base_Types::Integer_16;
-  Priority  : data Base_Types::Integer_16;
+  PriorityValue  : data Base_Types::Integer_16;
   
   Consumed  : data Base_Types::Boolean 
               { 
               	 Data_Model::Initial_Value => ("TRUE");
               };
   
-  Previous  : data t_aadl_linkedlist_link_ptr.impl;
-  Next      : data t_aadl_linkedlist_link_ptr.impl;
+  Previous    : data t_link
+              {
+                 Data_Model::Data_Representation => Array;
+                 Data_Model::Dimension => (0);
+              };
+              
+  Next        : data t_link
+              {
+                 Data_Model::Data_Representation => Array;
+                 Data_Model::Dimension => (0);
+              };
+              
 end t_aadl_linkedlist_link.impl;
 
 
 -- Pointer on linked element
 
-data t_aadl_linkedlist_link_ptr
-end t_aadl_linkedlist_link_ptr;
+-- data t_aadl_linkedlist_link_ptr
+-- end t_aadl_linkedlist_link_ptr;
 
-data implementation t_aadl_linkedlist_link_ptr.impl
-prototypes
-  t_request: data;
-properties
-  Data_Model::Data_Representation => Array;
-  Data_Model::Dimension => (0);
-  Data_Model::Base_Type => (classifier(t_aadl_linkedlist_link.impl));
-end t_aadl_linkedlist_link_ptr.impl;
+-- data implementation t_aadl_linkedlist_link_ptr.impl
+-- prototypes
+--  t_data: data;
+-- properties
+--  Data_Model::Data_Representation => Array;
+--  Data_Model::Dimension => (0);
+--  Data_Model::Base_Type => (classifier(t_aadl_linkedlist_link.impl));
+-- end t_aadl_linkedlist_link_ptr.impl;
 
 
 -- Linked list structure
@@ -69,13 +80,22 @@ end t_aadl_thread_data_queue;
 
 data implementation t_aadl_thread_data_queue.impl
 prototypes
-  t_request: data;
+  t_link: data t_aadl_linkedlist_link.impl;
+  t_lock: data;
 subcomponents
   Values: data t_aadl_thread_data_queue_content;
   Size: data Base_Types::Integer;
-  UsedSize: data Base_Types::Integer;
-  First: data t_aadl_linkedlist_link_ptr.impl;
-  Free: data t_aadl_linkedlist_link_ptr.impl;
+  First: data t_link
+        {
+            Data_Model::Data_Representation => Array;
+            Data_Model::Dimension => (0);
+        };
+  Last: data t_link
+        {
+            Data_Model::Data_Representation => Array;
+            Data_Model::Dimension => (0);
+        };
+  Lock: data t_lock;
 end t_aadl_thread_data_queue.impl;
 
 subprogram Init_LinkedList
@@ -93,7 +113,7 @@ annex behavior_specification {**
     t: s-[]->s {
     	PortVariable.Size  := Size;
     	PortVariable.First := PortVariable.Values[0];
-    	PortVariable.Free  := PortVariable.Values[0];
+    	PortVariable.Last  := PortVariable.Values[0];
     	
     	iMax := Size - 2;
     	for(i : Base_Types::Integer_16 in 0 .. iMax)
@@ -107,110 +127,125 @@ annex behavior_specification {**
 end Init_LinkedList;
 
 ---------------------------------------------------------------
--- Runtime Services
+-- Lock Services
 ---------------------------------------------------------------
-
 subprogram Get_Resource
+prototypes
+  t_port: data t_aadl_thread_data_queue.impl;
 features
-  PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
+  PortVariable: requires data access t_port;
 end Get_Resource;
 
 subprogram Release_Resource
+prototypes
+  t_port: data t_aadl_thread_data_queue.impl;
 features
-  PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
+  PortVariable: requires data access t_port;
 end Release_Resource;
 
-
+---------------------------------------------------------------
+-- Runtime Services
+---------------------------------------------------------------
 subprogram Put_Value
 prototypes
-  t_request: data;
+  t_data: data;
+  t_link: data t_aadl_linkedlist_link.impl;
+  t_port: data t_aadl_thread_data_queue.impl;
 features
-  PortVariable    : requires data access t_aadl_thread_data_queue.impl; 
-  DataValue       : requires data access t_request;
+  PortVariable    : requires data access t_port; 
+  DataValue       : requires data access t_data;
   CurrentDeadline : in parameter Base_Types::Integer_16;
-  Priority        : in parameter Base_Types::Integer_16;
+  PriorityValue   : in parameter Base_Types::Integer_16;
+end Put_Value;
+
+subprogram implementation Put_Value.impl
+prototypes
+  t_data_sub: data;
+  t_link_sub: data t_aadl_linkedlist_link.impl;
+  t_port_sub: data t_aadl_thread_data_queue.impl;
+  Get_Res       : subprogram Get_Resource;
+  Release_Res   : subprogram Release_Resource;
+subcomponents
+  CurrentLink   : data t_link_sub
+                  { Data_Model::Data_Representation => Array;
+                    Data_Model::Dimension => (0); };
+  AvailableLink : data t_link_sub
+                  { Data_Model::Data_Representation => Array;
+                    Data_Model::Dimension => (0); };
 annex behavior_specification {**
   variables
-    CurrentLink   : t_aadl_linkedlist_link_ptr.impl;
-    AvailableLink : t_aadl_linkedlist_link_ptr.impl;
     iterations    : Base_Types::Integer;
   states
     s: initial final state;
   transitions
     t: s -[]-> s
     {
-      Get_Resource! (PortVariable);
+      Get_Res! (PortVariable);
       
       CurrentLink := PortVariable.First;
       iterations := 0;
       while (not CurrentLink.Consumed 
              and (CurrentLink.Timestamp < CurrentDeadline 
   			         or (CurrentLink.Timestamp=CurrentDeadline 
-  			             and CurrentLink.Priority>Priority))
+  			             and CurrentLink.PriorityValue>PriorityValue))
   			 and (iterations < PortVariable.Size))
       {
   	     CurrentLink := CurrentLink.Next;
   	     iterations := iterations + 1
       };
       
-      if (iterations < PortVariable.Size and PortVariable.Free.Consumed)
+      if (iterations < PortVariable.Size and PortVariable.Last.Consumed)
   	  {
-  	     AvailableLink             := PortVariable.Free;
+  	     AvailableLink                 := PortVariable.Last;
   	     
-	     AvailableLink.DataPtr     := DataValue;
-	     AvailableLink.Timestamp   := CurrentDeadline;
-	     AvailableLink.Priority    := Priority;
-	     AvailableLink.Consumed    := FALSE;
+	     AvailableLink.DataPtr         := DataValue;
+	     AvailableLink.Timestamp       := CurrentDeadline;
+	     AvailableLink.PriorityValue   := PriorityValue;
+	     AvailableLink.Consumed        := FALSE;
 	       
 	     if (not CurrentLink.Consumed)
 	     {  
-	       Insert_Link!(AvailableLink, CurrentLink)
+	       AvailableLink.Next.Previous     := AvailableLink.Previous;
+           AvailableLink.Previous.Next     := AvailableLink.Next;
+           AvailableLink.Next              := CurrentLink;
+	       AvailableLink.Previous          := CurrentLink.Previous; 
+	       CurrentLink.Previous.Next       := AvailableLink;
+	       CurrentLink.Previous            := AvailableLink
 	     }
 	     end if;
 	           
-	     PortVariable.Free         := PortVariable.Free.Next;
-	     PortVariable.UsedSize     := PortVariable.UsedSize + 1
+	     PortVariable.Last         := PortVariable.Last.Next
   	  }
   	  end if;
       
-      Release_Resource! (PortVariable)
+      Release_Res! (PortVariable)
     };
 **};
-end Put_Value;
-
-subprogram Insert_Link
-features
-  Link        : in out parameter t_aadl_linkedlist_link_ptr.impl;
-  Follower    : in out parameter t_aadl_linkedlist_link_ptr.impl;
-annex behavior_specification {**
-  states
-    s: initial final state;
-  transitions
-    t: s -[]-> s
-    {
-      Link.Next.Previous     := Link.Previous;
-      Link.Previous.Next     := Link.Next;
-      Link.Next              := Follower;
-	  Link.Previous          := Follower.Previous; 
-	  Follower.Previous.Next := Link;
-	  Follower.Previous      := Link
-    };
-**};
-end Insert_Link;
+end Put_Value.impl;
 
 subprogram Receive_Input
 prototypes
-  t_request: data;
+  t_port: data t_aadl_thread_data_queue.impl;
+  t_link: data t_aadl_linkedlist_link.impl;
 features
-  Period : in parameter Base_Types::Integer_16;
+  PeriodValue   : in parameter Base_Types::Integer_16;
   CurrentPeriod : in parameter Base_Types::Integer_16;
-  PortVariable : requires data access t_aadl_thread_data_queue.impl;
-  First : in out parameter t_aadl_linkedlist_link_ptr.impl;
+  PortVariable  : requires data access t_port;
+end Receive_Input;
+
+subprogram implementation Receive_Input.impl
+prototypes
+  t_link_sub    : data t_aadl_linkedlist_link.impl;
+  Get_Res       : subprogram Get_Resource;
+  Release_Res   : subprogram Release_Resource;
+subcomponents
+  CurrentLink : data t_link_sub
+  		{ Data_Model::Data_Representation => Array;
+          Data_Model::Dimension => (0); };
 annex behavior_specification {**
   variables
     LastPeriod  : Base_Types::Integer_16;
-    CurrentLink : t_aadl_linkedlist_link_ptr.impl;
-    Next : t_aadl_linkedlist_link_ptr.impl;
+    
     i : Base_Types::Integer_16;
   states
     s: initial final state;
@@ -219,101 +254,71 @@ annex behavior_specification {**
       -- Skip elements received before previous period 
       -- and not already consumed.
     
-      Get_Resource! (PortVariable);
+      Get_Res! (PortVariable);
     
       if (CurrentPeriod > 0)
       {
-        LastPeriod := CurrentPeriod - Period;
+        LastPeriod := CurrentPeriod - PeriodValue;
         i := 0;
         
         CurrentLink := PortVariable.First;
         while ((CurrentLink.Timestamp <= LastPeriod)
                and (i < PortVariable.Size))
         {
-           --Next := CurrentLink.Next;
-           --Remove_Link! (CurrentLink, PortVariable);
-           --CurrentLink := Next;
-           
            CurrentLink.Consumed := TRUE;
            CurrentLink := CurrentLink.Next;
            i := i + 1
         };
-        First := CurrentLink
+        PortVariable.First := CurrentLink
       }
       end if;
       
-      Release_Resource!(PortVariable)
+      Release_Res!(PortVariable)
     };
 **};
-end Receive_Input;
-
-subprogram Remove_Link
-features
-  CurrentLink : in out parameter t_aadl_linkedlist_link_ptr.impl;
-  PortVariable : requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
-annex behavior_specification {**
-  states
-    s: initial final state;
-  transitions
-    t: s -[]-> s
-    {
-      CurrentLink.Consumed := TRUE;
-           
-      -- remove link
-      CurrentLink.Previous.Next := CurrentLink.Next;
-      CurrentLink.Next.Previous := CurrentLink.Previous;
-       
-      -- add link at the end of the chain
-      CurrentLink.Previous := PortVariable.Free;
-      CurrentLink.Next := PortVariable.Free.Next;
-      PortVariable.Free.Next.Previous := CurrentLink;
-      PortVariable.Free.Next := CurrentLink
-    };
-**};
-end Remove_Link;
+end Receive_Input.impl;
 
 subprogram Next_Value
 prototypes
-  t_request: data;
+  t_data: data;
+  t_link: data t_aadl_linkedlist_link.impl;
+  t_port: data t_aadl_thread_data_queue.impl;
 features
-  PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
-  DataValue: out parameter t_request; -- Reference to value being retrieved
-  First : in out parameter t_aadl_linkedlist_link_ptr.impl;
+  PortVariable: requires data access t_port;
+  DataValue: out parameter t_data;
   CurrentPeriod : in parameter Base_Types::Integer_16; 
+end Next_Value;
+
+subprogram implementation Next_Value.impl
+prototypes
+  t_link_sub: data t_aadl_linkedlist_link.impl;
+subcomponents
+  First: data t_link_sub
+     { Data_Model::Data_Representation => Array;
+       Data_Model::Dimension => (0); };
 annex behavior_specification {**
-  variables
-    Next : t_aadl_linkedlist_link_ptr.impl;
   states
     s: initial final state;
   transitions
     t: s -[]-> s
     {
-      Next := First.Next;
-      
-      if ((Next.Timestamp <= CurrentPeriod) and (Next.Consumed=FALSE))
+      First := PortVariable.First;
+      if ((First.Next.Timestamp <= CurrentPeriod) 
+      		and (First.Next.Consumed=FALSE))
       {
-        DataValue := Next.DataPtr;
-        --Remove_Link! (First, PortVariable);
+        DataValue := First.Next.DataPtr;
         First.Consumed := TRUE;
-        First := Next;
-        PortVariable.UsedSize := PortVariable.UsedSize - 1
+        PortVariable.First := First.Next
       }
       end if -- else DataValue is unchanged (use previous value)
     };
 **};
-end Next_Value;
+end Next_Value.impl;
 
 subprogram Send_Output
-prototypes
-  t_request: data;
-features
-  PortVariable: requires data access t_aadl_thread_data_queue.impl; -- Reference to port variable
-end Send_Output;
-
-subprogram Compute_Deadline
 features 
-  Period          : in out parameter Base_Types::Integer_16;
-  Deadline        : in out parameter Base_Types::Integer_16;
+  PeriodValue     : in parameter Base_Types::Integer_16;
+  DeadlineValue   : in parameter Base_Types::Integer_16;
   CurrentPeriod   : in out parameter Base_Types::Integer_16;
   CurrentDeadline : in out parameter Base_Types::Integer_16;
 annex behavior_specification {**
@@ -322,10 +327,10 @@ annex behavior_specification {**
   transitions
     t : s-[]->s
     {
-      CurrentPeriod := CurrentPeriod + Period;
-      CurrentDeadline := CurrentPeriod + Deadline
+      CurrentPeriod := CurrentPeriod + PeriodValue;
+      CurrentDeadline := CurrentPeriod + DeadlineValue
     };
 **};
-end Compute_Deadline;
+end Send_Output;
 
 end PeriodicDelayedMutex_runtime;
