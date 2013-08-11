@@ -30,7 +30,7 @@ module EventDataPorts_Mutex;
 create OUT : AADLBA 	from 		IN : AADLI;
 
 helper def : PeriodicDelayedMutexRuntime_Name : String = 'PERIODICDELAYEDMUTEX_RUNTIME';
-helper def : Compute_Deadline_Name : String = 'Send_Output';
+--helper def : Compute_Deadline_Name : String = 'Send_Output';
 
 helper def : Queue_Prototype : AADLBA!DataClassifier = 't_aadl_thread_data_queue'
 					.asDataType(thisModule.PeriodicDelayedMutexRuntime_Name);
@@ -267,7 +267,7 @@ rule m_Thread_Output_PeriodicDelayed_Port_Mutex
 		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
 		producerPort: AADLI!FeatureInstance = cnxInst.source;
 		consummerPort: AADLI!FeatureInstance = cnxInst.destination;
-		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
+		Put_Value_PrototypeSpg: AADLBA!SubprogramType = 'Put_Value'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
 		Array_Prototype : AADLBA!DataClassifier = 'ArrayDataType'.asDataType(thisModule.PeriodicDelayedMutexRuntime_Name);
 	}
 	to
@@ -282,57 +282,84 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		cnxRef: AADLI!PortConnection
 	using
 	{
-		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
+		Put_Value_PrototypeSpg: AADLBA!SubprogramType = 'Put_Value'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
+		Put_Value_PrototypeSpg_Impl : AADLBA!SubprogramImplementation = 'Put_Value.impl'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
+		putValueName : String = Put_Value_PrototypeSpg.name + '_' + fi.eContainer().name + '_' + fi.name;
+
 		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
 		producerPort: AADLI!FeatureInstance = cnxInst.source;
-		t_request: AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
+		
+		t_data: AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
+		bufferQueueImpl: AADLBA!DataImplementation = thisModule.resolveTemp(fi,'bufferQueueImpl').debug('bufferQueueImpl');
 	}
 	to
 		-----------------------
 		--- Put_Value
 		-----------------------
+		putValueSpgImpl : AADLBA!SubprogramImplementation
+		(
+			name <- putValueName + '.impl',
+			ownedExtension <- extendedPutValueSpgImpl
+		),
+		extendedPutValueSpgImpl : AADLBA!ImplementationExtension
+		(
+			extended <- Put_Value_PrototypeSpg_Impl
+		),
 		putValueSpg: AADLBA!SubprogramType
 		(
-			name <- Put_Value_PrototypeSpg.name+'_'+ fi.eContainer().name + '_' + fi.name,
+			name <- putValueName,
 			ownedExtension <- extendedPutValueSpg,
-			ownedPrototypeBinding <- Sequence{putValuePrototypeBinding},
-			ownedDataAccess <- Sequence {putValueSpgPortVariable,putValueSpgDataValue}
-		),
-		putValueSpgPortVariable: AADLBA!DataAccess
-		(
-			name <- 'PortVariable',
-			kind <- #requires,
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferQueueImpl'),
-			refined <- Put_Value_PrototypeSpg.ownedDataAccess->any(d|d.name='PortVariable')
-		),
-		putValueSpgDataValue: AADLBA!DataAccess
-		(
-			name <- 'DataValue',
-			kind <- #requires,
-			dataFeatureClassifier <- t_request,
-			refined <- Put_Value_PrototypeSpg.ownedDataAccess->any(d|d.name='DataValue')
+			ownedPrototypeBinding <- Sequence{putValueDataPrototypeBinding,
+											  putValueQueuePrototypeBinding,
+											  putValueLinkPrototypeBinding}
 		),
 		extendedPutValueSpg: AADLBA!TypeExtension
 		(
 			extended <- Put_Value_PrototypeSpg
 		),
-		putValuePrototypeBinding : AADLBA!ComponentPrototypeBinding
+		putValueDataPrototypeBinding : AADLBA!ComponentPrototypeBinding
 		(
-			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_request').debug('Put_Value.formal'),
-			actual <- Sequence{putValuePrototypeActual}
+			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_data').debug('Put_Value.t_data'),
+			actual <- Sequence{putValueDataPrototypeActual}
 		),
-		putValuePrototypeActual : AADLBA!ComponentPrototypeActual
+		putValueDataPrototypeActual : AADLBA!ComponentPrototypeActual
 		(
 			category <-  #data
+		),
+		putValueQueuePrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_port').debug('Put_Value.t_port'),
+			actual <- Sequence{putValueQueuePrototypeActual}
+		),
+		putValueQueuePrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <- #data
+		),
+		putValueLinkPrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_link').debug('Put_Value.t_link'),
+			actual <- Sequence{putValueLinkPrototypeActual}
+		),
+		putValueLinkPrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <- #data
 		)
 	do
 	{
-		-- next is a workaround
-		putValuePrototypeActual.setSubcomponentType(t_request);
+		--putValueSpgImpl.getName().debug('PutValueSpgImpl');
+		
+		putValueSpgImpl.ownedRealization <- thisModule.Realization(putValueSpg,putValueSpgImpl);
+		putValueDataPrototypeActual.setSubcomponentType(t_data);
+		putValueQueuePrototypeActual.setSubcomponentType(bufferQueueImpl);
+		putValueLinkPrototypeActual.setSubcomponentType(thisModule.Queue_Element_Type(t_data));
+		thisModule.public().ownedClassifier.add(putValueSpg);
+		thisModule.public().ownedClassifier.add(putValueSpgImpl);
+		
+		--thisModule.public().ownedClassifier.debug('classifiers');
+		
+		putValueSpgImpl;
 	}
 }
-
--- pb resolveTemp
 
 -- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex
@@ -501,13 +528,19 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 	{
 		ownerName : String = fi.eContainer().name;
 
-		dataClassifier : AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
+		t_data : AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
 		runtimeName: String = thisModule.PeriodicDelayedMutexRuntime_Name;
 
 		Buffer_Prototype : AADLBA!DataClassifier = 't_aadl_thread_data_queue_content'.asDataType(runtimeName);
 
 		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = 'Receive_Input'.asSubprogramType(runtimeName);
+		Receive_Input_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Receive_Input.impl'.asSubprogramType(runtimeName);
+		receiveInputName : String = Receive_Input_PrototypeSpg.name + ' ' + fi.eContainer().name + ' ' + fi.name;
+
 		Next_Value_PrototypeSpg: AADLBA!SubprogramType = 'Next_Value'.asSubprogramType(runtimeName);
+		Next_Value_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Next_Value.impl'.asSubprogramType(runtimeName);
+		nextValueName : String = Next_Value_PrototypeSpg.name + '_' + fi.eContainer().name + '_' + fi.name;
+
 		bufferTypeName: String = 'QueueType_'+fi.eContainer().name+'_'+fi.name;
 		bufferSubcomponentName: String = fi.eContainer().name+'_'+fi.name;
 	}
@@ -522,7 +555,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 					 	'Base_Type',
 						'DATA_MODEL',
 						thisModule.CreateListValueFromClassifier(
-							thisModule.Queue_Element_Type(dataClassifier))
+							thisModule.Queue_Element_Type(t_data))
 					),
 					
 					thisModule.CreatePropertyAssociation
@@ -548,7 +581,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 		(
 			extended <- thisModule.Queue_Prototype 
 		),
-		bufferQueueImpl: AADLBA!DataImplementation
+		bufferQueueImpl: AADLBA!DataImplementation mapsTo fi
 		(
 			name <- bufferTypeName + '.impl',
 			ownedRealization <- thisModule.Realization(bufferQueueType),
@@ -595,93 +628,115 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 			name<-bufferSubcomponentName,
 			dataSubcomponentType <- bufferQueueImpl
 		),
---		firstSubcomponent: AADLBA!DataSubcomponent 
---		(
---			name<-fi.eContainer().name+'_'+fi.name+'_First',
---			dataSubcomponentType <- thisModule.Queue_Element_Type_Ptr(dataClassifier) 
---		),
+		receiveInputSpgImpl : AADLBA!SubprogramImplementation
+		(
+			name <- receiveInputName + '.impl',
+			ownedExtension <- extendedReceiveInputSpgImpl
+		),
+		extendedReceiveInputSpgImpl : AADLBA!ImplementationExtension
+		(
+			extended <- Receive_Input_PrototypeSpg_Impl
+		),
 		receiveInputSpg: AADLBA!SubprogramType
 		(
 			name <- Receive_Input_PrototypeSpg.name+'_'+ fi.eContainer().name + '_' + fi.name,
 			ownedExtension <- extendedReceiveInputSpg,
-			ownedPrototypeBinding <- Sequence{receiveInputPrototypeBinding}
-			--ownedDataAccess <- Sequence{receiveInputPortVariable},
-			--ownedParameter <- Sequence{receiveInputFirst}
+			ownedPrototypeBinding <- Sequence{receiveInputPortPrototypeBinding, receiveInputLinkPrototypeBinding}
 		),
---		receiveInputPortVariable: AADLBA!DataAccess
---		(
---			name <- 'PortVariable',
---			kind <- #requires,
---			dataFeatureClassifier <- bufferQueueImpl,
---			refined <- Receive_Input_PrototypeSpg.ownedDataAccess->any(d|d.name='PortVariable')
---		),
---		receiveInputFirst: AADLBA!Parameter
---		(
---			name <- 'First',
---			dataFeatureClassifier <- thisModule.Queue_Element_Type_Ptr(dataClassifier),
---			refined <- Receive_Input_PrototypeSpg.ownedParameter->any(d|d.name='First')
---		),
 		extendedReceiveInputSpg: AADLBA!TypeExtension
 		(
 			extended <- Receive_Input_PrototypeSpg
 		),
-		receiveInputPrototypeBinding : AADLBA!ComponentPrototypeBinding
+		receiveInputPortPrototypeBinding : AADLBA!ComponentPrototypeBinding
 		(
-			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name = 't_request').debug('Next_Value.formal'),
-			actual <- Sequence{receiveInputPrototypeActual}
+			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name = 't_port'),
+			actual <- Sequence{receiveInputPortPrototypeActual}
 		),
-		receiveInputPrototypeActual : AADLBA!ComponentPrototypeActual
+		receiveInputPortPrototypeActual : AADLBA!ComponentPrototypeActual
 		(
+			extended <- Receive_Input_PrototypeSpg,
 			category <-  #data
+		),
+		receiveInputLinkPrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name='t_link'),
+			actual <- Sequence {receiveInputLinkPrototypeActual}
+		),
+		receiveInputLinkPrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <- #data
+		),
+		nextValueSpgImpl: AADLBA!SubprogramImplementation
+		(
+			name <- nextValueName + '.impl',
+			ownedExtension <- extendedNextValueSpgImpl
+		),
+		extendedNextValueSpgImpl : AADLBA!ImplementationExtension 
+		(
+			extended <- Next_Value_PrototypeSpg_Impl
 		),
 		nextValueSpg: AADLBA!SubprogramType
 		(
 			name <- Next_Value_PrototypeSpg.name+'_'+ fi.eContainer().name + '_' + fi.name,
 			ownedExtension <- extendedNextValueSpg,
-			ownedPrototypeBinding <- Sequence{nextValuePrototypeBinding}
-			--ownedDataAccess <- Sequence {nextValuePortVariable},
-			--ownedParameter <- Sequence {nextValueSpgDataValue,nextValueFirst}
+			ownedPrototypeBinding <- Sequence{nextValueDataPrototypeBinding,
+											  nextValuePortVariablePrototypeBinding,
+											  nextValueLinkPrototypeBinding}
 		),
---		nextValuePortVariable: AADLBA!DataAccess
---		(
---			name <- 'PortVariable',
---			kind <- #requires,
---			dataFeatureClassifier <- bufferQueueImpl,
---			refined <- Next_Value_PrototypeSpg.ownedDataAccess->any(d|d.name='PortVariable')
---		),
---		nextValueSpgDataValue: AADLBA!Parameter
---		(
---			name <- 'DataValue',
---			direction <- #out,
---			dataFeatureClassifier <- dataClassifier,
---			refined <- Next_Value_PrototypeSpg.ownedParameter->any(d|d.name='DataValue')
---		),
---		nextValueFirst: AADLBA!Parameter
---		(
---			name <- 'First',
---			dataFeatureClassifier <- thisModule.Queue_Element_Type_Ptr(dataClassifier),
---			refined <- Next_Value_PrototypeSpg.ownedParameter->any(d|d.name='First')
---		),
 		extendedNextValueSpg: AADLBA!TypeExtension
 		(
 			extended <- Next_Value_PrototypeSpg
 		),
-		nextValuePrototypeBinding : AADLBA!ComponentPrototypeBinding
+		nextValueDataPrototypeBinding : AADLBA!ComponentPrototypeBinding
 		(
-			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_request').debug('Next_Value.formal'),
-			actual <- Sequence{nextValuePrototypeActual}
+			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_data'),
+			actual <- Sequence{nextValueDataPrototypeActual}
 		),
-		nextValuePrototypeActual : AADLBA!ComponentPrototypeActual
+		nextValueDataPrototypeActual : AADLBA!ComponentPrototypeActual
 		(
 			category <-  #data
+		),
+		nextValuePortVariablePrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name='t_port'),
+			actual <- Sequence{nextValuePortVariablePrototypeActual}
+		),
+		nextValuePortVariablePrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <- #data
+		),
+		nextValueLinkPrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name='t_link'),
+			actual <- Sequence {nextValueLinkPrototypeActual}
+		),
+		nextValueLinkPrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <- #data
 		)
 	do
 	{
 		--thisModule.theHOOK.setDirection(receiveInputFirst, 'in_out');
 		--thisModule.theHOOK.setDirection(nextValueFirst,'in_out');
-		receiveInputPrototypeActual.setSubcomponentType(dataClassifier);
-		bufferQueueImplPrototypeActual.setSubcomponentType(thisModule.Queue_Element_Type(dataClassifier));
-		nextValuePrototypeActual.setSubcomponentType(dataClassifier);
+		receiveInputSpgImpl.ownedRealization <- thisModule.Realization(receiveInputSpg,receiveInputSpgImpl);
+		receiveInputPortPrototypeActual.setSubcomponentType(bufferQueueImpl);
+		receiveInputLinkPrototypeActual.setSubcomponentType(t_data);
+		
+		bufferQueueImplPrototypeActual.setSubcomponentType(thisModule.Queue_Element_Type(t_data));
+		
+		nextValueSpgImpl.ownedRealization <- thisModule.Realization(nextValueSpg,nextValueSpgImpl);
+		nextValueDataPrototypeActual.setSubcomponentType(t_data);
+		nextValuePortVariablePrototypeActual.setSubcomponentType(bufferQueueImpl);
+		nextValueLinkPrototypeActual.setSubcomponentType(thisModule.Queue_Element_Type(t_data));
+		
+		thisModule.public().ownedClassifier.add(receiveInputSpg);
+		thisModule.public().ownedClassifier.add(receiveInputSpgImpl);
+		thisModule.public().ownedClassifier.add(nextValueSpg);
+		thisModule.public().ownedClassifier.add(nextValueSpgImpl);
+		
+		true.debug('pouet');
+		
+		nextValueSpgImpl;
 	}
 }
 
@@ -819,7 +874,7 @@ unique lazy rule Queue_Element_Type
 			name <- linkName + '.impl',
 			ownedRealization <- thisModule.Realization(dataTypePtr),
 			ownedExtension <- extendedPointerImpl,
-			ownedPrototypeBinding <- Sequence{pointerImplPrototypeBinding}
+			ownedPrototypeBinding <- Sequence{dataPtrBinding,linksAccessesBinding}
 		),
 		extendedPointerImpl: AADLBA!ImplementationExtension
 		(
@@ -834,18 +889,34 @@ unique lazy rule Queue_Element_Type
 		(
 			extended <- Link_Prototype_Type
 		),
-		pointerImplPrototypeBinding : AADLBA!ComponentPrototypeBinding
+		-- binding of "dataPtr" which is the pointer to the current value
+		dataPtrBinding : AADLBA!ComponentPrototypeBinding
 		(
-			formal <- Link_Prototype_Impl.ownedPrototype->any(e|e.name = 't_request').debug('Queue_Element_Impl.formal'),
-			actual <- Sequence{pointerImplPrototypeActual}
+			formal <- Link_Prototype_Impl.ownedPrototype->any(e|e.name = 't_data'),
+			actual <- Sequence{dataPtrBindingActual}
 		),
-		pointerImplPrototypeActual : AADLBA!ComponentPrototypeActual
+		dataPtrBindingActual : AADLBA!ComponentPrototypeActual
 		(
 			category <-  #data
+		),
+		-- binding of "next"/"previous" pointers to links
+		linksAccessesBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Link_Prototype_Impl.ownedPrototype->any(e|e.name = 't_link'),
+			actual <- Sequence{linksAccessesBindingActual}
+		),
+		linksAccessesBindingActual : AADLBA!ComponentPrototypeActual
+		(
+			category <- #data
 		)
 	do
 	{
-		pointerImplPrototypeActual.setSubcomponentType(dataClassifier);
+		dataImplPtr.ownedRealization <- thisModule.Realization(dataTypePtr,dataImplPtr);
+		dataPtrBindingActual.setSubcomponentType(dataClassifier);
+		linksAccessesBindingActual.setSubcomponentType(dataImplPtr);
+		
+		thisModule.public().ownedClassifier.add(dataTypePtr);
+		thisModule.public().ownedClassifier.add(dataImplPtr);
 		dataImplPtr;
 	}
 }
