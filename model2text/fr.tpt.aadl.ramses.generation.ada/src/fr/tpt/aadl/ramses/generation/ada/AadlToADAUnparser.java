@@ -101,8 +101,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	public static String sourceName; 
 	private static ArrayList <String> activityProcedures;
 
-    List<String> sporadicThreads = new ArrayList<>();;
-    List<String> periodicThreads = new ArrayList<>();;
+    List<String> sporadicThreads = new ArrayList<String>();
+    List<String> periodicThreads = new ArrayList<String>();
 
     private static ArrayList <String> listeTypes;
     int cpt =0;
