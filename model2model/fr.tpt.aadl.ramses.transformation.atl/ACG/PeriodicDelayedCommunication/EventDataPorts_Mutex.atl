@@ -230,7 +230,7 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		)
 }
 
--- @extends m_Thread_Instance
+-- @extends m_PeriodicThread
 rule m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 {
 	from
@@ -288,9 +288,10 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 
 		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
 		producerPort: AADLI!FeatureInstance = cnxInst.source;
-		
+		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
+
 		t_data: AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
-		bufferQueueImpl: AADLBA!DataImplementation = thisModule.resolveTemp(fi,'bufferQueueImpl').debug('bufferQueueImpl');
+		bufferQueueImpl: AADLBA!DataImplementation = thisModule.resolveTemp(consumerPort,'bufferQueueImpl').debug('bufferQueueImpl');
 	}
 	to
 		-----------------------
@@ -346,16 +347,11 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		)
 	do
 	{
-		--putValueSpgImpl.getName().debug('PutValueSpgImpl');
-		
-		putValueSpgImpl.ownedRealization <- thisModule.Realization(putValueSpg,putValueSpgImpl);
+
+		putValueSpgImpl.ownedRealization <- thisModule.Realization(putValueSpg);
 		putValueDataPrototypeActual.setSubcomponentType(t_data);
 		putValueQueuePrototypeActual.setSubcomponentType(bufferQueueImpl);
 		putValueLinkPrototypeActual.setSubcomponentType(thisModule.Queue_Element_Type(t_data));
-		thisModule.public().ownedClassifier.add(putValueSpg);
-		thisModule.public().ownedClassifier.add(putValueSpgImpl);
-		
-		--thisModule.public().ownedClassifier.debug('classifiers');
 		
 		putValueSpgImpl;
 	}
@@ -654,7 +650,6 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 		),
 		receiveInputPortPrototypeActual : AADLBA!ComponentPrototypeActual
 		(
-			extended <- Receive_Input_PrototypeSpg,
 			category <-  #data
 		),
 		receiveInputLinkPrototypeBinding : AADLBA!ComponentPrototypeBinding
@@ -718,24 +713,17 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 	{
 		--thisModule.theHOOK.setDirection(receiveInputFirst, 'in_out');
 		--thisModule.theHOOK.setDirection(nextValueFirst,'in_out');
-		receiveInputSpgImpl.ownedRealization <- thisModule.Realization(receiveInputSpg,receiveInputSpgImpl);
+		receiveInputSpgImpl.ownedRealization <- thisModule.Realization(receiveInputSpg);
 		receiveInputPortPrototypeActual.setSubcomponentType(bufferQueueImpl);
 		receiveInputLinkPrototypeActual.setSubcomponentType(t_data);
 		
 		bufferQueueImplPrototypeActual.setSubcomponentType(thisModule.Queue_Element_Type(t_data));
 		
-		nextValueSpgImpl.ownedRealization <- thisModule.Realization(nextValueSpg,nextValueSpgImpl);
+		nextValueSpgImpl.ownedRealization <- thisModule.Realization(nextValueSpg);
 		nextValueDataPrototypeActual.setSubcomponentType(t_data);
 		nextValuePortVariablePrototypeActual.setSubcomponentType(bufferQueueImpl);
 		nextValueLinkPrototypeActual.setSubcomponentType(thisModule.Queue_Element_Type(t_data));
-		
-		thisModule.public().ownedClassifier.add(receiveInputSpg);
-		thisModule.public().ownedClassifier.add(receiveInputSpgImpl);
-		thisModule.public().ownedClassifier.add(nextValueSpg);
-		thisModule.public().ownedClassifier.add(nextValueSpgImpl);
-		
-		true.debug('pouet');
-		
+				
 		nextValueSpgImpl;
 	}
 }
@@ -911,12 +899,9 @@ unique lazy rule Queue_Element_Type
 		)
 	do
 	{
-		dataImplPtr.ownedRealization <- thisModule.Realization(dataTypePtr,dataImplPtr);
+		dataImplPtr.ownedRealization <- thisModule.Realization(dataTypePtr);
 		dataPtrBindingActual.setSubcomponentType(dataClassifier);
 		linksAccessesBindingActual.setSubcomponentType(dataImplPtr);
-		
-		thisModule.public().ownedClassifier.add(dataTypePtr);
-		thisModule.public().ownedClassifier.add(dataImplPtr);
 		dataImplPtr;
 	}
 }
@@ -1036,7 +1021,7 @@ unique lazy rule Queue_Element_Type
 --		bufferQueueImpl: AADLBA!DataImplementation
 --		(
 --			name <- bufferQueueType.name + '.impl',
---			ownedRealization <- thisModule.Realization(bufferQueueType,bufferQueueImpl),
+--			ownedRealization <- thisModule.Realization(bufferQueueType),
 --			ownedExtension <- bufferQueueImplExtension,
 --			ownedPrototypeBinding <- Sequence {bufferQueueImplPrototypeBinding},
 --			ownedPropertyAssociation <- Sequence {
