@@ -71,7 +71,7 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
       INode node = NodeModelUtils.findActualNodeFor(defaultAnnexSubclause) ;
       
       int offset = node.getOffset();
-      int line = node.getStartLine();
+      int line = node.getStartLine() + computeLineOffset(node, defaultAnnexSubclause);
       String sourceText = defaultAnnexSubclause.getSourceText();
       if (sourceText == null) break;
       int nlength = node.getLength();
@@ -104,5 +104,42 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
               offset, ap, errReporter, ar, resolveErrManager)) ;
       }
     }
+  }
+  
+  //Compute the number of line between the token "annex" and the token "{**".
+  //TODO test under windows.
+  private int computeLineOffset(INode node ,
+                                DefaultAnnexSubclause defaultAnnexSubclause )
+  {
+    int result = 0 ;
+    boolean next = true ;
+    char c ;
+    int index = 0 ;
+    
+    // Trim the space or new line before the keyword "annex".
+    while(node.getText().charAt(index++) != 'a')
+    {
+      continue ;
+    }
+    
+    index += 4 ; // Complete the word "annex".
+    
+    while(next)
+    {
+      c = node.getText().charAt(index) ;
+      
+      if(c == '\n')
+      {
+        result++ ;
+      }
+      else if(c == '{')
+      {
+        next = false ;
+      }
+      
+      index++ ;
+    }
+    
+    return result ;
   }
 }
