@@ -1,0 +1,57 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module EventDataPorts_Mutex_ARINC653;
+create OUT : AADLBA 	from 		IN : AADLI;
+
+helper def : ARINC653_Package : String = 'PeriodicDelayedMutex_Resource_ARINC653';
+
+-----------------------------------------------------------------------------------------------------
+-- Platform-dependent resources (refine lock type on queues and lock/unlock suprograms)
+-- Defined for ARINC653
+-----------------------------------------------------------------------------------------------------
+helper def : Queue_Prototype : AADLBA!DataClassifier = 't_aadl_thread_data_queue'
+					.asDataType(thisModule.ARINC653_Package);
+
+helper def : Queue_Prototype_Impl : AADLBA!DataClassifier = 't_aadl_thread_data_queue.arinc653'
+					.asDataType(thisModule.ARINC653_Package);
+
+helper def : Get_Resource_Subprogram_Type : AADLBA!SubprogramType =
+	AADLBA!SubprogramType->allInstancesFrom(thisModule.ARINC653_Package)
+		->any(s|s.name='Get_Resource')
+;
+helper def : Release_Resource_Subprogram_Type : AADLBA!SubprogramType =
+	AADLBA!SubprogramType->allInstancesFrom(thisModule.ARINC653_Package)
+		->any(s|s.name='Release_Resource')
+;
+
+helper def : Get_Resource_Subprogram_Implementation : AADLBA!SubprogramImplementation =
+	AADLBA!SubprogramImplementation->allInstancesFrom(thisModule.ARINC653_Package)
+		->any(s|s.name='Get_Resource.arinc653')
+;
+helper def : Release_Resource_Subprogram_Implementation : AADLBA!SubprogramImplementation =
+	AADLBA!SubprogramImplementation->allInstancesFrom(thisModule.ARINC653_Package)
+		->any(s|s.name='Release_Resource.arinc653')
+;
+-----------------------------------------------------------------------------------------------------
