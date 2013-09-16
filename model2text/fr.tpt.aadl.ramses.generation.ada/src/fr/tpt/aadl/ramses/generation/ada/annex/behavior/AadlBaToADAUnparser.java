@@ -13,6 +13,7 @@ import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
+import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
@@ -20,8 +21,10 @@ import org.osate.aadl2.ParameterConnectionEnd;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
+import org.osate.aadl2.ThreadClassifier;
 import org.osate.aadl2.modelsupport.AadlConstants;
 import org.osate.aadl2.modelsupport.UnparseText;
+import org.osate.aadl2.modelsupport.util.AadlUtil;
 
 import fr.tpt.aadl.annex.behavior.aadlba.Any;
 import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
@@ -43,6 +46,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryNumericOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.CalledSubprogramHolder;
+import fr.tpt.aadl.annex.behavior.aadlba.DataAccessHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
 import fr.tpt.aadl.annex.behavior.aadlba.DataSubcomponentHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchCondition;
@@ -981,10 +985,25 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	                // 's name thanks to the given data access mapping.
 	                if(_dataAccessMapping != null)
 	                {
-	                  Relation r = ((ValueExpression)pl).getRelations().get(0);
-	                  Term t = r.getFirstExpression().getTerms().get(0);
-	                  DataSubcomponentHolder dsh = (DataSubcomponentHolder) t.getFactors().get(0).getFirstValue();
-	                  name = _dataAccessMapping.get(dsh.getElement());
+	                  ElementHolder eh = null;
+	                  if(pl instanceof ValueExpression)
+	                  {
+	                	  Relation r = ((ValueExpression)pl).getRelations().get(0);
+	                	  Term t = r.getFirstExpression().getTerms().get(0);
+	                	  eh = (ElementHolder) t.getFactors().get(0).getFirstValue();  
+	                  }
+	                  else if(pl instanceof DataAccessHolder)
+	                  {
+	                  	eh = (ElementHolder) pl;
+	                  }
+	                  if(eh instanceof DataAccessHolder && 
+	                		  AadlUtil.getContainingAnnex(eh) instanceof ThreadClassifier)
+	                  	name = _dataAccessMapping.get((DataAccess)eh.getElement());
+	                  else if(eh instanceof DataSubcomponentHolder)
+	                  {
+	                  	DataSubcomponent ds = (DataSubcomponent) ((DataSubcomponentHolder) eh).getElement(); 
+	                  	name = GenerationUtilsADA.getGenerationADAIdentifier(ds.getQualifiedName());
+	                  }
 	                }
 
 	                if (name != null)
