@@ -78,6 +78,7 @@ import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyNotFound;
 import fr.tpt.aadl.utils.PropertyUtils;
@@ -88,20 +89,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	public static List <String> language;
 	public static ArrayList<Boolean> ADA;
 	public static String sourceName; 
-    int cp =0 ;
-    int cpp =0;
-    int cppp=0;
-
-    public static String adaplat = null;
-    List<String> sporadicThreads = new ArrayList<String>();
-    List<String> periodicThreads = new ArrayList<String>();
-    List<String> portTypeThreads = new ArrayList<>();;
-    public static List<String> platformes = new ArrayList<String>();
 
     private static ArrayList <String> listeTypes;
-    int cpt =0;
-
-    public static String plateforme = null;
     
 	private static AadlToADAUnparser singleton;
     List<String> dataNames = new ArrayList<String>() ;
@@ -110,16 +99,16 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
     public static String deadline = null ;
     public static String dispatchProtocol = null;
     public static String priority =null;
-    public static int compteurSpor=0;
-    public static int compteurPer=0;
-    int nbSporadic = 0;
-    int nbPeriodic=0;
 	// gtype.ads
 	protected AadlToADASwitchProcess _gtypesHeaderCode ;
 
 	// subprogram.adb and .ads
 	protected AadlToADASwitchProcess _subprogramImplCode ;
 	protected AadlToADASwitchProcess _subprogramHeaderCode ;
+
+	// partition's deployment.adb and .ads
+	protected AadlToADASwitchProcess _deploymentImplCode ;
+	protected AadlToADASwitchProcess _deploymentHeaderCode ;
 
 	// activity.adb and .ads
 	protected AadlToADASwitchProcess _activityImplCode ;
@@ -166,6 +155,11 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 		_subprogramHeaderCode.incrementIndent();
 
+		_deploymentImplCode = new AadlToADASwitchProcess(this) ;
+		_deploymentImplCode.addOutputNewline("\npackage body Deployment is") ;
+
+		_deploymentHeaderCode = new AadlToADASwitchProcess(this) ;
+
 		_activityImplCode = new AadlToADASwitchProcess(this) ;
 		_activityImplCode.addOutputNewline("\npackage body Activity is") ;
 		_activityImplCode.incrementIndent();
@@ -196,8 +190,9 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		_activityHeaderCode.addOutputNewline("\nend Activity;\n") ;
 		_subprogramImplCode.addOutputNewline("\nend Subprograms;\n") ;
 		_activityImplCode.addOutputNewline("\nend Activity;\n") ;
-		
-		
+		_deploymentHeaderCode.addOutputNewline("\nend Deployment;\n") ;
+		_deploymentImplCode.addOutputNewline("\nend Deployment;\n") ;
+
 		try
 		{
 			String headerGuard = null ;
@@ -239,6 +234,21 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			String addActivityHeader_ADS = "with System;\nwith Ada.Real_Time;\nwith Subprograms;use Subprograms;\nwith Gtypes; use Gtypes;" + headerGuard;
 			saveFile(activityFile_ADS, "",
 					addActivityHeader_ADS, _activityHeaderCode.getOutput()) ;
+
+			// partition's deployment.ads
+						FileWriter deploymentFile_ADS =
+								new FileWriter(targetDirectory.getAbsolutePath() + "/deployment.ads") ;
+						headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("deployment.ads");
+						String addDeploymentHeader_ADS = "with Gtypes; use Gtypes;\n" + headerGuard;
+						saveFile(deploymentFile_ADS, "", MAIN_HEADER_INCLUSION,
+								addDeploymentHeader_ADS, _deploymentHeaderCode.getOutput()) ;
+
+			// partition's deployment.adb
+						FileWriter deploymentFile_ADB =
+								new FileWriter(targetDirectory.getAbsolutePath() + "/deployment.adb") ;
+						String addDeploymentHeader_ADB = getAdditionalHeader(_deploymentImplCode) ;
+						saveFile(deploymentFile_ADB, addDeploymentHeader_ADB,
+								_deploymentImplCode.getOutput()) ;
 
 		}
 		catch(IOException e)
@@ -1033,11 +1043,58 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseProcessImplementation(ProcessImplementation object)
 			 {
-				 /*Process Impl Code*/
-				 buildDataAccessMapping(object) ;
-				 processEList(object.getOwnedThreadSubcomponents()) ;
- 
-				 return DONE ;
+			        buildDataAccessMapping(object) ;
+			        
+			        processEList(object.getOwnedThreadSubcomponents()) ;
+			        
+			        _currentImplUnparser = _deploymentImplCode;
+					_deploymentImplCode.addOutputNewline("procedure Deployment is");
+					_deploymentImplCode.addOutputNewline("begin");
+
+			        List<String> dataSubcomponentNames = new ArrayList<String>();
+			        Map<String, DataSubcomponent> dataSubcomponentMapping = new HashMap<String, DataSubcomponent>();
+			        for(DataSubcomponent ds: object.getOwnedDataSubcomponents())
+			        {
+			          dataSubcomponentNames.add(ds.getName());
+			          if(false == _dataAccessMapping.containsValue(ds.getName()))
+			          {
+			        	  _deploymentImplCode.addOutput(ds.getName()+" : ") ;
+			        	  processDataSubcomponentType(ds.getDataSubcomponentType(), _deploymentImplCode, _deploymentHeaderCode);
+			        	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds)) ;
+			        	  _deploymentImplCode.addOutputNewline(";") ;
+			          }
+			          else
+			          {
+			        	  dataSubcomponentMapping.put(ds.getName(), ds);
+			          }
+			          process(ds.getDataSubcomponentType());
+			        }
+			        
+			        if(false == _dataAccessMapping.isEmpty())
+			        {
+			          List<String> treatedDeclarations = new ArrayList<String>();
+			          for(DataAccess d : _dataAccessMapping.keySet())
+			          {
+			        	if(treatedDeclarations.contains(_dataAccessMapping.get(d)))
+			        	{
+			        		continue;
+			        	}
+			        	else if(dataSubcomponentNames.contains(_dataAccessMapping.get(d)))
+			        	{
+			        	  DataSubcomponentType dst = d.getDataFeatureClassifier();
+			        	  String declarationID = _dataAccessMapping.get(d);
+			              processDataSubcomponentType(dst, _deploymentImplCode, _deploymentHeaderCode);
+			              _deploymentImplCode.addOutput(" "+declarationID);
+			              DataSubcomponent ds = dataSubcomponentMapping.get(_dataAccessMapping.get(d));
+			              if(ds!=null)
+			            	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds)) ;
+			        	  _deploymentImplCode.addOutputNewline(";") ;
+			              treatedDeclarations.add(declarationID);
+			        	}
+			          }
+			        }
+			    	_deploymentImplCode.addOutputNewline("end Deployment;");
+			        return DONE ;
 			 }
 			 		 
 			 // Builds the data access mapping via the connections described in the
