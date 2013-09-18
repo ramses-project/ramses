@@ -56,6 +56,7 @@ import org.osate.aadl2.SubprogramCallSequence;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramGroupAccess;
 import org.osate.aadl2.SubprogramImplementation;
+import org.osate.aadl2.SubprogramSubcomponent;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
@@ -1165,62 +1166,46 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseThreadImplementation(ThreadImplementation object)
 			 {
-				 	 
+		    	for(SubprogramSubcomponent sc:object.getOwnedSubprogramSubcomponents())
+		    	{
+		    		process(sc);
+		    	}
+	 
 				 if(_processedTypes.contains(object.getQualifiedName()))
 				 {
 					 return DONE ;
 				 }
-				 _processedTypes.add(object.getQualifiedName());
-				 _currentImplUnparser = _activityImplCode ;
-				 _currentHeaderUnparser = _activityHeaderCode ;
-				 buildDataAccessMapping(object) ;
-				 process(object.getType()) ;
+			        _processedTypes.add(object.getQualifiedName());
+			    	_currentImplUnparser = _activityImplCode ;
+			        _currentHeaderUnparser = _activityHeaderCode ;
+			        buildDataAccessMapping(object) ;
+			        process(object.getType()) ;
+			        
+					 _currentImplUnparser.addOutputNewline("function " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) +GenerationUtilsADA.THREAD_SUFFIX+" return 0 is") ;
+					 _currentImplUnparser.addOutputNewline("begin") ;
+					 
+			        _currentImplUnparser.incrementIndent() ;
 
-				 _currentImplUnparser.incrementIndent() ;
+			        for(DataSubcomponent d : object.getOwnedDataSubcomponents())
+			        {
+			          process(d) ;
+			        }
+			        
+			        _currentImplUnparser.addOutputNewline("while 1 loop") ;
+			        _currentImplUnparser.incrementIndent() ;
+			        
+			        processBehavioredImplementation(object);
+			        
+			        _activityImplCode.decrementIndent() ;
+			        _activityImplCode.addOutputNewline("end loop;") ;
+			        
+			        _activityImplCode.addOutputNewline("return 0;") ;
+			        _activityImplCode.decrementIndent() ;
+			        _activityImplCode.addOutputNewline("end "+ GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())) ;
+			        
+			        _activityHeaderCode.addOutputNewline("function " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+ "_Job return 0"+";") ;
 
-				 
-				 for(DataSubcomponent d : object.getOwnedDataSubcomponents())
-				 {
-					 process(d) ;
-				 }
-
-				 _currentImplUnparser.addOutputNewline("");
-				 
-				 _currentImplUnparser.addOutputNewline("function " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + "_Job"+" return null "+ "is") ;
-
-				 _currentImplUnparser.addOutputNewline("begin") ;
-
-				 
-				 _currentImplUnparser.addOutputNewline("loop") ;
-				 _currentImplUnparser.incrementIndent() ;
-				 			 					 
-						processBehavioredImplementation(object);
-						 
-						 _activityImplCode.decrementIndent() ;
-						 _activityImplCode.addOutputNewline("end loop;") ;
-						 _activityImplCode.addOutputNewline("--  Return error code");
-						 _activityImplCode.addOutputNewline("return null;");
-						 _activityImplCode.decrementIndent() ;
-						 _activityImplCode.addOutput("end " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + "_Job;") ;
-						 _activityImplCode.addOutputNewline("");						 
-
-
-						 _activityHeaderCode.addOutput("function " + GenerationUtilsADA
-						 .getGenerationADAIdentifier(object.getQualifiedName()) + "_Job") ;
-							 
-						 _activityHeaderCode.addOutputNewline(" return  null;");						 
-							 
-
-						 _currentImplUnparser.addOutputNewline("");
-						 						 
-							 _activityHeaderCode.addOutputNewline(");");
-
-							 _activityHeaderCode.addOutputNewline("");						 
-
-						 
-						 _currentImplUnparser.addOutputNewline("");
-						 
-						 return null ;
+			        return null ;
 			 }
 
 			 @Override
