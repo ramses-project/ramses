@@ -281,7 +281,10 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
       ArrayList<File> atlFiles = new ArrayList<File>() ;
       for(String resourceFileName : resourceFileNameList)
       {
-          atlFiles.add(new File(resourceDir + "/" + resourceFileName)) ;
+    	  String resourcePath = resourceFileName;
+    	  if(false == resourceFileName.startsWith(File.pathSeparator))
+    		  resourcePath=resourceDir+"/"+resourceFileName;
+          atlFiles.add(new File(resourcePath)) ;
       }
 
       try {
