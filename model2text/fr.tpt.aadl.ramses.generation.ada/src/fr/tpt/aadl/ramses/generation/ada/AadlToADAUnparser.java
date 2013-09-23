@@ -100,7 +100,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
     public static String deadline = null ;
     public static String dispatchProtocol = null;
     public static String priority =null;
-    public static String sourceText = null; 
+    public static List<String> sourceText = new ArrayList<String>(); 
 	// gtype.ads
 	protected AadlToADASwitchProcess _gtypesHeaderCode ;
 
@@ -192,82 +192,58 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 		try
 		{
-			String headerGuard = null ;
+			String headerGuard = null ;		
+    		String head = "";
 
-    		sourceText = AadlBaToADAUnparser.srcText;
+    		for (String s : AadlBaToADAUnparser.srcText)
+    		{   
+    			head = head+ "with "+s.replaceAll(".ads", "")+";"+"\n";
+    		}
     		
-    		
-			String addSubprogramsHeader_ADS = "";
-			String addSubprogramHeader_ADB = "";
-			String addGtypesHeader_ADS  = "";
-			String addActivityHeader_ADB = "";
-			String addDeploymentHeader_ADB = "";
-			String addActivityHeader_ADS = "";
-			String addDeploymentHeader_ADS = "";
-					
-			if (sourceText.endsWith(".h"))
-			{
-				headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("gtypes.ads") ;
-				addGtypesHeader_ADS = "pragma No_Run_Time;\nwith Interfaces.C;\nwith System; use System;\nwith APEX; use APEX;\nwith APEX.Blackboards; use APEX.Blackboards;\n" + headerGuard;
-
-				headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("subprograms.ads");
-			    addSubprogramsHeader_ADS = "with Gtypes; use Gtypes;\nwith System; use System;\nwith Interfaces.C;\n"+ headerGuard;
-
-				headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("activity.ads");
-				addActivityHeader_ADS = "pragma No_Run_Time;\nwith Interfaces.C;\nwith System;use System;\nwith Subprograms;use Subprograms;\nwith Gtypes; use Gtypes;\nwith APEX.Blackboards; use APEX.Blackboards\nwith APEX; use APEX;\nwith APEX.Timing; use APEX.Timing;\n" + headerGuard;
-
-			}
-        	else if (sourceText.endsWith(".ads"))
-        	{
-				headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("gtypes.ads") ;
-				addGtypesHeader_ADS = "pragma Style_Checks(\"NM32766\");\n" + headerGuard;
-
-				headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("subprograms.ads");
-			    addSubprogramsHeader_ADS = "pragma Style_Checks(\"NM32766\");\nwith Gtypes; use Gtypes;\n"+"with "+sourceText.replaceAll(".ads", "")+";\n"+ headerGuard;
-
-				headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("activity.ads");
-				addActivityHeader_ADS = "pragma Style_Checks(\"NM32766\");\nwith System;\nwith Ada.Real_Time;\nwith Subprograms;use Subprograms;\nwith Gtypes; use Gtypes;\nwith Rooting; use Rooting;\nwith PolyORB_HI.Errors;\nwith PolyORB_HI.Sporadic_Task;\nwith PolyORB_HI.Periodic_Task;\n" + headerGuard;
-        	}
-        	
 			// gtypes.ads
 			FileWriter typesFile_ADS =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/gtypes.ads") ;
+			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("gtypes.ads") ;
+			String addGtypesHeader_ADS = "pragma No_Run_Time;\nwith Interfaces.C;\nwith System; use System;\n" + headerGuard;
 			saveFile(typesFile_ADS, "", addGtypesHeader_ADS,
 					_gtypesHeaderCode.getOutput()) ;
 
 			// subprogram.adb
 			FileWriter subprogramsFile_ADB =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/subprograms.adb") ;
-			addSubprogramHeader_ADB = getAdditionalHeader(_subprogramImplCode) ;
+			String addSubprogramHeader_ADB = getAdditionalHeader(_subprogramImplCode) ;
 			saveFile(subprogramsFile_ADB, addSubprogramHeader_ADB,
 					_subprogramImplCode.getOutput()) ;
 
 			// subprogram.ads
 			FileWriter subprogramsFile_ADS =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/subprograms.ads") ;
+			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("subprograms.ads");
+			String addSubprogramsHeader_ADS = "with Gtypes; use Gtypes;\nwith System; use System;\nwith Interfaces.C;\n"+head+ headerGuard;
 			saveFile(subprogramsFile_ADS, "", addSubprogramsHeader_ADS,
 					_subprogramHeaderCode.getOutput()) ;
 
 			// activity.adb
 			FileWriter activityFile_ADB =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/activity.adb") ;
-			addActivityHeader_ADB = getAdditionalHeader(_activityImplCode) ;
+			String addActivityHeader_ADB = getAdditionalHeader(_activityImplCode) ;
 			saveFile(activityFile_ADB, addActivityHeader_ADB, _activityImplCode.getOutput()) ;
 
 			// activity.ads
 			FileWriter activityFile_ADS =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/activity.ads") ;
+			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("activity.ads");
+			String addActivityHeader_ADS = "pragma No_Run_Time;\nwith Interfaces.C;\nwith System;use System;\nwith Subprograms;use Subprograms;\nwith Gtypes; use Gtypes;\n" + headerGuard;
 			saveFile(activityFile_ADS, "",
 					addActivityHeader_ADS, _activityHeaderCode.getOutput()) ;
 
 			// partition's deployment.ads
-						FileWriter deploymentFile_ADS =
-								new FileWriter(targetDirectory.getAbsolutePath() + "/deployment.ads") ;
-						headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("deployment.ads");
-						addDeploymentHeader_ADS = "with Gtypes; use Gtypes;\n" + headerGuard;
-						saveFile(deploymentFile_ADS, "", MAIN_HEADER_INCLUSION,
-								addDeploymentHeader_ADS, _deploymentHeaderCode.getOutput()) ;
-
+			FileWriter deploymentFile_ADS =
+					new FileWriter(targetDirectory.getAbsolutePath() + "/deployment.ads") ;
+			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("deployment.ads");
+			String addDeploymentHeader_ADS = "with Gtypes; use Gtypes;\n" + headerGuard;
+			saveFile(deploymentFile_ADS, "", MAIN_HEADER_INCLUSION,
+					addDeploymentHeader_ADS, _deploymentHeaderCode.getOutput()) ;
 		
 		}
 		catch(IOException e)
@@ -1071,7 +1047,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			        processEList(object.getOwnedThreadSubcomponents()) ;
 
 			        sourceText = AadlBaToADAUnparser.srcText;
-			        if(sourceText.endsWith(".h"))
+			        			        
+			        if(sourceText.get(0).endsWith(".h"))
 			        {
 			        _activityHeaderCode.addOutputNewline("procedure Last_Chance_Handler " +
 						 		"(Source_Location :System.Address; Line : Integer);");
@@ -1221,7 +1198,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			        buildDataAccessMapping(object) ;
 			        process(object.getType()) ;
 			        
-					 _currentImplUnparser.addOutputNewline("function " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) +GenerationUtilsADA.THREAD_SUFFIX+" return 0 is") ;
+					 _currentImplUnparser.addOutputNewline("procedure " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) +GenerationUtilsADA.THREAD_SUFFIX+" is") ;
 					 _currentImplUnparser.addOutputNewline("begin") ;
 					 
 			        _currentImplUnparser.incrementIndent() ;
@@ -1241,13 +1218,13 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			        
 			        _activityImplCode.addOutputNewline("return 0;") ;
 			        _activityImplCode.decrementIndent() ;
-			        _activityImplCode.addOutputNewline("end "+ GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())) ;
+			        _activityImplCode.addOutputNewline("end "+ GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+";") ;
 			        
-			        _activityHeaderCode.addOutputNewline("function " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+ "_Job return 0"+";") ;
+			        _activityHeaderCode.addOutputNewline("procedure " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+ "_Job"+";") ;
 
 			        sourceText = AadlBaToADAUnparser.srcText;
 			        
-			        if(sourceText.endsWith(".h"))
+			        if(sourceText.get(0).endsWith(".h"))
 			        {
 			        _activityHeaderCode.addOutputNewline("pragma Export (C,"+GenerationUtilsADA
 							 .getGenerationADAIdentifier(object.qualifiedName()) + 

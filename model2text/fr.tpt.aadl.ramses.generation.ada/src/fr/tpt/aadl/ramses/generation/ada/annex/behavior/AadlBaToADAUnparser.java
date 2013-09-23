@@ -105,7 +105,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	  protected UnparseText _adbFileContent = null ;
 	  protected UnparseText _adsFileContent = null ;
 	  protected List<String> _additionalADS = new ArrayList<String>() ;
-	  public static String srcText =null;
+	  public static List<String> srcText =new ArrayList<String>();
 	  private NamedElement _owner ;
 	  
 	  public AadlBaToADAUnparser(AnnexSubclause subclause,
@@ -201,16 +201,17 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	      List<String> sourceText =
 	            PropertyUtils.getStringListValue(ne, "Source_Text") ;
 	      aadlbaText.addOutput(sourceName) ;
-	      
+	      	      
 	      for(String s : sourceText)
 	      {
-	        if(s.endsWith(".ads") || s.endsWith(".h"))
+	    	  if((s.endsWith(".ads") || s.endsWith(".h")))
 	        {
-	        	srcText = s;
-	        	_additionalADS.add(s) ;
-	          return true;
+	    		 srcText.add(s);	    		  
+	        	_additionalADS.add(s);
+	        	return true;
 	        }
 	      }
+	      
 	      throw new Exception("In component "+ne.getName()+": Source_Text " +
 	      		"property should also reference a ads (.ads extension) file");
 	    }
@@ -220,14 +221,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	    }
 	  }
 
-	  /*
-	   * 
-	   * 
-	   * 
-	   */
-
-	   /* 
-	   */
 	  protected static String getInitialStateIdentifier(BehaviorAnnex ba)
 	  {
 	    for(BehaviorState s : ba.getStates())
