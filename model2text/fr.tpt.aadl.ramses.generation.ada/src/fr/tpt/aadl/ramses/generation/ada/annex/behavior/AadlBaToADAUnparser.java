@@ -197,7 +197,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	    {
 	      NamedElement ne = object ;
 	      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-	      
+	      	      
 	      List<String> sourceText =
 	            PropertyUtils.getStringListValue(ne, "Source_Text") ;
 	      aadlbaText.addOutput(sourceName) ;
@@ -701,7 +701,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	      {
 	        ElementValues set = object.getIteratedValues() ;
 
-	        if(set instanceof IntegerRange)
 	        {
 	          IntegerRange range = (IntegerRange) set ;
 	          String lowerRangeValue = this.toInteger(range.getLowerIntegerValue()) ;
