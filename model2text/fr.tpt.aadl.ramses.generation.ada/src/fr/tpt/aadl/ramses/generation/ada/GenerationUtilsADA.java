@@ -1,5 +1,6 @@
 package fr.tpt.aadl.ramses.generation.ada;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +17,8 @@ import fr.tpt.aadl.utils.PropertyUtils;
 public class GenerationUtilsADA
 {
 	public final static String THREAD_SUFFIX = "_Job" ;
+    public static List<String> srcText =new ArrayList<String>();
+
 	  
 	  // Give file name, in upper case or not and with or without extension.
 	  public static String generateHeaderInclusionGuard(String fileName)
@@ -222,6 +225,7 @@ public class GenerationUtilsADA
 			  {
 				  if(s.endsWith(".ads"))
 				  {
+					  srcText.add(s);
 					  additionalHeaders.add(s) ;
 				  }
 			  }

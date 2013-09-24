@@ -1,23 +1,55 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2012 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
+/**
+ * Author: Etienne Borde
+ */
+
 package fr.tpt.aadl.ramses.generation.ada.annex.behavior;
 
-
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.AbstractEnumerator;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.xtext.EcoreUtil2;
+import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
+import org.osate.aadl2.BehavioredImplementation;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.ParameterConnectionEnd;
+import org.osate.aadl2.PrototypeBinding;
+import org.osate.aadl2.Subprogram;
+import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
@@ -43,11 +75,13 @@ import fr.tpt.aadl.annex.behavior.aadlba.BehaviorStringLiteral;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTime;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable;
+import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariableHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.BinaryNumericOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.CalledSubprogramHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataAccessHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
+import fr.tpt.aadl.annex.behavior.aadlba.DataHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DataSubcomponentHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchCondition;
 import fr.tpt.aadl.annex.behavior.aadlba.DispatchConjunction;
@@ -68,6 +102,7 @@ import fr.tpt.aadl.annex.behavior.aadlba.LockAction;
 import fr.tpt.aadl.annex.behavior.aadlba.LogicalOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.MultiplyingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.Otherwise;
+import fr.tpt.aadl.annex.behavior.aadlba.ParameterHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.ParameterLabel;
 import fr.tpt.aadl.annex.behavior.aadlba.PortCountValue;
 import fr.tpt.aadl.annex.behavior.aadlba.PortDequeueAction;
@@ -79,12 +114,14 @@ import fr.tpt.aadl.annex.behavior.aadlba.Relation;
 import fr.tpt.aadl.annex.behavior.aadlba.RelationalOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression;
 import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
+import fr.tpt.aadl.annex.behavior.aadlba.SubprogramHolder;
 import fr.tpt.aadl.annex.behavior.aadlba.Term;
 import fr.tpt.aadl.annex.behavior.aadlba.TimedAction;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryAddingOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryBooleanOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.UnaryNumericOperator;
 import fr.tpt.aadl.annex.behavior.aadlba.UnlockAction;
+import fr.tpt.aadl.annex.behavior.aadlba.Value;
 import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression;
 import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement;
 import fr.tpt.aadl.annex.behavior.aadlba.util.AadlBaSwitch;
@@ -93,1268 +130,1447 @@ import fr.tpt.aadl.annex.behavior.unparser.AadlBaUnparser;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
 import fr.tpt.aadl.annex.behavior.utils.DimensionException;
+import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
-import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparser;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 
+
 public class AadlBaToADAUnparser extends AadlBaUnparser
 {
-	protected Map<DataAccess, String> _dataAccessMapping = null ;
-	  protected UnparseText _adbFileContent = null ;
-	  protected UnparseText _adsFileContent = null ;
-	  protected List<String> _additionalADS = new ArrayList<String>() ;
-	  public static List<String> srcText =new ArrayList<String>();
-	  private NamedElement _owner ;
-	  
-	  public AadlBaToADAUnparser(AnnexSubclause subclause,
-	                           String indent,
-	                           Map<DataAccess, String> dataAccessMapping)
-	  {
-	    super(subclause, indent) ;
-	    _dataAccessMapping = dataAccessMapping ;
-	  }
 
-	  public AadlBaToADAUnparser()
-	  {
-	    super() ;
-	  }
+  protected Map<DataAccess, String> _dataAccessMapping = null ;
+  protected UnparseText _adaFileContent = null ;
+  protected UnparseText _headerFileContent = null ;
+  protected Set<String> _additionalHeaders = new HashSet<String>() ;
+  private NamedElement _owner ;
 
-	  public void setDataAccessMapping(Map<DataAccess, String> dataAccessMapping)
-	  {
-	    _dataAccessMapping = dataAccessMapping ;
-	  }
-	  
-	  public String getCContent()
-	  {
-	    return _adbFileContent.getParseOutput() ;
-	  }
+  public AadlBaToADAUnparser(AnnexSubclause subclause,
+                           String indent,
+                           Map<DataAccess, String> dataAccessMapping)
+  {
+    super(subclause, indent) ;
+    _dataAccessMapping = dataAccessMapping ;
+  }
 
-	  public String getHContent()
-	  {
-	    return _adsFileContent.getParseOutput() ;
-	  }
+  public AadlBaToADAUnparser()
+  {
+    super() ;
+  }
 
-	  public List<String> getAdditionalHeaders()
-	  {
-		  _adsFileContent = new UnparseText() ;
-	    return _additionalADS ;
-	  }
+  public void setDataAccessMapping(Map<DataAccess, String> dataAccessMapping)
+  {
+    _dataAccessMapping = dataAccessMapping ;
+  }
+  
+  public String getADAContent()
+  {
+    return _adaFileContent.getParseOutput() ;
+  }
 
-	  public void processEList(UnparseText aadlText,
-	                           EList<?> list,
-	                           String separator)
-	  {
-	    boolean first = true ;
+  public String getADSContent()
+  {
+    return _headerFileContent.getParseOutput() ;
+  }
 
-	    for(Iterator<?> it = list.iterator() ; it.hasNext() ;)
-	    {
-	      if(!first)
-	      {
-	        if(separator == AadlConstants.newlineChar)
-	        {
-	          aadlText.addOutputNewline(AadlConstants.emptyString) ;
-	        }
-	        else
-	        {
-	          aadlText.addOutput(separator) ;
-	        }
-	      }
+  public Set<String> getAdditionalHeaders()
+  {
+    return _additionalHeaders ;
+  }
 
-	      first = false ;
-	      Object o = it.next() ;
+  public void processEList(UnparseText aadlText,
+                           EList<?> list,
+                           String separator)
+  {
+    boolean first = true ;
 
-	      if(o instanceof ElementHolder)
-	      {
-	        process((ElementHolder) o) ;
-	      }
-	      else if(o instanceof AbstractEnumerator)
-	        aadlText.addOutput(((AbstractEnumerator) o).getName().toLowerCase()) ;
-	      else if(o instanceof String)
-	      {
-	        aadlText.addOutput((String) o) ;
-	      }
-	      else
-	      {
-	        aadlText.addOutput("processEList") ;
-	      }
-	    }
-	  }
+    for(Iterator<?> it = list.iterator() ; it.hasNext() ;)
+    {
+      if(!first)
+      {
+        if(separator == AadlConstants.newlineChar)
+        {
+          aadlText.addOutputNewline(AadlConstants.emptyString) ;
+        }
+        else
+        {
+          aadlText.addOutput(separator) ;
+        }
+      }
 
-	  public void processEList(UnparseText aadlText,
-	                           final List<? extends BehaviorElement> list)
-	  {
-	    for(Iterator<? extends BehaviorElement> it = list.iterator() ; it.hasNext() ;)
-	    {
-	      process(it.next()) ;
-	    }
-	  }
+      first = false ;
+      Object o = it.next() ;
 
-	  public boolean resolveExistingCodeDependencies(NamedElement object)
-	  {		    
-	    try
-	    {
-	      NamedElement ne = object ;
-	      String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-	      	      
-	      List<String> sourceText =
-	            PropertyUtils.getStringListValue(ne, "Source_Text") ;
-	      aadlbaText.addOutput(sourceName) ;
-	      	      
-	      for(String s : sourceText)
-	      {
-	    	  if((s.endsWith(".ads") || s.endsWith(".h")))
-	        {
-	    		 srcText.add(s);	    		  
-	        	_additionalADS.add(s);
-	        	return true;
-	        }
-	      }
-	      
-	      throw new Exception("In component "+ne.getName()+": Source_Text " +
-	      		"property should also reference a ads (.ads extension) file");
-	    }
-	    catch(Exception e)
-	    {
-	      return false ;
-	    }
-	  }
+      if(o instanceof ElementHolder)
+      {
+        process((ElementHolder) o) ;
+      }
+      else if(o instanceof AbstractEnumerator)
+        aadlText.addOutput(((AbstractEnumerator) o).getName().toLowerCase()) ;
+      else if(o instanceof String)
+      {
+        aadlText.addOutput((String) o) ;
+      }
+      else
+      {
+        aadlText.addOutput("processEList: oh my, oh my!!") ;
+      }
+    }
+  }
 
-	  protected static String getInitialStateIdentifier(BehaviorAnnex ba)
-	  {
-	    for(BehaviorState s : ba.getStates())
-	    {
-	      if(s.isInitial())
-	      {
-	        return s.getName() ;
-	      }
-	    }
+  public void processEList(UnparseText aadlText,
+                           final List<? extends BehaviorElement> list)
+  {
+    for(Iterator<? extends BehaviorElement> it = list.iterator() ; it.hasNext() ;)
+    {
+      process(it.next()) ;
+    }
+  }
 
-	    return null ;
-	  }
+  
 
-	  protected static String getTargetLanguageOperator(LogicalOperator operator)
-	  {
-	    if(operator.equals(LogicalOperator.AND))
-	    {
-	      return "and" ;
-	    }
+  protected static String getInitialStateIdentifier(BehaviorAnnex ba)
+  {
+    for(BehaviorState s : ba.getStates())
+    {
+      if(s.isInitial())
+      {
+        return s.getName() ;
+      }
+    }
 
-	    if(operator.equals(LogicalOperator.OR))
-	    {
-	      return "or" ;
-	    }
+    return null ;
+  }
 
-	    if(operator.equals(LogicalOperator.XOR))
-	    {
-	      return "xor" ;
-	    }
+  protected static String getTargetLanguageOperator(LogicalOperator operator)
+  {
+    if(operator.equals(LogicalOperator.AND))
+    {
+      return "and" ;
+    }
 
-	    return operator.getLiteral() ;
-	  }
+    if(operator.equals(LogicalOperator.OR))
+    {
+      return "or" ;
+    }
 
-	  protected static String getTargetLanguageOperator(MultiplyingOperator operator)
-	  {
-	    if(operator.equals(MultiplyingOperator.DIVIDE))
-	    {
-	      return "/" ;
-	    }
+    if(operator.equals(LogicalOperator.XOR))
+    {
+      return "xor" ;
+    }
 
-	    if(operator.equals(MultiplyingOperator.MULTIPLY))
-	    {
-	      return "*" ;
-	    }
+    return operator.getLiteral() ;
+  }
+  
+  protected static String getTargetLanguageOperator(MultiplyingOperator operator)
+  {
+    if(operator.equals(MultiplyingOperator.DIVIDE))
+    {
+      return "/" ;
+    }
 
-	    if(operator.equals(MultiplyingOperator.MOD))
-	    {
-	      return "mod" ;
-	    }
+    if(operator.equals(MultiplyingOperator.MULTIPLY))
+    {
+      return "*" ;
+    }
 
-	    // TODO: find mapping for REM operator
-	    if(operator.equals(MultiplyingOperator.REM))
-	    {
-	      throw new UnsupportedOperationException() ;
-	    }
+    if(operator.equals(MultiplyingOperator.MOD))
+    {
+      return "mod" ;
+    }
 
-	    return operator.getLiteral() ;
-	  }
+    // TODO: find mapping for REM operator
+    if(operator.equals(MultiplyingOperator.REM))
+    {
+      throw new UnsupportedOperationException() ;
+    }
 
-	  protected static String getTargetLanguageOperator(UnaryNumericOperator operator)
-	  {
-	    if(operator.equals(UnaryNumericOperator.ABS))
-	    {
-	      return "aadl_runtime_abs" ;
-	    }
+    return operator.getLiteral() ;
+  }
 
-	    return operator.getLiteral() ;
-	  }
+  protected static String getTargetLanguageOperator(UnaryNumericOperator operator)
+  {
+    if(operator.equals(UnaryNumericOperator.ABS))
+    {
+      return "aadl_runtime_abs" ;
+    }
 
-	  protected static String getTargetLanguageOperator(BinaryNumericOperator operator)
-	  {
-	    if(operator.equals(UnaryNumericOperator.ABS))
-	    {
-	      return "aadl_runtime_exp(" ;
-	    }
+    return operator.getLiteral() ;
+  }
 
-	    return operator.getLiteral() ;
-	  }
+  protected static String getTargetLanguageOperator(BinaryNumericOperator operator)
+  {
+    if(operator.equals(UnaryNumericOperator.ABS))
+    {
+      return "aadl_runtime_exp(" ;
+    }
 
-	  protected static String getTargetLanguageOperator(UnaryBooleanOperator operator)
-	  {
-	    if(operator.equals(UnaryBooleanOperator.NOT))
-	    {
-	      return "not" ;
-	    }
+    return operator.getLiteral() ;
+  }
 
-	    return operator.getLiteral() ;
-	  }
+  protected static String getTargetLanguageOperator(UnaryBooleanOperator operator)
+  {
+    if(operator.equals(UnaryBooleanOperator.NOT))
+    {
+      return "not" ;
+    }
 
-	  protected static String getTargetLanguageOperator(RelationalOperator operator)
-	  {
-	    if(operator.equals(RelationalOperator.EQUAL))
-	    {
-	      return "=" ;
-	    }
+    return operator.getLiteral() ;
+  }
 
-	    if(operator.equals(RelationalOperator.NOT_EQUAL))
-	    {
-	      return "/=" ;
-	    }
+  protected static String getTargetLanguageOperator(RelationalOperator operator)
+  {
+    if(operator.equals(RelationalOperator.EQUAL))
+    {
+      return "=" ;
+    }
 
-	    return operator.getLiteral() ;
-	  }
+    if(operator.equals(RelationalOperator.NOT_EQUAL))
+    {
+      return "/=" ;
+    }
 
-	  @Override
-	  protected void initSwitches()
-	  {
-	    aadlbaSwitch = new AadlBaSwitch<String>()
-	    {
-	      /**
-	       * Top-level method to unparse "behavior_specification"
-	       * annexsubclause
-	       */
-	      @Override
-		public String caseAnnexSubclause(AnnexSubclause object)
-	      {
-	        process((BehaviorAnnex) object) ;
-	        return DONE ;
-	      }
+    return operator.getLiteral() ;
+  }
 
-	      /**
-	       * Unparse behaviorannex
-	       */
-	      @Override
-		public String caseBehaviorAnnex(BehaviorAnnex object)
-	      {
-	    	BehaviorAnnex ba = object ;
-	    	NamedElement aadlComponent = _owner ;
-	    	String aadlComponentADAId =
-	    		  GenerationUtilsADA.getGenerationADAIdentifier(aadlComponent
-	                  .getQualifiedName()) ;
-	        
-	        _adbFileContent = new UnparseText() ;
-	        _adsFileContent = new UnparseText() ;
-	        
-	        _adbFileContent.addOutputNewline("current_state : "+aadlComponentADAId +
+  @Override
+  protected void initSwitches()
+  {
+    aadlbaSwitch = new AadlBaSwitch<String>()
+    {
+
+	/**
+       * Top-level method to unparse "behavior_specification"
+       * annexsubclause
+       */
+      public String caseAnnexSubclause(AnnexSubclause object)
+      {
+        process((BehaviorAnnex) object) ;
+        return DONE ;
+      }
+
+      /**
+       * Unparse behaviorannex
+       */
+      public String caseBehaviorAnnex(BehaviorAnnex object)
+      {
+    	BehaviorAnnex ba = (BehaviorAnnex) object ;
+    	NamedElement aadlComponent = _owner ;
+    	String aadlComponentADAId =
+    		  GenerationUtilsADA.getGenerationADAIdentifier(aadlComponent
+                  .getQualifiedName()) ;
+
+        _adaFileContent = new UnparseText() ;
+        _headerFileContent = new UnparseText() ;
+        
+        _adaFileContent.addOutputNewline("current_state : "+aadlComponentADAId +
 	              "_BA_State_t := " + aadlComponentADAId + "_" +
 	              AadlBaToADAUnparser.getInitialStateIdentifier(ba) + ";") ;
-	        _adbFileContent.addOutputNewline("final : integer := 0;") ;
-	        _adbFileContent.addOutputNewline("begin");
-	        processEList(_adbFileContent, ba.getVariables()) ;
-	        _adbFileContent.addOutputNewline("while (final /= 1) loop") ;
-	        _adbFileContent.incrementIndent() ;
-	        _adbFileContent.addOutputNewline("case current_state is") ;
-	        _adbFileContent.incrementIndent() ;
-	        _adsFileContent.addOutputNewline("type "+aadlComponentADAId +
-		              "_BA_State_t"+ " is (") ;
-	        _adsFileContent.incrementIndent() ;
+        _adaFileContent.addOutputNewline("final : integer := 0;") ;
+        _adaFileContent.addOutputNewline("begin");
 
-	        for(BehaviorState state : ba.getStates())
-	        {
-	          if(AadlBaVisitors.getTransitionWhereSrc
-	                (state).isEmpty() == false)
-	          {
-	            _adbFileContent.addOutputNewline("when " + aadlComponentADAId + "_" +
-	                  state.getName() + " => ") ;
-	            processEList(_adbFileContent, AadlBaVisitors.
-	                         getTransitionWhereSrc(state)) ;
-	          }
-	          
-	          if(AadlBaVisitors.getTransitionWhereSrc
-		                (state).isEmpty() == true)
-		          {
-		            _adbFileContent.addOutputNewline("when " + aadlComponentADAId + "_" +
-		                  state.getName() + " => ") ;
-		            _adbFileContent.addOutputNewline("null;");
-		            processEList(_adbFileContent, AadlBaVisitors.
-		                         getTransitionWhereSrc(state)) ;
-		          }
-	          
-	          String stateADAId = GenerationUtilsADA.
-	                getGenerationADAIdentifier(aadlComponent.getQualifiedName()+
-	                                         "_"+state.getName());
-	          _adsFileContent.addOutput(stateADAId);
+        processEList(_adaFileContent, ba.getVariables()) ;
+        
+        _adaFileContent.addOutputNewline("while (final /= 1) loop") ;
+        _adaFileContent.incrementIndent() ;
+        _adaFileContent.addOutputNewline("case current_state is") ;
+        _adaFileContent.incrementIndent() ;
+
+        _headerFileContent.addOutputNewline("type "+ aadlComponentADAId +
+                "_BA_State_t(") ;
+        _headerFileContent.incrementIndent() ;
+
+        for(BehaviorState state : ba.getStates())
+        {
+          if(AadlBaVisitors.getTransitionWhereSrc
+                (state).isEmpty() == false)
+          {
+            _adaFileContent.addOutputNewline("when " + aadlComponentADAId + "_" +
+                  state.getName() + " => ") ;
+            processEList(_adaFileContent, (ArrayList<BehaviorTransition>) AadlBaVisitors.
+                         getTransitionWhereSrc(state)) ;
+          }
+          
+          String stateADAId = GenerationUtilsADA.
+                getGenerationADAIdentifier(aadlComponent.getQualifiedName()+
+                                         "_"+state.getName());
+          _headerFileContent.addOutput(stateADAId);
 
 
-	          if(ba.getStates().indexOf(state) < ba.getStates()
-	                .size() - 1)
-	          {
-	            _adsFileContent.addOutput(",") ;
-	          }
+          if(ba.getStates().indexOf(state) < ba.getStates()
+                .size() - 1)
+          {
+            _headerFileContent.addOutput(",") ;
+          }
 
-	          _adsFileContent.addOutputNewline("") ;
-	        }
+          _headerFileContent.addOutputNewline("") ;
+        }
 
-	        
-	        _adsFileContent.decrementIndent() ;
-	        _adsFileContent.addOutputNewline(");") ;
-	        _adsFileContent.addOutputNewline("") ;
-	        _adbFileContent.decrementIndent() ;
-	        _adbFileContent.decrementIndent() ;
-	        _adbFileContent.addOutputNewline("") ;
-	        
-	        _adbFileContent.incrementIndent();
-	        _adbFileContent.addOutputNewline("end case;") ;
+        _headerFileContent.decrementIndent() ;
+        _headerFileContent.addOutputNewline(");") ;
+        _headerFileContent.addOutputNewline("") ;
+        _adaFileContent.decrementIndent() ;
+        _adaFileContent.addOutputNewline("end case;") ;
+        
+        _adaFileContent.decrementIndent() ;
+        _adaFileContent.addOutputNewline("end loop;") ;
+        _adaFileContent.decrementIndent() ;
+        
+        return DONE ;
+      }
 
-	        _adbFileContent.decrementIndent();
-	        _adbFileContent.addOutputNewline("end loop;") ;
-	        
-	        return DONE ;
-	      }
+      /**
+       * Unparse behaviorvariable
+       */
+      public String caseBehaviorVariable(BehaviorVariable object)
+      {
+        String sourceName ;
+        try
+        {
+          sourceName = PropertyUtils.
+                getStringValue(object.getDataClassifier(), "Source_Name") ;
+        }
+        catch (Exception e)
+        {
+          sourceName = GenerationUtilsADA.
+                getGenerationADAIdentifier(object.
+                                         getDataClassifier().getQualifiedName());
+        }
+        _adaFileContent.addOutput(sourceName);
+        _adaFileContent.addOutput(" : " + object.getName()) ;
+        caseArrayDimensions(object.getArrayDimensions()) ;
+        String init = GeneratorUtils.getInitialValue(object.getDataClassifier()) ;
+        if(!init.isEmpty())
+        {
+        	_adaFileContent.addOutput(" := "+init) ;
+        }
+        _adaFileContent.addOutputNewline(";") ;
+        return DONE ;
+      }
 
-	      /**
-	       * Unparse behaviorvariable
-	       */
-	      @Override
-		public String caseBehaviorVariable(BehaviorVariable object)
-	      {
-	        String sourceName ;
-	        try
-	        {
-	          sourceName = PropertyUtils.
-	                getStringValue(object.getDataClassifier(), "Source_Name") ;
-	        }
-	        catch (Exception e)
-	        {
-	          sourceName = GenerationUtilsADA.
-	                getGenerationADAIdentifier(object.
-	                                         getDataClassifier().getQualifiedName());
-	        }
-	        _adbFileContent.addOutput(sourceName);
-	        _adbFileContent.addOutput(" : " + object.getName()) ;
-	        caseArrayDimensions(object.getArrayDimensions()) ;
-	        String init = GeneratorUtils.getInitialValue(object.getDataClassifier()) ;
-	        if(!init.isEmpty())
-	        {
-	        	_adbFileContent.addOutput(" := "+init) ;
-	        }
-	        _adbFileContent.addOutputNewline(";") ;
-	        return DONE ;
-	      }
+      /**
+       * Unparse arraysize
+       */
+      public String caseArrayDimensions(EList<ArrayDimension> arrayDimensions)
+      {
+        for(ArrayDimension ivc : arrayDimensions)
+        {
+          _adaFileContent.addOutput("(") ;
+          _adaFileContent.addOutput(Long.toString(ivc.getSize().getSize()));
+          _adaFileContent.addOutput(")") ;
+        }
 
-	      /**
-	       * Unparse arraysize
-	       */
-	      public String caseArrayDimensions(EList<ArrayDimension> arrayDimensions)
-	      {
-	        for(ArrayDimension ivc : arrayDimensions)
-	        {
-	          _adbFileContent.addOutput("( 0 .. ") ;
-	          _adbFileContent.addOutput(Long.toString(ivc.getSize().getSize() - 1));
-	          _adbFileContent.addOutput(" )") ;
-	        }
+        return DONE ;
+      }
 
-	        return DONE ;
-	      }
+      public String caseBehaviorEnumerationLiteral(BehaviorEnumerationLiteral object)
+      {
+        // ComponentPropertyValue is defined to refer Enumerated data
+    	NamedElement component = object.getComponent();
+    	if(component!=null)
+    	{
+    		try
+    	    {
+    	      _adaFileContent.addOutput(object.getEnumLiteral().getValue());
+    	    }
+    		catch(Exception e)
+    		{
+    			_adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(component.getQualifiedName())+"_"+object.getEnumLiteral().getValue());
+    		}
+    	}
+    	else
+    		_adaFileContent.addOutput(object.getEnumLiteral().getValue());
+        
+        return DONE ;
+      }
+      
+      /**
+       * Unparse DataComponentReference
+       */
+      public String caseDataComponentReference(DataComponentReference object)
+      {
+    	Iterator<DataHolder> itDataHolder = object.getData().iterator() ;
+    	process(itDataHolder.next());
+        while(itDataHolder.hasNext())
+        {
+        	_adaFileContent.addOutput(".");
+        	_adaFileContent.addOutput(((DataHolder)itDataHolder.next()).getElement().getName());
+        }
 
-	      @Override
-		public String caseBehaviorEnumerationLiteral(BehaviorEnumerationLiteral object)
-	      {
-	        // ComponentPropertyValue is defined to refer Enumerated data
-	        _adbFileContent.addOutput(object.getEnumLiteral().getValue());
-	        return DONE ;
-	      }
+        return DONE ;
+      }
 
-	      /**
-	       * Unparse behaviorstate
-	       * @object: input parameter, destination of a Behavior Transition
-	       */
-	      @Override
-		public String caseBehaviorState(BehaviorState object)
-	      {
-	        NamedElement aadlComponent = _owner ;
-	        String aadlComponentADAId =
-	              GenerationUtilsADA.getGenerationADAIdentifier(aadlComponent
-	                    .getQualifiedName()) ;
-	        _adbFileContent.addOutputNewline("current_state := " + aadlComponentADAId +
-	              "_" + object.getName() + ";") ;
-	        //if (object.isComplete())
+      /**
+       * Unparse behaviorstate
+       * @object: input parameter, destination of a Behavior Transition
+       */
+      public String caseBehaviorState(BehaviorState object)
+      {
+        NamedElement aadlComponent = _owner ;
+        String aadlComponentADAId =
+              GenerationUtilsADA.getGenerationADAIdentifier(aadlComponent
+                    .getQualifiedName()) ;
+        //if (object.isComplete())
 
-	        if(object.isFinal())
-	        {
-	          _adbFileContent.addOutputNewline("final := 1;") ;
-	        }
+        if(object.isFinal())
+        {
+          _adaFileContent.addOutputNewline("final := 1;") ;
+        }
+        else
+        {
+          _adaFileContent.addOutputNewline("current_state := " + aadlComponentADAId +
+                    "_" + object.getName() + ";") ;
+          _adaFileContent.addOutputNewline("exit;") ;
+        }
+        return DONE ;
+      }
 
-	        return DONE ;
-	      }
-
-	      
-	      /**
-	       * Unparse behaviortransition
-	       */
-	      @Override
-		public String caseBehaviorTransition(BehaviorTransition object)
-	      {
-	        aadlbaText = _adbFileContent ;
-	        long num = object.getPriority() ;
-
-	        _adbFileContent.addOutput("-- Transition id: " + object.getName()) ;
-
-
-	        if(num != -1) // numeral
-	        {
-	          _adbFileContent.addOutput(" -- Priority " +
-	                String.valueOf(num)) ;
-	        }
-
-	        _adbFileContent.addOutputNewline("") ;
-
-	        if(object.getCondition() != null)
-	        {
-	          if(object.getCondition() instanceof Otherwise)
-	          {
-	            _adbFileContent.addOutput("else") ;
-	            process(object.getCondition()) ;
-	          }
-	          else
-	          {
-	            _adbFileContent.addOutput("if ") ;
-	            process(object.getCondition()) ;
-	            _adbFileContent.addOutputNewline(" then") ;
-	          }
-	        }
-	        else
-	        {
-	          _adbFileContent.addOutputNewline("if TRUE then -- no execution condition") ;
-	        }
-
-	        //_adbFileContent.addOutputNewline("{") ;
-	        _adbFileContent.incrementIndent() ;
-
-	        if(object.getActionBlock() != null)
-	        {
-	          process(object.getActionBlock()) ;
-	        }
-
-	        process(object.getDestinationState()) ;
-	        _adbFileContent.decrementIndent() ;
-	        
-	        _adbFileContent.addOutputNewline("end if;") ;
-	        
-	        return DONE ;
-	      }
+      
+      /**
+       * Unparse behaviortransition
+       */
+      public String caseBehaviorTransition(BehaviorTransition object)
+      {
+        aadlbaText = _adaFileContent ;
+        long num = object.getPriority() ;
 
 
-	      @Override
-		public String caseOtherwise(Otherwise object)
-	      {
-	        _adbFileContent.addOutputNewline(" --otherwise") ;
-	        return DONE ;
-	      }
+        _adaFileContent.addOutput("-- Transition id: " + object.getName()) ;
 
-	      /**
-	       * Unparse dispatchcondition
-	       */
-	      @Override
-		public String caseDispatchCondition(DispatchCondition object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
 
-	      @Override
-		public String caseDispatchTriggerConditionStop(DispatchTriggerConditionStop object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+        if(num != -1) // numeral
+        {
+          _adaFileContent.addOutput(" -- Priority " +
+                String.valueOf(num)) ;
+        }
 
-	      @Override
-		public String caseDispatchTriggerLogicalExpression(DispatchTriggerLogicalExpression object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+        _adaFileContent.addOutputNewline("") ;
 
-	      @Override
-		public String caseDispatchConjunction(DispatchConjunction object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+        if(object.getCondition() != null)
+        {
+          if(object.getCondition() instanceof Otherwise)
+          {
+            _adaFileContent.addOutput("else") ;
+            process(object.getCondition()) ;
+          }
+          else
+          {
+            _adaFileContent.addOutput("if ") ;
+            process(object.getCondition()) ;
+            _adaFileContent.addOutputNewline(" then") ;
+          }
+        }
+        else
+        {
+          _adaFileContent.addOutputNewline("if TRUE then -- no execution condition") ;
+        }
 
-	      @Override
-		public String caseBehaviorActionBlock(BehaviorActionBlock object)
-	      {
-	        process(object.getContent()) ;
+        _adaFileContent.incrementIndent() ;
 
-	        if(object.getTimeout() != null)
-	        {
-	          throw new UnsupportedOperationException() ;
-	        }
+        if(object.getActionBlock() != null)
+        {
+          process(object.getActionBlock()) ;
+        }
 
-	        return DONE ;
-	      }
+        process((BehaviorState) object.getDestinationState()) ;
+        _adaFileContent.decrementIndent() ;
+        _adaFileContent.addOutputNewline("end if;") ;
+        return DONE ;
+      }
 
-	      @Override
-		public String caseBehaviorActionSequence(BehaviorActionSequence object)
-	      {
-	        processEList(_adbFileContent, object.getActions()) ;
-	        return DONE ;
-	      }
 
-	      @Override
-		public String caseBehaviorActionSet(BehaviorActionSet object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String caseOtherwise(Otherwise object)
+      {
+        _adaFileContent.addOutputNewline(" --otherwise") ;
+        return DONE ;
+      }
 
-	      
-	      /**
-	       * Unparse elsestatement
-	       */
-	      @Override
-		public String caseElseStatement(ElseStatement object)
-	      {
-	        BehaviorActions lba = object.getBehaviorActions() ;
-	        _adbFileContent.addOutput("else ") ;
-	        _adbFileContent.addOutputNewline("") ;
-	        process(lba) ;
-	        _adbFileContent.addOutputNewline("end if;") ;
-	        return DONE ;
-	      }
-	      
-	      /**
-	       * Unparse ifstatement
-	       */
-	      @Override
-		public String caseIfStatement(IfStatement object)
-	      {
-	        ValueExpression ve = object.getLogicalValueExpression() ;
-	        BehaviorActions lba = object.getBehaviorActions() ;
+      /**
+       * Unparse dispatchcondition
+       */
+      public String caseDispatchCondition(DispatchCondition object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	        if(object.eContainer() instanceof IfStatement)
-	        {
-	          _adbFileContent.addOutput("elsif ") ;
-	          process(ve) ;
-	          _adbFileContent.addOutput(" then") ;
-	        }
-	        else
-	        {
-	          _adbFileContent.addOutput("if ") ;
-	          process(ve) ;
-	          _adbFileContent.addOutput(" then") ;
-	        }
-	        
-	        _adbFileContent.addOutputNewline("") ;
-	        process(lba) ;
-	        _adbFileContent.addOutputNewline("end if; --DEBUG: REVENIR ICI") ;
+      public String caseDispatchTriggerConditionStop(DispatchTriggerConditionStop object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	        return DONE ;
-	      }
+      public String caseDispatchTriggerLogicalExpression(DispatchTriggerLogicalExpression object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      public String toInteger(IntegerValue integerValue)
-	      {
-	        if(integerValue instanceof IntegerValueConstant)
-	        {
-	          return Long.toString(((BehaviorIntegerLiteral) integerValue)
-	                .getValue()) ;
-	        }
+      public String caseDispatchConjunction(DispatchConjunction object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	        if(integerValue instanceof IntegerValueVariable)
-	        {
-	          if(integerValue instanceof BehaviorVariable)
-	          {
-	            return ((BehaviorVariable) integerValue).getDataClassifier()
-	                  .getName();
-	          }
+      public String caseBehaviorActionBlock(BehaviorActionBlock object)
+      {
+        process(object.getContent()) ;
 
-	          if(integerValue instanceof DataComponentReference)
-	          {
-	            return ((BehaviorVariable) integerValue).getDataClassifier()
-	                  .getName();
-	          }
-	        }
+        if(object.getTimeout() != null)
+        {
+          throw new UnsupportedOperationException() ;
+        }
 
-	        return "" ;
-	      }
+        return DONE ;
+      }
 
-	      /**
-	       * Unparse fororforallstatement
-	       */
-	      @Override
-		public String caseForOrForAllStatement(ForOrForAllStatement object)
-	      {
-	        ElementValues set = object.getIteratedValues() ;
+      public String caseBehaviorActionSequence(BehaviorActionSequence object)
+      {
+        processEList(_adaFileContent, object.getActions()) ;
+        return DONE ;
+      }
 
-	        {
+      public String caseBehaviorActionSet(BehaviorActionSet object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
+
+      
+      /**
+       * Unparse elsestatement
+       */
+      public String caseElseStatement(ElseStatement object)
+      {
+        BehaviorActions lba = object.getBehaviorActions() ;
+        _adaFileContent.addOutputNewline("else ") ;
+        process(lba) ;
+        _adaFileContent.addOutputNewline("end if;") ;
+        return DONE ;
+      }
+      
+      /**
+       * Unparse ifstatement
+       */
+      public String caseIfStatement(IfStatement object)
+      {
+        ValueExpression ve = object.getLogicalValueExpression() ;
+        BehaviorActions lba = object.getBehaviorActions() ;
+
+        if(object.isElif())
+          _adaFileContent.addOutput("elsif (") ;
+        else
+          _adaFileContent.addOutput("if (") ;
+        
+        process(ve) ;
+        _adaFileContent.addOutput(") ") ;
+
+        
+        _adaFileContent.addOutputNewline(" then") ;
+        process(lba) ;
+        _adaFileContent.addOutputNewline("") ;
+
+        return DONE ;
+      }
+
+      public String toInteger(IntegerValue integerValue)
+      {
+        if(integerValue instanceof IntegerValueConstant)
+        {
+          return Long.toString(((BehaviorIntegerLiteral) integerValue)
+                .getValue()) ;
+        }
+
+        if(integerValue instanceof IntegerValueVariable)
+        {
+          if(integerValue instanceof BehaviorVariable)
+          {
+            return ((BehaviorVariable) integerValue).getDataClassifier()
+                  .getName();
+          }
+
+          if(integerValue instanceof DataComponentReference)
+          {
+            return ((BehaviorVariable) integerValue).getDataClassifier()
+                  .getName();
+          }
+        }
+
+        return "" ;
+      }
+
+      /**
+       * Unparse fororforallstatement
+       */
+      public String caseForOrForAllStatement(ForOrForAllStatement object)
+      {
+        ElementValues set = object.getIteratedValues() ;
+
+        if(set instanceof IntegerRange)
+        {
 	          IntegerRange range = (IntegerRange) set ;
 	          String lowerRangeValue = this.toInteger(range.getLowerIntegerValue()) ;
 	          String upperRangeValue = this.toInteger(range.getUpperIntegerValue()) ;
-	          _adbFileContent.addOutputNewline("iter : Integer;") ;
-	          _adbFileContent.addOutputNewline("for iter in " + lowerRangeValue + " .. " + upperRangeValue + " loop") ;
-	          //_adbFileContent.addOutputNewline("{") ;
-	          _adbFileContent.incrementIndent() ;
-	          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
-	          try
-	          {
-	            resolveExistingCodeDependencies(iterativeVariableClassifier);
-	          } catch(Exception e)
-	          {
-	            _adbFileContent.addOutput(GenerationUtilsADA.
-	                                    getGenerationADAIdentifier(iterativeVariableClassifier.
-	                                    getQualifiedName()));
-	          }
-	          
-	          _adbFileContent.addOutput(" ") ;
-	          _adbFileContent.addOutput(object.getIterativeVariable().getName()) ;
-	          _adbFileContent.addOutputNewline(" := iter;") ;
-	          process(object.getBehaviorActions()) ;
+	          _adaFileContent.addOutputNewline("iter : Integer;") ;
+	          _adaFileContent.addOutputNewline("for iter in " + lowerRangeValue + " .. " + upperRangeValue + " loop") ;
+	          _adaFileContent.incrementIndent() ;
+          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
+          try
+          {
+            GenerationUtilsADA.resolveExistingCodeDependencies(iterativeVariableClassifier,_additionalHeaders);
+          } catch(Exception e)
+          {
+            _adaFileContent.addOutput(GenerationUtilsADA.
+                                    getGenerationADAIdentifier(iterativeVariableClassifier.
+                                    getQualifiedName()));
+          }
+          
+          _adaFileContent.addOutput(" ") ;
+          _adaFileContent.addOutput(object.getIterativeVariable().getName()) ;
+          _adaFileContent.addOutputNewline(" := iter;") ;
+          process(object.getBehaviorActions()) ;
+          _adaFileContent.decrementIndent() ;
+          _adaFileContent.addOutputNewline("end loop;") ;
+        }
 
-	          _adbFileContent.decrementIndent() ;
-	          _adbFileContent.addOutputNewline("end loop;") ;
-	        }
+        if(set instanceof DataComponentReference)
+        {
+          TypeHolder dataReferenceTypeHolder = null ;
 
-	        if(set instanceof DataComponentReference)
-	        {
-	          TypeHolder dataReferenceTypeHolder = null ;
+          try
+          {
+            dataReferenceTypeHolder =
+                  AadlBaUtils.getTypeHolder(object.getIteratedValues()) ;
+          }
+          catch(DimensionException e)
+          {
+            // TODO Auto-generated catch block
+            e.printStackTrace() ;
+          }
 
-	          try
-	          {
-	            dataReferenceTypeHolder =
-	                  AadlBaUtils.getTypeHolder(object.getIteratedValues()) ;
-	          }
-	          catch(DimensionException e)
-	          {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace() ;
-	          }
+          int numberOfLoop = dataReferenceTypeHolder.dimension ;
 
-	          int numberOfLoop = dataReferenceTypeHolder.dimension ;
-
-	          for(int i = 0 ; i < numberOfLoop ; i++)
-	          {
+          for(int i = 0 ; i < numberOfLoop ; i++)
+          {
 	            String iteratorID = "iter" + Integer.toString(i) ;
-	            //_adbFileContent.addOutputNewline("int " + iteratorID + "=0;") ;
-	            _adbFileContent.addOutputNewline(iteratorID + " : Integer;") ;
-	            _adbFileContent.addOutputNewline("for " + iteratorID + " in 0 .. " + Long.toString(dataReferenceTypeHolder.dimension_sizes[i] - 1) + " loop") ;
-	            //_adbFileContent.addOutputNewline("{") ;
-	            _adbFileContent.incrementIndent() ;
-	          }
+	            _adaFileContent.addOutputNewline(iteratorID + " : Integer;") ;
+	            _adaFileContent.addOutputNewline("for " + iteratorID + " in 0 .. " + Long.toString(dataReferenceTypeHolder.dimension_sizes[i] - 1) + " loop") ;
+	            _adaFileContent.incrementIndent() ;
+          }
 
-	          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
-	          try
-	          {
-	            resolveExistingCodeDependencies(iterativeVariableClassifier);
-	          }
-	          catch(Exception e)
-	          {
-	            _adbFileContent.addOutput(GenerationUtilsADA.
-	                                    getGenerationADAIdentifier(iterativeVariableClassifier.getQualifiedName()));
-	          }
-	          _adbFileContent.addOutput(" ") ;
-	          _adbFileContent.addOutput(object.getIterativeVariable().getName()) ;
-	          _adbFileContent.addOutput(" := ") ;
-	          process(object.getIteratedValues()) ;
+          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
+          try
+          {
+            String existing = GenerationUtilsADA.resolveExistingCodeDependencies(iterativeVariableClassifier, _additionalHeaders);
+            aadlbaText.addOutput(existing);
+          }
+          catch(Exception e)
+          {
+            _adaFileContent.addOutput(GenerationUtilsADA.
+                                    getGenerationADAIdentifier(iterativeVariableClassifier.getQualifiedName()));
+          }
+          _adaFileContent.addOutput(" ") ;
+          _adaFileContent.addOutput(object.getIterativeVariable().getName()) ;
+          _adaFileContent.addOutput(" := ") ;
+          process(object.getIteratedValues()) ;
 
-	          for(int i = 0 ; i < numberOfLoop ; i++)
-	          {
+          for(int i = 0 ; i < numberOfLoop ; i++)
+          {
 	            String iteratorID = "iter" + Integer.toString(i) ;
-	            _adbFileContent.addOutput("(") ;
-	            _adbFileContent.addOutput(iteratorID) ;
-	            _adbFileContent.addOutput(")") ;
-	            _adbFileContent.addOutput("--A DEBUGER") ;
-	          }
+	            _adaFileContent.addOutput("(") ;
+	            _adaFileContent.addOutput(iteratorID) ;
+	            _adaFileContent.addOutput(")") ;
+//	            _adbFileContent.addOutput("--A DEBUGER") ;
+          }
 
-	          _adbFileContent.addOutputNewline(";") ;
-	          process(object.getBehaviorActions()) ;
+          _adaFileContent.addOutputNewline(";") ;
+          process(object.getBehaviorActions()) ;
 
-	          for(int i = 0 ; i < numberOfLoop ; i++)
-	          {
-	            _adbFileContent.decrementIndent() ;
-	            _adbFileContent.addOutputNewline("end loop;") ;
-	          }
-	        }
+          for(int i = 0 ; i < numberOfLoop ; i++)
+          {
+            _adaFileContent.decrementIndent() ;
+            _adaFileContent.addOutputNewline("end loop;") ;
+          }	
+        }
 
-	        return DONE ;
-	      }
+        return DONE ;
+      }
 
-	      @Override
-		public String caseWhileOrDoUntilStatement(WhileOrDoUntilStatement object)
-	      {
-	        if(object.isDoUntil())
-	        {
-	          return caseDoUntilStatement(object) ;
-	        }
-	        else
-	        {
-	          return caseWhileStatement(object) ;
-	        }
-	      }
+      public String caseWhileOrDoUntilStatement(WhileOrDoUntilStatement object)
+      {
+        if(object.isDoUntil())
+        {
+          return caseDoUntilStatement(object) ;
+        }
+        else
+        {
+          return caseWhileStatement(object) ;
+        }
+      }
 
-	      /**
-	       * Unparse whilestatement
-	       */
-	      public String caseWhileStatement(WhileOrDoUntilStatement object)
-	      {
+      /**
+       * Unparse whilestatement
+       */
+      public String caseWhileStatement(WhileOrDoUntilStatement object)
+      {
+        //FIXME : TODO : update location reference
+        _adaFileContent.addOutput("while (") ;
+        process(object.getLogicalValueExpression()) ;
+        _adaFileContent.addOutputNewline(")") ;
+        _adaFileContent.addOutputNewline("loop") ;
+        _adaFileContent.incrementIndent() ;
+        process(object.getBehaviorActions()) ;
+        _adaFileContent.decrementIndent() ;
+        _adaFileContent.addOutputNewline("end loop;") ;
+        return DONE ;
+      }
+
+      /**
+       * Unparse dountilstatement
+       */
+      public String caseDoUntilStatement(WhileOrDoUntilStatement object)
+      {
 	        //FIXME : TODO : update location reference
-	        _adbFileContent.addOutput("while ") ;
-	        process(object.getLogicalValueExpression()) ;
-	        _adbFileContent.addOutputNewline(" loop") ;
-	        //_adbFileContent.addOutputNewline("{") ;
-	        _adbFileContent.incrementIndent() ;
+	        _adaFileContent.addOutputNewline("loop") ;
+	        _adaFileContent.incrementIndent() ;
 	        process(object.getBehaviorActions()) ;
-	        _adbFileContent.decrementIndent() ;
-	        _adbFileContent.addOutputNewline("end loop;") ;
-	        return DONE ;
-	      }
-
-	      /**
-	       * Unparse dountilstatement
-	       */
-	      public String caseDoUntilStatement(WhileOrDoUntilStatement object)
-	      {
-	        //FIXME : TODO : update location reference
-	        _adbFileContent.addOutputNewline("loop") ;
-	        //_adbFileContent.addOutputNewline("{") ;
-	        _adbFileContent.incrementIndent() ;
-	        process(object.getBehaviorActions()) ;
-	        _adbFileContent.decrementIndent() ;
-	        //_adbFileContent.addOutputNewline("}") ;
-	        _adbFileContent.addOutput("exit when ") ;
+	        _adaFileContent.decrementIndent() ;
+	        _adaFileContent.addOutput("exit when ") ;
 	        process(object.getLogicalValueExpression()) ;
-	        _adbFileContent.addOutputNewline(";") ;
-	        _adbFileContent.addOutputNewline("end loop;") ;
+	        _adaFileContent.addOutputNewline(";") ;
+	        _adaFileContent.addOutputNewline("end loop;") ;
 	        return DONE ;
-	      }
+	  }
 
-	      /**
-	       * Unparse integerrange
-	       */
-	      @Override
-		public String caseIntegerRange(IntegerRange object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      /**
+       * Unparse integerrange
+       */
+      public String caseIntegerRange(IntegerRange object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      /**
-	       * Unparse timedaction
-	       */
-	      @Override
-		public String caseTimedAction(TimedAction object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      /**
+       * Unparse timedaction
+       */
+      public String caseTimedAction(TimedAction object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      /**
-	       * Unparse assignmentaction
-	       */
-	      @Override
-		public String caseAssignmentAction(AssignmentAction object)
-	      {
-	        process(object.getTarget()) ;
-	        _adbFileContent.addOutput(" := ") ;
+      /**
+       * Unparse assignmentaction
+       */
+      public String caseAssignmentAction(AssignmentAction object)
+      {
+        process(object.getTarget()) ;
+        _adaFileContent.addOutput(" := ") ;
 
-	        if(object instanceof Any)
-	        {
-	          throw new UnsupportedOperationException() ;
-	        }
-	        else
-	        {
-	          process(object.getValueExpression()) ;
-	        }
+        if(object instanceof Any)
+        {
+          throw new UnsupportedOperationException() ;
+        }
+        else
+        {
+          process(object.getValueExpression()) ;
+        }
 
-	        _adbFileContent.addOutputNewline(";") ;
-	        return DONE ;
-	      }
-	      
-	      @Override
-		public String caseCalledSubprogramHolder(CalledSubprogramHolder object)
-	      {
-	        aadlbaText = _adbFileContent;
-	        resolveExistingCodeDependencies(object.getElement());
-	        return DONE ;
-	      }
-	      
-	      @Override
-		public String caseSubprogramCallAction(SubprogramCallAction object)
-	      {
-	        Parameter returnParameter = null;
+        _adaFileContent.addOutputNewline(";") ;
+        return DONE ;
+      }
+      
+      public boolean manageParameterDirection(Parameter formal, ParameterLabel actual)
+      {
+    	  boolean remainingParenthesis = false;
+    	  String usageP = Aadl2Utils.getParameter_Usage(formal);
+          if(Aadl2Utils.isInOutParameter(formal) ||
+          		Aadl2Utils.isOutParameter(formal) ||
+          		usageP.equalsIgnoreCase("by_reference"))
+          {
+            if(actual instanceof ParameterHolder)
+            {
+          	  ParameterHolder ph = (ParameterHolder) actual;
+          	  String usage = Aadl2Utils.getParameter_Usage(ph.getParameter());
+          	  // in out passed to in
+          	  if(!Aadl2Utils.isOutParameter(ph.getParameter()) &&
+          		!Aadl2Utils.isInOutParameter(ph.getParameter())
+          		&& !usage.equalsIgnoreCase("by_reference"))
+          		// and ph.getParameter not by reference
+          		  _adaFileContent.addOutput("") ;
+          		  
+            }
+            else if (actual instanceof DataSubcomponentHolder
+          		  || actual instanceof BehaviorVariableHolder)
+          	  _adaFileContent.addOutput("") ;
+            else if (actual instanceof DataComponentReference)
+            {
+          	  _adaFileContent.addOutput("(") ;
+          	  remainingParenthesis=true;
+            }
+            else if(actual instanceof DataAccessHolder)
+            {
+              DataAccessHolder dah = (DataAccessHolder) actual;
+              if(!Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
+            		  !Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
+            	  //TODO: and dah.getAccess not by reference
+            	  _adaFileContent.addOutput("") ;
+            }
+            else if(actual instanceof ValueExpression)
+            {
+          	  ValueExpression ve = (ValueExpression) actual;
+            	  Value v = ve.getRelations().get(0).
+            			  getFirstExpression().getTerms().get(0).
+            			  getFactors().get(0).
+            			  getFirstValue();
+          	  if(v instanceof DataAccessHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+          	  else if (v instanceof ParameterHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+          	  else
+          	  {
+          		_adaFileContent.addOutput("") ;
+          	  }
+            }
+          }
+          else
+          {
+          	// if p not by_reference
+          	if(actual instanceof ParameterHolder)
+            {
+          	  ParameterHolder ph = (ParameterHolder) actual;
+          	  String usagePH = Aadl2Utils.getParameter_Usage(ph.getElement());
+          	  // in to inout
+          	  if(Aadl2Utils.isOutParameter(ph.getParameter()) ||
+              	Aadl2Utils.isInOutParameter(ph.getParameter()) ||
+              	  usagePH.equalsIgnoreCase("by_reference"))
+          		  _adaFileContent.addOutput("") ;
+            }
+          	else if(actual instanceof DataAccessHolder)
+            {
+              DataAccessHolder dah = (DataAccessHolder) actual;
+              if(Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
+            		  Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
+            	  //TODO: and dah.getAccess not by reference
+            	  _adaFileContent.addOutput("") ;
+            }
+            else if(actual instanceof ValueExpression)
+            {
+          	  ValueExpression ve = (ValueExpression) actual;
+            	  Value v = ve.getRelations().get(0).
+            			  getFirstExpression().getTerms().get(0).
+            			  getFactors().get(0).
+            			  getFirstValue();
+          	  if(v instanceof DataAccessHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+          	  else if (v instanceof ParameterHolder)
+          	  {
+          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          	  }
+            }
+          }
+          return remainingParenthesis;
+      }
+      
+      public boolean manageAccessDirection(DataAccess formal, ParameterLabel actual)
+      {
+    	  boolean remainingParenthesis=false;
+    	  if(Aadl2Utils.isReadWriteDataAccess(formal)
+        		  || Aadl2Utils.isWriteOnlyDataAccess(formal))
+          {
+        	if(actual instanceof DataAccessHolder)
+        	{
+        	  DataAccessHolder dah = (DataAccessHolder) actual;
+        	  // in out passed to in
+          	  if(!Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()) &&
+          		!Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()))
+          		//TODO: and dah.getAccess not by reference
+          		  _adaFileContent.addOutput("") ;
+        	}
+        	else if(actual instanceof DataSubcomponentHolder
+        			|| actual instanceof BehaviorVariableHolder)
+        		_adaFileContent.addOutput("") ;
+        	else if (actual instanceof DataComponentReference)
+            {
+          	  _adaFileContent.addOutput("(") ;
+          	  remainingParenthesis=true;
+            }
+          }
+          else
+          {
+        	//TODO: if da not by_reference
+        	if(actual instanceof DataAccessHolder)
+          	{
+          		DataAccessHolder dah = (DataAccessHolder) actual;
+          		// in to inout
+        		if(Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()) ||
+            		Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()))
+        			_adaFileContent.addOutput("") ;
+          	}
+          }
+    	  return remainingParenthesis;
+      }
+      
+      public String caseCalledSubprogramHolder(CalledSubprogramHolder object)
+      {
+        aadlbaText = _adaFileContent;
+        String referencingExistingCode = GenerationUtilsADA.resolveExistingCodeDependencies(object.getElement(), _additionalHeaders);
+        if(referencingExistingCode!=null)
+        	aadlbaText.addOutput(referencingExistingCode);
+        else
+        {
+        	_adaFileContent.addOutput(GenerationUtilsADA.
+        			getGenerationADAIdentifier(object.getElement().getQualifiedName()));
+        }
+        return DONE ;
+      }
+      
+      public String caseSubprogramCallAction(SubprogramCallAction object)
+      {
+        Parameter returnParameter = null;
 
-	        if(object.getSubprogram().getElement() != null)
-	        {
-	          SubprogramType st = null ;
-	          SubprogramSubcomponentType sct =
-	                (SubprogramSubcomponentType) object.getSubprogram().getElement() ;
+        if(object.getSubprogram().getElement() != null)
+        {
+          SubprogramType st = null ;
+          SubprogramSubcomponentType sct =
+                (SubprogramSubcomponentType) object.getSubprogram().getElement() ;
 
+          AadlToADAUnparser aadlCUnparser = AadlToADAUnparser.getAadlToADAUnparser(); 
+          
+          if(sct instanceof SubprogramType)
+          {
+            st = (SubprogramType) sct ;
+          }
+          else
+          {
+            SubprogramImplementation si = (SubprogramImplementation) sct ;
+            st = si.getType() ;
+          }
+          additionalSubprogramsToUnparse(sct);
+          List<PrototypeBinding> currentBindings = aadlCUnparser.getCurrentPrototypeBindings(
+        		  object.getSubprogram().getElement().getName());
+          List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st, currentBindings) ;
 
-	          if(sct instanceof SubprogramType)
-	          {
-	            st = (SubprogramType) sct ;
-	          }
-	          else
-	          {
-	            SubprogramImplementation si = (SubprogramImplementation) sct ;
-	            st = si.getType() ;
-	          }
+          for(ParameterLabel pl : object.getParameterLabels())
+          {
+            ParameterConnectionEnd pce =
+                  (ParameterConnectionEnd) ordereFeatureList.get(object
+                                                                 .getParameterLabels().indexOf(pl)) ;
 
-	          List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st) ;
+            if(pce instanceof Parameter)
+            {
+              Parameter p = (Parameter) pce ;
+              boolean isReturnParam = GenerationUtilsADA.isReturnParameter(p);
+              if(isReturnParam)
+              {
+                returnParameter = p;
+                process(pl);
+                _adaFileContent.addOutput(" := ") ;
+                break;
+              }
+            }
+          }
 
-	          for(ParameterLabel pl : object.getParameterLabels())
-	          {
-	            ParameterConnectionEnd pce =
-	                  (ParameterConnectionEnd) ordereFeatureList.get(object
-	                                                                 .getParameterLabels().indexOf(pl)) ;
+          process(object.getSubprogram()) ;
 
-	            if(pce instanceof Parameter)
-	            {
-	              Parameter p = (Parameter) pce ;
-	              boolean isReturnParam= GenerationUtilsADA.isReturnParameter(p);
-	              if(isReturnParam)
-	              {
-	                returnParameter = p;
-	                process(pl);
-	                _adbFileContent.addOutput(" := ") ;
-	                break;
-	              }
-	            }
-	          }
+          if(st != null)
+          {
+            _adaFileContent.addOutput(" (") ;
+            boolean first = true;
+            boolean remainingParenthesis = false;
+            for(ParameterLabel pl : object.getParameterLabels())
+            {
+              ParameterConnectionEnd pce =
+                    (ParameterConnectionEnd) ordereFeatureList.get(object
+                                                                   .getParameterLabels().indexOf(pl)) ;
 
-	          process(object.getSubprogram()) ;
+              if(pce instanceof Parameter)
+              {
+                Parameter p = (Parameter) pce ;
+                if(p==returnParameter)
+                  continue;
+                if(first==false)
+                  _adaFileContent.addOutput(", ") ;
+                
+                remainingParenthesis = manageParameterDirection(p, pl);
 
-	          if(st != null)
-	          {
-	            _adbFileContent.addOutput(" (") ;
-	            boolean first = true;
-	            for(ParameterLabel pl : object.getParameterLabels())
-	            {
-	              ParameterConnectionEnd pce =
-	                    (ParameterConnectionEnd) ordereFeatureList.get(object
-	                                                                   .getParameterLabels().indexOf(pl)) ;
+                if(pl instanceof ElementHolder)
+                {
+                  ElementHolder eh = (ElementHolder) pl;
+                  if(eh instanceof ParameterHolder
+                		  || eh instanceof DataAccessHolder)
+                	  _adaFileContent.addOutput(eh.getElement().getName());
+                  else
+                	  _adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(eh.getElement().getQualifiedName()));
+                } 
+                else if(pl instanceof ValueExpression)
+                {
+              	  ValueExpression ve = (ValueExpression) pl;
+              	  Value v = ve.getRelations().get(0).
+              			  getFirstExpression().getTerms().get(0).
+              			  getFactors().get(0).
+              			  getFirstValue();
+              	  if(v instanceof ElementHolder)
+              	  {
+              		ElementHolder eh = (ElementHolder) v;
+              		if(eh instanceof ParameterHolder
+                  		  || eh instanceof DataAccessHolder)
+                  	  _adaFileContent.addOutput(eh.getElement().getName());
+                    else
+                  	  _adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(eh.getElement().getQualifiedName()));
+              	  }
+              	  else if(v instanceof DataComponentReference)
+              	  {
+              		DataComponentReference dcr = (DataComponentReference) v;
+              		boolean firstElement = true;
+              		for(DataHolder dh: dcr.getData())
+              		{
+              		  boolean lastElement = (dcr.getData().indexOf(dh)==dcr.getData().size()-1);
+              		  if(dh instanceof ParameterHolder
+                            || dh instanceof DataAccessHolder
+                            || firstElement == false)
+                        _adaFileContent.addOutput(dh.getElement().getName());
+                      else
+                      {
+                        _adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(dh.getElement().getQualifiedName()));
+                        firstElement=false;
+                      }
+              		  if(!lastElement)
+              			  _adaFileContent.addOutput(".");
+              		}
+              	  }
+                }
+                else
+                {
+                  process(pl) ;
+                }
+                if(remainingParenthesis)
+                {
+                	_adaFileContent.addOutput(")");
+                	remainingParenthesis=false;
+                }
+                first=false;
+              }
+              else if(pce instanceof DataAccess)
+              {
+                DataAccess da = (DataAccess) pce ;
+                if(first==false)
+                  _adaFileContent.addOutput(", ") ;
+                if(da.getKind().equals(AccessType.REQUIRES))
+                {
+                  remainingParenthesis = manageAccessDirection(da, pl);  
+                }
 
-	              if(pce instanceof Parameter)
-	              {
-	                Parameter p = (Parameter) pce ;
-	                if(p==returnParameter)
-	                  continue;
-	                if(first==false)
-	                  _adbFileContent.addOutput(", ") ;
-	                /*if(Aadl2Utils.isInOutParameter(p) ||
-	                		Aadl2Utils.isOutParameter(p))
-	                {
-	                  _adbFileContent.addOutput("&") ;
-	                }*/
+                String name = null ;
 
-	                process(pl) ;
-	                first=false;
-	              }
-	              else if(pce instanceof DataAccess)
-	              {
-	                DataAccess da = (DataAccess) pce ;
-	                if(first==false)
-	                  _adbFileContent.addOutput(", ") ;
-	                /*if(da.getKind().equals(AccessType.REQUIRES))
-	                {
-	                  
-	                  if(Aadl2Utils.isReadWriteDataAccess(da)
-	                		  || Aadl2Utils.isWriteOnlyDataAccess(da))
-	                  {
-	                    _adbFileContent.addOutput("&") ;
-	                  }
-	                }*/
+                // If a data access mapping is provided:
+                // Transforms any data access into the right data subcomponent
+                // 's name thanks to the given data access mapping.
+                
+                if(_dataAccessMapping != null)
+                {
+                  ElementHolder eh = null;
+                  if(pl instanceof ValueExpression)
+                  {
+                	  Relation r = ((ValueExpression)pl).getRelations().get(0);
+                	  Term t = r.getFirstExpression().getTerms().get(0);
+                	  eh = (ElementHolder) t.getFactors().get(0).getFirstValue();  
+                  }
+                  else if(pl instanceof DataAccessHolder)
+                  {
+                  	eh = (ElementHolder) pl;
+                  }
+                  if(eh instanceof DataAccessHolder && 
+                		  AadlUtil.getContainingAnnex(eh) instanceof ThreadClassifier)
+                  	name = _dataAccessMapping.get((DataAccess)eh.getElement());
+                  else if(eh instanceof DataSubcomponentHolder)
+                  {
+                  	DataSubcomponent ds = (DataSubcomponent) ((DataSubcomponentHolder) eh).getElement(); 
+                  	name = GenerationUtilsADA.getGenerationADAIdentifier(ds.getQualifiedName());
+                  }
+                }
 
-	                String name = null ;
+                if (name != null)
+                {
+                  _adaFileContent.addOutput(name);
+                }
+                else // Otherwise, process parameter label as usual.
+                {
+                  process((ParameterLabel) pl) ;
+                }
+                if(remainingParenthesis)
+                {
+                	_adaFileContent.addOutput(")");
+                	remainingParenthesis=false;
+                }
+                first=false;
+              }
 
-	                // If a data access mapping is provided:
-	                // Transforms any data access into the right data subcomponent
-	                // 's name thanks to the given data access mapping.
-	                if(_dataAccessMapping != null)
-	                {
-	                  ElementHolder eh = null;
-	                  if(pl instanceof ValueExpression)
-	                  {
-	                	  Relation r = ((ValueExpression)pl).getRelations().get(0);
-	                	  Term t = r.getFirstExpression().getTerms().get(0);
-	                	  eh = (ElementHolder) t.getFactors().get(0).getFirstValue();  
-	                  }
-	                  else if(pl instanceof DataAccessHolder)
-	                  {
-	                  	eh = (ElementHolder) pl;
-	                  }
-	                  if(eh instanceof DataAccessHolder && 
-	                		  AadlUtil.getContainingAnnex(eh) instanceof ThreadClassifier)
-	                  	name = _dataAccessMapping.get((DataAccess)eh.getElement());
-	                  else if(eh instanceof DataSubcomponentHolder)
-	                  {
-	                  	DataSubcomponent ds = (DataSubcomponent) ((DataSubcomponentHolder) eh).getElement(); 
-	                  	name = GenerationUtilsADA.getGenerationADAIdentifier(ds.getQualifiedName());
-	                  }
-	                }
+            }
 
-	                if (name != null)
-	                {
-	                  _adbFileContent.addOutput(name);
-	                }
-	                else // Otherwise, process parameter label as usual.
-	                {
-	                  process(pl) ;
-	                }
-	                first=false;
-	              }
+            _adaFileContent.addOutputNewline(");") ;
+          }
+        }
+        else
+        {
+          if(object.isSetParameterLabels())
+          {
+            _adaFileContent.addOutput(" (") ;
+            processEList(_adaFileContent, object.getParameterLabels(), ", ") ;
+            _adaFileContent.addOutputNewline(");") ;
+          }
+        }
 
-	            }
+        return DONE ;
+      }
+      
+      private void additionalSubprogramsToUnparse(SubprogramSubcomponentType sct) {
+    	AadlToADAUnparser aadlADAUnparser = AadlToADAUnparser.getAadlToADAUnparser();   
+    	if(false == aadlADAUnparser.additionalUnparsing.contains(sct))
+    	  aadlADAUnparser.additionalUnparsing.add(sct);
+        for(AnnexSubclause as: ((SubprogramClassifier)sct).getAllAnnexSubclauses() )
+        {
+          if(as instanceof BehaviorAnnex)
+          {
+        	for(SubprogramHolder otherSpg: EcoreUtil2.getAllContentsOfType(as, SubprogramHolder.class))
+        	{
+        	  if(true == aadlADAUnparser.additionalUnparsing.contains(otherSpg))
+        		continue;
+        	  aadlADAUnparser.additionalUnparsing.add(otherSpg.getSubprogram());
+        	  additionalSubprogramsToUnparse((SubprogramSubcomponentType) otherSpg.getSubprogram());
+        	}
+        	return;
+          }
+        }
+	 }
 
-	            _adbFileContent.addOutputNewline(");") ;
-	          }
-	        }
-	        else
-	        {
-	          if(object.isSetParameterLabels())
-	          {
-	            _adbFileContent.addOutput(" (") ;
-	            processEList(_adbFileContent, object.getParameterLabels(), ", ") ;
-	            _adbFileContent.addOutputNewline(");") ;
-	          }
-	        }
-
-	        return DONE ;
-	      }
-
-	      @Override
-		public String caseElementHolder(ElementHolder object)
-	      {
-	    	NamedElement elt = object.getElement();
-	    	String id;
-	    	if(elt instanceof Parameter)
+	public String caseElementHolder(ElementHolder object)
+      {
+    	NamedElement elt = object.getElement();
+    	String id;
+    	boolean pointer=false;
+    	if(elt instanceof Parameter)
+		{
+			Parameter p = (Parameter) elt;
+			if(false==(object.eContainer() instanceof SubprogramCallAction))
 			{
-				/*Parameter p = (Parameter) elt;
-				if(Aadl2Utils.isInOutParameter(p)
-						|| Aadl2Utils.isOutParameter(p))
-					aadlbaText.addOutput("*");*/
-				id = elt.getName();
+			  String usageP = Aadl2Utils.getParameter_Usage(p);
+			  if(Aadl2Utils.isInOutParameter(p)
+				  || Aadl2Utils.isOutParameter(p)
+				  || usageP.equalsIgnoreCase("by_reference"))
+			  {
+			    aadlbaText.addOutput("(");
+			    pointer=true;
+			  }
+			
 			}
-			else if (elt instanceof DataAccess)
+			id = elt.getName();
+			
+		}
+		else if (elt instanceof DataAccess)
+		{
+		  DataAccess da = (DataAccess) elt;
+		  
+		  if(false==(object.eContainer() instanceof SubprogramCallAction))
+		  {
+			if(Aadl2Utils.isReadWriteDataAccess(da)
+			  || Aadl2Utils.isWriteOnlyDataAccess(da))
 			{
-			  /*DataAccess da = (DataAccess) elt;
-			  
-			  if(Aadl2Utils.isReadWriteDataAccess(da)
-					  || Aadl2Utils.isWriteOnlyDataAccess(da))
-	  		  {
-	  			aadlbaText.addOutput("*");
-	  		  }*/
-	  		  id = elt.getName();
+  			   aadlbaText.addOutput("(");
+			   pointer=true;		
 			}
-	    	else	
-	    		id = elt.getQualifiedName();
-	    	aadlbaText.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(id));
-	    	if(object instanceof IndexableElement)
-	    	{	
-	    	  IndexableElement ie = (IndexableElement) object;
-	    	  for(IntegerValue iv: ie.getArrayIndexes())
-	    	  {
-	    		aadlbaText.addOutput("(");
-	    		process(iv);
-	    		aadlbaText.addOutput(")");
-	    	  }
-	    	}
-	        return DONE ;
-	      }
-	      
-	      @Override
-		public String casePortSendAction(PortSendAction object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+		  }
+  		  id = elt.getName();
+		}
+    	else	
+    		id = elt.getQualifiedName();
+    	aadlbaText.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(id));
+    	if(pointer)
+    		aadlbaText.addOutput(")");
+    	if(object instanceof IndexableElement)
+    	{	
+    	  IndexableElement ie = (IndexableElement) object;
+    	  for(IntegerValue iv: ie.getArrayIndexes())
+    	  {
+    		aadlbaText.addOutput("[");
+    		process(iv);
+    		aadlbaText.addOutput("]");
+    	  }
+    	}
+        return DONE ;
+      }
+      
+      public String casePortSendAction(PortSendAction object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      @Override
-		public String casePortFreezeAction(PortFreezeAction object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String casePortFreezeAction(PortFreezeAction object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      @Override
-		public String casePortDequeueAction(PortDequeueAction object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String casePortDequeueAction(PortDequeueAction object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      @Override
-		public String caseLockAction(LockAction object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String caseLockAction(LockAction object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      @Override
-		public String caseUnlockAction(UnlockAction object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String caseUnlockAction(UnlockAction object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      /**
-	       * Unparse behaviortime
-	       */
-	      @Override
-		public String caseBehaviorTime(BehaviorTime object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      /**
+       * Unparse behaviortime
+       */
+      public String caseBehaviorTime(BehaviorTime object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      @Override
-		public String casePortDequeueValue(PortDequeueValue object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String casePortDequeueValue(PortDequeueValue object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      @Override
-		public String casePortCountValue(PortCountValue object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String casePortCountValue(PortCountValue object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      @Override
-		public String casePortFreshValue(PortFreshValue object)
-	      {
-	        throw new UnsupportedOperationException() ;
-	      }
+      public String casePortFreshValue(PortFreshValue object)
+      {
+        throw new UnsupportedOperationException() ;
+      }
 
-	      /**
-	       * Unparse booleanliteral
-	       */
-	      @Override
-		public String caseBehaviorBooleanLiteral(BehaviorBooleanLiteral object)
-	      {
-	        //FIXME : TODO : update location reference
-	        if(object.isValue())
-	        {
-	          _adbFileContent.addOutput("TRUE") ;
-	        }
-	        else
-	        {
-	          _adbFileContent.addOutput("FALSE") ;
-	        }
+      /**
+       * Unparse booleanliteral
+       */
+      public String caseBehaviorBooleanLiteral(BehaviorBooleanLiteral object)
+      {
+        //FIXME : TODO : update location reference
+        if(object.isValue())
+        {
+          _adaFileContent.addOutput("TRUE") ;
+        }
+        else
+        {
+          _adaFileContent.addOutput("FALSE") ;
+        }
 
-	        return DONE ;
-	      }
+        return DONE ;
+      }
 
-	      /**
-	       * Unparse stringliteral
-	       */
-	      @Override
-		public String caseBehaviorStringLiteral(BehaviorStringLiteral object)
-	      {
-	        //FIXME : TODO : update location reference
-	        _adbFileContent.addOutput(object.getValue()) ;
-	        return DONE ;
-	      }
+      /**
+       * Unparse stringliteral
+       */
+      public String caseBehaviorStringLiteral(BehaviorStringLiteral object)
+      {
+        //FIXME : TODO : update location reference
+        _adaFileContent.addOutput(object.getValue()) ;
+        return DONE ;
+      }
 
-	      @Override
-		public String caseBehaviorRealLiteral(BehaviorRealLiteral object)
-	      {
-	        _adbFileContent.addOutput(String.valueOf(object.getValue())) ;
-	        return DONE ;
-	      }
+      public String caseBehaviorRealLiteral(BehaviorRealLiteral object)
+      {
+        _adaFileContent.addOutput(String.valueOf(object.getValue())) ;
+        return DONE ;
+      }
 
-	      @Override
-		public String caseBehaviorIntegerLiteral(BehaviorIntegerLiteral object)
-	      {
-	        _adbFileContent.addOutput(Long.toString(object.getValue())) ;
-	        return DONE ;
-	      }
-	      
-	      /**
-	       * Unparse valueexpression
-	       */
-	      @Override
-		public String caseValueExpression(ValueExpression object)
-	      {
-	        Iterator<Relation> itRel = object.getRelations().iterator() ;
-	        process(itRel.next()) ;
+      public String caseBehaviorIntegerLiteral(BehaviorIntegerLiteral object)
+      {
+        _adaFileContent.addOutput(Long.toString(object.getValue())) ;
+        return DONE ;
+      }
+      
+      /**
+       * Unparse valueexpression
+       */
+      public String caseValueExpression(ValueExpression object)
+      {
+        Iterator<Relation> itRel = object.getRelations().iterator() ;
+        process(itRel.next()) ;
 
-	        if(object.isSetLogicalOperators())
-	        {
-	          Iterator<LogicalOperator> itOp =
-	                object.getLogicalOperators().iterator() ;
+        if(object.isSetLogicalOperators())
+        {
+          Iterator<LogicalOperator> itOp =
+                object.getLogicalOperators().iterator() ;
 
-	          while(itRel.hasNext())
-	          {
-	            _adbFileContent.addOutput(" " +
-	                  AadlBaToADAUnparser.getTargetLanguageOperator(itOp.next()) +
-	                  " ") ;
-	            process(itRel.next()) ;
-	          }
-	        }
+          while(itRel.hasNext())
+          {
+            _adaFileContent.addOutput(" " +
+                  AadlBaToADAUnparser.getTargetLanguageOperator(itOp.next()) +
+                  " ") ;
+            process(itRel.next()) ;
+          }
+        }
+        return DONE ;
+      }
 
-	        return DONE ;
-	      }
+      /**
+       * Unparse relation
+       */
+      public String caseRelation(Relation object)
+      {
+        process(object.getFirstExpression()) ;
 
-	      /**
-	       * Unparse relation
-	       */
-	      @Override
-		public String caseRelation(Relation object)
-	      {
-	        process(object.getFirstExpression()) ;
+        if(object.getSecondExpression() != null)
+        {
+          _adaFileContent.addOutput(" " +
+                AadlBaToADAUnparser.getTargetLanguageOperator(object
+                      .getRelationalOperator()) + " ") ;
+          process(object.getSecondExpression()) ;
+        }
 
-	        if(object.getSecondExpression() != null)
-	        {
-	          _adbFileContent.addOutput(" " +
-	                AadlBaToADAUnparser.getTargetLanguageOperator(object
-	                      .getRelationalOperator()) + " ") ;
-	          process(object.getSecondExpression()) ;
-	        }
+        return DONE ;
+      }
 
-	        return DONE ;
-	      }
+      /**
+       * Unparse simpleexpression
+       */
+      public String caseSimpleExpression(SimpleExpression object)
+      {
+        if(object.getUnaryAddingOperator()!=UnaryAddingOperator.NONE)
+        {
+          _adaFileContent.addOutput(object.getUnaryAddingOperator()
+                .getLiteral()) ;
+        }
 
-	      /**
-	       * Unparse simpleexpression
-	       */
-	      @Override
-		public String caseSimpleExpression(SimpleExpression object)
-	      {
-	        if(object.getUnaryAddingOperator()!=UnaryAddingOperator.NONE)
-	        {
-	          _adbFileContent.addOutput(object.getUnaryAddingOperator()
-	                .getLiteral()) ;
-	        }
+        Iterator<Term> itTerm = object.getTerms().iterator() ;
+        process(itTerm.next()) ;
 
-	        Iterator<Term> itTerm = object.getTerms().iterator() ;
-	        process(itTerm.next()) ;
+        if(object.isSetBinaryAddingOperators())
+        {
+          Iterator<BinaryAddingOperator> itOp =
+                object.getBinaryAddingOperators().iterator() ;
 
-	        if(object.isSetBinaryAddingOperators())
-	        {
-	          Iterator<BinaryAddingOperator> itOp =
-	                object.getBinaryAddingOperators().iterator() ;
+          while(itTerm.hasNext())
+          {
+            _adaFileContent.addOutput(" " + itOp.next().getLiteral() + " ") ;
+            process(itTerm.next()) ;
+          }
+        }
 
-	          while(itTerm.hasNext())
-	          {
-	            _adbFileContent.addOutput(" " + itOp.next().getLiteral() + " ") ;
-	            process(itTerm.next()) ;
-	          }
-	        }
+        return DONE ;
+      }
 
-	        return DONE ;
-	      }
+      /**
+       * Unparse term
+       */
+      public String caseTerm(Term object)
+      {
+        Iterator<Factor> itFact = object.getFactors().iterator() ;
+        process(itFact.next()) ;
 
-	      /**
-	       * Unparse term
-	       */
-	      @Override
-		public String caseTerm(Term object)
-	      {
-	        Iterator<Factor> itFact = object.getFactors().iterator() ;
-	        process(itFact.next()) ;
+        if(object.isSetMultiplyingOperators())
+        {
+          Iterator<MultiplyingOperator> itOp =
+                object.getMultiplyingOperators().iterator() ;
 
-	        if(object.isSetMultiplyingOperators())
-	        {
-	          Iterator<MultiplyingOperator> itOp =
-	                object.getMultiplyingOperators().iterator() ;
+          while(itFact.hasNext())
+          {
+            _adaFileContent.addOutput(" " +
+                  AadlBaToADAUnparser.getTargetLanguageOperator(itOp.next()) +
+                  " ") ;
+            process(itFact.next()) ;
+          }
+        }
 
-	          while(itFact.hasNext())
-	          {
-	            _adbFileContent.addOutput(" " +
-	                  AadlBaToADAUnparser.getTargetLanguageOperator(itOp.next()) +
-	                  " ") ;
-	            process(itFact.next()) ;
-	          }
-	        }
+        return DONE ;
+      }
 
-	        return DONE ;
-	      }
-
-	      /**
-	       * Unparse factor
-	       */
-	      @Override
-		public String caseFactor(Factor object)
-	      {
-	        if(object.getUnaryNumericOperator() != UnaryNumericOperator.NONE)
-	        {
-	          _adbFileContent.addOutput(AadlBaToADAUnparser
-	                                  .getTargetLanguageOperator(object
-	                                                             .getUnaryNumericOperator())) ;
-	          _adbFileContent.addOutput("(") ;
-	        }
-	        else if(object.getUnaryBooleanOperator()!= UnaryBooleanOperator.NONE)
-	        {
-	          _adbFileContent.addOutput(AadlBaToADAUnparser
-	                                  .getTargetLanguageOperator(object
-	                                                             .getUnaryBooleanOperator())) ;
-	          _adbFileContent.addOutput("(") ;
-	        }
+      /**
+       * Unparse factor
+       */
+      public String caseFactor(Factor object)
+      {
+        if(object.getUnaryNumericOperator() != UnaryNumericOperator.NONE)
+        {
+          _adaFileContent.addOutput(AadlBaToADAUnparser
+                                  .getTargetLanguageOperator(object
+                                                             .getUnaryNumericOperator())) ;
+          _adaFileContent.addOutput("(") ;
+        }
+        else if(object.getUnaryBooleanOperator()!= UnaryBooleanOperator.NONE)
+        {
+          _adaFileContent.addOutput(AadlBaToADAUnparser
+                                  .getTargetLanguageOperator(object
+                                                             .getUnaryBooleanOperator())) ;
+          _adaFileContent.addOutput("(") ;
+        }
 
 
 
-	        if(object.getFirstValue() instanceof ValueExpression)
-	        {
-	          _adbFileContent.addOutput("(") ;
-	          process(object.getFirstValue()) ;
-	          _adbFileContent.addOutput(")") ;
-	        }
-	        else
-	        {
-	          process(object.getFirstValue()) ;
-	        }
+        if(object.getFirstValue() instanceof ValueExpression)
+        {
+          _adaFileContent.addOutput("(") ;
+          process(object.getFirstValue()) ;
+          _adaFileContent.addOutput(")") ;
+        }
+        else
+        {
+          process(object.getFirstValue()) ;
+        }
 
-	        if(object.getUnaryNumericOperator()!=UnaryNumericOperator.NONE ||
-	              object.getUnaryBooleanOperator() != UnaryBooleanOperator.NONE)
-	        {
-	          _adbFileContent.addOutput(")") ;
-	        }
+        if(object.getUnaryNumericOperator()!=UnaryNumericOperator.NONE ||
+              object.getUnaryBooleanOperator() != UnaryBooleanOperator.NONE)
+        {
+          _adaFileContent.addOutput(")") ;
+        }
 
-	        if(object.getBinaryNumericOperator()!=BinaryNumericOperator.NONE)
-	        {
-	          _adbFileContent.addOutput(" " +
-	                object.getBinaryNumericOperator().getLiteral() + " ") ;
+        if(object.getBinaryNumericOperator()!=BinaryNumericOperator.NONE)
+        {
+          _adaFileContent.addOutput(" " +
+                object.getBinaryNumericOperator().getLiteral() + " ") ;
 
-	          if(object.getSecondValue() instanceof ValueExpression)
-	          {
-	            _adbFileContent.addOutput("(") ;
-	            process(object.getSecondValue()) ;
-	            _adbFileContent.addOutput(")") ;
-	          }
-	          else
-	          {
-	            process(object.getSecondValue()) ;
-	          }
-	        }
+          if(object.getSecondValue() instanceof ValueExpression)
+          {
+            _adaFileContent.addOutput("(") ;
+            process(object.getSecondValue()) ;
+            _adaFileContent.addOutput(")") ;
+          }
+          else
+          {
+            process(object.getSecondValue()) ;
+          }
+        }
 
-	        return DONE ;
-	      }
-	/*
-	      public String caseComment(Comment object)
-	      {
-	        _adbFileContent.addOutputNewline("// " + object.getBody()) ;
-	        return DONE ;
-	      }
-	*/
-	    } ;
-	  }
+        return DONE ;
+      }
+/*
+      public String caseComment(Comment object)
+      {
+        _adaFileContent.addOutputNewline("// " + object.getBody()) ;
+        return DONE ;
+      }
+*/
+    } ;
+  }
 
-	  public void addIndent_ADB(String indent)
-	  {
-	    while(_adbFileContent.getIndentString().length() < indent.length())
-	    {
-	      _adbFileContent.incrementIndent() ;
-	    }
-	  }
+  public void addIndent_ADB(String indent)
+  {
+    while(_adaFileContent.getIndentString().length() < indent.length())
+    {
+      _adaFileContent.incrementIndent() ;
+    }
+  }
 
-	  public void addIndent_ADS(String indent)
-	  {
-	    while(_adsFileContent.getIndentString().length() < indent.length())
-	    {
-	      _adsFileContent.incrementIndent() ;
-	    }
-	  }
+  public void addIndent_ADS(String indent)
+  {
+    while(_headerFileContent.getIndentString().length() < indent.length())
+    {
+      _headerFileContent.incrementIndent() ;
+    }
+  }
 
-	  public void setOwner(NamedElement owner) {
-		this._owner = owner;
-	  }
+  public void setOwner(NamedElement owner) {
+	this._owner = owner;
+  }
+  
 }
