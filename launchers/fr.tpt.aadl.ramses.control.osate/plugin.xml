@@ -19,12 +19,11 @@
       </page>
    </extension>
    
-   
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
       		label="GenerateCodeAction"
-            id="fr.tpt.aadl.ramses.control.osate.generate"
+            id="fr.tpt.aadl.ramses.control.osate.generate.pok"
             visible="true">
          <menu
                id="menu.ramses"
@@ -77,4 +76,74 @@
       </wizard>
    </extension>
    
+   
+   
+   
+   <extension
+		point="org.eclipse.ui.commands">
+		<command
+			description="Generate the system code with RAMSES"
+			id="fr.tpt.aadl.ramses.control.osate.generate.pok"
+			name="RAMSES: Generate Code for POK">
+		</command>
+	</extension>
+	
+   <extension point="org.eclipse.ui.menus">
+	<menuContribution 
+		allPopups="false"
+		locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
+		<command
+		commandId="fr.tpt.aadl.ramses.control.osate.generate.pok"
+		tooltip="Do code generation for pok with RAMSES" 
+		style="push">
+		</command>
+	</menuContribution>
+   </extension>
+   
+   <extension
+		point="org.eclipse.ui.handlers">
+		<handler 
+			class="fr.tpt.aadl.ramses.control.osate.PokGenerateActionHandler"
+			commandId="fr.tpt.aadl.ramses.control.osate.generate.pok">
+		<!--	<activeWhen>
+				<reference
+					definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
+				</reference>
+			</activeWhen> -->
+		</handler>
+	</extension>
+	
+	   <extension
+		point="org.eclipse.ui.commands">
+		<command
+			description="Generate the system code with RAMSES"
+			id="fr.tpt.aadl.ramses.control.osate.generate.osek"
+			name="RAMSES: Generate Code for OSEK">
+		</command>
+	</extension>
+	
+   <extension point="org.eclipse.ui.menus">
+	<menuContribution 
+		allPopups="false"
+		locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
+		<command
+		commandId="fr.tpt.aadl.ramses.control.osate.generate.osek"
+		tooltip="Do code generation for osek with RAMSES" 
+		style="push">
+		</command>
+	</menuContribution>
+   </extension>
+   
+   <extension
+		point="org.eclipse.ui.handlers">
+		<handler 
+			class="fr.tpt.aadl.ramses.control.osate.OsekGenerateActionHandler"
+			commandId="fr.tpt.aadl.ramses.control.osate.generate.osek">
+		<!--	<activeWhen>
+				<reference
+					definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
+				</reference>
+			</activeWhen> -->
+		</handler>
+	</extension>
 </plugin>

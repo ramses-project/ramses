@@ -28,6 +28,7 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
 public class GenerateAction extends AbstractAnalyzer
 {
@@ -104,7 +105,7 @@ public class GenerateAction extends AbstractAnalyzer
         Resource r = root.eResource();
         String s = r.getURI().segment(1);
         File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
-        String workflow = this.findWorkflow(rootDir);
+        String workflow = GenerateActionUtils.findWorkflow(rootDir);
         if(workflow==null)
           generator.generate(root, 
                              resourceDir,
@@ -138,30 +139,10 @@ public class GenerateAction extends AbstractAnalyzer
     	Dialog.showError("Internal Error ", "See stack trace in console");
   	  	e.printStackTrace();
     }
+    finally {
+		HookAccessImpl.cleanupTransformationTrace();
+	}
     
-    
-  }
-
-  private String findWorkflow(File rootDirectory)
-  {
-	File[] list = rootDirectory.listFiles();
-
-    if (list == null) return null;
-
-      for ( File f : list ) {
-        if ( f.isDirectory() ) {
-          String result = findWorkflow( f );
-          if(result == null)
-        	continue;
-          else
-        	return result;
-        }
-        else {
-          if(f.getPath().endsWith(".workflow"))
-        	return f.getAbsolutePath(); 
-        }
-      }
-	return null;
   }
   
   @Override
