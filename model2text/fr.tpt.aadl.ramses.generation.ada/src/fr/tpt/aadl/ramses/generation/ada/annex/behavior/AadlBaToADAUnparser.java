@@ -378,7 +378,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         _adaFileContent.incrementIndent() ;
 
         _headerFileContent.addOutputNewline("type "+ aadlComponentADAId +
-                "_BA_State_t(") ;
+                "_BA_State_t is (") ;
         _headerFileContent.incrementIndent() ;
 
         for(BehaviorState state : ba.getStates())

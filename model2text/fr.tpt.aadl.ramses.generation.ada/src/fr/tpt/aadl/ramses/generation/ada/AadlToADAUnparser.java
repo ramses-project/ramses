@@ -89,21 +89,18 @@ import fr.tpt.aadl.utils.names.DataModelProperties;
 
 public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGenericUnparser
 {
-	public static List <String> language;
-	public static ArrayList<Boolean> ADA;
-	public static String sourceName; 
-	public static String typeLanguage;
-    private static ArrayList <String> listeTypes;
-    
 	private static AadlToADAUnparser singleton;
-    List<String> dataNames = new ArrayList<String>() ;
 
+	public static List <String> language;
+	public static String sourceName;
+    
     public static String period = null ;
     public static String deadline = null ;
     public static String dispatchProtocol = null;
     public static String priority =null;
     public static List<String> sourceText = new ArrayList<String>(); 
-	// gtype.ads
+	
+    // gtype.ads
 	protected AadlToADASwitchProcess _gtypesHeaderCode ;
 
 	// subprogram.adb and .ads
@@ -121,11 +118,10 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	private AadlToADASwitchProcess _currentImplUnparser ;
 	private AadlToADASwitchProcess _currentHeaderUnparser ;
 
-	private List<NamedElement> _delayedDataDeclarations ;
-
 	private Map<AadlToADASwitchProcess, Set<String>> _additionalHeaders ;
 
 	private List<String> _processedTypes  ;
+    public Set<NamedElement> additionalUnparsing = new LinkedHashSet<NamedElement>();
 
 	private static final String MAIN_HEADER_INCLUSION = "\n" ;
 	// Map Data Access with their relative Data Subcomponent. Relations 
@@ -133,7 +129,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
 	
 	private List<SubprogramClassifier> subprogramsUnparsingStack = new ArrayList<SubprogramClassifier>();
-    public Set<NamedElement> additionalUnparsing = new LinkedHashSet<NamedElement>();
 
 	public static AadlToADAUnparser getAadlToADAUnparser()
 	{
@@ -173,9 +168,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		_processedTypes = new ArrayList<String>() ;
 
 		_additionalHeaders = new HashMap<AadlToADASwitchProcess, Set<String>>() ;
-		listeTypes = new ArrayList<String>();
 
-		_delayedDataDeclarations = new ArrayList<NamedElement>() ;
 	}
 
 	public List<PrototypeBinding> getCurrentPrototypeBindings(String ctxt)
@@ -200,11 +193,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	  }
 	public void saveGeneratedFilesContent(File targetDirectory)
 	{
-
-		for(NamedElement ne : _delayedDataDeclarations)
-		{
-			getADATypeDeclarator(ne, false) ;
-		}
 
 		_gtypesHeaderCode.addOutputNewline("\nend Gtypes;\n") ;
 		_subprogramHeaderCode.addOutputNewline("\nend Subprograms;\n") ;
@@ -278,7 +266,13 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			// TODO: handle error message.
 			e.printStackTrace() ;
 		}
+
 	}
+
+	  private void clean() {
+			this._additionalHeaders.clear();
+			this._dataAccessMapping.clear();
+		  }
 
 	private String getAdditionalHeader(AadlToADASwitchProcess fileUnparser)
 	{
@@ -329,44 +323,27 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			AadlToADASwitchProcess sourceTextDest)
 					throws Exception
 					{
-		ne = object;
-		
-		List<String> sourceText =
-				PropertyUtils.getStringListValue(ne, "Source_Text") ;
-		
-
-		Set<String> l = new HashSet<String>() ;
-		int count = 0;
-		
-//		typeLanguage = sourceText.get(arg0)
-				
-		for(String s : sourceText)
+		Set<String> l;
+		if(_additionalHeaders.containsKey(sourceTextDest) == false)
 		{
-				
-			if((s.endsWith(".h") && this.language.get(count).equalsIgnoreCase("C")) || (s.endsWith(".ads")))
-				//if(s.endsWith(".h"))
-			{
-				if(_additionalHeaders.containsKey(sourceTextDest) == false)
-				{
-					l.add(s) ;
-					_additionalHeaders.put(sourceTextDest, l) ;
-				}
-				else
-				{
-					_additionalHeaders.get(sourceTextDest).add(s) ;
-				}
-			    sourceName = GenerationUtilsADA.resolveExistingCodeDependencies(object, l);
-
-				if(sourceNameDest!=null)
-					sourceNameDest.addOutput(sourceName) ;
-
-
-				return true ;
-			}
-			count++;
+		  l = new HashSet<String>() ;
+		  _additionalHeaders.put(sourceTextDest, l) ;
 		}
-
-		return false ;
+		else
+		{
+		  l = _additionalHeaders.get(sourceTextDest) ;
+		}
+		String sourceName = GenerationUtilsADA.resolveExistingCodeDependencies(object, l);
+		if(sourceName!=null)
+		{
+		  if(sourceNameDest!=null)
+			sourceNameDest.addOutput(sourceName);
+		  return true;
+		}
+		else
+			throw new Exception("In component "+object.getName()+": Source_Text " +
+		      		"property should also reference a header (.h extension) file");
+		
 					}
 
 	protected void processDataSubcomponentType(DataSubcomponentType dst,
@@ -491,8 +468,15 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 			 _additionalHeaders.get(headerUnparser)
 			 .addAll(baToADAUnparser.getAdditionalHeaders()) ;
+			 baToADAUnparser.getAdditionalHeaders().clear();
 		 }
 
+		    if (owner instanceof SubprogramType)
+		    {
+		    	subprogramsUnparsingStack.remove(subprogramsUnparsingStack.size()-1);
+		    }
+
+		 
 		 return DONE ;
 	}
 
@@ -527,8 +511,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	  }
 
 
-	 protected void getADATypeDeclarator(NamedElement object,
-			 boolean delayComplexTypes)
+	 protected void getADATypeDeclarator(NamedElement object)
 	 {
 
 		 String id =
@@ -581,7 +564,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 						 ClassifierValue cv = (ClassifierValue) v ;
 						 if(_processedTypes.contains(cv.getClassifier().getQualifiedName())==false && cv.getClassifier() instanceof DataSubcomponentType)
 						 {
-							 getADATypeDeclarator(cv.getClassifier(), false);
+							 getADATypeDeclarator(cv.getClassifier());
 							 _processedTypes.add(cv.getClassifier().getQualifiedName());
 						 }
 					 }
@@ -597,8 +580,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 _gtypesHeaderCode.incrementIndent();
 			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is Boolean;") ;
 			 _gtypesHeaderCode.decrementIndent();
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
 			 break ;
 		 }
 		 case CHARACTER :
@@ -606,8 +587,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 _gtypesHeaderCode.incrementIndent();
 			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is Character;") ;
 			 _gtypesHeaderCode.decrementIndent();
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
 			 break ;
 		 }
 		 case FIXED :
@@ -617,8 +596,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 _gtypesHeaderCode.incrementIndent();
 			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is Float;") ;
 			 _gtypesHeaderCode.decrementIndent();
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
 			 break ;
 		 }
 		 case INTEGER :
@@ -631,8 +608,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 _gtypesHeaderCode.addOutput("Integer_Default_Value : " + id + " := 0") ;
 				 _gtypesHeaderCode.addOutputNewline(";") ;
 				 
-				 if (!listeTypes.contains(id))
-					 listeTypes.add(id);
 				 break ;	 
 
 		 }
@@ -641,290 +616,308 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 _gtypesHeaderCode.incrementIndent();
 			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is String;") ;
 			 _gtypesHeaderCode.decrementIndent();
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
 			 break ;
 		 }
 		 // Complex types
 		 case ENUM :
 		 {
-			 if(delayComplexTypes)
-			 {
-				 _delayedDataDeclarations.add(object) ;
-				 break ;
-			 }
+			 
+			 StringBuilder enumDeclaration = new StringBuilder("type e_" + id + " is ( ");
+		        List<String> stringifiedRepresentation = new ArrayList<String>() ;
+		        EList<PropertyExpression> dataRepresentation =
+		              PropertyUtils
+		                    .getPropertyExpression(dataTypeHolder.klass,
+		                                           DataModelProperties.REPRESENTATION) ;
 
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
+		        for(PropertyExpression representationProperty : dataRepresentation)
+		        {
+		          if(representationProperty instanceof ListValue)
+		          {
+		            ListValue lv = (ListValue) representationProperty ;
 
-			 _gtypesHeaderCode.addOutputNewline("subtype e_" + id + " is ( ") ;
-	
-			 List<String> stringifiedRepresentation = new ArrayList<String>() ;
-			 EList<PropertyExpression> dataRepresentation =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.REPRESENTATION) ;
+		            for(PropertyExpression v : lv.getOwnedListElements())
+		            {
+		              if(v instanceof StringLiteral)
+		              {
+		                StringLiteral enumString = (StringLiteral) v ;
+		                stringifiedRepresentation.add(enumString.getValue()) ;
+		              }
+		            }
+		          }
+		        }
 
-			 for(PropertyExpression representationProperty : dataRepresentation)
-			 {
-				 if(representationProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) representationProperty ;
+		        EList<PropertyExpression> dataEnumerators =
+		              PropertyUtils
+		                    .getPropertyExpression(dataTypeHolder.klass,
+		                                           DataModelProperties.ENUMERATORS) ;
 
-					 for(PropertyExpression v : lv.getOwnedListElements())
-					 {
-						 if(v instanceof StringLiteral)
-						 {
-							 StringLiteral enumString = (StringLiteral) v ;
-							 stringifiedRepresentation.add(enumString.getValue()) ;
-						 }
-					 }
-				 }
-			 }
+		        for(PropertyExpression enumeratorProperty : dataEnumerators)
+		        {
+		          if(enumeratorProperty instanceof ListValue)
+		          {
+		            ListValue lv = (ListValue) enumeratorProperty ;
+		            Iterator<PropertyExpression> it =
+		                  lv.getOwnedListElements().iterator() ;
 
-			 EList<PropertyExpression> dataEnumerators =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.ENUMERATORS) ;
+		            while(it.hasNext())
+		            {
+		              PropertyExpression v = it.next() ;
 
-			 for(PropertyExpression enumeratorProperty : dataEnumerators)
-			 {
-				 if(enumeratorProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) enumeratorProperty ;
-					 Iterator<PropertyExpression> it =
-							 lv.getOwnedListElements().iterator() ;
+		              if(v instanceof StringLiteral)
+		              {
+		                StringLiteral enumString = (StringLiteral) v ;
+		                String rep = "" ;
 
-					 while(it.hasNext())
-					 {
-						 PropertyExpression v = it.next() ;
+		                if(stringifiedRepresentation.isEmpty() == false)
+		                {
+		                  rep =
+		                        " := " +
+		                              stringifiedRepresentation.get(lv
+		                                    .getOwnedListElements().indexOf(v)) ;
+		                }
 
-						 if(v instanceof StringLiteral)
-						 {
-							 StringLiteral enumString = (StringLiteral) v ;
-							 String rep = "" ;
+		                if(it.hasNext())
+		                {
+		                  rep += "," ;
+		                }
+		                enumDeclaration.append("\t"+id + "_" +
+		                        enumString.getValue() + rep+"\n");
+		              }
+		            }
+		          }
+		        }
 
-							 if(stringifiedRepresentation.isEmpty() == false)
-							 {
-								 rep =
-										 " = " +
-												 stringifiedRepresentation.get(lv
-														 .getOwnedListElements().indexOf(v)) ;
-							 }
-
-							 if(it.hasNext())
-							 {
-								 rep += "," ;
-							 }
-
-							 _gtypesHeaderCode.addOutputNewline(id + "_" +
-									 enumString.getValue() + rep) ;
-						 }
-					 }
-				 }
-			 }
-
-			 _gtypesHeaderCode.decrementIndent() ;
-			 _gtypesHeaderCode.addOutputNewline(") " + id + ";") ;
-			 break ;
+		        _gtypesHeaderCode.addOutput(enumDeclaration.toString()) ;
+		        _gtypesHeaderCode.addOutputNewline(");") ;
+		        break ;
+	 
 		 }
 		 case STRUCT :
 		 {
-			 if(delayComplexTypes)
-			 {
-				 _delayedDataDeclarations.add(object) ;
-				 break ;
-			 }
+		        StringBuilder structDefinition = new StringBuilder("subtype " + id + " is new record");
+		        EList<PropertyExpression> elementNames =
+		              PropertyUtils
+		                    .getPropertyExpression(dataTypeHolder.klass,
+		                                           DataModelProperties.ELEMENT_NAMES) ;
+		        if(elementNames.isEmpty()==false)
+		        {
+		          List<String> stringifiedElementNames = new ArrayList<String>() ;
 
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
+		          for(PropertyExpression elementNameProperty : elementNames)
+		          {
+		            if(elementNameProperty instanceof ListValue)
+		            {
+		              ListValue lv = (ListValue) elementNameProperty ;
 
-			 _gtypesHeaderCode.addOutputNewline("subtype " + id + " is new record") ;
-			 _gtypesHeaderCode.incrementIndent() ;
-			 EList<PropertyExpression> elementNames =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.ELEMENT_NAMES) ;
-			 List<String> stringifiedElementNames = new ArrayList<String>() ;
+		              for(PropertyExpression v : lv.getOwnedListElements())
+		              {
+		                if(v instanceof StringLiteral)
+		                {
+		                  StringLiteral eltName = (StringLiteral) v ;
+		                  stringifiedElementNames.add(eltName.getValue()) ;
+		                }
+		              }
+		            }
+		          }
 
-			 for(PropertyExpression elementNameProperty : elementNames)
-			 {
-				 if(elementNameProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) elementNameProperty ;
+		          EList<PropertyExpression> elementTypes =
+		                PropertyUtils
+		                      .getPropertyExpression(dataTypeHolder.klass,
+		                                             DataModelProperties.BASE_TYPE) ;
 
-					 for(PropertyExpression v : lv.getOwnedListElements())
-					 {
-						 if(v instanceof StringLiteral)
-						 {
-							 StringLiteral eltName = (StringLiteral) v ;
-							 stringifiedElementNames.add(eltName.getValue()) ;
-						 }
-					 }
-				 }
-			 }
+		          for(PropertyExpression elementTypeProperty : elementTypes)
+		          {
+		        	if(elementTypeProperty instanceof ListValue)
+		        	{
+		              ListValue lv = (ListValue) elementTypeProperty ;
 
-			 EList<PropertyExpression> elementTypes =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.BASE_TYPE) ;
-
-			 for(PropertyExpression elementTypeProperty : elementTypes)
-			 {
-				 if(elementTypeProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) elementTypeProperty ;
-
-					 for(PropertyExpression v : lv.getOwnedListElements())
-					 {
-						 if(v instanceof ClassifierValue)
-						 {
-							 ClassifierValue cv = (ClassifierValue) v ;
-							 String type =
-									 GenerationUtilsADA.getGenerationADAIdentifier(cv
-											 .getClassifier().getQualifiedName()) ;
-							 _gtypesHeaderCode.addOutputNewline(stringifiedElementNames.get(lv.getOwnedListElements()
-									 .indexOf(v)) + " : " + type +";") ;
-						 }
-					 }
-				 }
-			 }
-
-			 _gtypesHeaderCode.decrementIndent() ;
-			 _gtypesHeaderCode.addOutputNewline("end record;") ;
-			 break ;
+		              for(PropertyExpression v : lv.getOwnedListElements())
+		              {
+		                if(v instanceof ClassifierValue)
+		                {
+		                  ClassifierValue cv = (ClassifierValue) v ;
+		                  String type =
+		                        GenerationUtilsADA.getGenerationADAIdentifier(cv
+		                              .getClassifier().getQualifiedName()) ;
+		                  structDefinition.append("\t"+ stringifiedElementNames.get(lv.getOwnedListElements()
+	                              .indexOf(v)) +
+		                        " : " + type
+		                         + ";\n") ;
+		                }
+		              }
+		            }
+		          }
+		        }
+		        else
+		        {
+		        	if(object instanceof DataImplementation)
+		        	{
+		        		for(DataSubcomponent ds:((DataImplementation)object).getOwnedDataSubcomponents())
+		        		{
+		        			DataSubcomponentType dst = ds.getDataSubcomponentType();
+		        			Set<String> l;
+		        			if(_additionalHeaders.containsKey(_gtypesHeaderCode) == false)
+		        			{
+		        				l = new HashSet<String>() ;
+		        				_additionalHeaders.put(_gtypesHeaderCode, l) ;
+		        			}
+		        			else
+		        			{
+		        				l = _additionalHeaders.get(_gtypesHeaderCode) ;
+		        			}
+		        			String sourceName = GenerationUtilsADA.resolveExistingCodeDependencies(dst, l);
+		        			if(sourceName!=null)
+		        				structDefinition.append("\t"+sourceName);
+		        			else
+		        			{
+		        				process(dst);
+		        				sourceName = GenerationUtilsADA.getGenerationADAIdentifier(dst.getQualifiedName());
+		        				structDefinition.append("\t"+sourceName);
+		        			}
+		        			structDefinition.append(" "+ds.getName()+";\n");
+		        		}
+		        	}
+		        }
+		        _gtypesHeaderCode.addOutput(structDefinition.toString());
+		        _gtypesHeaderCode.addOutputNewline("end record;") ;
+		        break ;
+			 
 		 }
 		 case UNION :
 		 {
-			 if(delayComplexTypes)
-			 {
-				 _delayedDataDeclarations.add(object) ;
-				 break ;
-			 }
+			 
+			 
+			 StringBuilder unionDeclaration = new StringBuilder("case " + id + " is ");
+		        EList<PropertyExpression> elementNames =
+		              PropertyUtils
+		                    .getPropertyExpression(dataTypeHolder.klass,
+		                                           DataModelProperties.ELEMENT_NAMES) ;
+		        List<String> stringifiedElementNames = new ArrayList<String>() ;
 
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
+		        for(PropertyExpression elementNameProperty : elementNames)
+		        {
+		          if(elementNameProperty instanceof ListValue)
+		          {
+		            ListValue lv = (ListValue) elementNameProperty ;
 
-			 _gtypesHeaderCode.addOutputNewline("case " + id + " is") ;
-			 _gtypesHeaderCode.incrementIndent() ;
-			 EList<PropertyExpression> elementNames =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.ELEMENT_NAMES) ;
-			 List<String> stringifiedElementNames = new ArrayList<String>() ;
+		            for(PropertyExpression v : lv.getOwnedListElements())
+		            {
+		              if(v instanceof StringLiteral)
+		              {
+		                StringLiteral eltName = (StringLiteral) v ;
+		                stringifiedElementNames.add(eltName.getValue()) ;
+		              }
+		            }
+		          }
+		        }
 
-			 for(PropertyExpression elementNameProperty : elementNames)
-			 {
-				 if(elementNameProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) elementNameProperty ;
+		        EList<PropertyExpression> elementTypes =
+		              PropertyUtils
+		                    .getPropertyExpression(dataTypeHolder.klass,
+		                                           DataModelProperties.BASE_TYPE) ;
 
-					 for(PropertyExpression v : lv.getOwnedListElements())
-					 {
-						 if(v instanceof StringLiteral)
-						 {
-							 StringLiteral eltName = (StringLiteral) v ;
-							 stringifiedElementNames.add(eltName.getValue()) ;
-						 }
-					 }
-				 }
-			 }
+		        for(PropertyExpression elementTypeProperty : elementTypes)
+		        {
+		          if(elementTypeProperty instanceof ListValue)
+		          {
+		            ListValue lv = (ListValue) elementTypeProperty ;
 
-			 EList<PropertyExpression> elementTypes =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.BASE_TYPE) ;
-
-			 for(PropertyExpression elementTypeProperty : elementTypes)
-			 {
-				 if(elementTypeProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) elementTypeProperty ;
-					 int indice = 1;
-
-					 for(PropertyExpression v : lv.getOwnedListElements())
-					 {
-						 if(v instanceof ClassifierValue)
-						 {
-							 _gtypesHeaderCode.addOutputNewline("when " + indice + " =>");
-							 _gtypesHeaderCode.incrementIndent();
-							 indice++;
-							 ClassifierValue cv = (ClassifierValue) v ;
-							 String type =
-									 GenerationUtilsADA.getGenerationADAIdentifier(cv
-											 .getClassifier().getQualifiedName()) ;
-							 _gtypesHeaderCode.addOutputNewline(stringifiedElementNames.get(lv.getOwnedListElements()
-									 .indexOf(v)) + " : " + type + ";") ;
-							 _gtypesHeaderCode.decrementIndent() ;
-						 }
-					 }
-				 }
-			 }
-
-			 _gtypesHeaderCode.decrementIndent() ;
-			 _gtypesHeaderCode.addOutputNewline("end case;") ;
-			 break ;
+		            for(PropertyExpression v : lv.getOwnedListElements())
+		            {
+		              if(v instanceof ClassifierValue)
+		              {
+		                ClassifierValue cv = (ClassifierValue) v ;
+		                String type =
+		                      GenerationUtilsADA.getGenerationADAIdentifier(cv
+		                            .getClassifier().getQualifiedName()) ;
+		                unionDeclaration.append("\t"+type +
+		                      " " +
+		                      stringifiedElementNames.get(lv.getOwnedListElements()
+		                            .indexOf(v)) + ";\n") ;
+		              }
+		            }
+		          }
+		        }
+		        _gtypesHeaderCode.addOutput(unionDeclaration.toString());
+		        _gtypesHeaderCode.addOutputNewline("end" + id + ";") ;
+		        break ;
+			 
 		 }
 		 case ARRAY :
 		 {
 
-			 EList<PropertyExpression> baseType =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.BASE_TYPE) ;
+			 
+			  	StringBuilder arrayDef = new StringBuilder (id+" : array");
+		        EList<PropertyExpression> baseType =
+		              PropertyUtils
+		                    .getPropertyExpression(dataTypeHolder.klass,
+		                                           DataModelProperties.BASE_TYPE) ;
+		        boolean found = false;
+		        for(PropertyExpression baseTypeProperty : baseType)
+		        {
+		          if(baseTypeProperty instanceof ListValue)
+		          {
+		            ListValue lv = (ListValue) baseTypeProperty ;
 
-			 if (!listeTypes.contains(id))
-				 listeTypes.add(id);
+		            for(PropertyExpression v : lv.getOwnedListElements())
+		            {
+		              if(v instanceof ClassifierValue)
+		              {
+		                ClassifierValue cv = (ClassifierValue) v ;
+		               	if(false == _processedTypes.contains(cv.getClassifier().getQualifiedName()))
+		               	{
+		               	   getADATypeDeclarator(cv.getClassifier());
+		               	  _processedTypes.add(cv.getClassifier().getQualifiedName());
+		               	}
+		               	arrayDef.append(GenerationUtilsADA
+		                      .getGenerationADAIdentifier(cv.getClassifier()
+		                            .getQualifiedName())) ;
+		                found=true;
+		                break;
+		              }
+		            }
+		            if(found)
+		            	break;
+		          }
+		        }
+		        _gtypesHeaderCode.addOutput(arrayDef.toString());
+		        _gtypesHeaderCode.addOutput(" ") ;
+		        _gtypesHeaderCode.addOutput(id) ;
+		        EList<PropertyExpression> arrayDimensions =
+		              PropertyUtils
+		                    .getPropertyExpression(dataTypeHolder.klass,
+		                                           DataModelProperties.DIMENSION) ;
 
-			 _gtypesHeaderCode.addOutput(id) ;
-			 _gtypesHeaderCode.addOutput(" : array ") ;
-			 EList<PropertyExpression> arrayDimensions =
-					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
-							 DataModelProperties.DIMENSION) ;
-
-			 for(PropertyExpression dimensionProperty : arrayDimensions)
-			 {
-				 if(dimensionProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) dimensionProperty ;
-
-					 for(PropertyExpression v : lv.getOwnedListElements())
-					 {
-						 if(v instanceof IntegerLiteral)
-						 {
+		        if(arrayDimensions.isEmpty())
+		        {
+		          _gtypesHeaderCode.addOutput("[]") ;
+		        }
+		        else
+		        {
+		          for(PropertyExpression dimensionProperty : arrayDimensions)
+		          {
+		            if(dimensionProperty instanceof ListValue)
+		            {
+		              ListValue lv = (ListValue) dimensionProperty ;
+		 
+		              for(PropertyExpression v : lv.getOwnedListElements())
+		              {
+		                if(v instanceof IntegerLiteral)
+		                {
 							 _gtypesHeaderCode.addOutput("(0 .. ") ;
 							 IntegerLiteral dimension = (IntegerLiteral) v ;
 							 _gtypesHeaderCode.addOutput(Long.toString(dimension.getValue() - 1)) ;
 							 _gtypesHeaderCode.addOutput(" )") ;
-						 }
-					 }
-				 }
-			 }
+		                }
+		              }
+		            }
+		          }
+		        }
 
-			 _gtypesHeaderCode.addOutputNewline(" of ") ;
+		        _gtypesHeaderCode.addOutputNewline(";") ;
+		        break ;
+		      
 
-			 for(PropertyExpression baseTypeProperty : baseType)
-			 {
-				 if(baseTypeProperty instanceof ListValue)
-				 {
-					 ListValue lv = (ListValue) baseTypeProperty ;
-
-					 for(PropertyExpression v : lv.getOwnedListElements())
-					 {
-						 if(v instanceof ClassifierValue)
-						 {
-							 ClassifierValue cv = (ClassifierValue) v ;
-							 _gtypesHeaderCode.addOutput(GenerationUtilsADA
-									 .getGenerationADAIdentifier(cv.getClassifier()
-											 .getQualifiedName())) ;
-						 }
-					 }
-				 }
-			 }
-
-			 _gtypesHeaderCode.addOutputNewline(";") ;
-			 break ;
 		 }
 		 case UNKNOWN :
 		 {
@@ -933,14 +926,13 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 _gtypesHeaderCode.addOutputNewline("");
 				 _gtypesHeaderCode.incrementIndent();
 				 _gtypesHeaderCode.addOutput("subtype ") ;
+		          resolveExistingCodeDependencies(object, _gtypesHeaderCode,
+                          _gtypesHeaderCode) ;
 				 _gtypesHeaderCode.addOutput(id + " is " + object.getName()) ;
-
 
 				 _gtypesHeaderCode.addOutputNewline(";") ;
 				 _gtypesHeaderCode.decrementIndent();
 
-				 if (!listeTypes.contains(id))
-					 listeTypes.add(id);
 			 }
 			 catch(Exception e)
 			 {
@@ -969,8 +961,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 }
 				 _processedTypes.add(object.getQualifiedName());
 				 _gtypesHeaderCode.processComments(object) ;
-
-				 getADATypeDeclarator(object, true) ;
+				 getADATypeDeclarator((NamedElement)object) ;
 				 return DONE ;
 			 }
 
@@ -1026,9 +1017,14 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseDataImplementation(DataImplementation object)
 			 {
+			    	if(_processedTypes.contains(object.getQualifiedName()))
+			        {
+			          return DONE ;
+			        }
+			     _processedTypes.add(object.getQualifiedName());
 				 _currentHeaderUnparser = _gtypesHeaderCode ;
 				 _gtypesHeaderCode.processComments(object) ;
-				 getADATypeDeclarator(object, true) ;
+				 getADATypeDeclarator(object) ;
 				 return null ;
 			 }
 
@@ -1074,9 +1070,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			        processEList(object.getOwnedThreadSubcomponents()) ;
 
 			        sourceText = GenerationUtilsADA.srcText;
-			        			        
-//			        if(sourceText.get(0).endsWith(".h"))
-//			        {
+
 			        _activityHeaderCode.addOutputNewline("procedure Last_Chance_Handler " +
 						 		"(Source_Location :System.Address; Line : Integer);");
 					 String gnat_handler = "__gnat_last_chance_handler";
@@ -1091,8 +1085,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 					 _activityImplCode.addOutputNewline("end loop;");
 					 _activityImplCode.addOutputNewline("end Last_Chance_Handler;");
 
-
-//			        }
 			        
 			        List<String> dataSubcomponentNames = new ArrayList<String>();
 			        Map<String, DataSubcomponent> dataSubcomponentMapping = new HashMap<String, DataSubcomponent>();
@@ -1249,13 +1241,13 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			        _activityImplCode.decrementIndent() ;
 			        _activityImplCode.addOutputNewline("end "+ GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+";") ;
 			        
-			        _activityHeaderCode.addOutputNewline("procedure " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+ "_Job"+";") ;
+			        _activityHeaderCode.addOutputNewline("procedure " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+";") ;
 
 			        sourceText = GenerationUtilsADA.srcText;
 			        
 			        _activityHeaderCode.addOutputNewline("pragma Export (C,"+GenerationUtilsADA
-							 .getGenerationADAIdentifier(object.qualifiedName()) + 
-							 "_Job,\n     \""+GenerationUtilsADA.getGenerationADAIdentifier(object.qualifiedName())+"_Job\");");
+							 .getGenerationADAIdentifier(object.qualifiedName())+GenerationUtilsADA.THREAD_SUFFIX +
+							 ",\n     \""+GenerationUtilsADA.getGenerationADAIdentifier(object.qualifiedName())+GenerationUtilsADA.THREAD_SUFFIX+"\");");
 					 _activityHeaderCode.addOutputNewline("");
 
 					 return null ;
@@ -1278,25 +1270,28 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseSubprogramType(SubprogramType object)
 			 {
-				 if(_processedTypes.contains(object.getQualifiedName()))
-				 {
-					 return DONE ;
-				 }
-				 _processedTypes.add(object.getQualifiedName());
 				 
-				 //the problem
-				 try {
-					 resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
-				 } catch (Exception e1) {
-					 
-			          caseSubprogramClassifier((SubprogramClassifier) object);		                
+			    	_currentImplUnparser = _subprogramImplCode;
+			      	_currentHeaderUnparser = _subprogramHeaderCode; 
+			      	
+			    	if(_processedTypes.contains(object.getQualifiedName()))
+			        {
+			          return DONE ;
+			        }
+			        _processedTypes.add(object.getQualifiedName());
+			    	
+			        try {
+			          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
+			        } catch (Exception e1) {
+			          caseSubprogramClassifier((SubprogramClassifier) object);
+			                
 			          processBehavioredType(object) ;
-
-					 _subprogramImplCode.decrementIndent();
-					 _subprogramImplCode.addOutputNewline("end " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + ";");	
-				 }
-
-				 return DONE;
+			          	    
+						 _subprogramImplCode.decrementIndent();
+						 _subprogramImplCode.addOutputNewline("end " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) + ";");	
+			        }
+			  	    
+			  	    return DONE;					 
 			 }
 
 			 @Override
