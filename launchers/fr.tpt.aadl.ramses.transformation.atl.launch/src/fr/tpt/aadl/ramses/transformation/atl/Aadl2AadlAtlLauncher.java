@@ -157,8 +157,8 @@ public abstract class Aadl2AadlAtlLauncher extends AtlTransfoLauncher
 			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 					".aaxl2", "_extended.aadl2");
 
-			Resource expandedResult = this.doGeneration(inputResource,
-					transformationFileList, aadlGeneratedFileName);
+			Resource expandedResult = this.doTransformation(transformationFileList, inputResource,
+					aadlGeneratedFileName);
 
 			File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 			if(outputModelDir.exists()==false)
@@ -262,28 +262,17 @@ public abstract class Aadl2AadlAtlLauncher extends AtlTransfoLauncher
 		}
 			}
 
-	public Resource doGeneration(Resource inputResource,
-			List<File> transformationFileList,
+
+	public Resource doTransformation(List<File> transformationFileList, Resource inputResource,
 			String outputDirPathName)
-					throws FileNotFoundException, IOException, ATLCoreException, Exception
+					throws FileNotFoundException, IOException, ATLCoreException, GenerationException
 					{
 
 		if(Aadl2AadlAtlLauncher.resourcesDir == null)
-			throw new Exception(
+			throw new GenerationException(
 					"Illegal initialization of ATL transformation launcher: "
 							+ "directory containing .asm files is undefined") ;
-
-		//this.transformationFilepath = transformationFileName ;
-
-
-		return doTransformation(transformationFileList, inputResource, outputDirPathName) ;
-
-					}
-
-	protected Resource doTransformation(List<File> transformationFileList, Resource inputResource,
-			String outputDirPathName)
-					throws FileNotFoundException, IOException, ATLCoreException
-					{
+		
 		boolean workingWithInstances =
 				(inputResource.getContents().get(0) instanceof SystemInstance) ;
 
@@ -422,7 +411,7 @@ public abstract class Aadl2AadlAtlLauncher extends AtlTransfoLauncher
 		}
 	}
 
-	protected void setPredefinedResourcesDirectory(File dir)
+	public void setPredefinedResourcesDirectory(File dir)
 			throws ATLCoreException, Exception
 			{
 		if(resourcesDir==null)

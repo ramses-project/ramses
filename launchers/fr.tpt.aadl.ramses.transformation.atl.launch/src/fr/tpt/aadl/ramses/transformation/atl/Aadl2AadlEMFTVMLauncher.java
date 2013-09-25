@@ -74,6 +74,7 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
 
 public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
@@ -130,8 +131,8 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 					".aaxl2", "_extended.aadl2");
 
-			Resource expandedResult = this.doGeneration(inputResource,
-					transformationFileList, aadlGeneratedFileName);
+			Resource expandedResult = this.doTransformation(transformationFileList,
+					inputResource, aadlGeneratedFileName);
 
 			File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 			if(outputModelDir.exists()==false)
@@ -142,32 +143,22 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 
 			instantiator.serialize(expandedResult, outputFilePath);
 			return AadlToTargetSpecificAadl.extractAadlResource(inputResource, outputFile);
-			
-		} catch (Exception e) {
+		
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			throw new GenerationException(e.getMessage());
 		}
 			}
 
-	public Resource doGeneration(Resource inputResource,
-			List<File> transformationFileList,
+	public Resource doTransformation(List<File> transformationFileList, Resource inputResource,
 			String outputDirPathName)
-					throws FileNotFoundException, IOException, ATLCoreException, Exception
-					{
-
-		if(Aadl2AadlEMFTVMLauncher.resourcesDir == null)
-			throw new Exception(
-					"Illegal initialization of ATL transformation launcher: "
-							+ "directory containing .asm files is undefined") ;
-
-		return doTransformation(transformationFileList, inputResource, outputDirPathName) ;
-
-					}
-
-	protected Resource doTransformation(List<File> transformationFileList, Resource inputResource,
-			String outputDirPathName)
-					throws FileNotFoundException, IOException, ATLCoreException
+					throws FileNotFoundException, IOException, ATLCoreException, GenerationException
 	{
+		if(Aadl2AadlEMFTVMLauncher.resourcesDir == null)
+			throw new GenerationException(
+					"Illegal initialization of ATL transformation launcher: "
+							+ "directory containing .emftvm files is undefined") ;
 		
 		ExecEnv env = EmftvmFactory.eINSTANCE.createExecEnv();
 		ResourceSet rs = inputResource.getResourceSet();
@@ -251,7 +242,10 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			public Module resolveModule(String module) throws ModuleNotFoundException {
 				Resource moduleRes = new EMFTVMResourceImpl();
 				try {
-					URL moduleURL = new URL("file:" + module +".emftvm") ;
+					String URLString = "file:" + module;
+					if(false == URLString.endsWith(".emftvm"))
+						URLString+=".emftvm";
+					URL moduleURL = new URL(URLString) ;
 					InputStream inputStream = moduleURL.openStream();
 					try {
 						moduleRes.load(inputStream, Collections.emptyMap());
@@ -352,7 +346,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		}
 	}
 
-	protected void setPredefinedResourcesDirectory(File dir)
+	public void setPredefinedResourcesDirectory(File dir)
 			throws ATLCoreException, Exception
 	{
 		if(resourcesDir==null)

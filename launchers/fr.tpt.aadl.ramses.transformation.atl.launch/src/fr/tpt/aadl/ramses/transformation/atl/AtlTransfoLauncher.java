@@ -79,17 +79,10 @@ public abstract class AtlTransfoLauncher
 		  File resourceDir,
 		  List<File> transformationFileList,
 		  File outputDir) throws GenerationException;
-
-  public abstract Resource doGeneration(Resource inputResource,
-                               List<File> transformationFileList,
-                               String outputDirPathName)
-        throws FileNotFoundException, IOException, ATLCoreException, Exception;
   
-  
-  
-  protected abstract Resource doTransformation(List<File> transformationFileList, Resource inputResource,
+  public abstract Resource doTransformation(List<File> transformationFileList, Resource inputResource,
 		  String outputDirPathName)
-        throws FileNotFoundException, IOException, ATLCoreException;
+        throws FileNotFoundException, IOException, ATLCoreException, GenerationException;
 
   
   
@@ -110,7 +103,7 @@ public abstract class AtlTransfoLauncher
     }
   }
   
-  protected void setPredefinedResourcesDirectory(File dir)
+  public void setPredefinedResourcesDirectory(File dir)
                                               throws ATLCoreException, Exception
   {
 	if(resourcesDir==null)

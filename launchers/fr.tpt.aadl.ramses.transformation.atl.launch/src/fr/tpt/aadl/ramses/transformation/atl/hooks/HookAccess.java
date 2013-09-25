@@ -136,5 +136,7 @@ public interface HookAccess extends EObject
 	 */
 	Boolean isUsedInFreshClause(BehaviorAnnex ba, Port p);
 
+	
+	NamedElement getElement(NamedElement ne);
 
 } // HookAccess

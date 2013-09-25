@@ -51,7 +51,7 @@ public abstract class EMFTVMTransfoLauncher
   protected static File resourcesDir = null ;
 
   protected static final EMFInjector injector = new EMFInjector() ;
-//  private static final EMFExtractor extractor = new EMFExtractor() ;
+  //  private static final EMFExtractor extractor = new EMFExtractor() ;
 
   // Load the input file resource
   private static final EMFModelFactory factory = new EMFModelFactory() ;
@@ -73,12 +73,6 @@ public abstract class EMFTVMTransfoLauncher
 		  File resourceDir,
 		  List<File> transformationFileList,
 		  File outputDir) throws GenerationException;
-
-  public abstract Resource doGeneration(Resource inputResource,
-                               List<File> transformationFileList,
-                               String outputDirPathName)
-        throws FileNotFoundException, IOException, ATLCoreException, Exception;
-  
   
   
   protected abstract Resource doTransformation(List<File> transformationFileList, Resource inputResource,

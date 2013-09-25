@@ -162,6 +162,11 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
       _transformationTrace.put(targetDeclarative, sourceInstance);
     }
   
+    public static void cleanupTransformationTrace()
+    {
+    	_transformationTrace.clear();
+    }
+    
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -360,5 +365,10 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  result.add(iter.getFeatureInstance());
 	}
 	return result;
+  }
+  
+  public NamedElement getElement(NamedElement ne)
+  {
+	  return ne;
   }
 } //HookAccessImpl

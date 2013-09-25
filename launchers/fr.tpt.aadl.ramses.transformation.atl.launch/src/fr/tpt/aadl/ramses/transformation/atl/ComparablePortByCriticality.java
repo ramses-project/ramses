@@ -6,7 +6,7 @@ import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 
 public class ComparablePortByCriticality implements Comparable<ComparablePortByCriticality> {
 
-	private long _criticality=0;
+	private long _criticality=1;
 	private FeatureInstance _featureInstance=null;
 	
 	public ComparablePortByCriticality(FeatureInstance port)
