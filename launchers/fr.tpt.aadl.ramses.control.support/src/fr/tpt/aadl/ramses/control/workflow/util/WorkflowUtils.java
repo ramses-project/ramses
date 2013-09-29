@@ -78,13 +78,9 @@ public class WorkflowUtils {
 		getResourceSet().getPackageRegistry().put(WorkflowPackage.eNS_URI,
 				WorkflowPackage.eINSTANCE);
 
-		if (!getResourceSet().getURIConverter().exists(wf_uri, null)) {
-			resource = getResourceSet().createResource(wf_uri);
-			saveWorkflow(resource, workflow);
-		} else {
-			System.out.println("Workflow artifact of the specified path: "
-					+ _workflowPath + " already exists.");
-		}
+		resource = getResourceSet().createResource(wf_uri);
+		saveWorkflow(resource, workflow);
+		
 	}
 
 /*	*//**
