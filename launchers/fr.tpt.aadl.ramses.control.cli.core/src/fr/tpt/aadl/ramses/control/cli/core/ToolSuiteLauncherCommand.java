@@ -474,7 +474,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     List<Resource> modelResources = launcher.parse(mainModelFiles) ;
     MessageStatus ms = MessageStatus.INFO ;
     
-    String msg = "instanciation has " ;
+    String msg = "parsing has " ;
     
     ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
     
