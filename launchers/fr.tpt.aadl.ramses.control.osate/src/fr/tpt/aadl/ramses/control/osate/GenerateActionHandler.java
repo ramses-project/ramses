@@ -146,7 +146,7 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 											{
 												SystemInstance sinst=null;
 												URI instanceURI = OsateResourceUtil.getInstanceModelURI(si);
-												Resource sintResource = OsateResourceUtil.getResourceSet().getResource(instanceURI, true);
+												Resource sintResource = OsateResourceUtil.getResourceSet().getResource(instanceURI, false);
 												if(sintResource!=null)
 												{
 													sinst = (SystemInstance) sintResource.getContents().get(0);
