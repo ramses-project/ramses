@@ -62,7 +62,7 @@ public class ToolSuiteLauncher
   private List<String> _analysisToPerform ;
   private Set<File> _includeDirSet;
   
-  ToolSuiteLauncher()
+  public ToolSuiteLauncher()
   {
     _registry = ServiceRegistryProvider.getServiceRegistry() ;
     _predefinedPropertiesManager = new PredefinedPropertiesManager() ;
@@ -164,12 +164,12 @@ public class ToolSuiteLauncher
     }
   }
 
-  List<Resource> parse(List<File> aadlFile)
+  public List<Resource> parse(List<File> aadlFile)
   {
     return _instantiator.parse(aadlFile) ;
   }
 
-  void parsePredefinedRessources()
+  public void parsePredefinedRessources()
   {
     try
     {
@@ -261,7 +261,7 @@ public class ToolSuiteLauncher
     this.performAnalysis(instance, parameters) ;
   }
 
-  private SystemInstance instantiate(List<Resource> aadlModels,
+  public SystemInstance instantiate(List<Resource> aadlModels,
 		String systemToInstantiate) {
     for(Resource r : aadlModels)
     {
@@ -279,9 +279,9 @@ public class ToolSuiteLauncher
     			systemToInstantiate +
     			" could not be found for instantiation.");
 	return null;
-}
+  }
 
-void parsePredefinedPackages()
+  public void parsePredefinedPackages()
   {
     File aadlResourcesDir = RamsesConfiguration.getRamsesResourcesDir();
     new PredefinedPackagesManager(aadlResourcesDir);
