@@ -1,6 +1,8 @@
 package arinc653_runtime
 public
 
+with Data_Model,Base_Types;
+
 --------------------------------------------
 --------------------------------------------
 --               DATA TYPES               --
@@ -48,6 +50,12 @@ properties
   Programming_Properties::Source_Name => "QUEUING_DISCIPLINE_TYPE";
   Programming_Properties::Source_Text => ("arinc653/types.h");
 end Queuing_Discipline_Type;
+
+data Waiting_Range_Type
+properties
+  Programming_Properties::Source_Name => "WAITING_RANGE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/types.h");
+end Waiting_Range_Type;
 
 
 --------------------------------------------
@@ -254,9 +262,19 @@ end Queuing_Port_Id_Type;
 
 data Queuing_Port_Status_Type
 properties
+  Data_Model::Data_Representation => Struct;
   Programming_Properties::Source_Name => "QUEUING_PORT_STATUS_TYPE";
   Programming_Properties::Source_Text => ("arinc653/queueing.h");
 end Queuing_Port_Status_Type;
+
+data implementation Queuing_Port_Status_Type.impl
+subcomponents
+  NB_MESSAGE: data MESSAGE_RANGE_TYPE;
+  MAX_NB_MESSAGE: data MESSAGE_RANGE_TYPE;
+  MAX_MESSAGE_SIZE: data MESSAGE_SIZE_TYPE;
+  PORT_DIRECTION_TYPE: data PORT_DIRECTION;
+  WAITING_RANGE_TYPE: data WAITING_PROCESSES;
+end Queuing_Port_Status_Type.impl;
 
 subprogram Create_Queuing_Port
 features
@@ -321,6 +339,24 @@ properties
   Programming_Properties::Source_Text => ("arinc653/queueing.h");
 end Get_Queuing_Port_Status;
 
+subprogram Get_Queueing_Port_Count
+features
+  QUEUING_PORT_ID: in parameter QUEUING_PORT_ID_TYPE;
+  NB_MESSAGE: out parameter MESSAGE_RANGE_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+annex behavior_specification {**
+  VARIABLES
+    STATUS: Queuing_Port_Status_Type.impl;
+  STATES
+  	singleton: initial final state;
+  TRANSITIONS
+    t: singleton -[]-> singleton
+    {
+      Get_Queuing_Port_Status!(QUEUING_PORT_ID, STATUS, RETURN_CODE);
+      NB_MESSAGE := STATUS.NB_MESSAGE
+    };
+**};
+end Get_Queueing_Port_Count;
 --------------------------------------------
 --------------------------------------------
 --             SAMPLING PORT              --
