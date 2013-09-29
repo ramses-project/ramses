@@ -3,6 +3,7 @@ package fr.tpt.aadl.ramses.control.support;
 import java.io.File ;
 import java.io.IOException;
 import java.util.ArrayList ;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List ;
@@ -41,6 +42,8 @@ public class RamsesConfiguration
   
   public static void setIncludeDir(Resource r, Set<File> includeDirSet)
   {
+	if(includeDirSet==null)
+		includeDirSet = new HashSet<>();
 	if(IncludeDirectories.containsKey(r))
 	  IncludeDirectories.get(r).addAll(includeDirSet) ;
 	else
@@ -70,7 +73,7 @@ public class RamsesConfiguration
 	}
   }
   
-  protected static void setRamsesResourcesDir(File ramsesResourcesDir)
+  public static void setRamsesResourcesDir(File ramsesResourcesDir)
   {
     RamsesRessourcesDir = ramsesResourcesDir ;
   }
