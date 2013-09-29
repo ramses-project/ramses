@@ -25,8 +25,6 @@
 module SharedRules;
 create OUT : AADLBA from IN : AADLI;
 
-helper def : Put_Value_Name     : String = 'Put_Value';
-helper def : Send_Output_Name   : String = 'Send_Output';
 helper def : Receive_Input_Name : String = 'Receive_Input';
 helper def : Next_Value_Name    : String = 'Next_Value';
 
@@ -338,7 +336,6 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		(
 			element <- Send_Output_Spg
 		),
-		
 		--- connect CDWSize
 		CDWSize_Data_Holder_SendOutput: AADLBA!DataSubcomponentHolder
 		(
@@ -366,10 +363,8 @@ rule m_Input_PeriodicDelayed_Port
 		CurrentPerionReadTable: Sequence(Integer) = thisModule.getCurrentPerionReadTable(fi);
 		BufferSize: Integer = thisModule.getBufferSize(fi);
 		ArrayDataType: AADLBA!SubprogramType = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
-		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = thisModule.Receive_Input_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		Next_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Next_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
 		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath());
-		
 		Array_Prototype : AADLBA!DataClassifier = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
 	}
 	to
@@ -502,16 +497,8 @@ rule m_Input_PeriodicDelayed_Port
 		-----------------------
 		--- Receive_Input
 		-----------------------
-		extendedReceiveInputSpg: AADLBA!TypeExtension
-		(
-			extended<-Receive_Input_PrototypeSpg
-		),
-		receiveInputSpg: AADLBA!SubprogramType
-		(
-			name <- Receive_Input_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
-			ownedExtension <- extendedReceiveInputSpg,
-			ownedParameter <- Sequence{}
-		),
+		extendedReceiveInputSpg: AADLBA!TypeExtension,
+		receiveInputSpg: AADLBA!SubprogramType,
 		
 		-----------------------
 		--- Next_Value

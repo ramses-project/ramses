@@ -25,6 +25,12 @@
 module EventDataPorts_LowET;
 create OUT : AADLBA from IN : AADLI;
 
+helper def : Put_Value_Name     : String = 'Put_Value';
+helper def : Send_Output_Name   : String = 'Send_Output';
+helper def : Receive_Input_Name : String = 'Receive_Input';
+helper def : Next_Value_Name    : String = 'Next_Value';
+
+
 helper def : collectPeriodicDelayed_LocalVariables_LowET(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
 	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort() and e.isInputFeature())
 	->collect(fi|
@@ -35,6 +41,7 @@ helper def : collectPeriodicDelayed_LocalVariables_LowET(c: AADLI!ComponentInsta
 	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort())
 		->collect(fi|
 			fi.srcConnectionInstance->collect(cnxInst|
+				-- @ requires EventDataPorts_LowET.m_Thread_Output_PeriodicDelayed_Port_LowET(fi, cnxInst.connectionReference->first().connection) ==> produce a helper and a helper call that does the if(INCLUSION and not EXCLUSION) then resolveTemp else OclUndefined
 				thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'CurrentDeadlineWrite')
 			)
 		)
@@ -301,6 +308,24 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET
 		(fi.isEventDataPort()
 		and
 		fi.isIntraProcessFeatureInstance())
+	using
+	{
+		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = thisModule.Receive_Input_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		-----------------------
+		--- Receive_Input
+		-----------------------
+		extendedReceiveInputSpg: AADLBA!TypeExtension
+		(
+			extended<-Receive_Input_PrototypeSpg
+		),
+		receiveInputSpg: AADLBA!SubprogramType
+		(
+			name <- Receive_Input_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
+			ownedExtension <- extendedReceiveInputSpg,
+			ownedParameter <- Sequence{}
+		)
 }
 
 
