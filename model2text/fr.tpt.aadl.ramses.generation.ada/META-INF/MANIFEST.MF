@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AADL-Ramses-Generation-ADA
-Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.ada
+Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.ada;singleton:=true
 Bundle-Version: 0.5.0
 Bundle-Activator: fr.tpt.aadl.ramses.generation.ada.Activator
 Require-Bundle: org.eclipse.ui,

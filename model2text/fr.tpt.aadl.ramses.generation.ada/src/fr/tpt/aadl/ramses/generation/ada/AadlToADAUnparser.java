@@ -89,6 +89,8 @@ import fr.tpt.aadl.utils.names.DataModelProperties;
 
 public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGenericUnparser
 {
+
+	private AadlBaToADAUnparserAction baToADAUnparserAction = new AadlBaToADAUnparserAction();
 	private static AadlToADAUnparser singleton;
 
 	public static List <String> language;
@@ -431,27 +433,15 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 codeUnparser = _activityImplCode;
 			 headerUnparser = _subprogramHeaderCode;
 		 }
-		 String annexName = as.getName() ;
-		 if(annexName.equalsIgnoreCase(AadlBaUnParserAction.ANNEX_NAME))
-			 annexName = "ada_"+annexName;
-		 AnnexUnparser unparser =
-				 ServiceRegistryProvider.getServiceRegistry()
-				 .getUnparser(annexName) ;
-
-		 // XXX May AadlBaToADAUnparser have its own interface ???
-		 if(unparser != null && unparser instanceof AadlBaToADAUnparserAction )
-		 {
-			 AadlBaToADAUnparserAction baToADAUnparserAction =
-					 (AadlBaToADAUnparserAction) unparser ;
-
-			 AadlBaToADAUnparser baToADAUnparser =
+		 
+		 AadlBaToADAUnparser baToADAUnparser =
 					 baToADAUnparserAction.getUnparser() ;
 
-			 baToADAUnparser.setDataAccessMapping(_dataAccessMapping) ;
-			 baToADAUnparser.setOwner(owner);
+		 baToADAUnparser.setDataAccessMapping(_dataAccessMapping) ;
+		 baToADAUnparser.setOwner(owner);
 
-			 baToADAUnparserAction.unparseAnnexSubclause(as,
-					 codeUnparser.getIndent()) ;
+		 baToADAUnparserAction.unparseAnnexSubclause(as,
+				 codeUnparser.getIndent()) ;
 
 
 
@@ -460,14 +450,10 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 codeUnparser.addOutput(baToADAUnparser.getADAContent()) ;
 			 headerUnparser.addOutput(baToADAUnparser.getADSContent()) ;
 
-			 if(_additionalHeaders.get(headerUnparser) == null)
-			 {
-				 Set<String> t = new HashSet<String>() ;
-				 _additionalHeaders.put(headerUnparser, t) ;
-			 }
-
-			 _additionalHeaders.get(headerUnparser)
-			 .addAll(baToADAUnparser.getAdditionalHeaders()) ;
+		 if(_additionalHeaders.get(headerUnparser) == null)
+		 {
+			 Set<String> t = new HashSet<String>() ;
+			 _additionalHeaders.put(headerUnparser, t) ;
 			 baToADAUnparser.getAdditionalHeaders().clear();
 		 }
 

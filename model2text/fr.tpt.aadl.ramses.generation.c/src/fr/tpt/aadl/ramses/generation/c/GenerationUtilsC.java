@@ -138,9 +138,10 @@ public class GenerationUtilsC
 		isReturnParam =
 				  PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
 	  } catch (Exception e) {
-	    Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
-		BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
-		isReturnParam = bl.getValue();
+		  // DO NOT COMIT.
+//	    Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
+//		BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
+//		isReturnParam = bl.getValue();
 	  }
 	  return isReturnParam;
   }

@@ -90,6 +90,7 @@ import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.annexsupport.AnnexUnparser;
+import org.osate.annexsupport.AnnexUnparserProxy;
 
 import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
@@ -110,7 +111,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                              implements AadlGenericUnparser
 {
   private static AadlToCUnparser singleton;
-  
+  private AadlBaToCUnparserAction baToCUnparserAction = new AadlBaToCUnparserAction();
+
   // gtype.c and .h
   protected AadlToCSwitchProcess _gtypesImplCode ;
   protected AadlToCSwitchProcess _gtypesHeaderCode ;
@@ -456,51 +458,46 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	  codeUnparser = _activityImplCode;
 	  headerUnparser = _subprogramHeaderCode;
 	}
-    String annexName = as.getName() ;
-    	if(annexName.equalsIgnoreCase(AadlBaUnParserAction.ANNEX_NAME))
-    		annexName = "c_"+annexName;
-    AnnexUnparser unparser =
-          ServiceRegistryProvider.getServiceRegistry()
-                .getUnparser(annexName) ;
-    
+
     // XXX May AadlBaToCUnparser have its own interface ???
-    if(unparser != null && unparser instanceof AadlBaToCUnparserAction )
+    // XXX NO, using interfaces and in particular extension points is an overkill
+
+    AadlBaToCUnparser baToCUnparser =
+    		(AadlBaToCUnparser) baToCUnparserAction.getUnparser() ;
+
+    baToCUnparser.setDataAccessMapping(_dataAccessMapping) ;
+    baToCUnparser.setOwner(owner);
+
+    baToCUnparserAction.unparseAnnexSubclause(as,
+    		codeUnparser.getIndent()) ;
+
+
+
+    baToCUnparser.addIndent_C(codeUnparser.getIndent()) ;
+    baToCUnparser.addIndent_H(headerUnparser.getIndent()) ;
+    codeUnparser.addOutput(baToCUnparser.getCContent()) ;
+    headerUnparser.addOutput(baToCUnparser.getHContent()) ;
+
+    if(_additionalHeaders.get(headerUnparser) == null)
     {
-      AadlBaToCUnparserAction baToCUnparserAction =
-            (AadlBaToCUnparserAction) unparser ;
-      
-      AadlBaToCUnparser baToCUnparser =
-            (AadlBaToCUnparser) baToCUnparserAction.getUnparser() ;
-      
-      baToCUnparser.setDataAccessMapping(_dataAccessMapping) ;
-      baToCUnparser.setOwner(owner);
-      
-      baToCUnparserAction.unparseAnnexSubclause(as,
-    		  codeUnparser.getIndent()) ;
-      
-      
-      
-      baToCUnparser.addIndent_C(codeUnparser.getIndent()) ;
-      baToCUnparser.addIndent_H(headerUnparser.getIndent()) ;
-      codeUnparser.addOutput(baToCUnparser.getCContent()) ;
-      headerUnparser.addOutput(baToCUnparser.getHContent()) ;
-
-      if(_additionalHeaders.get(headerUnparser) == null)
-      {
-        Set<String> t = new HashSet<String>() ;
-        _additionalHeaders.put(headerUnparser, t) ;
-      }
-
-      _additionalHeaders.get(headerUnparser)
-            .addAll(baToCUnparser.getAdditionalHeaders()) ;
-      baToCUnparser.getAdditionalHeaders().clear();
+    	Set<String> t = new HashSet<String>() ;
+    	_additionalHeaders.put(headerUnparser, t) ;
     }
+
+    _additionalHeaders.get(headerUnparser)
+    .addAll(baToCUnparser.getAdditionalHeaders()) ;
+    baToCUnparser.getAdditionalHeaders().clear();
     
     if (owner instanceof SubprogramType)
     {
     	subprogramsUnparsingStack.remove(subprogramsUnparsingStack.size()-1);
     }
 
+    for(NamedElement ne: baToCUnparser.getCoreElementsToBeUnparsed())
+    {
+    	process(ne);
+    }
+    
     return DONE ;
   }
   

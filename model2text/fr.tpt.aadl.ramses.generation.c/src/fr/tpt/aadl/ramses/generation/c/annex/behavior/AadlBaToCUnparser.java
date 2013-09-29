@@ -146,7 +146,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   protected Set<String> _additionalHeaders = new HashSet<String>() ;
   private NamedElement _owner ;
   
-  public AadlBaToCUnparser(AnnexSubclause subclause,
+  private List<NamedElement> coreElementsToBeUnparsed = new ArrayList<>();
+  
+  public List<NamedElement> getCoreElementsToBeUnparsed() {
+	return coreElementsToBeUnparsed;
+  }
+
+public AadlBaToCUnparser(AnnexSubclause subclause,
                            String indent,
                            Map<DataAccess, String> dataAccessMapping)
   {
@@ -437,11 +443,15 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         _cFileContent.addOutput(" " + object.getName()) ;
         caseArrayDimensions(object.getArrayDimensions()) ;
         String init = GeneratorUtils.getInitialValue(object.getDataClassifier()) ;
+        coreElementsToBeUnparsed.add(object.getDataClassifier());
         if(!init.isEmpty())
         {
         	_cFileContent.addOutput(" = "+init) ;
         }
         _cFileContent.addOutputNewline(";") ;
+        
+        
+        
         return DONE ;
       }
 
