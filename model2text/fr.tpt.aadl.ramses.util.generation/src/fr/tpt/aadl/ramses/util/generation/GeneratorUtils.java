@@ -239,12 +239,30 @@ public class GeneratorUtils
       for(CallSpecification aCallSpecification : aCallSequence
             .getOwnedCallSpecifications())
       {
-        getListOfReferencedObjects(aCallSpecification, includeDirList, result) ;
+    	 try
+    	 {
+    		 getListOfReferencedObjects(aCallSpecification, includeDirList, result) ;
+    	 }
+    	 catch(Exception e)
+    	 {
+    		 System.err.println(e.getMessage());
+    		 e.printStackTrace();
+    		 continue;
+    	 }
       }
     }
     for(SubprogramSubcomponent sc:aThreadImplementation.getOwnedSubprogramSubcomponents())
     {
-    	getListOfReferencedObjects(sc, includeDirList, result) ;
+    	try
+    	{
+    		getListOfReferencedObjects(sc, includeDirList, result) ;
+    	}
+    	catch(Exception e)
+    	{
+    		System.err.println(e.getMessage());
+    		e.printStackTrace();
+    		continue;
+    	}
     }
   }
 
