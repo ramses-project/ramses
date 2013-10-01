@@ -14,7 +14,7 @@ void Compute_CDW(int taskID, int iteration_counter, periodic_delayed_context_t *
 {
   // validate taskID
   if (taskID >= context->writer_count) {
-    printf("!! taskID invalid !!\n");
+    printf("!! taskID %d invalid !! greater than writer count %d\n", taskID, context->writer_count);
     return;
   }
   

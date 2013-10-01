@@ -51,13 +51,27 @@ helper context AADLBA!ThreadImplementation def : callSequence() : AADLBA!Subprog
 	self.ownedSubprogramCallSequence->first()
 ;
 
-helper context AADLI!SubprogramCallSequence def: isComputeEntryPointOf(c: AADLI!ComponentInstance): Boolean =
+helper context AADLI!SubprogramCallSequence def: isComputeEntryPointOf(c: AADLI!InstanceObject): Boolean =
 	c.ownedPropertyAssociation->exists(
 				e | 
 				e.property.name = 'Compute_Entrypoint_Call_Sequence'
 				and
 				e.ownedValue->exists(f|f.ownedValue.containmentPathElement->first().namedElement=self)
 			)
+;
+
+helper context AADLI!SubprogramCallSequence def: modesIsComputeEntryPointOf(c: AADLI!InstanceObject): Sequence(AADLBA!Mode) =
+	c.ownedPropertyAssociation->select(
+				e | 
+				e.property.name = 'Compute_Entrypoint_Call_Sequence'
+				and
+				e.ownedValue->exists(f|f.ownedValue.containmentPathElement->first().namedElement=self)
+			)
+			->collect(
+				e | e.ownedValue->collect(ov | ov.inMode)
+			)
+			->flatten()
+			->asSet()
 ;
 
 helper context AADLI!InstanceObject def: getComputeEntryPoints(): Sequence(AADLI!SubprogramCallSequence) =

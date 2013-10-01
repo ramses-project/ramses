@@ -213,9 +213,9 @@ helper context AADLBA!PropertyExpression def: isPerDispatchRateUnit() : Boolean 
 ;
 
 helper context AADLBA!PropertyExpression def: isOnePerDispatchOutputRate() : Boolean =
-	self.ownedFieldValue->any(fv|fv.property.name='Value_Range').ownedValue.minimum.value = 1.0
+	(self.ownedFieldValue->any(fv|fv.property.name='Value_Range').ownedValue.minimum.value.toString() = '1.0')
 	and
-	self.ownedFieldValue->any(fv|fv.property.name='Value_Range').ownedValue.maximum.value = 1.0
+	(self.ownedFieldValue->any(fv|fv.property.name='Value_Range').ownedValue.maximum.value.toString() = '1.0')
 	and
 	self.isPerDispatchRateUnit()
 	and

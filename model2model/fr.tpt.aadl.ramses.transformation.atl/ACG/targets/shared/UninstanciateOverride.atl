@@ -211,7 +211,7 @@ rule m_create_Thread_BA
 													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
 													->collect(e|thisModule.createFreshnessIndicator(e))
 												)
-												->flatten(),
+												->flatten()->excluding(OclUndefined),
 			ownedSubprogramCallSequence     <- Sequence{thisModule.resolveTemp(c, 'callSequenceImg')},
 			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
 												e.source.oclIsKindOf(AADLI!Parameter) and e.destination.oclIsKindOf(AADLI!Parameter))
@@ -240,7 +240,7 @@ rule m_create_Thread_BA
 														)
 													)
 												)
-												->flatten(),
+												->flatten()->excluding(OclUndefined),
 			ownedAccessConnection			<- c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
 												->collect(fi| impl.ownedSubprogramCallSequence
 													->collect(callSequence|
@@ -310,7 +310,7 @@ rule m_create_Thread_BA
 														thisModule.collectPeriodicDelayed_LocalVariablesConnections(c,callSequence)
 													)
 												)
-												->flatten()
+												->flatten()->excluding(OclUndefined)
 		),
 		typeImg : AADLBA!ThreadType (
  	 		name <- c.uniqueName(),
@@ -329,7 +329,7 @@ rule m_create_Thread_BA
 													)->union(
 														thisModule.collectPeriodicDelayed_GlobalVariablesAccesses(c)
 													)
-													->flatten()->asSet()
+													->flatten()->asSet()->excluding(OclUndefined)
  		)
 }
 
@@ -473,7 +473,7 @@ rule m_Process_Implementation {
                                                                 thisModule.collectPeriodicDelayed_GlobalVariables(c)
                                                        )
 													)
-													->flatten(),
+													->flatten()->excluding(OclUndefined),
 		ownedAccessConnection			<- impl.getConnectionsInstancesImg('accessConnection')
 												->union(impl.getSubcomponentsInstances('thread')
 													->collect(c| c.featureInstance
@@ -500,7 +500,7 @@ rule m_Process_Implementation {
                                                                 thisModule.collectPeriodicDelayed_GlobalVariablesConnections(c)
                                                        )
                                                )
-                                               ->flatten()
+                                               ->flatten()->excluding(OclUndefined)
 											
 	)
 	do

@@ -192,7 +192,7 @@ rule m_ThreadEntrypoint {
 													(c,impl.ownedSubprogramCallSequence)
 												)
 												->append(returnData)
-												->flatten()
+												->flatten()->excluding(OclUndefined)
 		),
 		returnData: AADLBA!DataSubcomponent
 		(
@@ -205,20 +205,21 @@ rule m_ThreadEntrypoint {
 			calledSubprogram<-entryPointImplImg
 		),
 		callSequenceImg: AADLBA!SubprogramCallSequence 
-		(	
+		(
 			name <- 'main_call',
 			ownedCallSpecification <- Sequence{callEntryPoint}
 		),
 		behaviorAnnex: AADLBA!BehaviorAnnex
 		(
 			name        <- 'behavior_specification',
-			states      <- Sequence{initState,callSeqState,finalState},
+			states      <- Sequence{initState,waitDispatchState,execState,finalState},
 			transitions <- (if(c.needsToMapBehaviorAnnex()) then
 								thisModule.collectBAEntryPointTransitions(c)
 							else
 								thisModule.collectComputeEntryPointTransitions(c)
 							endif
-							)->append(dispatchTransition),
+							)->union(Sequence{whichPortTransition,dispatchTransition})
+							->flatten(),
 			actions		<- Sequence{dispatch_actionBlock}->union(
 										if(c.needsToMapBehaviorAnnex()) then
 											thisModule.collectBAEntryPointActionBlocks(c)
@@ -227,8 +228,95 @@ rule m_ThreadEntrypoint {
 										endif
 									),
 			variables   <- c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
-							->collect( ba | ba.variables)->flatten()
+							->collect( ba | ba.variables)
+							->flatten()
+							->append(activatedPort)
 		),
+		activatedPort: AADLBA!BehaviorVariable
+		(
+			name <- 'whichPortActivated',
+			dataClassifier <- whichPortActivatedDataDlassifier
+		),
+		whichPortActivatedDataDlassifier: AADLBA!DataType
+		(
+			name <- c.uniqueName()+'_behaviorIdentifier_enum',
+			ownedPropertyAssociation <- Sequence {
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Data_Representation',
+													'DATA_MODEL',
+													'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
+												),
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Enumerators',
+													'DATA_MODEL',
+													 thisModule.CreateListValueFromListOfString(c.featureInstance->select(fi|fi.isInputFeature())->collect(e|e.name)->append('default_behavior'))
+												)
+									}
+		),
+		portIDEnumLiteral: AADLBA!StringLiteral
+		(
+			value <- 'default_behavior'
+		),
+		execState: AADLBA!BehaviorState
+		(
+			initial  <- false,
+			final    <- false,
+			complete <- false,
+			name <- 'BA_entrypoint_exec_state'
+		),
+		whichPortTransition: AADLBA!BehaviorTransition
+		(
+			name <- 'which_behavior_default_mode',
+			sourceState <- initState,
+			destinationState <- execState,
+			actionBlock <- whichPortActionBlock
+		),
+		whichPortActionBlock: AADLBA!BehaviorActionBlock
+		(content<-whichPortActions),
+		whichPortActions: AADLBA!BehaviorActionSequence
+		( actions <- thisModule.collectTransitionChoiceActions(c) ),
+		
+		-- create action to activate default behavior
+		
+		updateDefaultBehaviorAction: AADLBA!AssignmentAction
+		(
+			target <- updateDefaultBehaviorVariableHolder,
+			valueExpression <- updateDefaultBehaviorValueExpression
+		),
+		updateDefaultBehaviorVariableHolder: AADLBA!BehaviorVariableHolder
+		(
+			element <- thisModule.resolveTemp(c, 'activatedPort')
+		),
+		updateDefaultBehaviorValueExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateDefaultBehaviorRelation}
+		),
+		updateDefaultBehaviorRelation: AADLBA!Relation
+		(
+			relationalOperator<-#None,
+			firstExpression<-updateDefaultBehaviorExpression
+		),
+		updateDefaultBehaviorExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateDefaultBehaviorTerm}
+		),
+		updateDefaultBehaviorTerm: AADLBA!Term
+		(
+			factors <- Sequence{updateDefaultBehaviorFactor}
+		),
+		updateDefaultBehaviorFactor: AADLBA!Factor
+		(
+			firstValue <- updateDefaultBehavior
+		),
+		updateDefaultBehavior: AADLBA!BehaviorEnumerationLiteral
+		(
+			component <- whichPortActivatedDataDlassifier,
+			enumLiteral <- portIDEnumLiteral
+		),
+		
 		initState: AADLBA!BehaviorState
 		(
 			initial  <- true,
@@ -236,12 +324,12 @@ rule m_ThreadEntrypoint {
 			complete <- false,
 			name     <- 'BA_entrypoint_init_state'
 		),
-		callSeqState: AADLBA!BehaviorState
+		waitDispatchState: AADLBA!BehaviorState
 		(
 			initial  <- false,
 			final    <- false,
 			complete <- false,
-			name     <- 'BA_entrypoint_exec_state'
+			name     <- 'BA_entrypoint_wait_dispatch_state'
 		),
 		finalState: AADLBA!BehaviorState
 		(
@@ -254,7 +342,7 @@ rule m_ThreadEntrypoint {
 		(
 			name <- 'dispatch_transition',
 			destinationState  <- initState,
-			sourceState       <- callSeqState,
+			sourceState       <- waitDispatchState,
 			actionBlock <- dispatch_actionBlock
 		),
 		dispatch_actionBlock: AADLBA!BehaviorActionBlock
@@ -262,6 +350,15 @@ rule m_ThreadEntrypoint {
 		dispatch_target_actions: AADLBA!BehaviorActionSequence
 		( actions <- Sequence{thisModule.resolveTemp(c,'waitDispatchCall')} )
 }
+
+helper def: collectTransitionChoiceActions(c: AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorActions)=
+	let orderedPorts : Sequence(AADLI!FeatureInstance) = thisModule.theHOOK.getFeaturesOrderedByCriticality(c) in
+	if(orderedPorts->select(port | c.subcomponent.classifier.ownedSubprogramCallSequence->exists(b | b.isComputeEntryPointOf(port) ) )->isEmpty()) then
+		Sequence{thisModule.resolveTemp(c, 'updateDefaultBehaviorAction')}
+	else
+		Sequence{}
+	endif
+;
 
 abstract rule m_ThreadBehavior
 {
@@ -279,13 +376,236 @@ abstract rule m_ThreadBehavior
 		computeEntryPointTransition: AADLBA!BehaviorTransition
 		(
 			name <- behavior.name,
-			sourceState <- thisModule.resolveTemp(c, 'initState'),
-			destinationState <- thisModule.resolveTemp(c, 'callSeqState'),
-			actionBlock <- computeEntryPointActionBlock
+			sourceState <- thisModule.resolveTemp(c, 'execState'),
+			destinationState <- thisModule.resolveTemp(c, 'waitDispatchState'), --- TODO: add 'if(c.modeInstance->isEmpty()) ... else ... endif
+			actionBlock <- computeEntryPointActionBlock,
+			condition <- thisModule.createComputeEntryPointConditionForComponent(c),
+			priority <- 0.longValue()
 		),
 		computeEntryPointActionBlock: AADLBA!BehaviorActionBlock
 		(content<-computeEntryPointActions),
 		computeEntryPointActions: AADLBA!BehaviorActionSequence
+}
+
+lazy abstract rule createComputeEntryPointCondition
+{
+	from
+		object: AADLI!InstanceObject
+	to
+		computeEntryPointCondition: AADLBA!ValueExpression
+		(
+			relations <- Sequence{comparisonRelation}
+		),
+		comparisonRelation: AADLBA!Relation
+		(
+			relationalOperator<-#Equal,
+			firstExpression<-behaviorIdentifiverValueExpression,
+			secondExpression<-portIDExpression
+		),
+		behaviorIdentifiverValueExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{behaviorIdentifiverValueTerm}
+		),
+		behaviorIdentifiverValueTerm: AADLBA!Term
+		(
+			factors <- Sequence{behaviorIdentifiverValueFactor}
+		),
+		behaviorIdentifiverValueFactor: AADLBA!Factor
+		(
+			firstValue <- behaviorIdentifiverValueHolder
+		),
+		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder,
+		
+		portIDExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{portIDTerm}
+		),
+		portIDTerm: AADLBA!Term
+		(
+			factors <- Sequence{portIDFactor}
+		),
+		portIDFactor: AADLBA!Factor
+		(
+			firstValue <- portIDEnum
+		),
+		portIDEnum: AADLBA!BehaviorEnumerationLiteral,
+		portIDEnumLiteral: AADLBA!StringLiteral
+	do
+	{
+		computeEntryPointCondition;
+	}
+}
+
+-- @extends createComputeEntryPointCondition
+lazy rule createComputeEntryPointConditionForPort
+{
+	from
+		object: AADLI!FeatureInstance
+	to
+		computeEntryPointCondition: AADLBA!ValueExpression,
+		portIDEnumLiteral: AADLBA!StringLiteral
+		(
+			value <- object.name
+		),
+		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
+		(
+			element <- thisModule.resolveTemp(object.eContainer(), 'activatedPort')
+		),
+		portIDEnum: AADLBA!BehaviorEnumerationLiteral
+		(
+			component <- thisModule.resolveTemp(object.eContainer(), 'whichPortActivatedDataDlassifier'),
+			enumLiteral <- portIDEnumLiteral
+		)
+	do
+	{
+		computeEntryPointCondition;
+	}
+}
+-- @extends createComputeEntryPointCondition
+lazy rule createComputeEntryPointConditionForComponent
+{
+	from
+		object: AADLI!ComponentInstance
+	to
+		computeEntryPointCondition: AADLBA!ValueExpression,
+		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
+		(
+			element <- thisModule.resolveTemp(object, 'activatedPort')
+		),
+		portIDEnum: AADLBA!BehaviorEnumerationLiteral
+		(
+			component <- thisModule.resolveTemp(object, 'whichPortActivatedDataDlassifier'),
+			enumLiteral <- thisModule.resolveTemp(object, 'portIDEnumLiteral')
+		)
+	do
+	{
+		computeEntryPointCondition;
+	}
+}
+
+rule m_PortBehavior
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence
+		(
+			fi.eContainer().category=#thread
+			and
+			behavior.isComputeEntryPointOf(fi)
+			and
+			behavior.modesIsComputeEntryPointOf(fi)->isEmpty()
+		)
+	using
+	{
+		c: AADLI!ComponentInstance = fi.eContainer();
+		orderedPorts: AADLI!FeatureInstance = thisModule.theHOOK.getFeaturesOrderedByCriticality(c);
+		fiIndex: Integer = orderedPorts->indexOf(fi);
+		nextPortByCriticakity : AADLI!FeatureInstance = orderedPorts->at(fiIndex+1);
+	}
+	to
+		
+		computeEntryPointTransition: AADLBA!BehaviorTransition
+		(
+			name <- behavior.name,
+			sourceState <- thisModule.resolveTemp(c, 'execState'), --- TODO: add 'if(c.modeInstance->isEmpty()) ... else ... endif
+			destinationState <- thisModule.resolveTemp(c, 'waitDispatchState'),
+			actionBlock <- computeEntryPointActionBlock,
+			condition <- thisModule.createComputeEntryPointConditionForPort(fi),
+			priority <- thisModule.theHOOK.getFeaturesOrderedByCriticality(c)->indexOf(fi)
+		),
+		computeEntryPointActionBlock: AADLBA!BehaviorActionBlock
+		(content<-computeEntryPointActions),
+		computeEntryPointActions: AADLBA!BehaviorActionSequence,
+
+		-- 1) IfStatement
+		checkforMessageAction: AADLBA!IfStatement
+		(
+			logicalValueExpression <- checkforMessageExpression,
+			behaviorActions <- updateActivatedPortAction
+		),
+		count_variable: AADLBA!BehaviorVariable, --- TODO: PF dependent definition of dataClassifier field
+		getCountValue: AADLBA!BehaviorVariableHolder
+		(
+			element <- count_variable
+		),
+		getCountAction: AADLBA!SubprogramCallAction, --- TODO: PF dependent definition of SubprogramCallAction content,
+		
+		
+		checkforMessageExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{checkforMessageRelation}
+		),
+		checkforMessageRelation: AADLBA!Relation
+		(
+			relationalOperator<-#NotEqual,
+			firstExpression<-getCountExpression,
+			secondExpression<-zeroValueConstantExpression
+		),
+		getCountExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{getCountTerm}
+		),
+		zeroValueConstantExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{zeroValueConstantTerm}
+		),
+		zeroValueConstantTerm: AADLBA!Term
+		(
+			factors <- Sequence{zeroValueConstantFactor}
+		),
+		zeroValueConstantFactor: AADLBA!Factor
+		(
+			firstValue <- zeroValueConstant
+		),
+		zeroValueConstant: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 0
+		),
+		getCountTerm: AADLBA!Term
+		(
+			factors <- Sequence{zeroValueConstantFactor}
+		),
+		getCountFactor: AADLBA!Factor
+		(
+			firstValue <- zeroValueConstant
+		),
+		-- 2) AssignmentAction
+		updateActivatedPortAction: AADLBA!AssignmentAction
+		(
+			target <- thisModule.resolveTemp(c, 'activatedPort'),
+			valueExpression <- updateActivatedPortValueExpression
+		),
+		updateActivatedPortValueExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{updateActivatedPortRelation}
+		),
+		updateActivatedPortRelation: AADLBA!Relation
+		(
+			relationalOperator<-#None,
+			firstExpression<-updateActivatedPortExpression
+		),
+		updateActivatedPortExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{updateActivatedPortTerm}
+		),
+		updateActivatedPortTerm: AADLBA!Term
+		(
+			factors <- Sequence{updateActivatedPortFactor}
+		),
+		updateActivatedPortFactor: AADLBA!Factor
+		(
+			firstValue <- updateActivatedPort
+		),
+		updateActivatedPort: AADLBA!BehaviorEnumerationLiteral
+		(
+			component <- thisModule.resolveTemp(c, 'whichPortActivatedDataDlassifier'),
+			enumLiteral <- thisModule.resolveTemp(fi, 'portIDEnumLiteral')
+		)
+		
+  	do
+  	{
+		computeEntryPointActions.actions <- thisModule.populateComputeEntryPointActions(c, behavior);
+  	}
 }
 
 -- @extends m_ThreadBehavior
@@ -302,12 +622,24 @@ rule m_ComputeEntrypointCallSequence {
 	)
 	using
 	{
-		intermediateCallActionSequence: Sequence(AADLBA!SubprogramCallAction) = Sequence{};
 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
 	}
 	to
-		computeEntryPointTransition: AADLBA!BehaviorTransition,
 		computeEntryPointActions: AADLBA!BehaviorActionSequence
+	do
+	{
+		computeEntryPointActions.actions <- thisModule.populateComputeEntryPointActions(c, behavior);
+	}
+}
+
+
+rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
+										behavior: AADLI!SubprogramCallSequence)
+{
+	using
+	{
+		intermediateCallActionSequence: Sequence(AADLBA!SubprogramCallAction) = Sequence{};
+	}
 	do
 	{
 		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
@@ -369,8 +701,7 @@ rule m_ComputeEntrypointCallSequence {
 				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
 			}
 		}
-        
-		computeEntryPointActions.actions <- intermediateCallActionSequence;
+		intermediateCallActionSequence;
 	}
 }
 
@@ -1034,6 +1365,8 @@ rule m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 			(paramCnx.source.connectionEnd = fi.feature
 				or
 				paramCnx.destination.connectionEnd = fi.feature)
+			and
+			fi.srcConnectionInstance->exists(e| e.connectionReference.first().connection = cnxRef)
 		)
 	to
 		call: AADLBA!SubprogramCallAction
