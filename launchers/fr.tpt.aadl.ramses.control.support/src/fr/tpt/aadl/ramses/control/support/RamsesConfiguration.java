@@ -43,7 +43,7 @@ public class RamsesConfiguration
   public static void setIncludeDir(Resource r, Set<File> includeDirSet)
   {
 	if(includeDirSet==null)
-		includeDirSet = new HashSet<>();
+		includeDirSet = new HashSet<File>();
 	if(IncludeDirectories.containsKey(r))
 	  IncludeDirectories.get(r).addAll(includeDirSet) ;
 	else
