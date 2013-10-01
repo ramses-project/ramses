@@ -146,7 +146,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   protected Set<String> _additionalHeaders = new HashSet<String>() ;
   private NamedElement _owner ;
   
-  private List<NamedElement> coreElementsToBeUnparsed = new ArrayList<>();
+  private List<NamedElement> coreElementsToBeUnparsed = new ArrayList<NamedElement>();
   
   public List<NamedElement> getCoreElementsToBeUnparsed() {
 	return coreElementsToBeUnparsed;

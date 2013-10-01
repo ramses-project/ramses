@@ -486,10 +486,10 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 
 
-			 baToADAUnparser.addIndent_ADB(codeUnparser.getIndent()) ;
-			 baToADAUnparser.addIndent_ADS(headerUnparser.getIndent()) ;
-			 codeUnparser.addOutput(baToADAUnparser.getADAContent()) ;
-			 headerUnparser.addOutput(baToADAUnparser.getADSContent()) ;
+		 baToADAUnparser.addIndent_ADB(codeUnparser.getIndent()) ;
+		 baToADAUnparser.addIndent_ADS(headerUnparser.getIndent()) ;
+		 codeUnparser.addOutput(baToADAUnparser.getADAContent()) ;
+		 headerUnparser.addOutput(baToADAUnparser.getADSContent()) ;
 
 		 if(_additionalHeaders.get(headerUnparser) == null)
 		 {
@@ -498,12 +498,15 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 baToADAUnparser.getAdditionalHeaders().clear();
 		 }
 
-		    if (owner instanceof SubprogramType)
-		    {
-		    	subprogramsUnparsingStack.remove(subprogramsUnparsingStack.size()-1);
-		    }
+		 if (owner instanceof SubprogramType)
+		 {
+			 subprogramsUnparsingStack.remove(subprogramsUnparsingStack.size()-1);
+		 }
 
-		 
+		 for(NamedElement ne: baToADAUnparser.getCoreElementsToBeUnparsed())
+		 {
+			 process(ne);
+		 }
 		 return DONE ;
 	}
 
@@ -1438,7 +1441,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseSubprogramClassifier(SubprogramClassifier object)
 			 {
-				 
+			    subprogramsUnparsingStack.add(object);
+
 				 Parameter returnParameter = null;
 				 List<Feature> orderedFeatureList = null;
 				 if(object instanceof SubprogramImplementation)

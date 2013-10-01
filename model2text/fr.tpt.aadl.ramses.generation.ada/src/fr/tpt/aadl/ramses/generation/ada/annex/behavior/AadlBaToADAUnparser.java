@@ -145,6 +145,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
   protected UnparseText _headerFileContent = null ;
   protected Set<String> _additionalHeaders = new HashSet<String>() ;
   private NamedElement _owner ;
+  private List<NamedElement> coreElementsToBeUnparsed = new ArrayList<NamedElement>();
 
   public AadlBaToADAUnparser(AnnexSubclause subclause,
                            String indent,
@@ -446,6 +447,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         	_adaFileContent.addOutput(" := "+init) ;
         }
         _adaFileContent.addOutputNewline(";") ;
+        coreElementsToBeUnparsed.add(object.getDataClassifier());
         return DONE ;
       }
 
@@ -1571,6 +1573,10 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 
   public void setOwner(NamedElement owner) {
 	this._owner = owner;
+  }
+
+  public List<NamedElement> getCoreElementsToBeUnparsed() {
+	return coreElementsToBeUnparsed;
   }
   
 }
