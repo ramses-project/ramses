@@ -10,3 +10,4 @@ Require-Bundle: fr.tpt.aadl.utils;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.transformation.atl.launch;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: org.osate.xtext.aadl2.properties.util

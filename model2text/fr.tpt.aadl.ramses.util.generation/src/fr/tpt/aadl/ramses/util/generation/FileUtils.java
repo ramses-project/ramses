@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.instance.InstanceObject;
+import org.osate.aadl2.util.OsateDebug;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.*;
@@ -168,14 +169,20 @@ public class FileUtils {
 		return paths;
 	}
 	
-	public static Set<File> getIncludeDir(NamedElement object) {
+	public static Set<File> getIncludeDir(NamedElement object)
+	{
+		OsateDebug.osateDebug("[FileUtils] getIncludeDir for " + object);
 		Set<File> includesConcat = new LinkedHashSet<File>();
 		NamedElement namedElement = HookAccessImpl.getTransformationTrace(object);
-		if(namedElement!=null)
+		if ((namedElement!=null) && (namedElement != object))
 		{
+			OsateDebug.osateDebug("[FileUtils] namedElement not null " + namedElement);
+
 			Set<File> includeDirSet = RamsesConfiguration.getIncludeDir(namedElement.getContainingClassifier().eResource());
 			if(!includeDirSet.isEmpty())
+			{
 				includesConcat.addAll(includeDirSet);
+			}
 			includeDirSet.addAll(getIncludeDir(namedElement.getContainingClassifier()));
 		}
 		return includesConcat;

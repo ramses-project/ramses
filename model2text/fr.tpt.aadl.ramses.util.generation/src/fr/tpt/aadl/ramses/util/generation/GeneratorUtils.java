@@ -112,6 +112,7 @@ public class GeneratorUtils
         else if(d instanceof DataClassifier)
         {
           DataClassifier dc = (DataClassifier) d ;
+          
           EList<PropertyExpression> initialValueProperty =
                 PropertyUtils
                       .getPropertyExpression(dc,
