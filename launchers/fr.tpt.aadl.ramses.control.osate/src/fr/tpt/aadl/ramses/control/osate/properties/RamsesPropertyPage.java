@@ -305,6 +305,10 @@ public class RamsesPropertyPage extends PropertyPage {
     arinc.setText("ARINC653 - POK");
     arinc.setData("pok");
     
+    Button ojr = new Button(composite, SWT.RADIO);
+    ojr.setText("Java - OJR");
+    ojr.setData("ojr");
+    
     Button osek = new Button(composite, SWT.RADIO);
     osek.setText("OSEX/NXT - TRAMPOLINE");
     osek.setData("osek");
@@ -317,6 +321,7 @@ public class RamsesPropertyPage extends PropertyPage {
         {
           Button button = (Button)(event.widget);
 
+      	System.out.println("Button =" + button);
           if (button.getSelection())
           {
               target = button;
@@ -326,6 +331,7 @@ public class RamsesPropertyPage extends PropertyPage {
     
     osek.addListener(SWT.Selection, listener);
     arinc.addListener(SWT.Selection, listener);
+    ojr.addListener(SWT.Selection, listener);
   }
 
 	private boolean saveConfiguration() throws CoreException

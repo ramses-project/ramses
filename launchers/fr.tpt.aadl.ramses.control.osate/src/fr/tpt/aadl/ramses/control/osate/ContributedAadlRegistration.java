@@ -13,7 +13,7 @@ import fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess;
 public class ContributedAadlRegistration implements PredefinedResourcesAccess { 
 
   private static String[] predefinedPackagesNames =
-	  {"Base_Types.aadl", "RAVENSCAR_runtime.aadl2","ARINC653_runtime.aadl2", "OSEK_runtime.aadl2", "PeriodicDelayed_runtime.aadl2"
+	  {"Base_Types.aadl", "RAVENSCAR_runtime.aadl2", "OJR_runtime.aadl2" , "ARINC653_runtime.aadl2", "OSEK_runtime.aadl2", "PeriodicDelayed_runtime.aadl2"
 	  } ;
   
   private static String[] predefinedPropertiesNames =
