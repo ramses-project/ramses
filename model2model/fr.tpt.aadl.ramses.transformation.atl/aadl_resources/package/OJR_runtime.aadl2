@@ -1,0 +1,32 @@
+package ojr_runtime
+public
+
+with Data_Model,Base_Types;
+
+data Status
+properties
+  Source_Name => "Status";
+  Programming_Properties::Source_Name => "Status";
+  Data_Model::Initial_Value => ("new Status()");
+end Status;
+
+data milliseconds
+properties
+	Data_Model::Data_Representation => integer;
+end milliseconds;
+
+subprogram Periodic_Wait
+features
+  timer: in parameter milliseconds;
+properties
+  Source_Name => "Services.WaitNextPeriod";
+end Periodic_Wait;
+
+subprogram Wait_Event
+features
+  timer: in parameter milliseconds;
+properties
+  Source_Name => "Wait_Event";
+end Wait_Event;
+
+end ojr_runtime;

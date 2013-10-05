@@ -14,6 +14,11 @@
             name="POK-Runtime">
       </aadlcontribution>
       <aadlcontribution
+            file="aadl_resources/package/OJR_runtime.aadl2"
+            id="fr.tpt.aadl.packages.ojr_runtime.aadlcontribution"
+            name="OJR-Runtime">
+      </aadlcontribution>
+      <aadlcontribution
             file="aadl_resources/package/RAVENSCAR_runtime.aadl2"
             id="fr.tpt.aadl.packages.ravenscar_runtime.aadlcontribution"
             name="RAVENSCAR-Runtime">
