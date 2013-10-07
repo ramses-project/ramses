@@ -61,9 +61,9 @@ void Compute_CDW(int taskID, int iteration_counter, periodic_delayed_context_t *
  * Compute the last index to read at iteration iteration_counter
  * @param iteration_counter 
  * @param context           
- * @param CPR               CurrentPeriodReadIndex
+ * @param CPR    CurrentPeriodReadIndex
  */
-void Compute_CPR(int iteration_counter, periodic_delayed_context_t *context, int * CPR)
+void Compute_CPR(int iteration_counter, periodic_delayed_context_t * context, int * CPR)
 {
   // for the first iteration we initialize it at 0, but no messages are to be read yet
   *CPR = 0;

@@ -112,7 +112,7 @@ with Base_Types, Data_Model, Generation_Properties;
     properties
       Data_Model::Data_Representation => Struct;
       Source_Name => "component_instance_t";
-      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c"); 
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c", "periodicdelayed_runtime.ads"); 
   end component_instance_t;
   
   data implementation component_instance_t.impl
@@ -137,10 +137,10 @@ with Base_Types, Data_Model, Generation_Properties;
   data implementation periodic_delayed_context_t.impl
     subcomponents
       reader_task_period: data base_types::Unsigned_16;
-      writer_instances: data ComponentInstanceArrayDataType;
       writer_count: data base_types::Unsigned_16;
       buffer_size: data base_types::Unsigned_16; 
       hyperperiod: data base_types::Unsigned_16;
+      writer_instances: data ComponentInstanceArrayDataType;
   end periodic_delayed_context_t.impl;
   
   subprogram Compute_CPR

@@ -12,49 +12,49 @@ with Data_Model,Base_Types;
 data Message_Size_Type
 properties
   Programming_Properties::Source_Name => "MESSAGE_SIZE_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end Message_Size_Type;
 
 data Message_Range_Type
 properties
   Programming_Properties::Source_Name => "MESSAGE_RANGE_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end Message_Range_Type;
 
 data Return_Code_Type
 properties
   Programming_Properties::Source_Name => "RETURN_CODE_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end Return_Code_Type;
 
 data Message_Addr_Type
 properties
   Programming_Properties::Source_Name => "MESSAGE_ADDR_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end Message_Addr_Type;
 
 data System_Time_Type
 properties
   Programming_Properties::Source_Name => "SYSTEM_TIME_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end System_Time_Type;
 
 data Port_Direction_Type
 properties
   Programming_Properties::Source_Name => "PORT_DIRECTION_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end Port_Direction_Type;
 
 data Queuing_Discipline_Type
 properties
   Programming_Properties::Source_Name => "QUEUING_DISCIPLINE_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end Queuing_Discipline_Type;
 
 data Waiting_Range_Type
 properties
   Programming_Properties::Source_Name => "WAITING_RANGE_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/types.h");
+  Programming_Properties::Source_Text => ("arinc653/types.h", "ada/arinc653/apex.ads");
 end Waiting_Range_Type;
 
 
@@ -70,19 +70,19 @@ end Waiting_Range_Type;
 data Buffer_Name_Type
 properties
   Programming_Properties::Source_Name => "BUFFER_NAME_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Buffer_Name_Type;
 
 data Buffer_Id_Type
 properties
   Programming_Properties::Source_Name => "BUFFER_ID_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Buffer_Id_Type;
 
 data Buffer_Status_Type
 properties
   Programming_Properties::Source_Name => "BUFFER_STATUS_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Buffer_Status_Type;
 
 subprogram Create_Buffer
@@ -95,7 +95,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "CREATE_BUFFER";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Create_Buffer;
 
 subprogram Send_Buffer
@@ -109,7 +109,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "SEND_BUFFER";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Send_Buffer;
  
 subprogram Receive_Buffer
@@ -123,7 +123,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "RECEIVE_BUFFER";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Receive_Buffer;
 
 subprogram Get_Buffer_Id
@@ -133,7 +133,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_BUFFER_ID";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Get_Buffer_Id;
  
 subprogram Get_Buffer_Status
@@ -143,7 +143,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_BUFFER_STATUS";
-  Programming_Properties::Source_Text => ("arinc653/buffer.h");
+  Programming_Properties::Source_Text => ("arinc653/buffer.h", "ada/arinc653/apex-buffers.ads");
 end Get_Buffer_Status;
 
 
@@ -157,31 +157,31 @@ end Get_Buffer_Status;
 data Event_Id_Type
 properties
   Programming_Properties::Source_Name => "EVENT_ID_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Event_Id_Type;
 
 data Event_State_Value_Type
 properties
   Programming_Properties::Source_Name => "EVENT_STATE_VALUE_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Event_State_Value_Type;
 
 data Event_State_Type
 properties
   Programming_Properties::Source_Name => "EVENT_STATE_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Event_State_Type;
 
 data Event_Name_Type
 properties
   Programming_Properties::Source_Name => "EVENT_NAME_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Event_Name_Type;
 
 data Event_Status_Type
 properties
   Programming_Properties::Source_Name => "EVENT_STATUS_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Event_Status_Type;
 
 subprogram Create_Event
@@ -191,7 +191,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "CREATE_EVENT";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Create_Event;
 
 subprogram Set_Event
@@ -200,7 +200,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "SET_EVENT";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Set_Event;
 
 subprogram Reset_Event
@@ -209,7 +209,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "RESET_EVENT";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Reset_Event;
 
 subprogram Wait_Event
@@ -219,7 +219,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "WAIT_EVENT";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Wait_Event;
 
 subprogram Get_Event_Id
@@ -229,7 +229,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_EVENT_ID";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Get_Event_Id;
 
 subprogram Get_Event_Status
@@ -239,7 +239,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_EVENT_STATUS";
-  Programming_Properties::Source_Text => ("arinc653/event.h");
+  Programming_Properties::Source_Text => ("arinc653/event.h", "ada/arinc653/apex-events.ads");
 end Get_Event_Status;
 
 --------------------------------------------
@@ -251,20 +251,20 @@ end Get_Event_Status;
 data Queuing_Port_Name_Type
 properties
   Programming_Properties::Source_Name => "NAME_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Queuing_Port_Name_Type;
 
 data Queuing_Port_Id_Type
 properties
   Programming_Properties::Source_Name => "APEX_INTEGER";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Queuing_Port_Id_Type;
 
 data Queuing_Port_Status_Type
 properties
   Data_Model::Data_Representation => Struct;
   Programming_Properties::Source_Name => "QUEUING_PORT_STATUS_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Queuing_Port_Status_Type;
 
 data implementation Queuing_Port_Status_Type.impl
@@ -287,7 +287,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "CREATE_QUEUING_PORT";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Create_Queuing_Port;
 
 
@@ -302,7 +302,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "SEND_QUEUING_MESSAGE";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Send_Queuing_Message;
 
 subprogram Receive_Queuing_Message
@@ -316,7 +316,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "RECEIVE_QUEUING_MESSAGE";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Receive_Queuing_Message;
 
 subprogram Get_Queuing_Port_Id
@@ -326,7 +326,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_QUEUING_PORT_ID";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Get_Queuing_Port_Id;
 
 subprogram Get_Queuing_Port_Status
@@ -336,7 +336,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_QUEUING_PORT_STATUS";
-  Programming_Properties::Source_Text => ("arinc653/queueing.h");
+  Programming_Properties::Source_Text => ("arinc653/queueing.h", "ada/arinc653/apex-queuing.ads");
 end Get_Queuing_Port_Status;
 
 subprogram Get_Queueing_Port_Count
@@ -366,25 +366,25 @@ end Get_Queueing_Port_Count;
 data Sampling_Port_Name_Type
 properties
   Programming_Properties::Source_Name => "SAMPLING_PORT_NAME_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Sampling_Port_Name_Type;
 
 data Sampling_Port_Id_Type
 properties
   Programming_Properties::Source_Name => "SAMPLING_PORT_ID_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Sampling_Port_Id_Type;
 
 data Validity_Type
 properties
   Programming_Properties::Source_Name => "VALIDITY_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Validity_Type;
 
 data Sampling_Port_Status_Type
 properties
   Programming_Properties::Source_Name => "SAMPLING_PORT_STATUS_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Sampling_Port_Status_Type;
 
 subprogram Create_Sampling_Port
@@ -397,7 +397,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "CREATE_SAMPLING_PORT";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Create_Sampling_Port;
  
 subprogram Write_Sampling_Message
@@ -410,7 +410,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "WRITE_SAMPLING_MESSAGE";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Write_Sampling_Message;
 
 subprogram Read_Sampling_Message
@@ -424,7 +424,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "READ_SAMPLING_MESSAGE";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Read_Sampling_Message;
 
 subprogram Get_Sampling_Port_Id
@@ -434,7 +434,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_SAMPLING_PORT_ID";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Get_Sampling_Port_Id;
 
 subprogram Get_Sampling_Port_Status
@@ -444,7 +444,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "GET_SAMPLING_PORT_STATUS";
-  Programming_Properties::Source_Text => ("arinc653/sampling.h");
+  Programming_Properties::Source_Text => ("arinc653/sampling.h", "ada/arinc653/apex-sampling.ads");
 end Get_Sampling_Port_Status;
 
 
@@ -458,13 +458,13 @@ end Get_Sampling_Port_Status;
 data Blackboard_Name_Type
 properties
   Programming_Properties::Source_Name => "BLACKBOARD_NAME_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Blackboard_Name_Type;
 
 data Blackboard_Id_Type
 properties
   Programming_Properties::Source_Name => "BLACKBOARD_ID_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Blackboard_Id_Type;
 
 subprogram Periodic_Wait
@@ -472,13 +472,13 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties
   Programming_Properties::Source_Name => "PERIODIC_WAIT";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/time.h", "ada/arinc653/apex-timing.ads");
 end Periodic_Wait;
 
 data Blackboard_Status_Type
 properties
   Programming_Properties::Source_Name => "BLACKBOARD_STATUS_TYPE";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Blackboard_Status_Type;
 
 subprogram Create_Blackboard
@@ -489,7 +489,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties
   Programming_Properties::Source_Name => "Create_Blackboard";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Create_Blackboard;
        
 subprogram Display_Blackboard
@@ -502,7 +502,7 @@ features
    RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties
   Programming_Properties::Source_Name => "DISPLAY_BLACKBOARD";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Display_Blackboard;
 
 subprogram Read_Blackboard
@@ -516,7 +516,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties
   Programming_Properties::Source_Name => "READ_BLACKBOARD";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Read_Blackboard;
 
 subprogram Clear_Blackboard
@@ -525,7 +525,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "CLEAR_BLACKBOARD";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Clear_Blackboard;
 
 subprogram Get_Blackboard_Id
@@ -535,7 +535,7 @@ features
  RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties
   Programming_Properties::Source_Name => "GET_BLACKBOARD_ID";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Get_Blackboard_Id;
 
 subprogram Get_Blackboard_Status
@@ -545,7 +545,7 @@ features
   RETURN_CODE: out parameter RETURN_CODE_TYPE ;
 properties
   Programming_Properties::Source_Name => "GET_BLACKBOARD_STATUS";
-  Programming_Properties::Source_Text => ("arinc653/blackboard.h");
+  Programming_Properties::Source_Text => ("arinc653/blackboard.h", "ada/arinc653/apex-blackboards.ads");
 end Get_Blackboard_Status;
 
 end arinc653_runtime;
