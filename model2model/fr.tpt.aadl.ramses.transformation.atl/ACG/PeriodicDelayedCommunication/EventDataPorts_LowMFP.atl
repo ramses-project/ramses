@@ -180,13 +180,13 @@ helper context AADLI!FeatureInstance def: initWriterContext() : String =
 	thisModule.concatToString(
 	    self.dstConnectionInstance->collect(e| e.source.eContainer())->asOrderedSet()
 																	->collect(e|e.initWriterContext())
-    )
+    ).debug(' !!!!!! ')
 ;
 
 helper context AADLI!ComponentInstance def: initWriterContext() : String = 
-	'{'+self.getPeriod().toString()+
+	thisModule.structInitInitiator+self.getPeriod().toString()+
     ','+
-	self.getDeadline().toString()+'}'
+	self.getDeadline().toString()+thisModule.structInitTerminator
 ;
 
 	
@@ -223,7 +223,7 @@ helper context AADLI!FeatureInstance def: computeThreadID(consumer: AADLI!Featur
 	let connections: Sequence(AADLI!ConnectionInstance) =
 		consumer.dstConnectionInstance->select(e|e.source=self)
 	in
-		consumer.dstConnectionInstance.indexOf(self);
+		consumer.dstConnectionInstance.indexOf(connections->first());
 
 
 unique lazy rule createThreadID
@@ -441,7 +441,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		--- connect taskID: in parameter Base_Types::Integer_16;
 		TaskID_Holder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.createThreadID(fi, consumerPort).debug(' !!!!! ')
+			element <- thisModule.createThreadID(fi, consumerPort)
 		),
       	--- connect iteration_counter: in out parameter Base_Types::Integer_16;
       	IterationCounter_Holder: AADLBA!DataAccessHolder
@@ -568,7 +568,7 @@ unique lazy rule createContextSubcomponent
 		contextInit: AADLBA!ListValue
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
-																'{'+
+																thisModule.structInitInitiator+
 																fi.eContainer().getPeriod().toString()+
 																','+
 																'writer_instances_'+fi.eContainer().name+'_'+fi.name+
@@ -578,7 +578,7 @@ unique lazy rule createContextSubcomponent
 																thisModule.getBufferSize(fi).toString()+
 																','+
 																thisModule.getHyperperiod(fi).toString()+
-																'}'
+																thisModule.structInitTerminator
 															)}
 		),
 		componentInstancesInit: AADLBA!ListValue
@@ -673,7 +673,7 @@ rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_L
 		)
 	do
 	{
-		receiveInputContextActual.setSubcomponentType(fi.feature.dataFeatureClassifier);
+		receiveInputContextActual.setSubcomponentType(thisModule.resolveTemp(fi, 'createContextSubcomponent', 'PeriodicDelayedContext_Impl'));
 	}
 }
 

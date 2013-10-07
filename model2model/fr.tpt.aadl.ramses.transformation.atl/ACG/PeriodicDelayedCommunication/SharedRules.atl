@@ -156,25 +156,6 @@ helper def: getBufferSize(destinationPort: AADLI!FeatureInstance) : Integer =
 	thisModule.theHOOK.getBufferSize(destinationPort)
 ;
 
-rule concatToString(list: Sequence(Integer))
-{
-	
-  using
-  {
-  	result: String = '';
-  	sep: String = ', ';
-  	subSeq: Sequence(Integer) = list->subSequence(1, list->size()-1);
-  }
-  do
-  {
-	result <- subSeq->iterate(i; result:String = '{' | 
-		result + i.toString() + ','
-	);
-	result <- result + list->last().toString() + '}';
-	result;
-  }
-}
-
 unique lazy rule createIterationCounter
 {
 	from
