@@ -26,7 +26,6 @@ library Services;
 helper def: dataAccessSuffix(): String ='_PortIdAccess_';
 helper def: callPrefix(): String ='call';
 
-
 helper def: theHOOK : ATLHOOKS!HookAccess = ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first();
 
 
