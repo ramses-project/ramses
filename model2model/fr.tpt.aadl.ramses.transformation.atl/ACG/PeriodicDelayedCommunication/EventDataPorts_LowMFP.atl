@@ -571,13 +571,13 @@ unique lazy rule createContextSubcomponent
 																thisModule.structInitInitiator+
 																fi.eContainer().getPeriod().toString()+
 																','+
-																'writer_instances_'+fi.eContainer().name+'_'+fi.name+
-																','+
 																writerPortsImg->size().toString()+
 																','+
 																thisModule.getBufferSize(fi).toString()+
 																','+
 																thisModule.getHyperperiod(fi).toString()+
+																','+
+																'writer_instances_'+fi.eContainer().name+'_'+fi.name +
 																thisModule.structInitTerminator
 															)}
 		),
