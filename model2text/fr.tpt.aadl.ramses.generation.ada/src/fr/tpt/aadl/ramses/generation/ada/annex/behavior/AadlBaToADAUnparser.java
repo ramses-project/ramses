@@ -368,10 +368,10 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         _adaFileContent.addOutputNewline("current_state : "+aadlComponentADAId +
 	              "_BA_State_t := " + aadlComponentADAId + "_" +
 	              AadlBaToADAUnparser.getInitialStateIdentifier(ba) + ";") ;
+        processEList(_adaFileContent, ba.getVariables()) ;
         _adaFileContent.addOutputNewline("final : integer := 0;") ;
         _adaFileContent.addOutputNewline("begin");
 
-        processEList(_adaFileContent, ba.getVariables()) ;
         
         _adaFileContent.addOutputNewline("while (final /= 1) loop") ;
         _adaFileContent.incrementIndent() ;
@@ -404,7 +404,12 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
           {
             _headerFileContent.addOutput(",") ;
           }
-
+          
+          if(ba.getStates().indexOf(state)==ba.getStates().size()-1)
+          {
+        	  _adaFileContent.addOutputNewline("when others =>") ;
+        	  _adaFileContent.addOutputNewline("final := 1;") ;
+          }
           _headerFileContent.addOutputNewline("") ;
         }
 
@@ -438,10 +443,10 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                 getGenerationADAIdentifier(object.
                                          getDataClassifier().getQualifiedName());
         }
-        _adaFileContent.addOutput(sourceName);
-        _adaFileContent.addOutput(" : " + object.getName()) ;
+        _adaFileContent.addOutput(object.getName());
+        _adaFileContent.addOutput(" : " + sourceName) ;
         caseArrayDimensions(object.getArrayDimensions()) ;
-        String init = GeneratorUtils.getInitialValue(object.getDataClassifier()) ;
+        String init = GeneratorUtils.getInitialValue(object.getDataClassifier(), "ada") ;
         if(!init.isEmpty())
         {
         	_adaFileContent.addOutput(" := "+init) ;
@@ -468,23 +473,24 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 
       public String caseBehaviorEnumerationLiteral(BehaviorEnumerationLiteral object)
       {
-        // ComponentPropertyValue is defined to refer Enumerated data
-    	NamedElement component = object.getComponent();
-    	if(component!=null)
-    	{
-    		try
-    	    {
-    	      _adaFileContent.addOutput(object.getEnumLiteral().getValue());
-    	    }
-    		catch(Exception e)
-    		{
-    			_adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(component.getQualifiedName())+"_"+object.getEnumLiteral().getValue());
-    		}
-    	}
-    	else
-    		_adaFileContent.addOutput(object.getEnumLiteral().getValue());
-        
-        return DONE ;
+          // ComponentPropertyValue is defined to refer Enumerated data
+      	NamedElement component = object.getComponent();
+      	if(component!=null)
+      	{
+      		try
+      	    {
+      	      String sourceName = PropertyUtils.getStringValue(component, "Source_Name") ;
+      	      _adaFileContent.addOutput(object.getEnumLiteral().getValue());
+      	    }
+      		catch(Exception e)
+      		{
+      			_adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(component.getQualifiedName())+"_"+object.getEnumLiteral().getValue());
+      		}
+      	}
+      	else
+      		_adaFileContent.addOutput(object.getEnumLiteral().getValue());
+          
+          return DONE ;
       }
       
       /**
@@ -523,7 +529,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         {
           _adaFileContent.addOutputNewline("current_state := " + aadlComponentADAId +
                     "_" + object.getName() + ";") ;
-          _adaFileContent.addOutputNewline("exit;") ;
         }
         return DONE ;
       }
@@ -667,7 +672,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         _adaFileContent.addOutputNewline(" then") ;
         process(lba) ;
         _adaFileContent.addOutputNewline("") ;
-
+        _adaFileContent.addOutputNewline("end if;") ;
         return DONE ;
       }
 
@@ -877,9 +882,8 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         return DONE ;
       }
       
-      public boolean manageParameterDirection(Parameter formal, ParameterLabel actual)
+      public void manageParameterDirection(Parameter formal, ParameterLabel actual)
       {
-    	  boolean remainingParenthesis = false;
     	  String usageP = Aadl2Utils.getParameter_Usage(formal);
           if(Aadl2Utils.isInOutParameter(formal) ||
           		Aadl2Utils.isOutParameter(formal) ||
@@ -896,14 +900,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
           		// and ph.getParameter not by reference
           		  _adaFileContent.addOutput("") ;
           		  
-            }
-            else if (actual instanceof DataSubcomponentHolder
-          		  || actual instanceof BehaviorVariableHolder)
-          	  _adaFileContent.addOutput("") ;
-            else if (actual instanceof DataComponentReference)
-            {
-          	  _adaFileContent.addOutput("(") ;
-          	  remainingParenthesis=true;
             }
             else if(actual instanceof DataAccessHolder)
             {
@@ -922,11 +918,11 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
             			  getFirstValue();
           	  if(v instanceof DataAccessHolder)
           	  {
-          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          		manageParameterDirection(formal, (ParameterLabel) v);
           	  }
           	  else if (v instanceof ParameterHolder)
           	  {
-          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          		manageParameterDirection(formal, (ParameterLabel) v);
           	  }
           	  else
           	  {
@@ -964,15 +960,15 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
             			  getFirstValue();
           	  if(v instanceof DataAccessHolder)
           	  {
-          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          		manageParameterDirection(formal, (ParameterLabel) v);
           	  }
           	  else if (v instanceof ParameterHolder)
           	  {
-          		remainingParenthesis = manageParameterDirection(formal, (ParameterLabel) v);
+          		manageParameterDirection(formal, (ParameterLabel) v);
           	  }
             }
           }
-          return remainingParenthesis;
+          return;
       }
       
       public boolean manageAccessDirection(DataAccess formal, ParameterLabel actual)
@@ -1080,7 +1076,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
           {
             _adaFileContent.addOutput(" (") ;
             boolean first = true;
-            boolean remainingParenthesis = false;
             for(ParameterLabel pl : object.getParameterLabels())
             {
               ParameterConnectionEnd pce =
@@ -1095,7 +1090,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                 if(first==false)
                   _adaFileContent.addOutput(", ") ;
                 
-                remainingParenthesis = manageParameterDirection(p, pl);
+                manageParameterDirection(p, pl);
 
                 if(pl instanceof ElementHolder)
                 {
@@ -1147,11 +1142,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                 {
                   process(pl) ;
                 }
-                if(remainingParenthesis)
-                {
-                	_adaFileContent.addOutput(")");
-                	remainingParenthesis=false;
-                }
                 first=false;
               }
               else if(pce instanceof DataAccess)
@@ -1161,7 +1151,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                   _adaFileContent.addOutput(", ") ;
                 if(da.getKind().equals(AccessType.REQUIRES))
                 {
-                  remainingParenthesis = manageAccessDirection(da, pl);  
+                  manageAccessDirection(da, pl);  
                 }
 
                 String name = null ;
@@ -1200,11 +1190,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                 else // Otherwise, process parameter label as usual.
                 {
                   process((ParameterLabel) pl) ;
-                }
-                if(remainingParenthesis)
-                {
-                	_adaFileContent.addOutput(")");
-                	remainingParenthesis=false;
                 }
                 first=false;
               }
@@ -1251,22 +1236,9 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
       {
     	NamedElement elt = object.getElement();
     	String id;
-    	boolean pointer=false;
     	if(elt instanceof Parameter)
 		{
 			Parameter p = (Parameter) elt;
-			if(false==(object.eContainer() instanceof SubprogramCallAction))
-			{
-			  String usageP = Aadl2Utils.getParameter_Usage(p);
-			  if(Aadl2Utils.isInOutParameter(p)
-				  || Aadl2Utils.isOutParameter(p)
-				  || usageP.equalsIgnoreCase("by_reference"))
-			  {
-			    aadlbaText.addOutput("(");
-			    pointer=true;
-			  }
-			
-			}
 			id = elt.getName();
 			
 		}
@@ -1274,30 +1246,19 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 		{
 		  DataAccess da = (DataAccess) elt;
 		  
-		  if(false==(object.eContainer() instanceof SubprogramCallAction))
-		  {
-			if(Aadl2Utils.isReadWriteDataAccess(da)
-			  || Aadl2Utils.isWriteOnlyDataAccess(da))
-			{
-  			   aadlbaText.addOutput("(");
-			   pointer=true;		
-			}
-		  }
   		  id = elt.getName();
 		}
     	else	
     		id = elt.getQualifiedName();
     	aadlbaText.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(id));
-    	if(pointer)
-    		aadlbaText.addOutput(")");
     	if(object instanceof IndexableElement)
     	{	
     	  IndexableElement ie = (IndexableElement) object;
     	  for(IntegerValue iv: ie.getArrayIndexes())
     	  {
-    		aadlbaText.addOutput("[");
+    		aadlbaText.addOutput("(");
     		process(iv);
-    		aadlbaText.addOutput("]");
+    		aadlbaText.addOutput(")");
     	  }
     	}
         return DONE ;
