@@ -1032,7 +1032,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         unparser.addOutput(" ") ;
         unparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object
               .getQualifiedName())) ;
-        unparser.addOutput(GeneratorUtils.getInitialValue(object)) ;
+        unparser.addOutput(GeneratorUtils.getInitialValue(object, "c")) ;
         unparser.addOutputNewline(";") ;
 
         if(_processedTypes.contains(object.getDataSubcomponentType().getQualifiedName()) == false)
@@ -1046,6 +1046,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             
       public String caseProcessImplementation(ProcessImplementation object)
       {
+    	
         buildDataAccessMapping(object) ;
         
         processEList(object.getOwnedThreadSubcomponents()) ;
@@ -1060,7 +1061,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           {
         	  processDataSubcomponentType(ds.getDataSubcomponentType(), _deploymentImplCode, _deploymentHeaderCode);
         	  _deploymentImplCode.addOutput(" "+ds.getName()) ;
-        	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds)) ;
+        	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds, "c")) ;
         	  _deploymentImplCode.addOutputNewline(";") ;
           }
           else
@@ -1087,7 +1088,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               _deploymentImplCode.addOutput(" "+declarationID);
               DataSubcomponent ds = dataSubcomponentMapping.get(_dataAccessMapping.get(d));
               if(ds!=null)
-            	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds)) ;
+            	  _deploymentImplCode.addOutput(GeneratorUtils.getInitialValue(ds, "c")) ;
         	  _deploymentImplCode.addOutputNewline(";") ;
               treatedDeclarations.add(declarationID);
         	}
