@@ -28,11 +28,22 @@ end Sampling_Port_Id_Type;
 
 
 subprogram Receive_Data
+prototypes
+  MESSAGE_TYPE: data;
+features
+  BLACKBOARD_ID: requires data access InternalPort {Access_Right=>read_only;};
+  RETURN_CODE: out parameter Status ;
 properties
   Programming_Properties::Source_Name => "Services.ReceiveData";
 end Receive_Data;
 
 subprogram Send_Data
+prototypes
+  MESSAGE_TYPE: data;
+features
+   BLACKBOARD_ID: requires data access InternalPort {Access_Right=>read_only;};
+
+   RETURN_CODE: out parameter Status ;
 properties
   Programming_Properties::Source_Name => "Services.SendData";
 end Send_Data;
@@ -44,6 +55,12 @@ properties
   Data_Model::Initial_Value => ("new InternalPort()");
 end InternalPort;
 
+data ExternalPort
+properties
+  Source_Name => "InternalPort";
+  Programming_Properties::Source_Name => "InternalPort";
+  Data_Model::Initial_Value => ("new InternalPort()");
+end ExternalPort;
 
 data Buffer_Id_Type
 properties
