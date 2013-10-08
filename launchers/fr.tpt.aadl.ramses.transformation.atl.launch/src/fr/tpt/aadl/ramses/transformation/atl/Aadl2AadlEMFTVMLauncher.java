@@ -64,6 +64,7 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
+import org.osate.aadl2.util.Aadl2Util;
 
 import antlr.RecognitionException;
 
@@ -131,8 +132,17 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 					".aaxl2", "_extended.aadl2");
 
-			Resource expandedResult = this.doTransformation(transformationFileList,
+			Aadl2Util.setUseTunedEqualsMethods (false);
+			Resource expandedResult;
+			try
+			{
+				expandedResult = this.doTransformation(transformationFileList,
 					inputResource, aadlGeneratedFileName);
+			}
+			finally
+			{
+				Aadl2Util.setUseTunedEqualsMethods (false);
+			}
 
 			File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 			if(outputModelDir.exists()==false)
