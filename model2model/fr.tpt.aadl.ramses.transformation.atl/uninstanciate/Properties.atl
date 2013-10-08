@@ -262,7 +262,9 @@ lazy rule createContainmentPathElement
 	from
 		ne: AADLI!NamedElement
 	to
-		cpe : AADLBA!ContainmentPathElement (namedElement<-ne)
+		cpe : AADLBA!ContainmentPathElement (
+				namedElement<-if(ne.oclIsKindOf(AADLI!FeatureInstance)) then thisModule.resolveTemp(ne, 'f') else ne endif
+			)
 	do
 	{
 		cpe;
