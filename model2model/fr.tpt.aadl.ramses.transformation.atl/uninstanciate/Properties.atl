@@ -444,8 +444,17 @@ rule m_RangeValue extends m_PropertyValue {
     	v : AADLI!RangeValue in IN
     to
     	v2 : AADLBA!RangeValue (
-    		minimum <- thisModule.resolveTemp(v.minimum, 'v2'),
-    		maximum <- thisModule.resolveTemp(v.maximum, 'v2')
+    		minimum <- if(v.minimum.isSimpleValueType())then
+    						v.minimum.PropertyExpression()
+						else
+							thisModule.resolveTemp(v.minimum, 'v2')
+						endif,
+    				
+    		maximum <- if(v.maximum.isSimpleValueType())then
+    						v.maximum.PropertyExpression()
+						else
+							thisModule.resolveTemp(v.maximum, 'v2')
+						endif
     	)
 }
 

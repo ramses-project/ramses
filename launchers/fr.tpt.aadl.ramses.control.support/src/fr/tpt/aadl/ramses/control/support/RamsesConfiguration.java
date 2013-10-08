@@ -49,7 +49,6 @@ public class RamsesConfiguration
 	else
 	{
 	  includeDirSet.add(RamsesRessourcesDir);
-	  File periodicDelayedRuntimeDir;
 
 	  // Add dir in which the input resource was defined
 	  URI uri = r.getURI();
@@ -58,10 +57,18 @@ public class RamsesConfiguration
 	  File inputResourceDir = new File(filePath.substring(0, lastIndex));
 	  includeDirSet.add(inputResourceDir);
 
-	  // Add Dir of PeriodicDelayed runtime
-	  periodicDelayedRuntimeDir = new File(
+	  
+	  // Add Dir of C PeriodicDelayed runtime
+	  File cPeriodicDelayedRuntimeDir;
+	  cPeriodicDelayedRuntimeDir = new File(
 			  RamsesRessourcesDir.getAbsolutePath()+"/C_runtime/PeriodicDelayed_runtime/");
-	  includeDirSet.add(periodicDelayedRuntimeDir);
+	  includeDirSet.add(cPeriodicDelayedRuntimeDir);
+
+	  // Add Dir of Ada PeriodicDelayed runtime
+	  File adaPeriodicDelayedRuntimeDir;
+	  adaPeriodicDelayedRuntimeDir = new File(
+			  RamsesRessourcesDir.getAbsolutePath()+"/Ada_runtime/PeriodicDelayed_runtime/");
+	  includeDirSet.add(adaPeriodicDelayedRuntimeDir);
 
 	  // TODO: include other runtime directories here.
 	  String pokPath = System.getenv("POK_PATH");
@@ -69,6 +76,8 @@ public class RamsesConfiguration
 		pokPath = System.getProperty("POK_PATH");
 	  File pokFile = new File(pokPath+"/libpok/include");
 	  includeDirSet.add(pokFile);
+	  File pokAdaFile = new File(pokPath+"/libpok/ada");
+	  includeDirSet.add(pokAdaFile);
 	  IncludeDirectories.put(r, includeDirSet);
 	}
   }

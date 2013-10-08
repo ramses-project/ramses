@@ -1,15 +1,19 @@
 package fr.tpt.aadl.ramses.generation.ada;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.DataImplementation;
+import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.Property;
+import org.osate.aadl2.SubprogramClassifier;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 
 import fr.tpt.aadl.utils.PropertyUtils;
@@ -17,8 +21,6 @@ import fr.tpt.aadl.utils.PropertyUtils;
 public class GenerationUtilsADA
 {
 	public final static String THREAD_SUFFIX = "_Job" ;
-    public static List<String> srcText =new ArrayList<String>();
-
 	  
 	  // Give file name, in upper case or not and with or without extension.
 	  public static String generateHeaderInclusionGuard(String fileName)
@@ -212,27 +214,38 @@ public class GenerationUtilsADA
 		  return isReturnParam;
 	  }
 	  
+	  public static String resolveExistingDependency(NamedElement object, 
+			  Set<String> additionalHeaders) throws Exception
+	  {
+		  NamedElement ne = object ;
+		  String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+		  List<String> sourceText =
+				  PropertyUtils.getStringListValue(ne, "Source_Text") ;
+		  for(String s : sourceText)
+		  {
+			  if(s.endsWith(".ads"))
+			  {
+				  additionalHeaders.add(s) ;
+				  return sourceName;
+			  }
+		  }
+		  for(String s : sourceText)
+		  {
+			  if(s.endsWith(".h"))
+			  {
+				  return sourceName;
+			  }
+		  }
+		  return null ;
+	  }
 	  
 	  public static String resolveExistingCodeDependencies(NamedElement object,
 				 Set<String> additionalHeaders)
 	  {
 		  try
 		  {
-			  NamedElement ne = object ;
-			  List<String> sourceText =
-					  PropertyUtils.getStringListValue(ne, "Source_Text") ;
-			  for(String s : sourceText)
-			  {
-				  if(s.endsWith(".ads"))
-				  {
-					  srcText.add(s);
-					  additionalHeaders.add(s) ;
-				  }
-			  }
-
-			String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-			return sourceName;
-		  	}
+			  return resolveExistingDependency(object,additionalHeaders);
+		  }
 		  catch(Exception e)
 		  {
 			  if(object instanceof ComponentType)

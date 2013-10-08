@@ -77,7 +77,7 @@ public class GeneratorUtils
 {
 
   @SuppressWarnings("unused")
-  public static String getInitialValue(Element e)
+  public static String getInitialValue(Element e, String language)
   {
     StringBuilder initialization = new StringBuilder() ;
 
@@ -102,12 +102,12 @@ public class GeneratorUtils
                         .equalsIgnoreCase(DataModelProperties.INITIAL_VALUE))
             {
               setInitialization(initialization, PropertyUtils
-                                      .getPropertyExpression(pa)) ;
+                                      .getPropertyExpression(pa), language) ;
               return initialization.toString() ;
             }
           }
 
-          return getInitialValue(ds.getClassifier()) ;
+          return getInitialValue(ds.getClassifier(), language) ;
         }
         else if(d instanceof DataClassifier)
         {
@@ -117,7 +117,7 @@ public class GeneratorUtils
                 PropertyUtils
                       .getPropertyExpression(dc,
                                              DataModelProperties.INITIAL_VALUE) ;
-          setInitialization(initialization, initialValueProperty) ;
+          setInitialization(initialization, initialValueProperty, language) ;
           return initialization.toString() ;
         }
 
@@ -432,7 +432,8 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
   }
 
   private static void setInitialization(StringBuilder initialization,
-                                        List<PropertyExpression> initialValues)
+                                        List<PropertyExpression> initialValues,
+                                        String language)
   {
     for(PropertyExpression pe : initialValues)
     {
@@ -443,12 +444,18 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
 
         if(initValueList.size() > 0)
         {
-          initialization.append(" = ") ;
+          if(language.equals("ada"))
+            initialization.append(" := ") ;
+          else
+            initialization.append(" = ") ;
         }
 
         if(initValueList.size() > 1)
         {
-          initialization.append("{") ;
+          if(language.equals("ada"))
+        	  initialization.append("(") ;
+          else
+        	  initialization.append("{") ;
         }
 
         Iterator<PropertyExpression> it = initValueList.iterator() ;
@@ -471,7 +478,10 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
 
         if(initValueList.size() > 1)
         {
-          initialization.append("}") ;
+          if(language.equals("ada"))
+            initialization.append("{") ;
+          else
+          	initialization.append("}") ;
         }
       }
     }
