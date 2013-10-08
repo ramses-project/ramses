@@ -59,6 +59,7 @@ rule m_PropertyAssociationAppliesToSelf {
     	)
 }
 
+
 rule m_PropertyAssociationAppliesToParent { 
     from 
     	p : AADLI!PropertyAssociation in IN
@@ -112,17 +113,26 @@ rule m_ModalPropertyValue {
         mp : AADLI!ModalPropertyValue in IN
     to 
     	mp2 : AADLBA!ModalPropertyValue (
-    		ownedValue <- if(mp.ownedValue.oclIsKindOf(AADLI!StringLiteral)
-    						or (mp.ownedValue.oclIsKindOf(AADLI!ListValue) and mp.ownedValue.ownedListElement->exists(e| e.oclIsKindOf(AADLI!StringLiteral))) ) 
+    		ownedValue <- if(mp.ownedValue.isSimpleValueType() ) 
     				then
-    				mp.ownedValue.PropertyExpression(false)
+    				mp.ownedValue.PropertyExpression().debug(' ModalPropertyValue value ')
 					else
-    				mp.ownedValue
+    				mp.ownedValue.debug(' ModalPropertyValue value (matched)')
 					endif
 			-- OSATE INSTANTIATION BUG WORKAROUND
 			-- ownedValue <- mp.ownedValue
     	)
 }
+
+helper context AADLI!PropertyExpression def: isSimpleValueType() : Boolean =
+	self.oclIsTypeOf(AADLI!StringLiteral) or
+	self.oclIsTypeOf(AADLI!IntegerLiteral) or 
+	self.oclIsTypeOf(AADLI!BooleanLiteral) or
+	self.oclIsTypeOf(AADLI!RecordValue) or
+	self.oclIsTypeOf(AADLI!NamedValue) or
+	self.oclIsTypeOf(AADLI!RealLiteral)
+	
+;
 
 rule m_BasicPropertyAssociation{
     from
@@ -172,24 +182,13 @@ rule m_ListValue extends m_PropertyExpression {
     		-- OSATE INSTANTIATION BUG WORKAROUND
 			-- ownedListElement <- v.ownedListElement
     		ownedListElement <- v.ownedListElement->collect( e | 
-				if(e.oclIsKindOf(AADLI!StringLiteral))
+				if(e.isSimpleValueType())
     				then
-    				thisModule.StringLiteral(e)
+    				e.PropertyExpression().debug(' ListValue Element ')
 					else
-    				e
+    				e.debug(' ListValue Element ')
 					endif
 				)
-    	)
-}
-
------------------------------------------------------------------------------------------------------------------
-
-rule m_RecordValue extends m_PropertyValue {
-    from
-    	v : AADLI!RecordValue in IN
-    to
-    	v2 : AADLBA!RecordValue (
-    		ownedFieldValue <- v.ownedFieldValue
     	)
 }
 
@@ -333,27 +332,44 @@ helper context AADLI!Connection def : getInstance() : AADLBA!Connection =
     AADLBA!Connection.allInstancesFrom('OUT') -> 
     	any ( c | c.name = self.name and c.getOwner().name = self.getOwner().name )
     ;
+
+
 -----------------------------------------------------------------------------------------------------------------
 
-rule m_StringLiteral extends m_PropertyValue {
+rule m_RecordValue extends m_PropertyValue {
     from
-    	v : AADLI!StringLiteral in IN
-    to 
-    	v2 : AADLBA!StringLiteral (
-    		value <- v.value    
+    	v : AADLI!RecordValue in IN
+    to
+    	v2 : AADLBA!RecordValue (
+    		ownedFieldValue <- if(v.ownedFieldValue.isSimpleValueType()) then
+									v.ownedFieldValue.PropertyExpression().debug(' RecordValue Element ')
+								else
+									v.ownedFieldValue.debug(' RecordValue Element ')
+								endif
     	)
 }
 
 -----------------------------------------------------------------------------------------------------------------
 
-rule m_BooleanLiteral extends m_PropertyValue {
-    from
-    	v : AADLI!BooleanLiteral in IN
-    to 
-    	v2 : AADLBA!BooleanLiteral (
-    		value <- v.value    
-    	)
-}
+--rule m_StringLiteral extends m_PropertyValue {
+--    from
+--    	v : AADLI!StringLiteral in IN
+--    to 
+--    	v2 : AADLBA!StringLiteral (
+--    		value <- v.value    
+--    	)
+--}
+
+-----------------------------------------------------------------------------------------------------------------
+
+--rule m_BooleanLiteral extends m_PropertyValue {
+--    from
+--    	v : AADLI!BooleanLiteral in IN
+--    to 
+--    	v2 : AADLBA!BooleanLiteral (
+--    		value <- v.value    
+--    	)
+--}
 
 -----------------------------------------------------------------------------------------------------------------
 
@@ -380,46 +396,46 @@ rule m_ComputedValue extends m_PropertyValue {
 
 -----------------------------------------------------------------------------------------------------------------
 
-abstract rule m_NumberValue extends m_PropertyValue {
-    from
-    	v : AADLI!NumberValue in IN
-    to 
-    	v2 : AADLBA!NumberValue (
-    		unit <- v.unit
-    	)
-}
+--abstract rule m_NumberValue extends m_PropertyValue {
+--    from
+--    	v : AADLI!NumberValue in IN
+--    to 
+--    	v2 : AADLBA!NumberValue (
+--    		unit <- v.unit
+--    	)
+--}
 
-rule m_IntegerLiteral extends m_NumberValue {
-    from
-    	v : AADLI!IntegerLiteral in IN
-    to 
-    	v2 : AADLBA!IntegerLiteral (
-    		base <- v.base,
-    		value <- v.value
-    	)
-}
+--rule m_IntegerLiteral extends m_NumberValue {
+--    from
+--    	v : AADLI!IntegerLiteral in IN
+--    to 
+--    	v2 : AADLBA!IntegerLiteral (
+--    		base <- v.base,
+--    		value <- v.value
+--    	)
+--}
 
 
-rule m_RealLiteral extends m_NumberValue {
-    from 
-    	v : AADLI!RealLiteral in IN
-    to
-    	v2 : AADLBA!RealLiteral (
-    		value <- v.value    
-    	)
-}
+--rule m_RealLiteral extends m_NumberValue {
+--    from 
+--    	v : AADLI!RealLiteral in IN
+--    to
+--    	v2 : AADLBA!RealLiteral (
+--    		value <- v.value    
+--    	)
+--}
 
 -----------------------------------------------------------------------------------------------------------------
 
-rule m_NamedValue extends m_PropertyValue {
-	from
-    	v : AADLI!NamedValue in IN
-    to
-    	v2 : AADLBA!NamedValue (
-    		namedValue <- v.namedValue    
-    	)
-    	
-}
+--rule m_NamedValue extends m_PropertyValue {
+--	from
+--    	v : AADLI!NamedValue in IN
+--    to
+--    	v2 : AADLBA!NamedValue (
+--    		namedValue <- v.namedValue    
+--    	)
+--    	
+--}
 
 -----------------------------------------------------------------------------------------------------------------
 
@@ -547,36 +563,33 @@ lazy rule ModalPropertyValueRule {
 --			StringLiteral
 
 
-helper context AADLI!ListValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ListValue =
-	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression(referencesOnly))
-						->select(e| not e.oclIsUndefined()) in 
-	if(not elements->isEmpty()) then
-		thisModule.ListValue(self, elements)
-	else
-		OclUndefined
-	endif
-;
+--helper context AADLI!ListValue def: PropertyExpression() : AADLBA!ListValue =
+--	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression())
+--						->select(e| not e.oclIsUndefined()) in 
+--	if(not elements->isEmpty()) then
+--		thisModule.ListValue(self, elements)
+--	else
+--		OclUndefined
+--	endif
+--;
+--
+--rule ListValue (l : AADLI!ListValue,
+--		elts: Sequence(AADLBA!PropertyExpression))
+--{
+--	to
+--		l2 : AADLBA!ListValue (
+--			ownedListElement <- elts->select(e|e.isSimpleValueType())->collect(e|e.PropertyExpression(false).debug(' ListValue Element '))
+--								->union(elts->select(e|not e.isSimpleValueType()).debug(' ListValue Elements '))
+--		)
+--	do { l2; }
+--}
 
-rule ListValue (l : AADLI!ListValue,
-		elts: Sequence(AADLBA!PropertyExpression))
-{
-	to
-		l2 : AADLBA!ListValue (
-			ownedListElement <- elts
-		)
-	do { l2; }
-}
-
-helper context AADLI!Operation def: PropertyExpression(referencesOnly:Boolean) : AADLBA!Operation =
-	if(referencesOnly)then
-		OclUndefined
-	else
-	let content : Sequence(AADLBA!PropertyExpression) = self.ownedPropertyExpressions->collect(pe|pe.PropertyExpression(referencesOnly))->select(e| not e.oclIsUndefined()) in
+helper context AADLI!Operation def: PropertyExpression() : AADLBA!Operation =
+	let content : Sequence(AADLBA!PropertyExpression) = self.ownedPropertyExpressions->collect(pe|pe.PropertyExpression())->select(e| not e.oclIsUndefined()) in
 	if (not content->isEmpty()) then
 		thisModule.Operation(self, content)
 	else
 		OclUndefined
-	endif
 	endif
 ;
 
@@ -590,12 +603,8 @@ rule Operation(l : AADLI!Operation,	content: Sequence(AADLBA!PropertyExpression)
 	do { l2; }
 }
 
-helper context AADLI!BooleanLiteral def: PropertyExpression(referencesOnly:Boolean) : AADLBA!BooleanLiteral =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.BooleanLiteral(self)
-	endif
+helper context AADLI!BooleanLiteral def: PropertyExpression() : AADLBA!BooleanLiteral =
+	thisModule.BooleanLiteral(self)
 ;
 
 lazy rule BooleanLiteral {
@@ -606,48 +615,44 @@ lazy rule BooleanLiteral {
 	do { l2; }
 }
 
-helper context AADLI!ClassifierValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ClassifierValue =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.ClassifierValue(self)
-	endif
-;
+--helper context AADLI!ClassifierValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ClassifierValue =
+--	if(referencesOnly)then
+--		OclUndefined
+--	else
+--		thisModule.ClassifierValue(self)
+--	endif
+--;
+--
+--lazy rule ClassifierValue {
+--	from
+--		l : AADLI!ClassifierValue
+--	to
+--		l2 : AADLBA!ClassifierValue(classifier <- l.classifier.resolve())
+--	do 
+--	{
+--		l2; 
+--	}
+--}
 
-lazy rule ClassifierValue {
-	from
-		l : AADLI!ClassifierValue
-	to
-		l2 : AADLBA!ClassifierValue(classifier <- l.classifier.resolve())
-	do 
-	{
-		l2; 
-	}
-}
 
+--helper context AADLI!ComputedValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ComputedValue =
+--	if(referencesOnly)then
+--		OclUndefined
+--	else
+--		thisModule.ClassifierValue(self)
+--	endif
+--;
+--
+--lazy rule ComputedValue {
+--	from
+--		l : AADLI!ComputedValue
+--	to
+--		l2 : AADLBA!ComputedValue (function <- l.function)
+--	do { l2; }
+--}
 
-helper context AADLI!ComputedValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ComputedValue =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.ClassifierValue(self)
-	endif
-;
-
-lazy rule ComputedValue {
-	from
-		l : AADLI!ComputedValue
-	to
-		l2 : AADLBA!ComputedValue (function <- l.function)
-	do { l2; }
-}
-
-helper context AADLI!PropertyConstant def: PropertyExpression(referencesOnly:Boolean) : AADLBA!PropertyConstant =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.PropertyConstant(self)
-	endif
+helper context AADLI!PropertyConstant def: PropertyExpression() : AADLBA!PropertyConstant =
+	thisModule.PropertyConstant(self)
 ;
 
 lazy rule PropertyConstant {
@@ -658,12 +663,8 @@ lazy rule PropertyConstant {
 	do { l2; }
 }
 
-helper context AADLI!NamedValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!NamedValue =
-	if(referencesOnly)then
-		OclUndefined
-	else
+helper context AADLI!NamedValue def: PropertyExpression() : AADLBA!NamedValue =
 		thisModule.NamedValue(self)
-	endif
 ;
 
 lazy rule NamedValue {
@@ -674,155 +675,151 @@ lazy rule NamedValue {
 	do { l2; }
 }
 
-helper context AADLI!ReferenceValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ReferenceValue =
-	if(referencesOnly)then
-		if( not self.getOwnerComponent().oclIsUndefined() )
-		then
-			thisModule.ReferenceValue(self)
-		else
-			OclUndefined
-		endif
-	else
-		OclUndefined
-	endif
-;
+--helper context AADLI!ReferenceValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ReferenceValue =
+--	if(referencesOnly)then
+--		if( not self.getOwnerComponent().oclIsUndefined() )
+--		then
+--			thisModule.ReferenceValue(self)
+--		else
+--			OclUndefined
+--		endif
+--	else
+--		OclUndefined
+--	endif
+--;
+--
+--lazy rule ReferenceValue {
+--	from
+--		l : AADLI!ReferenceValue
+--	using
+--	{
+--		ref : AADLI!Subcomponent = l.containmentPathElement->first().namedElement;
+--			
+--		o : AADLI!ComponentInstance = l.getOwnerComponent();
+--		subi : AADLI!ComponentInstance = o.getReferenceValueContainer(l);
+--		sub : AADLBA!Subcomponent = thisModule.resolveTemp(subi,'sub');
+--	}
+--	to
+--		l2 : AADLBA!ReferenceValue (containmentPathElement <- Sequence {cpe2,cpe1}),
+--		cpe1 : AADLBA!ContainmentPathElement (namedElement <- sub),
+--		cpe2 : AADLBA!ContainmentPathElement (namedElement <- o.getSubcomponentImg())
+--	do {
+--		l2;
+--	}
+--}
 
-lazy rule ReferenceValue {
-	from
-		l : AADLI!ReferenceValue
-	using
-	{
-		ref : AADLI!Subcomponent = l.containmentPathElement->first().namedElement;
-			
-		o : AADLI!ComponentInstance = l.getOwnerComponent();
-		subi : AADLI!ComponentInstance = o.getReferenceValueContainer(l);
-		sub : AADLBA!Subcomponent = thisModule.resolveTemp(subi,'sub');
-	}
-	to
-		l2 : AADLBA!ReferenceValue (containmentPathElement <- Sequence {cpe2,cpe1}),
-		cpe1 : AADLBA!ContainmentPathElement (namedElement <- sub),
-		cpe2 : AADLBA!ContainmentPathElement (namedElement <- o.getSubcomponentImg())
-	do {
-		l2;
-	}
-}
+--helper context AADLI!ComponentInstance def:getReferenceValueContainer(l: AADLI!ReferenceValue) : AADLI!ComponentInstance =
+--  let ref : AADLI!Subcomponent = l.containmentPathElement->first().namedElement in
+--  	self.componentInstance->any(subc|subc.name=ref.name)
+--;
+--
+--helper context AADLI!InstanceReferenceValue def: PropertyExpression(referencesOnly:Boolean) : AADLI!InstanceReferenceValue =
+--	if(referencesOnly)then
+--		let containmentPathOrder: Integer = thisModule.getInstanceReferenceInContainmentPath(true, self.getContainerInstance(), self.referencedInstanceObject)  
+--		in
+--		
+--		if(containmentPathOrder=1)
+--		then
+--			thisModule.FirstOrderInstanceReferenceValue(self)
+--		else if (containmentPathOrder=2)
+--			then
+--				thisModule.SecondOrderInstanceReferenceValue(self)
+--			else if (containmentPathOrder>2) then
+--				OclUndefined.debug('ERROR: Only Second Order RefenrenceValue have been implemented')
+--				else
+--					OclUndefined
+--				endif
+--			endif
+--		endif
+--	else
+--		OclUndefined
+--	endif
+--;
+--
+--helper context AADLI!Element def: getContainerInstance(): AADLI!InstanceObject = 
+--	let container : AADLI!InstanceObject = self.eContainer() in
+--	if(container.oclIsTypeOf(AADLI!ComponentInstance)
+--			or container.oclIsTypeOf(AADLI!SystemInstance)
+--			or  container.oclIsTypeOf(AADLI!ConnectionInstance)) then
+--		container
+--	else
+--		container.getContainerInstance()
+--	endif
+--;
+--
+--helper def : ContainmentPathOrder : Integer = 0;
+--
+--rule getInstanceReferenceInContainmentPath (first: Boolean, container: AADLI!InstanceObject, ref: AADLI!InstanceObject)
+--{
+--	do
+--	{
+--		if(first)
+--		{
+--			thisModule.ContainmentPathOrder<-0;
+--		}
+--		if(container = ref.eContainer())
+--		{
+--			thisModule.ContainmentPathOrder<-0;
+--		}
+--		else
+--		{
+--		if(container.eContainer().oclIsKindOf(AADLI!ComponentInstance))
+--		{
+--			if(container.eContainer().componentInstance->contains(ref))
+--			{
+--				thisModule.ContainmentPathOrder<-thisModule.ContainmentPathOrder+1;
+--			}
+--			else
+--			{
+--				if(not ref.eContainer().oclIsUndefined())
+--				{
+--					thisModule.ContainmentPathOrder<-thisModule.ContainmentPathOrder+1;
+--					thisModule.getInstanceReferenceInContainmentPath(false, container, ref.eContainer());
+--				}
+--				else
+--				thisModule.ContainmentPathOrder<-0;
+--				
+--			}
+--		}
+--	 		
+--		else
+--		{
+--			thisModule.ContainmentPathOrder<-0;
+--			thisModule.ContainmentPathOrder.debug('ERROR: Container of ComponentInstance, SystemInstance, or 
+--				ConnectionInstance is not of subtype of ComponentInstance');
+--		}
+--		}
+--		thisModule.ContainmentPathOrder;
+--	}
+--}
+--
+--lazy rule FirstOrderInstanceReferenceValue {
+--	from
+--		l : AADLI!InstanceReferenceValue
+--	to
+--		l2 : AADLBA!ReferenceValue(containmentPathElement <- Sequence{path}),
+--		path : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.getSubcomponentImg())
+--	do
+--	{
+--		l2;
+--	}
+--}
+--
+--lazy rule SecondOrderInstanceReferenceValue {
+--	from
+--		l : AADLI!InstanceReferenceValue
+--	to
+--		l2 : AADLBA!ReferenceValue(containmentPathElement <- Sequence{path1,path2}),
+--		path1 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.eContainer().getSubcomponentImg()),
+--		path2 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.getSubcomponentImg())
+--	do
+--	{
+--		l2;
+--	}
+--}
 
-helper context AADLI!ComponentInstance def:getReferenceValueContainer(l: AADLI!ReferenceValue) : AADLI!ComponentInstance =
-  let ref : AADLI!Subcomponent = l.containmentPathElement->first().namedElement in
-  	self.componentInstance->any(subc|subc.name=ref.name)
-;
-
-helper context AADLI!InstanceReferenceValue def: PropertyExpression(referencesOnly:Boolean) : AADLI!InstanceReferenceValue =
-	if(referencesOnly)then
-		let containmentPathOrder: Integer = thisModule.getInstanceReferenceInContainmentPath(true, self.getContainerInstance(), self.referencedInstanceObject)  
-		in
-		
-		if(containmentPathOrder=1)
-		then
-			thisModule.FirstOrderInstanceReferenceValue(self)
-		else if (containmentPathOrder=2)
-			then
-				thisModule.SecondOrderInstanceReferenceValue(self)
-			else if (containmentPathOrder>2) then
-				OclUndefined.debug('ERROR: Only Second Order RefenrenceValue have been implemented')
-				else
-					OclUndefined
-				endif
-			endif
-		endif
-	else
-		OclUndefined
-	endif
-;
-
-helper context AADLI!Element def: getContainerInstance(): AADLI!InstanceObject = 
-	let container : AADLI!InstanceObject = self.eContainer() in
-	if(container.oclIsTypeOf(AADLI!ComponentInstance)
-			or container.oclIsTypeOf(AADLI!SystemInstance)
-			or  container.oclIsTypeOf(AADLI!ConnectionInstance)) then
-		container
-	else
-		container.getContainerInstance()
-	endif
-;
-
-helper def : ContainmentPathOrder : Integer = 0;
-
-rule getInstanceReferenceInContainmentPath (first: Boolean, container: AADLI!InstanceObject, ref: AADLI!InstanceObject)
-{
-	do
-	{
-		if(first)
-		{
-			thisModule.ContainmentPathOrder<-0;
-		}
-		if(container = ref.eContainer())
-		{
-			thisModule.ContainmentPathOrder<-0;
-		}
-		else
-		{
-		if(container.eContainer().oclIsKindOf(AADLI!ComponentInstance))
-		{
-			if(container.eContainer().componentInstance->contains(ref))
-			{
-				thisModule.ContainmentPathOrder<-thisModule.ContainmentPathOrder+1;
-			}
-			else
-			{
-				if(not ref.eContainer().oclIsUndefined())
-				{
-					thisModule.ContainmentPathOrder<-thisModule.ContainmentPathOrder+1;
-					thisModule.getInstanceReferenceInContainmentPath(false, container, ref.eContainer());
-				}
-				else
-				thisModule.ContainmentPathOrder<-0;
-				
-			}
-		}
-	 		
-		else
-		{
-			thisModule.ContainmentPathOrder<-0;
-			thisModule.ContainmentPathOrder.debug('ERROR: Container of ComponentInstance, SystemInstance, or 
-				ConnectionInstance is not of subtype of ComponentInstance');
-		}
-		}
-		thisModule.ContainmentPathOrder;
-	}
-}
-
-lazy rule FirstOrderInstanceReferenceValue {
-	from
-		l : AADLI!InstanceReferenceValue
-	to
-		l2 : AADLBA!ReferenceValue(containmentPathElement <- Sequence{path}),
-		path : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.getSubcomponentImg())
-	do
-	{
-		l2;
-	}
-}
-
-lazy rule SecondOrderInstanceReferenceValue {
-	from
-		l : AADLI!InstanceReferenceValue
-	to
-		l2 : AADLBA!ReferenceValue(containmentPathElement <- Sequence{path1,path2}),
-		path1 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.eContainer().getSubcomponentImg()),
-		path2 : AADLBA!ContainmentPathElement (namedElement <- l.referencedInstanceObject.getSubcomponentImg())
-	do
-	{
-		l2;
-	}
-}
-
-helper context AADLI!IntegerLiteral def: PropertyExpression(referencesOnly:Boolean) : AADLBA!IntegerLiteral =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.IntegerLiteral(self)
-	endif
+helper context AADLI!IntegerLiteral def: PropertyExpression() : AADLBA!IntegerLiteral =
+	thisModule.IntegerLiteral(self)
 ;
 
 lazy rule IntegerLiteral {	
@@ -836,12 +833,8 @@ lazy rule IntegerLiteral {
 	do { l2; }
 }
 
-helper context AADLI!RealLiteral def: PropertyExpression(referencesOnly:Boolean) : AADLBA!RealLiteral =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.RealLiteral(self)
-	endif
+helper context AADLI!RealLiteral def: PropertyExpression() : AADLBA!RealLiteral =
+	thisModule.RealLiteral(self)
 ;
 
 lazy rule RealLiteral {
@@ -854,32 +847,23 @@ lazy rule RealLiteral {
 	do { l2; }
 }
 
-helper context AADLI!RangeValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!RangeValue =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.RangeValue(self, referencesOnly)
-	endif
+helper context AADLI!RangeValue def: PropertyExpression() : AADLBA!RangeValue =
+	thisModule.RangeValue(self)
 ;
 
-rule RangeValue (l : AADLI!RangeValue,
-				 referencesOnly:Boolean)
+rule RangeValue (l : AADLI!RangeValue)
 {
 	to
 		l2 : AADLBA!RangeValue (
-			minimum <- l.minimum.PropertyExpression(referencesOnly), 
-			maximum <- l.maximum.PropertyExpression(referencesOnly), 
+			minimum <- l.minimum.PropertyExpression(), 
+			maximum <- l.maximum.PropertyExpression(), 
 			delta <- l.delta
 		)
 	do { l2; }
 }
 
-helper context AADLI!RecordValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!RecordValue =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.RecordValue(self, referencesOnly)
-	endif
+helper context AADLI!RecordValue def: PropertyExpression() : AADLBA!RecordValue =
+	thisModule.RecordValue(self)
 ;
 
 rule RecordValue(l : AADLI!RecordValue,
@@ -892,23 +876,22 @@ rule RecordValue(l : AADLI!RecordValue,
 	do { l2; }
 }
 
-rule BasicPropertyAssociation(bpa : AADLI!BasicPropertyAssociation,
-							  referencesOnly:Boolean)
+rule BasicPropertyAssociation(bpa : AADLI!BasicPropertyAssociation)
 {
 	to
 		bpa2 : AADLBA!BasicPropertyAssociation (
 			property <- bpa.property,
-			ownedValue <- bpa.ownedValue.PropertyExpression(referencesOnly)
+			ownedValue <- if(bpa.ownedValue.isSimpleValueType()) then
+							bpa.ownedValue.PropertyExpression()
+						  else
+						  	bpa.ownedValue
+						  endif
 		)
 	do { bpa2; }
 }
 
-helper context AADLI!StringLiteral def: PropertyExpression(referencesOnly:Boolean) : AADLBA!StringLiteral =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.StringLiteral(self)
-	endif
+helper context AADLI!StringLiteral def: PropertyExpression() : AADLBA!StringLiteral =
+	thisModule.StringLiteral(self)
 ;
 
 lazy rule StringLiteral{
@@ -919,12 +902,8 @@ lazy rule StringLiteral{
 	do { l2; }
 }
 
-helper context AADLI!UnitLiteral def: PropertyExpression(referencesOnly:Boolean) : AADLBA!UnitLiteral =
-	if(referencesOnly)then
-		OclUndefined
-	else
-		thisModule.UnitLiteral(self)
-	endif
+helper context AADLI!UnitLiteral def: PropertyExpression() : AADLBA!UnitLiteral =
+	thisModule.UnitLiteral(self)
 ;
 
 lazy rule UnitLiteral{
