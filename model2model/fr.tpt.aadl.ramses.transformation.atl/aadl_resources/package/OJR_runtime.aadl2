@@ -10,6 +10,66 @@ properties
   Data_Model::Initial_Value => ("new Status()");
 end Status;
 
+
+data Message_Size_Type
+properties
+  Source_Name => "Time";
+  Programming_Properties::Source_Name => "Time";
+  Data_Model::Initial_Value => ("new Time()");
+end Message_Size_Type;
+
+
+data Sampling_Port_Id_Type
+properties
+  Source_Name => "Time";
+  Programming_Properties::Source_Name => "Time";
+  Data_Model::Initial_Value => ("new Time()");
+end Sampling_Port_Id_Type;
+
+
+subprogram Receive_Data
+properties
+  Programming_Properties::Source_Name => "Services.ReceiveData";
+end Receive_Data;
+
+subprogram Send_Data
+properties
+  Programming_Properties::Source_Name => "Services.SendData";
+end Send_Data;
+
+data InternalPort
+properties
+  Source_Name => "InternalPort";
+  Programming_Properties::Source_Name => "InternalPort";
+  Data_Model::Initial_Value => ("new InternalPort()");
+end InternalPort;
+
+
+data Buffer_Id_Type
+properties
+  Source_Name => "Time";
+  Programming_Properties::Source_Name => "Time";
+  Data_Model::Initial_Value => ("new Time()");
+end Buffer_Id_Type;
+
+
+
+data Validity_Type
+properties
+  Source_Name => "Time";
+  Programming_Properties::Source_Name => "Time";
+  Data_Model::Initial_Value => ("new Time()");
+end Validity_Type;
+
+
+data Time
+properties
+  Source_Name => "Time";
+  Programming_Properties::Source_Name => "Time";
+  Data_Model::Initial_Value => ("new Time()");
+end Time;
+
+
 data milliseconds
 properties
 	Data_Model::Data_Representation => integer;
