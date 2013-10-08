@@ -632,7 +632,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		_mainCCode.addOutput("VAR(" + GenerationUtilsC.getGenerationCIdentifier(data.getAllClassifier().getQualifiedName())
 				+ ", OS_VAR) " + data.getName());
 		String init="";
-		init = GeneratorUtils.getInitialValue(data.getDataSubcomponentType());
+		init = GeneratorUtils.getInitialValue(data.getDataSubcomponentType(), "c");
 		if(! init.isEmpty())
 			_mainCCode.addOutput(" = "+init);
 		_mainCCode.addOutputNewline(";");
