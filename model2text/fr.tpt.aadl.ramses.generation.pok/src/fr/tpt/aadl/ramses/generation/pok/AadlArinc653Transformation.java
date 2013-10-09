@@ -37,7 +37,7 @@ public class AadlArinc653Transformation extends
   }
 
 
-  public AadlArinc653Transformation()
+  public AadlArinc653Transformation(String module)
   {
   	ATL_FILE_NAMES = new String[]
         {"ACG/targets/shared/UninstanciateOverride",
@@ -52,7 +52,8 @@ public class AadlArinc653Transformation extends
   		 "ACG/targets/arinc653/QueuingCommunications",
   		 "ACG/targets/arinc653/SamplingCommunications",
   		 "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
-  		 "ACG/PeriodicDelayedCommunication/SharedRules"
+  		 "ACG/PeriodicDelayedCommunication/SharedRules",
+  		 module
         };
   }
   

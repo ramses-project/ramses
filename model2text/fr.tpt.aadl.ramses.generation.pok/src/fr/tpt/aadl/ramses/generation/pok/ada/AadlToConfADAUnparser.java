@@ -756,11 +756,17 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		// Global files.
 		genGlobalVariablesMainImpl(process, lthreads, mainImplCode, pp);
 
+		
 		// main function declaration.
 		mainImplCode.addOutputNewline(GenerationUtilsADA
 				.generateSectionTitleC("MAIN")) ;
+		
+		mainImplCode.addOutputNewline("extern void Init_Global_Variables();");
+		
 		mainImplCode.addOutputNewline("int main ()") ;
 		mainImplCode.addOutputNewline("{") ;
+		mainImplCode.incrementIndent();
+		mainImplCode.addOutputNewline("Init_Global_Variables();");
 		mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
 		mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
 		//not complete
@@ -796,6 +802,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		mainImplCode
 		.addOutputNewline("  SET_PARTITION_MODE (NORMAL, &(ret));") ;
 		mainImplCode.addOutputNewline("  return (0);") ;
+		mainImplCode.decrementIndent();
 		mainImplCode.addOutputNewline("}") ;
 		mainImplCode.addOutputNewline(GenerationUtilsADA.generateSectionMarkC()) ;
 	}

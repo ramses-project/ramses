@@ -47,7 +47,7 @@ public class AdaPokGeneratorFactory extends AbstractGeneratorFactory
                                                     pokADAUnparser,
                                                     pokMakefileUnparser) ;
     
-    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation();
+    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation("helpers/LanguageSpecificitiesAda");
     
     
     AadlTargetSpecificGenerator result = 

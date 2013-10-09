@@ -46,7 +46,7 @@ public class PokGeneratorFactory extends AbstractGeneratorFactory
                                                     pokCUnparser,
                                                     pokMakefileUnparser) ;
     
-    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation();
+    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation("helpers/LanguageSpecificitiesC") ;
     
     
     AadlTargetSpecificGenerator result = 
