@@ -65,22 +65,26 @@ abstract rule m_Input_BlackBoard
 		behavior: AADLI!Element
 	using
 	{
+		OBJ: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		spg: AADLBA!SubprogramType = 'Receive_Data'.asSubprogramType('OJR_RUNTIME');
-		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 	}
 	to
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
-			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,RETURN_CODE_HOLDER} 
+			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,OBJ_HOLDER,RETURN_CODE_HOLDER} 
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- resolvedSpg
+			element <- spg
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
 			element<-thisModule.resolveTemp(fi, 'f_entrypoint')
+		),
+		OBJ_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- OBJ
 		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }
@@ -131,22 +135,26 @@ abstract rule m_Output_BlackBoard
 		cnxRef: AADLI!PortConnection
 	using
 	{
+		OBJ: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		spg: AADLBA!SubprogramType = 'Send_Data'.asSubprogramType('OJR_RUNTIME');
-		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 	}
 	to
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
-			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,RETURN_CODE_HOLDER} 
+			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,OBJ_HOLDER,RETURN_CODE_HOLDER} 
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- resolvedSpg
+			element <- spg
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
 			element<-thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint')
+		),
+		OBJ_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- OBJ
 		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }

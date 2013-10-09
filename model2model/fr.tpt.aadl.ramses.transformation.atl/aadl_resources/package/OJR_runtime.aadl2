@@ -26,23 +26,25 @@ properties
   Data_Model::Initial_Value => ("new Time()");
 end Sampling_Port_Id_Type;
 
+data GenericObject
+properties
+  Source_Name => "Object";
+  Programming_Properties::Source_Name => "Object";
+end GenericObject;
 
 subprogram Receive_Data
-prototypes
-  MESSAGE_TYPE: data;
 features
   BLACKBOARD_ID: requires data access InternalPort {Access_Right=>read_only;};
+  OBJ: out parameter GenericObject;
   RETURN_CODE: out parameter Status ;
 properties
   Programming_Properties::Source_Name => "Services.ReceiveData";
 end Receive_Data;
 
 subprogram Send_Data
-prototypes
-  MESSAGE_TYPE: data;
 features
    BLACKBOARD_ID: requires data access InternalPort {Access_Right=>read_only;};
-
+   OBJ: in parameter GenericObject;
    RETURN_CODE: out parameter Status ;
 properties
   Programming_Properties::Source_Name => "Services.SendData";
