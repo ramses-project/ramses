@@ -113,12 +113,13 @@ rule m_ModalPropertyValue {
         mp : AADLI!ModalPropertyValue in IN
     to 
     	mp2 : AADLBA!ModalPropertyValue (
-    		ownedValue <- if(mp.ownedValue.isSimpleValueType() ) 
-    				then
-    				mp.ownedValue.PropertyExpression().debug(' ModalPropertyValue value ')
-					else
-    				mp.ownedValue.debug(' ModalPropertyValue value (matched)')
-					endif
+    		ownedValue <- mp.ownedValue
+--					if(mp.ownedValue.isSimpleValueType() ) 
+--    				then
+--    				mp.ownedValue.PropertyExpression().debug(' ModalPropertyValue value ')
+--					else
+--    				mp.ownedValue.debug(' ModalPropertyValue value (matched)')
+--					endif
 			-- OSATE INSTANTIATION BUG WORKAROUND
 			-- ownedValue <- mp.ownedValue
     	)
@@ -181,14 +182,16 @@ rule m_ListValue extends m_PropertyExpression {
     	v2 : AADLBA!ListValue (
     		-- OSATE INSTANTIATION BUG WORKAROUND
 			-- ownedListElement <- v.ownedListElement
-    		ownedListElement <- v.ownedListElement->collect( e | 
-				if(e.isSimpleValueType())
-    				then
-    				e.PropertyExpression().debug(' ListValue Element ')
-					else
-    				e.debug(' ListValue Element ')
-					endif
-				)
+    		ownedListElement <- v.ownedListElement
+			
+--			->collect( e | 
+--				if(e.isSimpleValueType())
+--    				then
+--    				e.PropertyExpression().debug(' ListValue Element ')
+--					else
+--    				e.debug(' ListValue Element ')
+--					endif
+--				)
     	)
 }
 
@@ -263,7 +266,7 @@ lazy rule createContainmentPathElement
 		ne: AADLI!NamedElement
 	to
 		cpe : AADLBA!ContainmentPathElement (
-				namedElement<-if(ne.oclIsKindOf(AADLI!FeatureInstance)) then thisModule.resolveTemp(ne, 'f') else ne endif
+				namedElement<-if(ne.resolve().oclIsKindOf(AADLI!NamedElement)) then ne else OclUndefined endif
 			)
 	do
 	{
@@ -343,35 +346,37 @@ rule m_RecordValue extends m_PropertyValue {
     	v : AADLI!RecordValue in IN
     to
     	v2 : AADLBA!RecordValue (
-    		ownedFieldValue <- if(v.ownedFieldValue.isSimpleValueType()) then
-									v.ownedFieldValue.PropertyExpression().debug(' RecordValue Element ')
-								else
-									v.ownedFieldValue.debug(' RecordValue Element ')
-								endif
+    		ownedFieldValue <- v.ownedFieldValue
+			
+--								if(v.ownedFieldValue.isSimpleValueType()) then
+--									v.ownedFieldValue.PropertyExpression().debug(' RecordValue Element ')
+--								else
+--									v.ownedFieldValue.debug(' RecordValue Element ')
+--								endif
     	)
 }
 
 -----------------------------------------------------------------------------------------------------------------
 
---rule m_StringLiteral extends m_PropertyValue {
---    from
---    	v : AADLI!StringLiteral in IN
---    to 
---    	v2 : AADLBA!StringLiteral (
---    		value <- v.value    
---    	)
---}
+rule m_StringLiteral extends m_PropertyValue {
+    from
+    	v : AADLI!StringLiteral in IN
+    to 
+    	v2 : AADLBA!StringLiteral (
+    		value <- v.value    
+    	)
+}
 
 -----------------------------------------------------------------------------------------------------------------
 
---rule m_BooleanLiteral extends m_PropertyValue {
---    from
---    	v : AADLI!BooleanLiteral in IN
---    to 
---    	v2 : AADLBA!BooleanLiteral (
---    		value <- v.value    
---    	)
---}
+rule m_BooleanLiteral extends m_PropertyValue {
+    from
+    	v : AADLI!BooleanLiteral in IN
+    to 
+    	v2 : AADLBA!BooleanLiteral (
+    		value <- v.value    
+    	)
+}
 
 -----------------------------------------------------------------------------------------------------------------
 
@@ -398,46 +403,46 @@ rule m_ComputedValue extends m_PropertyValue {
 
 -----------------------------------------------------------------------------------------------------------------
 
---abstract rule m_NumberValue extends m_PropertyValue {
---    from
---    	v : AADLI!NumberValue in IN
---    to 
---    	v2 : AADLBA!NumberValue (
---    		unit <- v.unit
---    	)
---}
+abstract rule m_NumberValue extends m_PropertyValue {
+    from
+    	v : AADLI!NumberValue in IN
+    to 
+    	v2 : AADLBA!NumberValue (
+    		unit <- v.unit
+    	)
+}
 
---rule m_IntegerLiteral extends m_NumberValue {
---    from
---    	v : AADLI!IntegerLiteral in IN
---    to 
---    	v2 : AADLBA!IntegerLiteral (
---    		base <- v.base,
---    		value <- v.value
---    	)
---}
+rule m_IntegerLiteral extends m_NumberValue {
+    from
+    	v : AADLI!IntegerLiteral in IN
+    to 
+    	v2 : AADLBA!IntegerLiteral (
+    		base <- v.base,
+    		value <- v.value
+    	)
+}
 
 
---rule m_RealLiteral extends m_NumberValue {
---    from 
---    	v : AADLI!RealLiteral in IN
---    to
---    	v2 : AADLBA!RealLiteral (
---    		value <- v.value    
---    	)
---}
+rule m_RealLiteral extends m_NumberValue {
+    from 
+    	v : AADLI!RealLiteral in IN
+    to
+    	v2 : AADLBA!RealLiteral (
+    		value <- v.value    
+    	)
+}
 
 -----------------------------------------------------------------------------------------------------------------
 
---rule m_NamedValue extends m_PropertyValue {
---	from
---    	v : AADLI!NamedValue in IN
---    to
---    	v2 : AADLBA!NamedValue (
---    		namedValue <- v.namedValue    
---    	)
---    	
---}
+rule m_NamedValue extends m_PropertyValue {
+	from
+    	v : AADLI!NamedValue in IN
+    to
+    	v2 : AADLBA!NamedValue (
+    		namedValue <- v.namedValue    
+    	)
+    	
+}
 
 -----------------------------------------------------------------------------------------------------------------
 
@@ -446,17 +451,19 @@ rule m_RangeValue extends m_PropertyValue {
     	v : AADLI!RangeValue in IN
     to
     	v2 : AADLBA!RangeValue (
-    		minimum <- if(v.minimum.isSimpleValueType())then
-    						v.minimum.PropertyExpression()
-						else
-							thisModule.resolveTemp(v.minimum, 'v2')
-						endif,
+    		minimum <- v.minimum,
+--						if(v.minimum.isSimpleValueType())then
+--    						v.minimum.PropertyExpression()
+--						else
+--							thisModule.resolveTemp(v.minimum, 'v2')
+--						endif,
     				
-    		maximum <- if(v.maximum.isSimpleValueType())then
-    						v.maximum.PropertyExpression()
-						else
-							thisModule.resolveTemp(v.maximum, 'v2')
-						endif
+    		maximum <- v.maximum
+--						if(v.maximum.isSimpleValueType())then
+--    						v.maximum.PropertyExpression()
+--						else
+--							thisModule.resolveTemp(v.maximum, 'v2')
+--						endif
     	)
 }
 
