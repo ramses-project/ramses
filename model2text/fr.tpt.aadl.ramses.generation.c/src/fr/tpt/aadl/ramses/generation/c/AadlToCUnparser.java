@@ -39,6 +39,7 @@ import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessCategory;
 import org.osate.aadl2.AccessConnection;
+import org.osate.aadl2.AccessSpecification;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
@@ -63,6 +64,8 @@ import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.FeaturePrototypeActual;
+import org.osate.aadl2.FeaturePrototypeBinding;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
@@ -207,8 +210,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 		  List<PrototypeBinding> cBindings = c.getOwnedPrototypeBindings();
 		  for(PrototypeBinding b : cBindings)
 		  {
-			  ComponentPrototypeBinding cpb = (ComponentPrototypeBinding) b;
-			  SubcomponentType st = cpb.getActuals().get(0).getSubcomponentType();
+			  FeaturePrototypeBinding cpb = (FeaturePrototypeBinding) b;
+			  SubcomponentType st = ((AccessSpecification)cpb.getActual()).getClassifier();
 			  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
 		  }
 		  
