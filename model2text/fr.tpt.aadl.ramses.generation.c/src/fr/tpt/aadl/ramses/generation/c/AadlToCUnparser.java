@@ -55,6 +55,7 @@ import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.DataAccess;
+import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.DataImplementation;
 import org.osate.aadl2.DataPrototype;
 import org.osate.aadl2.DataSubcomponent;
@@ -399,6 +400,18 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       {
     	for(PrototypeBinding pb: owner.getOwnedPrototypeBindings())
     	{
+      	  if(pb instanceof FeaturePrototypeBinding
+      			&& pb.getFormal().getName().equalsIgnoreCase(dst.getName()))
+      	  {
+      		FeaturePrototypeBinding fpb = (FeaturePrototypeBinding) pb;
+      		if(fpb.getActual() instanceof AccessSpecification)
+      		{
+      			AccessSpecification as = (AccessSpecification)fpb.getActual();
+      			if(as.getClassifier() instanceof DataSubcomponentType)
+      				processDataSubcomponentType(owner, (DataSubcomponentType) as.getClassifier(),
+      						sourceNameDest, sourceTextDest);
+      		}
+      	  }
     	  if(pb instanceof ComponentPrototypeBinding
     			&& pb.getFormal().getName().equalsIgnoreCase(dst.getName()))
     	  {
