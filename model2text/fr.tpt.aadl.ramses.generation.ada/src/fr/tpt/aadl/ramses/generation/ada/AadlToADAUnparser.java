@@ -135,8 +135,9 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 	private List<String> _processedTypes  ;
     public Set<NamedElement> additionalUnparsing = new LinkedHashSet<NamedElement>();
+    private static final String MAIN_HEADER_INCLUSION = "" ;
 
-    private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
+//    private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
 	// Map Data Access with their relative Data Subcomponent. Relations 
 	// are defined in the process implementation via connections.
 	private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
@@ -258,7 +259,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			FileWriter typesFile_ADS =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/gtypes.ads") ;
 			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("gtypes.ads") ;
-			String addGtypesHeader_ADS = "pragma No_Run_Time;\nwith System; use System;\n";
+			String addGtypesHeader_ADS = "with System; use System;\n";
 			addGtypesHeader_ADS += getGeneratedCodeForAdditionalHeaders(_gtypesHeaderCode) + headerGuard;
 			saveFile(typesFile_ADS, "", addGtypesHeader_ADS,
 					_gtypesHeaderCode.getOutput()) ;
@@ -295,7 +296,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			FileWriter activityFile_ADS =
 					new FileWriter(targetDirectory.getAbsolutePath() + "/activity.ads") ;
 			headerGuard = GenerationUtilsADA.generateHeaderInclusionGuard("activity.ads");
-			String addActivityHeader_ADS = "pragma No_Run_Time;\nwith System;use System;\nwith Subprograms;use Subprograms;\n" +
+			String addActivityHeader_ADS = "with System;use System;\nwith Subprograms;use Subprograms;\n" +
 					"with Gtypes; use Gtypes;\nwith Deployment; use Deployment;\n";
 			addActivityHeader_ADS += getGeneratedCodeForAdditionalHeaders(_activityHeaderCode) + headerGuard;
 			saveFile(activityFile_ADS, "",
