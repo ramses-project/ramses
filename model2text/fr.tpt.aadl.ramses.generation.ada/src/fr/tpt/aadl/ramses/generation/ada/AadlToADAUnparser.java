@@ -50,6 +50,7 @@ import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Parameter;
+import org.osate.aadl2.PortSpecification;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.PropertyExpression;
@@ -200,11 +201,30 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			  List<PrototypeBinding> cBindings = c.getOwnedPrototypeBindings();
 			  for(PrototypeBinding b : cBindings)
 			  {
-				  ComponentPrototypeBinding cpb = (ComponentPrototypeBinding) b;
-				  SubcomponentType st = cpb.getActuals().get(0).getSubcomponentType();
-				  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
-			  }
-			  
+				  if(b instanceof FeaturePrototypeBinding)
+				  {
+					  FeaturePrototypeBinding cpb = (FeaturePrototypeBinding) b;
+					  SubcomponentType st = null;
+					  if(cpb.getActual() instanceof AccessSpecification)
+					  {
+						  st = ((AccessSpecification)cpb.getActual()).getClassifier();
+					  }
+					  else if(cpb.getActual() instanceof PortSpecification)
+					  {
+						  st = ((PortSpecification)cpb.getActual()).getClassifier();
+					  }
+					  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
+
+				  }
+				  else
+				  {
+					  ComponentPrototypeBinding cpb = (ComponentPrototypeBinding) b;
+					  SubcomponentType st = cpb.getActuals().get(0).getSubcomponentType();
+					  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
+
+				  }
+				  
+			  }			  
 			  bindings.addAll(cBindings);
 		  }
 		  return bindings;
@@ -473,6 +493,13 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 							AccessSpecification as = (AccessSpecification)fpb.getActual();
 							if(as.getClassifier() instanceof DataSubcomponentType)
 								processDataSubcomponentType(owner, (DataSubcomponentType) as.getClassifier(),
+										sourceNameDest, sourceTextDest);
+						}
+						else if(fpb.getActual() instanceof PortSpecification)
+						{
+							PortSpecification ps = (PortSpecification)fpb.getActual();
+							if(ps.getClassifier() instanceof DataSubcomponentType)
+								processDataSubcomponentType(owner, (DataSubcomponentType) ps.getClassifier(),
 										sourceNameDest, sourceTextDest);
 						}
 					}
