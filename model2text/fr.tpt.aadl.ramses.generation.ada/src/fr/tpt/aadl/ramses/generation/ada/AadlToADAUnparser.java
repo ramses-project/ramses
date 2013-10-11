@@ -17,6 +17,7 @@ import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessCategory;
 import org.osate.aadl2.AccessConnection;
+import org.osate.aadl2.AccessSpecification;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
@@ -43,6 +44,7 @@ import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.FeaturePrototypeBinding;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
 import org.osate.aadl2.NamedElement;
@@ -462,6 +464,18 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			{
 				for(PrototypeBinding pb: owner.getOwnedPrototypeBindings())
 				{
+					if(pb instanceof FeaturePrototypeBinding
+							&& pb.getFormal().getName().equalsIgnoreCase(dst.getName()))
+					{
+						FeaturePrototypeBinding fpb = (FeaturePrototypeBinding) pb;
+						if(fpb.getActual() instanceof AccessSpecification)
+						{
+							AccessSpecification as = (AccessSpecification)fpb.getActual();
+							if(as.getClassifier() instanceof DataSubcomponentType)
+								processDataSubcomponentType(owner, (DataSubcomponentType) as.getClassifier(),
+										sourceNameDest, sourceTextDest);
+						}
+					}
 					if(pb instanceof ComponentPrototypeBinding
 							&& pb.getFormal().getName().equalsIgnoreCase(dst.getName()))
 					{
