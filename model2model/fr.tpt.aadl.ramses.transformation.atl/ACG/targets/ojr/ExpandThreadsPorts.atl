@@ -426,21 +426,33 @@ unique lazy rule createResolvedSpg
 	from
 		classifier: AADLI!DataClassifier,
 		spg: AADLBA!SubprogramType
+	using
+	{
+		param: AADLBA!Parameter = spg.ownedParameter->any(e|e.name = 'OBJ');
+	}
 	to
 		spg_ResolvedType: AADLBA!SubprogramType
 		(
 			name <- spg.name+'_'+thisModule.getProgrammationLanguageIdentifier(classifier.name),
-			ownedExtension <- extendedMessageType
+			ownedExtension <- extendedMessageType,
+			ownedParameter <- Sequence{actualParam}
 		),
 		extendedMessageType: AADLBA!TypeExtension
 		(
 			extended<-spg
+		),
+		actualParam : AADLBA!Parameter
+		(
+			refined <- param,
+			direction <- param.direction,
+			dataFeatureClassifier <- classifier
 		)
 	do
 	{
 		spg_ResolvedType;
 	}
 }
+
 
 
 unique lazy rule CreateLengthDataSubcomponent
