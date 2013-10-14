@@ -185,13 +185,13 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 		(fi.isDataPort())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME')),
+		(dataFeatureClassifier <- 'InternalPortSampled'.asDataType('OJR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME')),
+		(dataFeatureClassifier <- 'InternalPortSampled'.asDataType('OJR_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'InternalPort'.asDataType('OJR_RUNTIME')
+			dataSubcomponentType <- 'InternalPortSampled'.asDataType('OJR_RUNTIME')
 		)
 }
 
@@ -205,13 +205,13 @@ rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 		fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME')),
+		(dataFeatureClassifier <- 'InternalPortQueued'.asDataType('OJR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME')),
+		(dataFeatureClassifier <- 'InternalPortQueued'.asDataType('OJR_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'InternalPort'.asDataType('OJR_RUNTIME')
+			dataSubcomponentType <- 'InternalPortQueued'.asDataType('OJR_RUNTIME')
 		)
 }
 
@@ -342,9 +342,9 @@ rule m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance
 		)
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME')),
+		(dataFeatureClassifier <- 'InternalPortQueued'.asDataType('OJR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME'))
+		(dataFeatureClassifier <- 'InternalPortQueued'.asDataType('OJR_RUNTIME'))
 }
 
 -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
@@ -360,7 +360,7 @@ rule m_Thread_Output_IntraProcess_DataPort_Instance
 		)
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME')),
+		(dataFeatureClassifier <- 'InternalPortSampled'.asDataType('OJR_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
 		(dataFeatureClassifier <- 'InternalPort'.asDataType('OJR_RUNTIME'))
 }

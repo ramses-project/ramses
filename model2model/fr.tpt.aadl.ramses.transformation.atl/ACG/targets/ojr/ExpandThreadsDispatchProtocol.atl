@@ -77,23 +77,16 @@ lazy rule getSporadicWaitCallAction
 		spgImg: AADLBA!SubprogramImplementation
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.retreiveReturnCodeValue(spgImg);
 		spg : AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('OJR_RUNTIME');
  	}
 	to
 		call: AADLBA!SubprogramCallAction
 		(
-			subprogram <- callHolder,
-			parameterLabels <- Sequence{RETURN_CODE_HOLDER} 
+			subprogram <- callHolder
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
 			element <- spg
-		),
-
-		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
-		(
-			element <- RETURN_CODE
 		)
 	do
 	{

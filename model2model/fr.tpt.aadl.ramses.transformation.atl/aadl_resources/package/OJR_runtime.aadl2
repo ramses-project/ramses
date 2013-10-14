@@ -57,6 +57,21 @@ properties
   Data_Model::Initial_Value => ("new InternalPort()");
 end InternalPort;
 
+
+data InternalPortQueued
+properties
+  Source_Name => "InternalPortQueued";
+  Programming_Properties::Source_Name => "InternalPortQueued";
+  Data_Model::Initial_Value => ("new InternalPortQueued()");
+end InternalPortQueued;
+
+data InternalPortSampled
+properties
+  Source_Name => "InternalPortSampled";
+  Programming_Properties::Source_Name => "InternalPortSampled";
+  Data_Model::Initial_Value => ("new InternalPortSampled()");
+end InternalPortSampled;
+
 data ExternalPort
 properties
   Source_Name => "InternalPort";
@@ -102,8 +117,6 @@ properties
 end Periodic_Wait;
 
 subprogram Wait_Event
-features
-  timer: in parameter milliseconds;
 properties
   Source_Name => "Wait_Event";
 end Wait_Event;
