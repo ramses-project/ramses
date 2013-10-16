@@ -111,7 +111,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
         unparserContent
-              .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/deployment.h") ;
+              .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/main.h") ;
         unparserContent
               .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
