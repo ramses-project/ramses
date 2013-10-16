@@ -156,3 +156,186 @@ rule m_Output_Buffer_ComputeEntrypointCallSequence
 		)
 }
 
+-- @extends m_Output_EventPort
+rule m_OutputBuffer_EventPort
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		portCnx: AADLI!PortConnection,
+		cnxRef: AADLI!PortConnection		
+		(
+			not fi.srcConnectionInstance->exists(e|not e.destination.eContainer().isPeriodicThread())
+		)
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Send_Buffer'.asSubprogramType('ARINC653_RUNTIME');
+		int: AADLBA!DataType = 'Integer_16'.asClassifier('BASE_TYPES');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(int, spg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,TIME_OUT_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BUFFER_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BUFFER_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
+	}
+}
+
+-- @extends m_PortBehavior
+rule m_BufferBehavior
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Receive_Buffer'.asSubprogramType('ARINC653_RUNTIME');
+		int: AADLBA!DataType = 'Integer_16'.asClassifier('BASE_TYPES');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(int, spg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		BUFFER_ID: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+	}
+	to
+		count_variable: AADLBA!BehaviorVariable
+		(
+			name <- fi.name+'_'+behavior.name+'_message_count',
+			dataClassifier <- 'Message_Range_Type'.asClassifier('ARINC653_RUNTIME')
+		),
+		status_variable: AADLBA!BehaviorVariable
+		(
+			name <- fi.name+'_'+behavior.name+'_status',
+			dataClassifier <- 'Buffer_Status_Type.impl'.asClassifier('ARINC653_RUNTIME')
+		),
+		getCountAction: AADLBA!SubprogramCallAction
+		(
+			subprogram <- GET_BUFFER_STATUS_HOLDER,
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER,BUFFER_STATUS_HOLDER,RETURN_CODE_HOLDER}
+		),
+		GET_BUFFER_STATUS_HOLDER: AADLBA!SubprogramHolder
+		(
+			element <- 'Get_Buffer_Status'.asSubprogramType('ARINC653_RUNTIME')
+		),
+		BUFFER_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-BUFFER_ID
+		),
+		BUFFER_STATUS_HOLDER: AADLBA!BehaviorVariableHolder
+		(
+			element<-status_variable
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		),
+		count_assignement: AADLBA!AssignmentAction
+		(
+			target <- countBehaviorVariableHolder,
+			valueExpression <- nbMessagesValueExpression
+		),
+		countBehaviorVariableHolder: AADLBA!BehaviorVariableHolder
+		(
+			element <- count_variable
+		),
+		
+		nbMessagesValueExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{nbMessagesRelation}
+		),
+		nbMessagesRelation: AADLBA!Relation
+		(
+			relationalOperator<-#None,
+			firstExpression<-nbMessagesExpression
+		),
+		nbMessagesExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{nbMessagesTerm}
+		),
+		nbMessagesTerm: AADLBA!Term
+		(
+			factors <- Sequence{nbMessagesFactor}
+		),
+		nbMessagesFactor: AADLBA!Factor
+		(
+			firstValue <- nbMessagesDataComponentReference
+		),
+		nbMessagesDataComponentReference: AADLBA!DataComponentReference
+		(
+			data <- Sequence{statusHolder,nbMessageHolder}
+		),
+		statusHolder: AADLBA!BehaviorVariableHolder
+		(
+			element <- status_variable
+		),
+		nbMessageHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- 'Buffer_Status_Type.impl'.asClassifier('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'NB_MESSAGE')
+		),
+		-----------------------------------------------------------
+		--- if exists, remove the first element from the buffer ---
+		-----------------------------------------------------------
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER_RECEIVE,TIME_OUT_HOLDER_RECEIVE,MESSAGE_ADDR_HOLDER_RECEIVE,LENGTH_HOLDER_RECEIVE,RETURN_CODE_HOLDER_RECEIVE} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BUFFER_ID_HOLDER_RECEIVE: AADLBA!DataAccessHolder
+		(
+			element<-BUFFER_ID
+		),
+		MESSAGE_ADDR_HOLDER_RECEIVE: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER_RECEIVE: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER_RECEIVE: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER_RECEIVE: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}

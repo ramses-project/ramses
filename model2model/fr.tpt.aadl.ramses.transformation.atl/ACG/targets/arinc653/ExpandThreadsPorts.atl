@@ -71,7 +71,7 @@ helper def: collectGetValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
 	callSequences->collect(e | thisModule.resolveTemp(c, 'returnData'))
 	->union
-	(c.featureInstance->select(e|e.isDataOrEventDataPort() and not e.isPeriodicDelayedPort())
+	(c.featureInstance->select(e|e.feature.oclIsKindOf(AADLI!Port) and not e.isPeriodicDelayedPort())
 		->collect(fi|
 			Sequence
 			{
@@ -92,8 +92,6 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	)
 	->union
 	(c.featureInstance->select(e|
-		not e.isEventPort() -- event ports are not yet handled in the transformation
-		and
 		(e.isInputFeature() or (e.isEventOrEventDataPort() and e.isOutputFeature()) )
 		and 
 		not(e.isDataPort() and not e.isIntraProcessFeatureInstance())
@@ -248,7 +246,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 		)
 }
 
--- @extends m_Not_PeriodicDelayed_Port,m_Thread_IntraProcess_Input_Port_Instance
+-- @extends m_Not_PeriodicDelayed_Port,m_Thread_EventPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
 rule m_Thread_IntraProcess_Input_EventPort_Instance
 {
   	from
@@ -494,7 +492,7 @@ unique lazy rule CreateLengthDataSubcomponent
 	using
 	{
 		typeId: String = port.getLengthInitialValue();
-		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression('sizeof('+typeId+')');
+		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression(thisModule.getSizeOfType(typeId));
 	}
 	to
 		lv: AADLBA!ListValue
@@ -589,7 +587,11 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 			package_name+thisModule.packageSuffix.concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
 		endif
 	else
-		self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()
+		if(self.isEventPort()) then
+			'Integer_16'.asClassifier('BASE_TYPES').getProgrammationLanguageIdentifier()
+		else 
+			self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()
+		endif
 	endif
 ;
 

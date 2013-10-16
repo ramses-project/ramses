@@ -323,6 +323,11 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
         }
       }
     }
+    else if(fi.getCategory() == FeatureCategory.EVENT_PORT)
+    {
+      queueInfo.dataType="int";
+    }
+    
     
     if(getQueueInfo((Port)fi.getFeature(), queueInfo))
     {

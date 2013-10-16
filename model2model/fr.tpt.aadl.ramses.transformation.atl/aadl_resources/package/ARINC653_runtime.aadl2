@@ -85,6 +85,15 @@ properties
   Programming_Properties::Source_Text => ("arinc653/buffer.h", "arinc653/apex-buffers.ads");
 end Buffer_Status_Type;
 
+data implementation Buffer_Status_Type.impl
+subcomponents
+  NB_MESSAGE: data Message_Range_Type;
+  MAX_NB_MESSAGE: data Message_Range_Type;
+  MAX_MESSAGE_SIZE : data Message_Size_Type;
+  WAITING_PROCESSES : data Waiting_Range_Type;
+end Buffer_Status_Type.impl;
+
+
 subprogram Create_Buffer
 features
   BUFFER_NAME: in parameter BUFFER_NAME_TYPE;
@@ -128,7 +137,7 @@ end Receive_Buffer;
 
 subprogram Get_Buffer_Id
 features
-  BUFFER_NAME: in parameter BUFFER_NAME_TYPE; 
+  BUFFER_NAME: requires data access BUFFER_ID_TYPE {Access_Right=>read_only;};
   BUFFER_ID: out parameter BUFFER_ID_TYPE; 
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
@@ -138,7 +147,7 @@ end Get_Buffer_Id;
  
 subprogram Get_Buffer_Status
 features
-  BUFFER_ID: in parameter BUFFER_ID_TYPE;
+  BUFFER_ID: requires data access BUFFER_ID_TYPE {Access_Right=>read_only;};
   BUFFER_STATUS: out parameter BUFFER_STATUS_TYPE; 
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
