@@ -39,6 +39,7 @@ import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.BehavioredImplementation;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.DataSubcomponent;
@@ -1034,7 +1035,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
           SubprogramSubcomponentType sct =
                 (SubprogramSubcomponentType) object.getSubprogram().getElement() ;
 
-          AadlToADAUnparser aadlCUnparser = AadlToADAUnparser.getAadlToADAUnparser(); 
+          AadlToADAUnparser aadlADAUnparser = AadlToADAUnparser.getAadlToADAUnparser(); 
           
           if(sct instanceof SubprogramType)
           {
@@ -1046,7 +1047,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
             st = si.getType() ;
           }
           additionalSubprogramsToUnparse(sct);
-          List<PrototypeBinding> currentBindings = aadlCUnparser.getCurrentPrototypeBindings(
+          List<PrototypeBinding> currentBindings = aadlADAUnparser.getCurrentPrototypeBindings(
         		  object.getSubprogram().getElement().getName());
           List<Feature> ordereFeatureList = Aadl2Utils.orderFeatures(st, currentBindings) ;
 
@@ -1078,6 +1079,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
             boolean first = true;
             for(ParameterLabel pl : object.getParameterLabels())
             {
+              
               ParameterConnectionEnd pce =
                     (ParameterConnectionEnd) ordereFeatureList.get(object
                                                                    .getParameterLabels().indexOf(pl)) ;
@@ -1097,7 +1099,9 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                   ElementHolder eh = (ElementHolder) pl;
                   if(eh instanceof ParameterHolder
                 		  || eh instanceof DataAccessHolder)
+                  {
                 	  _adaFileContent.addOutput(eh.getElement().getName());
+                  }
                   else
                 	  _adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(eh.getElement().getQualifiedName()));
                 } 
@@ -1113,7 +1117,9 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
               		ElementHolder eh = (ElementHolder) v;
               		if(eh instanceof ParameterHolder
                   		  || eh instanceof DataAccessHolder)
+              		{
                   	  _adaFileContent.addOutput(eh.getElement().getName());
+              		}
                     else
                   	  _adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(eh.getElement().getQualifiedName()));
               	  }
@@ -1127,12 +1133,18 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
               		  if(dh instanceof ParameterHolder
                             || dh instanceof DataAccessHolder
                             || firstElement == false)
+              		  {
                         _adaFileContent.addOutput(dh.getElement().getName());
+              		  }
                       else
                       {
                         _adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(dh.getElement().getQualifiedName()));
                         firstElement=false;
                       }
+              		  if(paramAsPrototype(dh.getElement(), st))
+          		  	  {
+              			_adaFileContent.addOutput("'Address") ;
+          		  	  }
               		  if(!lastElement)
               			  _adaFileContent.addOutput(".");
               		}
@@ -1143,6 +1155,10 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                   process(pl) ;
                 }
                 first=false;
+                if(paramAsPrototype(p, st))
+                {
+              	  _adaFileContent.addOutput("'Address") ;
+                }
               }
               else if(pce instanceof DataAccess)
               {
@@ -1159,7 +1175,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                 // If a data access mapping is provided:
                 // Transforms any data access into the right data subcomponent
                 // 's name thanks to the given data access mapping.
-                
                 if(_dataAccessMapping != null)
                 {
                   ElementHolder eh = null;
@@ -1181,6 +1196,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                   	DataSubcomponent ds = (DataSubcomponent) ((DataSubcomponentHolder) eh).getElement(); 
                   	name = GenerationUtilsADA.getGenerationADAIdentifier(ds.getQualifiedName());
                   }
+                  
                 }
 
                 if (name != null)
@@ -1191,6 +1207,10 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                 {
                   process((ParameterLabel) pl) ;
                 }
+                if(paramAsPrototype(da, st))
+                {
+        		  _adaFileContent.addOutput("'Address") ;
+        		}
                 first=false;
               }
 
@@ -1212,7 +1232,65 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         return DONE ;
       }
       
-      private void additionalSubprogramsToUnparse(SubprogramSubcomponentType sct) {
+      private boolean paramAsPrototype(NamedElement element, SubprogramClassifier subprogram) {
+		if(subprogram.getExtended()==null)
+			return false;
+    	if(element instanceof Feature)
+		{
+			Feature f = (Feature) element;
+			Classifier extendedSc = subprogram.getExtended();
+			for(Feature extendedFeature:extendedSc.getAllFeatures())
+			{
+				if(false == extendedFeature.getName().equals(element.getName()))
+					continue;
+				if(extendedFeature instanceof DataAccess)
+				{
+					DataAccess da = (DataAccess) extendedFeature;
+					if(da.getPrototype()==null)
+					{
+						if(subprogram.getExtended()!=null)
+							return paramAsPrototype(element, (SubprogramClassifier)subprogram.getExtended());
+						else
+							return false;
+					}
+				}
+				if(extendedFeature instanceof Parameter)
+				{
+					Parameter da = (Parameter) extendedFeature;
+					if(da.getPrototype()==null)
+					{
+						if(subprogram.getExtended()!=null)
+							return paramAsPrototype(element, (SubprogramClassifier)subprogram.getExtended());
+						else
+							return false;
+					}
+				}
+			}
+			
+			try
+			{
+				NamedElement ne = extendedSc ;
+				String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+				List<String> sourceText =
+						PropertyUtils.getStringListValue(ne, "Source_Text") ;
+				for(String s : sourceText)
+				{
+					if(s.endsWith(".ads"))
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			catch(Exception e)
+			{
+				return false;
+			}
+		}
+		return false;
+	}
+
+	private void additionalSubprogramsToUnparse(SubprogramSubcomponentType sct) {
     	AadlToADAUnparser aadlADAUnparser = AadlToADAUnparser.getAadlToADAUnparser();   
     	if(false == aadlADAUnparser.additionalUnparsing.contains(sct))
     	  aadlADAUnparser.additionalUnparsing.add(sct);

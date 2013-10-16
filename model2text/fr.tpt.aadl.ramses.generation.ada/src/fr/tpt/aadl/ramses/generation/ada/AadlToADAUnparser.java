@@ -96,9 +96,6 @@ import fr.tpt.aadl.utils.names.DataModelProperties;
 
 public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGenericUnparser
 {
-	// TODO:	param in devrait in out dans la déf de comute_cpr
-	// TODO:	utiliser System'To_Address pour un passage par référence d'une variable (locale ou globale) en Ada
-	// TODO:	ré-écrire le main.c en main.adb.
 	private AadlBaToADAUnparserAction baToADAUnparserAction = new AadlBaToADAUnparserAction();
 	private static AadlToADAUnparser singleton;
 

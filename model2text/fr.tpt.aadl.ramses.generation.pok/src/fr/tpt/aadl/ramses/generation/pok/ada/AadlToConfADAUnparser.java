@@ -62,9 +62,7 @@ import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
 import fr.tpt.aadl.utils.PropertyUtils;
-import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
-
-
+import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
 
 public class AadlToConfADAUnparser implements AadlTargetUnparser
 {
@@ -72,19 +70,19 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 	  
 	  // TODO: factorization with ATL transformation into a naming class or enum. 
 	  public final static String BLACKBOARD_AADL_TYPE = 
-	                                             "pok_runtime::Blackboard_Id_Type" ;
+	                                             "arinc653_runtime::Blackboard_Id_Type" ;
 	  
 	  public final static String QUEUING_AADL_TYPE =
-	                                           "pok_runtime::Queuing_Port_Id_Type" ;
+	                                           "arinc653_runtime::Queuing_Port_Id_Type" ;
 
 	  public final static String SAMPLING_AADL_TYPE =
-	                                          "pok_runtime::Sampling_Port_Id_Type" ;
+	                                          "arinc653_runtime::Sampling_Port_Id_Type" ;
 	  
 	  public final static String EVENT_AADL_TYPE =
-	                                          "pok_runtime::Event_Id_Type" ;
+	                                          "arinc653_runtime::Event_Id_Type" ;
 	  
 	  public final static String BUFFER_AADL_TYPE =
-	                                          "pok_runtime::Buffer_Id_Type" ;
+	                                          "arinc653_runtime::Buffer_Id_Type" ;
 	  
 	  private ProcessorProperties _processorProp;
 
@@ -351,9 +349,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 			mainImplCode.addOutput("  CREATE_QUEUING_PORT (\"") ;
 			mainImplCode.addOutput(info.uniqueId);
 			mainImplCode.addOutputNewline("\",");
-			//mainImplCode.addOutput("    sizeof( "+info.dataType+" ), ");
-			mainImplCode.addOutput("    sizeof(int), ");			
-			//mainImplCode.addOutput(" "+info.dataType+"'size");
+			mainImplCode.addOutput(info.dataType+
+		      		"'size, ") ;
 			mainImplCode.addOutput(Long.toString(info.size)) ;
 			mainImplCode.addOutput(", ");
 
@@ -398,7 +395,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 			mainImplCode.addOutput("  CREATE_BUFFER (\"") ;
 			mainImplCode.addOutput(info.id);
 			mainImplCode.addOutput("\",");
-			mainImplCode.addOutput("    size'int, ");
+			mainImplCode.addOutput(info.dataType+
+		      		"'size, ") ;
 			mainImplCode.addOutput(Long.toString(info.size)) ;
 			mainImplCode.addOutput(", ");
 			mainImplCode.addOutput(info.type.toUpperCase());
@@ -416,8 +414,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 			mainImplCode.addOutput("  CREATE_SAMPLING_PORT (\"") ;
 			mainImplCode.addOutput(info.uniqueId);
 			mainImplCode.addOutputNewline("\",");
-			mainImplCode.addOutput("    size'int, ");
-
+			mainImplCode.addOutput(info.dataType+
+		      		"'size, ") ;
 			String direction = null ;
 			if(DirectionType.IN == info.direction)
 			{
@@ -448,9 +446,21 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
 		this.findCommunicationMechanism(processImpl, pp);
 
-		// Generate main.ads
+		// Generate main.h
 		UnparseText mainHeaderCode = new UnparseText() ;
 		genMainHeader(processImpl, mainHeaderCode, _processorProp, pp);
+		
+		// Generate main.c
+		UnparseText mainCImplCode = new UnparseText() ;
+		mainCImplCode.addOutputNewline("int main(){");
+		mainCImplCode.incrementIndent();
+		mainCImplCode.addOutputNewline("main_ada();");
+		mainCImplCode.decrementIndent();
+		mainCImplCode.addOutputNewline("}");
+		
+		// Generate main.ads
+		UnparseText mainSpecificationCode = new UnparseText() ;
+		genMainSpecification(processImpl, mainSpecificationCode, _processorProp, pp);
 
 		// Generate main.adb
 		UnparseText mainImplCode = new UnparseText() ;
@@ -458,11 +468,17 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
 		try
 		{
-			FileUtils.saveFile(generatedFilePath, "main.ads",
-					mainHeaderCode.getParseOutput()) ;
+			FileUtils.saveFile(generatedFilePath, "main_ada.ads",
+					mainSpecificationCode.getParseOutput()) ;
 
-			FileUtils.saveFile(generatedFilePath, "main.adb",
+			FileUtils.saveFile(generatedFilePath, "main.h",
+					mainHeaderCode.getParseOutput()) ;
+			
+			FileUtils.saveFile(generatedFilePath, "main_ada.adb",
 					mainImplCode.getParseOutput()) ;
+			
+			FileUtils.saveFile(generatedFilePath, "main.c",
+					mainCImplCode.getParseOutput()) ;
 		}
 		catch(IOException e)
 		{
@@ -471,12 +487,160 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		}
 	}
 
+	private PartitionProperties genMainHeader(ProcessImplementation process,
+			UnparseText mainHeaderCode,
+			ProcessorProperties processorProp,
+			PartitionProperties pp)
+	{
+		List<ThreadSubcomponent> bindedThreads =
+				process.getOwnedThreadSubcomponents() ;
+
+		String guard = GenerationUtilsC.generateHeaderInclusionGuard("main.h") ;
+		mainHeaderCode.addOutputNewline(guard) ;
+
+		/**** #DEFINE ****/
+
+		mainHeaderCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
+
+		if(processorProp.consoleFound == true)
+		{
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
+		}
+
+		if(processorProp.stdioFound == true)
+		{
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_LIBC_STDIO 1") ;
+		}
+
+		if(processorProp.stdlibFound == true)
+		{
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_LIBC_STDLIB 1") ;
+		}
+
+		mainHeaderCode
+		.addOutputNewline("#define POK_CONFIG_NB_THREADS " +
+				Integer.toString(bindedThreads.size() + 1)) ;
+
+		if(pp.hasBlackboard)
+		{
+			mainHeaderCode
+			.addOutputNewline("#define POK_CONFIG_NB_BLACKBOARDS " +
+					pp.blackboardInfo.size()) ;
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_ARINC653_BLACKBOARD 1") ;
+
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_BLACKBOARDS 1") ;
+		}
+
+		if(pp.hasEvent)
+		{
+			mainHeaderCode
+			.addOutputNewline("#define POK_CONFIG_NB_EVENTS " +
+					pp.eventNames.size()) ;
+			mainHeaderCode
+			.addOutputNewline("#define POK_CONFIG_ARINC653_NB_EVENTS " +
+					pp.eventNames.size()) ;
+
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_ARINC653_EVENT 1") ;
+
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_EVENTS 1") ;
+
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_ARINC653_EVENTS 1") ;
+		}
+
+		if(pp.hasQueue)
+		{
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_QUEUEING 1") ;
+
+			// XXX ARBITRARY
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_LIBC_STRING 1");
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1");
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_PROTOCOLS 1") ;
+
+		}
+
+		if(pp.hasSample)
+		{
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_SAMPLING 1");
+			// XXX ARBITRARY
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_LIBC_STRING 1");
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1");
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_PROTOCOLS 1") ;
+		}
+
+		if(pp.hasBuffer)
+		{
+
+			mainHeaderCode
+			.addOutputNewline("#define POK_CONFIG_NB_BUFFERS " +
+					pp.bufferInfo.size()) ;
+
+			mainHeaderCode
+			.addOutputNewline("#define POK_NEEDS_BUFFERS 1") ;
+
+			mainHeaderCode.addOutputNewline("#define POK_NEEDS_ARINC653_BUFFER 1");
+		}
+
+		mainHeaderCode
+		.addOutputNewline("#define POK_CONFIG_STACKS_SIZE " +
+				Long.toString(processorProp.requiredStackSizePerPartition.get(process)));
+
+		// XXX Is there any condition for the generation of theses directives ?
+		// XXX ARBITRARY
+		mainHeaderCode
+		.addOutputNewline("#define POK_NEEDS_ARINC653_TIME 1") ;
+		mainHeaderCode
+		.addOutputNewline("#define POK_NEEDS_ARINC653_PROCESS 1") ;
+		mainHeaderCode
+		.addOutputNewline("#define POK_NEEDS_ARINC653_PARTITION 1") ;
+
+		// XXX Is there any condition for the generation of POK_NEEDS_MIDDLEWARE ?
+		// XXX ARBITRARY
+		mainHeaderCode
+		.addOutputNewline("#define POK_NEEDS_MIDDLEWARE 1") ;
+
+		/**** "#INCLUDE ****/
+
+		mainHeaderCode.addOutputNewline("");
+
+		// always files included:
+		mainHeaderCode.addOutputNewline("#include <arinc653/types.h>");
+		mainHeaderCode.addOutputNewline("#include <arinc653/process.h>");
+		mainHeaderCode.addOutputNewline("#include <arinc653/partition.h>");
+		mainHeaderCode.addOutputNewline("#include <arinc653/time.h>");
+
+		// conditioned files included:
+		if(pp.hasBlackboard)
+		{
+			mainHeaderCode.addOutputNewline("#include <arinc653/blackboard.h>");
+		}
+
+		if(pp.hasQueue)
+		{
+			mainHeaderCode.addOutputNewline("#include <arinc653/queueing.h>");
+
+			// XXX ARBITRARY
+			mainHeaderCode.addOutputNewline("#include <protocols/protocols.h>");
+		}
+
+		mainHeaderCode.addOutputNewline("\n#endif") ;
+
+		return pp ;
+	}
+
+	
 	//Generate global variables.
 	private void genGlobalVariablesMainImpl(ProcessImplementation process, EList<ThreadSubcomponent> lthreads,
 			UnparseText mainImplCode,
 			PartitionProperties pp)
 	{
-		String guard = GenerationUtilsADA.generateHeaderInclusionGuard("main.adb") ;
+		String guard = GenerationUtilsADA.generateHeaderInclusionGuard("main_ada.adb") ;
 		mainImplCode.addOutput(guard) ;
 
 		mainImplCode.addOutputNewline(GenerationUtilsADA.generateSectionMarkAda()) ;
@@ -488,7 +652,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		{
 			mainImplCode
 			.addOutputNewline(
-					"arinc_threads : array (1 .. POK_CONFIG_NB_THREADS-1) of Process_Id_Type;") ;
+					"arinc_threads : array (1 .. POK_CONFIG_NB_THREADS) of Process_Id_Type;") ;
 		}
 
 		mainImplCode.addOutputNewline("  tattr : Process_Attribute_Type;") ;
@@ -498,22 +662,26 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		if(pp.hasBlackboard)
 		{
 			
-			mainImplCode.addOutput("pok_blackboards_names is array(POK_CONFIG_NB_BLACKBOARDS) of String := (") ;
-
+			mainImplCode.addOutput("pok_blackboards_names: array(0..POK_CONFIG_NB_BLACKBOARDS-1) of String (1..80) := (") ;
+			int counter = 0;
 			for(BlackBoardInfo info : pp.blackboardInfo)
 			{
+				if(counter!=0)
+					mainImplCode.addOutput(",") ;
+				mainImplCode.addOutput(Integer.toString(counter)+" => ") ;
 				mainImplCode.addOutput("\"") ;
 				mainImplCode.addOutput(info.id) ;
-				mainImplCode.addOutput("\",") ;
+				mainImplCode.addOutput("\"") ;
+				counter++;
 			}
-
 			mainImplCode.addOutputNewline(");") ;
+			mainImplCode.addOutputNewline("pragma Export(C, pok_blackboards_names, \"pok_blackboards_names\");");
 
 			// Generate external variable (declared in deployment.adb).
 			for(BlackBoardInfo info : pp.blackboardInfo)
 			{
-				mainImplCode.addOutputNewline(info.id + " : ") ;
-				mainImplCode.addOutput("BLACKBOARD_ID_TYPE;") ;
+				mainImplCode.addOutput(info.id + " : ") ;
+				mainImplCode.addOutputNewline("BLACKBOARD_ID_TYPE;") ;
 			}
 		}
 
@@ -535,7 +703,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 			// Generate external variable (declared in deployment.adb).
 			for(String name : pp.eventNames)
 			{
-				mainImplCode.addOutputNewline(name+" : ") ;
+				mainImplCode.addOutput(name+" : ") ;
 				mainImplCode.addOutputNewline(" EVENT_ID_TYPE;") ;
 			}
 		}
@@ -557,8 +725,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 			// Generate external variable (declared in deployment.adb).
 			for(QueueInfo info : pp.bufferInfo)
 			{
-				mainImplCode.addOutputNewline(info.id+" : ") ;
-				mainImplCode.addOutput(" Buffer_Id_Type;") ;				
+				mainImplCode.addOutput(info.id+" : ") ;
+				mainImplCode.addOutputNewline(" Buffer_Id_Type;") ;				
 			}
 
 		}
@@ -605,6 +773,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 	    mainHeaderCode.addOutputNewline("with APEX.Timing; use APEX.Timing;");
 	    mainHeaderCode.addOutputNewline("with Activity; use Activity;");
 	    mainHeaderCode.addOutputNewline("with Deployment; use Deployment;");
+	    mainHeaderCode.addOutputNewline("with Gtypes; use Gtypes;");
 	    mainHeaderCode.addOutputNewline("with Interfaces.C; use Interfaces.C;");
 	}
 	
@@ -616,19 +785,11 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		ThreadImplementation timpl =
 				(ThreadImplementation) thread.getComponentImplementation() ;
 
-		mainImplCode.addOutputNewline("task "+GenerationUtilsADA
-				.getGenerationADAIdentifier(timpl.getFullName())+";") ;
-
-		mainImplCode.addOutputNewline("task body "+GenerationUtilsADA
-				.getGenerationADAIdentifier(timpl.getFullName())+" is") ;
-		mainImplCode.addOutputNewline("begin") ;
-
-//		mainImplCode.addOutput("  tattr.ENTRY_POINT := ") ;
+		mainImplCode.addOutput("  tattr.ENTRY_POINT := ") ;
 		mainImplCode.addOutput(GenerationUtilsADA
 				.getGenerationADAIdentifier(timpl.getQualifiedName())) ;
-		mainImplCode.addOutputNewline(GenerationUtilsADA.THREAD_SUFFIX + ';') ;
+		mainImplCode.addOutputNewline(GenerationUtilsADA.THREAD_SUFFIX +"'Address"+ ';') ;
 		String period = null ;
-		String deadline = null ;
 		String timeCapacity = null ;
 
 		try
@@ -647,24 +808,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 			mainImplCode.addOutput("  tattr.Period := ") ;
 			mainImplCode.addOutputNewline(period + ';') ;
 		}
-
-		try
-		{
-			long value = PropertyUtils.getIntValue(thread, "Deadline") ;
-			deadline = Long.toString(value) ;
-		}
-		catch(Exception e)
-		{
-			// If deadline is not set, use period instead.
-			deadline = period ;
-		}
-
-		// If period and deadline are not set , don't generate.
-		if(deadline != null)
-		{
-			mainImplCode.addOutput("  tattr.Deadline := ") ;
-			mainImplCode.addOutputNewline(deadline + ';') ;
-		}
+		mainImplCode.addOutput("  tattr.Deadline := ") ;
+		mainImplCode.addOutputNewline("Hard" + ';') ;
 
 		try
 		{
@@ -717,9 +862,6 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		mainImplCode.addOutput(Integer.toString(threadIndex)) ;
 		mainImplCode.addOutputNewline("), ret);") ;
 
-		mainImplCode.addOutputNewline("end "+GenerationUtilsADA
-				.getGenerationADAIdentifier(timpl.getFullName())+";") ;
-
 	}
 
 	
@@ -731,7 +873,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		{
 			mainImplCode.addOutput("  CREATE_BLACKBOARD (\"") ;
 			mainImplCode.addOutput(info.id) ;
-			mainImplCode.addOutput("\", size'int, ") ;
+			mainImplCode.addOutput("\", " +info.dataType+
+      		"'size, ") ;
 			
 			mainImplCode.addOutput(info.id);
 			mainImplCode.addOutputNewline(", ret);") ;
@@ -753,8 +896,16 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		mainImplCode.addOutputNewline(GenerationUtilsADA
 				.generateSectionTitleAda("MAIN BODY")) ;
 
-		mainImplCode.addOutputNewline("procedure Main is") ;
+		mainImplCode.addOutputNewline("procedure Main_Ada is") ;
 		
+
+		
+
+		genMainImplEnd(process, mainImplCode);
+
+		mainImplCode.addOutputNewline("begin") ;
+		mainImplCode.incrementIndent();
+		mainImplCode.addOutputNewline("Init_Global_Variables;");
 		//not complete
 		// Blackboard declarations.
 		genBlackboardMainImpl(mainImplCode, pp) ;
@@ -770,7 +921,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
 		// Buffer declarations.    
 		genBufferMainImpl(mainImplCode, pp) ;
-
+		
 		// For each declared thread
 		// Zero stands for ARINC's IDL thread.
 		int threadIndex = 1 ;
@@ -781,19 +932,14 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 			genThreadDeclarationMainImpl(thread, threadIndex, mainImplCode) ;
 			threadIndex++ ;
 		}
-
-		genMainImplEnd(process, mainImplCode);
-
-		mainImplCode.addOutputNewline("begin") ;
-		mainImplCode.incrementIndent();
-		mainImplCode.addOutputNewline("Init_Global_Variables;");
-		mainImplCode.addOutputNewline("null;");
+		
 		mainImplCode
 		.addOutputNewline("  Set_Partition_Mode (Normal, ret);") ;
 		mainImplCode.decrementIndent();
-		mainImplCode.addOutputNewline("end Main;") ;
+		mainImplCode.addOutputNewline("end Main_Ada;") ;
+
 		mainImplCode.addOutputNewline(GenerationUtilsADA.generateSectionMarkAda()) ;
-		mainImplCode.addOutput("end Main;") ;
+		mainImplCode.addOutput("end Main_Ada;") ;
 	}
 
 	protected void genMainImplEnd(ProcessImplementation process,
@@ -850,7 +996,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		}
 	}
 
-	private PartitionProperties genMainHeader(ProcessImplementation process,
+	private PartitionProperties genMainSpecification(ProcessImplementation process,
 			UnparseText mainHeaderCode,
 			ProcessorProperties processorProp,
 			PartitionProperties pp)
@@ -880,7 +1026,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		mainHeaderCode.addOutputNewline(GenerationUtilsADA
 				.generateSectionTitleAda("MAIN SPECIFICATION")) ;
 
-		String guard = GenerationUtilsADA.generateHeaderInclusionGuard("main.ads") ;
+		String guard = GenerationUtilsADA.generateHeaderInclusionGuard("main_ada.ads") ;
 		mainHeaderCode.addOutput(guard) ;
 
 
@@ -984,8 +1130,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		    
 //		    mainHeaderCode.addOutputNewline("procedure strcpy(Target : out char_array; Source : in char_array);");
 //		    mainHeaderCode.addOutputNewline("pragma Import(C,strcpy, \"strcpy\");");
-		    mainHeaderCode.addOutputNewline("procedure Main;");
-		    mainHeaderCode.addOutputNewline("end Main;") ;
+		    mainHeaderCode.addOutputNewline("procedure Main_Ada;");
+		    mainHeaderCode.addOutputNewline("pragma Export(C, Main_Ada, \"main_ada\");") ;
+		    mainHeaderCode.addOutputNewline("end Main_Ada;") ;
 
 		return pp ;
 	}
