@@ -49,3 +49,23 @@ rule concatToString(list: Sequence(Integer))
 	result;
   }
 }
+
+
+helper def: getSizeOfType(dataType: String): String =
+	dataType+'\'size';
+
+helper context AADLBA!NamedElement def: getProgrammationLanguageIdentifier(): String =
+	let pa: AADLBA!PropertyAssociation = self.getPropertyAssociation('Source_Name') in
+	if(not pa.oclIsUndefined()) then
+		pa.ownedValue->first().ownedValue.value
+	else
+		self.getQualifiedName().replaceAll('::', '_').replaceAll('\\.','_')
+	endif
+;
+
+helper context String def: getProgrammationLanguageIdentifier(): String =
+	self.replaceAll('::', '__').replaceAll('\\.','_')
+;
+
+helper def:getProgrammationLanguageIdentifier(identifier:String): String =
+	identifier.replaceAll('\\.','_').replaceAll('::','_');

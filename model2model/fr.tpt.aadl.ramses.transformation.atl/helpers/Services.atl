@@ -28,24 +28,6 @@ helper def: callPrefix(): String ='call';
 
 helper def: theHOOK : ATLHOOKS!HookAccess = ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first();
 
-
-helper context AADLBA!NamedElement def: getProgrammationLanguageIdentifier(): String =
-	let pa: AADLBA!PropertyAssociation = self.getPropertyAssociation('Source_Name') in
-	if(not pa.oclIsUndefined()) then
-		pa.ownedValue->first().ownedValue.value
-	else
-		self.getQualifiedName().replaceAll('::', '__').replaceAll('\\.','_')
-	endif
-;
-
-helper context String def: getProgrammationLanguageIdentifier(): String =
-	self.replaceAll('::', '__').replaceAll('\\.','_')
-;
-
-helper def:getProgrammationLanguageIdentifier(identifier:String): String =
-	identifier.replaceAll('\\.','_').replaceAll('::','__');
-
-
 helper context AADLBA!ThreadImplementation def : callSequence() : AADLBA!SubprogramCallSequence =
 	self.ownedSubprogramCallSequence->first()
 ;
@@ -163,7 +145,7 @@ helper context AADLI!FeatureInstance def : isDataOrEventDataPort() : Boolean =
 	(self.isEventDataPort() or self.isDataPort()); 
 
 helper context AADLI!FeatureInstance def : isEventOrEventDataPort() : Boolean =
-	(self.isEventDataPort() or self.isEventDataPort());
+	(self.isEventDataPort() or self.isEventPort());
 
 helper context AADLI!FeatureInstance def : isEventPort(): Boolean =
 	self.feature.oclIsTypeOf(AADLI!EventPort);
