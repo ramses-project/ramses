@@ -321,6 +321,8 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
     {
       try
       {
+    	Process makeCleanProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " clean") ;
+    	makeCleanProcess.waitFor();
         Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all POK_PATH="+pokPath) ;
         makeProcess.waitFor();
         if (makeProcess.exitValue() != 0) {
