@@ -488,7 +488,7 @@ unique lazy rule CreateLengthDataSubcomponent
 	using
 	{
 		typeId: String = port.getLengthInitialValue();
-		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression('sizeof('+typeId+')');
+		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression(thisModule.getSizeOfType(typeId));
 	}
 	to
 		lv: AADLBA!ListValue
