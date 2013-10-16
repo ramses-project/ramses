@@ -446,7 +446,7 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
         coreElementsToBeUnparsed.add(object.getDataClassifier());
         if(!init.isEmpty())
         {
-        	_cFileContent.addOutput(" = "+init) ;
+        	_cFileContent.addOutput(init) ;
         }
         _cFileContent.addOutputNewline(";") ;
         
@@ -674,7 +674,8 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
         _cFileContent.addOutputNewline("{") ;
         process(lba) ;
         _cFileContent.addOutputNewline("}") ;
-
+        if(object.getElseStatement()!=null)
+        	process(object.getElseStatement());
         return DONE ;
       }
 
