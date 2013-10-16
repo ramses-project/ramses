@@ -180,7 +180,7 @@ helper context AADLI!FeatureInstance def: initWriterContext() : String =
 	thisModule.concatToString(
 	    self.dstConnectionInstance->collect(e| e.source.eContainer())->asOrderedSet()
 																	->collect(e|e.initWriterContext())
-    ).debug(' !!!!!! ')
+    )
 ;
 
 helper context AADLI!ComponentInstance def: initWriterContext() : String = 
