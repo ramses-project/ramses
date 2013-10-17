@@ -66,6 +66,7 @@ import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement;
+import fr.tpt.aadl.annex.behavior.aadlba.DataRepresentation;
 import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
 import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
@@ -101,7 +102,7 @@ public class GeneratorUtils
                   p.getName()
                         .equalsIgnoreCase(DataModelProperties.INITIAL_VALUE))
             {
-              setInitialization(initialization, PropertyUtils
+              setInitialization(ds, initialization, PropertyUtils
                                       .getPropertyExpression(pa), language) ;
               return initialization.toString() ;
             }
@@ -117,8 +118,20 @@ public class GeneratorUtils
                 PropertyUtils
                       .getPropertyExpression(dc,
                                              DataModelProperties.INITIAL_VALUE) ;
-          setInitialization(initialization, initialValueProperty, language) ;
+          setInitialization(dc, initialization, initialValueProperty, language) ;
+//          String ret = "";
+          
+//          if (language.equalsIgnoreCase("java"))
+//          {
+//        	if (AadlBaUtils.getDataRepresentation(dc) == DataRepresentation.ENUM)	
+//        	{
+//              	ret += dc.getQualifiedName() + "_";
+//
+//        	}  
+//          }
+          
           return initialization.toString() ;
+//          return ret;
         }
 
         dataTypeHolder = AadlBaUtils.getTypeHolder(d) ;
@@ -431,7 +444,8 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
     }
   }
 
-  private static void setInitialization(StringBuilder initialization,
+  private static void setInitialization(NamedElement obj,
+		  								StringBuilder initialization,
                                         List<PropertyExpression> initialValues,
                                         String language)
   {
@@ -467,6 +481,17 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
           if(initValue instanceof StringLiteral)
           {
             StringLiteral sl = (StringLiteral) initValue ;
+            if (language.equalsIgnoreCase("java"))
+            {
+            	if (obj instanceof DataClassifier)
+            	{
+		          	if (AadlBaUtils.getDataRepresentation((DataClassifier)obj) == DataRepresentation.ENUM)	
+		          	{
+		                	initialization.append(obj.getQualifiedName() + "INSERTDOTHERE");
+		
+		          	}
+            	}
+            }
             initialization.append(sl.getValue()) ;
 
             if(it.hasNext())
