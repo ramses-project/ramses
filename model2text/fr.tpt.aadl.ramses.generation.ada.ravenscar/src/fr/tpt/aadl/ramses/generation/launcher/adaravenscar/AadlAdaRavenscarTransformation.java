@@ -37,21 +37,24 @@ public class AadlAdaRavenscarTransformation extends
 	  }
 
 
-	  public AadlAdaRavenscarTransformation()
+	  public AadlAdaRavenscarTransformation(String module)
 	  {
-	  	ATL_FILE_NAMES = new String[]
-	        {
-	  		 "ACG/targets/shared/UninstanciateOverride",
-	  		 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
-	  		 "ACG/targets/shared/PortsCommonRefinementSteps",
-	  		 "ACG/targets/shared/DispatchCommonRefinementSteps",
-	  		 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
-	  		 "ACG/targets/ravenscar/ExpandThreadsPorts",
-		  	 "ACG/targets/ravenscar/RavenscarCommunications",
-	  		 "ACG/targets/ravenscar/ExpandThreadsDispatchProtocol",
-		  	 "ACG/PeriodicDelayedCommunication/SharedRules"
-		  	 
-	        };
-	  }
+		  	ATL_FILE_NAMES = new String[]
+		        {"ACG/targets/shared/UninstanciateOverride",
+		  		 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
+		  		 "ACG/targets/shared/PortsCommonRefinementSteps",
+		  		 "ACG/targets/shared/DispatchCommonRefinementSteps",
+		  		 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
+		  		 "ACG/targets/arinc653/ExpandThreadsPorts",
+		  		 "ACG/targets/arinc653/BlackboardCommunications",
+		  		 "ACG/targets/arinc653/BufferCommunications",
+		  		 "ACG/targets/arinc653/EventsCommunications",
+		  		 "ACG/targets/arinc653/QueuingCommunications",
+		  		 "ACG/targets/arinc653/SamplingCommunications",
+		  		 "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
+		  		 "ACG/PeriodicDelayedCommunication/SharedRules",
+		  		 module
+		        };
+		  }
 	  
 }

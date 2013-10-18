@@ -40,23 +40,16 @@ public class AdaRavenscarGeneratorFactory extends AbstractGeneratorFactory
     AadlToADAUnparser genericADAUnparser = AadlToADAUnparser.getAadlToADAUnparser() ;
     
     AadlToAdaRavenscarMakefileUnparser adaRavenscarMakefileUnparser = new AadlToAdaRavenscarMakefileUnparser() ;
-    /*
+    
     AadlTargetSpecificCodeGenerator tarSpecCodeGen = new 
             AadlTargetSpecificCodeGenerator(genericADAUnparser,
-                                            pokADAUnparser) ;
-
-
-    */
-    AadlTargetSpecificCodeGenerator tarSpecCodeGen = new 
-                    AadlTargetSpecificCodeGenerator(genericADAUnparser,
-                    								null,
-                                                    adaRavenscarMakefileUnparser) ;
+            								AdaRavenscarUnparser,
+            								adaRavenscarMakefileUnparser);
     
-    AadlAdaRavenscarTransformation targetTrans = new AadlAdaRavenscarTransformation();
-    
+    AadlAdaRavenscarTransformation targetTrans = new AadlAdaRavenscarTransformation("helpers/LanguageSpecificitiesAda");
     
     AadlTargetSpecificGenerator result = 
-                  new AadlTargetSpecificGenerator(null, tarSpecCodeGen) ;
+                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen) ;
     
     result.setRegistryName(ADA_RAVENSCAR_GENERATOR_NAME) ;
     
