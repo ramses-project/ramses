@@ -1,4 +1,4 @@
-package polyorb-hi-ada_runtime
+package ravenscar_runtime
 public
 with Data_Model, Base_Types;
 ---------------------
@@ -315,4 +315,4 @@ properties
    programming_properties::source_text => ("polyorb-hi-ada/polyorb_hi-thread_interrogators.adb");
 end Get_Time_Stamp;
 
-end polyorb-hi-ada_runtime;
+end ravenscar_runtime;
