@@ -544,7 +544,7 @@ unique lazy rule CreateValidityDataSubcomponent
 	}
 }
 
-unique lazy rule CreateTimeOutSubcomponent
+unique lazy rule CreateTimeOutSubcomponentFromPort
 {
 	from
 		port : AADLI!FeatureInstance
