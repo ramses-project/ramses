@@ -72,9 +72,10 @@ abstract rule m_Input_Sampling
 		VALIDITY: AADLBA!DataSubcomponent = thisModule.CreateValidityDataSubcomponent(fi);
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
 	to
-		call: AADLBA!SubprogramCallAction
+		checkedCall: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
 			parameterLabels <- Sequence{SAMPLING_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,VALIDITY_HOLDER,RETURN_CODE_HOLDER} 
@@ -99,7 +100,12 @@ abstract rule m_Input_Sampling
 		(
 			element <- VALIDITY
 		),
-		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder,
+		call: AADLBA!IfStatement
+		(
+			logicalValueExpression <- thisModule.createCheckforMessageExpression(RETURN_CODE),
+			behaviorActions <- thisModule.errorsCheckActions(checkedCall)
+		)
 }
 
 
@@ -114,7 +120,7 @@ rule m_Input_Sampling_ComputeEntrypointCallSequence
 		)
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder

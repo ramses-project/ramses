@@ -53,7 +53,6 @@ abstract rule m_BufferCallSpecification
 		)
 }
 
-
 -- @extends m_BufferCallSpecification,m_Input_EventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
 rule m_Input_Buffer_ComputeEntrypointCallSequence
 {
@@ -67,12 +66,12 @@ rule m_Input_Buffer_ComputeEntrypointCallSequence
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		BUFFER_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
 	to
-		call: AADLBA!SubprogramCallAction
+		checkedCall: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
 			parameterLabels <- Sequence{BUFFER_ID_HOLDER,TIME_OUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
@@ -100,7 +99,13 @@ rule m_Input_Buffer_ComputeEntrypointCallSequence
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
+		),
+		call: AADLBA!IfStatement
+		(
+			logicalValueExpression <- thisModule.createCheckforMessageExpression(RETURN_CODE),
+			behaviorActions <- thisModule.errorsCheckActions(checkedCall)
 		)
+		
 }
 
 -- @extends m_BufferCallSpecification,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
@@ -120,7 +125,7 @@ rule m_Output_Buffer_ComputeEntrypointCallSequence
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
@@ -174,7 +179,7 @@ rule m_OutputBuffer_EventPort
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(int, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}
@@ -227,7 +232,7 @@ rule m_BufferBehavior
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(int, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		BUFFER_ID: AADLBA!DataAccess = fi.getFeatureImg();
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
 	}

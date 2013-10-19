@@ -81,6 +81,12 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 		)
 	)
 	->union
+	(
+		c.featureInstance->select(e|not e.oclIsKindOf(AADLBA!DataAccess) and e.isInputFeature() and not e.isPeriodicDelayedPort())
+		->collect(fi| thisModule.resolveTemp(fi, 'CreateReturnSubcomponentFromPort', 'dataSubcomponent'))
+		
+	)
+	->union
 	(c.featureInstance->select(e|e.isDataPort() and not e.isIntraProcessFeatureInstance() and e.isInputFeature() and not e.isPeriodicDelayedPort())
 		->collect(fi|
 			Sequence
@@ -98,7 +104,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 		and
 		not e.isPeriodicDelayedPort())
 		->collect(fi|
-			thisModule.resolveTemp(fi, 'CreateTimeOutSubcomponent', 'dataSubcomponent')
+			thisModule.resolveTemp(fi, 'CreateTimeOutSubcomponentFromPort', 'dataSubcomponent')
 		)
 	)
 	->union
@@ -116,6 +122,73 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	)
 	->flatten()
 ;
+
+
+rule createCheckforMessageExpression(RETURN_CODE: AADLBA!DataSubcomponent)
+{
+	to
+		checkforMessageExpression: AADLBA!ValueExpression
+		(
+			relations <- Sequence{checkforMessageRelation}
+		),
+		checkforMessageRelation: AADLBA!Relation
+		(
+			relationalOperator<-#Equal,
+			firstExpression<-getCountExpression,
+			secondExpression<-zeroValueConstantExpression
+		),
+		getCountExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{getCountTerm}
+		),
+		zeroValueConstantExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{zeroValueConstantTerm}
+		),
+		zeroValueConstantTerm: AADLBA!Term
+		(
+			factors <- Sequence{zeroValueConstantFactor}
+		),
+		zeroValueConstantFactor: AADLBA!Factor
+		(
+			firstValue <- zeroValueConstant
+		),
+		zeroValueConstant: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 0.longValue()
+		),
+		getCountTerm: AADLBA!Term
+		(
+			factors <- Sequence{countFactor}
+		),
+		countFactor: AADLBA!Factor
+		(
+			firstValue <- count_variable_holder
+		),
+		count_variable_holder: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		checkforMessageExpression;
+	}
+}
+rule errorsCheckActions(checkedCall: AADLBA!SubprogramCallAction)
+{
+	to
+		errorsCheckActions: AADLBA!BehaviorActionSequence
+		(
+			actions <- Sequence{checkedCall}
+		)
+		
+	do
+	{
+		errorsCheckActions;
+	}
+}
+
+
 
 abstract rule m_Not_PeriodicDelayed_Port
 {
@@ -529,7 +602,29 @@ unique lazy rule CreateValidityDataSubcomponent
 	}
 }
 
-unique lazy rule CreateTimeOutSubcomponent
+unique lazy rule CreateTimeOutSubcomponentFromCpt
+{
+	from
+		inst : AADLI!ComponentInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral('INFINITE_TIME_VALUE');
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-inst.name+'_TimeOut',
+			dataSubcomponentType<-'System_Time_Type'.asDataType('ARINC653_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, inst);
+		dataSubcomponent;
+	}
+}
+
+unique lazy rule CreateTimeOutSubcomponentFromPort
 {
 	from
 		port : AADLI!FeatureInstance
@@ -542,6 +637,28 @@ unique lazy rule CreateTimeOutSubcomponent
 		(
 			name<-port.feature.name+'_TimeOut',
 			dataSubcomponentType<-'System_Time_Type'.asDataType('ARINC653_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
+		dataSubcomponent;
+	}
+}
+
+unique lazy rule CreateReturnSubcomponentFromPort
+{
+	from
+		port : AADLI!FeatureInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral('0');
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-port.feature.name+'_ErrorCode',
+			dataSubcomponentType<-thisModule.getRuntimeReturnType(),
 			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
 		)
 	do
