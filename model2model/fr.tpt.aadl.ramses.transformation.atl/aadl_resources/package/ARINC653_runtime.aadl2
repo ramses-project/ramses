@@ -60,6 +60,20 @@ end Waiting_Range_Type;
 
 --------------------------------------------
 --------------------------------------------
+--            TIME MANAGEMENT             --
+--------------------------------------------
+--------------------------------------------
+
+subprogram Timed_Wait
+features
+  DELAY_TIME : in parameter System_Time_Type;
+  RETURN_CODE : out parameter Return_Code_Type;
+properties
+  Programming_Properties::Source_Name => "TIMED_WAIT";
+  Programming_Properties::Source_Text => ("arinc653/time.h", "arinc653/apex-timing.ads");  
+end Timed_Wait;
+--------------------------------------------
+--------------------------------------------
 --                 BUFFER                 --
 --------------------------------------------
 --------------------------------------------
