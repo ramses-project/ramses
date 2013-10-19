@@ -31,6 +31,36 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									HOOKS: ATLHOOKS;
 
 
+helper def: collectSporadicGlobalVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
+helper def: collectSporadicLocalVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
+helper def: collectSporadicGlobalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+	
+helper def: collectSporadicGlobalVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+	Sequence{}
+;
+	
+helper def: collectSporadicBehaviorActions (c: AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorAction) =
+	Sequence{}
+;
+
+helper def: collectSporadicLocalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+
+helper def: collectSporadicLocalVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+	Sequence{}
+;
+
+
 -- @extends m_ThreadEntrypoint
 rule m_PeriodicThread
 {
@@ -68,17 +98,31 @@ rule m_PeriodicThread
 rule m_SporadicThread
 {
 	from
-	c: AADLI!ComponentInstance
-    (c.isSporadicThread())	
+		c: AADLI!ComponentInstance
+    	(
+    		c.isSporadicThread()
+		)
+	using
+	{
+		spg_event : AADLBA!SubprogramType = thisModule.getWaitEventSubprogram;
+	}
 	to
 		sub: AADLBA!ThreadSubcomponent,
+		waitDispatchCall: AADLBA!SubprogramCallAction
+		(
+			subprogram<-dispatchHolder
+		),
+		dispatchHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg_event
+		),
 		f: AADLBA!DataAccess
 		(
-   			name <- c.name+thisModule.dataAccessSuffix()+'GlobalQueue'+':'+'GlobalQueue',
+   			name <- c.name+thisModule.dataAccessSuffix()+'_GlobalQueue',
 			dataFeatureClassifier <- thisModule.getRuntimeEventType(),
 			kind <- #requires
 		),
-		NewInstanceData: AADLBA!DataType
+		GlobalQueueDataType: AADLBA!DataType
 		(
 			name <- 'Global_Queue_'+c.uniqueName(),
 			ownedExtension  <- extendedQueueType,
@@ -88,7 +132,7 @@ rule m_SporadicThread
 		(
 			extended<-thisModule.getRuntimeEventType()
 		),
-    	NewInstanceDataImpl: AADLBA!DataImplementation
+    	GlobalQueueDataImpl: AADLBA!DataImplementation
 		(
 			name <- 'Global_Queue_'+c.uniqueName()+'.impl',
 			ownedDataSubcomponent <- c.featureInstance->collect(fi|thisModule.resolveTemp(fi, 'queueSubcomponent')),

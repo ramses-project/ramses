@@ -154,6 +154,15 @@ rule m_ThreadEntrypoint {
 											thisModule.collectPeriodicDelayed_LocalVariablesAccesses(c, behavior)
 										)
 									)
+									->union
+									(
+										if(c.isSporadicThread()) then
+											thisModule.collectSporadicLocalVariablesAccesses(c)
+										else
+											Sequence{}
+										endif
+										
+									)
 									->flatten()->asSet(),
 			ownedParameter <- impl.ownedParameterConnection
 								->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
@@ -193,6 +202,14 @@ rule m_ThreadEntrypoint {
 													(c,impl.ownedSubprogramCallSequence)
 												)
 												->append(returnData)
+												->union
+												(
+													if c.isSporadicThread() then
+														thisModule.collectSporadicLocalVariables(c)
+													else
+														Sequence{}
+													endif
+												)
 												->flatten()->excluding(OclUndefined)
 		),
 		returnData: AADLBA!DataSubcomponent
@@ -357,7 +374,10 @@ rule m_ThreadEntrypoint {
 		dispatch_actionBlock: AADLBA!BehaviorActionBlock
 		(content<-dispatch_target_actions),
 		dispatch_target_actions: AADLBA!BehaviorActionSequence
-		( actions <- Sequence{thisModule.resolveTemp(c,'waitDispatchCall')}->union(thisModule.collectTransitionChoiceActions(c)) )
+		( 
+			actions <- if(c.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(c) else Sequence{thisModule.resolveTemp(c,'waitDispatchCall')} endif
+				->union(thisModule.collectTransitionChoiceActions(c)) 
+		)
 }
 
 unique lazy rule collectTransitionChoiceActions
@@ -765,7 +785,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 {
 	using
 	{
-		intermediateCallActionSequence: Sequence(AADLBA!SubprogramCallAction) = Sequence{};
+		intermediateCallActionSequence: Sequence(AADLBA!BehaviorAction) = Sequence{};
 		c: AADLI!ComponentInstance = fi.eContainer();
 	}
 	do
@@ -795,7 +815,6 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 			}
 			
 			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi,behavior,call}, 'subprogramCallAction'));
-			
 			
 			if(fi.isOutputFeature() and fi.isEventOrEventDataPort())
 			{
@@ -1572,7 +1591,7 @@ rule m_Input_EventDataPort_ComputeEntrypointCallSequence
 			fi.isEventDataPort()
 		)
 	to
-		call:AADLBA!SubprogramCallAction
+		call:AADLBA!BehaviorAction
 }
 
 --  	- m_Input_DataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)

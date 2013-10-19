@@ -211,6 +211,14 @@ rule m_create_Thread_BA
 													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
 													->collect(e|thisModule.createFreshnessIndicator(e))
 												)
+												->union
+												(
+													if(c.isSporadicThread()) then
+														thisModule.collectSporadicLocalVariables(c)
+													else
+														Sequence{}
+													endif
+												)
 												->flatten()->excluding(OclUndefined),
 			ownedSubprogramCallSequence     <- Sequence{thisModule.resolveTemp(c, 'callSequenceImg')},
 			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
@@ -310,6 +318,13 @@ rule m_create_Thread_BA
 														thisModule.collectPeriodicDelayed_LocalVariablesConnections(c,callSequence)
 													)
 												)
+												->union(
+													if(c.isSporadicThread()) then
+														thisModule.collectSporadicLocalVariablesAccessConnections(c)
+													else
+														Sequence{}
+													endif
+												)
 												->flatten()->excluding(OclUndefined)
 		),
 		typeImg : AADLBA!ThreadType (
@@ -328,6 +343,13 @@ rule m_create_Thread_BA
 														)
 													)->union(
 														thisModule.collectPeriodicDelayed_GlobalVariablesAccesses(c)
+													)
+													->union(
+														if(c.isSporadicThread()) then
+															thisModule.collectSporadicGlobalVariablesAccesses(c)
+														else
+															Sequence{}
+														endif
 													)
 													->flatten()->asSet()->excluding(OclUndefined)
  		)
@@ -473,6 +495,17 @@ rule m_Process_Implementation {
                                                                 thisModule.collectPeriodicDelayed_GlobalVariables(c)
                                                        )
 													)
+													->union
+													(
+														impl.getSubcomponentsInstances('thread')
+                                                        ->collect(c|
+															if(c.isSporadicThread()) then
+																thisModule.collectSporadicGlobalVariables(c)
+															else
+																Sequence{}
+															endif
+														)
+													)
 													->flatten()->excluding(OclUndefined),
 		ownedAccessConnection			<- impl.getConnectionsInstancesImg('accessConnection')
 												->union(impl.getSubcomponentsInstances('thread')
@@ -500,6 +533,17 @@ rule m_Process_Implementation {
                                                                 thisModule.collectPeriodicDelayed_GlobalVariablesConnections(c)
                                                        )
                                                )
+											   ->union
+												(
+													impl.getSubcomponentsInstances('thread')
+                                                           ->collect(c|
+														if(c.isSporadicThread()) then
+															thisModule.collectSporadicGlobalVariablesAccessConnections(c)
+														else
+															Sequence{}
+														endif
+													)
+												)
                                                ->flatten()->excluding(OclUndefined)
 											
 	)
