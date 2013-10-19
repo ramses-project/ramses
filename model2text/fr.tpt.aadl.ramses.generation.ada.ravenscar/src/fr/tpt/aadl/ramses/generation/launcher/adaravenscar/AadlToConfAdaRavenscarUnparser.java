@@ -58,7 +58,7 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 	private ProcessorProperties _processorProp;
 	List<String> sporadicThreads = new ArrayList<String>();
 	List<String> periodicThreads = new ArrayList<String>();
-	List<String> portTypeThreads = new ArrayList<>();
+	List<String> portTypeThreads = new ArrayList<String>();
     int nbSporadic = 0;
     int nbPeriodic=0;
     public static int compteurPer=0; 
