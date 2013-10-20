@@ -233,10 +233,6 @@ helper def: getBAInitialStateIdentifier(implBA: AADLBA!BehaviorAnnex) : String =
 	implBA.states->any(s|s.initial=true).name
 ;
 
-helper context AADLI!FeatureInstance def : retreiveIdAccess(threadImplImg: AADLBA!ThreadImplementation) : AADLBA!DataAccess =
-	self.getFeatureImg()
-;
-
 helper context AADLI!Connection def : uniqueName(): String =
 	let component : AADLI!ComponentImplementation = self.eContainer() in
 	if(not self.name.isEmpty()) then
