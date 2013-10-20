@@ -47,6 +47,10 @@ helper def: collectGetValueCalls(c: AADLI!ComponentInstance, behavior:AADLI!Subp
 	Sequence{}
 ;
 
+helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+	Sequence{}
+;
+
 helper def: collectComputeEntryPointTransitions(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorTransition) =
 	c.featureInstance->select(fi| not fi.getComputeEntryPoints().oclIsUndefined() )
 	->collect
