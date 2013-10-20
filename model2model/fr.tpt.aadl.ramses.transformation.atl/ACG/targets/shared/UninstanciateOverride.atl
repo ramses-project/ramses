@@ -329,10 +329,10 @@ rule m_create_Thread_BA
 		),
 		typeImg : AADLBA!ThreadType (
  	 		name <- c.uniqueName(),
-	 		ownedDataAccess <- c.featureInstance->select(e| (e.isThreadPort() and e.isInputFeature()) or e.feature.oclIsKindOf(AADLBA!DataAccess))->
+			ownedDataAccess <- c.featureInstance->select(e| (e.isThreadPort() and e.isInputFeature()))->
 													collect
 													(
-														f|thisModule.resolveTemp(f, 'f')
+														f|f.getFeatureImg()
 													)
 													->union(
 														c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
@@ -350,6 +350,10 @@ rule m_create_Thread_BA
 														else
 															Sequence{}
 														endif
+													)
+													->union
+													(
+														c.featureInstance->select(e|e.feature.oclIsKindOf(AADLBA!DataAccess))
 													)
 													->flatten()->asSet()->excluding(OclUndefined)
  		)

@@ -112,20 +112,11 @@ rule m_ThreadEntrypoint {
 		entryPointImg: AADLBA!SubprogramType
 		(
 			name <- c.uniqueName()+'_entrypoint',
-			ownedDataAccess <- c.featureInstance->select(e| e.feature.oclIsKindOf(AADLI!DataAccess))
-									->union
-									(
-										c.featureInstance->select(e| e.isInputFeature())
-										->collect(e| thisModule.resolveTemp(e, 'f_entrypoint'))
-									)
-									->union
-									(
-										c.featureInstance->select(e| e.isOutputFeature())
+			ownedDataAccess <- 	c.featureInstance->select(e| e.isOutputFeature())
 										->collect
 										(
 											e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveTemp(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
 										)
-									)
 									->union
 									(
 										callSequences->collect(behavior | 
