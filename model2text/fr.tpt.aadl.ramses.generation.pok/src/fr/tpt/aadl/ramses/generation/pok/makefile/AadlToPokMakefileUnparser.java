@@ -309,7 +309,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
     kernelMakefileContent
           .addOutputNewline("include "+runtimePath+"/misc/mk/common-$(ARCH).mk") ;
     kernelMakefileContent
-          .addOutputNewline("include "+runtimePath+"misc/mk/rules-common.mk") ;
+          .addOutputNewline("include "+runtimePath+"/misc/mk/rules-common.mk") ;
     kernelMakefileContent
           .addOutputNewline("include "+runtimePath+"/misc/mk/rules-kernel.mk") ;
     GeneratorUtils.saveMakefile(kernelMakefileContent, kernelDir) ;
