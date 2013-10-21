@@ -35,6 +35,8 @@ from
 	SCHEDULER_REALIZATIONS : AADLBA,
 	SCHEDULER_RUNTIME	   : AADLBA;
 
+helper def : Unique_Send_Output_Per_Thread : Boolean = false;
+
 -----------------------------------------------------------------
 --- Beginning of refactoring
 -----------------------------------------------------------------
@@ -112,11 +114,17 @@ rule m_ThreadEntrypoint {
 		entryPointImg: AADLBA!SubprogramType
 		(
 			name <- c.uniqueName()+'_entrypoint',
-			ownedDataAccess <- 	c.featureInstance->select(e| e.isOutputFeature())
-										->collect
-										(
-											e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveTemp(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
-										)
+			ownedDataAccess <- 	c.featureInstance->select(e| e.isInputFeature())
+								->collect(
+										e|thisModule.resolveTemp(e, 'f_entrypoint')
+									)
+									->union(
+										c.featureInstance->select(e| e.isOutputFeature())
+											->collect
+											(
+												e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveTemp(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
+											)
+									)
 									->union
 									(
 										callSequences->collect(behavior | 
@@ -961,17 +969,24 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'call'));
 			}
 		}
-		for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
+		if (thisModule.Unique_Send_Output_Per_Thread)
 		{
-			for(cnxInst in source.srcConnectionInstance)
+			intermediateCallActionSequence <- intermediateCallActionSequence.append(
+				thisModule.resolveTemp(c,'callSendOutput'));
+		}
+		else
+		{
+			for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
 			{
-				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
+				for(cnxInst in source.srcConnectionInstance)
+				{
+					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
+				}
 			}
 		}
 		intermediateCallActionSequence;
 	}
 }
-
 
 lazy rule CreateParameterHolder
 {
