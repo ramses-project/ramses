@@ -201,7 +201,7 @@ public class ToolSuiteLauncher
       throw new GenerationException("instanciation failed.") ;
     }
     
-    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet);
+    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet, targetName);
     
     _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
     
@@ -234,7 +234,7 @@ public class ToolSuiteLauncher
       throw new GenerationException("instanciation failed.") ;
     }
 
-    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet);
+    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet, targetName);
     
     _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
 
