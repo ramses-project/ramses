@@ -5,31 +5,31 @@ public
 data StatusType
 properties
   Programming_Properties::Source_Name => "StatusType";
-  Programming_Properties::Source_Text => ("tpl_os_types.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end StatusType;
 
 data TaskType
 properties
   Programming_Properties::Source_Name => "TaskType";
-  Programming_Properties::Source_Text => ("tpl_os_types.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end TaskType;
 
 data TaskRefType
 properties
   Programming_Properties::Source_Name => "TaskRefType";
-  Programming_Properties::Source_Text => ("tpl_os_types.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end TaskRefType;
 
 data TaskStateType
 properties
   Programming_Properties::Source_Name => "TaskStateType";
-  Programming_Properties::Source_Text => ("tpl_os_types.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end TaskStateType;
 
 data TaskStateRefType
 properties
   Programming_Properties::Source_Name => "TaskStateRefType";
-  Programming_Properties::Source_Text => ("tpl_os_types.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end TaskStateRefType;
 
 subprogram ActivateTask
@@ -38,13 +38,13 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ActivateTask";
-  Programming_Properties::Source_Text => ("tpl_os_task.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end ActivateTask;
 
 subprogram TerminateTask
 properties
   Programming_Properties::Source_Name => "TerminateTask";
-  Programming_properties::Source_Text => ("tpl_os_task.h");
+  Programming_properties::Source_Text => ("kernel.h");
   Compute_Execution_Time => 2 ms .. 3 ms; 
 end TerminateTask;
 
@@ -58,7 +58,7 @@ end TerminateTask;
 data ResourceType
 properties
   Programming_Properties::Source_Name => "ResourceType";
-  Programming_Properties::Source_Text => ("tpl_os_rez.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end ResourceType;
 
 subprogram GetResource
@@ -67,7 +67,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "GetResource";
-  Programming_Properties::Source_Text => ("tpl_os_rez.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end GetResource;
 
 subprogram ReleaseResource
@@ -76,20 +76,20 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ReleaseResource";
-  Programming_Properties::Source_Text => ("tpl_os_rez.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end ReleaseResource;
 
 -- Event control
 data EventMaskType
 properties
   Programming_Properties::Source_Name => "EventMaskType";
-  Programming_Properties::Source_Text => ("tpl_os_event.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end EventMaskType;
 
 data EventMaskRefType
 properties
   Programming_Properties::Source_Name => "EventMaskRefType";
-  Programming_Properties::Source_Text => ("tpl_os_event.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end EventMaskRefType;
 
 subprogram SetEvent
@@ -99,7 +99,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "SetEvent";
-  Programming_Properties::Source_Text => ("tpl_os_event.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end SetEvent;
 
 subprogram ClearEvent
@@ -108,7 +108,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ClearEvent";
-  Programming_Properties::Source_Text => ("tpl_os_event.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end ClearEvent;
 
 subprogram GetEvent
@@ -118,7 +118,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "GetEvent";
-  Programming_Properties::Source_Text => ("tpl_os_event.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end GetEvent;
 
 subprogram WaitEvent
@@ -127,14 +127,14 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "WaitEvent";
-  Programming_Properties::Source_Text => ("tpl_os_event.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end WaitEvent;
 
 -- Operating system
 data AppModeType
 properties
   Programming_Properties::Source_Name => "AppModeType";
-  Programming_Properties::Source_Text => ("tpl_os.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end AppModeType;
 
 -- TODO: GetActiveApplicationMode
@@ -144,7 +144,7 @@ features
   STATUS: out parameter StatusType;
 properties
   Programming_Properties::Source_Name => "StartOS";
-  Programming_Properties::Source_Text => ("tpl_os.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end StartOS;
 
 subprogram ShutdownOS
@@ -152,7 +152,7 @@ features
   STATUS: in parameter StatusType;
 properties
   Programming_Properties::Source_Name => "ShutdownOS";
-  Programming_Properties::Source_Text => ("tpl_os.h");
+  Programming_Properties::Source_Text => ("kernel.h");
 end ShutdownOS;
 
 -- Hooks
