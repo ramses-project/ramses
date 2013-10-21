@@ -52,6 +52,11 @@ processor arm
 end arm;
 
 processor implementation arm.impl
+properties
+  OSEK::SystemCounter_Source => "it_timer1";
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
 end arm.impl;
 
 ---------------
@@ -67,10 +72,6 @@ subcomponents
   nxt_cpu: processor arm.impl;
 properties
   Actual_Processor_Binding => (reference (nxt_cpu)) applies to p;
-  OSEK::SystemCounter_Source => "it_timer1";
-  OSEK::SystemCounter_MaxAllowedValue => 2000;
-  OSEK::SystemCounter_TicksPerBase => 1;
-  OSEK::SystemCounter_MinCycle => 1;
 end root.impl;
 
 end periodic_delayed;

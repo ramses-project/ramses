@@ -54,7 +54,7 @@ void selectState(int in_distance, Robot_state *state)
 /* Ungenerated datas */
 /*********************/
 
-#include "tpl_os.h"
+#include "kernel.h"
 
 void StartupHook(void)
 {

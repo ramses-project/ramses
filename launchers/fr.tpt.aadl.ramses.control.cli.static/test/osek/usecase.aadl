@@ -31,9 +31,8 @@ features
   angle : out parameter Int;
 properties
   Source_language => (C);
-  Source_text => ("in_robot.h");
+  Source_text => ("in_robot.h", "in_robot.c");
   Source_name => "computePID";
-  OSEK::Source_Location => "in_robot.c";
 end computePID;
 
 subprogram computeSpeed
@@ -171,6 +170,10 @@ end arm;
 processor implementation arm.impl
 properties
   Scheduling_Protocol => (Rate_Monotonic_Protocol) ;
+  OSEK::SystemCounter_Source => "it_timer1";
+  OSEK::SystemCounter_MaxAllowedValue => 2000;
+  OSEK::SystemCounter_TicksPerBase => 1;
+  OSEK::SystemCounter_MinCycle => 1;
 end arm.impl;
 
 -------------
@@ -318,10 +321,6 @@ connections
 properties
   Actual_Processor_Binding => (reference (nxt_cpu)) applies to PROC;
   Actual_Processor_Binding => (reference (nxt_cpu)) applies to LightSensor;
-  OSEK::SystemCounter_Source => "it_timer1";
-  OSEK::SystemCounter_MaxAllowedValue => 2000;
-  OSEK::SystemCounter_TicksPerBase => 1;
-  OSEK::SystemCounter_MinCycle => 1;
 end nxt.Impl;
 
 end nxt_use_case;
