@@ -25,15 +25,4 @@ public class Implementation {
 		this.name = name;
 	}
 	
-	public void generateOil(UnparseText code) {
-		code.addOutputNewline("IMPLEMENTATION " + name + " {");
-		code.incrementIndent();
-		
-		task.generateOil(code);
-		isr.generateOil(code);
-		
-		code.decrementIndent();
-		code.addOutputNewline("};");
-		code.addOutputNewline("");
-	}
 }

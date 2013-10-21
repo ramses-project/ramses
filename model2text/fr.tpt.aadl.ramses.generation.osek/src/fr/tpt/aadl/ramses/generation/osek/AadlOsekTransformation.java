@@ -16,11 +16,9 @@ public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
  			"ACG/targets/shared/PortsCommonRefinementSteps",
  			"ACG/targets/shared/DispatchCommonRefinementSteps",
  			"ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
-			"ACG/targets/osek/ExpandThreadsPorts", 
+ 			"ACG/targets/osek/ExpandThreadsPorts", 
 			"ACG/targets/osek/ExpandThreadsDispatchProtocol",
-			"ACG/targets/shared/PortsCommonRefinementSteps",
-			"ACG/PeriodicDelayedCommunication/SharedRules"//,
-			//"CreateThreadsBehavior" 
+			"ACG/PeriodicDelayedCommunication/SharedRules"
 			};
 	}
 

@@ -18,8 +18,6 @@ public class Os {
 	private Status status;
 	private boolean startupHook;
 	private boolean shutdownHook;
-	private final Set<File> appSrcs;
-	private final Set<File> appHeaders;
 	private String trampolineBasePath;
 	private String appName;
 	private final List<String> cFlags;
@@ -33,13 +31,11 @@ public class Os {
 	private Memmap memmap;
 
 	public Os() {
-		appSrcs = new HashSet<File>();
-		appHeaders = new HashSet<File>();
 		cFlags = new ArrayList<String>();
 		asFlags = new ArrayList<String>();
 		ldFlags = new ArrayList<String>();
 		memmap = new Memmap();
-		status = Status.STANDARD;
+		status = Status.EXTENDED;
 		startupHook = false;
 		trampolineBasePath = null;
 	}
@@ -74,26 +70,6 @@ public class Os {
 
 	public void setShutdownHook(boolean shutdownHook) {
 		this.shutdownHook = shutdownHook;
-	}
-	
-	public Set<File> getAppHeaders() {
-		return appHeaders;
-	}
-
-	public void addAppHeader(File appHeader) {
-		this.appHeaders.add(appHeader);
-	}
-	
-	public Set<File> getAppSrcs() {
-		return appSrcs;
-	}
-
-	public void addAppSrc(File appSrc) {
-		this.appSrcs.add(appSrc);
-	}
-
-	public void addAllAppSrcs(List<File> appSrcs) {
-		this.appSrcs.addAll(appSrcs);
 	}
 
 	public void setAppName(String appName) {
@@ -144,35 +120,12 @@ public class Os {
 		code.addOutputNewline("STATUS = " + status + ";");
 		code.addOutputNewline("STARTUPHOOK = " + Boolean.toString(startupHook).toUpperCase() + ";");
 		code.addOutputNewline("SHUTDOWNHOOK = " + Boolean.toString(shutdownHook).toUpperCase() + ";");
-
-		for (File src : appSrcs)
-			code.addOutputNewline("APP_SRC = \"" + src.getName() + "\";");
-
-		code.addOutputNewline("APP_NAME = \"" + appName + "\";");
-
-		if (trampolineBasePath != null && !trampolineBasePath.isEmpty())
-			code.addOutputNewline("TRAMPOLINE_BASE_PATH =\"" + trampolineBasePath + "\";");
-		else
-			code.addOutputNewline("TRAMPOLINE_BASE_PATH =");
-
-		for (String cFlag : cFlags)
-			code.addOutputNewline("CFLAGS = \"" + cFlag + "\";");
-
-		for (String asFlag : asFlags)
-			code.addOutputNewline("ASFLAGS = \"" + asFlag + "\";");
-
-		for (String ldFlag : ldFlags)
-			code.addOutputNewline("LDFLAGS = \"" + ldFlag + "\";");
-
-		code.addOutputNewline("SYSTEM_CALL = " + Boolean.toString(systemCall).toUpperCase() + ";");
-
-		code.addOutputNewline("COMPILER = \"" + compiler + "\";");
-
-		code.addOutputNewline("ASSEMBLER = \"" + assembler + "\";");
-
-		code.addOutputNewline("LINKER = \"" + linker + "\";");
-
-		memmap.generateOil(code);
+		code.addOutputNewline("ERRORHOOK = FALSE;"); 
+		code.addOutputNewline("PRETASKHOOK = FALSE;");
+		code.addOutputNewline("POSTTASKHOOK = FALSE;");
+		code.addOutputNewline("USEGETSERVICEID = FALSE;");
+		code.addOutputNewline("USEPARAMETERACCESS = FALSE;");
+		code.addOutputNewline("USERESSCHEDULER = FALSE;");
 
 		code.decrementIndent();
 		code.addOutputNewline("};");

@@ -36,7 +36,6 @@ public class Counter {
 	public void generateOil(UnparseText code) {
 		code.addOutputNewline("COUNTER " + name + "{");
 		code.incrementIndent();
-		code.addOutputNewline("SOURCE = " + source + ";");
 		code.addOutputNewline("MAXALLOWEDVALUE = " + maxAllowedValue + ";");
 		code.addOutputNewline("TICKSPERBASE = " + ticksPerBase + ";");
 		code.addOutputNewline("MINCYCLE = " + minCycle + ";");

@@ -26,8 +26,8 @@ import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
 import fr.tpt.aadl.ramses.generation.osek.c.AadlOSEKCodeGenerator;
-import fr.tpt.aadl.ramses.generation.osek.c.AadlToOSEKCUnparser;
-import fr.tpt.aadl.ramses.generation.osek.makefile.AadlToOSEKMakefileUnparser;
+import fr.tpt.aadl.ramses.generation.osek.c.AadlToOSEKNxtCUnparser;
+import fr.tpt.aadl.ramses.generation.osek.makefile.AadlToOSEKnxtMakefileUnparser;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator;
 
@@ -42,10 +42,10 @@ public class OSEKGeneratorFactory extends AbstractGeneratorFactory {
 		AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
 
 		// Instantiate generator OIL
-		AadlToOSEKCUnparser osekCUnparser = new AadlToOSEKCUnparser(oil);
+		AadlToOSEKNxtCUnparser osekCUnparser = new AadlToOSEKNxtCUnparser(oil);
 
 		// Call "goil" trampoline program
-		AadlToOSEKMakefileUnparser osekMakefileUnparser = new AadlToOSEKMakefileUnparser(oil);
+		AadlToOSEKnxtMakefileUnparser osekMakefileUnparser = new AadlToOSEKnxtMakefileUnparser();
 
 		// Instantiate transformation AADL to refined ADDL
 		AadlOsekTransformation targetTrans = new AadlOsekTransformation();

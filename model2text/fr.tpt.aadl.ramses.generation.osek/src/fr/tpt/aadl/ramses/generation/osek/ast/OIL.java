@@ -28,11 +28,10 @@ public class OIL {
 	}
 
 	public void generateOil(UnparseText code) {
+		code.addOutputNewline("#include \"implementation.oil\"");
 
-		code.addOutputNewline("OIL_VERSION = \"" + version + "\";");
 		code.addOutputNewline("");
 
-		implementation.generateOil(code);
 		cpu.generateOil(code);
 		code.addOutputNewline("");
 	}

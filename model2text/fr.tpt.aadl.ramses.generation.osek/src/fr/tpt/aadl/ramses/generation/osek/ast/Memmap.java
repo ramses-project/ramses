@@ -25,16 +25,4 @@ public class Memmap {
 		this.memoryProtection = memoryProtection;
 	}
 
-	public void generateOil(UnparseText code) {
-
-		code.addOutputNewline("MEMMAP = TRUE {");
-		code.incrementIndent();
-		code.addOutputNewline("COMPILER = " + compiler + ";");
-		code.addOutputNewline("LINKER = " + linker + ";");
-		code.addOutputNewline("ASSEMBLER = " + assembler + ";");
-		code.addOutputNewline("MEMORY_PROTECTION = " + Boolean.toString(memoryProtection).toUpperCase() + ";");
-		code.decrementIndent();
-		code.addOutputNewline("};");
-		code.addOutputNewline("");
-	}
 }

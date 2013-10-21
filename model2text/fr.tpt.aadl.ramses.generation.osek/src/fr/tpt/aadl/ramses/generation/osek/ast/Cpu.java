@@ -87,10 +87,6 @@ public class Cpu {
 			task.generateOil(code);
 		}
 
-		for (Isr isr : isrs) {
-			isr.generateOil(code);
-		}
-
 		code.decrementIndent();
 		code.addOutputNewline("};");
 		code.addOutputNewline("");

@@ -21,7 +21,13 @@
 
 package fr.tpt.aadl.ramses.util.generation;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList ;
 import java.util.Iterator ;
 import java.util.LinkedHashSet;
@@ -62,6 +68,7 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
+import org.osate.aadl2.modelsupport.UnparseText;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
@@ -417,7 +424,7 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       	    }
       	  }
     	  if(!found)
-    		throw new Exception("file referenced in object "+ aPropertyAssociation.getContainingClassifier().getFullName() + " could not be found "+ value);
+    		System.err.println("file referenced in object "+ aPropertyAssociation.getContainingClassifier().getFullName() + " could not be found "+ value);
     	}
     	else if(aPE instanceof ListValue)
     	{
@@ -437,7 +444,7 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
         	  }
         	}
         	if(!found)
-        	  throw new Exception("file referenced in object "+ aPropertyAssociation.getContainingClassifier().getFullName() + " could not be found "+ value);
+        		System.err.println("file referenced in object "+ aPropertyAssociation.getContainingClassifier().getFullName() + " could not be found "+ value);
           }
     	}
       }
@@ -547,5 +554,102 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
   }
 
   return null ;
+  }
+  
+  public static void executeMake(File generatedFilePath, String EnvirVarId)
+  {
+    Runtime runtime = Runtime.getRuntime();
+    String runtimePath = getRuntimePath(EnvirVarId);
+	if(runtimePath!=null && runtimePath!="")
+    {
+      try
+      {
+    	Process makeCleanProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " clean") ;
+    	makeCleanProcess.waitFor();
+        Process makeProcess = runtime.exec("make -C "+ generatedFilePath.getAbsolutePath() + " all POK_PATH="+runtimePath) ;
+        makeProcess.waitFor();
+        if (makeProcess.exitValue() != 0) {
+          System.err.println("Error when compiling generated code: ");
+
+          InputStream is;
+          is = makeProcess.getInputStream();
+          BufferedReader in = new BufferedReader(new InputStreamReader(is));
+          
+          String line = null;
+          while ((line = in.readLine()) != null) {
+            System.err.println(line);
+          }
+          is = makeProcess.getErrorStream();
+          in = new BufferedReader(new InputStreamReader(is));
+          line = null;
+          while ((line = in.readLine()) != null) {
+            System.err.println(line);
+          }
+        }
+        else
+        {
+          InputStream is;
+          is = makeProcess.getInputStream();
+          BufferedReader in = new BufferedReader(new InputStreamReader(is));
+            
+          String line = null;
+          while ((line = in.readLine()) != null) {
+            System.out.println(line);
+          }
+          System.out.println("Generated code was successfully built.\n");
+        }
+      }
+      catch(IOException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      catch(InterruptedException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      
+    }
+	else
+	{
+		System.out.println("ERROR: could not build generated code, runtime path not found");
+	}
+  }
+  
+  public static String getRuntimePath(String EnvirVarId)
+  {
+    String runtimePath = System.getenv(EnvirVarId);
+  	if(runtimePath==null || runtimePath=="")
+  		runtimePath = System.getProperty(EnvirVarId);
+  	return runtimePath;
+  }
+  
+  public static void saveMakefile(UnparseText text,
+          File makeFileDir)
+  {
+	  try
+	  {
+		  File makeFile = new File(makeFileDir.getAbsolutePath() + "/Makefile") ;
+		  FileWriter fileW = new FileWriter(makeFile) ;
+		  BufferedWriter output ;
+
+		  try
+		  {
+			  output = new BufferedWriter(fileW) ;
+			  output.write(text.getParseOutput()) ;
+			  output.close() ;
+		  }
+		  catch(IOException e)
+		  {
+			  // TODO Auto-generated catch block
+			  e.printStackTrace() ;
+		  }
+	  }
+	  catch(IOException e)
+	  {
+		  // TODO Auto-generated catch block
+		  e.printStackTrace() ;
+	  }
   }
 }

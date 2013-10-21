@@ -36,11 +36,11 @@ import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 
-public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
+public class AadlToTrampolineOSEKMakefileUnparser implements TargetBuilderGenerator {
 
 	private OIL oil;
 
-	public AadlToOSEKMakefileUnparser(OIL oil) {
+	public AadlToTrampolineOSEKMakefileUnparser(OIL oil) {
 		this.oil = oil;
 	}
 
@@ -59,17 +59,6 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
     System.out.println("* Prepare Make ...");
 
     
-    // Copy runtime and user c code
-    for (File src : oil.getCpu().getOs().getAppSrcs()) {
-      System.out.println("src " + src);
-      FileUtils.copyFile(src, generatedFilePath);
-    }
-
-    // Copy runtime and user header code
-    for (File header : oil.getCpu().getOs().getAppHeaders()) {
-      FileUtils.copyFile(header, generatedFilePath);
-    }
-
     File preparemake = new File(RamsesConfiguration.getInputDirectory(), "/preparemake.sh");
     
     preparemake = FileUtils.copyFile(preparemake, generatedFilePath);
@@ -85,7 +74,7 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
       // TrampolineBasePath NOT found
       if (oil.getCpu().getOs().getTrampolineBasePath() == null) {
 
-        Process makeProcess = runtime.exec(new String[] { refineOil.getCanonicalPath(), oilTrashFile.getCanonicalPath() + "_specification.oil"});
+        Process makeProcess = runtime.exec(new String[] { refineOil.getCanonicalPath(), oilTrashFile.getCanonicalPath() + ".oil"});
         makeProcess.waitFor();
         if (makeProcess.exitValue() != 0) {
           System.err.println("Error on goil generation: refine_oil;");
@@ -100,15 +89,15 @@ public class AadlToOSEKMakefileUnparser implements TargetBuilderGenerator {
         System.err.println("\t    - run eclipse on the same shell");
         System.err.println("You can also generate manually the Makefile :");
         System.err.println("\t 1) - execute source env on lejos directory");
-        System.err.println("\t 2) - execute ./refine_oil.sh " + oilTrashFile.getCanonicalPath() + "_specification.oil");
-        System.err.println("\t 3) - execute ./preparemake.sh " + oilTrashFile.getCanonicalPath() + "_specification.oil");
+        System.err.println("\t 2) - execute ./refine_oil.sh " + oilTrashFile.getCanonicalPath() + ".oil");
+        System.err.println("\t 3) - execute ./preparemake.sh " + oilTrashFile.getCanonicalPath() + ".oil");
 
         return;
       }
       // Generate Makefile
       else {
         System.out.println("Premaring Make");
-        Process makeProcess = runtime.exec(new String[] { preparemake.getCanonicalPath(), oilTrashFile.getCanonicalPath() + "_specification.oil"});
+        Process makeProcess = runtime.exec(new String[] { preparemake.getCanonicalPath(), oilTrashFile.getCanonicalPath() + ".oil"});
         makeProcess.waitFor();
 
         if (makeProcess.exitValue() != 0) {
