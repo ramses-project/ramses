@@ -138,7 +138,7 @@ rule m_SporadicThread
 	using
 	{
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromCpt(c);
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(c, 'returnData').debug(' !!!!!! ');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(c, 'returnData');
 		spg_event : AADLBA!SubprogramType = thisModule.getWaitEventSubprogram;
 		spg_timed_wait: AADLBA!SubprogramType = thisModule.getTimedWaitSubprogram;
 	}
@@ -182,7 +182,7 @@ rule m_SporadicThread_SeveralInputs
 	using
 	{
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromCpt(c);
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(c, 'returnData').debug(' !!!!!! ');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(c, 'returnData');
 		spg_event : AADLBA!SubprogramType = thisModule.getWaitEventSubprogram;
 		spg_timed_wait: AADLBA!SubprogramType = thisModule.getTimedWaitSubprogram;
 	}
