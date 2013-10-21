@@ -40,7 +40,7 @@ public class RamsesConfiguration
     OutputDirectory = outputDir ;
   }
   
-  public static void setIncludeDir(Resource r, Set<File> includeDirSet)
+  public static void setIncludeDir(Resource r, Set<File> includeDirSet, String targetName)
   {
 	if(includeDirSet==null)
 		includeDirSet = new HashSet<File>();
@@ -70,14 +70,21 @@ public class RamsesConfiguration
 			  RamsesRessourcesDir.getAbsolutePath()+"/Ada_runtime/PeriodicDelayed_runtime/");
 	  includeDirSet.add(adaPeriodicDelayedRuntimeDir);
 
+	  // Add Dir of C OSEK runtime
+	  File OSEKRuntimeDir = new File(
+			  RamsesRessourcesDir.getAbsolutePath()+"/C_runtime/OSEK/");
+	  includeDirSet.add(OSEKRuntimeDir);
 	  // TODO: include other runtime directories here.
 	  String pokPath = System.getenv("POK_PATH");
 	  if(pokPath==null || pokPath=="")
 		pokPath = System.getProperty("POK_PATH");
-	  File pokFile = new File(pokPath+"/libpok/include");
-	  includeDirSet.add(pokFile);
-	  File pokAdaFile = new File(pokPath+"/libpok/ada");
-	  includeDirSet.add(pokAdaFile);
+	  if(pokPath!=null && targetName=="pok")
+	  {
+		  File pokFile = new File(pokPath+"/libpok/include");
+		  includeDirSet.add(pokFile);
+		  File pokAdaFile = new File(pokPath+"/libpok/ada");
+		  includeDirSet.add(pokAdaFile);
+	  }
 	  IncludeDirectories.put(r, includeDirSet);
 	}
   }
