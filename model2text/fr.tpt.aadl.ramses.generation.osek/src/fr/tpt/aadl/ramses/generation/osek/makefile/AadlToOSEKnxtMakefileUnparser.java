@@ -108,7 +108,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
               "_OSEK") ;
 
-		unparserContent.addOutputNewline("TOPPERS_OSEK_OIL_SOURCE = "+processGeneratedFilePath.toPath().toAbsolutePath().toString()+"/"+object.getName()+".oil");
+		unparserContent.addOutputNewline("TOPPERS_OSEK_OIL_SOURCE = ./"+object.getName()+".oil");
 
         process(object.getComponentImplementation()) ;
         unparserContent.addOutputNewline("O_PATH ?= build");
