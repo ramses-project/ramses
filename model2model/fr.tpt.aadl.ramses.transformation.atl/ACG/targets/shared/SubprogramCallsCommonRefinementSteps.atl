@@ -783,12 +783,14 @@ rule m_PortBehavior
   	}
 }
 
+
 rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 										behavior: AADLI!SubprogramCallSequence)
 {
 	using
 	{
 		intermediateCallActionSequence: Sequence(AADLBA!BehaviorAction) = Sequence{};
+		portsInvoledInCall: Sequence(AADLI!FeatureInstance) = Sequence{};
 		c: AADLI!ComponentInstance = fi.eContainer();
 	}
 	do
@@ -817,7 +819,25 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 				}
 			}
 			
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi,behavior,call}, 'subprogramCallAction'));
+			portsInvoledInCall <- thisModule.getPortsInvoledInCall(c,call);
+			if(portsInvoledInCall->isEmpty())
+			{
+				intermediateCallActionSequence <- intermediateCallActionSequence.append
+					(
+						thisModule.resolveTemp(Sequence{fi,behavior,call}, 'subprogramCallAction')
+					);
+			}
+			else
+			{
+				intermediateCallActionSequence <- intermediateCallActionSequence.append
+					(
+						thisModule.createCheckedCall
+						(
+							thisModule.getPortsInvoledInCall(c,call),
+							thisModule.resolveTemp(Sequence{fi,behavior,call}, 'subprogramCallAction')
+						)
+					);
+			}
 			
 			if(fi.isOutputFeature() and fi.isEventOrEventDataPort())
 			{
@@ -894,12 +914,118 @@ rule m_ComputeEntrypointCallSequence {
 }
 
 
+helper def : getPortsInvoledInCall(c: AADLI!ComponentInstance, call: AADLI!SubprogramCall) : Sequence(AADLI!FeatureInstance) = 
+	c.featureInstance->select(e| 
+		e.isInputFeature() and 
+		c.subcomponent.classifier.ownedParameterConnection->exists(paramCnxIter|
+			paramCnxIter.source.context=call and 
+			paramCnxIter.destination.connectionEnd = e.feature)
+	)
+	->union(
+		c.featureInstance->select(e| 
+		e.isInputFeature() and
+		c.subcomponent.classifier.ownedParameterConnection->exists(paramCnxIter|
+			paramCnxIter.destination.context=call and 
+			paramCnxIter.source.connectionEnd = e.feature)
+		)
+	)
+;
+
+rule createCheckedCall(features: Sequence(AADLI!FeatureInstance), checkedCall: AADLBA!BehaviorAction)
+{
+	to
+  		checkedAction: AADLBA!IfStatement
+		(
+			logicalValueExpression <- checkforMessageExpression,
+			behaviorActions <- thisModule.errorsCheckActions(checkedCall)
+		),
+		checkforMessageExpression: AADLBA!ValueExpression
+		(
+			relations <- features->collect(e|thisModule.createCheckforMessageExpression(e)),
+			logicalOperators <- features->excluding(features->first())->collect(e| #And)
+		)
+	do
+	{
+		checkedAction;
+	}
+}
+
+
+rule createCheckforMessageExpression(fi: AADLI!FeatureInstance)
+{
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
+	}
+	to
+
+		checkforMessageRelation: AADLBA!Relation
+		(
+			relationalOperator<-#Equal,
+			firstExpression<-getCountExpression,
+			secondExpression<-zeroValueConstantExpression
+		),
+		getCountExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{getCountTerm}
+		),
+		zeroValueConstantExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{zeroValueConstantTerm}
+		),
+		zeroValueConstantTerm: AADLBA!Term
+		(
+			factors <- Sequence{zeroValueConstantFactor}
+		),
+		zeroValueConstantFactor: AADLBA!Factor
+		(
+			firstValue <- zeroValueConstant
+		),
+		zeroValueConstant: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 0.longValue()
+		),
+		getCountTerm: AADLBA!Term
+		(
+			factors <- Sequence{countFactor}
+		),
+		countFactor: AADLBA!Factor
+		(
+			firstValue <- count_variable_holder
+		),
+		count_variable_holder: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		checkforMessageRelation;
+	}
+}
+
+rule errorsCheckActions(checkedCall: AADLBA!SubprogramCallAction)
+{
+	to
+		errorsCheckActions: AADLBA!BehaviorActionSequence
+		(
+			actions <- Sequence{checkedCall}
+		)
+		
+	do
+	{
+		errorsCheckActions;
+	}
+}
+
+
+
 rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 										behavior: AADLI!SubprogramCallSequence)
 {
 	using
 	{
 		intermediateCallActionSequence: Sequence(AADLBA!SubprogramCallAction) = Sequence{};
+		portsInvoledInCall: Sequence(AADLI!FeatureInstance) = Sequence{};
 	}
 	do
 	{
@@ -926,9 +1052,25 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior, paramCnx} ,'call'));
 				}
 			}
-			
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{c,behavior,call}, 'subprogramCallAction'));
-			
+			portsInvoledInCall <- thisModule.getPortsInvoledInCall(c,call);
+			if(portsInvoledInCall->isEmpty())
+			{
+				intermediateCallActionSequence <- intermediateCallActionSequence.append
+					(
+						thisModule.resolveTemp(Sequence{c,behavior,call}, 'subprogramCallAction')
+					);
+			}
+			else
+			{
+				intermediateCallActionSequence <- intermediateCallActionSequence.append
+					(
+						thisModule.createCheckedCall
+						(
+							thisModule.getPortsInvoledInCall(c,call),
+							thisModule.resolveTemp(Sequence{c,behavior,call}, 'subprogramCallAction')
+						)
+					);
+			}
 			
 			for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isEventOrEventDataPort()))
 			{
@@ -1118,6 +1260,8 @@ lazy rule populateParameterLabels
 		intermediateParameterLabelList;
 	}
 }
+
+
 rule m_PortSubprogramCall {
   from
 	fi: AADLI!FeatureInstance,

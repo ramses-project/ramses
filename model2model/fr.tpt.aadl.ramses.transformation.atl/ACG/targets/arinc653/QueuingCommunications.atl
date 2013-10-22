@@ -71,7 +71,7 @@ rule m_Input_Queuing_ComputeEntrypointCallSequence
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
 	to
-		checkedCall: AADLBA!SubprogramCallAction
+		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
 			parameterLabels <- Sequence{
@@ -104,11 +104,6 @@ rule m_Input_Queuing_ComputeEntrypointCallSequence
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
-		),
-		call: AADLBA!IfStatement
-		(
-			logicalValueExpression <- thisModule.createCheckforMessageExpression(RETURN_CODE),
-			behaviorActions <- thisModule.errorsCheckActions(checkedCall)
 		)
 }
 

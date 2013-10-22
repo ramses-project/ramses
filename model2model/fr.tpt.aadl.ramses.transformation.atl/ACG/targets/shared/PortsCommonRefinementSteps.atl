@@ -454,3 +454,24 @@ rule m_DataAccess_Instance_with_BA
 	}
 }
 
+unique lazy rule CreateReturnSubcomponentFromPort
+{
+	from
+		port : AADLI!FeatureInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral('0');
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-port.feature.name+'_ErrorCode',
+			dataSubcomponentType<-thisModule.getRuntimeReturnType(),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
+		dataSubcomponent;
+	}
+}
