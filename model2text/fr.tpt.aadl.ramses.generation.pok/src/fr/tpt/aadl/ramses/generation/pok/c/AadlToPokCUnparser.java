@@ -35,6 +35,7 @@ import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DirectionType;
+import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
 import org.osate.aadl2.Port;
@@ -53,6 +54,8 @@ import org.osate.aadl2.instance.FeatureCategory;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
+import org.osate.aadl2.modelsupport.util.AadlUtil;
+import org.osate.aadl2.util.Aadl2Util;
 
 import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
 import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
@@ -64,6 +67,7 @@ import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
+import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.utils.PropertyUtils;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
@@ -336,7 +340,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     else
     {
       queueInfo.type = "FIFO";
-      queueInfo.size = 1;
+      queueInfo.size = 10;
       pp.bufferInfo.add(queueInfo) ;
     }
     
@@ -1196,7 +1200,21 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       threadNumberPerPartition.add(Integer.valueOf(pi
             .getOwnedThreadSubcomponents().size())) ;
     }
-
+    for(ThreadSubcomponent th: bindedThreads)
+    {
+    	String dispatchProtocol;
+		try {
+			dispatchProtocol = PropertyUtils.getEnumValue(th, "Dispatch_Protocol");
+			if(dispatchProtocol.equalsIgnoreCase("sporadic"))
+	    	{
+	    		deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_THREAD_SLEEP 1");
+	    		break;
+	    	}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
     //  The maccro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
     //  the kernel.It comprises the tasks for the partition and the main task of 
     //  each partition that initialize all ressources.
