@@ -319,15 +319,15 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
     }
   }
 
-  public static void getListOfReferencedObjects(Subprogram aSubprogram,
+  public static boolean getListOfReferencedObjects(Subprogram aSubprogram,
 		  Set<File> includeDirList,
 		  Set<File> result) throws Exception
   {
+	boolean found = false;
   	if(aSubprogram instanceof SubprogramType)
     {
       SubprogramType aSubprogramType =
             (SubprogramType) aSubprogram ;
-
       for(AnnexSubclause annex: aSubprogramType.getAllAnnexSubclauses())
       {
       	if(annex instanceof BehaviorAnnex)
@@ -336,12 +336,21 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       		getListOfReferencedObjects(ba,
       			includeDirList,
               	result);
+      		return true;
       	}
       }
       for(PropertyAssociation aPropertyAssociation : aSubprogramType
             .getOwnedPropertyAssociations())
       {
-        getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
+        found = getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
+        if(found)
+          return found;
+      }
+      if(aSubprogramType.getOwnedExtension()!=null)
+      {
+    	found = getListOfReferencedObjects((Subprogram)aSubprogramType.getOwnedExtension().getExtended(),
+    		  includeDirList,
+    		  result);
       }
     }
     else if(aSubprogram instanceof SubprogramImplementation)
@@ -357,20 +366,35 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       		getListOfReferencedObjects(ba,
       			includeDirList,
               	result);
+      		return true;
       	}
       }
       for(PropertyAssociation aPropertyAssociation : aSubprogramImplementation
             .getOwnedPropertyAssociations())
       {
-        getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
+        found = getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
+        if(found)
+          return found;
       }
-
+   	  if(aSubprogramImplementation.getOwnedExtension()!=null)
+      {
+    	found = getListOfReferencedObjects((Subprogram)aSubprogramImplementation.getOwnedExtension().getExtended(),
+    		  includeDirList,
+    		  result);
+      }
+      if(!found)
+      {
+    	found = getListOfReferencedObjects((Subprogram)aSubprogramImplementation.getOwnedExtension().getExtended().getType(),
+   			  includeDirList,
+   			  result);
+      }
       for(CallSpecification aCallSpecification : aSubprogramImplementation
             .getCallSpecifications())
       {
         getListOfReferencedObjects(aCallSpecification, includeDirList, result) ;
       }
     }
+  	return found;
   }
   
   private static void getListOfReferencedObjects(BehaviorAnnex ba,
@@ -392,17 +416,17 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
 		}
 	}
 
-	public static void getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
+	public static boolean getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
 												Set<File> includeDirList,
                                                 Set<File> result) throws Exception
   {
-    if(aPropertyAssociation.getProperty().getName() != null &&
-          (aPropertyAssociation.getProperty().getName()
-                .equals("Source_Location")
-                ||
-                aPropertyAssociation.getProperty().getName()
-                .equals("Source_Text"))
-                )
+	boolean isSourceTextPA = aPropertyAssociation.getProperty().getName() != null &&
+	          (aPropertyAssociation.getProperty().getName()
+	                  .equals("Source_Location")
+	                  ||
+	                  aPropertyAssociation.getProperty().getName()
+	                  .equals("Source_Text"));
+    if(isSourceTextPA)
     {
       for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
             .getOwnedValues())
@@ -449,6 +473,7 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
     	}
       }
     }
+    return isSourceTextPA;
   }
 
   private static void setInitialization(NamedElement obj,
