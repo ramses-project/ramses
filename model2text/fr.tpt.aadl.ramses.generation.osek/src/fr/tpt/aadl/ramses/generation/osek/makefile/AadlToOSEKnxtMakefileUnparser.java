@@ -113,7 +113,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
         process(object.getComponentImplementation()) ;
         unparserContent.addOutputNewline("O_PATH ?= build");
     	if(runtimePath!=null && runtimePath!="")
-        unparserContent.addOutputNewline("include "+runtimePath+"/ecrobot/ecrobot.mak");
+    		unparserContent.addOutputNewline("include "+runtimePath+"/ecrobot/ecrobot.mak");
         return DONE ;
       }
 

@@ -66,30 +66,11 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	 */
 	private final static String compilationFile = "compilation.properties";
 
-	/**
-	 * OSEK
-	 */
-	private final static String C_OSEK_RUNTIME = "osek_runtime.c";
-	private final static String H_OSEK_RUNTIME = "osek_runtime.h";
 
 	/**
 	 * Variable OIL
 	 */
 	private final static String OIL_VERSION = "2.5";
-
-	/**
-	 * Trampoline
-	 */
-	private final static int TRAMPOLINE_STACKSIZE = 500;
-	private final static int TRAMPOLINE_PRIORITY = 1;
-	private final static int ISR_STACKSIZE = 500;
-
-	/**
-	 * OS config
-	 */
-	private final static String OS_NAME = "config";
-	private final static boolean OS_SYSTEM_CALL = true;
-	private final static boolean MEMORY_PROTECTION = false;
 
 	/**
 	 * Counter
@@ -285,10 +266,10 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		    }
 		  }
 		}
-
+		cpu.setAppmode(MAIN_APP_MODE);
 		cpu.setName(ps.getName());
 		genOsConfig(ps);
-
+		
 
 	}
 
@@ -299,43 +280,28 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	 */
 	private void genOsConfig(ProcessSubcomponent processSubcomponent) {
 
-		Os os = oil.getCpu().getOs();
-		Memmap memmap = os.getMemmap();
-
-		List<String> cFlags = resources.getValues("cpu.os.cflags");
-		List<String> asFlags = resources.getValues("cpu.os.asflags");
-		List<String> ldFlags = resources.getValues("cpu.os.ldflags");
-		String compiler = resources.getValue("cpu.os.compiler");
-		String assembler = resources.getValue("cpu.os.assembler");
-		String linker = resources.getValue("cpu.os.linker");
-		String memmapCompiler = resources.getValue("cpu.os.memmap.compiler");
-		String memmapLinker = resources.getValue("cpu.os.memmap.linker");
-		String memmapAssembler = resources.getValue("cpu.os.memmap.assembler");
-
-		os.setName(OS_NAME);
-		os.setAppName(processSubcomponent.getName());
-
-		String trampolineBasePath = System.getenv().get("TRAMPOLINEPATH");
-		if (trampolineBasePath != null)
-			os.setTrampolineBasePath(trampolineBasePath);
-
-		os.addAllCFlags(cFlags);
-		os.addAllAsFlags(asFlags);
-		os.addAllLdFlags(ldFlags);
-		os.setCompiler(compiler);
-		os.setAssembler(assembler);
-		os.setLinker(linker);
-		os.setSystemCall(OS_SYSTEM_CALL);
-
-		memmap.setMemoryProtection(MEMORY_PROTECTION);
-		memmap.setCompiler(memmapCompiler);
-		memmap.setAssembler(memmapAssembler);
-		memmap.setLinker(memmapLinker);
-
 		/* C Data declaration */
-
+		Os os = oil.getCpu().getOs();
+		os.setName("config");
+		os.setAppName(processSubcomponent.getName());
+		_mainHCode.addOutputNewline("#include \"kernel.h\"");
+		
 		_mainCCode.addOutputNewline("/*********** Data ***********/");
 		ProcessImplementation pi = (ProcessImplementation) processSubcomponent.getComponentImplementation();
+		for(DataSubcomponent ds: pi.getOwnedDataSubcomponents())
+		{
+		  if(ds.getSubcomponentType().getName().equalsIgnoreCase("ThreadQueueType")
+				  || ds.getSubcomponentType().getName().equalsIgnoreCase("DataPortType"))
+		  {
+			  _mainCCode.addOutputNewline("DeclareResource("+ds.getName()+"_rez);");
+			  _mainHCode.addOutputNewline("extern const ResourceType "+ds.getName()+"_rez;");
+		  }
+		  if(ds.getSubcomponentType().getName().equalsIgnoreCase("ThreadQueueType"))
+		  {
+			  _mainCCode.addOutputNewline("DeclareEvent("+ds.getName()+"_evt)");
+			  _mainHCode.addOutputNewline("extern ResourceType "+ds.getName()+"_evt;");
+		  }
+		}
 
 		_mainCCode.addOutputNewline("");
 	}

@@ -7,7 +7,7 @@ import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
 public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 
 	
-	public AadlOsekTransformation()
+	public AadlOsekTransformation(String module)
 	{
 		ATL_FILE_NAMES = new String[] 
 				{
@@ -17,8 +17,10 @@ public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
  			"ACG/targets/shared/DispatchCommonRefinementSteps",
  			"ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
  			"ACG/targets/osek/ExpandThreadsPorts", 
+ 			"ACG/targets/osek/BlackboardCommunications",
 			"ACG/targets/osek/ExpandThreadsDispatchProtocol",
-			"ACG/PeriodicDelayedCommunication/SharedRules"
+			"ACG/PeriodicDelayedCommunication/SharedRules",
+			module
 			};
 	}
 

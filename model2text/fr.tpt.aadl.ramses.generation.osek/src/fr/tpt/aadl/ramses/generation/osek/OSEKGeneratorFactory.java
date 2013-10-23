@@ -48,7 +48,7 @@ public class OSEKGeneratorFactory extends AbstractGeneratorFactory {
 		AadlToOSEKnxtMakefileUnparser osekMakefileUnparser = new AadlToOSEKnxtMakefileUnparser();
 
 		// Instantiate transformation AADL to refined ADDL
-		AadlOsekTransformation targetTrans = new AadlOsekTransformation();
+		AadlOsekTransformation targetTrans = new AadlOsekTransformation("helpers/LanguageSpecificitiesC");
 
 		// new implementation
 		AadlTargetSpecificCodeGenerator tarSpecCodeGen = new AadlOSEKCodeGenerator(genericCUnparser, osekCUnparser,
