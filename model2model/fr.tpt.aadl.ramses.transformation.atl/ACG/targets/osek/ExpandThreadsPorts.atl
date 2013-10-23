@@ -35,7 +35,7 @@ abstract rule m_Not_PeriodicDelayed_Port
 {
 	from
 		fi: AADLI!FeatureInstance
-		(true)
+		(not fi.isPeriodicDelayedPort())
 }
 
 
