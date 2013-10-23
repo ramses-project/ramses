@@ -1,6 +1,8 @@
 package OSEK_runtime
 public
 
+with Generation_Properties;
+
 -- Task management
 data StatusType
 properties
@@ -169,54 +171,68 @@ end ShutdownHook;
 -- TODO: Interrupt handling
 
 -- Ports management
-data EventQueueIdType
-properties
-  Programming_Properties::Source_Name => "EventQueueIdType";
-  Programming_Properties::Source_Text => ("osek_runtime.h");
-end EventQueueIdType;
 
-data EventDataType
+data PortQueueType
 properties
-  Programming_Properties::Source_Name => "EventDataType";
+  Programming_Properties::Source_Name => "port_queue_t";
   Programming_Properties::Source_Text => ("osek_runtime.h");
-end EventDataType;
+end PortQueueType;
 
-subprogram SetOSEKEventData
+data ThreadQueueType
+properties
+  Programming_Properties::Source_Name => "thread_queue_t";
+  Programming_Properties::Source_Text => ("osek_runtime.h");
+end ThreadQueueType;
+
+data DataPortType
+properties
+  Programming_Properties::Source_Name => "data_port_t";
+  Programming_Properties::Source_Text => ("osek_runtime.h");
+end DataPortType;
+
+
+subprogram SetEventData
 features
   EV_DATA_QUEUE_ID: in parameter EventQueueIdType;
   VALUE_IN: in parameter EventDataType;
   STATUS: out parameter StatusType;
 properties
-  Programming_Properties::Source_Name => "SetEventData";
+  Programming_Properties::Source_Name => "PutEventDataMessage";
   Programming_Properties::Source_Text => ("osek_runtime.h");
-end SetOSEKEventData;
+end SetEventData;
 
-subprogram WaitOSEKEventData
+subprogram WaitEventData
 features
   EV_DATA_QUEUE_ID: in parameter EventQueueIdType;
   VALUE_OUT: out parameter EventDataType;
   STATUS: out parameter StatusType;
 properties
-  Programming_Properties::Source_Name => "WaitEventData";
+  Programming_Properties::Source_Name => "GetEventDataMessage";
   Programming_Properties::Source_Text => ("osek_runtime.h");
-end WaitOSEKEventData;
+end WaitEventData;
 
-subprogram SetOSEKEvent
+subprogram PutValueDataPort
+prototypes
+  MESSAGE_TYPE: data;
 features
-  EV_QUEUE_ID: in parameter EventQueueIdType;
-  STATUS: out parameter StatusType;
+  DATA_PORT_ID: in parameter DataPortType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  MESSAGE_ADDR: in out parameter MESSAGE_TYPE;
+  STATUS: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
-  Programming_Properties::Source_Name => "SetEvent";
-  Programming_Properties::Source_Text => ("osek_runtime.h");
-end SetOSEKEvent;
+  Programming_Properties::Source_Name => "PutValueDataPort";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
+end PutValueDataPort;
 
-subprogram WaitOSEKEvent
+subprogram GetValueDataPort
+prototypes
+  MESSAGE_TYPE: data;
 features
-  EV_QUEUE_ID: in parameter EventQueueIdType;
-  STATUS: out parameter StatusType;
+  DATA_PORT_ID: in out parameter DataPortType;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  STATUS: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
-  Programming_Properties::Source_Name => "WaitEvent";
-  Programming_Properties::Source_Text => ("osek_runtime.h");
-end WaitOSEKEvent;
+  Programming_Properties::Source_Name => "GetValueDataPort";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
+end GetValueDataPort;
 
 end OSEK_runtime;

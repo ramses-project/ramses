@@ -31,9 +31,10 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									ARINC653_RUNTIME: AADLBA;
 
 
--------------------------------------------------------------------------------------------
----- Beginning of refactoring
--------------------------------------------------------------------------------------------
+helper def : getRuntimeSizeType: AADLBA!DataType = 
+	'Message_Size_Type'.asDataType('ARINC653_RUNTIME')
+;
+
 
 helper def: collectPutValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
 	c.featureInstance->
@@ -122,14 +123,6 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	)
 	->flatten()
 ;
-
-
-abstract rule m_Not_PeriodicDelayed_Port
-{
-	from
-		fi: AADLI!FeatureInstance
-		(not fi.isPeriodicDelayedPort())
-}
 
 --	- m_Process_Output_DataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
 --		such that
@@ -455,10 +448,6 @@ helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpress
 	endif
 ;
 
-helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
-	thisModule.resolveTemp(self, 'localVariable')
-;
-
 unique lazy rule createResolvedSpg
 {
 	from
@@ -488,34 +477,6 @@ unique lazy rule createResolvedSpg
 	do
 	{
 		spg_ResolvedType;
-	}
-}
-
-
-unique lazy rule CreateLengthDataSubcomponent
-{
-	from
-		port : AADLI!FeatureInstance
-	using
-	{
-		typeId: String = port.getLengthInitialValue();
-		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression(thisModule.getSizeOfType(typeId));
-	}
-	to
-		lv: AADLBA!ListValue
-		(
-			ownedListElement <- Sequence{initValuePE}
-		),
-		dataSubcomponent: AADLBA!DataSubcomponent
-		(
-			name<-port.feature.name+'_Length',
-			dataSubcomponentType<-'Message_Size_Type'.asDataType('ARINC653_RUNTIME'),
-			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
-		)
-	do
-	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
-		dataSubcomponent;
 	}
 }
 
@@ -598,12 +559,7 @@ helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'Return_Code_
 --	not thisModule.toBeTransformedInterProcessConnection(self)
 --	and
 --	not thisModule.toBeTransformedIntraProcessConnection(self)
---; 
-
-
-helper context AADLI!ComponentInstance def : getProcessorBinding() : AADLBA!Subcomponent =
-	self.ownedPropertyAssociation->any(e | e.property = AADLBA!Property->allInstancesFrom('DEPLOYMENT_PROPERTIES')->any(f|f.name = 'Actual_Processor_Binding')).appliesTo
-;
+--;
 
 helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in

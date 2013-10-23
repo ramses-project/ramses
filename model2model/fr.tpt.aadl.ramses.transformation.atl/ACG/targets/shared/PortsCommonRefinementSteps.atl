@@ -39,6 +39,17 @@ helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!Da
 	thisModule.resolveTemp(self,'globalVariable')
 ;
 
+helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
+	thisModule.resolveTemp(self, 'localVariable')
+;
+
+abstract rule m_Not_PeriodicDelayed_Port
+{
+	from
+		fi: AADLI!FeatureInstance
+		(not fi.isPeriodicDelayedPort())
+}
+
 -- @extends m_Feature_Instance
 rule m_Thread_Port_Instance
 {
@@ -473,5 +484,65 @@ unique lazy rule CreateReturnSubcomponentFromPort
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
 		dataSubcomponent;
+	}
+}
+
+unique lazy rule CreateLengthDataSubcomponent
+{
+	from
+		port : AADLI!FeatureInstance
+	using
+	{
+		typeId: String = port.getLengthInitialValue();
+		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression(thisModule.getSizeOfType(typeId));
+	}
+	to
+		lv: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{initValuePE}
+		),
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-port.feature.name+'_Length',
+			dataSubcomponentType<-thisModule.getRuntimeSizeType,
+			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
+		
+		dataSubcomponent;
+	}
+}
+
+unique lazy rule createResolvedSpg
+{
+	from
+		classifier: AADLI!DataClassifier,
+		spg: AADLBA!SubprogramType
+	using
+	{
+		param: AADLBA!Parameter = spg.ownedParameter->any(e|e.name = 'MESSAGE_ADDR');
+	}
+	to
+		spg_ResolvedType: AADLBA!SubprogramType
+		(
+			name <- spg.name+'_'+thisModule.getProgrammationLanguageIdentifier(classifier.name),
+			ownedExtension <- extendedMessageType,
+			ownedParameter <- Sequence{actualParam}
+		),
+		extendedMessageType: AADLBA!TypeExtension
+		(
+			extended<-spg
+		),
+		actualParam : AADLBA!Parameter
+		(
+			refined <- param,
+			direction <- param.direction,
+			dataFeatureClassifier <- classifier
+		)
+	do
+	{
+		spg_ResolvedType;
 	}
 }

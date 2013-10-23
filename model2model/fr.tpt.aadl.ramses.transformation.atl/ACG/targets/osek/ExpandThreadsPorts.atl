@@ -31,9 +31,80 @@ from 		IN : AADLI,							-- Simplified model : org.osate.aadl2/model/instance.ec
 			HOOKS: ATLHOOKS,						
 			OSEK_RUNTIME: AADLBA;
 
+abstract rule m_Not_PeriodicDelayed_Port
+{
+	from
+		fi: AADLI!FeatureInstance
+		(true)
+}
+
+
+
+helper def : getRuntimeSizeType: AADLBA!DataType = 
+	'Integer_16'.asDataType('BASE_TYPES')
+;
+
+helper def: collectPutValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
+	c.featureInstance->
+		select(
+			e|e.isOutputFeature() 
+			and 
+			e.feature.oclIsKindOf(AADLI!DataPort)
+			and
+			c.subcomponent.classifier.ownedParameterConnection
+			->exists(paramCnx| paramCnx.source.connectionEnd = e.feature or paramCnx.destination.connectionEnd = e.feature)
+		)
+		->collect(e|
+			e.srcConnectionInstance
+				->collect(f| 
+					thisModule.resolveTemp(Sequence{e,callSequence,f.connectionReference->first()}, 'call')
+				)
+		)->flatten()
+;
+		
+helper def: collectGetValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
+	c.featureInstance->
+		select(
+			e|e.isInputFeature() 
+			and 
+			e.feature.oclIsKindOf(AADLI!DataPort)
+			and
+			c.subcomponent.classifier.ownedParameterConnection
+			->exists(paramCnx| paramCnx.source.connectionEnd = e.feature or paramCnx.destination.connectionEnd = e.feature)
+		)
+		->collect(e|
+			thisModule.resolveTemp(Sequence{e,callSequence}, 'call')
+		)->flatten()
+;
 
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
 	callSequences->collect(e | thisModule.resolveTemp(c, 'returnData'))
+	->union
+	(c.featureInstance->select(e|e.feature.oclIsKindOf(AADLI!Port) and not e.isPeriodicDelayedPort())
+		->collect(fi|
+			Sequence
+			{
+				fi.retreiveMessageAddress(),
+				thisModule.resolveTemp(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')
+			}
+		)
+	)
+	->union
+	(
+		c.featureInstance->select(e|not e.oclIsKindOf(AADLBA!DataAccess) and e.isInputFeature() and not e.isPeriodicDelayedPort())
+		->collect(fi| thisModule.resolveTemp(fi, 'CreateReturnSubcomponentFromPort', 'dataSubcomponent'))
+		
+	)
+	->union
+	(c.featureInstance->select(e|e.isDataPort() and not e.isIntraProcessFeatureInstance() and e.isInputFeature() and not e.isPeriodicDelayedPort())
+		->collect(fi|
+			Sequence
+			{
+				fi.retreiveMessageAddress(),
+				thisModule.resolveTemp(fi, 'CreateValidityDataSubcomponent', 'dataSubcomponent')
+			}
+		)
+	)
 	->union
 	(
 		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 
@@ -50,44 +121,456 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	->flatten()
 ;
 
+--	- m_Process_Output_DataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a data port
+--		produce
+--			(i) refine globalVariable type to Sampling_Id_Type
+--	- m_Process_Output_EventDataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a data port
+--		produce
+--			(i) refine globalVariable type to Queueing_Id_Type
+--	- m_Process_Output_EventPort_Instance extends m_Process_Output_Port_Instance: for each port instance
+--		such that
+--			port is a event port
+--		produce
+--			(i) refine globalVariable type to Queueing_Id_Type
 
-rule PortConnection_Instance
+-- @extends m_Process_Output_Port_Instance
+rule m_Process_Output_EventDataPort_Instance
 {
 	from
-		cnxInst: AADLI!ConnectionInstance
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort())
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(dataSubcomponentType <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Process_Output_Port_Instance
+rule m_Process_Output_DataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort())
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(dataSubcomponentType <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Thread_InterProcess_Input_Port_Instance
+rule m_Process_Input_EventPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort())
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(dataSubcomponentType <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Process_Input_Port_Instance
+rule m_Process_Input_EventDataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort())
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(dataSubcomponentType <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Process_Input_Port_Instance
+rule m_Process_Input_DataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort())
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(dataSubcomponentType <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Thread_InterProcess_Input_Port_Instance
+rule m_Process_Output_EventPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort())
+	to
+		connectedSubcomponent: AADLBA!ConnectedElement,
+		globalVariable: AADLBA!DataSubcomponent
+		(dataSubcomponentType <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+
+-- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_DataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent,
+		globalVariable:AADLBA!DataSubcomponent
 		(
-			false
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME')
 		)
 }
 
-rule EventDataPort_Instance
+-- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 {
-	from
-		fi: AADLI!FeatureInstance (fi.category=#dataPort
-									and fi.eContainer().category=#thread
-									and not fi.isPeriodicDelayedPort())
-	to
-		-- target data access must be called 'f' to be retreived with resolveTemp 
-		f: AADLBA!DataAccess
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent,
+		globalVariable:AADLBA!DataSubcomponent
 		(
-			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
-			kind <- #requires
+			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME')
 		)
 }
 
-unique lazy rule addStatusType
+-- @extends m_Not_PeriodicDelayed_Port,m_Thread_EventPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_EventPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent,
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME')
+		)
+}
+
+-- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance
+rule m_Thread_InterProcess_Input_EventDataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort()
+		and
+		not fi.isIntraProcessFeatureInstance())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_InterProcess_Input_EventOrEventDataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort()
+		and
+		not fi.isIntraProcessFeatureInstance())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent
+}
+
+-- @extends m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_InterProcess_Input_Port_Instance
+rule m_Thread_InterProcess_Input_DataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort()
+		and
+		not fi.isIntraProcessFeatureInstance())
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME')),
+		localVariable:AADLBA!DataSubcomponent
+}
+
+
+--	- m_Thread_Output_IntraProcess_DataPort_Instance extends m_Thread_Output_Port_Instance for each pair of (port instance,connection reference)
+--		such that
+--			destination of the connection reference is the port of a thread
+--			port is a data port
+--		produce
+--			(i) refine data access f type to Blackoard_Id_Type
+--	- m_Thread_Output_InterProcess_EventDataPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a thread
+--			port is an event data port
+--		produce
+--			(i) refine data access f type to Buffer_Id_Type
+--  	- m_Thread_Output_IntraProcess_EventPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a thread
+--			port is an event port
+--		produce
+--			(i) refine data access f type to Events_Id_Type
+--	- m_Thread_Output_InterProcess_DataPort_Instance extends m_Thread_Output_Port_Instance for each pair of (port instance,connection reference)
+--		such that
+--			destination of the connection reference is the port of a process
+--			port is a data port
+--		produce
+--			(i) refine data access f type to Sampling_Id_Type
+--  	- m_Thread_Output_InterProcess_EventPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a process
+--			port is an event port
+--		produce
+--			(i) refine data access f type to Queueing_Id_Type
+--  	- m_Thread_Output_InterProcess_EventDataPort_Instance extends m_Thread_Output_Port_Instance
+--  		such that
+--			destination of the connection reference is the port of a process
+--			port is an event data port
+--		produce
+--			(i) refine data access f type to Queuing_Id_Type
+
+
+helper context AADLBA!Connection def: otherFeature(feature: AADLBA!Feature): AADLBA!Feature =
+	if(self.source.connectionEnd = feature) then
+		self.destination.connectionEnd
+	else
+		self.source.connectionEnd
+	endif
+;
+
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isEventOrEventDataPort()
+			and
+			cnxRef.otherFeature(fi.feature).isThreadPort()
+		)
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_Output_IntraProcess_DataPort_Instance
 {
 	from
-		implImg : AADLBA!BehavioredImplementation
-	to
-		status: AADLBA!DataSubcomponent
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
 		(
-			name <- 'osek_calls_status',
-			dataSubcomponentType <- 'StatusType'.asSubprogramType('OSEK_RUNTIME')
+			fi.isDataPort()
+			and
+			cnxRef.otherFeature(fi.feature).isThreadPort()
+		)
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_InterProcess_EventDataPort_Output_Instance
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isEventOrEventDataPort()
+			and
+			cnxRef.destination.connectionEnd.isProcessPort()
+		)
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+-- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_InterProcess_DataPort_Output_Instance
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isDataPort()
+			and
+			cnxRef.otherFeature(fi.feature).isProcessPort()
+		)
+  	to
+  		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
+}
+
+
+
+helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpression =
+	if(port.getModalPropertyValue('Timeout').oclIsUndefined())
+	then
+		thisModule.toStringLiteral('0')
+	else
+		if(port.getModalPropertyValue('Timeout').ownedValue.value.oclIsUndefined())
+		then
+			OclUndefined
+		else
+			thisModule.toStringLiteral(port.getModalPropertyValue('Timeout').ownedValue.value.toString())
+		endif
+	endif
+;
+
+
+unique lazy rule CreateTimeOutSubcomponentFromCpt
+{
+	from
+		inst : AADLI!ComponentInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral('INFINITE_TIME_VALUE');
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-inst.name+'_TimeOut',
+			dataSubcomponentType<-'UNDEFINED'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
 		)
 	do
 	{
-		implImg.ownedDataSubcomponent.add(status);
-		status;
-	}	
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, inst);
+		dataSubcomponent;
+	}
 }
+
+
+
+-------------------------------------------------------------------------------------------
+----	OVERRIDEN HELPERS
+-------------------------------------------------------------------------------------------
+
+helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
+	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
+	let p: AADLI!FeatureInstance = self.getDirectlyUsedInFresh() in
+	if(not p.oclIsUndefined()) then
+		let package_name: String = p.eContainer().subcomponent.classifier.getNamespace().getOwner().name in
+		if(p.eContainer().eContainer() = self.eContainer().eContainer()) then
+			package_name+thisModule.packageSuffix.concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		else
+			package_name+thisModule.packageSuffix.concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		endif
+	else
+		if(self.isEventPort()) then
+			'Integer_16'.asClassifier('BASE_TYPES').getProgrammationLanguageIdentifier()
+		else 
+			self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()
+		endif
+	endif
+;
+
+
+------------------------------------
+---      ADDED CALLED RULES     ----
+------------------------------------
+
+rule addNextValueSubprogramCallAction(actions:AADLBA!BehaviorActions,
+								fi: AADLI!FeatureInstance,
+								implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		for(cnxInst in fi.dstConnectionInstance)
+		{
+			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addReceiveQueuingAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addReadSamplingAction(actions, fi, implImg);
+				}
+			}
+			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort)
+				{
+					thisModule.addWaitEventAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addReceiveBufferAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addReadBlackBoardAction(actions, fi, implImg);
+				}
+			}
+		}
+	}
+}
+
+rule addPutValueSubprogramCallAction(actions:AADLBA!BehaviorActions,
+								fi: AADLI!FeatureInstance,
+								implImg: AADLBA!ComponentImplementation)
+{
+	do
+	{
+		for(cnxInst in fi.srcConnectionInstance)
+		{
+			if(thisModule.toBeTransformedInterProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort or cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addSendQueuingAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addWriteSamplingAction(actions, fi, implImg);
+				}
+			}
+			else if(thisModule.toBeTransformedIntraProcessConnection(cnxInst))
+			{
+				if(cnxInst.source.category=#eventPort)
+				{
+					thisModule.addSetEventAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#eventDataPort)
+				{
+					thisModule.addSendBufferAction(actions, fi, implImg);
+				}
+				else if(cnxInst.source.category=#dataPort)
+				{
+					thisModule.addDisplayBlackBoardAction(actions, fi, implImg);
+				}
+			}
+		}
+	}
+}
+

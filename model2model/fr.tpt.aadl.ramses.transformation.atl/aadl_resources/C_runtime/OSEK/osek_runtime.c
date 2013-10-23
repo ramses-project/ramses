@@ -10,7 +10,7 @@ static void memcpy(char *dst, const char *src, unsigned int size)
   }
 }
 
-StatusType SetOSEKEvent(thread_queue_t * global_q, port_id_t port_id)
+StatusType PutEventMessage(thread_queue_t * global_q, port_id_t port_id)
 {
   StatusType status = E_OK;
   struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
@@ -30,7 +30,7 @@ StatusType SetOSEKEvent(thread_queue_t * global_q, port_id_t port_id)
   return status;
 }
 
-StatusType PutValueOSEK(thread_queue_t * global_q, int port_id, data_t value)
+StatusType PutValue(thread_queue_t * global_q, int port_id, data_t value)
 {
   StatusType status = E_OK;
   struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
@@ -51,10 +51,9 @@ StatusType PutValueOSEK(thread_queue_t * global_q, int port_id, data_t value)
   return status;
 }
 
-StatusType SendOutputOSEK(thread_queue_t * global_q, int port_id, data_t value)
+StatusType SendOutput(thread_queue_t * global_q, int port_id, data_t value)
 {
   StatusType status = E_OK;
-  struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
   status = GetResource(*(global_q->rez));
   if (status != E_OK)
     return status;
@@ -67,7 +66,7 @@ StatusType SendOutputOSEK(thread_queue_t * global_q, int port_id, data_t value)
   return status;
 }
 
-StatusType NextValueOSEK(thread_queue_t * global_q, int port_id, data_t dst)
+StatusType NextValue(thread_queue_t * global_q, int port_id, data_t dst)
 {
   StatusType status = E_OK;
   struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
@@ -85,7 +84,7 @@ StatusType NextValueOSEK(thread_queue_t * global_q, int port_id, data_t dst)
   return status;
 }
 
-StatusType GetValueOSEK(thread_queue_t * global_q, int port_id, data_t dst)
+StatusType GetValue(thread_queue_t * global_q, int port_id, data_t dst)
 {
   StatusType status = E_OK;
   struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
@@ -100,7 +99,7 @@ StatusType GetValueOSEK(thread_queue_t * global_q, int port_id, data_t dst)
 }
 
 
-StatusType ReceiveInputsOSEK(thread_queue_t * global_q, int port_id)
+StatusType ReceiveInputs(thread_queue_t * global_q, int port_id)
 {
   StatusType status = E_OK;
   struct port_queue_t * port_q = (struct port_queue_t*) global_q->port_queues[port_id];
@@ -122,7 +121,7 @@ StatusType ReceiveInputsOSEK(thread_queue_t * global_q, int port_id)
   return status; 
 }
 
-StatusType WaitEventOSEK(thread_queue_t * global_q)
+StatusType GetEventMessage(thread_queue_t * global_q)
 {
   StatusType status = E_OK;
   status = GetResource(*(global_q->rez));
@@ -146,4 +145,22 @@ StatusType WaitEventOSEK(thread_queue_t * global_q)
   return status;
 }
 
+StatusType GetValueDataPort(data_port_t * p, void* data)
+{
+  StatusType status = E_OK;
+  status = GetResource(*(p->rez));
+  memcpy (data, p->data, p->size);
+  status = GetResource(*(p->rez));
+  return status;
+}
 
+StatusType PutValueDataPort(data_port_t * p, void* data)
+{
+  StatusType status = E_OK;
+  status = GetResource(*(p->rez));
+  if(status != E_OK)
+    return status;
+  memcpy (p->data, data, p->size);
+  status = GetResource(*(p->rez));
+  return status;
+}

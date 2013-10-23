@@ -242,6 +242,10 @@ helper context AADLI!Connection def : uniqueName(): String =
 	endif
 ;
 
+helper context AADLI!ComponentInstance def : getProcessorBinding() : AADLBA!Subcomponent =
+	self.ownedPropertyAssociation->any(e | e.property = AADLBA!Property->allInstancesFrom('DEPLOYMENT_PROPERTIES')->any(f|f.name = 'Actual_Processor_Binding')).appliesTo
+;
+
 helper def : collectPeriodicDelayed_GlobalVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
 	Sequence{}
 ;

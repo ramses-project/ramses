@@ -37,17 +37,28 @@ typedef struct thread_queue_t {
   port_queue_t ** port_queues;
 } thread_queue_t;
 
+typedef struct data_port_t {
+  ResourceType * rez;
+  void * data;
+  int size;
+} data_port_t;
 
 /*  Send an event with a data */
-StatusType SetOSEKEventData(thread_queue_t * global_q, int port_id, data_t value);
+StatusType PutEventDataMessage(thread_queue_t * global_q, int port_id, data_t value);
 
 /* Wait for an event-data */
-StatusType WaitOSEKEventData(port_id_t port_id, data_t dst);
+StatusType GetEventDataMessage(port_id_t port_id, data_t dst);
 
 /* Send an event */
-StatusType SetOSEKEvent(thread_queue_t * global_q, port_id_t queue_id);
+StatusType SetEventMessage(thread_queue_t * global_q, port_id_t queue_id);
 
 /* Wait for an event */
-StatusType WaitOSEKEvent(port_id_t port_id);
+StatusType GetEventMessage(thread_queue_t * global_q);
+
+/* Read data */
+StatusType GetValueDataPort(data_port_t * p, void * data);
+
+/* Write data */
+StatusType PutValueDataPort(data_port_t * p, void* data);
 
 #endif

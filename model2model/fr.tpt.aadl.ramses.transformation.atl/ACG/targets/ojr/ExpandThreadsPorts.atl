@@ -92,13 +92,6 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	->flatten()
 ;
 
-abstract rule m_Not_PeriodicDelayed_Port
-{
-	from
-		fi: AADLI!FeatureInstance
-		(not fi.isPeriodicDelayedPort())
-}
-
 --	- m_Process_Output_DataPort_Instance extends m_Process_Output_Port_Instance: for each port instance
 --		such that
 --			port is a data port
@@ -423,10 +416,6 @@ helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpress
 	endif
 ;
 
-helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
-	thisModule.resolveTemp(self, 'localVariable')
-;
-
 unique lazy rule createResolvedSpg
 {
 	from
@@ -546,11 +535,6 @@ helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'Status'.asDa
 --	and
 --	not thisModule.toBeTransformedIntraProcessConnection(self)
 --; 
-
-
-helper context AADLI!ComponentInstance def : getProcessorBinding() : AADLBA!Subcomponent =
-	self.ownedPropertyAssociation->any(e | e.property = AADLBA!Property->allInstancesFrom('DEPLOYMENT_PROPERTIES')->any(f|f.name = 'Actual_Processor_Binding')).appliesTo
-;
 
 helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
