@@ -3,13 +3,13 @@ package fr.tpt.aadl.sched.wcetanalysis.extractors.seq;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 public class ThreadCallSequenceExtractor extends CallSequenceExtractor
 {

@@ -4,32 +4,32 @@ import java.util.List ;
 
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.ba.aadlba.AssignmentAction ;
+import org.osate.ba.aadlba.BehaviorAction ;
+import org.osate.ba.aadlba.BehaviorActions ;
+import org.osate.ba.aadlba.BehaviorIntegerLiteral ;
+import org.osate.ba.aadlba.BehaviorVariable ;
+import org.osate.ba.aadlba.BehaviorVariableHolder ;
+import org.osate.ba.aadlba.BinaryAddingOperator ;
+import org.osate.ba.aadlba.DataComponentReference ;
+import org.osate.ba.aadlba.DataHolder ;
+import org.osate.ba.aadlba.Factor ;
+import org.osate.ba.aadlba.LogicalOperator ;
+import org.osate.ba.aadlba.Relation ;
+import org.osate.ba.aadlba.RelationalOperator ;
+import org.osate.ba.aadlba.SimpleExpression ;
+import org.osate.ba.aadlba.Target ;
+import org.osate.ba.aadlba.Term ;
+import org.osate.ba.aadlba.Value ;
+import org.osate.ba.aadlba.ValueExpression ;
+import org.osate.ba.aadlba.WhileOrDoUntilStatement ;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorIntegerLiteral ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariableHolder ;
-import fr.tpt.aadl.annex.behavior.aadlba.BinaryAddingOperator ;
-import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference ;
-import fr.tpt.aadl.annex.behavior.aadlba.DataHolder ;
-import fr.tpt.aadl.annex.behavior.aadlba.Factor ;
-import fr.tpt.aadl.annex.behavior.aadlba.LogicalOperator ;
-import fr.tpt.aadl.annex.behavior.aadlba.Relation ;
-import fr.tpt.aadl.annex.behavior.aadlba.RelationalOperator ;
-import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression ;
-import fr.tpt.aadl.annex.behavior.aadlba.Target ;
-import fr.tpt.aadl.annex.behavior.aadlba.Term ;
-import fr.tpt.aadl.annex.behavior.aadlba.Value ;
-import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression ;
-import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement ;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext ;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug ;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode ;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind ;
 import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator ;
-import fr.tpt.aadl.utils.PropertyUtils ;
 
 
 public class WhileLoopUtil

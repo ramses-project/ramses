@@ -12,20 +12,21 @@ import org.osate.aadl2.Parameter;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.ba.aadlba.ActualPortHolder ;
+import org.osate.ba.aadlba.AssignmentAction ;
+import org.osate.ba.aadlba.BehaviorVariable ;
+import org.osate.ba.aadlba.DataComponentReference ;
+import org.osate.ba.aadlba.DataHolder ;
+import org.osate.ba.aadlba.DataSubcomponentHolder ;
+import org.osate.ba.aadlba.ParameterHolder ;
+import org.osate.ba.aadlba.ParameterLabel ;
+import org.osate.ba.aadlba.SimpleExpression ;
+import org.osate.ba.aadlba.SubprogramCallAction ;
+import org.osate.ba.aadlba.Target ;
+import org.osate.ba.aadlba.Value ;
+import org.osate.ba.aadlba.ValueExpression ;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.ActualPortHolder;
-import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorVariable;
-import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
-import fr.tpt.aadl.annex.behavior.aadlba.DataHolder;
-import fr.tpt.aadl.annex.behavior.aadlba.DataSubcomponentHolder;
-import fr.tpt.aadl.annex.behavior.aadlba.ParameterHolder;
-import fr.tpt.aadl.annex.behavior.aadlba.ParameterLabel;
-import fr.tpt.aadl.annex.behavior.aadlba.SimpleExpression;
-import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
-import fr.tpt.aadl.annex.behavior.aadlba.Target;
-import fr.tpt.aadl.annex.behavior.aadlba.Value;
-import fr.tpt.aadl.annex.behavior.aadlba.ValueExpression;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
@@ -33,7 +34,6 @@ import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.util.Aadl2ASTUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 public class AssignmentActionUtil
 {

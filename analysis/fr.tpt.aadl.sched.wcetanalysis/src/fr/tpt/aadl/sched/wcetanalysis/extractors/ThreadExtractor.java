@@ -2,8 +2,8 @@ package fr.tpt.aadl.sched.wcetanalysis.extractors;
 
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.ba.aadlba.BehaviorAnnex ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.ba.ThreadBehaviorAnnexExtractor;

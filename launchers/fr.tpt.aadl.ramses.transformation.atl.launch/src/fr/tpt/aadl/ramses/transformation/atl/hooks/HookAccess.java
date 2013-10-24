@@ -38,10 +38,10 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceObject;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorState ;
+import org.osate.ba.aadlba.BehaviorTransition ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
 
 /**
  * <!-- begin-user-doc -->

@@ -27,9 +27,9 @@ import org.osate.aadl2.instance.ConnectionKind;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceReferenceValue;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 public class Aadl2ASTUtil
 {

@@ -69,17 +69,17 @@ import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
 import org.osate.aadl2.modelsupport.UnparseText;
+import org.osate.ba.aadlba.BehaviorActionBlock ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorElement ;
+import org.osate.ba.aadlba.DataRepresentation ;
+import org.osate.ba.aadlba.SubprogramCallAction ;
+import org.osate.ba.analyzers.TypeHolder ;
+import org.osate.ba.utils.AadlBaUtils ;
+import org.osate.ba.utils.DimensionException ;
+import org.osate.utils.PropertyUtils ;
+import org.osate.utils.names.DataModelProperties ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement;
-import fr.tpt.aadl.annex.behavior.aadlba.DataRepresentation;
-import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
-import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder ;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils ;
-import fr.tpt.aadl.annex.behavior.utils.DimensionException ;
-import fr.tpt.aadl.utils.PropertyUtils ;
-import fr.tpt.aadl.utils.names.DataModelProperties ;
 
 public class GeneratorUtils
 {

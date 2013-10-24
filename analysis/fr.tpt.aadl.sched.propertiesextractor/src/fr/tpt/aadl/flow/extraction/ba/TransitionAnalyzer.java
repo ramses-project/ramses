@@ -7,25 +7,25 @@ import org.osate.aadl2.IntegerLiteral ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.RealLiteral ;
 import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.ba.aadlba.AssignmentAction ;
+import org.osate.ba.aadlba.BasicAction ;
+import org.osate.ba.aadlba.BehaviorAction ;
+import org.osate.ba.aadlba.BehaviorActionSequence ;
+import org.osate.ba.aadlba.BehaviorActionSet ;
+import org.osate.ba.aadlba.DataComponentReference ;
+import org.osate.ba.aadlba.ElementValues ;
+import org.osate.ba.aadlba.ForOrForAllStatement ;
+import org.osate.ba.aadlba.IfStatement ;
+import org.osate.ba.aadlba.IntegerValue ;
+import org.osate.ba.aadlba.SubprogramCallAction ;
+import org.osate.ba.aadlba.TimedAction ;
+import org.osate.utils.IntegerRange ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BasicAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSet ;
-import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference ;
-import fr.tpt.aadl.annex.behavior.aadlba.ElementValues ;
-import fr.tpt.aadl.annex.behavior.aadlba.ForOrForAllStatement ;
-import fr.tpt.aadl.annex.behavior.aadlba.IfStatement ;
-import fr.tpt.aadl.annex.behavior.aadlba.IntegerValue ;
-import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.TimedAction ;
 import fr.tpt.aadl.flow.extraction.ExtractionContext ;
 import fr.tpt.aadl.flow.extraction.util.BehaviorAnnexUtil ;
 import fr.tpt.aadl.flow.extraction.util.IDGenerator ;
 import fr.tpt.aadl.flow.model.RTAction ;
 import fr.tpt.aadl.flow.model.RTActionType ;
-import fr.tpt.aadl.utils.IntegerRange ;
 
 /**
  * Extract action flow from a list of Behavior Actions
@@ -155,10 +155,10 @@ public class TransitionAnalyzer extends BAElementAnalyzer
   {
     ElementValues values = forall.getIteratedValues() ;
 
-    if(values instanceof fr.tpt.aadl.annex.behavior.aadlba.IntegerRange)
+    if(values instanceof org.osate.ba.aadlba.IntegerRange)
     {
-      fr.tpt.aadl.annex.behavior.aadlba.IntegerRange r =
-            (fr.tpt.aadl.annex.behavior.aadlba.IntegerRange) values ;
+      org.osate.ba.aadlba.IntegerRange r =
+            (org.osate.ba.aadlba.IntegerRange) values ;
       IntegerValue lower = r.getLowerIntegerValue() ;
       IntegerValue upper = r.getUpperIntegerValue() ;
       int lowerV = getIntegerValue(lower) ;

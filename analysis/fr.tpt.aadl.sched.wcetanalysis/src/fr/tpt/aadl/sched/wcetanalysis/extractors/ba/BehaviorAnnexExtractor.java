@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.ba.aadlba.BehaviorAction ;
+import org.osate.ba.aadlba.BehaviorActionBlock ;
+import org.osate.ba.aadlba.BehaviorActionCollection ;
+import org.osate.ba.aadlba.BehaviorActions ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorState ;
+import org.osate.ba.aadlba.BehaviorTransition ;
+import org.osate.ba.aadlba.LoopStatement ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionCollection;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
-import fr.tpt.aadl.annex.behavior.aadlba.LoopStatement;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTExtractor;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;

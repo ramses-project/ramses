@@ -53,17 +53,17 @@ import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.parsesupport.LocationReference;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorElement ;
+import org.osate.ba.aadlba.BehaviorState ;
+import org.osate.ba.aadlba.BehaviorTransition ;
+import org.osate.ba.utils.AadlBaLocationReference ;
+import org.osate.ba.utils.AadlBaVisitors ;
+import org.osate.utils.Aadl2Utils ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaLocationReference;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
 import fr.tpt.aadl.ramses.transformation.atl.ComparablePortByCriticality;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
-import fr.tpt.aadl.utils.Aadl2Utils;
 import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
 import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning;
 

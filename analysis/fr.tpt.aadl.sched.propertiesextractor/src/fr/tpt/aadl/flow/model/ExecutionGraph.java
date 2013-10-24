@@ -1,10 +1,10 @@
 package fr.tpt.aadl.flow.model ;
 
 import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.flow.analysis.util.LongestAndShortestPath ;
 import fr.tpt.aadl.flow.analysis.util.TaskSequence ;
-import fr.tpt.aadl.utils.PropertyUtils ;
 
 public class ExecutionGraph
 {

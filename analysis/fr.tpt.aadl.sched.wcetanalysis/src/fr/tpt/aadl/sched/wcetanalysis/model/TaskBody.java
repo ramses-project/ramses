@@ -1,10 +1,10 @@
 package fr.tpt.aadl.sched.wcetanalysis.model ;
 
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.sched.wcetanalysis.extractors.AST2AccessDates;
 import fr.tpt.aadl.sched.wcetanalysis.util.LongestAndShortestPath;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 public class TaskBody
 {

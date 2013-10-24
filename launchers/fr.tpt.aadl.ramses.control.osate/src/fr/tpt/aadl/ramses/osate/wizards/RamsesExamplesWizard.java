@@ -27,9 +27,10 @@ import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 
-import fr.tpt.aadl.annex.behavior.wizards.AadlBaExamplesWizard ;
+import org.osate.ba.wizards.AadlBaExamplesWizard ;
+import org.osate.utils.Aadl2Utils ;
+
 import fr.tpt.aadl.ramses.control.osate.Activator ;
-import fr.tpt.aadl.utils.Aadl2Utils ;
 
 public class RamsesExamplesWizard extends AadlBaExamplesWizard
 {

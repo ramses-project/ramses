@@ -39,7 +39,6 @@ import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
-import fr.tpt.aadl.utils.PropertyUtils ;
 
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.ProcessImplementation ;
@@ -50,6 +49,7 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 import org.osate.aadl2.util.Aadl2Switch ;
+import org.osate.utils.PropertyUtils ;
 
 public class AadlToAdaRavenscarMakefileUnparser extends AadlProcessingSwitch
 implements TargetBuilderGenerator

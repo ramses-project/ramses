@@ -38,8 +38,8 @@ import org.osate.aadl2.SubprogramCallSequence ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceReferenceValue ;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.utils.PropertyUtils ;
 
 public class AadlUtil
 {

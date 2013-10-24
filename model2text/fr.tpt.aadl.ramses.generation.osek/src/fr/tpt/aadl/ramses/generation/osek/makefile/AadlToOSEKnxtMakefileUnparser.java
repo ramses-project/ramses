@@ -38,6 +38,7 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
 import org.osate.aadl2.util.Aadl2Switch;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
@@ -46,7 +47,6 @@ import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
 												implements TargetBuilderGenerator {

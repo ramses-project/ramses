@@ -78,9 +78,9 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
 import org.osate.annexsupport.AnnexParser;
 import org.osate.annexsupport.AnnexResolver;
+import org.osate.ba.AadlBaParserAction ;
+import org.osate.ba.aadlba.AadlBaPackage ;
 
-import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
-import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -102,7 +102,7 @@ public abstract class Aadl2AadlAtlLauncher extends AtlTransfoLauncher
 	private static EMFReferenceModel ATLHookMetamodel ;
 
 	private static final String AADLBA_MM_URI =
-			fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage.eNS_URI ;
+			org.osate.ba.aadlba.AadlBaPackage.eNS_URI ;
 	private static final String AADL2_MM_URI =
 			org.osate.aadl2.Aadl2Package.eNS_URI ;
 	private static final String AADLI_MM_URI =

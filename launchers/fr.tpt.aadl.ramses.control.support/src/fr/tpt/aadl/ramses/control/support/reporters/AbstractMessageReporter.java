@@ -25,8 +25,8 @@ import java.io.File ;
 
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.parsesupport.LocationReference ;
+import org.osate.utils.Aadl2Utils ;
 
-import fr.tpt.aadl.utils.Aadl2Utils ;
 
 public abstract class AbstractMessageReporter implements MessageReporter
 {

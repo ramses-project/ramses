@@ -12,8 +12,8 @@ Export-Package: fr.tpt.aadl.sched.wcetanalysis,
  fr.tpt.aadl.sched.wcetanalysis.util
 Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.modelsupport;bundle-version="1.0.0",
- fr.tpt.aadl.utils;bundle-version="0.9.5",
- fr.tpt.aadl.annex.behavior;bundle-version="0.9.5",
+ org.osate.utils;bundle-version="0.9.5",
+ org.osate.ba;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

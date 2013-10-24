@@ -14,9 +14,9 @@ import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.Property;
 import org.osate.aadl2.SubprogramClassifier;
+import org.osate.utils.PropertyUtils ;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 
-import fr.tpt.aadl.utils.PropertyUtils;
 
 public class GenerationUtilsADA
 {

@@ -16,23 +16,23 @@ import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.ConnectionKind;
 import org.osate.aadl2.instance.FeatureInstance;
+import org.osate.ba.aadlba.AssignmentAction ;
+import org.osate.ba.aadlba.BehaviorAction ;
+import org.osate.ba.aadlba.BehaviorActionBlock ;
+import org.osate.ba.aadlba.BehaviorActionSequence ;
+import org.osate.ba.aadlba.BehaviorActionSet ;
+import org.osate.ba.aadlba.BehaviorActions ;
+import org.osate.ba.aadlba.CalledSubprogramHolder ;
+import org.osate.ba.aadlba.DataComponentReference ;
+import org.osate.ba.aadlba.ElementValues ;
+import org.osate.ba.aadlba.ElseStatement ;
+import org.osate.ba.aadlba.ForOrForAllStatement ;
+import org.osate.ba.aadlba.IfStatement ;
+import org.osate.ba.aadlba.IntegerValue ;
+import org.osate.ba.aadlba.SubprogramCallAction ;
+import org.osate.ba.aadlba.TimedAction ;
+import org.osate.ba.aadlba.WhileOrDoUntilStatement ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AssignmentAction;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSet;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActions;
-import fr.tpt.aadl.annex.behavior.aadlba.CalledSubprogramHolder;
-import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
-import fr.tpt.aadl.annex.behavior.aadlba.ElementValues;
-import fr.tpt.aadl.annex.behavior.aadlba.ElseStatement;
-import fr.tpt.aadl.annex.behavior.aadlba.ForOrForAllStatement;
-import fr.tpt.aadl.annex.behavior.aadlba.IfStatement;
-import fr.tpt.aadl.annex.behavior.aadlba.IntegerValue;
-import fr.tpt.aadl.annex.behavior.aadlba.SubprogramCallAction;
-import fr.tpt.aadl.annex.behavior.aadlba.TimedAction;
-import fr.tpt.aadl.annex.behavior.aadlba.WhileOrDoUntilStatement;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.ba.BehaviorAnnexExtractor;
@@ -368,9 +368,9 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 	{
 		ElementValues values = forall.getIteratedValues();
 
-		if (values instanceof fr.tpt.aadl.annex.behavior.aadlba.IntegerRange)
+		if (values instanceof org.osate.ba.aadlba.IntegerRange)
 		{
-			fr.tpt.aadl.annex.behavior.aadlba.IntegerRange r = (fr.tpt.aadl.annex.behavior.aadlba.IntegerRange) values;
+			org.osate.ba.aadlba.IntegerRange r = (org.osate.ba.aadlba.IntegerRange) values;
 			IntegerValue lower = r.getLowerIntegerValue();
 			IntegerValue upper = r.getUpperIntegerValue();
 			int lowerV = getIntegerValue(lower);

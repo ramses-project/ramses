@@ -96,21 +96,21 @@ import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.annexsupport.AnnexUnparser;
 import org.osate.annexsupport.AnnexUnparserProxy;
+import org.osate.ba.AadlBaParserAction ;
+import org.osate.ba.AadlBaUnParserAction ;
+import org.osate.ba.analyzers.TypeHolder ;
+import org.osate.ba.utils.AadlBaUtils ;
+import org.osate.ba.utils.DimensionException ;
+import org.osate.utils.Aadl2Utils ;
+import org.osate.utils.PropertyUtils ;
+import org.osate.utils.names.DataModelProperties ;
 
-import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
-import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
-import fr.tpt.aadl.annex.behavior.analyzers.TypeHolder;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaUtils;
-import fr.tpt.aadl.annex.behavior.utils.DimensionException;
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
-import fr.tpt.aadl.utils.Aadl2Utils;
-import fr.tpt.aadl.utils.PropertyUtils;
-import fr.tpt.aadl.utils.names.DataModelProperties;
 
 public class AadlToCUnparser extends AadlProcessingSwitch
                              implements AadlGenericUnparser

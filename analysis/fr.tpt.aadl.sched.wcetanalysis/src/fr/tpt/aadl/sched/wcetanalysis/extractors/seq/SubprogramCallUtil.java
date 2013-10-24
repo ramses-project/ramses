@@ -14,9 +14,9 @@ import org.osate.aadl2.SubprogramCallSequence;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.ConnectionInstanceEnd;
+import org.osate.ba.aadlba.DataComponentReference ;
+import org.osate.ba.aadlba.DataHolder ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.DataComponentReference;
-import fr.tpt.aadl.annex.behavior.aadlba.DataHolder;
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 
 public class SubprogramCallUtil {

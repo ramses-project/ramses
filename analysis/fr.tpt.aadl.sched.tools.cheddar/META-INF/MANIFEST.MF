@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.6.1",
  org.osate.ui;bundle-version="1.0.0",
  org.osate.workspace;bundle-version="1.0.0",
  org.jdom;bundle-version="1.1.1",
- fr.tpt.aadl.utils;bundle-version="0.8.5",
+ org.osate.utils;bundle-version="0.8.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0"
 Provide-Package: 

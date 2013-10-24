@@ -65,10 +65,10 @@ import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
 import org.osate.aadl2.util.Aadl2Util;
+import org.osate.ba.aadlba.AadlBaPackage ;
 
 import antlr.RecognitionException;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -82,7 +82,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 {
 
 	private static final String AADLBA_MM_URI =
-			fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage.eNS_URI ;
+			org.osate.ba.aadlba.AadlBaPackage.eNS_URI ;
 	private static final String AADL2_MM_URI =
 			org.osate.aadl2.Aadl2Package.eNS_URI ;
 	private static final String AADLI_MM_URI =

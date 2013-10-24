@@ -56,9 +56,9 @@ import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
 import org.osate.aadl2.util.Aadl2Util;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.utils.AadlBaVisitors ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex;
-import fr.tpt.aadl.annex.behavior.utils.AadlBaVisitors;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
@@ -67,8 +67,8 @@ import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
-import fr.tpt.aadl.utils.Aadl2Utils;
-import fr.tpt.aadl.utils.PropertyUtils;
+import org.osate.utils.Aadl2Utils;
+import org.osate.utils.PropertyUtils;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
 {

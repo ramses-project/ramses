@@ -26,9 +26,9 @@ import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.ProcessClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
+import org.osate.utils.Aadl2Utils ;
 
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
-import fr.tpt.aadl.utils.Aadl2Utils;
 
 public class AadlToPokCUtils
 {

@@ -23,9 +23,9 @@ package fr.tpt.aadl.ramses.generation.c.annex.behavior ;
 
 
 import org.osate.aadl2.AnnexSubclause ;
+import org.osate.ba.AadlBaUnParserAction ;
+import org.osate.ba.aadlba.BehaviorElement ;
 
-import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorElement ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 

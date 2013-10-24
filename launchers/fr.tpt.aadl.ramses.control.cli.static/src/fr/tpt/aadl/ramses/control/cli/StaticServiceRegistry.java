@@ -29,10 +29,10 @@ import java.util.Set;
 import org.osate.annexsupport.AnnexParser;
 import org.osate.annexsupport.AnnexResolver;
 import org.osate.annexsupport.AnnexUnparser;
+import org.osate.ba.AadlBaParserAction ;
+import org.osate.ba.AadlBaResolver ;
+import org.osate.ba.AadlBaUnParserAction ;
 
-import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
-import fr.tpt.aadl.annex.behavior.AadlBaResolver;
-import fr.tpt.aadl.annex.behavior.AadlBaUnParserAction;
 import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;

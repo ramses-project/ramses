@@ -41,6 +41,7 @@ import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -50,7 +51,6 @@ import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 
 public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser

@@ -26,7 +26,7 @@ import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody;
 import fr.tpt.aadl.sched.wcetanalysis.util.SequenceUtil;
-import fr.tpt.aadl.utils.PropertyUtils;
+import org.osate.utils.PropertyUtils;
 
 public class AadlPropertiesUpdate {
 

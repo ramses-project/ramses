@@ -5,11 +5,11 @@ import java.util.List ;
 import java.util.Map ;
 
 import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.ba.aadlba.BehaviorAction ;
+import org.osate.ba.aadlba.BehaviorActionSequence ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorTransition ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition ;
 import fr.tpt.aadl.flow.extraction.ExtractionContext ;
 import fr.tpt.aadl.flow.extraction.ba.AutomatonAnalyzer ;
 import fr.tpt.aadl.flow.model.ExecutionGraph ;

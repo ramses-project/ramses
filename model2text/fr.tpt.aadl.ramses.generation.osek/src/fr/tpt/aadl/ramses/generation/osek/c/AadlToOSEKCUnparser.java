@@ -24,6 +24,8 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.modelsupport.UnparseText;
+import org.osate.utils.PropertyNotFound ;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
@@ -51,8 +53,6 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
-import fr.tpt.aadl.utils.PropertyNotFound;
-import fr.tpt.aadl.utils.PropertyUtils;
 
 /**
  * Unparser to generate an oil file for OSEK from aadl.

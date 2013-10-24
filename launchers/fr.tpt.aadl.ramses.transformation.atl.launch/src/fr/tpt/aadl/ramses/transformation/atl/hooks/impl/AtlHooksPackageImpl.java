@@ -27,7 +27,6 @@
  */
 package fr.tpt.aadl.ramses.transformation.atl.hooks.impl;
 
-import fr.tpt.aadl.annex.behavior.aadlba.AadlBaPackage;
 
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
@@ -42,6 +41,7 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
 import org.osate.aadl2.Aadl2Package;
 
 import org.osate.aadl2.instance.InstancePackage;
+import org.osate.ba.aadlba.AadlBaPackage ;
 
 /**
  * <!-- begin-user-doc -->

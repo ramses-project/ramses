@@ -60,10 +60,10 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.annexsupport.AnnexParser;
 import org.osate.annexsupport.AnnexResolver;
+import org.osate.ba.AadlBaParserAction ;
 
 import antlr.RecognitionException;
 
-import fr.tpt.aadl.annex.behavior.AadlBaParserAction;
 import fr.tpt.aadl.ramses.control.support.AadlResourceValidator;
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;

@@ -5,14 +5,14 @@ import java.util.Map ;
 
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.ba.aadlba.BehaviorAction ;
+import org.osate.ba.aadlba.BehaviorActionBlock ;
+import org.osate.ba.aadlba.BehaviorActionSequence ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorState ;
+import org.osate.ba.aadlba.BehaviorTransition ;
+import org.osate.ba.aadlba.LoopStatement ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAction ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionBlock ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorActionSequence ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorState ;
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorTransition ;
-import fr.tpt.aadl.annex.behavior.aadlba.LoopStatement ;
 import fr.tpt.aadl.flow.extraction.ExtractionContext ;
 import fr.tpt.aadl.flow.model.RTAction ;
 

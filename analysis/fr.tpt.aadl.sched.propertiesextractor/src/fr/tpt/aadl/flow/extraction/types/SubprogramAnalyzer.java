@@ -2,8 +2,8 @@ package fr.tpt.aadl.flow.extraction.types ;
 
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
 
-import fr.tpt.aadl.annex.behavior.aadlba.BehaviorAnnex ;
 import fr.tpt.aadl.flow.extraction.ExecutionAnalyzer ;
 import fr.tpt.aadl.flow.extraction.ExtractionContext ;
 import fr.tpt.aadl.flow.extraction.ba.types.SubprogramAA ;
