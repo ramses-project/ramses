@@ -41,6 +41,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  org.osate.utils;bundle-version="0.9.5"
 Bundle-ClassPath: lib/jdom-2.0.2.jar,
  .
-Import-Package: org.osate.aadl2.instantiation
+Import-Package: org.osate.aadl2.instantiation,
+ org.osate.utils
 
 

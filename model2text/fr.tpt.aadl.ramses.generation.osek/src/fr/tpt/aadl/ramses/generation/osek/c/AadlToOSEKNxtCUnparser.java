@@ -32,6 +32,7 @@ import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.modelsupport.UnparseText;
+import org.osate.utils.Aadl2Utils;
 import org.osate.utils.PropertyNotFound ;
 import org.osate.utils.PropertyUtils ;
 

@@ -84,6 +84,7 @@ import org.osate.ba.aadlba.SubprogramCallAction ;
 import org.osate.ba.analyzers.TypeHolder ;
 import org.osate.ba.utils.AadlBaUtils ;
 import org.osate.ba.utils.DimensionException ;
+import org.osate.utils.Aadl2Utils;
 import org.osate.utils.PropertyUtils ;
 import org.osate.utils.names.DataModelProperties ;
 
