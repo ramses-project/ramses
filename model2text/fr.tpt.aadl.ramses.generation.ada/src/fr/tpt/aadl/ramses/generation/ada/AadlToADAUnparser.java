@@ -1333,7 +1333,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseProcessImplementation(ProcessImplementation object)
 			 {
-				 buildDataAccessMapping(object) ;
+				 GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
 
 				 processEList(object.getOwnedThreadSubcomponents()) ;
 
@@ -1443,64 +1443,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 				 return DONE ;
 			 }
-			 		 
-			 // Builds the data access mapping via the connections described in the
-			 // process implementation.
-			 private void buildDataAccessMapping(ComponentImplementation cptImpl)
-			 {
-
-				 EList<Subcomponent> subcmpts = cptImpl.getAllSubcomponents() ;
-
-				 List<String> dataSubcomponentNames = new ArrayList<String>() ;
-
-				 // Fetches data subcomponent names.
-				 for(Subcomponent s : subcmpts)
-				 {
-					 if(s instanceof DataSubcomponent)
-					 {
-						 dataSubcomponentNames.add(s.getName()) ;
-					 }
-				 }
-
-				 // Binds data subcomponent names with DataAcess objects.
-				 // See process implementation's connections.
-				 for(Connection connect : cptImpl.getAllConnections())
-				 {
-					 if (connect instanceof AccessConnection &&
-							 ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA &&
-							 connect.getAllDestination() instanceof DataSubcomponent)
-					 {
-
-						 if(connect.getAllDestination() instanceof DataSubcomponent)
-						 {
-							 DataSubcomponent destination =  (DataSubcomponent) connect.
-									 getAllDestination() ;
-
-							 if(Aadl2Utils.contains(destination.getName(), dataSubcomponentNames))
-							 {
-								 ConnectedElement source = (ConnectedElement) connect.getSource() ;
-								 DataAccess da = (DataAccess) source.getConnectionEnd() ;
-								 _dataAccessMapping.put(da, destination.getName()) ; 
-							 }
-						 }
-						 else
-						 {
-							 if(connect.getAllSource() instanceof DataSubcomponent)
-							 {
-								 DataSubcomponent source =  (DataSubcomponent) connect.
-										 getAllSource() ;
-								 if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
-								 {
-									 ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
-
-									 DataAccess da = (DataAccess) dest.getConnectionEnd() ;
-									 _dataAccessMapping.put(da, source.getName()) ;
-								 }
-							 }
-						 }
-					 }
-				 }
-			 }
 
 			 @Override
 			 public String caseProcessSubcomponent(ProcessSubcomponent object)
@@ -1528,7 +1470,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			        _processedTypes.add(object.getQualifiedName());
 			    	_currentImplUnparser = _activityImplCode ;
 			        _currentHeaderUnparser = _activityHeaderCode ;
-			        buildDataAccessMapping(object) ;
+			        GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
 			        process(object.getType()) ;
 			        
 					 _currentImplUnparser.addOutputNewline("procedure " + GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()) +GenerationUtilsADA.THREAD_SUFFIX+" is") ;

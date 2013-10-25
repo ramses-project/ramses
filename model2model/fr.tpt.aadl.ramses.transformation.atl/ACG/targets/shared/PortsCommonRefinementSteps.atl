@@ -515,6 +515,25 @@ unique lazy rule CreateLengthDataSubcomponent
 	}
 }
 
+helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
+	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
+	let p: AADLI!FeatureInstance = self.getDirectlyUsedInFresh() in
+	if(not p.oclIsUndefined()) then
+		let package_name: String = p.eContainer().subcomponent.classifier.getNamespace().getOwner().name in
+		if(p.eContainer().eContainer() = self.eContainer().eContainer()) then
+			package_name+thisModule.packageSuffix.concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		else
+			package_name+thisModule.packageSuffix.concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		endif
+	else
+		if(self.isEventPort()) then
+			'Integer_16'.asClassifier('BASE_TYPES').getProgrammationLanguageIdentifier()
+		else 
+			self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()
+		endif
+	endif
+;
+
 unique lazy rule createResolvedSpg
 {
 	from

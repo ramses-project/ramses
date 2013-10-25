@@ -4,12 +4,19 @@ import java.io.File;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
+import org.osate.aadl2.AccessCategory;
+import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.Connection;
+import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DeviceSubcomponent;
 import org.osate.aadl2.NamedElement;
@@ -23,6 +30,7 @@ import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
+import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.utils.PropertyNotFound ;
 import org.osate.utils.PropertyUtils ;
@@ -59,6 +67,9 @@ import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
  */
 public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
+	
+	private static String DATA_PORT_TYPE = "DataPortType";
+	private static String EVENTDATA_PORT_TYPE = "ThreadQueueType";
 	private final static String MAIN_APP_MODE = "std";
 
 	/**
@@ -108,6 +119,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	 */
 	private Resources resources;
 
+	private Map<DataAccess, String> dataAccessMapping = new LinkedHashMap<DataAccess, String>();
+	
 	public AadlToOSEKNxtCUnparser(OIL oil) {
 		this.oil = oil;
 		oil.setVersion(OIL_VERSION);
@@ -231,6 +244,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
 		/* Generate code for threads process */
 		ProcessImplementation pi = (ProcessImplementation) ps.getComponentImplementation();
+		cpu.addAllDataSubcomponent(pi.getOwnedDataSubcomponents());
+		buildDataAccessMapping(pi, dataAccessMapping) ;
 		
 		EList<ThreadSubcomponent> subcomponents = pi.getOwnedThreadSubcomponents();
 
@@ -290,15 +305,15 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		ProcessImplementation pi = (ProcessImplementation) processSubcomponent.getComponentImplementation();
 		for(DataSubcomponent ds: pi.getOwnedDataSubcomponents())
 		{
-		  if(ds.getSubcomponentType().getName().equalsIgnoreCase("ThreadQueueType")
-				  || ds.getSubcomponentType().getName().equalsIgnoreCase("DataPortType"))
+		  if(ds.getSubcomponentType().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE)
+				  || ds.getSubcomponentType().getName().equalsIgnoreCase(DATA_PORT_TYPE))
 		  {
 			  _mainCCode.addOutputNewline("DeclareResource("+ds.getName()+"_rez);");
 			  _mainHCode.addOutputNewline("extern const ResourceType "+ds.getName()+"_rez;");
 		  }
-		  if(ds.getSubcomponentType().getName().equalsIgnoreCase("ThreadQueueType"))
+		  if(ds.getSubcomponentType().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE))
 		  {
-			  _mainCCode.addOutputNewline("DeclareEvent("+ds.getName()+"_evt)");
+			  _mainCCode.addOutputNewline("DeclareEvent("+ds.getName()+"_evt);");
 			  _mainHCode.addOutputNewline("extern ResourceType "+ds.getName()+"_evt;");
 		  }
 		}
@@ -404,9 +419,19 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
 		task.setSchedule(schedule);
 		task.setStacksize(stackSize);
-
-		ThreadImplementation ti = (ThreadImplementation) thread.getSubcomponentType();
 		
+		
+		
+		ThreadImplementation ti = (ThreadImplementation) thread.getSubcomponentType();
+		ThreadType tt = (ThreadType) ti.getType();
+		for(DataAccess da: this.dataAccessMapping.keySet())
+		{
+		  for(DataAccess tda: tt.getOwnedDataAccesses())
+		  {
+			if(tda.equals(da))
+			  task.addResource(this.dataAccessMapping.get(tda));	
+		  }
+		}
 		for(SubprogramCallSequence scs: ti.getOwnedSubprogramCallSequences())
 		{
 		  for(CallSpecification cs: scs.getOwnedCallSpecifications())
@@ -610,4 +635,80 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	public void setParameters(Map<Enum<?>, Object> parameters) {
 		// TODO Do NOT Use
 	}
+	
+	  //Builds the data access mapping via the connections described in the
+	  // process implementation.
+	  private void buildDataAccessMapping(ComponentImplementation cptImpl,
+	                                        Map<DataAccess, String> _dataAccessMapping)
+	  {
+	    
+	    EList<Subcomponent> subcmpts = cptImpl.getAllSubcomponents() ;
+	    
+	    List<String> dataSubcomponentNames = new ArrayList<String>() ;
+	    
+	    // Fetches data subcomponent names.
+	    for(Subcomponent s : subcmpts)
+	    {
+	      if(s instanceof DataSubcomponent)
+	      {
+	    	if(s.getSubcomponentType().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE)
+	  		   || s.getSubcomponentType().getName().equalsIgnoreCase(DATA_PORT_TYPE))
+	    	{
+	    	  dataSubcomponentNames.add(s.getName()) ;
+	    	}
+	      }
+	    }
+	    
+	    // Binds data subcomponent names with DataAcess objects
+	    // of threads.
+	    // See process implementation's connections.
+	    for(Connection connect : cptImpl.getAllConnections())
+	    {
+	      if (connect instanceof AccessConnection &&
+	         ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
+	      {
+
+	      if(connect.getAllDestination() instanceof DataSubcomponent)
+	      {
+	        DataSubcomponent destination =  (DataSubcomponent) connect.
+	                                                       getAllDestination() ;
+	        
+	          if(Aadl2Utils.contains(destination.getName(), dataSubcomponentNames))
+	          {
+	            ConnectedElement source = (ConnectedElement) connect.getSource() ;
+	            DataAccess da = (DataAccess) source.getConnectionEnd() ;
+	            _dataAccessMapping.put(da, destination.getName()) ; 
+	          }
+	      }
+	        else if(connect.getAllSource() instanceof DataSubcomponent)
+	        {
+	          DataSubcomponent source =  (DataSubcomponent) connect.
+	              getAllSource() ;
+	          if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
+	          {
+	            ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
+	             
+	            DataAccess da = (DataAccess) dest.getConnectionEnd() ;
+	            _dataAccessMapping.put(da, source.getName()) ;
+	          }
+	        }
+	        else if(connect.getAllDestination() instanceof DataAccess
+	            && connect.getAllSource() instanceof DataAccess)
+	        {
+	          if(!(connect.getAllDestination().eContainer() instanceof Thread)
+	            && !(connect.getAllSource().eContainer() instanceof Thread))
+	            continue;
+	          DataAccess destination = (DataAccess) connect.getAllDestination();
+	          DataAccess source = (DataAccess) connect.getAllSource();
+	          if(_dataAccessMapping.containsKey(destination) &&
+	              !_dataAccessMapping.containsKey(source))
+	            _dataAccessMapping.put(source, _dataAccessMapping.get(destination)) ;
+	          if(_dataAccessMapping.containsKey(source) &&
+	              !_dataAccessMapping.containsKey(destination))
+	            _dataAccessMapping.put(destination, _dataAccessMapping.get(source)) ;
+	          
+	        }
+	      }
+	    }
+	  }
 }

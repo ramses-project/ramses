@@ -1091,7 +1091,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       public String caseProcessImplementation(ProcessImplementation object)
       {
     	
-        buildDataAccessMapping(object) ;
+        GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         
         processEList(object.getOwnedThreadSubcomponents()) ;
         
@@ -1141,77 +1141,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return DONE ;
       }
       
-      // Builds the data access mapping via the connections described in the
-      // process implementation.
-      private void buildDataAccessMapping(ComponentImplementation cptImpl)
-      {
-        
-        EList<Subcomponent> subcmpts = cptImpl.getAllSubcomponents() ;
-        
-        List<String> dataSubcomponentNames = new ArrayList<String>() ;
-        
-        // Fetches data subcomponent names.
-        for(Subcomponent s : subcmpts)
-        {
-          if(s instanceof DataSubcomponent)
-          {
-            dataSubcomponentNames.add(s.getName()) ;
-          }
-        }
-        
-        // Binds data subcomponent names with DataAcess objects
-        // of threads.
-        // See process implementation's connections.
-        for(Connection connect : cptImpl.getAllConnections())
-        {
-          if (connect instanceof AccessConnection &&
-             ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
-          {
-
-        	if(connect.getAllDestination() instanceof DataSubcomponent)
-        	{
-        	  DataSubcomponent destination =  (DataSubcomponent) connect.
-                                                           getAllDestination() ;
-            
-              if(Aadl2Utils.contains(destination.getName(), dataSubcomponentNames))
-              {
-                ConnectedElement source = (ConnectedElement) connect.getSource() ;
-                DataAccess da = (DataAccess) source.getConnectionEnd() ;
-                _dataAccessMapping.put(da, destination.getName()) ; 
-              }
-        	}
-            else if(connect.getAllSource() instanceof DataSubcomponent)
-            {
-              DataSubcomponent source =  (DataSubcomponent) connect.
-              		getAllSource() ;
-              if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
-              {
-                ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
-                 
-                DataAccess da = (DataAccess) dest.getConnectionEnd() ;
-                _dataAccessMapping.put(da, source.getName()) ;
-              }
-            }
-            else if(connect.getAllDestination() instanceof DataAccess
-            		&& connect.getAllSource() instanceof DataAccess)
-            {
-            	if(!(connect.getAllDestination().eContainer() instanceof Thread)
-            		&& !(connect.getAllSource().eContainer() instanceof Thread))
-            		continue;
-            	DataAccess destination = (DataAccess) connect.getAllDestination();
-            	DataAccess source = (DataAccess) connect.getAllSource();
-            	if(_dataAccessMapping.containsKey(destination) &&
-            			!_dataAccessMapping.containsKey(source))
-            		_dataAccessMapping.put(source, _dataAccessMapping.get(destination)) ;
-            	if(_dataAccessMapping.containsKey(source) &&
-            			!_dataAccessMapping.containsKey(destination))
-            		_dataAccessMapping.put(destination, _dataAccessMapping.get(source)) ;
-            	
-            }
-          }
-        }
-      }
-      
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
         process(object.getComponentImplementation()) ;
@@ -1240,7 +1169,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _processedTypes.add(object.getQualifiedName());
     	_currentImplUnparser = _activityImplCode ;
         _currentHeaderUnparser = _activityHeaderCode ;
-        buildDataAccessMapping(object) ;
+        GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         process(object.getType()) ;
         _currentImplUnparser.addOutput("void* ") ;
         _currentImplUnparser.addOutput(GenerationUtilsC

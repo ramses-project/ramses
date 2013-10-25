@@ -2,7 +2,11 @@ package fr.tpt.aadl.ramses.generation.osek.ast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.osate.aadl2.DataAccess;
+import org.osate.aadl2.DataSubcomponent;
+import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.modelsupport.UnparseText;
 
 public class Cpu {
@@ -24,13 +28,17 @@ public class Cpu {
 	private List<PeriodicTask> periodicTasks;
 	private List<Task> tasks;
 	private List<Isr> isrs;
-
+	private List<DataSubcomponent> datasubcomponents;
+	private Map<DataAccess, String> dataAccessMapping;
+	
+	
 	public Cpu() {
 		os = new Os();
 		counter = new Counter();
 		periodicTasks = new ArrayList<PeriodicTask>();
 		tasks = new ArrayList<Task>();
 		isrs = new ArrayList<Isr>();
+		datasubcomponents = new ArrayList<DataSubcomponent>();
 	}
 
 	public Os getOs() {
@@ -69,6 +77,16 @@ public class Cpu {
 		return isrs;
 	}
 
+	public void addAllDataSubcomponent(List<DataSubcomponent> dataSubcomponents)
+	{
+		datasubcomponents.addAll(dataSubcomponents);
+	}
+	
+	public void setDataAccessMapping(Map<DataAccess, String> dataAccessMapping)
+	{
+		this.dataAccessMapping = dataAccessMapping;
+	}
+	
 	public void generateOil(UnparseText code) {
 
 		code.addOutputNewline("CPU " + name + " {");
@@ -78,6 +96,24 @@ public class Cpu {
 		code.addOutputNewline("};");
 		counter.generateOil(code);
 
+		for(DataSubcomponent ds: datasubcomponents)
+		{
+		  if(ds.getSubcomponentType().getName().equalsIgnoreCase("ThreadQueueType")
+				  || ds.getSubcomponentType().getName().equalsIgnoreCase("DataPortType"))
+		  {
+			  code.addOutputNewline("RESOURCE "+ds.getName()+"_rez");
+			  code.addOutputNewline("{");
+			  code.incrementIndent();
+			  code.addOutputNewline("RESOURCEPROPERTY = STANDARD;");
+			  code.decrementIndent();
+			  code.addOutputNewline("};");
+		  }
+		  if(ds.getSubcomponentType().getName().equalsIgnoreCase("ThreadQueueType"))
+		  {
+			  code.addOutputNewline("Event "+ds.getName()+"_evt {};");
+		  }
+		}
+		
 		for (PeriodicTask task : periodicTasks) {
 			task.task.generateOil(code);
 			task.alarm.generateOil(code);

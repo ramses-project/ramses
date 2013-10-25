@@ -32,13 +32,20 @@ import java.util.ArrayList ;
 import java.util.Iterator ;
 import java.util.LinkedHashSet;
 import java.util.List ;
+import java.util.Map;
 import java.util.Set ;
 
 import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.ecore.EObject;
+import org.osate.aadl2.AccessCategory;
+import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.CallSpecification ;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.Connection;
 import org.osate.aadl2.Data ;
+import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.Element ;
@@ -676,5 +683,78 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
 		  // TODO Auto-generated catch block
 		  e.printStackTrace() ;
 	  }
+  }
+  
+  
+  //Builds the data access mapping via the connections described in the
+  // process implementation.
+  public static void buildDataAccessMapping(ComponentImplementation cptImpl,
+                                            Map<DataAccess, String> _dataAccessMapping)
+  {
+    
+    EList<Subcomponent> subcmpts = cptImpl.getAllSubcomponents() ;
+    
+    List<String> dataSubcomponentNames = new ArrayList<String>() ;
+    
+    // Fetches data subcomponent names.
+    for(Subcomponent s : subcmpts)
+    {
+      if(s instanceof DataSubcomponent)
+      {
+        dataSubcomponentNames.add(s.getName()) ;
+      }
+    }
+    
+    // Binds data subcomponent names with DataAcess objects
+    // of threads.
+    // See process implementation's connections.
+    for(Connection connect : cptImpl.getAllConnections())
+    {
+      if (connect instanceof AccessConnection &&
+         ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
+      {
+
+      if(connect.getAllDestination() instanceof DataSubcomponent)
+      {
+        DataSubcomponent destination =  (DataSubcomponent) connect.
+                                                       getAllDestination() ;
+        
+          if(Aadl2Utils.contains(destination.getName(), dataSubcomponentNames))
+          {
+            ConnectedElement source = (ConnectedElement) connect.getSource() ;
+            DataAccess da = (DataAccess) source.getConnectionEnd() ;
+            _dataAccessMapping.put(da, destination.getName()) ; 
+          }
+      }
+        else if(connect.getAllSource() instanceof DataSubcomponent)
+        {
+          DataSubcomponent source =  (DataSubcomponent) connect.
+              getAllSource() ;
+          if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
+          {
+            ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
+             
+            DataAccess da = (DataAccess) dest.getConnectionEnd() ;
+            _dataAccessMapping.put(da, source.getName()) ;
+          }
+        }
+        else if(connect.getAllDestination() instanceof DataAccess
+            && connect.getAllSource() instanceof DataAccess)
+        {
+          if(!(connect.getAllDestination().eContainer() instanceof Thread)
+            && !(connect.getAllSource().eContainer() instanceof Thread))
+            continue;
+          DataAccess destination = (DataAccess) connect.getAllDestination();
+          DataAccess source = (DataAccess) connect.getAllSource();
+          if(_dataAccessMapping.containsKey(destination) &&
+              !_dataAccessMapping.containsKey(source))
+            _dataAccessMapping.put(source, _dataAccessMapping.get(destination)) ;
+          if(_dataAccessMapping.containsKey(source) &&
+              !_dataAccessMapping.containsKey(destination))
+            _dataAccessMapping.put(destination, _dataAccessMapping.get(source)) ;
+          
+        }
+      }
+    }
   }
 }

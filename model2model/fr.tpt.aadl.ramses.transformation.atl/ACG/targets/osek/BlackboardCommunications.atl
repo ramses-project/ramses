@@ -149,7 +149,7 @@ abstract rule m_Output_BlackBoard
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
-			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,MESSAGE_ADDR_HOLDER,RETURN_CODE_HOLDER} 
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
@@ -162,10 +162,6 @@ abstract rule m_Output_BlackBoard
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- MESSAGE_ADDR
-		),
-		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
-		(
-			element <- LENGTH
 		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }

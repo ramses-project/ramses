@@ -1,6 +1,13 @@
 package fr.tpt.aadl.ramses.generation.osek.ast;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.modelsupport.UnparseText;
+
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 
 public class Task {
 
@@ -15,7 +22,8 @@ public class Task {
 	private Schedule schedule;
 	private int stacksize;
 	private String appmode;
-
+	private List<String> resources = new ArrayList<String>();
+	
 	public void setAppmode(String appmode) {
 		this.appmode = appmode;
 	}
@@ -43,7 +51,12 @@ public class Task {
 	public void setStacksize(int stacksize) {
 		this.stacksize = stacksize;
 	}
-
+	
+	public void addResource(String res)
+	{
+		this.resources.add(res);
+	}
+	
 	public void generateOil(UnparseText code) {
 		code.addOutputNewline("TASK " + name + " {");
 		code.incrementIndent();
@@ -63,6 +76,11 @@ public class Task {
 		if(stacksize != 0)
 			code.addOutputNewline("STACKSIZE = " + stacksize + ";");
 		code.decrementIndent();
+		
+		for(String resourceName: this.resources)
+		{
+			code.addOutputNewline("RESOURCE = " + resourceName + "_rez;");
+		}
 		code.addOutputNewline("};");
 		code.addOutputNewline("");
 	}

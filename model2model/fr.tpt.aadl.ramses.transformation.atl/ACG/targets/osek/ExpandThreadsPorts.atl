@@ -204,6 +204,10 @@ rule m_Process_Output_EventPort_Instance
 		(dataSubcomponentType <- 'UNDEFINED'.asDataType('OSEK_RUNTIME'))
 }
 
+helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
+	Sequence{thisModule.resolveTemp(self, 'globalVariableValue'), thisModule.resolveTemp(self, 'globalVariable')}
+;
+
 
 -- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
 rule m_Thread_IntraProcess_Input_DataPort_Instance
@@ -219,8 +223,30 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME')
-		)
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		globalVariableValue: AADLBA!DataSubcomponent
+		(
+			name <- fi.eContainer().name+'_'+fi.name+'_value',
+			dataSubcomponentType <- fi.feature.dataFeatureClassifier
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalVariable.name+'_rez, &'+
+								globalVariableValue.name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
 }
 
 -- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance

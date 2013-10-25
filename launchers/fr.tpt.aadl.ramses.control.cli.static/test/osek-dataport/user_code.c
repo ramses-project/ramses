@@ -23,22 +23,14 @@
 
 void receive(char d)
 {
-  char hcount,lcount;
-  for (hcount = 0; hcount < 10; hcount++) {
-    for (lcount = 0; lcount < 3200; lcount++) ;
-    ecrobot_debug1(d, hcount, 0);
-  }
+  ecrobot_debug1(d, 0, 0);
 }
 
 char value=0;
 
 void send(char* d)
 {
-  char hcount, lcount;
   *d = value;
   value++;
-  for (hcount = 0; hcount < 10; hcount++) {
-    for (lcount = 0; lcount < 3200; lcount++) ;
-    ecrobot_debug2(*d, hcount, 0);
-  }
+  ecrobot_debug1(0, 0, *d);
 }

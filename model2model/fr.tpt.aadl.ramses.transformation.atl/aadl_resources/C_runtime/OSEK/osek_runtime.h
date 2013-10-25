@@ -16,7 +16,7 @@
 typedef int port_id_t;
 
 /* Data type to send with events */
-typedef char * data_t;
+typedef void * data_t;
 
 typedef struct port_queue_t {
   int queue_size;
@@ -25,11 +25,12 @@ typedef struct port_queue_t {
   int write_idx;
   int msg_size;
   data_t * offset;
+  char blocking;
 } port_queue_t;
 
 typedef struct thread_queue_t {
   int id;
-  ResourceType *rez;
+  ResourceType * rez;
   TaskType *in_task;
   EventMaskType *event;
   char waiting;
@@ -43,22 +44,15 @@ typedef struct data_port_t {
   int size;
 } data_port_t;
 
-/*  Send an event with a data */
-StatusType PutEventDataMessage(thread_queue_t * global_q, int port_id, data_t value);
+StatusType SendOutput_runtime(thread_queue_t * global_q, int port_id, data_t value);
 
-/* Wait for an event-data */
-StatusType GetEventDataMessage(port_id_t port_id, data_t dst);
+StatusType NextValue_runtime(thread_queue_t * global_q, int port_id, data_t dst);
 
-/* Send an event */
-StatusType SetEventMessage(thread_queue_t * global_q, port_id_t queue_id);
+StatusType GetValue_runtime(thread_queue_t * global_q, int port_id, data_t dst);
 
-/* Wait for an event */
-StatusType GetEventMessage(thread_queue_t * global_q);
+StatusType ReceiveInputs_runtime(thread_queue_t * global_q, int port_id);
 
-/* Read data */
-StatusType GetValueDataPort(data_port_t * p, void * data);
+StatusType GetValueDataPort_runtime(data_port_t * p, void* data);
 
-/* Write data */
-StatusType PutValueDataPort(data_port_t * p, void* data);
-
+StatusType PutValueDataPort_runtime(data_port_t * p, void* data);
 #endif

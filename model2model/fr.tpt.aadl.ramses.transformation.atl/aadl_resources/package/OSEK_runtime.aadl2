@@ -1,7 +1,7 @@
 package OSEK_runtime
 public
 
-with Generation_Properties;
+with Generation_Properties, Base_Types;
 
 -- Task management
 data StatusType
@@ -190,26 +190,54 @@ properties
   Programming_Properties::Source_Text => ("osek_runtime.h");
 end DataPortType;
 
-
-subprogram SetEventData
+subprogram SendOutput
+prototypes
+  MESSAGE_TYPE: data;
 features
-  EV_DATA_QUEUE_ID: in parameter EventQueueIdType;
-  VALUE_IN: in parameter EventDataType;
-  STATUS: out parameter StatusType;
+  dest_global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  dest_port_id: in parameter Base_Types::Integer;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
-  Programming_Properties::Source_Name => "PutEventDataMessage";
+  Programming_Properties::Source_Name => "PutValue_runtime";
   Programming_Properties::Source_Text => ("osek_runtime.h");
-end SetEventData;
+end SendOutput;
 
-subprogram WaitEventData
+subprogram NextValue
+prototypes
+  MESSAGE_TYPE: data;
 features
-  EV_DATA_QUEUE_ID: in parameter EventQueueIdType;
-  VALUE_OUT: out parameter EventDataType;
-  STATUS: out parameter StatusType;
+  global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  port_id: in parameter Base_Types::Integer;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
-  Programming_Properties::Source_Name => "GetEventDataMessage";
-  Programming_Properties::Source_Text => ("osek_runtime.h");
-end WaitEventData;
+  Programming_Properties::Source_Name => "NextValue_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h");  
+end NextValue;
+
+subprogram GetValue
+prototypes
+  MESSAGE_TYPE: data;
+features
+  global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  port_id: in parameter Base_Types::Integer;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "GetValue_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h");  
+end GetValue;
+
+subprogram ReceiveInputs
+features
+  global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  port_id: in parameter Base_Types::Integer;
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "ReceiveInputs_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h");  
+end ReceiveInputs;
 
 subprogram PutValueDataPort
 prototypes
@@ -219,7 +247,7 @@ features
   MESSAGE_ADDR: in out parameter MESSAGE_TYPE;
   STATUS: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
-  Programming_Properties::Source_Name => "PutValueDataPort";
+  Programming_Properties::Source_Name => "PutValueDataPort_runtime";
   Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
 end PutValueDataPort;
 
@@ -231,7 +259,7 @@ features
   MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
   STATUS: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
-  Programming_Properties::Source_Name => "GetValueDataPort";
+  Programming_Properties::Source_Name => "GetValueDataPort_runtime";
   Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
 end GetValueDataPort;
 

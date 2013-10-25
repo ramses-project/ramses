@@ -199,7 +199,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
 	@Override
 	public void process(SystemImplementation system, File generatedFilePath) throws GenerationException {
 		generateMakefile((NamedElement) system, generatedFilePath) ;
-		GeneratorUtils.executeMake(generatedFilePath, "OSEKNXT_PATH");
+		GeneratorUtils.executeMake(generatedFilePath, "NXTOSEK_PATH");
 	}
 
 	@Override
