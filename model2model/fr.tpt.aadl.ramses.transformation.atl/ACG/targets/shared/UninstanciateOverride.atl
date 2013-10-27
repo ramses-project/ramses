@@ -466,6 +466,10 @@ helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Seque
 	Sequence{thisModule.resolveTemp(self, 'globalVariable')}
 ;
 
+helper context AADLI!ComponentInstance def: collectGlobalVariableImg()  : Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
 rule m_Process_Implementation {
  from
  	impl : AADLI!ProcessImplementation
@@ -479,6 +483,11 @@ rule m_Process_Implementation {
 												-- intraprocess input thread port
 												-- process output port
 												-- process input port
+												->union(impl.getSubcomponentsInstances('thread')
+													->collect(c|
+														c.collectGlobalVariableImg()
+													)
+												)
 												->union(impl.getSubcomponentsInstances('thread')
 													->collect(c| c.featureInstance
 														->select(e| e.isThreadPort() and e.isInputFeature() and e.isIntraProcessFeatureInstance())

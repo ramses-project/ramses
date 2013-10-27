@@ -188,7 +188,7 @@ rule m_Thread_IntraProcess_Input_Port_Instance
 		(name <- fi.eContainer().name+'_'+fi.name+'_globalVariable'), -- process subcomponents Task + _ + Port P + global variable 
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-globalVariable
+			connectionEnd<-fi.getGlobalVariableImg()
 		)
 	do
 	{

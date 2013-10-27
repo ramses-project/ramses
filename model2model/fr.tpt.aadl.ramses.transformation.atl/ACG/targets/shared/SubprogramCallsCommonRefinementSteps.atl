@@ -378,9 +378,26 @@ rule m_ThreadEntrypoint {
 		(content<-dispatch_target_actions),
 		dispatch_target_actions: AADLBA!BehaviorActionSequence
 		( 
-			actions <- if(c.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(c) else Sequence{thisModule.resolveTemp(c,'waitDispatchCall')} endif
-				->union(thisModule.collectTransitionChoiceActions(c)) 
+			actions <- c.collectDispatchActions()
 		)
+}
+
+helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AADLBA!BehaviorAction) = 
+	if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveTemp(self,'waitDispatchCall')} endif
+		->union(
+				self.featureInstance->select(fi| 
+					fi.isInputFeature() and
+					(fi.isEventPort() or fi.isEventDataPort())
+			)
+			->collect(fi|thisModule.createReceiveInputCall(fi))
+		)
+		->union(thisModule.collectTransitionChoiceActions(self))->excluding(OclUndefined)
+;
+
+unique lazy rule createReceiveInputCall
+{
+	from
+		fi:AADLI!FeatureInstance
 }
 
 unique lazy rule collectTransitionChoiceActions
@@ -1745,7 +1762,7 @@ rule m_Input_EventDataPort_ComputeEntrypointCallSequence
 			fi.isEventDataPort()
 		)
 	to
-		call:AADLBA!BehaviorAction
+		call:AADLBA!SubprogramCallAction
 }
 
 --  	- m_Input_DataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)
