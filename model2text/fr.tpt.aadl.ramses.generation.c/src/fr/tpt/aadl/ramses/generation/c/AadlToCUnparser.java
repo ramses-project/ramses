@@ -92,12 +92,14 @@ import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
+import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.annexsupport.AnnexUnparser;
 import org.osate.annexsupport.AnnexUnparserProxy;
 import org.osate.ba.AadlBaParserAction ;
 import org.osate.ba.AadlBaUnParserAction ;
+import org.osate.ba.aadlba.BehaviorAnnex;
 import org.osate.ba.analyzers.TypeHolder ;
 import org.osate.ba.utils.AadlBaUtils ;
 import org.osate.ba.utils.DimensionException ;
@@ -505,7 +507,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
     // XXX May AadlBaToCUnparser have its own interface ???
     // XXX NO, using interfaces and in particular extension points is an overkill
-
+	
     AadlBaToCUnparser baToCUnparser =
     		(AadlBaToCUnparser) baToCUnparserAction.getUnparser() ;
 
@@ -1261,6 +1263,30 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         {
           SubprogramType st = (SubprogramType) object;
           orderedFeatureList = Aadl2Utils.orderFeatures(st) ;
+        }
+        
+        BehaviorAnnex ba = null;
+        
+        for(AnnexSubclause as: object.getOwnedAnnexSubclauses())
+        {
+          if(as instanceof BehaviorAnnex)
+          {
+        	ba = (BehaviorAnnex) as;
+        	break;
+          }
+        }
+        if(ba!=null)
+        {
+    	  String aadlComponentCId =
+    	  		  GenerationUtilsC.getGenerationCIdentifier(object
+    	                .getQualifiedName()) ;
+    	      
+    	      
+    	  _subprogramImplCode.addOutputNewline(aadlComponentCId +
+    	            "_BA_State_t " +
+    	            object.getName().replace('.', '_')+
+    	            "_current_state = " + aadlComponentCId + "_" +
+    	            AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
         }
         boolean isReturnParam=false;
         for(Feature param: orderedFeatureList)

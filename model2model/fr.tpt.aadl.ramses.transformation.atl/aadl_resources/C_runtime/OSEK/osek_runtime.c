@@ -10,30 +10,31 @@ static void memcpy(char *dst, const char *src, unsigned int size)
   }
 }
 
-StatusType SendOutput_runtime(thread_queue_t * global_q, int port_id, data_t value)
+StatusType SendOutput_runtime(thread_queue_t * global_q, int port_id, void * value)
 {
   StatusType status = E_OK;
   struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
   status = GetResource(*(global_q->rez));
   if (status != E_OK)
     return status;
-
-  if (port_q->write_idx == port_q->first_idx) {
+  
+  if ((port_q->write_idx+1) % port_q->queue_size == port_q->first_idx) {
     status = E_OS_LIMIT;
   } else {
     global_q->msg_nb++;
     port_q->write_idx = (port_q->write_idx+1) % port_q->queue_size;
-    memcpy(port_q->offset[port_q->write_idx], value, port_q->msg_size);
+    memcpy(&port_q->offset[port_q->write_idx*(port_q->msg_size/sizeof(char))], value, port_q->msg_size);
     if (global_q->waiting)
       status = SetEvent(*(global_q->in_task), *(global_q->event));
   }
   
-
   ReleaseResource(*(global_q->rez));
   return status;
 }
 
-StatusType NextValue_runtime(thread_queue_t * global_q, int port_id, data_t dst)
+#include "ecrobot_interface.h"
+
+StatusType NextValue_runtime(thread_queue_t * global_q, int port_id, void * dst)
 {
   StatusType status = E_OK;
   struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
@@ -46,7 +47,9 @@ StatusType NextValue_runtime(thread_queue_t * global_q, int port_id, data_t dst)
     if(port_q->blocking)
     {
       global_q->waiting=global_q->waiting+1;
+      ReleaseResource(*(global_q->rez));
       status = WaitEvent(*(global_q->event));
+      GetResource(*(global_q->rez));
       global_q->waiting=global_q->waiting-1;
     }
     else
@@ -56,17 +59,17 @@ StatusType NextValue_runtime(thread_queue_t * global_q, int port_id, data_t dst)
     }
   }
   if(port_q->first_idx < port_q->last_idx)
-    port_q->first_idx++;
-     
-  memcpy(dst, port_q->offset[port_q->write_idx], port_q->msg_size);
+    port_q->first_idx=(port_q->first_idx+1)%port_q->queue_size;
+
+  memcpy(dst, &port_q->offset[(port_q->first_idx)*(port_q->msg_size/sizeof(char))], port_q->msg_size);
 
   global_q->msg_nb--;
-
+  
   ReleaseResource(*(global_q->rez));
   return status;
 }
 
-StatusType GetValue_runtime(thread_queue_t * global_q, int port_id, data_t dst)
+StatusType GetValue_runtime(thread_queue_t * global_q, int port_id, void * dst)
 {
   StatusType status = E_OK;
   struct port_queue_t *port_q = (struct port_queue_t*) global_q->port_queues[port_id];
@@ -74,7 +77,7 @@ StatusType GetValue_runtime(thread_queue_t * global_q, int port_id, data_t dst)
   if (status != E_OK)
     return status;
 
-  memcpy(dst, port_q->offset[port_q->write_idx], port_q->msg_size);
+  memcpy(dst, &port_q->offset[(port_q->first_idx)*(port_q->msg_size/sizeof(char))], port_q->msg_size);
 
   ReleaseResource(*(global_q->rez));
   return status;
@@ -88,19 +91,12 @@ StatusType ReceiveInputs_runtime(thread_queue_t * global_q, int port_id)
   status = GetResource(*(global_q->rez));
   if (status != E_OK)
     return status;
-  if(port_q->last_idx == port_q->first_idx)
-    status = E_OS_LIMIT;
-  else if(port_q->last_idx == port_q->write_idx-1)
-    status = E_OS_LIMIT;
-  if(status == E_OK)
-  {
-    int discarded_msg_nb = port_q->last_idx-port_q->first_idx;
-    port_q->first_idx=port_q->last_idx;
-    port_q->last_idx = port_q->write_idx-1;
-    global_q->msg_nb-=discarded_msg_nb;
-  }
+  int discarded_msg_nb = port_q->last_idx-port_q->first_idx;
+  port_q->first_idx=port_q->last_idx;
+  port_q->last_idx = port_q->write_idx;
+  global_q->msg_nb-=discarded_msg_nb;
   ReleaseResource(*(global_q->rez));
-  return status; 
+  return status;
 }
 
 StatusType GetValueDataPort_runtime(data_port_t * p, void* data)

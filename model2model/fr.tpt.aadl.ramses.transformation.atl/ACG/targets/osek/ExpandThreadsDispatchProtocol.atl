@@ -37,7 +37,7 @@ rule m_PeriodicThread
 {
 	from
 		c: AADLI!ComponentInstance
-		( (c.isPeriodicThread() or c.isSporadicThread()) )
+		( c.isPeriodicThread() )
 	using
 	{
 		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
@@ -62,6 +62,127 @@ rule m_PeriodicThread
 	}
 }
 
+helper context AADLI!ComponentInstance def: collectGlobalVariableImg()  : Sequence(AADLBA!DataSubcomponent) =
+	if(self.needsGlobalQueue()) then
+		Sequence{thisModule.resolveTemp(self, 'globalQueue')}
+	else
+		Sequence{}
+	endif
+;
+
+helper context AADLI!ComponentInstance def: needsGlobalQueue(): Boolean =
+	(
+		self.isPeriodicThread() and
+		self.featureInstance->exists(
+				e|e.isInputFeature() and
+				(e.isEventPort() or e.isEventDataPort())
+			)
+	) or self.isSporadicThread()
+;
+
+helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!DataSubcomponent =
+	if(self.isEventPort() or self.isEventDataPort()) then
+		thisModule.resolveTemp(self.eContainer(),'globalQueue')
+	else
+		thisModule.resolveTemp(self,'globalVariable')
+	endif
+;
+
+-- @extends m_PeriodicThread
+rule m_PeriodicThread_with_InputPort
+{
+	from
+		c: AADLI!ComponentInstance
+		(
+			c.needsGlobalQueue()
+		)
+	to
+		globalQueue: AADLBA!DataSubcomponent
+		(
+			name <- c.name+'_globalQueue',
+			dataSubcomponentType <- 'ThreadQueueType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalQueue.name+'_rez, &'+
+								c.name+', &'+
+								globalQueue.name+'_evt, 0, 0, '+
+								thisModule.concatToString(
+									c.featureInstance->select(e| 
+										e.isInputFeature() and (e.isEventPort() or e.isEventDataPort()))
+										->collect(e|
+											'&'+thisModule.resolveTemp(e, 'globalVariable').name
+										)
+								)+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
+}
+
+helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AADLBA!BehaviorAction) = 
+	self.featureInstance->select(fi| 
+					fi.isInputFeature() and
+					(fi.isEventPort() or fi.isEventDataPort())
+			)
+			->collect(fi|thisModule.createReceiveInputCall(fi))
+		->union(thisModule.collectTransitionChoiceActions(self))
+		->union(
+			if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveTemp(self,'waitDispatchCall')} endif			
+		)
+		->excluding(OclUndefined)
+;
+
+unique lazy rule createReceiveInputCall
+{
+	from
+		fi:AADLI!FeatureInstance
+	using
+	{
+		GLOBAL_Q: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
+	}
+	to
+		receiveInputsCall: AADLBA!SubprogramCallAction
+		(
+			subprogram<-receiveInputsHolder,
+			parameterLabels <- Sequence{GLOBAL_Q_HOLDER,thisModule.createPortIdValueExpression(fi),RETURN_CODE_HOLDER}
+		),
+		receiveInputsHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- 'ReceiveInputs'.asSubprogramType('OSEK_RUNTIME')	
+		),
+		GLOBAL_Q_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-GLOBAL_Q
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
+		receiveInputsCall;
+	}
+}
+
+-- @extends m_ThreadEntrypoint
+rule m_SporadicThread
+{
+	from
+		c: AADLI!ComponentInstance
+		( c.isSporadicThread() )
+}
 
 helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'StatusType'.asDataType('OSEK_RUNTIME');
 

@@ -259,14 +259,55 @@ rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 		fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		(dataFeatureClassifier <- 'ThreadQueueType'.asDataType('OSEK_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		(dataFeatureClassifier <- 'ThreadQueueType'.asDataType('OSEK_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent,
-		globalVariable:AADLBA!DataSubcomponent
+		globalVariable: AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME')
-		)
+			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		globalVariableValue: AADLBA!DataSubcomponent
+		(
+			name <- fi.eContainer().name+'_'+fi.name+'_value',
+			dataSubcomponentType <- buffer
+		),
+		buffer: AADLBA!DataType
+		(
+			name <- fi.eContainer().name+'_'+fi.name+'_bufferType',
+			ownedPropertyAssociation <- Sequence
+			{
+				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
+					'Array'.asEnumeration('DATA_MODEL').asNamedValue()),
+				thisModule.CreatePropertyAssociation('Base_Type', 'DATA_MODEL',
+					thisModule.CreateListValueFromClassifier(
+										fi.feature.dataFeatureClassifier
+									)
+				),
+				thisModule.CreatePropertyAssociation('Dimension',
+													  'DATA_MODEL',
+													  thisModule.CreateListValueFromInteger(
+														fi.getQueueSize())
+												)
+			}
+		),
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+
+								fi.getQueueSize().toString()+', 0, 0, 0, '+ thisModule.getSizeOfType(fi.getLengthInitialValue())
+								+', '+globalVariableValue.name+', 0'+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
 }
 
 -- @extends m_Not_PeriodicDelayed_Port,m_Thread_EventPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
@@ -279,9 +320,9 @@ rule m_Thread_IntraProcess_Input_EventPort_Instance
 		fi.isIntraProcessFeatureInstance())
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		(dataFeatureClassifier <- 'ThreadQueueType'.asDataType('OSEK_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		(dataFeatureClassifier <- 'ThreadQueueType'.asDataType('OSEK_RUNTIME')),
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
@@ -396,9 +437,9 @@ rule m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance
 		)
   	to
   		f: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME')),
+		(dataFeatureClassifier <- 'ThreadQueueType'.asDataType('OSEK_RUNTIME')),
 		f_entrypoint: AADLBA!DataAccess
-		(dataFeatureClassifier <- 'PortQueueType'.asDataType('OSEK_RUNTIME'))
+		(dataFeatureClassifier <- 'ThreadQueueType'.asDataType('OSEK_RUNTIME'))
 }
 
 -- @extends m_Thread_Output_Port_Instance,m_Not_PeriodicDelayed_Port

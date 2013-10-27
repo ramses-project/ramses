@@ -242,6 +242,7 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
 		Cpu cpu = oil.getCpu();
 		Os os = cpu.getOs();
+		_mainHCode.addOutputNewline("#include \"kernel.h\"");
 
 		/* Generate code for threads process */
 		ProcessImplementation pi = (ProcessImplementation) ps.getComponentImplementation();
@@ -300,7 +301,6 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		Os os = oil.getCpu().getOs();
 		os.setName("config");
 		os.setAppName(processSubcomponent.getName());
-		_mainHCode.addOutputNewline("#include \"kernel.h\"");
 		
 		_mainCCode.addOutputNewline("/*********** Data ***********/");
 		ProcessImplementation pi = (ProcessImplementation) processSubcomponent.getComponentImplementation();
@@ -309,13 +309,13 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		  if(ds.getSubcomponentType().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE)
 				  || ds.getSubcomponentType().getName().equalsIgnoreCase(DATA_PORT_TYPE))
 		  {
-			  _mainCCode.addOutputNewline("DeclareResource("+ds.getName()+"_rez);");
-			  _mainHCode.addOutputNewline("extern const ResourceType "+ds.getName()+"_rez;");
+			  _mainHCode.addOutputNewline("DeclareResource("+ds.getName()+"_rez);");
+//			  _mainHCode.addOutputNewline("extern const ResourceType "+ds.getName()+"_rez;");
 		  }
 		  if(ds.getSubcomponentType().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE))
 		  {
-			  _mainCCode.addOutputNewline("DeclareEvent("+ds.getName()+"_evt);");
-			  _mainHCode.addOutputNewline("extern ResourceType "+ds.getName()+"_evt;");
+			  _mainHCode.addOutputNewline("DeclareEvent("+ds.getName()+"_evt);");
+//			  _mainHCode.addOutputNewline("extern const EventMaskType "+ds.getName()+"_evt;");
 		  }
 		}
 
@@ -334,7 +334,6 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		int minCycle;
 
 		try {
-			source = PropertyUtils.getStringValue(processor, "SystemCounter_Source");
 			maxValue = (int) PropertyUtils.getIntValue(processor, "SystemCounter_MaxAllowedValue");
 			ticksPerBase = (int) PropertyUtils.getIntValue(processor, "SystemCounter_TicksPerBase");
 			minCycle = (int) PropertyUtils.getIntValue(processor, "SystemCounter_MinCycle");
@@ -344,7 +343,6 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		}
 
 		counter.setName(processor.getName()+"_"+COUNTER_NAME);
-		counter.setSource(source);
 		counter.setMaxAllowedValue(maxValue);
 		counter.setTicksPerBase(ticksPerBase);
 		counter.setMinCycle(minCycle);
@@ -430,7 +428,11 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		  for(DataAccess tda: tt.getOwnedDataAccesses())
 		  {
 			if(tda.equals(da))
-			  task.addResource(this.dataAccessMapping.get(tda));	
+			{
+			  task.addResource(this.dataAccessMapping.get(tda));
+			  if(da.getDataFeatureClassifier().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE))
+				task.addEvent(this.dataAccessMapping.get(da));
+			}
 		  }
 		}
 		for(SubprogramCallSequence scs: ti.getOwnedSubprogramCallSequences())
@@ -525,7 +527,7 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		_mainCCode.addOutputNewline("}");
 		_mainCCode.addOutputNewline("");
 		
-		_mainCCode.addOutputNewline("DeclareCounter("+oil.getCpu().getCounter().getName()+");");
+		_mainHCode.addOutputNewline("DeclareCounter("+oil.getCpu().getCounter().getName()+");");
 		_mainCCode.addOutputNewline("");
 		
 		/* LEJOS OSEK hook to be invoked from an ISR in category 2 */
@@ -561,7 +563,7 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		_mainCCode.addOutputNewline("extern void *" + threadName + "_Job(void);");
 		_mainCCode.addOutputNewline("");
 
-		_mainCCode.addOutputNewline("DeclareTask(" + thread.getName() + ");");
+		_mainHCode.addOutputNewline("DeclareTask(" + thread.getName() + ");");
 		_mainCCode.addOutputNewline("");
 
 		_mainCCode.addOutputNewline("TASK(" + thread.getName() + ")");

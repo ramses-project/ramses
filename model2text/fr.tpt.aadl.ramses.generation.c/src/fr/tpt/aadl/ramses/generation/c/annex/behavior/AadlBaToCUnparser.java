@@ -236,7 +236,7 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
 
   
 
-  protected static String getInitialStateIdentifier(BehaviorAnnex ba)
+  public static String getInitialStateIdentifier(BehaviorAnnex ba)
   {
     for(BehaviorState s : ba.getStates())
     {
@@ -370,14 +370,13 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
         _cFileContent = new UnparseText() ;
         _headerFileContent = new UnparseText() ;
         
-        _cFileContent.addOutputNewline(aadlComponentCId +
-              "_BA_State_t current_state = " + aadlComponentCId + "_" +
-              AadlBaToCUnparser.getInitialStateIdentifier(ba) + ";") ;
         processEList(_cFileContent, ba.getVariables()) ;
         _cFileContent.addOutputNewline("while(1)") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
-        _cFileContent.addOutputNewline("switch(current_state)") ;
+        _cFileContent.addOutputNewline("switch(" +
+        		_owner.getName().replace('.', '_')+
+                "_current_state)") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
         _headerFileContent.addOutputNewline("typedef enum {") ;
@@ -526,9 +525,9 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
         }
         else
         {
-          _cFileContent.addOutputNewline("current_state = " + aadlComponentCId +
+          _cFileContent.addOutputNewline(_owner.getName().replace('.', '_')+
+                    "_current_state = " + aadlComponentCId +
                     "_" + object.getName() + ";") ;
-          _cFileContent.addOutputNewline("break;") ;
         }
         return DONE ;
       }
@@ -575,13 +574,15 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
 
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
-
+        
+        process((BehaviorState) object.getDestinationState()) ;
         if(object.getActionBlock() != null)
         {
           process(object.getActionBlock()) ;
         }
-
-        process((BehaviorState) object.getDestinationState()) ;
+        if(!object.getDestinationState().isFinal())
+            _cFileContent.addOutputNewline("break;") ;
+        
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         return DONE ;
@@ -1155,6 +1156,10 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
               		  if(!lastElement)
               			  _cFileContent.addOutput(".");
               		}
+              	  }
+              	  else
+              	  {
+              		  process(v);
               	  }
                 }
                 else

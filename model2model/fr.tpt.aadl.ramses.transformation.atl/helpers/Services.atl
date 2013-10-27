@@ -246,6 +246,12 @@ helper context AADLI!ComponentInstance def : getProcessorBinding() : AADLBA!Subc
 	self.ownedPropertyAssociation->any(e | e.property = AADLBA!Property->allInstancesFrom('DEPLOYMENT_PROPERTIES')->any(f|f.name = 'Actual_Processor_Binding')).appliesTo
 ;
 
+helper context AADLI!FeatureInstance def: getInputMessagePortId(): Integer = 
+	self.eContainer().featureInstance->select(e| e.isInputFeature() and 
+										(self.category=#eventDataPort or self.category=#eventPort)
+															)->indexOf(self)
+;
+
 helper def : collectPeriodicDelayed_GlobalVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
 	Sequence{}
 ;

@@ -188,7 +188,7 @@ lazy rule CreateListValueFromPropertyExpression
 	}
 }
 
-rule CreateListValueFromInteger (value: Integer)
+rule CreateListValueFromInteger (value: OclAny) -- OclAny could be long or integer values
 {
 	to
 		il : AADLBA!IntegerLiteral(value<-value.longValue()),

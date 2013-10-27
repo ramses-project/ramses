@@ -23,6 +23,7 @@ public class Task {
 	private int stacksize;
 	private String appmode;
 	private List<String> resources = new ArrayList<String>();
+	private List<String> events = new ArrayList<String>();
 	
 	public void setAppmode(String appmode) {
 		this.appmode = appmode;
@@ -57,6 +58,11 @@ public class Task {
 		this.resources.add(res);
 	}
 	
+	public void addEvent(String evt)
+	{
+		this.events.add(evt);
+	}
+	
 	public void generateOil(UnparseText code) {
 		code.addOutputNewline("TASK " + name + " {");
 		code.incrementIndent();
@@ -80,6 +86,10 @@ public class Task {
 		for(String resourceName: this.resources)
 		{
 			code.addOutputNewline("RESOURCE = " + resourceName + "_rez;");
+		}
+		for(String eventName: this.events)
+		{
+			code.addOutputNewline("EVENT = " + eventName + "_evt;");
 		}
 		code.addOutputNewline("};");
 		code.addOutputNewline("");

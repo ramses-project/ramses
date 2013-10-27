@@ -99,10 +99,14 @@ helper context AADLBA!ThreadType def : getMaxExecutionTime() : AADLBA!RealLitera
 ;
 
 
+helper context AADLI!FeatureInstance def : getDefaultQueueSize() : Integer =
+	10
+;
+
 helper context AADLI!FeatureInstance def : getQueueSize() : Integer =
 	if (self.ownedPropertyAssociation->any(pa|pa.property.name='Queue_Size')
 			.oclIsUndefined()) then
-			1
+			self.getDefaultQueueSize()
 	else
 		self.ownedPropertyAssociation->any(pa|pa.property.name='Queue_Size')
 		.ownedValue->first().ownedValue.value

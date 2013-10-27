@@ -350,9 +350,7 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       for(PropertyAssociation aPropertyAssociation : aSubprogramType
             .getOwnedPropertyAssociations())
       {
-        found = getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
-        if(found)
-          return found;
+        getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
       }
       if(aSubprogramType.getOwnedExtension()!=null)
       {
@@ -380,15 +378,18 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
       for(PropertyAssociation aPropertyAssociation : aSubprogramImplementation
             .getOwnedPropertyAssociations())
       {
-        found = getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
-        if(found)
-          return found;
+    	
+        boolean newTry = getListOfReferencedObjects(aPropertyAssociation, includeDirList, result) ;
+        if(!found && newTry)
+          found=true;
       }
    	  if(aSubprogramImplementation.getOwnedExtension()!=null)
       {
-    	found = getListOfReferencedObjects((Subprogram)aSubprogramImplementation.getOwnedExtension().getExtended(),
+   		boolean newTry = getListOfReferencedObjects((Subprogram)aSubprogramImplementation.getOwnedExtension().getExtended(),
     		  includeDirList,
     		  result);
+    	if(!found && newTry)
+            found=true;
       }
       if(!found)
       {

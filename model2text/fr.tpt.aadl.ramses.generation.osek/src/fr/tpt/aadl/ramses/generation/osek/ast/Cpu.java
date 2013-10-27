@@ -110,7 +110,11 @@ public class Cpu {
 		  }
 		  if(ds.getSubcomponentType().getName().equalsIgnoreCase("ThreadQueueType"))
 		  {
-			  code.addOutputNewline("Event "+ds.getName()+"_evt {};");
+			code.addOutputNewline("EVENT "+ds.getName()+"_evt {");
+			code.incrementIndent();
+			code.addOutputNewline("MASK = AUTO;");
+			code.decrementIndent();
+			code.addOutputNewline("};");
 		  }
 		}
 		

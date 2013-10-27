@@ -199,8 +199,8 @@ features
   MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
   status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
-  Programming_Properties::Source_Name => "PutValue_runtime";
-  Programming_Properties::Source_Text => ("osek_runtime.h");
+  Programming_Properties::Source_Name => "SendOutput_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
 end SendOutput;
 
 subprogram NextValue
@@ -213,7 +213,7 @@ features
   status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "NextValue_runtime";
-  Programming_Properties::Source_Text => ("osek_runtime.h");  
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
 end NextValue;
 
 subprogram GetValue
@@ -226,7 +226,7 @@ features
   status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "GetValue_runtime";
-  Programming_Properties::Source_Text => ("osek_runtime.h");  
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
 end GetValue;
 
 subprogram ReceiveInputs
@@ -236,7 +236,7 @@ features
   status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
 properties
   Programming_Properties::Source_Name => "ReceiveInputs_runtime";
-  Programming_Properties::Source_Text => ("osek_runtime.h");  
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
 end ReceiveInputs;
 
 subprogram PutValueDataPort
