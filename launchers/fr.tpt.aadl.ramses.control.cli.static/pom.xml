@@ -142,12 +142,6 @@
 
     <dependency>
       <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.annex.behavior</artifactId>
-      <version>0.9.5</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.instantiation</artifactId>
       <version>0.5.0</version>
     </dependency>
@@ -192,12 +186,6 @@
       <groupId>ramses</groupId>
       <version>0.0.1</version>
       <artifactId>fr.tpt.aadl.ramses.analysis.result</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>ramses</groupId>
-      <version>0.9.5</version>
-      <artifactId>fr.tpt.aadl.utils</artifactId>
     </dependency>
 
     <dependency>
@@ -302,6 +290,18 @@
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.xtext.aadl2</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.ba</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.utils</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
 
