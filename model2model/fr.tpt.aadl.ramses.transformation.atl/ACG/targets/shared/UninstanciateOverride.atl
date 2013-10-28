@@ -30,6 +30,13 @@ from
 	IN 				: AADLI;
 
 
+helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
+	self.ownedPropertyAssociation->select(
+				e | 
+				not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
+		)->collectSelfPropertyAssociationImg()
+;
+
 abstract rule m_Component_Implementation {
  from
     impl : AADLI!ComponentImplementation
