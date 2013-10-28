@@ -31,9 +31,13 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									OJR_RUNTIME: AADLBA;
 
 
--------------------------------------------------------------------------------------------
----- Beginning of refactoring
--------------------------------------------------------------------------------------------
+abstract rule m_Not_PeriodicDelayed_Port
+{
+	from
+		fi: AADLI!FeatureInstance
+		(not fi.isPeriodicDelayedPort())
+}
+
 
 helper def: collectPutValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
 	c.featureInstance->
