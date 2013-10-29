@@ -13,6 +13,17 @@ properties
   Programming_Properties::Source_Text => ("polyorb-hi-ada/polyorb_hi-thread_interrogators.ads");
 end Port_Type;
 
+data Entity_Type
+properties
+  Programming_Properties::Source_Name => "Entity_Type";
+  Programming_Properties::Source_Text => ("Rooting.ads");
+end Entity_Type;
+
+data Timestamp
+properties
+  Data_Model::Data_Representation => integer;
+end Timestamp;
+
 data Error_Kind
 properties
   Programming_Properties::Source_Name => "Error_Kind";
