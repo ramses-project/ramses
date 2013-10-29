@@ -48,7 +48,7 @@ rule m_EventCallSpecification
 			
 --			fi.isEventPort()
 --			and
---			callSequence.isComputeEntryPointOf(fi.eContainer())
+--			callSequence.isComputeEntryPointOf(fi.getComponentInstance())
 --			and
 --			fi.isIntraProcessFeatureInstance()
 		)
@@ -57,7 +57,7 @@ rule m_EventCallSpecification
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		EVENT_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction,

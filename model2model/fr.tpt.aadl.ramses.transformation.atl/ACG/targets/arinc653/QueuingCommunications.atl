@@ -47,7 +47,7 @@ abstract rule m_QueueingCallSpecification
 		(
 			fi.isEventOrEventDataPort()
 			and
-			behavior.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 			and
 			not fi.isIntraProcessFeatureInstance()
 		)
@@ -126,7 +126,7 @@ rule m_Output_Queuing_ComputeEntrypointCallSequence
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		QUEUE_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction

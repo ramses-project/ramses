@@ -32,7 +32,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									ARINC653_RUNTIME: AADLBA;
 
 helper context AADLI!FeatureInstance def: isLastFeatureInstance() : Boolean =
-	let c: AADLI!ComponentInstance = self.eContainer() in
+	let c: AADLI!ComponentInstance = self.getComponentInstance() in
 	c.featureInstance->last() = self
 ;
 
