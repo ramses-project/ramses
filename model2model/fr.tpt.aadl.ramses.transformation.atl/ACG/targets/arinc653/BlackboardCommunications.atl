@@ -108,7 +108,7 @@ rule m_Input_BlackBoard_ComputeEntrypointCallSequence
 		fi: AADLI!FeatureInstance,
 		behavior: AADLI!SubprogramCallSequence
 		(
-			behavior.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 		)
 	using
 	{
@@ -129,7 +129,7 @@ rule m_Input_BlackBoard_BehaviorAnnex
 		behavior: AADLBA!AnnexSubclause
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
@@ -185,11 +185,11 @@ rule m_Output_BlackBoard_ComputeEntrypointCallSequence
 		behavior: AADLI!SubprogramCallSequence,
 		cnxRef: AADLI!PortConnection
 		(
-			behavior.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 		)
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
@@ -207,7 +207,7 @@ rule m_Output_BlackBoard_BehaviorAnnex
 		cnxRef: AADLI!PortConnection
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
