@@ -336,11 +336,15 @@ rule m_create_Thread_BA
 		),
 		typeImg : AADLBA!ThreadType (
  	 		name <- c.uniqueName(),
-			ownedDataAccess <- c.featureInstance->select(e| (e.isThreadPort() and e.isInputFeature()))->
+			ownedDataAccess <- c.featureInstance->select(e| e.feature.oclIsTypeOf(AADLI!DataAccess))
+								->union
+								(
+													c.featureInstance->select(e| (e.isThreadPort() and e.isInputFeature()))->
 													collect
 													(
 														f|f.getFeatureImg()
 													)
+								)
 													->union(
 														c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
 														->collect(

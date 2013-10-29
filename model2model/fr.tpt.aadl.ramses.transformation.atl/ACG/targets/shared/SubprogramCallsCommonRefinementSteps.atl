@@ -115,6 +115,9 @@ rule m_ThreadEntrypoint {
 		(
 			name <- c.uniqueName()+'_entrypoint',
 			ownedDataAccess <- 	c.featureInstance->select(e| e.feature.oclIsTypeOf(AADLI!DataAccess))
+									->collect(
+											e|thisModule.resolveTemp(e, 'f_entrypoint')
+										)	
 									->union(
 										c.featureInstance->select(e| e.isInputFeature())
 											->collect(
@@ -614,11 +617,11 @@ unique lazy rule createComputeEntryPointConditionForPort
 		),
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
-			element <- thisModule.resolveTemp(object.eContainer(), 'activatedPort')
+			element <- thisModule.resolveTemp(object.getComponentInstance(), 'activatedPort')
 		),
 		portIDEnum: AADLBA!BehaviorEnumerationLiteral
 		(
-			component <- thisModule.resolveTemp(object.eContainer(), 'whichPortActivatedDataDlassifier'),
+			component <- thisModule.resolveTemp(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
 			enumLiteral <- portIDEnumLiteral
 		)
 	do
@@ -654,7 +657,7 @@ rule m_PortBehavior
 		fi: AADLI!FeatureInstance,
 		behavior: AADLI!SubprogramCallSequence
 		(
-			fi.eContainer().category=#thread
+			fi.getComponentInstance().category=#thread
 			and
 			behavior.isComputeEntryPointOf(fi)
 			and
@@ -662,7 +665,7 @@ rule m_PortBehavior
 		)
 	using
 	{
-		c: AADLI!ComponentInstance = fi.eContainer();
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
 		orderedPorts: AADLI!FeatureInstance = thisModule.theHOOK.getFeaturesOrderedByCriticality(c);
 		fiIndex: Integer = orderedPorts->indexOf(fi);
 	}
@@ -798,7 +801,7 @@ rule m_PortBehavior
 		
   	do
   	{
-  		destinationCE.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
+  		destinationCE.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint'));
 		computeEntryPointActions.actions <- thisModule.populateFeatureComputeEntryPointActions(fi, behavior);
   	}
 }
@@ -811,7 +814,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 	{
 		intermediateCallActionSequence: Sequence(AADLBA!BehaviorAction) = Sequence{};
 		portsInvoledInCall: Sequence(AADLI!FeatureInstance) = Sequence{};
-		c: AADLI!ComponentInstance = fi.eContainer();
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
 	}
 	do
 	{
@@ -1290,7 +1293,7 @@ rule m_PortSubprogramCall {
 	(behavior.isComputeEntryPointOf(fi))
   using
   {
-	c: AADLI!ComponentInstance = fi.eContainer();
+	c: AADLI!ComponentInstance = fi.getComponentInstance();
 	impl: AADLI!ThreadImplementation = c.subcomponent.classifier;
 	calledSubprogram : AADLI!SubprogramClassifier = subprogramCall.getSubprogramClassifier();
 	intermediateParameterLabelList: Sequence(AADLBA!ElementHolder) = Sequence{};
@@ -1480,7 +1483,7 @@ rule m_Parameter_to_PortInstance_Connection
 			and
 			paramCnx.isPartOfCallSequence(behavior)
 			and
-			behavior.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 			and
 			fi.feature.oclIsKindOf(AADLI!Port)
 		)
@@ -1659,7 +1662,7 @@ abstract rule m_Port_ComputeEntrypointCallSequence
 		(
 			fi.isThreadPort()
 			and
-			behavior.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 		)
 }
 
@@ -1697,7 +1700,7 @@ rule m_Input_Port_ComputeEntrypointCallSequence
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint'));
 	}
 }
 
@@ -1826,7 +1829,7 @@ rule m_Output_Port_ComputeEntrypointCallSequence
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint'));
 	}
 }
 
