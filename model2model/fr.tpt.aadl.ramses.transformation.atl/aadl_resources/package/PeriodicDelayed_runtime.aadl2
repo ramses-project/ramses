@@ -5,7 +5,9 @@ with Base_Types, Data_Model, Generation_Properties;
 
   data ReturnCodeType
     properties
-      Source_Name => "periodic_delayed_return_t";
+	  Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("Ok","EmtpyQueue", "FullQueue");
+      Data_Model::Initial_Value => ("Ok");
   end ReturnCodeType;
 
   data ArrayDataType
@@ -22,6 +24,7 @@ with Base_Types, Data_Model, Generation_Properties;
       first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       bufferSize: in parameter Base_Types::Integer_16;
+      ReturnCode: out parameter ReturnCodeType ;
      annex behavior_specification {**
        variables
        	 prev : Base_Types::Integer_16;
@@ -52,6 +55,7 @@ with Base_Types, Data_Model, Generation_Properties;
       buffer: requires data access ArrayDataType {Access_Right=>read_only;};
       output: requires data access output_type {Access_Right=>write_only;};
       bufferSize: in parameter Base_Types::Integer_16;
+      ReturnCode: out parameter ReturnCodeType ;
     annex behavior_specification {**
       states
     	s: initial final state;
@@ -152,6 +156,7 @@ with Base_Types, Data_Model, Generation_Properties;
     					Generation_Properties::Parameter_Usage => By_Reference;
   						};
       CPR : out parameter Base_Types::Integer_16;
+      ReturnCode: out parameter ReturnCodeType ;
     properties
       Source_Name => "Compute_CPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
@@ -164,6 +169,7 @@ with Base_Types, Data_Model, Generation_Properties;
       PPR : out parameter Base_Types::Integer_16;
       CPR : in parameter Base_Types::Integer_16;
       periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
+      ReturnCode: out parameter ReturnCodeType ;
     properties
       Source_Name => "Compute_PPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
@@ -193,15 +199,16 @@ with Base_Types, Data_Model, Generation_Properties;
       periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
       first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      ReturnCode: out parameter ReturnCodeType ;
     annex behavior_specification {**
       states
         s: initial final state;
       transitions
        t: s -[]-> s 
        {
-		 Compute_CPR!(iteration_counter, periodic_delayed_context, first);
+		 Compute_CPR!(iteration_counter, periodic_delayed_context, first, ReturnCode);
          iteration_counter := (iteration_counter+1) mod CPRSize;
-         Compute_CPR!(iteration_counter, periodic_delayed_context, last)
+         Compute_CPR!(iteration_counter, periodic_delayed_context, last, ReturnCode)
        };
     **};
   end Receive_Input_LowFP;

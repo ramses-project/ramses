@@ -580,7 +580,12 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	call: AADLBA!SubprogramCallAction
 	(
 		subprogram<-nextValueHolder,
-		parameterLabels <- Sequence{readIndex_SubcomponentHolder,lastIndex_SubcomponentHolder,buffer_AccessHolder,output_AccessHolder,bufferSize_SubcomponentHolder}
+		parameterLabels <- Sequence{readIndex_SubcomponentHolder,
+									lastIndex_SubcomponentHolder,
+									buffer_AccessHolder,
+									output_AccessHolder,
+									bufferSize_SubcomponentHolder,
+									ErrorCode_Holder}
 	),
 	nextValueHolder: AADLBA!CalledSubprogramHolder
 	(
@@ -616,5 +621,10 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	bufferSize_SubcomponentHolder: AADLBA!DataSubcomponentHolder
 	(
 		element<-thisModule.resolveTemp(fi, 'bufferSizeSubcomponent')
+	),
+	
+	ErrorCode_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element <- thisModule.CreateReturnSubcomponentFromPort(fi)
 	)
 }

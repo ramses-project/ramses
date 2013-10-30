@@ -753,7 +753,8 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 									CPRSize_Holder,
 									PeriodicDelayedContext_Holder,
 									ReadIndex_Holder,
-									LastIndex_Holder}
+									LastIndex_Holder,
+									ErrorCode_Holder}
 	),	  
 	receiveInput_Holder: AADLBA!SubprogramHolder
 	(
@@ -788,5 +789,10 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	LastIndex_Holder: AADLBA!DataAccessHolder
 	(
 		element<-thisModule.resolveTemp(fi,'lastIndex')
+	),
+	
+	ErrorCode_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element <- thisModule.CreateReturnSubcomponentFromPort(fi)
 	)
 }

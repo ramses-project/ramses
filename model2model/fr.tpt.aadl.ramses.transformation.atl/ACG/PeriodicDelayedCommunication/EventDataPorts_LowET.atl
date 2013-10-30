@@ -190,7 +190,11 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram<-putValueSpgHolder,		
-			parameterLabels <- Sequence{iterationCounter_DataSubcomponent_Holder, CDWTable_Holder, CDWSize_DataSubcomponent_Holder, currentValue_DataSubcomponent_Holder, buffer_ThreadAccess_Holder}
+			parameterLabels <- Sequence{iterationCounter_DataSubcomponent_Holder, 
+										CDWTable_Holder, 
+										CDWSize_DataSubcomponent_Holder, 
+										currentValue_DataSubcomponent_Holder, 
+										buffer_ThreadAccess_Holder}
 		),
 		putValueSpgHolder: AADLBA!CalledSubprogramHolder
 		(
@@ -247,7 +251,14 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	callReceiveInputs: AADLBA!SubprogramCallAction
 	(
 		subprogram<-receiveInputsHolder,
-		parameterLabels <- Sequence{iterationCounter_DataSubcomponent_Holder,CPR_DataSubcomponent_Holder,CPRSize_DataSubcomponent_Holder,readIndex_DataSubcomponent_Holder,lastIndex_DataSubcomponent_Holder,bufferSize_DataSubcomponent_Holder}
+		parameterLabels <- Sequence{iterationCounter_DataSubcomponent_Holder,
+									CPR_DataSubcomponent_Holder,
+									CPRSize_DataSubcomponent_Holder,
+									readIndex_DataSubcomponent_Holder,
+									lastIndex_DataSubcomponent_Holder,
+									bufferSize_DataSubcomponent_Holder,
+									ErrorCode_Holder
+		}
 	),
 	receiveInputsHolder: AADLBA!CalledSubprogramHolder
 	(
@@ -288,6 +299,11 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	bufferSize_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
 	(
 		element<-thisModule.resolveTemp(fi, 'bufferSizeSubcomponent')
+	),
+	
+	ErrorCode_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element <- thisModule.CreateReturnSubcomponentFromPort(fi)
 	)
 }
 
