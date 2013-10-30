@@ -45,7 +45,7 @@ abstract rule m_RavenscarCallSpecification
 		(
 			fi.isEventOrEventDataPort()
 			and
-			behavior.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 			and
 			fi.isIntraProcessFeatureInstance()
 		)

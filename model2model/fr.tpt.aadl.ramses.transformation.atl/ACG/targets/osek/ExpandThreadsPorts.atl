@@ -233,7 +233,7 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 		),
 		globalVariableValue: AADLBA!DataSubcomponent
 		(
-			name <- fi.eContainer().name+'_'+fi.name+'_value',
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_value',
 			dataSubcomponentType <- fi.feature.dataFeatureClassifier
 		),
 		GvInit: AADLBA!ListValue
@@ -275,12 +275,12 @@ rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 		),
 		globalVariableValue: AADLBA!DataSubcomponent
 		(
-			name <- fi.eContainer().name+'_'+fi.name+'_value',
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_value',
 			dataSubcomponentType <- buffer
 		),
 		buffer: AADLBA!DataType
 		(
-			name <- fi.eContainer().name+'_'+fi.name+'_bufferType',
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_bufferType',
 			ownedPropertyAssociation <- Sequence
 			{
 				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
@@ -545,8 +545,8 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
 	let p: AADLI!FeatureInstance = self.getDirectlyUsedInFresh() in
 	if(not p.oclIsUndefined()) then
-		let package_name: String = p.eContainer().subcomponent.classifier.getNamespace().getOwner().name in
-		if(p.eContainer().eContainer() = self.eContainer().eContainer()) then
+		let package_name: String = p.getComponentInstance().subcomponent.classifier.getNamespace().getOwner().name in
+		if(p.getComponentInstance().eContainer() = self.getComponentInstance().eContainer()) then
 			package_name+thisModule.packageSuffix.concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
 		else
 			package_name+thisModule.packageSuffix.concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()

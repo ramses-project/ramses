@@ -1248,6 +1248,20 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   	    return DONE;
       }
       
+      private BehaviorAnnex getAnnexSubclause(SubprogramClassifier object)
+      {
+    	  for(AnnexSubclause as: object.getOwnedAnnexSubclauses())
+          {
+            if(as instanceof BehaviorAnnex)
+            {
+          	  return (BehaviorAnnex) as;
+            }
+          }
+    	  if(object.getExtended()!=null)
+    		return getAnnexSubclause((SubprogramClassifier) object.getExtended());
+    	  return null;
+      }
+      
       public String caseSubprogramClassifier(SubprogramClassifier object)
       {
     	subprogramsUnparsingStack.add(object);
@@ -1265,16 +1279,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           orderedFeatureList = Aadl2Utils.orderFeatures(st) ;
         }
         
-        BehaviorAnnex ba = null;
+        BehaviorAnnex ba = getAnnexSubclause(object);
         
-        for(AnnexSubclause as: object.getOwnedAnnexSubclauses())
-        {
-          if(as instanceof BehaviorAnnex)
-          {
-        	ba = (BehaviorAnnex) as;
-        	break;
-          }
-        }
         if(ba!=null)
         {
     	  String aadlComponentCId =

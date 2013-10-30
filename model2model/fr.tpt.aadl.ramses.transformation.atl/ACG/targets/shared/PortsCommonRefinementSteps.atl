@@ -110,7 +110,7 @@ rule m_Thread_Output_Port_Instance
 		)
 	do
 	{
-		connectedAccess.setContext(thisModule.resolveTemp(fi.eContainer(), 'sub'));
+		connectedAccess.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'sub'));
 	}
 }
 
@@ -125,7 +125,7 @@ rule m_Process_Output_Port_Instance
 		)
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(name <- fi.eContainer().name+'_'+fi.name+'_globalVariable')
+		(name <- fi.getComponentInstance().name+'_'+fi.name+'_globalVariable')
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
@@ -145,7 +145,7 @@ rule m_Thread_Input_Port_Instance
 		connectedSubcomponent: AADLBA!ConnectedElement,
 		accessConnection: AADLBA!AccessConnection
 		(
-			name <- 'Id_instance_to_'+fi.eContainer().name+'_'+fi.name,
+			name <- 'Id_instance_to_'+fi.getComponentInstance().name+'_'+fi.name,
 			source<-connectedAccess,
 			accessCategory<-#data,
 			destination<-connectedSubcomponent
@@ -156,7 +156,7 @@ rule m_Thread_Input_Port_Instance
 		)
 	do
 	{
-		connectedAccess.setContext(thisModule.resolveTemp(fi.eContainer(), 'sub'));
+		connectedAccess.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'sub'));
 	}
 }
 
@@ -185,7 +185,7 @@ rule m_Thread_IntraProcess_Input_Port_Instance
 		)
 	to
 		globalVariable: AADLBA!DataSubcomponent
-		(name <- fi.eContainer().name+'_'+fi.name+'_globalVariable'), -- process subcomponents Task + _ + Port P + global variable 
+		(name <- fi.getComponentInstance().name+'_'+fi.name+'_globalVariable'), -- process subcomponents Task + _ + Port P + global variable 
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
 			connectionEnd<-fi.getGlobalVariableImg()
@@ -207,7 +207,7 @@ rule m_Process_Input_Port_Instance
 		)
 	to
 		globalVariable:AADLBA!DataSubcomponent
-		(name <- fi.eContainer().name+'_'+fi.name+'globalVariable')
+		(name <- fi.getComponentInstance().name+'_'+fi.name+'globalVariable')
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
@@ -356,7 +356,7 @@ helper def: assignPortVariableType(fi: AADLI!FeatureInstance, fresh_data_impl_wr
 ;
 
 helper context AADLI!FeatureInstance def: getBehaviorAnnex():  AADLBA!BehaviorAnnex = 
-	self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+	self.getComponentInstance().subcomponent.classifier.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
 ;
 
 helper context AADLI!ComponentInstance def: needsToMapBehaviorAnnex(): Boolean =
@@ -376,12 +376,12 @@ rule m_EventPort_Instance_with_BA
 {
 	from
 		fi: AADLI!FeatureInstance (fi.category=#eventPort 
-									and fi.eContainer().category = #thread
+									and fi.getComponentInstance().category = #thread
 									and not fi.isPeriodicDelayedPort()
-									and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+									and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
-		c: AADLI!ComponentInstance = fi.eContainer();
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
 	}
 	to
 		-- target data access must be called 'f' to be retreived with resolveTemp
@@ -406,12 +406,12 @@ rule m_EventDataPort_Instance_with_BA
 {
 	from
 		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
-								and fi.eContainer().category=#thread
+								and fi.getComponentInstance().category=#thread
 								and not fi.isPeriodicDelayedPort()
-								and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+								and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
-		c: AADLI!ComponentInstance = fi.eContainer();
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
 		implImg: AADLI!ComponentImplementation = OclUndefined;
 	}
 	to
@@ -443,11 +443,11 @@ rule m_DataAccess_Instance_with_BA
 {
 	from
 		fi: AADLI!FeatureInstance (fi.category=#dataAccess
-			 and fi.eContainer().category=#thread
-			 and fi.eContainer().subcomponent.classifier.needsToMapBehaviorAnnex())
+			 and fi.getComponentInstance().category=#thread
+			 and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex())
 	using
 	{
-		c: AADLI!ComponentInstance = fi.eContainer();
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
 		implImg: AADLI!ComponentImplementation = OclUndefined; 
 		processImplImg: AADLI!ProcessImplementation = OclUndefined;
 	}
@@ -519,8 +519,8 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
 	let p: AADLI!FeatureInstance = self.getDirectlyUsedInFresh() in
 	if(not p.oclIsUndefined()) then
-		let package_name: String = p.eContainer().subcomponent.classifier.getNamespace().getOwner().name in
-		if(p.eContainer().eContainer() = self.eContainer().eContainer()) then
+		let package_name: String = p.getComponentInstance().subcomponent.classifier.getNamespace().getOwner().name in
+		if(p.getComponentInstance().eContainer() = self.getComponentInstance().eContainer()) then
 			package_name+thisModule.packageSuffix.concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
 		else
 			package_name+thisModule.packageSuffix.concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()

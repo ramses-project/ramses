@@ -82,7 +82,7 @@ helper context AADLI!ComponentInstance def: needsGlobalQueue(): Boolean =
 
 helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!DataSubcomponent =
 	if(self.isEventPort() or self.isEventDataPort()) then
-		thisModule.resolveTemp(self.eContainer(),'globalQueue')
+		thisModule.resolveTemp(self.getComponentInstance(),'globalQueue')
 	else
 		thisModule.resolveTemp(self,'globalVariable')
 	endif

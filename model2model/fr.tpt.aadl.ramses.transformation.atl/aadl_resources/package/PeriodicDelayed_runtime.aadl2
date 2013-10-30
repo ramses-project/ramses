@@ -6,7 +6,7 @@ with Base_Types, Data_Model, Generation_Properties;
   data ReturnCodeType
     properties
 	  Data_Model::Data_Representation => Enum;
-      Data_Model::Enumerators => ("Ok","EmtpyQueue", "FullQueue");
+      Data_Model::Enumerators => ("Ok","EmptyQueue", "FullQueue");
       Data_Model::Initial_Value => ("Ok");
   end ReturnCodeType;
 
@@ -65,8 +65,11 @@ with Base_Types, Data_Model, Generation_Properties;
 	  if(first>=0)
             output := buffer[first];
             if(first!=last)
-        	first := (first+1) mod bufferSize 
-            end if -- TODO : else: should have an error port and send and error
+        	  first := (first+1) mod bufferSize;
+        	  ReturnCode:=ReturnCodeType#Ok
+        	else
+        	  ReturnCode:=ReturnCodeType#EmptyQueue
+            end if
           end if
         };
     **};
@@ -156,7 +159,6 @@ with Base_Types, Data_Model, Generation_Properties;
     					Generation_Properties::Parameter_Usage => By_Reference;
   						};
       CPR : out parameter Base_Types::Integer_16;
-      ReturnCode: out parameter ReturnCodeType ;
     properties
       Source_Name => "Compute_CPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
@@ -169,7 +171,6 @@ with Base_Types, Data_Model, Generation_Properties;
       PPR : out parameter Base_Types::Integer_16;
       CPR : in parameter Base_Types::Integer_16;
       periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
-      ReturnCode: out parameter ReturnCodeType ;
     properties
       Source_Name => "Compute_PPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
@@ -206,9 +207,9 @@ with Base_Types, Data_Model, Generation_Properties;
       transitions
        t: s -[]-> s 
        {
-		 Compute_CPR!(iteration_counter, periodic_delayed_context, first, ReturnCode);
+		 Compute_CPR!(iteration_counter, periodic_delayed_context, first);
          iteration_counter := (iteration_counter+1) mod CPRSize;
-         Compute_CPR!(iteration_counter, periodic_delayed_context, last, ReturnCode)
+         Compute_CPR!(iteration_counter, periodic_delayed_context, last)
        };
     **};
   end Receive_Input_LowFP;

@@ -297,7 +297,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		behavior: AADLI!SubprogramCallSequence,
 		cnxRef: AADLI!PortConnection
 		(
-			behavior.isComputeEntryPointOf(fi.eContainer())
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 		)
 	using
 	{
@@ -326,7 +326,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		--- connect IterationCounter
 		iterationCounter_Data_Holder_SendOutput: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.createIterationCounter(fi.eContainer())
+			element<-thisModule.createIterationCounter(fi.getComponentInstance())
 		)
 }
 
@@ -354,7 +354,7 @@ rule m_Input_PeriodicDelayed_Port
 		-----------------------
 		bufferArrayType: AADLBA!DataType
 		(
-			name <- 'BufferArrayType_'+fi.eContainer().name+'_'+fi.name,
+			name <- 'BufferArrayType_'+fi.getComponentInstance().name+'_'+fi.name,
 			ownedPropertyAssociation <- Sequence {
 												
 												thisModule.CreatePropertyAssociation
@@ -389,7 +389,7 @@ rule m_Input_PeriodicDelayed_Port
 		),
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			name<-fi.eContainer().name+'_'+fi.name+'_Buffer',
+			name<-fi.getComponentInstance().name+'_'+fi.name+'_Buffer',
 			dataSubcomponentType <- bufferArrayType
 		),
 		
@@ -401,7 +401,7 @@ rule m_Input_PeriodicDelayed_Port
 		
 		bufferSizeSubcomponent:AADLBA!DataSubcomponent
 		(
-			name<-fi.eContainer().name+'_'+fi.name+'_BufferSize',
+			name<-fi.getComponentInstance().name+'_'+fi.name+'_BufferSize',
 			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
 			ownedPropertyAssociation <- Sequence {
 				thisModule.CreatePropertyAssociation(

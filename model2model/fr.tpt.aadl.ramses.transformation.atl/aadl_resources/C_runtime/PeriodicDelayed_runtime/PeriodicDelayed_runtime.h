@@ -1,6 +1,13 @@
 #ifndef _PERIODICDELAYED_RUNTIME_C
 #define _PERIODICDELAYED_RUNTIME_C
 
+typedef enum periodic_delayed_error_t
+{
+  Ok,
+  EmtpyQueue,
+  FullQueue
+} periodic_delayed_error_t;
+
 /**
  * Data of a task
  */

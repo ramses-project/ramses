@@ -114,6 +114,7 @@ public class RamsesPropertyPage extends PropertyPage {
               new ResourceListSelectionDialog(getShell(), 
                                               resourceArray);
         dialog.setTitle("Select instance model to generate code from");
+        dialog.setMessage("To display all available instance models, use *.aaxl2 as the search key.");
         if (dialog.open() == ContainerSelectionDialog.OK) {
           Object[] result = dialog.getResult();
           if (result != null && result.length > 0) {

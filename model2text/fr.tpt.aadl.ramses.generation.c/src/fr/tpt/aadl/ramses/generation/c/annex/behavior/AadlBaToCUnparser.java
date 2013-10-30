@@ -519,16 +519,10 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
                     .getQualifiedName()) ;
         //if (object.isComplete())
 
-        if(object.isFinal())
-        {
-          _cFileContent.addOutputNewline("return;") ;
-        }
-        else
-        {
-          _cFileContent.addOutputNewline(_owner.getName().replace('.', '_')+
-                    "_current_state = " + aadlComponentCId +
-                    "_" + object.getName() + ";") ;
-        }
+        _cFileContent.addOutputNewline(_owner.getName().replace('.', '_')+
+                  "_current_state = " + aadlComponentCId +
+                  "_" + object.getName() + ";") ;
+        
         return DONE ;
       }
 
@@ -582,7 +576,9 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
         }
         if(!object.getDestinationState().isFinal())
             _cFileContent.addOutputNewline("break;") ;
-        
+        else
+            _cFileContent.addOutputNewline("return;") ;
+
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         return DONE ;

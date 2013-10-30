@@ -156,7 +156,7 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 --		behavior: AADLI!SubprogramCallSequence,
 --		cnxRef: AADLI!PortConnection
 --		(
---			behavior.isComputeEntryPointOf(fi.eContainer())
+--			behavior.isComputeEntryPointOf(fi.getComponentInstance())
 --		)
 --	using
 --	{
@@ -390,7 +390,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 	{
 		Put_Value_PrototypeSpg: AADLBA!SubprogramType = 'Put_Value'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
 		Put_Value_PrototypeSpg_Impl : AADLBA!SubprogramImplementation = 'Put_Value.impl'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
-		putValueName : String = Put_Value_PrototypeSpg.name + '_' + fi.eContainer().name + '_' + fi.name;
+		putValueName : String = Put_Value_PrototypeSpg.name + '_' + fi.getComponentInstance().name + '_' + fi.name;
 
 		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
 		producerPort: AADLI!FeatureInstance = cnxInst.source;
@@ -554,12 +554,12 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 --  	CurrentDeadline : in parameter Base_Types::Integer_16;
 		currentDeadlineHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi.eContainer(), 'currentDeadlineSub')
+			element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentDeadlineSub')
 		),
 --  	Priority        : in parameter Base_Types::Integer_16;
 		priorityHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi.eContainer(),'msgPrioritySub')
+			element <- thisModule.resolveTemp(fi.getComponentInstance(),'msgPrioritySub')
 		)
 
 }
@@ -571,7 +571,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
   	fi: AADLI!FeatureInstance,
 	behavior: AADLI!SubprogramCallSequence
 	(
-		(behavior.isComputeEntryPointOf(fi.eContainer())
+		(behavior.isComputeEntryPointOf(fi.getComponentInstance())
 		and
 		fi.isInputFeature()
 		and
@@ -599,12 +599,12 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 --	Period : in parameter Base_Types::Integer_16;
   	periodHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- thisModule.resolveTemp(fi.eContainer(), 'periodSub')
+		element <- thisModule.resolveTemp(fi.getComponentInstance(), 'periodSub')
 	),
 --	CurrentPeriod : in parameter Base_Types::Integer_16;
   	currentPeriodHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- thisModule.resolveTemp(fi.eContainer(), 'currentPeriodSub')
+		element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentPeriodSub')
 	),
 --	PortVariable : requires data access t_aadl_thread_data_queue.impl;
   	portVariableHolder: AADLBA!DataAccessHolder
@@ -679,7 +679,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 		fi.isIntraProcessFeatureInstance())
 	using
 	{
-		ownerName : String = fi.eContainer().name;
+		ownerName : String = fi.getComponentInstance().name;
 
 		t_data : AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
 		runtimeName: String = thisModule.PeriodicDelayedMutexRuntime_Name;
@@ -688,19 +688,19 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 
 		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = 'Receive_Input'.asSubprogramType(runtimeName);
 		Receive_Input_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Receive_Input.impl'.asSubprogramType(runtimeName);
-		receiveInputName : String = Receive_Input_PrototypeSpg.name + ' ' + fi.eContainer().name + ' ' + fi.name;
+		receiveInputName : String = Receive_Input_PrototypeSpg.name + ' ' + fi.getComponentInstance().name + ' ' + fi.name;
 
 		Next_Value_PrototypeSpg: AADLBA!SubprogramType = 'Next_Value'.asSubprogramType(runtimeName);
 		Next_Value_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Next_Value.impl'.asSubprogramType(runtimeName);
-		nextValueName : String = Next_Value_PrototypeSpg.name + '_' + fi.eContainer().name + '_' + fi.name;
+		nextValueName : String = Next_Value_PrototypeSpg.name + '_' + fi.getComponentInstance().name + '_' + fi.name;
 
-		bufferTypeName: String = 'QueueType_'+fi.eContainer().name+'_'+fi.name;
-		bufferSubcomponentName: String = fi.eContainer().name+'_'+fi.name;
+		bufferTypeName: String = 'QueueType_'+fi.getComponentInstance().name+'_'+fi.name;
+		bufferSubcomponentName: String = fi.getComponentInstance().name+'_'+fi.name;
 	}
 	to
 		bufferArrayType: AADLBA!DataType
 		(
-			name <- 'BufferArrayType_'+fi.eContainer().name+'_'+fi.name,
+			name <- 'BufferArrayType_'+fi.getComponentInstance().name+'_'+fi.name,
 			ownedPropertyAssociation <- Sequence {
 												
 					thisModule.CreatePropertyAssociation
@@ -795,7 +795,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 		),
 		receiveInputSpg: AADLBA!SubprogramType
 		(
-			name <- Receive_Input_PrototypeSpg.name+'_'+ fi.eContainer().name + '_' + fi.name,
+			name <- Receive_Input_PrototypeSpg.name+'_'+ fi.getComponentInstance().name + '_' + fi.name,
 			ownedExtension <- extendedReceiveInputSpg,
 			ownedPrototypeBinding <- Sequence{receiveInputPortPrototypeBinding, receiveInputLinkPrototypeBinding}
 		),
@@ -860,7 +860,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
 		),
 		nextValueSpg: AADLBA!SubprogramType
 		(
-			name <- Next_Value_PrototypeSpg.name+'_'+ fi.eContainer().name + '_' + fi.name,
+			name <- Next_Value_PrototypeSpg.name+'_'+ fi.getComponentInstance().name + '_' + fi.name,
 			ownedExtension <- extendedNextValueSpg,
 			ownedPrototypeBinding <- Sequence{nextValueDataPrototypeBinding,
 											  nextValuePortVariablePrototypeBinding,
@@ -969,7 +969,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 --		),
 		currentPeriodHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi.eContainer(), 'currentPeriodSub')
+			element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentPeriodSub')
 		)
 }
 
@@ -1002,10 +1002,10 @@ helper context AADLBA!ThreadImplementation def : getCall(name: String) : AADLBA!
 
 helper context AADLI!FeatureInstance def : getAllInternalConnections() : Sequence(AADLI!Connection) =
 	if (self.direction = #out) then
-		self.eContainer().subcomponent.classifier.getOwnedConnections()
+		self.getComponentInstance().subcomponent.classifier.getOwnedConnections()
 			->select(c|c.destination.connectionEnd.name=self.feature.name)
 	else
-		self.eContainer().subcomponent.classifier.getOwnedConnections()
+		self.getComponentInstance().subcomponent.classifier.getOwnedConnections()
 			->select(c|c.source.connectionEnd.name=self.feature.name)
 	endif
 ;
@@ -1267,7 +1267,7 @@ unique lazy rule Queue_Element_Type
 --	{
 --		processImg : AADLBA!Subcomponent = OclUndefined;
 --		dstThreadImg : AADLBA!Subcomponent = OclUndefined;
---		ownerName : String = port.eContainer().name;
+--		ownerName : String = port.getComponentInstance().name;
 --
 --		dataClassifier : AADLBA!DataClassifier = port.feature.dataFeatureClassifier;
 --		runtimeName: String = thisModule.PeriodicDelayedMutexRuntime_Name;
@@ -1283,7 +1283,7 @@ unique lazy rule Queue_Element_Type
 --	
 --		bufferArrayType: AADLBA!DataType
 --		(
---			name <- 'BufferArrayType_'+port.eContainer().name+'_'+port.name,
+--			name <- 'BufferArrayType_'+port.getComponentInstance().name+'_'+port.name,
 --			ownedPropertyAssociation <- Sequence {
 --												
 --					thisModule.CreatePropertyAssociation
@@ -1310,7 +1310,7 @@ unique lazy rule Queue_Element_Type
 --		),
 --		bufferQueueType: AADLBA!DataType
 --		(
---			name <- 'QueueType_'+port.eContainer().name+'_'+port.name,
+--			name <- 'QueueType_'+port.getComponentInstance().name+'_'+port.name,
 --			ownedExtension <- bufferQueueTypeExtension
 --		),
 --		bufferQueueTypeExtension: AADLBA!TypeExtension
@@ -1353,17 +1353,17 @@ unique lazy rule Queue_Element_Type
 --		),
 --		bufferSubcomponent:AADLBA!DataSubcomponent
 --		(
---			name<-port.eContainer().name+'_'+port.name,
+--			name<-port.getComponentInstance().name+'_'+port.name,
 --			dataSubcomponentType <- bufferQueueImpl
 --		),
 --		firstSubcomponent: AADLBA!DataSubcomponent 
 --		(
---			name<-port.eContainer().name+'_'+port.name+'_First',
+--			name<-port.getComponentInstance().name+'_'+port.name+'_First',
 --			dataSubcomponentType <- thisModule.Queue_Element_Type_Ptr(dataClassifier) 
 --		),
 --		bufferAccess:AADLBA!DataAccess
 --		(
---			name <- port.eContainer().name+'_'+port.name+'_Buffer',
+--			name <- port.getComponentInstance().name+'_'+port.name+'_Buffer',
 --			dataFeatureClassifier <- bufferQueueImpl,
 --			kind<-#requires
 --		),
@@ -1373,7 +1373,7 @@ unique lazy rule Queue_Element_Type
 --		),
 --		bufferConnection_Dest: AADLBA!ConnectedElement
 --		(
---			context <- port.eContainer().getSubcomponentImg(),
+--			context <- port.getComponentInstance().getSubcomponentImg(),
 --			connectionEnd <- bufferAccess.debug('bufferConnection_Dest')
 --		),
 --		bufferConnection:AADLBA!AccessConnection
@@ -1388,8 +1388,8 @@ unique lazy rule Queue_Element_Type
 --		port.debug('EventDataPort_Instance');
 --		thisModule.addImportedUnit(thisModule.public(), 'PERIODICDELAYEDMUTEX_RUNTIME', 'PeriodicDelayedMutex_runtime');
 --		
---		processImg<-port.eContainer().eContainer().getSubcomponentImg().classifier;
---		dstThreadImg<-port.eContainer().getSubcomponentImg().classifier;
+--		processImg<-port.getComponentInstance().eContainer().getSubcomponentImg().classifier;
+--		dstThreadImg<-port.getComponentInstance().getSubcomponentImg().classifier;
 --		
 --		dstThreadImg.debug('EventDataPort_Instance-dstThreadImg');
 --		
@@ -1409,7 +1409,7 @@ unique lazy rule Queue_Element_Type
 --		dstThreadImg.ownedParameterConnection.add(receiveInputFirstAccessConnection);
 --		
 --		bufferConnection_Dest.context 
---			<- port.eContainer().getSubcomponentImg().debug('bufferConnection_Dest.context');
+--			<- port.getComponentInstance().getSubcomponentImg().debug('bufferConnection_Dest.context');
 --		
 --		receiveInputPeriodParameterConnection_Source.connectionEnd
 --			<- dstThreadImg.ownedDataSubcomponent->any(d|d.name='Period');
@@ -1435,8 +1435,8 @@ unique lazy rule Queue_Element_Type
 --			--cnxInst.destination.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED DESTINATION')
 --			--and cnxInst.source.isPeriodicDelayedPort().debug('IS PERIODIC-DELAYED SOURCE')
 --			cnxInst.destination.debug('PortConnection_Instance').isDelayedPort()
---			and cnxInst.source.eContainer().category = #thread
---			and cnxInst.destination.eContainer().category = #thread
+--			and cnxInst.source.getComponentInstance().category = #thread
+--			and cnxInst.destination.getComponentInstance().category = #thread
 --		)
 --	using
 --	{
@@ -1449,9 +1449,9 @@ unique lazy rule Queue_Element_Type
 --		Send_Output_Spg: AADLBA!SubprogramType = 'Send_Output'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
 --
 --		putValueCallIndex : Integer = 0;
---		sourceOwner : String = cnxInst.source.eContainer().name;
+--		sourceOwner : String = cnxInst.source.getComponentInstance().name;
 --
---		portSimpleName : String = port.eContainer().name 
+--		portSimpleName : String = port.getComponentInstance().name 
 --			          + '_' + port.name;
 --	}
 --	to
@@ -1472,7 +1472,7 @@ unique lazy rule Queue_Element_Type
 --		),
 --		portDataConnection_Destination : AADLBA!ConnectedElement
 --		(
---			context <- cnxInst.source.eContainer().getSubcomponentImg(),
+--			context <- cnxInst.source.getComponentInstance().getSubcomponentImg(),
 --			connectionEnd <- portDataAccess
 --		),
 --		portDataConnection : AADLBA!AccessConnection
@@ -1484,7 +1484,7 @@ unique lazy rule Queue_Element_Type
 --		),
 --		bufferAccess: AADLBA!DataAccess
 --		(
---			name<-port.eContainer().name+'_'+port.name+'_Buffer',
+--			name<-port.getComponentInstance().name+'_'+port.name+'_Buffer',
 --			dataFeatureClassifier <- thisModule.resolveTemp(port,'bufferQueueImpl'),
 --			kind <- #requires
 --		),
@@ -1494,7 +1494,7 @@ unique lazy rule Queue_Element_Type
 --		),
 --		bufferConnection_Dest : AADLBA!ConnectedElement
 --		(
---			context <- cnxInst.source.eContainer().getSubcomponentImg(),
+--			context <- cnxInst.source.getComponentInstance().getSubcomponentImg(),
 --			connectionEnd <- bufferAccess
 --		),
 --		bufferConnection : AADLBA!AccessConnection
@@ -1550,7 +1550,7 @@ unique lazy rule Queue_Element_Type
 --		),
 --		putValueMsgPriorityParameterConnection_Source: AADLBA!ConnectedElement
 --		(
---			connectionEnd <- port.eContainer().getImgSubcomponent('MsgPriority')
+--			connectionEnd <- port.getComponentInstance().getImgSubcomponent('MsgPriority')
 --		),
 --		putValueMsgPriorityParameterConnection_Destination : AADLBA!ConnectedElement
 --		(
@@ -1565,7 +1565,7 @@ unique lazy rule Queue_Element_Type
 --		),
 --		putValueCurrentDeadlineParameterConnection_Source: AADLBA!ConnectedElement
 --		(
---			connectionEnd <- port.eContainer().getImgSubcomponent('CurrentDeadline')
+--			connectionEnd <- port.getComponentInstance().getImgSubcomponent('CurrentDeadline')
 --		),
 --		putValueCurrentDeadlineParameterConnection_Destination : AADLBA!ConnectedElement
 --		(
@@ -1598,8 +1598,8 @@ unique lazy rule Queue_Element_Type
 --	{
 --		thisModule.addImportedUnit(thisModule.public(), 'PERIODICDELAYEDMUTEX_RUNTIME', 'PeriodicDelayedMutex_runtime');
 --		
---		processImg<-port.eContainer().eContainer().getSubcomponentImg().classifier;
---		dstThreadImg<-cnxInst.source.eContainer().getSubcomponentImg().classifier;
+--		processImg<-port.getComponentInstance().eContainer().getSubcomponentImg().classifier;
+--		dstThreadImg<-cnxInst.source.getComponentInstance().getSubcomponentImg().classifier;
 --		
 --		dstThreadImg.debug('Connection_Instance-dstThreadImg');
 --		
@@ -1639,7 +1639,7 @@ unique lazy rule Queue_Element_Type
 --	to
 --		receiveInputSpg: AADLBA!SubprogramType
 --		(
---			name <- Receive_Input_PrototypeSpg.name+'_'+ port.eContainer().name + '_' + port.name,
+--			name <- Receive_Input_PrototypeSpg.name+'_'+ port.getComponentInstance().name + '_' + port.name,
 --			ownedExtension <- extendedReceiveInputSpg,
 --			ownedPrototypeBinding <- Sequence{receiveInputPrototypeBinding},
 --			ownedDataAccess <- Sequence{receiveInputPortVariable},
@@ -1695,7 +1695,7 @@ unique lazy rule Queue_Element_Type
 --		nextValueSpg: AADLBA!SubprogramType
 --		(
 --			--name <- Next_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath()),
---			name <- Next_Value_PrototypeSpg.name+'_'+ port.eContainer().name + '_' + port.name,
+--			name <- Next_Value_PrototypeSpg.name+'_'+ port.getComponentInstance().name + '_' + port.name,
 --			ownedExtension <- extendedNextValueSpg,
 --			ownedPrototypeBinding <- Sequence{nextValuePrototypeBinding},
 --			ownedDataAccess <- Sequence {nextValuePortVariable},
@@ -1758,7 +1758,7 @@ unique lazy rule Queue_Element_Type
 --		sendOutputSpg: AADLBA!SubprogramType
 --		(
 --			--name <- Next_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(port.getComponentInstancePath()),
---			name <- Send_Output_PrototypeSpg.name+'_'+ port.eContainer().name + '_' + port.name,
+--			name <- Send_Output_PrototypeSpg.name+'_'+ port.getComponentInstance().name + '_' + port.name,
 --			ownedExtension <- extendedSendOutputSpg,
 --			ownedPrototypeBinding <- Sequence{sendOutputPrototypeBinding},
 --			ownedDataAccess <- Sequence {sendOutputPortVariable}
