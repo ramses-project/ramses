@@ -180,7 +180,7 @@ rule m_SubprogramAccess_Instance
 		fi: AADLI!FeatureInstance (fi.category=#subprogramAccess)
 	using
 	{
-			c : AADLI!ComponentInstance = fi.eContainer();
+			c : AADLI!ComponentInstance = fi.getComponentInstance();
 	}
 	to
 		f: AADLBA!SubprogramAccess
