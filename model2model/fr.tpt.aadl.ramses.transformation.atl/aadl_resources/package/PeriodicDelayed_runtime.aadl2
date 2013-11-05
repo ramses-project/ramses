@@ -27,16 +27,16 @@ with Base_Types, Data_Model, Generation_Properties;
       ReturnCode: out parameter ReturnCodeType ;
      annex behavior_specification {**
        variables
-       	 prev : Base_Types::Integer_16;
+       	 next : Base_Types::Integer_16;
        states
          s: initial final state;
        transitions
        t2: s -[]-> s 
        {
-         prev := (iteration_counter-1) mod CPRSize;
-         if(CPR[prev] != CPR[iteration_counter])
-           first := (last+1) mod bufferSize;
-           last  := CPR[iteration_counter]
+         next := (iteration_counter+1) mod CPRSize;
+         if(CPR[next] != CPR[iteration_counter])
+           first := CPR[iteration_counter];
+           last  := CPR[next]
          else
            first := -1;
 	       last  := -1
