@@ -62,7 +62,7 @@ with Base_Types, Data_Model, Generation_Properties;
       transitions
         t: s -[]-> s
         {
-	  if(first>=0)
+		  if(first>=0)
             output := buffer[first];
             if(first!=last)
         	  first := (first+1) mod bufferSize;
@@ -70,6 +70,8 @@ with Base_Types, Data_Model, Generation_Properties;
         	else
         	  ReturnCode:=ReturnCodeType#EmptyQueue
             end if
+          else
+            ReturnCode:=ReturnCodeType#EmptyQueue
           end if
         };
     **};
