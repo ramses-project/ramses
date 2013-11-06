@@ -185,6 +185,8 @@ unique lazy rule createIterationCounter
 	}
 }
 
+helper def : PDC_RUNTIME_NAME : String = 'PeriodicDelayed_runtime';
+
 abstract rule m_PeriodicDelayed_Port
 {
 	from
@@ -192,7 +194,8 @@ abstract rule m_PeriodicDelayed_Port
 		(fi.isPeriodicDelayedPort())
 	do
 	{
-		thisModule.addImportedUnit(thisModule.public(), 'PERIODICDELAYED_RUNTIME', 'PeriodicDelayed_runtime');
+		--thisModule.addImportedUnit(thisModule.public(), 'PERIODICDELAYED_RUNTIME', 'PeriodicDelayed_runtime');
+		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_RUNTIME_NAME.toUpper(), thisModule.PDC_RUNTIME_NAME);
 	}
 }
 
@@ -330,7 +333,6 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		)
 }
 
-
 -- @extends m_Thread_Input_Port_Instance,m_PeriodicDelayed_Port
 rule m_Input_PeriodicDelayed_Port
 {
@@ -357,21 +359,21 @@ rule m_Input_PeriodicDelayed_Port
 			name <- 'BufferArrayType_'+fi.getComponentInstance().name+'_'+fi.name,
 			ownedPropertyAssociation <- Sequence {
 												
-												thisModule.CreatePropertyAssociation
-												(
-												 	'Data_Representation',
-													'DATA_MODEL',
-													'Array'.asEnumeration('DATA_MODEL').asNamedValue()
-												),
-												
-												thisModule.CreatePropertyAssociation
-												(
-												 	'Base_Type',
-													'DATA_MODEL',
-													thisModule.CreateListValueFromClassifier(
-														'Integer_16'.asClassifier('BASE_TYPES')
-													)
-												),
+--												thisModule.CreatePropertyAssociation
+--												(
+--												 	'Data_Representation',
+--													'DATA_MODEL',
+--													'Array'.asEnumeration('DATA_MODEL').asNamedValue()
+--												),
+--												
+--												thisModule.CreatePropertyAssociation
+--												(
+--												 	'Base_Type',
+--													'DATA_MODEL',
+--													thisModule.CreateListValueFromClassifier(
+--														'Integer_16'.asClassifier('BASE_TYPES')
+--													)
+--												),
 												
 												thisModule.CreatePropertyAssociation
 												(
