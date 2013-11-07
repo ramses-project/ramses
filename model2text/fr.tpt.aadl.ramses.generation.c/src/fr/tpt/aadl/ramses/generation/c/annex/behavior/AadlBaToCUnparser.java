@@ -39,6 +39,9 @@ import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
 import org.osate.aadl2.BehavioredImplementation;
+import org.osate.aadl2.Classifier;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentPrototypeBinding;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.DataSubcomponent;
@@ -51,6 +54,7 @@ import org.osate.aadl2.PrototypeBinding;
 import org.osate.aadl2.Subprogram;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation;
+import org.osate.aadl2.SubprogramPrototype;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadClassifier;
@@ -1051,11 +1055,31 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
 
           AadlToCUnparser aadlCUnparser = AadlToCUnparser.getAadlToCUnparser(); 
           
+          if(sct instanceof SubprogramPrototype)
+          {
+        	  SubprogramPrototype sp = (SubprogramPrototype) sct ;
+        	  Classifier cl = (Classifier) _owner;
+        	  List<PrototypeBinding> prototypeBindingList = cl.getOwnedPrototypeBindings();
+        	  if(cl instanceof ComponentImplementation)
+        	  {
+        		  ComponentImplementation ci = (ComponentImplementation) cl;
+        		  prototypeBindingList.addAll(ci.getType().getOwnedPrototypeBindings());
+        	  }
+        	  for(PrototypeBinding pb: prototypeBindingList)
+        	  {
+        		  ComponentPrototypeBinding cpb = (ComponentPrototypeBinding) pb;
+        		  if(pb.getFormal().equals(sp))
+        		  {
+        			  sct = (SubprogramSubcomponentType) cpb.getActuals().get(0).getSubcomponentType();
+        			  break;
+        		  }
+        	  }
+          }
           if(sct instanceof SubprogramType)
           {
             st = (SubprogramType) sct ;
           }
-          else
+          else if(sct instanceof SubprogramImplementation)
           {
             SubprogramImplementation si = (SubprogramImplementation) sct ;
             st = si.getType() ;

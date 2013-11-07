@@ -151,6 +151,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   // are defined in the process implementation via connections.
   private Map<DataAccess, String> _dataAccessMapping = new HashMap<DataAccess, String>();
   
+  private NamedElement _owner;
+  
   /**
    * Stack of subprogram classifiers currently uunparsed.
    * Used to resolve prototype dependencies between subprogram calls.
@@ -404,7 +406,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 		  AadlToCSwitchProcess sourceNameDest, 
 		  AadlToCSwitchProcess sourceTextDest)
   {
-	  processDataSubcomponentType(null, dst, sourceNameDest, sourceTextDest);
+	  processDataSubcomponentType((Classifier)_owner, dst, sourceNameDest, sourceTextDest);
   }
   
   protected void processDataSubcomponentType(Classifier owner,
@@ -800,7 +802,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         {
         	if(object instanceof DataImplementation)
         	{
-        		for(DataSubcomponent ds:((DataImplementation)object).getOwnedDataSubcomponents())
+        		_owner = object;
+        		for(DataSubcomponent ds:getAllDataSubcomponents((DataImplementation)object))
         		{
         			DataSubcomponentType dst = ds.getDataSubcomponentType();
         			Set<String> l;
@@ -819,8 +822,16 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         			else
         			{
         				process(dst);
-        				sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
-        				structDefinition.append("\t"+sourceName);
+        				
+        				if(dst instanceof DataPrototype)
+        				{
+        					structDefinition.append("\tvoid *");
+        				}
+        				else
+        				{
+        				  sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
+        				  structDefinition.append("\t"+sourceName);
+        				}
         			}
         			structDefinition.append(" "+ds.getName()+";\n");
         		}
@@ -979,6 +990,18 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       }
     }
   }
+  
+  List<DataSubcomponent> getAllDataSubcomponents(ComponentImplementation ci)
+  {
+	List<DataSubcomponent> result = new ArrayList<DataSubcomponent>();
+	for(Subcomponent s: ci.getAllSubcomponents())
+	{
+	  if(s instanceof DataSubcomponent)
+	    result.add((DataSubcomponent)s);
+	}
+	return result;
+  }
+	  
 
   @Override
   protected void initSwitches()
@@ -1100,7 +1123,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentImplUnparser = _deploymentImplCode;
         List<String> dataSubcomponentNames = new ArrayList<String>();
         Map<String, DataSubcomponent> dataSubcomponentMapping = new HashMap<String, DataSubcomponent>();
-        for(DataSubcomponent ds: object.getOwnedDataSubcomponents())
+        _owner = object;
+        for(DataSubcomponent ds: getAllDataSubcomponents(object))
         {
           dataSubcomponentNames.add(ds.getName());
           if(false == _dataAccessMapping.containsValue(ds.getName()))
@@ -1146,9 +1170,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       public String caseProcessSubcomponent(ProcessSubcomponent object)
       {
         process(object.getComponentImplementation()) ;
-        for(NamedElement ne: additionalUnparsing)
-        	process(ne);
-        additionalUnparsing.clear();
+        List<NamedElement> additionalNamedElement = new ArrayList<NamedElement>();
+        while(false==additionalUnparsing.isEmpty())
+        {
+          additionalNamedElement.addAll(additionalUnparsing);
+          additionalUnparsing.clear();
+          for(NamedElement ne: additionalNamedElement)
+            process(ne);
+        }
         return DONE ;
       }
       
@@ -1179,8 +1208,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + "()") ;
         _currentImplUnparser.addOutputNewline("{") ;
         _currentImplUnparser.incrementIndent() ;
-
-        for(DataSubcomponent d : object.getOwnedDataSubcomponents())
+        _owner = object;
+        for(DataSubcomponent d : getAllDataSubcomponents(object))
         {
           process(d) ;
         }
@@ -1394,8 +1423,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
         } catch (Exception e1) {
       	  caseSubprogramClassifier((SubprogramClassifier) object);
-        
-    	  for(DataSubcomponent d : object.getOwnedDataSubcomponents())
+      	  _owner = object;
+    	  for(DataSubcomponent d : getAllDataSubcomponents(object))
           {
             process(d) ;
           }
