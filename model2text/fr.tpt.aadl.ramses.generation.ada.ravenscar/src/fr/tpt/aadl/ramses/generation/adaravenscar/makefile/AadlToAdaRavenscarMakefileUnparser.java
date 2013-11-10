@@ -86,12 +86,17 @@ implements TargetBuilderGenerator
 //				unparserContent.addOutputNewline("PROJECT_FILE = " + object.getName() +
 //						".gpr") ;
 				unparserContent.addOutputNewline("all:") ;
-
+				
 				unparserContent
 				.addOutputNewline("\tADA_PROJECT_PATH=\"/usr/local/include/ocarina/runtime/polyorb-hi-ada:$$ADA_PROJECT_PATH\" \\");
 
 				unparserContent.addOutputNewline("\t$(GNATMAKE) -x -P$(PROJECT_FILE) -XTARGET=$(TARGET) -XBUILD=$(BUILD) -XCGCTRL=$(CGCTRL) -largs ${C_OBJECTS}") ;
 
+				unparserContent.addOutputNewline("clean:") ;
+				unparserContent.addOutputNewline("\trm *.o *.ali main *~*") ;
+
+				
+				
 				process(object.getComponentImplementation()) ;
 				return DONE ;
 			}

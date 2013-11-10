@@ -45,13 +45,9 @@ public class AadlAdaRavenscarTransformation extends
 		  		 "ACG/targets/shared/PortsCommonRefinementSteps",
 		  		 "ACG/targets/shared/DispatchCommonRefinementSteps",
 		  		 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
-		  		 "ACG/targets/arinc653/ExpandThreadsPorts",
-		  		 "ACG/targets/arinc653/BlackboardCommunications",
-		  		 "ACG/targets/arinc653/BufferCommunications",
-		  		 "ACG/targets/arinc653/EventsCommunications",
-		  		 "ACG/targets/arinc653/QueuingCommunications",
-		  		 "ACG/targets/arinc653/SamplingCommunications",
-		  		 "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
+		  		 "ACG/targets/ravenscar/ExpandThreadsPorts",
+//		  		 "ACG/targets/ravenscar/RavenscarCommunications",
+		  		 "ACG/targets/ravenscar/ExpandThreadsDispatchProtocol",		  		 
 		  		 "ACG/PeriodicDelayedCommunication/SharedRules",
 		  		 module
 		        };

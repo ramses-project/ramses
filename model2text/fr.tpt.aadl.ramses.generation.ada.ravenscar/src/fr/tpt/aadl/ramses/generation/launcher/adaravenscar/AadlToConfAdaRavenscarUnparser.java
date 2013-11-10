@@ -25,8 +25,10 @@ package fr.tpt.aadl.ramses.generation.launcher.adaravenscar;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -46,6 +48,7 @@ import org.osate.utils.PropertyUtils ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
+import fr.tpt.aadl.ramses.generation.ada.AadlToADASwitchProcess;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
 
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
@@ -59,6 +62,7 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 	List<String> sporadicThreads = new ArrayList<String>();
 	List<String> periodicThreads = new ArrayList<String>();
 	List<String> portTypeThreads = new ArrayList<String>();
+
     int nbSporadic = 0;
     int nbPeriodic=0;
     public static int compteurPer=0; 
@@ -103,7 +107,6 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 //		return p ;
 //	}
 
-
 	public void process(ProcessSubcomponent process, File generatedFilePath,
 			TargetProperties tarProp)
 	{
@@ -128,6 +131,7 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		UnparseText rootingHeaderCode = new UnparseText() ;
 		genRootingHeader(processImpl, rootingHeaderCode, pp) ;
 
+
 		try
 		{
 			FileUtils.saveFile(generatedFilePath, "main.gpr",
@@ -146,7 +150,8 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 			e.printStackTrace() ;
 		}
 	}
-
+	
+	
 	private PartitionProperties genMainHeader(ProcessImplementation process,
 			UnparseText mainHeaderCode,
 			ProcessorProperties processorProp,
@@ -175,7 +180,6 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 				.generateSectionTitleAda("GLOBAL VARIABLES")) ;
 
 		genGlobalVariablesMainOptional(process, mainImplCode);
-
 		mainImplCode.addOutputNewline(GenerationUtilsADA.generateSectionMarkAda()) ;
 	}
 
@@ -202,12 +206,42 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 				.generateSectionTitleAda("INCLUSION")) ;
 		// always files included:
       // for(String s: AadlToADAUnparser.Includes)
-		mainImplCode.addOutputNewline("with Activity;");
-		mainImplCode.addOutputNewline("with PolyORB_HI.Output;use PolyORB_HI.Output;");
-		mainImplCode.addOutputNewline("with Warnings (Off, Activity);");
-		mainImplCode.addOutputNewline("with Elaborate_All (Activity);");
 		mainImplCode.addOutputNewline("with System;");
+		mainImplCode.addOutputNewline("with Ada.Real_Time; use Ada.Real_Time;");
+		mainImplCode.addOutputNewline("with Activity;use Activity;");
+		mainImplCode.addOutputNewline("with Subprograms;use Subprograms;");
+		mainImplCode.addOutputNewline("with Gtypes;use Gtypes;");
+		mainImplCode.addOutputNewline("with Deployment; use Deployment;");
+		mainImplCode.addOutputNewline("with Rooting; use Rooting;");
+		mainImplCode.addOutputNewline("with PolyORB_HI.Output;");
 		mainImplCode.addOutputNewline("with PolyORB_HI.Suspenders;");
+		mainImplCode.addOutputNewline("with PolyORB_HI.Sporadic_Task;");
+		mainImplCode.addOutputNewline("with PolyORB_HI.Periodic_Task;");
+	}
+	
+	private void genTaskDeclarationMainImpl(ThreadSubcomponent thread,
+			int threadIndex,
+			UnparseText mainImplCode,
+			ProcessImplementation procImpl)
+	{
+			
+		ThreadImplementation timpl =
+				(ThreadImplementation) thread.getComponentImplementation();
+		mainImplCode.incrementIndent();
+		mainImplCode.addOutputNewline("task type "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName())+";");
+		mainImplCode.decrementIndent();
+	}
+
+	private void genTaskMainImpl(ThreadSubcomponent thread,
+			int threadIndex,
+			UnparseText mainImplCode,
+			ProcessImplementation procImpl)
+	{
+		ThreadImplementation timpl =
+				(ThreadImplementation) thread.getComponentImplementation() ;
+		mainImplCode.incrementIndent();
+		mainImplCode.addOutputNewline("New_"+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName())+" : array (1..1) of "+timpl.getFullName()+";");
+		mainImplCode.decrementIndent();		
 	}
 
 	private void genThreadDeclarationMainImpl(ThreadSubcomponent thread,
@@ -239,8 +273,10 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 				 periodicThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(thread.getFullName())+"_K");
 			 }
 			
-
-		mainImplCode.addOutputNewline("");
+	    mainImplCode.addOutputNewline("");
+		mainImplCode.addOutputNewline("task body "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName())+" is");
+		
+	    mainImplCode.addOutputNewline("");
 		mainImplCode.addOutput("package "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getQualifiedName())+"_Task "+ "is new PolyORB_HI.Periodic_Task");
 		mainImplCode.addOutputNewline(" (");
 
@@ -289,7 +325,13 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		mainImplCode.addOutputNewline("Task_Stack_Size => 10000,");
 		mainImplCode.addOutputNewline("Job => "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX);
 		mainImplCode.addOutputNewline(");");
+		mainImplCode.addOutputNewline("begin");
+		mainImplCode.incrementIndent();
+		mainImplCode.addOutputNewline("null;");
 		mainImplCode.decrementIndent();
+		mainImplCode.addOutputNewline("end "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName())+";");
+		mainImplCode.addOutputNewline("");
+		mainImplCode.decrementIndent();		
 	}
 
 	private void genRootingHeader(ProcessImplementation process,
@@ -720,35 +762,49 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 				.generateSectionTitleAda("MAIN BODY")) ;
 
 		mainImplCode.addOutputNewline("procedure Main is");
-		mainImplCode.incrementIndent();
-		mainImplCode.addOutputNewline("pragma Priority");
-		mainImplCode.incrementIndent();
-		mainImplCode.addOutputNewline("(System.Priority'Last);");
-		mainImplCode.addOutputNewline("");
-        mainImplCode.decrementIndent();
-        mainImplCode.decrementIndent();
+//		mainImplCode.incrementIndent();
+//		mainImplCode.addOutputNewline("pragma Priority");
+//		mainImplCode.incrementIndent();
+//		mainImplCode.addOutputNewline("(System.Priority'Last);");
+//		mainImplCode.addOutputNewline("");
+//        mainImplCode.decrementIndent();
+//        mainImplCode.decrementIndent();
         
 		genMainImplEnd(process, mainImplCode);
-
-		mainImplCode.addOutputNewline("begin") ;
-		mainImplCode.incrementIndent();
-		mainImplCode.addOutputNewline("Put_Line(\"here\");");
-		mainImplCode.addOutputNewline("--  Unblock all user tasks");
-		mainImplCode.addOutputNewline("PolyORB_HI.Suspenders.Unblock_All_Tasks;");
-		mainImplCode.addOutputNewline("--  Suspend forever instead of putting an endless loop. This saves the CPU ressources.");
-		mainImplCode.addOutputNewline("PolyORB_HI.Suspenders.Suspend_Forever;");
-		mainImplCode.decrementIndent();
 		
 		// For each declared thread
 		// Zero stands for ARINC's IDL thread.
 		int threadIndex = 1 ;
-
+        
 		// Thread declarations.
+		
+		for(ThreadSubcomponent thread : lthreads)
+		{
+			genTaskDeclarationMainImpl(thread, threadIndex, mainImplCode, process) ;
+			threadIndex++ ;
+		}
+
 		for(ThreadSubcomponent thread : lthreads)
 		{
 			genThreadDeclarationMainImpl(thread, threadIndex, mainImplCode, process) ;
 			threadIndex++ ;
 		}
+
+		for(ThreadSubcomponent thread : lthreads)
+		{
+			genTaskMainImpl(thread, threadIndex, mainImplCode, process) ;
+			threadIndex++ ;
+		}
+
+		mainImplCode.addOutputNewline("") ;
+		mainImplCode.addOutputNewline("begin") ;
+		mainImplCode.incrementIndent();
+		mainImplCode.addOutputNewline("--  Unblock all user tasks");
+		mainImplCode.addOutputNewline("PolyORB_HI.Suspenders.Unblock_All_Tasks;");
+		mainImplCode.addOutputNewline("--  Suspend forever instead of putting an endless loop. This saves the CPU ressources.");
+		mainImplCode.addOutputNewline("PolyORB_HI.Suspenders.Suspend_Forever;");
+		mainImplCode.decrementIndent();
+
 		mainImplCode.addOutputNewline("end Main;") ;
 	}
 

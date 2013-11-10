@@ -575,9 +575,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 baToADAUnparser.setOwner(owner);
 
 		 baToADAUnparserAction.unparseAnnexSubclause(as,
-				 codeUnparser.getIndent()) ;
-
-
+				 codeUnparser.getIndent());
 
 		 baToADAUnparser.addIndent_ADB(codeUnparser.getIndent()) ;
 		 baToADAUnparser.addIndent_ADS(headerUnparser.getIndent()) ;
