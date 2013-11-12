@@ -489,21 +489,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.eclipse</groupId>
-      <artifactId>xtext.util</artifactId>
-      <version>2.3.1.v201208210947</version>
-    </dependency>
-
-   <dependency>
-      <groupId>org.eclipse</groupId>
-      <artifactId>xtext.ui</artifactId>
-      <version>2.3.0.v201206120633</version>
-    </dependency>
-
-   <dependency>
-      <groupId>org.eclipse</groupId>
-      <artifactId>xtext</artifactId>
-      <version>2.3.1.v201208210947</version>
+      <groupId>org.eclipse.xtext</groupId>
+      <artifactId>org.eclipse.xtext.standalone</artifactId>
+      <version>2.4.3</version>
     </dependency>
 
    <dependency>
