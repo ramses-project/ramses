@@ -243,6 +243,12 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		Resource outputResource = rs.getResource(uri, false);
 		if(outputResource==null)
 		  outputResource = rs.createResource(uri);
+		else
+		{
+		  outputResource.delete(null);
+		  outputResource = rs.createResource(uri);
+		}
+
 		Model outModel = EmftvmFactory.eINSTANCE.createModel();
 		outModel.setResource(outputResource);
 		env.registerInOutModel("OUT", outModel);
