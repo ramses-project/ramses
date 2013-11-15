@@ -13,6 +13,12 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Shell;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
@@ -53,6 +59,32 @@ public class GenerateAction extends AbstractAnalyzer
                                       SystemInstance root,
                                       SystemOperationMode som)
   {
+	  
+//		Display dsp = Display.getCurrent();
+//		Shell shl = new Shell(SWT.BORDER);
+//		shl.setLayout(new GridLayout());
+//
+//		// Create a smooth ProgressBar
+//		final ProgressBar progressbar = new ProgressBar(shl, SWT.HORIZONTAL | SWT.SMOOTH);
+//		progressbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		progressbar.setMinimum(0);
+//		progressbar.setMaximum(30);
+//
+//		shl.open();
+//		while (!shl.isDisposed()) {
+//			if (!dsp.readAndDispatch()) {
+//				dsp.sleep();
+//			}
+//		}
+//		while (System.currentTimeMillis() < (start+(1000*5)))
+//		{
+//			System.out.println("The thread is running ...");
+//			if(progressbar.isDisposed())
+//				return;
+//			progressbar.setSelection(progressbar.getSelection()+1);
+//			progressbar.redraw();
+//		}
+	  
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
     String workspaceURI = root.eResource().getURI().toString();
     if(workspaceURI.startsWith("platform:/resource"))
