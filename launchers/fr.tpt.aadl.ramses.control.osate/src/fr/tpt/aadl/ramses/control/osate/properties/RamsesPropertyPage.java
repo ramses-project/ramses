@@ -1,14 +1,17 @@
 package fr.tpt.aadl.ramses.control.osate.properties;
 
 import java.io.File ;
+import java.io.IOException;
 import java.util.ArrayList ;
 import java.util.List ;
+import java.util.Properties;
 
 import org.eclipse.core.resources.IContainer ;
 import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource ;
 import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.Path ;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -26,14 +29,20 @@ import org.eclipse.swt.layout.GridLayout ;
 import org.eclipse.swt.widgets.Button ;
 import org.eclipse.swt.widgets.Composite ;
 import org.eclipse.swt.widgets.Control ;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event ;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label ;
 import org.eclipse.swt.widgets.Listener ;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text ;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog ;
 import org.eclipse.ui.dialogs.PropertyPage ;
 import org.eclipse.ui.dialogs.ResourceListSelectionDialog ;
 import org.osate.aadl2.instance.SystemInstance ;
+
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 
 public class RamsesPropertyPage extends PropertyPage {
 
@@ -42,6 +51,8 @@ public class RamsesPropertyPage extends PropertyPage {
 	public static final String PREFIX = "fr.tpt.aadl.ramses.";
 	public static final String PATH_ID = "output.directory";
 	public static final String TARGET_ID = "target";
+	public static final String PLATFORM_ID = "platform";
+	public static final String PREF = "pref_pok";
 	
 	private String DEFAULT_PATH;
 	private String PROJECT_NAME;	
@@ -51,8 +62,11 @@ public class RamsesPropertyPage extends PropertyPage {
 	private IResource instanceModel = null;
 	private Text outputDirText;
 	private Button target;
-	private Text selectedInstanceName; 
+	private Text outputPathText;
+	private Text selectedInstanceName;
+	private Label selectedPathLabel;
 	private Label selectedInstanceModel;
+	private QualifiedName qfName;
 	/**
 	 * Constructor for SamplePropertyPage.
 	 */
@@ -323,6 +337,8 @@ public class RamsesPropertyPage extends PropertyPage {
           Button button = (Button)(event.widget);
 
       	System.out.println("Button =" + button);
+      	selectedPathLabel.setText("Select path for :"+button);
+      	selectedPathLabel.redraw();
           if (button.getSelection())
           {
               target = button;
@@ -333,6 +349,59 @@ public class RamsesPropertyPage extends PropertyPage {
     osek.addListener(SWT.Selection, listener);
     arinc.addListener(SWT.Selection, listener);
     ojr.addListener(SWT.Selection, listener);
+    
+    // Code added by achille
+    Button pathButton = new Button(composite, SWT.PUSH);
+    pathButton.setText("Choose the target platform path");
+    pathButton.setAlignment(SWT.RIGHT);
+    
+    selectedPathLabel = new Label(composite, SWT.BOLD); 
+    selectedPathLabel.setText("Path for target not selected ...");
+    selectedPathLabel.setSize(TEXT_FIELD_WIDTH, 50);
+    GridData grdPath = new GridData();
+    grdPath.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+    selectedPathLabel.setLayoutData(grdPath) ;
+    
+    outputPathText = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
+	outputPathText.setEditable(false) ;
+    GridData grd = new GridData();
+    grd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+    outputPathText.setLayoutData(grd) ;
+    
+    pathButton.addSelectionListener( new SelectionAdapter() 
+    {
+    	public void widgetSelected(SelectionEvent e)
+    	{    		
+    		DirectoryDialog ddg = new DirectoryDialog(getShell());
+    		File selectedFile = null;
+    		String file = ddg.open();
+    		if(file != null && file.length() > 2)
+    		{
+    			selectedFile = new File(file);
+    			outputPathText.setText(selectedFile.getAbsolutePath());
+    		}
+    		System.out.println("The file browser button have been selected");
+    	}
+    	
+//      public void widgetSelected(SelectionEvent e) 
+//      {
+//        ContainerSelectionDialog browseWorkspace = 
+//              new ContainerSelectionDialog(getShell(),
+//                                           (IContainer) getElement(),
+//                                           true,
+//                                           "Select output directory for generated code"
+//                    );
+//        if (browseWorkspace.open() == ContainerSelectionDialog.OK) {
+//          Object[] result = browseWorkspace.getResult();
+//          if (result != null && result.length > 0) {
+//            Path outputDir = (Path) result[0];
+//            outputDirText.setText(convertToAbsolutePath(outputDir));
+//            // Move the cursor to the end.
+//            outputDirText.setSelection(outputDirText.getText().length()) ;
+//          }
+//        }
+//      }
+    });
   }
 
 	private boolean saveConfiguration() throws CoreException
@@ -340,10 +409,20 @@ public class RamsesPropertyPage extends PropertyPage {
 	  boolean isCorrectConfiguration=true;
 	  if(instanceModel==null)
 	    isCorrectConfiguration=false;
-	  if(isCorrectConfiguration && outputDirText.getText()!=null && !outputDirText.getText().equals(""))
-	    instanceModel.setPersistentProperty(
-          new QualifiedName(PREFIX, PATH_ID),
-          outputDirText.getText());
+	  if(isCorrectConfiguration && outputDirText.getText()!=null && !outputDirText.getText().equals("")
+			  && outputPathText.getText()!=null && !outputPathText.getText().equals(""))
+	  {
+		  instanceModel.setPersistentProperty(
+				  new QualifiedName(PREFIX, PATH_ID),
+		          outputDirText.getText());
+		  qfName =   new QualifiedName(PREF, PLATFORM_ID);
+		  instanceModel.setPersistentProperty(
+				  qfName,
+		          outputPathText.getText());
+		  
+		   System.out.println("property = "+instanceModel.getPersistentProperty(qfName));  
+	  }
+          
 	  else
       isCorrectConfiguration=false;
 	  if(isCorrectConfiguration && target != null && target.getData()!=null)
@@ -353,6 +432,7 @@ public class RamsesPropertyPage extends PropertyPage {
 	  else
       isCorrectConfiguration=false;
 	  
+	  System.out.println("Before end of saveConfiguration property = "+instanceModel.getPersistentProperty(qfName));
 	  return isCorrectConfiguration;
 	}
 	
@@ -373,7 +453,12 @@ public class RamsesPropertyPage extends PropertyPage {
 		// store the value in the owner text field
 		try {
 		  if(saveConfiguration())
-		    return true;
+		  {
+	    	  System.out.println("OK: Champs corrects, platform = "+outputPathText.getText());
+//	    	  System.setProperty("POK_PATH", outputPathText.getText());
+//	    	  System.out.println("POK_PATH = "+System.getProperty("POK_PATH"));
+			  return true;
+		  }
 		  else
 		  {
 		    popupConfigurationError();
@@ -391,7 +476,18 @@ public class RamsesPropertyPage extends PropertyPage {
     try {
       if(!saveConfiguration())
       {
-        popupConfigurationError();
+    	  System.out.println("Erreur Apply");
+    	  popupConfigurationError();
+      }
+      else
+      {
+    	  System.out.println("Apply: Champs corrects, platform = "+outputPathText.getText());
+//    	  String cmd = "export POK_PATH=/home/achille/Documents/Ramses/pok/trunk";
+//    	  Runtime r = Runtime.getRuntime();
+//    	  r.exec(cmd);
+    	  RamsesConfiguration.setRuntimeDir(outputPathText.getText());
+    	  //System.setProperty("POK_PATH", outputPathText.getText());
+    	  System.out.println("POK_PATH = "+System.getProperty("POK_PATH"));
       }
     } catch (CoreException e) {
       e.printStackTrace();
@@ -406,7 +502,8 @@ public class RamsesPropertyPage extends PropertyPage {
                             "To configure RAMSES, you must select\n" +
                             "\t 1 - an instance model, \n" +
                             "\t 2 - an output directory, \n" +
-                            "\t 3 - and a target platform.\n\n" +
+                            "\t 3 - and a target platform.\n" +
+                            "\t 4 - and a Path for the selected platform.\n\n" +
                             "One of these elements was not configured properly.");
 	}
 }
