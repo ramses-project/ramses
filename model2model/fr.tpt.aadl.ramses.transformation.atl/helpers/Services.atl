@@ -122,7 +122,7 @@ helper context AADLI!Feature def : isThreadPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def : isThreadPort() : Boolean =
-	self.eContainer().category = #thread and self.feature.oclIsKindOf(AADLBA!Port)
+	self.getComponentInstance().category = #thread and self.feature.oclIsKindOf(AADLBA!Port)
 ;
 
 helper context AADLI!ComponentInstance def : isThreadPort() : Boolean =
@@ -134,7 +134,7 @@ helper context AADLI!Feature def : isProcessPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def : isProcessPort() : Boolean =
-	self.eContainer().category=#process  and self.feature.oclIsKindOf(AADLBA!Port)
+	self.getComponentInstance().category=#process  and self.feature.oclIsKindOf(AADLBA!Port)
 ;
 
 helper context AADLI!ComponentInstance def : isProcessPort() : Boolean =
@@ -163,7 +163,19 @@ helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Bool
 ;
 
 helper context AADLI!FeatureInstance def : getProcess(): AADLI!ComponentInstance =
-	self.eContainer().eContainer()
+	if(self.getComponentInstance().category=#process) then
+		self.getComponentInstance()
+	else
+			self.getComponentInstance().getProcess()
+	endif
+;
+
+helper context AADLI!ComponentInstance def : getProcess(): AADLI!ComponentInstance =
+	if(self.category=#process) then
+		self
+	else
+		self.eContainer().getProcess()
+	endif
 ;
 
 helper context AADLI!NamedElement def: getPeriodValue(): Integer =
@@ -247,9 +259,17 @@ helper context AADLI!ComponentInstance def : getProcessorBinding() : AADLBA!Subc
 ;
 
 helper context AADLI!FeatureInstance def: getInputMessagePortId(): Integer = 
-	self.eContainer().featureInstance->select(e| e.isInputFeature() and 
+	self.getComponentInstance().featureInstance->select(e| e.isInputFeature() and 
 										(self.category=#eventDataPort or self.category=#eventPort)
 															)->indexOf(self)
+;
+
+helper context AADLI!ComponentInstance def: getContainingThread():AADLBA!ThreadClassifier =
+	if(self.eContainer().category=#thread) then
+		self.eContainer()
+	else
+		self.eContainer().getContainingThread()
+	endif
 ;
 
 helper def : collectPeriodicDelayed_GlobalVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
@@ -274,4 +294,12 @@ helper def : collectPeriodicDelayed_LocalVariablesConnections(c: AADLI!Component
 
 helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
 	Sequence{}
+;
+
+helper def: collectPeriodicDelayed_ThreadVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+	Sequence{}
+;
+
+helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
+	OclUndefined
 ;

@@ -35,7 +35,7 @@ helper def: collectSporadicGlobalVariables (c: AADLI!ComponentInstance) : Sequen
 	Sequence{}
 ;
 
-helper def: collectSporadicLocalVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+helper def: collectSporadicThreadVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
 	Sequence{}
 ;
 
@@ -51,12 +51,12 @@ helper def: collectSporadicBehaviorActions (c: AADLI!ComponentInstance) : Sequen
 	Sequence{}
 ;
 
-helper def: collectSporadicLocalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+helper def: collectSporadicThreadVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
 	Sequence{}
 ;
 
 
-helper def: collectSporadicLocalVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+helper def: collectSporadicThreadVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
 	Sequence{}
 ;
 

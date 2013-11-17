@@ -64,7 +64,7 @@ helper def: collectSporadicGlobalVariables (c: AADLI!ComponentInstance) : Sequen
 	endif
 ;
 
-helper def: collectSporadicLocalVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =	
+helper def: collectSporadicThreadVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =	
 	Sequence{thisModule.resolveTemp(c, 'DELAY'), thisModule.CreateTimeOutSubcomponentFromCpt(c)}
 ;
 
@@ -77,7 +77,7 @@ helper def: collectSporadicGlobalVariablesAccesses (c: AADLI!ComponentInstance) 
 	endif
 ;
 
-helper def: collectSporadicLocalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+helper def: collectSporadicThreadVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
 	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
 	if(portsForDispatch.size()>1) then
 		Sequence{thisModule.resolveTemp(c, 'EVENT_ID_LOCAL_ACCESS')}
@@ -87,7 +87,7 @@ helper def: collectSporadicLocalVariablesAccesses (c: AADLI!ComponentInstance) :
 ;
 
 
-helper def: collectSporadicLocalVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+helper def: collectSporadicThreadVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
 	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
 	if(portsForDispatch.size()>1) then
 		Sequence{thisModule.resolveTemp(c, 'EVENT_ID_LOCAL_ACCESSCONNECTION')}

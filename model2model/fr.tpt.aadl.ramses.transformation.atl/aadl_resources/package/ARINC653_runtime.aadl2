@@ -571,4 +571,54 @@ properties
   Programming_Properties::Source_Text => ("arinc653/blackboard.h", "arinc653/apex-blackboards.ads");
 end Get_Blackboard_Status;
 
+data Semaphore_Name_Type
+properties
+  Programming_Properties::Source_Name => "SEMAPHORE_NAME_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/semaphore.h", "arinc653/apex-semaphore.ads");
+end Semaphore_Name_Type;
+
+data Semaphore_Id_Type
+properties
+  Programming_Properties::Source_Name => "SEMAPHORE_ID_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/semaphore.h", "arinc653/apex-semaphore.ads");
+end Semaphore_Id_Type;
+
+data Semaphore_Value_Type
+properties
+  Programming_Properties::Source_Name => "SEMAPHORE_VALUE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/semaphore.h", "arinc653/apex-semaphore.ads");
+end Semaphore_Value_Type;
+
+subprogram Create_Semaphore
+features
+  SEMAPHORE_NAME: in parameter SEMAPHORE_NAME_TYPE;
+  CURRENT_VALUE: in parameter SEMAPHORE_VALUE_TYPE;
+  MAXIMUM_VALUE: in parameter SEMAPHORE_VALUE_TYPE;
+  QUEUING_DISCIPLINE : in parameter QUEUING_DISCIPLINE_TYPE;
+  SEMAPHORE_ID: requires data access SEMAPHORE_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "CREATE_SEMAPHORE";
+  Programming_Properties::Source_Text => ("arinc653/semaphore.h", "arinc653/apex-semaphore.ads");
+end Create_Semaphore;
+
+subprogram Wait_Semaphore
+features
+  SEMAPHORE_ID: requires data access SEMAPHORE_ID_TYPE {Access_Right=>read_only;};
+  TIME_OUT: in parameter SYSTEM_TIME_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "WAIT_SEMAPHORE";
+  Programming_Properties::Source_Text => ("arinc653/semaphore.h", "arinc653/apex-semaphore.ads");
+end Wait_Semaphore;
+
+subprogram Signal_Semaphore
+features
+  SEMAPHORE_ID: requires data access SEMAPHORE_ID_TYPE {Access_Right=>read_only;};
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "SIGNAL_SEMAPHORE";
+  Programming_Properties::Source_Text => ("arinc653/semaphore.h", "arinc653/apex-semaphore.ads");
+end Signal_Semaphore;
+
 end arinc653_runtime;

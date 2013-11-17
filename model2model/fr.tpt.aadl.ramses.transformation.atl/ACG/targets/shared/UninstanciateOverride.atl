@@ -31,10 +31,8 @@ from
 
 
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
-	self.ownedPropertyAssociation->select(
-				e | 
-				not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
-		)->collectSelfPropertyAssociationImg()
+	self.ownedPropertyAssociation->select(e | not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
+									)->collectSelfPropertyAssociationImg()
 ;
 
 abstract rule m_Component_Implementation {
@@ -187,6 +185,53 @@ rule m_FeatureGroupConnection_Reference
 		cnxRef: AADLI!ConnectionReference (cnxRef.eContainer().kind = #featureGroupConnection)
 }
 
+helper def : collectComputeEntryPoint(c: AADLI!ComponentInstance): AADLBA!PropertyAssociation =
+	thisModule.collectComputeEntryPoint_rule(c)
+;
+
+unique lazy rule collectComputeEntryPoint_rule
+{
+	from
+		c: AADLI!ComponentInstance
+	to
+		pa: AADLBA!PropertyAssociation
+		(
+			property <- thisModule.getProperty('Compute_Entrypoint_Call_Sequence'),  
+    		ownedValue <- Sequence{mpv}
+		),
+		mpv: AADLBA!ModalPropertyValue
+		(
+			ownedValue<-v
+		),
+		v: AADLBA!ReferenceValue
+		(
+			containmentPathElement <- Sequence{cpe}
+		),
+		cpe: AADLBA!ContainmentPathElement
+		(
+			namedElement <- thisModule.resolveTemp(c, 'callSequenceImg')
+		)
+	do
+	{
+		pa;
+	}
+}
+
+helper def : collectInitializationEntryPoint(c: AADLI!ComponentInstance) : AADLBA!PropertyAssociation =
+	OclUndefined
+;
+
+helper def : collectThreadVariables(c: AADLI!ComponentInstance): AADLBA!DataSubcomponent =
+	if(c.isSporadicThread()) then
+		thisModule.collectSporadicThreadVariables(c)
+	else
+		Sequence{}
+	endif
+	->union(
+		thisModule.collectPeriodicDelayed_ThreadVariables(c)
+	)
+;
+
 -- @extends m_Component_Instance
 rule m_create_Thread_BA
 {
@@ -198,7 +243,14 @@ rule m_create_Thread_BA
  	}
 	to
 		sub : AADLBA!ThreadSubcomponent(
-			threadSubcomponentType <- implImg
+			threadSubcomponentType <- implImg,
+			ownedPropertyAssociation <- c.collectSelfPropertyAssociationImg()
+										->append(
+											thisModule.collectComputeEntryPoint(c)
+										)
+										->append(
+											thisModule.collectInitializationEntryPoint(c)	 
+										)->excluding(OclUndefined)
 		),
 		implImg : AADLBA!ThreadImplementation (
  			name <- c.uniqueName().concat('.impl'), -- name thread implmentation
@@ -220,14 +272,14 @@ rule m_create_Thread_BA
 												)
 												->union
 												(
-													if(c.isSporadicThread()) then
-														thisModule.collectSporadicLocalVariables(c)
-													else
-														Sequence{}
-													endif
+													thisModule.collectThreadVariables(c)
 												)
 												->flatten()->excluding(OclUndefined),
-			ownedSubprogramCallSequence     <- Sequence{thisModule.resolveTemp(c, 'callSequenceImg')},
+			ownedSubprogramCallSequence     <- Sequence{
+ 															thisModule.resolveTemp(c, 'callSequenceImg'),
+ 															thisModule.collectInitCallSequence(c)
+														}
+ 												->excluding(OclUndefined),
 			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
 												e.source.oclIsKindOf(AADLI!Parameter) and e.destination.oclIsKindOf(AADLI!Parameter))
 												->collect(e| thisModule.ParameterConnection(e))
@@ -327,7 +379,7 @@ rule m_create_Thread_BA
 												)
 												->union(
 													if(c.isSporadicThread()) then
-														thisModule.collectSporadicLocalVariablesAccessConnections(c)
+														thisModule.collectSporadicThreadVariablesAccessConnections(c)
 													else
 														Sequence{}
 													endif

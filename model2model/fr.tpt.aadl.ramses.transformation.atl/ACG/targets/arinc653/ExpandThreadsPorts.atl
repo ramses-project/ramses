@@ -42,40 +42,6 @@ helper def : getRuntimeSizeType: AADLBA!DataType =
 	'Message_Size_Type'.asDataType('ARINC653_RUNTIME')
 ;
 
-
-helper def: collectPutValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
-	c.featureInstance->
-		select(
-			e|e.isOutputFeature() 
-			and 
-			e.feature.oclIsKindOf(AADLI!DataPort)
-			and
-			c.subcomponent.classifier.ownedParameterConnection
-			->exists(paramCnx| paramCnx.source.connectionEnd = e.feature or paramCnx.destination.connectionEnd = e.feature)
-		)
-		->collect(e|
-			e.srcConnectionInstance
-				->collect(f| 
-					thisModule.resolveTemp(Sequence{e,callSequence,f.connectionReference->first()}, 'call')
-				)
-		)->flatten()
-;
-		
-helper def: collectGetValueCalls(c: AADLI!ComponentInstance, callSequence:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
-	c.featureInstance->
-		select(
-			e|e.isInputFeature() 
-			and 
-			e.feature.oclIsKindOf(AADLI!DataPort)
-			and
-			c.subcomponent.classifier.ownedParameterConnection
-			->exists(paramCnx| paramCnx.source.connectionEnd = e.feature or paramCnx.destination.connectionEnd = e.feature)
-		)
-		->collect(e|
-			thisModule.resolveTemp(Sequence{e,callSequence}, 'call')
-		)->flatten()
-;
-
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
 	callSequences->collect(e | thisModule.resolveTemp(c, 'returnData'))
 	->union

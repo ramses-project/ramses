@@ -465,13 +465,17 @@ rule m_DataAccess_Instance_with_BA
 	}
 }
 
+helper def: getErrorCodeInitValue() : String =
+	thisModule.toStringLiteral('0')
+;
+
 unique lazy rule CreateReturnSubcomponentFromPort
 {
 	from
 		port : AADLI!FeatureInstance
 	using
 	{
-		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral('0');
+		initValuePE: AADLBA!PropertyExpression = thisModule.getErrorCodeInitValue();
 	}
 	to
 		dataSubcomponent: AADLBA!DataSubcomponent

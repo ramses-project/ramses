@@ -36,7 +36,15 @@ helper def : collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c: AADLI!Comp
 	Sequence{}
 ;
 
+helper def : collectPeriodicDelayed_GlobalVariablesAccesses_Mutex(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
 helper def : collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!AccessConnection) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_GlobalVariablesConnections_Mutex(c: AADLI!ComponentInstance): Sequence(AADLBA!AccessConnection) =
 	Sequence{}
 ;
 
@@ -44,7 +52,16 @@ helper def : collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c: AADLI!Compo
 	Sequence{}
 ;
 
+helper def : collectPeriodicDelayed_LocalVariablesAccesses_Mutex(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+
 helper def : collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!AccessConnection) =
+	Sequence{}
+;
+
+helper def : collectPeriodicDelayed_LocalVariablesConnections_Mutex(c: AADLI!ComponentInstance): Sequence(AADLBA!AccessConnection) =
 	Sequence{}
 ;
 
@@ -60,24 +77,62 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInsta
 	Sequence{}
 ;
 
+helper def : collectPeriodicDelayed_GlobalVariables_Mutex(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
+helper def: collectPeriodicDelayed_ThreadVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent)=
+	thisModule.collectPeriodicDelayed_ThreadVariables_LowMFP(c)
+	->union
+	(
+		thisModule.collectPeriodicDelayed_ThreadVariables_Mutex(c)
+	)
+;
+
+helper def: collectPeriodicDelayed_ThreadVariables_Mutex(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent)=
+	Sequence{}
+;
+
+helper def: collectPeriodicDelayed_ThreadVariables_LowMFP(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent)=
+	Sequence{}
+;
+
 helper def : collectPeriodicDelayed_GlobalVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent) =
 	thisModule.collectPeriodicDelayed_GlobalVariables_LowMFP(c)
+	->union
+	(
+		thisModule.collectPeriodicDelayed_GlobalVariables_Mutex(c)
+	)
 ;
 
 helper def : collectPeriodicDelayed_GlobalVariablesAccesses(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
 	thisModule.collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c)
+	->union
+	(
+		thisModule.collectPeriodicDelayed_GlobalVariablesAccesses_Mutex(c)
+	)
 ;
 
 helper def : collectPeriodicDelayed_GlobalVariablesConnections(c: AADLI!ComponentInstance): Sequence(AADLBA!DataAccess) =
 	thisModule.collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c)
+	->union
+	(thisModule.collectPeriodicDelayed_GlobalVariablesConnections_Mutex(c))
 ;
 
 helper def : collectPeriodicDelayed_LocalVariablesAccesses(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
 	thisModule.collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c, behavior)
+	->union
+	(
+		thisModule.collectPeriodicDelayed_LocalVariablesAccesses_Mutex(c, behavior)
+	)
 ;
 
 helper def : collectPeriodicDelayed_LocalVariablesConnections(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
 	thisModule.collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c, behavior)
+	->union
+	(
+		thisModule.collectPeriodicDelayed_LocalVariablesConnections_Mutex(c)
+	)->asSet()
 ;
 
 helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
