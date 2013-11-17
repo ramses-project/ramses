@@ -37,19 +37,39 @@ from
 
 helper def : Unique_Send_Output_Per_Thread : Boolean = false;
 
------------------------------------------------------------------
---- Beginning of refactoring
------------------------------------------------------------------
 
-helper def: collectPutValueCalls(c: AADLI!ComponentInstance, behavior:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
-	Sequence{}
+
+helper def: collectDataNextValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
+	Sequence{thisModule.resolveTemp(Sequence{fi, behavior} ,'call')}
 ;
 
-helper def: collectGetValueCalls(c: AADLI!ComponentInstance, behavior:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
-	Sequence{}
+helper def: collectEventDataNextValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence, paramCnx:AADLBA!ParameterConnection): Sequence(AADLBA!SubprogramCall) =
+	Sequence{thisModule.resolveTemp(Sequence{fi, behavior, paramCnx} ,'call')}
+;
+
+helper def: collectDataPutValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence, cnxInst:AADLI!ConnectionInstance): Sequence(AADLBA!SubprogramCall) =
+	Sequence{
+		thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection} ,'call')
+	}
+;
+
+helper def: collectEventDataPutValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence, paramCnx:AADLBA!Connection, cnxInst:AADLI!ConnectionInstance): Sequence(AADLBA!SubprogramCall) =
+	Sequence{
+		thisModule.resolveTemp(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call')
+	}
+;
+
+helper def: collectReceiveInputsCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence) : Sequence(AADLBA!SubprogramCall) =
+	Sequence{
+		thisModule.resolveTemp(Sequence{fi, behavior} ,'callReceiveInputs')
+	}
 ;
 
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+	Sequence{}
+;
+
+helper def: collectThreadInitActions(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorAction) =
 	Sequence{}
 ;
 
@@ -166,7 +186,7 @@ rule m_ThreadEntrypoint {
 									->union
 									(
 										if(c.isSporadicThread()) then
-											thisModule.collectSporadicLocalVariablesAccesses(c)
+											thisModule.collectSporadicThreadVariablesAccesses(c)
 										else
 											Sequence{}
 										endif
@@ -214,7 +234,7 @@ rule m_ThreadEntrypoint {
 												->union
 												(
 													if c.isSporadicThread() then
-														thisModule.collectSporadicLocalVariables(c)
+														thisModule.collectSporadicThreadVariables(c)
 													else
 														Sequence{}
 													endif
@@ -312,7 +332,10 @@ rule m_ThreadEntrypoint {
 		whichPortActionBlock: AADLBA!BehaviorActionBlock
 		(content<-whichPortActions),
 		whichPortActions: AADLBA!BehaviorActionSequence
-		( actions <- Sequence{updateDefaultBehaviorAction}),
+		( 
+			actions <- Sequence{updateDefaultBehaviorAction}
+						->union(thisModule.collectThreadInitActions(c))
+		),
 		
 		-- create action to activate default behavior
 		
@@ -820,12 +843,12 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 	{
 		if(fi.isInputFeature() and fi.isEventDataPort() and fi.isPeriodicDelayedPort())
 		{
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior} ,'callReceiveInputs'));
+			intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectReceiveInputsCalls(fi, behavior));
 		}
 		
 		if(fi.isInputFeature() and fi.isDataPort())
 		{
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior} ,'call'));
+			intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataNextValueCalls(fi,behavior));
 		}
 
 		for(call in behavior.ownedCallSpecification)
@@ -834,11 +857,11 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 			{
 				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = fi.feature))
 				{
-					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, paramCnx} ,'call'));
+					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataPutValueCalls(fi,behavior,paramCnx));
 				}
 				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = fi.feature))
 				{
-					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, paramCnx} ,'call'));
+					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataPutValueCalls(fi,behavior,paramCnx));
 				}
 			}
 			
@@ -868,28 +891,28 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 				{
 					for(cnxInst in fi.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, paramCnx, cnxInst));
 					}
 				}
 				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = fi.feature))
 				{
 					for(cnxInst in fi.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, paramCnx, cnxInst));
 					}
 				}
 				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.source.context=call  and portCnxIter.destination.connectionEnd = fi.feature))
 				{
 					for(cnxInst in fi.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, portCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, portCnx, cnxInst));
 					}
 				}
 				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.destination.context=call  and portCnxIter.source.connectionEnd = fi.feature))
 				{
 					for(cnxInst in fi.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, portCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, portCnx, cnxInst));
 					}
 				}
 			}
@@ -898,7 +921,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 		{
 			for(cnxInst in fi.srcConnectionInstance)
 			{
-				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection} ,'call'));
+				intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataPutValueCalls(fi, behavior, cnxInst));
 			}
 		}
 		for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
@@ -986,27 +1009,23 @@ rule createCheckforMessageExpression(fi: AADLI!FeatureInstance)
 		(
 			relationalOperator<-#Equal,
 			firstExpression<-getCountExpression,
-			secondExpression<-zeroValueConstantExpression
+			secondExpression<-noErrorValueConstantExpression
 		),
 		getCountExpression: AADLBA!SimpleExpression
 		(
 			terms <- Sequence{getCountTerm}
 		),
-		zeroValueConstantExpression: AADLBA!SimpleExpression
+		noErrorValueConstantExpression: AADLBA!SimpleExpression
 		(
-			terms <- Sequence{zeroValueConstantTerm}
+			terms <- Sequence{noErrorValueConstantTerm}
 		),
-		zeroValueConstantTerm: AADLBA!Term
+		noErrorValueConstantTerm: AADLBA!Term
 		(
-			factors <- Sequence{zeroValueConstantFactor}
+			factors <- Sequence{noErrorValueConstantFactor}
 		),
-		zeroValueConstantFactor: AADLBA!Factor
+		noErrorValueConstantFactor: AADLBA!Factor
 		(
-			firstValue <- zeroValueConstant
-		),
-		zeroValueConstant: AADLBA!BehaviorIntegerLiteral
-		(
-			value <- 0.longValue()
+			firstValue <- thisModule.createNoErrorValueConstant()
 		),
 		getCountTerm: AADLBA!Term
 		(
@@ -1025,6 +1044,20 @@ rule createCheckforMessageExpression(fi: AADLI!FeatureInstance)
 		checkforMessageRelation;
 	}
 }
+
+rule createNoErrorValueConstant()
+{
+	to
+		noErrorValueConstant: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 0.longValue()
+		)
+	do
+	{
+		noErrorValueConstant;
+	}
+}
+
 
 rule errorsCheckActions(checkedCall: AADLBA!SubprogramCallAction)
 {
@@ -1054,12 +1087,12 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 	{
 		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventDataPort() and e.isPeriodicDelayedPort()))
 		{
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior} ,'callReceiveInputs'));
+			intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectReceiveInputsCalls(destination, behavior));
 		}
 		
 		for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isDataPort()))
 		{
-			intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior} ,'call'));
+			intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataNextValueCalls(destination, behavior));
 		}
 
 		for(call in behavior.ownedCallSpecification)
@@ -1068,11 +1101,11 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 			{
 				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = destination.feature))
 				{
-					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior, paramCnx} ,'call'));
+					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataNextValueCalls(destination, behavior, paramCnx));
 				}
 				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = destination.feature))
 				{
-					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{destination, behavior, paramCnx} ,'call'));
+					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataNextValueCalls(destination, behavior, paramCnx));
 				}
 			}
 			portsInvoledInCall <- thisModule.getPortsInvoledInCall(c,call);
@@ -1101,28 +1134,28 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 				{
 					for(cnxInst in source.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, paramCnx, cnxInst));
 					}
 				}
 				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = source.feature))
 				{
 					for(cnxInst in source.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, paramCnx, cnxInst));
 					}
 				}
 				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.source.context=call  and portCnxIter.destination.connectionEnd = source.feature))
 				{
 					for(cnxInst in source.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, portCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, portCnx, cnxInst));
 					}
 				}
 				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.destination.context=call  and portCnxIter.source.connectionEnd = source.feature))
 				{
 					for(cnxInst in source.srcConnectionInstance)
 					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, portCnx, cnxInst.connectionReference->first().connection} ,'call'));
+						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, portCnx, cnxInst));
 					}
 				}
 			}
@@ -1131,7 +1164,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 		{
 			for(cnxInst in source.srcConnectionInstance)
 			{
-				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'call'));
+				intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataPutValueCalls(source, behavior, cnxInst));
 			}
 		}
 		if (thisModule.Unique_Send_Output_Per_Thread)
@@ -1507,7 +1540,7 @@ abstract rule m_Parameter_to_DataInstance_Connection
 			and
 			paramCnx.isPartOfCallSequence(behavior)
 			and
-			behavior.isComputeEntryPointOf(c.eContainer())
+			behavior.isComputeEntryPointOf(c.getContainingThread())
 			and
 			c.subcomponent.subcomponentType.oclIsKindOf(AADLI!DataClassifier)
 		)
@@ -1532,7 +1565,7 @@ abstract rule m_Parameter_to_DataInstance_Connection
 		)
 	do
 	{
-		paramConnectedElement.setContext(thisModule.resolveTemp(c.eContainer(), 'callEntryPoint'));
+		paramConnectedElement.setContext(thisModule.resolveTemp(c.getContainingThread(), 'callEntryPoint'));
 	}
 		
 }
@@ -1584,7 +1617,7 @@ rule m_Access_to_DataInstance_Connection
 			and
 			accessCnx.isPartOfCallSequence(behavior)
 			and
-			behavior.isComputeEntryPointOf(c.eContainer())
+			behavior.isComputeEntryPointOf(c.getContainingThread())
 			and
 			c.subcomponent.subcomponentType.oclIsKindOf(AADLI!DataClassifier)
 		)
