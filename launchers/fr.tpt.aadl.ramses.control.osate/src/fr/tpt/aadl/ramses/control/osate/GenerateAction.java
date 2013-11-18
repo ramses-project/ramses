@@ -28,6 +28,7 @@ import org.osgi.framework.Bundle;
 
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
 import fr.tpt.aadl.ramses.control.support.EcorePilot;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -60,30 +61,6 @@ public class GenerateAction extends AbstractAnalyzer
                                       SystemOperationMode som)
   {
 	  
-//		Display dsp = Display.getCurrent();
-//		Shell shl = new Shell(SWT.BORDER);
-//		shl.setLayout(new GridLayout());
-//
-//		// Create a smooth ProgressBar
-//		final ProgressBar progressbar = new ProgressBar(shl, SWT.HORIZONTAL | SWT.SMOOTH);
-//		progressbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-//		progressbar.setMinimum(0);
-//		progressbar.setMaximum(30);
-//
-//		shl.open();
-//		while (!shl.isDisposed()) {
-//			if (!dsp.readAndDispatch()) {
-//				dsp.sleep();
-//			}
-//		}
-//		while (System.currentTimeMillis() < (start+(1000*5)))
-//		{
-//			System.out.println("The thread is running ...");
-//			if(progressbar.isDisposed())
-//				return;
-//			progressbar.setSelection(progressbar.getSelection()+1);
-//			progressbar.redraw();
-//		}
 	  
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
     String workspaceURI = root.eResource().getURI().toString();
@@ -93,6 +70,7 @@ public class GenerateAction extends AbstractAnalyzer
     
     String targetName = null;
     String outputDirName = null;
+    String outputPathName = null;
     try
     {
       targetName = 
@@ -112,10 +90,23 @@ public class GenerateAction extends AbstractAnalyzer
       
       if(outputDirName==null)
       {
-        Dialog.showError("Code Generation Error",
-              "Please select an output directory for generated code");
-        return;
+    	  Dialog.showError("Code Generation Error",
+    			  "Please select an output directory for generated code");
+    	  return;
       }
+
+      outputPathName = 
+    		  resource.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
+    				  RamsesPropertyPage.PLATFORM_ID));
+
+      if(outputPathName==null)
+      {
+    	  Dialog.showError("Code Generation Error",
+    			  "Please select a Path for "+targetName+"");
+    	  return;
+      }
+        
+      RamsesConfiguration.setRuntimeDir(outputPathName);
       
       ServiceRegistry registry = new OSGiServiceRegistry () ;
       Generator generator = registry.getGenerator(targetName) ;
