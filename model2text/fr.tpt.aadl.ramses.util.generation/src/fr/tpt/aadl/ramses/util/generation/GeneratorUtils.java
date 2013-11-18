@@ -590,10 +590,9 @@ public static void getListOfReferencedObjects(CallSpecification aCallSpecificati
   return null ;
   }
   
-  public static void executeMake(File generatedFilePath, String EnvirVarId)
+  public static void executeMake(File generatedFilePath, String runtimePath)
   {
     Runtime runtime = Runtime.getRuntime();
-    String runtimePath = getRuntimePath(EnvirVarId);
 	if(runtimePath!=null && runtimePath!="")
     {
       try
