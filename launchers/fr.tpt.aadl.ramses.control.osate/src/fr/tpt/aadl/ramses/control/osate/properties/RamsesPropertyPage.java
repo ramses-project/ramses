@@ -415,7 +415,7 @@ public class RamsesPropertyPage extends PropertyPage {
 		  instanceModel.setPersistentProperty(
 				  new QualifiedName(PREFIX, PATH_ID),
 		          outputDirText.getText());
-		  qfName =   new QualifiedName(PREF, PLATFORM_ID);
+		  qfName =   new QualifiedName(PREFIX, PLATFORM_ID);
 		  instanceModel.setPersistentProperty(
 				  qfName,
 		          outputPathText.getText());
