@@ -48,6 +48,7 @@ import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.ComponentPrototype;
 import org.osate.aadl2.ComponentPrototypeActual;
 import org.osate.aadl2.ComponentPrototypeBinding;
 import org.osate.aadl2.ComponentType;
@@ -75,8 +76,10 @@ import org.osate.aadl2.Parameter;
 import org.osate.aadl2.PortSpecification;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
+import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PrototypeBinding;
+import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SubcomponentType;
@@ -89,6 +92,7 @@ import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramSubcomponent;
 import org.osate.aadl2.SubprogramSubcomponentType;
 import org.osate.aadl2.SubprogramType;
+import org.osate.aadl2.ThreadClassifier;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
@@ -159,6 +163,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
    */
   private List<SubprogramClassifier> subprogramsUnparsingStack = new ArrayList<SubprogramClassifier>();
   
+  private SubprogramCallSequence _currentBehaviorCallSequence = null;
+  private SubprogramCallSequence _initBehaviorCallSequence = null;
   public static AadlToCUnparser getAadlToCUnparser()
   {
     if(singleton==null)
@@ -568,9 +574,14 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       }
 	  if(!foundRestrictedAnnex && !object.getOwnedSubprogramCallSequences().isEmpty())
 	  {
-	  	for(SubprogramCallSequence scs: object.getOwnedSubprogramCallSequences())
-	  	{
+	    if(object instanceof ThreadClassifier)
+	      process(_currentBehaviorCallSequence);
+	    else
+	    {
+	  	  for(SubprogramCallSequence scs: object.getOwnedSubprogramCallSequences())
+	  	  {
 	  		process(scs);
+	  	  }
 	  	}
 	  	foundRestrictedAnnex=true;
 	  }
@@ -800,9 +811,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
         else
         {
+        	_owner = object;
         	if(object instanceof DataImplementation)
         	{
-        		_owner = object;
+        		boolean isAbstract = isAbstractType((DataClassifier)object);
+        		if(isAbstract)
+        		  break; // do not consider data with prototypes as acceptable struct definitions.
         		for(DataSubcomponent ds:getAllDataSubcomponents((DataImplementation)object))
         		{
         			DataSubcomponentType dst = ds.getDataSubcomponentType();
@@ -817,22 +831,38 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         				l = _additionalHeaders.get(_gtypesHeaderCode) ;
         			}
         			String sourceName = GenerationUtilsC.resolveExistingCodeDependencies(dst, l);
-        			if(sourceName!=null)
-        				structDefinition.append("\t"+sourceName);
-        			else
+        			if(sourceName==null)
         			{
         				process(dst);
-        				
         				if(dst instanceof DataPrototype)
         				{
-        					structDefinition.append("\tvoid *");
+        				  Classifier cl = (Classifier) _owner;
+        			      for(PrototypeBinding pb: cl.getOwnedPrototypeBindings())
+        			      {
+        			        if(pb.getFormal().equals(dst))
+        			        {
+        			          for(ComponentPrototypeActual pa: ((ComponentPrototypeBinding) pb).getActuals())
+        			    	  {
+        			    	    if(pa.getSubcomponentType() instanceof DataSubcomponentType)
+        			    	    {
+        			    	      DataSubcomponentType dstActual = (DataSubcomponentType) pa.getSubcomponentType();
+        			    	      process(dstActual);
+        			    	      sourceName = GenerationUtilsC.resolveExistingCodeDependencies(dstActual, l);
+        			    	      if(sourceName==null)
+        			    	    	  sourceName = GenerationUtilsC.getGenerationCIdentifier(dstActual.getQualifiedName());
+        			    	      break;
+        			    	    }
+        			    	  }
+        			    	}
+        			      }
         				}
         				else
         				{
         				  sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
-        				  structDefinition.append("\t"+sourceName);
         				}
         			}
+        			if(sourceName!=null)
+        				structDefinition.append("\t"+sourceName);
         			structDefinition.append(" "+ds.getName()+";\n");
         		}
         	}
@@ -906,8 +936,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                     .getPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
         boolean found = false;
-        for(PropertyExpression baseTypeProperty : baseType)
+        boolean isAbstract = false;
+        for(int i = baseType.size()-1; i>=0; i--)
         {
+          PropertyExpression baseTypeProperty = baseType.get(i);
           if(baseTypeProperty instanceof ListValue)
           {
             ListValue lv = (ListValue) baseTypeProperty ;
@@ -917,6 +949,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               if(v instanceof ClassifierValue)
               {
                 ClassifierValue cv = (ClassifierValue) v ;
+                isAbstract = isAbstractType((DataClassifier)cv.getClassifier());
+                if(isAbstract)
+                  break;
                	if(false == _processedTypes.contains(cv.getClassifier().getQualifiedName()))
                	{
                   getCTypeDeclarator(cv.getClassifier());
@@ -933,6 +968,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
             	break;
           }
         }
+        if(isAbstract)
+          break;
         _gtypesHeaderCode.addOutput(arrayDef.toString());
         _gtypesHeaderCode.addOutput(" ") ;
         _gtypesHeaderCode.addOutput(id) ;
@@ -989,6 +1026,36 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         break ;
       }
     }
+  }
+  
+  boolean isAbstractType(DataClassifier dc)
+  {
+	if(dc instanceof DataImplementation)
+	{
+	  DataImplementation di = (DataImplementation) dc;
+	  for(DataSubcomponent ds:getAllDataSubcomponents(di))
+      {
+	    DataSubcomponentType dst = ds.getDataSubcomponentType();
+	    if(dst instanceof DataPrototype)
+	    {
+		  boolean bounded = false;
+		  Classifier cl = (Classifier) _owner;
+	      for(PrototypeBinding pb: cl.getOwnedPrototypeBindings())
+	      {
+	        if(pb.getFormal().equals(dst))
+	        {
+	          bounded = true;
+	          break;
+	        }
+	      }
+		  if(bounded==false)
+		  {
+		    return true;
+		  }
+	    }
+	  }
+	}
+	return false;
   }
   
   List<DataSubcomponent> getAllDataSubcomponents(ComponentImplementation ci)
@@ -1202,6 +1269,30 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentHeaderUnparser = _activityHeaderCode ;
         GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         process(object.getType()) ;
+        
+        _currentImplUnparser.addOutput("void ") ;
+        _currentImplUnparser.addOutput(GenerationUtilsC
+              .getGenerationCIdentifier(object.getQualifiedName())) ;
+        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_INIT_SUFFIX + "()") ;
+        _currentImplUnparser.addOutputNewline("{") ;
+        _currentImplUnparser.incrementIndent() ;
+        
+        
+        if(_initBehaviorCallSequence!=null)
+        {
+          for(DataSubcomponent d : getAllDataSubcomponents(object))
+          {
+            if(isUsedInCallSequence(d, _initBehaviorCallSequence))
+          	  process(d) ;
+          }
+          process(_initBehaviorCallSequence);
+          _initBehaviorCallSequence=null;
+        }
+        
+        _activityImplCode.decrementIndent() ;
+        _activityImplCode.addOutputNewline("}") ;
+        _activityImplCode.addOutputNewline("") ;
+        
         _currentImplUnparser.addOutput("void* ") ;
         _currentImplUnparser.addOutput(GenerationUtilsC
               .getGenerationCIdentifier(object.getQualifiedName())) ;
@@ -1209,9 +1300,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentImplUnparser.addOutputNewline("{") ;
         _currentImplUnparser.incrementIndent() ;
         _owner = object;
+        
+        
         for(DataSubcomponent d : getAllDataSubcomponents(object))
         {
-          process(d) ;
+          if(isUsedInCallSequence(d, _currentBehaviorCallSequence))
+            process(d) ;
         }
         
         _currentImplUnparser.addOutputNewline("while (1) {") ;
@@ -1226,6 +1320,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _activityImplCode.decrementIndent() ;
         _activityImplCode.addOutputNewline("}") ;
         
+        if(_currentBehaviorCallSequence!=null)
+          _currentBehaviorCallSequence=null;
+        
         _activityHeaderCode.addOutput("void*  ") ;
         _activityHeaderCode.addOutput(GenerationUtilsC
               .getGenerationCIdentifier(object.getQualifiedName())) ;
@@ -1234,7 +1331,32 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         return null ;
       }
 
-      public String caseSubprogramCallSequence(SubprogramCallSequence object)
+    private boolean isUsedInCallSequence(DataSubcomponent d,
+		SubprogramCallSequence callSequence) {
+	  ComponentImplementation ci = (ComponentImplementation) callSequence.getContainingClassifier();
+	  for(Connection cnx: ci.getOwnedConnections())
+	  {
+	    if(cnx.getAllDestinationContext() != null)
+	    {
+	      if(cnx.getAllDestinationContext().eContainer().equals(callSequence)
+	    		  && cnx.getAllSource().equals(d))
+	      {
+	    	return true;
+	      }
+	    }
+	    if(cnx.getAllSourceContext() != null)
+	    {
+	      if(cnx.getAllSourceContext().eContainer().equals(callSequence)
+	    		&& cnx.getAllDestination().equals(d))
+	      {
+	    	return true;
+	      }
+	    }
+	  }
+	  return false;
+    }
+    
+	public String caseSubprogramCallSequence(SubprogramCallSequence object)
       {
     	for(CallSpecification cs : object.getOwnedCallSpecifications())
     	{
@@ -1578,6 +1700,16 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseThreadSubcomponent(ThreadSubcomponent object)
       {
+        PropertyAssociation pa = PropertyUtils.getPropertyAssociation(object, "Compute_Entrypoint_Call_Sequence");
+        ReferenceValue rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue();
+	  	_currentBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements().get(0).getNamedElement();
+	  	
+	  	pa = PropertyUtils.getPropertyAssociation(object, "Initialize_Entrypoint_Call_Sequence");
+	  	if(pa!=null)
+	  	{
+	  	  rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue();
+	  	  _initBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements().get(0).getNamedElement();
+        }
         process(object.getComponentImplementation()) ;
         return null ;
       }

@@ -32,6 +32,7 @@ import org.osate.aadl2.DataPrototype;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.Property;
+import org.osate.aadl2.ThreadImplementation;
 import org.osate.utils.PropertyUtils ;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 
@@ -41,6 +42,17 @@ public class GenerationUtilsC
 {
   
   public final static String THREAD_SUFFIX = "_Job" ;
+  public final static String THREAD_INIT_SUFFIX = "_Init" ;
+  
+  
+  public static String getInitializationCall(ThreadImplementation object)
+  {
+    StringBuilder result = new StringBuilder();
+    result.append(GenerationUtilsC
+              .getGenerationCIdentifier(object.getQualifiedName())) ;
+    result.append(THREAD_INIT_SUFFIX + "();") ;
+    return result.toString();
+  }
   
   // Give file name, in upper case or not and with or without extension.
   public static String generateHeaderInclusionGuard(String fileName)

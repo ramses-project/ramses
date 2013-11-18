@@ -90,6 +90,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   public final static String BUFFER_AADL_TYPE =
                                           "arinc653_runtime::Buffer_Id_Type" ;
   
+  public final static String SEMAPHORE_AADL_TYPE = 
+		  								  "arinc653_runtime::Semaphore_Id_Type" ;
+  
   private ProcessorProperties _processorProp;
   
   public void process(ProcessorSubcomponent processorSubcomponent,
@@ -635,6 +638,29 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
       }
     }
     
+    // Generate semaphore names array.
+    if(pp.hasSemaphore)
+    {
+      mainImplCode.addOutput("char* pok_arinc653_semaphores_names[POK_CONFIG_ARINC653_NB_SEMAPHORES] = {") ;
+
+      for(String name : pp.semaphoreNames)
+      {
+        mainImplCode.addOutput("\"") ;
+        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput("\"") ;
+      }
+
+      mainImplCode.addOutputNewline("};") ;
+      
+      // Generate external variable (declared in deployment.c).
+      for(String name : pp.semaphoreNames)
+      {
+        mainImplCode.addOutput("SEMAPHORE_ID_TYPE ") ;
+        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutputNewline(";") ;
+      }
+    }
+    
     // Generate buffer names array.
     if(pp.hasBuffer)
     {
@@ -815,7 +841,19 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     }
   }
   
-  
+  private void genSemaphoreMainImpl(UnparseText mainImplCode,
+          PartitionProperties pp)
+  {
+    // For each semaphore
+	for(String info : pp.semaphoreNames)
+	{
+      mainImplCode.addOutput("  CREATE_SEMAPHORE (\"") ;
+      mainImplCode.addOutput(info) ;
+      mainImplCode.addOutput("\", 1, 1, PRIORITY, &") ;
+      mainImplCode.addOutput(info);
+      mainImplCode.addOutputNewline(", &(ret));") ;
+	}
+  }
   
   private void genMainImpl(ProcessImplementation process,
                            UnparseText mainImplCode,
@@ -835,11 +873,22 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
           .generateSectionTitle("MAIN")) ;
     mainImplCode.addOutputNewline("int main ()") ;
     mainImplCode.addOutputNewline("{") ;
+    for(ThreadSubcomponent ts:process.getOwnedThreadSubcomponents())
+    {
+      mainImplCode.addOutputNewline(
+    	GenerationUtilsC.getInitializationCall(
+    				(ThreadImplementation) ts.getClassifier()
+    				)
+      );
+    }
     mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
     mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
     
     // Blackboard declarations.
     genBlackboardMainImpl(mainImplCode, pp) ;
+    
+    // Semaphore declarations.
+    genSemaphoreMainImpl(mainImplCode, pp) ;
     
     // Queue declarations.
     genQueueMainImpl(mainImplCode,pp) ;
@@ -923,6 +972,12 @@ private void findCommunicationMechanism(ProcessImplementation process,
                        getTransformationTrace(s), pp);
           pp.hasBuffer = true ;
         }
+        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
+                .equalsIgnoreCase(SEMAPHORE_AADL_TYPE))
+        {
+          pp.semaphoreNames.add(s.getName());
+          pp.hasSemaphore = true;
+        }
       }
     }
   }
@@ -974,7 +1029,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
       mainHeaderCode
       .addOutputNewline("#define POK_NEEDS_BLACKBOARDS 1") ;
     }
-
+    if(pp.hasSemaphore)
+    {
+      mainHeaderCode
+        .addOutputNewline("#define POK_NEEDS_ARINC653_SEMAPHORE 1") ;
+      mainHeaderCode
+        .addOutputNewline("#define POK_CONFIG_ARINC653_NB_SEMAPHORES " +
+                 pp.semaphoreNames.size());
+    }
     if(pp.hasEvent)
     {
       mainHeaderCode
@@ -1303,7 +1365,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
         findCommunicationMechanism(process, pp) ;
       }
       PartitionProperties pp = _processorProp.partitionProperties.get(process) ;
-      if(pp.hasBlackboard || pp.hasBuffer || pp.hasEvent)
+      if(pp.hasBlackboard || pp.hasBuffer || pp.hasEvent || pp.hasSemaphore)
       {
         deploymentHeaderCode
               .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;
@@ -1347,8 +1409,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
                   .getComponentImplementation()) ;
       deploymentHeaderCode.addOutput(Integer
             .toString(pp.blackboardInfo.size()
-                      + pp.bufferInfo.size()+
-                      pp.eventNames.size())) ;
+                      + pp.bufferInfo.size()
+                      + pp.eventNames.size()
+                      + pp.semaphoreNames.size())) ;
       if(bindedProcess.indexOf(ps) < bindedProcess.size() - 1)
       {
         deploymentHeaderCode.addOutput(",") ;

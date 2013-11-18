@@ -84,6 +84,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 	  public final static String BUFFER_AADL_TYPE =
 	                                          "arinc653_runtime::Buffer_Id_Type" ;
 	  
+	  public final static String SEMAPHORE_AADL_TYPE =
+			  								   "arinc653_runtime::Semaphore_Id_Type" ;
+	  
 	  private ProcessorProperties _processorProp;
 
       UnparseText deploymentHeaderCode = new UnparseText() ;
@@ -992,6 +995,12 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 							getTransformationTrace(s), pp);
 					pp.hasBuffer = true ;
 				}
+				else if(s.getClassifier().getQualifiedName()
+						.equalsIgnoreCase(SEMAPHORE_AADL_TYPE))
+				{
+					pp.semaphoreNames.add(s.getName());
+					pp.hasSemaphore = true ;
+				}
 			}
 		}
 	}
@@ -1349,7 +1358,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 	        findCommunicationMechanism(process, pp) ;
 	      }
 	      PartitionProperties pp = _processorProp.partitionProperties.get(process) ;
-	      if(pp.hasBlackboard || pp.hasBuffer || pp.hasEvent)
+	      if(pp.hasBlackboard || pp.hasBuffer || pp.hasEvent || pp.hasSemaphore)
 	      {
 	        deploymentHeaderCode
 	              .addOutputNewline("#define POK_NEEDS_LOCKOBJECTS 1") ;

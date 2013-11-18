@@ -36,5 +36,9 @@ public class PartitionProperties
   public Set<QueueInfo> queueInfo = new LinkedHashSet<QueueInfo>();
   
   public Set<SampleInfo> sampleInfo = new LinkedHashSet<SampleInfo>();
+
+  public boolean hasSemaphore;
+  
+  public Set<String> semaphoreNames = new LinkedHashSet<String>() ;
   
 }

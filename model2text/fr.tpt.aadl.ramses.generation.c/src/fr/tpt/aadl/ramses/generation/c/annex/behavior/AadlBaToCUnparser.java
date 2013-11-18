@@ -500,17 +500,72 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
        */
       public String caseDataComponentReference(DataComponentReference object)
       {
-    	Iterator<DataHolder> itDataHolder = object.getData().iterator() ;
-    	process(itDataHolder.next());
-        while(itDataHolder.hasNext())
-        {
-        	_cFileContent.addOutput(".");
-        	_cFileContent.addOutput(((DataHolder)itDataHolder.next()).getElement().getName());
-        }
-
+        processDataComponentReference(object);
         return DONE ;
       }
 
+      void processDataComponentReference(DataComponentReference object)
+      {
+      	Iterator<DataHolder> itDataHolder = object.getData().iterator() ;
+      	DataHolder dh = itDataHolder.next();
+      	process(dh);
+      	if(dh instanceof DataSubcomponentHolder)
+      	{
+      	  DataSubcomponentHolder dsh = (DataSubcomponentHolder) dh;
+      	  for(IntegerValue iv:dsh.getArrayIndexes())
+      	  {
+      		_cFileContent.addOutput("[");
+      		if(iv instanceof BehaviorIntegerLiteral)
+      		{
+   				BehaviorIntegerLiteral ivc = (BehaviorIntegerLiteral) iv;
+   				_cFileContent.addOutput(Long.toString(ivc.getValue()));
+   			}
+   			else if(iv instanceof DataSubcomponentHolder)
+  			{
+   				processDataComponentReferenceElement((DataSubcomponentHolder)iv);
+  			}
+  			else if(iv instanceof DataComponentReference)
+  			{
+  				processDataComponentReference((DataComponentReference) iv);
+  			}
+      		_cFileContent.addOutput("]");
+   		  }
+      	}
+        while(itDataHolder.hasNext())
+        {
+          _cFileContent.addOutput(".");
+          dh = (DataHolder)itDataHolder.next();
+          processDataComponentReferenceElement(dh);
+        }
+      }
+      
+      void processDataComponentReferenceElement(DataHolder dh)
+      {
+    	_cFileContent.addOutput(dh.getElement().getName());
+      	if(dh instanceof DataSubcomponentHolder)
+      	{
+      		DataSubcomponentHolder dsh = (DataSubcomponentHolder) dh;
+      		for(IntegerValue iv:dsh.getArrayIndexes())
+      		{
+      			_cFileContent.addOutput("[");
+      			if(iv instanceof BehaviorIntegerLiteral)
+      			{
+      				BehaviorIntegerLiteral ivc = (BehaviorIntegerLiteral) iv;
+      				_cFileContent.addOutput(Long.toString(ivc.getValue()));
+      			}
+      			else if(iv instanceof DataComponentReference)
+      			{
+      				processDataComponentReference((DataComponentReference) iv);
+      			}
+      			else
+      			{
+      				process(iv);
+      			}
+      			_cFileContent.addOutput("]");
+      		}
+      	}
+      }
+      
       /**
        * Unparse behaviorstate
        * @object: input parameter, destination of a Behavior Transition
@@ -1159,23 +1214,7 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
               	  }
               	  else if(v instanceof DataComponentReference)
               	  {
-              		DataComponentReference dcr = (DataComponentReference) v;
-              		boolean firstElement = true;
-              		for(DataHolder dh: dcr.getData())
-              		{
-              		  boolean lastElement = (dcr.getData().indexOf(dh)==dcr.getData().size()-1);
-              		  if(dh instanceof ParameterHolder
-                            || dh instanceof DataAccessHolder
-                            || firstElement == false)
-                        _cFileContent.addOutput(dh.getElement().getName());
-                      else
-                      {
-                        _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(dh.getElement().getQualifiedName()));
-                        firstElement=false;
-                      }
-              		  if(!lastElement)
-              			  _cFileContent.addOutput(".");
-              		}
+              		process(v);
               	  }
               	  else
               	  {
