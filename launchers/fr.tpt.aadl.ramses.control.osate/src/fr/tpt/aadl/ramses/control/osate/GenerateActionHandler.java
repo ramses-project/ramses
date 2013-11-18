@@ -3,7 +3,7 @@ package fr.tpt.aadl.ramses.control.osate;
 import java.io.File;
 import java.net.URL;
 import java.util.Iterator;
-
+import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -25,6 +25,17 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
@@ -52,6 +63,7 @@ import org.osate.ui.navigator.AadlNavigator;
 
 import com.google.inject.Inject;
 
+import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
 import fr.tpt.aadl.ramses.control.support.EcorePilot;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
@@ -63,6 +75,7 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 	@Inject
 	private EObjectAtOffsetHelper eObjectAtOffsetHelper;
 
+	private static int TEXT_FIELD_WIDTH = 43;
 
 	protected static final InternalErrorReporter internalErrorLogger = new LogInternalErrorReporter(OsateCorePlugin
 			.getDefault().getBundle());
@@ -101,9 +114,191 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 		}
 		return null;
 	}
-
+//	@SuppressWarnings("unused")
+//	private class CodeGenerationOperation extends Thread
+//	{
+//		private Display display;
+//
+//		private ProgressBar progressBar;
+//
+//		public CodeGenerationOperation(Display display, ProgressBar progressBar) {
+//			this.display = display;
+//			this.progressBar = progressBar;
+//		}
+//
+//		public void run() {
+//			for (int i = 0; i < 30; i++) {
+//				try {
+//					System.out.println("Thread is running...");	
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e) {
+//				}
+//				display.asyncExec(new Runnable() {
+//					public void run() {
+//						if (progressBar.isDisposed())
+//							return;
+//						progressBar.setSelection(progressBar.getSelection() + 1);
+//					}
+//				});
+//			}
+//		}
+//	}
+	
+//	private class doShellProgress extends DialogPage
+//	{
+//
+//		@Override
+//		public void createControl(Composite parent) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//		
+//	}
+//	@SuppressWarnings("unused")
+//	protected class myThread  extends DialogPage implements Runnable 
+//	{
+//
+//		@Override
+//		public void createControl(Composite parent) {
+//			// TODO Auto-generated method stub
+//			
+//		}
+//
+//		@Override
+//		public void run() {
+//			// TODO Auto-generated method stub
+//			ProgressBar progressbar = new ProgressBar(getShell(), SWT.SMOOTH);
+//			progressbar.setMinimum(1);
+//			progressbar.setMaximum(100);
+//			progressbar.setVisible(true);
+//		}
+//		
+//	}
 	void doCodeGeneration()
 	{
+//		boolean isclosed = false;
+//		final Display dsp = Display.getCurrent();
+//		final Shell shl = dsp.getActiveShell();
+//		final ProgressBar progressbar = new ProgressBar(shl, SWT.HORIZONTAL|SWT.SMOOTH);
+//		progressbar.setMinimum(1);
+//		progressbar.setMaximum(200);
+//		final long start = System.currentTimeMillis();
+//		Thread thd = new Thread(){
+//			public void run()
+//			{
+//				
+//				while (System.currentTimeMillis() < (start+(1000*5)))
+//				{
+//					System.out.println("The thread is running ...");
+//					shl.open();
+//					try {
+//						Thread.sleep(2000);
+//						
+//						
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//				
+//			}
+//		};
+//		
+//		thd.start();
+		
+//		final Display dsp = Display.getCurrent();
+//		final Shell shl = new Shell(dsp.getActiveShell(), SWT.BORDER);
+//		shl.setText("My Progressbar");
+//		final ProgressBar progressbar = new ProgressBar(shl, SWT.HORIZONTAL|SWT.SMOOTH);
+//		progressbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		progressbar.setMinimum(0);
+//		progressbar.setMaximum(30);
+//		final long start = System.currentTimeMillis();
+//		
+//		shl.open();
+//		final Display dsp = Display.getCurrent();
+//		final Shell shl = dsp.getActiveShell();
+//		shl.setLayout(new GridLayout());
+//
+//		// Create a smooth ProgressBar
+//		final ProgressBar progressbar = new ProgressBar(shl, SWT.HORIZONTAL | SWT.SMOOTH);
+//		progressbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		progressbar.setMinimum(0);
+//		progressbar.setMaximum(30);
+//		
+//		new CodeGenerationOperation(dsp, progressbar).start();
+//
+//		shl.open();
+//		while (!shl.isDisposed()) {
+//			if (!dsp.readAndDispatch()) {
+//				dsp.sleep();
+//			}
+//		}
+		
+//		Thread thd = new Thread()
+//		{
+//			public void run() 
+//			{
+//				for(int i = 0; i < 30; i++)
+//				{
+//					try {
+//						Thread.sleep(1000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					dsp.asyncExec(new Runnable() {
+//						
+//						@Override
+//						public void run() {
+//							// TODO Auto-generated method stub
+//							if(progressbar.isDisposed())
+//								return;
+//							progressbar.setSelection(progressbar.getSelection() + 1);
+//						}
+//					});
+//				}
+//			}
+//		};
+//		thd.start();
+//		shl.open();
+//		while (System.currentTimeMillis() < (start+(1000*5)))
+//		{
+//			System.out.println("The thread is running ...");
+//			if(progressbar.isDisposed())
+//				return;
+//			progressbar.setSelection(progressbar.getSelection()+1);
+//			progressbar.redraw();
+//		}
+		
+		Display display = Display.getCurrent();
+		Shell shell = new Shell(display, SWT.BORDER);
+
+
+		MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION |SWT.YES | SWT.NO);
+		messageBox.setMessage("You have to chose Path for the target Platform before generating Code");
+		int rc = messageBox.open();
+		
+		if(rc == SWT.YES)
+		{
+			//Open another windows to set the path
+			System.out.println("RC is Yes");
+			shell.close();
+			Shell shl = new Shell(display, SWT.BORDER);
+			RememberPath rmPath = new RememberPath(shl);
+			rmPath.open();
+			//TO BE COMPLETED
+		}
+		else
+		{
+			//There is nothing to do for the moment
+			System.out.println("RC is NO");
+			//TO BE COMPLETED
+		}
+
+		
+		
+		
 		IWorkbench wb = PlatformUI.getWorkbench();
 		IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
 		IWorkbenchPage page = win.getActivePage();
