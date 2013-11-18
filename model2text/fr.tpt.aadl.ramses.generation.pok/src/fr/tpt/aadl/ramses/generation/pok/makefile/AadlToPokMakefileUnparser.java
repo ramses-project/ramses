@@ -58,8 +58,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
   private UnparseText unparserContent ;
   private UnparseText kernelMakefileContent ;
   private List<ProcessSubcomponent> bindedProcess ;
-  private static final String POK_ENVIRVARID = "POK_PATH";
-  private static final String runtimePath = GeneratorUtils.getRuntimePath(POK_ENVIRVARID);
+  
   @Override
   protected void initSwitches()
   {
@@ -114,7 +113,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent
               .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/main.h") ;
         unparserContent
-              .addOutputNewline("include "+runtimePath+"/misc/mk/config.mk") ;
+        .addOutputNewline("export POK_PATH="+RamsesConfiguration.getRuntimeDir()) ;
+        unparserContent
+              .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
               ".elf") ;
         process(object.getComponentImplementation()) ;
@@ -152,7 +153,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent.addOutputNewline("all: libpok $(TARGET)\n") ;
         unparserContent.addOutputNewline("clean: common-clean\n") ;
         unparserContent
-              .addOutputNewline("include "+runtimePath+"/misc/mk/common-$(ARCH).mk") ;
+              .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
         if(false==includeDirList.isEmpty())
           unparserContent.addOutput("export USER_INCLUDES=");
         for (File include: includeDirList)
@@ -161,9 +162,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         }
         unparserContent.addOutput("\n") ;
         unparserContent
-              .addOutputNewline("include "+runtimePath+"/misc/mk/rules-partition.mk") ;
+              .addOutputNewline("include $(POK_PATH)/misc/mk/rules-partition.mk") ;
         unparserContent
-              .addOutputNewline("include "+runtimePath+"/misc/mk/rules-common.mk") ;
+              .addOutputNewline("include $(POK_PATH)/misc/mk/rules-common.mk") ;
         return DONE ;
       }
 
@@ -213,9 +214,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent
               .addOutputNewline("export POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE=1") ;
         unparserContent
-              .addOutputNewline("include "+runtimePath+"/misc/mk/config.mk") ;
+              .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
         unparserContent
-              .addOutputNewline("include "+runtimePath+"/misc/mk/common-$(ARCH).mk") ;
+              .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
         unparserContent.addOutputNewline("TARGET=$(shell pwd)/pok.elf") ;
         unparserContent.addOutput("PARTITIONS=") ;
 
@@ -257,9 +258,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
                 " && $(MAKE) distclean") ;
         }
         
-        unparserContent.addOutputNewline("include "+runtimePath+"/misc/mk/rules-common.mk");
-        unparserContent.addOutputNewline("include "+runtimePath+"/misc/mk/rules-main.mk");
-        unparserContent.addOutputNewline("include "+runtimePath+"/misc/mk/install-rules.mk");
+        unparserContent.addOutputNewline("include $(POK_PATH)/misc/mk/rules-common.mk");
+        unparserContent.addOutputNewline("include $(POK_PATH)/misc/mk/rules-main.mk");
+        unparserContent.addOutputNewline("include $(POK_PATH)/misc/mk/install-rules.mk");
 
         return DONE ;
       }
@@ -280,7 +281,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         throws GenerationException
   {
     generateMakefile((NamedElement) system, generatedFilePath) ;
-    GeneratorUtils.executeMake(generatedFilePath, POK_ENVIRVARID);
+    GeneratorUtils.executeMake(generatedFilePath, RamsesConfiguration.getRuntimeDir());
   }
   
   
@@ -299,7 +300,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
     kernelMakefileContent
           .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/deployment.h") ;
     kernelMakefileContent
-          .addOutputNewline("include "+runtimePath+"/misc/mk/config.mk") ;
+          .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
     kernelMakefileContent.addOutputNewline("LO_TARGET = kernel.lo") ;
     kernelMakefileContent.addOutputNewline("LO_OBJS = deployment.o routing.o") ;
     kernelMakefileContent.addOutputNewline("LO_DEPS = pok.lo") ;
@@ -307,11 +308,11 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
           .addOutputNewline("all: kernel copy-kernel $(LO_TARGET)") ;
     kernelMakefileContent.addOutputNewline("clean: common-clean") ;
     kernelMakefileContent
-          .addOutputNewline("include "+runtimePath+"/misc/mk/common-$(ARCH).mk") ;
+          .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
     kernelMakefileContent
-          .addOutputNewline("include "+runtimePath+"/misc/mk/rules-common.mk") ;
+          .addOutputNewline("include $(POK_PATH)/misc/mk/rules-common.mk") ;
     kernelMakefileContent
-          .addOutputNewline("include "+runtimePath+"/misc/mk/rules-kernel.mk") ;
+          .addOutputNewline("include $(POK_PATH)/misc/mk/rules-kernel.mk") ;
     GeneratorUtils.saveMakefile(kernelMakefileContent, kernelDir) ;
   }
 
