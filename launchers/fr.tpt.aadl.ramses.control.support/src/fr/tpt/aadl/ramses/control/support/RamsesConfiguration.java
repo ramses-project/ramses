@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.instance.InstanceObject;
@@ -24,8 +25,12 @@ public class RamsesConfiguration
   private static File InputDirectory;
   private static InstantiationManager _instantiationManager = new InstantiationManagerImpl();
   private static PredefinedResourcesAccess predefinedResourcesManager;
+  private static String runtimePath = "";
+  private static ProgressBar progressbar;
+  public static final String PLATFORM_ID = "platform";
   
-  public static void setInstantiationManager(InstantiationManager im)
+
+public static void setInstantiationManager(InstantiationManager im)
   {
 	_instantiationManager=im;
   }
@@ -131,4 +136,19 @@ public class RamsesConfiguration
 	RamsesConfiguration.predefinedResourcesManager = predefinedResourcesRegistration;
   }
 
+public static String getRuntimeDir() {
+	return runtimePath;
+}
+
+public static void setRuntimeDir(String path) {
+	runtimePath=path;
+}
+
+public static ProgressBar getProgressbar() {
+	return progressbar;
+}
+
+public static void setProgressbar(ProgressBar progressbar) {
+	RamsesConfiguration.progressbar = progressbar;
+}
 }
