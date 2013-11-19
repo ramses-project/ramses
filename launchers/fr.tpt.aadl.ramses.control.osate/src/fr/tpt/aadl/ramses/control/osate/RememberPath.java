@@ -2,123 +2,120 @@ package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File;
 
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class RememberPath extends Dialog 
-{
-	private final static int TEXT_FIELD_WIDTH = 250; 
-	private final String msgButton="";
-	private final String platformType="POK";
-	private Button browseButton;
-	private Button applyButton;
-	private Button cancelButton;
-	private Text textPath;
-	private Composite my_parent;
-	private Composite container;
-	
-	public RememberPath(Shell parent) {
-		super(parent);
-		my_parent = parent;
-		System.out.println("Remember path created");
-		// TODO Auto-generated constructor stub
+public class RememberPath extends TitleAreaDialog {
+
+	private Button browseFileButton;
+	private Text outputPathText;
+	private Label lblPath;
+	private String PathForTarget;
+	private String target;
+
+	public RememberPath(Shell parentShell) {
+		super(parentShell);
 	}
-	
-	protected Control createContents(Composite parent)
-	{
-		
-		CreateDialogArea(parent);
-		createButtonBar(parent);
-		return parent;
+
+	@Override
+	public void create() {
+		super.create();
+		setTitle("Custom dialog");
+		setMessage("This is a target platform selection path dialog", IMessageProvider.INFORMATION);
+		PathForTarget = "";
 	}
-	protected Control CreateDialogArea(Composite parent)
-	{
-		System.out.println("CreateDialogArea ...");
-		container = (Composite) super.createDialogArea(parent);
-//		GridLayout layout = new GridLayout(1, false);
-//		layout.marginRight = 5;
-//		layout.marginLeft = 10;
-//		container.setLayout(layout);
-		
-		
-		Button browseButton = new Button(container, SWT.PUSH);
-		browseButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,false));
-		browseButton.setText("Select path for the target platform");
-		//browseButton.setAlignment(SWT.RIGHT);
-		
-		
-	    final Text outputPathText = new Text(container, SWT.BORDER);
-		outputPathText.setEditable(false) ;
-	    GridData grd = new GridData();
-	    grd.widthHint = TEXT_FIELD_WIDTH;
-	    outputPathText.setLayoutData(grd) ;
-	    
-		browseButton.addSelectionListener(new SelectionAdapter(){
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-	    		DirectoryDialog ddg = new DirectoryDialog(getShell());
-	    		File selectedFile = null;
-	    		String file = ddg.open();
-	    		if(file != null && file.length() > 2)
-	    		{
-	    			selectedFile = new File(file);
-	    			outputPathText.setText(selectedFile.getAbsolutePath());
-	    		}
-				System.out.println("Select path for the target platform");
+
+	@Override
+	protected Control createDialogArea(Composite parent) {
+		Composite area = (Composite) super.createDialogArea(parent);
+		Composite container = new Composite(area, SWT.NONE);
+		container.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridLayout layout = new GridLayout(1, false);
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		container.setLayout(layout);
+
+		createFirstName(container);
+		createLastName(container);
+
+		return area;
+	}
+
+	private void createFirstName(Composite container) {
+
+		browseFileButton = new Button(container, SWT.PUSH);
+		browseFileButton.setText("Select path for the target platform");
+		browseFileButton.setAlignment(SWT.LEFT);
+
+		browseFileButton.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				DirectoryDialog ddg = new DirectoryDialog(getShell());
+				File selectedFile = null;
+				String file = ddg.open();
+				if(file != null && file.length() > 2)
+				{
+					selectedFile = new File(file);
+					outputPathText.setText(selectedFile.getAbsolutePath());
+					lblPath.setText("Path selected ...");
+				}
 			}
 		});
-	
-		return container;
-
-	}
-	
-	protected Control createButtonBar(Composite parent)
-	{
-		
-		createButtonsForButtonBar(container);
-		return container;		
-	}
-	
-	protected void createButtonsForButtonBar(Composite parent) 
-	{
-		createButton(parent, IDialogConstants.OK_ID, "Ok", true);
-		createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, false);
-	}
-	protected void configureShell(Shell newShell)
-	{
-		super.configureShell(newShell);
-		newShell.setText("Selection dialog");
 	}
 
-	protected Point getInitialSize() {
-		return new Point(450, 300);
-	}
-	/**
-	 * @return the msgButton
-	 */
-	public String getMsgButton() {
-		return msgButton;
+	private void createLastName(Composite container) {
+
+		lblPath = new Label(container, SWT.NONE);
+		lblPath.setText("Path not selected");
+
+		GridData dataLastName = new GridData();
+		dataLastName.grabExcessHorizontalSpace = false;
+		dataLastName.horizontalAlignment = GridData.FILL;
+		outputPathText = new Text(container, SWT.BORDER);
+		outputPathText.setLayoutData(dataLastName);
 	}
 
-	/**
-	 * @return the platformType
-	 */
-	public String getPlatformType() {
-		return platformType;
+
+
+	@Override
+	protected boolean isResizable() {
+		return true;
 	}
 
-	
-}
+	// save content of the Text fields because they get disposed
+	// as soon as the Dialog closes
+	private void saveInput() {
+		PathForTarget = outputPathText.getText();
+
+	}
+
+	@Override
+	protected void okPressed() {
+		saveInput();
+		super.okPressed();
+	}
+
+	public String getPathForTarget() {
+		return PathForTarget;
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
+} 
