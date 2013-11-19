@@ -1,6 +1,8 @@
 package fr.tpt.aadl.ramses.control.support;
 
 import java.io.File ;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList ;
 import java.util.HashSet;
@@ -9,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List ;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -28,6 +31,8 @@ public class RamsesConfiguration
   private static String runtimePath = "";
   private static ProgressBar progressbar;
   public static final String PLATFORM_ID = "platform";
+  private static String pokValidFilePath = "/misc/mk/config.mk";
+  private static String osekValidFilePath = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
   
 
 public static void setInstantiationManager(InstantiationManager im)
@@ -150,5 +155,37 @@ public static ProgressBar getProgressbar() {
 
 public static void setProgressbar(ProgressBar progressbar) {
 	RamsesConfiguration.progressbar = progressbar;
+}
+
+public static boolean pokRuntimePathValidityCheck(String path)
+{
+	String 	result = path.concat(pokValidFilePath.toString());
+	File file = new File(result);
+
+	try {
+		FileReader fr = new FileReader(file);
+	} catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		System.out.println("File not exists !");
+		return false;
+	}
+
+	return true;
+}
+
+public static boolean osekRuntimePathValidityCheck(String path)
+{
+	String 	result = path.concat(osekValidFilePath.toString());
+	File file = new File(result);
+
+	try {
+		FileReader fr = new FileReader(file);
+	} catch (FileNotFoundException e) {
+		// TODO Auto-generated catch block
+		System.out.println("File not exists !");
+		return false;
+	}
+
+	return true;
 }
 }

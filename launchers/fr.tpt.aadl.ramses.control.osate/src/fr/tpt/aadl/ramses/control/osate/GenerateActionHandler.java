@@ -137,6 +137,12 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 			rmPath.setTarget(_targetName);
 			if(rmPath.open() == Window.OK)
 			{
+				if(!RamsesConfiguration.pokRuntimePathValidityCheck(rmPath.getPathForTarget()))
+				{
+					Dialog.showError("Code Generation Error",
+							"This path is not valid for "+_targetName);
+					return;
+				}
 				if (rmPath.getPathForTarget() == "")
 				{
 					Dialog.showError("Code Generation Error",
