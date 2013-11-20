@@ -41,6 +41,7 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog ;
 import org.eclipse.ui.dialogs.PropertyPage ;
 import org.eclipse.ui.dialogs.ResourceListSelectionDialog ;
 import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.ui.dialogs.Dialog;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
@@ -165,17 +166,11 @@ public class RamsesPropertyPage extends PropertyPage {
 				else if(projectResources[i].getFileExtension()!=null &&
 						projectResources[i].getFileExtension().equals("aaxl2"))
 				{
-					// Obtain a new resource set
-					ResourceSet resSet = new ResourceSetImpl();
-
 					// Get the resource
-					Resource resource = resSet.
-							getResource(URI.createURI(projectResources[i].
-									getLocationURI().toString()),
-									true);
+					Resource resource=OsateResourceUtil.getResource(projectResources[i]);
 					// Get the first model element and cast it to the right type, in my
 					// example everything is hierarchical included in this first node
-					if(resource.getContents().get(0) instanceof SystemInstance)
+					if(resource!= null && resource.getContents().get(0) instanceof SystemInstance)
 						instanceModelList.add(projectResources[i]);
 				}
 			}
