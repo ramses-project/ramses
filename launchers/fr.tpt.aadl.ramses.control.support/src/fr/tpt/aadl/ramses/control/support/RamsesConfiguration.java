@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.instance.InstanceObject;
+import org.osate.aadl2.instance.SystemInstance;
 
 public class RamsesConfiguration
 {
@@ -34,6 +35,17 @@ public class RamsesConfiguration
   private static String pokValidFilePath = "/misc/mk/config.mk";
   private static String osekValidFilePath = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
   
+  private static SystemInstance sysInstance;
+  
+  
+
+public static SystemInstance getSysInstance() {
+	return sysInstance;
+}
+
+public static void setSysInstance(SystemInstance sysInstance) {
+	RamsesConfiguration.sysInstance = sysInstance;
+}
 
 public static void setInstantiationManager(InstantiationManager im)
   {
@@ -52,6 +64,7 @@ public static void setInstantiationManager(InstantiationManager im)
   
   public static void setIncludeDir(Resource r, Set<File> includeDirSet, String targetName)
   {
+
 	if(includeDirSet==null)
 		includeDirSet = new HashSet<File>();
 	if(IncludeDirectories.containsKey(r))
@@ -62,11 +75,15 @@ public static void setInstantiationManager(InstantiationManager im)
 
 	  // Add dir in which the input resource was defined
 	  URI uri = r.getURI();
-	  String filePath = r.getURI().toFileString();
+//	  String filePath = r.getURI().toFileString();
+
+	  String filePath = r.getURI().toString();
+	  if(filePath.startsWith("platform:/resource"))
+		  filePath = filePath.substring(18);
+
 	  int lastIndex = filePath.indexOf(uri.lastSegment());
 	  File inputResourceDir = new File(filePath.substring(0, lastIndex));
 	  includeDirSet.add(inputResourceDir);
-
 	  
 	  // Add Dir of C PeriodicDelayed runtime
 	  File cPeriodicDelayedRuntimeDir;

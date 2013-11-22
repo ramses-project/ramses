@@ -3,6 +3,7 @@ package fr.tpt.aadl.ramses.control.osate;
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -13,12 +14,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Shell;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
@@ -28,8 +23,8 @@ import org.osgi.framework.Bundle;
 
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
 import fr.tpt.aadl.ramses.control.support.EcorePilot;
+import fr.tpt.aadl.ramses.control.support.Names;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
@@ -44,6 +39,13 @@ public class GenerateAction extends AbstractAnalyzer
   private static final String GENERATOR_NAME = "RAMSES" ;
   private final static String PLUGIN_NAME = "Ramses4Osate" ;
   private final static String PLUGIN_ID = "fr.tpt.aadl.ramses.control.osate" ;
+  private Set<File> _includeDirSet = null;
+//  private static final String SOURCE_MODELS_OPTION_ID = "source_models" ;
+//  private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
+//	        "system_to_instantiate" ;
+//  private static final String INCLUDES_OPTION_ID = "include_directories" ;
+  private static String RAMSES_DIR ;
+  
   
   @Override
   protected void analyzeDeclarativeModel(IProgressMonitor monitor,
@@ -61,12 +63,19 @@ public class GenerateAction extends AbstractAnalyzer
                                       SystemOperationMode som)
   {
 	  
-	  
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
     String workspaceURI = root.eResource().getURI().toString();
     if(workspaceURI.startsWith("platform:/resource"))
     	workspaceURI = workspaceURI.substring(18);
+    
     IResource resource=workspaceRoot.findMember(workspaceURI);
+    IResource res = resource.getParent().getParent();
+
+    System.out.println("getName = "+resource.getName());
+    System.out.println("getFullPath = "+resource.getFullPath());
+    System.out.println("getLocation = "+resource.getLocation());
+    System.out.println("getLocationURI = "+resource.getLocationURI());
+    System.out.println("getFullPath = "+resource.getParent().getFullPath());
     
     String targetName = null;
     String outputDirName = null;
@@ -113,6 +122,22 @@ public class GenerateAction extends AbstractAnalyzer
       
       File outputDir = new File (outputDirName);
       
+      // XXX DEBUG
+      
+      
+      RAMSES_DIR = 
+              "../sources/aadlmt/model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
+
+	  File aadlResourcesDir;
+	  try {
+		  aadlResourcesDir = getPublicAADLResourcesDir(RAMSES_DIR);
+		  RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
+	  } catch (Exception e) {
+		  // TODO Auto-generated catch block
+		  e.printStackTrace();
+	  }
+
+	  RamsesConfiguration.setIncludeDir(root.eResource(), _includeDirSet, targetName);
       
       try
       {
@@ -129,6 +154,9 @@ public class GenerateAction extends AbstractAnalyzer
         String s = r.getURI().segment(1);
         File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
         String workflow = GenerateActionUtils.findWorkflow(rootDir);
+        
+        
+        
         if(workflow==null)
           generator.generate(root, 
                              resourceDir,
@@ -203,5 +231,34 @@ public class GenerateAction extends AbstractAnalyzer
     return PLUGIN_ID;
   }
   
+  private static File getPublicAADLResourcesDir(String transformationDirName)
+		  throws Exception
+  {
+	  File transformationDir = getPublicVerifiedPath(transformationDirName) ;
+	  File aadlResourcesDir =
+			  new File(transformationDir.getAbsolutePath() + '/' +
+					  Names.AADL_RESOURCE_DIRECTORY_NAME) ;
 
+	  if(aadlResourcesDir.exists() == false)
+	  {
+		  throw new Exception("ERROR: file " + transformationDirName +
+				  " does not contain " + Names.AADL_RESOURCE_DIRECTORY_NAME +
+				  " directory") ;
+	  }
+
+	  return aadlResourcesDir ;
+	}
+
+  private static File getPublicVerifiedPath(String filePath) throws Exception
+  {
+	  File potentialFile = new File(filePath) ;
+
+	  if(potentialFile.exists())
+	  {
+		  return potentialFile ;
+	  }
+
+	  throw new Exception("file or directory " + potentialFile.getCanonicalPath() +
+			  " could not be found") ;
+  }
 }
