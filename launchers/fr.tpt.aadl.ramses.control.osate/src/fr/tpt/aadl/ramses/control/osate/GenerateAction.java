@@ -122,22 +122,6 @@ public class GenerateAction extends AbstractAnalyzer
       
       File outputDir = new File (outputDirName);
       
-      // XXX DEBUG
-      
-      
-      RAMSES_DIR = 
-              "../sources/aadlmt/model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
-
-	  File aadlResourcesDir;
-	  try {
-		  aadlResourcesDir = getPublicAADLResourcesDir(RAMSES_DIR);
-		  RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
-	  } catch (Exception e) {
-		  // TODO Auto-generated catch block
-		  e.printStackTrace();
-	  }
-
-	  RamsesConfiguration.setIncludeDir(root.eResource(), _includeDirSet, targetName);
       
       try
       {
@@ -148,6 +132,16 @@ public class GenerateAction extends AbstractAnalyzer
         System.out.println("\nURI: " + uri + "\nFile URL: " + url);
 
         File resourceDir = new File(url.toURI()); 
+      
+  	  	try {
+  		  RamsesConfiguration.setRamsesResourcesDir(resourceDir);
+  	  	} catch (Exception e) {
+  		  // TODO Auto-generated catch block
+  		  e.printStackTrace();
+  	  	}
+
+  	  	RamsesConfiguration.setIncludeDir(root.getSystemImplementation().eResource(), _includeDirSet, targetName);
+        
         
         // look for a wokflow file
         Resource r = root.eResource();

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -79,7 +80,11 @@ public static void setInstantiationManager(InstantiationManager im)
 
 	  String filePath = r.getURI().toString();
 	  if(filePath.startsWith("platform:/resource"))
+	  {
 		  filePath = filePath.substring(18);
+		  String filePathPrefix = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
+		  filePath = filePathPrefix+filePath;
+	  }
 
 	  int lastIndex = filePath.indexOf(uri.lastSegment());
 	  File inputResourceDir = new File(filePath.substring(0, lastIndex));
