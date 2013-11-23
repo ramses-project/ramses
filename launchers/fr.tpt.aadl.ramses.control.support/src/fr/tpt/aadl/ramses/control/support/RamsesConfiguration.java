@@ -85,7 +85,8 @@ public static void setInstantiationManager(InstantiationManager im)
 		  String filePathPrefix = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
 		  filePath = filePathPrefix+filePath;
 	  }
-
+	  else if(filePath.startsWith("file:"))
+		  filePath = filePath.substring(5);
 	  int lastIndex = filePath.indexOf(uri.lastSegment());
 	  File inputResourceDir = new File(filePath.substring(0, lastIndex));
 	  includeDirSet.add(inputResourceDir);
