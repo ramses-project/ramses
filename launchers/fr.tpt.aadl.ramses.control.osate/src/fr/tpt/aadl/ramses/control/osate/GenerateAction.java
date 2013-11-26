@@ -40,11 +40,13 @@ public class GenerateAction extends AbstractAnalyzer
   private final static String PLUGIN_NAME = "Ramses4Osate" ;
   private final static String PLUGIN_ID = "fr.tpt.aadl.ramses.control.osate" ;
   private Set<File> _includeDirSet = null;
+  private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
 //  private static final String SOURCE_MODELS_OPTION_ID = "source_models" ;
 //  private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
 //	        "system_to_instantiate" ;
 //  private static final String INCLUDES_OPTION_ID = "include_directories" ;
   private static String RAMSES_DIR ;
+  private static String outputDirPath = "/output";
   
   
   @Override
@@ -69,7 +71,6 @@ public class GenerateAction extends AbstractAnalyzer
     	workspaceURI = workspaceURI.substring(18);
     
     IResource resource=workspaceRoot.findMember(workspaceURI);
-    IResource res = resource.getParent().getParent();
 
     System.out.println("getName = "+resource.getName());
     System.out.println("getFullPath = "+resource.getFullPath());
@@ -121,7 +122,7 @@ public class GenerateAction extends AbstractAnalyzer
       Generator generator = registry.getGenerator(targetName) ;
       
       File outputDir = new File (outputDirName);
-      
+      RamsesConfiguration.setOutputDir(outputDir);
       
       try
       {
@@ -142,7 +143,7 @@ public class GenerateAction extends AbstractAnalyzer
 
   	  	RamsesConfiguration.setIncludeDir(root.getSystemImplementation().eResource(), _includeDirSet, targetName);
         
-        
+  	  	
         // look for a wokflow file
         Resource r = root.eResource();
         String s = r.getURI().segment(1);

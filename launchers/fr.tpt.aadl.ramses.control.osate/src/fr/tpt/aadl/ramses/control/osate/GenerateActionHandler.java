@@ -3,7 +3,11 @@ package fr.tpt.aadl.ramses.control.osate;
 import java.io.File;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Set ;
+
 import org.eclipse.jface.dialogs.DialogPage;
+import org.eclipse.jface.dialogs.IMessageProvider ;
+import org.eclipse.jface.dialogs.TitleAreaDialog ;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -12,7 +16,9 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement ;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform ;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -27,12 +33,17 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter ;
+import org.eclipse.swt.events.SelectionEvent ;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control ;
+import org.eclipse.swt.widgets.DirectoryDialog ;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label ;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
@@ -76,14 +87,20 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 
 	@Inject
 	private EObjectAtOffsetHelper eObjectAtOffsetHelper;
-
+	private Set<File> _includeDirSet = null;
 	private static int TEXT_FIELD_WIDTH = 43;
-
+	private static CustomDialog customdiag;
+private static final String extension = "org.eclipse.ui.propertyPages";
 	protected static final InternalErrorReporter internalErrorLogger = new LogInternalErrorReporter(OsateCorePlugin
 			.getDefault().getBundle());
 
 
 	protected String _targetName=getTargetName();
+  private static  enum code
+  {
+    YES,
+    NO;
+  }
 
 	abstract String getTargetName();
 
@@ -117,53 +134,178 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 		return null;
 	}
 
+	private class CustomDialog extends TitleAreaDialog
+	{
+	  private Label    label;
+	  private Text     outputPathText;
+	  private String   _outputTargetPath;
+	  private Button  yesButton;
+	  private Button   noButton;
+	  private String   code;
+
+    public String getCode()
+    {
+      return code ;
+    }
+
+    public void setCode(String code)
+    {
+      this.code = code ;
+    }
+
+    public CustomDialog(
+                        Shell parentShell, String path)
+    {
+      super(parentShell) ;
+      _outputTargetPath = path;      
+    }
+	  
+    @Override
+    public void create() {
+      super.create();
+      setTitle("Do you want to change the default path ?");
+      //setMessage("This is the target path, do you want to change it ?", IMessageProvider.INFORMATION);
+    }
+
+    @Override
+    protected Control createDialogArea(Composite parent) {
+      Composite area = (Composite) super.createDialogArea(parent);
+      Composite container = new Composite(area, SWT.NONE);
+      container.setLayoutData(new GridData(GridData.FILL_BOTH));
+      GridLayout layout = new GridLayout(1, false);
+      container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+      container.setLayout(layout);
+
+      createWidgets(container);
+      return area;
+    }
+    
+    @Override
+    protected void createButtonsForButtonBar(Composite parent)
+    {
+      yesButton = createButton(parent, SWT.YES, "Yes", false);
+      yesButton.setEnabled(true);
+//      yesButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));;
+      
+      yesButton.addSelectionListener(new SelectionAdapter()
+      {
+        public void widgetSelected(SelectionEvent e)
+        {
+          close();
+          setCode("YES");
+        }
+      });
+    
+      noButton = createButton(parent, SWT.NO, "No", true);
+      noButton.setEnabled(true);
+//      noButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 1, 1));
+      
+      noButton.addSelectionListener(new SelectionAdapter()
+      {
+        public void widgetSelected(SelectionEvent e)
+        {
+          close();
+          setCode("NO");
+        }
+      });
+      
+      
+      
+    }
+    
+    private void createWidgets(Composite container) {
+            
+      GridData dataOutputPath = new GridData(SWT.CENTER, SWT.CENTER, true, true);      
+      outputPathText = new Text(container, SWT.BORDER);
+      outputPathText.setLayoutData(dataOutputPath);
+      outputPathText.setEditable(false);
+      if(_outputTargetPath != null)
+        outputPathText.setText(_outputTargetPath);
+    }
+
+	}
+	
+	public void CreateCustomDialog(Shell sh, String path)
+	{
+	  customdiag = new CustomDialog(sh, path);
+	}
+	
+
 	void doCodeGeneration()
 	{		
-		Display display = Display.getCurrent();
-		Shell shell = new Shell(display, SWT.BORDER);
+	  Display display = Display.getCurrent();
+	  Shell shell = new Shell(display, SWT.BORDER);
 
-
-		MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION |SWT.YES | SWT.NO);
-		messageBox.setMessage("You have to chose Path for the target Platform before generating Code");
-		int rc = messageBox.open();
-		
-		if(rc == SWT.YES)
-		{
-			//Open another window to set the path
-			shell.close();
-			Shell shl = new Shell(display, SWT.BORDER);
-			RememberPath rmPath = new RememberPath(shl);
-			rmPath.create();
-			rmPath.setTarget(_targetName);
-			if(rmPath.open() == Window.OK)
-			{
-				if(!RamsesConfiguration.pokRuntimePathValidityCheck(rmPath.getPathForTarget()))
-				{
-					Dialog.showError("Code Generation Error",
-							"This path is not valid for "+_targetName);
-					return;
-				}
-				if (rmPath.getPathForTarget() == "")
-				{
-					Dialog.showError("Code Generation Error",
-							"Problem occuring while setting Path ");
-					return;
-				}
-				RamsesConfiguration.setRuntimeDir(rmPath.getPathForTarget());
-			}
-			else
-				return;
-
-		}
-		else
-		{
-			if (RamsesConfiguration.getRuntimeDir() == "")
-			{
-				Dialog.showError("Code Generation Error",
-						"Please select a Path for "+_targetName+"");
-				return;
-			}
-		}
+	  if((RamsesConfiguration.getRuntimeDir() != null) 
+	      && (RamsesConfiguration.getRuntimeDir() != "")
+	      && (RamsesConfiguration.getOutputDir() != null))
+	  {
+	    CreateCustomDialog(shell, RamsesConfiguration.getRuntimeDir());
+	    customdiag.create();
+	    customdiag.open();
+	    while(true)
+	    {
+	      if(customdiag.getCode() == "YES")
+	      {
+	          //Open another window to set the path
+	          //        shell.close();
+	          //        Shell shl = new Shell(display, SWT.BORDER);
+	          PersistentPath rmPath = new PersistentPath(shell);
+	          rmPath.create();
+	          rmPath.setTarget(_targetName);
+	          if(rmPath.open() == Window.OK)
+	          {
+	            if(!RamsesConfiguration.pokRuntimePathValidityCheck(rmPath.getPathForTarget()))
+	            {
+	              Dialog.showError("Code Generation Error",
+	                               "This path is not valid for "+_targetName);
+	              return;
+	            }
+	            if (rmPath.getPathForTarget() == "")
+	            {
+	              Dialog.showError("Code Generation Error",
+	                    "Problem occuring while setting Path ");
+	              return;
+	            }
+	            RamsesConfiguration.setRuntimeDir(rmPath.getPathForTarget());
+	          }
+	          else
+	            return;
+	        
+	        break;
+	      }
+	    }
+	  }
+	  else if(RamsesConfiguration.getOutputDir() == null)
+	  {
+	    //Instanciate a propertyPage
+	   // RamsesPropertyPage propertyPage = new RamsesPropertyPage();
+	    
+	    System.out.println("Display a propertyPage !!!") ;
+//	    IConfigurationElement config[] = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.propertyPages");
+//	    for(IConfigurationElement e: config)
+//	    {
+//	      try
+//        {
+//          final Object o = e.createExecutableExtension("class");
+//          System.out.println("e.name = "+ e.getName());
+//          System.out.println("o.toString = "+o.toString()) ;
+//          
+//        }
+//        catch(CoreException e1)
+//        {
+//          // TODO Auto-generated catch block
+//          e1.printStackTrace();
+//        }
+//	      
+//	    }
+//	    return;
+	    
+	  }
+	  else
+	  {
+	    //TODO
+	  }
 		
 		IWorkbench wb = PlatformUI.getWorkbench();
 		IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
@@ -235,13 +377,15 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 													java.net.URI modelURI = new java.net.URI(workspaceURI);
 													URL modelURL = FileLocator.toFileURL(modelURI.toURL());
 													File outputDir = new File(modelURL.toURI()); 
+													RamsesConfiguration.setOutputDir(outputDir);
 
 													URI resourceURI = URI.createPlatformPluginURI("fr.tpt.aadl.ramses.transformation.atl", false);
 													java.net.URI uri = new java.net.URI(resourceURI.toString());
 													URL url = FileLocator.toFileURL(uri.toURL());
 
 													File resourceDir = new File(url.toURI()); 
-
+													RamsesConfiguration.setRamsesResourcesDir(resourceDir);
+													RamsesConfiguration.setIncludeDir(sinst.getSystemImplementation().eResource(), _includeDirSet, _targetName);
 													// look for a wokflow file
 													Resource r = si.eResource();
 													String s = r.getURI().segment(1);

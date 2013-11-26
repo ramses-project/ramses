@@ -58,7 +58,7 @@ public static void setInstantiationManager(InstantiationManager im)
 	return _instantiationManager;
   }
   
-  protected static void setOutputDir(File outputDir)
+  public static void setOutputDir(File outputDir)
   {
     OutputDirectory = outputDir ;
   }
@@ -76,6 +76,7 @@ public static void setInstantiationManager(InstantiationManager im)
 
 	  // Add dir in which the input resource was defined
 	  URI uri = r.getURI();
+	  System.out.println("resource ="+r.toString()) ;
 //	  String filePath = r.getURI().toFileString();
 
 	  String filePath = r.getURI().toString();
@@ -83,10 +84,15 @@ public static void setInstantiationManager(InstantiationManager im)
 	  {
 		  filePath = filePath.substring(18);
 		  String filePathPrefix = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
+		  System.out.println("filePathPrefix = "+filePathPrefix);
 		  filePath = filePathPrefix+filePath;
+		  System.out.println("filePath = "+filePath);
 	  }
 	  else if(filePath.startsWith("file:"))
-		  filePath = filePath.substring(5);
+		 {
+	    filePath = filePath.substring(5);
+	    System.out.println("filePath = "+filePath);
+		 }
 	  int lastIndex = filePath.indexOf(uri.lastSegment());
 	  File inputResourceDir = new File(filePath.substring(0, lastIndex));
 	  includeDirSet.add(inputResourceDir);
