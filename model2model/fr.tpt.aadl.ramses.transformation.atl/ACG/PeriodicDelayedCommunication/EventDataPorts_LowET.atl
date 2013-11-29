@@ -157,7 +157,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		(
 			name <- 'buffer',
 			refined <- Put_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'buffer'),
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayType'),
+			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayImpl'),
 			kind<-#requires
 		),
 		putValueSpg: AADLBA!SubprogramType
@@ -338,7 +338,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET
 		),
 		receiveInputSpg: AADLBA!SubprogramType
 		(
-			name <- Receive_Input_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
+			name <- Receive_Input_PrototypeSpg.name+'_lowet_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
 			ownedExtension <- extendedReceiveInputSpg,
 			ownedParameter <- Sequence{}
 		)

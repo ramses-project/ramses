@@ -1,0 +1,92 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module SharedRules_No_Mutex;
+create OUT : AADLBA from IN : AADLI;
+
+
+
+-- @extends m_PeriodicDelayed_Port,m_Input_EventDataPort_ComputeEntrypointCallSequence
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
+{
+  from
+  	fi: AADLI!FeatureInstance,
+	behavior: AADLI!SubprogramCallSequence,
+	paramCnx: AADLI!ParameterConnection
+  using
+  {
+	nextValueSpg: AADLBA!SubprogramType = thisModule.resolveTemp(fi, 'nextValueSpg');
+  }
+  to
+	call: AADLBA!SubprogramCallAction
+	(
+		subprogram<-nextValueHolder,
+		parameterLabels <- Sequence{readIndex_SubcomponentHolder,
+									lastIndex_SubcomponentHolder,
+									buffer_AccessHolder,
+									output_AccessHolder,
+									bufferSize_SubcomponentHolder,
+									ErrorCode_Holder}
+	),
+	nextValueHolder: AADLBA!CalledSubprogramHolder
+	(
+		element <- nextValueSpg
+	),
+	
+	
+	--- connect output
+	output_AccessHolder: AADLBA!DataAccessHolder
+	(
+		element<-thisModule.resolveTemp(fi, 'localVariable')
+	),
+	
+	--- connect first
+	readIndex_SubcomponentHolder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveTemp(fi, 'readIndex')
+	),
+	
+	--- connect last
+	lastIndex_SubcomponentHolder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveTemp(fi, 'lastIndex')
+	),
+	
+	--- connect buffer
+	buffer_AccessHolder: AADLBA!DataAccessHolder
+	(
+		element<-thisModule.resolveTemp(fi, 'f_entrypoint')
+	),
+
+	--- connect bufferSize
+	bufferSize_SubcomponentHolder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveTemp(fi, 'bufferSizeSubcomponent')
+	),
+	
+	ErrorCode_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element <- thisModule.CreateReturnSubcomponentFromPort(fi)
+	)
+}

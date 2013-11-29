@@ -319,12 +319,12 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		--- Buffer
 		f: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayType'),
+			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayImpl'),
 			kind<-#requires
 		),
 		f_entrypoint: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayType'),
+			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayImpl'),
 			kind<-#requires
 		),
 		buffer_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
@@ -388,7 +388,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		)
 }
 
--- @extends m_Thread_Input_Port_Instance,m_PeriodicDelayed_Port
+-- @extends m_PeriodicDelayed_Port,m_Thread_Input_Port_Instance
 rule m_Input_PeriodicDelayed_Port
 {
   	from
@@ -409,9 +409,15 @@ rule m_Input_PeriodicDelayed_Port
 		-----------------------
 		--- Data Subcomponents
 		-----------------------
+		
 		bufferArrayType: AADLBA!DataType
 		(
-			name <- 'BufferArrayType_'+fi.getComponentInstance().name+'_'+fi.name,
+			name <- 'bufferArrayImpl_'+fi.getComponentInstance().name+'_'+fi.name,
+			ownedExtension <- indexArrayDataTypeExtension
+		),
+		bufferArrayImpl: AADLBA!DataImplementation
+		(
+			name <- 'bufferArrayImpl_'+fi.getComponentInstance().name+'_'+fi.name+'.impl',
 			ownedPropertyAssociation <- Sequence {
 												
 --												thisModule.CreatePropertyAssociation
@@ -438,7 +444,7 @@ rule m_Input_PeriodicDelayed_Port
 														CurrentPerionReadTable->size())
 												)
 									   },
-			ownedExtension <- indexArrayDataTypeExtension
+			ownedRealization <- thisModule.Realization(bufferArrayType) 
 		),
 		indexArrayDataTypeExtension: AADLBA!TypeExtension
 		(
@@ -447,7 +453,7 @@ rule m_Input_PeriodicDelayed_Port
 		globalVariable:AADLBA!DataSubcomponent
 		(
 			name<-fi.getComponentInstance().name+'_'+fi.name+'_Buffer',
-			dataSubcomponentType <- bufferArrayType
+			dataSubcomponentType <- bufferArrayImpl
 		),
 		
 		BufferSizeInit: AADLBA!ListValue
@@ -522,12 +528,12 @@ rule m_Input_PeriodicDelayed_Port
 		--- Buffer
 		f: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- bufferArrayType,
+			dataFeatureClassifier <- bufferArrayImpl,
 			kind<-#requires
 		),
 		f_entrypoint: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- bufferArrayType,
+			dataFeatureClassifier <- bufferArrayImpl,
 			kind<-#requires
 		),
 		
@@ -561,7 +567,7 @@ rule m_Input_PeriodicDelayed_Port
 		(
 			name <- 'buffer',
 			refined <- Next_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'buffer'),
-			dataFeatureClassifier <- bufferArrayType,
+			dataFeatureClassifier <- bufferArrayImpl,
 			kind<-#requires
 		),
 		
@@ -620,68 +626,4 @@ rule m_Thread_IntraProcess_Input_EventPort_PeriodicDelayed_Instance
 		(fi.isEventPort()
 		and
 		fi.isIntraProcessFeatureInstance())
-}
-
--- @extends m_PeriodicDelayed_Port,m_Input_EventDataPort_ComputeEntrypointCallSequence
-abstract rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
-{
-  from
-  	fi: AADLI!FeatureInstance,
-	behavior: AADLI!SubprogramCallSequence,
-	paramCnx: AADLI!ParameterConnection
-  using
-  {
-	nextValueSpg: AADLBA!SubprogramType = thisModule.resolveTemp(fi, 'nextValueSpg');
-  }
-  to
-	call: AADLBA!SubprogramCallAction
-	(
-		subprogram<-nextValueHolder,
-		parameterLabels <- Sequence{readIndex_SubcomponentHolder,
-									lastIndex_SubcomponentHolder,
-									buffer_AccessHolder,
-									output_AccessHolder,
-									bufferSize_SubcomponentHolder,
-									ErrorCode_Holder}
-	),
-	nextValueHolder: AADLBA!CalledSubprogramHolder
-	(
-		element <- nextValueSpg
-	),
-	
-	
-	--- connect output
-	output_AccessHolder: AADLBA!DataAccessHolder
-	(
-		element<-thisModule.resolveTemp(fi, 'localVariable')
-	),
-	
-	--- connect first
-	readIndex_SubcomponentHolder: AADLBA!DataSubcomponentHolder
-	(
-		element<-thisModule.resolveTemp(fi, 'readIndex')
-	),
-	
-	--- connect last
-	lastIndex_SubcomponentHolder: AADLBA!DataSubcomponentHolder
-	(
-		element<-thisModule.resolveTemp(fi, 'lastIndex')
-	),
-	
-	--- connect buffer
-	buffer_AccessHolder: AADLBA!DataAccessHolder
-	(
-		element<-thisModule.resolveTemp(fi, 'f_entrypoint')
-	),
-
-	--- connect bufferSize
-	bufferSize_SubcomponentHolder: AADLBA!DataSubcomponentHolder
-	(
-		element<-thisModule.resolveTemp(fi, 'bufferSizeSubcomponent')
-	),
-	
-	ErrorCode_Holder: AADLBA!DataSubcomponentHolder
-	(
-		element <- thisModule.CreateReturnSubcomponentFromPort(fi)
-	)
 }

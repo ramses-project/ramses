@@ -29,6 +29,11 @@
             name="PeriodicDelayed-Runtime">
       </aadlcontribution>
       <aadlcontribution
+            file="aadl_resources/package/PeriodicDelayedMutex_runtime.aadl2"
+            id="fr.tpt.aadl.packages.periodicdelayedMutex_runtime.aadlcontribution"
+            name="PeriodicDelayedMutex-Runtime">
+      </aadlcontribution>
+      <aadlcontribution
             file="aadl_resources/propertyset/pok_properties.aadl2"
             id="fr.tpt.aadl.propetries.pok.aadlcontribution"
             name="POK-Properties">

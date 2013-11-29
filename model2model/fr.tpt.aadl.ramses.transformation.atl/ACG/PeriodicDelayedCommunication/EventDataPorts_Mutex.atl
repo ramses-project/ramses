@@ -31,8 +31,8 @@ helper def : Unique_Send_Output_Per_Thread : Boolean = true;
 
 helper def : Send_Output_Name   : String = 'Send_Output';
 
-helper def : PDC_RUNTIME_NAME : String = 'PeriodicDelayedMutex_runtime';
-helper def : PeriodicDelayedMutexRuntime_Name : String = thisModule.PDC_RUNTIME_NAME.toUpper();
+helper def : PDC_MUTEX_RUNTIME_NAME : String = 'PeriodicDelayedMutex_runtime';
+helper def : PeriodicDelayedMutexRuntime_Name : String = thisModule.PDC_MUTEX_RUNTIME_NAME.toUpper();
 
 -----------------------------------------------------------------------------------------------------
 --- Platform-dependent resources (refine lock type on queues and lock/unlock suprograms)
@@ -49,34 +49,13 @@ helper def : SharedStruct_Prototype : AADLBA!DataClassifier = 'SharedStructure'
 					.asDataType(thisModule.PeriodicDelayedMutexRuntime_Name);
 -----------------------------------------------------------------------------------------------------
 
-helper def: collectProcessInitActions(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorAction) =
-	c.featureInstance->select(e|e.isInputFeature())
-	->collect(e|thisModule.resolveTemp(e,'callInit'))
-;
-
 helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
-  if(c.featureInstance->exists(e|e.isInputFeature())) then
-	thisModule.initLinkedList(c)
+  if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
+	thisModule.resolveTemp(c, 'initCallSequence')
   else
   	OclUndefined
   endif
 ;
-
-unique lazy rule initLinkedList
-{
-	from
-		c: AADLI!ComponentInstance
-	to
-		initCallSequence: AADLBA!SubprogramCallSequence
-		(
-			name <- 'initLikedList',
-			ownedCallSpecification <- thisModule.collectProcessInitActions(c)
-		)
-	do
-	{
-		initCallSequence;
-	}
-}
 
 helper def : collectPeriodicDelayed_LocalVariablesConnections_Mutex(c: AADLI!ComponentInstance): Sequence(AADLBA!AccessConnection) =
 	c.featureInstance->select(e|e.isInputFeature())
@@ -108,82 +87,32 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInsta
 	        else Sequence{}
 	        endif)
 	->union(thisModule.collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c, behavior))
-	->flatten()
-;
-
-helper def : collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
-	Sequence{}
-;
-
-helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
-	if(not c.featureInstance->exists(e|e.isPeriodicDelayedPort())) then
-	Sequence{}
-	else
-	Sequence{
+	
+	->append(
 		thisModule.createIterationCounter(c)
-	}->union
+	)
+	->union
 	(
 	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort())
 		->collect(fi|
 			thisModule.resolveTemp(fi, 'localVariable')
 		)
 	)
-	->union
-	(
-	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort() and e.isInputFeature())
-		->collect(fi|
-			Sequence
-			{
-				thisModule.resolveTemp(fi, 'localVariable')
-			}
-		)
-	)
-	->union
-	(
-		behavior->collect
-		( b |
-			thisModule.collectPeriodicDelayed_LocalVariables_Mutex(c, b)
-		)
-	)
 	->flatten()
-	endif
+	
+;
+
+helper def : collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	Sequence{}
 ;
 
 helper def : collectInitializationEntryPoint(c: AADLI!ComponentInstance): AADLBA!PropertyAssociation =
-  if(c.featureInstance->exists(e|e.isInputFeature())) then
-	thisModule.collectInitializationEntryPoint_rule(c)
+  if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
+	thisModule.resolveTemp(c, 'pa')
   else
   	OclUndefined
   endif
 ;
-
-unique lazy rule collectInitializationEntryPoint_rule
-{
-	from
-		c: AADLI!ComponentInstance
-	to
-		pa: AADLBA!PropertyAssociation
-		(
-			property <- thisModule.getProperty('Initialize_Entrypoint_Call_Sequence'),  
-    		ownedValue <- Sequence{mpv}
-		),
-		mpv: AADLBA!ModalPropertyValue
-		(
-			ownedValue<-v
-		),
-		v: AADLBA!ReferenceValue
-		(
-			containmentPathElement <- Sequence{cpe}
-		),
-		cpe: AADLBA!ContainmentPathElement
-		(
-			namedElement <- thisModule.initLinkedList(c)
-		)
-	do
-	{
-		pa;
-	}
-}
 
 -- @extends m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 rule m_Thread_With_Output_PeriodicDelayed_Port
@@ -213,71 +142,44 @@ rule m_Thread_With_Output_PeriodicDelayed_Port
 }
 
 
--- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
-abstract rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP
+-- @extends m_Thread_With_Input_or_Output_PeriodicDelayed_Port
+rule m_Thread_With_Input_PeriodicDelayed_Port
 {
-  	from
-		fi: AADLI!FeatureInstance,
-		cnxRef: AADLI!PortConnection
+	from
+		c: AADLI!ComponentInstance
 		(
-			fi.isEventOrEventDataPort()
+			c.category = #thread
 			and
-			(cnxRef.destination.connectionEnd.isThreadPort()
-				or cnxRef.source.connectionEnd.isThreadPort())
+			c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())
 		)
-	using
-	{
-		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
-		producerPort: AADLI!FeatureInstance = cnxInst.source;
-		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
-		Put_Value_PrototypeSpg: AADLBA!SubprogramType = 'Put_Value'.asSubprogramType(thisModule.PDC_RUNTIME_NAME);
-		Send_Output_Spg: AADLBA!SubprogramType = 'Send_Output'.asSubprogramType(thisModule.PDC_RUNTIME_NAME);
-		portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(producerPort.getComponentInstancePath());
-	}
 	to
-		---------------------------------------------------------------------
-		--- Refine Put_Value to precise the data type of prototypes
-		---------------------------------------------------------------------
-		extendedPutValueSpg: AADLBA!TypeExtension
+		sub: AADLBA!ThreadSubcomponent,
+		pa: AADLBA!PropertyAssociation
 		(
-			extended<-Put_Value_PrototypeSpg
+			property <- thisModule.getProperty('Initialize_Entrypoint_Call_Sequence'),  
+    		ownedValue <- Sequence{mpv}
 		),
-		putValueOutputPrototypeBinding: AADLBA!FeaturePrototypeBinding
+		mpv: AADLBA!ModalPropertyValue
 		(
-			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_data'),
-			actual <- putValueOutputActual
+			ownedValue<-v
 		),
-		putValueValueParam: AADLBA!DataAccess
+		v: AADLBA!ReferenceValue
 		(
-			name <- 'DataValue',
-			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'Datavalue'),
-			dataFeatureClassifier <-  producerPort.feature.dataFeatureClassifier
+			containmentPathElement <- Sequence{cpe}
 		),
-		BufferAccess: AADLBA!DataAccess
+		cpe: AADLBA!ContainmentPathElement
 		(
-			name <- 'BufferAccess',
-			refined <- Put_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'BufferAccess'),
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'sharedStructureImpl'),
-			kind<-#requires
+			namedElement <- initCallSequence
 		),
-		putValueSpg: AADLBA!SubprogramType
+		initCallSequence: AADLBA!SubprogramCallSequence
 		(
-			name <- Put_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(producerPort.getComponentInstancePath()),
-			ownedExtension <- extendedPutValueSpg,
-			ownedPrototypeBinding <- Sequence{putValueOutputPrototypeBinding},
-			ownedParameter <- Sequence{putValueValueParam}, -- CDWParam
-			ownedDataAccess <- Sequence{BufferAccess}
-		),
-		putValueOutputActual: AADLBA!AccessSpecification
-		(
-			category<-#data
+			name <- 'initLikedList',
+			ownedCallSpecification <- c.featureInstance->select(e|e.isInputFeature())
+										->collect(e|thisModule.resolveTemp(e,'callInit'))
 		)
 	do
 	{
-		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_RUNTIME_NAME.toUpper(), thisModule.PDC_RUNTIME_NAME);
-		-- next is a workaround
-		thisModule.theHOOK.setDirection(putValueValueParam, 'in');
-		putValueOutputActual.setClassifier(fi.feature.dataFeatureClassifier);
+		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_MUTEX_RUNTIME_NAME.toUpper(), thisModule.PDC_MUTEX_RUNTIME_NAME);
 	}
 }
 
@@ -414,7 +316,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
 
 		t_data: AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
-		bufferQueueImpl: AADLBA!DataImplementation = thisModule.resolveTemp(consumerPort,'bufferArrayType');
+		bufferQueueImpl: AADLBA!DataImplementation = thisModule.resolveTemp(consumerPort,'bufferArrayImpl');
 	}
 	to
 		-----------------------
@@ -583,17 +485,230 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	)
 }
 
--- @extends m_Thread_Input_Port_Instance,m_PeriodicDelayed_Port
-rule m_Input_PeriodicDelayed_Port
+
+-- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port_Mutex
+rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+	using
+	{
+		ownerName : String = fi.getComponentInstance().name;
+
+		t_data : AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
+		runtimeName: String = thisModule.PeriodicDelayedMutexRuntime_Name;
+
+		Buffer_Prototype : AADLBA!DataClassifier = 'BufferPrototype'.asDataType(runtimeName);
+
+		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = 'Receive_Input'.asSubprogramType(runtimeName);
+		Receive_Input_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Receive_Input.impl'.asSubprogramType(runtimeName);
+		receiveInputName : String = Receive_Input_PrototypeSpg.name + '_mutex_' + fi.eContainer().name + '_' + fi.name;
+
+		Next_Value_PrototypeSpg: AADLBA!SubprogramType = 'Next_Value'.asSubprogramType(runtimeName);
+		Next_Value_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Next_Value.impl'.asSubprogramType(runtimeName);
+		nextValueName : String = Next_Value_PrototypeSpg.name + '_' + fi.getComponentInstance().name + '_' + fi.name;
+
+		sharedStructTypeName: String = 'SharedStructType_'+fi.getComponentInstance().name+'_'+fi.name;
+		bufferTypeName: String = 'QueueType_'+fi.getComponentInstance().name+'_'+fi.name;
+		bufferSubcomponentName: String = fi.getComponentInstance().name+'_'+fi.name;
+	}
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(dataSubcomponentType <- bufferArrayImpl),
+		sharedStructureType: AADLBA!DataType
+		(
+			name <- sharedStructTypeName,
+			ownedExtension <- sharedStructTypeExtension
+		),
+		sharedStructTypeExtension: AADLBA!TypeExtension
+		(
+			extended <- thisModule.SharedStruct_Prototype
+		),
+		sharedStructImplExtension: AADLBA!ImplementationExtension
+		(
+			extended <- thisModule.SharedStruct_Prototype_Impl
+		),
+		bufferArrayImpl: AADLBA!DataImplementation mapsTo fi
+		(
+		  name <- sharedStructTypeName + '.impl',
+		  ownedExtension <- sharedStructImplExtension,
+		  ownedRealization <- thisModule.Realization(sharedStructureType),
+		  ownedPrototypeBinding <- Sequence{bufferTypeProtoBinding}
+		),
+		bufferTypeProtoBinding: AADLBA!ComponentPrototypeBinding
+		(
+			formal <- thisModule.SharedStruct_Prototype_Impl.ownedPrototype->any(e|e.name = 't_buffer'),
+			actual <- Sequence{bufferTypePrototypeActual}
+		),
+		bufferTypePrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <-  #data,
+			subcomponentType <- bufferType
+		),
+		bufferType : AADLBA!DataType
+		(
+			name <- bufferTypeName,
+			ownedExtension <- bufferArrayImplExtension,
+			ownedPropertyAssociation <- Sequence {
+												
+					thisModule.CreatePropertyAssociation
+					(
+					 	'Base_Type',
+						'DATA_MODEL',
+						thisModule.CreateListValueFromClassifier(
+							thisModule.Queue_Element_Type(t_data))
+					),
+					
+					thisModule.CreatePropertyAssociation
+					(
+					 	'Dimension',
+						'DATA_MODEL',
+						thisModule.CreateListValueFromInteger(
+							fi.getQueueSize())
+					)
+			}
+		),
+		bufferArrayImplExtension: AADLBA!TypeExtension
+		(
+			extended <- Buffer_Prototype
+		), 
+		
+		receiveInputSpgImpl : AADLBA!SubprogramImplementation
+		(
+			name <- receiveInputName + '.impl',
+			ownedExtension <- extendedReceiveInputSpgImpl,
+			ownedPrototypeBinding <- Sequence{receiveInputBufferPrototypeBinding}
+		),
+		extendedReceiveInputSpgImpl : AADLBA!ImplementationExtension
+		(
+			extended <- Receive_Input_PrototypeSpg_Impl
+		),
+		receiveInputSpg: AADLBA!SubprogramType
+		(
+			name <- Receive_Input_PrototypeSpg.name+'_mutex_'+ fi.getComponentInstance().name + '_' + fi.name,
+			ownedExtension <- extendedReceiveInputSpg,
+			ownedPrototypeBinding <- Sequence{receiveInputBufferPrototypeBinding}
+		),
+		extendedReceiveInputSpg: AADLBA!TypeExtension
+		(
+			extended <- Receive_Input_PrototypeSpg
+		),
+		receiveInputBufferPrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name = 't_buffer'),
+			actual <- Sequence{receiveInputBufferPrototypeActual}
+		),
+		receiveInputBufferPrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <-  #data
+		),
+		nextValueSpgImpl: AADLBA!SubprogramImplementation
+		(
+			name <- nextValueName + '.impl',
+			ownedExtension <- extendedNextValueSpgImpl,
+			ownedPrototypeBinding <- Sequence{nextValueDataPrototypeBinding,
+											  nextValueBufferVariablePrototypeBinding}
+		),
+		extendedNextValueSpgImpl : AADLBA!ImplementationExtension 
+		(
+			extended <- Next_Value_PrototypeSpg_Impl
+		),
+		nextValueSpg: AADLBA!SubprogramType
+		(
+			name <- Next_Value_PrototypeSpg.name+'_'+ fi.getComponentInstance().name + '_' + fi.name,
+			ownedExtension <- extendedNextValueSpg,
+			ownedPrototypeBinding <- Sequence{nextValueDataPrototypeBinding,
+											  nextValueBufferVariablePrototypeBinding}
+		),
+		extendedNextValueSpg: AADLBA!TypeExtension
+		(
+			extended <- Next_Value_PrototypeSpg
+		),
+		nextValueDataPrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_data'),
+			actual <- Sequence{nextValueDataPrototypeActual}
+		),
+		nextValueDataPrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <-  #data
+		),
+		nextValueBufferVariablePrototypeBinding : AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name='t_buffer'),
+			actual <- Sequence{nextValueBufferVariablePrototypeActual}
+		),
+		nextValueBufferVariablePrototypeActual : AADLBA!ComponentPrototypeActual
+		(
+			category <- #data
+		) 
+	do
+	{
+		receiveInputSpgImpl.ownedRealization <- thisModule.Realization(receiveInputSpg);
+		receiveInputBufferPrototypeActual.setSubcomponentType(bufferArrayImpl);
+		
+		nextValueSpgImpl.ownedRealization <- thisModule.Realization(nextValueSpg);
+		nextValueDataPrototypeActual.setSubcomponentType(t_data);
+		nextValueBufferVariablePrototypeActual.setSubcomponentType(bufferArrayImpl);
+		
+		nextValueSpgImpl;
+	}
+}
+
+-- @extends m_PeriodicDelayed_Port,m_Input_EventDataPort_ComputeEntrypointCallSequence
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex
+{
+  from
+  	fi: AADLI!FeatureInstance,
+	behavior: AADLI!SubprogramCallSequence,
+	paramCnx: AADLI!ParameterConnection
+  to
+
+  		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- nextValueHolder,
+			parameterLabels <- Sequence{portVariableHolder,
+										dataValueHolder,
+										currentPeriodHolder,
+										returnCodeHolder}
+		),
+		nextValueHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- thisModule.resolveTemp(fi, 'nextValueSpgImpl')
+		),
+		portVariableHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(fi, 'f_entrypoint')
+		),
+		dataValueHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(fi, 'localVariable')
+		),
+		currentPeriodHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentPeriodSub')
+		),
+		returnCodeHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.CreateReturnSubcomponentFromPort(fi)
+		)		
+}
+
+-- @extends m_PeriodicDelayed_Port,m_Thread_Input_Port_Instance
+rule m_Input_PeriodicDelayed_Port_Mutex
 {
   	from
 		fi: AADLI!FeatureInstance
 	using
 	{
+		CurrentPerionReadTable: Sequence(Integer) = thisModule.getCurrentPerionReadTable(fi);
 		initSpgPrototype: AADLBA!SubprogramType = 'Init_Prototype'.asSubprogramType(thisModule.PeriodicDelayedMutexRuntime_Name);
 	}
 	to
-		bufferArrayType: AADLBA!DataType, -- refined in extended rules
+		bufferArrayImpl: AADLBA!DataImplementation, -- refined in extended rules
 	
 		-----------------------
 		--- Thread configuration
@@ -602,12 +717,12 @@ rule m_Input_PeriodicDelayed_Port
 		--- Buffer
 		f: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- bufferArrayType,
+			dataFeatureClassifier <- bufferArrayImpl,
 			kind<-#requires
 		),
 		f_entrypoint: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- bufferArrayType,
+			dataFeatureClassifier <- bufferArrayImpl,
 			kind<-#requires
 		),
 		queueSizeVariable: AADLBA!DataSubcomponent
@@ -676,231 +791,8 @@ rule m_Input_PeriodicDelayed_Port
 		initSpgPrototypeActual : AADLBA!ComponentPrototypeActual
 		(
 			category <-  #data,
-			subcomponentType <- thisModule.resolveTemp(fi,'bufferArrayType')
-		)
-}
-
--- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port_Mutex
-rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex
-{
-  	from
-		fi: AADLI!FeatureInstance
-		(fi.isEventDataPort()
-		and
-		fi.isIntraProcessFeatureInstance())
-	using
-	{
-		ownerName : String = fi.getComponentInstance().name;
-
-		t_data : AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
-		runtimeName: String = thisModule.PeriodicDelayedMutexRuntime_Name;
-
-		Buffer_Prototype : AADLBA!DataClassifier = 'BufferPrototype'.asDataType(runtimeName);
-
-		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = 'Receive_Input'.asSubprogramType(runtimeName);
-		Receive_Input_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Receive_Input.impl'.asSubprogramType(runtimeName);
-		receiveInputName : String = Receive_Input_PrototypeSpg.name + '_' + fi.eContainer().name + '_' + fi.name;
-
-		Next_Value_PrototypeSpg: AADLBA!SubprogramType = 'Next_Value'.asSubprogramType(runtimeName);
-		Next_Value_PrototypeSpg_Impl: AADLBA!SubprogramImplementation = 'Next_Value.impl'.asSubprogramType(runtimeName);
-		nextValueName : String = Next_Value_PrototypeSpg.name + '_' + fi.getComponentInstance().name + '_' + fi.name;
-
-		sharedStructTypeName: String = 'SharedStructType_'+fi.getComponentInstance().name+'_'+fi.name;
-		bufferTypeName: String = 'QueueType_'+fi.getComponentInstance().name+'_'+fi.name;
-		bufferSubcomponentName: String = fi.getComponentInstance().name+'_'+fi.name;
-	}
-	to
-		globalVariable: AADLBA!DataSubcomponent
-		(dataSubcomponentType <- bufferArrayType),
-		sharedStructureType: AADLBA!DataType
-		(
-			name <- sharedStructTypeName,
-			ownedExtension <- sharedStructTypeExtension
+			subcomponentType <- thisModule.resolveTemp(fi,'bufferArrayImpl')
 		),
-		sharedStructTypeExtension: AADLBA!TypeExtension
-		(
-			extended <- thisModule.SharedStruct_Prototype
-		),
-		sharedStructImplExtension: AADLBA!ImplementationExtension
-		(
-			extended <- thisModule.SharedStruct_Prototype_Impl
-		),
-		bufferArrayType: AADLBA!DataImplementation mapsTo fi
-		(
-		  name <- sharedStructTypeName + '.impl',
-		  ownedExtension <- sharedStructImplExtension,
-		  ownedRealization <- thisModule.Realization(sharedStructureType),
-		  ownedPrototypeBinding <- Sequence{bufferTypeProtoBinding}
-		),
-		bufferTypeProtoBinding: AADLBA!ComponentPrototypeBinding
-		(
-			formal <- thisModule.SharedStruct_Prototype_Impl.ownedPrototype->any(e|e.name = 't_buffer'),
-			actual <- Sequence{bufferTypePrototypeActual}
-		),
-		bufferTypePrototypeActual : AADLBA!ComponentPrototypeActual
-		(
-			category <-  #data,
-			subcomponentType <- bufferType
-		),
-		bufferType : AADLBA!DataType
-		(
-			name <- bufferTypeName,
-			ownedExtension <- bufferArrayTypeExtension,
-			ownedPropertyAssociation <- Sequence {
-												
-					thisModule.CreatePropertyAssociation
-					(
-					 	'Base_Type',
-						'DATA_MODEL',
-						thisModule.CreateListValueFromClassifier(
-							thisModule.Queue_Element_Type(t_data))
-					),
-					
-					thisModule.CreatePropertyAssociation
-					(
-					 	'Dimension',
-						'DATA_MODEL',
-						thisModule.CreateListValueFromInteger(
-							fi.getQueueSize())
-					)
-			}
-		),
-		bufferArrayTypeExtension: AADLBA!TypeExtension
-		(
-			extended <- Buffer_Prototype
-		), 
-		
-		receiveInputSpgImpl : AADLBA!SubprogramImplementation
-		(
-			name <- receiveInputName + '.impl',
-			ownedExtension <- extendedReceiveInputSpgImpl,
-			ownedPrototypeBinding <- Sequence{receiveInputBufferPrototypeBinding}
-		),
-		extendedReceiveInputSpgImpl : AADLBA!ImplementationExtension
-		(
-			extended <- Receive_Input_PrototypeSpg_Impl
-		),
-		receiveInputSpg: AADLBA!SubprogramType
-		(
-			name <- Receive_Input_PrototypeSpg.name+'_'+ fi.getComponentInstance().name + '_' + fi.name,
-			ownedExtension <- extendedReceiveInputSpg,
-			ownedPrototypeBinding <- Sequence{receiveInputBufferPrototypeBinding}
-		),
-		extendedReceiveInputSpg: AADLBA!TypeExtension
-		(
-			extended <- Receive_Input_PrototypeSpg
-		),
-		receiveInputBufferPrototypeBinding : AADLBA!ComponentPrototypeBinding
-		(
-			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name = 't_buffer'),
-			actual <- Sequence{receiveInputBufferPrototypeActual}
-		),
-		receiveInputBufferPrototypeActual : AADLBA!ComponentPrototypeActual
-		(
-			category <-  #data
-		),
-		nextValueSpgImpl: AADLBA!SubprogramImplementation
-		(
-			name <- nextValueName + '.impl',
-			ownedExtension <- extendedNextValueSpgImpl,
-			ownedPrototypeBinding <- Sequence{nextValueDataPrototypeBinding,
-											  nextValueBufferVariablePrototypeBinding}
-		),
-		extendedNextValueSpgImpl : AADLBA!ImplementationExtension 
-		(
-			extended <- Next_Value_PrototypeSpg_Impl
-		),
-		nextValueSpg: AADLBA!SubprogramType
-		(
-			name <- Next_Value_PrototypeSpg.name+'_'+ fi.getComponentInstance().name + '_' + fi.name,
-			ownedExtension <- extendedNextValueSpg,
-			ownedPrototypeBinding <- Sequence{nextValueDataPrototypeBinding,
-											  nextValueBufferVariablePrototypeBinding}
-		),
-		extendedNextValueSpg: AADLBA!TypeExtension
-		(
-			extended <- Next_Value_PrototypeSpg
-		),
-		nextValueDataPrototypeBinding : AADLBA!ComponentPrototypeBinding
-		(
-			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 't_data'),
-			actual <- Sequence{nextValueDataPrototypeActual}
-		),
-		nextValueDataPrototypeActual : AADLBA!ComponentPrototypeActual
-		(
-			category <-  #data
-		),
-		nextValueBufferVariablePrototypeBinding : AADLBA!ComponentPrototypeBinding
-		(
-			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name='t_buffer'),
-			actual <- Sequence{nextValueBufferVariablePrototypeActual}
-		),
-		nextValueBufferVariablePrototypeActual : AADLBA!ComponentPrototypeActual
-		(
-			category <- #data
-		) 
-	do
-	{
-		receiveInputSpgImpl.ownedRealization <- thisModule.Realization(receiveInputSpg);
-		receiveInputBufferPrototypeActual.setSubcomponentType(bufferArrayType);
-		
-		nextValueSpgImpl.ownedRealization <- thisModule.Realization(nextValueSpg);
-		nextValueDataPrototypeActual.setSubcomponentType(t_data);
-		nextValueBufferVariablePrototypeActual.setSubcomponentType(bufferArrayType);
-		
-		nextValueSpgImpl;
-	}
-}
-
--- @extends m_PeriodicDelayed_Port,m_Input_EventDataPort_ComputeEntrypointCallSequence
-rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex
-{
-  from
-  	fi: AADLI!FeatureInstance,
-	behavior: AADLI!SubprogramCallSequence,
-	paramCnx: AADLI!ParameterConnection
-  to
-
-  		call: AADLBA!SubprogramCallAction
-		(
-			subprogram <- nextValueHolder,
-			parameterLabels <- Sequence{portVariableHolder,
-										dataValueHolder,
-										currentPeriodHolder,
-										returnCodeHolder}
-		),
-		nextValueHolder: AADLBA!CalledSubprogramHolder
-		(
-			element <- thisModule.resolveTemp(fi, 'nextValueSpgImpl')
-		),
-		portVariableHolder: AADLBA!DataSubcomponentHolder
-		(
-			element <- thisModule.resolveTemp(fi, 'f_entrypoint')
-		),
-		dataValueHolder: AADLBA!DataSubcomponentHolder
-		(
-			element <- thisModule.resolveTemp(fi, 'localVariable')
-		),
-		currentPeriodHolder: AADLBA!DataSubcomponentHolder
-		(
-			element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentPeriodSub')
-		),
-		returnCodeHolder: AADLBA!DataSubcomponentHolder
-		(
-			element <- thisModule.CreateReturnSubcomponentFromPort(fi)
-		)		
-}
-
--- @extends m_Input_PeriodicDelayed_Port
-rule m_Input_PeriodicDelayed_Port_Mutex
-{
-  	from
-		fi: AADLI!FeatureInstance
-	using
-	{
-		CurrentPerionReadTable: Sequence(Integer) = thisModule.getCurrentPerionReadTable(fi);
-	}
-	to
 		CPRInit: AADLBA!ListValue
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(

@@ -192,7 +192,7 @@ rule m_ThreadEntrypoint {
 										endif
 										
 									)
-									->flatten()->asSet(),
+									->flatten()->excluding(OclUndefined)->asSet(),
 			ownedParameter <- impl.ownedParameterConnection
 								->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
 								->collect(e|

@@ -33,6 +33,14 @@ from
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
 	self.ownedPropertyAssociation->select(e | not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
 									)->collectSelfPropertyAssociationImg()
+	->union(
+		if self.oclIsTypeOf(AADLI!ComponentInstance) and self.category=#thread then
+			Sequence{ thisModule.collectComputeEntryPoint_rule(self),
+					  thisModule.collectInitializationEntryPoint(self)}->excluding(OclUndefined)
+		else
+			Sequence{}
+		endif
+	)
 ;
 
 abstract rule m_Component_Implementation {
@@ -185,10 +193,6 @@ rule m_FeatureGroupConnection_Reference
 		cnxRef: AADLI!ConnectionReference (cnxRef.eContainer().kind = #featureGroupConnection)
 }
 
-helper def : collectComputeEntryPoint(c: AADLI!ComponentInstance): AADLBA!PropertyAssociation =
-	thisModule.collectComputeEntryPoint_rule(c)
-;
-
 unique lazy rule collectComputeEntryPoint_rule
 {
 	from
@@ -243,14 +247,7 @@ rule m_create_Thread_BA
  	}
 	to
 		sub : AADLBA!ThreadSubcomponent(
-			threadSubcomponentType <- implImg,
-			ownedPropertyAssociation <- c.collectSelfPropertyAssociationImg()
-										->append(
-											thisModule.collectComputeEntryPoint(c)
-										)
-										->append(
-											thisModule.collectInitializationEntryPoint(c)	 
-										)->excluding(OclUndefined)
+			threadSubcomponentType <- implImg
 		),
 		implImg : AADLBA!ThreadImplementation (
  			name <- c.uniqueName().concat('.impl'), -- name thread implmentation

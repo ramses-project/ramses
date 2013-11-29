@@ -128,7 +128,8 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_AR
 		semaphoreThreadDataAccess: AADLBA!DataAccess
 		(
 			name <- fi.name+'_semAccess',
-			dataFeatureClassifier <- semaphoreType
+			dataFeatureClassifier <- semaphoreType,
+			kind<-#requires
 		),
 		semaphoreEntryPointAccessCnx: AADLBA!AccessConnection
 		(
@@ -148,7 +149,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_AR
 		),
 		semaphoreEntryPointDataAccess: AADLBA!DataAccess
 		(
-			name <- fi.name+'_semAccess',
+			name <- fi.name+'_entrypointSemAccess',
 			dataFeatureClassifier <- semaphoreType,
 			kind<-#requires
 		),
@@ -324,7 +325,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex
 		),
 		semaphoreEntryPointDataAccess: AADLBA!DataAccess
 		(
-			name <- fi.name+'_semAccess',
+			name <- fi.name+'_entrypointSemAccess',
 			dataFeatureClassifier <- semaphoreType,
 			kind <- #requires
 		),
@@ -347,6 +348,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex
 			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
 		)
 }
+
 -- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex
 rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC
 {
