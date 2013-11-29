@@ -7,8 +7,11 @@ import java.util.List ;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IContainer ;
+import org.eclipse.core.resources.IFile ;
 import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.Path ;
 import org.eclipse.core.runtime.Platform;
@@ -37,7 +40,14 @@ import org.eclipse.swt.widgets.Label ;
 import org.eclipse.swt.widgets.Listener ;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text ;
+import org.eclipse.ui.IEditorPart ;
+import org.eclipse.ui.IFileEditorInput ;
+import org.eclipse.ui.IWorkbench ;
+import org.eclipse.ui.IWorkbenchPage ;
+import org.eclipse.ui.IWorkbenchWindow ;
+import org.eclipse.ui.PlatformUI ;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog ;
+import org.eclipse.ui.dialogs.PreferencesUtil ;
 import org.eclipse.ui.dialogs.PropertyPage ;
 import org.eclipse.ui.dialogs.ResourceListSelectionDialog ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -69,6 +79,7 @@ public class RamsesPropertyPage extends PropertyPage {
 	private Label selectedPathLabel;
 	private Label selectedInstanceModel;
 	private QualifiedName qfName;
+	
 	/**
 	 * Constructor for SamplePropertyPage.
 	 */
@@ -94,92 +105,92 @@ public class RamsesPropertyPage extends PropertyPage {
 
 	private void addResourceSelectionSection(final Composite composite)
 	{
-		Label label = new Label(composite, SWT.BOLD);
-		label.setText("1 - Select instance model to generate code from");
-		Button button = new Button(composite, SWT.PUSH);
-		button.setText("Select instance model...");
-		button.setAlignment(SWT.LEFT);
-		selectedInstanceModel = new Label(composite, SWT.BOLD);
-		selectedInstanceName = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
-		selectedInstanceName.setEditable(false);
-		GridData gd = new GridData();
-		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		selectedInstanceName.setLayoutData(gd) ;
-
-		if(instanceModel==null)
-		{
-			selectedInstanceModel.setText("No instance model selected");
-		}
-		button.addSelectionListener( new SelectionAdapter() 
-		{
-			public void widgetSelected(SelectionEvent e) 
-			{
-				IProject project = (IProject) getElement();
-				List<IResource> instanceModels = new ArrayList<IResource>();
-				populateInstanceModelList(project, instanceModels);
-				if(instanceModels.size()==0)
-				{
-					MessageDialog.openError(getShell(),
-							"Configuration Error",
-							"No instance model found in current projet. Instantiate your AADL model first.");
-					return;
-				}
-				IResource[] resourceArray = new IResource[instanceModels.size()]; 
-				instanceModels.toArray(resourceArray);
-				ResourceListSelectionDialog dialog = 
-						new ResourceListSelectionDialog(getShell(), 
-								resourceArray);
-				dialog.setTitle("Select instance model to generate code from");
-				dialog.setMessage("To display all available instance models, use *.aaxl2 as the search key.");
-				if (dialog.open() == ContainerSelectionDialog.OK) {
-					Object[] result = dialog.getResult();
-					if (result != null && result.length > 0) {
-						instanceModel = (IResource) result[0];
-						selectedInstanceModel.setText("Selected Instance model: ");
-						selectedInstanceModel.redraw();
-						selectedInstanceName.setText(instanceModel.getName());
-						int columns = instanceModel.getName().length();
-						GC gc = new GC(selectedInstanceModel);
-						FontMetrics fm = gc.getFontMetrics();
-						int width = columns * fm.getAverageCharWidth();
-						int height = fm.getHeight();
-						gc.dispose();
-						selectedInstanceName.setSize(selectedInstanceModel.computeSize(width, height));
-						selectedInstanceName.redraw();
-					}
-				}
-			}
-		});
+//		Label label = new Label(composite, SWT.BOLD);
+//		label.setText("1 - Select instance model to generate code from");
+//		Button button = new Button(composite, SWT.PUSH);
+//		button.setText("Select instance model...");
+//		button.setAlignment(SWT.LEFT);
+//		selectedInstanceModel = new Label(composite, SWT.BOLD);
+//		selectedInstanceName = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
+//		selectedInstanceName.setEditable(false);
+//		GridData gd = new GridData();
+//		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+//		selectedInstanceName.setLayoutData(gd) ;
+//
+//		if(instanceModel==null)
+//		{
+//			selectedInstanceModel.setText("No instance model selected");
+//		}
+//		button.addSelectionListener( new SelectionAdapter() 
+//		{
+//			public void widgetSelected(SelectionEvent e) 
+//			{
+//				IProject project = (IProject) getElement();
+//				List<IResource> instanceModels = new ArrayList<IResource>();
+//				populateInstanceModelList(project, instanceModels);
+//				if(instanceModels.size()==0)
+//				{
+//					MessageDialog.openError(getShell(),
+//							"Configuration Error",
+//							"No instance model found in current projet. Instantiate your AADL model first.");
+//					return;
+//				}
+//				IResource[] resourceArray = new IResource[instanceModels.size()]; 
+//				instanceModels.toArray(resourceArray);
+//				ResourceListSelectionDialog dialog = 
+//						new ResourceListSelectionDialog(getShell(), 
+//								resourceArray);
+//				dialog.setTitle("Select instance model to generate code from");
+//				dialog.setMessage("To display all available instance models, use *.aaxl2 as the search key.");
+//				if (dialog.open() == ContainerSelectionDialog.OK) {
+//					Object[] result = dialog.getResult();
+//					if (result != null && result.length > 0) {
+//						instanceModel = (IResource) result[0];
+//						selectedInstanceModel.setText("Selected Instance model: ");
+//						selectedInstanceModel.redraw();
+//						selectedInstanceName.setText(instanceModel.getName());
+//						int columns = instanceModel.getName().length();
+//						GC gc = new GC(selectedInstanceModel);
+//						FontMetrics fm = gc.getFontMetrics();
+//						int width = columns * fm.getAverageCharWidth();
+//						int height = fm.getHeight();
+//						gc.dispose();
+//						selectedInstanceName.setSize(selectedInstanceModel.computeSize(width, height));
+//						selectedInstanceName.redraw();
+//					}
+//				}
+//			}
+//		});
 	}
 
 	private void populateInstanceModelList(IContainer container, List<IResource> instanceModelList)
 	{
-		IResource[] projectResources ;
-		try
-		{
-			projectResources = container.members() ;
-
-			for (int i=0; i<container.members().length; i++)
-			{
-				if(projectResources[i] instanceof IContainer && !projectResources[i].getName().equalsIgnoreCase(".svn"))
-					populateInstanceModelList((IContainer) container.members()[i], instanceModelList);
-				else if(projectResources[i].getFileExtension()!=null &&
-						projectResources[i].getFileExtension().equals("aaxl2"))
-				{
-					// Get the resource
-					Resource resource=OsateResourceUtil.getResource(projectResources[i]);
-					// Get the first model element and cast it to the right type, in my
-					// example everything is hierarchical included in this first node
-					if(resource!= null && resource.getContents().get(0) instanceof SystemInstance)
-						instanceModelList.add(projectResources[i]);
-				}
-			}
-		}
-		catch(CoreException exc)
-		{
-			// TODO Auto-generated catch block
-			exc.printStackTrace();
-		}
+//		IResource[] projectResources ;
+//		try
+//		{
+//			projectResources = container.members() ;
+//
+//			for (int i=0; i<container.members().length; i++)
+//			{
+//				if(projectResources[i] instanceof IContainer && !projectResources[i].getName().equalsIgnoreCase(".svn"))
+//					populateInstanceModelList((IContainer) container.members()[i], instanceModelList);
+//				else if(projectResources[i].getFileExtension()!=null &&
+//						projectResources[i].getFileExtension().equals("aaxl2"))
+//				{
+//					// Get the resource
+//					Resource resource=OsateResourceUtil.getResource(projectResources[i]);
+//					// Get the first model element and cast it to the right type, in my
+//					// example everything is hierarchical included in this first node
+//					if(resource!= null && resource.getContents().get(0) instanceof SystemInstance)
+//						instanceModelList.add(projectResources[i]);
+//				}
+//			}
+//		}
+//		catch(CoreException exc)
+//		{
+//			// TODO Auto-generated catch block
+//			exc.printStackTrace();
+//		}
 	}
 
 	private void addOutputDirectorySection(Composite parent) {
@@ -221,6 +232,7 @@ public class RamsesPropertyPage extends PropertyPage {
 		} else
 		{
 			outputDirText.setText(DEFAULT_PATH);
+			RamsesConfiguration.setOutputDir(new Path(DEFAULT_PATH).toFile());
 		}
 
 		// Move the cursor to the end.
@@ -244,9 +256,11 @@ public class RamsesPropertyPage extends PropertyPage {
 											Object[] result = browseWorkspace.getResult();
 											if (result != null && result.length > 0) {
 												Path outputDir = (Path) result[0];
+												
 												outputDirText.setText(convertToAbsolutePath(outputDir));
 												// Move the cursor to the end.
 												outputDirText.setSelection(outputDirText.getText().length()) ;
+												RamsesConfiguration.setOutputDir(outputDir.toFile());
 											}
 										}
 			}
@@ -293,7 +307,7 @@ public class RamsesPropertyPage extends PropertyPage {
 		GridData data = new GridData(GridData.FILL);
 		data.grabExcessHorizontalSpace = true;
 		composite.setLayoutData(data);
-
+		
 		addInformationSection(composite);
 		addSeparator(composite);
 		addResourceSelectionSection(composite);
@@ -301,6 +315,7 @@ public class RamsesPropertyPage extends PropertyPage {
 		addOutputDirectorySection(composite);
 		addSeparator(composite);
 		addTargetSection(composite);
+		
 		return composite;
 	}
 
@@ -383,26 +398,27 @@ public class RamsesPropertyPage extends PropertyPage {
 	private boolean saveConfiguration() throws CoreException
 	{
 		boolean isCorrectConfiguration=true;
-		if(instanceModel==null)
-			isCorrectConfiguration=false;
+		IProject project = null;
+//		if(instanceModel==null)
+//			isCorrectConfiguration=false;
 		if(isCorrectConfiguration && outputDirText.getText()!=null && !outputDirText.getText().equals("")
 				&& outputPathText.getText()!=null && !outputPathText.getText().equals(""))
 		{
-			instanceModel.setPersistentProperty(
-					new QualifiedName(PREFIX, PATH_ID),
-					outputDirText.getText());
-			qfName =   new QualifiedName(PREFIX, PLATFORM_ID);
-			instanceModel.setPersistentProperty(
-					qfName,
-					outputPathText.getText());
+		  if((project = RamsesConfiguration.getCurrentProject()) == null)
+		   return false;
+		  
+		  project.setPersistentProperty(new QualifiedName(PREFIX, PATH_ID),
+		                                outputDirText.getText());
 
-			System.out.println("property = "+instanceModel.getPersistentProperty(qfName));  
+		  project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_ID),
+		                                outputPathText.getText());
+		      
 		}
 
 		else
 			isCorrectConfiguration=false;
 		if(isCorrectConfiguration && target != null && target.getData()!=null)
-			instanceModel.setPersistentProperty(
+			project.setPersistentProperty(
 					new QualifiedName(PREFIX, TARGET_ID),
 					target.getData().toString());
 		else
@@ -480,11 +496,10 @@ public class RamsesPropertyPage extends PropertyPage {
 		MessageDialog.openError(getShell(),
 				"Configuration Error",
 				"To configure RAMSES, you must select\n" +
-						"\t 1 - an instance model, \n" +
-						"\t 2 - an output directory, \n" +
-						"\t 3 - and a target platform.\n" +
-						"\t 4 - and a Path for the selected platform.\n\n" +
+						"\t 1 - an output directory, \n" +
+						"\t 2 - and a target platform.\n" +
+						"\t 3 - and a Path for the selected platform.\n\n" +
 				"One of these elements was not configured properly.");
 	}
-	
+
 }

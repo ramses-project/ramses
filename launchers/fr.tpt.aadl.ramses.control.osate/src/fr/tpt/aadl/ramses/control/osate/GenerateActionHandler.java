@@ -11,11 +11,14 @@ import org.eclipse.jface.dialogs.TitleAreaDialog ;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile ;
+import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IAdaptable ;
 import org.eclipse.core.runtime.IConfigurationElement ;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform ;
@@ -27,6 +30,7 @@ import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.RollbackException;
 import org.eclipse.emf.transaction.TransactionalCommandStack;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.jface.preference.PreferenceDialog ;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -50,11 +54,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IFileEditorInput ;
+import org.eclipse.ui.ISelectionService ;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil ;
+import org.eclipse.ui.internal.Workbench ;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.resource.XtextResource;
@@ -90,12 +98,15 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 	private Set<File> _includeDirSet = null;
 	private static int TEXT_FIELD_WIDTH = 43;
 	private static CustomDialog customdiag;
-private static final String extension = "org.eclipse.ui.propertyPages";
-	protected static final InternalErrorReporter internalErrorLogger = new LogInternalErrorReporter(OsateCorePlugin
-			.getDefault().getBundle());
+	private static final String extension = "org.eclipse.ui.propertyPages";
+	protected static final InternalErrorReporter 
+	                                           internalErrorLogger = 
+	                                           new LogInternalErrorReporter
+	                                           (OsateCorePlugin
+	                                           .getDefault().getBundle());
+  private static IProject currentProject;
 
-
-	protected String _targetName=getTargetName();
+  protected String _targetName=getTargetName();
   private static  enum code
   {
     YES,
@@ -107,6 +118,7 @@ private static final String extension = "org.eclipse.ui.propertyPages";
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
+	  
 		final TransactionalEditingDomain domain = TransactionalEditingDomain.Registry.INSTANCE
 				.getEditingDomain("org.osate.aadl2.ModelEditingDomain");
 		// We execute this command on the command stack because otherwise, we will not
@@ -133,7 +145,7 @@ private static final String extension = "org.eclipse.ui.propertyPages";
 		}
 		return null;
 	}
-
+  
 	private class CustomDialog extends TitleAreaDialog
 	{
 	  private Label    label;
@@ -207,10 +219,7 @@ private static final String extension = "org.eclipse.ui.propertyPages";
           close();
           setCode("NO");
         }
-      });
-      
-      
-      
+      });   
     }
     
     private void createWidgets(Composite container) {
@@ -229,82 +238,32 @@ private static final String extension = "org.eclipse.ui.propertyPages";
 	{
 	  customdiag = new CustomDialog(sh, path);
 	}
-	
 
 	void doCodeGeneration()
 	{		
 	  Display display = Display.getCurrent();
 	  Shell shell = new Shell(display, SWT.BORDER);
 
-	  if((RamsesConfiguration.getRuntimeDir() != null) 
-	      && (RamsesConfiguration.getRuntimeDir() != "")
-	      && (RamsesConfiguration.getOutputDir() != null))
+	  if((RamsesConfiguration.getRuntimeDir() == null) 
+	        || (RamsesConfiguration.getRuntimeDir().equals(""))
+	        || (RamsesConfiguration.getOutputDir() == null))
 	  {
-	    CreateCustomDialog(shell, RamsesConfiguration.getRuntimeDir());
-	    customdiag.create();
-	    customdiag.open();
-	    while(true)
+	    //Instanciate the propertyPage
+	    
+	    if((currentProject = RamsesConfiguration.getCurrentProject()) == null)
 	    {
-	      if(customdiag.getCode() == "YES")
-	      {
-	          //Open another window to set the path
-	          //        shell.close();
-	          //        Shell shl = new Shell(display, SWT.BORDER);
-	          PersistentPath rmPath = new PersistentPath(shell);
-	          rmPath.create();
-	          rmPath.setTarget(_targetName);
-	          if(rmPath.open() == Window.OK)
-	          {
-	            if(!RamsesConfiguration.pokRuntimePathValidityCheck(rmPath.getPathForTarget()))
-	            {
-	              Dialog.showError("Code Generation Error",
-	                               "This path is not valid for "+_targetName);
-	              return;
-	            }
-	            if (rmPath.getPathForTarget() == "")
-	            {
-	              Dialog.showError("Code Generation Error",
-	                    "Problem occuring while setting Path ");
-	              return;
-	            }
-	            RamsesConfiguration.setRuntimeDir(rmPath.getPathForTarget());
-	          }
-	          else
-	            return;
-	        
-	        break;
-	      }
+	      Dialog.showError("Code Generation Error",
+	            "No editor displayed ");
 	    }
-	  }
-	  else if(RamsesConfiguration.getOutputDir() == null)
-	  {
-	    //Instanciate a propertyPage
-	   // RamsesPropertyPage propertyPage = new RamsesPropertyPage();
-	    
-	    System.out.println("Display a propertyPage !!!") ;
-//	    IConfigurationElement config[] = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.propertyPages");
-//	    for(IConfigurationElement e: config)
-//	    {
-//	      try
-//        {
-//          final Object o = e.createExecutableExtension("class");
-//          System.out.println("e.name = "+ e.getName());
-//          System.out.println("o.toString = "+o.toString()) ;
-//          
-//        }
-//        catch(CoreException e1)
-//        {
-//          // TODO Auto-generated catch block
-//          e1.printStackTrace();
-//        }
-//	      
-//	    }
-//	    return;
-	    
-	  }
-	  else
-	  {
-	    //TODO
+
+	    PreferenceDialog prefDiag = PreferencesUtil.
+	          createPropertyDialogOn(shell, currentProject,
+	                                 "fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage",
+	                                 null, null);
+	    if(prefDiag.open() == Window.CANCEL)
+	    {
+	      return;
+	    }
 	  }
 		
 		IWorkbench wb = PlatformUI.getWorkbench();
@@ -436,5 +395,5 @@ private static final String extension = "org.eclipse.ui.propertyPages";
 			}
 		}
 	}
-
+ 
 }

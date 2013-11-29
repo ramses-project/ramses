@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -71,7 +72,7 @@ public class GenerateAction extends AbstractAnalyzer
     	workspaceURI = workspaceURI.substring(18);
     
     IResource resource=workspaceRoot.findMember(workspaceURI);
-
+    
     System.out.println("getName = "+resource.getName());
     System.out.println("getFullPath = "+resource.getFullPath());
     System.out.println("getLocation = "+resource.getLocation());
@@ -81,10 +82,12 @@ public class GenerateAction extends AbstractAnalyzer
     String targetName = null;
     String outputDirName = null;
     String outputPathName = null;
+    IProject project = RamsesConfiguration.getCurrentProject();
+    
     try
     {
       targetName = 
-            resource.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
+            project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
                                                              RamsesPropertyPage.TARGET_ID));
       
       if(targetName==null)
@@ -95,7 +98,7 @@ public class GenerateAction extends AbstractAnalyzer
       }
       
       outputDirName = 
-            resource.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
+            project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
                                                              RamsesPropertyPage.PATH_ID));
       
       if(outputDirName==null)
@@ -106,7 +109,7 @@ public class GenerateAction extends AbstractAnalyzer
       }
 
       outputPathName = 
-    		  resource.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
+            project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
     				  RamsesPropertyPage.PLATFORM_ID));
 
       if(outputPathName==null)
