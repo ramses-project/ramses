@@ -400,3 +400,14 @@ rule m_Input_PeriodicDelayed_Port_LowET
 			dataSubcomponentType <- indexArrayDataType
 		)
 }
+
+-- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowET
+{
+  from
+  	fi: AADLI!FeatureInstance,
+	behavior: AADLI!SubprogramCallSequence,
+	paramCnx: AADLI!ParameterConnection
+  to
+  	call: AADLBA!SubprogramCallAction
+}

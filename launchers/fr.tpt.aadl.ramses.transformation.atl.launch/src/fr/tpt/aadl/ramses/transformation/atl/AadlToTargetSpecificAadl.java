@@ -120,7 +120,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
     }
   }
   public Resource unparse(Resource inputResource, 
-		  Resource expandedResult, File outputDir, String pkgName)
+		  Resource expandedResult, File outputDir)
   {
 	  String aadlGeneratedFileName = expandedResult.getURI().lastSegment();
 	  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(

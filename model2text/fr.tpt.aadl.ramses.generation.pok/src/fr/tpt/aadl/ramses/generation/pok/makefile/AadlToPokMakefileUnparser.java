@@ -113,8 +113,6 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent
               .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/main.h") ;
         unparserContent
-        .addOutputNewline("export POK_PATH="+RamsesConfiguration.getRuntimeDir()) ;
-        unparserContent
               .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
               ".elf") ;
@@ -281,7 +279,14 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         throws GenerationException
   {
     generateMakefile((NamedElement) system, generatedFilePath) ;
-    GeneratorUtils.executeMake(generatedFilePath, RamsesConfiguration.getRuntimeDir());
+    String pokPath = RamsesConfiguration.getRuntimeDir();
+    if(pokPath=="")
+    {
+    	pokPath = System.getenv("POK_PATH");
+    	if(pokPath==null || pokPath=="")
+    		pokPath = System.getProperty("POK_PATH");
+    }
+    GeneratorUtils.executeMake(generatedFilePath, pokPath);
   }
   
   

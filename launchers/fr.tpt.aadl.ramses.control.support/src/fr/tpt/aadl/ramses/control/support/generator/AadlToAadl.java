@@ -37,8 +37,7 @@ public interface AadlToAadl
   
   public Resource unparse(Resource inputResource, 
 		                  Resource expandedResult, 
-		                  File outputDir,
-		                  String pkgName);
+		                  File outputDir);
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
 

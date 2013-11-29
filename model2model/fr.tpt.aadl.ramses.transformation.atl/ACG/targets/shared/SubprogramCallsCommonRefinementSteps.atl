@@ -1738,7 +1738,7 @@ rule m_Input_Port_ComputeEntrypointCallSequence
 }
 
 -- @extends m_Input_Port_ComputeEntrypointCallSequence
-rule m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence
+abstract rule m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence
 {
 	from
 		fi: AADLI!FeatureInstance,
@@ -1768,7 +1768,7 @@ rule m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence
 --  			(iii) a connection from image localVariable of feature instance to parameter of getValue
 
 -- @extends m_Input_EventOrEventDataPort_ComputeEntrypointCallSequence
-rule m_Input_EventPort_ComputeEntrypointCallSequence
+abstract rule m_Input_EventPort_ComputeEntrypointCallSequence
 {
 	from
 		fi: AADLI!FeatureInstance,
@@ -1777,8 +1777,6 @@ rule m_Input_EventPort_ComputeEntrypointCallSequence
 		(
 			fi.isEventPort()
 		)
-	to
-		call:AADLBA!SubprogramCallAction
 }
 
 --  	- m_Input_EventDataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence
@@ -1800,8 +1798,6 @@ rule m_Input_EventDataPort_ComputeEntrypointCallSequence
 		(
 			fi.isEventDataPort()
 		)
-	to
-		call:AADLBA!SubprogramCallAction
 }
 
 --  	- m_Input_DataPort_ComputeEntrypointCallSequence extends m_Input_Port_ComputeEntrypointCallSequence: for each pair (call sequence, feature instance)

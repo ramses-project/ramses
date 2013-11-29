@@ -153,10 +153,9 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       else if(operation.equals("unparse"))
       {  
-    	  String pkgName = initialPackageName + "_" + transfoCounter;
     	  
     	  doUnparse(currentInstance.eResource(), currentImplResource, 
-    			  generatedDir, pkgName);
+    			  generatedDir);
     	  
     	  transfoCounter++;
       }
@@ -271,13 +270,13 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private void doUnparse(Resource inputResource, Resource expandedResult,
-		  File outputDir, String pkgName)
+		  File outputDir)
   {
-	  Aadl2StandaloneUnparser.getAadlUnparser().setCustomPackageName(pkgName);
+	  // Aadl2StandaloneUnparser.getAadlUnparser().setCustomPackageName(pkgName);
 	  
 	  if (expandedResult != null)
 	  {
-		  _targetTrans.unparse(inputResource, expandedResult, outputDir, pkgName);
+		  _targetTrans.unparse(inputResource, expandedResult, outputDir);
 	  }
 	  else
 	  {

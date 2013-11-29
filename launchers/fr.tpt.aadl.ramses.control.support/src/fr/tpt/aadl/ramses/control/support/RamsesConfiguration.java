@@ -88,11 +88,11 @@ public static void setInstantiationManager(InstantiationManager im)
 		  filePath = filePathPrefix+filePath;
 		  System.out.println("filePath = "+filePath);
 	  }
-	  else if(filePath.startsWith("file:"))
+/*	  else if(filePath.startsWith("file:"))
 		 {
 	    filePath = filePath.substring(5);
 	    System.out.println("filePath = "+filePath);
-		 }
+		 }*/
 	  int lastIndex = filePath.indexOf(uri.lastSegment());
 	  File inputResourceDir = new File(filePath.substring(0, lastIndex));
 	  includeDirSet.add(inputResourceDir);
