@@ -63,6 +63,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil ;
 import org.eclipse.ui.internal.Workbench ;
+import org.eclipse.ui.part.EditorPart ;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
 import org.eclipse.xtext.resource.XtextResource;
@@ -77,6 +78,7 @@ import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter;
 import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.aadl2.modelsupport.util.AadlUtil ;
 import org.osate.core.OsateCorePlugin;
 import org.osate.ui.dialogs.Dialog;
 import org.osate.ui.navigator.AadlNavigator;
@@ -241,6 +243,7 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 
 	void doCodeGeneration()
 	{		
+
 	  Display display = Display.getCurrent();
 	  Shell shell = new Shell(display, SWT.BORDER);
 
@@ -249,13 +252,16 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 	        || (RamsesConfiguration.getOutputDir() == null))
 	  {
 	    //Instanciate the propertyPage
-	    
-	    if((currentProject = RamsesConfiguration.getCurrentProject()) == null)
+	    if(currentProject == null)
 	    {
-	      Dialog.showError("Code Generation Error",
-	            "No editor displayed ");
+	      if((currentProject = getProjectResource()) == null)
+	      {
+	        Dialog.showError("Code Generation Error",
+	              "No editor displayed ");
+	      }
 	    }
-
+	    
+	    RamsesConfiguration.setCurrentProject(currentProject);
 	    PreferenceDialog prefDiag = PreferencesUtil.
 	          createPropertyDialogOn(shell, currentProject,
 	                                 "fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage",
@@ -266,12 +272,13 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 	    }
 	  }
 		
-		IWorkbench wb = PlatformUI.getWorkbench();
-		IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-		IWorkbenchPage page = win.getActivePage();
-		IWorkbenchPart part = page.getActivePart();
-		final ISelection selection;
-		IEditorPart activeEditor = page.getActiveEditor();
+    IWorkbench wb = PlatformUI.getWorkbench();
+    IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+    IWorkbenchPage page = win.getActivePage();
+    IWorkbenchPart part = page.getActivePart();   
+    final ISelection selection;
+    IEditorPart activeEditor = page.getActiveEditor();
+
 		if (activeEditor != null){
 			XtextEditor xtextEditor = (activeEditor == null)?null:(XtextEditor) activeEditor.getAdapter(XtextEditor.class);
 			if (part instanceof ContentOutline) {
@@ -396,4 +403,43 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 		}
 	}
  
+	public IProject getProjectResource()
+	{
+	  IWorkbench wb = PlatformUI.getWorkbench();
+	  IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+	  IWorkbenchPage page = win.getActivePage();
+	  IEditorPart activeEditor = page.getActiveEditor();
+	  IProject project = null;
+	  IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+	  IProject projects[] = root.getProjects();
+	  for(IProject p : projects)
+	  {
+
+	    if(!p.getName().equals("Plugin_Resources"))
+	    {
+
+	      if(p.isOpen())
+	      {
+	        activeEditor = page.getActiveEditor();
+
+	        if(activeEditor  != null)
+	        {
+	          IFileEditorInput input = (IFileEditorInput)activeEditor.getEditorInput() ;
+	          IFile file = input.getFile();
+	          IProject activeProject = file.getProject();
+	          String activeProjectName = activeProject.getName();
+	          if(p.getName().equals(activeProjectName))
+	          {
+	            project = p;
+	            break;
+	          }
+	        }
+	      }
+
+	    }
+	  }
+
+    return project ;
+	  
+	}
 }

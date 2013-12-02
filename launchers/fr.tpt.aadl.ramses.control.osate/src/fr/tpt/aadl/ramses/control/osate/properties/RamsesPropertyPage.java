@@ -50,8 +50,10 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog ;
 import org.eclipse.ui.dialogs.PreferencesUtil ;
 import org.eclipse.ui.dialogs.PropertyPage ;
 import org.eclipse.ui.dialogs.ResourceListSelectionDialog ;
+import org.osate.aadl2.Element ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.aadl2.modelsupport.util.AadlUtil ;
 import org.osate.ui.dialogs.Dialog;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
@@ -195,6 +197,7 @@ public class RamsesPropertyPage extends PropertyPage {
 
 	private void addOutputDirectorySection(Composite parent) {
 
+	  
 		Label label = new Label(parent, SWT.BOLD);
 		label.setText("2 - Select output directory to generate code in");
 
@@ -234,7 +237,7 @@ public class RamsesPropertyPage extends PropertyPage {
 			outputDirText.setText(DEFAULT_PATH);
 			RamsesConfiguration.setOutputDir(new Path(DEFAULT_PATH).toFile());
 		}
-
+    RamsesConfiguration.setCurrentProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME));
 		// Move the cursor to the end.
 		outputDirText.setSelection(outputDirText.getText().length()) ;
 

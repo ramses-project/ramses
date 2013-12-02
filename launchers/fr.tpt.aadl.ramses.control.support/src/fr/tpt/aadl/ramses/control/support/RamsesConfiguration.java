@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IWorkspaceRoot ;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable ;
 import org.eclipse.core.runtime.IPath ;
+import org.eclipse.core.runtime.Plugin ;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jface.viewers.ISelection ;
@@ -28,6 +29,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.ui.IEditorPart ;
 import org.eclipse.ui.IFileEditorInput ;
 import org.eclipse.ui.ISelectionService ;
+import org.eclipse.ui.IViewPart ;
 import org.eclipse.ui.IWorkbench ;
 import org.eclipse.ui.IWorkbenchPage ;
 import org.eclipse.ui.IWorkbenchWindow ;
@@ -51,65 +53,13 @@ public class RamsesConfiguration
   private static String pokValidFilePath = "/misc/mk/config.mk";
   private static String osekValidFilePath = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
   private static IProject currentProject = null;
-
+  private static SystemInstance sysint = null;
 
   public static IProject getCurrentProject()
   {
-//    IWorkbench wb = PlatformUI.getWorkbench();
-//    IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-//    IWorkbenchPage page = win.getActivePage();
-//    IEditorPart activEditor;
-//
-//    
-//    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-//    IProject projects[] = root.getProjects();
-//    for(IProject p : projects)
-//    {
-//
-//      if(!p.getName().equals("Plugin_Resources"))
-//      {
-//
-//        if(p.isOpen())
-//        {
-//          activEditor = page.getActiveEditor();
-//
-//          if(activEditor  != null)
-//          {
-//            IFileEditorInput input = (IFileEditorInput)activEditor.getEditorInput() ;
-//            IFile file = input.getFile();
-//            IProject activeProject = file.getProject();
-//            String activeProjectName = activeProject.getName();
-//            if(p.getName().equals(activeProjectName))
-//            {
-//              System.out.println("activeProjectName ="+activeProjectName) ;
-//              currentProject = p;
-//              break;
-//            }
-//          }
-//          System.out.println("getName ="+p.getName()) ;
-//        }
-//
-//      }
-//      System.out.println("getName ="+p.getName()) ;
-//      System.out.println("getFullPath = "+p.getFullPath()) ;
-//      System.out.println("getLocationURI = "+p.getLocationURI()) ;
-//      System.out.println("getLocation = "+p.getLocation()) ;
-//    }
-    
-    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    IProject projects[] = root.getProjects();
-    for(IProject p : projects)
-    {
-
-      if((!p.getName().equals("Plugin_Resources") && p.isOpen()))
-      {
-
-        currentProject = p;
-        break;
-      }
-    }
+  
     return currentProject ;
-    
+
   }
 
   public static void setCurrentProject(IProject project)
@@ -297,6 +247,16 @@ public class RamsesConfiguration
     }
 
     return true;
+  }
+
+  public static SystemInstance getSysint()
+  {
+    return sysint ;
+  }
+
+  public static void setSysint(SystemInstance sysint)
+  {
+    RamsesConfiguration.sysint = sysint ;
   }
 
 }
