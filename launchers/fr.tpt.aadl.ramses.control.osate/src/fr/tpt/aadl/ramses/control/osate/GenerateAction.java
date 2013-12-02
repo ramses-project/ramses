@@ -1,9 +1,11 @@
 package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException ;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit ;
 
 import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource;
@@ -15,6 +17,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog ;
+import org.eclipse.jface.operation.IRunnableWithProgress ;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
@@ -66,6 +70,12 @@ public class GenerateAction extends AbstractAnalyzer
                                       SystemOperationMode som)
   {
 	  
+    
+
+    monitor.beginTask("This process may take several seconds...", 3);
+    waitUnitOfTime();
+    monitor.subTask("Getting persistent properties");
+
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
     String workspaceURI = root.eResource().getURI().toString();
     if(workspaceURI.startsWith("platform:/resource"))
@@ -118,7 +128,7 @@ public class GenerateAction extends AbstractAnalyzer
     			  "Please select a Path for "+targetName+"");
     	  return;
       }
-        
+       
       RamsesConfiguration.setRuntimeDir(outputPathName);
       
       ServiceRegistry registry = new OSGiServiceRegistry () ;
@@ -126,7 +136,9 @@ public class GenerateAction extends AbstractAnalyzer
       
       File outputDir = new File (outputDirName);
       RamsesConfiguration.setOutputDir(outputDir);
-      
+      monitor.worked(1);
+      waitUnitOfTime();
+      monitor.subTask("Create list of included directories");
       try
       {
         
@@ -145,16 +157,16 @@ public class GenerateAction extends AbstractAnalyzer
   	  	}
 
   	  	RamsesConfiguration.setIncludeDir(root.getSystemImplementation().eResource(), _includeDirSet, targetName);
-        
+  	  	
   	  	
         // look for a wokflow file
         Resource r = root.eResource();
         String s = r.getURI().segment(1);
         File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
         String workflow = GenerateActionUtils.findWorkflow(rootDir);
-        
-        
-        
+        monitor.worked(1);
+        waitUnitOfTime();
+        monitor.subTask("Generate code");
         if(workflow==null)
           generator.generate(root, 
                              resourceDir,
@@ -170,6 +182,7 @@ public class GenerateAction extends AbstractAnalyzer
         }
         ResourcesPlugin.getWorkspace().getRoot().
         	refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        monitor.worked(1);
       }
       catch(GenerationException e)
       {
@@ -258,5 +271,17 @@ public class GenerateAction extends AbstractAnalyzer
 
 	  throw new Exception("file or directory " + potentialFile.getCanonicalPath() +
 			  " could not be found") ;
+  }
+  public void waitUnitOfTime()
+  {
+    try
+    {
+      TimeUnit.SECONDS.sleep(1);
+    }
+    catch(InterruptedException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 }
