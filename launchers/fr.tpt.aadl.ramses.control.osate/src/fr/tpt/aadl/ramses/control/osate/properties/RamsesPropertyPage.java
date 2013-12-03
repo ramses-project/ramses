@@ -263,7 +263,6 @@ public class RamsesPropertyPage extends PropertyPage {
 												outputDirText.setText(convertToAbsolutePath(outputDir));
 												// Move the cursor to the end.
 												outputDirText.setSelection(outputDirText.getText().length()) ;
-												RamsesConfiguration.setOutputDir(outputDir.toFile());
 											}
 										}
 			}
@@ -447,16 +446,7 @@ public class RamsesPropertyPage extends PropertyPage {
 		// store the value in the owner text field
 		try {
 			if(saveConfiguration())
-			{
-				if(!RamsesConfiguration.pokRuntimePathValidityCheck(outputPathText.getText()))
-				{
-					Dialog.showError("Code Generation Error",
-							"This path is not valid for "+target.getText());
-					return false;
-				}
-				
-				return true;
-			}
+			  return true;
 			else
 			{
 				popupConfigurationError();
@@ -486,7 +476,6 @@ public class RamsesPropertyPage extends PropertyPage {
 					return;
 				}
 				RamsesConfiguration.setRuntimeDir(outputPathText.getText());
-				System.out.println("POK_PATH = "+System.getProperty("POK_PATH"));
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();

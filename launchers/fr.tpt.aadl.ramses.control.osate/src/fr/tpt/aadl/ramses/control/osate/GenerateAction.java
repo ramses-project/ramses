@@ -19,6 +19,13 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog ;
 import org.eclipse.jface.operation.IRunnableWithProgress ;
+import org.eclipse.jface.preference.PreferenceDialog ;
+import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags ;
+import org.eclipse.jface.window.Window ;
+import org.eclipse.swt.SWT ;
+import org.eclipse.swt.widgets.Display ;
+import org.eclipse.swt.widgets.Shell ;
+import org.eclipse.ui.dialogs.PreferencesUtil ;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
@@ -69,13 +76,8 @@ public class GenerateAction extends AbstractAnalyzer
                                       SystemInstance root,
                                       SystemOperationMode som)
   {
-	  
+
     
-
-    monitor.beginTask("This process may take several seconds...", 3);
-    waitUnitOfTime();
-    monitor.subTask("Getting persistent properties");
-
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
     String workspaceURI = root.eResource().getURI().toString();
     if(workspaceURI.startsWith("platform:/resource"))
@@ -83,52 +85,58 @@ public class GenerateAction extends AbstractAnalyzer
     
     IResource resource=workspaceRoot.findMember(workspaceURI);
     
-    System.out.println("getName = "+resource.getName());
-    System.out.println("getFullPath = "+resource.getFullPath());
-    System.out.println("getLocation = "+resource.getLocation());
-    System.out.println("getLocationURI = "+resource.getLocationURI());
-    System.out.println("getFullPath = "+resource.getParent().getFullPath());
-    
     String targetName = null;
     String outputDirName = null;
     String outputPathName = null;
+    boolean flag = false;
     IProject project = RamsesConfiguration.getCurrentProject();
-    
+    int loop = 0;
+    if(project == null)
+    {
+      project = resource.getProject();
+      RamsesConfiguration.setCurrentProject(project);
+    }
     try
     {
-      targetName = 
-            project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
-                                                             RamsesPropertyPage.TARGET_ID));
-      
-      if(targetName==null)
+      while(true)
       {
-        Dialog.showError("Code Generation Error",
-              "Please select a target platform for generated code");
-        return;
-      }
-      
-      outputDirName = 
-            project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
-                                                             RamsesPropertyPage.PATH_ID));
-      
-      if(outputDirName==null)
-      {
-    	  Dialog.showError("Code Generation Error",
-    			  "Please select an output directory for generated code");
-    	  return;
-      }
+        loop++;
+        targetName = 
+              project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
+                                                              RamsesPropertyPage.TARGET_ID));
 
-      outputPathName = 
-            project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
-    				  RamsesPropertyPage.PLATFORM_ID));
+        outputDirName = 
+              project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
+                                                              RamsesPropertyPage.PATH_ID));
 
-      if(outputPathName==null)
-      {
-    	  Dialog.showError("Code Generation Error",
-    			  "Please select a Path for "+targetName+"");
-    	  return;
+        outputPathName = 
+              project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
+                                                              RamsesPropertyPage.PLATFORM_ID));
+        if((outputPathName==null)||(outputDirName==null)||(targetName==null))
+        { 
+          if(loop > 1)
+            return;
+          
+          Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+              PreferenceDialog prefDiag = PreferencesUtil.
+                    createPropertyDialogOn(getShell(), RamsesConfiguration.getCurrentProject(),
+                                           "fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage",
+                                           null, null);
+              if(prefDiag.open() == Window.CANCEL)
+              {
+                return;
+              }
+            }
+          });
+        }
+        else
+          break;
       }
-       
+      monitor.beginTask("This process may take several seconds...", 3);
+      waitUnitOfTime();
+      monitor.subTask("Getting persistent properties");
+      
       RamsesConfiguration.setRuntimeDir(outputPathName);
       
       ServiceRegistry registry = new OSGiServiceRegistry () ;
@@ -164,15 +172,21 @@ public class GenerateAction extends AbstractAnalyzer
         String s = r.getURI().segment(1);
         File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
         String workflow = GenerateActionUtils.findWorkflow(rootDir);
+        
         monitor.worked(1);
-        waitUnitOfTime();
-        monitor.subTask("Generate code");
         if(workflow==null)
-          generator.generate(root, 
+        {
+          
+          waitUnitOfTime();
+          monitor.subTask("Transformation model and effective code generation...");
+          generator.generate(root,         
                              resourceDir,
                              outputDir) ;
+        }
         else
         {
+          waitUnitOfTime();
+          monitor.subTask("Generate code with workflow");
           EcorePilot xmlPilot = new EcorePilot(workflow);
           generator.generateWorkflow(root,
         		                     resourceDir,
