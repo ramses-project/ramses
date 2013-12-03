@@ -87,7 +87,7 @@ public class AnalysisResult
 			{
 				double deadline = getDeadline(cpuName, taskName);
 				double wcrt = rtr.get(taskName).worst;
-				double margin = wcrt - deadline;
+				double margin = (deadline - wcrt)/deadline;
 				
 				AnalysisSource responseMargin_s = f.createAnalysisSource();
 				responseMargin_s.setMethodName(AADLInspectorSchedulingAnalysis.ANALYZER_NAME);
