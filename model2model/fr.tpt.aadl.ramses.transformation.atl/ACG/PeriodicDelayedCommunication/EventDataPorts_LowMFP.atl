@@ -618,7 +618,7 @@ unique lazy rule createContextSubcomponent
 		}
 }
 
--- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance
+-- @extends m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port_No_Mutex
 rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_LowMFP
 {
   	from

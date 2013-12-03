@@ -555,30 +555,11 @@ rule m_Input_PeriodicDelayed_Port
 		(
 			name <- Next_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
 			ownedExtension <- extendedNextValueSpg,
-			ownedPrototypeBinding <- Sequence{nextValueOutputPrototypeBinding},
-			ownedDataAccess <- Sequence{BufferAccess, nextValueValueParam}
+			ownedPrototypeBinding <- Sequence{nextValueOutputPrototypeBinding}
 		),
 		nextValueOutputPrototypeBinding: AADLBA!ComponentPrototypeBinding
 		(
 			formal <- Next_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'output_type')
-		),
-	
-		BufferAccess: AADLBA!DataAccess
-		(
-			name <- 'buffer',
-			refined <- Next_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'buffer'),
-			dataFeatureClassifier <- bufferArrayImpl,
-			kind<-#requires
-		),
-		
-		--- FIXME: fix for osate connection 
-		--- resolution warning ('XXX is missing a classifier' when prototype binding is used)
-		nextValueValueParam: AADLBA!DataAccess
-		(
-			name <- 'output',
-			kind <- #requires,
-			refined <- Next_Value_PrototypeSpg.ownedDataAccess->any(d|d.name = 'output'),
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
 		)
 	do
 	{

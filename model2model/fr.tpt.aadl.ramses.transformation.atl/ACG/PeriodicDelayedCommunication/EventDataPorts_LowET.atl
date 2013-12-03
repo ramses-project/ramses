@@ -345,7 +345,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET
 }
 
 
--- @extends m_Input_PeriodicDelayed_Port
+-- @extends m_Input_PeriodicDelayed_Port_No_Mutex
 rule m_Input_PeriodicDelayed_Port_LowET
 {
   	from

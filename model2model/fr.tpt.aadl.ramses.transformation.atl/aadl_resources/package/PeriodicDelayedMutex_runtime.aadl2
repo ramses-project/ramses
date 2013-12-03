@@ -59,7 +59,7 @@ prototypes
   t_buffer: data SharedStructure.impl;
 features
   BufferAccess : requires data access  t_buffer;
-  Size : requires data access Base_Types::Integer {Access_Right=>read_only;};
+  Size : requires data access Base_Types::Integer_16 {Access_Right=>read_only;};
 annex behavior_specification {**
   variables
     j : Base_Types::Integer_16;

@@ -183,19 +183,6 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 	}
 }
 
--- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
-abstract rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
-{
-	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!SubprogramCallSequence,
-		cnxRef: AADLI!PortConnection
-		(
-			behavior.isComputeEntryPointOf(fi.eContainer())
-		)
-	to
-}
-
 -- @extends m_PeriodicThread
 rule m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 {

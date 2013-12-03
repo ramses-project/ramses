@@ -90,3 +90,40 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 		element <- thisModule.CreateReturnSubcomponentFromPort(fi)
 	)
 }
+
+-- @extends m_Input_PeriodicDelayed_Port
+rule m_Input_PeriodicDelayed_Port_No_Mutex
+{
+  	from
+		fi: AADLI!FeatureInstance
+	using
+	{
+		Next_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Next_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+			
+	}
+	to
+		bufferArrayImpl: AADLBA!DataImplementation,
+		
+		nextValueSpg: AADLBA!SubprogramType
+		(
+			ownedDataAccess <- Sequence{BufferAccess, nextValueValueParam}
+		),
+		
+		BufferAccess: AADLBA!DataAccess
+		(
+			name <- 'buffer',
+			refined <- Next_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'buffer'),
+			dataFeatureClassifier <- bufferArrayImpl,
+			kind<-#requires
+		),
+		
+		--- FIXME: fix for osate connection 
+		--- resolution warning ('XXX is missing a classifier' when prototype binding is used)
+		nextValueValueParam: AADLBA!DataAccess
+		(
+			name <- 'output',
+			kind <- #requires,
+			refined <- Next_Value_PrototypeSpg.ownedDataAccess->any(d|d.name = 'output'),
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+		)
+}
