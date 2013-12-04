@@ -65,7 +65,7 @@ public class RamsesPropertyPage extends PropertyPage {
 	public static final String PREFIX = "fr.tpt.aadl.ramses.";
 	public static final String PATH_ID = "output.directory";
 	public static final String TARGET_ID = "target";
-	public static final String PLATFORM_ID = "platform";
+	public static final String PLATFORM_PATH = "platform.path";
 	public static final String PREF = "pref_pok";
 
 	private String DEFAULT_PATH;
@@ -73,10 +73,12 @@ public class RamsesPropertyPage extends PropertyPage {
 
 	private static final int TEXT_FIELD_WIDTH = 43;
 
+	public static final String PLATFORM_ID = "platform.id";
+
 	private IResource instanceModel = null;
 	private Text outputDirText;
 	private Button target;
-	private Text outputPathText;
+	private Text runtimePathText;
 	private Text selectedInstanceName;
 	private Label selectedPathLabel;
 	private Label selectedInstanceModel;
@@ -195,11 +197,16 @@ public class RamsesPropertyPage extends PropertyPage {
 //		}
 	}
 
+	public static String getDefaultOutputDir(IResource resource)
+	{
+		return resource.getLocation().makeAbsolute().toOSString();
+	}
+	
 	private void addOutputDirectorySection(Composite parent) {
 
 	  
 		Label label = new Label(parent, SWT.BOLD);
-		label.setText("2 - Select output directory to generate code in");
+		label.setText("1 - Select output directory to generate code in");
 
 		Composite composite = createDefaultComposite(parent);
 
@@ -215,7 +222,7 @@ public class RamsesPropertyPage extends PropertyPage {
 		outputDirText.setEditable(false) ;
 
 		// Populate output dir text field
-		DEFAULT_PATH = ((IResource) getElement()).getLocation().makeAbsolute().toOSString();
+		DEFAULT_PATH = getDefaultOutputDir((IResource) getElement());
 		PROJECT_NAME = (((IResource) getElement()).getName()) ;
 
 		IResource resource = instanceModel;
@@ -324,7 +331,7 @@ public class RamsesPropertyPage extends PropertyPage {
 	private void addTargetSection(Composite composite)
 	{
 		Label targetInfo = new Label(composite, SWT.BOLD);
-		targetInfo.setText("3 - Select one of the following target platforms to generate code for:");
+		targetInfo.setText("2 - Select one of the following target platforms to generate code for:");
 		// Create checkboxes for targets supported by RAMSES
 
 		// TODO :  Should be deduced from the plugin.xml of generators;
@@ -375,11 +382,11 @@ public class RamsesPropertyPage extends PropertyPage {
 		grdPath.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
 		selectedPathLabel.setLayoutData(grdPath) ;
 
-		outputPathText = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
-		outputPathText.setEditable(false) ;
+		runtimePathText = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
+		runtimePathText.setEditable(false) ;
 		GridData grd = new GridData();
 		grd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		outputPathText.setLayoutData(grd) ;
+		runtimePathText.setLayoutData(grd) ;
 
 		pathButton.addSelectionListener( new SelectionAdapter() 
 		{
@@ -391,7 +398,7 @@ public class RamsesPropertyPage extends PropertyPage {
 				if(file != null && file.length() > 2)
 				{
 					selectedFile = new File(file);
-					outputPathText.setText(selectedFile.getAbsolutePath());
+					runtimePathText.setText(selectedFile.getAbsolutePath());
 				}
 			}
 		});
@@ -404,7 +411,7 @@ public class RamsesPropertyPage extends PropertyPage {
 //		if(instanceModel==null)
 //			isCorrectConfiguration=false;
 		if(isCorrectConfiguration && outputDirText.getText()!=null && !outputDirText.getText().equals("")
-				&& outputPathText.getText()!=null && !outputPathText.getText().equals(""))
+				&& runtimePathText.getText()!=null && !runtimePathText.getText().equals(""))
 		{
 		  if((project = RamsesConfiguration.getCurrentProject()) == null)
 		   return false;
@@ -412,8 +419,11 @@ public class RamsesPropertyPage extends PropertyPage {
 		  project.setPersistentProperty(new QualifiedName(PREFIX, PATH_ID),
 		                                outputDirText.getText());
 
+		  project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_PATH),
+		                                runtimePathText.getText());
+		  
 		  project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_ID),
-		                                outputPathText.getText());
+                  (String)target.getData());
 		      
 		}
 
@@ -469,13 +479,13 @@ public class RamsesPropertyPage extends PropertyPage {
 			}
 			else
 			{				
-				if(!RamsesConfiguration.pokRuntimePathValidityCheck(outputPathText.getText()))
+				if(!RamsesConfiguration.pokRuntimePathValidityCheck(runtimePathText.getText()))
 				{
 					Dialog.showError("Code Generation Error",
 							"This path is not valid for "+target.getText());
 					return;
 				}
-				RamsesConfiguration.setRuntimeDir(outputPathText.getText());
+				RamsesConfiguration.setRuntimeDir(runtimePathText.getText());
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();

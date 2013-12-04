@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IAdaptable ;
 import org.eclipse.core.runtime.IConfigurationElement ;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform ;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -93,11 +94,14 @@ import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
-public abstract class GenerateActionHandler extends AbstractHandler {
+public class GenerateActionHandler extends AbstractHandler {
 
 	@Inject
 	private EObjectAtOffsetHelper eObjectAtOffsetHelper;
 	private Set<File> _includeDirSet = null;
+	protected String _targetName;
+	protected String _targetPath;
+	public String _outputDir;
 	private static int TEXT_FIELD_WIDTH = 43;
 	private static CustomDialog customdiag;
 	private static final String extension = "org.eclipse.ui.propertyPages";
@@ -108,15 +112,13 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 	                                           .getDefault().getBundle());
   private static IProject currentProject;
 
-  protected String _targetName=getTargetName();
   private static  enum code
   {
     YES,
     NO;
   }
 
-	abstract String getTargetName();
-
+	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
@@ -241,6 +243,20 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 	  customdiag = new CustomDialog(sh, path);
 	}
 
+	public void retreivePersistentConfiguration()
+	{
+		// try to retreive information from persistent properties
+	    try {
+			_outputDir = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.PATH_ID));
+			if (_outputDir == null)
+				_outputDir = RamsesPropertyPage.getDefaultOutputDir((IResource)currentProject);
+			_targetPath = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.PLATFORM_PATH));
+			_targetName = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.PLATFORM_ID));
+		} catch (CoreException e) {
+			Dialog.showError("Configuration Error", "Porperties were not reachable for project " + currentProject.getName());
+		}
+	}
+	
 	void doCodeGeneration()
 	{		
 
@@ -251,25 +267,38 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 	        || (RamsesConfiguration.getRuntimeDir().equals(""))
 	        || (RamsesConfiguration.getOutputDir() == null))
 	  {
-	    //Instanciate the propertyPage
+		
+	    // get a reference to current project
 	    if(currentProject == null)
 	    {
 	      if((currentProject = getProjectResource()) == null)
 	      {
-	        Dialog.showError("Code Generation Error",
+	        Dialog.showError("Configuration Error",
 	              "No editor displayed ");
 	      }
 	    }
 	    
-	    RamsesConfiguration.setCurrentProject(currentProject);
-	    PreferenceDialog prefDiag = PreferencesUtil.
-	          createPropertyDialogOn(shell, currentProject,
-	                                 "fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage",
-	                                 null, null);
-	    if(prefDiag.open() == Window.CANCEL)
+	    retreivePersistentConfiguration();
+	    
+	    if(_outputDir == null || _targetName == null || _targetPath ==null)
 	    {
-	      return;
+	      //Instanciate the propertyPage  
+	      PreferenceDialog prefDiag = PreferencesUtil.
+	  	        createPropertyDialogOn(shell, currentProject,
+	  	                               "fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage",
+	  	                                 null, null);
+	  	  if(prefDiag.open() == Window.CANCEL)
+	  	  {
+	  	    return;
+	  	  }
 	    }
+	    retreivePersistentConfiguration();
+	    
+	    RamsesConfiguration.setOutputDir(new File(_outputDir));
+	    RamsesConfiguration.setRuntimeDir(_targetPath);
+	    
+	    RamsesConfiguration.setCurrentProject(currentProject);
+	    
 	  }
 		
     IWorkbench wb = PlatformUI.getWorkbench();
@@ -341,23 +370,22 @@ public abstract class GenerateActionHandler extends AbstractHandler {
 													String workspaceURI = si.eResource().getURI().trimFragment().toString();
 													workspaceURI = workspaceURI.substring(0, workspaceURI.lastIndexOf("/"));
 													java.net.URI modelURI = new java.net.URI(workspaceURI);
-													URL modelURL = FileLocator.toFileURL(modelURI.toURL());
-													File outputDir = new File(modelURL.toURI()); 
-													RamsesConfiguration.setOutputDir(outputDir);
-
+													
 													URI resourceURI = URI.createPlatformPluginURI("fr.tpt.aadl.ramses.transformation.atl", false);
 													java.net.URI uri = new java.net.URI(resourceURI.toString());
 													URL url = FileLocator.toFileURL(uri.toURL());
 
 													File resourceDir = new File(url.toURI()); 
 													RamsesConfiguration.setRamsesResourcesDir(resourceDir);
+													RamsesConfiguration.setRuntimeDir(_targetPath);
 													RamsesConfiguration.setIncludeDir(sinst.getSystemImplementation().eResource(), _includeDirSet, _targetName);
 													// look for a wokflow file
 													Resource r = si.eResource();
 													String s = r.getURI().segment(1);
 													File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
 													String workflow = GenerateActionUtils.findWorkflow(rootDir);
-													
+
+													File outputDir = RamsesConfiguration.getOutputDir();
 													if(workflow==null)
 														generator.generate(sinst, 
 																resourceDir,

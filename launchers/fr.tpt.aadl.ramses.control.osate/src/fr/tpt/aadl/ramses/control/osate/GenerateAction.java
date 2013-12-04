@@ -89,13 +89,10 @@ public class GenerateAction extends AbstractAnalyzer
     String outputDirName = null;
     String outputPathName = null;
     boolean flag = false;
-    IProject project = RamsesConfiguration.getCurrentProject();
+    IProject project = resource.getProject();
     int loop = 0;
-    if(project == null)
-    {
-      project = resource.getProject();
-      RamsesConfiguration.setCurrentProject(project);
-    }
+    RamsesConfiguration.setCurrentProject(project);
+    
     try
     {
       while(true)
@@ -111,7 +108,7 @@ public class GenerateAction extends AbstractAnalyzer
 
         outputPathName = 
               project.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, 
-                                                              RamsesPropertyPage.PLATFORM_ID));
+                                                              RamsesPropertyPage.PLATFORM_PATH));
         if((outputPathName==null)||(outputDirName==null)||(targetName==null))
         { 
           if(loop > 1)
