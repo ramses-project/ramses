@@ -74,6 +74,12 @@ public class AadlTargetSpecificCodeGenerator
                        File generatedFilePath) throws GenerationException
   {
 	List<SystemImplementation> systemImplementationList=new ArrayList<SystemImplementation>();
+	
+	if (inputResource.getContents().size() <= 0)
+	{
+		throw new GenerationException("Cannot find source models");
+	}
+	
 	EObject root = inputResource.getContents().get(0);
 	if(root instanceof SystemInstance)
 	{
@@ -90,7 +96,7 @@ public class AadlTargetSpecificCodeGenerator
 	}
 	else
 	{
-	  throw new GenerationException("Try to generate from a resources that is nto an AADL model");
+	  throw new GenerationException("Try to generate from a resources that is into an AADL model");
 	}
 	File generatedCodeDirectory =
           new File(generatedFilePath + GENERATED_DIR_NAME) ;
