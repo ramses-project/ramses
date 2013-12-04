@@ -75,7 +75,7 @@ public class AadlTargetSpecificCodeGenerator
   {
 	List<SystemImplementation> systemImplementationList=new ArrayList<SystemImplementation>();
 	
-	if (inputResource.getContents().size() <= 0)
+	if ((inputResource == null ) || (inputResource.getContents() == null) || (inputResource.getContents().size() <= 0))
 	{
 		throw new GenerationException("Cannot find source models");
 	}
