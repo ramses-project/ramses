@@ -79,10 +79,9 @@ public class RamsesPropertyPage extends PropertyPage {
 	private Text outputDirText;
 	private Button target;
 	private Text runtimePathText;
-	private Text selectedInstanceName;
 	private Label selectedPathLabel;
-	private Label selectedInstanceModel;
-	private QualifiedName qfName;
+	
+	
 	
 	/**
 	 * Constructor for SamplePropertyPage.
@@ -105,96 +104,6 @@ public class RamsesPropertyPage extends PropertyPage {
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.grabExcessHorizontalSpace = true;
 		separator.setLayoutData(gridData);
-	}
-
-	private void addResourceSelectionSection(final Composite composite)
-	{
-//		Label label = new Label(composite, SWT.BOLD);
-//		label.setText("1 - Select instance model to generate code from");
-//		Button button = new Button(composite, SWT.PUSH);
-//		button.setText("Select instance model...");
-//		button.setAlignment(SWT.LEFT);
-//		selectedInstanceModel = new Label(composite, SWT.BOLD);
-//		selectedInstanceName = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
-//		selectedInstanceName.setEditable(false);
-//		GridData gd = new GridData();
-//		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-//		selectedInstanceName.setLayoutData(gd) ;
-//
-//		if(instanceModel==null)
-//		{
-//			selectedInstanceModel.setText("No instance model selected");
-//		}
-//		button.addSelectionListener( new SelectionAdapter() 
-//		{
-//			public void widgetSelected(SelectionEvent e) 
-//			{
-//				IProject project = (IProject) getElement();
-//				List<IResource> instanceModels = new ArrayList<IResource>();
-//				populateInstanceModelList(project, instanceModels);
-//				if(instanceModels.size()==0)
-//				{
-//					MessageDialog.openError(getShell(),
-//							"Configuration Error",
-//							"No instance model found in current projet. Instantiate your AADL model first.");
-//					return;
-//				}
-//				IResource[] resourceArray = new IResource[instanceModels.size()]; 
-//				instanceModels.toArray(resourceArray);
-//				ResourceListSelectionDialog dialog = 
-//						new ResourceListSelectionDialog(getShell(), 
-//								resourceArray);
-//				dialog.setTitle("Select instance model to generate code from");
-//				dialog.setMessage("To display all available instance models, use *.aaxl2 as the search key.");
-//				if (dialog.open() == ContainerSelectionDialog.OK) {
-//					Object[] result = dialog.getResult();
-//					if (result != null && result.length > 0) {
-//						instanceModel = (IResource) result[0];
-//						selectedInstanceModel.setText("Selected Instance model: ");
-//						selectedInstanceModel.redraw();
-//						selectedInstanceName.setText(instanceModel.getName());
-//						int columns = instanceModel.getName().length();
-//						GC gc = new GC(selectedInstanceModel);
-//						FontMetrics fm = gc.getFontMetrics();
-//						int width = columns * fm.getAverageCharWidth();
-//						int height = fm.getHeight();
-//						gc.dispose();
-//						selectedInstanceName.setSize(selectedInstanceModel.computeSize(width, height));
-//						selectedInstanceName.redraw();
-//					}
-//				}
-//			}
-//		});
-	}
-
-	private void populateInstanceModelList(IContainer container, List<IResource> instanceModelList)
-	{
-//		IResource[] projectResources ;
-//		try
-//		{
-//			projectResources = container.members() ;
-//
-//			for (int i=0; i<container.members().length; i++)
-//			{
-//				if(projectResources[i] instanceof IContainer && !projectResources[i].getName().equalsIgnoreCase(".svn"))
-//					populateInstanceModelList((IContainer) container.members()[i], instanceModelList);
-//				else if(projectResources[i].getFileExtension()!=null &&
-//						projectResources[i].getFileExtension().equals("aaxl2"))
-//				{
-//					// Get the resource
-//					Resource resource=OsateResourceUtil.getResource(projectResources[i]);
-//					// Get the first model element and cast it to the right type, in my
-//					// example everything is hierarchical included in this first node
-//					if(resource!= null && resource.getContents().get(0) instanceof SystemInstance)
-//						instanceModelList.add(projectResources[i]);
-//				}
-//			}
-//		}
-//		catch(CoreException exc)
-//		{
-//			// TODO Auto-generated catch block
-//			exc.printStackTrace();
-//		}
 	}
 
 	public static String getDefaultOutputDir(IResource resource)
@@ -319,7 +228,6 @@ public class RamsesPropertyPage extends PropertyPage {
 		
 		addInformationSection(composite);
 		addSeparator(composite);
-		addResourceSelectionSection(composite);
 		addSeparator(composite);
 		addOutputDirectorySection(composite);
 		addSeparator(composite);
@@ -408,8 +316,7 @@ public class RamsesPropertyPage extends PropertyPage {
 	{
 		boolean isCorrectConfiguration=true;
 		IProject project = null;
-//		if(instanceModel==null)
-//			isCorrectConfiguration=false;
+
 		if(isCorrectConfiguration && outputDirText.getText()!=null 
 		   && !outputDirText.getText().equals(""))
 		{		    
@@ -420,28 +327,17 @@ public class RamsesPropertyPage extends PropertyPage {
 		                                outputDirText.getText());
 
 		  project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_PATH),
-		                                runtimePathText.getText());
-		  
-		  project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_ID),
-                  (String)target.getData());
-		      
+		                                runtimePathText.getText());		      
 		}
 
 		else
 			isCorrectConfiguration=false;
 		if(isCorrectConfiguration && target != null && target.getData()!=null)
-		{
-//      if((runtimePathText.getText()!=null && !runtimePathText.getText().equals("")
-//            && (target.getText().equals("Java - OJR")))
-//         || ((runtimePathText.getText()== null || runtimePathText.getText().equals(""))
-//            && (!target.getText().equals("Java - OJR"))))
-//           return false;
-        
-		  project.setPersistentProperty(
-		
+		  
+		  project.setPersistentProperty(		
 					new QualifiedName(PREFIX, TARGET_ID),
 					target.getData().toString());
-		}
+	
 		else
 			isCorrectConfiguration=false;
 
@@ -496,7 +392,7 @@ public class RamsesPropertyPage extends PropertyPage {
 					return;
 				}
 				if(!target.getText().equals("Java - OJR"))
-				  RamsesConfiguration.setRuntimeDir(runtimePathText.getText());
+				 RamsesConfiguration.setRuntimeDir(runtimePathText.getText());
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
