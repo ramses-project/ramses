@@ -356,7 +356,7 @@ public class RamsesPropertyPage extends PropertyPage {
 			{
 				Button button = (Button)(event.widget);
 
-				System.out.println("Button =" + button);
+				System.out.println("Button =" + button.getText());
 				selectedPathLabel.setText("Select path for :"+button);
 				selectedPathLabel.redraw();
 				if (button.getSelection())
@@ -410,9 +410,9 @@ public class RamsesPropertyPage extends PropertyPage {
 		IProject project = null;
 //		if(instanceModel==null)
 //			isCorrectConfiguration=false;
-		if(isCorrectConfiguration && outputDirText.getText()!=null && !outputDirText.getText().equals("")
-				&& runtimePathText.getText()!=null && !runtimePathText.getText().equals(""))
-		{
+		if(isCorrectConfiguration && outputDirText.getText()!=null 
+		   && !outputDirText.getText().equals(""))
+		{		    
 		  if((project = RamsesConfiguration.getCurrentProject()) == null)
 		   return false;
 		  
@@ -430,9 +430,18 @@ public class RamsesPropertyPage extends PropertyPage {
 		else
 			isCorrectConfiguration=false;
 		if(isCorrectConfiguration && target != null && target.getData()!=null)
-			project.setPersistentProperty(
+		{
+//      if((runtimePathText.getText()!=null && !runtimePathText.getText().equals("")
+//            && (target.getText().equals("Java - OJR")))
+//         || ((runtimePathText.getText()== null || runtimePathText.getText().equals(""))
+//            && (!target.getText().equals("Java - OJR"))))
+//           return false;
+        
+		  project.setPersistentProperty(
+		
 					new QualifiedName(PREFIX, TARGET_ID),
 					target.getData().toString());
+		}
 		else
 			isCorrectConfiguration=false;
 
@@ -479,13 +488,15 @@ public class RamsesPropertyPage extends PropertyPage {
 			}
 			else
 			{				
-				if(!RamsesConfiguration.pokRuntimePathValidityCheck(runtimePathText.getText()))
+				if(!RamsesConfiguration.pokRuntimePathValidityCheck(runtimePathText.getText())
+				   && (!target.getText().equals("Java - OJR")))
 				{
 					Dialog.showError("Code Generation Error",
 							"This path is not valid for "+target.getText());
 					return;
 				}
-				RamsesConfiguration.setRuntimeDir(runtimePathText.getText());
+				if(!target.getText().equals("Java - OJR"))
+				  RamsesConfiguration.setRuntimeDir(runtimePathText.getText());
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
