@@ -40,6 +40,7 @@ import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
@@ -114,6 +115,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
               .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/main.h") ;
         unparserContent
               .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
+
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
               ".elf") ;
         process(object.getComponentImplementation()) ;
@@ -152,12 +154,18 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent.addOutputNewline("clean: common-clean\n") ;
         unparserContent
               .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
+
         if(false==includeDirList.isEmpty())
           unparserContent.addOutput("export USER_INCLUDES=");
         for (File include: includeDirList)
         {
           unparserContent.addOutput("-I"+include.getAbsolutePath()+" ");
+          
         }
+        
+//        unparserContent.addOutput("export USER_INCLUDES=");
+//        unparserContent.addOutput("-I /home/achille/runtime-New_config/prj/examples/arinc653-buffer/input");
+        
         unparserContent.addOutput("\n") ;
         unparserContent
               .addOutputNewline("include $(POK_PATH)/misc/mk/rules-partition.mk") ;
@@ -278,6 +286,12 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
                       File generatedFilePath)
         throws GenerationException
   {
+ 
+    IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
+    ramsesMonit.worked(1);
+    ramsesMonit.subTask("Compilation of the generated code..."); 
+    RamsesConfiguration.waitUnitOfTime(1);
+    
     generateMakefile((NamedElement) system, generatedFilePath) ;
     String pokPath = RamsesConfiguration.getRuntimeDir();
     if(pokPath=="")
@@ -287,6 +301,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
     		pokPath = System.getProperty("POK_PATH");
     }
     GeneratorUtils.executeMake(generatedFilePath, pokPath);
+    ramsesMonit.worked(1);
   }
   
   

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
@@ -38,6 +39,7 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
 
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -102,17 +104,21 @@ public class AadlTargetSpecificCodeGenerator
           new File(generatedFilePath + GENERATED_DIR_NAME) ;
     generatedCodeDirectory.mkdir() ;
 
+    IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
+    ramsesMonit.subTask("Code generation ..."); 
+    RamsesConfiguration.waitUnitOfTime(1);
+
     for(SystemImplementation sys: systemImplementationList)
     {
       SystemImplementation si = (SystemImplementation) sys ;
       File generatedFileDir = new File(generatedFilePath + GENERATED_DIR_NAME);
-      
+
       // XXX Have AadlGenericUnparser to unparse the SystemImplementation
       // object ?
       TargetProperties tarProp=null;
       if(_targetUnparser != null)
         tarProp = _targetUnparser.process(si, generatedFilePath);
-      
+
       for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
       {
         // create directory with the processor subcomponent name
@@ -121,35 +127,35 @@ public class AadlTargetSpecificCodeGenerator
         processorFileDir.mkdir() ;
         if(_targetBuilderGen != null)
           _targetBuilderGen.process(ps, processorFileDir) ;
-        
+
         File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
         if(_targetUnparser != null)
           _targetUnparser.process(ps, kernelFileDir, tarProp);
         List<ProcessSubcomponent> ownedProcess = 
-                                      GeneratorUtils.getBindedProcesses(ps) ;
-        
+              GeneratorUtils.getBindedProcesses(ps) ;
+
         for(ProcessSubcomponent process : ownedProcess)
         {
           String generationTargetDirectory = processorFileDir +
-                                             "/" + process.getName() ;
+                "/" + process.getName() ;
           File processDirectory = new File(generationTargetDirectory) ;
           processDirectory.mkdir() ;
-          
+
           _genericUnparser.process(process, processDirectory) ;
           if(_targetUnparser!=null)
             _targetUnparser.process(process, processDirectory, tarProp);
           if(_targetBuilderGen!= null)
-        	_targetBuilderGen.process(process, processDirectory) ;
-         }
-        
-       // This line is at the end because it will launch the build of the generated code;
-       // Thus it is better is the code has been generated...
-       if(_targetBuilderGen!= null)
-         _targetBuilderGen.process(si, generatedFileDir) ;
-        
+            _targetBuilderGen.process(process, processDirectory) ;
+        }
+
+        // This line is at the end because it will launch the build of the generated code;
+        // Thus it is better is the code has been generated...
+        if(_targetBuilderGen!= null)
+          _targetBuilderGen.process(si, generatedFileDir) ;
+
       }
-    }  
-  }
+    }
+ }
 
 private List<SystemImplementation> getListOfSystemImplementation(
 		SystemInstance systemInstance) {

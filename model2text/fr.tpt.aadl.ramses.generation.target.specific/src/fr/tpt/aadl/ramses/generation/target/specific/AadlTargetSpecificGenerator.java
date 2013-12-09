@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
@@ -47,6 +48,7 @@ import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.reporters.ProcessMonitor ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
@@ -66,6 +68,12 @@ public class AadlTargetSpecificGenerator implements Generator
   
   protected AadlTargetSpecificGenerator()
   {
+    
+    //DEBUG
+    
+    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+    sr.getProgessMonitor() ;
+    
   }
   
   public AadlTargetSpecificGenerator(AadlToTargetSpecificAadl targetTrans,
@@ -108,11 +116,20 @@ public class AadlTargetSpecificGenerator implements Generator
   {
     Resource inputResource = systemInstance.eResource() ;
     Resource r;
+
+    IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
+    
     if(_targetTrans != null)
+    {
+      ramsesMonit.subTask("Model transformation (refinement) ..."); 
+      RamsesConfiguration.waitUnitOfTime(1);
       r = _targetTrans.transform(inputResource, resourceFilePath,
-                                        generatedFilePath);
+
+                                 generatedFilePath);
+      ramsesMonit.worked(1);
+    }
     else
-      r = inputResource;
+     r = inputResource;
     
     _codeGen.generate(r, generatedFilePath) ;
   }

@@ -40,8 +40,10 @@ import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.reporters.ProcessMonitor ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
 public class GenerateAction extends AbstractAnalyzer
@@ -59,6 +61,7 @@ public class GenerateAction extends AbstractAnalyzer
 //  private static final String INCLUDES_OPTION_ID = "include_directories" ;
   private static String RAMSES_DIR ;
   private static String outputDirPath = "/output";
+  private ProcessMonitorImpl processMonitor = null;
   
   
   @Override
@@ -76,8 +79,6 @@ public class GenerateAction extends AbstractAnalyzer
                                       SystemInstance root,
                                       SystemOperationMode som)
   {
-
-    
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
     String workspaceURI = root.eResource().getURI().toString();
     if(workspaceURI.startsWith("platform:/resource"))
@@ -92,7 +93,7 @@ public class GenerateAction extends AbstractAnalyzer
     IProject project = resource.getProject();
     int loop = 0;
     RamsesConfiguration.setCurrentProject(project);
-    
+    RamsesConfiguration.setRamsesMonitor(monitor);
     try
     {
       while(true)
@@ -130,9 +131,15 @@ public class GenerateAction extends AbstractAnalyzer
         else
           break;
       }
-      monitor.beginTask("This process may take several seconds...", 3);
-      waitUnitOfTime();
-      monitor.subTask("Getting persistent properties");
+      System.out.println("targetName = "+targetName) ;
+      System.out.println("outputDirName = "+outputDirName) ;
+      System.out.println("outputPathName = "+outputPathName) ;
+      
+      
+      IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
+      ramsesMonit.beginTask("This process may take several seconds...", 3);
+      ramsesMonit.subTask("Transformation model ...");
+      RamsesConfiguration.waitUnitOfTime(1);
       
       RamsesConfiguration.setRuntimeDir(outputPathName);
       
@@ -141,9 +148,7 @@ public class GenerateAction extends AbstractAnalyzer
       
       File outputDir = new File (outputDirName);
       RamsesConfiguration.setOutputDir(outputDir);
-      monitor.worked(1);
-      waitUnitOfTime();
-      monitor.subTask("Create list of included directories");
+      
       try
       {
         
@@ -170,20 +175,15 @@ public class GenerateAction extends AbstractAnalyzer
         File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
         String workflow = GenerateActionUtils.findWorkflow(rootDir);
         
-        monitor.worked(1);
+//        RamsesConfiguration.setRamsesMonitor(ramsesMonit);
         if(workflow==null)
         {
-          
-          waitUnitOfTime();
-          monitor.subTask("Transformation model and effective code generation...");
           generator.generate(root,         
                              resourceDir,
                              outputDir) ;
         }
         else
         {
-          waitUnitOfTime();
-          monitor.subTask("Generate code with workflow");
           EcorePilot xmlPilot = new EcorePilot(workflow);
           generator.generateWorkflow(root,
         		                     resourceDir,
@@ -191,9 +191,11 @@ public class GenerateAction extends AbstractAnalyzer
         		                     xmlPilot);
           
         }
+        //End of progressbar
+        ramsesMonit.worked(1);
+        
         ResourcesPlugin.getWorkspace().getRoot().
         	refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-        monitor.worked(1);
       }
       catch(GenerationException e)
       {
@@ -283,16 +285,5 @@ public class GenerateAction extends AbstractAnalyzer
 	  throw new Exception("file or directory " + potentialFile.getCanonicalPath() +
 			  " could not be found") ;
   }
-  public void waitUnitOfTime()
-  {
-    try
-    {
-      TimeUnit.SECONDS.sleep(1);
-    }
-    catch(InterruptedException e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
+
 }
