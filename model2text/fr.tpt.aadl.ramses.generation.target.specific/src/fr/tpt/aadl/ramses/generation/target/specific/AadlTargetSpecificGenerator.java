@@ -48,7 +48,6 @@ import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.reporters.ProcessMonitor ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
@@ -68,11 +67,6 @@ public class AadlTargetSpecificGenerator implements Generator
   
   protected AadlTargetSpecificGenerator()
   {
-    
-    //DEBUG
-    
-    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
-    sr.getProgessMonitor() ;
     
   }
   
@@ -170,9 +164,10 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       else if(operation.equals("unparse"))
       {  
+    	  String pkgName = initialPackageName + "_" + transfoCounter;
     	  
     	  doUnparse(currentInstance.eResource(), currentImplResource, 
-    			  generatedDir);
+    			  generatedDir, pkgName);
     	  
     	  transfoCounter++;
       }
@@ -287,13 +282,13 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private void doUnparse(Resource inputResource, Resource expandedResult,
-		  File outputDir)
+		  File outputDir, String pkgName)
   {
-	  // Aadl2StandaloneUnparser.getAadlUnparser().setCustomPackageName(pkgName);
+	  Aadl2StandaloneUnparser.getAadlUnparser().setCustomPackageName(pkgName);
 	  
 	  if (expandedResult != null)
 	  {
-		  _targetTrans.unparse(inputResource, expandedResult, outputDir);
+		  _targetTrans.unparse(inputResource, expandedResult, outputDir, pkgName);
 	  }
 	  else
 	  {

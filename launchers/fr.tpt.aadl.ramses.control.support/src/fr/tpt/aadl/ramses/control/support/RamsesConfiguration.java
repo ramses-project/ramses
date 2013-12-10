@@ -1,43 +1,22 @@
 package fr.tpt.aadl.ramses.control.support;
 
 import java.io.File ;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList ;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List ;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.io.FileNotFoundException ;
+import java.io.FileReader ;
+import java.util.HashSet ;
+import java.util.LinkedHashMap ;
+import java.util.LinkedHashSet ;
+import java.util.Map ;
+import java.util.Set ;
+import java.util.concurrent.TimeUnit ;
 
-import org.eclipse.core.resources.IFile ;
 import org.eclipse.core.resources.IProject ;
-import org.eclipse.core.resources.IResource ;
-import org.eclipse.core.resources.IWorkspaceRoot ;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IAdaptable ;
-import org.eclipse.core.runtime.IPath ;
-import org.eclipse.core.runtime.Plugin ;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.jface.viewers.ISelection ;
-import org.eclipse.jface.viewers.IStructuredSelection ;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.ui.IEditorPart ;
-import org.eclipse.ui.IFileEditorInput ;
-import org.eclipse.ui.ISelectionService ;
-import org.eclipse.ui.IViewPart ;
-import org.eclipse.ui.IWorkbench ;
-import org.eclipse.ui.IWorkbenchPage ;
-import org.eclipse.ui.IWorkbenchWindow ;
-import org.eclipse.ui.PlatformUI ;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.instance.InstanceObject;
-import org.osate.aadl2.instance.SystemInstance;
+import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.swt.widgets.ProgressBar ;
+import org.osate.aadl2.instance.SystemInstance ;
 
 public class RamsesConfiguration
 {
@@ -54,7 +33,8 @@ public class RamsesConfiguration
   private static String osekValidFilePath = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
   private static IProject currentProject = null;
   private static SystemInstance sysint = null;
-
+  private static IProgressMonitor ramsesMonitor = null ;
+  
   public static IProject getCurrentProject()
   {
   
@@ -259,4 +239,26 @@ public class RamsesConfiguration
     RamsesConfiguration.sysint = sysint ;
   }
 
+  public static IProgressMonitor getRamsesMonitor()
+  {
+    return ramsesMonitor ;
+  }
+
+  public static void setRamsesMonitor(IProgressMonitor ramsesMonitor)
+  {
+    RamsesConfiguration.ramsesMonitor = ramsesMonitor ;
+  }
+  
+  public static void waitUnitOfTime(int time)
+  {
+    try
+    {
+      TimeUnit.SECONDS.sleep(time);
+    }
+    catch(InterruptedException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 }
