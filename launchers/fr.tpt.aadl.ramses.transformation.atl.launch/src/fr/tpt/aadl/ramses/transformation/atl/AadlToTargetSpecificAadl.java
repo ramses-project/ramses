@@ -149,6 +149,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 	  SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
 	  if(Platform.isRunning())
 	  {
+		 
 		  String workspaceLocation = ResourcesPlugin.getWorkspace()
 				  .getRoot().getLocationURI().getPath();
 		  int outputPathHeaderIndex = workspaceLocation.length();
@@ -156,7 +157,16 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 		  String outputAbsolutePath = outputFile.getAbsolutePath().toString();
 		  String outputPlatformRelativePath = "";
 		  if(outputPathHeaderIndex>0)
+		  {
+
+			  String inputURI = inputResource.getURI().toString();
+			  String projectName = inputURI.substring(inputURI.indexOf("resource") + 9);
+			  projectName = projectName.substring(0, projectName.indexOf('/'));
+			  
+			  outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName);
 			  outputPlatformRelativePath = outputAbsolutePath.substring(outputPathHeaderIndex);
+			  
+		  }
 		  IResource rootMember=null;
 		  while(ResourcesPlugin.getWorkspace().getRoot().findMember(outputPlatformRelativePath)==null
 				  && outputPlatformRelativePath.contains("/"))
