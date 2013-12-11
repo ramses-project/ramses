@@ -3,4 +3,3 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Atl
 Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.atl;singleton:=true
 Bundle-Version: 0.0.1
-Require-Bundle: org.osate.pluginsupport
