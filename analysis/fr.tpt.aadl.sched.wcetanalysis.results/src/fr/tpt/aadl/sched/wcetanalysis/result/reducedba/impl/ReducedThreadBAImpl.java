@@ -6,23 +6,21 @@
  */
 package fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl;
 
+import java.util.Collection;
+
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
+
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ThreadBehaviorElement;
-
-import java.util.Collection;
-
-import org.eclipse.emf.common.notify.NotificationChain;
-
-import org.eclipse.emf.common.util.EList;
-
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
-
-import org.eclipse.emf.ecore.impl.EObjectImpl;
-
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -32,6 +30,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.ReducedThreadBAImpl#getElements <em>Elements</em>}</li>
+ *   <li>{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.ReducedThreadBAImpl#getThreadID <em>Thread ID</em>}</li>
  * </ul>
  * </p>
  *
@@ -47,6 +46,26 @@ public class ReducedThreadBAImpl extends EObjectImpl implements ReducedThreadBA 
 	 * @ordered
 	 */
 	protected EList<ThreadBehaviorElement> elements;
+
+	/**
+	 * The default value of the '{@link #getThreadID() <em>Thread ID</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getThreadID()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String THREAD_ID_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getThreadID() <em>Thread ID</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getThreadID()
+	 * @generated
+	 * @ordered
+	 */
+	protected String threadID = THREAD_ID_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -84,6 +103,27 @@ public class ReducedThreadBAImpl extends EObjectImpl implements ReducedThreadBA 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getThreadID() {
+		return threadID;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setThreadID(String newThreadID) {
+		String oldThreadID = threadID;
+		threadID = newThreadID;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ReducedbaPackage.REDUCED_THREAD_BA__THREAD_ID, oldThreadID, threadID));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -103,6 +143,8 @@ public class ReducedThreadBAImpl extends EObjectImpl implements ReducedThreadBA 
 		switch (featureID) {
 			case ReducedbaPackage.REDUCED_THREAD_BA__ELEMENTS:
 				return getElements();
+			case ReducedbaPackage.REDUCED_THREAD_BA__THREAD_ID:
+				return getThreadID();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -120,6 +162,9 @@ public class ReducedThreadBAImpl extends EObjectImpl implements ReducedThreadBA 
 				getElements().clear();
 				getElements().addAll((Collection<? extends ThreadBehaviorElement>)newValue);
 				return;
+			case ReducedbaPackage.REDUCED_THREAD_BA__THREAD_ID:
+				setThreadID((String)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -135,6 +180,9 @@ public class ReducedThreadBAImpl extends EObjectImpl implements ReducedThreadBA 
 			case ReducedbaPackage.REDUCED_THREAD_BA__ELEMENTS:
 				getElements().clear();
 				return;
+			case ReducedbaPackage.REDUCED_THREAD_BA__THREAD_ID:
+				setThreadID(THREAD_ID_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -149,8 +197,26 @@ public class ReducedThreadBAImpl extends EObjectImpl implements ReducedThreadBA 
 		switch (featureID) {
 			case ReducedbaPackage.REDUCED_THREAD_BA__ELEMENTS:
 				return elements != null && !elements.isEmpty();
+			case ReducedbaPackage.REDUCED_THREAD_BA__THREAD_ID:
+				return THREAD_ID_EDEFAULT == null ? threadID != null : !THREAD_ID_EDEFAULT.equals(threadID);
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (threadID: ");
+		result.append(threadID);
+		result.append(')');
+		return result.toString();
 	}
 
 } //ReducedThreadBAImpl

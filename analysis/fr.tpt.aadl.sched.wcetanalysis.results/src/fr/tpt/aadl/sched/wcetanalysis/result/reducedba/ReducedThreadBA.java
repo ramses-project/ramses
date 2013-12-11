@@ -7,7 +7,6 @@
 package fr.tpt.aadl.sched.wcetanalysis.result.reducedba;
 
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -19,6 +18,7 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getElements <em>Elements</em>}</li>
+ *   <li>{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID <em>Thread ID</em>}</li>
  * </ul>
  * </p>
  *
@@ -42,5 +42,31 @@ public interface ReducedThreadBA extends EObject {
 	 * @generated
 	 */
 	EList<ThreadBehaviorElement> getElements();
+
+	/**
+	 * Returns the value of the '<em><b>Thread ID</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Thread ID</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Thread ID</em>' attribute.
+	 * @see #setThreadID(String)
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage#getReducedThreadBA_ThreadID()
+	 * @model
+	 * @generated
+	 */
+	String getThreadID();
+
+	/**
+	 * Sets the value of the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID <em>Thread ID</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Thread ID</em>' attribute.
+	 * @see #getThreadID()
+	 * @generated
+	 */
+	void setThreadID(String value);
 
 } // ReducedThreadBA

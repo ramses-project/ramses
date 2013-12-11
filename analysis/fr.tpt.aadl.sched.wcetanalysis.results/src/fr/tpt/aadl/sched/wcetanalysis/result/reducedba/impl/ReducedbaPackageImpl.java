@@ -6,6 +6,12 @@
  */
 package fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl;
 
+import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.impl.EPackageImpl;
+
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.Computation;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionBegin;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionEnd;
@@ -13,13 +19,6 @@ import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaFactory;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ThreadBehaviorElement;
-
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EReference;
-
-import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
  * <!-- begin-user-doc -->
@@ -210,6 +209,15 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getReducedThreadBA_ThreadID() {
+		return (EAttribute)reducedThreadBAEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public ReducedbaFactory getReducedbaFactory() {
 		return (ReducedbaFactory)getEFactoryInstance();
 	}
@@ -246,6 +254,7 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 
 		reducedThreadBAEClass = createEClass(REDUCED_THREAD_BA);
 		createEReference(reducedThreadBAEClass, REDUCED_THREAD_BA__ELEMENTS);
+		createEAttribute(reducedThreadBAEClass, REDUCED_THREAD_BA__THREAD_ID);
 	}
 
 	/**
@@ -294,6 +303,7 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 
 		initEClass(reducedThreadBAEClass, ReducedThreadBA.class, "ReducedThreadBA", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getReducedThreadBA_Elements(), this.getThreadBehaviorElement(), null, "elements", null, 0, -1, ReducedThreadBA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getReducedThreadBA_ThreadID(), ecorePackage.getEString(), "threadID", null, 0, 1, ReducedThreadBA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

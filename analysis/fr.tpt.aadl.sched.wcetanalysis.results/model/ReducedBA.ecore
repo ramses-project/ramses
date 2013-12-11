@@ -14,5 +14,6 @@
   <eClassifiers xsi:type="ecore:EClass" name="ReducedThreadBA">
     <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
         eType="#//ThreadBehaviorElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="threadID" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
 </ecore:EPackage>

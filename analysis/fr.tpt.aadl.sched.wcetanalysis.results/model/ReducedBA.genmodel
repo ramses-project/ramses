@@ -17,6 +17,7 @@
     <genClasses ecoreClass="ReducedBA.ecore#//CriticalSectionEnd"/>
     <genClasses ecoreClass="ReducedBA.ecore#//ReducedThreadBA">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ReducedBA.ecore#//ReducedThreadBA/elements"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ReducedBA.ecore#//ReducedThreadBA/threadID"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

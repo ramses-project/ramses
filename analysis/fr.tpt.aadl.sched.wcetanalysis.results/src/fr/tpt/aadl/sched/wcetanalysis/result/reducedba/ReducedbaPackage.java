@@ -182,13 +182,22 @@ public interface ReducedbaPackage extends EPackage {
 	int REDUCED_THREAD_BA__ELEMENTS = 0;
 
 	/**
+	 * The feature id for the '<em><b>Thread ID</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REDUCED_THREAD_BA__THREAD_ID = 1;
+
+	/**
 	 * The number of structural features of the '<em>Reduced Thread BA</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int REDUCED_THREAD_BA_FEATURE_COUNT = 1;
+	int REDUCED_THREAD_BA_FEATURE_COUNT = 2;
 
 
 	/**
@@ -284,6 +293,17 @@ public interface ReducedbaPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getReducedThreadBA_Elements();
+
+	/**
+	 * Returns the meta object for the attribute '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID <em>Thread ID</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Thread ID</em>'.
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID()
+	 * @see #getReducedThreadBA()
+	 * @generated
+	 */
+	EAttribute getReducedThreadBA_ThreadID();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -388,6 +408,14 @@ public interface ReducedbaPackage extends EPackage {
 		 * @generated
 		 */
 		EReference REDUCED_THREAD_BA__ELEMENTS = eINSTANCE.getReducedThreadBA_Elements();
+
+		/**
+		 * The meta object literal for the '<em><b>Thread ID</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute REDUCED_THREAD_BA__THREAD_ID = eINSTANCE.getReducedThreadBA_ThreadID();
 
 	}
 
