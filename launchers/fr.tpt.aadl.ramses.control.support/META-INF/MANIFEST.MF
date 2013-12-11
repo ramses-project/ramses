@@ -37,8 +37,7 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.osate.utils;bundle-version="0.9.5"
 Bundle-ClassPath: lib/jdom-2.0.2.jar,
  .
-Import-Package: org.eclipse.ui,
- org.osate.aadl2.instantiation,
+Import-Package: org.osate.aadl2.instantiation,
  org.osate.utils
 
 
