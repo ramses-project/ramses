@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.sched.wcetanalysis.results/src"
+    modelPluginID="fr.tpt.aadl.sched.wcetanalysis.results" modelName="ReducedBA" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false">
+  <foreignModel>ReducedBA.ecore</foreignModel>
+  <genPackages prefix="Reducedba" basePackage="fr.tpt.aadl.sched.wcetanalysis.result"
+      disposableProviderFactory="true" ecorePackage="ReducedBA.ecore#/">
+    <genClasses image="false" ecoreClass="ReducedBA.ecore#//ThreadBehaviorElement"/>
+    <genClasses ecoreClass="ReducedBA.ecore#//Computation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ReducedBA.ecore#//Computation/min"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ReducedBA.ecore#//Computation/max"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ReducedBA.ecore#//Computation/unit"/>
+    </genClasses>
+    <genClasses ecoreClass="ReducedBA.ecore#//CriticalSectionBegin"/>
+    <genClasses ecoreClass="ReducedBA.ecore#//CriticalSectionEnd"/>
+    <genClasses ecoreClass="ReducedBA.ecore#//ReducedThreadBA">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ReducedBA.ecore#//ReducedThreadBA/elements"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
