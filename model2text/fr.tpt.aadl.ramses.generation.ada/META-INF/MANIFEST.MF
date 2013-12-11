@@ -4,12 +4,9 @@ Bundle-Name: AADL-Ramses-Generation-ADA
 Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.ada;singleton:=true
 Bundle-Version: 0.5.0
 Bundle-Activator: fr.tpt.aadl.ramses.generation.ada.Activator
-Require-Bundle: org.eclipse.emf.ecore,
- org.osate.aadl2.modelsupport;bundle-version="1.0.0",
- org.osate.aadl2,
+Require-Bundle: org.osate.aadl2,
  org.osate.annexsupport,
  org.osate.xtext.aadl2,
- org.eclipse.xtext,
  org.osate.utils;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  org.osate.ba;bundle-version="0.9.5",
