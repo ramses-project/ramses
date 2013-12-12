@@ -61,7 +61,7 @@ public class GenerateAction extends AbstractAnalyzer
 //  private static final String INCLUDES_OPTION_ID = "include_directories" ;
   private static String RAMSES_DIR ;
   private static String outputDirPath = "/output";
-  private ProcessMonitorImpl processMonitor = null;
+  
   
   
   @Override
@@ -139,6 +139,7 @@ public class GenerateAction extends AbstractAnalyzer
       IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
       ramsesMonit.beginTask("This process may take several seconds...", 3);
       ramsesMonit.subTask("Transformation model ...");
+//      RamsesConfiguration.setMonitMessage("Transformation model ...");
       RamsesConfiguration.waitUnitOfTime(1);
       
       RamsesConfiguration.setRuntimeDir(outputPathName);
