@@ -288,7 +288,7 @@ public class AadlTargetSpecificGenerator implements Generator
 	  
 	  if (expandedResult != null)
 	  {
-		  _targetTrans.unparse(inputResource, expandedResult, outputDir, pkgName);
+		  _targetTrans.unparse(inputResource, expandedResult, outputDir);
 	  }
 	  else
 	  {
