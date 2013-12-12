@@ -1,98 +1,92 @@
 package fr.tpt.aadl.ramses.control.osate;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Iterator;
+import java.io.File ;
+import java.lang.reflect.InvocationTargetException ;
+import java.net.URL ;
 import java.util.Set ;
-
-import org.eclipse.jface.dialogs.DialogPage;
-import org.eclipse.jface.dialogs.IMessageProvider ;
-import org.eclipse.jface.dialogs.TitleAreaDialog ;
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import java.util.concurrent.TimeUnit ;
+import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.core.commands.AbstractHandler ;
+import org.eclipse.core.commands.ExecutionEvent ;
+import org.eclipse.core.commands.ExecutionException ;
 import org.eclipse.core.resources.IFile ;
 import org.eclipse.core.resources.IProject ;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IAdaptable ;
-import org.eclipse.core.runtime.IConfigurationElement ;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform ;
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.transaction.RecordingCommand;
-import org.eclipse.emf.transaction.RollbackException;
-import org.eclipse.emf.transaction.TransactionalCommandStack;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.core.resources.IResource ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.CoreException ;
+import org.eclipse.core.runtime.FileLocator ;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.IStatus ;
+import org.eclipse.core.runtime.NullProgressMonitor ;
+import org.eclipse.core.runtime.QualifiedName ;
+import org.eclipse.core.runtime.Status ;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent ;
+import org.eclipse.core.runtime.jobs.Job ;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter ;
+import org.eclipse.emf.common.command.Command ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.transaction.RecordingCommand ;
+import org.eclipse.emf.transaction.RollbackException ;
+import org.eclipse.emf.transaction.TransactionalCommandStack ;
+import org.eclipse.emf.transaction.TransactionalEditingDomain ;
+import org.eclipse.jface.action.IAction ;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog ;
+import org.eclipse.jface.dialogs.TitleAreaDialog ;
+import org.eclipse.jface.operation.IRunnableWithProgress ;
 import org.eclipse.jface.preference.PreferenceDialog ;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.text.ITextSelection ;
+import org.eclipse.jface.viewers.ISelection ;
+import org.eclipse.jface.viewers.IStructuredSelection ;
+import org.eclipse.jface.window.Window ;
+import org.eclipse.swt.SWT ;
 import org.eclipse.swt.events.SelectionAdapter ;
 import org.eclipse.swt.events.SelectionEvent ;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.GridData ;
+import org.eclipse.swt.layout.GridLayout ;
+import org.eclipse.swt.widgets.Button ;
+import org.eclipse.swt.widgets.Composite ;
 import org.eclipse.swt.widgets.Control ;
-import org.eclipse.swt.widgets.DirectoryDialog ;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Display ;
 import org.eclipse.swt.widgets.Label ;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
+import org.eclipse.swt.widgets.Shell ;
+import org.eclipse.swt.widgets.Text ;
+import org.eclipse.ui.IEditorPart ;
 import org.eclipse.ui.IFileEditorInput ;
-import org.eclipse.ui.ISelectionService ;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IWorkbench ;
+import org.eclipse.ui.IWorkbenchPage ;
+import org.eclipse.ui.IWorkbenchPart ;
+import org.eclipse.ui.IWorkbenchWindow ;
+import org.eclipse.ui.PlatformUI ;
 import org.eclipse.ui.dialogs.PreferencesUtil ;
-import org.eclipse.ui.internal.Workbench ;
-import org.eclipse.ui.part.EditorPart ;
-import org.eclipse.ui.views.contentoutline.ContentOutline;
-import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.ui.editor.XtextEditor;
-import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.instantiation.InstantiateModel;
-import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter;
-import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.aadl2.modelsupport.util.AadlUtil ;
-import org.osate.core.OsateCorePlugin;
-import org.osate.ui.dialogs.Dialog;
-import org.osate.ui.navigator.AadlNavigator;
+import org.eclipse.ui.views.contentoutline.ContentOutline ;
+import org.eclipse.xtext.resource.EObjectAtOffsetHelper ;
+import org.eclipse.xtext.resource.XtextResource ;
+import org.eclipse.xtext.ui.editor.XtextEditor ;
+import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode ;
+import org.eclipse.xtext.util.concurrent.IUnitOfWork ;
+import org.osate.aadl2.ComponentImplementation ;
+import org.osate.aadl2.Element ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.instantiation.InstantiateModel ;
+import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter ;
+import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.core.OsateCorePlugin ;
+import org.osate.ui.dialogs.Dialog ;
 
-import com.google.inject.Inject;
+import com.google.inject.Inject ;
 
-import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
-import fr.tpt.aadl.ramses.control.support.EcorePilot;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
+import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
+import fr.tpt.aadl.ramses.control.support.EcorePilot ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
 
 public class GenerateActionHandler extends AbstractHandler {
 
@@ -110,6 +104,7 @@ public class GenerateActionHandler extends AbstractHandler {
 	                                           new LogInternalErrorReporter
 	                                           (OsateCorePlugin
 	                                           .getDefault().getBundle());
+
   private static IProject currentProject;
 
   private static  enum code
@@ -256,13 +251,14 @@ public class GenerateActionHandler extends AbstractHandler {
 			Dialog.showError("Configuration Error", "Porperties were not reachable for project " + currentProject.getName());
 		}
 	}
-	
-	void doCodeGeneration()
-	{		
+
+	@SuppressWarnings("static-access")
+  void doCodeGeneration()
+	{	
 
 	  Display display = Display.getCurrent();
 	  Shell shell = new Shell(display, SWT.BORDER);
-
+	  
 	  if((RamsesConfiguration.getRuntimeDir() == null) 
 	        || (RamsesConfiguration.getRuntimeDir().equals(""))
 	        || (RamsesConfiguration.getOutputDir() == null))
@@ -300,7 +296,12 @@ public class GenerateActionHandler extends AbstractHandler {
 	    RamsesConfiguration.setCurrentProject(currentProject);
 	    
 	  }
-		
+
+	  // DEBUG
+	  //this line is to avoid nullPointerexception error when generating code
+	  RamsesConfiguration.setRamsesMonitor(new NullProgressMonitor());
+	  
+
     IWorkbench wb = PlatformUI.getWorkbench();
     IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
     IWorkbenchPage page = win.getActivePage();
@@ -318,7 +319,7 @@ public class GenerateActionHandler extends AbstractHandler {
 			if (xtextEditor != null) {
 				// make sure the model has been saved
 				if (xtextEditor.isDirty())
-					xtextEditor.doSave(new NullProgressMonitor());
+				  xtextEditor.doSave(new NullProgressMonitor());
 
 				xtextEditor.getDocument().readOnly(
 						new IUnitOfWork<EObject, XtextResource>() {
@@ -429,6 +430,8 @@ public class GenerateActionHandler extends AbstractHandler {
 						});
 			}
 		}
+//		ramsesMonit.worked(1);
+//		ramsesMonit.done();
 	}
  
 	public IProject getProjectResource()
@@ -470,4 +473,119 @@ public class GenerateActionHandler extends AbstractHandler {
     return project ;
 	  
 	}
+	
+	public IProgressMonitor createIProgressMonitor()
+	{
+	  return new IProgressMonitor()
+    {
+      
+      @Override
+      public void worked(int work)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+      
+      @Override
+      public void subTask(String name)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+      
+      @Override
+      public void setTaskName(String name)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+      
+      @Override
+      public void setCanceled(boolean value)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+      
+      @Override
+      public boolean isCanceled()
+      {
+        // TODO Auto-generated method stub
+        return false ;
+      }
+      
+      @Override
+      public void internalWorked(double work)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+      
+      @Override
+      public void done()
+      {
+        // TODO Auto-generated method stub
+        
+      }
+      
+      @Override
+      public void beginTask(String name,
+                            int totalWork)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+    };
+	 
+	}
+
+	public void doCodeGenerationMonit(Shell shell)
+	{
+    ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
+    try
+    {
+      dialog.run(true, true, new IRunnableWithProgress(){
+           public void run(IProgressMonitor monitor) throws InterruptedException {
+               monitor.beginTask("This process may take several seconds...", 3);
+               // execute the task ...
+               TimeUnit.SECONDS.sleep(1);
+               monitor.done();
+           }
+       });
+    }
+    catch(InvocationTargetException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    catch(InterruptedException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } 
+	}
+
+	 public void run(IAction action) {
+	    Job job = new Job("Test Job") {
+	      @Override
+	      protected IStatus run(IProgressMonitor monitor) {
+	        // Set total number of work units
+	        monitor.beginTask("start task", 100);
+	 
+	        for (int i = 0; i < 10; i++) {
+	          try {
+	            Thread.sleep(1000);
+	            monitor.subTask("doing " + i);
+	            // Report that 10 units are done
+	            monitor.worked(10);
+	          } catch (InterruptedException e1) {
+	            e1.printStackTrace();
+	          }
+	        }
+	        return Status.OK_STATUS;
+	      }
+	    };
+	 
+	    job.schedule();
+	  }
 }
