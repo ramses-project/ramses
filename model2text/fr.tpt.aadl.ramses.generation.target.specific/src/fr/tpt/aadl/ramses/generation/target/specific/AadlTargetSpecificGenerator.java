@@ -264,11 +264,11 @@ public class AadlTargetSpecificGenerator implements Generator
   private SystemInstance doTransformation(WorkflowPilot workflowPilot, Resource r, 
 		  File resourceDir, File generatedDir, String systemToInstantiate) throws GenerationException
   {
-	  List<String> resourceFileNameList = workflowPilot.getNextTransformationFileNameList();
+	  List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
       System.out.println("Transformation launched : " + resourceFileNameList);
-
+      String outputPackageSuffix = workflowPilot.getTransformationOutputModelId();
       Resource result = _targetTrans.transformXML(r, resourceDir, resourceFileNameList, 
-                                                  generatedDir);
+                                                  generatedDir, outputPackageSuffix);
 
       InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
       PropertiesLinkingService pls = new PropertiesLinkingService ();

@@ -109,6 +109,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
         atlFiles.add(new File(resourceDir + "/" + fileName)) ;
       }
       Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher();
+      atlLauncher.setOutputPackageName("refined");
         return atlLauncher.generationEntryPoint(inputResource,
                 resourceDir,
                 atlFiles,
@@ -279,9 +280,10 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
   }
   
   public Resource transformXML(Resource inputResource,
-                                                           File resourceDir,
-                                                           List<String> resourceFileNameList,
-                                                           File outputDir) throws GenerationException
+		  						File resourceDir,
+		  						List<String> resourceFileNameList,
+		  						File outputDir,
+		  						String outputPackageName) throws GenerationException
   {
       if(resourceDir == null)
       {
@@ -299,6 +301,7 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
 
       try {
     	  Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher();
+    	  atlLauncher.setOutputPackageName(outputPackageName);
           return atlLauncher.generationEntryPoint(inputResource,
                   resourceDir,
                   atlFiles,

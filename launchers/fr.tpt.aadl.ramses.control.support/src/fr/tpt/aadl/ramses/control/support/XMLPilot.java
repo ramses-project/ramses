@@ -155,4 +155,16 @@ public class XMLPilot implements WorkflowPilot
 			racine = null;
 		}
 	}
+
+	@Override
+	public List<String> getTransformationFileNameList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getTransformationOutputModelId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

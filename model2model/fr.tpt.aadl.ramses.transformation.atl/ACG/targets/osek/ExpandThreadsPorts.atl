@@ -515,9 +515,9 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 	if(not p.oclIsUndefined()) then
 		let package_name: String = p.getComponentInstance().subcomponent.classifier.getNamespace().getOwner().name in
 		if(p.getComponentInstance().eContainer() = self.getComponentInstance().eContainer()) then
-			package_name+thisModule.packageSuffix.concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+			package_name+thisModule.getPackageSuffix().concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
 		else
-			package_name+thisModule.packageSuffix.concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+			package_name+thisModule.getPackageSuffix().concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
 		endif
 	else
 		if(self.isEventPort()) then

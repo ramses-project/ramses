@@ -138,5 +138,9 @@ public interface HookAccess extends EObject
 
 	
 	NamedElement getElement(NamedElement ne);
+	
+	public String getOutputPackageName();
+	  
+	public void setOutputPackageName(String param);
 
 } // HookAccess

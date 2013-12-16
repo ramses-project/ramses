@@ -89,7 +89,16 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			org.osate.aadl2.instance.InstancePackage.eNS_URI ;
 	private static final String ATLHOOKS_MM_URI = AtlHooksPackage.eNS_URI ;
 
+	private String outputPackageName = "";
 	
+	public String getOutputPackageName() {
+		return outputPackageName;
+	}
+
+	public void setOutputPackageName(String outputPackageName) {
+		this.outputPackageName = outputPackageName;
+	}
+
 	public static File getTransformationDirName()
 	{
 		return Aadl2AadlEMFTVMLauncher.resourcesDir ;
@@ -223,6 +232,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		ResourceSet set = new ResourceSetImpl() ;
 		Resource hookResource = set.createResource(fileURI) ;
 		HookAccess atlHook = AtlHooksFactory.eINSTANCE.createHookAccess() ;
+		atlHook.setOutputPackageName(outputPackageName);
 		hookResource.getContents().add(atlHook) ;
 		hookResource.load(null) ;
 

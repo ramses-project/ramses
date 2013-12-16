@@ -99,7 +99,7 @@ public class EcorePilot  implements WorkflowPilot {
 		}
 	}
 
-	public List<String> getNextTransformationFileNameList() {
+	public List<String> getTransformationFileNameList() {
 		if (racine instanceof Transformation) {
 			fr.tpt.aadl.ramses.control.workflow.List list = ((Transformation) racine).getList();
 
@@ -150,6 +150,17 @@ public class EcorePilot  implements WorkflowPilot {
 			resourceSet = new ResourceSetImpl();
 		}
 		return resourceSet;
+	}
+
+	@Override
+	public String getTransformationOutputModelId() {
+		if (racine instanceof Transformation) {
+			Transformation t = (Transformation) racine;
+			String result = t.getOutputModelIdentifier().getId();
+			if(result!=null)
+				return result;
+		}
+		return null;
 	}
 
 }

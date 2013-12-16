@@ -12,10 +12,11 @@ public interface WorkflowPilot {
 	
 	public String getNextAnalysisMode();
 	
-	public List<String> getNextTransformationFileNameList();
+	public List<String> getTransformationFileNameList();
 	
 	public void setAnalysisResult(boolean _analysisResult);
 	
 	public void goForward();
 	
+	public String getTransformationOutputModelId();
 }

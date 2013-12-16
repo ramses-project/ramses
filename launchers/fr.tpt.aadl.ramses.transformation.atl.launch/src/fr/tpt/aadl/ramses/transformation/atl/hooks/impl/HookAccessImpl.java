@@ -79,7 +79,9 @@ import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicat
 public class HookAccessImpl extends EObjectImpl implements HookAccess
 {
 
-  /**
+  private String outputPackageName;
+
+/**
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
@@ -370,5 +372,15 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   public NamedElement getElement(NamedElement ne)
   {
 	  return ne;
+  }
+  
+  public String getOutputPackageName()
+  {
+	return outputPackageName;
+  }
+  
+  public void setOutputPackageName(String param)
+  {
+	outputPackageName = param;
   }
 } //HookAccessImpl
