@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<genmodel:GenModel xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
-    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.sched.wcetanalysis.results/src"
-    modelPluginID="fr.tpt.aadl.sched.wcetanalysis.results" modelName="ReducedBA" importerID="org.eclipse.emf.importer.ecore"
-    complianceLevel="6.0" copyrightFields="false">
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.sched.wcetanalysis.results/src" modelPluginID="fr.tpt.aadl.sched.wcetanalysis.results"
+    modelName="ReducedBA" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
+    copyrightFields="false" usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../org.osate.aadl2/model/instance.genmodel#//instance">
   <foreignModel>ReducedBA.ecore</foreignModel>
   <genPackages prefix="Reducedba" basePackage="fr.tpt.aadl.sched.wcetanalysis.result"
       disposableProviderFactory="true" ecorePackage="ReducedBA.ecore#/">
@@ -17,7 +16,7 @@
     <genClasses ecoreClass="ReducedBA.ecore#//CriticalSectionEnd"/>
     <genClasses ecoreClass="ReducedBA.ecore#//ReducedThreadBA">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference ReducedBA.ecore#//ReducedThreadBA/elements"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ReducedBA.ecore#//ReducedThreadBA/threadID"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ReducedBA.ecore#//ReducedThreadBA/thread"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
