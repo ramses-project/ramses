@@ -17,14 +17,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog ;
-import org.eclipse.jface.operation.IRunnableWithProgress ;
 import org.eclipse.jface.preference.PreferenceDialog ;
-import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags ;
 import org.eclipse.jface.window.Window ;
-import org.eclipse.swt.SWT ;
 import org.eclipse.swt.widgets.Display ;
-import org.eclipse.swt.widgets.Shell ;
 import org.eclipse.ui.dialogs.PreferencesUtil ;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
@@ -40,10 +35,8 @@ import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.reporters.ProcessMonitor ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
 public class GenerateAction extends AbstractAnalyzer
