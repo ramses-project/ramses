@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-
+<!--
  <extension point="org.eclipse.ui.actionSets">
    		<actionSet id="fr.tpt.aadl.sched.Main" label="Scheduling Tools" visible="true">
    			<menu id="fr.tpt.aadl.sched.menu.cheddar" label="AADL-2-Cheddar">
@@ -36,6 +36,7 @@
       </action>
    		</actionSet>
     </extension>
+ -->
  <extension
        point="fr.tpt.aadl.ramses.control.support.analyzer">
     <analyzer
