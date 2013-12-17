@@ -92,6 +92,10 @@ public class ReducedbaAdapterFactory extends AdapterFactoryImpl {
 				return createReducedThreadBAAdapter();
 			}
 			@Override
+			public Adapter caseAnalysisModel(AnalysisModel object) {
+				return createAnalysisModelAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -178,6 +182,20 @@ public class ReducedbaAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createReducedThreadBAAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel <em>Analysis Model</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel
+	 * @generated
+	 */
+	public Adapter createAnalysisModelAdapter() {
 		return null;
 	}
 

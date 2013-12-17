@@ -103,6 +103,12 @@ public class ReducedbaSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case ReducedbaPackage.ANALYSIS_MODEL: {
+				AnalysisModel analysisModel = (AnalysisModel)theEObject;
+				T result = caseAnalysisModel(analysisModel);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -179,6 +185,21 @@ public class ReducedbaSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseReducedThreadBA(ReducedThreadBA object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Analysis Model</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Analysis Model</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAnalysisModel(AnalysisModel object) {
 		return null;
 	}
 

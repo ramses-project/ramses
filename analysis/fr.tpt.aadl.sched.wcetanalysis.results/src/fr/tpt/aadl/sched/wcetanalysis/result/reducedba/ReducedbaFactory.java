@@ -62,6 +62,15 @@ public interface ReducedbaFactory extends EFactory {
 	ReducedThreadBA createReducedThreadBA();
 
 	/**
+	 * Returns a new object of class '<em>Analysis Model</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Analysis Model</em>'.
+	 * @generated
+	 */
+	AnalysisModel createAnalysisModel();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

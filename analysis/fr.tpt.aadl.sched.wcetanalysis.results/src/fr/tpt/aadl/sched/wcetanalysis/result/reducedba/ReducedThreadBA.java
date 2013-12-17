@@ -8,6 +8,7 @@ package fr.tpt.aadl.sched.wcetanalysis.result.reducedba;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.osate.aadl2.instance.ComponentInstance;
 
 /**
  * <!-- begin-user-doc -->
@@ -18,7 +19,7 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getElements <em>Elements</em>}</li>
- *   <li>{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID <em>Thread ID</em>}</li>
+ *   <li>{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThread <em>Thread</em>}</li>
  * </ul>
  * </p>
  *
@@ -44,29 +45,29 @@ public interface ReducedThreadBA extends EObject {
 	EList<ThreadBehaviorElement> getElements();
 
 	/**
-	 * Returns the value of the '<em><b>Thread ID</b></em>' attribute.
+	 * Returns the value of the '<em><b>Thread</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Thread ID</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Thread</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Thread ID</em>' attribute.
-	 * @see #setThreadID(String)
-	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage#getReducedThreadBA_ThreadID()
+	 * @return the value of the '<em>Thread</em>' reference.
+	 * @see #setThread(ComponentInstance)
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage#getReducedThreadBA_Thread()
 	 * @model
 	 * @generated
 	 */
-	String getThreadID();
+	ComponentInstance getThread();
 
 	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID <em>Thread ID</em>}' attribute.
+	 * Sets the value of the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThread <em>Thread</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Thread ID</em>' attribute.
-	 * @see #getThreadID()
+	 * @param value the new value of the '<em>Thread</em>' reference.
+	 * @see #getThread()
 	 * @generated
 	 */
-	void setThreadID(String value);
+	void setThread(ComponentInstance value);
 
 } // ReducedThreadBA

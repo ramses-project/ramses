@@ -135,13 +135,22 @@ public interface ReducedbaPackage extends EPackage {
 	int CRITICAL_SECTION_BEGIN = 2;
 
 	/**
+	 * The feature id for the '<em><b>Shared Data</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CRITICAL_SECTION_BEGIN__SHARED_DATA = THREAD_BEHAVIOR_ELEMENT_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Critical Section Begin</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CRITICAL_SECTION_BEGIN_FEATURE_COUNT = THREAD_BEHAVIOR_ELEMENT_FEATURE_COUNT + 0;
+	int CRITICAL_SECTION_BEGIN_FEATURE_COUNT = THREAD_BEHAVIOR_ELEMENT_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.CriticalSectionEndImpl <em>Critical Section End</em>}' class.
@@ -154,13 +163,22 @@ public interface ReducedbaPackage extends EPackage {
 	int CRITICAL_SECTION_END = 3;
 
 	/**
+	 * The feature id for the '<em><b>Shared Data</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CRITICAL_SECTION_END__SHARED_DATA = THREAD_BEHAVIOR_ELEMENT_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Critical Section End</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CRITICAL_SECTION_END_FEATURE_COUNT = THREAD_BEHAVIOR_ELEMENT_FEATURE_COUNT + 0;
+	int CRITICAL_SECTION_END_FEATURE_COUNT = THREAD_BEHAVIOR_ELEMENT_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.ReducedThreadBAImpl <em>Reduced Thread BA</em>}' class.
@@ -182,13 +200,13 @@ public interface ReducedbaPackage extends EPackage {
 	int REDUCED_THREAD_BA__ELEMENTS = 0;
 
 	/**
-	 * The feature id for the '<em><b>Thread ID</b></em>' attribute.
+	 * The feature id for the '<em><b>Thread</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int REDUCED_THREAD_BA__THREAD_ID = 1;
+	int REDUCED_THREAD_BA__THREAD = 1;
 
 	/**
 	 * The number of structural features of the '<em>Reduced Thread BA</em>' class.
@@ -198,6 +216,35 @@ public interface ReducedbaPackage extends EPackage {
 	 * @ordered
 	 */
 	int REDUCED_THREAD_BA_FEATURE_COUNT = 2;
+
+
+	/**
+	 * The meta object id for the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.AnalysisModelImpl <em>Analysis Model</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.AnalysisModelImpl
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.ReducedbaPackageImpl#getAnalysisModel()
+	 * @generated
+	 */
+	int ANALYSIS_MODEL = 5;
+
+	/**
+	 * The feature id for the '<em><b>Threads BA</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANALYSIS_MODEL__THREADS_BA = 0;
+
+	/**
+	 * The number of structural features of the '<em>Analysis Model</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANALYSIS_MODEL_FEATURE_COUNT = 1;
 
 
 	/**
@@ -264,6 +311,17 @@ public interface ReducedbaPackage extends EPackage {
 	EClass getCriticalSectionBegin();
 
 	/**
+	 * Returns the meta object for the reference '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionBegin#getSharedData <em>Shared Data</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Shared Data</em>'.
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionBegin#getSharedData()
+	 * @see #getCriticalSectionBegin()
+	 * @generated
+	 */
+	EReference getCriticalSectionBegin_SharedData();
+
+	/**
 	 * Returns the meta object for class '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionEnd <em>Critical Section End</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -272,6 +330,17 @@ public interface ReducedbaPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getCriticalSectionEnd();
+
+	/**
+	 * Returns the meta object for the reference '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionEnd#getSharedData <em>Shared Data</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Shared Data</em>'.
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionEnd#getSharedData()
+	 * @see #getCriticalSectionEnd()
+	 * @generated
+	 */
+	EReference getCriticalSectionEnd_SharedData();
 
 	/**
 	 * Returns the meta object for class '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA <em>Reduced Thread BA</em>}'.
@@ -295,15 +364,36 @@ public interface ReducedbaPackage extends EPackage {
 	EReference getReducedThreadBA_Elements();
 
 	/**
-	 * Returns the meta object for the attribute '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID <em>Thread ID</em>}'.
+	 * Returns the meta object for the reference '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThread <em>Thread</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Thread ID</em>'.
-	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThreadID()
+	 * @return the meta object for the reference '<em>Thread</em>'.
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA#getThread()
 	 * @see #getReducedThreadBA()
 	 * @generated
 	 */
-	EAttribute getReducedThreadBA_ThreadID();
+	EReference getReducedThreadBA_Thread();
+
+	/**
+	 * Returns the meta object for class '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel <em>Analysis Model</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Analysis Model</em>'.
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel
+	 * @generated
+	 */
+	EClass getAnalysisModel();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel#getThreadsBA <em>Threads BA</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Threads BA</em>'.
+	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel#getThreadsBA()
+	 * @see #getAnalysisModel()
+	 * @generated
+	 */
+	EReference getAnalysisModel_ThreadsBA();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -382,6 +472,14 @@ public interface ReducedbaPackage extends EPackage {
 		EClass CRITICAL_SECTION_BEGIN = eINSTANCE.getCriticalSectionBegin();
 
 		/**
+		 * The meta object literal for the '<em><b>Shared Data</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CRITICAL_SECTION_BEGIN__SHARED_DATA = eINSTANCE.getCriticalSectionBegin_SharedData();
+
+		/**
 		 * The meta object literal for the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.CriticalSectionEndImpl <em>Critical Section End</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -390,6 +488,14 @@ public interface ReducedbaPackage extends EPackage {
 		 * @generated
 		 */
 		EClass CRITICAL_SECTION_END = eINSTANCE.getCriticalSectionEnd();
+
+		/**
+		 * The meta object literal for the '<em><b>Shared Data</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CRITICAL_SECTION_END__SHARED_DATA = eINSTANCE.getCriticalSectionEnd_SharedData();
 
 		/**
 		 * The meta object literal for the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.ReducedThreadBAImpl <em>Reduced Thread BA</em>}' class.
@@ -410,12 +516,30 @@ public interface ReducedbaPackage extends EPackage {
 		EReference REDUCED_THREAD_BA__ELEMENTS = eINSTANCE.getReducedThreadBA_Elements();
 
 		/**
-		 * The meta object literal for the '<em><b>Thread ID</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Thread</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute REDUCED_THREAD_BA__THREAD_ID = eINSTANCE.getReducedThreadBA_ThreadID();
+		EReference REDUCED_THREAD_BA__THREAD = eINSTANCE.getReducedThreadBA_Thread();
+
+		/**
+		 * The meta object literal for the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.AnalysisModelImpl <em>Analysis Model</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.AnalysisModelImpl
+		 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl.ReducedbaPackageImpl#getAnalysisModel()
+		 * @generated
+		 */
+		EClass ANALYSIS_MODEL = eINSTANCE.getAnalysisModel();
+
+		/**
+		 * The meta object literal for the '<em><b>Threads BA</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ANALYSIS_MODEL__THREADS_BA = eINSTANCE.getAnalysisModel_ThreadsBA();
 
 	}
 

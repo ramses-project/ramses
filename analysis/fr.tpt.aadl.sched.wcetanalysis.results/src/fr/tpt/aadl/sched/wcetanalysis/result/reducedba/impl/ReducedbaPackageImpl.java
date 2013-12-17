@@ -6,12 +6,15 @@
  */
 package fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl;
 
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
+import org.osate.aadl2.Aadl2Package;
+import org.osate.aadl2.instance.InstancePackage;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.Computation;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionBegin;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionEnd;
@@ -63,6 +66,13 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 	private EClass reducedThreadBAEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass analysisModelEClass = null;
+
+	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
 	 * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
 	 * package URI value.
@@ -107,6 +117,9 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 		ReducedbaPackageImpl theReducedbaPackage = (ReducedbaPackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof ReducedbaPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new ReducedbaPackageImpl());
 
 		isInited = true;
+
+		// Initialize simple dependencies
+		InstancePackage.eINSTANCE.eClass();
 
 		// Create package meta-data objects
 		theReducedbaPackage.createPackageContents();
@@ -182,8 +195,26 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getCriticalSectionBegin_SharedData() {
+		return (EReference)criticalSectionBeginEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getCriticalSectionEnd() {
 		return criticalSectionEndEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCriticalSectionEnd_SharedData() {
+		return (EReference)criticalSectionEndEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -209,8 +240,26 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getReducedThreadBA_ThreadID() {
-		return (EAttribute)reducedThreadBAEClass.getEStructuralFeatures().get(1);
+	public EReference getReducedThreadBA_Thread() {
+		return (EReference)reducedThreadBAEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getAnalysisModel() {
+		return analysisModelEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getAnalysisModel_ThreadsBA() {
+		return (EReference)analysisModelEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -249,12 +298,17 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 		createEAttribute(computationEClass, COMPUTATION__UNIT);
 
 		criticalSectionBeginEClass = createEClass(CRITICAL_SECTION_BEGIN);
+		createEReference(criticalSectionBeginEClass, CRITICAL_SECTION_BEGIN__SHARED_DATA);
 
 		criticalSectionEndEClass = createEClass(CRITICAL_SECTION_END);
+		createEReference(criticalSectionEndEClass, CRITICAL_SECTION_END__SHARED_DATA);
 
 		reducedThreadBAEClass = createEClass(REDUCED_THREAD_BA);
 		createEReference(reducedThreadBAEClass, REDUCED_THREAD_BA__ELEMENTS);
-		createEAttribute(reducedThreadBAEClass, REDUCED_THREAD_BA__THREAD_ID);
+		createEReference(reducedThreadBAEClass, REDUCED_THREAD_BA__THREAD);
+
+		analysisModelEClass = createEClass(ANALYSIS_MODEL);
+		createEReference(analysisModelEClass, ANALYSIS_MODEL__THREADS_BA);
 	}
 
 	/**
@@ -280,6 +334,10 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 		setNsPrefix(eNS_PREFIX);
 		setNsURI(eNS_URI);
 
+		// Obtain other dependent packages
+		Aadl2Package theAadl2Package = (Aadl2Package)EPackage.Registry.INSTANCE.getEPackage(Aadl2Package.eNS_URI);
+		InstancePackage theInstancePackage = (InstancePackage)EPackage.Registry.INSTANCE.getEPackage(InstancePackage.eNS_URI);
+
 		// Create type parameters
 
 		// Set bounds for type parameters
@@ -298,12 +356,17 @@ public class ReducedbaPackageImpl extends EPackageImpl implements ReducedbaPacka
 		initEAttribute(getComputation_Unit(), ecorePackage.getEString(), "unit", null, 0, 1, Computation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(criticalSectionBeginEClass, CriticalSectionBegin.class, "CriticalSectionBegin", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getCriticalSectionBegin_SharedData(), theAadl2Package.getDataAccess(), null, "sharedData", null, 0, 1, CriticalSectionBegin.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(criticalSectionEndEClass, CriticalSectionEnd.class, "CriticalSectionEnd", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getCriticalSectionEnd_SharedData(), theAadl2Package.getDataAccess(), null, "sharedData", null, 0, 1, CriticalSectionEnd.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(reducedThreadBAEClass, ReducedThreadBA.class, "ReducedThreadBA", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getReducedThreadBA_Elements(), this.getThreadBehaviorElement(), null, "elements", null, 0, -1, ReducedThreadBA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getReducedThreadBA_ThreadID(), ecorePackage.getEString(), "threadID", null, 0, 1, ReducedThreadBA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getReducedThreadBA_Thread(), theInstancePackage.getComponentInstance(), null, "thread", null, 0, 1, ReducedThreadBA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(analysisModelEClass, AnalysisModel.class, "AnalysisModel", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getAnalysisModel_ThreadsBA(), this.getReducedThreadBA(), null, "threadsBA", null, 1, -1, AnalysisModel.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

@@ -31,7 +31,7 @@ public class ReducedbaFactoryImpl extends EFactoryImpl implements ReducedbaFacto
 	 */
 	public static ReducedbaFactory init() {
 		try {
-			ReducedbaFactory theReducedbaFactory = (ReducedbaFactory)EPackage.Registry.INSTANCE.getEFactory("http://fr.tpt.aadl.sched.wcetanalysis.result.reducedba/1.0"); 
+			ReducedbaFactory theReducedbaFactory = (ReducedbaFactory)EPackage.Registry.INSTANCE.getEFactory(ReducedbaPackage.eNS_URI);
 			if (theReducedbaFactory != null) {
 				return theReducedbaFactory;
 			}
@@ -64,6 +64,7 @@ public class ReducedbaFactoryImpl extends EFactoryImpl implements ReducedbaFacto
 			case ReducedbaPackage.CRITICAL_SECTION_BEGIN: return createCriticalSectionBegin();
 			case ReducedbaPackage.CRITICAL_SECTION_END: return createCriticalSectionEnd();
 			case ReducedbaPackage.REDUCED_THREAD_BA: return createReducedThreadBA();
+			case ReducedbaPackage.ANALYSIS_MODEL: return createAnalysisModel();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -107,6 +108,16 @@ public class ReducedbaFactoryImpl extends EFactoryImpl implements ReducedbaFacto
 	public ReducedThreadBA createReducedThreadBA() {
 		ReducedThreadBAImpl reducedThreadBA = new ReducedThreadBAImpl();
 		return reducedThreadBA;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public AnalysisModel createAnalysisModel() {
+		AnalysisModelImpl analysisModel = new AnalysisModelImpl();
+		return analysisModel;
 	}
 
 	/**
