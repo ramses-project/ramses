@@ -73,8 +73,6 @@ public class RamsesPropertyPage extends PropertyPage {
 
 	private static final int TEXT_FIELD_WIDTH = 43;
 
-	public static final String PLATFORM_ID = "platform.id";
-
 	private IResource instanceModel = null;
 	private Text outputDirText;
 	private Button target;

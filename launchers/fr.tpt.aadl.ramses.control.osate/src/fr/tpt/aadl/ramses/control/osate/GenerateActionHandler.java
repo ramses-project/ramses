@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException ;
 import java.net.URL ;
 import java.util.Set ;
 import java.util.concurrent.TimeUnit ;
+
 import org.eclipse.core.commands.AbstractHandler ;
 import org.eclipse.core.commands.ExecutionEvent ;
 import org.eclipse.core.commands.ExecutionException ;
@@ -83,6 +84,7 @@ import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
 
 public class GenerateActionHandler extends AbstractHandler {
@@ -243,7 +245,7 @@ public class GenerateActionHandler extends AbstractHandler {
 			if (_outputDir == null)
 				_outputDir = RamsesPropertyPage.getDefaultOutputDir((IResource)currentProject);
 			_targetPath = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.PLATFORM_PATH));
-			_targetName = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.PLATFORM_ID));
+			_targetName = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.TARGET_ID));
 		} catch (CoreException e) {
 			Dialog.showError("Configuration Error", "Porperties were not reachable for project " + currentProject.getName());
 		}
@@ -362,7 +364,7 @@ public class GenerateActionHandler extends AbstractHandler {
 												else
 												{	
 													ServiceRegistry registry;
-													registry = new OSGiServiceRegistry ();
+													registry = ServiceRegistryProvider.getServiceRegistry() ;
 													Generator generator = registry.getGenerator(_targetName) ;
 													IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 													String workspaceURI = si.eResource().getURI().trimFragment().toString();
