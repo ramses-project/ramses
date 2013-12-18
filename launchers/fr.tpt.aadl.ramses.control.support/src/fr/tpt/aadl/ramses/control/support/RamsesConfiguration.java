@@ -1,8 +1,8 @@
 package fr.tpt.aadl.ramses.control.support;
 
 import java.io.File ;
-import java.io.FileNotFoundException ;
 import java.io.FileReader ;
+import java.io.IOException ;
 import java.util.HashSet ;
 import java.util.LinkedHashMap ;
 import java.util.LinkedHashSet ;
@@ -13,9 +13,9 @@ import java.util.concurrent.TimeUnit ;
 import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.swt.widgets.ProgressBar ;
 import org.osate.aadl2.instance.SystemInstance ;
 
 public class RamsesConfiguration
@@ -27,13 +27,12 @@ public class RamsesConfiguration
   private static InstantiationManager _instantiationManager = new InstantiationManagerImpl();
   private static PredefinedResourcesAccess predefinedResourcesManager;
   private static String runtimePath = "";
-  private static ProgressBar progressbar;
   public static final String PLATFORM_ID = "platform";
   private static String pokValidFilePath = "/misc/mk/config.mk";
   private static String osekValidFilePath = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
   private static IProject currentProject = null;
   private static SystemInstance sysint = null;
-  private static IProgressMonitor ramsesMonitor = null ;
+  private static IProgressMonitor ramsesMonitor =new NullProgressMonitor()  ;
   
   public static IProject getCurrentProject()
   {
@@ -189,14 +188,6 @@ public class RamsesConfiguration
     runtimePath=path;
   }
 
-  public static ProgressBar getProgressbar() {
-    return progressbar;
-  }
-
-  public static void setProgressbar(ProgressBar progressbar) {
-    RamsesConfiguration.progressbar = progressbar;
-  }
-
   public static boolean pokRuntimePathValidityCheck(String path)
   {
     String  result = path.concat(pokValidFilePath.toString());
@@ -204,7 +195,8 @@ public class RamsesConfiguration
 
     try {
       FileReader fr = new FileReader(file);
-    } catch (FileNotFoundException e) {
+      fr.close();
+    } catch (IOException e) {
       // TODO Auto-generated catch block
       System.out.println("File not exists !");
       return false;
@@ -218,9 +210,12 @@ public class RamsesConfiguration
     String  result = path.concat(osekValidFilePath.toString());
     File file = new File(result);
 
-    try {
+    try
+    {
       FileReader fr = new FileReader(file);
-    } catch (FileNotFoundException e) {
+      fr.close(); 
+    }
+    catch (IOException e) {
       // TODO Auto-generated catch block
       System.out.println("File not exists !");
       return false;
