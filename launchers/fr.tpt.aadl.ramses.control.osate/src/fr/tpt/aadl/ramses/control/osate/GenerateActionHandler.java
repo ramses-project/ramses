@@ -296,11 +296,6 @@ public class GenerateActionHandler extends AbstractHandler {
 	    
 	  }
 
-	  // DEBUG
-	  //this line is to avoid nullPointerexception error when generating code
-	  RamsesConfiguration.setRamsesMonitor(new NullProgressMonitor());
-	  
-
     IWorkbench wb = PlatformUI.getWorkbench();
     IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
     IWorkbenchPage page = win.getActivePage();
