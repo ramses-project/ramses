@@ -35,9 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -67,15 +65,12 @@ import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
 import org.osate.aadl2.util.Aadl2Util;
 import org.osate.ba.aadlba.AadlBaPackage ;
 
-import antlr.RecognitionException;
-
 import fr.tpt.aadl.ramses.control.support.InstantiationManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
 
 public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher

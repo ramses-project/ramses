@@ -35,11 +35,9 @@ import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
 import java.util.concurrent.TimeoutException ;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.EList;
@@ -71,8 +69,6 @@ import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
-//import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
-import fr.tpt.aadl.ramses.transformation.atl.AtlTransfoLauncher;
 
 public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 {
@@ -168,20 +164,9 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 			  outputPlatformRelativePath = outputAbsolutePath.substring(outputPathHeaderIndex);
 			  
 		  }
-		  IResource rootMember=null;
-		  while(ResourcesPlugin.getWorkspace().getRoot().findMember(outputPlatformRelativePath)==null
-				  && outputPlatformRelativePath.contains("/"))
-		  {
-			  if(rootMember==null)
-			  {
-				  String rootMemberPath = outputPlatformRelativePath.substring(0,outputPlatformRelativePath.indexOf("/"));
-				  rootMember = ResourcesPlugin.getWorkspace().getRoot().findMember(rootMemberPath);
-				  if(rootMember!=null)
-					  rootMember.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-			  }
-			  outputPlatformRelativePath=outputPlatformRelativePath.substring(outputPlatformRelativePath.indexOf("/")+1);
-		  }
-
+		  
+		  outputPlatformRelativePath = outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
+		  		  
 		  uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
 
 		  ResourceSet rs = OsateResourceUtil.getResourceSet();
