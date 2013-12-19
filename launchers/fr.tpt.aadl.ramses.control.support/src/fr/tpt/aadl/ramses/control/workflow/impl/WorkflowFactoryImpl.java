@@ -43,7 +43,7 @@ public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory
 	 */
 	public static WorkflowFactory init() {
 		try {
-			WorkflowFactory theWorkflowFactory = (WorkflowFactory)EPackage.Registry.INSTANCE.getEFactory("http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0"); 
+			WorkflowFactory theWorkflowFactory = (WorkflowFactory)EPackage.Registry.INSTANCE.getEFactory(WorkflowPackage.eNS_URI);
 			if (theWorkflowFactory != null) {
 				return theWorkflowFactory;
 			}

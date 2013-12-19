@@ -266,13 +266,22 @@ public interface WorkflowPackage extends EPackage {
 	int ANALYSIS__NO_OPTION = WORKFLOW_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
+	 * The feature id for the '<em><b>Output Model Identifier</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANALYSIS__OUTPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 5;
+
+	/**
 	 * The number of structural features of the '<em>Analysis</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ANALYSIS_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 5;
+	int ANALYSIS_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 6;
 
 	/**
 	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ErrorStateImpl <em>Error State</em>}' class.
@@ -634,6 +643,17 @@ public interface WorkflowPackage extends EPackage {
 	EReference getAnalysis_NoOption();
 
 	/**
+	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getOutputModelIdentifier <em>Output Model Identifier</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Output Model Identifier</em>'.
+	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis#getOutputModelIdentifier()
+	 * @see #getAnalysis()
+	 * @generated
+	 */
+	EReference getAnalysis_OutputModelIdentifier();
+
+	/**
 	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.ErrorState <em>Error State</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -939,6 +959,14 @@ public interface WorkflowPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ANALYSIS__NO_OPTION = eINSTANCE.getAnalysis_NoOption();
+
+		/**
+		 * The meta object literal for the '<em><b>Output Model Identifier</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ANALYSIS__OUTPUT_MODEL_IDENTIFIER = eINSTANCE.getAnalysis_OutputModelIdentifier();
 
 		/**
 		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ErrorStateImpl <em>Error State</em>}' class.

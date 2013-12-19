@@ -32,6 +32,7 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getYesOption <em>Yes Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getNoOption <em>No Option</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
  * </p>
  *
@@ -107,6 +108,16 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 	 * @ordered
 	 */
 	protected AnalysisOption noOption;
+
+	/**
+	 * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getOutputModelIdentifier()
+	 * @generated
+	 * @ordered
+	 */
+	protected ModelIdentifier outputModelIdentifier;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -297,12 +308,57 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public ModelIdentifier getOutputModelIdentifier() {
+		return outputModelIdentifier;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier, NotificationChain msgs) {
+		ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
+		outputModelIdentifier = newOutputModelIdentifier;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, newOutputModelIdentifier);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier) {
+		if (newOutputModelIdentifier != outputModelIdentifier) {
+			NotificationChain msgs = null;
+			if (outputModelIdentifier != null)
+				msgs = ((InternalEObject)outputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+			if (newOutputModelIdentifier != null)
+				msgs = ((InternalEObject)newOutputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+			msgs = basicSetOutputModelIdentifier(newOutputModelIdentifier, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, newOutputModelIdentifier, newOutputModelIdentifier));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case WorkflowPackage.ANALYSIS__YES_OPTION:
 				return basicSetYesOption(null, msgs);
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				return basicSetNoOption(null, msgs);
+			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+				return basicSetOutputModelIdentifier(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -325,6 +381,8 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 				return basicGetInputModelIdentifier();
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				return getNoOption();
+			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+				return getOutputModelIdentifier();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -350,6 +408,9 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 				return;
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				setNoOption((AnalysisOption)newValue);
+				return;
+			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+				setOutputModelIdentifier((ModelIdentifier)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -377,6 +438,9 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				setNoOption((AnalysisOption)null);
 				return;
+			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+				setOutputModelIdentifier((ModelIdentifier)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -398,6 +462,8 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 				return inputModelIdentifier != null;
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				return noOption != null;
+			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+				return outputModelIdentifier != null;
 		}
 		return super.eIsSet(featureID);
 	}

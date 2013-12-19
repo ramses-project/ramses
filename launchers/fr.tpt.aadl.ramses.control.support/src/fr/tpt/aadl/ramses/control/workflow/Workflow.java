@@ -63,7 +63,7 @@ public interface Workflow extends EObject {
 	 * @return the value of the '<em>Input Model Identifier</em>' containment reference.
 	 * @see #setInputModelIdentifier(ModelIdentifier)
 	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getWorkflow_InputModelIdentifier()
-	 * @model containment="true"
+	 * @model containment="true" required="true"
 	 * @generated
 	 */
 	ModelIdentifier getInputModelIdentifier();

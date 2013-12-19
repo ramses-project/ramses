@@ -20,6 +20,7 @@ package fr.tpt.aadl.ramses.control.workflow;
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getYesOption <em>Yes Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getNoOption <em>No Option</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
  * </p>
  *
@@ -117,7 +118,7 @@ public interface Analysis extends WorkflowElement, AnalysisElement {
 	 * @return the value of the '<em>Input Model Identifier</em>' reference.
 	 * @see #setInputModelIdentifier(ModelIdentifier)
 	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAnalysis_InputModelIdentifier()
-	 * @model
+	 * @model required="true"
 	 * @generated
 	 */
 	ModelIdentifier getInputModelIdentifier();
@@ -157,5 +158,31 @@ public interface Analysis extends WorkflowElement, AnalysisElement {
 	 * @generated
 	 */
 	void setNoOption(AnalysisOption value);
+
+	/**
+	 * Returns the value of the '<em><b>Output Model Identifier</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Output Model Identifier</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Output Model Identifier</em>' containment reference.
+	 * @see #setOutputModelIdentifier(ModelIdentifier)
+	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAnalysis_OutputModelIdentifier()
+	 * @model containment="true"
+	 * @generated
+	 */
+	ModelIdentifier getOutputModelIdentifier();
+
+	/**
+	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getOutputModelIdentifier <em>Output Model Identifier</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Output Model Identifier</em>' containment reference.
+	 * @see #getOutputModelIdentifier()
+	 * @generated
+	 */
+	void setOutputModelIdentifier(ModelIdentifier value);
 
 } // Analysis
