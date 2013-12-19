@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.ba.aadlba.BehaviorAction ;
-import org.osate.ba.aadlba.BehaviorActionBlock ;
-import org.osate.ba.aadlba.BehaviorActionCollection ;
-import org.osate.ba.aadlba.BehaviorActions ;
-import org.osate.ba.aadlba.BehaviorAnnex ;
-import org.osate.ba.aadlba.BehaviorState ;
-import org.osate.ba.aadlba.BehaviorTransition ;
-import org.osate.ba.aadlba.LoopStatement ;
+import org.osate.ba.aadlba.BehaviorAction;
+import org.osate.ba.aadlba.BehaviorActionBlock;
+import org.osate.ba.aadlba.BehaviorActionCollection;
+import org.osate.ba.aadlba.BehaviorActions;
+import org.osate.ba.aadlba.BehaviorAnnex;
+import org.osate.ba.aadlba.BehaviorState;
+import org.osate.ba.aadlba.BehaviorTransition;
+import org.osate.ba.aadlba.LoopStatement;
 
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTExtractor;
@@ -96,14 +96,21 @@ public abstract class BehaviorAnnexExtractor extends ASTExtractor
 	{
 		for(BehaviorState st : ba.getStates())
 		{
-			boolean isFinal = true;
+			for(BehaviorState s : ba.getStates())
+			{
+				if (s.isFinal())
+				{
+					return s;
+				}
+			}
+			/*boolean isFinal = true;
 			for(BehaviorTransition t : ba.getTransitions())
 			{
 				if (t.getSourceState() == st)
 					isFinal = false;
 			}
 			if (isFinal)
-				return st;
+				return st;*/
 		}
 		return null;
 	}

@@ -7,12 +7,12 @@ import org.osate.aadl2.Classifier;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.ba.aadlba.BehaviorAnnex ;
-import org.osate.ba.aadlba.BehaviorState ;
-import org.osate.ba.aadlba.CommunicationAction ;
-import org.osate.ba.aadlba.DataAccessHolder ;
-import org.osate.ba.aadlba.ParameterLabel ;
-import org.osate.ba.aadlba.SubprogramCallAction ;
+import org.osate.ba.aadlba.BehaviorAnnex;
+import org.osate.ba.aadlba.BehaviorState;
+import org.osate.ba.aadlba.CommunicationAction;
+import org.osate.ba.aadlba.DataAccessHolder;
+import org.osate.ba.aadlba.ParameterLabel;
+import org.osate.ba.aadlba.SubprogramCallAction;
 
 
 public class BehaviorAnnexUtil

@@ -21,12 +21,12 @@ import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody;
 import fr.tpt.aadl.sched.wcetanalysis.util.SequenceUtil;
-import org.osate.utils.PropertyUtils;
 
 public class AadlPropertiesUpdate {
 

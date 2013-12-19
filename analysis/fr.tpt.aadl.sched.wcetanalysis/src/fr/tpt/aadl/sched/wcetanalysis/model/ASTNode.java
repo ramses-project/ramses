@@ -356,7 +356,8 @@ public class ASTNode
     if(next.size() > 1)
     {
       if((type == StatementKind.Conditional) 
-    	  || (type == StatementKind.Empty) || (type == StatementKind.Compute))
+    	  || (type == StatementKind.Empty) || (type == StatementKind.Compute)
+    	  || (type == StatementKind.ASTStartOrEnd))
       {
         ASTNode clone = new ASTNode(IDGenerator.getNewIdForName(
         		"ComputationBlocks"), StatementKind.Compute, task) ;

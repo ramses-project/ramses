@@ -27,7 +27,8 @@ import org.osate.aadl2.instance.ConnectionKind;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceReferenceValue;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.utils.PropertyUtils ;
+import org.osate.ba.aadlba.SubprogramCallAction;
+import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
 
@@ -93,8 +94,16 @@ public class Aadl2ASTUtil
 	public static DataClassifier getDataClassifier(DataSubcomponentType t,
 			SubprogramClassifier sc)
 	{
+		return getDataClassifier(t,sc,null);
+	}
+	
+	public static DataClassifier getDataClassifier(DataSubcomponentType t,
+			SubprogramClassifier sc, SubprogramCallAction callAction)
+	{
 		if (t instanceof DataClassifier)
 		{
+			//TODO: dataclassifier refined by feature connection
+			
 			return (DataClassifier) t;
 		}
 		else if (t instanceof DataPrototype)

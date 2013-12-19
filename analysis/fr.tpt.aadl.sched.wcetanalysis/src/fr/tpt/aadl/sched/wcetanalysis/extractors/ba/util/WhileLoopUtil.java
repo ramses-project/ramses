@@ -1,35 +1,35 @@
 package fr.tpt.aadl.sched.wcetanalysis.extractors.ba.util;
 
-import java.util.List ;
+import java.util.List;
 
-import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.instance.ComponentInstance ;
-import org.osate.ba.aadlba.AssignmentAction ;
-import org.osate.ba.aadlba.BehaviorAction ;
-import org.osate.ba.aadlba.BehaviorActions ;
-import org.osate.ba.aadlba.BehaviorIntegerLiteral ;
-import org.osate.ba.aadlba.BehaviorVariable ;
-import org.osate.ba.aadlba.BehaviorVariableHolder ;
-import org.osate.ba.aadlba.BinaryAddingOperator ;
-import org.osate.ba.aadlba.DataComponentReference ;
-import org.osate.ba.aadlba.DataHolder ;
-import org.osate.ba.aadlba.Factor ;
-import org.osate.ba.aadlba.LogicalOperator ;
-import org.osate.ba.aadlba.Relation ;
-import org.osate.ba.aadlba.RelationalOperator ;
-import org.osate.ba.aadlba.SimpleExpression ;
-import org.osate.ba.aadlba.Target ;
-import org.osate.ba.aadlba.Term ;
-import org.osate.ba.aadlba.Value ;
-import org.osate.ba.aadlba.ValueExpression ;
-import org.osate.ba.aadlba.WhileOrDoUntilStatement ;
-import org.osate.utils.PropertyUtils ;
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.ba.aadlba.AssignmentAction;
+import org.osate.ba.aadlba.BehaviorAction;
+import org.osate.ba.aadlba.BehaviorActions;
+import org.osate.ba.aadlba.BehaviorIntegerLiteral;
+import org.osate.ba.aadlba.BehaviorVariable;
+import org.osate.ba.aadlba.BehaviorVariableHolder;
+import org.osate.ba.aadlba.BinaryAddingOperator;
+import org.osate.ba.aadlba.DataComponentReference;
+import org.osate.ba.aadlba.DataHolder;
+import org.osate.ba.aadlba.Factor;
+import org.osate.ba.aadlba.LogicalOperator;
+import org.osate.ba.aadlba.Relation;
+import org.osate.ba.aadlba.RelationalOperator;
+import org.osate.ba.aadlba.SimpleExpression;
+import org.osate.ba.aadlba.Target;
+import org.osate.ba.aadlba.Term;
+import org.osate.ba.aadlba.Value;
+import org.osate.ba.aadlba.ValueExpression;
+import org.osate.ba.aadlba.WhileOrDoUntilStatement;
+import org.osate.utils.PropertyUtils;
 
-import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext ;
-import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug ;
-import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode ;
-import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind ;
-import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator ;
+import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
+import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
+import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
+import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator;
 
 
 public class WhileLoopUtil

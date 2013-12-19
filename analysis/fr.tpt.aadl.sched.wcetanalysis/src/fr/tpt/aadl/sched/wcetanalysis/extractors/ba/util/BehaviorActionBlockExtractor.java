@@ -13,25 +13,22 @@ import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramCallSequence;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.ConnectionKind;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.ba.aadlba.AssignmentAction ;
-import org.osate.ba.aadlba.BehaviorAction ;
-import org.osate.ba.aadlba.BehaviorActionBlock ;
-import org.osate.ba.aadlba.BehaviorActionSequence ;
-import org.osate.ba.aadlba.BehaviorActionSet ;
-import org.osate.ba.aadlba.BehaviorActions ;
-import org.osate.ba.aadlba.CalledSubprogramHolder ;
-import org.osate.ba.aadlba.DataComponentReference ;
-import org.osate.ba.aadlba.ElementValues ;
-import org.osate.ba.aadlba.ElseStatement ;
-import org.osate.ba.aadlba.ForOrForAllStatement ;
-import org.osate.ba.aadlba.IfStatement ;
-import org.osate.ba.aadlba.IntegerValue ;
-import org.osate.ba.aadlba.SubprogramCallAction ;
-import org.osate.ba.aadlba.TimedAction ;
-import org.osate.ba.aadlba.WhileOrDoUntilStatement ;
+import org.osate.ba.aadlba.AssignmentAction;
+import org.osate.ba.aadlba.BehaviorAction;
+import org.osate.ba.aadlba.BehaviorActionBlock;
+import org.osate.ba.aadlba.BehaviorActionSequence;
+import org.osate.ba.aadlba.BehaviorActionSet;
+import org.osate.ba.aadlba.BehaviorActions;
+import org.osate.ba.aadlba.CalledSubprogramHolder;
+import org.osate.ba.aadlba.DataComponentReference;
+import org.osate.ba.aadlba.ElementValues;
+import org.osate.ba.aadlba.ElseStatement;
+import org.osate.ba.aadlba.ForOrForAllStatement;
+import org.osate.ba.aadlba.IfStatement;
+import org.osate.ba.aadlba.IntegerValue;
+import org.osate.ba.aadlba.SubprogramCallAction;
+import org.osate.ba.aadlba.TimedAction;
+import org.osate.ba.aadlba.WhileOrDoUntilStatement;
 
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
@@ -233,8 +230,12 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 		final CalledSubprogramHolder holder = (CalledSubprogramHolder) callAction.getSubprogram();
 		final NamedElement ref = BehaviorAnnexUtil.getSubprogramReference(callAction);
 		
+		ctxt.pushVisitingSubprogramCallAction(callAction);
+		
 		lastAction = ctxt.subprogramExtractor.caseSubprogramClassifier((Classifier) ref, lastAction);
 		lastAction.addExecutionTime(assignUtil.computeParametersAssignmentTime(callAction));
+		
+		ctxt.popVisitingSubprogramCallAction();
 		
 		StatementKind type = lastAction.getType();
 

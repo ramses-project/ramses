@@ -11,6 +11,7 @@ import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
+import org.osate.ba.aadlba.SubprogramCallAction;
 
 import fr.tpt.aadl.sched.wcetanalysis.extractors.SubprogramExtractor;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.ThreadExtractor;
@@ -28,6 +29,7 @@ public class ExtractionContext
 	public final SubprogramCallUtil callUtil;
 	
 	private Stack<NamedElement> visiting = new Stack<NamedElement>();
+	private Stack<SubprogramCallAction> visitingBA = new Stack<SubprogramCallAction>();
 
 	private ExtractionContext(AnalysisErrorReporterManager errManager)
 	{
@@ -82,6 +84,24 @@ public class ExtractionContext
 	public TaskBody getAST(ComponentInstance task)
 	{
 		return taskToAST.get(task);
+	}
+	
+	public void pushVisitingSubprogramCallAction(SubprogramCallAction a)
+	{
+		visitingBA.push(a);
+	}
+	
+	public SubprogramCallAction popVisitingSubprogramCallAction()
+	{
+		return visitingBA.pop();
+	}
+	
+	public SubprogramCallAction peekVisitingSubprogramCallAction()
+	{
+		if (visitingBA.isEmpty())
+			return null;
+		else
+			return visitingBA.peek();
 	}
 	
 	public void pushVisitingElement(NamedElement e)

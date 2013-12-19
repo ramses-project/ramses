@@ -12,20 +12,20 @@ import org.osate.aadl2.Parameter;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.ba.aadlba.ActualPortHolder ;
-import org.osate.ba.aadlba.AssignmentAction ;
-import org.osate.ba.aadlba.BehaviorVariable ;
-import org.osate.ba.aadlba.DataComponentReference ;
-import org.osate.ba.aadlba.DataHolder ;
-import org.osate.ba.aadlba.DataSubcomponentHolder ;
-import org.osate.ba.aadlba.ParameterHolder ;
-import org.osate.ba.aadlba.ParameterLabel ;
-import org.osate.ba.aadlba.SimpleExpression ;
-import org.osate.ba.aadlba.SubprogramCallAction ;
-import org.osate.ba.aadlba.Target ;
-import org.osate.ba.aadlba.Value ;
-import org.osate.ba.aadlba.ValueExpression ;
-import org.osate.utils.PropertyUtils ;
+import org.osate.ba.aadlba.ActualPortHolder;
+import org.osate.ba.aadlba.AssignmentAction;
+import org.osate.ba.aadlba.BehaviorVariable;
+import org.osate.ba.aadlba.DataComponentReference;
+import org.osate.ba.aadlba.DataHolder;
+import org.osate.ba.aadlba.DataSubcomponentHolder;
+import org.osate.ba.aadlba.ParameterHolder;
+import org.osate.ba.aadlba.ParameterLabel;
+import org.osate.ba.aadlba.SimpleExpression;
+import org.osate.ba.aadlba.SubprogramCallAction;
+import org.osate.ba.aadlba.Target;
+import org.osate.ba.aadlba.Value;
+import org.osate.ba.aadlba.ValueExpression;
+import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
@@ -159,6 +159,7 @@ public class AssignmentActionUtil
 	
 	private DataClassifier getDataClassifier(DataSubcomponentType t)
 	{
+		SubprogramCallAction sca = ctxt.peekVisitingSubprogramCallAction();
 		NamedElement e = ctxt.getCurrentVisitedElement();
 		SubprogramClassifier sc = null;
 		if (e instanceof SubprogramClassifier)
@@ -170,7 +171,15 @@ public class AssignmentActionUtil
 			sc = (SubprogramClassifier) 
 					(((SubprogramCall) e).getCalledSubprogram());
 		}
-		return Aadl2ASTUtil.getDataClassifier(t,sc);
+		if (sca != null)
+		{
+			if (sca.getSubprogram().getElement() != sc)
+			{
+				sca = null;
+			}
+		}
+		
+		return Aadl2ASTUtil.getDataClassifier(t,sc, sca);
 	}
 	
 

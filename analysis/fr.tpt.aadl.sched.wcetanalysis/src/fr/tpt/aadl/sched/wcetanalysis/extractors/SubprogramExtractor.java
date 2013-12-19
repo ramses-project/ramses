@@ -5,7 +5,7 @@ import org.osate.aadl2.Classifier;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorAnnex;
 
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;

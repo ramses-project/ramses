@@ -14,14 +14,12 @@ import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.Subprogram;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramCallSequence;
 import org.osate.aadl2.SubprogramClassifier;
-import org.osate.aadl2.SubprogramSubcomponent;
 import org.osate.aadl2.instance.ComponentInstance;
-
 import fr.tpt.aadl.ramses.util.properties.AadlUtil;
+
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
