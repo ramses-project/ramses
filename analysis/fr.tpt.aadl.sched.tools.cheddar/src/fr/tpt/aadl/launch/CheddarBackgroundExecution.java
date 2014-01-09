@@ -30,7 +30,7 @@ public class CheddarBackgroundExecution extends
   }
 
   @Override
-  protected Resource analyzeInstanceModel(IProgressMonitor monitor,
+  protected void analyzeInstanceModel(IProgressMonitor monitor,
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
@@ -64,6 +64,6 @@ public class CheddarBackgroundExecution extends
     {
       e2.printStackTrace() ;
     }
-    return null;
+    return;
   }
 }

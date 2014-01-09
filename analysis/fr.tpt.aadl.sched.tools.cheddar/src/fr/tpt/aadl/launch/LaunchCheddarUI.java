@@ -30,7 +30,7 @@ public class LaunchCheddarUI extends
   }
 
   @Override
-  protected Resource analyzeInstanceModel(IProgressMonitor monitor,
+  protected void analyzeInstanceModel(IProgressMonitor monitor,
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
@@ -52,6 +52,6 @@ public class LaunchCheddarUI extends
     {
       e2.printStackTrace() ;
     }
-    return null;
+    return;
   }
 }

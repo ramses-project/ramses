@@ -45,16 +45,25 @@ public class WcetAnalysis extends AbstractAnalyzer {
 	private final static String PLUGIN_ID = "fr.tpt.aadl.ramses.control.osate.wcet";
 
 	private String outputModelIdentifier;
-	
+	private Resource aadlWithWcet;
+	boolean init = true;
 	@Override
 	public void setParameters(Map<String, Object> parameters) {
-		mode = (String) parameters.get("Mode");
-		AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
-		currentResult = f.createAnalysisArtifact();
-		parameters.put("AnalysisResult", currentResult);
-		outputModelIdentifier = (String) parameters.get("OutputModelIdentifier");
+		if(init)
+		{
+		  mode = (String) parameters.get("Mode");
+		  AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
+		  currentResult = f.createAnalysisArtifact();
+		  parameters.put("AnalysisResult", currentResult);
+		  outputModelIdentifier = (String) parameters.get("OutputModelIdentifier");
+		  init=false;
+		}
+		else
+		  parameters.put("OutputResource", aadlWithWcet);
 	}
 
+	
+	
 	@Override
 	protected String getActionName() {
 		return ACTION_NAME;
@@ -85,7 +94,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 
 	@SuppressWarnings("restriction")
 	@Override
-	protected Resource analyzeInstanceModel(IProgressMonitor monitor,
+	protected void analyzeInstanceModel(IProgressMonitor monitor,
 			AnalysisErrorReporterManager errManager, SystemInstance root,
 			SystemOperationMode som) 
 	{
@@ -133,7 +142,6 @@ public class WcetAnalysis extends AbstractAnalyzer {
 		AST2ResultModel toResult = new AST2ResultModel(root,helper);
 		
 		AnalysisModel m = toResult.getAnalysisModel();
-		Resource aadlWithWcet=null;
 		try
 		{
 			Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m);
@@ -207,7 +215,6 @@ public class WcetAnalysis extends AbstractAnalyzer {
 				ast2dot.visit(tb);
 			}
 		}
-		return aadlWithWcet;
 	}
 	
 }

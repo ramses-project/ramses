@@ -245,8 +245,10 @@ public class AadlTargetSpecificGenerator implements Generator
         {
           
           a.setParameters(analysisParam);
-      	  Resource result = a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+      	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                     new NullProgressMonitor()) ;
+      	  a.setParameters(analysisParam);
+      	  Resource result = (Resource) analysisParam.get("OutputResource");
       	  if(result!=null)
       	  {
       	    SystemImplementation si = (SystemImplementation) pls.
@@ -296,7 +298,10 @@ public class AadlTargetSpecificGenerator implements Generator
     	  workflowPilot.setAnalysisResult(false);
     	}
     	if(result != null)
+    	{
           System.out.println(">> " + analysisName + " result set at " + result.isValidated());
+          workflowPilot.setAnalysisResult(result.isValidated());
+    	}
       }
       else if(analysisMode.equals("manual")) {
         int res = JOptionPane.showConfirmDialog(null, "Was the analysis " + analysisName + " successfull?", "Confirmation", JOptionPane.YES_NO_OPTION);

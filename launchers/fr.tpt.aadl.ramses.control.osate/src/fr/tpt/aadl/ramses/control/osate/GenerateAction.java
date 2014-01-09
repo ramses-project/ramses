@@ -78,7 +78,7 @@ public class GenerateAction extends AbstractAnalyzer
   }
 
   @Override
-  protected Resource analyzeInstanceModel(IProgressMonitor monitor,
+  protected void analyzeInstanceModel(IProgressMonitor monitor,
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
@@ -116,7 +116,7 @@ public class GenerateAction extends AbstractAnalyzer
         if((outputPathName==null)||(outputDirName==null)||(targetName==null))
         { 
           if(loop > 1)
-            return null;
+            return;
           
           Display.getDefault().syncExec(new Runnable() {
             public void run() {
@@ -220,7 +220,7 @@ public class GenerateAction extends AbstractAnalyzer
     finally {
 		HookAccessImpl.cleanupTransformationTrace();
 	}
-	return null;
+	return;
   }
   
   @Override

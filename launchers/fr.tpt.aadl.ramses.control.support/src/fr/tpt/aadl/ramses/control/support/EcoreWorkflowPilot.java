@@ -177,7 +177,7 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	 * @see WorkflowPilot#setAnalysisResult(boolean)
 	 */
 	public void setAnalysisResult(boolean analysisResult) {
-		analysisResult = analysisResult;
+		this.analysisResult = analysisResult;
 	}
 
 	/**

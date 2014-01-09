@@ -33,10 +33,11 @@ import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 public interface Analyzer extends NamedPlugin
 {
   
-  public Resource performAnalysis(SystemInstance instance,
+  public void performAnalysis(SystemInstance instance,
                                AnalysisErrorReporterManager errReporterManager,
                                IProgressMonitor monitor)
         throws AnalysisResultException ;
 
   public void setParameters(Map<String, Object> parameters) ;
+  
 }

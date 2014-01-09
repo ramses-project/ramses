@@ -29,7 +29,7 @@ public class WCETAnalysis extends AbstractAnalyzer
   }
 
   @Override
-  protected Resource analyzeInstanceModel(IProgressMonitor monitor,
+  protected void analyzeInstanceModel(IProgressMonitor monitor,
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
@@ -46,7 +46,7 @@ public class WCETAnalysis extends AbstractAnalyzer
     {
       e.printStackTrace() ;
     }
-    return null;
+    return;
   }
 
   @Override

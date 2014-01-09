@@ -43,11 +43,11 @@ public abstract class AbstractAnalyzer extends
   protected AnalysisArtifact currentResult = null;
   
   @Override
-  public Resource performAnalysis(SystemInstance instance,
+  public void performAnalysis(SystemInstance instance,
                               AnalysisErrorReporterManager errReporterManager,
                               IProgressMonitor monitor)
         throws AnalysisResultException
   {
-    return this.analyzeInstanceModel(monitor, errReporterManager, instance, null) ;
+    this.analyzeInstanceModel(monitor, errReporterManager, instance, null) ;
   }
 }

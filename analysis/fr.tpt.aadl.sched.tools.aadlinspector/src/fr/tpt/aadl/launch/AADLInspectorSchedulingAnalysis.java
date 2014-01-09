@@ -61,7 +61,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	}
 
 	@Override
-	protected Resource analyzeInstanceModel(IProgressMonitor monitor,
+	protected void analyzeInstanceModel(IProgressMonitor monitor,
 			AnalysisErrorReporterManager errManager, SystemInstance root,
 			SystemOperationMode som) 
 	{
@@ -75,7 +75,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		{
 			System.err.println("AADLInspector: " + e.getMessage());
 		}
-		return null;
+		return;
 	}
 
 }
