@@ -30,7 +30,6 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  * <ul>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl#getElement <em>Element</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl#getList <em>List</em>}</li>
- *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
  * </p>
@@ -57,16 +56,6 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 	 * @ordered
 	 */
 	protected List list;
-
-	/**
-	 * The cached value of the '{@link #getInputModelIdentifier() <em>Input Model Identifier</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInputModelIdentifier()
-	 * @generated
-	 * @ordered
-	 */
-	protected ModelIdentifier inputModelIdentifier;
 
 	/**
 	 * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
@@ -187,44 +176,6 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ModelIdentifier getInputModelIdentifier() {
-		if (inputModelIdentifier != null && inputModelIdentifier.eIsProxy()) {
-			InternalEObject oldInputModelIdentifier = (InternalEObject)inputModelIdentifier;
-			inputModelIdentifier = (ModelIdentifier)eResolveProxy(oldInputModelIdentifier);
-			if (inputModelIdentifier != oldInputModelIdentifier) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, WorkflowPackage.TRANSFORMATION__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
-			}
-		}
-		return inputModelIdentifier;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ModelIdentifier basicGetInputModelIdentifier() {
-		return inputModelIdentifier;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setInputModelIdentifier(ModelIdentifier newInputModelIdentifier) {
-		ModelIdentifier oldInputModelIdentifier = inputModelIdentifier;
-		inputModelIdentifier = newInputModelIdentifier;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.TRANSFORMATION__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public ModelIdentifier getOutputModelIdentifier() {
 		return outputModelIdentifier;
 	}
@@ -291,9 +242,6 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 				return getElement();
 			case WorkflowPackage.TRANSFORMATION__LIST:
 				return getList();
-			case WorkflowPackage.TRANSFORMATION__INPUT_MODEL_IDENTIFIER:
-				if (resolve) return getInputModelIdentifier();
-				return basicGetInputModelIdentifier();
 			case WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER:
 				return getOutputModelIdentifier();
 		}
@@ -312,9 +260,6 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 				return;
 			case WorkflowPackage.TRANSFORMATION__LIST:
 				setList((List)newValue);
-				return;
-			case WorkflowPackage.TRANSFORMATION__INPUT_MODEL_IDENTIFIER:
-				setInputModelIdentifier((ModelIdentifier)newValue);
 				return;
 			case WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER:
 				setOutputModelIdentifier((ModelIdentifier)newValue);
@@ -336,9 +281,6 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 			case WorkflowPackage.TRANSFORMATION__LIST:
 				setList((List)null);
 				return;
-			case WorkflowPackage.TRANSFORMATION__INPUT_MODEL_IDENTIFIER:
-				setInputModelIdentifier((ModelIdentifier)null);
-				return;
 			case WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER:
 				setOutputModelIdentifier((ModelIdentifier)null);
 				return;
@@ -357,8 +299,6 @@ public class TransformationImpl extends WorkflowElementImpl implements Transform
 				return element != null;
 			case WorkflowPackage.TRANSFORMATION__LIST:
 				return list != null;
-			case WorkflowPackage.TRANSFORMATION__INPUT_MODEL_IDENTIFIER:
-				return inputModelIdentifier != null;
 			case WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER:
 				return outputModelIdentifier != null;
 		}

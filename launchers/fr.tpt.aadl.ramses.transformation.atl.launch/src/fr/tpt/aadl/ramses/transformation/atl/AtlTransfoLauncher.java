@@ -19,22 +19,12 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/*
- * author: Etienne Borde
- *
- */
-
 package fr.tpt.aadl.ramses.transformation.atl ;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.m2m.atl.core.ATLCoreException;
@@ -46,16 +36,24 @@ import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PropertySet;
 
-import antlr.RecognitionException;
-
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 
+/**
+ * This abstract class specifies the methods and resources of an ATL
+ * model transformation launcher which produces AADL models.
+ */
 public abstract class AtlTransfoLauncher
 {
 
+  /**
+   * resourcesDir stores the root directory of model transformation files.
+   */
   protected static File resourcesDir = null ;
 
+  /**
+   * injector is an object for injecting objects to the ATL runtime. 
+   */
   protected static final EMFInjector injector = new EMFInjector() ;
 //  private static final EMFExtractor extractor = new EMFExtractor() ;
 
@@ -79,11 +77,6 @@ public abstract class AtlTransfoLauncher
 		  File resourceDir,
 		  List<File> transformationFileList,
 		  File outputDir) throws GenerationException;
-  
-  public abstract Resource doTransformation(List<File> transformationFileList, Resource inputResource,
-		  String outputDirPathName)
-        throws FileNotFoundException, IOException, ATLCoreException, GenerationException;
-
   
   
   protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher)

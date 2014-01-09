@@ -26,12 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.Classifier;
-import org.osate.aadl2.Element;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.PublicPackageSection;
@@ -39,7 +38,7 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
 
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -105,9 +104,12 @@ public class AadlTargetSpecificCodeGenerator
     generatedCodeDirectory.mkdir() ;
 
     IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
-    ramsesMonit.subTask("Code generation ..."); 
-    RamsesConfiguration.waitUnitOfTime(1);
-
+    if(ramsesMonit!=null)
+    {
+    	ramsesMonit.subTask("Code generation ..."); 
+    	RamsesConfiguration.waitUnitOfTime(1);
+    }
+    
     for(SystemImplementation sys: systemImplementationList)
     {
       SystemImplementation si = (SystemImplementation) sys ;

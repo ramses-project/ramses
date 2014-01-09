@@ -65,7 +65,7 @@ import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
 import org.osate.aadl2.util.Aadl2Util;
 import org.osate.ba.aadlba.AadlBaPackage ;
 
-import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksFactory;
@@ -76,6 +76,8 @@ import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
 public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 {
 
+	protected ExecEnv env = EmftvmFactory.eINSTANCE.createExecEnv();
+	
 	private static final String AADLBA_MM_URI =
 			org.osate.ba.aadlba.AadlBaPackage.eNS_URI ;
 	private static final String AADL2_MM_URI =
@@ -141,7 +143,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			try
 			{
 				expandedResult = this.doTransformation(transformationFileList,
-					inputResource, aadlGeneratedFileName);
+					inputResource, aadlGeneratedFileName, "_extended");
 			}
 			finally
 			{
@@ -151,7 +153,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 			if(outputModelDir.exists()==false)
 				outputModelDir.mkdir();
-			InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+			AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
 			String outputFilePath=outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName;
 			File outputFile = new File(outputFilePath);
 
@@ -166,7 +168,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			}
 
 	public Resource doTransformation(List<File> transformationFileList, Resource inputResource,
-			String outputDirPathName)
+			String outputDirPathName, String resourceSuffix)
 					throws FileNotFoundException, IOException, ATLCoreException, GenerationException
 	{
 		if(Aadl2AadlEMFTVMLauncher.resourcesDir == null)
@@ -174,7 +176,6 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 					"Illegal initialization of ATL transformation launcher: "
 							+ "directory containing .emftvm files is undefined") ;
 		
-		ExecEnv env = EmftvmFactory.eINSTANCE.createExecEnv();
 		ResourceSet rs = inputResource.getResourceSet();
 
 		// Load metamodels
@@ -243,7 +244,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 		else if (aadlGeneratedFileName.startsWith("platform:/resource"))
 			aadlGeneratedFileName = aadlGeneratedFileName.substring("platform:/resource".length());
 		aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
-				".aaxl2", "_extended.aaxl2");
+				".aaxl2", resourceSuffix+".aaxl2");
 		URI uri = URI.createURI(aadlGeneratedFileName);
 		Resource outputResource = rs.getResource(uri, false);
 		if(outputResource==null)

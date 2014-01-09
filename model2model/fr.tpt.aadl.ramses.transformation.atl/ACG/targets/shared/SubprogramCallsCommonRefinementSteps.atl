@@ -2438,16 +2438,3 @@ helper context AADLBA!SubprogramCall def:getConnectedAccessDataSubcomponent(p: A
 		endif
 	endif
 ;
-
-
-helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AADLBA!ComponentImplementation) : AADLBA!SubprogramCallSequence =
-	if( impl.behaviorFromImpl().oclIsUndefined() ) then
-		if(impl.behaviorFromComputeEntryPoint().oclIsUndefined()) then
-			OclUndefined
-		else
-			thisModule.mapComputeEntrypoint(implImg, c, impl)
-		endif
-	else
-		thisModule.mapCallSequence(implImg, c, impl)
-	endif
-;

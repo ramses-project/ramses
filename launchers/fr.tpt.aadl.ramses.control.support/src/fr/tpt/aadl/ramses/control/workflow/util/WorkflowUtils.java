@@ -59,18 +59,21 @@ public class WorkflowUtils {
 	}
 
 	/**
-	 * Creates a new Workflow definition under a specified path
+	 * Creates a new workflow definition, from a root workflow 
+	 * element and under a specified path.
 	 * 
 	 * @param workflowPath
-	 *            String representing the artifact path
+	 *            String representing the artifact path.
+	 * @param workflowElement
+	 * 			  root element of the created workflow.
 	 */
-	public static void createNewWorkflow(String _workflowPath, WorkflowElement _workflowElement) {
+	public static void createNewWorkflow(String workflowPath, WorkflowElement workflowElement) {
 
 		Workflow workflow = WorkflowFactory.eINSTANCE.createWorkflow();
 
-		workflow.setElement(_workflowElement);
+		workflow.setElement(workflowElement);
 		
-		URI wf_uri = URI.createFileURI(_workflowPath);
+		URI wf_uri = URI.createFileURI(workflowPath);
 
 		getResourceSet().getResourceFactoryRegistry()
 				.getExtensionToFactoryMap()
@@ -83,67 +86,8 @@ public class WorkflowUtils {
 		
 	}
 
-/*	*//**
-	 * Adds a Transformation object to Workflow artifact of specified path
-	 * 
-	 * @param _workflowPath   	String representing the artifact path
-	 * @param _fileNames   		ArrayList of files to be executed
-	 * @param _analysisElement  AnalysisElement that contains given transformation
-	 * 
-	 *//*
-	public static void addTransformation(String _workflowPath,
-			ArrayList<String> _fileNames, AnalysisElement _analysisElement) {
-
-		Workflow w = WorkflowUtils.parse(_workflowPath);
-
-		Transformation t = WorkflowFactory.eINSTANCE.createTransformation();
-
-		Generation g = WorkflowFactory.eINSTANCE.createGeneration();
-
-		List l = WorkflowFactory.eINSTANCE.createList();
-
-		Iterator<String> fileNamesIt = _fileNames.iterator();
-		while (fileNamesIt.hasNext()) {
-			File f = WorkflowFactory.eINSTANCE.createFile();
-			f.setPath(fileNamesIt.next());
-			l.getFile().add(f);
-		}
-
-		t.setElement(g);
-		t.setList(l);
-
-		w.setElement(t);
-		saveWorkflow(getResource(_workflowPath), w);
-	}*/
-
-/*	*//**
-	 * Adds a Analysis object to Workflow artifact of specified path
-	 * 
-	 * @param _workflowPath   String representing the artifact path
-	 * 
-	 *//*
-	public static void addAnalysis(String workflowPath) {
-
-		Workflow w = WorkflowUtils.parse(workflowPath);
-
-		Analysis a = WorkflowFactory.eINSTANCE.createAnalysis();
-
-		Generation g = WorkflowFactory.eINSTANCE.createGeneration();
-
-		AnalysisOption o = WorkflowFactory.eINSTANCE.createAnalysisOption();
-		
-		o.setElement(g);
-		
-		a.setNoOption(o);
-
-		w.setElement(a);
-		
-		saveWorkflow(getResource(workflowPath), w);
-	}*/
-	
-	
 	/**
-	 * Saves the given specification at the resource location
+	 * Saves the given workflow specification at the {@code resource} location
 	 * 
 	 * @param resource
 	 *            Resource object associated with the specific disk location

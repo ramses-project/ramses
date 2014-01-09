@@ -109,13 +109,22 @@ public interface WorkflowPackage extends EPackage {
 	int WORKFLOW_ELEMENT = 1;
 
 	/**
+	 * The feature id for the '<em><b>Input Model Identifier</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER = 0;
+
+	/**
 	 * The number of structural features of the '<em>Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int WORKFLOW_ELEMENT_FEATURE_COUNT = 0;
+	int WORKFLOW_ELEMENT_FEATURE_COUNT = 1;
 
 	/**
 	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl <em>Transformation</em>}' class.
@@ -126,6 +135,15 @@ public interface WorkflowPackage extends EPackage {
 	 * @generated
 	 */
 	int TRANSFORMATION = 2;
+
+	/**
+	 * The feature id for the '<em><b>Input Model Identifier</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSFORMATION__INPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER;
 
 	/**
 	 * The feature id for the '<em><b>Element</b></em>' containment reference.
@@ -146,22 +164,13 @@ public interface WorkflowPackage extends EPackage {
 	int TRANSFORMATION__LIST = WORKFLOW_ELEMENT_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Input Model Identifier</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSFORMATION__INPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 2;
-
-	/**
 	 * The feature id for the '<em><b>Output Model Identifier</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 3;
+	int TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Transformation</em>' class.
@@ -170,7 +179,7 @@ public interface WorkflowPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSFORMATION_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 4;
+	int TRANSFORMATION_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisElementImpl <em>Analysis Element</em>}' class.
@@ -202,6 +211,15 @@ public interface WorkflowPackage extends EPackage {
 	int GENERATION = 4;
 
 	/**
+	 * The feature id for the '<em><b>Input Model Identifier</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GENERATION__INPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER;
+
+	/**
 	 * The number of structural features of the '<em>Generation</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -219,6 +237,15 @@ public interface WorkflowPackage extends EPackage {
 	 * @generated
 	 */
 	int ANALYSIS = 5;
+
+	/**
+	 * The feature id for the '<em><b>Input Model Identifier</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ANALYSIS__INPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER;
 
 	/**
 	 * The feature id for the '<em><b>Method</b></em>' attribute.
@@ -248,22 +275,13 @@ public interface WorkflowPackage extends EPackage {
 	int ANALYSIS__YES_OPTION = WORKFLOW_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Input Model Identifier</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ANALYSIS__INPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 3;
-
-	/**
 	 * The feature id for the '<em><b>No Option</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ANALYSIS__NO_OPTION = WORKFLOW_ELEMENT_FEATURE_COUNT + 4;
+	int ANALYSIS__NO_OPTION = WORKFLOW_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Output Model Identifier</b></em>' containment reference.
@@ -272,7 +290,7 @@ public interface WorkflowPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ANALYSIS__OUTPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 5;
+	int ANALYSIS__OUTPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
 	 * The number of structural features of the '<em>Analysis</em>' class.
@@ -281,7 +299,7 @@ public interface WorkflowPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ANALYSIS_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 6;
+	int ANALYSIS_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 5;
 
 	/**
 	 * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.ErrorStateImpl <em>Error State</em>}' class.
@@ -434,6 +452,15 @@ public interface WorkflowPackage extends EPackage {
 	int UNPARSE = 11;
 
 	/**
+	 * The feature id for the '<em><b>Input Model Identifier</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int UNPARSE__INPUT_MODEL_IDENTIFIER = WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER;
+
+	/**
 	 * The feature id for the '<em><b>Element</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -504,6 +531,17 @@ public interface WorkflowPackage extends EPackage {
 	EClass getWorkflowElement();
 
 	/**
+	 * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.control.workflow.WorkflowElement#getInputModelIdentifier <em>Input Model Identifier</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Input Model Identifier</em>'.
+	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowElement#getInputModelIdentifier()
+	 * @see #getWorkflowElement()
+	 * @generated
+	 */
+	EReference getWorkflowElement_InputModelIdentifier();
+
+	/**
 	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.Transformation <em>Transformation</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -534,17 +572,6 @@ public interface WorkflowPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getTransformation_List();
-
-	/**
-	 * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getInputModelIdentifier <em>Input Model Identifier</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Input Model Identifier</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Transformation#getInputModelIdentifier()
-	 * @see #getTransformation()
-	 * @generated
-	 */
-	EReference getTransformation_InputModelIdentifier();
 
 	/**
 	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}'.
@@ -619,17 +646,6 @@ public interface WorkflowPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getAnalysis_YesOption();
-
-	/**
-	 * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getInputModelIdentifier <em>Input Model Identifier</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Input Model Identifier</em>'.
-	 * @see fr.tpt.aadl.ramses.control.workflow.Analysis#getInputModelIdentifier()
-	 * @see #getAnalysis()
-	 * @generated
-	 */
-	EReference getAnalysis_InputModelIdentifier();
 
 	/**
 	 * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getNoOption <em>No Option</em>}'.
@@ -849,6 +865,14 @@ public interface WorkflowPackage extends EPackage {
 		EClass WORKFLOW_ELEMENT = eINSTANCE.getWorkflowElement();
 
 		/**
+		 * The meta object literal for the '<em><b>Input Model Identifier</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER = eINSTANCE.getWorkflowElement_InputModelIdentifier();
+
+		/**
 		 * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.TransformationImpl <em>Transformation</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -873,14 +897,6 @@ public interface WorkflowPackage extends EPackage {
 		 * @generated
 		 */
 		EReference TRANSFORMATION__LIST = eINSTANCE.getTransformation_List();
-
-		/**
-		 * The meta object literal for the '<em><b>Input Model Identifier</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSFORMATION__INPUT_MODEL_IDENTIFIER = eINSTANCE.getTransformation_InputModelIdentifier();
 
 		/**
 		 * The meta object literal for the '<em><b>Output Model Identifier</b></em>' containment reference feature.
@@ -943,14 +959,6 @@ public interface WorkflowPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ANALYSIS__YES_OPTION = eINSTANCE.getAnalysis_YesOption();
-
-		/**
-		 * The meta object literal for the '<em><b>Input Model Identifier</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ANALYSIS__INPUT_MODEL_IDENTIFIER = eINSTANCE.getAnalysis_InputModelIdentifier();
 
 		/**
 		 * The meta object literal for the '<em><b>No Option</b></em>' containment reference feature.

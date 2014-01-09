@@ -14,6 +14,9 @@ public class ContributedAadlRegistration implements PredefinedResourcesAccess {
   PredefinedPackagesManager predefinedPackagesManager;
   PredefinedPropertiesManager predefinedPropertiesManager;
 
+  /**
+   * @see fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess#setPredefinedResourcesDir(File)
+   */
   @Override
   public void setPredefinedResourcesDir(File resourceDir) throws Exception {
 	predefinedPackagesManager =
@@ -30,6 +33,9 @@ public class ContributedAadlRegistration implements PredefinedResourcesAccess {
    	
   }
 
+  /**
+   * @see fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess#getPredefinedResources()
+   */
   @Override
   public List<Resource> getPredefinedResources() {
 	List<Resource> result = new ArrayList<Resource>();

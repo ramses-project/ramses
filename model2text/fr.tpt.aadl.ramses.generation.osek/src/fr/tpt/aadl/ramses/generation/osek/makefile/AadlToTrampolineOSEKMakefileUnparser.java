@@ -29,12 +29,12 @@ import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.SystemImplementation;
 
+import fr.tpt.aadl.ramses.control.support.FileUtils;
 import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
-import fr.tpt.aadl.ramses.util.generation.FileUtils;
 
 public class AadlToTrampolineOSEKMakefileUnparser implements TargetBuilderGenerator {
 
@@ -61,11 +61,11 @@ public class AadlToTrampolineOSEKMakefileUnparser implements TargetBuilderGenera
     
     File preparemake = new File(RamsesConfiguration.getInputDirectory(), "/preparemake.sh");
     
-    preparemake = FileUtils.copyFile(preparemake, generatedFilePath);
+    FileUtils.copyFile(preparemake, generatedFilePath);
     preparemake.setExecutable(true);
 
     File refineOil = new File(RamsesConfiguration.getInputDirectory(), "/refine_oil.sh");
-    refineOil = FileUtils.copyFile(refineOil, generatedFilePath);
+    FileUtils.copyFile(refineOil, generatedFilePath);
     refineOil.setExecutable(true);
     
     File oilTrashFile = new File(generatedFilePath, process.getName());

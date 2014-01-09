@@ -35,12 +35,10 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
-import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.instance.InstanceObject;
-import org.osate.ba.aadlba.BehaviorAnnex ;
-import org.osate.ba.aadlba.BehaviorState ;
-import org.osate.ba.aadlba.BehaviorTransition ;
+import org.osate.ba.aadlba.BehaviorAnnex;
+import org.osate.ba.aadlba.BehaviorState;
+import org.osate.ba.aadlba.BehaviorTransition;
 
 
 /**

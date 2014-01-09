@@ -44,12 +44,12 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 import fr.tpt.aadl.ramses.control.support.AadlResourceValidator;
-import fr.tpt.aadl.ramses.control.support.InstantiationManagerImpl;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.instantiation.manager.ContributedAadlRegistration;
 
-public class StandAloneInstantiator extends InstantiationManagerImpl
+public class StandAloneInstantiator extends AadlModelsManagerImpl
 {
   OsateCorePlugin corePlugin = new OsateCorePlugin();
   

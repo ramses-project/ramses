@@ -496,6 +496,7 @@ features
 properties
   Programming_Properties::Source_Name => "PERIODIC_WAIT";
   Programming_Properties::Source_Text => ("arinc653/time.h", "arinc653/apex-timing.ads");
+  Compute_Execution_Time => 1 Ms .. 1 Ms;
 end Periodic_Wait;
 
 data Blackboard_Status_Type

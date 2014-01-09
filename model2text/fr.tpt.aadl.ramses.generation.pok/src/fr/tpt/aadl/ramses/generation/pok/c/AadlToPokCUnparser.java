@@ -22,7 +22,6 @@
 package fr.tpt.aadl.ramses.generation.pok.c;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +30,9 @@ import java.util.Map;
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
 import org.osate.aadl2.Port;
@@ -49,26 +46,22 @@ import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.ConnectionReference;
 import org.osate.aadl2.instance.FeatureCategory;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
-import org.osate.aadl2.modelsupport.util.AadlUtil;
-import org.osate.aadl2.util.Aadl2Util;
-import org.osate.ba.aadlba.BehaviorAnnex ;
-import org.osate.ba.utils.AadlBaVisitors ;
+import org.osate.ba.aadlba.BehaviorAnnex;
+import org.osate.ba.utils.AadlBaVisitors;
+import org.osate.utils.PropertyUtils;
 
+import fr.tpt.aadl.ramses.control.support.FileUtils;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
-import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
-import org.osate.utils.Aadl2Utils;
-import org.osate.utils.PropertyUtils;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
 {

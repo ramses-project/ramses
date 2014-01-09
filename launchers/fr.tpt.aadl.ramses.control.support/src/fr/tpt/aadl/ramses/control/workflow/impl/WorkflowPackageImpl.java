@@ -221,6 +221,15 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getWorkflowElement_InputModelIdentifier() {
+		return (EReference)workflowElementEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTransformation() {
 		return transformationEClass;
 	}
@@ -248,17 +257,8 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTransformation_InputModelIdentifier() {
-		return (EReference)transformationEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getTransformation_OutputModelIdentifier() {
-		return (EReference)transformationEClass.getEStructuralFeatures().get(3);
+		return (EReference)transformationEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -320,7 +320,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAnalysis_InputModelIdentifier() {
+	public EReference getAnalysis_NoOption() {
 		return (EReference)analysisEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -329,17 +329,8 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAnalysis_NoOption() {
-		return (EReference)analysisEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getAnalysis_OutputModelIdentifier() {
-		return (EReference)analysisEClass.getEStructuralFeatures().get(5);
+		return (EReference)analysisEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -492,11 +483,11 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		createEReference(workflowEClass, WORKFLOW__INPUT_MODEL_IDENTIFIER);
 
 		workflowElementEClass = createEClass(WORKFLOW_ELEMENT);
+		createEReference(workflowElementEClass, WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER);
 
 		transformationEClass = createEClass(TRANSFORMATION);
 		createEReference(transformationEClass, TRANSFORMATION__ELEMENT);
 		createEReference(transformationEClass, TRANSFORMATION__LIST);
-		createEReference(transformationEClass, TRANSFORMATION__INPUT_MODEL_IDENTIFIER);
 		createEReference(transformationEClass, TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER);
 
 		analysisElementEClass = createEClass(ANALYSIS_ELEMENT);
@@ -507,7 +498,6 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		createEAttribute(analysisEClass, ANALYSIS__METHOD);
 		createEAttribute(analysisEClass, ANALYSIS__MODE);
 		createEReference(analysisEClass, ANALYSIS__YES_OPTION);
-		createEReference(analysisEClass, ANALYSIS__INPUT_MODEL_IDENTIFIER);
 		createEReference(analysisEClass, ANALYSIS__NO_OPTION);
 		createEReference(analysisEClass, ANALYSIS__OUTPUT_MODEL_IDENTIFIER);
 
@@ -571,11 +561,11 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		initEReference(getWorkflow_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 1, 1, Workflow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workflowElementEClass, WorkflowElement.class, "WorkflowElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getWorkflowElement_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 1, 1, WorkflowElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(transformationEClass, Transformation.class, "Transformation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getTransformation_Element(), this.getAnalysisElement(), null, "element", null, 1, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTransformation_List(), this.getList(), null, "list", null, 1, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTransformation_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 0, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTransformation_OutputModelIdentifier(), this.getModelIdentifier(), null, "outputModelIdentifier", null, 0, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(analysisElementEClass, AnalysisElement.class, "AnalysisElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -586,7 +576,6 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
 		initEAttribute(getAnalysis_Method(), ecorePackage.getEString(), "method", null, 0, 1, Analysis.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAnalysis_Mode(), ecorePackage.getEString(), "mode", null, 0, 1, Analysis.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAnalysis_YesOption(), this.getAnalysisOption(), null, "yesOption", null, 1, 1, Analysis.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getAnalysis_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 1, 1, Analysis.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAnalysis_NoOption(), this.getAnalysisOption(), null, "noOption", null, 1, 1, Analysis.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAnalysis_OutputModelIdentifier(), this.getModelIdentifier(), null, "outputModelIdentifier", null, 0, 1, Analysis.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

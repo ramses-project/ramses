@@ -3,6 +3,7 @@ package fr.tpt.aadl.launch ;
 import java.io.IOException ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.instance.SystemOperationMode ;
@@ -29,7 +30,7 @@ public class LaunchCheddarUI extends
   }
 
   @Override
-  protected void analyzeInstanceModel(IProgressMonitor monitor,
+  protected Resource analyzeInstanceModel(IProgressMonitor monitor,
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
@@ -51,5 +52,6 @@ public class LaunchCheddarUI extends
     {
       e2.printStackTrace() ;
     }
+    return null;
   }
 }

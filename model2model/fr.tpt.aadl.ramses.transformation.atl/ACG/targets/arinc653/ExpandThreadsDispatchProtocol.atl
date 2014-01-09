@@ -31,6 +31,10 @@ create OUT : AADLBA 	from 		IN : AADLI,
 
 									ARINC653_RUNTIME: AADLBA;
 
+helper def : getProcessorSchedulingProtocol() : String = 'ARINC653';
+
+helper def : getVirtualProcessorSchedulingProtocol() : String = 'Rate_Monotonic_Protocol';
+
 helper context AADLI!FeatureInstance def: isLastFeatureInstance() : Boolean =
 	let c: AADLI!ComponentInstance = self.getComponentInstance() in
 	c.featureInstance->last() = self

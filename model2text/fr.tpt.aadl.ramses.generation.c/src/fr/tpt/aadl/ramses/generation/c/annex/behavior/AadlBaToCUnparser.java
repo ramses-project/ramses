@@ -880,7 +880,6 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
        */
       public String caseWhileStatement(WhileOrDoUntilStatement object)
       {
-        //FIXME : TODO : update location reference
         _cFileContent.addOutput("while (") ;
         process(object.getLogicalValueExpression()) ;
         _cFileContent.addOutputNewline(")") ;
@@ -897,7 +896,6 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
        */
       public String caseDoUntilStatement(WhileOrDoUntilStatement object)
       {
-        //FIXME : TODO : update location reference
         _cFileContent.addOutputNewline("do") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
@@ -1434,7 +1432,6 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
        */
       public String caseBehaviorBooleanLiteral(BehaviorBooleanLiteral object)
       {
-        //FIXME : TODO : update location reference
         if(object.isValue())
         {
           _cFileContent.addOutput("1") ;
@@ -1452,7 +1449,6 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
        */
       public String caseBehaviorStringLiteral(BehaviorStringLiteral object)
       {
-        //FIXME : TODO : update location reference
         _cFileContent.addOutput(object.getValue()) ;
         return DONE ;
       }

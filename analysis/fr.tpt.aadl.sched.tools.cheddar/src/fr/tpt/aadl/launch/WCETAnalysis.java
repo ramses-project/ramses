@@ -3,6 +3,7 @@ package fr.tpt.aadl.launch ;
 import java.util.Map ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.instance.SystemOperationMode ;
@@ -28,7 +29,7 @@ public class WCETAnalysis extends AbstractAnalyzer
   }
 
   @Override
-  protected void analyzeInstanceModel(IProgressMonitor monitor,
+  protected Resource analyzeInstanceModel(IProgressMonitor monitor,
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
@@ -45,6 +46,7 @@ public class WCETAnalysis extends AbstractAnalyzer
     {
       e.printStackTrace() ;
     }
+    return null;
   }
 
   @Override

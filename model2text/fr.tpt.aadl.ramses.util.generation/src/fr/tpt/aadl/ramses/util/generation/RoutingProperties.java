@@ -41,8 +41,6 @@ import org.osate.aadl2.instance.FeatureCategory ;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceReferenceValue;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.util.Aadl2Util;
-import org.osate.utils.* ;
 
 
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;

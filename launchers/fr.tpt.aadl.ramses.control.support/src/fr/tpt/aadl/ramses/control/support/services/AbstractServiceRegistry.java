@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.support.services;
 
+
 public abstract class AbstractServiceRegistry implements ServiceRegistry
 {
    @Override

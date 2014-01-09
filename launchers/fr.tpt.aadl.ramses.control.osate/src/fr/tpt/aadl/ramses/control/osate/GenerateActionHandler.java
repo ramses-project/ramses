@@ -1,91 +1,111 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2012 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.control.osate;
 
-import java.io.File ;
-import java.lang.reflect.InvocationTargetException ;
-import java.net.URL ;
-import java.util.Set ;
-import java.util.concurrent.TimeUnit ;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.commands.AbstractHandler ;
-import org.eclipse.core.commands.ExecutionEvent ;
-import org.eclipse.core.commands.ExecutionException ;
-import org.eclipse.core.resources.IFile ;
-import org.eclipse.core.resources.IProject ;
-import org.eclipse.core.resources.IResource ;
-import org.eclipse.core.resources.IWorkspaceRoot ;
-import org.eclipse.core.resources.ResourcesPlugin ;
-import org.eclipse.core.runtime.CoreException ;
-import org.eclipse.core.runtime.FileLocator ;
-import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.core.runtime.IStatus ;
-import org.eclipse.core.runtime.NullProgressMonitor ;
-import org.eclipse.core.runtime.QualifiedName ;
-import org.eclipse.core.runtime.Status ;
-import org.eclipse.core.runtime.jobs.Job ;
-import org.eclipse.emf.common.command.Command ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.transaction.RecordingCommand ;
-import org.eclipse.emf.transaction.RollbackException ;
-import org.eclipse.emf.transaction.TransactionalCommandStack ;
-import org.eclipse.emf.transaction.TransactionalEditingDomain ;
-import org.eclipse.jface.action.IAction ;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog ;
-import org.eclipse.jface.dialogs.TitleAreaDialog ;
-import org.eclipse.jface.operation.IRunnableWithProgress ;
-import org.eclipse.jface.preference.PreferenceDialog ;
-import org.eclipse.jface.text.ITextSelection ;
-import org.eclipse.jface.viewers.ISelection ;
-import org.eclipse.jface.viewers.IStructuredSelection ;
-import org.eclipse.jface.window.Window ;
-import org.eclipse.swt.SWT ;
-import org.eclipse.swt.events.SelectionAdapter ;
-import org.eclipse.swt.events.SelectionEvent ;
-import org.eclipse.swt.layout.GridData ;
-import org.eclipse.swt.layout.GridLayout ;
-import org.eclipse.swt.widgets.Button ;
-import org.eclipse.swt.widgets.Composite ;
-import org.eclipse.swt.widgets.Control ;
-import org.eclipse.swt.widgets.Display ;
-import org.eclipse.swt.widgets.Label ;
-import org.eclipse.swt.widgets.Shell ;
-import org.eclipse.swt.widgets.Text ;
-import org.eclipse.ui.IEditorPart ;
-import org.eclipse.ui.IFileEditorInput ;
-import org.eclipse.ui.IWorkbench ;
-import org.eclipse.ui.IWorkbenchPage ;
-import org.eclipse.ui.IWorkbenchPart ;
-import org.eclipse.ui.IWorkbenchWindow ;
-import org.eclipse.ui.PlatformUI ;
-import org.eclipse.ui.dialogs.PreferencesUtil ;
-import org.eclipse.ui.views.contentoutline.ContentOutline ;
-import org.eclipse.xtext.resource.EObjectAtOffsetHelper ;
-import org.eclipse.xtext.resource.XtextResource ;
-import org.eclipse.xtext.ui.editor.XtextEditor ;
-import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode ;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork ;
-import org.osate.aadl2.ComponentImplementation ;
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.SystemImplementation ;
-import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.instantiation.InstantiateModel ;
-import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter ;
-import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter ;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
-import org.osate.core.OsateCorePlugin ;
-import org.osate.ui.dialogs.Dialog ;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.RollbackException;
+import org.eclipse.emf.transaction.TransactionalCommandStack;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.views.contentoutline.ContentOutline;
+import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
+import org.eclipse.xtext.resource.XtextResource;
+import org.eclipse.xtext.ui.editor.XtextEditor;
+import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
+import org.eclipse.xtext.util.concurrent.IUnitOfWork;
+import org.osate.aadl2.ComponentImplementation;
+import org.osate.aadl2.Element;
+import org.osate.aadl2.SystemImplementation;
+import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.instantiation.InstantiateModel;
+import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter;
+import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.core.OsateCorePlugin;
+import org.osate.ui.dialogs.Dialog;
 
-import com.google.inject.Inject ;
+import com.google.inject.Inject;
 
-import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
-import fr.tpt.aadl.ramses.control.support.EcorePilot ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
+import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
 
 public class GenerateActionHandler extends AbstractHandler {
 
@@ -132,10 +152,10 @@ public class GenerateActionHandler extends AbstractHandler {
 			((TransactionalCommandStack) domain.getCommandStack()).execute(cmd, null);
 			return null;
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			// TODO Manage with error reporter
 			e.printStackTrace();
 		} catch (RollbackException e) {
-			// TODO Auto-generated catch block
+			// TODO Manage with error reporter
 			e.printStackTrace();
 		}
 		finally {
@@ -387,7 +407,7 @@ public class GenerateActionHandler extends AbstractHandler {
 																outputDir) ;
 													else
 													{
-														EcorePilot xmlPilot = new EcorePilot(workflow);
+														EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
 														generator.generateWorkflow(sinst,
 																resourceDir,
 																outputDir,

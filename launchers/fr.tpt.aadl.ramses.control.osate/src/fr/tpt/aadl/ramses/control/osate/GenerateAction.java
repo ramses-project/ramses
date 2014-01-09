@@ -1,13 +1,32 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2012 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException ;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit ;
 
-import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -17,10 +36,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.jface.preference.PreferenceDialog ;
-import org.eclipse.jface.window.Window ;
-import org.eclipse.swt.widgets.Display ;
-import org.eclipse.ui.dialogs.PreferencesUtil ;
+import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
@@ -29,8 +48,7 @@ import org.osate.ui.dialogs.Dialog;
 import org.osgi.framework.Bundle;
 
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
-import fr.tpt.aadl.ramses.control.support.EcorePilot;
-import fr.tpt.aadl.ramses.control.support.Names;
+import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -47,13 +65,6 @@ public class GenerateAction extends AbstractAnalyzer
   private final static String PLUGIN_NAME = "Ramses4Osate" ;
   private final static String PLUGIN_ID = "fr.tpt.aadl.ramses.control.osate" ;
   private Set<File> _includeDirSet = null;
-  private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
-//  private static final String SOURCE_MODELS_OPTION_ID = "source_models" ;
-//  private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
-//	        "system_to_instantiate" ;
-//  private static final String INCLUDES_OPTION_ID = "include_directories" ;
-  private static String RAMSES_DIR ;
-  private static String outputDirPath = "/output";
   
   
   
@@ -67,7 +78,7 @@ public class GenerateAction extends AbstractAnalyzer
   }
 
   @Override
-  protected void analyzeInstanceModel(IProgressMonitor monitor,
+  protected Resource analyzeInstanceModel(IProgressMonitor monitor,
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
@@ -82,7 +93,6 @@ public class GenerateAction extends AbstractAnalyzer
     String targetName = null;
     String outputDirName = null;
     String outputPathName = null;
-    boolean flag = false;
     IProject project = resource.getProject();
     int loop = 0;
     RamsesConfiguration.setCurrentProject(project);
@@ -106,7 +116,7 @@ public class GenerateAction extends AbstractAnalyzer
         if((outputPathName==null)||(outputDirName==null)||(targetName==null))
         { 
           if(loop > 1)
-            return;
+            return null;
           
           Display.getDefault().syncExec(new Runnable() {
             public void run() {
@@ -132,7 +142,6 @@ public class GenerateAction extends AbstractAnalyzer
       IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
       ramsesMonit.beginTask("This process may take several seconds...", 3);
       ramsesMonit.subTask("Transformation model ...");
-//      RamsesConfiguration.setMonitMessage("Transformation model ...");
       RamsesConfiguration.waitUnitOfTime(1);
       
       RamsesConfiguration.setRuntimeDir(outputPathName);
@@ -156,7 +165,7 @@ public class GenerateAction extends AbstractAnalyzer
   	  	try {
   		  RamsesConfiguration.setRamsesResourcesDir(resourceDir);
   	  	} catch (Exception e) {
-  		  // TODO Auto-generated catch block
+  		  // TODO Manage with error reporter
   		  e.printStackTrace();
   	  	}
 
@@ -178,7 +187,7 @@ public class GenerateAction extends AbstractAnalyzer
         }
         else
         {
-          EcorePilot xmlPilot = new EcorePilot(workflow);
+          EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
           generator.generateWorkflow(root,
         		                     resourceDir,
         		                     outputDir,
@@ -211,7 +220,7 @@ public class GenerateAction extends AbstractAnalyzer
     finally {
 		HookAccessImpl.cleanupTransformationTrace();
 	}
-    
+	return null;
   }
   
   @Override
@@ -247,37 +256,6 @@ public class GenerateAction extends AbstractAnalyzer
   public String getPluginId()
   {
     return PLUGIN_ID;
-  }
-  
-  private static File getPublicAADLResourcesDir(String transformationDirName)
-		  throws Exception
-  {
-	  File transformationDir = getPublicVerifiedPath(transformationDirName) ;
-	  File aadlResourcesDir =
-			  new File(transformationDir.getAbsolutePath() + '/' +
-					  Names.AADL_RESOURCE_DIRECTORY_NAME) ;
-
-	  if(aadlResourcesDir.exists() == false)
-	  {
-		  throw new Exception("ERROR: file " + transformationDirName +
-				  " does not contain " + Names.AADL_RESOURCE_DIRECTORY_NAME +
-				  " directory") ;
-	  }
-
-	  return aadlResourcesDir ;
-	}
-
-  private static File getPublicVerifiedPath(String filePath) throws Exception
-  {
-	  File potentialFile = new File(filePath) ;
-
-	  if(potentialFile.exists())
-	  {
-		  return potentialFile ;
-	  }
-
-	  throw new Exception("file or directory " + potentialFile.getCanonicalPath() +
-			  " could not be found") ;
   }
 
 }

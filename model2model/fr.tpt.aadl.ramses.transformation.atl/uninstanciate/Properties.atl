@@ -541,7 +541,7 @@ lazy rule createContainedNamedElement
 }
 
 helper def:ModalPropertyValue(v : AADLI!ModalPropertyValue, referencesOnly:Boolean) : AADLBA!ModalPropertyValue =
-	let content: AADLBA!PropertyExpression = v.ownedValue.PropertyExpression(referencesOnly)
+	let content: AADLBA!PropertyExpression = v.ownedValue.PropertyExpression()
 	in
 	if(not content.oclIsUndefined()) then
 		thisModule.ModalPropertyValueRule(v, content)
@@ -581,26 +581,26 @@ lazy rule ModalPropertyValueRule {
 --			StringLiteral
 
 
---helper context AADLI!ListValue def: PropertyExpression() : AADLBA!ListValue =
---	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression())
---						->select(e| not e.oclIsUndefined()) in 
---	if(not elements->isEmpty()) then
---		thisModule.ListValue(self, elements)
---	else
---		OclUndefined
---	endif
---;
---
---rule ListValue (l : AADLI!ListValue,
---		elts: Sequence(AADLBA!PropertyExpression))
---{
---	to
---		l2 : AADLBA!ListValue (
---			ownedListElement <- elts->select(e|e.isSimpleValueType())->collect(e|e.PropertyExpression(false).debug(' ListValue Element '))
---								->union(elts->select(e|not e.isSimpleValueType()).debug(' ListValue Elements '))
---		)
---	do { l2; }
---}
+helper context AADLI!ListValue def: PropertyExpression() : AADLBA!ListValue =
+	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression())
+						->select(e| not e.oclIsUndefined()) in 
+	if(not elements->isEmpty()) then
+		thisModule.ListValue(self, elements)
+	else
+		OclUndefined
+	endif
+;
+
+rule ListValue (l : AADLI!ListValue,
+		elts: Sequence(AADLBA!PropertyExpression))
+{
+	to
+		l2 : AADLBA!ListValue (
+			ownedListElement <- elts->select(e|e.isSimpleValueType())->collect(e|e.PropertyExpression().debug(' ListValue Element '))
+								->union(elts->select(e|not e.isSimpleValueType()).debug(' ListValue Elements '))
+		)
+	do { l2; }
+}
 
 helper context AADLI!Operation def: PropertyExpression() : AADLBA!Operation =
 	let content : Sequence(AADLBA!PropertyExpression) = self.ownedPropertyExpressions->collect(pe|pe.PropertyExpression())->select(e| not e.oclIsUndefined()) in

@@ -322,8 +322,8 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		),
 		putValueValueParam: AADLBA!Parameter
 		(
-			name <- 'value',
-			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'value'),
+			name <- 'pvalue',
+			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'pvalue'),
 			dataFeatureClassifier <-  producerPort.feature.dataFeatureClassifier
 		),
 		BufferAccess: AADLBA!DataAccess

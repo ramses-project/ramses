@@ -3,25 +3,24 @@ package fr.tpt.aadl.launch;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instance.SystemOperationMode;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher;
 import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult;
 
 public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	
-	public final static String ACTION_NAME = "AADLInspector Scheduling Simulation";
-	public final static String ANALYZER_NAME = "AADLInspector";
-	public final static String PLUGIN_NAME = "AADLInspector-Simulation";
-	public final static String PLUGIN_ID = "AADLInspector-Simulation";
-	private String mode = "automatic";
-	
-	private AnalysisArtifact currentResult = null;
+	private final static String ACTION_NAME = "AADLInspector Scheduling Simulation";
+	private final static String ANALYZER_NAME = "AADLInspector-SchedulingAnalysis";
+	public final static String PLUGIN_NAME = "AADLInspector-SchedulingAnalysis";
+	private final static String PLUGIN_ID = "AADLInspector-SchedulingAnalysis";
 	
 	
 	@Override
@@ -56,26 +55,27 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	public void setParameters(Map<String, Object> parameters) 
 	{
 	  mode = (String) parameters.get("Mode");
+	  AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
+	  currentResult = f.createAnalysisArtifact();
 	  parameters.put("AnalysisResult", currentResult);
 	}
 
 	@Override
-	protected void analyzeInstanceModel(IProgressMonitor monitor,
+	protected Resource analyzeInstanceModel(IProgressMonitor monitor,
 			AnalysisErrorReporterManager errManager, SystemInstance root,
 			SystemOperationMode som) 
 	{
-		boolean schedulable = false;
 		
 		try
 		{
 			AnalysisResult r = AADLInspectorLauncher.launchAnalysis(root, mode);
-			currentResult = r.normalize();
+			r.normalize(currentResult);
 		}
 		catch (Exception e)
 		{
 			System.err.println("AADLInspector: " + e.getMessage());
 		}
-		System.out.println("Scheduling analysis result: " + schedulable);
+		return null;
 	}
 
 }

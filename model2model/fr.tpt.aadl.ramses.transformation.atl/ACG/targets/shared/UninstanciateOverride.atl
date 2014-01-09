@@ -633,6 +633,10 @@ rule m_Process_Implementation {
 	}
 }
 
+helper def : getProcessorSchedulingProtocol() : String = 'Posix_1003_Highest_Priority_First_Protocol';
+
+helper def : getVirtualProcessorSchedulingProtocol() : String = 'Posix_1003_Highest_Priority_First_Protocol';
+
 rule m_Processor_Instance {
 	from
 		c : AADLI!ComponentInstance (c.category = #processor)
@@ -656,7 +660,40 @@ rule m_Processor_Instance {
 		),
 		el : AADLBA!EnumerationLiteral
 		(
-			name <- 'Posix_1003_Highest_Priority_First_Protocol'
+			name <- thisModule.getProcessorSchedulingProtocol()
+		)
+		
+		
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+rule m_VirtualProcessor_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category.getName() = 'virtual processor')
+	to
+		sub : AADLBA!VirtualProcessorSubcomponent
+		(
+			name <- c.name.debug('subcomponent created'),
+			virtualProcessorSubcomponentType <- c.subcomponent.subcomponentType,
+			ownedPropertyAssociation  <- c.ownedPropertyAssociation->select(e | not (e.property.name.toLower() = 'scheduling_protocol'))
+												->collectSelfPropertyAssociationImg()
+												-> append(thisModule.CreatePropertyAssociation ('Scheduling_Protocol', 'DEPLOYMENT_PROPERTIES', listValue))
+												
+		),
+		listValue : AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{sched}
+		),
+		sched : AADLBA!NamedValue
+		(
+			namedValue <- el
+		),
+		el : AADLBA!EnumerationLiteral
+		(
+			name <- thisModule.getVirtualProcessorSchedulingProtocol()
 		)
 		
 		

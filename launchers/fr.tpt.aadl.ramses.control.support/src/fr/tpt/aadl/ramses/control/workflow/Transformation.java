@@ -17,7 +17,6 @@ package fr.tpt.aadl.ramses.control.workflow;
  * <ul>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getElement <em>Element</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getList <em>List</em>}</li>
- *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
  * </p>
@@ -78,32 +77,6 @@ public interface Transformation extends WorkflowElement, AnalysisElement {
 	 * @generated
 	 */
 	void setList(List value);
-
-	/**
-	 * Returns the value of the '<em><b>Input Model Identifier</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Input Model Identifier</em>' reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Input Model Identifier</em>' reference.
-	 * @see #setInputModelIdentifier(ModelIdentifier)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_InputModelIdentifier()
-	 * @model
-	 * @generated
-	 */
-	ModelIdentifier getInputModelIdentifier();
-
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Transformation#getInputModelIdentifier <em>Input Model Identifier</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Input Model Identifier</em>' reference.
-	 * @see #getInputModelIdentifier()
-	 * @generated
-	 */
-	void setInputModelIdentifier(ModelIdentifier value);
 
 	/**
 	 * Returns the value of the '<em><b>Output Model Identifier</b></em>' containment reference.

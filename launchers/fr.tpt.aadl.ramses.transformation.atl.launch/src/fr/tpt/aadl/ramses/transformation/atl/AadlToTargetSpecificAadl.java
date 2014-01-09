@@ -63,7 +63,7 @@ import org.osate.ba.AadlBaParserAction ;
 import antlr.RecognitionException;
 
 import fr.tpt.aadl.ramses.control.support.AadlResourceValidator;
-import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -126,7 +126,7 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 	  File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 	  if(outputModelDir.exists()==false)
 		  outputModelDir.mkdir();
-	  InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+	  AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
 	  String outputFilePath=outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName;
 	  File outputFile = new File(outputFilePath);
 
@@ -264,11 +264,11 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
 	AadlResourceValidator.validate(rs);
   }
   
-  public Resource transformXML(Resource inputResource,
-		  						File resourceDir,
-		  						List<String> resourceFileNameList,
-		  						File outputDir,
-		  						String outputPackageName) throws GenerationException
+  public Resource transformWokflow(Resource inputResource,
+		  							File resourceDir,
+		  							List<String> resourceFileNameList,
+		  							File outputDir,
+		  							String outputPackageName) throws GenerationException
   {
       if(resourceDir == null)
       {

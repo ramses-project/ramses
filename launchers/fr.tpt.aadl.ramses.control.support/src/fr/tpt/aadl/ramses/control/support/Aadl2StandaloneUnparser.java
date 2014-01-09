@@ -134,7 +134,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     }
     catch(Exception e)
     {
-      // TODO Auto-generated catch block
+      // TODO Manage with error reporter  
       e.printStackTrace() ;
     }
   }

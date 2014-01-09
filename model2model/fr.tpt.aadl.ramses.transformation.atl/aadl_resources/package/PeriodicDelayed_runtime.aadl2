@@ -25,6 +25,8 @@ with Base_Types, Data_Model, Generation_Properties;
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       bufferSize: in parameter Base_Types::Integer_16;
       ReturnCode: out parameter ReturnCodeType ;
+    properties
+        Compute_Execution_Time => 0 ms .. 1 ms;
      annex behavior_specification {**
        variables
        	 next : Base_Types::Integer_16;
@@ -56,6 +58,8 @@ with Base_Types, Data_Model, Generation_Properties;
       output: requires data access output_type {Access_Right=>write_only;};
       bufferSize: in parameter Base_Types::Integer_16;
       ReturnCode: out parameter ReturnCodeType ;
+    properties
+      Compute_Execution_Time => 0 ms .. 1 ms;
     annex behavior_specification {**
       states
     	s: initial final state;
@@ -84,15 +88,17 @@ with Base_Types, Data_Model, Generation_Properties;
       iteration_counter: in out parameter Base_Types::Integer_16;
       CDW: in parameter ArrayDataType;
       CDWSize: in parameter Base_Types::Integer_16;
-      value: in parameter value_type;
+      pvalue: in parameter value_type;
       buffer: requires data access ArrayDataType {Access_Right=>write_only;};
+    properties
+      Compute_Execution_Time => 0 ms .. 1 ms;
     annex behavior_specification {**
       states
         s: initial final state;
       transitions
         t: s -[]-> s
         {
-          buffer[CDW[iteration_counter]] := value
+          buffer[CDW[iteration_counter]] := pvalue
         };
     **};
   end Put_Value;
@@ -101,6 +107,8 @@ with Base_Types, Data_Model, Generation_Properties;
   features
     iteration_counter: in out parameter Base_Types::Integer_16;
     CDWSize: in parameter Base_Types::Integer_16;
+  properties
+      Compute_Execution_Time => 0 ms .. 1 ms;
   annex behavior_specification {**
   	states
   	  s: initial final state;
@@ -224,7 +232,7 @@ with Base_Types, Data_Model, Generation_Properties;
       taskID: in parameter Base_Types::Integer_16;
       iteration_counter: in out parameter Base_Types::Integer_16;
       CDWSize: in parameter Base_Types::Integer_16;
-      value: in parameter value_type;
+      pvalue: in parameter value_type;
       periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
       buffer: requires data access ArrayDataType {Access_Right=>write_only;};
     annex behavior_specification {**
@@ -236,7 +244,7 @@ with Base_Types, Data_Model, Generation_Properties;
         t: s -[]-> s
         {
           Compute_CDW!(taskID, iteration_counter, periodic_delayed_context, CDWIndex);
-          buffer[CDWIndex] := value
+          buffer[CDWIndex] := pvalue
         };
     **};
   end Put_Value_LowFP;

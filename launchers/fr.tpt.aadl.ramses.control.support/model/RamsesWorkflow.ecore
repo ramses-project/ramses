@@ -8,13 +8,15 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" lowerBound="1"
         eType="#//ModelIdentifier" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="WorkflowElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="WorkflowElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" lowerBound="1"
+        eType="#//ModelIdentifier"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Transformation" eSuperTypes="#//WorkflowElement #//AnalysisElement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="element" lowerBound="1"
         eType="#//AnalysisElement" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="list" lowerBound="1" eType="#//List"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" eType="#//ModelIdentifier"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"
         eType="#//ModelIdentifier" containment="true"/>
   </eClassifiers>
@@ -25,8 +27,6 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="mode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="yesOption" lowerBound="1"
         eType="#//AnalysisOption" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" lowerBound="1"
-        eType="#//ModelIdentifier"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="noOption" lowerBound="1"
         eType="#//AnalysisOption" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"

@@ -31,58 +31,59 @@ import java.io.IOException ;
 public class FileUtil
 {
 
-  private FileUtil()
-  {
-  }
+	private FileUtil()
+	{
+	}
 
-  public static String getFileInBuffer(String filename)
-        throws IOException
-  {
-    BufferedReader reader =
-          new BufferedReader(new FileReader(new File(filename))) ;
-    String buffer = "" ;
-    String line = "" ;
 
-    while((line = reader.readLine()) != null)
-    {
-      buffer += line + "\n" ;
-    }
+	public static String getFileInBuffer(String filename)
+			throws IOException
+			{
+		BufferedReader reader =
+				new BufferedReader(new FileReader(new File(filename))) ;
+		String buffer = "" ;
+		String line = "" ;
 
-    reader.close() ;
-    return buffer ;
-  }
+		while((line = reader.readLine()) != null)
+		{
+			buffer += line + "\n" ;
+		}
 
-  public static void saveBufferInFile(String buffer,
-                                      String filename)
-  {
-    File f = new File(filename) ;
-    BufferedWriter writer = null ;
+		reader.close() ;
+		return buffer ;
+			}
 
-    try
-    {
-      writer = new BufferedWriter(new FileWriter(f)) ;
-      writer.write(buffer) ;
-      writer.close() ;
-    }
-    catch(IOException e)
-    {
-      try
-      {
-        writer.close() ;
-      }
-      catch(Exception e2)
-      {
-      }
-    }
-    finally
-    {
-      try
-      {
-        writer.close() ;
-      }
-      catch(Exception e2)
-      {
-      }
-    }
-  }
+	public static void saveBufferInFile(String buffer,
+			String filename)
+	{
+		File f = new File(filename) ;
+		BufferedWriter writer = null ;
+
+		try
+		{
+			writer = new BufferedWriter(new FileWriter(f)) ;
+			writer.write(buffer) ;
+			writer.close() ;
+		}
+		catch(IOException e)
+		{
+			try
+			{
+				writer.close() ;
+			}
+			catch(Exception e2)
+			{
+			}
+		}
+		finally
+		{
+			try
+			{
+				writer.close() ;
+			}
+			catch(Exception e2)
+			{
+			}
+		}
+	}
 }

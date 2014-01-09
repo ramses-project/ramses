@@ -1,59 +1,52 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2012 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.control.osate.properties;
 
-import java.io.File ;
-import java.io.IOException;
-import java.util.ArrayList ;
-import java.util.List ;
-import java.util.Properties;
+import java.io.File;
 
-import org.eclipse.core.resources.IContainer ;
-import org.eclipse.core.resources.IFile ;
-import org.eclipse.core.resources.IProject ;
-import org.eclipse.core.resources.IResource ;
-import org.eclipse.core.resources.IWorkspaceRoot ;
-import org.eclipse.core.resources.ResourcesPlugin ;
-import org.eclipse.core.runtime.CoreException ;
-import org.eclipse.core.runtime.Path ;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.QualifiedName ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
-import org.eclipse.jface.dialogs.MessageDialog ;
-import org.eclipse.jface.preference.PreferencePage ;
-import org.eclipse.swt.SWT ;
-import org.eclipse.swt.events.SelectionAdapter ;
-import org.eclipse.swt.events.SelectionEvent ;
-import org.eclipse.swt.graphics.FontMetrics ;
-import org.eclipse.swt.graphics.GC ;
-import org.eclipse.swt.layout.GridData ;
-import org.eclipse.swt.layout.GridLayout ;
-import org.eclipse.swt.widgets.Button ;
-import org.eclipse.swt.widgets.Composite ;
-import org.eclipse.swt.widgets.Control ;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event ;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label ;
-import org.eclipse.swt.widgets.Listener ;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text ;
-import org.eclipse.ui.IEditorPart ;
-import org.eclipse.ui.IFileEditorInput ;
-import org.eclipse.ui.IWorkbench ;
-import org.eclipse.ui.IWorkbenchPage ;
-import org.eclipse.ui.IWorkbenchWindow ;
-import org.eclipse.ui.PlatformUI ;
-import org.eclipse.ui.dialogs.ContainerSelectionDialog ;
-import org.eclipse.ui.dialogs.PreferencesUtil ;
-import org.eclipse.ui.dialogs.PropertyPage ;
-import org.eclipse.ui.dialogs.ResourceListSelectionDialog ;
-import org.osate.aadl2.Element ;
-import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.aadl2.modelsupport.util.AadlUtil ;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.ContainerSelectionDialog;
+import org.eclipse.ui.dialogs.PropertyPage;
 import org.osate.ui.dialogs.Dialog;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;

@@ -35,14 +35,9 @@ property set POK is
   Timeslice : Time applies to (virtual processor);
   -- DEPRECATED at this time
 
-  Module_Major_Frame : Time applies to (processor);
-
   Scheduler : POK::Available_Schedulers
       applies to (processor, virtual processor);
 
-  Partition_Slots: list of Time applies to (processor);
-    
-  Slots_Allocation:  list of reference (virtual processor) applies to (processor);
   --  List available schedulers
   --  When we use the STATIC scheduler in the virtual processor
   --  The Slots and Slots_Allocation properties are used to determine when
@@ -81,12 +76,6 @@ property set POK is
 
   -- Deployment properties
   -- Indicate which architecture we use and which bsp
-
-  Source_Location : list of aadlstring applies to (subprogram);
-
-  -- Indicate where is the object file
-  -- that contains this subprogram.
-
 
   MILS_Verified : aadlboolean applies to (system, process, device, thread, processor, data);
   --  For verification purpose

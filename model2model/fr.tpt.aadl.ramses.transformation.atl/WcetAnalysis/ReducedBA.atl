@@ -1,0 +1,173 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module ReducedBA;
+create OUT : AADLBA 	from 		IN: AADLI,
+									WCET: REDUCEDBA;
+
+---- next rule overrides the existing "copy" since we use already defined types referencing them instead of copying them
+abstract rule m_Data_Type {
+ from 
+   type : AADLI!DataType
+ to
+}
+
+abstract rule m_Subprogram_Type {
+ from
+ 	type : AADLI!SubprogramType
+}
+
+abstract rule m_Subprogram_Implementation {
+ from
+ 	impl : AADLI!SubprogramImplementation
+}
+
+rule m_AddReducedBA
+{
+	from
+		t: AADLI!ComponentInstance in IN,
+		reducedBA: REDUCEDBA!ReducedThreadBA in WCET
+		(
+			t.category = #thread
+			and
+			reducedBA.thread = t
+		)
+	to
+		ba: AADLBA!BehaviorAnnex
+		(
+			name        <- 'behavior_specification',
+			states      <- Sequence{singleState},
+			transitions <- Sequence{singleTransition},
+			actions		<- Sequence{mainLoopActionBlock}
+		),
+		singleState:AADLBA!BehaviorState
+		(
+			initial  <- true,
+			final    <- true,
+			complete <- true,
+			name     <- 'main_state'
+		),
+		singleTransition:AADLBA!BehaviorTransition
+		(
+			name <- 'main_loop',
+			sourceState <- singleState,
+			destinationState <- singleState,
+			condition <- onDispatch,
+			actionBlock <- mainLoopActionBlock
+		),
+		onDispatch: AADLBA!DispatchCondition,
+		mainLoopActionBlock: AADLBA!BehaviorActionBlock
+		(content<-mainLoopActions),
+		mainLoopActions: AADLBA!BehaviorActionSequence
+		( 
+			actions <- reducedBA.elements
+		)
+	do
+	{
+		t.subcomponent.subcomponentType.resolve().ownedAnnexSubclause <- Sequence{ba};
+	}
+}
+
+rule m_AddComputation
+{
+	from
+		t: AADLI!ComponentInstance,
+		comp: REDUCEDBA!Computation
+		(
+			t.category = #thread
+			and
+			comp.eContainer().thread = t
+		)
+	to
+		baComputation: AADLBA!TimedAction mapsTo comp
+		(
+		  lowerTime <- lower,
+		  upperTime <- upper
+		),
+		lower: AADLBA!BehaviorTime
+		(
+			integerValue <- lowerIV,
+			unit <- lowerUnit
+		),
+		lowerIV: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- comp.min.longValue()
+		),
+		lowerUnit: AADLBA!UnitLiteral
+		(name <- comp.unit),
+		
+		upper: AADLBA!BehaviorTime
+		(
+			integerValue <- upperIV,
+			unit <- upperUnit
+		),
+		upperIV: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- comp.max.longValue()
+		),
+		upperUnit: AADLBA!UnitLiteral
+		(name <- comp.unit)
+}
+
+rule m_AddLock
+{
+	from
+		t: AADLI!ComponentInstance,
+		lock: REDUCEDBA!CriticalSectionBegin
+		(
+			t.category = #thread
+			and
+			lock.eContainer().thread = t
+		)
+	to
+		entry: AADLBA!LockAction mapsTo lock
+		(
+			dataAccess <- dah
+		),
+		dah: AADLBA!DataAccessHolder
+		(
+			element <- lock.sharedData
+		)
+}
+
+rule m_AddUnlock
+{
+	from
+		t: AADLI!ComponentInstance,
+		unlock: REDUCEDBA!CriticalSectionEnd
+		(
+			t.category = #thread
+			and
+			unlock.eContainer().thread = t
+		)
+	to
+		exit: AADLBA!UnlockAction mapsTo unlock
+		(
+			dataAccess <- dah
+		),
+		dah: AADLBA!DataAccessHolder
+		(
+			element <- unlock.sharedData
+		)
+}

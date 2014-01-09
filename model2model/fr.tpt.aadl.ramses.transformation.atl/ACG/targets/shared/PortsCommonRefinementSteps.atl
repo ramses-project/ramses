@@ -322,7 +322,7 @@ unique lazy rule createFreshnessDataStructure
 		),
 		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
 		(
-			name <- 'value',
+			name <- 'pvalue',
 			dataSubcomponentType <- payload
 		)
 	do

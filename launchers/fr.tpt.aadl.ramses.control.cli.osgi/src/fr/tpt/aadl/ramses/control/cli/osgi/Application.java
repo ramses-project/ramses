@@ -31,12 +31,18 @@ import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
 /**
- * This class controls all aspects of the application's execution
+ * This class implements an OSGi application for
+ * the Command Line Interface (CLI) version of RAMSES.
+ * It relies on class #{@link fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand}
+ * to process CLI options and execute corresponding actions.
  */
 public class Application implements IApplication
 {
-  /* (non-Javadoc)
-   * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
+  /**
+   * This method is the main entrypoint for the Java standalone 
+   * version of RAMSES.
+   * @param context OSGi application context from which RAMSES 
+   * argument will be extracted.
    */
   public Object start(IApplicationContext context)
         throws Exception

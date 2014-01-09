@@ -24,7 +24,7 @@ public class RamsesConfiguration
   private static Map<Resource,Set<File>> IncludeDirectories = new LinkedHashMap<Resource,Set<File>>();
   private static File RamsesRessourcesDir;
   private static File InputDirectory;
-  private static InstantiationManager _instantiationManager = new InstantiationManagerImpl();
+  private static AadlModelsManager _instantiationManager = new AadlModelsManagerImpl();
   private static PredefinedResourcesAccess predefinedResourcesManager;
   private static String runtimePath = "";
   public static final String PLATFORM_ID = "platform";
@@ -58,12 +58,12 @@ public class RamsesConfiguration
     RamsesConfiguration.sysInstance = sysInstance;
   }
 
-  public static void setInstantiationManager(InstantiationManager im)
+  public static void setInstantiationManager(AadlModelsManager im)
   {
     _instantiationManager=im;
   }
 
-  public static InstantiationManager getInstantiationManager()
+  public static AadlModelsManager getInstantiationManager()
   {
     return _instantiationManager;
   }
@@ -252,7 +252,7 @@ public class RamsesConfiguration
     }
     catch(InterruptedException e)
     {
-      // TODO Auto-generated catch block
+      // TODO Manage with error reporter
       e.printStackTrace();
     }
   }

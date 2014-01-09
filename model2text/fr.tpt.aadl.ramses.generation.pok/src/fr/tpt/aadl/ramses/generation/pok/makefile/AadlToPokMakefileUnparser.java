@@ -288,9 +288,12 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
   {
  
     IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
-    ramsesMonit.worked(1);
-    ramsesMonit.subTask("Compilation of the generated code..."); 
-    RamsesConfiguration.waitUnitOfTime(1);
+    if(ramsesMonit!=null)
+    {
+    	ramsesMonit.worked(1);
+    	ramsesMonit.subTask("Compilation of the generated code..."); 
+    	RamsesConfiguration.waitUnitOfTime(1);
+    }
     
     generateMakefile((NamedElement) system, generatedFilePath) ;
     String pokPath = RamsesConfiguration.getRuntimeDir();
@@ -301,7 +304,8 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
     		pokPath = System.getProperty("POK_PATH");
     }
     GeneratorUtils.executeMake(generatedFilePath, pokPath);
-    ramsesMonit.worked(1);
+    if(ramsesMonit!=null)
+    	ramsesMonit.worked(1);
   }
   
   

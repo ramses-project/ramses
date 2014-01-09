@@ -1,4 +1,4 @@
-Bundle-SymbolicName: fr.tpt.aadl.ramses.util.properties;singleton=true
+Bundle-SymbolicName: fr.tpt.aadl.ramses.util.properties;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Name: AADL-Ramses-Util-Properties
 Bundle-Vendor: TELECOM ParisTech
@@ -8,10 +8,8 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
  org.jdom;bundle-version="1.1.1",
  org.osate.utils;bundle-version="0.9.5"
-Provide-Package: fr.tpt.aadl.ramses.util.properties,
- fr.tpt.aadl.ramses.util.workspace
-Export-Package: fr.tpt.aadl.ramses.util.properties,
- fr.tpt.aadl.ramses.util.workspace
+Export-Package: fr.tpt.aadl.ramses.util.properties,fr.tpt.aadl.ramses.util.workspace
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: org.osate.utils
+Bundle-ManifestVersion: 2

@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.control.support.analysis ;
 import java.util.Map ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
@@ -31,8 +32,8 @@ import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
 public interface Analyzer extends NamedPlugin
 {
-  // TODO : return generic analysis results. Any ideas ? Return Resource ???
-  public void performAnalysis(SystemInstance instance,
+  
+  public Resource performAnalysis(SystemInstance instance,
                                AnalysisErrorReporterManager errReporterManager,
                                IProgressMonitor monitor)
         throws AnalysisResultException ;

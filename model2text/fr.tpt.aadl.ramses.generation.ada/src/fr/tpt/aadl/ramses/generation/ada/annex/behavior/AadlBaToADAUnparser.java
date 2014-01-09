@@ -817,7 +817,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
        */
       public String caseWhileStatement(WhileOrDoUntilStatement object)
       {
-        //FIXME : TODO : update location reference
         _adaFileContent.addOutput("while (") ;
         process(object.getLogicalValueExpression()) ;
         _adaFileContent.addOutputNewline(")") ;
@@ -834,17 +833,16 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
        */
       public String caseDoUntilStatement(WhileOrDoUntilStatement object)
       {
-	        //FIXME : TODO : update location reference
-	        _adaFileContent.addOutputNewline("loop") ;
-	        _adaFileContent.incrementIndent() ;
-	        process(object.getBehaviorActions()) ;
-	        _adaFileContent.decrementIndent() ;
-	        _adaFileContent.addOutput("exit when ") ;
-	        process(object.getLogicalValueExpression()) ;
-	        _adaFileContent.addOutputNewline(";") ;
-	        _adaFileContent.addOutputNewline("end loop;") ;
-	        return DONE ;
-	  }
+    	  _adaFileContent.addOutputNewline("loop") ;
+    	  _adaFileContent.incrementIndent() ;
+    	  process(object.getBehaviorActions()) ;
+    	  _adaFileContent.decrementIndent() ;
+    	  _adaFileContent.addOutput("exit when ") ;
+    	  process(object.getLogicalValueExpression()) ;
+    	  _adaFileContent.addOutputNewline(";") ;
+    	  _adaFileContent.addOutputNewline("end loop;") ;
+    	  return DONE ;
+      }
 
       /**
        * Unparse integerrange
@@ -1395,7 +1393,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
        */
       public String caseBehaviorBooleanLiteral(BehaviorBooleanLiteral object)
       {
-        //FIXME : TODO : update location reference
         if(object.isValue())
         {
           _adaFileContent.addOutput("TRUE") ;
@@ -1413,7 +1410,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
        */
       public String caseBehaviorStringLiteral(BehaviorStringLiteral object)
       {
-        //FIXME : TODO : update location reference
         _adaFileContent.addOutput(object.getValue()) ;
         return DONE ;
       }

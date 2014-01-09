@@ -65,18 +65,17 @@ public class AnalysisResult
 		responseTimeResults.put(cpuName, r);
 	}
 	
-	public AnalysisArtifact normalize()
+	public void normalize(AnalysisArtifact aaResults)
 	{
 		AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
 		
 		QualitativeAnalysisResult schedulable = f.createQualitativeAnalysisResult();
 		AnalysisSource schedulable_s = f.createAnalysisSource();
-		schedulable_s.setMethodName(AADLInspectorSchedulingAnalysis.ANALYZER_NAME);
+		schedulable_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
 		
 		schedulable.setValidated(isSchedulable());
 		schedulable.setSource(schedulable_s);
 		
-		AnalysisArtifact aaResults = f.createAnalysisArtifact();
 		aaResults.getResults().add(schedulable);
 		
 		for(String cpuName : responseTimeResults.keySet())
@@ -90,7 +89,7 @@ public class AnalysisResult
 				double margin = (deadline - wcrt)/deadline;
 				
 				AnalysisSource responseMargin_s = f.createAnalysisSource();
-				responseMargin_s.setMethodName(AADLInspectorSchedulingAnalysis.ANALYZER_NAME);
+				responseMargin_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
 				responseMargin_s.setScope(taskName);
 				
 				QuantitativeAnalysisResult responseMargin = f.createQuantitativeAnalysisResult();
@@ -101,7 +100,6 @@ public class AnalysisResult
 			}
 		}
 		
-		return aaResults;
 	}
 	
 	private double getDeadline(String cpuName, String taskName)

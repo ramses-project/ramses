@@ -30,11 +30,14 @@ import javax.swing.JOptionPane;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PublicPackageSection;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.aadl2.util.OsateDebug;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
@@ -42,7 +45,7 @@ import fr.tpt.aadl.ramses.analysis.AnalysisResult;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser;
-import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
@@ -64,6 +67,10 @@ public class AadlTargetSpecificGenerator implements Generator
   private Resource currentImplResource = null;
   
   private Resource _analysisResults = null;
+  
+  private Map<String, Resource> modelsMap = new HashMap<String, Resource>();
+  
+  private String systemToInstantiate = null;
   
   protected AadlTargetSpecificGenerator()
   {
@@ -138,8 +145,11 @@ public class AadlTargetSpecificGenerator implements Generator
 	  _analysisResults = AnalysisUtils.createNewAnalysisArtifact(generatedDir.getAbsolutePath()+systemInstance.getName()+".ares");
 	Resource r = systemInstance.eResource() ;
     SystemInstance currentInstance = systemInstance;
-    final String systemToInstantiate = systemInstance.getSystemImplementation().getName();
+    String rootModelId = workflowPilot.getInputModelId();
+    if(rootModelId!=null && !rootModelId.isEmpty())
+    	modelsMap.put(rootModelId, r);
     
+   systemToInstantiate = systemInstance.getSystemImplementation().getName();
     PublicPackageSection pps = (PublicPackageSection) systemInstance.getSystemImplementation().getOwner();
     AadlPackage p = (AadlPackage) pps.getOwner();
     final String initialPackageName = p.getName();
@@ -153,13 +163,12 @@ public class AadlTargetSpecificGenerator implements Generator
     	  return;
       if(operation.equals("analysis"))
       {
-        doAnalysis(workflowPilot, currentInstance);
+        doAnalysis(workflowPilot);
       }
       else if(operation.equals("transformation"))
       {
     	currentInstance = doTransformation(workflowPilot,r,
-    			resourceDir,generatedDir,systemToInstantiate);
-    	
+    			resourceDir,generatedDir);
     	r = currentInstance.eResource();
       }
       else if(operation.equals("unparse"))
@@ -188,17 +197,46 @@ public class AadlTargetSpecificGenerator implements Generator
     }
   }
 
-  private void doAnalysis(WorkflowPilot workflowPilot, SystemInstance currentInstance)
+  private void doAnalysis(WorkflowPilot workflowPilot)
   {
-	  String analysisName = workflowPilot.getNextAnalysisName();
-      String analysisMode = workflowPilot.getNextAnalysisMode();
+	  String analysisName = workflowPilot.getAnalysisName();
+      String analysisMode = workflowPilot.getAnalysisMode();
+      String analysisModelInputIdentifier = workflowPilot.getInputModelId();
+      String analysisModelOutputIdentifier = workflowPilot.getOutputModelId();
+      Resource inputResource = modelsMap.get(analysisModelInputIdentifier);
+      SystemInstance currentInstance;
+      PropertiesLinkingService pls = new PropertiesLinkingService ();
+      AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
+      if(inputResource.getContents().get(0) instanceof AadlPackage)
+      {
+   	    SystemImplementation si = (SystemImplementation) pls.
+    	   		findNamedElementInsideAadlPackage(systemToInstantiate, 
+    	   				((AadlPackage) inputResource.getContents().get(0)).getOwnedPublicSection());
+    	//Check if instance model already exists
+    	URI instanceModelURI = OsateResourceUtil.getInstanceModelURI(si);
+    	Resource r = OsateResourceUtil.getResourceSet().getResource(instanceModelURI, false);
+    	if(r!=null)
+    	{
+    	  currentInstance = (SystemInstance) r.getContents().get(0);
+    	}
+    	//otherwise produce one
+    	else
+    	{
+          currentInstance = instantiator.instantiate(si); 
+    	}
+      }
+      else
+    	  currentInstance = (SystemInstance) inputResource.getContents().get(0);
+      
       System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
       ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
       Analyzer a = sr.getAnalyzer(analysisName);
+      String outputModelId = workflowPilot.getOutputModelId();
+      Map<String, Object> analysisParam = new HashMap<String, Object>();
       try {
-        Map<String, Object> anaysisParam = new HashMap<String, Object>();
-        anaysisParam.put("Mode", analysisMode);
-        anaysisParam.put("AnalysisResult", _analysisResults);
+        analysisParam.put("Mode", analysisMode);
+        if(outputModelId!=null)
+        	analysisParam.put("OutputModelIdentifier", outputModelId);
         if (a == null)
         {
       	  System.err.println("Unknown analysis: " + analysisName);
@@ -206,9 +244,22 @@ public class AadlTargetSpecificGenerator implements Generator
         else
         {
           
-          a.setParameters(anaysisParam);
-      	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+          a.setParameters(analysisParam);
+      	  Resource result = a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                     new NullProgressMonitor()) ;
+      	  if(result!=null)
+      	  {
+      	    SystemImplementation si = (SystemImplementation) pls.
+            		findNamedElementInsideAadlPackage(systemToInstantiate, 
+              				((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
+      	    String systemToInstantiateSuffix = systemToInstantiate.substring(systemToInstantiate.lastIndexOf("."),
+    			  systemToInstantiate.length());
+    	    systemToInstantiate = analysisModelOutputIdentifier+systemToInstantiateSuffix;
+    	    si.setName(systemToInstantiate);
+      	  
+      		SystemInstance sinst = instantiator.instantiate(si);
+      		modelsMap.put(analysisModelOutputIdentifier, sinst.eResource());
+      	  }
         }
         
       } catch (Exception e) {
@@ -224,9 +275,10 @@ public class AadlTargetSpecificGenerator implements Generator
 
       if(analysisMode.equals("automatic"))
       {
-    	AnalysisArtifact aa = (AnalysisArtifact) _analysisResults.getContents().get(0);
+    	AnalysisArtifact aa = (AnalysisArtifact) analysisParam.get("AnalysisResult");
+    	_analysisResults.getContents().add(aa);
     	QualitativeAnalysisResult result = null;
-    	for(int j=aa.getResults().size()-1; j>=0; j++)
+    	for(int j=aa.getResults().size()-1; j>=0; j--)
     	{
     	  AnalysisResult r = (AnalysisResult) aa.getResults().get(j);
     	  if(r.getSource().getMethodName().toLowerCase().equals(a.getPluginName().toLowerCase()))
@@ -262,23 +314,28 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private SystemInstance doTransformation(WorkflowPilot workflowPilot, Resource r, 
-		  File resourceDir, File generatedDir, String systemToInstantiate) throws GenerationException
+		  File resourceDir, File generatedDir) throws GenerationException
   {
 	  List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
       System.out.println("Transformation launched : " + resourceFileNameList);
-      String outputPackageSuffix = workflowPilot.getTransformationOutputModelId();
-      Resource result = _targetTrans.transformXML(r, resourceDir, resourceFileNameList, 
-                                                  generatedDir, outputPackageSuffix);
 
-      InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
+      String outputModelId = workflowPilot.getOutputModelId();
+      Resource result = _targetTrans.transformWokflow(r, resourceDir, resourceFileNameList, 
+                                                  generatedDir, outputModelId);
+
+      AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
       PropertiesLinkingService pls = new PropertiesLinkingService ();
       SystemImplementation si = (SystemImplementation) pls.
       		findNamedElementInsideAadlPackage(systemToInstantiate, 
       				((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
       
-      currentImplResource = result;
+      SystemInstance sinst = instantiator.instantiate(si);
+      if(outputModelId!=null && !outputModelId.isEmpty())
+    	  this.modelsMap.put(outputModelId, sinst.eResource());
       
-      return instantiator.instantiate(si);
+      currentImplResource = sinst.eResource();
+      
+      return sinst;
   }
   
   private void doUnparse(Resource inputResource, Resource expandedResult,

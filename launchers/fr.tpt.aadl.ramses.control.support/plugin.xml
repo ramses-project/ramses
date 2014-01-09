@@ -24,4 +24,12 @@ http://www.eclipse.org/org/documents/epl-v10.php
    <extension-point id="fr.tpt.aadl.ramses.control.support.analyzer" name="TPT AADL analyzer" schema="schema/analyzer.exsd"/>
    <extension-point id="fr.tpt.aadl.ramses.control.support.generator" name="TPT AADL generator" schema="schema/generator.exsd"/>
 
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated RamsesWorkflow -->
+      <package
+            uri="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0"
+            class="fr.tpt.aadl.ramses.control.workflow.WorkflowPackage"
+            genModel="model/RamsesWorkflow.genmodel"/>
+   </extension>
+
 </plugin>

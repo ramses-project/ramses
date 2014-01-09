@@ -180,8 +180,8 @@ rule m_Thread_Implementation {
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
 		ownedSubprogramCallSequence     <- impl.ownedSubprogramCallSequence,
-		ownedParameterConnection		<- impl.ownedParameterConnection->collect(e|thisModule.ParameterConnection(e,implImg)),
-		ownedAccessConnection			<- impl.ownedAccessConnection->collect(e|thisModule.AccessConnection(e,implImg))
+		ownedParameterConnection		<- impl.ownedParameterConnection->collect(e|thisModule.ParameterConnection(e)),
+		ownedAccessConnection			<- impl.ownedAccessConnection->collect(e|thisModule.AccessConnection(e))
 	)
  do
  {
@@ -218,14 +218,27 @@ rule m_Subprogram_Implementation {
  }
 }
 
---@extends m_Component_Implementation
-rule m_Data_Implementation {
-  from
- 	impl : AADLI!DataImplementation 
- to 
- 	implImg : AADLBA!DataImplementation (
-		ownedPropertyAssociation 	<- impl.mapOwnedPropertyAssociationList(),
-		ownedDataSubcomponent 		<- impl.getSubcomponentsInstances('data')
-	)
-}
+helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AADLBA!ComponentImplementation) : AADLBA!SubprogramCallSequence =
+	if( impl.behaviorFromImpl().oclIsUndefined() ) then
+		if(impl.behaviorFromComputeEntryPoint().oclIsUndefined()) then
+			OclUndefined
+		else
+			thisModule.mapComputeEntrypoint(implImg, c, impl)
+		endif
+	else
+		thisModule.mapCallSequence(implImg, c, impl)
+	endif
+;
+
+
+----@extends m_Component_Implementation
+--rule m_Data_Implementation {
+--  from
+-- 	impl : AADLI!DataImplementation 
+-- to 
+-- 	implImg : AADLBA!DataImplementation (
+--		ownedPropertyAssociation 	<- impl.mapOwnedPropertyAssociationList(),
+--		ownedDataSubcomponent 		<- impl.getSubcomponentsInstances('data')
+--	)
+--}
 

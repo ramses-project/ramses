@@ -26,7 +26,9 @@ import org.osate.ui.actions.AbstractInstanceOrDeclarativeModelModifyActionAction
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.resource.Resource;
 
+import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
 public abstract class AbstractAnalyzer extends
@@ -36,12 +38,16 @@ public abstract class AbstractAnalyzer extends
                                                                                           NamedPlugin
 
 {
+	
+  protected String mode = "automatic";
+  protected AnalysisArtifact currentResult = null;
+  
   @Override
-  public void performAnalysis(SystemInstance instance,
+  public Resource performAnalysis(SystemInstance instance,
                               AnalysisErrorReporterManager errReporterManager,
                               IProgressMonitor monitor)
         throws AnalysisResultException
   {
-    this.analyzeInstanceModel(monitor, errReporterManager, instance, null) ;
+    return this.analyzeInstanceModel(monitor, errReporterManager, instance, null) ;
   }
 }

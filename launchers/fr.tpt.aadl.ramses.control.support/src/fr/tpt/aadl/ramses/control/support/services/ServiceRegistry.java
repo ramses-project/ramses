@@ -38,6 +38,10 @@ import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorRepor
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneParseErrorReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 
+/**
+ * This interface specifies the API to register services 
+ * in order to plug them inside RAMSES.
+ */
 public interface ServiceRegistry
 {
   public final static MessageReporter MSG_REPORTER =
@@ -55,21 +59,84 @@ public interface ServiceRegistry
   public final static AnalysisErrorReporterManager ANALYSIS_ERR_REPORTER_MANAGER =
         new AnalysisErrorReporterManager(ANALYSIS_ERR_REPORTER_FACT) ;
 
+  /**
+   * This method check if the OSGi platform is used or not.
+   * OSGi facilities should be used to register services in case
+   * it is present.
+   * @return true if OSGi platform is used
+   */
   public boolean isOSGi() ;
 
+  /**
+   * This method returns an object (or service in this context) of type
+   * #{@link org.osate.annexsupport.AnnexParser} according to the name
+   * of the annex that needs to be parsed.
+   * @param annexName the name (aadl id) of the annex that needs to be 
+   * parsed
+   * @return an object (or service in this context) of type
+   * #{@link org.osate.annexsupport.AnnexParser}
+   */
   public AnnexParser getParser(String annexName) ;
 
+  /**
+   * This method returns an object (or service in this context) of type
+   * #{@link org.osate.annexsupport.AnnexResolver} according to the name
+   * of the annex for which references need to be resolved.
+   * @param annexName the name (aadl id) of the annex that needs to be 
+   * parsed
+   * @return an object (or service in this context) of type
+   * #{@link org.osate.annexsupport.AnnexResolver}
+   */
   public AnnexResolver getResolver(String annexName) ;
 
+  /**
+   * This method returns an object (or service in this context) of type
+   * #{@link org.osate.annexsupport.AnnexUnparser} according to the name
+   * of the annex that needs to be unparsed.
+   * @param annexName the name (aadl id) of the annex that needs to be 
+   * unparsed
+   * @return an object (or service in this context) of type
+   * #{@link org.osate.annexsupport.AnnexUnparser}
+   */
   public AnnexUnparser getUnparser(String annexName) ;
 
+  /**
+   * This method lists the name of analysis services that have been plugged
+   * in RAMSES.
+   * @return list of available analysis identifiers
+   */
   public Set<String> getAvailableAnalysisNames() ;
 
+  /**
+   * This method returns the on object of type 
+   * #{@link fr.tpt.aadl.ramses.control.support.analysis.Analyzer}, which
+   * can be used to proceed to the analysis identified by analyzerName.
+   * @param analyzerName the name of an analysis
+   * @return an object from which the analysis can be launched
+   */
   public Analyzer getAnalyzer(String analyzerName) ;
 
+  /**
+   * This method lists the name of code generation services that have been plugged
+   * in RAMSES.
+   * @return list of available code generator identifiers
+   */
   public Set<String> getAvailableGeneratorNames() ;
 
-  public Generator getGenerator(String generator) ;
+  /**
+   * This method returns the on object of type 
+   * #{@link fr.tpt.aadl.ramses.control.support.generator.Generator}, which
+   * can be used to proceed to the codeGeneration identified by generatorName.
+   * @param generatorName the name of a code generator
+   * @return an object from which the code generation can be launched
+   */
+  public Generator getGenerator(String generatorName) ;
   
+  /**
+   * This method returns the number of errors that occurred during 
+   * TODO: check if this is normal... 
+   * @return number of errors
+   */
   public int getNbError() ;
+  
 }

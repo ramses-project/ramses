@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.transformation.atl;
+package fr.tpt.aadl.ramses.transformation.atl.hooks.util;
 
 import org.osate.aadl2.instance.FeatureInstance;
 

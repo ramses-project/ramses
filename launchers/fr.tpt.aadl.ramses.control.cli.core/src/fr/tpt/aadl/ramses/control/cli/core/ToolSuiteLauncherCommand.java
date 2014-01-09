@@ -38,10 +38,9 @@ import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
-import fr.tpt.aadl.ramses.control.support.EcorePilot;
+import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot;
 import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
@@ -49,6 +48,12 @@ import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
+/**
+ * This class provides the main entry point of the Command Line 
+ * Interface (CLI) version of RAMSES. It takes as input the 
+ * set of command line arguments of RAMSES, parses them, and
+ * launches the corresponding actions.
+ */
 
 public class ToolSuiteLauncherCommand extends RamsesConfiguration
 {
@@ -77,7 +82,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static Switch analysisOnlyMode ;
   private static QualifiedSwitch analysis ;
   
-  private static final String XML_OPTION_ID = "xml_path" ;
   private static final String WORKFLOW_OPTION_ID = "workflow_path" ;
   
   private final static DefaultMessageReporter _reporter = new DefaultMessageReporter();
@@ -94,7 +98,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     {
       RAMSES_DIR = tmp ;
     }
-    else // try to found out where it is ...
+    else // try to found out where RAMSES_DIR it is ...
     {
       File workingDirectory = new File(System.getProperty("user.dir")) ;
       boolean found = false ;
@@ -122,6 +126,12 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     }
   }
   
+  /**
+   * This method is the main entry point of the Command Line 
+   * Interface (CLI) version of RAMSES. It takes as input the 
+   * set of command line arguments of RAMSES, parses them, and
+   * launches the corresponding actions.
+   */
   public static void main(String[] args)
   {
 	JSAP jsapHelp = new JSAP() ;
@@ -189,7 +199,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
         }
       }
 
-      // Currently disable
+      // TODO: Currently disabled
 //      transformation(launcher, jsapTransfo, args) ;
       
       generation(launcher, jsapGen, args) ;
@@ -201,7 +211,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       System.exit(0) ;
     }
 
-    // TODO : call unparser
   }
 
   
@@ -313,14 +322,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                 .setLongFlag("output").setShortFlag('o').setList(false)
                 .setAllowMultipleDeclarations(false) ;
     generated_file_path.setHelp("Directory where files will be generated") ;
-    
-    FlaggedOption xml_path =
-          new FlaggedOption(XML_OPTION_ID)
-                  .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-                  .setLongFlag("xml").setShortFlag(JSAP.NO_SHORTFLAG).setList(false)
-                  .setAllowMultipleDeclarations(false) ;
-    xml_path.setHelp("The specified XML file contains the workflow") ;
-
                   
    FlaggedOption workflow_path =
    		  new FlaggedOption(WORKFLOW_OPTION_ID)
@@ -359,7 +360,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapHelp.registerParameter(superimposition_files) ;
     jsapHelp.registerParameter(post_transformation_files) ;
     jsapHelp.registerParameter(generation) ;
-    jsapHelp.registerParameter(xml_path) ;
     jsapHelp.registerParameter(workflow_path) ;
     jsapHelp.registerParameter(parameters);
     
@@ -398,7 +398,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     jsapGen.registerParameter(system_to_instantiate) ;
     jsapGen.registerParameter(generated_file_path) ;
     jsapGen.registerParameter(generation) ;
-    jsapGen.registerParameter(xml_path) ;
     jsapGen.registerParameter(workflow_path) ;
     jsapGen.registerParameter(parameters);
   }
@@ -640,30 +639,14 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       String workflow_path =
             genConf.getString(WORKFLOW_OPTION_ID) ;
       
-      String xml_path =
-            genConf.getString(XML_OPTION_ID) ;
-
       Map<String, Object> parameters = parametersHandler(genConf) ;
       
       if(workflow_path != null)
       {
-        EcorePilot xmlPilot = new EcorePilot(genConf.getString(WORKFLOW_OPTION_ID));
+        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(genConf.getString(WORKFLOW_OPTION_ID));
         
         launcher.initializeGeneration(targetName, includeFolderNames) ;
-        launcher.launchModelGenerationWorkflow(mainModelFiles,
-                                          systemToInstantiate,
-                                          outputDir,
-                                          targetName,
-                                          atlResourceDir,
-                                          xmlPilot,
-                                          parameters) ;
-      }
-      else if(xml_path != null)
-      {
-    	XMLPilot xmlPilot = new XMLPilot(genConf.getString(XML_OPTION_ID));
-          
-        launcher.initializeGeneration(targetName, includeFolderNames) ;
-        launcher.launchModelGenerationWorkflow(mainModelFiles,
+        launcher.launchWorkflowProcess(mainModelFiles,
                                           systemToInstantiate,
                                           outputDir,
                                           targetName,
@@ -674,7 +657,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       else
       {
     	launcher.initializeGeneration(targetName, includeFolderNames) ;
-        launcher.launchModelGeneration(mainModelFiles,
+        launcher.launchDefaultGenerationProcess(mainModelFiles,
                                        systemToInstantiate,
                                        outputDir,
                                        targetName,

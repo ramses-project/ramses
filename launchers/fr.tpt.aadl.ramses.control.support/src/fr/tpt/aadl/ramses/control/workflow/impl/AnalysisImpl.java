@@ -30,7 +30,6 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getMethod <em>Method</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getMode <em>Mode</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getYesOption <em>Yes Option</em>}</li>
- *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getNoOption <em>No Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
@@ -88,16 +87,6 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 	 * @ordered
 	 */
 	protected AnalysisOption yesOption;
-
-	/**
-	 * The cached value of the '{@link #getInputModelIdentifier() <em>Input Model Identifier</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getInputModelIdentifier()
-	 * @generated
-	 * @ordered
-	 */
-	protected ModelIdentifier inputModelIdentifier;
 
 	/**
 	 * The cached value of the '{@link #getNoOption() <em>No Option</em>}' containment reference.
@@ -227,44 +216,6 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ModelIdentifier getInputModelIdentifier() {
-		if (inputModelIdentifier != null && inputModelIdentifier.eIsProxy()) {
-			InternalEObject oldInputModelIdentifier = (InternalEObject)inputModelIdentifier;
-			inputModelIdentifier = (ModelIdentifier)eResolveProxy(oldInputModelIdentifier);
-			if (inputModelIdentifier != oldInputModelIdentifier) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, WorkflowPackage.ANALYSIS__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
-			}
-		}
-		return inputModelIdentifier;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ModelIdentifier basicGetInputModelIdentifier() {
-		return inputModelIdentifier;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setInputModelIdentifier(ModelIdentifier newInputModelIdentifier) {
-		ModelIdentifier oldInputModelIdentifier = inputModelIdentifier;
-		inputModelIdentifier = newInputModelIdentifier;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public AnalysisOption getNoOption() {
 		return noOption;
 	}
@@ -376,9 +327,6 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 				return getMode();
 			case WorkflowPackage.ANALYSIS__YES_OPTION:
 				return getYesOption();
-			case WorkflowPackage.ANALYSIS__INPUT_MODEL_IDENTIFIER:
-				if (resolve) return getInputModelIdentifier();
-				return basicGetInputModelIdentifier();
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				return getNoOption();
 			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
@@ -402,9 +350,6 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 				return;
 			case WorkflowPackage.ANALYSIS__YES_OPTION:
 				setYesOption((AnalysisOption)newValue);
-				return;
-			case WorkflowPackage.ANALYSIS__INPUT_MODEL_IDENTIFIER:
-				setInputModelIdentifier((ModelIdentifier)newValue);
 				return;
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				setNoOption((AnalysisOption)newValue);
@@ -432,9 +377,6 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 			case WorkflowPackage.ANALYSIS__YES_OPTION:
 				setYesOption((AnalysisOption)null);
 				return;
-			case WorkflowPackage.ANALYSIS__INPUT_MODEL_IDENTIFIER:
-				setInputModelIdentifier((ModelIdentifier)null);
-				return;
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				setNoOption((AnalysisOption)null);
 				return;
@@ -458,8 +400,6 @@ public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 				return MODE_EDEFAULT == null ? mode != null : !MODE_EDEFAULT.equals(mode);
 			case WorkflowPackage.ANALYSIS__YES_OPTION:
 				return yesOption != null;
-			case WorkflowPackage.ANALYSIS__INPUT_MODEL_IDENTIFIER:
-				return inputModelIdentifier != null;
 			case WorkflowPackage.ANALYSIS__NO_OPTION:
 				return noOption != null;
 			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:

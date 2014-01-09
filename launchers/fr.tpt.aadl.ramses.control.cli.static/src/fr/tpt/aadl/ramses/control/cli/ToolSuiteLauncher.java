@@ -20,14 +20,23 @@
  */
 
 package fr.tpt.aadl.ramses.control.cli ;
+
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
+/**
+ * This class implements a Standalone Java application for
+ * the Command Line Interface (CLI) version of RAMSES.
+ * It relies on class #{@link fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand}
+ * to process CLI options and execute corresponding actions.
+ */
 public class ToolSuiteLauncher
 {
 
   /**
-   * @param args
+   * This method is the main entrypoint for the Java standalone 
+   * version of RAMSES.
+   * @param args arguments from the command line.
    */
   public static void main(String[] args)
   {

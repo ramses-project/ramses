@@ -99,7 +99,7 @@ public interface AnalysisSource extends EObject {
 	 * Sets the value of the '{@link fr.tpt.aadl.ramses.analysis.AnalysisSource#getMethodName <em>Method Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Method Name</em>' attribute.
+	 * @param value the new value of the '<em>Method Name</em>' attribute. Should be set with the plugin name.
 	 * @see #getMethodName()
 	 * @generated
 	 */

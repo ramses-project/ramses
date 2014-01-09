@@ -21,39 +21,41 @@
 
 package fr.tpt.aadl.ramses.control.cli.core ;
 
-import java.io.File ;
-import java.io.IOException ;
-import java.io.PrintStream ;
-import java.util.ArrayList ;
-import java.util.LinkedHashSet;
-import java.util.List ;
-import java.util.Map ;
-import java.util.Set ;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.SystemImplementation;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.instance.SystemInstance;
-import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
 
-import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
-import fr.tpt.aadl.ramses.control.support.InstantiationManager;
+import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser;
+import fr.tpt.aadl.ramses.control.support.FileUtils;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManager;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
-import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager ;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager ;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
 
-public class ToolSuiteLauncher
+/**
+ * This class provides services to the Command 
+ * Line Interface launcher #fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand
+ */
+
+class ToolSuiteLauncher
 {
 
   private ServiceRegistry _registry ;
@@ -62,7 +64,7 @@ public class ToolSuiteLauncher
   private List<String> _analysisToPerform ;
   private Set<File> _includeDirSet;
   
-  public ToolSuiteLauncher()
+  ToolSuiteLauncher()
   {
     _registry = ServiceRegistryProvider.getServiceRegistry() ;
     _predefinedPropertiesManager = new PredefinedPropertiesManager() ;
@@ -84,21 +86,8 @@ public class ToolSuiteLauncher
     {
       throw new Exception ("Invalid generation target identifier: " + targetName) ;
     }
-    String errors = "";
-    _includeDirSet = new LinkedHashSet<File>();
-    // TODO: move next in a file utils
-    for(int i = 0 ; i < includeDirArray.length ; i++)
-    {
-      File potentialFile = new File(includeDirArray[i]) ;
-      
-      if(potentialFile.exists())
-      {
-    	_includeDirSet.add(potentialFile) ;
-        continue ;
-      }
-      else
-    	errors+="\t"+includeDirArray[i]+"\n";
-    }
+    String errors="";
+    _includeDirSet = FileUtils.checkFilesExist(includeDirArray, errors);
     if(false == errors.isEmpty())
     {
       throw new Exception("ERROR: could not be find directories (given in -i option):\n"+errors);
@@ -164,12 +153,16 @@ public class ToolSuiteLauncher
     }
   }
 
-  public List<Resource> parse(List<File> aadlFile)
+  List<Resource> parse(List<File> aadlFile)
   {
     return _instantiator.parse(aadlFile) ;
   }
 
-  public void parsePredefinedRessources()
+  /**
+   * This method parses AADL predefined packages and property sets
+   * and registers them in the OSATE resource set.
+   */
+  void parsePredefinedRessources()
   {
     try
     {
@@ -183,18 +176,18 @@ public class ToolSuiteLauncher
     }
   }
   
-  void launchModelGeneration (List<File> mainModels,
-                                     String systemToInstantiate,
-                                     File generatedFilePath,
-                                     String targetName,
-                                     File resourceFilePath,
-                                     Map<String, Object> parameters)
+  void launchDefaultGenerationProcess (List<File> mainModels,
+                                     	String systemToInstantiate,
+                                     	File generatedFilePath,
+                                     	String targetName,
+                                     	File resourceFilePath,
+                                     	Map<String, Object> parameters)
                                                       throws GenerationException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
-    
+    AadlModelsManager im = RamsesConfiguration.getInstantiationManager();
     SystemInstance instance =
-          this.instantiate(aadlModels, systemToInstantiate) ;
+          im.instantiate(aadlModels, systemToInstantiate) ;
     
     if(instance == null)
     {
@@ -215,7 +208,7 @@ public class ToolSuiteLauncher
                        generatedFilePath) ;
   }
 
-  public void launchModelGenerationWorkflow (List<File> mainModels,
+  void launchWorkflowProcess (List<File> mainModels,
                                         	 String systemToInstantiate,
                                         	 File generatedFilePath,
                                         	 String targetName,
@@ -226,8 +219,9 @@ public class ToolSuiteLauncher
   {
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
 
+    AadlModelsManager im = RamsesConfiguration.getInstantiationManager();
     SystemInstance instance =
-          this.instantiate(aadlModels, systemToInstantiate) ;
+          im.instantiate(aadlModels, systemToInstantiate) ;
 
     if(instance == null)
     {
@@ -256,38 +250,19 @@ public class ToolSuiteLauncher
         throws AnalysisResultException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModelFiles) ;
+    AadlModelsManager im = RamsesConfiguration.getInstantiationManager();
     SystemInstance instance =
-          this.instantiate(aadlModels, systemToInstantiate) ;
+          im.instantiate(aadlModels, systemToInstantiate) ;
     this.performAnalysis(instance, parameters) ;
   }
 
-  public SystemInstance instantiate(List<Resource> aadlModels,
-		String systemToInstantiate) {
-    for(Resource r : aadlModels)
-    {
-	  InstantiationManager instantiator = RamsesConfiguration.getInstantiationManager();
-      PropertiesLinkingService pls = new PropertiesLinkingService ();
-      AadlPackage pkg = (AadlPackage) r.getContents().get(0);
-      SystemImplementation si = (SystemImplementation) pls.
-      		findNamedElementInsideAadlPackage(systemToInstantiate, 
-      				pkg.getOwnedPublicSection());
-      if(si==null)
-    	  continue;
-      return instantiator.instantiate(si);
-    }
-    System.err.println("ERROR: "+ 
-    			systemToInstantiate +
-    			" could not be found for instantiation.");
-	return null;
-  }
-
-  public void parsePredefinedPackages()
+  void parsePredefinedPackages()
   {
     File aadlResourcesDir = RamsesConfiguration.getRamsesResourcesDir();
     new PredefinedPackagesManager(aadlResourcesDir);
   }
-
-  public void unparse(List<Resource> resources, File outputPath) throws IOException
+  
+  void unparse(List<Resource> resources, File outputPath) throws IOException
   {
     String fileName ;
     String outputFilePath ;
@@ -321,4 +296,5 @@ public class ToolSuiteLauncher
       ps.close() ;
     }
   }
+  
 }

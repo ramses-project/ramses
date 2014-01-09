@@ -15,6 +15,7 @@ import org.osate.aadl2.DataPrototype;
 import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.FeaturePrototypeActual;
 import org.osate.aadl2.FeaturePrototypeBinding;
+import org.osate.aadl2.ListValue;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PrototypeBinding;
 import org.osate.aadl2.RangeValue;
@@ -163,33 +164,41 @@ public class Aadl2ASTUtil
 			{
 				PropertyExpression pe = PropertyUtils.getPropertyValue(
 						"Actual_Memory_Binding", process);
+				ComponentInstance mem = null;
 				if (pe instanceof InstanceReferenceValue)
 				{
 					InstanceReferenceValue irv = (InstanceReferenceValue) pe;
-					ComponentInstance mem = (ComponentInstance) irv
+					mem = (ComponentInstance) irv
 							.getReferencedInstanceObject();
-					RecordValue rv = PropertyUtils.getRecordValue(mem, property);
-					
-					double fixed = 0d;
-					double perByte = 0d;
-					
-					for(BasicPropertyAssociation value : rv.getOwnedFieldValues())
-					{
-						String propertyName = value.getProperty().getName();
-						if (propertyName.equalsIgnoreCase("Fixed"))
-						{
-							RangeValue range = (RangeValue) value.getOwnedValue();
-							fixed = range.getMaximumValue().getScaledValue("ms");
-						}
-						else if (propertyName.equalsIgnoreCase("PerByte"))
-						{
-							RangeValue range = (RangeValue) value.getOwnedValue();
-							perByte = range.getMaximumValue().getScaledValue("ms");
-						}
-					}
-					
-					return new IOTime(fixed,perByte);
 				}
+				else if(pe instanceof ListValue)
+				{
+					ListValue lv = (ListValue) pe;
+					InstanceReferenceValue irv = (InstanceReferenceValue) lv.getOwnedListElements().get(0);
+					mem = (ComponentInstance) irv
+							.getReferencedInstanceObject();
+				}
+				RecordValue rv = PropertyUtils.getRecordValue(mem, property);
+
+				double fixed = 0d;
+				double perByte = 0d;
+
+				for(BasicPropertyAssociation value : rv.getOwnedFieldValues())
+				{
+					String propertyName = value.getProperty().getName();
+					if (propertyName.equalsIgnoreCase("Fixed"))
+					{
+						RangeValue range = (RangeValue) value.getOwnedValue();
+						fixed = range.getMaximumValue().getScaledValue("ms");
+					}
+					else if (propertyName.equalsIgnoreCase("PerByte"))
+					{
+						RangeValue range = (RangeValue) value.getOwnedValue();
+						perByte = range.getMaximumValue().getScaledValue("ms");
+					}
+				}
+
+				return new IOTime(fixed,perByte);
 			}
 			catch (Exception e){}
 		}

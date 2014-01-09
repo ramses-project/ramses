@@ -47,7 +47,10 @@ import fr.tpt.aadl.ramses.generation.pok.ada.AdaPokGeneratorFactory;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis;
 
-
+/**
+ * This class implements the API to register statically services into RAMSES. These
+ * services are used in the standalone Java version of RAMSES.
+ */
 public class StaticServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {
 
@@ -61,7 +64,7 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
 
   private Map<String, Generator> _gen = new HashMap<String, Generator>() ;
 
-  public StaticServiceRegistry()
+  StaticServiceRegistry()
         throws Exception
   {
     // Setup AADLBA Front End parser, resolver and unparser.
@@ -75,8 +78,8 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _unparsers.put(AadlBaToADAUnparserAction.ANNEX_NAME,
             new AadlBaToADAUnparserAction()) ;
     
-    _analyzers.put(WcetAnalysis.ANALYZER_NAME, new WcetAnalysis());
-    _analyzers.put(AADLInspectorSchedulingAnalysis.ANALYZER_NAME, new AADLInspectorSchedulingAnalysis());
+    _analyzers.put(WcetAnalysis.PLUGIN_NAME, new WcetAnalysis());
+    _analyzers.put(AADLInspectorSchedulingAnalysis.PLUGIN_NAME, new AADLInspectorSchedulingAnalysis());
     
     AbstractGeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
     AbstractGeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();
@@ -96,48 +99,72 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
 
   }
 
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#getParser(String)
+   */
   @Override
   public AnnexParser getParser(String annexName)
   {
     return _parsers.get(annexName.toLowerCase()) ;
   }
 
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#getResolver(String)
+   */
   @Override
   public AnnexResolver getResolver(String annexName)
   {
     return _resolvers.get(annexName.toLowerCase()) ;
   }
 
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#getUnparser(String)
+   */
   @Override
   public AnnexUnparser getUnparser(String annexName)
   {
     return _unparsers.get(annexName.toLowerCase()) ;
   }
 
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#getAvailableAnalysisNames()
+   */
   @Override
   public Set<String> getAvailableAnalysisNames()
   {
     return _analyzers.keySet() ;
   }
 
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#getAvailableGeneratorNames()
+   */
   @Override
   public Set<String> getAvailableGeneratorNames()
   {
     return _gen.keySet() ;
   }
 
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#getAnalyzer()
+   */  
   @Override
   public Analyzer getAnalyzer(String analyzerName)
   {
     return _analyzers.get(analyzerName) ;
   }
 
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#getGenerator()
+   */ 
   @Override
   public Generator getGenerator(String TransformationName)
   {
     return _gen.get(TransformationName) ;
   }
   
+  /**
+   *  @see fr.tpt.aadl.ramses.control.support.services.ServiceRegistry#isOSGi()
+   */ 
   @Override
   public boolean isOSGi()
   {

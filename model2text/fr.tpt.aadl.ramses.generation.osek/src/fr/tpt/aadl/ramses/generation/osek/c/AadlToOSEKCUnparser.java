@@ -27,6 +27,7 @@ import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.utils.PropertyNotFound ;
 import org.osate.utils.PropertyUtils ;
 
+import fr.tpt.aadl.ramses.control.support.FileUtils;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -50,7 +51,6 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status;
 import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
-import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
 

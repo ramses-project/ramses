@@ -214,11 +214,15 @@ public class SubprogramCallSequenceExtractor extends CallSequenceExtractor
 
 	private static StatementKind getSubprogramActionType(NamedElement e)
 	{
-		if (e.getName().equals("Get_Resource"))
+		// TODO: should set a convention that called subprogram inherits 
+		// a subprogram called Get_Resource or Release_Resource
+		if (e.getName().equals("Get_Resource")
+				|| e.getName().equals("Wait_Semaphore"))
 		{
 			return StatementKind.GetResource;
 		}
-		else if (e.getName().equals("Release_Resource"))
+		else if (e.getName().equals("Release_Resource")
+				|| e.getName().equals("Signal_Semaphore"))
 		{
 			return StatementKind.ReleaseResource;
 		}

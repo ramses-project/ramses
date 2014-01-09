@@ -25,13 +25,10 @@ package fr.tpt.aadl.ramses.generation.launcher.adaravenscar;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
-
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
@@ -39,20 +36,16 @@ import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.UnparseText;
-import org.osate.utils.PropertyUtils ;
+import org.osate.utils.PropertyUtils;
 
+import fr.tpt.aadl.ramses.control.support.FileUtils;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
-import fr.tpt.aadl.ramses.generation.ada.AadlToADASwitchProcess;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
-
 import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
-import fr.tpt.aadl.ramses.util.generation.FileUtils;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
 
 

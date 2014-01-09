@@ -1,9 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: AADL-Ramses-Support
+Bundle-Name: fr.tpt.aadl.ramses.control.support
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.support;singleton:=true
 Bundle-Version: 0.5.0
-Bundle-Vendor: TELECOM ParisTech
+Bundle-Vendor: TPT
+Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.tpt.aadl.ramses.control.support,
@@ -34,10 +35,15 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.modelsupport;bundle-version="1.0.0",
  org.osate.ui;bundle-version="1.0.0",
  org.osate.annexsupport;bundle-version="1.0.0",
- org.osate.utils;bundle-version="0.9.5"
+ org.osate.utils;bundle-version="0.9.5",
+ org.eclipse.core.runtime,
+ org.eclipse.emf.ecore;visibility:=reexport,
+ org.osate.xtext.aadl2.properties;bundle-version="1.0.0"
+Eclipse-LazyStart: true
 Bundle-ClassPath: lib/jdom-2.0.2.jar,
  .
-Import-Package: org.osate.aadl2.instantiation,
+Import-Package: fr.tpt.aadl.ramses.analysis,
+ org.osate.aadl2.instantiation,
  org.osate.utils
 
 

@@ -27,7 +27,6 @@ import java.util.Map ;
 import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.XMLPilot ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
 

@@ -18,7 +18,6 @@ package fr.tpt.aadl.ramses.control.workflow;
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getMethod <em>Method</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getMode <em>Mode</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getYesOption <em>Yes Option</em>}</li>
- *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getNoOption <em>No Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
@@ -106,32 +105,6 @@ public interface Analysis extends WorkflowElement, AnalysisElement {
 	 * @generated
 	 */
 	void setYesOption(AnalysisOption value);
-
-	/**
-	 * Returns the value of the '<em><b>Input Model Identifier</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Input Model Identifier</em>' reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Input Model Identifier</em>' reference.
-	 * @see #setInputModelIdentifier(ModelIdentifier)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAnalysis_InputModelIdentifier()
-	 * @model required="true"
-	 * @generated
-	 */
-	ModelIdentifier getInputModelIdentifier();
-
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Analysis#getInputModelIdentifier <em>Input Model Identifier</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Input Model Identifier</em>' reference.
-	 * @see #getInputModelIdentifier()
-	 * @generated
-	 */
-	void setInputModelIdentifier(ModelIdentifier value);
 
 	/**
 	 * Returns the value of the '<em><b>No Option</b></em>' containment reference.
