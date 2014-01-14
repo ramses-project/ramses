@@ -158,7 +158,10 @@ public class WcetAnalysis extends AbstractAnalyzer {
 
 			}
 			launcher.setOutputPackageName(outputModelIdentifier);
-			File aadlWithWcetFile = new File(RamsesConfiguration.getOutputDir().getAbsolutePath()+"/wcet/"+outputModelIdentifier+".aadl2");
+			File outputDir = new File(RamsesConfiguration.getOutputDir().getAbsolutePath()+"/wcet");
+			if(outputDir.exists()==false)
+				outputDir.mkdir();
+			File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+outputModelIdentifier+".aadl2");
 			Resource rootResource = root.eResource();
 			aadlWithWcet = launcher.doTransformation(transformationFileList, 
 										rootResource,
