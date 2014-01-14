@@ -161,14 +161,14 @@ public class WcetAnalysis extends AbstractAnalyzer {
 			File outputDir = new File(RamsesConfiguration.getOutputDir().getAbsolutePath()+"/wcet");
 			if(outputDir.exists()==false)
 				outputDir.mkdir();
-			File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+outputModelIdentifier+".aadl2");
+			File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+"/"+outputModelIdentifier+".aadl2");
 			Resource rootResource = root.eResource();
 			aadlWithWcet = launcher.doTransformation(transformationFileList, 
 										rootResource,
 										RamsesConfiguration.getOutputDir().getAbsolutePath(),
 										"_"+outputModelIdentifier);
 			
-			//aadlWithWcet.setURI(URI.createFileURI(aadlWithWcetFile.getAbsolutePath()));
+			aadlWithWcet.setURI(URI.createFileURI(aadlWithWcetFile.getAbsolutePath()));
 			
 			AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
 			
