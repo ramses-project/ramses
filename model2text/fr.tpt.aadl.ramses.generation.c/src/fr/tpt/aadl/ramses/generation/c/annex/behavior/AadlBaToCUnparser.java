@@ -441,12 +441,12 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
           sourceName = GenerationUtilsC.
                 getGenerationCIdentifier(object.
                                          getDataClassifier().getQualifiedName());
+          coreElementsToBeUnparsed.add(object.getDataClassifier());
         }
         _cFileContent.addOutput(sourceName);
         _cFileContent.addOutput(" " + object.getName()) ;
         caseArrayDimensions(object.getArrayDimensions()) ;
         String init = GeneratorUtils.getInitialValue(object.getDataClassifier(), "c") ;
-        coreElementsToBeUnparsed.add(object.getDataClassifier());
         if(!init.isEmpty())
         {
         	_cFileContent.addOutput(init) ;
