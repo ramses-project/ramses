@@ -44,6 +44,18 @@ helper context AADLI!NamedElement def : getPropertyAssociationImg() : Sequence (
     	collect ( p |  thisModule.resolveTemp(p, 'p2'))
 ;
 
+helper context AADLI!Element def: getContainerInstance(): AADLI!InstanceObject = 
+	let container : AADLI!InstanceObject = self.eContainer() in
+	if(container.oclIsTypeOf(AADLI!ComponentInstance)
+			or container.oclIsTypeOf(AADLI!SystemInstance)
+			or  container.oclIsTypeOf(AADLI!ConnectionInstance)
+			or container.oclIsUndefined()) then
+		container
+	else
+		container.getContainerInstance()
+	endif
+;
+
 rule m_PropertyAssociationAppliesToSelf { 
     from 
     	p : AADLI!PropertyAssociation in IN
@@ -754,16 +766,6 @@ lazy rule NamedValue {
 --	endif
 --;
 --
---helper context AADLI!Element def: getContainerInstance(): AADLI!InstanceObject = 
---	let container : AADLI!InstanceObject = self.eContainer() in
---	if(container.oclIsTypeOf(AADLI!ComponentInstance)
---			or container.oclIsTypeOf(AADLI!SystemInstance)
---			or  container.oclIsTypeOf(AADLI!ConnectionInstance)) then
---		container
---	else
---		container.getContainerInstance()
---	endif
---;
 --
 --helper def : ContainmentPathOrder : Integer = 0;
 --

@@ -52,6 +52,7 @@ public class AadlArinc653Transformation extends
   		 "ACG/targets/arinc653/QueuingCommunications",
   		 "ACG/targets/arinc653/SamplingCommunications",
   		 "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
+  		 "ACG/targets/arinc653/HealthMonitoring",
   		 "ACG/PeriodicDelayedCommunication/SharedRules",
   		 module
         };

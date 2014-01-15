@@ -9,6 +9,21 @@ with Data_Model,Base_Types;
 --------------------------------------------
 --------------------------------------------
 
+data APEX_UNSIGNED extends Base_Types::Unsigned_32
+end APEX_UNSIGNED;
+
+data APEX_INTEGER extends Base_Types::Integer_32
+end APEX_INTEGER;
+
+data PROCESS_ID_TYPE extends APEX_INTEGER
+end PROCESS_ID_TYPE;
+
+data SYSTEM_ADDRESS_TYPE
+properties
+  Source_Name => "SYSTEM_ADDRESS_TYPE";
+  source_text => ("arinc653/types.h");
+end SYSTEM_ADDRESS_TYPE;
+
 data Message_Size_Type
 properties
   Programming_Properties::Source_Name => "MESSAGE_SIZE_TYPE";
@@ -56,6 +71,61 @@ properties
   Programming_Properties::Source_Name => "WAITING_RANGE_TYPE";
   Programming_Properties::Source_Text => ("arinc653/types.h", "arinc653/apex.ads");
 end Waiting_Range_Type;
+
+
+--------------------------------------------
+--------------------------------------------
+--          PROCESS MANAGEMENT            --
+--------------------------------------------
+--------------------------------------------
+
+subprogram Stop_Self
+properties
+  Programming_Properties::Source_Name => "STOP_SELF";
+  Programming_Properties::Source_Text => ("arinc653/process.h");  
+end Stop_Self;
+
+subprogram a_Stop
+features
+  PROCESS_ID : in parameter PROCESS_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "STOP";
+  Programming_Properties::Source_Text => ("arinc653/process.h");  
+end a_Stop;
+
+subprogram Start 
+features
+  PROCESS_ID : in parameter PROCESS_ID_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "START";
+  Programming_Properties::Source_Text => ("arinc653/process.h");  
+end Start;
+
+
+--------------------------------------------
+--------------------------------------------
+--         PARTITION MANAGEMENT           --
+--------------------------------------------
+--------------------------------------------
+
+data OPERATING_MODE_TYPE
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("IDLE", "COLD_START", "WARM_START", "NORMAL");
+  Programming_Properties::Source_Name => "OPERATING_MODE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/partition.h"); 
+end OPERATING_MODE_TYPE;
+
+subprogram Set_Partition_Mode
+features
+  OPERATING_MODE : in parameter OPERATING_MODE_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Programming_Properties::Source_Name => "SET_PARTITION_MODE";
+  Programming_Properties::Source_Text => ("arinc653/partition.h");  
+end Set_Partition_Mode;
 
 
 --------------------------------------------
@@ -572,6 +642,12 @@ properties
   Programming_Properties::Source_Text => ("arinc653/blackboard.h", "arinc653/apex-blackboards.ads");
 end Get_Blackboard_Status;
 
+--------------------------------------------
+--------------------------------------------
+--              SEMAPHORE                 --
+--------------------------------------------
+--------------------------------------------
+
 data Semaphore_Name_Type
 properties
   Programming_Properties::Source_Name => "SEMAPHORE_NAME_TYPE";
@@ -621,5 +697,73 @@ properties
   Programming_Properties::Source_Name => "SIGNAL_SEMAPHORE";
   Programming_Properties::Source_Text => ("arinc653/semaphore.h", "arinc653/apex-semaphore.ads");
 end Signal_Semaphore;
+
+--------------------------------------------
+--------------------------------------------
+--           HEALTH MONITORING            --
+--------------------------------------------
+--------------------------------------------
+
+data ERROR_MESSAGE_TYPE
+properties
+  Source_Name => "ERROR_MESSAGE_TYPE";
+  source_text => ("arinc653/error.h");
+end ERROR_MESSAGE_TYPE;
+
+data STACK_SIZE_TYPE extends APEX_UNSIGNED
+end STACK_SIZE_TYPE;
+
+data Error_Code_Type
+properties
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("DEADLINE_MISSED",
+  							  "APPLICATION_ERROR",
+  							  "NUMERIC_ERROR",
+  							  "ILLEGAL_REQUEST",
+  							  "STACK_OVERFLOW",
+  							  "MEMORY_VIOLATION",
+  							  "HARDWARE_FAULT",
+  							  "POWER_FAIL");
+  Programming_Properties::Source_Name => "ERROR_CODE_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/error.h");  
+end Error_Code_Type;
+
+
+data Error_Status_Type
+properties
+  Data_Model::Data_Representation => Struct;
+end Error_Status_Type;
+
+data implementation Error_Status_Type.impl
+subcomponents
+  ERROR_CODE: data ERROR_CODE_TYPE;
+  LENGTH: data MESSAGE_SIZE_TYPE;
+  FAILED_PROCESS_ID: data PROCESS_ID_TYPE;
+  FAILED_ADDRESS: data SYSTEM_ADDRESS_TYPE;
+  MESSAGE: data ERROR_MESSAGE_TYPE;
+properties
+  Programming_Properties::Source_Name => "ERROR_STATUS_TYPE";
+  Programming_Properties::Source_Text => ("arinc653/error.h");  
+end Error_Status_Type.impl;
+
+subprogram  Create_Error_Handler
+features
+  ENTRY_POINT: requires subprogram access;
+  STACK_SIZE: in parameter STACK_SIZE_TYPE;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Source_Name => "CREATE_ERROR_HANDLER";
+  source_text => ("arinc653/error.h");
+end Create_Error_Handler;
+
+subprogram Get_Error_Status
+features
+  ERROR_STATUS: out parameter ERROR_STATUS_TYPE.impl;
+  RETURN_CODE: out parameter RETURN_CODE_TYPE;
+properties
+  Source_Name => "GET_ERROR_STATUS";
+  source_text => ("arinc653/error.h");
+end Get_Error_Status;
+
 
 end arinc653_runtime;

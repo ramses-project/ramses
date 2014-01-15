@@ -38,20 +38,17 @@ import org.eclipse.xtext.EcoreUtil2;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.ArrayDimension;
-import org.osate.aadl2.BehavioredImplementation;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation;
 import org.osate.aadl2.ComponentPrototypeBinding;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.DataClassifier;
 import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.ParameterConnectionEnd;
 import org.osate.aadl2.PrototypeBinding;
-import org.osate.aadl2.Subprogram;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramPrototype;
@@ -61,80 +58,80 @@ import org.osate.aadl2.ThreadClassifier;
 import org.osate.aadl2.modelsupport.AadlConstants;
 import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.aadl2.modelsupport.util.AadlUtil;
-import org.osate.ba.aadlba.Any ;
-import org.osate.ba.aadlba.AssignmentAction ;
-import org.osate.ba.aadlba.BehaviorActionBlock ;
-import org.osate.ba.aadlba.BehaviorActionSequence ;
-import org.osate.ba.aadlba.BehaviorActionSet ;
-import org.osate.ba.aadlba.BehaviorActions ;
-import org.osate.ba.aadlba.BehaviorAnnex ;
-import org.osate.ba.aadlba.BehaviorBooleanLiteral ;
-import org.osate.ba.aadlba.BehaviorElement ;
-import org.osate.ba.aadlba.BehaviorEnumerationLiteral ;
-import org.osate.ba.aadlba.BehaviorIntegerLiteral ;
-import org.osate.ba.aadlba.BehaviorRealLiteral ;
-import org.osate.ba.aadlba.BehaviorState ;
-import org.osate.ba.aadlba.BehaviorStringLiteral ;
-import org.osate.ba.aadlba.BehaviorTime ;
-import org.osate.ba.aadlba.BehaviorTransition ;
-import org.osate.ba.aadlba.BehaviorVariable ;
-import org.osate.ba.aadlba.BehaviorVariableHolder ;
-import org.osate.ba.aadlba.BinaryAddingOperator ;
-import org.osate.ba.aadlba.BinaryNumericOperator ;
-import org.osate.ba.aadlba.CalledSubprogramHolder ;
-import org.osate.ba.aadlba.DataAccessHolder ;
-import org.osate.ba.aadlba.DataComponentReference ;
-import org.osate.ba.aadlba.DataHolder ;
-import org.osate.ba.aadlba.DataSubcomponentHolder ;
-import org.osate.ba.aadlba.DispatchCondition ;
-import org.osate.ba.aadlba.DispatchConjunction ;
-import org.osate.ba.aadlba.DispatchTriggerConditionStop ;
-import org.osate.ba.aadlba.DispatchTriggerLogicalExpression ;
-import org.osate.ba.aadlba.ElementHolder ;
-import org.osate.ba.aadlba.ElementValues ;
-import org.osate.ba.aadlba.ElseStatement ;
-import org.osate.ba.aadlba.Factor ;
-import org.osate.ba.aadlba.ForOrForAllStatement ;
-import org.osate.ba.aadlba.IfStatement ;
-import org.osate.ba.aadlba.IndexableElement ;
-import org.osate.ba.aadlba.IntegerRange ;
-import org.osate.ba.aadlba.IntegerValue ;
-import org.osate.ba.aadlba.IntegerValueConstant ;
-import org.osate.ba.aadlba.IntegerValueVariable ;
-import org.osate.ba.aadlba.LockAction ;
-import org.osate.ba.aadlba.LogicalOperator ;
-import org.osate.ba.aadlba.MultiplyingOperator ;
-import org.osate.ba.aadlba.Otherwise ;
-import org.osate.ba.aadlba.ParameterHolder ;
-import org.osate.ba.aadlba.ParameterLabel ;
-import org.osate.ba.aadlba.PortCountValue ;
-import org.osate.ba.aadlba.PortDequeueAction ;
-import org.osate.ba.aadlba.PortDequeueValue ;
-import org.osate.ba.aadlba.PortFreezeAction ;
-import org.osate.ba.aadlba.PortFreshValue ;
-import org.osate.ba.aadlba.PortSendAction ;
-import org.osate.ba.aadlba.Relation ;
-import org.osate.ba.aadlba.RelationalOperator ;
-import org.osate.ba.aadlba.SimpleExpression ;
-import org.osate.ba.aadlba.SubprogramCallAction ;
-import org.osate.ba.aadlba.SubprogramHolder ;
-import org.osate.ba.aadlba.Term ;
-import org.osate.ba.aadlba.TimedAction ;
-import org.osate.ba.aadlba.UnaryAddingOperator ;
-import org.osate.ba.aadlba.UnaryBooleanOperator ;
-import org.osate.ba.aadlba.UnaryNumericOperator ;
-import org.osate.ba.aadlba.UnlockAction ;
-import org.osate.ba.aadlba.Value ;
-import org.osate.ba.aadlba.ValueExpression ;
-import org.osate.ba.aadlba.WhileOrDoUntilStatement ;
-import org.osate.ba.aadlba.util.AadlBaSwitch ;
-import org.osate.ba.analyzers.TypeHolder ;
-import org.osate.ba.unparser.AadlBaUnparser ;
-import org.osate.ba.utils.AadlBaUtils ;
-import org.osate.ba.utils.AadlBaVisitors ;
-import org.osate.ba.utils.DimensionException ;
-import org.osate.utils.Aadl2Utils ;
-import org.osate.utils.PropertyUtils ;
+import org.osate.ba.aadlba.Any;
+import org.osate.ba.aadlba.AssignmentAction;
+import org.osate.ba.aadlba.BehaviorActionBlock;
+import org.osate.ba.aadlba.BehaviorActionSequence;
+import org.osate.ba.aadlba.BehaviorActionSet;
+import org.osate.ba.aadlba.BehaviorActions;
+import org.osate.ba.aadlba.BehaviorAnnex;
+import org.osate.ba.aadlba.BehaviorBooleanLiteral;
+import org.osate.ba.aadlba.BehaviorElement;
+import org.osate.ba.aadlba.BehaviorEnumerationLiteral;
+import org.osate.ba.aadlba.BehaviorIntegerLiteral;
+import org.osate.ba.aadlba.BehaviorRealLiteral;
+import org.osate.ba.aadlba.BehaviorState;
+import org.osate.ba.aadlba.BehaviorStringLiteral;
+import org.osate.ba.aadlba.BehaviorTime;
+import org.osate.ba.aadlba.BehaviorTransition;
+import org.osate.ba.aadlba.BehaviorVariable;
+import org.osate.ba.aadlba.BehaviorVariableHolder;
+import org.osate.ba.aadlba.BinaryAddingOperator;
+import org.osate.ba.aadlba.BinaryNumericOperator;
+import org.osate.ba.aadlba.CalledSubprogramHolder;
+import org.osate.ba.aadlba.DataAccessHolder;
+import org.osate.ba.aadlba.DataComponentReference;
+import org.osate.ba.aadlba.DataHolder;
+import org.osate.ba.aadlba.DataSubcomponentHolder;
+import org.osate.ba.aadlba.DispatchCondition;
+import org.osate.ba.aadlba.DispatchConjunction;
+import org.osate.ba.aadlba.DispatchTriggerConditionStop;
+import org.osate.ba.aadlba.DispatchTriggerLogicalExpression;
+import org.osate.ba.aadlba.ElementHolder;
+import org.osate.ba.aadlba.ElementValues;
+import org.osate.ba.aadlba.ElseStatement;
+import org.osate.ba.aadlba.Factor;
+import org.osate.ba.aadlba.ForOrForAllStatement;
+import org.osate.ba.aadlba.IfStatement;
+import org.osate.ba.aadlba.IndexableElement;
+import org.osate.ba.aadlba.IntegerRange;
+import org.osate.ba.aadlba.IntegerValue;
+import org.osate.ba.aadlba.IntegerValueConstant;
+import org.osate.ba.aadlba.IntegerValueVariable;
+import org.osate.ba.aadlba.LockAction;
+import org.osate.ba.aadlba.LogicalOperator;
+import org.osate.ba.aadlba.MultiplyingOperator;
+import org.osate.ba.aadlba.Otherwise;
+import org.osate.ba.aadlba.ParameterHolder;
+import org.osate.ba.aadlba.ParameterLabel;
+import org.osate.ba.aadlba.PortCountValue;
+import org.osate.ba.aadlba.PortDequeueAction;
+import org.osate.ba.aadlba.PortDequeueValue;
+import org.osate.ba.aadlba.PortFreezeAction;
+import org.osate.ba.aadlba.PortFreshValue;
+import org.osate.ba.aadlba.PortSendAction;
+import org.osate.ba.aadlba.Relation;
+import org.osate.ba.aadlba.RelationalOperator;
+import org.osate.ba.aadlba.SimpleExpression;
+import org.osate.ba.aadlba.SubprogramCallAction;
+import org.osate.ba.aadlba.SubprogramHolder;
+import org.osate.ba.aadlba.Term;
+import org.osate.ba.aadlba.TimedAction;
+import org.osate.ba.aadlba.UnaryAddingOperator;
+import org.osate.ba.aadlba.UnaryBooleanOperator;
+import org.osate.ba.aadlba.UnaryNumericOperator;
+import org.osate.ba.aadlba.UnlockAction;
+import org.osate.ba.aadlba.Value;
+import org.osate.ba.aadlba.ValueExpression;
+import org.osate.ba.aadlba.WhileOrDoUntilStatement;
+import org.osate.ba.aadlba.util.AadlBaSwitch;
+import org.osate.ba.analyzers.TypeHolder;
+import org.osate.ba.unparser.AadlBaUnparser;
+import org.osate.ba.utils.AadlBaUtils;
+import org.osate.ba.utils.AadlBaVisitors;
+import org.osate.ba.utils.DimensionException;
+import org.osate.utils.Aadl2Utils;
+import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
@@ -155,8 +152,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   public List<NamedElement> getCoreElementsToBeUnparsed() {
 	return coreElementsToBeUnparsed;
   }
-
-public AadlBaToCUnparser(AnnexSubclause subclause,
+  
+  public AadlBaToCUnparser(AnnexSubclause subclause,
                            String indent,
                            Map<DataAccess, String> dataAccessMapping)
   {
@@ -435,6 +432,15 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
         {
           sourceName = PropertyUtils.
                 getStringValue(object.getDataClassifier(), "Source_Name") ;
+          List<String> sourceText =
+					PropertyUtils.getStringListValue(object.getDataClassifier(), "Source_Text") ;
+			for(String s : sourceText)
+			{
+				if(s.endsWith(".h"))
+				{
+					_additionalHeaders.add(s);
+				}
+			}
         }
         catch (Exception e)
         {
@@ -481,7 +487,7 @@ public AadlBaToCUnparser(AnnexSubclause subclause,
     	{
     		try
     	    {
-    	      String sourceName = PropertyUtils.getStringValue(component, "Source_Name") ;
+    	      PropertyUtils.getStringValue(component, "Source_Name") ;
     	      _cFileContent.addOutput(object.getEnumLiteral().getValue());
     	    }
     		catch(Exception e)

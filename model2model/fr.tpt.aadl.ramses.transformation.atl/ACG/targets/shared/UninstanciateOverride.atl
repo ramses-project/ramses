@@ -534,16 +534,35 @@ helper context AADLI!ComponentInstance def: collectGlobalVariableImg()  : Sequen
 	Sequence{}
 ;
 
-rule m_Process_Implementation {
- from
- 	impl : AADLI!ProcessImplementation
- to 
- 	implImg : AADLBA!ProcessImplementation (
- 		name 							<- impl.name,
-		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('threadgroup'),
-        ownedThreadSubcomponent         <- impl.getSubcomponentsInstances('thread')->collect(e| thisModule.resolveTemp(e, 'sub')),
-		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
-		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
+helper context AADLI!ComponentInstance def: retrieveErrorHandler(): Sequence(AADLBA!SubprogramSubcomponent) =
+	Sequence{}
+;
+
+-- @extends m_Component_Instance
+rule m_Process_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #process)
+	using
+	{
+ 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+	}
+	to 
+		sub : AADLBA!ProcessSubcomponent
+		(
+			processSubcomponentType <- implImg
+		),
+		implImg : AADLBA!ProcessImplementation (
+ 			name 							<- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then c.processSubcomponentType.name+'.impl'
+											else c.subcomponent.processSubcomponentType.name
+											endif,
+			ownedRealization 				<- thisModule.Realization(
+											if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then c.processSubcomponentType.resolve()
+											else c.subcomponent.processSubcomponentType.type.resolve()
+											endif),
+			ownedThreadGroupSubcomponent 	<- c.componentInstance->select(e|e.category=#threadgroup),
+        	ownedThreadSubcomponent         <- c.componentInstance->select(e|e.category=#thread),
+			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
+			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data)
 												-- intraprocess input thread port
 												-- process output port
 												-- process input port
@@ -631,6 +650,13 @@ rule m_Process_Implementation {
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(implImg, impl);
 	}
+}
+
+rule m_Process_Implementation {
+ from
+ 	impl : AADLI!ProcessImplementation
+ to 
+ 	
 }
 
 helper def : getProcessorSchedulingProtocol() : String = 'Posix_1003_Highest_Priority_First_Protocol';

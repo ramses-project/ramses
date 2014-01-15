@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AnnexSubclause;
+import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DataSubcomponent;
@@ -39,6 +40,7 @@ import org.osate.aadl2.Port;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
 import org.osate.aadl2.ProcessorSubcomponent;
+import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
@@ -717,7 +719,24 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     mainImplCode.addOutputNewline("#include \"main.h\"") ;
     mainImplCode.addOutputNewline("#include \"activity.h\"") ;
   }
-  
+
+  private void genThreadErrorHandlerImpl(ThreadSubcomponent thread,
+        UnparseText mainImplCode)
+  {
+    ThreadImplementation timpl =
+	        (ThreadImplementation) thread.getComponentImplementation() ;
+    mainImplCode.addOutput("  tattr.ENTRY_POINT = ") ;
+	mainImplCode.addOutput(GenerationUtilsC
+	       .getGenerationCIdentifier(timpl.getQualifiedName())) ;
+	mainImplCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + ';') ;
+	mainImplCode
+    .addOutput("  CREATE_ERROR_HANDLER (tattr.ENTRY_POINT,");
+	mainImplCode
+    .addOutput("500,");
+    mainImplCode
+    	    .addOutputNewline("&(ret));");
+  }
+
   private void genThreadDeclarationMainImpl(ThreadSubcomponent thread,
                                             int threadIndex,
                                             UnparseText mainImplCode)
@@ -870,8 +889,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       mainImplCode.addOutputNewline(
     	GenerationUtilsC.getInitializationCall(
-    				(ThreadImplementation) ts.getClassifier()
-    				)
+    			(ThreadImplementation) ts.getClassifier()
+    			)
       );
     }
     mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
@@ -902,8 +921,28 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     // Thread declarations.
     for(ThreadSubcomponent thread : lthreads)
     {
-      genThreadDeclarationMainImpl(thread, threadIndex, mainImplCode) ;
-      threadIndex++ ;
+      boolean foundHM = false;
+      for(PropertyAssociation pa: thread.getOwnedPropertyAssociations())
+      {
+        if(pa.getProperty().getName().equalsIgnoreCase("Error_Handling"))
+        {
+          BooleanLiteral bl = (BooleanLiteral) pa.
+        			  getOwnedValues().get(0).getOwnedValue();
+          foundHM = bl.getValue();
+          if(foundHM)
+        	break;
+        }
+        if(foundHM)
+        {
+          genThreadErrorHandlerImpl(thread, mainImplCode);
+          break;
+        }
+      }
+      if(!foundHM)
+      {
+        genThreadDeclarationMainImpl(thread, threadIndex, mainImplCode) ;
+        threadIndex++ ;
+      }
     }
     
     genMainImplEnd(process, mainImplCode);
@@ -984,7 +1023,26 @@ private void findCommunicationMechanism(ProcessImplementation process,
                                          process.getOwnedThreadSubcomponents() ;
     
     String guard = GenerationUtilsC.generateHeaderInclusionGuard("main.h") ;
+    boolean foundHM = false;
+    for(ThreadSubcomponent ts: process.getOwnedThreadSubcomponents())
+    {
+      for(PropertyAssociation pa: ts.getOwnedPropertyAssociations())
+      {
+    	if(pa.getProperty().getName().equalsIgnoreCase("Error_Handling"))
+    	{
+    	  BooleanLiteral bl = (BooleanLiteral) pa.
+    			  getOwnedValues().get(0).getOwnedValue();
+    	  foundHM = bl.getValue();
+    	  if(foundHM)
+    		break;
+    	}
+      }
+      if(foundHM)
+  		break;
+    }
     mainHeaderCode.addOutputNewline(guard) ;
+    
+    
     
     /**** #DEFINE ****/
 
@@ -1007,6 +1065,10 @@ private void findCommunicationMechanism(ProcessImplementation process,
             .addOutputNewline("#define POK_NEEDS_LIBC_STDLIB 1") ;
     }
     
+    if(foundHM)
+      mainHeaderCode
+        	.addOutputNewline("#define POK_NEEDS_ARINC653_ERROR 1") ;
+
     mainHeaderCode
           .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
                 Integer.toString(bindedThreads.size() + 1)) ;
@@ -1125,6 +1187,9 @@ private void findCommunicationMechanism(ProcessImplementation process,
       // XXX ARBITRARY
       mainHeaderCode.addOutputNewline("#include <protocols/protocols.h>");
     }
+    
+    if(foundHM)
+      mainHeaderCode.addOutputNewline("#include <arinc653/error.h>");
     
     mainHeaderCode.addOutputNewline("\n#endif") ;
     

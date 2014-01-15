@@ -37,8 +37,6 @@ import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.AccessCategory;
-import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.AccessSpecification;
 import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexLibrary;
@@ -48,11 +46,9 @@ import org.osate.aadl2.CallSpecification;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentPrototype;
 import org.osate.aadl2.ComponentPrototypeActual;
 import org.osate.aadl2.ComponentPrototypeBinding;
 import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.ConnectedElement;
 import org.osate.aadl2.Connection;
 import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.DataAccess;
@@ -66,7 +62,6 @@ import org.osate.aadl2.DefaultAnnexLibrary;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.Feature;
-import org.osate.aadl2.FeaturePrototypeActual;
 import org.osate.aadl2.FeaturePrototypeBinding;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
@@ -96,20 +91,18 @@ import org.osate.aadl2.ThreadClassifier;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
 import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.modelsupport.UnparseText;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
 import org.osate.aadl2.util.Aadl2Switch;
 import org.osate.annexsupport.AnnexUnparser;
-import org.osate.annexsupport.AnnexUnparserProxy;
-import org.osate.ba.AadlBaParserAction ;
-import org.osate.ba.AadlBaUnParserAction ;
+import org.osate.ba.AadlBaParserAction;
+import org.osate.ba.AadlBaUnParserAction;
 import org.osate.ba.aadlba.BehaviorAnnex;
-import org.osate.ba.analyzers.TypeHolder ;
-import org.osate.ba.utils.AadlBaUtils ;
-import org.osate.ba.utils.DimensionException ;
-import org.osate.utils.Aadl2Utils ;
-import org.osate.utils.PropertyUtils ;
-import org.osate.utils.names.DataModelProperties ;
+import org.osate.ba.analyzers.TypeHolder;
+import org.osate.ba.utils.AadlBaUtils;
+import org.osate.ba.utils.DimensionException;
+import org.osate.utils.Aadl2Utils;
+import org.osate.utils.PropertyUtils;
+import org.osate.utils.names.DataModelProperties;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
@@ -189,8 +182,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     _subprogramImplCode.addOutputNewline("#include \"subprograms.h\"") ;
     
     _subprogramHeaderCode = new AadlToCSwitchProcess(this) ;
-    
     _subprogramHeaderCode.addOutputNewline("#include \"gtypes.h\"") ;    
+    _subprogramHeaderCode.addOutputNewline("#include \"main.h\"") ;    
     
     _activityImplCode = new AadlToCSwitchProcess(this) ;
     _activityImplCode.addOutputNewline("#include \"activity.h\"") ;
