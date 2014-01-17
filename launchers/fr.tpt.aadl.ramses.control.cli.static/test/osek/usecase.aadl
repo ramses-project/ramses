@@ -170,7 +170,6 @@ end arm;
 processor implementation arm.impl
 properties
   Scheduling_Protocol => (Rate_Monotonic_Protocol) ;
-  OSEK::SystemCounter_Source => "it_timer1";
   OSEK::SystemCounter_MaxAllowedValue => 2000;
   OSEK::SystemCounter_TicksPerBase => 1;
   OSEK::SystemCounter_MinCycle => 1;

@@ -55,7 +55,7 @@ rule m_Threads_HM
 			and
 			c.componentInstance->exists(e|	e.category = #thread
 											and 
-											e.ownedPropertyAssociation->exists(e|e.property.name.equalsIgnoreCase('Recovery_Actions'))
+											e.ownedPropertyAssociation->exists(e|e.property.name.equalsIgnoreCase('HM_Process_Recovery_Actions'))
 										)
 		)
 	using
@@ -63,10 +63,10 @@ rule m_Threads_HM
 		threadWith_HM: Sequence(AADLI!ComponentInstance) = c.componentInstance->select(e|	
 											e.category = #thread
 											and 
-											e.ownedPropertyAssociation->exists(e|e.property.name.equalsIgnoreCase('Recovery_Actions'))
+											e.ownedPropertyAssociation->exists(e|e.property.name.equalsIgnoreCase('HM_Process_Recovery_Actions'))
 										);
 		errorIds: Set(String) = threadWith_HM->collect(e| 
-									e.ownedPropertyAssociation->any(f|f.property.name.equalsIgnoreCase('Recovery_Errors')).ownedValue->at(1).ownedValue.ownedListElement
+									e.ownedPropertyAssociation->any(f|f.property.name.equalsIgnoreCase('HM_Errors')).ownedValue->at(1).ownedValue.ownedListElement
 									->collect(g|g.namedValue.name)
 									)->asSet();
 		getErrorSpg: AADLBA!SubprogramType = thisModule.getErrorStatusSubprogram;
@@ -240,7 +240,7 @@ unique lazy rule createTransition
 	threadWith_HM: Sequence(AADLI!ComponentInstance) = c.componentInstance->select(e|	
 											e.category = #thread
 											and 
-											e.ownedPropertyAssociation->exists(e|e.property.name.equalsIgnoreCase('Recovery_Actions'))
+											e.ownedPropertyAssociation->exists(e|e.property.name.equalsIgnoreCase('HM_Process_Recovery_Actions'))
 										);
 
 	a: AADLBA!BehaviorAction = OclUndefined;
@@ -315,14 +315,14 @@ unique lazy rule createTransition
   do
   {
   	 a <- threadWith_HM->collect(e|
-						let error: AADLBA!NamedValue = e.ownedPropertyAssociation->any(e|e.property.name.equalsIgnoreCase('Recovery_Errors'))
+						let error: AADLBA!NamedValue = e.ownedPropertyAssociation->any(e|e.property.name.equalsIgnoreCase('HM_Errors'))
 							.ownedValue->at(1).ownedValue.ownedListElement->any(e|e.namedValue.name=errorId)
 						in
-						let idx:Integer = e.ownedPropertyAssociation->any(e|e.property.name.equalsIgnoreCase('Recovery_Errors'))
+						let idx:Integer = e.ownedPropertyAssociation->any(e|e.property.name.equalsIgnoreCase('HM_Errors'))
 							.ownedValue->at(1).ownedValue.ownedListElement->indexOf(error)
 						in
 							
-						e.ownedPropertyAssociation->any(e|e.property.name.equalsIgnoreCase('Recovery_Actions'))
+						e.ownedPropertyAssociation->any(e|e.property.name.equalsIgnoreCase('HM_Process_Recovery_Actions'))
 						.ownedValue->at(1).ownedValue.ownedListElement->at(idx).namedValue.createAction(e)
 					)->flatten();
 	 if(a.oclIsUndefined())
@@ -348,36 +348,51 @@ helper context OclAny def: getPropertyAssociation() : AADLBA!PropertyAssociation
 
 
 helper context AADLBA!EnumerationLiteral def: createAction(c: AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorAction) =
-	if(self.name.equalsIgnoreCase('Ignore')) then
+	-- Ignore
+	-- Nothing
+	if(self.name.equalsIgnoreCase('Nothing') or self.name.equalsIgnoreCase('Ignore')) then
 		OclUndefined
 	else
+		-- Confirm
 		if(self.name.equalsIgnoreCase('Confirm')) then
 			OclUndefined
 		else
-			if(self.name.equalsIgnoreCase('Thread_Restart')) then
+			-- Process_Restart
+			if(self.name.equalsIgnoreCase('Process_Restart')) then
 				Sequence{
 					thisModule.createCallRestart(c)
 				}
 			else
-				if(self.name.equalsIgnoreCase('Thread_Stop_And_Start_Another')) then
+				-- Process_Stop_And_Start_Another
+				if(self.name.equalsIgnoreCase('Process_Stop_And_Start_Another')) then
 					OclUndefined
 				else
-					if(self.name.equalsIgnoreCase('Thread_Stop')) then
+					-- Process_Stop
+					if(self.name.equalsIgnoreCase('Process_Stop')) then
 						Sequence{
 							thisModule.createCallStop(c)
 						}
 					else
-						if(self.name.equalsIgnoreCase('Partition_Restart')) then
+						-- Cold_Restart
+						if(self.name.equalsIgnoreCase('Cold_Restart')) then
 							Sequence{
 								thisModule.createCallSetPartitionMode(c, 'COLD_START')
 							}
 						else
-							if(self.name.equalsIgnoreCase('Partition_Stop')) then
+							-- Partition_Stop
+							if(self.name.equalsIgnoreCase('Warm_Restart')) then
 								Sequence{
-									thisModule.createCallSetPartitionMode(c, 'IDLE')
+									thisModule.createCallSetPartitionMode(c, 'WARM_START')
 								}
 							else
-								OclUndefined
+								-- Partition_Stop
+								if(self.name.equalsIgnoreCase('Partition_Stop')) then
+									Sequence{
+										thisModule.createCallSetPartitionMode(c, 'IDLE')
+									}
+								else
+									OclUndefined
+								endif
 							endif
 						endif
 					endif

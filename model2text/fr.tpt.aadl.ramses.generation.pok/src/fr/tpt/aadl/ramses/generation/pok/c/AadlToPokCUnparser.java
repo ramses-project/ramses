@@ -36,15 +36,18 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
+import org.osate.aadl2.ProcessorImplementation;
 import org.osate.aadl2.ProcessorSubcomponent;
 import org.osate.aadl2.PropertyAssociation;
 import org.osate.aadl2.Subcomponent;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadSubcomponent;
+import org.osate.aadl2.VirtualProcessorImplementation;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
@@ -89,6 +92,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 		  								  "arinc653_runtime::Semaphore_Id_Type" ;
   
   private ProcessorProperties _processorProp;
+  
+  private int partitionId=0;
   
   public void process(ProcessorSubcomponent processorSubcomponent,
                       File outputDir,
@@ -921,24 +926,17 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     // Thread declarations.
     for(ThreadSubcomponent thread : lthreads)
     {
-      boolean foundHM = false;
-      for(PropertyAssociation pa: thread.getOwnedPropertyAssociations())
-      {
-        if(pa.getProperty().getName().equalsIgnoreCase("Error_Handling"))
-        {
-          BooleanLiteral bl = (BooleanLiteral) pa.
-        			  getOwnedValues().get(0).getOwnedValue();
-          foundHM = bl.getValue();
-          if(foundHM)
-        	break;
-        }
-        if(foundHM)
-        {
-          genThreadErrorHandlerImpl(thread, mainImplCode);
-          break;
-        }
+      boolean foundHM;
+      try {
+		foundHM = PropertyUtils.getBooleanValue(thread, "Error_Handling");
+      } catch (Exception e) {
+		foundHM = false;
       }
-      if(!foundHM)
+      if(foundHM)
+      {
+        genThreadErrorHandlerImpl(thread, mainImplCode);
+      }
+      else
       {
         genThreadDeclarationMainImpl(thread, threadIndex, mainImplCode) ;
         threadIndex++ ;
@@ -1201,7 +1199,223 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
                                  ProcessorProperties pokProp)
   {
     deploymentImplCode.addOutputNewline("#include <types.h>") ;
-    deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;    
+    deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
+    boolean processorLevelErrors = false;
+    List<String> errorIdList=null;
+    List<String> errorActionList=null;
+    try
+    {
+      errorIdList = PropertyUtils.getStringListValue(processor, "HM_Errors");
+      errorActionList = PropertyUtils.getStringListValue(processor, "HM_Module_Recovery_Actions");
+      processorLevelErrors=true;
+    }
+    catch(Exception e)
+    {
+      // do nothing
+    }
+    if(processorLevelErrors)
+    {
+      deploymentImplCode.addOutputNewline("void pok_kernel_error");
+      deploymentImplCode.incrementIndent();
+      deploymentImplCode.incrementIndent();
+      deploymentImplCode.addOutputNewline("(uint32_t error)");
+      deploymentImplCode.decrementIndent();
+      deploymentImplCode.decrementIndent();
+      deploymentImplCode.addOutputNewline("{");
+      deploymentImplCode.incrementIndent();
+      generateErrorIdSelection(processor, errorIdList, errorActionList, deploymentImplCode);
+      deploymentImplCode.addOutputNewline("}");
+    }
+    
+    ProcessorImplementation pi = (ProcessorImplementation) processor.getSubcomponentType();
+    boolean partitionLevelErrors=false;
+    for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
+    {
+      try
+      {
+        errorIdList = PropertyUtils.getStringListValue(vps, "HM_Errors");
+        partitionLevelErrors=true;
+        break;
+      }
+      catch(Exception e)
+      {
+    	// do nothting
+      }
+    }
+    partitionId=0;
+    if(partitionLevelErrors)
+    {
+  	  deploymentImplCode.addOutputNewline("void pok_partition_error");
+  	  deploymentImplCode.incrementIndent();
+  	  deploymentImplCode.incrementIndent();
+  	  deploymentImplCode.addOutputNewline("(uint8_t partition, uint32_t error)");
+  	  deploymentImplCode.decrementIndent();
+  	  deploymentImplCode.decrementIndent();
+  	  deploymentImplCode.addOutputNewline("{");
+  	  deploymentImplCode.incrementIndent();
+  	  deploymentImplCode.addOutputNewline("switch (partition)");
+      deploymentImplCode.addOutputNewline("{");
+      deploymentImplCode.incrementIndent();
+  	  for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
+      {
+  		try
+  		{
+  		  errorIdList = PropertyUtils.getStringListValue(vps, "HM_Errors");
+          errorActionList = PropertyUtils.getStringListValue(vps, "HM_Partition_Recovery_Actions");
+          deploymentImplCode.addOutputNewline("case "+Integer.toString(partitionId)+":");
+  		  deploymentImplCode.incrementIndent();
+  		  generateErrorIdSelection(vps, errorIdList, errorActionList, deploymentImplCode);
+  		}
+  		catch(Exception e)
+  		{
+  			// do nothing
+  		}
+  		deploymentImplCode.decrementIndent();
+  		partitionId++;
+      }
+  	  deploymentImplCode.addOutputNewline("break;");
+      deploymentImplCode.addOutputNewline("}");
+      deploymentImplCode.decrementIndent();
+      deploymentImplCode.addOutputNewline("}");
+    }
+  }
+  
+  private void generateErrorIdSelection(NamedElement ne,
+		List<String> errorIdList,
+		List<String> errorActionList, UnparseText deploymentImplCode) {
+    deploymentImplCode.addOutputNewline("switch (error)");
+    deploymentImplCode.addOutputNewline("{");
+    deploymentImplCode.incrementIndent();
+    for(String errorId:errorIdList)
+    {
+      String actionId = errorActionList.get(errorIdList.indexOf(errorId));
+      String pokErrorId="POK_ERROR_KIND_INVALID";
+      //Module_Config
+      if(errorId.equalsIgnoreCase("Module_Config"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_KERNEL_CONFIG";
+      }
+      //Module_Init
+      if(errorId.equalsIgnoreCase("Module_Init"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_KERNEL_INIT";
+      }
+      //Module_Scheduling
+      if(errorId.equalsIgnoreCase("Module_Scheduling"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_KERNEL_SCHEDULING";
+      }
+      //Partition_Scheduling
+      else if(errorId.equalsIgnoreCase("Partition_Scheduling"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_PARTITION_SCHEDULING";
+      }
+      //Partition_Config
+      else if(errorId.equalsIgnoreCase("Partition_Config"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_PARTITION_CONFIGURATION";
+      }
+      //Partition_Handler
+      else if(errorId.equalsIgnoreCase("Partition_Handler"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_PARTITION_HANDLER";
+      }
+      //Partition_Init
+      else if(errorId.equalsIgnoreCase("Partition_Init"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_PARTITION_INIT";
+      }
+      //Deadline_Miss
+      else if(errorId.equalsIgnoreCase("Deadline_Miss"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_DEADLINE_MISSED";
+      }
+      //Application_Error
+      else if(errorId.equalsIgnoreCase("Application_Error"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_APPLICATION_ERROR";
+      }
+      //Numeric_Error
+      else if(errorId.equalsIgnoreCase("Numeric_Error"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_NUMERIC_ERROR";
+      }
+      //Illegal_Request
+      else if(errorId.equalsIgnoreCase("Illegal_Request"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_ILLEGAL_REQUEST";
+      }
+      //Stack_Overflow
+      else if(errorId.equalsIgnoreCase("Stack_Overflow"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_STACK_OVERFLOW";
+      }
+      //Memory_Violation
+      else if(errorId.equalsIgnoreCase("Memory_Violation"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_MEMORY_VIOLATION";
+      }
+      //Hardware_Fault
+      else if(errorId.equalsIgnoreCase("Hardware_Fault"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_HARDWARE_FAULT";
+      }
+      //Power_Fail
+      else if(errorId.equalsIgnoreCase("Power_Fail"))
+      {
+    	pokErrorId = "POK_ERROR_KIND_POWER_FAIL";
+      }
+      deploymentImplCode.addOutputNewline("case "+pokErrorId+":");
+      deploymentImplCode.addOutputNewline("{");
+      deploymentImplCode.incrementIndent();
+      
+      if(ne instanceof ProcessorImplementation)
+    	genModuleErrorAction(deploymentImplCode,actionId);
+      else if(ne instanceof VirtualProcessorSubcomponent)
+    	genPartitionErrorAction(deploymentImplCode,actionId);
+      
+      deploymentImplCode.addOutputNewline("break;");
+      deploymentImplCode.addOutputNewline("}");
+    }
+    deploymentImplCode.decrementIndent();
+    deploymentImplCode.addOutputNewline("}");
+  }
+
+  private void genModuleErrorAction(UnparseText deploymentImplCode, String actionId) {
+	// Ignore, Stop, Reset
+	if(actionId.equalsIgnoreCase("Stop"))
+	{
+	  deploymentImplCode.addOutputNewline("pok_kernel_stop();");
+	}
+	else if(actionId.equalsIgnoreCase("Reset"))
+	{
+	  deploymentImplCode.addOutputNewline("pok_kernel_restart();");
+	}
+	else if(actionId.equalsIgnoreCase("Ignore"))
+	{
+	  deploymentImplCode.addOutputNewline("// Ignore");
+	}
+  }
+
+  private void genPartitionErrorAction(UnparseText deploymentImplCode, String actionId)
+  {
+	// Ignore, Partition_Stop, Warm_Restart, Cold_Restart
+    if(actionId.equalsIgnoreCase("Partition_Stop"))
+	{
+	  deploymentImplCode.addOutputNewline("pok_partition_set_mode("+partitionId+", POK_PARTITION_MODE_STOPPED);");
+	}
+    else if(actionId.equalsIgnoreCase("Warm_Restart"))
+	{
+      deploymentImplCode.addOutputNewline("pok_partition_set_mode("+partitionId+", POK_PARTITION_MODE_RESTART);");
+	}
+    else if(actionId.equalsIgnoreCase("Cold_Restart"))
+	{
+      deploymentImplCode.addOutputNewline("pok_partition_set_mode("+partitionId+", POK_PARTITION_MODE_RESTART);");
+	}
+    else if(actionId.equalsIgnoreCase("Ignore"))
+	{
+	  deploymentImplCode.addOutputNewline("// Ignore");
+	}
   }
   
   private void genDeploymentHeader(ProcessorSubcomponent processor,
@@ -1216,7 +1430,6 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     deploymentHeaderCode.addOutputNewline(guard) ;
 
     deploymentHeaderCode.addOutputNewline("#include \"routing.h\"") ;
-    
     // POK::Additional_Features => (libc_stdio,libc_stdlib,console);
     // this property is associated to virtual processors
     List<VirtualProcessorSubcomponent> bindedVPS =
@@ -1314,10 +1527,10 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 
     for(ProcessSubcomponent p : bindedProcess)
     {
-      ProcessImplementation pi =
+      ProcessImplementation processImplementation =
             (ProcessImplementation) p.getComponentImplementation() ;
-      bindedThreads.addAll(pi.getOwnedThreadSubcomponents()) ;
-      threadNumberPerPartition.add(Integer.valueOf(pi
+      bindedThreads.addAll(processImplementation.getOwnedThreadSubcomponents()) ;
+      threadNumberPerPartition.add(Integer.valueOf(processImplementation
             .getOwnedThreadSubcomponents().size())) ;
     }
     for(ThreadSubcomponent th: bindedThreads)
@@ -1626,23 +1839,23 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 
     for(ProcessSubcomponent ps : bindedProcess)
     {
-      ProcessImplementation pi =
+      ProcessImplementation processImplementation =
             (ProcessImplementation) ps.getComponentImplementation() ;
 
-      for(ThreadSubcomponent ts : pi.getOwnedThreadSubcomponents())
+      for(ThreadSubcomponent ts : processImplementation.getOwnedThreadSubcomponents())
       {
         try
         {
           long partitionStack =
                 PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
           _processorProp.requiredStackSize += partitionStack ;
-          _processorProp.requiredStackSizePerPartition.put(pi, partitionStack) ;
+          _processorProp.requiredStackSizePerPartition.put(processImplementation, partitionStack) ;
         }
         catch(Exception e)
         {
           _processorProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
           _processorProp.requiredStackSizePerPartition
-                .put(pi, DEFAULT_REQUIRED_STACK_SIZE) ;
+                .put(processImplementation, DEFAULT_REQUIRED_STACK_SIZE) ;
         }
       }
     }
@@ -1660,9 +1873,69 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 1");
     }
 
+    
+    boolean needErrorHandler=false,needPartitionErrorHandler=false,needKernelErrorHandler = false;
+    try
+    {
+      PropertyUtils.getStringListValue(processor, "HM_Errors");
+      needErrorHandler = true;
+      needKernelErrorHandler = true;
+    }
+    catch(Exception e)
+    {
+      //do nothing
+    }
+    ProcessorImplementation pi = (ProcessorImplementation) processor.getSubcomponentType();
+    for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
+    {
+      try
+      {
+        PropertyUtils.getStringListValue(vps, "HM_Errors");
+        needErrorHandler = true;
+        needPartitionErrorHandler = true;
+      }
+      catch(Exception e)
+      {
+        //do nothing
+      }
+    }
+    for(ProcessSubcomponent ps: bindedProcess)
+    {
+      if(needErrorHandler)
+    	break;
+      ProcessImplementation procImpl = (ProcessImplementation) ps.getSubcomponentType();
+      for(ThreadSubcomponent ts:procImpl.getOwnedThreadSubcomponents())
+      {
+    	try
+        {
+          PropertyUtils.getStringListValue(ts, "HM_Errors");
+          needErrorHandler = true;
+          break;
+        }
+    	catch(Exception e)
+        {
+          //do nothing
+        }
+      }
+    	  
+    }
+    
+    if(needErrorHandler)
+    {
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_ERROR_HANDLING 1");
+      if(needKernelErrorHandler)
+    	deploymentHeaderCode.addOutputNewline("#define POK_USE_GENERATED_KERNEL_ERROR_HANDLER 1");
+      if(needPartitionErrorHandler)
+    	deploymentHeaderCode.addOutputNewline("#define POK_USE_GENERATED_PARTITION_ERROR_HANDLER 1");
+      deploymentHeaderCode.addOutputNewline("#include \"core/partition.h\"") ;
+      deploymentHeaderCode.addOutputNewline("#include \"core/error.h\"") ;
+    }
+
+    
     genDeploymentHeaderEnd(deploymentHeaderCode);
     
     deploymentHeaderCode.addOutputNewline("#endif") ;
+    
   }                                            
 
   protected void genDeploymentHeaderEnd(UnparseText deploymentHeaderCode){}

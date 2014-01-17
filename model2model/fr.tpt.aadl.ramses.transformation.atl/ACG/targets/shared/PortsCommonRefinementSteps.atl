@@ -444,7 +444,8 @@ rule m_DataAccess_Instance_with_BA
 	from
 		fi: AADLI!FeatureInstance (fi.category=#dataAccess
 			 and fi.getComponentInstance().category=#thread
-			 and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex())
+			 and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex()
+		)
 	using
 	{
 		c: AADLI!ComponentInstance = fi.getComponentInstance();
