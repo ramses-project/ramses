@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AnnexSubclause;
@@ -737,7 +738,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 	mainImplCode
     .addOutput("  CREATE_ERROR_HANDLER (tattr.ENTRY_POINT,");
 	mainImplCode
-    .addOutput("500,");
+    .addOutput("8192,");
     mainImplCode
     	    .addOutputNewline("&(ret));");
   }
@@ -1064,9 +1065,12 @@ private void findCommunicationMechanism(ProcessImplementation process,
     }
     
     if(foundHM)
+    {
       mainHeaderCode
         	.addOutputNewline("#define POK_NEEDS_ARINC653_ERROR 1") ;
-
+      mainHeaderCode
+  			.addOutputNewline("#define POK_USE_GENERATED_ERROR_HANDLER 1");
+    }
     mainHeaderCode
           .addOutputNewline("#define POK_CONFIG_NB_THREADS " +
                 Integer.toString(bindedThreads.size() + 1)) ;
@@ -2002,18 +2006,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_NODES " +
 			  Integer.toString(routeProp.processors.size())) ;
 
-	  List<VirtualProcessorSubcomponent> bindedVPS =
-	          new ArrayList<VirtualProcessorSubcomponent>() ;
-
-	  for(Subcomponent sub : processor.getSubcomponent().getComponentImplementation()
-	          .getOwnedSubcomponents())
-	  {
-		  if(sub instanceof VirtualProcessorSubcomponent)
-	      {
-	        bindedVPS.add((VirtualProcessorSubcomponent) sub) ;
-	      }
-	  }
-	  
+	  Set<ComponentInstance> bindedPorcesses = routeProp.processPerProcessor.get(processor);
 	  
 	  if(!localPorts.isEmpty())
       {
@@ -2023,9 +2016,13 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 		  ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance();
 		  if(processInstance.getCategory() == ComponentCategory.PROCESS)
 		  {
-	        List<ComponentInstance> bindedVP = PropertyUtils.getComponentInstanceList(processInstance,
-	        		"Actual_Processor_Binding") ;
-	        int partitionIndex = bindedVPS.indexOf(bindedVP.get(0).getSubcomponent());
+
+			int partitionIndex = 0;
+			for (Object entry:bindedPorcesses) {
+			  if (entry.equals(processInstance)) break;
+			  partitionIndex++;
+			}
+			
 			routingHeaderCode.addOutput(Integer.toString(partitionIndex));
 		  }
 		  routingHeaderCode.addOutput(",");
