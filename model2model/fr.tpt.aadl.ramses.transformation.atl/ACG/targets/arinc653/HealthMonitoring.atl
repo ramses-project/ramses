@@ -306,7 +306,12 @@ unique lazy rule createTransition
 		enumLiteral <- enumSL
 	),
 	enumSL: AADLBA!StringLiteral
-	(value<-errorId.toUpperCase()),
+	(value<-if(errorId.equalsIgnoreCase('Deadline_Miss')) then
+				'DEADLINE_MISSED'
+			else
+				errorId.toUpperCase()
+			endif	
+			),
 	recoveryActionBlock: AADLBA!BehaviorActionBlock
 	(
 		content<-recoveryactions
@@ -325,14 +330,14 @@ unique lazy rule createTransition
 						e.ownedPropertyAssociation->any(e|e.property.name.equalsIgnoreCase('HM_Process_Recovery_Actions'))
 						.ownedValue->at(1).ownedValue.ownedListElement->at(idx).namedValue.createAction(e)
 					)->flatten();
-	 if(a.oclIsUndefined())
-	 {
-		recoveryactions.actions <- Sequence{};
-	 }
-	 else
+	 if(not a.oclIsUndefined() and not a->isEmpty())
 	 {
 		recoveryactions.actions <- a;
   		t.actionBlock <- recoveryActionBlock;
+	 }
+	 else
+	 {
+		t.actionBlock <- OclUndefined;
 	 }
 	 t;
   }
@@ -351,11 +356,11 @@ helper context AADLBA!EnumerationLiteral def: createAction(c: AADLI!ComponentIns
 	-- Ignore
 	-- Nothing
 	if(self.name.equalsIgnoreCase('Nothing') or self.name.equalsIgnoreCase('Ignore')) then
-		OclUndefined
+		Sequence{}
 	else
 		-- Confirm
 		if(self.name.equalsIgnoreCase('Confirm')) then
-			OclUndefined
+			Sequence{}
 		else
 			-- Process_Restart
 			if(self.name.equalsIgnoreCase('Process_Restart')) then
@@ -365,7 +370,7 @@ helper context AADLBA!EnumerationLiteral def: createAction(c: AADLI!ComponentIns
 			else
 				-- Process_Stop_And_Start_Another
 				if(self.name.equalsIgnoreCase('Process_Stop_And_Start_Another')) then
-					OclUndefined
+					Sequence{}
 				else
 					-- Process_Stop
 					if(self.name.equalsIgnoreCase('Process_Stop')) then
@@ -403,7 +408,7 @@ helper context AADLBA!EnumerationLiteral def: createAction(c: AADLI!ComponentIns
 ;
 
 
-unique lazy rule createCallStop
+lazy rule createCallStop
 {
   from
   	c: AADLI!ComponentInstance
@@ -505,7 +510,7 @@ unique lazy rule createCallStop
   }
 }
 
-unique lazy rule createCallRestart
+lazy rule createCallRestart
 {
   from
   	c: AADLI!ComponentInstance
@@ -630,7 +635,7 @@ unique lazy rule createCallRestart
   }
 }
 
-unique lazy rule createCallSetPartitionMode
+lazy rule createCallSetPartitionMode
 {
   from
   	c: AADLI!ComponentInstance,

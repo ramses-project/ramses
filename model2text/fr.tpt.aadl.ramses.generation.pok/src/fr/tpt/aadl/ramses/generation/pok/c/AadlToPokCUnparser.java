@@ -2079,8 +2079,6 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	  routingHeaderCode.decrementIndent() ;
 	  routingHeaderCode.addOutputNewline("} pok_port_identifier_t;") ;
 
-	  // TODO: define buses for distributed use-case
-	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0") ;
 	  idx=0;
 	  routingHeaderCode.addOutputNewline("typedef enum") ;
 	  routingHeaderCode.addOutputNewline("{") ;
