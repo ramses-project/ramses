@@ -1,12 +1,14 @@
 package fr.tpt.aadl.sched.aadlinspector.output;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis;
 import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
@@ -102,6 +104,35 @@ public class AnalysisResult
 		
 	}
 	
+	private String getAIQualifiedName(ComponentInstance ci)
+	{
+		String result = ci.getName();
+		if(ci instanceof SystemInstance && ci.eContainer()==null)
+		{
+			result = "root";
+		}
+		else if(ci.getCategory() == ComponentCategory.VIRTUAL_PROCESSOR)
+			result = getAIQualifiedName((ComponentInstance) ci.eContainer());
+		else if(ci.getCategory() == ComponentCategory.PROCESSOR)
+		{
+			String prefix = getAIQualifiedName((ComponentInstance) ci.eContainer());
+			result = prefix+"."+result;
+		}
+		else if(ci.getCategory() == ComponentCategory.PROCESS)
+		{
+			ComponentInstance bindedCPU = PropertyUtils.getComponentInstanceList(ci,
+	        		"Actual_Processor_Binding").get(0) ;
+			String prefix = getAIQualifiedName(bindedCPU);
+			result = prefix+"."+result;
+		}
+		else if(ci.getCategory() == ComponentCategory.THREAD)
+		{
+			String prefix = getAIQualifiedName((ComponentInstance) ci.eContainer());
+			result = prefix+"."+result;
+		}
+		return result;
+	}
+	
 	private double getDeadline(String cpuName, String taskName)
 	{
 		ComponentInstance cpu = null;
@@ -109,8 +140,9 @@ public class AnalysisResult
 		
 		for(ComponentInstance c : model.getComponentInstances())
 		{
+			String qName = getAIQualifiedName(c);
 			if ((c.getCategory()==ComponentCategory.PROCESSOR)
-					&& (c.getName().equals(cpuName)))
+					&& (qName.equals(cpuName)))
 			{
 				cpu = c;
 				break;
@@ -119,14 +151,12 @@ public class AnalysisResult
 		
 		for(ComponentInstance c : model.getAllComponentInstances())
 		{
+			String qName = getAIQualifiedName(c);
 			if ((c.getCategory()==ComponentCategory.THREAD)
-					&& (c.getName().equals(taskName)))
+					&& (qName.equals(taskName)))
 			{
-				if (AadlUtil.getInfoTaskCPU(c) == cpu)
-				{
-					task = c;
-					break;
-				}
+				task = c;
+				break;
 			}
 		}
 		

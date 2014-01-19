@@ -51,13 +51,18 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	protected void analyzeDeclarativeModel(IProgressMonitor monitor,
 			AnalysisErrorReporterManager errManager, Element declarativeObject) {}
 
+	boolean first = true;
 	@Override
 	public void setParameters(Map<String, Object> parameters) 
 	{
-	  mode = (String) parameters.get("Mode");
-	  AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
-	  currentResult = f.createAnalysisArtifact();
-	  parameters.put("AnalysisResult", currentResult);
+	  if(first)
+	  {
+		mode = (String) parameters.get("Mode");
+		AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
+		currentResult = f.createAnalysisArtifact();
+		parameters.put("AnalysisResult", currentResult);
+		first = false;
+	  }
 	}
 
 	@Override

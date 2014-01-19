@@ -61,12 +61,12 @@ public class XMLResultsProvider {
 			if (nodeName.equals("feasibilityTest"))
 			{
 				NamedNodeMap attrs = n.getAttributes();
-				String nName = attrs.getNamedItem("name").getNodeName();
-				if (nName.equals(ANALYSIS_CPU_UTILIZATION_FACTOR))
+				String nValue = attrs.getNamedItem("name").getNodeValue();
+				if (nValue.equals(ANALYSIS_CPU_UTILIZATION_FACTOR))
 				{
 					extractUtilizationFactorResults(n);
 				}
-				else if (nName.equals(ANALYSIS_SIMULATION))
+				else if (nValue.equals(ANALYSIS_SIMULATION))
 				{
 					extractSimulationResults(n);
 				}
@@ -82,7 +82,7 @@ public class XMLResultsProvider {
 	private void extractSimulationResults(Node n)
 	{
 		String cpu = n.getAttributes().getNamedItem("reference")
-				.getNodeName();
+				.getNodeValue();
 		
 		ResponseTimeResult r = new ResponseTimeResult();
 		result.setResponseTimeResult(cpu, r);
@@ -95,9 +95,9 @@ public class XMLResultsProvider {
 			
 			if (nChildName.equals("computation"))
 			{
-				String compName = nChild.getAttributes()
-						.getNamedItem("name").getNodeName();
-				if (compName.equals(COMPUTATION_SIMULATION_RESPONSE_TIME))
+				String compValue = nChild.getAttributes()
+						.getNamedItem("name").getNodeValue();
+				if (compValue.equals(COMPUTATION_SIMULATION_RESPONSE_TIME))
 				{
 					NamedNodeMap attrs = nChild.getAttributes();
 					Node nReference = attrs.getNamedItem("reference");
@@ -105,10 +105,10 @@ public class XMLResultsProvider {
 					Node nBest = attrs.getNamedItem("best");
 					Node nAvg = attrs.getNamedItem("average");
 					
-					String taskName = nReference.getNodeName();
-					int worst = Integer.parseInt(nWorst.getNodeName());
-					int best  = Integer.parseInt(nBest.getNodeName());
-					double average = Double.parseDouble(nAvg.getNodeName());
+					String taskName = nReference.getNodeValue();
+					int worst = Integer.parseInt(nWorst.getNodeValue());
+					int best  = Integer.parseInt(nBest.getNodeValue());
+					double average = Double.parseDouble(nAvg.getNodeValue());
 					
 					r.setResponseTime(taskName, new TaskResponseTimeResult(
 							taskName, best,worst,average));
@@ -122,10 +122,10 @@ public class XMLResultsProvider {
 				Node nResult = attrs.getNamedItem("result");
 				Node nExplanation = attrs.getNamedItem("explanation");
 				
-				String scheduler = nScheduler.getNodeName();
-				boolean preemptive = nPreemptive.getNodeName().equals("true");
-				boolean result = nResult.getNodeName().equals("true");
-				String explanation = nExplanation.getNodeName();
+				String scheduler = nScheduler.getNodeValue();
+				boolean preemptive = nPreemptive.getNodeValue().equals("true");
+				boolean result = nResult.getNodeValue().equals("true");
+				String explanation = nExplanation.getNodeValue();
 				
 				r.setScheduler(scheduler);
 				r.setPreemptive(preemptive);

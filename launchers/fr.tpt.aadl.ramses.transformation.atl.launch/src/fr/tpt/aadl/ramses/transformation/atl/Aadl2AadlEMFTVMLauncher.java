@@ -208,7 +208,7 @@ public class Aadl2AadlEMFTVMLauncher extends AtlTransfoLauncher
 			for(EObject ref: obj.eCrossReferences())
 			{
 				Resource r = ref.eResource();
-				if(!registeredReferences.contains(r))
+				if(r!=null && !registeredReferences.contains(r))
 				{
 					registeredReferences.add(r);
 					Model referencedModel = EmftvmFactory.eINSTANCE.createModel();
