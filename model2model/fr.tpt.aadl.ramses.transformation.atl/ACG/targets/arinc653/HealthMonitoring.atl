@@ -462,7 +462,7 @@ lazy rule createCallStop
 	),
 	processIdFieldForCheckHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- 'Error_Status_Type.impl'.asClassifier('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
+		element <- 'Error_Status_Type.impl'.asDataType('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
 	),
 	
 	currentThreadExpression: AADLBA!SimpleExpression
@@ -502,7 +502,7 @@ lazy rule createCallStop
 	),
 	processIdFieldHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- 'Error_Status_Type.impl'.asClassifier('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
+		element <- 'Error_Status_Type.impl'.asDataType('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
 	)
   do
   {
@@ -564,7 +564,7 @@ lazy rule createCallRestart
 	),
 	processIdFieldForCheckHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- 'Error_Status_Type.impl'.asClassifier('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
+		element <- 'Error_Status_Type.impl'.asDataType('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
 	),
 	
 	currentThreadExpression: AADLBA!SimpleExpression
@@ -604,7 +604,7 @@ lazy rule createCallRestart
 	),
 	processIdFieldHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- 'Error_Status_Type.impl'.asClassifier('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
+		element <- 'Error_Status_Type.impl'.asDataType('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
 	),
 	stopCall: AADLBA!SubprogramCallAction
 	(
@@ -627,7 +627,7 @@ lazy rule createCallRestart
 	),
 	processIdFieldHolderForStop: AADLBA!DataSubcomponentHolder
 	(
-		element <- 'Error_Status_Type.impl'.asClassifier('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
+		element <- 'Error_Status_Type.impl'.asDataType('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
 	)
   do
   {
@@ -689,7 +689,7 @@ lazy rule createCallSetPartitionMode
 	),
 	processIdFieldHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- 'Error_Status_Type.impl'.asClassifier('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
+		element <- 'Error_Status_Type.impl'.asDataType('ARINC653_RUNTIME').ownedDataSubcomponent->any(e|e.name = 'FAILED_PROCESS_ID')
 	),
 	
 	currentThreadExpression: AADLBA!SimpleExpression
@@ -742,7 +742,7 @@ lazy rule createCallSetPartitionMode
 	),
 	modeEnumLiteral:AADLBA!BehaviorEnumerationLiteral
 	(
-		component <- 'OPERATING_MODE_TYPE'.asClassifier('ARINC653_RUNTIME'),
+		component <- 'OPERATING_MODE_TYPE'.asDataType('ARINC653_RUNTIME'),
 		enumLiteral <- enumSL
 	),
 	enumSL: AADLBA!StringLiteral
