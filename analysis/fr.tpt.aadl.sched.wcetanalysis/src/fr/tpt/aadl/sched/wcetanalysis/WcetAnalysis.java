@@ -40,7 +40,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
 
 	
 	private static final String ACTION_NAME = "Compute WCET from AADL model";
-	private static final String REGISTRY_NAME = "RAMSES";
+	private static final String REGISTRY_NAME = "WCET";
 	public final static String PLUGIN_NAME = "WCET";
 	private final static String PLUGIN_ID = "fr.tpt.aadl.ramses.control.osate.wcet";
 
@@ -112,7 +112,10 @@ public class WcetAnalysis extends AbstractAnalyzer {
 		File generatedFile = new File(generatedFilePath);
 		
 		String wcetPath = generatedFile.getParentFile().getParentFile().getParentFile().getAbsolutePath() + "/wcet/";
-
+		File wcetPathFile = new File(wcetPath);
+		if(wcetPathFile.exists()==false)
+			wcetPathFile.mkdir();
+		
 		AST2DOT ast2dot = new AST2DOT(wcetPath);
 		File outputFile = new File(wcetPath + "threads_ast_extraction.txt");
 		try {
