@@ -1,11 +1,13 @@
 package fr.tpt.aadl.flow.extraction.util ;
 
 import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.NumberValue;
 import org.osate.aadl2.SubprogramSubcomponent ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.flow.extraction.ExecutionAnalyzer ;
 import fr.tpt.aadl.flow.model.RTActionType ;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 
 public class ComputationUtil
 {
@@ -52,11 +54,13 @@ public class ComputationUtil
   public static int getElementMaxDuration(NamedElement e,
                                           ExecutionAnalyzer a)
   {
-    int d = 0 ;
+    Double d = 0.0 ;
 
     try
     {
-      d = (int) PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
+      NumberValue nv = PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
+      d = nv.getScaledValue(AadlUtil.getPrecision(e)) ;
+      return d.intValue();
     }
     catch(Exception ex)
     {
@@ -76,17 +80,19 @@ public class ComputationUtil
       }
     }
 
-    return d ;
+    return d.intValue() ;
   }
 
   public static int getElementMinDuration(NamedElement e,
                                           ExecutionAnalyzer a)
   {
-    int d = 0 ;
+    Double d = 0.0 ;
 
     try
     {
-      d = (int) PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
+      NumberValue nv = PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
+      d = nv.getScaledValue(AadlUtil.getPrecision(e)) ;
+      return d.intValue();
     }
     catch(Exception ex)
     {
@@ -106,7 +112,7 @@ public class ComputationUtil
       }
     }
 
-    return d ;
+    return d.intValue() ;
   }
 
   /*

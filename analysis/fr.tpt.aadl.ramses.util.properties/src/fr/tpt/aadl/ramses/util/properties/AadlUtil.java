@@ -26,19 +26,28 @@ import java.util.ArrayList ;
 import java.util.Collections ;
 import java.util.List ;
 
+import org.eclipse.core.runtime.Platform;
 import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.NamedValue;
+import org.osate.aadl2.NumberValue;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.Subprogram ;
 import org.osate.aadl2.SubprogramCall ;
 import org.osate.aadl2.SubprogramCallSequence ;
+import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.InstanceReferenceValue ;
 import org.osate.utils.PropertyUtils ;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
+
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
 
 
 public class AadlUtil
@@ -118,11 +127,12 @@ public class AadlUtil
     return cpu ;
   }
 
-  public static float getInfoMaxDuration(NamedElement e)
+  public static double getInfoMaxDuration(NamedElement e, String unit)
   {
     try
     {
-      return PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
+      NumberValue nv =  PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
+      return nv.getScaledValue(unit);
     }
     catch(Exception ex)
     {
@@ -131,15 +141,16 @@ public class AadlUtil
     }
   }
 
-  public static float getInfoMinDuration(NamedElement e)
+  public static double getInfoMinDuration(NamedElement e, String unit)
   {
     try
     {
-      return PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
+      NumberValue nv = PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time"); 
+      return nv.getScaledValue(unit);
     }
     catch(Exception ex)
     {
-      return getInfoMaxDuration(e) ;
+      return getInfoMaxDuration(e, unit) ;
     }
   }
 
@@ -241,12 +252,13 @@ public class AadlUtil
 	  }
   }
   
-  public static float getThreadContextSwitchFor(ComponentInstance processor)
+  public static double getThreadContextSwitchFor(ComponentInstance processor, String unit)
   {
     try
     {
-      return PropertyUtils.getMaxRangeValue(processor,
+      NumberValue nv = PropertyUtils.getMaxRangeValue(processor,
                                             "Thread_Swap_Execution_Time") ;
+      return nv.getScaledValue(unit);
     }
     catch(Exception e)
     {
@@ -254,12 +266,13 @@ public class AadlUtil
     }
   }
 
-  public static float getProcessContextSwitchFor(ComponentInstance processor)
+  public static double getProcessContextSwitchFor(ComponentInstance processor, String unit)
   {
     try
     {
-      return PropertyUtils.getMaxRangeValue(processor,
+      NumberValue nv =  PropertyUtils.getMaxRangeValue(processor,
                                             "Process_Swap_Execution_Time") ;
+      return nv.getScaledValue(unit);
     }
     catch(Exception e)
     {
@@ -267,11 +280,12 @@ public class AadlUtil
     }
   }
 
-  public static float getSchedulerQuantum(ComponentInstance processor)
+  public static double getSchedulerQuantum(ComponentInstance processor, String unit)
   {
     try
     {
-      return PropertyUtils.getMaxRangeValue(processor, "Scheduler_Quantum") ;
+      NumberValue nv = PropertyUtils.getMaxRangeValue(processor, "Scheduler_Quantum") ;
+      return nv.getScaledValue(unit);
     }
     catch(Exception e)
     {
@@ -279,26 +293,26 @@ public class AadlUtil
     }
   }
 
-  public static float getSequenceMaxDuration(List<Subprogram> subprograms)
+  public static float getSequenceMaxDuration(List<Subprogram> subprograms, String unit)
   {
     BigDecimal d = new BigDecimal("0") ;
 
     for(Subprogram s : subprograms)
     {
-      float max = getInfoMaxDuration(s) ;
+      double max = getInfoMaxDuration(s,unit) ;
       d = d.add(new BigDecimal(max + "")) ;
     }
 
     return d.floatValue() ;
   }
 
-  public static float getSequenceMinDuration(List<Subprogram> subprograms)
+  public static float getSequenceMinDuration(List<Subprogram> subprograms, String unit)
   {
     BigDecimal d = new BigDecimal("0") ;
 
     for(Subprogram s : subprograms)
     {
-      float min = getInfoMinDuration(s) ;
+      double min = getInfoMinDuration(s,unit) ;
       d = d.add(new BigDecimal(min + "")) ;
     }
 
@@ -382,4 +396,22 @@ public class AadlUtil
   {
     return getCallSequenceMaxDuration(getAllCallSequence(thread));
   }*/
+  
+  public static String getPrecision(NamedElement ne)
+  {
+	String precision = "";
+	if(Platform.isRunning())
+	{
+		Property prop = GetProperties.lookupPropertyDefinition(ne, "AADL_Project", "Timing_Precision") ;
+		UnitLiteral sl = (UnitLiteral) prop.getDefaultValue() ;
+		precision = sl.getName();
+	}
+	else
+	{
+		PropertyConstant prop = PredefinedPropertiesManager.getPropertyConstantDefinition("AADL_Project", "Timing_Precision");
+		NamedValue sl = (NamedValue) prop.getConstantValue() ;
+		precision = ((UnitLiteral)sl.getNamedValue()).getName();
+	}
+	return precision;
+  }
 }

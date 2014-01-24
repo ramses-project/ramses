@@ -1,9 +1,16 @@
 package fr.tpt.aadl.sched.wcetanalysis;
 
 import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.DataAccess;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.FeatureCategory;
+import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
 
+import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody;
@@ -13,6 +20,7 @@ import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionBegin;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.CriticalSectionEnd;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedThreadBA;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaFactory;
+import fr.tpt.aadl.sched.wcetanalysis.util.Aadl2ASTUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.SequenceUtil;
 
 public class AST2ResultModel {
@@ -77,11 +85,25 @@ public class AST2ResultModel {
 			if (node.getType()==StatementKind.GetResource)
 			{
 				CriticalSectionBegin csBegin = factory.createCriticalSectionBegin();
+				ComponentInstance ci = body.getTask();
+				for(FeatureInstance fi: ci.getFeatureInstances())
+				{
+					if(fi.getCategory() == FeatureCategory.DATA_ACCESS
+							&& fi.getFeature().getName().equals(node.getResourceID()))
+						csBegin.setSharedData((DataAccess)fi.getFeature());
+				}
 				bamodel.getElements().add(csBegin);
 			}
 			else if (node.getType()==StatementKind.ReleaseResource)
 			{
 				CriticalSectionEnd csEnd = factory.createCriticalSectionEnd();
+				ComponentInstance ci = body.getTask();
+				for(FeatureInstance fi: ci.getFeatureInstances())
+				{
+					if(fi.getCategory() == FeatureCategory.DATA_ACCESS
+							&& fi.getFeature().getName().equals(node.getResourceID()))
+						csEnd.setSharedData((DataAccess)fi.getFeature());
+				}
 				bamodel.getElements().add(csEnd);
 			}
 			else
@@ -89,12 +111,12 @@ public class AST2ResultModel {
 				Computation comp = factory.createComputation();
 				double bcet = node.getMinExecutionTime();
 				double wcet = node.getMaxExecutionTime();
-				int bcetInt = (int) ((bcet*factor)+0.5d);
-				int wcetInt = (int) ((wcet*factor)+0.5d);
 				
-				comp.setMin(bcetInt);
-				comp.setMax(wcetInt);
-				comp.setUnit("ms");
+				String precision = AadlUtil.getPrecision(body.getTask());
+				
+				comp.setMin(bcet);
+				comp.setMax(wcet);
+				comp.setUnit(precision);
 				
 				bamodel.getElements().add(comp);
 			}

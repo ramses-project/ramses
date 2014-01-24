@@ -64,7 +64,7 @@ public class ThreadCallSequenceExtractor extends CallSequenceExtractor
 		else
 		{
 			ASTNode init = new ASTNode(sc.getName(), StatementKind.Compute, comp);
-			int computationTime = (int) AadlUtil.getInfoMaxDuration(sc);
+			int computationTime = (int) AadlUtil.getInfoMaxDuration(sc, AadlUtil.getPrecision(sc));
 			init.setMaxExecutionTime(computationTime);
 			return init;
 		}

@@ -17,15 +17,19 @@ import org.osate.aadl2.PropertySet;
 import org.osate.aadl2.RangeValue;
 import org.osate.aadl2.RealLiteral;
 import org.osate.aadl2.RecordValue;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.ThreadImplementation;
 import org.osate.aadl2.ThreadType;
 import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.utils.PropertyUtils;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
 
+import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody;
+import fr.tpt.aadl.sched.wcetanalysis.util.Aadl2ASTUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.SequenceUtil;
 
 public class AadlPropertiesUpdate {
@@ -163,13 +167,16 @@ public class AadlPropertiesUpdate {
 		DataAccess da = getDataAccess(t,resourceID);
 		PropertyAssociation pa = PropertyUtils.getPropertyAssociation(da, 
 				"Access_Time");
+		
+		String precision = AadlUtil.getPrecision(t);
+
 		if (pa == null)
 		{
 			RecordValue rvStart = Aadl2Factory.eINSTANCE.createRecordValue();
 			RecordValue rvEnd = Aadl2Factory.eINSTANCE.createRecordValue();
 			
-			addRecordValueField(rvStart, "Offset", startCS, "ms");
-			addRecordValueField(rvEnd, "Offset", endCS, "ms");
+			addRecordValueField(rvStart, "Offset", startCS, precision);
+			addRecordValueField(rvEnd, "Offset", endCS, precision);
 			
 			RecordValue rv = Aadl2Factory.eINSTANCE.createRecordValue();
 			addRecordValueField(rv, "First", rvStart);

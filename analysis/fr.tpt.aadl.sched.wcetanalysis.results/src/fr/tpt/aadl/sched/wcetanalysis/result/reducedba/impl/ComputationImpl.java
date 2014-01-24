@@ -39,7 +39,7 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int MIN_EDEFAULT = 0;
+	protected static final double MIN_EDEFAULT = 0.0;
 
 	/**
 	 * The cached value of the '{@link #getMin() <em>Min</em>}' attribute.
@@ -49,7 +49,7 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * @generated
 	 * @ordered
 	 */
-	protected int min = MIN_EDEFAULT;
+	protected double min = MIN_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getMax() <em>Max</em>}' attribute.
@@ -59,7 +59,7 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int MAX_EDEFAULT = 0;
+	protected static final double MAX_EDEFAULT = 0.0;
 
 	/**
 	 * The cached value of the '{@link #getMax() <em>Max</em>}' attribute.
@@ -69,7 +69,7 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * @generated
 	 * @ordered
 	 */
-	protected int max = MAX_EDEFAULT;
+	protected double max = MAX_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getUnit() <em>Unit</em>}' attribute.
@@ -115,7 +115,7 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getMin() {
+	public double getMin() {
 		return min;
 	}
 
@@ -124,8 +124,8 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setMin(int newMin) {
-		int oldMin = min;
+	public void setMin(double newMin) {
+		double oldMin = min;
 		min = newMin;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ReducedbaPackage.COMPUTATION__MIN, oldMin, min));
@@ -136,7 +136,7 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getMax() {
+	public double getMax() {
 		return max;
 	}
 
@@ -145,8 +145,8 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setMax(int newMax) {
-		int oldMax = max;
+	public void setMax(double newMax) {
+		double oldMax = max;
 		max = newMax;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ReducedbaPackage.COMPUTATION__MAX, oldMax, max));
@@ -200,10 +200,10 @@ public class ComputationImpl extends ThreadBehaviorElementImpl implements Comput
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ReducedbaPackage.COMPUTATION__MIN:
-				setMin((Integer)newValue);
+				setMin((Double)newValue);
 				return;
 			case ReducedbaPackage.COMPUTATION__MAX:
-				setMax((Integer)newValue);
+				setMax((Double)newValue);
 				return;
 			case ReducedbaPackage.COMPUTATION__UNIT:
 				setUnit((String)newValue);

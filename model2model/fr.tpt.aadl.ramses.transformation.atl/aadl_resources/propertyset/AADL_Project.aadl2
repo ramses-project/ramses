@@ -54,4 +54,7 @@ property set AADL_Project is
 							GByte => MByte * 1000, TByte => GByte * 1000);
 	
 	Time_Units: type units (ps, ns => ps * 1000, us => ns * 1000, ms => us * 1000, sec => ms * 1000, min => sec * 60, hr => min * 60);
+	
+	Timing_Precision: constant Time_Units => ms;
+	
 end AADL_Project;

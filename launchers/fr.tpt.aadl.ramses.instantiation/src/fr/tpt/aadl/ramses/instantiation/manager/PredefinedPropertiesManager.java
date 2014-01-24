@@ -35,6 +35,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.EnumerationLiteral;
 import org.osate.aadl2.NamedValue;
 import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.PropertySet;
 
 import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
@@ -136,37 +137,65 @@ public class PredefinedPropertiesManager
     return predefinedPropertySets ;
   }
 
-  public static String getDefaultStringValue(String PropertySetName,
-                                             String PropertyName)
+  
+  public static PropertyConstant getPropertyConstantDefinition(String PropertySetName,
+                                               String PropertyName)
   {
-    String res = "" ;
     Resource r = predefinedPropertySets.get(PropertySetName) ;
     TreeIterator<EObject> it = r.getAllContents() ;
 
     while(it.hasNext())
     {
       EObject elt = it.next() ;
-      if(elt instanceof Property)
+      if(elt instanceof PropertyConstant)
       {
-        Property p = (Property) elt ;
-
+        PropertyConstant p = (PropertyConstant) elt ;
         if(p.getName().equalsIgnoreCase(PropertyName))
         {
-          if(p.getDefaultValue() != null &&
-                p.getDefaultValue() instanceof NamedValue)
-          {
-            NamedValue nv = (NamedValue) p.getDefaultValue() ;
-            if(nv.getNamedValue() instanceof EnumerationLiteral)
-            {
-              EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
-              return el.getName();
-            }
-          }
+          return p;
         }
       }
     }
+    return null;
+  }
+    
+  public static Property getPropertyDefinition(String PropertySetName,
+                            String PropertyName)
+  {
+	  Resource r = predefinedPropertySets.get(PropertySetName) ;
+	  TreeIterator<EObject> it = r.getAllContents() ;
 
-    return res ;
+	  while(it.hasNext())
+	  {
+		  EObject elt = it.next() ;
+		  if(elt instanceof Property)
+		  {
+			  Property p = (Property) elt ;
+
+			  if(p.getName().equalsIgnoreCase(PropertyName))
+			  {
+				  return p;
+			  }
+		  }
+	  }
+	  return null;
+  }
+                            
+  public static String getDefaultStringValue(String PropertySetName,
+                                             String PropertyName)
+  {
+    Property p = getPropertyDefinition(PropertySetName, PropertyName);
+    if(p.getDefaultValue() != null &&
+    		p.getDefaultValue() instanceof NamedValue)
+    {
+    	NamedValue nv = (NamedValue) p.getDefaultValue() ;
+    	if(nv.getNamedValue() instanceof EnumerationLiteral)
+    	{
+    		EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+    		return el.getName();
+    	}
+    }
+    return null;
   }
   
   public int getPropertiesCount()

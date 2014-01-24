@@ -36,6 +36,7 @@ import org.osate.aadl2.DataSubcomponent;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
+import org.osate.aadl2.NumberValue;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
@@ -816,9 +817,10 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
 		try
 		{
-			float value =
+			NumberValue value =
 					PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
-			timeCapacity = Integer.toString((int) value) ;
+			Double d = value.getScaledValue("ms");
+			timeCapacity = Integer.toString(d.intValue()) ;
 		}
 		catch(Exception e)
 		{

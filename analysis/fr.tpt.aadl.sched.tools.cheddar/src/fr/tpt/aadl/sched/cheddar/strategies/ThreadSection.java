@@ -3,6 +3,7 @@ package fr.tpt.aadl.sched.cheddar.strategies ;
 import java.util.HashMap ;
 
 import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.NumberValue;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.utils.PropertyUtils ;
 
@@ -58,11 +59,11 @@ public class ThreadSection extends CheddarModelConversionPart<CheddarTask>
           (CheddarAddressSpace) getMappingOf(process) ;
     DispatchProtocol dispatchE = AadlUtil.getInfoTaskDispatch(aadlInstance) ;
     CheddarTaskType dispatch = taskTypeToXML.get(dispatchE.name()) ;
-    float capacity = getInfoTaskCapacity(aadlInstance) ;
+    double capacity = getInfoTaskCapacity(aadlInstance) ;
     int deadline = AadlUtil.getInfoTaskDeadline(aadlInstance) ;
     t.setName(process.getName() + "." + aadlInstance.getName()) ;
     t.setOwner(cheddarProcess) ;
-    t.setCapacity(capacity) ;
+    t.setCapacity((float) capacity) ;
     t.setStart_time(getInfoTaskStartTime(aadlInstance)) ;
     t.setQueueing_policy(getInfoTaskPolicy(aadlInstance, "SCHED_FIFO")) ;
     t.setDeadline(deadline) ;
@@ -77,11 +78,13 @@ public class ThreadSection extends CheddarModelConversionPart<CheddarTask>
     return t ;
   }
 
-  protected float getInfoTaskCapacity(ComponentInstance task)
+  protected double getInfoTaskCapacity(ComponentInstance task)
   {
+	  
     try
     {
-      return PropertyUtils.getMaxRangeValue(task, "Compute_Execution_Time") ;
+      NumberValue nv = PropertyUtils.getMaxRangeValue(task, "Compute_Execution_Time");
+      return  nv.getScaledValue(AadlUtil.getPrecision(task));
     }
     catch(Exception e)
     {

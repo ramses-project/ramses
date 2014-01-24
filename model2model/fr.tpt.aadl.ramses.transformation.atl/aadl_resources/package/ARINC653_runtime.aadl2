@@ -611,6 +611,17 @@ features
 properties
   Programming_Properties::Source_Name => "READ_BLACKBOARD";
   Programming_Properties::Source_Text => ("arinc653/blackboard.h", "arinc653/apex-blackboards.ads");
+annex behavior_specification {**
+	states
+		s:initial final state;
+	transitions
+		t: s-[]->s{
+			computation(4 us .. 5 us);
+			BLACKBOARD_ID!<;
+			computation(1ms..2ms);
+			BLACKBOARD_ID!>
+		};
+**};
 end Read_Blackboard;
 
 subprogram Clear_Blackboard

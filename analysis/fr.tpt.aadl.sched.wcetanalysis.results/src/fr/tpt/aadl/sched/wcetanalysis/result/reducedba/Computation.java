@@ -35,12 +35,12 @@ public interface Computation extends ThreadBehaviorElement {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Min</em>' attribute.
-	 * @see #setMin(int)
+	 * @see #setMin(double)
 	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage#getComputation_Min()
 	 * @model
 	 * @generated
 	 */
-	int getMin();
+	double getMin();
 
 	/**
 	 * Sets the value of the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.Computation#getMin <em>Min</em>}' attribute.
@@ -50,7 +50,7 @@ public interface Computation extends ThreadBehaviorElement {
 	 * @see #getMin()
 	 * @generated
 	 */
-	void setMin(int value);
+	void setMin(double value);
 
 	/**
 	 * Returns the value of the '<em><b>Max</b></em>' attribute.
@@ -61,12 +61,12 @@ public interface Computation extends ThreadBehaviorElement {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max</em>' attribute.
-	 * @see #setMax(int)
+	 * @see #setMax(double)
 	 * @see fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage#getComputation_Max()
 	 * @model
 	 * @generated
 	 */
-	int getMax();
+	double getMax();
 
 	/**
 	 * Sets the value of the '{@link fr.tpt.aadl.sched.wcetanalysis.result.reducedba.Computation#getMax <em>Max</em>}' attribute.
@@ -76,7 +76,7 @@ public interface Computation extends ThreadBehaviorElement {
 	 * @see #getMax()
 	 * @generated
 	 */
-	void setMax(int value);
+	void setMax(double value);
 
 	/**
 	 * Returns the value of the '<em><b>Unit</b></em>' attribute.

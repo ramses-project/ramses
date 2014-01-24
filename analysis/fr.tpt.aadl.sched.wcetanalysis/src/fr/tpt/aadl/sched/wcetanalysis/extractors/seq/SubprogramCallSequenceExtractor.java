@@ -85,8 +85,8 @@ public class SubprogramCallSequenceExtractor extends CallSequenceExtractor
 		ASTNode compute = new ASTNode(
 				IDGenerator.getNewIdForName(spg.getName()), type,
 				lastAction.getElement());
-		compute.setMinExecutionTime(AadlUtil.getInfoMinDuration(spg));
-		compute.setMaxExecutionTime(AadlUtil.getInfoMaxDuration(spg));
+		compute.setMinExecutionTime(AadlUtil.getInfoMinDuration(spg, AadlUtil.getPrecision(spg)));
+		compute.setMaxExecutionTime(AadlUtil.getInfoMaxDuration(spg, AadlUtil.getPrecision(spg)));
 		return compute;
 	}
 

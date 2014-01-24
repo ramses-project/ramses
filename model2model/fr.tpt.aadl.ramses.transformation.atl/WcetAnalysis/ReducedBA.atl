@@ -43,6 +43,57 @@ abstract rule m_Subprogram_Implementation {
  	impl : AADLI!SubprogramImplementation
 }
 
+-- @extends m_PropertyValue
+abstract rule m_NumberValue {
+    from
+    	v : AADLI!NumberValue in IN
+		(v.unit.oclIsUndefined()
+    		or not v.unit.isTimeUnit())
+    to 
+    	v2 : AADLBA!NumberValue (
+    		unit <- v.unit
+    	)
+}
+
+rule m_IntegerLiteral_Time {
+    from
+    	v : AADLI!IntegerLiteral in IN
+		(not v.unit.oclIsUndefined()
+    		and v.unit.isTimeUnit()) 
+	using
+	{
+		precision: String = thisModule.theHOOK.getTimingPrecision(v.getContainingClassifier());
+	}
+    to 
+    	v2 : AADLBA!IntegerLiteral (
+    		base <- v.base,
+    		value <- thisModule.theHOOK.getFloor(v.getScaledValue(precision)),
+			unit <- AADLI!UnitLiteral.allInstances()->any(e|e.name = precision)
+    	)
+}
+
+
+rule m_RealLiteral_Time {
+    from 
+    	v : AADLI!RealLiteral  in IN
+		(not v.unit.oclIsUndefined()
+    		and v.unit.isTimeUnit())
+	using
+	{
+		precision: String = thisModule.theHOOK.getTimingPrecision(v.getContainingClassifier());
+	}
+    to
+    	v2 : AADLBA!RealLiteral (
+    		value <- v.getScaledValue(precision),   
+			unit <- AADLI!UnitLiteral.allInstances()->any(e|e.name = precision)
+    	)
+}
+
+helper context AADLBA!UnitLiteral def: isTimeUnit() : Boolean =
+	self.name='ns' or self.name='us' or self.name='ms'
+	or self.name='sec' or self.name='min' or self.name='hr'
+;
+
 rule m_AddReducedBA
 {
 	from
@@ -99,6 +150,10 @@ rule m_AddComputation
 			and
 			comp.eContainer().thread = t
 		)
+	using
+	{
+		precision: String = thisModule.theHOOK.getTimingPrecision(t);
+	}
 	to
 		baComputation: AADLBA!TimedAction mapsTo comp
 		(
@@ -115,7 +170,7 @@ rule m_AddComputation
 			value <- comp.min.longValue()
 		),
 		lowerUnit: AADLBA!UnitLiteral
-		(name <- comp.unit),
+		(name <- precision),
 		
 		upper: AADLBA!BehaviorTime
 		(
@@ -124,10 +179,10 @@ rule m_AddComputation
 		),
 		upperIV: AADLBA!BehaviorIntegerLiteral
 		(
-			value <- comp.max.longValue()
+			value <- thisModule.theHOOK.getCeil(comp.max)
 		),
 		upperUnit: AADLBA!UnitLiteral
-		(name <- comp.unit)
+		(name <- precision)
 }
 
 rule m_AddLock
@@ -147,7 +202,7 @@ rule m_AddLock
 		),
 		dah: AADLBA!DataAccessHolder
 		(
-			element <- lock.sharedData
+			element <- t.featureInstance->any(e|e.feature = lock.sharedData)
 		)
 }
 
@@ -168,6 +223,6 @@ rule m_AddUnlock
 		),
 		dah: AADLBA!DataAccessHolder
 		(
-			element <- unlock.sharedData
+			element <- t.featureInstance->any(e|e.feature = unlock.sharedData)
 		)
 }

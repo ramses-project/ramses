@@ -3,16 +3,29 @@ package fr.tpt.aadl.sched.wcetanalysis.extractors.ba.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
+import org.osate.aadl2.Aadl2Factory;
+import org.osate.aadl2.Aadl2Package;
+import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessConnection;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NamedValue;
+import org.osate.aadl2.NumberValue;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.RealLiteral;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.SubprogramCallSequence;
+import org.osate.aadl2.SubprogramType;
 import org.osate.aadl2.ThreadImplementation;
+import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.util.Aadl2Util;
 import org.osate.ba.aadlba.AssignmentAction;
 import org.osate.ba.aadlba.BehaviorAction;
 import org.osate.ba.aadlba.BehaviorActionBlock;
@@ -20,23 +33,39 @@ import org.osate.ba.aadlba.BehaviorActionSequence;
 import org.osate.ba.aadlba.BehaviorActionSet;
 import org.osate.ba.aadlba.BehaviorActions;
 import org.osate.ba.aadlba.CalledSubprogramHolder;
+import org.osate.ba.aadlba.DataAccessHolder;
 import org.osate.ba.aadlba.DataComponentReference;
 import org.osate.ba.aadlba.ElementValues;
 import org.osate.ba.aadlba.ElseStatement;
 import org.osate.ba.aadlba.ForOrForAllStatement;
 import org.osate.ba.aadlba.IfStatement;
 import org.osate.ba.aadlba.IntegerValue;
+import org.osate.ba.aadlba.LockAction;
+import org.osate.ba.aadlba.ParameterLabel;
+import org.osate.ba.aadlba.Relation;
 import org.osate.ba.aadlba.SubprogramCallAction;
 import org.osate.ba.aadlba.TimedAction;
+import org.osate.ba.aadlba.UnlockAction;
+import org.osate.ba.aadlba.Value;
+import org.osate.ba.aadlba.ValueExpression;
 import org.osate.ba.aadlba.WhileOrDoUntilStatement;
+import org.osate.ba.utils.AadlBaUtils;
+import org.osate.utils.Aadl2Utils;
+import org.osate.utils.PropertyUtils;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
 
 import fr.tpt.aadl.sched.wcetanalysis.ExtractionContext;
 import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysisDebug;
 import fr.tpt.aadl.sched.wcetanalysis.extractors.ba.BehaviorAnnexExtractor;
 import fr.tpt.aadl.sched.wcetanalysis.model.ASTNode;
 import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
+import fr.tpt.aadl.sched.wcetanalysis.util.Aadl2ASTUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.BehaviorAnnexUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator;
+
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 
 /**
  * Extract action flow from a list of Behavior Actions
@@ -174,14 +203,20 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 		{
 			return caseWhileOrDoUntil((WhileOrDoUntilStatement) action, lastAction);
 		}
+		else if(action instanceof LockAction)
+		{
+			return caseLockAction((LockAction) action, lastAction);
+		}
+		else if(action instanceof UnlockAction)
+		{
+			return caseUnockAction((UnlockAction) action, lastAction);
+		}
 		else
 		{
 			reportError(action, "Unknown behavior action kind : " + action);
 			return null;
 		}
 	}
-
-	
 
 	private ASTNode caseAssignment(AssignmentAction aa, ASTNode lastAction)
 	{
@@ -191,28 +226,42 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 	private ASTNode caseTimedAction(TimedAction ta, ASTNode lastAction)
 	{
 		final ComponentInstance element = lastAction.getElement();
-
-		IntegerValue min, max;
+		
 		double minVal, maxVal;
-		min = ta.getLowerTime().getIntegerValue();
-		max = ta.getUpperTime().getIntegerValue();
-
+		
+		IntegerValue min = ta.getLowerTime().getIntegerValue();
+		IntegerValue max = ta.getUpperTime().getIntegerValue();
+		
+		String precision = AadlUtil.getPrecision(element);
+				
 		if (min instanceof IntegerLiteral)
 		{
-			minVal = ((IntegerLiteral) min).getValue();
+			IntegerLiteral ilMin = Aadl2Factory.eINSTANCE.createIntegerLiteral();
+			ilMin.setUnit(ta.getLowerTime().getUnit());
+			ilMin.setValue(((IntegerLiteral) min).getValue());
+			minVal = ilMin.getScaledValue(precision);
 		}
 		else
 		{
-			minVal = ((RealLiteral) min).getValue();
+			RealLiteral irMin = Aadl2Factory.eINSTANCE.createRealLiteral();
+			irMin.setUnit(ta.getLowerTime().getUnit());
+			irMin.setValue(((RealLiteral) min).getValue());
+			minVal = irMin.getScaledValue(precision);
 		}
 
 		if (max instanceof IntegerLiteral)
 		{
-			maxVal = ((IntegerLiteral) max).getValue();
+			IntegerLiteral ilMax = Aadl2Factory.eINSTANCE.createIntegerLiteral();
+			ilMax.setUnit(ta.getUpperTime().getUnit());
+			ilMax.setValue(((IntegerLiteral) max).getValue());
+			maxVal = ilMax.getScaledValue(precision);
 		}
 		else
 		{
-			maxVal = (double) ((RealLiteral) max).getValue();
+			RealLiteral irMax = Aadl2Factory.eINSTANCE.createRealLiteral();
+			irMax.setUnit(ta.getUpperTime().getUnit());
+			irMax.setValue(((RealLiteral) max).getValue());
+			maxVal = irMax.getScaledValue(precision);
 		}
 
 		ASTNode comp = new ASTNode(IDGenerator.getNewIdForName("computation"),
@@ -229,6 +278,7 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 	{
 		final CalledSubprogramHolder holder = (CalledSubprogramHolder) callAction.getSubprogram();
 		final NamedElement ref = BehaviorAnnexUtil.getSubprogramReference(callAction);
+		
 		
 		ctxt.pushVisitingSubprogramCallAction(callAction);
 		
@@ -257,28 +307,12 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 	
 	private String getResourceID(NamedElement e, String accessID)
 	{
-		ComponentInstance thread  = ctxt.getCurrentVisitedThread();
-		ComponentInstance process = (ComponentInstance) thread.eContainer();
-		
 		if (e instanceof SubprogramCall)
 		{
 			SubprogramCall call = (SubprogramCall) e;
 			SubprogramCallSequence seq = (SubprogramCallSequence) call.eContainer();
 			ThreadImplementation ti = (ThreadImplementation) seq.eContainer();
 			accessID = getResourceID(ti, accessID, call);
-			/*for(ConnectionInstance ci: process.getConnectionInstances())
-			{
-				if ((ci.getKind()==ConnectionKind.ACCESS_CONNECTION))
-				{
-					FeatureInstance dst = (FeatureInstance) ci.getDestination();
-					if (dst.eContainer()==thread && dst.getName().equals(accessID)
-							&& (ci.getSource() instanceof ComponentInstance))
-					{
-						ComponentInstance src = (ComponentInstance) ci.getSource();
-						return src.getName();
-					}
-				}
-			}*/
 			return accessID;
 		}
 		return accessID;
@@ -407,6 +441,78 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 		return lastAction;
 	}
 
+	private ASTNode caseLockAction(LockAction action,
+			ASTNode lastAction)
+	{
+		ASTNode newNode = new ASTNode(StatementKind.GetResource, ctxt.getCurrentVisitedThread());
+		NamedElement currentVisiting = ctxt.getCurrentVisitedElement(); // subprogram call Put_Value
+		
+		int size = ctxt.getVisitingSubprogramCallActionSize();
+		DataAccess da = action.getDataAccess().getDataAccess();
+		SubprogramType spg = (SubprogramType) da.getContainingClassifier();
+		int containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+		for(int i=0;i<size;i++)
+		{
+			SubprogramCallAction sca = ctxt.getVisitingSubprogramCallAction(i);
+			ParameterLabel pl = sca.getParameterLabels().get(containerFeatureIdx);
+			{
+				if(pl instanceof ValueExpression)
+				{
+					ValueExpression ve = (ValueExpression) pl;
+					Relation relation = ve.getRelations().get(0);
+					Value v = relation.getFirstExpression().getTerms().get(0).getFactors().get(0).getFirstValue();
+					if(v instanceof DataAccessHolder)
+					{
+						DataAccessHolder dah = (DataAccessHolder) v;
+						da = (DataAccess) dah.getDataAccess();
+						spg = (SubprogramType) da.getContainingClassifier();
+						containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+					}
+				}
+			}
+		}
+		
+		String res = getResourceID(currentVisiting, da.getName());
+		newNode.setResourceID(res);
+		lastAction.addNext(newNode);
+		return newNode;
+	}
+	
+	private ASTNode caseUnockAction(UnlockAction action, ASTNode lastAction) {
+		ASTNode newNode = new ASTNode(StatementKind.ReleaseResource, ctxt.getCurrentVisitedThread());
+		NamedElement currentVisiting = ctxt.getCurrentVisitedElement(); // subprogram call Put_Value
+		
+		int size = ctxt.getVisitingSubprogramCallActionSize();
+		DataAccess da = action.getDataAccess().getDataAccess();
+		SubprogramType spg = (SubprogramType) da.getContainingClassifier();
+		int containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+		for(int i=0;i<size;i++)
+		{
+			SubprogramCallAction sca = ctxt.getVisitingSubprogramCallAction(i);
+			ParameterLabel pl = sca.getParameterLabels().get(containerFeatureIdx);
+			{
+				if(pl instanceof ValueExpression)
+				{
+					ValueExpression ve = (ValueExpression) pl;
+					Relation relation = ve.getRelations().get(0);
+					Value v = relation.getFirstExpression().getTerms().get(0).getFactors().get(0).getFirstValue();
+					if(v instanceof DataAccessHolder)
+					{
+						DataAccessHolder dah = (DataAccessHolder) v;
+						da = (DataAccess) dah.getDataAccess();
+						spg = (SubprogramType) da.getContainingClassifier();
+						containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+					}
+				}
+			}
+		}
+		
+		String res = getResourceID(currentVisiting, da.getName());
+		newNode.setResourceID(res);
+		lastAction.addNext(newNode);
+		return newNode;
+	}
+	
 	private class IntegerRange
 	{
 		private int min, max;

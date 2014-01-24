@@ -38,6 +38,7 @@ import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.MemorySubcomponent;
 import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NumberValue;
 import org.osate.aadl2.Port;
 import org.osate.aadl2.ProcessImplementation;
 import org.osate.aadl2.ProcessSubcomponent;
@@ -794,9 +795,10 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     try
     {
-      float value =
-            PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
-      timeCapacity = Integer.toString((int) value) ;
+    	NumberValue value =
+				PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
+		Double d = value.getScaledValue("ms");
+		timeCapacity = Integer.toString(d.intValue()) ;
     }
     catch(Exception e)
     {

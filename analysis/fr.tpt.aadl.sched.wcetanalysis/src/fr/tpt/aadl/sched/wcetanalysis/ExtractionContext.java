@@ -7,8 +7,11 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.FeatureCategory;
+import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 import org.osate.ba.aadlba.SubprogramCallAction;
@@ -30,6 +33,7 @@ public class ExtractionContext
 	
 	private Stack<NamedElement> visiting = new Stack<NamedElement>();
 	private Stack<SubprogramCallAction> visitingBA = new Stack<SubprogramCallAction>();
+
 
 	private ExtractionContext(AnalysisErrorReporterManager errManager)
 	{
@@ -104,6 +108,16 @@ public class ExtractionContext
 			return visitingBA.peek();
 	}
 	
+	public SubprogramCallAction getVisitingSubprogramCallAction(int i)
+	{
+		return visitingBA.get(i);
+	}
+	
+	public int getVisitingSubprogramCallActionSize()
+	{
+		return visitingBA.size();
+	}
+	
 	public void pushVisitingElement(NamedElement e)
 	{
 		visiting.push(e);
@@ -148,4 +162,5 @@ public class ExtractionContext
 		}
 		return null;
 	}
+
 }

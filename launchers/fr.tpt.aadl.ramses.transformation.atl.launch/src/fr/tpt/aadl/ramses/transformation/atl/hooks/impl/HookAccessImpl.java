@@ -47,6 +47,8 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
@@ -60,10 +62,12 @@ import org.osate.ba.aadlba.BehaviorTransition ;
 import org.osate.ba.utils.AadlBaLocationReference ;
 import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.Aadl2Utils ;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
 
 import fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.HookAccess;
 import fr.tpt.aadl.ramses.transformation.atl.hooks.util.ComparablePortByCriticality;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
 import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning;
 
@@ -382,5 +386,21 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   public void setOutputPackageName(String param)
   {
 	outputPackageName = param;
+  }
+  
+  public String getTimingPrecision(NamedElement ne)
+  {
+	return AadlUtil.getPrecision(ne);
+  }
+  
+  public long getFloor(Double d)
+  {
+	  return d.longValue();
+  }
+  
+  public long getCeil(Double d)
+  {
+	  Double res = Math.ceil(d);
+	  return res.longValue();
   }
 } //HookAccessImpl

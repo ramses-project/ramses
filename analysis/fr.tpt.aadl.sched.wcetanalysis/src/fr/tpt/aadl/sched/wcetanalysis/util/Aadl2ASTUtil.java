@@ -2,6 +2,7 @@ package fr.tpt.aadl.sched.wcetanalysis.util;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.osate.aadl2.AccessSpecification;
 import org.osate.aadl2.BasicPropertyAssociation;
 import org.osate.aadl2.BehavioredImplementation;
@@ -16,11 +17,17 @@ import org.osate.aadl2.DataSubcomponentType;
 import org.osate.aadl2.FeaturePrototypeActual;
 import org.osate.aadl2.FeaturePrototypeBinding;
 import org.osate.aadl2.ListValue;
+import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NamedValue;
+import org.osate.aadl2.Property;
+import org.osate.aadl2.PropertyConstant;
 import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.PrototypeBinding;
 import org.osate.aadl2.RangeValue;
 import org.osate.aadl2.RecordValue;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.SubprogramClassifier;
+import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.ConnectionInstanceEnd;
@@ -30,7 +37,10 @@ import org.osate.aadl2.instance.InstanceReferenceValue;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.ba.aadlba.SubprogramCallAction;
 import org.osate.utils.PropertyUtils;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
 
+import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
 
 public class Aadl2ASTUtil
@@ -183,18 +193,22 @@ public class Aadl2ASTUtil
 				double fixed = 0d;
 				double perByte = 0d;
 
+				
+				String precision = AadlUtil.getPrecision(process);
+
+				
 				for(BasicPropertyAssociation value : rv.getOwnedFieldValues())
 				{
 					String propertyName = value.getProperty().getName();
 					if (propertyName.equalsIgnoreCase("Fixed"))
 					{
 						RangeValue range = (RangeValue) value.getOwnedValue();
-						fixed = range.getMaximumValue().getScaledValue("ms");
+						fixed = range.getMaximumValue().getScaledValue(precision);
 					}
 					else if (propertyName.equalsIgnoreCase("PerByte"))
 					{
 						RangeValue range = (RangeValue) value.getOwnedValue();
-						perByte = range.getMaximumValue().getScaledValue("ms");
+						perByte = range.getMaximumValue().getScaledValue(precision);
 					}
 				}
 
@@ -204,4 +218,5 @@ public class Aadl2ASTUtil
 		}
 		return new IOTime();
 	}
+	
 }

@@ -4,8 +4,8 @@
     nsPrefix="fr.tpt.aadl.sched.wcetanalysis.result.reducedba">
   <eClassifiers xsi:type="ecore:EClass" name="ThreadBehaviorElement" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Computation" eSuperTypes="#//ThreadBehaviorElement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="min" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="max" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="min" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="max" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CriticalSectionBegin" eSuperTypes="#//ThreadBehaviorElement">
