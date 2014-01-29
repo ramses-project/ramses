@@ -1277,12 +1277,13 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
   			// do nothing
   		}
   		deploymentImplCode.decrementIndent();
+  		deploymentImplCode.addOutputNewline("break;");
   		partitionId++;
       }
-  	  deploymentImplCode.addOutputNewline("break;");
       deploymentImplCode.addOutputNewline("}");
       deploymentImplCode.decrementIndent();
       deploymentImplCode.addOutputNewline("}");
+      deploymentImplCode.decrementIndent();
     }
   }
   
