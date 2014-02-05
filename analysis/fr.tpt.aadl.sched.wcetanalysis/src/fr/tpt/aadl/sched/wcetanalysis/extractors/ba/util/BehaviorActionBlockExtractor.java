@@ -467,7 +467,16 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 						da = (DataAccess) dah.getDataAccess();
 						spg = (SubprogramType) da.getContainingClassifier();
 						containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+						break;
 					}
+				}
+				else if(pl instanceof DataAccessHolder)
+				{
+					DataAccessHolder dah = (DataAccessHolder) pl;
+					da = (DataAccess) dah.getDataAccess();
+					spg = (SubprogramType) da.getContainingClassifier();
+					containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+					break;
 				}
 			}
 		}
@@ -502,7 +511,16 @@ public class BehaviorActionBlockExtractor extends BehaviorAnnexExtractor
 						da = (DataAccess) dah.getDataAccess();
 						spg = (SubprogramType) da.getContainingClassifier();
 						containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+						break;
 					}
+				}
+				else if(pl instanceof DataAccessHolder)
+				{
+					DataAccessHolder dah = (DataAccessHolder) pl;
+					da = (DataAccess) dah.getDataAccess();
+					spg = (SubprogramType) da.getContainingClassifier();
+					containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+					break;
 				}
 			}
 		}
