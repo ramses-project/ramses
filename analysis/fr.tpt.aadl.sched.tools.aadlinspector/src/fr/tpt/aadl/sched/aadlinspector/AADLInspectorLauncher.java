@@ -76,9 +76,10 @@ public class AADLInspectorLauncher
 		Process p = Runtime.getRuntime().exec(new String[] {
 				command, 
 				"-a", modelList, 
-				"--plugin", PATH + "config/plugins.common/cheddar.aip", 
+				"--plugin", "schedulability.cheddarSimTest", 
 				"--result", OUTPUT_FILE_PATH, 
 				"--show", modeOption});
+		
 		int exitValue = p.waitFor();
 		if (exitValue!=0)
 		{
