@@ -18,6 +18,7 @@ import org.osate.aadl2.instance.SystemInstance;
 
 import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult;
 import fr.tpt.aadl.sched.aadlinspector.output.XMLResultsProvider;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 
 public class AADLInspectorLauncher 
 {
@@ -27,7 +28,7 @@ public class AADLInspectorLauncher
 	
 	private final static String PATH = getPath();
 	private static String BIN_PATH;
-	private final static String OUTPUT_FILE_PATH = PATH + "output.xml";
+	private final static String OUTPUT_FILE_PATH = RamsesConfiguration.getOutputDir() + "output.xml";
 	private static String extension = "";
 	private AADLInspectorLauncher() {}
 	
