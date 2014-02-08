@@ -28,7 +28,7 @@ public class AADLInspectorLauncher
 	
 	private final static String PATH = getPath();
 	private static String BIN_PATH;
-	private final static String OUTPUT_FILE_PATH = RamsesConfiguration.getOutputDir() + "output.xml";
+	private final static String OUTPUT_FILE_PATH = RamsesConfiguration.getOutputDir() + "/AADL_Inspector_output.xml";
 	private static String extension = "";
 	private AADLInspectorLauncher() {}
 	
@@ -80,6 +80,12 @@ public class AADLInspectorLauncher
 				"--plugin", "schedulability.cheddarSimTest", 
 				"--result", OUTPUT_FILE_PATH, 
 				"--show", modeOption});
+		
+		String debugCommand = command+" -a "+modelList+ 
+				" --plugin "+ "schedulability.cheddarSimTest"+ 
+				" --result "+ OUTPUT_FILE_PATH+
+				" --show "+ modeOption;
+		System.out.println("AADL Inspector command: "+debugCommand);
 		
 		int exitValue = p.waitFor();
 		if (exitValue!=0)
