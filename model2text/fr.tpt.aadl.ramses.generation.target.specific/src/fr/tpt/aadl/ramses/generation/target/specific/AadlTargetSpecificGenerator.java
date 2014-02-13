@@ -30,8 +30,10 @@ import javax.swing.JOptionPane ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.Element;
 import org.osate.aadl2.PublicPackageSection ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -127,6 +129,20 @@ public class AadlTargetSpecificGenerator implements Generator
     {
     	monitor.subTask("Model validation: check compatibility for refinement.");
     	r = _modelValidator.validate(inputResource, errManager, monitor);
+    	if(false==r.getContents().isEmpty())
+    	{
+    	  for(EObject err : r.getContents())
+    	  {
+    		if(err instanceof fr.tpt.aadl.ramses.constraintsreporter.Error)
+    		{
+    		  fr.tpt.aadl.ramses.constraintsreporter.Error constraintError =
+    						(fr.tpt.aadl.ramses.constraintsreporter.Error) err;
+    		  errManager.error((Element) constraintError.getObject(), 
+    						constraintError.getMessage());
+    		}
+    	  }
+    	  return;
+    	}
     }
     if(_targetTrans != null)
     {
@@ -156,7 +172,27 @@ public class AadlTargetSpecificGenerator implements Generator
   {
 	if(_analysisResults==null)
 	  _analysisResults = AnalysisUtils.createNewAnalysisArtifact(outputDir.getAbsolutePath()+systemInstance.getName()+".ares");
+	
 	Resource r = systemInstance.eResource() ;
+	if(_modelValidator != null)
+    {
+      monitor.subTask("Model validation: check compatibility for refinement.");
+      Resource errRes = _modelValidator.validate(r, errManager, monitor);
+      if(false==errRes.getContents().isEmpty())
+      {
+    	for(EObject err : errRes.getContents())
+    	{
+    	  if(err instanceof fr.tpt.aadl.ramses.constraintsreporter.Error)
+    	  {
+    		fr.tpt.aadl.ramses.constraintsreporter.Error constraintError =
+    						(fr.tpt.aadl.ramses.constraintsreporter.Error) err;
+    		errManager.error((Element) constraintError.getObject(), 
+    						constraintError.getMessage());
+    	  }
+    	}
+    	return;
+      }
+    }
     SystemInstance currentInstance = systemInstance;
     String rootModelId = xmlPilot.getInputModelId();
     if(rootModelId!=null && !rootModelId.isEmpty())

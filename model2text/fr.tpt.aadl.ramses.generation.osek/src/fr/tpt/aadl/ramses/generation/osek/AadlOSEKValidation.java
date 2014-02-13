@@ -13,7 +13,9 @@ public class AadlOSEKValidation extends Aadl2ConstraintValidationEMFTVMLauncher 
 			throws ATLCoreException {
 		super(modelInstantiator, predefinedResourcesManager);
 		ATL_FILE_NAMES = new String[]
-		        {"ACG/Constraints/shared/ProcessInstances"
+		        {"ACG/Constraints/shared/Common",
+				"ACG/Constraints/shared/ProcessInstances",
+				"ACG/Constraints/shared/ThreadInstances"
 		        };
 	}
 
