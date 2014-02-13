@@ -32,12 +32,13 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataType ;
 
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
+import fr.tpt.aadl.ramses.control.support.Names ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
 public class PredefinedPackagesManager
 {
-
-  private File predefinedPackagesDir ;
+  private StandAloneInstantiator _instantiator ;
 
   // File names without their extension.
   private static String[] names =
@@ -45,25 +46,21 @@ public class PredefinedPackagesManager
 	  "PeriodicDelayedMutex_runtime"
         } ;
   private static HashMap<String, Resource> resources = new HashMap<String, Resource>() ;
-
-  public PredefinedPackagesManager(File resourceDir)
+  
+  public PredefinedPackagesManager(StandAloneInstantiator instantiator)
+  {
+    _instantiator = instantiator ;
+  }
+  
+  public void parsePredefinedPackages()
   {
     if(resources.isEmpty()==false)
       return;
-    StandAloneInstantiator parser = StandAloneInstantiator.getInstantiator() ;
-    File[] subDirs = resourceDir.listFiles() ;
-
-    for(int i = 0 ; i < subDirs.length ; i++)
-    {
-      if(subDirs[i].getName().equals("package"))
-      {
-        predefinedPackagesDir = subDirs[i] ;
-        break ;
-      }
-    }
-
+    
     FilenameFilter filter = new AADLFileFilter() ;
-    File[] predefinedPackages = predefinedPackagesDir.listFiles(filter) ;
+    File packageDir = new File (RamsesConfiguration.getPredefinedResourceDir() + File.separator + Names.AADL_PREDEFINED_PACKAGE_DIR_NAME) ;
+    
+    File[] predefinedPackages = packageDir.listFiles(filter) ;
     List<File> toBeParsed = new ArrayList<File>() ;
 
     for(int r = 0 ; r < names.length ; r++)
@@ -84,7 +81,7 @@ public class PredefinedPackagesManager
       }
     }
 
-    List<Resource> parsedResources = parser.parse(toBeParsed, false) ;
+    List<Resource> parsedResources = _instantiator.parse(toBeParsed, false) ;
 
     for(Resource r : parsedResources)
     {
@@ -93,7 +90,7 @@ public class PredefinedPackagesManager
       resources.put(resourceName, r) ;
     }
   }
-
+  
   public Resource getRuntimeResource()
   {
     return resources.get("aadl_runtime") ;

@@ -1,7 +1,7 @@
 package fr.tpt.aadl.sched.cheddar ;
 
+import java.io.File ;
 import java.util.ArrayList ;
-
 import java.util.List ;
 
 import org.jdom.Document ;
@@ -25,7 +25,7 @@ public class AADL2Cheddar
 
   private final ExecutionGraphRegistry registry ;
 
-  private String OUTPUT_PATH = null ;
+  private File outputDir = null ;
 
   private Document cheddarXML = null ;
 
@@ -41,10 +41,10 @@ public class AADL2Cheddar
 
   //FIXME: remove registry, execution graph analysis must be isolated from Cheddar
 
-  public AADL2Cheddar(
-                      String prefix, SystemInstance root,
+  public AADL2Cheddar(String prefix, SystemInstance root, File outputDir,
                       AnalysisErrorReporterManager errManager, float scaling)
   {
+    this.outputDir = outputDir ;
     this.root = root ;
     this.prefix = prefix ;
     this.scaling = scaling ;
@@ -63,9 +63,7 @@ public class AADL2Cheddar
   public void createCheddarModel()
   {
     CheddarModelConversionPart.init() ;
-    OUTPUT_PATH =
-          PluginActivator.getInstance().getSimulationDirectory(root.eResource()) + prefix +
-                root.getName() + ".xml" ;
+
     /** Step 1 : Extract Cheddar Model from AADL Model. */
     cheddarElements = new ArrayList<CheddarElement>() ;
     strategy.getExtractionSection(ComponentCategory.PROCESSOR)
@@ -84,15 +82,15 @@ public class AADL2Cheddar
     }
 
     /** Step 2 : Export Cheddar Model in XML File. */
-    cheddarXML = modelToXML.generateXML(cheddarModel, OUTPUT_PATH) ;
+    cheddarXML = modelToXML.generateXML(cheddarModel, outputDir) ;
     //XMLUtil.printXML(cheddarXML);
     /** Step 3 : Notify observers. */
     //strategy.getExecutionRegistry().notifyVisitors();
   }
 
-  public String getCheddarXMLPath()
+  public File getCheddarXMLPath()
   {
-    return OUTPUT_PATH ;
+    return outputDir ;
   }
 
   public Document getCheddarXML()

@@ -27,25 +27,25 @@ public class FileUtils {
 	/**
 	 * This method checks that files stored in an array of path (String) actually
 	 * exist.
-	 * @param includeDirArray the array fo String referencing files.
+	 * @param fileNamesArray the array fo String referencing files.
 	 * @param errors errors a storage for error messages when file is not found
 	 * @return a set of #{@link java.io.File} identified from the path in 
 	 * {@code includeDirArray}.
 	 */
-	public static Set<File> checkFilesExist(String includeDirArray[], String errors)
+	public static Set<File> checkFilesExist(String fileNamesArray[], String errors)
 	{
 		Set<File> includeDirSet = new LinkedHashSet<File>();
-	    for(int i = 0 ; i < includeDirArray.length ; i++)
+	    for(int i = 0 ; i < fileNamesArray.length ; i++)
 	    {
-	      File potentialFile = new File(includeDirArray[i]) ;
+	      File potentialFile = new File(fileNamesArray[i]) ;
 	      
 	      if(potentialFile.exists())
 	      {
-	    	includeDirSet.add(potentialFile) ;
+	    	  includeDirSet.add(potentialFile) ;
 	        continue ;
 	      }
 	      else
-	    	errors+="\t"+includeDirArray[i]+"\n";
+	    	errors+="\t"+fileNamesArray[i]+"\n";
 	    }
 	    return includeDirSet;
 	}
@@ -223,7 +223,7 @@ public class FileUtils {
 		BufferedWriter output ;
 
 		FileWriter file =
-				new FileWriter(directory.getAbsolutePath() + "/" + fileName) ;
+				new FileWriter(directory.getAbsolutePath() + File.separator + fileName) ;
 
 		output = new BufferedWriter(file) ;
 

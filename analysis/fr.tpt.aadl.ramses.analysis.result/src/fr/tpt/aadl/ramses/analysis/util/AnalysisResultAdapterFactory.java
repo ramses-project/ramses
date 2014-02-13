@@ -3,12 +3,11 @@
 package fr.tpt.aadl.ramses.analysis.util;
 
 import fr.tpt.aadl.ramses.analysis.*;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -100,13 +99,13 @@ public class AnalysisResultAdapterFactory extends AdapterFactoryImpl {
 
 
 	/**
-	 * Creates a new adapter for an object of class '{@link fr.tpt.aadl.ramses.analysis.AnalysisArtifact <em>Analysis Artifact</em>}'.
+	 * Creates a new adapter for an object of class '{@link fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact <em>Analysis Artifact</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisArtifact
+	 * @see fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact
 	 * @generated
 	 */
 	public Adapter createAnalysisArtifactAdapter() {

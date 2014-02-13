@@ -1,7 +1,8 @@
 package fr.tpt.aadl.sched.cheddar ;
 
-import org.jdom.Attribute ;
+import java.io.File ;
 
+import org.jdom.Attribute ;
 import org.jdom.Document ;
 import org.jdom.Element ;
 
@@ -19,7 +20,7 @@ public class Cheddar2XML
 {
 
   public Document generateXML(CheddarModel model,
-                              String outputPath)
+                              File outputPath)
   {
     final Element root = new Element("cheddar") ;
     final Document doc = new Document(root) ;
@@ -69,10 +70,10 @@ public class Cheddar2XML
   }
 
   private Element createProcessorNode(CheddarProcessor p,
-                                      String outputPath)
+                                      File outputPath)
   {
     final String AUTOMATON_PATH =
-          outputPath.replace(".xml", "_" + p.getName() + ".sc") ;
+          outputPath.toString().replace(".xml", "_" + p.getName() + ".sc") ;
     Element e = new Element("processor") ;
     Element scheduler =
           XMLUtil.createEnclosedValue("scheduler", p.getSchedulerType()) ;

@@ -1,23 +1,22 @@
 package fr.tpt.aadl.sched.aadlinspector.output;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.HashMap ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.utils.PropertyUtils;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis;
-import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
-import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
-import fr.tpt.aadl.ramses.analysis.AnalysisSource;
-import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
-import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
-import fr.tpt.aadl.ramses.util.properties.AadlUtil;
-import fr.tpt.aadl.sched.aadlinspector.output.ResponseTimeResult.TaskResponseTimeResult;
+import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis ;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
+import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
+import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
+import fr.tpt.aadl.sched.aadlinspector.output.ResponseTimeResult.TaskResponseTimeResult ;
 
 public class AnalysisResult 
 {

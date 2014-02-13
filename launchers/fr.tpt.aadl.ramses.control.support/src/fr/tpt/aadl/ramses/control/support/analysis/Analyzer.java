@@ -21,10 +21,10 @@
 
 package fr.tpt.aadl.ramses.control.support.analysis ;
 
+import java.io.File ;
 import java.util.Map ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
@@ -33,9 +33,11 @@ import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 public interface Analyzer extends NamedPlugin
 {
   
-  public void performAnalysis(SystemInstance instance,
-                               AnalysisErrorReporterManager errReporterManager,
-                               IProgressMonitor monitor)
+  public void performAnalysis(SystemInstance systemInstance,
+                              File outputDir,
+                              AnalysisErrorReporterManager errManager,
+                              IProgressMonitor monitor
+                              )
         throws AnalysisResultException ;
 
   public void setParameters(Map<String, Object> parameters) ;

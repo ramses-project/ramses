@@ -1,16 +1,17 @@
 package fr.tpt.aadl.launch ;
 
 import java.io.BufferedReader ;
+import java.io.File ;
 import java.io.FileReader ;
 import java.io.IOException ;
 
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.ui.plugin.AbstractUIPlugin ;
-
 import org.osgi.framework.Bundle ;
 import org.osgi.framework.BundleContext ;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
 @SuppressWarnings("restriction")
 public class PluginActivator extends AbstractUIPlugin
@@ -31,23 +32,6 @@ public class PluginActivator extends AbstractUIPlugin
     }
 
     return instance ;
-  }
-
-  public String getSimulationDirectory(Resource instance)
-  {
-    if(simulationDirectory == null && RamsesConfiguration.getOutputDir()!=null)
-    {
-      /*BundleHost bh = (BundleHost) bundle ;
-      BaseData bd = (BaseData) bh.getBundleData() ;
-      String path = bd.getBundleFile().getBaseFile().getAbsolutePath() ;
-      simulationDirectory = path + "/simulation/" ;*/
-      
-      simulationDirectory = RamsesConfiguration.getOutputDir().getAbsolutePath() ;
-    }
-    if(simulationDirectory == null)
-      simulationDirectory = instance.getURI().toFileString();
-    
-    return simulationDirectory ;
   }
 
   @Override

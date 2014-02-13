@@ -28,6 +28,8 @@ import org.osate.annexsupport.AnnexParser ;
 import org.osate.annexsupport.AnnexResolver ;
 import org.osate.annexsupport.AnnexUnparser ;
 
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 
@@ -79,5 +81,26 @@ public class DefaultServiceRegistry extends AbstractServiceRegistry implements S
   public boolean isOSGi()
   {
     return false ;
+  }
+
+  @Override
+  public void init(AadlModelInstantiatior modelInstantiatior,
+                   PredefinedAadlModelManager predefinedAadlModels)
+        throws Exception
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public AadlModelInstantiatior getModelInstantiatior()
+  {
+    return null ;
+  }
+
+  @Override
+  public PredefinedAadlModelManager getPredefinedAadlModels()
+  {
+    return null ;
   }
 }

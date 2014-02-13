@@ -75,10 +75,10 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The fully qualified name of the class that implements &lt;code&gt;fr.tpt.aadl.toolsuite.support.Transformation&lt;/code&gt;.
+                  The fully qualified name of the class that implements &lt;code&gt;fr.tpt.aadl.ramses.control.support.generator.Generator&lt;/code&gt;.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":fr.tpt.aadl.toolsuite.support.transformation.Transformation"/>
+                  <meta.attribute kind="java" basedOn=":fr.tpt.aadl.ramses.control.support.generator.Generator"/>
                </appinfo>
             </annotation>
          </attribute>

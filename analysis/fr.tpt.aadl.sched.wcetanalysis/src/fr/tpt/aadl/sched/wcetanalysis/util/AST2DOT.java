@@ -36,9 +36,9 @@ public class AST2DOT implements TaskBodyVisitor
 		this.layout = layout;
 		this.programFound = commandExists(layout.name());
 
-		if (!outputDir.endsWith("/"))
+		if (!outputDir.endsWith(File.separator))
 		{
-			outputDir += "/";
+			outputDir += File.separator;
 		}
 		initDirectory(new File(outputDir));
 	}

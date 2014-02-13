@@ -30,13 +30,15 @@ import org.osate.annexsupport.AnnexParser ;
 import org.osate.annexsupport.AnnexResolver ;
 import org.osate.annexsupport.AnnexUnparser ;
 
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneAnalysisErrorReporterFactory ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneParseErrorReporter ;
-import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 
 /**
  * This interface specifies the API to register services 
@@ -59,6 +61,18 @@ public interface ServiceRegistry
   public final static AnalysisErrorReporterManager ANALYSIS_ERR_REPORTER_MANAGER =
         new AnalysisErrorReporterManager(ANALYSIS_ERR_REPORTER_FACT) ;
 
+  /**
+   * Initialize the registry. This method has to be called prior calling the
+   * others methods.
+   * 
+   * @param modelInstantiatior the provided AADL model instantiator
+   * @param predefinedAadlModels the provided predefined AADL models 
+   * @param includeDirs the set of directory paths that may contain AADL model or user code.
+   * @throws Exception for any initialization errors 
+   */
+  public void init(AadlModelInstantiatior modelInstantiatior,
+                   PredefinedAadlModelManager predefinedAadlModels) throws Exception ;
+  
   /**
    * This method check if the OSGi platform is used or not.
    * OSGi facilities should be used to register services in case
@@ -139,4 +153,7 @@ public interface ServiceRegistry
    */
   public int getNbError() ;
   
+  public AadlModelInstantiatior getModelInstantiatior() ;
+  
+  public PredefinedAadlModelManager getPredefinedAadlModels() ;
 }

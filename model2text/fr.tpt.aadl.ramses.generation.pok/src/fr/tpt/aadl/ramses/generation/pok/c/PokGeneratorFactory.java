@@ -21,19 +21,32 @@
 
 package fr.tpt.aadl.ramses.generation.pok.c;
 
-import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
+import java.io.File ;
+import java.io.FileReader ;
+import java.io.IOException ;
+
+import org.eclipse.m2m.atl.core.ATLCoreException;
+
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
-import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Transformation;
+import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Transformation ;
+import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Validation;
 import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
+import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
 
-public class PokGeneratorFactory extends AbstractGeneratorFactory
+public class PokGeneratorFactory implements GeneratorFactory
 {
-  public static String POK_GENERATOR_NAME = "pok" ;
+  public final static String POK_GENERATOR_NAME = "pok" ;
+  private final static String _POK_RUNTIME_PATH = "/misc/mk/config.mk";
   
-  private static Generator createPokGenerator()
+  @Override
+  public Generator createGenerator(AadlModelInstantiatior modelInstantiatior,
+                                   PredefinedAadlModelManager predefinedAadlModels)
   {
     AadlToPokCUnparser pokCUnparser = new AadlToPokCUnparser() ;
     
@@ -46,21 +59,44 @@ public class PokGeneratorFactory extends AbstractGeneratorFactory
                                                     pokCUnparser,
                                                     pokMakefileUnparser) ;
     
-    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation("helpers/LanguageSpecificitiesC") ;
+    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation(
+                                             modelInstantiatior,
+                                             predefinedAadlModels,
+                                             "helpers/LanguageSpecificitiesC") ;
     
-    
+    AadlModelValidator targetVal=null;
+	try {
+		targetVal = new AadlArinc653Validation(
+				 								 modelInstantiatior,
+				 								 predefinedAadlModels);
+	} catch (ATLCoreException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     AadlTargetSpecificGenerator result = 
-                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen) ;
+                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
+                                                  modelInstantiatior,
+                                                  targetVal) ;
     
     result.setRegistryName(POK_GENERATOR_NAME) ;
     
     return result ;
   }
-  
-  
-  
-  public Generator createGenerator()
+
+  public static boolean runtimePathChecker(File runtimePath)
   {
-      return createPokGenerator();
+    File result = new File(runtimePath + _POK_RUNTIME_PATH) ;
+    
+    try 
+    {
+      FileReader fr = new FileReader(result);
+      fr.close();
+    }
+    catch (IOException e)
+    {
+      return false;
+    }
+
+    return true;
   }
 }

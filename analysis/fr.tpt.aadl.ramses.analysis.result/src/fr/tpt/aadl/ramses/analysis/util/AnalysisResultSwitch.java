@@ -3,6 +3,7 @@
 package fr.tpt.aadl.ramses.analysis.util;
 
 import fr.tpt.aadl.ramses.analysis.*;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 
 import java.util.List;
 

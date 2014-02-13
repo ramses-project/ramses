@@ -22,22 +22,20 @@
 package fr.tpt.aadl.ramses.transformation.atl ;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.m2m.atl.core.ATLCoreException;
-import org.eclipse.m2m.atl.core.emf.EMFInjector;
-import org.eclipse.m2m.atl.core.emf.EMFModel;
-import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
-import org.eclipse.m2m.atl.core.emf.EMFReferenceModel;
-import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.PropertySet;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.m2m.atl.core.ATLCoreException ;
+import org.eclipse.m2m.atl.core.emf.EMFInjector ;
+import org.eclipse.m2m.atl.core.emf.EMFModel ;
+import org.eclipse.m2m.atl.core.emf.EMFModelFactory ;
+import org.eclipse.m2m.atl.core.emf.EMFReferenceModel ;
+import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.PropertySet ;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 
 /**
  * This abstract class specifies the methods and resources of an ATL
@@ -45,12 +43,6 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
  */
 public abstract class AtlTransfoLauncher
 {
-
-  /**
-   * resourcesDir stores the root directory of model transformation files.
-   */
-  protected static File resourcesDir = null ;
-
   /**
    * injector is an object for injecting objects to the ATL runtime. 
    */
@@ -60,29 +52,13 @@ public abstract class AtlTransfoLauncher
   // Load the input file resource
   private static final EMFModelFactory factory = new EMFModelFactory() ;
   protected static EMFReferenceModel aadlbaMetamodel ;
-
-
-  /*
-   * The parameters of the transformation: asm file, input and a-output path.
-   */ 
-
-  public static File getTransformationDirName()
-  {
-    return AtlTransfoLauncher.resourcesDir ;
-  }
-
+  
   protected abstract void initTransformation() throws ATLCoreException;
   
-  public abstract Resource generationEntryPoint(Resource inputResource,
-		  File resourceDir,
-		  List<File> transformationFileList,
-		  File outputDir) throws GenerationException;
-  
-  
-  protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher)
+  protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher,
+                                                       List<Resource> predefinedAadlModels)
   {
-    for(Resource r: RamsesConfiguration.getPredefinedResourcesManager()
-    		.getPredefinedResources())
+    for(Resource r: predefinedAadlModels)
     {
       String name;
       EObject obj = r.getContents().get(0);
@@ -95,15 +71,4 @@ public abstract class AtlTransfoLauncher
       launcher.addInModel(rModel, name.toUpperCase(), "AADLBA") ;
     }
   }
-  
-  public void setPredefinedResourcesDirectory(File dir)
-                                              throws ATLCoreException, Exception
-  {
-	if(resourcesDir==null)
-		this.initTransformation() ;
-    AtlTransfoLauncher.resourcesDir = dir ;
-  }
-  
-  protected abstract void registerDefaultTransformations(List<Object> atlModules, EMFVMLauncher launcher) throws IOException;
-  
 }

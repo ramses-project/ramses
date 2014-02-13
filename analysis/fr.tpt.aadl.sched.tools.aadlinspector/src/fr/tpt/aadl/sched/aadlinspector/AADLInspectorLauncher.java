@@ -1,13 +1,10 @@
 package fr.tpt.aadl.sched.aadlinspector;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.AadlPackage;
@@ -18,7 +15,6 @@ import org.osate.aadl2.instance.SystemInstance;
 
 import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult;
 import fr.tpt.aadl.sched.aadlinspector.output.XMLResultsProvider;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 
 public class AADLInspectorLauncher 
 {
@@ -28,7 +24,7 @@ public class AADLInspectorLauncher
 	
 	private final static String PATH = getPath();
 	private static String BIN_PATH;
-	private final static String OUTPUT_FILE_PATH = RamsesConfiguration.getOutputDir() + "/AADL_Inspector_output.xml";
+	private static String OUTPUT_FILE_PATH;
 	private static String extension = "";
 	private AADLInspectorLauncher() {}
 	
@@ -39,7 +35,7 @@ public class AADLInspectorLauncher
 			aIPath = System.getProperty(ENV_VAR);
 		if(aIPath != null)
 		{
-		  aIPath = aIPath.endsWith("/") ? aIPath : aIPath + "/";
+		  aIPath = aIPath.endsWith(File.separator) ? aIPath : aIPath + File.separator;
 		  return aIPath;
 		}
 		System.err.println("AADLINSPECTOR_PATH environment variable should be initialized.");
@@ -47,6 +43,7 @@ public class AADLInspectorLauncher
 	}
 	
 	private static AnalysisResult launchAnalysis(String[] aadlModelsPath, 
+			File outputDir,
 			String mode, SystemInstance model)
 		throws Exception
 	{
@@ -55,7 +52,7 @@ public class AADLInspectorLauncher
 			throw new Exception("environment variable " + ENV_VAR + " not initialized");
 		}
 		
-		
+		OUTPUT_FILE_PATH = outputDir.getAbsolutePath() + "/AADL_Inspector_output.xml";
 		String modelList = "";
 		for(String aadlModelPath : aadlModelsPath)
 		{
@@ -106,7 +103,7 @@ public class AADLInspectorLauncher
 	}
 	
 	
-	public static AnalysisResult launchAnalysis(SystemInstance root, String mode)
+	public static AnalysisResult launchAnalysis(SystemInstance root, File outputDir, String mode)
 			throws Exception
 	{
 		String OS = (String) System.getProperties().get("os.name");
@@ -135,7 +132,7 @@ public class AADLInspectorLauncher
 		loadResourcePaths(pps, paths);
 		String[] modelList = paths.toArray(new String[paths.size()]);
 		
-		return launchAnalysis(modelList, mode, root);
+		return launchAnalysis(modelList, outputDir, mode, root);
 	}
 	
 	private static void loadResourcePaths(PublicPackageSection pps, List<String> pathList)

@@ -21,39 +21,38 @@
 
 package fr.tpt.aadl.ramses.generation.target.specific;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File ;
+import java.util.HashMap ;
+import java.util.List ;
+import java.util.Map ;
 
-import javax.swing.JOptionPane;
+import javax.swing.JOptionPane ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.PublicPackageSection;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.aadl2.util.OsateDebug;
-import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.PublicPackageSection ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
-import fr.tpt.aadl.ramses.analysis.AnalysisResult;
-import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
-import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils;
-import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser;
-import fr.tpt.aadl.ramses.control.support.AadlModelsManager;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
-import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
+import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
+import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
+import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl ;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -72,16 +71,20 @@ public class AadlTargetSpecificGenerator implements Generator
   
   private String systemToInstantiate = null;
   
-  protected AadlTargetSpecificGenerator()
-  {
-    
-  }
+  private AadlModelInstantiatior _modelInstantiator ;
+
+  private AadlModelValidator _modelValidator;
+  
   
   public AadlTargetSpecificGenerator(AadlToTargetSpecificAadl targetTrans,
-                                     AadlTargetSpecificCodeGenerator codeGen)
+                                     AadlTargetSpecificCodeGenerator codeGen,
+                                     AadlModelInstantiatior modelInstantiator,
+                                     AadlModelValidator modelValidator)
   {
     _targetTrans = targetTrans ;
     _codeGen = codeGen ;
+    _modelInstantiator = modelInstantiator ;
+    _modelValidator = modelValidator;
   }
   
   public void setRegistryName(String registryName)
@@ -111,41 +114,51 @@ public class AadlTargetSpecificGenerator implements Generator
 
   @Override
   public void generate(SystemInstance systemInstance,
-                       File resourceFilePath,
-                       File generatedFilePath)
-                                                      throws GenerationException
+                       File runtimeDir,
+                       File outputDir,
+                       File[] includeDirs,
+                       AnalysisErrorReporterManager errManager,
+                       IProgressMonitor monitor) throws GenerationException
   {
+	
     Resource inputResource = systemInstance.eResource() ;
     Resource r;
-
-    IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
-    
+    if(_modelValidator != null)
+    {
+    	monitor.subTask("Model validation: check compatibility for refinement.");
+    	r = _modelValidator.validate(inputResource, errManager, monitor);
+    }
     if(_targetTrans != null)
     {
-      ramsesMonit.subTask("Model transformation (refinement) ..."); 
-      RamsesConfiguration.waitUnitOfTime(1);
-      r = _targetTrans.transform(inputResource, resourceFilePath,
-
-                                 generatedFilePath);
-      ramsesMonit.worked(1);
+      monitor.subTask("Model transformation (refinement) ..."); 
+//      RamsesConfiguration.waitUnitOfTime(1);
+      r = _targetTrans.transform(inputResource, outputDir, monitor);
+      monitor.worked(1);
     }
     else
      r = inputResource;
     
-    _codeGen.generate(r, generatedFilePath) ;
+    _codeGen.generate(r, runtimeDir, outputDir, includeDirs, monitor) ;
   }
 
   @Override
-  public void generateWorkflow(SystemInstance systemInstance,
+/*  public void generateWorkflow(SystemInstance systemInstance,
                           File resourceDir,
                           File generatedDir,
-                          WorkflowPilot workflowPilot) throws GenerationException
+                          WorkflowPilot workflowPilot) throws GenerationException */
+  public void generateWorkflow(SystemInstance systemInstance,
+                               WorkflowPilot xmlPilot,
+                               File runtimeDir,
+                               File outputDir,
+                               File[] includeDirs,
+                               AnalysisErrorReporterManager errManager,
+                               IProgressMonitor monitor) throws GenerationException
   {
 	if(_analysisResults==null)
-	  _analysisResults = AnalysisUtils.createNewAnalysisArtifact(generatedDir.getAbsolutePath()+systemInstance.getName()+".ares");
+	  _analysisResults = AnalysisUtils.createNewAnalysisArtifact(outputDir.getAbsolutePath()+systemInstance.getName()+".ares");
 	Resource r = systemInstance.eResource() ;
     SystemInstance currentInstance = systemInstance;
-    String rootModelId = workflowPilot.getInputModelId();
+    String rootModelId = xmlPilot.getInputModelId();
     if(rootModelId!=null && !rootModelId.isEmpty())
     	modelsMap.put(rootModelId, r);
     
@@ -156,19 +169,18 @@ public class AadlTargetSpecificGenerator implements Generator
     
     int transfoCounter = 0;
     
-    while(workflowPilot.hasNextOperation())
+    while(xmlPilot.hasNextOperation())
     {
-      String operation = workflowPilot.getNextOperation();
+      String operation = xmlPilot.getNextOperation();
       if(operation == null)
     	  return;
       if(operation.equals("analysis"))
       {
-        doAnalysis(workflowPilot);
+        doAnalysis(xmlPilot, outputDir, monitor, errManager);
       }
       else if(operation.equals("transformation"))
       {
-    	currentInstance = doTransformation(workflowPilot,r,
-    			resourceDir,generatedDir);
+    	currentInstance = doTransformation(xmlPilot, r, outputDir);
     	r = currentInstance.eResource();
       }
       else if(operation.equals("unparse"))
@@ -176,7 +188,7 @@ public class AadlTargetSpecificGenerator implements Generator
     	  String pkgName = initialPackageName + "_" + transfoCounter;
     	  
     	  doUnparse(currentInstance.eResource(), currentImplResource, 
-    			  generatedDir, pkgName);
+    	            outputDir, pkgName, monitor);
     	  
     	  transfoCounter++;
       }
@@ -186,18 +198,20 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       else if(operation.equals("generation"))
       {
-        doGeneration(generatedDir, r);
+        doGeneration(runtimeDir, outputDir, includeDirs, r, monitor);
       }   
       else
       {
         System.err.println("Undefined operation : " + operation);
       }
 
-      workflowPilot.goForward();
+      xmlPilot.goForward();
     }
   }
 
-  private void doAnalysis(WorkflowPilot workflowPilot)
+  private void doAnalysis(WorkflowPilot workflowPilot, File outputDir,
+                          IProgressMonitor monitor,
+                          AnalysisErrorReporterManager errManager)
   {
 	  String analysisName = workflowPilot.getAnalysisName();
       String analysisMode = workflowPilot.getAnalysisMode();
@@ -206,7 +220,6 @@ public class AadlTargetSpecificGenerator implements Generator
       Resource inputResource = modelsMap.get(analysisModelInputIdentifier);
       SystemInstance currentInstance;
       PropertiesLinkingService pls = new PropertiesLinkingService ();
-      AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
       if(inputResource.getContents().get(0) instanceof AadlPackage)
       {
    	    SystemImplementation si = (SystemImplementation) pls.
@@ -222,7 +235,7 @@ public class AadlTargetSpecificGenerator implements Generator
     	//otherwise produce one
     	else
     	{
-          currentInstance = instantiator.instantiate(si); 
+          currentInstance = _modelInstantiator.instantiate(si); 
     	}
       }
       else
@@ -245,8 +258,10 @@ public class AadlTargetSpecificGenerator implements Generator
         {
           
           a.setParameters(analysisParam);
-      	  a.performAnalysis(currentInstance, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
-                    new NullProgressMonitor()) ;
+      	  a.performAnalysis(currentInstance,
+      	                    outputDir,
+      	                    errManager,
+      	                    monitor) ;
       	  a.setParameters(analysisParam);
       	  Resource result = (Resource) analysisParam.get("OutputResource");
       	  if(result!=null)
@@ -259,7 +274,7 @@ public class AadlTargetSpecificGenerator implements Generator
     	    systemToInstantiate = analysisModelOutputIdentifier+systemToInstantiateSuffix;
     	    si.setName(systemToInstantiate);
       	  
-      		SystemInstance sinst = instantiator.instantiate(si);
+      		SystemInstance sinst = _modelInstantiator.instantiate(si);
       		modelsMap.put(analysisModelOutputIdentifier, sinst.eResource());
       	  }
         }
@@ -319,22 +334,22 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private SystemInstance doTransformation(WorkflowPilot workflowPilot, Resource r, 
-		  File resourceDir, File generatedDir) throws GenerationException
+		                                      File generatedDir)
+		                                                 throws GenerationException
   {
 	  List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
       System.out.println("Transformation launched : " + resourceFileNameList);
 
       String outputModelId = workflowPilot.getOutputModelId();
-      Resource result = _targetTrans.transformWokflow(r, resourceDir, resourceFileNameList, 
+      Resource result = _targetTrans.transformWokflow(r, resourceFileNameList, 
                                                   generatedDir, outputModelId);
 
-      AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
       PropertiesLinkingService pls = new PropertiesLinkingService ();
       SystemImplementation si = (SystemImplementation) pls.
       		findNamedElementInsideAadlPackage(systemToInstantiate, 
       				((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
       
-      SystemInstance sinst = instantiator.instantiate(si);
+      SystemInstance sinst = _modelInstantiator.instantiate(si);
       if(outputModelId!=null && !outputModelId.isEmpty())
     	  this.modelsMap.put(outputModelId, sinst.eResource());
       
@@ -343,14 +358,17 @@ public class AadlTargetSpecificGenerator implements Generator
       return sinst;
   }
   
-  private void doUnparse(Resource inputResource, Resource expandedResult,
-		  File outputDir, String pkgName)
+  private void doUnparse(Resource inputResource,
+                         Resource expandedResult,
+		                     File outputDir,
+		                     String pkgName,
+		                     IProgressMonitor monitor)
   {
 	  Aadl2StandaloneUnparser.getAadlUnparser().setCustomPackageName(pkgName);
 	  
 	  if (expandedResult != null)
 	  {
-		  _targetTrans.unparse(inputResource, expandedResult, outputDir);
+		  _targetTrans.unparse(inputResource, expandedResult, outputDir, monitor);
 	  }
 	  else
 	  {
@@ -360,10 +378,14 @@ public class AadlTargetSpecificGenerator implements Generator
 	  }
   }
   
-  private void doGeneration(File generatedDir, Resource r)
+  private void doGeneration(File runtimePath,
+                            File outputDir,
+                            File[] includeDirs,
+                            Resource r,
+                            IProgressMonitor monitor)
 		throws GenerationException {
 	System.out.println("Generation launched from " + r.getURI().toFileString());
-	_codeGen.generate(r, generatedDir) ;
+	_codeGen.generate(r, runtimePath, outputDir, includeDirs, monitor) ;
 }
 
 private void doErrorState() {
@@ -376,4 +398,15 @@ private void doErrorState() {
     // AadlTargetSpecificGenerator does not take any parameters: nothing to do.
   }
 
+  @Override
+  public boolean runtimePathChecker(File runtimePath)
+  {
+    return _codeGen.runtimePathChecker(runtimePath) ;
+  }
+
+  @Override
+  public String getRuntimePathEnvVar()
+  {
+    return _codeGen.getRuntimePathEnvVar() ;
+  }
 }

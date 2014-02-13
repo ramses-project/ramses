@@ -1,6 +1,10 @@
 package fr.tpt.aadl.launch ;
 
+import java.io.File ;
 import java.io.FileNotFoundException ;
+import java.util.Map ;
+
+import javax.naming.OperationNotSupportedException ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -10,18 +14,26 @@ import org.osate.aadl2.instance.SystemOperationMode ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 import org.osate.ui.actions.AbstractInstanceOrDeclarativeModelReadOnlyAction ;
 
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
 
-public class CheddarBackgroundExecution extends
-                                       AbstractInstanceOrDeclarativeModelReadOnlyAction
-{
+public class CheddarBackgroundExecution implements Analyzer
 
+/*
+extends
+                                       AbstractInstanceOrDeclarativeModelReadOnlyAction
+                                       
+                                       */
+{
+/*
   @Override
   protected String getActionName()
   {
     return "Generate Cheddar model and simulate scheduling" ;
   }
 
+  
   @Override
   protected void analyzeDeclarativeModel(IProgressMonitor monitor,
                                          AnalysisErrorReporterManager errManager,
@@ -34,8 +46,18 @@ public class CheddarBackgroundExecution extends
                                       AnalysisErrorReporterManager errManager,
                                       SystemInstance root,
                                       SystemOperationMode som)
+  */
+  @Override
+  public void performAnalysis(SystemInstance systemInstance,
+                              File outputDir,
+                              AnalysisErrorReporterManager errManager,
+                              IProgressMonitor monitor
+                              )
+        throws AnalysisResultException
   {
-    CheddarToolchain cheddar = new CheddarToolchain(root, errManager) ;
+    CheddarToolchain cheddar = new CheddarToolchain(systemInstance,
+                                                    outputDir,
+                                                    errManager) ;
     cheddar.createCheddarModel() ;
 
     try
@@ -65,5 +87,29 @@ public class CheddarBackgroundExecution extends
       e2.printStackTrace() ;
     }
     return;
+  }
+
+  @Override
+  public String getRegistryName()
+  {
+    throw new UnsupportedOperationException() ;
+  }
+
+  @Override
+  public String getPluginName()
+  {
+    throw new UnsupportedOperationException() ;
+  }
+
+  @Override
+  public String getPluginId()
+  {
+    throw new UnsupportedOperationException() ;
+  }
+
+  @Override
+  public void setParameters(Map<String, Object> parameters)
+  {
+    throw new UnsupportedOperationException() ;
   }
 }

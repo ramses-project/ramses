@@ -1,58 +1,64 @@
 package fr.tpt.aadl.ramses.instantiation.manager;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayList ;
+import java.util.List ;
 
-import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.Resource ;
 
-import fr.tpt.aadl.ramses.control.support.Names ;
-import fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess;
+import fr.tpt.aadl.ramses.control.support.AbstractPredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
-public class ContributedAadlRegistration implements PredefinedResourcesAccess { 
+public class ContributedAadlRegistration extends AbstractPredefinedAadlModelManager
+{ 
+  private PredefinedPackagesManager _predefinedPackagesManager;
+  private PredefinedPropertiesManager _predefinedPropertiesManager;
 
-  PredefinedPackagesManager predefinedPackagesManager;
-  PredefinedPropertiesManager predefinedPropertiesManager;
-
-  /**
-   * @see fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess#setPredefinedResourcesDir(File)
-   */
+  private StandAloneInstantiator _instantiator ;
+  
+  public ContributedAadlRegistration(StandAloneInstantiator instantiator)
+  {
+    _instantiator = instantiator ;
+    
+    _predefinedPackagesManager =
+          new PredefinedPackagesManager(_instantiator) ;
+    
+    _predefinedPropertiesManager = new PredefinedPropertiesManager(_instantiator);
+  }
+  
   @Override
-  public void setPredefinedResourcesDir(File resourceDir) throws Exception {
-	predefinedPackagesManager =
-			new PredefinedPackagesManager(new File(resourceDir
-	  					.getAbsolutePath() + '/' + Names.AADL_RESOURCE_DIRECTORY_NAME)) ;
-
-	if(!predefinedPackagesManager.allPackagesFound())
-		throw new Exception(
-			"Illegal initialization of ATL transformation launcher: " +
-			"some predefined packages not found: " +
-			predefinedPackagesManager.getPackagesNotFound()) ;
-
-   	predefinedPropertiesManager = new PredefinedPropertiesManager();
-   	
+  public void parsePredefinedAadlModels() throws Exception
+  {
+    // Always parse the property sets before packages !
+    _predefinedPropertiesManager.parsePredefinedPropertySets() ;
+    
+    _predefinedPackagesManager.parsePredefinedPackages() ;
+    
+    if(!_predefinedPackagesManager.allPackagesFound())
+      throw new Exception(
+        "Illegal initialization of ATL transformation launcher: " +
+        "some predefined packages not found: " +
+        _predefinedPackagesManager.getPackagesNotFound()) ;
   }
 
   /**
-   * @see fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess#getPredefinedResources()
+   * @see fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager#getPredefinedResources()
    */
   @Override
   public List<Resource> getPredefinedResources() {
 	List<Resource> result = new ArrayList<Resource>();
 
-    for(int p = 0 ; p < predefinedPackagesManager.getPackagesCount() ; p++)
+    for(int p = 0 ; p < _predefinedPackagesManager.getPackagesCount() ; p++)
 	{
-	  String name = predefinedPackagesManager.getPackageName(p) ;
-	  Resource r = predefinedPackagesManager.getPackageResource(name) ;
+	  String name = _predefinedPackagesManager.getPackageName(p) ;
+	  Resource r = _predefinedPackagesManager.getPackageResource(name) ;
 	  result.add(r);
 	}
-    for(int p = 0 ; p < predefinedPropertiesManager.getPropertiesCount() ; p++)
+    for(int p = 0 ; p < _predefinedPropertiesManager.getPropertiesCount() ; p++)
 	{
-	  String name = predefinedPropertiesManager.getPropertySetName(p) ;
-	  Resource r = predefinedPropertiesManager.getPropertySetResource(name) ;
+	  String name = _predefinedPropertiesManager.getPropertySetName(p) ;
+	  Resource r = _predefinedPropertiesManager.getPropertySetResource(name) ;
 	  result.add(r);
 	}
     return result;
   }
-
 }

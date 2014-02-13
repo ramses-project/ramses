@@ -2,6 +2,7 @@ package fr.tpt.aadl.ramses.control.support;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
@@ -9,13 +10,14 @@ import org.osate.aadl2.instance.SystemInstance;
 /**
  * This interface specifies the methods to manage AADL systems instantiation
  */
-public interface AadlModelsManager {
+public interface AadlModelInstantiatior {
 
 	/**
-	 * This method search for a system implementation with name
-	 * {@code systemToInstantiate} in a list of aadl models, instantiates
-	 * it and returns the system instance.
-	 * @param aadlModels list of aadl model containing the system 
+	 * Search the system implementation by the given name in the given AADL
+	 * resources. Then instantiate the system implementation found and return the
+	 * instance. 
+	 * 
+	 * @param aadlModels list of AADL model resources containing the system 
 	 * implementation to instantiate
 	 * @param systemToInstantiate name of the system implementation
 	 * to instantiate
@@ -23,13 +25,12 @@ public interface AadlModelsManager {
 	 * null if the system instantiation failed.
 	 */
 	SystemInstance instantiate(List<Resource> aadlModels,
-			String systemToInstantiate);
+			                       String systemToInstantiate);
 	
 	/**
-	 * This method interfaces with OSATE to call its instantiation mechanism
-	 * from a given aadl system implementation.
+	 * Instantiate the given system implementation node.
 	 * @param si the system implementation to instantiate
-	 * @return the syste instance resulting from instantiation, null
+	 * @return the system instance resulting from instantiation, null
 	 * if the instantiation failed.
 	 */
 	SystemInstance instantiate(SystemImplementation si);
@@ -42,4 +43,6 @@ public interface AadlModelsManager {
 	 * aadl code will be added.
 	 */
 	void serialize(Resource transfoResult, String targetFileName);
+	
+	public void setProgressMonitor(IProgressMonitor monitor) ;
 }

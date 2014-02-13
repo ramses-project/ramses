@@ -21,385 +21,555 @@
 
 package fr.tpt.aadl.ramses.control.osate.properties;
 
-import java.io.File;
+import java.io.File ;
+import java.io.FileNotFoundException ;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ContainerSelectionDialog;
-import org.eclipse.ui.dialogs.PropertyPage;
-import org.osate.ui.dialogs.Dialog;
+import org.eclipse.core.resources.IContainer ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IResource ;
+import org.eclipse.core.runtime.CoreException ;
+import org.eclipse.core.runtime.Path ;
+import org.eclipse.core.runtime.QualifiedName ;
+import org.eclipse.jface.dialogs.MessageDialog ;
+import org.eclipse.jface.preference.PreferenceDialog ;
+import org.eclipse.jface.preference.PreferencePage ;
+import org.eclipse.jface.window.Window ;
+import org.eclipse.swt.SWT ;
+import org.eclipse.swt.events.SelectionAdapter ;
+import org.eclipse.swt.events.SelectionEvent ;
+import org.eclipse.swt.layout.GridData ;
+import org.eclipse.swt.layout.GridLayout ;
+import org.eclipse.swt.widgets.Button ;
+import org.eclipse.swt.widgets.Composite ;
+import org.eclipse.swt.widgets.Control ;
+import org.eclipse.swt.widgets.DirectoryDialog ;
+import org.eclipse.swt.widgets.Event ;
+import org.eclipse.swt.widgets.Label ;
+import org.eclipse.swt.widgets.Listener ;
+import org.eclipse.swt.widgets.Shell ;
+import org.eclipse.swt.widgets.Text ;
+import org.eclipse.ui.dialogs.ContainerSelectionDialog ;
+import org.eclipse.ui.dialogs.PreferencesUtil ;
+import org.eclipse.ui.dialogs.PropertyPage ;
+import org.osate.ui.dialogs.Dialog ;
+import org.osate.utils.FileUtils ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.osate.WorkbenchUtils ;
+import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
 
 public class RamsesPropertyPage extends PropertyPage {
 
-	private static final String PATH_TITLE = "Output directory (where code will be generated)";
+  private static final String PATH_TITLE = "Output directory (where code will be generated)";
 
-	public static final String PREFIX = "fr.tpt.aadl.ramses.";
-	public static final String PATH_ID = "output.directory";
-	public static final String TARGET_ID = "target";
-	public static final String PLATFORM_PATH = "platform.path";
-	public static final String PREF = "pref_pok";
+  private static final String _PROPERTY_PAGE_ID = "fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage" ;
+  
+  public static final String PREFIX = "fr.tpt.aadl.ramses.";
+  public static final String OUTPUT_DIR = "output.directory";
+  public static final String PLATFORM_ID = "platform.id";
+  public static final String PLATFORM_PATH = "platform.path";
+  public static final String PREF = "pref_pok";
+  
+  private static final String _OJR_PLATFORM = "ojr" ;
 
-	private String DEFAULT_PATH;
-	private String PROJECT_NAME;	
+  private String DEFAULT_PATH;
+  private String PROJECT_NAME;  
 
-	private static final int TEXT_FIELD_WIDTH = 43;
+  private static final int TEXT_FIELD_WIDTH = 43;
 
-	private IResource instanceModel = null;
-	private Text outputDirText;
-	private Button target;
-	private Text runtimePathText;
-	private Label selectedPathLabel;
-	
-	
-	
-	/**
-	 * Constructor for SamplePropertyPage.
-	 */
-	public RamsesPropertyPage() {
-		super();
-	}
+  private Text outputDirText;
+  private Button target;
+  private Text runtimePathText;
+  private Label selectedPathLabel;
+  
+  private IProject _project ;
+  
+  /**
+   * Constructor for SamplePropertyPage.
+   */
+  public RamsesPropertyPage() {
+    super();
+    
+    _project = WorkbenchUtils.getProjectResource() ;
+  }
 
-	private void addInformationSection(Composite parent) {
-		Composite composite = createDefaultComposite(parent);
+  private RamsesConfiguration loadConfig()
+  {
+    try
+    {
+      return fetchProperties(_project) ;
+    }
+    catch (ConfigurationException ee)
+    {
+      // Missing configuration or first time configuration.
+      return new RamsesConfiguration() ;
+    }
+    catch(CoreException e)
+    {
+      MessageDialog.openError(getShell(),
+                              "Configuration Error",
+                              "Not enable to load the RAMSES configuration:\n" + 
+                              e.getMessage()) ;
+      return null ;
+    }
+  }
 
-		//Label for information
-		Label pathLabel = new Label(composite, SWT.CENTER);
-		pathLabel.setText("This property page enable you to configure RAMSES code generator");
-	}
+  private void addInformationSection(Composite parent) {
+    Composite composite = createDefaultComposite(parent);
 
-	private void addSeparator(Composite parent) {
-		Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-		GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		separator.setLayoutData(gridData);
-	}
+    //Label for information
+    Label pathLabel = new Label(composite, SWT.CENTER);
+    pathLabel.setText("This property page enable you to configure RAMSES code generator");
+  }
 
-	public static String getDefaultOutputDir(IResource resource)
-	{
-		return resource.getLocation().makeAbsolute().toOSString();
-	}
-	
-	private void addOutputDirectorySection(Composite parent) {
+  private void addSeparator(Composite parent) {
+    Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+    GridData gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    separator.setLayoutData(gridData);
+  }
 
-	  
-		Label label = new Label(parent, SWT.BOLD);
-		label.setText("1 - Select output directory to generate code in");
+  public static String getDefaultOutputDir(IResource resource)
+  {
+    return resource.getLocation().makeAbsolute().toOSString();
+  }
+  
+  private void addOutputDirectorySection(Composite parent,
+                                         RamsesConfiguration config)
+  {
 
-		Composite composite = createDefaultComposite(parent);
+    
+    Label label = new Label(parent, SWT.BOLD);
+    label.setText("1 - Select output directory to generate code in");
 
-		// Label for output directory field
-		Label ownerLabel = new Label(composite, SWT.BOLD);
-		ownerLabel.setText(PATH_TITLE);
+    Composite composite = createDefaultComposite(parent);
 
-		// output Directory button field
-		outputDirText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData gd = new GridData();
-		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		outputDirText.setLayoutData(gd);
-		outputDirText.setEditable(false) ;
+    // Label for output directory field
+    Label ownerLabel = new Label(composite, SWT.BOLD);
+    ownerLabel.setText(PATH_TITLE);
 
-		// Populate output dir text field
-		DEFAULT_PATH = getDefaultOutputDir((IResource) getElement());
-		PROJECT_NAME = (((IResource) getElement()).getName()) ;
+    // output Directory button field
+    outputDirText = new Text(composite, SWT.SINGLE | SWT.BORDER);
+    GridData gd = new GridData();
+    gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+    outputDirText.setLayoutData(gd);
+    outputDirText.setEditable(false) ;
 
-		IResource resource = instanceModel;
-		if(instanceModel!=null)
-		{
-			try {
-				String value =
-						resource.getPersistentProperty(new QualifiedName(PREFIX, PATH_ID));
-				if (value == null)
-					outputDirText.setText(DEFAULT_PATH);
-				else
-					outputDirText.setText(value);
-			}
-			catch (CoreException e) {
-				e.printStackTrace();
-			}
-		} else
-		{
-			outputDirText.setText(DEFAULT_PATH);
-			RamsesConfiguration.setOutputDir(new Path(DEFAULT_PATH).toFile());
-		}
-    RamsesConfiguration.setCurrentProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME));
-		// Move the cursor to the end.
-		outputDirText.setSelection(outputDirText.getText().length()) ;
+    // Populate output dir text field
+    DEFAULT_PATH = getDefaultOutputDir((IResource) getElement());
+    PROJECT_NAME = (((IResource) getElement()).getName()) ;
 
-		Button button = new Button(composite, SWT.PUSH);
-		button.setText("Browse existing directories in workspace...");
-		button.setAlignment(SWT.LEFT);
+    if (config.getOutputDir() == null)
+        outputDirText.setText(DEFAULT_PATH);
+      else
+        outputDirText.setText(config.getOutputDir().getAbsolutePath());
+    
+    // Move the cursor to the end.
+    outputDirText.setSelection(outputDirText.getText().length()) ;
 
-		button.addSelectionListener( new SelectionAdapter() 
-		{
-			public void widgetSelected(SelectionEvent e) 
-			{
-				ContainerSelectionDialog browseWorkspace = 
-						new ContainerSelectionDialog(getShell(),
-								(IContainer) getElement(),
-								true,
-								"Select output directory for generated code"
-								);
-										if (browseWorkspace.open() == ContainerSelectionDialog.OK) {
-											Object[] result = browseWorkspace.getResult();
-											if (result != null && result.length > 0) {
-												Path outputDir = (Path) result[0];
-												
-												outputDirText.setText(convertToAbsolutePath(outputDir));
-												// Move the cursor to the end.
-												outputDirText.setSelection(outputDirText.getText().length()) ;
-											}
-										}
-			}
-		});
-	}
+    Button button = new Button(composite, SWT.PUSH);
+    button.setText("Browse existing directories in workspace...");
+    button.setAlignment(SWT.LEFT);
 
-	private String convertToAbsolutePath(Path relativePath)
-	{
-		String root = File.separator + PROJECT_NAME ;
+    button.addSelectionListener( new SelectionAdapter() 
+    {
+      public void widgetSelected(SelectionEvent e) 
+      {
+        ContainerSelectionDialog browseWorkspace = 
+            new ContainerSelectionDialog(getShell(),
+                (IContainer) getElement(),
+                true,
+                "Select output directory for generated code"
+                );
+                    if (browseWorkspace.open() == ContainerSelectionDialog.OK) {
+                      Object[] result = browseWorkspace.getResult();
+                      if (result != null && result.length > 0) {
+                        Path outputDir = (Path) result[0];
+                        
+                        outputDirText.setText(convertToAbsolutePath(outputDir));
+                        // Move the cursor to the end.
+                        outputDirText.setSelection(outputDirText.getText().length()) ;
+                      }
+                    }
+      }
+    });
+  }
 
-		if(root.equals(relativePath.toOSString()))
-		{
-			return DEFAULT_PATH ;
-		}
-		else
-		{
-			return DEFAULT_PATH + File.separator +
-					relativePath.removeFirstSegments(1).toOSString() ;
-		}
-	}
+  private String convertToAbsolutePath(Path relativePath)
+  {
+    String root = File.separator + PROJECT_NAME ;
 
-	private Composite createDefaultComposite(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		composite.setLayout(layout);
+    if(root.equals(relativePath.toOSString()))
+    {
+      return DEFAULT_PATH ;
+    }
+    else
+    {
+      return DEFAULT_PATH + File.separator +
+          relativePath.removeFirstSegments(1).toOSString() ;
+    }
+  }
 
-		GridData data = new GridData();
-		data.verticalAlignment = GridData.FILL;
-		data.horizontalAlignment = GridData.FILL;
-		composite.setLayoutData(data);
+  private Composite createDefaultComposite(Composite parent) {
+    Composite composite = new Composite(parent, SWT.NULL);
+    GridLayout layout = new GridLayout();
+    layout.numColumns = 2;
+    composite.setLayout(layout);
 
-		return composite;
-	}
+    GridData data = new GridData();
+    data.verticalAlignment = GridData.FILL;
+    data.horizontalAlignment = GridData.FILL;
+    composite.setLayoutData(data);
 
-	/**
-	 * @see PreferencePage#createContents(Composite)
-	 */
-	@Override
-	protected Control createContents(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		composite.setLayout(layout);
-		GridData data = new GridData(GridData.FILL);
-		data.grabExcessHorizontalSpace = true;
-		composite.setLayoutData(data);
-		
-		addInformationSection(composite);
-		addSeparator(composite);
-		addSeparator(composite);
-		addOutputDirectorySection(composite);
-		addSeparator(composite);
-		addTargetSection(composite);
-		
-		return composite;
-	}
+    return composite;
+  }
 
-	private void addTargetSection(Composite composite)
-	{
-		Label targetInfo = new Label(composite, SWT.BOLD);
-		targetInfo.setText("2 - Select one of the following target platforms to generate code for:");
-		// Create checkboxes for targets supported by RAMSES
+  /**
+   * @see PreferencePage#createContents(Composite)
+   */
+  @Override
+  protected Control createContents(Composite parent) {
+    Composite composite = new Composite(parent, SWT.NONE);
+    GridLayout layout = new GridLayout();
+    composite.setLayout(layout);
+    GridData data = new GridData(GridData.FILL);
+    data.grabExcessHorizontalSpace = true;
+    composite.setLayoutData(data);
+    
+    RamsesConfiguration config = loadConfig() ; 
+    
+    addInformationSection(composite);
+    addSeparator(composite);
+    addSeparator(composite);
+    addOutputDirectorySection(composite, config);
+    addSeparator(composite);
+    addTargetSection(composite, config);
+    
+    return composite;
+  }
 
-		// TODO :  Should be deduced from the plugin.xml of generators;
-		// see ramses (OSGI)
-		Button arinc = new Button(composite, SWT.RADIO);
-		arinc.setText("ARINC653 - POK");
-		arinc.setData("pok");
+  private void addTargetSection(Composite composite, RamsesConfiguration config)
+  {
+    Label targetInfo = new Label(composite, SWT.BOLD);
+    targetInfo.setText("2 - Select one of the following target platforms to generate code for:");
+    // Create checkboxes for targets supported by RAMSES
 
-		Button ojr = new Button(composite, SWT.RADIO);
-		ojr.setText("Java - OJR");
-		ojr.setData("ojr");
+    // TODO :  Should be deduced from the plugin.xml of generators;
+    // see ramses (OSGI)
+    Button arinc = new Button(composite, SWT.RADIO);
+    arinc.setText("ARINC653 - POK");
+    arinc.setData(PokGeneratorFactory.POK_GENERATOR_NAME);
 
-		Button osek = new Button(composite, SWT.RADIO);
-		osek.setText("OSEX/NXT - TRAMPOLINE");
-		osek.setData("osek");
+    Button ojr = new Button(composite, SWT.RADIO);
+    ojr.setText("Java - OJR");
+    ojr.setData(_OJR_PLATFORM);
 
-		Listener listener = new Listener()
-		{
+    Button osek = new Button(composite, SWT.RADIO);
+    osek.setText("OSEX/NXT - TRAMPOLINE");
+    osek.setData(OSEKGeneratorFactory.OSEK_GENERATOR_NAME);
+    
+    if(config.getTargetId() != null)
+    {
+      switch(config.getTargetId())
+      {
+        case _OJR_PLATFORM :
+        {
+          target = ojr ;
+          break ;
+        }
+        
+        case PokGeneratorFactory.POK_GENERATOR_NAME :
+        {
+          target = arinc ;
+          break ;
+        }
+        
+        case OSEKGeneratorFactory.OSEK_GENERATOR_NAME :
+        {
+          target = osek ;
+          break ;
+        }
+      }
 
-			@Override
-			public void handleEvent(Event event)
-			{
-				Button button = (Button)(event.widget);
+      target.setSelection(true) ;
+    }
+    
+    Listener listener = new Listener()
+    {
 
-				System.out.println("Button =" + button.getText());
-				selectedPathLabel.setText("Select path for :"+button);
-				selectedPathLabel.redraw();
-				if (button.getSelection())
-				{
-					target = button;
-				}
-			}
-		};
+      @Override
+      public void handleEvent(Event event)
+      {
+        Button button = (Button)(event.widget);
 
-		osek.addListener(SWT.Selection, listener);
-		arinc.addListener(SWT.Selection, listener);
-		ojr.addListener(SWT.Selection, listener);
+        System.out.println("Button =" + button.getText());
+        selectedPathLabel.setText("Select path for :"+button);
+        selectedPathLabel.redraw();
+        if (button.getSelection())
+        {
+          target = button;
+        }
+      }
+    };
 
-		// Code added by achille
-		Button pathButton = new Button(composite, SWT.PUSH);
-		pathButton.setText("Choose the target platform path");
-		pathButton.setAlignment(SWT.RIGHT);
+    osek.addListener(SWT.Selection, listener);
+    arinc.addListener(SWT.Selection, listener);
+    ojr.addListener(SWT.Selection, listener);
 
-		selectedPathLabel = new Label(composite, SWT.BOLD); 
-		selectedPathLabel.setText("Path for target not selected ...");
-		selectedPathLabel.setSize(TEXT_FIELD_WIDTH, 50);
-		GridData grdPath = new GridData();
-		grdPath.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		selectedPathLabel.setLayoutData(grdPath) ;
+    // Code added by achille
+    Button pathButton = new Button(composite, SWT.PUSH);
+    pathButton.setText("Choose the target platform path");
+    pathButton.setAlignment(SWT.RIGHT);
 
-		runtimePathText = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
-		runtimePathText.setEditable(false) ;
-		GridData grd = new GridData();
-		grd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		runtimePathText.setLayoutData(grd) ;
+    selectedPathLabel = new Label(composite, SWT.BOLD); 
+    selectedPathLabel.setText("Path for target not selected ...");
+    selectedPathLabel.setSize(TEXT_FIELD_WIDTH, 50);
+    GridData grdPath = new GridData();
+    grdPath.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+    selectedPathLabel.setLayoutData(grdPath) ;
 
-		pathButton.addSelectionListener( new SelectionAdapter() 
-		{
-			public void widgetSelected(SelectionEvent e)
-			{    		
-				DirectoryDialog ddg = new DirectoryDialog(getShell());
-				File selectedFile = null;
-				String file = ddg.open();
-				if(file != null && file.length() > 2)
-				{
-					selectedFile = new File(file);
-					runtimePathText.setText(selectedFile.getAbsolutePath());
-				}
-			}
-		});
-	}
+    runtimePathText = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
+    runtimePathText.setEditable(false) ;
+    GridData grd = new GridData();
+    grd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
+    runtimePathText.setLayoutData(grd) ;
+    
+    if(config.getRuntimePath() != null)
+    {
+      runtimePathText.setText(config.getRuntimePath().getAbsolutePath());
+    }
 
-	private boolean saveConfiguration() throws CoreException
-	{
-		boolean isCorrectConfiguration=true;
-		IProject project = null;
+    pathButton.addSelectionListener( new SelectionAdapter() 
+    {
+      public void widgetSelected(SelectionEvent e)
+      {       
+        DirectoryDialog ddg = new DirectoryDialog(getShell());
+        File selectedFile = null;
+        String file = ddg.open();
+        if(file != null && file.length() > 2)
+        {
+          selectedFile = new File(file);
+          runtimePathText.setText(selectedFile.getAbsolutePath());
+        }
+      }
+    });
+  }
 
-		if(isCorrectConfiguration && outputDirText.getText()!=null 
-		   && !outputDirText.getText().equals(""))
-		{		    
-		  if((project = RamsesConfiguration.getCurrentProject()) == null)
-		   return false;
-		  
-		  project.setPersistentProperty(new QualifiedName(PREFIX, PATH_ID),
-		                                outputDirText.getText());
 
-		  project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_PATH),
-		                                runtimePathText.getText());		      
-		}
+  
+  private void saveConfiguration() throws CoreException
+  {
+    _project.setPersistentProperty(new QualifiedName(PREFIX, OUTPUT_DIR),
+                                  outputDirText.getText());
+    
+    _project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_ID),
+                                  target.getData().toString()) ;
+    
+    if(! _OJR_PLATFORM.equals(target.getData().toString()))
+    {
+      _project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_PATH),
+                                    runtimePathText.getText());
+      System.out.println(runtimePathText.getText()) ;
+    }
+  }
 
-		else
-			isCorrectConfiguration=false;
-		if(isCorrectConfiguration && target != null && target.getData()!=null)
-		  
-		  project.setPersistentProperty(		
-					new QualifiedName(PREFIX, TARGET_ID),
-					target.getData().toString());
-	
-		else
-			isCorrectConfiguration=false;
+  /**
+   * @see PreferencePage#performDefaults()
+   */
+  @Override
+  protected void performDefaults() {
+    super.performDefaults();
+    outputDirText.setText(DEFAULT_PATH);
+  }
 
-		return isCorrectConfiguration;
-	}
+  /**
+   * @see PreferencePage#performOk()
+   */
+  @Override
+  public boolean performOk()
+  {
+    try
+    {
+      short errno = configChecker() ;
+      
+      if(errno == 0)
+      {
+        saveConfiguration();
+        return true;
+      }
+      else
+      {
+        popupConfigurationErrorMessage(errno);
+        return false;
+      }
+    }
+    catch (CoreException e)
+    {
+      MessageDialog.openError(getShell(),
+                              "Configuration Error",
+                              "Not enable to save the RAMSES configuration:\n" + 
+                              e.getMessage()) ;
+      return false;
+    }
+  }
 
-	/**
-	 * @see PreferencePage#performDefaults()
-	 */
-	@Override
-	protected void performDefaults() {
-		super.performDefaults();
-		outputDirText.setText(DEFAULT_PATH);
-	}
+  private short configChecker()
+  {
+    short result = 0 ; // Zero means no error.
 
-	/**
-	 * @see PreferencePage#performOk()
-	 */
-	@Override
-	public boolean performOk() {
-		// store the value in the owner text field
-		try {
-			if(saveConfiguration())
-			  return true;
-			else
-			{
-				popupConfigurationError();
-				return false;
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
+    if(outputDirText.getText() == null || outputDirText.getText().isEmpty())
+    {
+      result += 10 ;
+    }
 
-	@Override
-	public void performApply() {
-		// store the value in the owner text field
-		try {
-			if(!saveConfiguration())
-			{
-				System.out.println("Erreur Apply");
-				popupConfigurationError();
-			}
-			else
-			{				
-				if(!RamsesConfiguration.pokRuntimePathValidityCheck(runtimePathText.getText())
-				   && (!target.getText().equals("Java - OJR")))
-				{
-					Dialog.showError("Code Generation Error",
-							"This path is not valid for "+target.getText());
-					return;
-				}
-				if(!target.getText().equals("Java - OJR"))
-				 RamsesConfiguration.setRuntimeDir(runtimePathText.getText());
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+    if(target != null && target.getData() != null)
+    {
+      ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+      Generator gen = sr.getGenerator(target.getData().toString()) ;
+      if(gen != null)
+      {
+        try
+        {
+          File runtimePath = null ;
+          
+          if(runtimePathText.getText() != null &&
+             ! runtimePathText.getText().isEmpty())
+          {
+            runtimePath = FileUtils.stringToFile(runtimePathText.getText()) ;
+          }
+          // the runtime path can be null.
+          if(! gen.runtimePathChecker(runtimePath))
+          {
+            result +=400 ;
+          }
+        }
+        catch (FileNotFoundException e)
+        {
+          result +=300 ;
+        }
+      }
+      else
+      {
+        result +=200 ;
+      }
+    }
+    else
+    {
+      result += 100 ;
+    }
 
-	}
+    return result ;
+  }
+  
+  private void popupConfigurationErrorMessage(short errno)
+  {
+    StringBuilder msg =
+             new StringBuilder("Not enable to save the RAMSES configuration:\n\n");
 
-	private void popupConfigurationError()
-	{
-		MessageDialog.openError(getShell(),
-				"Configuration Error",
-				"To configure RAMSES, you must select\n" +
-						"\t 1 - an output directory, \n" +
-						"\t 2 - and a target platform.\n" +
-						"\t 3 - and a Path for the selected platform.\n\n" +
-				"One of these elements was not configured properly.");
-	}
+    if(errno == 1)
+    {
+      msg.append("\n\tCan't fetch the project.") ;
+    }
+    else
+    {
+      int tmp = errno/100 ;
+      
+      switch(tmp)
+      {
+        case 1 :
+        {
+          msg.append("\n\tTarget is missing.") ;
+          break ;
+        }
+        
+        case 2 :
+        {
+          msg.append("\n\tThe target " + target.getData().toString() + " is not supported.") ;
+          break ;
+        }
+        
+        case 3 :
+        {
+          msg.append("\n\tThe runtime is missing.") ;
+          break ;
+        }
+        
+        case 4 :
+        {
+          msg.append("\n\tThe given runtime is not a valid " + target.getData().toString() + " runtime.") ;
+          break ;
+        }
+      }
+      
+      if(errno%100 != 0)
+      {
+        msg.append("\n\tMissing output directory.") ;
+      }
+    }
+    
+    Dialog.showError("RAMSES Configuration error",
+                     msg.toString()) ;
+  }
+  
+  private static String fetchPropertiesValue(IProject project,
+                                             String property) throws
+                                                           CoreException
+  {
+    String value = project.getPersistentProperty(new QualifiedName(
+                                                   RamsesPropertyPage.PREFIX,
+                                                   property));
+    
+    return value ;
+  }
+  
+  public static RamsesConfiguration fetchProperties(IProject project) throws
+                                                                   CoreException,
+                                                                   ConfigurationException
+                                                           
+  {
+    RamsesConfiguration result = new RamsesConfiguration() ;
+    ConfigStatus status ;
+    
+    status = result.setOutputDir(fetchPropertiesValue(project, OUTPUT_DIR)) ;
+    if(status != ConfigStatus.SET)
+    {
+      throw new ConfigurationException(status) ;
+    }
+    
+    status = result.setGeneretionTargetId(fetchPropertiesValue(project, PLATFORM_ID)) ;
+    if(status != ConfigStatus.SET)
+    {
+      throw new ConfigurationException(status) ;
+    }
 
+    status = result.setRuntimePath(fetchPropertiesValue(project, PLATFORM_PATH)) ;
+    if(status != ConfigStatus.SET)
+    {
+      throw new ConfigurationException(status) ;
+    }
+    
+    return result ;
+  }
+  
+  // Return false if user has canceled.
+  public static boolean openPropertyDialog(IProject currentProject)
+  {
+    Shell shell = WorkbenchUtils.getCurrentShell() ;
+    
+    //Instantiate the project propertyPage.
+    PreferenceDialog prefDiag = PreferencesUtil.
+          createPropertyDialogOn(shell, currentProject, _PROPERTY_PAGE_ID, null,
+                                 null);
+    
+    // TODO: display the missing informations.
+    
+    return prefDiag.open() == Window.OK ;
+  }
 }

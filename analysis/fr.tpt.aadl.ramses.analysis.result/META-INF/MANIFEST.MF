@@ -7,11 +7,12 @@ Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.emf.ecore;visibility:=reexport
+ org.eclipse.emf.ecore;visibility:=reexport,
+ org.eclipse.emf.ecore.xmi,
+ org.junit,
+ fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0"
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.emf.ecore.xmi.impl,
- org.junit;version="4.10.0"
 Export-Package: fr.tpt.aadl.ramses.analysis,
  fr.tpt.aadl.ramses.analysis.impl,
  fr.tpt.aadl.ramses.analysis.util,

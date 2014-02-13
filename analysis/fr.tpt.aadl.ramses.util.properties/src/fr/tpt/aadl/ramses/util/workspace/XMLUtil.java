@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.util.workspace ;
 
+import java.io.File ;
 import java.io.FileOutputStream ;
 import java.io.IOException ;
 import java.io.OutputStream ;
@@ -54,7 +55,7 @@ public class XMLUtil
   }
 
   public static void saveIn(Document doc,
-                            String filename,
+                            File filename,
                             String header)
   {
     try

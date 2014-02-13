@@ -20,11 +20,11 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.eclipse.m2m.atl.core;bundle-version="3.4.0",
  org.eclipse.m2m.atl.emftvm;bundle-version="3.4.0",
  org.eclipse.m2m.atl.engine.emfvm.launch;bundle-version="3.4.0",
- org.osate.xtext.aadl2.properties
+ org.osate.xtext.aadl2.properties,
+ fr.tpt.aadl.sched.wcetanalysis.results;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.instantiation;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: resources/lib/jgrapht-jdk1.6.jar,
  .
-Import-Package: fr.tpt.aadl.ramses.instantiation.manager,
- fr.tpt.aadl.ramses.util.properties,
- fr.tpt.aadl.sched.wcetanalysis.result.reducedba

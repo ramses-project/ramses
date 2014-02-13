@@ -23,42 +23,51 @@
 package fr.tpt.aadl.ramses.generation.adaravenscar.makefile ;
 
 
-import java.io.BufferedReader ;
-import java.io.BufferedWriter ;
 import java.io.File ;
-import java.io.FileWriter ;
-import java.io.IOException ;
-import java.io.InputStream ;
-import java.io.InputStreamReader ;
-import java.util.List;
 import java.util.Map ;
-import java.util.Set;
 
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
-import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
-import fr.tpt.aadl.ramses.util.generation.FileUtils;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
-
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
-import org.osate.aadl2.ProcessorImplementation ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.modelsupport.UnparseText ;
-import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 import org.osate.aadl2.util.Aadl2Switch ;
-import org.osate.utils.PropertyUtils ;
 
-public class AadlToAdaRavenscarMakefileUnparser extends AadlProcessingSwitch
-implements TargetBuilderGenerator
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.util.generation.AbstractMakefileUnparser ;
+
+public class AadlToAdaRavenscarMakefileUnparser extends AbstractMakefileUnparser
 {
 
+  private final static String _ADA_SUB_PATH = "/Ada_runtime/PeriodicDelayed_runtime/" ;
+  private final static String RUNTIME_INCL_DIR = "/libpok/ada" ;
 	private UnparseText unparserContent ;
+	
+	/*
 	private UnparseText kernelMakefileContent ;
 	private List<ProcessSubcomponent> bindedProcess ;
-
+  */
+	
+	@Override
+	protected void setupCommonDirs()
+	{
+	  // Add Dir of Ada PeriodicDelayed runtime
+    File adaPeriodicDelayedRuntimeDir;
+    adaPeriodicDelayedRuntimeDir = new File(RamsesConfiguration.getPredefinedResourceDir()
+                                            .getAbsolutePath() + _ADA_SUB_PATH);
+    _includeDirManager.addCommonDependency(adaPeriodicDelayedRuntimeDir);
+	}
+	
+	@Override
+	protected void handleDirs(File runtimePath, File[] includeDirs) throws GenerationException
+	{
+    File pokAdaFile = new File(runtimePath + RUNTIME_INCL_DIR);
+    _includeDirManager.addCommonDependency(pokAdaFile) ;
+    super.handleDirs(runtimePath, includeDirs);
+	}
+	
 	@Override
 	protected void initSwitches()
 	{
@@ -104,35 +113,6 @@ implements TargetBuilderGenerator
 				} ;
 	}
 
-	private void saveMakefile(UnparseText text,
-			File makeFileDir)
-	{
-	    try
-	    {
-	      File makeFile = new File(makeFileDir.getAbsolutePath() + "/Makefile") ;
-	      FileWriter fileW = new FileWriter(makeFile) ;
-	      BufferedWriter output ;
-
-	      try
-	      {
-	        output = new BufferedWriter(fileW) ;
-	        output.write(text.getParseOutput()) ;
-	        output.close() ;
-	      }
-	      catch(IOException e)
-	      {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace() ;
-	      }
-	    }
-	    catch(IOException e)
-	    {
-	      // TODO Auto-generated catch block
-	      e.printStackTrace() ;
-	    }
-
-	}
-
 	private void generateMakefile(NamedElement ne,
 			File makeFile)
 	{
@@ -143,32 +123,39 @@ implements TargetBuilderGenerator
 
 	@Override
 	public void process(SystemImplementation system,
-			File generatedFilePath)
-					throws GenerationException
+	                    File runtimePath,
+	                    File outputDir,
+	                    File[] includeDirs,
+	                    IProgressMonitor monitor)
+					              throws GenerationException
 					{
-		//generateMakefile((NamedElement) system, generatedFilePath) ;
-		executeMake(generatedFilePath);
+	  super.process(system, runtimePath, outputDir, includeDirs, monitor) ;
+	  //generateMakefile((NamedElement) system, generatedFilePath) ;
+		executeMake(outputDir, runtimePath);
 					}
-
-
-	public void executeMake(File generatedFilePath)
-	{
-	}
 
 	@Override
 	public void process(ProcessorSubcomponent processor,
-			File generatedFilePath)
+	                    File runtimePath,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
 					throws GenerationException
 					{
+	            throw new UnsupportedOperationException() ;
 					}
 
 	@Override
 	public void process(ProcessSubcomponent process,
-			File generatedFilePath)
+	                    File runtimePath,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
 					throws GenerationException
 					{
-		unparserContent = new UnparseText() ;
-		generateMakefile((NamedElement) process, generatedFilePath) ;
+	  super.process(process, runtimePath, outputDir, includeDirs, monitor) ;
+	  unparserContent = new UnparseText() ;
+		generateMakefile((NamedElement) process, outputDir) ;
 					}
 
 	@Override
@@ -176,4 +163,12 @@ implements TargetBuilderGenerator
 	{
 		throw new UnsupportedOperationException() ;
 	}
+	
+	@Override
+  public boolean runtimePathChecker(File runtimePath)
+  {
+    // TODO: to be implemented.
+	  
+	  return true ;
+  }
 }

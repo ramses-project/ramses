@@ -41,7 +41,7 @@
        point="fr.tpt.aadl.ramses.control.support.analyzer">
     <analyzer
           analysisName="WCETAnalysis"
-          class="fr.tpt.aadl.launch.WCETAnalysis"
+          class="fr.tpt.aadl.launch.CheddarFactory"
           id="fr.tpt.aadl.sched.tools.cheddar.analyzer"
           name="TPT model-based WCET analysis">
     </analyzer>

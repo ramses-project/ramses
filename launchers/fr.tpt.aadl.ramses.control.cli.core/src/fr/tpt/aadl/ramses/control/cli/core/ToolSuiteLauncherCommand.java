@@ -24,11 +24,11 @@ package fr.tpt.aadl.ramses.control.cli.core ;
 import java.io.File ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
-import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
 import com.martiansoftware.jsap.FlaggedOption ;
@@ -38,15 +38,22 @@ import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
-import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot;
+import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot ;
+import fr.tpt.aadl.ramses.control.support.EnvUtils ;
+import fr.tpt.aadl.ramses.control.support.FileUtils ;
 import fr.tpt.aadl.ramses.control.support.Names ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
-import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.ramses.instantiation.manager.ContributedAadlRegistration ;
 
 /**
  * This class provides the main entry point of the Command Line 
@@ -70,7 +77,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String SYSTEM_TO_INSTANTIATE_OPTION_ID =
         "system_to_instantiate" ;
   private static final String OUTPUT_DIR_OPTION_ID = "output_directory" ;
-  private static final String RAMSES_DIR ;
+  
   private static final String GENERATION_OPTION_ID = "target_platform" ;
   
   private static final String PARAMETER_SEPARATOR = "=" ;
@@ -84,155 +91,84 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   private static final String WORKFLOW_OPTION_ID = "workflow_path" ;
   
+  private static final String RUNTIME_PATH_OPTION_ID = "runtime_path" ;
+  
   private final static DefaultMessageReporter _reporter = new DefaultMessageReporter();
   private final static StandAloneInternalErrorReporter _errorReporter = new StandAloneInternalErrorReporter(_reporter);
   
-  static
-  {
-    String tmp = System.getProperty(Names.RAMSES_RESOURCES_VAR) ;
-    if (tmp == null || tmp.isEmpty())
-    {
-      tmp = System.getenv(Names.RAMSES_RESOURCES_VAR) ;
-    }
-    if(! (tmp == null || tmp.isEmpty()))
-    {
-      RAMSES_DIR = tmp ;
-    }
-    else // try to found out where RAMSES_DIR it is ...
-    {
-      File workingDirectory = new File(System.getProperty("user.dir")) ;
-      boolean found = false ;
-      for (File f : workingDirectory.listFiles())
-      {
-        // RAMSES resources are in the current working directory: this is the
-        // case for the regular RAMSES deployment.
-        if(f.isDirectory() && f.getName().equalsIgnoreCase(
-                                            Names.AADL_RESOURCE_DIRECTORY_NAME))
-        {
-          found = true ;
-          break ;
-        }
-      }
-      
-      if(found)
-      {
-        RAMSES_DIR = "." ;
-      }
-      else // finally affect it the default directory for development environment.
-      {
-        RAMSES_DIR = 
-            "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
-      }
-    }
-  }
+  private static Set<File> _includeDirs ;
+  private static List<File> _mainModelFiles ;
+  private static String _systemToInstantiate ;
+  private static ToolSuiteLauncher _launcher ;
+  
   
   /**
    * This method is the main entry point of the Command Line 
    * Interface (CLI) version of RAMSES. It takes as input the 
    * set of command line arguments of RAMSES, parses them, and
    * launches the corresponding actions.
+   * @throws Exception 
    */
-  public static void main(String[] args)
+  public static void main(String[] args) throws Exception
   {
-	JSAP jsapHelp = new JSAP() ;
-    JSAP jsapParse = new JSAP() ;
-    JSAP jsapAnalysis = new JSAP() ;
-    JSAP jsapTransfo = new JSAP() ;
-    JSAP jsapGen = new JSAP() ;
-    ToolSuiteLauncher launcher = new ToolSuiteLauncher() ;
+    JSAP jsap = new JSAP() ;
 
     try
     {
-      initSwitches(jsapHelp, jsapParse, jsapAnalysis, jsapTransfo, jsapGen) ;
-      JSAPResult helpConf = jsapHelp.parse(args) ;
-      boolean helpOnly = helpConf.getBoolean(HELP_ONLY_OPTION_ID) ;
+      initSwitches(jsap) ;
+      JSAPResult parseConfig = jsap.parse(args) ;
+      boolean helpOnly = parseConfig.getBoolean(HELP_ONLY_OPTION_ID) ;
 
       if(helpOnly)
       {
-    	  printHelp(jsapHelp, args);
+        printHelp(jsap, args);
+        System.exit(1) ; 
       }
-      
-      JSAPResult parseConfig = jsapParse.parse(args) ;
-      boolean parseOnly = parseConfig.getBoolean(PARSE_ONLY_OPTION_ID) ;
-      jsapParse.unregisterParameter(parseOnlyMode) ;
-
-      if(parseOnly)
+      else
       {
         if(parseConfig.success())
         {
-          parse(launcher, parseConfig) ;
-          System.exit(1) ;
+          boolean parseOnly = parseConfig.getBoolean(PARSE_ONLY_OPTION_ID) ;
+          boolean analysisOnly = parseConfig.getBoolean(ANALYSIS_ONLY_OPTION_ID) ;
+          
+          if(parseOnly)
+          {
+            parse(parseConfig) ;
+          }
+          else if(analysisOnly)
+          { 
+            analyse(parseConfig) ;
+          }
+          else // Case of generation.
+          {
+            generation(parseConfig) ;
+          }
         }
-        else
-        {
-          StringBuilder sb =
-                new StringBuilder("\nParsing Configuration Usage:\n\n--parse ") ;
-          sb.append(jsapParse.getUsage()) ;
-          sb.append("\n\n") ;
-          sb.append(jsapParse.getHelp()) ;
-          reportError(parseConfig.getErrorMessageIterator(), sb.toString()) ;
-          System.exit(0) ;
-        }
-      }
-
-      JSAPResult analysisConfig = jsapAnalysis.parse(args) ;
-      boolean analysisOnly = analysisConfig.getBoolean(ANALYSIS_ONLY_OPTION_ID) ;
-      jsapAnalysis.unregisterParameter(analysisOnlyMode) ;
-
-      if(analysisOnly)
-      {
-        if(analysisConfig.success())
-        {
-          analyse(launcher, analysisConfig) ;
-          System.exit(1) ;
-        }
-        else
-        {
-          StringBuilder sb =
-                new StringBuilder(
-                      "\nAnalysis Configuration Usage:\n\n--analysis ") ;
-          sb.append(jsapAnalysis.getUsage()) ;
-          sb.append("\n\n") ;
-          sb.append(jsapAnalysis.getHelp()) ;
-          reportError(analysisConfig.getErrorMessageIterator(), sb.toString()) ;
-          System.exit(0) ;
-        }
-      }
-
-      // TODO: Currently disabled
-//      transformation(launcher, jsapTransfo, args) ;
       
-      generation(launcher, jsapGen, args) ;
-      System.exit(0);
+        System.exit(1);
+      }
     }
     catch(Exception e)
     {
       e.printStackTrace() ;
       System.exit(0) ;
     }
-
   }
-
   
   private static void printHelp(JSAP jsapHelp, String[] args)
   {
-	  
+    
     StringBuilder sb =
-    		new StringBuilder("\nGeneral Configuration Usage:\n\n") ;
+        new StringBuilder("\nGeneral Configuration Usage:\n\n") ;
     sb.append(jsapHelp.getUsage()) ;
     sb.append("\n\n") ;
     sb.append(jsapHelp.getHelp()) ;
     _reporter.reportMessage(MessageStatus.INFO, sb.toString()) ;
-    System.exit(1) ; 
   }
   
   // Setup and register switches into the given JASP parser, analysis and
   // transformation.
-  private static void initSwitches(JSAP jsapHelp,
-		  						   JSAP jsapParse,
-                                   JSAP jsapAnalysis,
-                                   JSAP jsapTransfo,
-                                   JSAP jsapGen)
+  private static void initSwitches(JSAP jsap)
         throws JSAPException
   {
     helpOnlyMode =
@@ -289,6 +225,13 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                 .setAllowMultipleDeclarations(false) ;
     includes.setHelp("List of path to find input models") ;
     
+    FlaggedOption runtimePath =
+          new FlaggedOption(RUNTIME_PATH_OPTION_ID)
+                .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+                .setLongFlag("runtime-path").setShortFlag('r').setList(false)
+                .setAllowMultipleDeclarations(false) ;
+    runtimePath.setHelp("Path to the targeted platform runtime") ;
+    
     FlaggedOption system_to_instantiate =
           new FlaggedOption(SYSTEM_TO_INSTANTIATE_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(false)
@@ -324,17 +267,17 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     generated_file_path.setHelp("Directory where files will be generated") ;
                   
    FlaggedOption workflow_path =
-   		  new FlaggedOption(WORKFLOW_OPTION_ID)
+        new FlaggedOption(WORKFLOW_OPTION_ID)
                   .setStringParser(JSAP.STRING_PARSER).setRequired(false)
                   .setLongFlag("workflow").setShortFlag(JSAP.NO_SHORTFLAG).setList(false)
                   .setAllowMultipleDeclarations(false) ;
    workflow_path.setHelp("The specified ecore file contains the workflow") ;
 
     FlaggedOption generation =
-    		new FlaggedOption(GENERATION_OPTION_ID)
-    			  .setStringParser(JSAP.STRING_PARSER).setRequired(false)
-    			  .setLongFlag("generation").setShortFlag('g').setList(false)
-    			  .setAllowMultipleDeclarations(false) ;
+        new FlaggedOption(GENERATION_OPTION_ID)
+            .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+            .setLongFlag("generation").setShortFlag('g').setList(false)
+            .setAllowMultipleDeclarations(false) ;
 
     generation.setHelp("Targeted platform for code generation (pok, etc.).") ;
 
@@ -347,59 +290,22 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                   
     parameters.setHelp("additional parameters given as key=value format") ;
     
-    jsapHelp.registerParameter(helpOnlyMode) ;
-    jsapHelp.registerParameter(parseOnlyMode) ;
-    jsapHelp.registerParameter(model) ;
-    jsapHelp.registerParameter(includes) ;
+    jsap.registerParameter(helpOnlyMode) ;
+    jsap.registerParameter(parseOnlyMode) ;
+    jsap.registerParameter(model) ;
+    jsap.registerParameter(includes) ;
     
-    jsapHelp.registerParameter(analysisOnlyMode) ;
-    jsapHelp.registerParameter(analysis) ;
-    jsapHelp.registerParameter(system_to_instantiate) ;
-    jsapHelp.registerParameter(generated_file_path) ;
+    jsap.registerParameter(analysisOnlyMode) ;
+    jsap.registerParameter(analysis) ;
+    jsap.registerParameter(system_to_instantiate) ;
+    jsap.registerParameter(generated_file_path) ;
     
-    jsapHelp.registerParameter(superimposition_files) ;
-    jsapHelp.registerParameter(post_transformation_files) ;
-    jsapHelp.registerParameter(generation) ;
-    jsapHelp.registerParameter(workflow_path) ;
-    jsapHelp.registerParameter(parameters);
-    
-    jsapParse.registerParameter(model) ;
-    jsapParse.registerParameter(includes) ;
-    jsapParse.registerParameter(parseOnlyMode) ;
-    jsapParse.registerParameter(parameters);
-    jsapParse.registerParameter(generated_file_path);
-    
-    jsapAnalysis.registerParameter(analysis) ;
-    jsapAnalysis.registerParameter(model) ;
-    jsapAnalysis.registerParameter(includes) ;
-    jsapAnalysis.registerParameter(analysisOnlyMode) ;
-    jsapAnalysis.registerParameter(system_to_instantiate) ;
-    jsapAnalysis.registerParameter(generated_file_path) ;
-    jsapAnalysis.registerParameter(parameters);
-    jsapAnalysis.registerParameter(helpOnlyMode) ;
-    
-    jsapTransfo.registerParameter(analysisOnlyMode) ;
-    jsapTransfo.registerParameter(helpOnlyMode) ;
-    jsapTransfo.registerParameter(parseOnlyMode) ;
-    jsapTransfo.registerParameter(model) ;
-    jsapTransfo.registerParameter(includes) ;
-    jsapTransfo.registerParameter(system_to_instantiate) ;
-    jsapTransfo.registerParameter(superimposition_files) ;
-    jsapTransfo.registerParameter(post_transformation_files) ;
-    jsapTransfo.registerParameter(generated_file_path) ;
-    jsapTransfo.registerParameter(analysis) ;
-    jsapTransfo.registerParameter(parameters);
-    
-    
-    jsapGen.registerParameter(helpOnlyMode) ;
-    jsapGen.registerParameter(parseOnlyMode) ;
-    jsapGen.registerParameter(model) ;
-    jsapGen.registerParameter(includes) ;
-    jsapGen.registerParameter(system_to_instantiate) ;
-    jsapGen.registerParameter(generated_file_path) ;
-    jsapGen.registerParameter(generation) ;
-    jsapGen.registerParameter(workflow_path) ;
-    jsapGen.registerParameter(parameters);
+    jsap.registerParameter(superimposition_files) ;
+    jsap.registerParameter(post_transformation_files) ;
+    jsap.registerParameter(generation) ;
+    jsap.registerParameter(runtimePath);
+    jsap.registerParameter(workflow_path) ;
+    jsap.registerParameter(parameters);
   }
 
   private static Map<String, Object> parametersHandler(JSAPResult config)
@@ -407,7 +313,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   {
     String[] unparsedParameters = config.getStringArray(PARAMETER_OPTION_ID) ;
 
-    Map<String, Object> result = null ;
+    Map<String, Object> result = new HashMap<String, Object>() ;
 
     if(unparsedParameters.length != 0)
     {
@@ -434,7 +340,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
     return result ;
   }
-  
+  /*
   @SuppressWarnings("rawtypes")
   private static void reportError(Iterator errs,
                                   String message)
@@ -451,26 +357,49 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     sb.append(message) ;
     _errorReporter.internalErrorImpl(sb.toString()) ;
   }
-
-  private static void parse(ToolSuiteLauncher launcher,
-                            JSAPResult parseConfig)
-        throws Exception
+  */
+  
+  private static void commonOptionsHandler(JSAPResult options) throws Exception
   {
     String[] includeFolderNames =
-          parseConfig.getStringArray(INCLUDES_OPTION_ID) ;
-    String[] mainModels = parseConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
+          options.getStringArray(INCLUDES_OPTION_ID) ;
+    String[] mainModels = options.getStringArray(SOURCE_MODELS_OPTION_ID) ;
     
-    File aadlResourcesDir =
-          ToolSuiteLauncherCommand.getAADLResourcesDir(RAMSES_DIR) ;
-    RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
+    String errors = "" ;
     
-    List<File> mainModelFiles ;
-    mainModelFiles =
+    _includeDirs = FileUtils.checkFilesExist(includeFolderNames, errors) ;
+    
+    // TODO : throw warnings for the faulty directories.
+    
+    /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
+    setRamsesResourceDir(_includeDirs) ;
+        
+    IProgressMonitor monitor = new RamsesProgressMonitor() ;
+    
+    StandAloneInstantiator instantiator = new StandAloneInstantiator(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+                                                                     monitor) ;
+    PredefinedAadlModelManager modelManager = new ContributedAadlRegistration(instantiator) ;
+    
+    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    
+    registry.init(instantiator, modelManager);
+    /**************************************************************************/
+    
+    
+    _launcher = new ToolSuiteLauncher(monitor, instantiator, modelManager) ;
+    
+    _mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
-                                                   includeFolderNames) ;
-    launcher.parsePredefinedRessources() ;
-    launcher.parsePredefinedPackages() ;
-    List<Resource> modelResources = launcher.parse(mainModelFiles) ;
+                                                   _includeDirs) ;
+  }
+  
+  private static void parse(JSAPResult options)
+        throws Exception
+  {
+    commonOptionsHandler(options) ;
+    
+    _launcher.parsePredefinedRessources() ;
+    List<Resource> modelResources = _launcher.parse(_mainModelFiles) ;
     MessageStatus ms = MessageStatus.INFO ;
     
     String msg = "parsing has " ;
@@ -493,57 +422,54 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     // still can't be possible to discriminate the nature of the errors.
     // So unparse anyway.
     String unparse_file_path =
-        parseConfig.getString(OUTPUT_DIR_OPTION_ID) ;
+        options.getString(OUTPUT_DIR_OPTION_ID) ;
     
-    if( ! (
-            unparse_file_path == null ||
-            unparse_file_path.isEmpty()
-          )
-      )
+    if (unparse_file_path != null && !unparse_file_path.isEmpty())
     {
-      File outputPath = ToolSuiteLauncherCommand.
-                                            getVerifiedPath(unparse_file_path) ;
+      RamsesConfiguration ramsesConfig = new RamsesConfiguration() ;
+      ConfigStatus status = ramsesConfig.setOutputDir(unparse_file_path) ;
       
-      launcher.unparse(modelResources, outputPath) ;
+      if(status == ConfigStatus.SET)
+      {
+        _launcher.unparse(modelResources, ramsesConfig) ;
+      }
     }
   }
 
-  private static void analyse(ToolSuiteLauncher launcher,
-                              JSAPResult analysisConfig)
-        throws Exception
+  private static void instantiationOptionsHandler(JSAPResult options,
+                                                  RamsesConfiguration config)
+                                                                throws Exception
   {
-    String[] includeFolderNames =
-          analysisConfig.getStringArray(INCLUDES_OPTION_ID) ;
-    String[] mainModels =
-          analysisConfig.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-    String[] analysisToPerform =
-          analysisConfig.getStringArray(ANALYSIS_LIST_OPTION_ID) ;
-    String systemToInstantiate =
-          analysisConfig.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
-    String analysis_output_path =
-          analysisConfig.getString(OUTPUT_DIR_OPTION_ID) ;
+    _systemToInstantiate =
+          options.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
+    String output_path =
+          options.getString(OUTPUT_DIR_OPTION_ID) ;
     
-    if(analysis_output_path!=null)
+    
+    ConfigStatus status = config.setOutputDir(output_path) ;
+    if(status != ConfigStatus.SET)
     {
-      File outputDir =
-            ToolSuiteLauncherCommand.getVerifiedPath(analysis_output_path) ;
-      RamsesConfiguration.setOutputDir(outputDir);
+      throw new Exception(status.msg) ;
     }
+  }
+  
+  private static void analyse(JSAPResult options) throws Exception
         
-    File aadlResourcesDir =
-          ToolSuiteLauncherCommand.getAADLResourcesDir(RAMSES_DIR) ;
-    RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
+  {
+    RamsesConfiguration config = new RamsesConfiguration() ;
+    commonOptionsHandler(options);
+    instantiationOptionsHandler(options, config);
     
-    List<File> mainModelFiles =
-          ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
-                                                   includeFolderNames) ;
-    launcher.parsePredefinedRessources() ;
-    launcher.parsePredefinedPackages() ;
+    String[] analysisToPerform =
+          options.getStringArray(ANALYSIS_LIST_OPTION_ID) ;
+   
+    _launcher.parsePredefinedRessources() ;
+    
     if(analysisToPerform.length > 0)
     {
       try
       {
-        launcher.initializeAnalysis(analysisToPerform) ;
+        _launcher.initializeAnalysis(analysisToPerform) ;
       }
       catch(Exception e)
       {
@@ -554,9 +480,9 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
       try
       {
-        Map<String, Object> parameters = parametersHandler(analysisConfig) ;
+        Map<String, Object> parameters = parametersHandler(options) ;
         
-        launcher.performAnalysis(mainModelFiles, systemToInstantiate,
+        _launcher.performAnalysis(_mainModelFiles, _systemToInstantiate, config,
                                  parameters) ;
       }
       catch(AnalysisResultException e)
@@ -568,106 +494,69 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     }
   }
   
-  private static void generation(ToolSuiteLauncher launcher,
-                                 JSAP jsapGen,
-                                 String[] args)
+  private static File[] toArray(Set<File> fileSet)
+  {
+    File[] result = new File[fileSet.size()] ;
+    fileSet.toArray(result) ;
+    return result ;
+  }
+  
+  private static void generation(JSAPResult options)
                                                    throws Exception
   {
-    JSAPResult genConf = jsapGen.parse(args) ;
+    RamsesConfiguration config = new RamsesConfiguration() ;
     
-    if(false == genConf.success())
+    commonOptionsHandler(options);
+    instantiationOptionsHandler(options, config);
+    
+    String targetName = options.getString(GENERATION_OPTION_ID) ;
+    ConfigStatus status = config.setGeneretionTargetId(targetName) ;
+    if(status != ConfigStatus.SET)
     {
-    	StringBuilder sb =
-                new StringBuilder("\nParsing Configuration Usage:\n\n--parse ") ;
-        sb.append(jsapGen.getUsage()) ;
-        sb.append("\n\n") ;
-        sb.append(jsapGen.getHelp()) ;
-        reportError(genConf.getErrorMessageIterator(), sb.toString()) ;
-        System.exit(0) ;
+      throw new Exception(status.msg) ;
     }
     
-    String[] includeFolderNames =
-          genConf.getStringArray(INCLUDES_OPTION_ID) ;
-    String systemToInstantiate =
-          genConf.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
-    String[] mainModels =
-          genConf.getStringArray(SOURCE_MODELS_OPTION_ID) ;
-    String generated_file_path =
-          genConf.getString(OUTPUT_DIR_OPTION_ID) ;
-    String resourcesDirName = RAMSES_DIR ;
-    
-    String targetName = genConf.getString(GENERATION_OPTION_ID) ;
-
-    if(resourcesDirName.endsWith("/") == false)
+    String path = options.getString(RUNTIME_PATH_OPTION_ID) ;
+    status = config.setRuntimePath(path) ;
+    if(status != ConfigStatus.SET)
     {
-      resourcesDirName = resourcesDirName + "/" ;
-    }
-
-    List<File> mainModelFiles =
-          ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
-                                                   includeFolderNames) ;
-    
-    ToolSuiteLauncherCommand.getVerifiedPath(resourcesDirName) ;
-    
-    File aadlResourcesDir =
-          ToolSuiteLauncherCommand
-                .getAADLResourcesDir(resourcesDirName) ;
-    
-    RamsesConfiguration.setRamsesResourcesDir(aadlResourcesDir);
-    
-    File atlResourceDir = ToolSuiteLauncherCommand.
-                                          getATLResourceDir(resourcesDirName) ;  
-    
-    launcher.parsePredefinedRessources() ;
-    launcher.parsePredefinedPackages() ;
-    File outputDir = new File(generated_file_path) ;
-    
-    try
-    {
-      outputDir.mkdirs() ;
-    }
-    catch (Exception e)
-    {
-      _errorReporter.internalErrorImpl(e) ;
-      System.exit(0) ;
+      throw new Exception(status.msg) ;
     }
     
-    RamsesConfiguration.setOutputDir(outputDir);
-
+    _launcher.parsePredefinedRessources() ;
+    
+    File[] inclDirs = toArray(_includeDirs) ;
+    
     try
     {
       String workflow_path =
-            genConf.getString(WORKFLOW_OPTION_ID) ;
+            options.getString(WORKFLOW_OPTION_ID) ;
       
-      Map<String, Object> parameters = parametersHandler(genConf) ;
+      Map<String, Object> parameters = parametersHandler(options) ;
       
       if(workflow_path != null)
       {
-        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(genConf.getString(WORKFLOW_OPTION_ID));
+        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(options.getString(WORKFLOW_OPTION_ID));
         
-        launcher.initializeGeneration(targetName, includeFolderNames) ;
-        launcher.launchWorkflowProcess(mainModelFiles,
-                                          systemToInstantiate,
-                                          outputDir,
-                                          targetName,
-                                          atlResourceDir,
-                                          xmlPilot,
-                                          parameters) ;
+        _launcher.launchWorkflowProcess(_mainModelFiles,
+                                       _systemToInstantiate,
+                                       config,
+                                       inclDirs,
+                                       xmlPilot,
+                                       parameters) ;
       }
       else
       {
-    	launcher.initializeGeneration(targetName, includeFolderNames) ;
-        launcher.launchDefaultGenerationProcess(mainModelFiles,
-                                       systemToInstantiate,
-                                       outputDir,
-                                       targetName,
-                                       atlResourceDir,
-                                       parameters) ;
+        _launcher.launchDefaultGenerationProcess(_mainModelFiles,
+                                                _systemToInstantiate,
+                                                config,
+                                                inclDirs,
+                                                parameters) ;
       }
     }
     catch(Exception e)
     {
-    	if(System.getProperty("DEBUG")!=null)
+      if(System.getProperty("DEBUG")!=null)
         {
             e.printStackTrace() ;
         }
@@ -677,22 +566,9 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
     
   }
-  
-  private static File getVerifiedPath(String filePath) throws Exception
-  {
-    File potentialFile = new File(filePath) ;
-
-    if(potentialFile.exists())
-    {
-      return potentialFile ;
-    }
-
-    throw new Exception("file or directory " + potentialFile.getCanonicalPath() +
-          " could not be found") ;
-  }
 
   private static List<File> getVerifiedPath(String[] filePath,
-                                            String[] includeFolderNames)
+                                            Set<File> includeDirs)
         throws Exception
   {
     List<File> verifiedPaths = new ArrayList<File>() ;
@@ -706,28 +582,39 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       if(potentialFile.exists())
       {
         verifiedPaths.add(potentialFile) ;
+        
+        try
+        {
+          File containingDir = org.osate.utils.FileUtils.getContainingDirectory(potentialFile) ;
+          includeDirs.add(containingDir) ;
+        }
+        catch (NullPointerException e)
+        {
+          // Nothing to do.
+        }
         continue ;
       }
 
       boolean pathFound = false ;
 
-      for(int j = 0 ; j < includeFolderNames.length ; j++)
+      for(File includeDir : includeDirs)
       {
-        if(includeFolderNames[j].endsWith("/") == false)
-        {
-          includeFolderNames[j] = includeFolderNames[j] + "/" ;
-        }
-
-        potentialFile = new File(includeFolderNames[j] + filePath[i]) ;
-
-        if(potentialFile.exists())
+        potentialFile = verifyPath(includeDir, filePath[i]) ;
+        if(potentialFile != null)
         {
           verifiedPaths.add(potentialFile) ;
           pathFound = true ;
           break ;
         }
       }
-
+      
+      potentialFile = verifyInRamsesDirs(filePath[i]) ;
+      if(potentialFile != null)
+      {
+        verifiedPaths.add(potentialFile) ;
+        pathFound = true ;
+      }
+      
       if(pathFound == false)
       {
         errorMessage = "file " + new File(filePath[i]).getCanonicalPath() + " could not be found";
@@ -743,32 +630,126 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
     return verifiedPaths ;
   }
-
-  private static File getAADLResourcesDir(String transformationDirName)
-        throws Exception
-  {
-    File transformationDir =
-          ToolSuiteLauncherCommand.getVerifiedPath(transformationDirName) ;
-    File aadlResourcesDir =
-          new File(transformationDir.getAbsolutePath() + '/' +
-                   Names.AADL_RESOURCE_DIRECTORY_NAME) ;
-
-    if(aadlResourcesDir.exists() == false)
-    {
-      throw new Exception("ERROR: file " + transformationDirName +
-            " does not contain " + Names.AADL_RESOURCE_DIRECTORY_NAME +
-            " directory") ;
-    }
-
-    return aadlResourcesDir ;
-  }
   
-  private static File getATLResourceDir(String dirName)
-        throws Exception
+  private static File verifyInRamsesDirs(String path)
   {
-    File result =
-          ToolSuiteLauncherCommand.getVerifiedPath(dirName) ;
+    File result = verifyPath(RamsesConfiguration.getAadlPackageDir(), path) ;
+    
+    if(result == null)
+    {
+      result = verifyPath(RamsesConfiguration.getAadlPropertysetDir(), path) ;
+      
+      if(result == null)
+      {
+        result = verifyPath(RamsesConfiguration.getRamsesResourceDir(), path) ;
+        
+        if(result == null)
+        {
+          result = verifyPath(RamsesConfiguration.getAtlResourceDir(), path) ;
+          
+          if(result == null)
+          {
+            verifyPath(RamsesConfiguration.getPredefinedResourceDir(), path) ;
+          }
+        }
+        
+      }
+    }
     
     return result ;
+  }
+  
+  private static File verifyPath(File includeDir, String path)
+  {
+    File result = new File(includeDir + File.separator + path) ;
+    
+    if(! result.exists())
+    {
+      result = null ;
+    }
+    
+    return result ;
+  }
+
+  private static void setRamsesResourceDir(Set<File> includeFolder)
+                                                                throws ConfigurationException
+  {
+    ConfigStatus status = null;
+    short count = 0 ;
+    boolean hasToThrow = false ;
+    
+    for(File folder : includeFolder)
+    {
+      if(count != 1)
+      {
+        status = RamsesConfiguration.setRamsesResourceDir(folder.toString()) ;
+        if(status == ConfigStatus.SET)
+        {
+          count += 1 ;
+          
+          if(count/100 != 1)
+          {
+            status = RamsesConfiguration.setPredefinedResourceDir(folder.toString() + File.separator +
+                                                                  Names.AADL_RESOURCE_DIRECTORY_NAME) ;
+            if(status == ConfigStatus.SET)
+            {
+              count += 100 ;
+            }
+          }
+        }
+      }
+      
+      if(count/10 != 1)
+      {
+        status = RamsesConfiguration.setAtlResourceDir(folder.toString()) ;
+        if(status == ConfigStatus.SET)
+        {
+          count += 10 ;
+        }
+      }
+      
+      if(count/100 != 1)
+      {
+        status = RamsesConfiguration.setPredefinedResourceDir(folder.toString()) ;
+        if(status == ConfigStatus.SET)
+        {
+          count += 100 ;
+        }
+      }
+    }
+    
+    if(count != 111)
+    {
+      String folder = EnvUtils.getEnvVariable(Names.RAMSES_RESOURCES_VAR) ;
+      
+      status = RamsesConfiguration.setRamsesResourceDir(folder) ;
+      if(status == ConfigStatus.SET)
+      {
+        status = RamsesConfiguration.setAtlResourceDir(folder) ;
+        if(status == ConfigStatus.SET)
+        {
+          status = RamsesConfiguration.setPredefinedResourceDir(folder) ;
+          if(status != ConfigStatus.SET)
+          {
+            String calculatedPredefinedDir = folder + File.separator + Names.AADL_RESOURCE_DIRECTORY_NAME ; 
+            
+            status = RamsesConfiguration.setPredefinedResourceDir(calculatedPredefinedDir) ;
+            if(status != ConfigStatus.SET)
+            {
+              hasToThrow = true ;
+            }
+          }
+        }
+        else
+          hasToThrow = true ;
+      }
+      else
+        hasToThrow = true ;
+    }
+    
+    if(hasToThrow)
+    {
+      throw new ConfigurationException(status) ;
+    }
   }
 }

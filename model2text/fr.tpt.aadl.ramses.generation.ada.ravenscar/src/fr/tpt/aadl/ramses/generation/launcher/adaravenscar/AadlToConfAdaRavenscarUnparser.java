@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.ProcessImplementation;
@@ -63,8 +64,10 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
     UnparseText deploymentHeaderCode = new UnparseText() ;
 
 	public void process(ProcessorSubcomponent processor,
-			File generatedFilePath,
-			TargetProperties tarProp) 
+	                    TargetProperties tarProp,
+	                    File runtimePath,
+                      File outputDir,
+                      IProgressMonitor monitor) 
 					throws GenerationException
 					{ 
 		ProcessorProperties processorProp = new ProcessorProperties() ;
@@ -100,8 +103,11 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 //		return p ;
 //	}
 
-	public void process(ProcessSubcomponent process, File generatedFilePath,
-			TargetProperties tarProp)
+	public void process(ProcessSubcomponent process,
+			                TargetProperties tarProp,
+			                File runtimePath,
+                      File outputDir,
+                      IProgressMonitor monitor)
 	{
 		PartitionProperties pp = new PartitionProperties();
 
@@ -127,13 +133,13 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 
 		try
 		{
-			FileUtils.saveFile(generatedFilePath, "main.gpr",
+			FileUtils.saveFile(outputDir, "main.gpr",
 					mainSpecificationCode.getParseOutput()) ;
 			
-			FileUtils.saveFile(generatedFilePath, "main.adb",
+			FileUtils.saveFile(outputDir, "main.adb",
 					mainImplCode.getParseOutput()) ;
 			
-			FileUtils.saveFile(generatedFilePath, "rooting.ads",
+			FileUtils.saveFile(outputDir, "rooting.ads",
 					rootingHeaderCode.getParseOutput()) ;
 			
 		}
@@ -869,7 +875,9 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 	  }
 
 	  public TargetProperties process(SystemImplementation si,
-	                                   File generatedFilePath)
+	                                  File runtimePath,
+	                                  File outputDir,
+	                                  IProgressMonitor monitor)
 		     	                                             throws GenerationException
 		{
 		  SystemInstance system = (SystemInstance) 

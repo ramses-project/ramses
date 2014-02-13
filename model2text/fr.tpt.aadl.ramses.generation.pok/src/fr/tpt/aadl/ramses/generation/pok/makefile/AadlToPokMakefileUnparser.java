@@ -21,24 +21,11 @@
 
 package fr.tpt.aadl.ramses.generation.pok.makefile ;
 
-import java.io.BufferedReader ;
- 
-import java.io.BufferedWriter ;
 import java.io.File ;
-import java.io.FileWriter ;
-import java.io.IOException ;
-import java.io.InputStream ;
-import java.io.InputStreamReader ;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator ;
+import java.util.List ;
 import java.util.Map ;
-import java.util.Set;
-
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
-import fr.tpt.aadl.ramses.util.generation.FileUtils;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import java.util.Set ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.NamedElement ;
@@ -48,17 +35,35 @@ import org.osate.aadl2.ProcessorImplementation ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.modelsupport.UnparseText ;
-import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
 import org.osate.aadl2.util.Aadl2Switch ;
 import org.osate.utils.PropertyUtils ;
 
-public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
-                                       implements TargetBuilderGenerator
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
+import fr.tpt.aadl.ramses.util.generation.AbstractAadlToCMakefileUnparser ;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
+
+public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
 {
 
   private UnparseText unparserContent ;
   private UnparseText kernelMakefileContent ;
   private List<ProcessSubcomponent> bindedProcess ;
+  private final static String RUNTIME_INCL_DIR = "/libpok/include" ;
+  public final static String POK_RUNTIME_VAR_ENV = "POK_PATH" ;
+  
+  public AadlToPokMakefileUnparser()
+  {
+    AbstractAadlToCMakefileUnparser._ENV_VAR_NAME = POK_RUNTIME_VAR_ENV ;
+  }
+  
+  @Override
+  protected void handleDirs(File runtimePath, File[] includeDirs) throws GenerationException
+  {
+    File pokCFile = new File(runtimePath + RUNTIME_INCL_DIR);
+    _includeDirManager.addCommonDependency(pokCFile);
+    super.handleDirs(runtimePath, includeDirs);
+  }
   
   @Override
   protected void initSwitches()
@@ -68,6 +73,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
       @Override
       public String caseSystemImplementation(SystemImplementation object)
       {
+        unparserContent.addOutputNewline("export " + POK_RUNTIME_VAR_ENV + "=" +
+                                         _runtimePath.toString());
+        
         unparserContent.addOutputNewline("all:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
@@ -114,7 +122,7 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent
               .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/main.h") ;
         unparserContent
-              .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
+              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/config.mk") ;
 
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
               ".elf") ;
@@ -128,10 +136,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent
               .addOutput("OBJS = main.o activity.o subprograms.o gtypes.o deployment.o ") ;
         
-        Set<File> includeDirList = FileUtils.getIncludeDir(object);
         Set<File> sourceFileList;
 		try {
-		  sourceFileList = GeneratorUtils.getListOfReferencedObjects(object);
+		  sourceFileList = getListOfReferencedObjects(object);
           for(File sourceFile : sourceFileList)
           {
             String value = sourceFile.getAbsolutePath();
@@ -153,24 +160,26 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent.addOutputNewline("all: libpok $(TARGET)\n") ;
         unparserContent.addOutputNewline("clean: common-clean\n") ;
         unparserContent
-              .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
+              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/common-$(ARCH).mk") ;
 
-        if(false==includeDirList.isEmpty())
-          unparserContent.addOutput("export USER_INCLUDES=");
-        for (File include: includeDirList)
+        Iterator<File> it = new IncludeDirIterator() ;
+        
+        if(it.hasNext())
         {
-          unparserContent.addOutput("-I"+include.getAbsolutePath()+" ");
-          
+          unparserContent.addOutput("export USER_INCLUDES=");
+          File include ;
+          while(it.hasNext())
+          {
+            include = it.next() ;
+            unparserContent.addOutput("-I"+include.getAbsolutePath()+" ");
+          }
+          unparserContent.addOutput("\n") ;
         }
         
-//        unparserContent.addOutput("export USER_INCLUDES=");
-//        unparserContent.addOutput("-I /home/achille/runtime-New_config/prj/examples/arinc653-buffer/input");
-        
-        unparserContent.addOutput("\n") ;
         unparserContent
-              .addOutputNewline("include $(POK_PATH)/misc/mk/rules-partition.mk") ;
+              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-partition.mk") ;
         unparserContent
-              .addOutputNewline("include $(POK_PATH)/misc/mk/rules-common.mk") ;
+              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-common.mk") ;
         return DONE ;
       }
 
@@ -220,15 +229,15 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
         unparserContent
               .addOutputNewline("export POK_CONFIG_OPTIMIZE_FOR_GENERATED_CODE=1") ;
         unparserContent
-              .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
+              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/config.mk") ;
         unparserContent
-              .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
+              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/common-$(ARCH).mk") ;
         unparserContent.addOutputNewline("TARGET=$(shell pwd)/pok.elf") ;
         unparserContent.addOutput("PARTITIONS=") ;
 
         for(ProcessSubcomponent part:bindedProcess)
         { 
-          unparserContent.addOutput(part.getName() + "/" +
+          unparserContent.addOutput(part.getName() + File.separator +
         		  part.getName() + ".elf ") ;
         }
 
@@ -264,9 +273,9 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
                 " && $(MAKE) distclean") ;
         }
         
-        unparserContent.addOutputNewline("include $(POK_PATH)/misc/mk/rules-common.mk");
-        unparserContent.addOutputNewline("include $(POK_PATH)/misc/mk/rules-main.mk");
-        unparserContent.addOutputNewline("include $(POK_PATH)/misc/mk/install-rules.mk");
+        unparserContent.addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-common.mk");
+        unparserContent.addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-main.mk");
+        unparserContent.addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/install-rules.mk");
 
         return DONE ;
       }
@@ -278,53 +287,46 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
   {
     unparserContent = new UnparseText() ;
     process(ne) ;
-    GeneratorUtils.saveMakefile(unparserContent, makeFile) ;
+    super.saveMakefile(unparserContent, makeFile) ;
   }
 
   @Override
   public void process(SystemImplementation system,
-                      File generatedFilePath)
-        throws GenerationException
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor
+                      )
+                        throws GenerationException
   {
- 
-    IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
-    if(ramsesMonit!=null)
-    {
-    	ramsesMonit.worked(1);
-    	ramsesMonit.subTask("Compilation of the generated code..."); 
-    	RamsesConfiguration.waitUnitOfTime(1);
-    }
+    super.process(system, runtimeDir, outputDir, includeDirs, monitor); 
+    monitor.worked(1);
+    monitor.subTask("Compilation of the generated code..."); 
+//    RamsesConfiguration.waitUnitOfTime(1);
     
-    generateMakefile((NamedElement) system, generatedFilePath) ;
-    String pokPath = RamsesConfiguration.getRuntimeDir();
-    if(pokPath=="")
-    {
-    	pokPath = System.getenv("POK_PATH");
-    	if(pokPath==null || pokPath=="")
-    		pokPath = System.getProperty("POK_PATH");
-    }
-    GeneratorUtils.executeMake(generatedFilePath, pokPath);
-    if(ramsesMonit!=null)
-    	ramsesMonit.worked(1);
+    generateMakefile((NamedElement) system, outputDir) ;
+    
+    super.executeMake(outputDir, runtimeDir);
+    monitor.worked(1);
   }
-  
-  
-
 
   @Override
   public void process(ProcessorSubcomponent processor,
-                      File generatedFilePath)
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
         throws GenerationException
   {
-    unparserContent = new UnparseText() ;
-    generateMakefile((NamedElement) processor, generatedFilePath) ;
+    super.process(processor, runtimeDir, outputDir, includeDirs, monitor);
+    generateMakefile((NamedElement) processor, outputDir) ;
     kernelMakefileContent = new UnparseText() ;
-    File kernelDir = new File(generatedFilePath.getAbsolutePath() + "/kernel") ;
+    File kernelDir = new File(outputDir.getAbsolutePath() + "/kernel") ;
     kernelDir.mkdir() ;
     kernelMakefileContent
           .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/deployment.h") ;
     kernelMakefileContent
-          .addOutputNewline("include $(POK_PATH)/misc/mk/config.mk") ;
+          .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/config.mk") ;
     kernelMakefileContent.addOutputNewline("LO_TARGET = kernel.lo") ;
     kernelMakefileContent.addOutputNewline("LO_OBJS = deployment.o routing.o") ;
     kernelMakefileContent.addOutputNewline("LO_DEPS = pok.lo") ;
@@ -332,26 +334,35 @@ public class AadlToPokMakefileUnparser extends AadlProcessingSwitch
           .addOutputNewline("all: kernel copy-kernel $(LO_TARGET)") ;
     kernelMakefileContent.addOutputNewline("clean: common-clean") ;
     kernelMakefileContent
-          .addOutputNewline("include $(POK_PATH)/misc/mk/common-$(ARCH).mk") ;
+          .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/common-$(ARCH).mk") ;
     kernelMakefileContent
-          .addOutputNewline("include $(POK_PATH)/misc/mk/rules-common.mk") ;
+          .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-common.mk") ;
     kernelMakefileContent
-          .addOutputNewline("include $(POK_PATH)/misc/mk/rules-kernel.mk") ;
-    GeneratorUtils.saveMakefile(kernelMakefileContent, kernelDir) ;
+          .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-kernel.mk") ;
+    super.saveMakefile(kernelMakefileContent, kernelDir) ;
   }
 
   @Override
   public void process(ProcessSubcomponent process,
-                      File generatedFilePath)
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
         throws GenerationException
   {
-    unparserContent = new UnparseText() ;
-    generateMakefile((NamedElement) process, generatedFilePath) ;
+    super.process(process, runtimeDir, outputDir, includeDirs, monitor);
+    generateMakefile((NamedElement) process, outputDir) ;
   }
 
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
+  }
+  
+  @Override
+  public boolean runtimePathChecker(File runtimePath)
+  {
+    return PokGeneratorFactory.runtimePathChecker(runtimePath) ;
   }
 }

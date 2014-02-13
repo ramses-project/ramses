@@ -28,7 +28,7 @@ import org.osate.aadl2.Element ;
 
 public interface AadlGenericUnparser
 {
-  public void process(Element element, File generatedFilePath) 
+  public void process(Element element, File outputDir) 
         throws GenerationException ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;

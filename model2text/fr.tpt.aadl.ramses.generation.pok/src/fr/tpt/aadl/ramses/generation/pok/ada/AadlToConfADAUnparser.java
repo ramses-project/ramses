@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.ConnectedElement;
@@ -93,8 +94,10 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
       UnparseText deploymentHeaderCode = new UnparseText() ;
 
 	public void process(ProcessorSubcomponent processor,
-			File generatedFilePath,
-			TargetProperties tarProp) 
+	                    TargetProperties tarProp,
+	                    File runtimePath,
+	                    File outputDir,
+	                    IProgressMonitor monitor) 
 					throws GenerationException
 					{ 
 		ProcessorProperties processorProp = new ProcessorProperties() ;
@@ -122,15 +125,15 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
 		try
 		{
-			FileUtils.saveFile(generatedFilePath, "deployment.h",
+			FileUtils.saveFile(outputDir, "deployment.h",
 					deploymentHeaderCode.getParseOutput()) ;
 
-			FileUtils.saveFile(generatedFilePath, "deployment.c",
+			FileUtils.saveFile(outputDir, "deployment.c",
 					deploymentImplCode.getParseOutput()) ;
 
-			FileUtils.saveFile(generatedFilePath, "routing.h", routingHeaderCode.getParseOutput()) ;
+			FileUtils.saveFile(outputDir, "routing.h", routingHeaderCode.getParseOutput()) ;
 
-			FileUtils.saveFile(generatedFilePath, "routing.c", routingImplCode.getParseOutput()) ;
+			FileUtils.saveFile(outputDir, "routing.c", routingImplCode.getParseOutput()) ;
 		}
 		catch(IOException e)
 		{
@@ -440,8 +443,11 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		}
 	}
 
-	public void process(ProcessSubcomponent process, File generatedFilePath,
-			TargetProperties tarProp)
+	public void process(ProcessSubcomponent process,
+	                    TargetProperties tarProp,
+	                    File runtimePath,
+                      File outputDir,
+                      IProgressMonitor monitor)
 	{
 		PartitionProperties pp = new PartitionProperties();
 
@@ -472,16 +478,16 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
 		try
 		{
-			FileUtils.saveFile(generatedFilePath, "main_ada.ads",
+			FileUtils.saveFile(outputDir, "main_ada.ads",
 					mainSpecificationCode.getParseOutput()) ;
 
-			FileUtils.saveFile(generatedFilePath, "main.h",
+			FileUtils.saveFile(outputDir, "main.h",
 					mainHeaderCode.getParseOutput()) ;
 			
-			FileUtils.saveFile(generatedFilePath, "main_ada.adb",
+			FileUtils.saveFile(outputDir, "main_ada.adb",
 					mainImplCode.getParseOutput()) ;
 			
-			FileUtils.saveFile(generatedFilePath, "main.c",
+			FileUtils.saveFile(outputDir, "main.c",
 					mainCImplCode.getParseOutput()) ;
 		}
 		catch(IOException e)
@@ -1610,7 +1616,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 	  }
 
 	  public TargetProperties process(SystemImplementation si,
-	                                   File generatedFilePath)
+	                                  File runtimePath,
+	                                  File outputDir,
+	                                  IProgressMonitor monitor)
 		     	                                             throws GenerationException
 		{
 		  SystemInstance system = (SystemInstance) 

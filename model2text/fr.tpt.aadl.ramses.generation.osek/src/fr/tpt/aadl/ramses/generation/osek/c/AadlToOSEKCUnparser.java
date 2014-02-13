@@ -1,58 +1,55 @@
 package fr.tpt.aadl.ramses.generation.osek.c;
 
-import java.io.File;
+import java.io.File ;
+import java.io.IOException ;
+import java.util.List ;
+import java.util.Map ;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.emf.common.util.EList;
-import org.osate.aadl2.CallSpecification;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.DeviceSubcomponent;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.ProcessSubcomponent;
-import org.osate.aadl2.ProcessorSubcomponent;
-import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.SubprogramCall;
-import org.osate.aadl2.SubprogramCallSequence;
-import org.osate.aadl2.SubprogramType;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.ThreadImplementation;
-import org.osate.aadl2.ThreadSubcomponent;
-import org.osate.aadl2.modelsupport.UnparseText;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.common.util.EList ;
+import org.osate.aadl2.CallSpecification ;
+import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.DataSubcomponent ;
+import org.osate.aadl2.DeviceSubcomponent ;
+import org.osate.aadl2.ProcessImplementation ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.Subcomponent ;
+import org.osate.aadl2.SubprogramCall ;
+import org.osate.aadl2.SubprogramCallSequence ;
+import org.osate.aadl2.SubprogramType ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.ThreadSubcomponent ;
+import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.PropertyNotFound ;
 import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.control.support.FileUtils;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
-import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
-import fr.tpt.aadl.ramses.generation.osek.Resources;
-import fr.tpt.aadl.ramses.generation.osek.ast.Alarm;
-import fr.tpt.aadl.ramses.generation.osek.ast.Alarm.Action;
-import fr.tpt.aadl.ramses.generation.osek.ast.Counter;
-import fr.tpt.aadl.ramses.generation.osek.ast.Cpu;
-import fr.tpt.aadl.ramses.generation.osek.ast.Cpu.PeriodicTask;
-import fr.tpt.aadl.ramses.generation.osek.ast.Hook;
-import fr.tpt.aadl.ramses.generation.osek.ast.Implementation;
-import fr.tpt.aadl.ramses.generation.osek.ast.ImplementationIsr;
-import fr.tpt.aadl.ramses.generation.osek.ast.ImplementationTask;
-import fr.tpt.aadl.ramses.generation.osek.ast.Isr;
-import fr.tpt.aadl.ramses.generation.osek.ast.Memmap;
-import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
-import fr.tpt.aadl.ramses.generation.osek.ast.Os;
-import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status;
-import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram;
-import fr.tpt.aadl.ramses.generation.osek.ast.Task;
-import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
-import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
+import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
+import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
+import fr.tpt.aadl.ramses.generation.osek.Resources ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Alarm ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Alarm.Action ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Counter ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Cpu ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Cpu.PeriodicTask ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Hook ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Implementation ;
+import fr.tpt.aadl.ramses.generation.osek.ast.ImplementationIsr ;
+import fr.tpt.aadl.ramses.generation.osek.ast.ImplementationTask ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Isr ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Memmap ;
+import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Os ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Task ;
+import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule ;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
+import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
 
 /**
  * Unparser to generate an oil file for OSEK from aadl.
@@ -134,40 +131,20 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	}
 
 	/**
-	 * Method called before browsing the AST thanks to the "process" method. 
-	 * 
-	 * @param generatedCodeDirectory
-	 * TODO
-	 * @param generatedOilPath
-	 *            path in which output files are generated
-	 * @param configurationPath
-	 *            path of the directory in which are stored the
-	 *            configuration files.
-	 * @param oilFile
-	 *            name of the generated oil file
-	 * @param cFile
-	 *            name of the generated c file
-	 */
-	public void open(File generatedCodeDirectory, File configurationPath) {
-
-	  _generatedCodeDirectory = generatedCodeDirectory;
-		_oilCode = new UnparseText();
-		_mainCCode = new UnparseText();
-		_mainHCode = new UnparseText();
-		resources = new Resources(new File(configurationPath, compilationFile));
-		_startupHook = new Hook();
-		_shutdownHook = new Hook();
-		
-	}
-
-	/**
 	 * Methode appelée sur chaque noeud implémentant un système.
 	 */
 	@Override
-	public TargetProperties process(SystemImplementation si, File generatedFilePath) throws GenerationException {
+	public TargetProperties process(SystemImplementation si,
+	                                File runtimePath,
+	                                File outputDir,
+	                                IProgressMonitor monitor) throws GenerationException {
 
-	  File configurationPath = RamsesConfiguration.getInputDirectory();
-	  open(generatedFilePath, configurationPath);
+	  _generatedCodeDirectory = outputDir;
+    _oilCode = new UnparseText();
+    _mainCCode = new UnparseText();
+    _mainHCode = new UnparseText();
+    _startupHook = new Hook();
+    _shutdownHook = new Hook();
 	  
 	  _mainCCode.addOutputNewline("/*** This file has been generated by students, use it at your own risk ***/");
 	  _mainCCode.addOutputNewline("#include \"tpl_os.h\"");
@@ -184,7 +161,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 */
 	public void process(SubprogramType elt, File generatedFilePath) {
 
-		Os os = oil.getCpu().getOs();
+//		Os os = oil.getCpu().getOs();
 
 		if (_startupHook.getReferences().contains(elt.getName())) {
 			try {
@@ -687,13 +664,21 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	// XXX: Just implemented to respect the interface definition, but they are
 	// not used in case of OSEK
 	@Override
-	public void process(ProcessorSubcomponent processor, File generatedFilePath, TargetProperties tarProp)
+	public void process(ProcessorSubcomponent processor,
+	                    TargetProperties tarProp,
+	                    File runtimePath,
+                      File outputDir,
+                      IProgressMonitor monitor)
 			throws GenerationException {
-		// TODO Do NOT Use
+		throw new UnsupportedOperationException() ;
 	}
 
 	@Override
-	public void process(ProcessSubcomponent process, File generatedFilePath, TargetProperties tarProp)
+	public void process(ProcessSubcomponent process,
+	                    TargetProperties tarProp,
+	                    File runtimePath,
+                      File outputDir,
+                      IProgressMonitor monitor)
 			throws GenerationException {
     
     // Generate main.h
@@ -708,13 +693,13 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
     try
     {
       
-      FileUtils.saveFile(generatedFilePath, "main.h",
+      FileUtils.saveFile(outputDir, "main.h",
                _mainHCode.getParseOutput()) ;
       
-      FileUtils.saveFile(generatedFilePath, "main.c",
+      FileUtils.saveFile(outputDir, "main.c",
                _mainCCode.getParseOutput()) ;
       
-      FileUtils.saveFile(generatedFilePath, process.getName() + ".oil",
+      FileUtils.saveFile(outputDir, process.getName() + ".oil",
                          _oilCode.getParseOutput()) ;
     }
     catch(IOException e)

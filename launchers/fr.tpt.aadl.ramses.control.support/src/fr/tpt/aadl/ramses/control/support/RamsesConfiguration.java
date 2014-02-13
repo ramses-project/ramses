@@ -1,259 +1,267 @@
 package fr.tpt.aadl.ramses.control.support;
 
 import java.io.File ;
-import java.io.FileReader ;
-import java.io.IOException ;
-import java.util.HashSet ;
-import java.util.LinkedHashMap ;
-import java.util.LinkedHashSet ;
-import java.util.Map ;
-import java.util.Set ;
-import java.util.concurrent.TimeUnit ;
+import java.io.FileNotFoundException ;
 
-import org.eclipse.core.resources.IProject ;
-import org.eclipse.core.resources.ResourcesPlugin ;
-import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.core.runtime.NullProgressMonitor ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.osate.aadl2.instance.SystemInstance ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+
+import org.osate.utils.FileUtils ;
 
 public class RamsesConfiguration
 {
-  private static File OutputDirectory;
-  private static Map<Resource,Set<File>> IncludeDirectories = new LinkedHashMap<Resource,Set<File>>();
-  private static File RamsesRessourcesDir;
-  private static File InputDirectory;
-  private static AadlModelsManager _instantiationManager = new AadlModelsManagerImpl();
-  private static PredefinedResourcesAccess predefinedResourcesManager;
-  private static String runtimePath = "";
-  public static final String PLATFORM_ID = "platform";
-  private static String pokValidFilePath = "/misc/mk/config.mk";
-  private static String osekValidFilePath = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
-  private static IProject currentProject = null;
-  private static SystemInstance sysint = null;
-  private static IProgressMonitor ramsesMonitor =new NullProgressMonitor()  ;
+  // Directory where generated files are produced.
+  private  File _outputDir;
   
-  public static IProject getCurrentProject()
-  {
+  // Path to the platform runtime.
+  private File _runtimePath = null ;
   
-    return currentProject ;
-
-  }
-
-  public static void setCurrentProject(IProject project)
+  // Execution platform  id.
+  private String _targetId = null ;
+  
+  private static File _PREDEFINED_RESOUCE_DIR ;
+  private static File _ATL_RESOURCE_DIR ;
+  private static File _RAMSES_RESOURCE_DIR ;
+  private static File _AADL_PACKAGE_DIR ;
+  private static File _AADL_PROPERTYSET_DIR ;
+  
+  public static ConfigStatus setRamsesResourceDir(String path)
   {
-    currentProject = project ;
+    try
+    {
+      File resourceDir = fileChecker(path) ;
+      
+      if(AbstractPredefinedAadlModelManager.ramsesDirChecker(resourceDir))
+      {
+        _RAMSES_RESOURCE_DIR = resourceDir ;
+        ConfigStatus.SET.msg = "Set RAMSES resource directory to \'" + path + "\'" ;
+        return ConfigStatus.SET ;
+      }
+      else
+      {
+        ConfigStatus.NOT_VALID.msg = "\'" + path + "\' is not a valid RAMSES resource directory" ;
+        return  ConfigStatus.NOT_VALID ;
+      }
+    }
+    catch(ConfigurationException e)
+    {
+      return e.status ;
+    }
   }
-
-  private static SystemInstance sysInstance;
-
-
-
-  public static SystemInstance getSysInstance() {
-    return sysInstance;
-  }
-
-  public static void setSysInstance(SystemInstance sysInstance) {
-    RamsesConfiguration.sysInstance = sysInstance;
-  }
-
-  public static void setInstantiationManager(AadlModelsManager im)
+  
+  public File getOutputDir()
   {
-    _instantiationManager=im;
+    return _outputDir ;
   }
 
-  public static AadlModelsManager getInstantiationManager()
+  public File getRuntimePath()
   {
-    return _instantiationManager;
+    return _runtimePath ;
   }
 
-  public static void setOutputDir(File outputDir)
+  public String getTargetId()
   {
-    OutputDirectory = outputDir ;
+    return _targetId ;
   }
 
-  public static void setIncludeDir(Resource r, Set<File> includeDirSet, String targetName)
+  public static File getPredefinedResourceDir()
   {
+    return _PREDEFINED_RESOUCE_DIR ;
+  }
 
-    if(includeDirSet==null)
-      includeDirSet = new HashSet<File>();
-    if(IncludeDirectories.containsKey(r))
-      IncludeDirectories.get(r).addAll(includeDirSet) ;
+  public static File getAtlResourceDir()
+  {
+    return _ATL_RESOURCE_DIR ;
+  }
+
+  public static File getRamsesResourceDir()
+  {
+    return _RAMSES_RESOURCE_DIR ;
+  }
+
+  public static ConfigStatus setAtlResourceDir(String path)
+  {
+    try
+    {
+      File resourceDir = fileChecker(path) ;
+      
+      if(AbstractAadlToAadl.atlResourceDirChecker(resourceDir))
+      {
+        _ATL_RESOURCE_DIR = resourceDir ;
+        ConfigStatus.SET.msg = "Set ATL resource directory to \'" + path + "\'" ;
+        return ConfigStatus.SET ;
+      }
+      else
+      {
+        ConfigStatus.NOT_VALID.msg = "\'" + path + "\' is not a valid ATL resource directory" ;
+        return ConfigStatus.NOT_VALID ;
+      }
+    }
+    catch(ConfigurationException e)
+    {
+      return e.status ;
+    }
+  }
+  
+  public static ConfigStatus setPredefinedResourceDir(String path)
+  {
+    try
+    {
+      File resourceDir = fileChecker(path) ;
+      
+      if(AbstractPredefinedAadlModelManager.predefinedAadlModelDirChecker(resourceDir))
+      {
+        _PREDEFINED_RESOUCE_DIR = resourceDir ;
+        
+        _AADL_PACKAGE_DIR = new File(resourceDir + File.separator + Names.AADL_PREDEFINED_PACKAGE_DIR_NAME) ;
+        _AADL_PROPERTYSET_DIR = new File(resourceDir + File.separator + Names.AADL_PREDEFINED_PROPERTIES_DIR_NAME) ;
+        
+        ConfigStatus.SET.msg = "Set AADL predefined resource directory to \'" + path + "\'" ;
+        return ConfigStatus.SET ;
+      }
+      else
+      {
+        ConfigStatus.NOT_VALID.msg = "\'" + path + "\' is not a valid AADL predefined resource directory" ;
+        return ConfigStatus.NOT_VALID ;
+      }
+    }
+    catch(ConfigurationException e)
+    {
+      return e.status ;
+    }
+  }
+  
+  public ConfigStatus setOutputDir(String path)
+  {
+    File outputDir = new File(path) ;
+    
+    if(! outputDir.exists())
+    {
+      try
+      {
+        if(! outputDir.mkdirs())
+        {
+          ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'";
+          return ConfigStatus.NOT_VALID ;
+        }
+      }
+      catch(Exception e)
+      {
+        ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'. Because:\n\n\t" +
+        e.getMessage() ;
+        return ConfigStatus.NOT_VALID ;
+      }
+    }
+    
+    _outputDir = outputDir ;
+    ConfigStatus.SET.msg = "Set output directory to \'" + path + "\'" ;
+    return ConfigStatus.SET ;
+  }
+
+  // path can be null.
+  public ConfigStatus setRuntimePath(String path)
+  {
+    try
+    {
+      File runtimePath = null ;
+      if(path != null)
+      {
+        runtimePath = fileChecker(path) ;
+      }
+      ServiceRegistry reg = ServiceRegistryProvider.getServiceRegistry() ;
+      Generator gen = reg.getGenerator(_targetId) ;
+      
+      // The runtime path can be null.
+      if(gen.runtimePathChecker(runtimePath))
+      {
+        _runtimePath = runtimePath ;
+        ConfigStatus.SET.msg = "Set runtime path to \'" + path + "\'" ;
+        return ConfigStatus.SET ;
+      }
+      else
+      {
+        String envPath = EnvUtils.getEnvVariable(gen.getRuntimePathEnvVar()) ;
+        
+        if(envPath != null)
+        {
+          runtimePath = fileChecker(envPath) ;
+          if(gen.runtimePathChecker(runtimePath))
+          {
+            _runtimePath = runtimePath ;
+            ConfigStatus.SET.msg = "Set runtime path to \'" + path + "\'" ;
+            return ConfigStatus.SET ;
+          }
+          else
+          {
+            ConfigStatus.NOT_VALID.msg = "the $" + gen.getRuntimePathEnvVar() + " doesn't point to a valid runtime path" ;
+            return ConfigStatus.NOT_VALID ;
+          }
+        }
+        else
+        { 
+          String msg = "";
+          
+          if(path == null || path.isEmpty())
+          {
+            msg = "missing runtime path" ;
+          }
+          else
+          {
+            msg = "\'" + path + "\' is not a valid runtime path" ;
+          }
+          
+          msg += " and $" + gen.getRuntimePathEnvVar() + " is not set" ;
+          
+          ConfigStatus.NOT_VALID.msg = msg ; 
+          return ConfigStatus.NOT_VALID ;
+        }
+      }
+    }
+    catch(ConfigurationException e)
+    {
+      return e.status ;
+    }
+  }
+  
+  public ConfigStatus setGeneretionTargetId(String targetId)
+  {
+    ServiceRegistry reg = ServiceRegistryProvider.getServiceRegistry() ;
+    Generator gen = reg.getGenerator(targetId) ;
+    if(gen == null)
+    {
+      ConfigStatus.NOT_VALID.msg = "\'" + targetId + "\' is not a supported generation target" ;
+      return ConfigStatus.NOT_VALID ;
+    }
     else
     {
-      includeDirSet.add(RamsesRessourcesDir);
-
-      // Add dir in which the input resource was defined
-      URI uri = r.getURI();
-      System.out.println("resource ="+r.toString()) ;
-      //    String filePath = r.getURI().toFileString();
-
-      String filePath = r.getURI().toString();
-      if(filePath.startsWith("platform:/resource"))
-      {
-        filePath = filePath.substring(18);
-        String filePathPrefix = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
-        System.out.println("filePathPrefix = "+filePathPrefix);
-        filePath = filePathPrefix+filePath;
-        System.out.println("filePath = "+filePath);
-      }
-      else if(filePath.startsWith("file:"))
-      {
-        filePath = filePath.substring(5);
-        System.out.println("filePath = "+filePath);
-      }
-      int lastIndex = filePath.indexOf(uri.lastSegment());
-      File inputResourceDir = new File(filePath.substring(0, lastIndex));
-      includeDirSet.add(inputResourceDir);
-
-      // Add Dir of C PeriodicDelayed runtime
-      File cPeriodicDelayedRuntimeDir;
-      cPeriodicDelayedRuntimeDir = new File(
-                                            RamsesRessourcesDir.getAbsolutePath()+"/C_runtime/PeriodicDelayed_runtime/");
-      includeDirSet.add(cPeriodicDelayedRuntimeDir);
-
-      // Add Dir of Ada PeriodicDelayed runtime
-      File adaPeriodicDelayedRuntimeDir;
-      adaPeriodicDelayedRuntimeDir = new File(
-                                              RamsesRessourcesDir.getAbsolutePath()+"/Ada_runtime/PeriodicDelayed_runtime/");
-      includeDirSet.add(adaPeriodicDelayedRuntimeDir);
-
-      // Add Dir of C OSEK runtime
-      File OSEKRuntimeDir = new File(
-                                     RamsesRessourcesDir.getAbsolutePath()+"/C_runtime/OSEK/");
-      includeDirSet.add(OSEKRuntimeDir);
-      // TODO: include other runtime directories here.
-      String pokPath = System.getenv("POK_PATH");
-      if(pokPath==null || pokPath=="")
-        pokPath = System.getProperty("POK_PATH");
-      if(pokPath!=null && targetName=="pok")
-      {
-        File pokFile = new File(pokPath+"/libpok/include");
-        includeDirSet.add(pokFile);
-        File pokAdaFile = new File(pokPath+"/libpok/ada");
-        includeDirSet.add(pokAdaFile);
-      }
-      IncludeDirectories.put(r, includeDirSet);
+      _targetId = targetId ;
+      ConfigStatus.SET.msg = "Set generation target id to \'" + targetId + "\'" ;
+      return ConfigStatus.SET ;
     }
-  }
-
-  public static void setRamsesResourcesDir(File ramsesResourcesDir)
-  {
-    RamsesRessourcesDir = ramsesResourcesDir ;
-  }
-
-  public static File getOutputDir()
-  {
-    return OutputDirectory;
-  }
-
-  public static Set<File> getIncludeDir(Resource r)
-  {
-    if(IncludeDirectories.get(r)==null)
-    {
-      Set<File> includeSet = new LinkedHashSet<File>();
-      IncludeDirectories.put(r,includeSet);
-    }
-    return IncludeDirectories.get(r);
-  }
-
-  public static File getRamsesResourcesDir()
-  {
-    return RamsesRessourcesDir;
-  }
-
-  public static File getInputDirectory() {
-    return InputDirectory;
-  }
-
-  public static void setInputDirectory(File inputDirectory) {
-    InputDirectory = inputDirectory;
-  }
-
-  public static PredefinedResourcesAccess getPredefinedResourcesManager() {
-    return predefinedResourcesManager;
-  }
-
-  public static void setPredefinedResourcesRegistration(PredefinedResourcesAccess 
-                                                        predefinedResourcesRegistration) {
-    RamsesConfiguration.predefinedResourcesManager = predefinedResourcesRegistration;
-  }
-
-  public static String getRuntimeDir() {
-    return runtimePath;
-  }
-
-  public static void setRuntimeDir(String path) {
-    runtimePath=path;
-  }
-
-  public static boolean pokRuntimePathValidityCheck(String path)
-  {
-    String  result = path.concat(pokValidFilePath.toString());
-    File file = new File(result);
-
-    try {
-      FileReader fr = new FileReader(file);
-      fr.close();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      System.out.println("File not exists !");
-      return false;
-    }
-
-    return true;
-  }
-
-  public static boolean osekRuntimePathValidityCheck(String path)
-  {
-    String  result = path.concat(osekValidFilePath.toString());
-    File file = new File(result);
-
-    try
-    {
-      FileReader fr = new FileReader(file);
-      fr.close(); 
-    }
-    catch (IOException e) {
-      // TODO Auto-generated catch block
-      System.out.println("File not exists !");
-      return false;
-    }
-
-    return true;
-  }
-
-  public static SystemInstance getSysint()
-  {
-    return sysint ;
-  }
-
-  public static void setSysint(SystemInstance sysint)
-  {
-    RamsesConfiguration.sysint = sysint ;
-  }
-
-  public static IProgressMonitor getRamsesMonitor()
-  {
-    return ramsesMonitor ;
-  }
-
-  public static void setRamsesMonitor(IProgressMonitor ramsesMonitor)
-  {
-    RamsesConfiguration.ramsesMonitor = ramsesMonitor ;
   }
   
-  public static void waitUnitOfTime(int time)
+  private static File fileChecker(String path) throws ConfigurationException
   {
     try
     {
-      TimeUnit.SECONDS.sleep(time);
+      return FileUtils.stringToFile(path) ;
     }
-    catch(InterruptedException e)
+    catch(FileNotFoundException e)
     {
-      // TODO Manage with error reporter
-      e.printStackTrace();
+      ConfigStatus.NOT_FOUND.msg = "\'" + path + "\' is not found" ;
+      throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
     }
+  }
+
+  public static File getAadlPackageDir()
+  {
+    return _AADL_PACKAGE_DIR ;
+  }
+
+  public static File getAadlPropertysetDir()
+  {
+    return _AADL_PROPERTYSET_DIR ;
   }
 }

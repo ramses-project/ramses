@@ -2,19 +2,18 @@
  */
 package fr.tpt.aadl.ramses.analysis.impl;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
-
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**

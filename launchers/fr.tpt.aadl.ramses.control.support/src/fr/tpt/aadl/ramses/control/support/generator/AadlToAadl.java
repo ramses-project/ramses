@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.control.support.generator;
 import java.io.File ;
 import java.util.Map ;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
 
@@ -32,13 +33,13 @@ public interface AadlToAadl
   public void initAtlFileNameList(File resourceFilePath);
 	
   public Resource transform(Resource inputResource,
-                            File resourceDir,
-                            File generatedDir) throws GenerationException;
+                            File outputDir,
+                            IProgressMonitor monitor) throws GenerationException;
   
-  public Resource unparse(Resource inputResource, 
-		                  Resource expandedResult, 
-		                  File outputDir);
+  public Resource unparse(Resource inputResource,
+                          Resource expandedResult,
+		                      File outputDir,
+		                      IProgressMonitor monitor);
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
-
 }

@@ -21,34 +21,42 @@
 
 package fr.tpt.aadl.ramses.generation.osek.makefile;
 
-import java.io.File; 
-import java.io.IOException;
-import java.util.Map;
+import java.io.File ;
+import java.io.IOException ;
+import java.util.Map ;
 
-import org.osate.aadl2.ProcessSubcomponent;
-import org.osate.aadl2.ProcessorSubcomponent;
-import org.osate.aadl2.SystemImplementation;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.SystemImplementation ;
 
-import fr.tpt.aadl.ramses.control.support.FileUtils;
-import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
-import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
+import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
+import fr.tpt.aadl.ramses.util.generation.AbstractAadlToCMakefileUnparser ;
 
-public class AadlToTrampolineOSEKMakefileUnparser implements TargetBuilderGenerator {
-
+public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefileUnparser
+{
 	private OIL oil;
+	
+	public final static String TRAMPOLINE_ENV_VAR_NAME = "TRAMPOLINEPATH" ;
 
-	public AadlToTrampolineOSEKMakefileUnparser(OIL oil) {
+	public AadlToTrampolineOSEKMakefileUnparser(OIL oil) 
+	{
 		this.oil = oil;
+		_ENV_VAR_NAME = TRAMPOLINE_ENV_VAR_NAME ;
 	}
 
-	
 	@Override
-  public void process(ProcessSubcomponent process, File generatedFilePath) throws GenerationException {
+  public void process(ProcessSubcomponent process,
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor) throws GenerationException {
     
-	String OS = (String) System.getProperties().get("os.name");	
+	super.process(process, runtimeDir, outputDir, includeDirs, monitor);
+	  String OS = (String) System.getProperties().get("os.name");	
 	if(OS.toLowerCase().contains("windows"))
 	{
 	  System.out.println("Deployment to osek supported from UNIX systems only");
@@ -57,18 +65,29 @@ public class AadlToTrampolineOSEKMakefileUnparser implements TargetBuilderGenera
     Runtime runtime = Runtime.getRuntime();
     
     System.out.println("* Prepare Make ...");
-
     
-    File preparemake = new File(RamsesConfiguration.getInputDirectory(), "/preparemake.sh");
+    // XXX Kept in case of refactoring.
+    File inputDir = null ;
+    try
+    {
+      inputDir = File.createTempFile("trampoline", "compilation.properties") ;
+    }
+    catch(IOException e1)
+    {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
     
-    FileUtils.copyFile(preparemake, generatedFilePath);
+    File preparemake = new File(inputDir, "/preparemake.sh");
+    
+    FileUtils.copyFile(preparemake, outputDir);
     preparemake.setExecutable(true);
 
-    File refineOil = new File(RamsesConfiguration.getInputDirectory(), "/refine_oil.sh");
-    FileUtils.copyFile(refineOil, generatedFilePath);
+    File refineOil = new File(inputDir, "/refine_oil.sh");
+    FileUtils.copyFile(refineOil, outputDir);
     refineOil.setExecutable(true);
     
-    File oilTrashFile = new File(generatedFilePath, process.getName());
+    File oilTrashFile = new File(outputDir, process.getName());
     try {
 
       // TrampolineBasePath NOT found
@@ -107,7 +126,7 @@ public class AadlToTrampolineOSEKMakefileUnparser implements TargetBuilderGenera
         else
         {
           System.out.println("Compiling Code");
-          makeProcess = runtime.exec("make -o Makefile", null, generatedFilePath);
+          makeProcess = runtime.exec("make -o Makefile", null, outputDir);
           ProcessMessageDisplay.displayOutputMessage(makeProcess);
           makeProcess.waitFor();
           if (makeProcess.exitValue() != 0) {
@@ -127,17 +146,40 @@ public class AadlToTrampolineOSEKMakefileUnparser implements TargetBuilderGenera
 	// definition
 
 	@Override
-	public void process(SystemImplementation system, File generatedFilePath) throws GenerationException {
-		// TODO Do NOT use
+	public void process(SystemImplementation system,
+	                    File runtimePath,
+	                    File outputDir,
+	                    File[] includeDirs,
+	                    IProgressMonitor monitor)
+	                          throws GenerationException {
+		throw new UnsupportedOperationException () ;
 	}
 
 	@Override
-	public void process(ProcessorSubcomponent processor, File generatedFilePath) throws GenerationException {
-		// TODO Do NOT use
+	public void process(ProcessorSubcomponent processor,
+	                    File runtimePath,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor) throws GenerationException {
+	  throw new UnsupportedOperationException () ;
 	}
 
 	@Override
-	public void setParameters(Map<Enum<?>, Object> parameters) {
-		// TODO Do NOT use
+	public void setParameters(Map<Enum<?>, Object> parameters)
+	{
+	  throw new UnsupportedOperationException () ;
 	}
+
+  @Override
+  public boolean runtimePathChecker(File runtimePath)
+  {
+    // TODO: to be implemented
+    return true ;
+  }
+
+  @Override
+  protected void initSwitches()
+  {
+    // TODO Auto-generated method stub
+  }
 }

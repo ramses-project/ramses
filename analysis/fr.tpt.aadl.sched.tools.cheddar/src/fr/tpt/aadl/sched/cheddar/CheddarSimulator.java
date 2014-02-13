@@ -34,7 +34,7 @@ public class CheddarSimulator
   public CheddarSimulator(
                           AADL2Cheddar aadl2Cheddar)
   {
-    this(aadl2Cheddar.getCheddarModel(), aadl2Cheddar.getCheddarXMLPath()) ;
+    this(aadl2Cheddar.getCheddarModel(), aadl2Cheddar.getCheddarXMLPath().toString()) ;
   }
 
   /**

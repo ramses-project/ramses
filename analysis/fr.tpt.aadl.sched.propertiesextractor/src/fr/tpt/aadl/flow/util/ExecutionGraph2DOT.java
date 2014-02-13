@@ -30,9 +30,9 @@ public class ExecutionGraph2DOT implements ExecutionGraphVisitor
   {
     this.outputDir = outputDir ;
 
-    if(!outputDir.endsWith("/"))
+    if(!outputDir.endsWith(File.separator))
     {
-      outputDir += "/" ;
+      outputDir += File.separator ;
     }
   }
 

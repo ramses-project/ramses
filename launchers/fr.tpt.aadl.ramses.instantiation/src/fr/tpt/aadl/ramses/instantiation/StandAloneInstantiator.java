@@ -21,40 +21,35 @@
 
 package fr.tpt.aadl.ramses.instantiation ;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File ;
+import java.util.ArrayList ;
+import java.util.List ;
 
-import org.eclipse.emf.common.util.Diagnostic;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.Diagnostician;
-import org.eclipse.xtext.resource.IResourceServiceProvider;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.resource.XtextResourceSet;
-import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.aadl2.util.Aadl2ResourceFactoryImpl;
-import org.osate.core.OsateCorePlugin;
-import org.osate.xtext.aadl2.properties.util.EMFIndexRetrieval;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.xtext.resource.IResourceServiceProvider ;
+import org.eclipse.xtext.resource.XtextResource ;
+import org.eclipse.xtext.resource.XtextResourceSet ;
+import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.aadl2.util.Aadl2ResourceFactoryImpl ;
+import org.osate.core.OsateCorePlugin ;
+import org.osate.xtext.aadl2.properties.util.EMFIndexRetrieval ;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Inject ;
+import com.google.inject.Injector ;
 
-import fr.tpt.aadl.ramses.control.support.AadlResourceValidator;
-import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.instantiation.manager.ContributedAadlRegistration;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
+import fr.tpt.aadl.ramses.control.support.AadlResourceValidator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 public class StandAloneInstantiator extends AadlModelsManagerImpl
 {
   OsateCorePlugin corePlugin = new OsateCorePlugin();
-  
-  
-  private static StandAloneInstantiator _instantiator ;
+
   private static final Aadl2StandaloneLinking aadlStandAloneSetup =
         new Aadl2StandaloneLinking() ;
   private static final Injector injector = aadlStandAloneSetup
@@ -69,33 +64,24 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
   private IResourceServiceProvider.Registry rspr = injector.getInstance(IResourceServiceProvider.Registry.class);
   
   // Singleton
-  protected StandAloneInstantiator()
+  public StandAloneInstantiator(AnalysisErrorReporterManager errManager,
+                                IProgressMonitor monitor)
   {
-	try {
+	  super(errManager, monitor) ;
+    
+    try {
 	  corePlugin.registerInjectorFor("org.osate.xtext.aadl2.properties.Properties", injector);
 	} catch (Exception e) {
 	  // TODO Auto-generated catch block
 	  e.printStackTrace();
 	}
-	Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+	
+    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
           .put("aaxl2", new Aadl2ResourceFactoryImpl()) ;
-    ContributedAadlRegistration predefinedResourcesAccessor = new ContributedAadlRegistration();
-    RamsesConfiguration.setPredefinedResourcesRegistration(predefinedResourcesAccessor);
+
     EMFIndexRetrieval.registerResourceProviders(rdp, rspr);
   }
 
-  public static StandAloneInstantiator getInstantiator()
-  {
-    if(_instantiator == null)
-    {
-      _instantiator = new StandAloneInstantiator() ;
-    }
-
-    return _instantiator ;
-  }
-
-  
-  
   private Resource parse(File aadlFile)
   {
     // Must specify file protocol. Otherwise, got resource doesn't exist when

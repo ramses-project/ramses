@@ -4,6 +4,8 @@ package fr.tpt.aadl.ramses.analysis;
 
 import org.eclipse.emf.ecore.EFactory;
 
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
+
 /**
  * <!-- begin-user-doc -->
  * The <b>Factory</b> for the model.

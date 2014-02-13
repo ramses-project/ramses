@@ -23,23 +23,25 @@ package fr.tpt.aadl.ramses.generation.pok ;
 
 import java.util.Map;
 
-import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl ;
 
 public class AadlArinc653Transformation extends
                                        AadlToTargetSpecificAadl
 {
-    
-  
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
     throw new UnsupportedOperationException() ;
   }
 
-
-  public AadlArinc653Transformation(String module)
+  public AadlArinc653Transformation(AadlModelInstantiatior modelInstantiator,
+                                    PredefinedAadlModelManager predefinedAadlModels,
+                                    String module)
   {
-  	ATL_FILE_NAMES = new String[]
+    super(modelInstantiator, predefinedAadlModels) ;
+    _atlFileNames = new String[]
         {"ACG/targets/shared/UninstanciateOverride",
   		 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
   		 "ACG/targets/shared/PortsCommonRefinementSteps",
@@ -57,5 +59,4 @@ public class AadlArinc653Transformation extends
   		 module
         };
   }
-  
 }

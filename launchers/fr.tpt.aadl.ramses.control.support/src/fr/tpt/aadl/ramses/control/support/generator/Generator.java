@@ -24,23 +24,39 @@ package fr.tpt.aadl.ramses.control.support.generator ;
 import java.io.File ;
 import java.util.Map ;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
-import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
+import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
 
 public interface Generator extends NamedPlugin
 {
-  public void generate(SystemInstance instance,
-                       File resourceDir,
-                       File outputDir) throws GenerationException ;
+  //TODO: doc me !
+  // runtimePath can be null.
+  public void generate(SystemInstance systemInstance,
+                       File runtimeDir,
+                       File outputDir,
+                       File[] includeDirs,
+                       AnalysisErrorReporterManager errManager,
+                       IProgressMonitor monitor) throws GenerationException ;
 
-  public void generateWorkflow(SystemInstance instance,
-                               File resourceDir,
+  // TODO: doc me !
+  // runtimePath can be null.
+  public void generateWorkflow(SystemInstance systemInstance,
+                               WorkflowPilot xmlPilot,
+                               File runtimeDir,
                                File outputDir,
-                               WorkflowPilot xmlPilot) throws GenerationException ;
+                               File[] includeDirs,
+                               AnalysisErrorReporterManager errManager,
+                               IProgressMonitor monitor) throws GenerationException ;
 
+  // runtimePath can be null.
+  public boolean runtimePathChecker(File runtimePath) ;
+  
+  public String getRuntimePathEnvVar() ;
   
   public void setParameters(Map<String, Object> parameters) ;
 }

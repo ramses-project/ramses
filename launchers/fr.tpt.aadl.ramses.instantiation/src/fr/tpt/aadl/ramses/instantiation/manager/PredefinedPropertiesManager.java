@@ -21,24 +21,26 @@
 
 package fr.tpt.aadl.ramses.instantiation.manager ;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File ;
+import java.io.FilenameFilter ;
+import java.util.ArrayList ;
+import java.util.Arrays ;
+import java.util.HashMap ;
+import java.util.List ;
+import java.util.Map ;
 
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.EnumerationLiteral;
-import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyConstant;
-import org.osate.aadl2.PropertySet;
+import org.eclipse.emf.common.util.TreeIterator ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.EnumerationLiteral ;
+import org.osate.aadl2.NamedValue ;
+import org.osate.aadl2.Property ;
+import org.osate.aadl2.PropertyConstant ;
+import org.osate.aadl2.PropertySet ;
 
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
+import fr.tpt.aadl.ramses.control.support.Names ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
 public class PredefinedPropertiesManager
 {
@@ -55,38 +57,23 @@ public class PredefinedPropertiesManager
        "osek_properties"
             } ;
   
-  public PredefinedPropertiesManager()
+  private StandAloneInstantiator _instanciator ;
+  
+  public PredefinedPropertiesManager(StandAloneInstantiator instantiator)
   {
+    _instanciator = instantiator ;
     for (int i=0; i<names.length; i++)
       expectedPropertySet.add(names[i]) ; // Added by Arnaud
   }
-
-  public Map<String, Resource> extractStandardPropertySets(File resourceDirectory)
+  
+  public Map<String, Resource> parsePredefinedPropertySets()
         throws Exception
   {
-    File[] resourceDirContent = resourceDirectory.listFiles() ;
-    File propertySetDir = null ;
-
-    for(int i = 0 ; i < resourceDirContent.length ; i++)
-    {
-      if(resourceDirContent[i].getName().equals("propertyset"))
-      {
-        propertySetDir = resourceDirContent[i] ;
-        break ;
-      }
-    }
-
-    if(propertySetDir == null)
-    {
-      throw new Exception(
-            "ERROR: predefined propertyset directory could not be found") ;
-    }
-
-    StandAloneInstantiator parser = StandAloneInstantiator.getInstantiator() ;
+    File propertyDir = new File(RamsesConfiguration.getPredefinedResourceDir() + File.separator + Names.AADL_PREDEFINED_PROPERTIES_DIR_NAME) ;
     FilenameFilter filter = new AADLFileFilter() ;
     List<File> propertySetFiles =
-          Arrays.asList(propertySetDir.listFiles(filter)) ;
-    List<Resource> propertySetResources = parser.parse(propertySetFiles, false) ;
+          Arrays.asList(propertyDir.listFiles(filter)) ;
+    List<Resource> propertySetResources = _instanciator.parse(propertySetFiles, false) ;
 
     for(String resourceName : expectedPropertySet)
     {

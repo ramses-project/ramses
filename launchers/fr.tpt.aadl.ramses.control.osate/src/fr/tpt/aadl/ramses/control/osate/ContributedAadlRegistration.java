@@ -21,46 +21,35 @@
 
 package fr.tpt.aadl.ramses.control.osate;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File ;
+import java.util.ArrayList ;
+import java.util.List ;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 
-import fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess;
+import fr.tpt.aadl.ramses.control.support.AbstractPredefinedAadlModelManager ;
 
 /**
  * This class is registers statically the predefined resources needed for RAMSES.
  */
 
-public class ContributedAadlRegistration implements PredefinedResourcesAccess { 
+public class ContributedAadlRegistration extends AbstractPredefinedAadlModelManager
+{ 
 
-  private static String[] predefinedPackagesNames =
-	  {"Base_Types.aadl", "RAVENSCAR_runtime.aadl2", "OJR_runtime.aadl2" ,
-	  "ARINC653_runtime.aadl2", "OSEK_runtime.aadl2", "PeriodicDelayed_runtime.aadl2",
-	  "PeriodicDelayedMutex_runtime.aadl2"
-	  } ;
-  
-  private static String[] predefinedPropertiesNames =
-      {"AADL_Project.aadl", "Communication_Properties.aadl", "Data_Model.aadl", "Deployment_Properties.aadl",
-       "Memory_Properties.aadl", "Modeling_Properties.aadl", "Programming_Properties.aadl",
-       "Thread_Properties.aadl", "Timing_Properties.aadl", "Generation_Properties.aadl2",
-       "pok_properties.aadl2", "oseknxt_properties.aadl2",
-       "osek_properties.aadl2"
-            } ;
-  
   /**
-   * @see fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess#setPredefinedResourcesDir(File)
+   * @see fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager#setPredefinedResourcesDir(File)
    */
   @Override
-  public void setPredefinedResourcesDir(File resourceDir) {
-	// Do nothing
+  public void parsePredefinedAadlModels()
+  {
+    // Nothing to do. Predefined AADL models are parsed by xtext. They are located in the
+    // "plugin resources" directory.
   }
 
   /**
-   * @see fr.tpt.aadl.ramses.control.support.PredefinedResourcesAccess#getPredefinedResourcesDir()
+   * @see fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager#getPredefinedAadlResourceDir()
    */
   @Override
   public List<Resource> getPredefinedResources() {	  
@@ -81,5 +70,4 @@ public class ContributedAadlRegistration implements PredefinedResourcesAccess {
 	}
     return result;
   }
-
 }

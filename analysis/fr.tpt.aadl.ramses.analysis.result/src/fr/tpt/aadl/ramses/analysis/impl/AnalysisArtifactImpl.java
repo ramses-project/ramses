@@ -10,20 +10,16 @@ package fr.tpt.aadl.ramses.analysis.impl;
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 
 /**
  * <!-- begin-user-doc -->

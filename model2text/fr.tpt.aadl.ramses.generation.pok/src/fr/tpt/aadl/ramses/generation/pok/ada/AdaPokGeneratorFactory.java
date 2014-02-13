@@ -22,19 +22,26 @@
 
 package fr.tpt.aadl.ramses.generation.pok.ada;
 
-import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
+import org.eclipse.m2m.atl.core.ATLCoreException;
+
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
-import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Transformation;
-import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser;
+import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser ;
+import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Transformation ;
+import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Validation;
+import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
+import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
 
-public class AdaPokGeneratorFactory extends AbstractGeneratorFactory
+public class AdaPokGeneratorFactory implements GeneratorFactory
 {
   public static String ADA_GENERATOR_NAME = "ada-pok" ;
   
-  private static Generator createPokGenerator()
+  public Generator createGenerator(AadlModelInstantiatior modelInstantiatior,
+                                   PredefinedAadlModelManager predefinedAadlModels)
   {
     AadlToConfADAUnparser pokADAUnparser = new AadlToConfADAUnparser() ;
     
@@ -47,21 +54,28 @@ public class AdaPokGeneratorFactory extends AbstractGeneratorFactory
                                                     pokADAUnparser,
                                                     pokMakefileUnparser) ;
     
-    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation("helpers/LanguageSpecificitiesAda");
+    AadlArinc653Transformation targetTrans = new AadlArinc653Transformation(
+                                            modelInstantiatior,
+                                            predefinedAadlModels,
+                                            "helpers/LanguageSpecificitiesAda");
     
     
+    AadlModelValidator targetVal=null;
+	try {
+		targetVal = new AadlArinc653Validation(
+				 								 modelInstantiatior,
+				 								 predefinedAadlModels);
+	} catch (ATLCoreException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     AadlTargetSpecificGenerator result = 
-                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen) ;
+                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
+                                                  modelInstantiatior,
+                                                  targetVal) ;
     
     result.setRegistryName(ADA_GENERATOR_NAME) ;
     
     return result ;
-  }
-  
-  
-  
-  public Generator createGenerator()
-  {
-      return createPokGenerator();
   }
 }

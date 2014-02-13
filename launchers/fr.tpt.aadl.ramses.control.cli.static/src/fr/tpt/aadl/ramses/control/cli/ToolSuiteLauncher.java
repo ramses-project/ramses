@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.control.cli ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
 /**
@@ -42,7 +43,10 @@ public class ToolSuiteLauncher
   {
     try
     {
-      ServiceRegistryProvider.setDefault(new StaticServiceRegistry()) ;
+      ServiceRegistry registry = new StaticServiceRegistry() ;
+      
+      ServiceRegistryProvider.setDefault(registry) ;
+      
       ToolSuiteLauncherCommand.main(args) ;
     }
     catch(Exception e)

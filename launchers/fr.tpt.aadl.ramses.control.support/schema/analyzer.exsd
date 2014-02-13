@@ -68,10 +68,10 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The fully qualified name of the class that implements &lt;code&gt;fr.tpt.aadl.toolsuite.support.Analyzer&lt;/code&gt;.
+                  The fully qualified name of the class that implements &lt;code&gt;fr.tpt.aadl.ramses.control.support.analysis.AnalyzerFactory&lt;/code&gt;.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":fr.tpt.aadl.toolsuite.support.analysis.Analyzer"/>
+                  <meta.attribute kind="java" basedOn=":fr.tpt.aadl.ramses.control.support.analysis.AnalyzerFactory"/>
                </appinfo>
             </annotation>
          </attribute>

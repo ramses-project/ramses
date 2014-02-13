@@ -2,14 +2,19 @@ package fr.tpt.aadl.ramses.generation.osek;
 
 import java.util.Map;
 
-import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl ;
 
 public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 
 	
-	public AadlOsekTransformation(String module)
+	public AadlOsekTransformation(AadlModelInstantiatior modelInstantiator,
+	                              PredefinedAadlModelManager predefinedAadlModels,
+	                              String module)
 	{
-		ATL_FILE_NAMES = new String[] 
+		super(modelInstantiator, predefinedAadlModels) ;
+	  _atlFileNames = new String[] 
 				{
 			"ACG/targets/shared/UninstanciateOverride",
  			"ACG/targets/shared/SubprogramCallsCommonRefinementSteps",

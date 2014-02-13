@@ -36,11 +36,11 @@ public class FileUtil
 	}
 
 
-	public static String getFileInBuffer(String filename)
+	public static String getFileInBuffer(File filename)
 			throws IOException
 			{
 		BufferedReader reader =
-				new BufferedReader(new FileReader(new File(filename))) ;
+				new BufferedReader(new FileReader(filename)) ;
 		String buffer = "" ;
 		String line = "" ;
 
@@ -54,14 +54,13 @@ public class FileUtil
 			}
 
 	public static void saveBufferInFile(String buffer,
-			String filename)
+			File filename)
 	{
-		File f = new File(filename) ;
 		BufferedWriter writer = null ;
 
 		try
 		{
-			writer = new BufferedWriter(new FileWriter(f)) ;
+			writer = new BufferedWriter(new FileWriter(filename)) ;
 			writer.write(buffer) ;
 			writer.close() ;
 		}

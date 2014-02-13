@@ -9,14 +9,6 @@
 -->
 
 <plugin>
-
-   <extension point="org.eclipse.emf.ecore.generated_package">
-      <package
-            uri="http://fr.tpt.aadl.sched.wcetanalysis.result.reducedba/1.0"
-            class="reducedba.ReducedbaPackage"
-            genModel="model/ReducedBA.genmodel"/>
-   </extension>
-
    <extension point="org.eclipse.emf.ecore.generated_package">
       <!-- @generated ReducedBA -->
       <package

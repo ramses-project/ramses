@@ -1,36 +1,54 @@
 package fr.tpt.aadl.ramses.control.support;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
+import java.io.BufferedWriter ;
+import java.io.File ;
+import java.io.FileWriter ;
+import java.io.IOException ;
+import java.util.List ;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.instantiation.InstantiateModel;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.NullProgressMonitor ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.Element ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.instantiation.InstantiateModel ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 
+public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 
-public class AadlModelsManagerImpl implements AadlModelsManager {
-
-	private InstantiateModel instantiateModel ;
+	protected InstantiateModel _instantiateModel ;
+        
 	private ResourceSet aadlResourceSet = new ResourceSetImpl();
+//	protected AadlModelInstantiatior _modelInstantiator ;
+	protected IProgressMonitor _monitor = new NullProgressMonitor() ;
+	protected AnalysisErrorReporterManager _errManager ;
 	
-	public AadlModelsManagerImpl() {
-	  instantiateModel =
-		        new InstantiateModel(new NullProgressMonitor(),
-		              ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
+	public AadlModelsManagerImpl(AnalysisErrorReporterManager errManager)
+  {
+    _errManager = errManager ;
+    _instantiateModel = new InstantiateModel(_monitor, errManager) ;
+  }
+	
+	public AadlModelsManagerImpl(AnalysisErrorReporterManager errManager,
+	                             IProgressMonitor monitor)
+	{
+	  _errManager = errManager ;
+	  _monitor = monitor ;
+	  _instantiateModel = new InstantiateModel(monitor, errManager) ;
+	}
+	
+	public void setProgressMonitor(IProgressMonitor monitor)
+	{
+	  _monitor = monitor ;
+	  _instantiateModel = new InstantiateModel(_monitor, _errManager) ;
 	}
 	
 	/**
@@ -50,29 +68,29 @@ public class AadlModelsManagerImpl implements AadlModelsManager {
 	              .createResource(instanceURI) ;
 	  }
 
-	  SystemInstance instance = instantiateModel.createSystemInstanceInt(si,
+	  SystemInstance instance = _instantiateModel.createSystemInstanceInt(si,
 	                                                    aadlResource) ;
 		    
 	  return instance;
     }
 
 	/**
-	 * @see AadlModelsManager#instantiate(List, String)
+	 * @see AadlModelInstantiatior#instantiate(List, String)
 	 */
 	@Override
 	public	SystemInstance instantiate(List<Resource> aadlModels,
-			String systemToInstantiate) {
+			                               String systemToInstantiate)
+	{
 	    for(Resource r : aadlModels)
 	    {
-		  AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
-	      PropertiesLinkingService pls = new PropertiesLinkingService ();
+		    PropertiesLinkingService pls = new PropertiesLinkingService ();
 	      AadlPackage pkg = (AadlPackage) r.getContents().get(0);
 	      SystemImplementation si = (SystemImplementation) pls.
 	      		findNamedElementInsideAadlPackage(systemToInstantiate, 
 	      				pkg.getOwnedPublicSection());
 	      if(si==null)
 	    	  continue;
-	      return instantiator.instantiate(si);
+	      return this.instantiate(si);
 	    }
 	    // TODO: Manage with error reporter
 	    System.err.println("ERROR: "+ 

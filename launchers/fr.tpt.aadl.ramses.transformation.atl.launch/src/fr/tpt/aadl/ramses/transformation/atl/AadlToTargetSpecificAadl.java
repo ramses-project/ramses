@@ -22,11 +22,11 @@
 package fr.tpt.aadl.ramses.transformation.atl;
 
 import java.io.File ;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.Collection ;
+import java.util.Collections ;
+import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.concurrent.Callable ;
@@ -35,89 +35,88 @@ import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
 import java.util.concurrent.TimeoutException ;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.CoreException ;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.Path ;
+import org.eclipse.core.runtime.Platform ;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.xtext.nodemodel.ICompositeNode;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
-import org.osate.aadl2.Aadl2Package;
-import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.DefaultAnnexSubclause;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
-import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.annexsupport.AnnexParser;
-import org.osate.annexsupport.AnnexResolver;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.util.EcoreUtil ;
+import org.eclipse.xtext.nodemodel.ICompositeNode ;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.Aadl2Package ;
+import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.DefaultAnnexSubclause ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.annexsupport.AnnexParser ;
+import org.osate.annexsupport.AnnexResolver ;
 import org.osate.ba.AadlBaParserAction ;
 
-import antlr.RecognitionException;
+import antlr.RecognitionException ;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.AadlResourceValidator ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
-import fr.tpt.aadl.ramses.control.support.AadlResourceValidator;
-import fr.tpt.aadl.ramses.control.support.AadlModelsManager;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.AadlToAadl;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
-
-public abstract class AadlToTargetSpecificAadl implements AadlToAadl
+public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 {
-	protected static AadlResourceValidator extractor;
-    protected String[] ATL_FILE_NAMES;
-    public List<File> ATL_FILES;
-    private static final String DEFAULT_ATL_FILE_PATH =
-      "../../model2model/fr.tpt.aadl.ramses.transformation.atl/" ;
-    
-    public void initAtlFileNameList(File resourceDir)
-    {
-        ATL_FILES = new ArrayList<File>(ATL_FILE_NAMES.length);
-        for (String fileName : ATL_FILE_NAMES) {
-        ATL_FILES.add(new File(resourceDir.getAbsolutePath() +"/"+ fileName));
-      }
-    }
+	protected AadlModelInstantiatior _modelInstantiator ;
+	
+	protected PredefinedAadlModelManager _predefinedAadlModels ;
+	
+	public AadlToTargetSpecificAadl(AadlModelInstantiatior modelInstantiator,
+	                                PredefinedAadlModelManager predefinedAadlModels)
+  {
+    _modelInstantiator = modelInstantiator ;
+    _predefinedAadlModels = predefinedAadlModels ;
+  }
+  
+  protected static AadlResourceValidator extractor;
    
   public Resource transform(Resource inputResource,
-                            File resourceDir,
-                            File outputDir) throws GenerationException
+                            File outputDir,
+                            IProgressMonitor monitor) throws GenerationException
   {
-     
-      initAtlFileNameList(resourceDir);
-      if(resourceDir == null)
-    {
-      resourceDir = new File(DEFAULT_ATL_FILE_PATH) ;
-    }
+    initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
 
-    try {
-        ArrayList<File> atlFiles = new ArrayList<File>(ATL_FILE_NAMES.length) ;
-     
-      for(String fileName : ATL_FILE_NAMES)
+    try
+    {
+      ArrayList<File> atlFiles = new ArrayList<File>(_atlFileNames.length) ;
+
+      for(String fileName : _atlFileNames)
       {
-        atlFiles.add(new File(resourceDir + "/" + fileName)) ;
+        atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
       }
-      Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher();
-      atlLauncher.setOutputPackageName("refined");
-        return atlLauncher.generationEntryPoint(inputResource,
-                resourceDir,
-                atlFiles,
-                outputDir);
-    } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        return null;
+      Aadl2AadlEMFTVMLauncher atlLauncher =
+            new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
+                  _predefinedAadlModels) ;
+      atlLauncher.setOutputPackageName("refined") ;
+      return atlLauncher.generationEntryPoint(inputResource,
+                                              atlFiles, outputDir) ;
+    }
+    catch(Exception e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace() ;
+      return null ;
     }
   }
-  public Resource unparse(Resource inputResource, 
-		  Resource expandedResult, File outputDir)
+  
+  @Override
+  public Resource unparse(Resource inputResource, Resource expandedResult,
+                          File outputDir, IProgressMonitor monitor)
   {
 	  String aadlGeneratedFileName = expandedResult.getURI().lastSegment();
 	  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
@@ -126,11 +125,10 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 	  File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 	  if(outputModelDir.exists()==false)
 		  outputModelDir.mkdir();
-	  AadlModelsManager instantiator = RamsesConfiguration.getInstantiationManager();
-	  String outputFilePath=outputModelDir.getAbsolutePath()+"/"+aadlGeneratedFileName;
+	  String outputFilePath=outputModelDir.getAbsolutePath()+File.separator+aadlGeneratedFileName;
 	  File outputFile = new File(outputFilePath);
 
-	  instantiator.serialize(expandedResult, outputFilePath);
+	  _modelInstantiator.serialize(expandedResult, outputFilePath);
 
 	  try {
 		  return extractAadlResource(inputResource, outputFile);
@@ -172,16 +170,12 @@ public abstract class AadlToTargetSpecificAadl implements AadlToAadl
 		  ResourceSet rs = OsateResourceUtil.getResourceSet();
 		  Resource xtextResource = rs.getResource(uri, true);
 
-		  URI inputURI = si.getSystemImplementation().eResource().getURI();
-		  IPath path = new Path(inputURI.toString().substring(18));
-		  File inputDir = new File (workspaceLocation+path.toOSString());
-		  RamsesConfiguration.setInputDirectory(inputDir.getParentFile());
 		  return xtextResource;
 	  }
 	  else
 	  {
 		  uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
-		  RamsesConfiguration.setInputDirectory(new File(si.getSystemImplementation().eResource().getURI().toFileString()).getParentFile());
+		  
 		  final Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
 		  xtextResource.load(null);
 		  
@@ -265,30 +259,24 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
   }
   
   public Resource transformWokflow(Resource inputResource,
-		  							File resourceDir,
 		  							List<String> resourceFileNameList,
 		  							File outputDir,
 		  							String outputPackageName) throws GenerationException
   {
-      if(resourceDir == null)
-      {
-          resourceDir = new File(DEFAULT_ATL_FILE_PATH) ;
-      }
-
       ArrayList<File> atlFiles = new ArrayList<File>() ;
       for(String resourceFileName : resourceFileNameList)
       {
     	  String resourcePath = resourceFileName;
     	  if(false == resourceFileName.startsWith(File.separator))
-    		  resourcePath=resourceDir+"/"+resourceFileName;
+    		  resourcePath=RamsesConfiguration.getAtlResourceDir()+File.separator+resourceFileName;
           atlFiles.add(new File(resourcePath)) ;
       }
 
       try {
-    	  Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher();
+    	  Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
+    	                                                                    _predefinedAadlModels);
     	  atlLauncher.setOutputPackageName(outputPackageName);
           return atlLauncher.generationEntryPoint(inputResource,
-                  resourceDir,
                   atlFiles,
                   outputDir);
       } catch (Exception e) {

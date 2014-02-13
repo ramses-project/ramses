@@ -21,14 +21,11 @@
 
 package fr.tpt.aadl.ramses.generation.pok.c;
 
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.ProcessClassifier;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.utils.Aadl2Utils ;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.FeatureInstance ;
 
-import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
+import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 
 public class AadlToPokCUtils
 {

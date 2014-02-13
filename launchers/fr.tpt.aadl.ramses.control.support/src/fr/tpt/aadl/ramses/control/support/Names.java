@@ -27,7 +27,10 @@ public class Names
   {"aadl2", "aadl"} ;
 
   public final static String RAMSES_SUPPORT_PLUGIN_ID =
-        "fr.tpt.aadl.ramses.control.support" ;
+                                          "fr.tpt.aadl.ramses.control.support" ;
+  
+  public final static String ATL_TRANSFORMATION_PLUGIN_ID =
+                                       "fr.tpt.aadl.ramses.transformation.atl" ;
 
   public final static String ANALYSIS_EXT_ID = "analyzer" ;
 
@@ -40,4 +43,14 @@ public class Names
   
   public static final String AADL_RESOURCE_DIRECTORY_NAME="aadl_resources" ;
   public static final String RAMSES_RESOURCES_VAR = "RAMSES_DIR";
+  
+  public static final String GENERATION_ROOT_OBJECT_CLASS = "org.osate.aadl2.SystemImplementation" ;
+  
+  public static final String DEFAULT_RAMSES_RESOUCE_DIR = "../../model2model/" +
+                                            ATL_TRANSFORMATION_PLUGIN_ID + "/" ;
+  
+  public static final String AADL_PREDEFINED_PACKAGE_DIR_NAME = "package" ;
+  
+  public static final String AADL_PREDEFINED_PROPERTIES_DIR_NAME = "propertyset" ;
+  
 }

@@ -21,49 +21,86 @@
 
 package fr.tpt.aadl.ramses.generation.osek;
 
-import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
-import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
-import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
-import fr.tpt.aadl.ramses.generation.osek.c.AadlOSEKCodeGenerator;
-import fr.tpt.aadl.ramses.generation.osek.c.AadlToOSEKNxtCUnparser;
-import fr.tpt.aadl.ramses.generation.osek.makefile.AadlToOSEKnxtMakefileUnparser;
-import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator;
-import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator;
+import java.io.File ;
+import java.io.FileReader ;
+import java.io.IOException ;
 
-public class OSEKGeneratorFactory extends AbstractGeneratorFactory {
-	public static String OSEK_GENERATOR_NAME = "osek";
+import org.eclipse.m2m.atl.core.ATLCoreException;
 
-	private static Generator createOSEKGenerator() {
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
+import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
+import fr.tpt.aadl.ramses.generation.osek.c.AadlOSEKCodeGenerator ;
+import fr.tpt.aadl.ramses.generation.osek.c.AadlToOSEKNxtCUnparser ;
+import fr.tpt.aadl.ramses.generation.osek.makefile.AadlToOSEKnxtMakefileUnparser ;
+import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
+import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
+import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
 
-		OIL oil = new OIL();
-		
-		// Instantiate generator ADDL-- to C
-		AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
+public class OSEKGeneratorFactory implements GeneratorFactory {
+	
+  public final static String OSEK_GENERATOR_NAME = "osek";
+  private final static String _OSEK_RUNTIME_PATH = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
 
-		// Instantiate generator OIL
-		AadlToOSEKNxtCUnparser osekCUnparser = new AadlToOSEKNxtCUnparser(oil);
+	@Override
+	public Generator createGenerator(AadlModelInstantiatior modelInstantiator,
+	                                 PredefinedAadlModelManager predefinedAadlModels)
+	{
+	   OIL oil = new OIL();
+	    
+	    // Instantiate generator ADDL-- to C
+	    AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
 
-		// Call "goil" trampoline program
-		AadlToOSEKnxtMakefileUnparser osekMakefileUnparser = new AadlToOSEKnxtMakefileUnparser();
+	    // Instantiate generator OIL
+	    AadlToOSEKNxtCUnparser osekCUnparser = new AadlToOSEKNxtCUnparser(oil);
 
-		// Instantiate transformation AADL to refined ADDL
-		AadlOsekTransformation targetTrans = new AadlOsekTransformation("helpers/LanguageSpecificitiesC");
+	    // Call "goil" trampoline program
+	    AadlToOSEKnxtMakefileUnparser osekMakefileUnparser = new AadlToOSEKnxtMakefileUnparser();
 
-		// new implementation
-		AadlTargetSpecificCodeGenerator tarSpecCodeGen = new AadlOSEKCodeGenerator(genericCUnparser, osekCUnparser,
-				osekMakefileUnparser);
+	    // Instantiate transformation AADL to refined ADDL
+	    AadlOsekTransformation targetTrans = new AadlOsekTransformation(modelInstantiator,
+	                                                                    predefinedAadlModels,
+	                                                                    "helpers/LanguageSpecificitiesC");
 
-		// Generate oil and C
-		AadlTargetSpecificGenerator result = new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen);
+	    // new implementation
+	    AadlTargetSpecificCodeGenerator tarSpecCodeGen = new AadlOSEKCodeGenerator(genericCUnparser, osekCUnparser,
+	        osekMakefileUnparser);
 
-		result.setRegistryName(OSEK_GENERATOR_NAME);
+	    // Generate oil and C
+	    AadlModelValidator targetVal=null;
+		try {
+			targetVal = new AadlOSEKValidation(modelInstantiator,
+					 						   predefinedAadlModels);
+		} catch (ATLCoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    AadlTargetSpecificGenerator result = 
+	                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
+	                		  						  modelInstantiator,
+	                                                  targetVal) ;
+	    result.setRegistryName(OSEK_GENERATOR_NAME);
 
-		return result;
+	    return result;
 	}
 	
-	@Override
-	public Generator createGenerator() {
-			return createOSEKGenerator();
+	public static boolean runtimePathChecker(File runtimePath)
+	{
+    File result = new File(runtimePath + _OSEK_RUNTIME_PATH) ;
+    
+    try 
+    {
+      FileReader fr = new FileReader(result);
+      fr.close();
+    }
+    catch (IOException e)
+    {
+      return false;
+    }
+
+    return true;
 	}
 }

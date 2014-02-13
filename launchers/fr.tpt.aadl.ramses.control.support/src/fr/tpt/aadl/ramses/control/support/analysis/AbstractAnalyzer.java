@@ -21,33 +21,10 @@
 
 package fr.tpt.aadl.ramses.control.support.analysis ;
 
-import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.ui.actions.AbstractInstanceOrDeclarativeModelModifyActionAction ;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
-
-import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.emf.ecore.resource.Resource;
-
-import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
-public abstract class AbstractAnalyzer extends
-                                      AbstractInstanceOrDeclarativeModelModifyActionAction
-                                                                                          implements
-                                                                                          Analyzer,
-                                                                                          NamedPlugin
-
+public abstract class AbstractAnalyzer implements Analyzer, NamedPlugin
 {
-	
   protected String mode = "automatic";
   protected AnalysisArtifact currentResult = null;
-  
-  @Override
-  public void performAnalysis(SystemInstance instance,
-                              AnalysisErrorReporterManager errReporterManager,
-                              IProgressMonitor monitor)
-        throws AnalysisResultException
-  {
-    this.analyzeInstanceModel(monitor, errReporterManager, instance, null) ;
-  }
 }

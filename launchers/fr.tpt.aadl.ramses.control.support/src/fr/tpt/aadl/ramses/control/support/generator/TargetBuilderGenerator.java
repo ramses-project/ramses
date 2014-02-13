@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.control.support.generator;
 import java.io.File ;
 import java.util.Map ;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
@@ -31,16 +32,29 @@ import org.osate.aadl2.SystemImplementation ;
 public interface TargetBuilderGenerator
 {
   public void process(SystemImplementation system,
-                      File generatedFilePath)
-                          throws GenerationException ;
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
+                            throws GenerationException ;
   
   public void process(ProcessorSubcomponent processor,
-                      File generatedFilePath)
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
                             throws GenerationException ;
   
   public void process(ProcessSubcomponent process,
-                      File generatedFilePath)
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor)
                             throws GenerationException ;
+  
+  public boolean runtimePathChecker(File runtimePath) ;
+  
+  public String getRuntimePathEnvVar() ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
 }

@@ -13,7 +13,7 @@
 <mapEntry key="[debug]" value="org.eclipse.jdt.launching.localJavaApplication"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m ../../../build_and_test/junit_tests/tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/input/test_buffer_delayed.aadl2  -g pok -s root.impl -o ../../../build_and_test/junit_tests/tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/output/ -i test/ --workflow ../../../build_and_test/junit_tests/tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/input/Workflow.xmi"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m ../../../build_and_test/junit_tests/tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/input/test_buffer_delayed.aadl2  -g pok -s root.impl -o ../../../build_and_test/junit_tests/tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/output/ -i test/ --workflow ../../../build_and_test/junit_tests/tests/arinc653/arinc653-buffer-delayed-no_mutex_lowmfp/input/Workflow.xmi -r /usr/share/pok"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DDEBUG&#10;-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&#10;-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl&#10;-Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
 </launchConfiguration>

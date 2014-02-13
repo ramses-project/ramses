@@ -18,52 +18,7 @@
 	     </filter>
       </page>
    </extension>
-   
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-      		label="GenerateCodeAction"
-            id="fr.tpt.aadl.ramses.control.osate.generate"
-            visible="true">
-         <menu
-               id="menu.ramses"
-               label="RAMSES">
-               <separator name="generation"/>
-               <groupMarker name="top.grp"/>
-         </menu>
-         <action
-               class="fr.tpt.aadl.ramses.control.osate.GenerateAction"
-               id="fr.tpt.aadl.ramses.control.osate.generate.action"
-               menubarPath="menu.ramses/top.grp"
-               toolbarPath="menu.ramses/generation"
-               enablesFor="1"
-               label="&amp;Generate Code"
-               icon="icons/RAMSES.gif"
-               tooltip="Generate code for a given target platform">
-            <enablement>
-               <or>
-                  <and>
-                     <objectClass name="org.eclipse.core.resources.IFile"/>
-                     <objectState name="extension" value="aaxl2"/>
-                  </and>
-                  <objectClass name="org.osate.aadl2.instance.SystemInstance"/>
-               </or>
-            </enablement>
-         </action>
-      </actionSet>
-   </extension>
-   
-   <extension point="org.osate.ui.analysis">
-      <analysis
-   		 id="fr.tpt.aadl.ramses.control.osate.generate"
-   		 name="RAMSES"
-   		 class="fr.tpt.aadl.ramses.control.osate.GenerateAction">
-   		 <declarativeModel selectRootObject="true">
-   		    <selectedObject objectType="org.osate.aadl2.instance.SystemInstance"/>
-   		 </declarativeModel>
-   		 <instanceModel selectRootObject="true"/>
-   	  </analysis>
-   </extension>
+
    <extension
          point="org.eclipse.ui.newWizards">
       <wizard
@@ -76,41 +31,139 @@
       </wizard>
    </extension>
    
-   
-   
-   
    <extension
 		point="org.eclipse.ui.commands">
 		<command
-			description="Generate the system code with RAMSES"
-			id="fr.tpt.aadl.ramses.control.osate.generate"
-			name="RAMSES: Generate Code for the selected platform">
+			description="RAMSES generation code from system instance"
+			id="fr.tpt.aadl.ramses.control.osate.instance.generation"
+			name="Generate code">
 		</command>
-	</extension>
-	
+  <command
+        description="RAMSES generation code from aadl file outline"
+        id="fr.tpt.aadl.ramses.control.osate.outline.generation"
+        name="Generate code">
+  </command>
+   </extension>
+
+   <extension
+     point="org.eclipse.core.expressions.definitions">
+     <definition
+       id="fr.tpt.aadl.ramses.instance.generation.expression">
+       <with
+         variable="selection">
+         <and>
+           <iterate
+             ifEmpty="false"
+             operator="and">
+             <instanceof
+               value="org.eclipse.core.resources.IFile">
+             </instanceof>
+             <test
+               property="org.eclipse.core.resources.extension"
+               value="aaxl2">
+             </test>
+           </iterate>
+           <count
+             value="1">
+           </count>
+         </and>
+       </with>
+     </definition>
+     <definition
+           id="fr.tpt.aadl.ramses.outline.generation.expression">
+        <with
+              variable="selection">
+           <and>
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <test
+                       forcePluginActivation="true"
+                       property="fr.tpt.aadl.ramses.control.osate.canGenerate">
+                 </test>
+              </iterate>
+              <count
+                    value="1">
+              </count>
+           </and>
+        </with>
+     </definition>
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="fr.tpt.aadl.ramses.control.osate.OutlinePropertyTester"
+            id="fr.tpt.aadl.ramses.control.osate.OutlinePropertyTester"
+            namespace="fr.tpt.aadl.ramses.control.osate"
+            properties="canGenerate"
+            type="org.eclipse.xtext.ui.editor.outline.impl.EObjectNode">
+      </propertyTester>
+   </extension>
+   
    <extension point="org.eclipse.ui.menus">
 	<menuContribution 
 		allPopups="false"
 		locationURI="popup:org.osate.xtext.aadl2.ui.outline?after=additions">
 		<command
-		commandId="fr.tpt.aadl.ramses.control.osate.generate"
-		tooltip="Do code generation with RAMSES" 
-		style="push">
+        commandId="fr.tpt.aadl.ramses.control.osate.outline.generation"
+        icon="icons/RAMSES.gif"
+        label="RAMSES code generation"
+        style="push"
+        tooltip="RAMSES code generation">
 		</command>
 	</menuContribution>
+    <menuContribution
+       locationURI="menu:org.eclipse.ui.main.menu">
+    <menu
+          id="ramses.menu"
+          label="RAMSES">
+       <command
+             commandId="fr.tpt.aadl.ramses.control.osate.instance.generation"
+             icon="icons/RAMSES.gif"
+             label="RAMSES code generation"
+             style="push"
+             tooltip="RAMSES code generation">
+       </command>
+    </menu>
+ </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="toolbar:org.eclipse.ui.main.toolbar">
+       <toolbar
+             id="fr.tpt.aadl.ramses.control.osate.toolbar.generation"
+             label="RAMSES code generation">
+          <command
+                commandId="fr.tpt.aadl.ramses.control.osate.instance.generation"
+                icon="icons/RAMSES.gif"
+                label="RAMSES code generation"
+                style="push"
+                tooltip="RAMSES code generation">
+          </command>
+       </toolbar>
+    </menuContribution>
    </extension>
    
    <extension
 		point="org.eclipse.ui.handlers">
 		<handler 
 			class="fr.tpt.aadl.ramses.control.osate.GenerateActionHandler"
-			commandId="fr.tpt.aadl.ramses.control.osate.generate">
-		<!--	<activeWhen>
-				<reference
-					definitionId="org.osate.xtext.aadl2.Aadl2.Editor.opened">
-				</reference>
-			</activeWhen> -->
+			commandId="fr.tpt.aadl.ramses.control.osate.instance.generation">
+     <enabledWhen>
+        <reference
+              definitionId="fr.tpt.aadl.ramses.instance.generation.expression">
+        </reference>
+     </enabledWhen>
 		</handler>
+  <handler
+        class="fr.tpt.aadl.ramses.control.osate.GenerateActionHandler"
+        commandId="fr.tpt.aadl.ramses.control.osate.outline.generation">
+     <enabledWhen>
+        <reference
+              definitionId="fr.tpt.aadl.ramses.outline.generation.expression">
+        </reference>
+     </enabledWhen>
+  </handler>
 	</extension>
 	
 </plugin>

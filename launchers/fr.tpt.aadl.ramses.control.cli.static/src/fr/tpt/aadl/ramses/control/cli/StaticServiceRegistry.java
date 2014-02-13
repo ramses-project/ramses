@@ -22,30 +22,32 @@
 package fr.tpt.aadl.ramses.control.cli ;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.HashMap ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.osate.annexsupport.AnnexParser;
-import org.osate.annexsupport.AnnexResolver;
-import org.osate.annexsupport.AnnexUnparser;
+import org.osate.annexsupport.AnnexParser ;
+import org.osate.annexsupport.AnnexResolver ;
+import org.osate.annexsupport.AnnexUnparser ;
 import org.osate.ba.AadlBaParserAction ;
 import org.osate.ba.AadlBaResolver ;
 import org.osate.ba.AadlBaUnParserAction ;
 
-import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis;
-import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
-import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
-import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction;
-import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
-import fr.tpt.aadl.ramses.generation.launcher.adaravenscar.AdaRavenscarGeneratorFactory;
-import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory;
-import fr.tpt.aadl.ramses.generation.pok.ada.AdaPokGeneratorFactory;
-import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory;
-import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis;
+import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis ;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
+import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction ;
+import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction ;
+import fr.tpt.aadl.ramses.generation.launcher.adaravenscar.AdaRavenscarGeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.pok.ada.AdaPokGeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
+import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis ;
 
 /**
  * This class implements the API to register statically services into RAMSES. These
@@ -64,9 +66,17 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
 
   private Map<String, Generator> _gen = new HashMap<String, Generator>() ;
 
-  StaticServiceRegistry()
-        throws Exception
+  private AadlModelInstantiatior _modelInstantiatior ;
+  private PredefinedAadlModelManager _predefinedAadlModels ;
+  
+  @Override
+  public void init(AadlModelInstantiatior modelInstantiatior,
+                   PredefinedAadlModelManager predefinedAadlModels)
+                     throws Exception
   {
+    _modelInstantiatior = modelInstantiatior ;
+    _predefinedAadlModels = predefinedAadlModels ;
+    
     // Setup AADLBA Front End parser, resolver and unparser.
     _parsers.put(AadlBaParserAction.ANNEX_NAME, new AadlBaParserAction()) ;
     _parsers.put(AadlBaToCUnparserAction.ANNEX_NAME, new AadlBaParserAction()) ;
@@ -78,19 +88,28 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _unparsers.put(AadlBaToADAUnparserAction.ANNEX_NAME,
             new AadlBaToADAUnparserAction()) ;
     
-    _analyzers.put(WcetAnalysis.PLUGIN_NAME, new WcetAnalysis());
+    _analyzers.put(WcetAnalysis.PLUGIN_NAME, new WcetAnalysis(modelInstantiatior,
+                                                              predefinedAadlModels));
+    
     _analyzers.put(AADLInspectorSchedulingAnalysis.PLUGIN_NAME, new AADLInspectorSchedulingAnalysis());
     
-    AbstractGeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
-    AbstractGeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();
-    AbstractGeneratorFactory adaGeneratorFactory = new AdaPokGeneratorFactory();
-    AbstractGeneratorFactory adaRavenscarGeneratorFactory = new AdaRavenscarGeneratorFactory();
+    GeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
+    GeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();
+    GeneratorFactory adaGeneratorFactory = new AdaPokGeneratorFactory();
+    GeneratorFactory adaRavenscarGeneratorFactory = new AdaRavenscarGeneratorFactory();
     
-    Generator genPok = pokGeneratorFactory.createGenerator() ;
-    Generator genOsek = oSEKGeneratorFactory.createGenerator();
-    Generator genAda = adaGeneratorFactory.createGenerator();
-    Generator genAdaRavenscar = adaRavenscarGeneratorFactory.createGenerator();
+    Generator genPok = pokGeneratorFactory.createGenerator(modelInstantiatior,
+                                                           predefinedAadlModels);
     
+    Generator genOsek = oSEKGeneratorFactory.createGenerator(modelInstantiatior,
+                                                             predefinedAadlModels);
+    
+    Generator genAda = adaGeneratorFactory.createGenerator(modelInstantiatior,
+                                                           predefinedAadlModels);
+    
+    Generator genAdaRavenscar = adaRavenscarGeneratorFactory.
+                                             createGenerator(modelInstantiatior,
+                                                          predefinedAadlModels);
     
     _gen.put(genPok.getRegistryName(), genPok) ;
     _gen.put(genOsek.getRegistryName(), genOsek) ;
@@ -169,5 +188,17 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
   public boolean isOSGi()
   {
     return false ;
+  }
+
+  @Override
+  public AadlModelInstantiatior getModelInstantiatior()
+  {
+    return _modelInstantiatior ;
+  }
+
+  @Override
+  public PredefinedAadlModelManager getPredefinedAadlModels()
+  {
+    return _predefinedAadlModels ;
   }
 }

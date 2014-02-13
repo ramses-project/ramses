@@ -5,7 +5,7 @@
          point="fr.tpt.aadl.ramses.control.support.analyzer">
       <analyzer
             analysisName="AADLInspector"
-            class="fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis"
+            class="fr.tpt.aadl.launch.AadlInspectorFactory"
             id="fr.tpt.aadl.sched.tools.aadlinspector">
       </analyzer>
    </extension>

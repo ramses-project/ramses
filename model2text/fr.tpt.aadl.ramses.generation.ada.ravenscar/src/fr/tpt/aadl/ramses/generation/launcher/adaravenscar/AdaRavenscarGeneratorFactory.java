@@ -22,18 +22,24 @@
 
 package fr.tpt.aadl.ramses.generation.launcher.adaravenscar;
 
-import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
+import org.eclipse.m2m.atl.core.ATLCoreException;
+
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
-import fr.tpt.aadl.ramses.generation.adaravenscar.makefile.AadlToAdaRavenscarMakefileUnparser;
+import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
+import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser ;
+import fr.tpt.aadl.ramses.generation.adaravenscar.makefile.AadlToAdaRavenscarMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
+import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
 
-public class AdaRavenscarGeneratorFactory extends AbstractGeneratorFactory
+public class AdaRavenscarGeneratorFactory implements GeneratorFactory
 {
   public static String ADA_RAVENSCAR_GENERATOR_NAME = "ada-ravenscar" ;
   
-  private static Generator createPokGenerator()
+  public Generator createGenerator(AadlModelInstantiatior modelInstantiator,
+                                   PredefinedAadlModelManager predefinedAadlModels)
   {
     AadlToConfAdaRavenscarUnparser AdaRavenscarUnparser = new AadlToConfAdaRavenscarUnparser() ;
     
@@ -43,23 +49,25 @@ public class AdaRavenscarGeneratorFactory extends AbstractGeneratorFactory
     
     AadlTargetSpecificCodeGenerator tarSpecCodeGen = new 
             AadlTargetSpecificCodeGenerator(genericADAUnparser,
-            								AdaRavenscarUnparser,
-            								adaRavenscarMakefileUnparser);
+                            AdaRavenscarUnparser,
+                            adaRavenscarMakefileUnparser);
     
-    AadlAdaRavenscarTransformation targetTrans = new AadlAdaRavenscarTransformation("helpers/LanguageSpecificitiesAda");
+    AadlAdaRavenscarTransformation targetTrans = new AadlAdaRavenscarTransformation(modelInstantiator, predefinedAadlModels, "helpers/LanguageSpecificitiesAda");
     
+    AadlModelValidator targetVal=null;
+	try {
+		targetVal = new AadlAdaRavenscarValidation(modelInstantiator,
+				 						   predefinedAadlModels);
+	} catch (ATLCoreException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     AadlTargetSpecificGenerator result = 
-                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen) ;
-    
+                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
+                		  						  modelInstantiator,
+                                                  targetVal) ;
     result.setRegistryName(ADA_RAVENSCAR_GENERATOR_NAME) ;
     
     return result ;
-  }
-  
-  
-  
-  public Generator createGenerator()
-  {
-      return createPokGenerator();
   }
 }

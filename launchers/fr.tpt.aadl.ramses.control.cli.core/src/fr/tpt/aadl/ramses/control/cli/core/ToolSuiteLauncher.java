@@ -21,55 +21,53 @@
 
 package fr.tpt.aadl.ramses.control.cli.core ;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File ;
+import java.io.IOException ;
+import java.io.PrintStream ;
+import java.util.ArrayList ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.instance.SystemInstance;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.instance.SystemInstance ;
 
-import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser;
-import fr.tpt.aadl.ramses.control.support.FileUtils;
-import fr.tpt.aadl.ramses.control.support.AadlModelsManager;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.WorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException;
-import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
+import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
 /**
  * This class provides services to the Command 
  * Line Interface launcher #fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand
  */
 
-class ToolSuiteLauncher
+public class ToolSuiteLauncher
 {
 
   private ServiceRegistry _registry ;
-  private PredefinedPropertiesManager _predefinedPropertiesManager ;
   private StandAloneInstantiator _instantiator ;
   private List<String> _analysisToPerform ;
-  private Set<File> _includeDirSet;
+  private IProgressMonitor _monitor  ;
+  private PredefinedAadlModelManager _modelManager ;
   
-  ToolSuiteLauncher()
+  ToolSuiteLauncher(IProgressMonitor monitor,
+                    StandAloneInstantiator instantiator,
+                    PredefinedAadlModelManager modelManager)
   {
-    _registry = ServiceRegistryProvider.getServiceRegistry() ;
-    _predefinedPropertiesManager = new PredefinedPropertiesManager() ;
-    _instantiator = StandAloneInstantiator.getInstantiator() ;
-    RamsesConfiguration.setInstantiationManager(_instantiator);
+    _monitor = monitor ;
+    _instantiator = instantiator ;
+    _modelManager = modelManager ;
   }
 
   void initializeAnalysis(String[] analysisIdentifiers)
@@ -79,21 +77,6 @@ class ToolSuiteLauncher
           initialize(analysisIdentifiers, _registry.getAvailableAnalysisNames()) ;
   }
   
-  void initializeGeneration(String targetName, String[] includeDirArray)
-        throws Exception
-  {
-    if(false == _registry.getAvailableGeneratorNames().contains(targetName))
-    {
-      throw new Exception ("Invalid generation target identifier: " + targetName) ;
-    }
-    String errors="";
-    _includeDirSet = FileUtils.checkFilesExist(includeDirArray, errors);
-    if(false == errors.isEmpty())
-    {
-      throw new Exception("ERROR: could not be find directories (given in -i option):\n"+errors);
-    }
-  }
-
   private List<String> initialize(String[] processNames,
                                   Set<String> availableProcessNames)
         throws Exception
@@ -134,7 +117,8 @@ class ToolSuiteLauncher
   }
 
   private void performAnalysis(SystemInstance instance,
-                                Map<String, Object> parameters)
+                                Map<String, Object> parameters,
+                                File outputDir)
         throws AnalysisResultException
   {
     if(_analysisToPerform != null && _analysisToPerform.isEmpty() == false)
@@ -147,8 +131,10 @@ class ToolSuiteLauncher
         // Set parameters to null in order to reset analyzer's parameters.
         analyzer.setParameters(parameters) ;
         analyzer.performAnalysis(instance,
+                                 outputDir,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
-                               new NullProgressMonitor()) ;
+                               _monitor
+                               ) ;
       }
     }
   }
@@ -166,9 +152,7 @@ class ToolSuiteLauncher
   {
     try
     {
-      File aadlResourcesDir = RamsesConfiguration.getRamsesResourcesDir();
-      _predefinedPropertiesManager
-            .extractStandardPropertySets(aadlResourcesDir) ;
+      _modelManager.parsePredefinedAadlModels();
     }
     catch(Exception e1)
     {
@@ -177,95 +161,79 @@ class ToolSuiteLauncher
   }
   
   void launchDefaultGenerationProcess (List<File> mainModels,
-                                     	String systemToInstantiate,
-                                     	File generatedFilePath,
-                                     	String targetName,
-                                     	File resourceFilePath,
-                                     	Map<String, Object> parameters)
+                                     	 String systemToInstantiate,
+                                     	 RamsesConfiguration config,
+                                     	 File[] includeDirs,
+                                     	 Map<String, Object> parameters)
                                                       throws GenerationException
   {
+    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    Generator generator = registry.getGenerator(config.getTargetId()) ;
+    
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
-    AadlModelsManager im = RamsesConfiguration.getInstantiationManager();
+    
     SystemInstance instance =
-          im.instantiate(aadlModels, systemToInstantiate) ;
+          _instantiator.instantiate(aadlModels, systemToInstantiate) ;
     
     if(instance == null)
     {
       throw new GenerationException("instanciation failed.") ;
     }
     
-    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet, targetName);
-    
-    _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
-    
-    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
-    
-    Generator generator = registry.getGenerator(targetName) ;
-    
     generator.setParameters(parameters) ;
     
-    generator.generate(instance, resourceFilePath,
-                       generatedFilePath) ;
+    generator.generate(instance,config.getRuntimePath(), config.getOutputDir(), 
+                       includeDirs,
+                       ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, _monitor) ;
   }
 
   void launchWorkflowProcess (List<File> mainModels,
-                                        	 String systemToInstantiate,
-                                        	 File generatedFilePath,
-                                        	 String targetName,
-                                        	 File resourceFilePath,
-                                        	 WorkflowPilot xmlPilot,
-                                        	 Map<String, Object> parameters)
-                                              throws GenerationException
+                              String systemToInstantiate,
+                              RamsesConfiguration config,
+                              File[] includeDirs,
+                              WorkflowPilot xmlPilot,
+                              Map<String, Object> parameters)
+                                                      throws GenerationException
   {
+    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    Generator generator = registry.getGenerator(config.getTargetId()) ;
+    
+    // DEBUG
+    System.out.println("Generator.generateXML called");
+    
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
 
-    AadlModelsManager im = RamsesConfiguration.getInstantiationManager();
     SystemInstance instance =
-          im.instantiate(aadlModels, systemToInstantiate) ;
+          _instantiator.instantiate(aadlModels, systemToInstantiate) ;
 
     if(instance == null)
     {
       throw new GenerationException("instanciation failed.") ;
     }
 
-    RamsesConfiguration.setIncludeDir(instance.getSystemImplementation().eResource(), _includeDirSet, targetName);
-    
-    _predefinedPropertiesManager.extractStandardPropertySets(aadlModels) ;
-
-    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
-
-    Generator generator = registry.getGenerator(targetName) ;
-    System.out.println("Generator.generateXML called");
-    
     generator.setParameters(parameters) ;
     
-    generator.generateWorkflow(instance, resourceFilePath,
-                          generatedFilePath, xmlPilot) ;
+    generator.generateWorkflow(instance, xmlPilot, config.getRuntimePath(),
+                               config.getOutputDir(), includeDirs,
+                               ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+                               _monitor) ;
   }
   
-  
   void performAnalysis(List<File> mainModelFiles,
-                               String systemToInstantiate,
-                               Map<String, Object> parameters)
+                       String systemToInstantiate,
+                       RamsesConfiguration config,
+                       Map<String, Object> parameters)
         throws AnalysisResultException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModelFiles) ;
-    AadlModelsManager im = RamsesConfiguration.getInstantiationManager();
     SystemInstance instance =
-          im.instantiate(aadlModels, systemToInstantiate) ;
-    this.performAnalysis(instance, parameters) ;
+          _instantiator.instantiate(aadlModels, systemToInstantiate) ;
+    this.performAnalysis(instance, parameters, config.getOutputDir()) ;
   }
 
-  void parsePredefinedPackages()
-  {
-    File aadlResourcesDir = RamsesConfiguration.getRamsesResourcesDir();
-    new PredefinedPackagesManager(aadlResourcesDir);
-  }
-  
-  void unparse(List<Resource> resources, File outputPath) throws IOException
+  void unparse(List<Resource> resources, RamsesConfiguration config) throws IOException
   {
     String fileName ;
-    String outputFilePath ;
     File outputFile ;
     PrintStream ps ;
     String msg ;
@@ -274,8 +242,7 @@ class ToolSuiteLauncher
     {
       fileName = r.getURI().toFileString() ;
       fileName = fileName.substring(fileName.lastIndexOf(File.separator)) ;
-      outputFilePath = outputPath.getAbsolutePath() + fileName ; 
-      outputFile = new File(outputFilePath);
+      outputFile = new File(config.getOutputDir() + fileName);
       
       if(outputFile.exists())
       {
@@ -296,5 +263,4 @@ class ToolSuiteLauncher
       ps.close() ;
     }
   }
-  
 }

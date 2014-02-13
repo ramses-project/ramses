@@ -105,9 +105,9 @@ public class WorkspaceFilePrinter extends PrintStream
       newPath = newPath.substring(9) ;
     }
 
-    int indexSep = newPath.lastIndexOf("/") ;
+    int indexSep = newPath.lastIndexOf(File.separator) ;
     newPath =
-          newPath.substring(0, indexSep) + "/_" +
+          newPath.substring(0, indexSep) + File.separator + "_" +
                 newPath.substring(indexSep + 1) ;
     return newPath ;
   }

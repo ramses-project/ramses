@@ -21,54 +21,54 @@
 
 package fr.tpt.aadl.ramses.generation.pok.c;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File ;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.eclipse.emf.common.util.EList;
-import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.BooleanLiteral;
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.DataPort;
-import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.EventDataPort;
-import org.osate.aadl2.MemorySubcomponent;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.NumberValue;
-import org.osate.aadl2.Port;
-import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.ProcessSubcomponent;
-import org.osate.aadl2.ProcessorImplementation;
-import org.osate.aadl2.ProcessorSubcomponent;
-import org.osate.aadl2.PropertyAssociation;
-import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.ThreadImplementation;
-import org.osate.aadl2.ThreadSubcomponent;
-import org.osate.aadl2.VirtualProcessorImplementation;
-import org.osate.aadl2.VirtualProcessorSubcomponent;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.FeatureCategory;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.modelsupport.UnparseText;
-import org.osate.ba.aadlba.BehaviorAnnex;
-import org.osate.ba.utils.AadlBaVisitors;
-import org.osate.utils.PropertyUtils;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.common.util.EList ;
+import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.BooleanLiteral ;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.DataPort ;
+import org.osate.aadl2.DataSubcomponent ;
+import org.osate.aadl2.DirectionType ;
+import org.osate.aadl2.EventDataPort ;
+import org.osate.aadl2.MemorySubcomponent ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.NumberValue ;
+import org.osate.aadl2.Port ;
+import org.osate.aadl2.ProcessImplementation ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.ProcessorImplementation ;
+import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.PropertyAssociation ;
+import org.osate.aadl2.Subcomponent ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.ThreadSubcomponent ;
+import org.osate.aadl2.VirtualProcessorSubcomponent ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.ConnectionInstance ;
+import org.osate.aadl2.instance.FeatureCategory ;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.UnparseText ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.utils.AadlBaVisitors ;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.control.support.FileUtils;
-import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
-import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
-import fr.tpt.aadl.ramses.util.generation.RoutingProperties;
+import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
+import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
+import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
 {
@@ -98,8 +98,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   private int partitionId=0;
   
   public void process(ProcessorSubcomponent processorSubcomponent,
+                      TargetProperties tarProp,
+                      File runtimePath,
                       File outputDir,
-                      TargetProperties tarProp) 
+                      IProgressMonitor monitor) 
                                                      throws GenerationException
   { 
     ProcessorProperties processorProp = new ProcessorProperties() ;
@@ -542,8 +544,10 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     }
   }
   
-  public void process(ProcessSubcomponent process, File generatedFilePath,
-                      TargetProperties tarProp)
+  public void process(ProcessSubcomponent process,TargetProperties tarProp,
+                      File runtimePath,
+                      File outputDir,
+                      IProgressMonitor monitor)
   {
 	StringBuilder sb = new StringBuilder(process.getQualifiedName());
     PartitionProperties pp = new PartitionProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
@@ -563,10 +567,10 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     
     try
     {
-      FileUtils.saveFile(generatedFilePath, "main.h",
+      FileUtils.saveFile(outputDir, "main.h",
                mainHeaderCode.getParseOutput()) ;
       
-      FileUtils.saveFile(generatedFilePath, "main.c",
+      FileUtils.saveFile(outputDir, "main.c",
                mainImplCode.getParseOutput()) ;
     }
     catch(IOException e)
@@ -1954,7 +1958,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
   }
 
   public TargetProperties process(SystemImplementation si,
-                                   File generatedFilePath)
+                                  File runtimePath,
+                                  File outputDir,
+                                  IProgressMonitor monitor)
 	     	                                             throws GenerationException
 	{
 	  SystemInstance system = (SystemInstance) 

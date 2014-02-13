@@ -42,7 +42,7 @@ public class ListPanelModel extends DefaultListModel {
 			fileNames = file.list();
 			for(String fileName : fileNames) {
 				try {
-					processAndImportItem(new File(file.getCanonicalPath() + "/" + fileName), fileExtension);
+					processAndImportItem(new File(file.getCanonicalPath() + File.separator + fileName), fileExtension);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -71,7 +71,7 @@ public class ListPanelModel extends DefaultListModel {
 			try {
 				String fileCanPath = file.getCanonicalPath();
 				fileName = fileName.replaceFirst(fileExtension, "");
-				String fileRelPath = fileCanPath.replaceFirst(itemRootFolder + "/", "");
+				String fileRelPath = fileCanPath.replaceFirst(itemRootFolder + File.separator, "");
 				fileRelPath = fileRelPath.replaceFirst(".asm", "");
 				newItem = new ListItem(
 						fileRelPath,

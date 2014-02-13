@@ -8,12 +8,12 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 
 public class AnalysisUtils {
 

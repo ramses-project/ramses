@@ -21,57 +21,73 @@
 
 package fr.tpt.aadl.ramses.generation.osek.makefile;
 
-import java.io.BufferedWriter;
-import java.io.File; 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File ;
+import java.util.Iterator ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.ProcessSubcomponent;
-import org.osate.aadl2.ProcessorImplementation;
-import org.osate.aadl2.ProcessorSubcomponent;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.modelsupport.UnparseText;
-import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
-import org.osate.aadl2.util.Aadl2Switch;
-import org.osate.utils.PropertyUtils ;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.ProcessImplementation ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.ProcessorImplementation ;
+import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.modelsupport.UnparseText ;
+import org.osate.aadl2.util.Aadl2Switch ;
 
-import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
-import fr.tpt.aadl.ramses.generation.osek.ast.OIL;
-import fr.tpt.aadl.ramses.util.generation.FileUtils;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
+import fr.tpt.aadl.ramses.util.generation.AbstractAadlToCMakefileUnparser ;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
 
-public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
-												implements TargetBuilderGenerator {
+public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnparser 
+{
 
-  UnparseText unparserContent;
+  private UnparseText unparserContent;
+  
   private List<ProcessSubcomponent> bindedProcess ;
-  private static final String OSEXNXT_ENVIRVARID = "NXTOSEK_PATH";
-  private static final String runtimePath = GeneratorUtils.getRuntimePath(OSEXNXT_ENVIRVARID);
 
-  private File processGeneratedFilePath = null;
+  private static final String _C_OSEK_SUB_PATH = "/C_runtime/OSEK/" ;
+  
+  // TODO set up ! 
+  public static final String OSEK_NXT_ENV_VAR_NAME = "" ;
+  
+  public AadlToOSEKnxtMakefileUnparser()
+  {
+    _ENV_VAR_NAME = OSEK_NXT_ENV_VAR_NAME ;
+  }
   
   @Override
-  public void process(ProcessSubcomponent process, File generatedFilePath) throws GenerationException
+  public void setupCommonDirs()
   {
-      unparserContent = new UnparseText() ;
-      processGeneratedFilePath = generatedFilePath;
-	  generateMakefile((NamedElement) process, generatedFilePath) ;
+    super.setupCommonDirs() ;
+    
+    // Add Dir of C OSEK runtime
+    File OSEKRuntimeDir = new File(RamsesConfiguration.getPredefinedResourceDir().getAbsolutePath() +
+                                   _C_OSEK_SUB_PATH);
+    _includeDirManager.addCommonDependency(OSEKRuntimeDir);
+  }
+
+  @Override
+  public void process(ProcessSubcomponent process,
+                      File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor) throws GenerationException
+  {
+    super.process(process, runtimeDir, outputDir, includeDirs, monitor);
+   	generateMakefile((NamedElement) process, outputDir) ;
   }
 
   private void generateMakefile(NamedElement ne,
-          File makeFile)
+                                File makeFile)
   {
 	  unparserContent = new UnparseText() ;
 	  process(ne) ;
-	  GeneratorUtils.saveMakefile(unparserContent, makeFile) ;
+	  super.saveMakefile(unparserContent, makeFile) ;
   }
   @Override
   protected void initSwitches()
@@ -112,8 +128,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
 
         process(object.getComponentImplementation()) ;
         unparserContent.addOutputNewline("O_PATH ?= build");
-    	if(runtimePath!=null && runtimePath!="")
-    		unparserContent.addOutputNewline("include "+runtimePath+"/ecrobot/ecrobot.mak");
+    		unparserContent.addOutputNewline("include "+_runtimePath+"/ecrobot/ecrobot.mak");
         return DONE ;
       }
 
@@ -123,10 +138,9 @@ public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
         unparserContent
               .addOutput("TARGET_SOURCES = main.c activity.c subprograms.c gtypes.c deployment.c ") ;
         
-        Set<File> includeDirList = FileUtils.getIncludeDir(object);
         Set<File> sourceFileList;
 		try {
-		  sourceFileList = GeneratorUtils.getListOfReferencedObjects(object);
+		  sourceFileList = getListOfReferencedObjects(object);
           for(File sourceFile : sourceFileList)
           {
             String value = sourceFile.getAbsolutePath();
@@ -145,14 +159,21 @@ public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
 		  e.printStackTrace();
 		}
 		unparserContent.addOutput("\n") ;
-		if(false==includeDirList.isEmpty())
-          unparserContent.addOutput("export USER_INCLUDES=");
-        for (File include: includeDirList)
-        {
-          unparserContent.addOutput(include.getAbsolutePath()+" ");
-        }
-        unparserContent.addOutput("\n") ;
-        return DONE ;
+		
+		Iterator<File> it = new IncludeDirIterator() ;
+		File include ;
+		
+		if(it.hasNext())
+		{
+		  unparserContent.addOutput("export USER_INCLUDES=");
+		  while(it.hasNext())
+	    {
+		    include = it.next() ;
+		    unparserContent.addOutput(include.getAbsolutePath()+" ");
+		  }
+		  unparserContent.addOutput("\n") ;
+    }
+		return DONE ;
       }
 
       @Override
@@ -197,19 +218,36 @@ public class AadlToOSEKnxtMakefileUnparser  extends AadlProcessingSwitch
 	// definition
 
 	@Override
-	public void process(SystemImplementation system, File generatedFilePath) throws GenerationException {
-		generateMakefile((NamedElement) system, generatedFilePath) ;
-		GeneratorUtils.executeMake(generatedFilePath, "NXTOSEK_PATH");
+	public void process(SystemImplementation system,
+	                    File runtimeDir,
+	                    File outputDir,
+	                    File[] includeDirs,
+	                    IProgressMonitor monitor)
+	                          throws GenerationException
+  {
+	  super.process(system, runtimeDir, outputDir, includeDirs, monitor);
+	  generateMakefile((NamedElement) system, outputDir) ;
+		super.executeMake(outputDir, runtimeDir);
 	}
 
 	@Override
-	public void process(ProcessorSubcomponent processor, File generatedFilePath) throws GenerationException {
-		unparserContent = new UnparseText() ;
-	    generateMakefile((NamedElement) processor, generatedFilePath) ;
+	public void process(ProcessorSubcomponent processor,
+	                    File runtimeDir,
+                      File outputDir,
+                      File[] includeDirs,
+                      IProgressMonitor monitor) throws GenerationException {
+	  super.process(processor, runtimeDir, outputDir, includeDirs, monitor);
+	  generateMakefile((NamedElement) processor, outputDir) ;
 	}
 
 	@Override
 	public void setParameters(Map<Enum<?>, Object> parameters) {
 		// TODO Do NOT use
 	}
+
+  @Override
+  public boolean runtimePathChecker(File runtimePath)
+  {
+    return OSEKGeneratorFactory.runtimePathChecker(runtimePath) ;
+  }
 }

@@ -39,10 +39,13 @@ import org.osate.annexsupport.AnnexResolverRegistry ;
 import org.osate.annexsupport.AnnexUnparser ;
 import org.osate.annexsupport.AnnexUnparserRegistry ;
 
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.Names ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
-import fr.tpt.aadl.ramses.control.support.generator.AbstractGeneratorFactory;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalyzerFactory ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
 public class OSGiServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
@@ -56,10 +59,17 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
 
   private Map<String, Generator> _genRegistry =
         new HashMap<String, Generator>() ;
+  
+  private AadlModelInstantiatior _modelInstantiatior ;
+  private PredefinedAadlModelManager _predefinedAadlModels ;
 
-  public OSGiServiceRegistry()
-        throws CoreException
+  @Override
+  public void init(AadlModelInstantiatior modelInstantiatior,
+                   PredefinedAadlModelManager predefinedAadlModels) throws Exception
   {
+    _modelInstantiatior = modelInstantiatior ;
+    _predefinedAadlModels = predefinedAadlModels ;
+    
     _parserRegistry =
           (AnnexParserRegistry) AnnexRegistry
                 .getRegistry(AnnexRegistry.ANNEX_PARSER_EXT_ID) ;
@@ -69,13 +79,17 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
     _unparserRegistry =
           (AnnexUnparserRegistry) AnnexRegistry
                 .getRegistry(AnnexRegistry.ANNEX_UNPARSER_EXT_ID) ;
-    initialize(_analyzersRegistry, Names.ANALYSIS_EXT_ID) ;
-    initialize(_genRegistry, Names.GENERATOR_EXT_ID) ;
+    initialize(_analyzersRegistry, Names.ANALYSIS_EXT_ID, modelInstantiatior,
+               predefinedAadlModels) ;
+    initialize(_genRegistry, Names.GENERATOR_EXT_ID, modelInstantiatior,
+               predefinedAadlModels) ;
   }
 
   @SuppressWarnings("all")
   private void initialize(Map registry,
-                          String extensionId)
+                          String extensionId,
+                          AadlModelInstantiatior modelInstantiatior,
+                          PredefinedAadlModelManager predefinedAadlModels)
         throws CoreException
   {
     IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry() ;
@@ -95,18 +109,27 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
     		{
     			if(extensionId==Names.GENERATOR_EXT_ID)
     			{
-    				
-    				AbstractGeneratorFactory factory = (AbstractGeneratorFactory) configElems[j]
-							.createExecutableExtension(Names.ATT_CLASS) ;
-    				Generator gen = factory.createGenerator();
+    				GeneratorFactory factory = (GeneratorFactory) configElems[j]
+							                     .createExecutableExtension(Names.ATT_CLASS) ;
+    				Generator gen = factory.createGenerator(modelInstantiatior,
+    				                                        predefinedAadlModels);
     				registry.put(gen.getRegistryName(), gen) ;
     			}
-    			else
+    			else if(extensionId==Names.ANALYSIS_EXT_ID)
     			{
-    				NamedPlugin instance =
-        					(NamedPlugin) configElems[j]
-        							.createExecutableExtension(Names.ATT_CLASS) ;
-    				registry.put(instance.getRegistryName(), instance) ;
+    				AnalyzerFactory factory = (AnalyzerFactory) configElems[j]
+                                   .createExecutableExtension(Names.ATT_CLASS) ;
+    				
+    				Analyzer analyzer = factory.createAnalyzer(modelInstantiatior,
+    				                                           predefinedAadlModels) ;
+    				registry.put(analyzer.getRegistryName(), analyzer) ;
+    			}
+    			else // XXX What is it about ???
+    			{
+    			  NamedPlugin instance =
+                  (NamedPlugin) configElems[j]
+                      .createExecutableExtension(Names.ATT_CLASS) ;
+            registry.put(instance.getRegistryName(), instance) ;
     			}
     		}
     	}
@@ -159,5 +182,17 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
   public boolean isOSGi()
   {
     return true ;
+  }
+  
+  @Override
+  public AadlModelInstantiatior getModelInstantiatior()
+  {
+    return _modelInstantiatior ;
+  }
+
+  @Override
+  public PredefinedAadlModelManager getPredefinedAadlModels()
+  {
+    return _predefinedAadlModels ;
   }
 }

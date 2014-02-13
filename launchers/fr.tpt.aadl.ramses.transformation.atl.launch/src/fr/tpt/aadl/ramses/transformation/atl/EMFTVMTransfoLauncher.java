@@ -42,7 +42,6 @@ import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PropertySet;
 
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 
 public abstract class EMFTVMTransfoLauncher
@@ -81,10 +80,10 @@ public abstract class EMFTVMTransfoLauncher
 
   
   
-  protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher)
+  protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher,
+                                                       List<Resource> predefinedAadlModels)
   {
-    for(Resource r: RamsesConfiguration.getPredefinedResourcesManager()
-    		.getPredefinedResources())
+    for(Resource r: predefinedAadlModels)
     {
       String name;
       EObject obj = r.getContents().get(0);

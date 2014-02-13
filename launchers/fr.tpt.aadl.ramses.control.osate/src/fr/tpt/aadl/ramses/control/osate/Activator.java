@@ -21,13 +21,17 @@
 
 package fr.tpt.aadl.ramses.control.osate;
 
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.BundleContext;
+import org.eclipse.jface.resource.ImageDescriptor ;
+import org.eclipse.ui.plugin.AbstractUIPlugin ;
+import org.osate.ui.dialogs.Dialog ;
+import org.osgi.framework.BundleContext ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -53,9 +57,32 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		ContributedAadlRegistration car = new ContributedAadlRegistration();
-		RamsesConfiguration.setPredefinedResourcesRegistration(car);
-		ServiceRegistryProvider.setDefault(new OSGiServiceRegistry()) ;
+		
+		try
+    {
+		  /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
+		  WorkbenchUtils.setResourceDirectories() ;
+    }
+    catch(Exception e)
+    {
+      // DEBUG
+      e.printStackTrace();
+      
+      Dialog.showError("Configuration Error",
+                       "Not enable to fetch RAMSES directory: \n\n" +
+                       e.getMessage());
+    }
+		
+		ServiceRegistry sr = new OSGiServiceRegistry() ;
+		AadlModelInstantiatior instantiator ;
+		instantiator = new AadlModelsManagerImpl(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
+		
+		PredefinedAadlModelManager modelManager ;
+		modelManager = new ContributedAadlRegistration() ;
+		
+		sr.init(instantiator, modelManager);
+		ServiceRegistryProvider.setDefault(sr) ;
+		/**************************************************************************/
 	}
 
 	/*

@@ -21,585 +21,338 @@
 
 package fr.tpt.aadl.ramses.control.osate;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.io.File ;
+import java.util.Set ;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.transaction.RecordingCommand;
-import org.eclipse.emf.transaction.RollbackException;
-import org.eclipse.emf.transaction.TransactionalCommandStack;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.PreferenceDialog;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.views.contentoutline.ContentOutline;
-import org.eclipse.xtext.resource.EObjectAtOffsetHelper;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.ui.editor.XtextEditor;
-import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
-import org.eclipse.xtext.util.concurrent.IUnitOfWork;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.instantiation.InstantiateModel;
-import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter;
-import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter;
-import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
-import org.osate.core.OsateCorePlugin;
-import org.osate.ui.dialogs.Dialog;
+import org.eclipse.core.commands.AbstractHandler ;
+import org.eclipse.core.commands.ExecutionEvent ;
+import org.eclipse.core.commands.ExecutionException ;
+import org.eclipse.core.resources.IFile ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IResource ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.CoreException ;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.IStatus ;
+import org.eclipse.core.runtime.NullProgressMonitor ;
+import org.eclipse.core.runtime.Status ;
+import org.eclipse.core.runtime.jobs.Job ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.transaction.RecordingCommand ;
+import org.eclipse.emf.transaction.TransactionalCommandStack ;
+import org.eclipse.emf.transaction.TransactionalEditingDomain ;
+import org.eclipse.jface.viewers.ISelection ;
+import org.eclipse.jface.viewers.IStructuredSelection ;
+import org.eclipse.ui.IEditorPart ;
+import org.eclipse.ui.handlers.HandlerUtil ;
+import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.instantiation.InstantiateModel ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter ;
+import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
+import org.osate.core.OsateCorePlugin ;
+import org.osate.ui.dialogs.Dialog ;
 
-import com.google.inject.Inject;
-
-import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
-import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl;
+import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
 
 public class GenerateActionHandler extends AbstractHandler {
 
-	@Inject
-	private EObjectAtOffsetHelper eObjectAtOffsetHelper;
-	private Set<File> _includeDirSet = null;
-	protected String _targetName;
-	protected String _targetPath;
-	public String _outputDir;
-	private static int TEXT_FIELD_WIDTH = 43;
-	private static CustomDialog customdiag;
-	private static final String extension = "org.eclipse.ui.propertyPages";
-	protected static final InternalErrorReporter 
-	                                           internalErrorLogger = 
-	                                           new LogInternalErrorReporter
-	                                           (OsateCorePlugin
-	                                           .getDefault().getBundle());
-
-  private static IProject currentProject;
-
-  private static  enum code
-  {
-    YES,
-    NO;
-  }
-
-	
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-
-	  
-		final TransactionalEditingDomain domain = TransactionalEditingDomain.Registry.INSTANCE
-				.getEditingDomain("org.osate.aadl2.ModelEditingDomain");
-		// We execute this command on the command stack because otherwise, we will not
-		//  have write permissions on the editing domain.
-		Command cmd = new RecordingCommand(domain) {
-
-			protected void doExecute() {
-				doCodeGeneration();
-			}
-		};
-		
-		try {
-			((TransactionalCommandStack) domain.getCommandStack()).execute(cmd, null);
-			return null;
-		} catch (InterruptedException e) {
-			// TODO Manage with error reporter
-			e.printStackTrace();
-		} catch (RollbackException e) {
-			// TODO Manage with error reporter
-			e.printStackTrace();
-		}
-		finally {
-			HookAccessImpl.cleanupTransformationTrace();
-		}
-		return null;
-	}
+  private static final String _JOB_NAME = "RAMSES code generation" ;
   
-	private class CustomDialog extends TitleAreaDialog
-	{
-	  private Label    label;
-	  private Text     outputPathText;
-	  private String   _outputTargetPath;
-	  private Button  yesButton;
-	  private Button   noButton;
-	  private String   code;
+  protected static final InternalErrorReporter 
+                                             internalErrorLogger = 
+                                             new LogInternalErrorReporter
+                                             (OsateCorePlugin
+                                             .getDefault().getBundle());
 
-    public String getCode()
-    {
-      return code ;
-    }
-
-    public void setCode(String code)
-    {
-      this.code = code ;
-    }
-
-    public CustomDialog(
-                        Shell parentShell, String path)
-    {
-      super(parentShell) ;
-      _outputTargetPath = path;      
-    }
-	  
-    @Override
-    public void create() {
-      super.create();
-      setTitle("Do you want to change the default path ?");
-      //setMessage("This is the target path, do you want to change it ?", IMessageProvider.INFORMATION);
-    }
-
-    @Override
-    protected Control createDialogArea(Composite parent) {
-      Composite area = (Composite) super.createDialogArea(parent);
-      Composite container = new Composite(area, SWT.NONE);
-      container.setLayoutData(new GridData(GridData.FILL_BOTH));
-      GridLayout layout = new GridLayout(1, false);
-      container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-      container.setLayout(layout);
-
-      createWidgets(container);
-      return area;
-    }
+  private static final String _OUTLINE_COMMAND_ID = 
+                         "fr.tpt.aadl.ramses.control.osate.outline.generation" ;
+//  private static final String MENU_OR_BUTTON_COMMAND_ID = 
+//                        "fr.tpt.aadl.ramses.control.osate.instance.generation" ;
+  
+  @Override
+  public Object execute(final ExecutionEvent event) throws ExecutionException
+  {
+    IProject currentProject = WorkbenchUtils.getProjectResource() ;
     
-    @Override
-    protected void createButtonsForButtonBar(Composite parent)
-    {
-      yesButton = createButton(parent, SWT.YES, "Yes", false);
-      yesButton.setEnabled(true);
-//      yesButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));;
-      
-      yesButton.addSelectionListener(new SelectionAdapter()
-      {
-        public void widgetSelected(SelectionEvent e)
-        {
-          close();
-          setCode("YES");
-        }
-      });
-    
-      noButton = createButton(parent, SWT.NO, "No", true);
-      noButton.setEnabled(true);
-//      noButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 1, 1));
-      
-      noButton.addSelectionListener(new SelectionAdapter()
-      {
-        public void widgetSelected(SelectionEvent e)
-        {
-          close();
-          setCode("NO");
-        }
-      });   
-    }
-    
-    private void createWidgets(Composite container) {
-            
-      GridData dataOutputPath = new GridData(SWT.CENTER, SWT.CENTER, true, true);      
-      outputPathText = new Text(container, SWT.BORDER);
-      outputPathText.setLayoutData(dataOutputPath);
-      outputPathText.setEditable(false);
-      if(_outputTargetPath != null)
-        outputPathText.setText(_outputTargetPath);
-    }
+    // Reinitialize the registry as include directors (eg projects directories),
+    // may be added or deleted.
 
-	}
-	
-	public void CreateCustomDialog(Shell sh, String path)
-	{
-	  customdiag = new CustomDialog(sh, path);
-	}
-
-	public void retreivePersistentConfiguration()
-	{
-		// try to retreive information from persistent properties
-	    try {
-			_outputDir = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.PATH_ID));
-			if (_outputDir == null)
-				_outputDir = RamsesPropertyPage.getDefaultOutputDir((IResource)currentProject);
-			_targetPath = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.PLATFORM_PATH));
-			_targetName = currentProject.getPersistentProperty(new QualifiedName(RamsesPropertyPage.PREFIX, RamsesPropertyPage.TARGET_ID));
-		} catch (CoreException e) {
-			Dialog.showError("Configuration Error", "Porperties were not reachable for project " + currentProject.getName());
-		}
-	}
-
-	@SuppressWarnings("static-access")
-  void doCodeGeneration()
-	{	
-
-	  Display display = Display.getCurrent();
-	  Shell shell = new Shell(display, SWT.BORDER);
-	  
-	  if((RamsesConfiguration.getRuntimeDir() == null) 
-	        || (RamsesConfiguration.getRuntimeDir().equals(""))
-	        || (RamsesConfiguration.getOutputDir() == null))
-	  {
-		
-	    // get a reference to current project
-	    if(currentProject == null)
-	    {
-	      if((currentProject = getProjectResource()) == null)
-	      {
-	        Dialog.showError("Configuration Error",
-	              "No editor displayed ");
-	      }
-	    }
-	    
-	    retreivePersistentConfiguration();
-	    
-	    if(_outputDir == null || _targetName == null || _targetPath ==null)
-	    {
-	      //Instanciate the propertyPage  
-	      PreferenceDialog prefDiag = PreferencesUtil.
-	  	        createPropertyDialogOn(shell, currentProject,
-	  	                               "fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage",
-	  	                                 null, null);
-	  	  if(prefDiag.open() == Window.CANCEL)
-	  	  {
-	  	    return;
-	  	  }
-	    }
-	    retreivePersistentConfiguration();
-	    
-	    RamsesConfiguration.setOutputDir(new File(_outputDir));
-	    RamsesConfiguration.setRuntimeDir(_targetPath);
-	    
-	    RamsesConfiguration.setCurrentProject(currentProject);
-	    
-	  }
-
-    IWorkbench wb = PlatformUI.getWorkbench();
-    IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-    IWorkbenchPage page = win.getActivePage();
-    IWorkbenchPart part = page.getActivePart();   
-    final ISelection selection;
-    IEditorPart activeEditor = page.getActiveEditor();
-
-		if (activeEditor != null){
-			XtextEditor xtextEditor = (activeEditor == null)?null:(XtextEditor) activeEditor.getAdapter(XtextEditor.class);
-			if (part instanceof ContentOutline) {
-				selection = ((ContentOutline) part).getSelection();
-			} else {
-				selection = (ITextSelection) xtextEditor.getSelectionProvider().getSelection();
-			}
-			if (xtextEditor != null) {
-				// make sure the model has been saved
-				if (xtextEditor.isDirty())
-				  xtextEditor.doSave(new NullProgressMonitor());
-
-				xtextEditor.getDocument().readOnly(
-						new IUnitOfWork<EObject, XtextResource>() {
-							public EObject exec(XtextResource resource) throws Exception {
-								EObject targetElement = null;
-								if (selection instanceof IStructuredSelection) {
-									IStructuredSelection ss = (IStructuredSelection) selection;
-									Object eon = ss.getFirstElement();
-									if (eon instanceof EObjectNode) {
-										targetElement = ((EObjectNode)eon).getEObject(resource);
-									}
-								} else {
-									targetElement = eObjectAtOffsetHelper.resolveContainedElementAt(resource,
-											((ITextSelection)selection).getOffset());
-								}
-
-								if (targetElement != null) {
-									if (targetElement instanceof Element){
-										ComponentImplementation cc = ((Element) targetElement).getContainingComponentImpl();
-										if (cc instanceof SystemImplementation){
-											SystemImplementation si = (SystemImplementation)cc;
-											try
-											{
-												SystemInstance sinst=null;
-												URI instanceURI = OsateResourceUtil.getInstanceModelURI(si);
-												Resource sintResource = OsateResourceUtil.getResourceSet().getResource(instanceURI, false);
-												if(sintResource!=null)
-												{
-													sinst = (SystemInstance) sintResource.getContents().get(0);
-												}	
-												else
-													sinst = InstantiateModel.buildInstanceModelFile(si);
-												if (sinst == null)
-												{
-													String message;
-													message = "Error when instantiating the model";
-													if (InstantiateModel.getErrorMessage() != null)
-													{
-														message = message + " - reason: " + InstantiateModel.getErrorMessage() + "\nRefer to the help content and FAQ for more information";
-													}
-													Dialog.showError("Model Instantiate", message);
-												}
-												else
-												{	
-													ServiceRegistry registry;
-													registry = ServiceRegistryProvider.getServiceRegistry() ;
-													Generator generator = registry.getGenerator(_targetName) ;
-													IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-													String workspaceURI = si.eResource().getURI().trimFragment().toString();
-													workspaceURI = workspaceURI.substring(0, workspaceURI.lastIndexOf("/"));
-													java.net.URI modelURI = new java.net.URI(workspaceURI);
-													
-													URI resourceURI = URI.createPlatformPluginURI("fr.tpt.aadl.ramses.transformation.atl", false);
-													java.net.URI uri = new java.net.URI(resourceURI.toString());
-													URL url = FileLocator.toFileURL(uri.toURL());
-
-													File resourceDir = new File(url.toURI()); 
-													RamsesConfiguration.setRamsesResourcesDir(resourceDir);
-													RamsesConfiguration.setRuntimeDir(_targetPath);
-													RamsesConfiguration.setIncludeDir(sinst.getSystemImplementation().eResource(), _includeDirSet, _targetName);
-													// look for a wokflow file
-													Resource r = si.eResource();
-													String s = r.getURI().segment(1);
-													File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
-													String workflow = GenerateActionUtils.findWorkflow(rootDir);
-
-													File outputDir = RamsesConfiguration.getOutputDir();
-													if(workflow==null)
-														generator.generate(sinst, 
-																resourceDir,
-																outputDir) ;
-													else
-													{
-														EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
-														generator.generateWorkflow(sinst,
-																resourceDir,
-																outputDir,
-																xmlPilot);
-
-													}
-												}
-												ResourcesPlugin.getWorkspace().getRoot().
-												refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-
-											}
-											catch (UnsupportedOperationException uoe)
-											{
-												Dialog.showError("Code Generation", "Operation is not supported: " + uoe.getMessage());
-											}
-											catch (Exception other)
-											{
-												other.printStackTrace();
-												Dialog.showError("Code Generation", "Error when generating code");
-											}
-
-										} 
-										else 
-										{
-											Dialog.showInfo("Model Instantiation","Must select a system implementation. Selected " + targetElement.eClass().getName()+" "+targetElement.toString());
-										}
-									} else {
-										Dialog.showInfo("Model Instantiation","Please select an AADL model element. You selected " + targetElement.eClass().getName()+" "+ targetElement.toString());
-									}
-									return null;
-								}
-								return null;
-							}
-						});
-			}
-		}
-//		ramsesMonit.worked(1);
-//		ramsesMonit.done();
-	}
- 
-	public IProject getProjectResource()
-	{
-	  IWorkbench wb = PlatformUI.getWorkbench();
-	  IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-	  IWorkbenchPage page = win.getActivePage();
-	  IEditorPart activeEditor = page.getActiveEditor();
-	  IProject project = null;
-	  IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-	  IProject projects[] = root.getProjects();
-	  for(IProject p : projects)
-	  {
-
-	    if(!p.getName().equals("Plugin_Resources"))
-	    {
-
-	      if(p.isOpen())
-	      {
-	        activeEditor = page.getActiveEditor();
-
-	        if(activeEditor  != null)
-	        {
-	          IFileEditorInput input = (IFileEditorInput)activeEditor.getEditorInput() ;
-	          IFile file = input.getFile();
-	          IProject activeProject = file.getProject();
-	          String activeProjectName = activeProject.getName();
-	          if(p.getName().equals(activeProjectName))
-	          {
-	            project = p;
-	            break;
-	          }
-	        }
-	      }
-
-	    }
-	  }
-
-    return project ;
-	  
-	}
-	
-	public IProgressMonitor createIProgressMonitor()
-	{
-	  return new IProgressMonitor()
-    {
-      
-      @Override
-      public void worked(int work)
-      {
-        // TODO Auto-generated method stub
-        
-      }
-      
-      @Override
-      public void subTask(String name)
-      {
-        // TODO Auto-generated method stub
-        
-      }
-      
-      @Override
-      public void setTaskName(String name)
-      {
-        // TODO Auto-generated method stub
-        
-      }
-      
-      @Override
-      public void setCanceled(boolean value)
-      {
-        // TODO Auto-generated method stub
-        
-      }
-      
-      @Override
-      public boolean isCanceled()
-      {
-        // TODO Auto-generated method stub
-        return false ;
-      }
-      
-      @Override
-      public void internalWorked(double work)
-      {
-        // TODO Auto-generated method stub
-        
-      }
-      
-      @Override
-      public void done()
-      {
-        // TODO Auto-generated method stub
-        
-      }
-      
-      @Override
-      public void beginTask(String name,
-                            int totalWork)
-      {
-        // TODO Auto-generated method stub
-        
-      }
-    };
-	 
-	}
-
-	public void doCodeGenerationMonit(Shell shell)
-	{
-    ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
+    // Fetch RAMSES configuration.
+    RamsesConfiguration config = null ;
     try
     {
-      dialog.run(true, true, new IRunnableWithProgress(){
-           public void run(IProgressMonitor monitor) throws InterruptedException {
-               monitor.beginTask("This process may take several seconds...", 3);
-               // execute the task ...
-               TimeUnit.SECONDS.sleep(1);
-               monitor.done();
-           }
-       });
+      config = RamsesPropertyPage.fetchProperties(currentProject) ;
     }
-    catch(InvocationTargetException e)
+    catch (ConfigurationException ee)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      if(RamsesPropertyPage.openPropertyDialog(currentProject))
+      {
+        try
+        {
+          // Reload configuration.
+          config = RamsesPropertyPage.fetchProperties(currentProject) ;
+        }
+        catch (Exception e)
+        {
+          Dialog.showError("Configuration Error",
+                           "Not enable to load RAMSES properties: \n\n" +
+                           e.getMessage());
+          
+          // Abort generation. Error has already been reported at this point.
+          return null ;
+        }
+      }
+      else // User has canceled.
+      {
+        return null ;
+      }
     }
-    catch(InterruptedException e)
+    catch (CoreException e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } 
-	}
+      Dialog.showError("Configuration Error",
+                       "Not enable to load RAMSES properties: \n\n" +
+                       e.getMessage());
+      
+      // Abort generation. Error has already been reported at this point.
+      return null ;
+    }
+    
+    // if (config.checkForGeneration())
+    {
+      doGenerate(currentProject, event, config) ;
+    }
+    /*else // Configuration is missing.
+    {
+      // TODO report ?
+      return null ;
+    }
+    */
+    return null ;
+  }
+  
+  private SystemInstance getSelectedSystemInstance(ExecutionEvent event)
+  {
+    ISelection s = HandlerUtil.getCurrentSelection(event) ;
+    IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;
+    Resource resource = OsateResourceUtil.getResource((IResource) node) ;
+    return (SystemInstance) resource.getContents().get(0) ;
+  }
+  
+  private SystemImplementation getOutlineSelectedSystem(ExecutionEvent event,
+                                                        IEditorPart editor)
+                                                        throws Exception
+  {
+    SystemImplementation result = null ;
+    
+    try
+    {
+      ISelection s = HandlerUtil.getCurrentSelection(event) ;
+      
+      // Prior checking were performed on the selection (for instance, object type).
+      // See OutlinePropertyTester.
+      // It doesn't worth to perform theses checking twice.
+      
+      EObjectNode node = (EObjectNode)((IStructuredSelection) s).getFirstElement() ;
+      Resource resource = OsateResourceUtil.getResource(node.getEObjectURI()) ;
+      EObject obj = node.getEObject(resource) ;
+      result = (SystemImplementation) obj ;
+    }
+    catch (Exception e)
+    {
+      String message;
+      message = "Not enable to fetch the selected system implementation node";
+      if (InstantiateModel.getErrorMessage() != null)
+      {
+        message = message + " - reason: " + InstantiateModel.getErrorMessage() +
+                     "\nRefer to the help content and FAQ for more information";
+      }
+      Dialog.showError("Model Instantiate", message);
+      
+      throw e ;
+    }
+    
+    return result ;
+  }
+  
+  private void jobCore( IProject currentProject,
+                        ExecutionEvent event,
+                        RamsesConfiguration config,
+                        IProgressMonitor monitor
+                      ) throws Exception
+  {
+    SystemInstance sysInstance = null ;
+    
+    // Make sur that this xtext editor is saved.
+    IEditorPart editor = HandlerUtil.getActiveEditor(event) ;
+    WorkbenchUtils.saveEditor(editor);
+    
+    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+    AadlModelInstantiatior instantiator =sr.getModelInstantiatior() ;
+    
+    instantiator.setProgressMonitor(monitor);
+    
+    // For the executed command from outline menu,the system implementation 
+    // root has to be instantiated prior to the code generation.
+    if(_OUTLINE_COMMAND_ID.equals(event.getCommand().getId()))
+    {
+      SystemImplementation sysImpl = null ;
+      // Fetch system implementation model.
+      sysImpl = getOutlineSelectedSystem(event, editor) ;
+      
+      // Fetch instantiate the model.
+      sysInstance = instantiator.instantiate(sysImpl) ;
+    }
+    else
+    {
+      // For executed command from the button or the RAMSES menu,system
+      // implementation has already been instantiated.
+      sysInstance = getSelectedSystemInstance(event) ;
+    }
+    
+    generate(currentProject, sysInstance, config, monitor);
+  }
+  
+  private void doGenerate(final IProject currentProject,
+                          final ExecutionEvent event,
+                          final RamsesConfiguration config)
+  {
+    Job job = new Job(_JOB_NAME)
+    {
+      @Override
+      protected IStatus run(final IProgressMonitor monitor)
+      {
+        IStatus result = null ;
+        
+        final TransactionalEditingDomain domain =
+              TransactionalEditingDomain.Registry.INSTANCE
+                    .getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
+        // We execute this command on the command stack because otherwise, we will
+        // not have write permissions on the editing domain.
+        RecordingCommand cmd = new RecordingCommand(domain)
+        {
+          protected void doExecute()
+          {
+            try
+            {
+              jobCore(currentProject, event, config, monitor) ;
+              this.setLabel("OK");
+            }
+            catch(Exception e)
+            {
+              // TODO Manage with error reporter
+              e.printStackTrace() ;
+              this.setLabel("CANCEL");
+            }
+          }
+        } ;
 
-	 public void run(IAction action) {
-	    Job job = new Job("Test Job") {
-	      @Override
-	      protected IStatus run(IProgressMonitor monitor) {
-	        // Set total number of work units
-	        monitor.beginTask("start task", 100);
-	 
-	        for (int i = 0; i < 10; i++) {
-	          try {
-	            Thread.sleep(1000);
-	            monitor.subTask("doing " + i);
-	            // Report that 10 units are done
-	            monitor.worked(10);
-	          } catch (InterruptedException e1) {
-	            e1.printStackTrace();
-	          }
-	        }
-	        return Status.OK_STATUS;
-	      }
-	    };
-	 
-	    job.schedule();
-	  }
+        try
+        {
+          ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
+                                                                         null) ;
+        }
+        catch(Exception e)
+        {
+          // TODO Manage with error reporter
+          e.printStackTrace() ;
+          result = Status.CANCEL_STATUS ;
+        }
+        finally
+        {
+          HookAccessImpl.cleanupTransformationTrace() ;
+        }
+        
+        if(result == null)
+        {
+          result = ("OK".equals(cmd.getLabel())) ? Status.OK_STATUS :
+                                                   Status.CANCEL_STATUS ; 
+        }
+        
+        return result ;
+      }
+    };
+    
+    job.setUser(true);
+    job.schedule();
+  }
+
+  private void generate(IProject currentProject,
+                        SystemInstance sinst,
+                        RamsesConfiguration config,
+                        IProgressMonitor monitor)
+                        throws Exception
+  {
+    try
+    {
+      ServiceRegistry registry;
+      registry = ServiceRegistryProvider.getServiceRegistry() ;
+      Generator generator = registry.getGenerator(config.getTargetId()) ;
+      
+      SystemImplementation sysImpl = sinst.getSystemImplementation() ;
+      
+      IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+      
+      // look for a workflow file
+      Resource r = sysImpl.eResource();
+      String s = r.getURI().segment(1);
+      File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
+      String workflow = GenerateActionUtils.findWorkflow(rootDir);
+      
+      AnalysisErrorReporterManager errReporter = 
+                                WorkbenchUtils.getAnalysisErrReporterManager() ;
+      
+      Set<File> tmp = WorkbenchUtils.getIncludeDirs(currentProject) ;
+      File[] includeDirs = new File[tmp.size()] ;
+      tmp.toArray(includeDirs) ;
+      
+      if(workflow==null)
+        generator.generate(sinst, 
+                           config.getRuntimePath(),
+                           config.getOutputDir(),
+                           includeDirs,
+                           errReporter,
+                           monitor) ;
+      else
+      {
+        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
+        generator.generateWorkflow(sinst,
+                                   xmlPilot,
+                                   config.getRuntimePath(),
+                                   config.getOutputDir(),
+                                   includeDirs,
+                                   errReporter,
+                                   monitor);
+      }
+      
+      ResourcesPlugin.getWorkspace().getRoot().
+      refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); 
+    }
+    catch (UnsupportedOperationException uoe)
+    {
+      Dialog.showError("Code Generation", "Operation is not supported:\n" +
+                       uoe.getMessage());
+      throw uoe ;
+    }
+    catch (Exception other)
+    {
+      other.printStackTrace();
+      Dialog.showError("Code Generation", "Error when generating code:\n" +
+                       other.getMessage());
+      throw other ;
+    }
+  }
 }

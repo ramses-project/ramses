@@ -287,21 +287,21 @@ public interface AnalysisResultPackage extends EPackage {
 
 
 	/**
-	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.analysis.AnalysisArtifact <em>Analysis Artifact</em>}'.
+	 * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact <em>Analysis Artifact</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Analysis Artifact</em>'.
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisArtifact
+	 * @see fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact
 	 * @generated
 	 */
 	EClass getAnalysisArtifact();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link fr.tpt.aadl.ramses.analysis.AnalysisArtifact#getResults <em>Results</em>}'.
+	 * Returns the meta object for the containment reference list '{@link fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact#getResults <em>Results</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Results</em>'.
-	 * @see fr.tpt.aadl.ramses.analysis.AnalysisArtifact#getResults()
+	 * @see fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact#getResults()
 	 * @see #getAnalysisArtifact()
 	 * @generated
 	 */

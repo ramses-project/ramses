@@ -14,6 +14,8 @@ import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
 import org.eclipse.m2m.atl.emftvm.Metamodel;
 import org.eclipse.m2m.atl.emftvm.Model;
 
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlEMFTVMLauncher;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel;
@@ -26,8 +28,19 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	
 	AnalysisModel wcetModel;
 	
-	public Wcet2AadlEMFTVMLauncher(AnalysisModel model) throws ATLCoreException {
-		EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, ReducedbaPackage.eINSTANCE) ;
+	/* Some how, this class has to implements AbstractAadlToAadl
+	static
+	{
+	  _resourcesDirNames.add("Wcetanalysis") ;
+	}
+	*/
+	public Wcet2AadlEMFTVMLauncher(AnalysisModel model,
+	                               AadlModelInstantiatior modelInstantiator,
+	                               PredefinedAadlModelManager predefinedResourcesManager)
+	                                     throws ATLCoreException
+	{
+		super(modelInstantiator, predefinedResourcesManager) ;
+	  EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, ReducedbaPackage.eINSTANCE) ;
 		wcetModel = model;
 		this.initTransformation();
 	}

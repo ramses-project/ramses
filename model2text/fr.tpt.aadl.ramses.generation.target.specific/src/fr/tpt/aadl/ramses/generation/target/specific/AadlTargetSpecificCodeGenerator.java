@@ -21,30 +21,28 @@
 
 package fr.tpt.aadl.ramses.generation.target.specific;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.File ;
+import java.util.ArrayList ;
+import java.util.List ;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.ProcessSubcomponent;
-import org.osate.aadl2.ProcessorSubcomponent;
-import org.osate.aadl2.PublicPackageSection;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.SystemInstance;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.PublicPackageSection ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.SystemInstance ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
-import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator;
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser ;
+import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
+import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
+import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
 
 
 public class AadlTargetSpecificCodeGenerator
@@ -65,20 +63,27 @@ public class AadlTargetSpecificCodeGenerator
     _targetBuilderGen = targetBuilderGen ;
   }
   
-  public void setParameters(Map<Enum<?>, Object> parameters)
+  public boolean runtimePathChecker(File runtimePath)
   {
-    throw new UnsupportedOperationException() ;
+    return _targetBuilderGen.runtimePathChecker(runtimePath) ;
   }
   
-  //  @Override
+  public String getRuntimePathEnvVar()
+  {
+    return _targetBuilderGen.getRuntimePathEnvVar() ;
+  }
+  
   public void generate(Resource inputResource,
-                       File generatedFilePath) throws GenerationException
+                       File runtimePath,
+                       File outputDir,
+                       File[] includeDirs, 
+                       IProgressMonitor monitor) throws GenerationException
   {
 	List<SystemImplementation> systemImplementationList=new ArrayList<SystemImplementation>();
 	
 	if ((inputResource == null ) || (inputResource.getContents() == null) || (inputResource.getContents().size() <= 0))
 	{
-		throw new GenerationException("Cannot find source models");
+		throw new GenerationException("Cannot find AADL model sources");
 	}
 	
 	EObject root = inputResource.getContents().get(0);
@@ -100,60 +105,62 @@ public class AadlTargetSpecificCodeGenerator
 	  throw new GenerationException("Try to generate from a resources that is into an AADL model");
 	}
 	File generatedCodeDirectory =
-          new File(generatedFilePath + GENERATED_DIR_NAME) ;
+          new File(outputDir + GENERATED_DIR_NAME) ;
     generatedCodeDirectory.mkdir() ;
 
-    IProgressMonitor ramsesMonit = RamsesConfiguration.getRamsesMonitor();
-    if(ramsesMonit!=null)
-    {
-    	ramsesMonit.subTask("Code generation ..."); 
-    	RamsesConfiguration.waitUnitOfTime(1);
-    }
+    monitor.subTask("Code generation ..."); 
+//  RamsesConfiguration.waitUnitOfTime(1);
     
     for(SystemImplementation sys: systemImplementationList)
     {
       SystemImplementation si = (SystemImplementation) sys ;
-      File generatedFileDir = new File(generatedFilePath + GENERATED_DIR_NAME);
+      File generatedFileDir = new File(outputDir + GENERATED_DIR_NAME);
 
       // XXX Have AadlGenericUnparser to unparse the SystemImplementation
       // object ?
       TargetProperties tarProp=null;
       if(_targetUnparser != null)
-        tarProp = _targetUnparser.process(si, generatedFilePath);
+        tarProp = _targetUnparser.process(si, runtimePath,
+                                          outputDir, monitor);
 
       for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
       {
         // create directory with the processor subcomponent name
         File processorFileDir =
-              new File(generatedFileDir + "/" + ps.getName()) ;
+              new File(generatedFileDir + File.separator + ps.getName()) ;
         processorFileDir.mkdir() ;
         if(_targetBuilderGen != null)
-          _targetBuilderGen.process(ps, processorFileDir) ;
+          _targetBuilderGen.process(ps, runtimePath,
+                                    processorFileDir, includeDirs, monitor);
 
         File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
         if(_targetUnparser != null)
-          _targetUnparser.process(ps, kernelFileDir, tarProp);
+          _targetUnparser.process(ps, tarProp, runtimePath,
+                                  kernelFileDir, monitor);
         List<ProcessSubcomponent> ownedProcess = 
               GeneratorUtils.getBindedProcesses(ps) ;
 
         for(ProcessSubcomponent process : ownedProcess)
         {
           String generationTargetDirectory = processorFileDir +
-                "/" + process.getName() ;
+                File.separator + process.getName() ;
           File processDirectory = new File(generationTargetDirectory) ;
           processDirectory.mkdir() ;
 
           _genericUnparser.process(process, processDirectory) ;
           if(_targetUnparser!=null)
-            _targetUnparser.process(process, processDirectory, tarProp);
+            _targetUnparser.process(process, tarProp, runtimePath,
+                                    processDirectory, monitor);
           if(_targetBuilderGen!= null)
-            _targetBuilderGen.process(process, processDirectory) ;
+            _targetBuilderGen.process(process, runtimePath,
+                                      processDirectory, includeDirs, monitor) ;
         }
 
         // This line is at the end because it will launch the build of the generated code;
         // Thus it is better is the code has been generated...
         if(_targetBuilderGen!= null)
-          _targetBuilderGen.process(si, generatedFileDir) ;
+          _targetBuilderGen.process(si, runtimePath,
+                                    generatedFileDir, includeDirs, monitor) ;
 
       }
     }

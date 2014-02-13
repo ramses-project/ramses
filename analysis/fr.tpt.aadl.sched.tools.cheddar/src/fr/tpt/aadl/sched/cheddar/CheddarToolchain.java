@@ -1,5 +1,6 @@
 package fr.tpt.aadl.sched.cheddar ;
 
+import java.io.File ;
 import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
@@ -9,6 +10,7 @@ import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
+import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter ;
 import fr.tpt.aadl.sched.cheddar.events.SimulationData ;
 import fr.tpt.aadl.sched.cheddar.events.TaskActivation ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarModel ;
@@ -23,23 +25,26 @@ public class CheddarToolchain
   private CheddarSimulator simulator ;
   private SimulationXML2Data importer ;
   private SimulationData simulation ;
+  
+  private File _outputDir ;
 
   private final String prefix ;
 
-  public CheddarToolchain(
-                          String prefix, SystemInstance root,
+  public CheddarToolchain(String prefix, SystemInstance root,
+                          File outputDir,
                           AnalysisErrorReporterManager errManager)
   {
+    this._outputDir = outputDir ;
     this.prefix = prefix ;
     this.root = root ;
     this.errManager = errManager ;
   }
 
-  public CheddarToolchain(
-                          SystemInstance root,
+  public CheddarToolchain(SystemInstance root,
+                          File outputDir,
                           AnalysisErrorReporterManager errManager)
   {
-    this("", root, errManager) ;
+    this("", root, outputDir, errManager) ;
   }
 
   public void resetSchedulingData()
@@ -55,7 +60,7 @@ public class CheddarToolchain
   {
     if(exporter == null)
     {
-      exporter = new AADL2Cheddar(prefix, root, errManager, scaling) ;
+      exporter = new AADL2Cheddar(prefix, root, _outputDir, errManager, scaling) ;
     }
 
     exporter.createCheddarModel() ;
@@ -70,11 +75,6 @@ public class CheddarToolchain
   public CheddarModel getCheddarModel()
   {
     return exporter.getCheddarModel() ;
-  }
-
-  public String getCheddarModelPath()
-  {
-    return exporter.getCheddarXMLPath() ;
   }
 
   public void exportAndSimule()

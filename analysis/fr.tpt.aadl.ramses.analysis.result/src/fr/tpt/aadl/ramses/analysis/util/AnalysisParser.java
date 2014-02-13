@@ -6,8 +6,8 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisArtifact;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 
 public class AnalysisParser {
 
