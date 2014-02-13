@@ -402,7 +402,16 @@ public class AadlUtil
 	String precision = "";
 	if(Platform.isRunning())
 	{
-		Property prop = GetProperties.lookupPropertyDefinition(ne, "AADL_Project", "Timing_Precision") ;
+		Property prop = null;
+		try{
+			prop = GetProperties.lookupPropertyDefinition(ne, "AADL_Project", "Timing_Precision") ;
+		}
+		catch(Exception e)
+		{
+			return "ms";
+		}
+		if(prop==null)
+			return "ms";
 		UnitLiteral sl = (UnitLiteral) prop.getDefaultValue() ;
 		precision = sl.getName();
 	}
