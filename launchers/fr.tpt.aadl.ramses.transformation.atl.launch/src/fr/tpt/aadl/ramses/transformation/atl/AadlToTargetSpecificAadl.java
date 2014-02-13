@@ -140,48 +140,41 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 
   public static Resource extractAadlResource(Resource inputResource, File outputFile) throws InterruptedException, ExecutionException, CoreException, IOException, RecognitionException
   {
-	  URI uri;
-	  SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
-	  if(Platform.isRunning())
-	  {
-		 
-		  String workspaceLocation = ResourcesPlugin.getWorkspace()
+    URI uri;
+    SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
+    final Resource xtextResource;
+    if(Platform.isRunning())
+    { 
+	  String workspaceLocation = ResourcesPlugin.getWorkspace()
 				  .getRoot().getLocationURI().getPath();
-		  int outputPathHeaderIndex = workspaceLocation.length();
-
-		  String outputAbsolutePath = outputFile.getAbsolutePath().toString();
-		  String outputPlatformRelativePath = "";
-		  if(outputPathHeaderIndex>0)
-		  {
-
-			  String inputURI = inputResource.getURI().toString();
-			  String projectName = inputURI.substring(inputURI.indexOf("resource") + 9);
-			  projectName = projectName.substring(0, projectName.indexOf('/'));
-			  
-			  outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName);
-			  outputPlatformRelativePath = outputAbsolutePath.substring(outputPathHeaderIndex);
-			  
-		  }
-		  
-		  outputPlatformRelativePath = outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
-		  		  
-		  uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
-
-		  ResourceSet rs = OsateResourceUtil.getResourceSet();
-		  Resource xtextResource = rs.getResource(uri, true);
-
-		  return xtextResource;
-	  }
-	  else
+	  int outputPathHeaderIndex = workspaceLocation.length();
+	  String outputAbsolutePath = outputFile.getAbsolutePath().toString();
+	  String outputPlatformRelativePath = "";
+	  if(outputPathHeaderIndex>0)
 	  {
-		  uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
-		  
-		  final Resource xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
-		  xtextResource.load(null);
-		  
-		  // Implements a timeout of 10s.
-		  
-		  Callable<Boolean> app = new Callable<Boolean>(){
+	    String inputURI = inputResource.getURI().toString();
+	    String projectName = inputURI.substring(inputURI.indexOf("resource") + 9);
+	    projectName = projectName.substring(0, projectName.indexOf('/'));
+	    outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName);
+	    outputPlatformRelativePath = outputAbsolutePath.substring(outputPathHeaderIndex);
+	  }
+	  outputPlatformRelativePath = outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
+
+	  uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
+
+	  ResourceSet rs = OsateResourceUtil.getResourceSet();
+	  xtextResource = rs.getResource(uri, true);
+
+    }
+    else
+    {
+      uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
+      xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
+      xtextResource.load(null);
+
+      // Implements a timeout of 10s.
+
+      Callable<Boolean> app = new Callable<Boolean>(){
 
         @Override
         public Boolean call() throws Exception
@@ -190,65 +183,105 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
           return true ;
         }
 		    
-		  } ;
+      };
+      FutureTask<Boolean> ft = new FutureTask<Boolean>(app) ;
+      new Thread(ft).start() ;		  
 		  
-		  FutureTask<Boolean> ft = new FutureTask<Boolean>(app) ;
-		  
-		  new Thread(ft).start() ;		  
-		  
-		  try
+      try
       {
-		    ft.get(10, TimeUnit.SECONDS) ;
+        ft.get(10, TimeUnit.SECONDS) ;
       }
       catch (TimeoutException ee)
+      {
+    	// Nothing to do, just continue.
+      }  		  
+      ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+      ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
+      AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
+      Iterator<EObject> iter = xtextResource.getAllContents();
+      while(iter.hasNext())
+      {
+    	Collection<Object> dasList = EcoreUtil.getObjectsByType(iter.next().eContents(), Aadl2Package.eINSTANCE.getDefaultAnnexSubclause());
+		for (Object o : dasList)
+		{
+		  DefaultAnnexSubclause das = (DefaultAnnexSubclause) o;
+		  String annexName = das.getName();
+		  if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
 		  {
-		    // Nothing to do, just continue.
-		  }
-		  		  
-		  ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
-		  ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
-		  AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
-		  Iterator<EObject> iter = xtextResource.getAllContents();
-		  while(iter.hasNext())
-		  {
-			  Collection<Object> dasList = EcoreUtil.getObjectsByType(iter.next().eContents(), Aadl2Package.eINSTANCE.getDefaultAnnexSubclause());
-			  for (Object o : dasList)
-			  {
-				  DefaultAnnexSubclause das = (DefaultAnnexSubclause) o;
-				  String annexName = das.getName();
-				  if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
-				  {
-					  AnnexParser ap = sr.getParser(annexName);
-					  ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
-					  String annexText = das.getSourceText();
-					  if(annexText.length() > 6)
-					  {
-						  annexText = annexText.substring(3, annexText.length() - 3) ;
-					  }
-					  AnnexSubclause as = ap.parseAnnexSubclause(annexName,
+		    AnnexParser ap = sr.getParser(annexName);
+		    ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
+		    String annexText = das.getSourceText();
+		    if(annexText.length() > 6)
+		    {
+			  annexText = annexText.substring(3, annexText.length() - 3) ;
+		    }
+		    AnnexSubclause as = ap.parseAnnexSubclause(annexName,
 							  annexText,
 							  outputFile.getName(),
 							  node.getStartLine(),
 							  node.getOffset(),
 							  errReporter);
-					  AnnexResolver ar = sr.getResolver(annexName) ;
-					  if(as != null && errReporter.getNumErrors() == 0)
-					  {
-						  as.setName(annexName) ;
-						  // replace default annex library with the new one.
-						  EList<AnnexSubclause> ael =
-						  ((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
-						  int idx = ael.indexOf(das) ;
-						  ael.add(idx, as) ;
-						  ael.remove(das) ;
-						  List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
-						  ar.resolveAnnex(das.getName(), annexElements, errManager) ;
-					  }
-				  }
-			  }
+		    AnnexResolver ar = sr.getResolver(annexName) ;
+		    if(as != null && errReporter.getNumErrors() == 0)
+		    {
+		      as.setName(annexName) ;
+		      // replace default annex library with the new one.
+		      EList<AnnexSubclause> ael =
+		    		  ((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
+		      int idx = ael.indexOf(das) ;
+		      ael.add(idx, as) ;
+		      ael.remove(das) ;
+		      List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
+		      ar.resolveAnnex(das.getName(), annexElements, errManager) ;
+		    }
 		  }
-		  return xtextResource;
-	  }
+		}
+      }
+    }
+	  
+    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+    ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
+    AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
+    Iterator<EObject> iter = xtextResource.getAllContents();
+    while(iter.hasNext())
+    {
+      Collection<Object> dasList = EcoreUtil.getObjectsByType(iter.next().eContents(), Aadl2Package.eINSTANCE.getDefaultAnnexSubclause());
+      for (Object o : dasList)
+      {
+    	DefaultAnnexSubclause das = (DefaultAnnexSubclause) o;
+    	String annexName = das.getName();
+    	if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
+    	{
+    	  AnnexParser ap = sr.getParser(annexName);
+    	  ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
+    	  String annexText = das.getSourceText();
+    	  if(annexText.length() > 6)
+    	  {
+    		annexText = annexText.substring(3, annexText.length() - 3) ;
+    	  }
+    	  AnnexSubclause as = ap.parseAnnexSubclause(annexName,
+						  annexText,
+						  outputFile.getName(),
+						  node.getStartLine(),
+						  node.getOffset(),
+						  errReporter);
+    	  AnnexResolver ar = sr.getResolver(annexName) ;
+    	  if(as != null && errReporter.getNumErrors() == 0)
+    	  {
+    		as.setName(annexName) ;
+    		// replace default annex library with the new one.
+    		EList<AnnexSubclause> ael =
+    				((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
+    		int idx = ael.indexOf(das) ;
+    		ael.add(idx, as) ;
+    		ael.remove(das) ;
+    		List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
+    		ar.resolveAnnex(das.getName(), annexElements, errManager) ;
+    	  }
+    	}
+      }
+    }
+    return xtextResource;
   }
 
 abstract public void setParameters(Map<Enum<?>, Object> parameters);
