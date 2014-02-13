@@ -36,9 +36,9 @@ public class WcetAnalysis extends AbstractAnalyzer {
 
 	
 //	private static final String ACTION_NAME = "Compute WCET from AADL model";
-	private static final String REGISTRY_NAME = "WCET";
-	public final static String PLUGIN_NAME = "WCET";
-	private final static String PLUGIN_ID = "fr.tpt.aadl.ramses.control.osate.wcet";
+  private static final String REGISTRY_NAME = "WCET";
+  public final static String PLUGIN_NAME = "WCET";
+  private final static String PLUGIN_ID = "fr.tpt.aadl.ramses.control.osate.wcet";
 
   private String outputModelIdentifier;
   private Resource aadlWithWcet;
@@ -55,20 +55,20 @@ public class WcetAnalysis extends AbstractAnalyzer {
   }
   
   @Override
-  public void setParameters(Map<String, Object> parameters) {
+  public void setParameters(Map<String, Object> parameters) 
+  {
+    mode = (String) parameters.get("Mode");
+    AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
+    parameters.put("AnalysisResult", currentResult);
+    outputModelIdentifier = (String) parameters.get("OutputModelIdentifier");
     if(init)
-    {
-      mode = (String) parameters.get("Mode");
-      AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
       currentResult = f.createAnalysisArtifact();
-      parameters.put("AnalysisResult", currentResult);
-      outputModelIdentifier = (String) parameters.get("OutputModelIdentifier");
+    else
+    {
+      parameters.put("OutputResource", aadlWithWcet);
       init=false;
     }
-    else
-      parameters.put("OutputResource", aadlWithWcet);
   }
-
   
   /*
   @Override
