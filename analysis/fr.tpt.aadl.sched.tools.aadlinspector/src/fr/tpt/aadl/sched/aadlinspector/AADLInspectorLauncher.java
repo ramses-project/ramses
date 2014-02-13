@@ -30,9 +30,9 @@ public class AADLInspectorLauncher
 	
 	private static String getPath()
 	{
-		String aIPath = System.getenv(ENV_VAR);
+		String aIPath = System.getProperty(ENV_VAR);
 		if (aIPath == null)
-			aIPath = System.getProperty(ENV_VAR);
+			aIPath = System.getenv(ENV_VAR);
 		if(aIPath != null)
 		{
 		  aIPath = aIPath.endsWith(File.separator) ? aIPath : aIPath + File.separator;
