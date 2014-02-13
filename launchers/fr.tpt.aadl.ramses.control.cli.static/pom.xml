@@ -96,7 +96,12 @@
       <artifactId>resources</artifactId>
       <version>3.7.100.v20110510-0712</version>
     </dependency>
-
+	
+	<dependency>
+ 	  <groupId>ramses</groupId>
+	  <artifactId>fr.tpt.aadl.ramses.constraints.reporter.metamodel</artifactId>
+	  <version>1.0.0</version>
+    </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
