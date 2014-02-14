@@ -163,6 +163,16 @@ rule CreateStringLiteralPropertyExpression (value : String) {
 	}
 }
 
+rule CreateEnumValuePropertyExpression (value : String) {
+	to
+		pr : AADLBA!NamedValue(namedValue<-el),
+		el : AADLBA!EnumerationLiteral(name<-value)
+	do
+	{
+		pr;
+	}
+}
+
 rule CreateIntegerLiteralPropertyExpression (value: Integer)
 {
 	to
