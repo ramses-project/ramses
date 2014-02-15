@@ -145,7 +145,11 @@ rule m_System_Implementation {
   to
   	implImg : AADLBA!SystemImplementation
 	(
-		name                              <- impl.name,
+		name                              <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
+											 impl.name
+											 else
+											 thisModule.theHOOK.getOutputPackageName()+'.impl'
+											 endif,
 		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory'),
 		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor'),
 		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device'),
@@ -185,7 +189,7 @@ rule m_Thread_Implementation {
 	)
  do
  {
- 	if(impl.debug('------').ownedAnnexSubclause->exists(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)))
+ 	if(impl.ownedAnnexSubclause->exists(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)))
 	{
 		implImg.ownedAnnexSubclause.add
 		(

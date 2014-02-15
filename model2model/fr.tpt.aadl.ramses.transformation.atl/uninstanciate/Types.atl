@@ -183,6 +183,11 @@ rule m_System_Type {
  	type : AADLI!SystemType 
  to 
  	typeImg : AADLBA!SystemType (
+ 		name <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
+				type.name
+				else
+				thisModule.theHOOK.getOutputPackageName()
+				endif,
 		ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
 		ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
 		ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
