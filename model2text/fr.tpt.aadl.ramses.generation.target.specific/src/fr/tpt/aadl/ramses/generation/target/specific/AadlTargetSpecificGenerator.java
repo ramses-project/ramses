@@ -46,6 +46,7 @@ import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
@@ -198,7 +199,7 @@ public class AadlTargetSpecificGenerator implements Generator
     if(rootModelId!=null && !rootModelId.isEmpty())
     	modelsMap.put(rootModelId, r);
     
-   systemToInstantiate = systemInstance.getSystemImplementation().getName();
+   systemToInstantiate = xmlPilot.getOutputModelId()+".impl";
     PublicPackageSection pps = (PublicPackageSection) systemInstance.getSystemImplementation().getOwner();
     AadlPackage p = (AadlPackage) pps.getOwner();
     final String initialPackageName = p.getName();
@@ -249,6 +250,7 @@ public class AadlTargetSpecificGenerator implements Generator
                           IProgressMonitor monitor,
                           AnalysisErrorReporterManager errManager)
   {
+	  _modelInstantiator = new AadlModelsManagerImpl(errManager);
 	  String analysisName = workflowPilot.getAnalysisName();
       String analysisMode = workflowPilot.getAnalysisMode();
       String analysisModelInputIdentifier = workflowPilot.getInputModelId();
@@ -302,13 +304,10 @@ public class AadlTargetSpecificGenerator implements Generator
       	  Resource result = (Resource) analysisParam.get("OutputResource");
       	  if(result!=null)
       	  {
+      		systemToInstantiate = analysisModelOutputIdentifier+".impl";
       	    SystemImplementation si = (SystemImplementation) pls.
             		findNamedElementInsideAadlPackage(systemToInstantiate, 
               				((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
-      	    String systemToInstantiateSuffix = systemToInstantiate.substring(systemToInstantiate.lastIndexOf("."),
-    			  systemToInstantiate.length());
-    	    systemToInstantiate = analysisModelOutputIdentifier+systemToInstantiateSuffix;
-    	    si.setName(systemToInstantiate);
       	  
       		SystemInstance sinst = _modelInstantiator.instantiate(si);
       		modelsMap.put(analysisModelOutputIdentifier, sinst.eResource());

@@ -51,15 +51,38 @@ abstract rule m_Connection_Reference
 		cnxImg: AADLBA!Connection(
 			name <- cnxRef.name,
 			source <- cnxSourceImg,
-			destination <- cnxDestinationImg
+			destination <- cnxDestinationImg,
+			bidirectional <- cnxRef.connection.bidirectional
 		),
 		cnxSourceImg : AADLBA!ConnectedElement(
 			connectionEnd <- cnxRef.source,
-			context <- cnxRef.connection.source.context
+			context <- if(cnxRef.connection.bidirectional)then
+							if(not cnxRef.connection.destination.context.oclIsUndefined()) then 
+								cnxRef.source.eContainer().debug(' !!!! 1')
+							else
+								OclUndefined
+							endif
+						else if(not cnxRef.connection.source.context.oclIsUndefined()) then 
+							cnxRef.source.eContainer().debug(' !!!! 2')
+							else
+								OclUndefined
+							endif
+						endif
 		),
 		cnxDestinationImg : AADLBA!ConnectedElement(
 			connectionEnd <- cnxRef.destination,
-			context <- cnxRef.connection.destination.context
+			context <- if(cnxRef.connection.bidirectional)then
+							if(not cnxRef.connection.source.context.oclIsUndefined()) then 
+								cnxRef.destination.eContainer().debug(' !!!! 3')
+							else
+								OclUndefined
+							endif
+						else if(not cnxRef.connection.destination.context.oclIsUndefined()) then 
+							cnxRef.destination.eContainer().debug(' !!!! 4')
+							else
+								OclUndefined
+							endif
+						endif
 		)
 }
 

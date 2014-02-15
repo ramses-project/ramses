@@ -6,8 +6,10 @@ import java.io.FileWriter ;
 import java.io.IOException ;
 import java.util.List ;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
@@ -61,12 +63,18 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	  
 	  Resource aadlResource = aadlResourceSet.getResource(instanceURI,
 	                                                      false) ;
-
-	  if(aadlResource == null)
+	  
+	  if(aadlResource != null)
 	  {
-	    aadlResource = aadlResourceSet
-	              .createResource(instanceURI) ;
+		  try {
+			aadlResource.delete(null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	  }
+	  aadlResource = aadlResourceSet
+              .createResource(instanceURI) ;
 
 	  SystemInstance instance = _instantiateModel.createSystemInstanceInt(si,
 	                                                    aadlResource) ;

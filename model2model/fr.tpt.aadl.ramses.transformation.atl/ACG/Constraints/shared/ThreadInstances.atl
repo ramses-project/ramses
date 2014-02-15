@@ -19,6 +19,7 @@
 -- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
+-- @nsURI AADLI=http://aadl.info/AADL/2.0/instance
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
@@ -46,8 +47,18 @@ rule check_HasBehavior
 	(message <- 'Thread subcomponent ' + obj.subcomponent.name + ' has no behavior (BA or Compute_Entrypoint_CallSequence)')
 }
 
+
+
 helper context AADLI!ComponentInstance def: hasBehavior() : Boolean =
-	self.subcomponent.classifier.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
+	self.hasBehaviorAnnex()
 	or
+	self.hasCallSequence()
+;
+
+helper context AADLI!ComponentInstance def: hasBehaviorAnnex() : Boolean =
+	self.subcomponent.classifier.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
+;
+
+helper context AADLI!ComponentInstance def: hasCallSequence() : Boolean =
 	self.hasProperty('Compute_Entrypoint_Call_Sequence')
 ;

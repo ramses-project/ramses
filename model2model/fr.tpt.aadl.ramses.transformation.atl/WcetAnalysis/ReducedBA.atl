@@ -26,6 +26,23 @@ module ReducedBA;
 create OUT : AADLBA 	from 		IN: AADLI,
 									WCET: REDUCEDBA;
 
+helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
+	self.ownedPropertyAssociation->select(e | not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
+									)->collectSelfPropertyAssociationImg()
+;
+
+--@extends m_Component_Implementation
+rule m_Thread_Implementation {
+ from 
+ 	impl : AADLI!ThreadImplementation
+ to 
+ 	implImg : AADLBA!ThreadImplementation (
+ 		name <- impl.name,
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
+	)
+}
+
 ---- next rule overrides the existing "copy" since we use already defined types referencing them instead of copying them
 abstract rule m_Data_Type {
  from 

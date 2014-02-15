@@ -7,7 +7,9 @@ import java.util.ArrayList ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.ComponentCategory ;
@@ -62,11 +64,13 @@ public class WcetAnalysis extends AbstractAnalyzer {
     parameters.put("AnalysisResult", currentResult);
     outputModelIdentifier = (String) parameters.get("OutputModelIdentifier");
     if(init)
+    {
       currentResult = f.createAnalysisArtifact();
+      init=false;
+    }
     else
     {
-      parameters.put("OutputResource", aadlWithWcet);
-      init=false;
+      parameters.put("OutputResource", aadlWithWcet); 
     }
   }
   
@@ -125,12 +129,18 @@ public class WcetAnalysis extends AbstractAnalyzer {
     
     
     String generatedFilePath = systemInstance.eResource().getURI().path();
+    if(Platform.isRunning())
+    {
+    	generatedFilePath = generatedFilePath.substring(9);
+    	generatedFilePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString()+
+				generatedFilePath;
+    }
     File generatedFile = new File(generatedFilePath);
     
     String wcetPath = generatedFile.getParentFile().getParentFile().getParentFile().getAbsolutePath() + "/wcet/";
-		File wcetPathFile = new File(wcetPath);
-		if(wcetPathFile.exists()==false)
-			wcetPathFile.mkdir();
+	File wcetPathFile = new File(wcetPath);
+	if(wcetPathFile.exists()==false)
+		wcetPathFile.mkdir();
 		
     AST2DOT ast2dot = new AST2DOT(wcetPath);
     File outputFile = new File(wcetPath + "threads_ast_extraction.txt");
