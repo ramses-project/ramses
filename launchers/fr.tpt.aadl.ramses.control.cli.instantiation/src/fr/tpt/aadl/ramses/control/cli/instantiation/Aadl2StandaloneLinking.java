@@ -19,43 +19,20 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.instantiation ;
+package fr.tpt.aadl.ramses.control.cli.instantiation ;
 
-import java.util.ArrayList ;
-import java.util.List ;
 
-public class AnnexJobHandler
+import org.osate.xtext.aadl2.Aadl2StandaloneSetup ;
+
+import com.google.inject.Guice ;
+import com.google.inject.Injector ;
+import com.google.inject.Module ;
+
+public class Aadl2StandaloneLinking extends Aadl2StandaloneSetup
 {
-  private List<AnnexJob> _jobList = new ArrayList<AnnexJob>() ;
-
-  public void addJob(AnnexJob job)
+  @Override
+  public Injector createInjector()
   {
-    _jobList.add(job) ;
-  }
-
-  public boolean parseAllAnnexes()
-  {
-    boolean result = true ;
-
-    for(AnnexJob job : _jobList)
-    {
-      result &= job.parse() ;
-    }
-
-    return result ;
-  }
-
-  public boolean resolveAllAnnexes()
-  {
-    boolean result = true ;
-
-    for(AnnexJob job : _jobList)
-    {
-      result &= job.resolve() ;
-    }
-    
-    _jobList.clear() ;
-    
-    return result ;
+    return Guice.createInjector((Module) new Aadl2StandaloneRuntimeModule()) ;
   }
 }

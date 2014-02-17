@@ -34,6 +34,7 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.instance.SystemInstance ;
 
+import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
@@ -45,7 +46,6 @@ import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
 /**
  * This class provides services to the Command 

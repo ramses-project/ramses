@@ -19,20 +19,21 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.instantiation ;
+package fr.tpt.aadl.ramses.control.cli.instantiation.manager ;
 
+import java.io.File ;
+import java.io.FilenameFilter ;
 
-import org.osate.xtext.aadl2.Aadl2StandaloneSetup ;
+import fr.tpt.aadl.ramses.control.support.Names ;
 
-import com.google.inject.Guice ;
-import com.google.inject.Injector ;
-import com.google.inject.Module ;
-
-public class Aadl2StandaloneLinking extends Aadl2StandaloneSetup
+public class AADLFileFilter implements FilenameFilter
 {
-  @Override
-  public Injector createInjector()
+
+  public boolean accept(File dir,
+                        String name)
   {
-    return Guice.createInjector((Module) new Aadl2StandaloneRuntimeModule()) ;
+    return name.endsWith(Names.FILE_EXTENSIONS[0]) ||
+          name.endsWith(Names.FILE_EXTENSIONS[1]) ;
   }
+
 }

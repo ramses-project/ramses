@@ -19,7 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.instantiation ;
+package fr.tpt.aadl.ramses.control.cli.instantiation ;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.osate.xtext.aadl2.valueconversion.Aadl2ValueConverter;

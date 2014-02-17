@@ -62,9 +62,8 @@ import fr.tpt.aadl.sched.wcetanalysis.model.StatementKind;
 import fr.tpt.aadl.sched.wcetanalysis.util.Aadl2ASTUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.BehaviorAnnexUtil;
 import fr.tpt.aadl.sched.wcetanalysis.util.IDGenerator;
-
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPackagesManager;
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
+import fr.tpt.aadl.ramses.control.cli.instantiation.manager.PredefinedPackagesManager ;
+import fr.tpt.aadl.ramses.control.cli.instantiation.manager.PredefinedPropertiesManager ;
 import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 
 /**

@@ -1,12 +1,12 @@
-package fr.tpt.aadl.ramses.instantiation.manager;
+package fr.tpt.aadl.ramses.control.cli.instantiation.manager;
 
 import java.util.ArrayList ;
 import java.util.List ;
 
 import org.eclipse.emf.ecore.resource.Resource ;
 
+import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.AbstractPredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
 public class ContributedAadlRegistration extends AbstractPredefinedAadlModelManager
 { 

@@ -38,6 +38,8 @@ import com.martiansoftware.jsap.JSAPResult ;
 import com.martiansoftware.jsap.QualifiedSwitch ;
 import com.martiansoftware.jsap.Switch ;
 
+import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.ramses.control.cli.instantiation.manager.ContributedAadlRegistration ;
 import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
 import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot ;
@@ -52,8 +54,6 @@ import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
-import fr.tpt.aadl.ramses.instantiation.manager.ContributedAadlRegistration ;
 
 /**
  * This class provides the main entry point of the Command Line 

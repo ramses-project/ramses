@@ -10,7 +10,7 @@
 		<relativePath>../../../build_and_test/ramses-maven-build/pom.xml</relativePath>
 	</parent>
 	<groupId>ramses</groupId>
-	<artifactId>fr.tpt.aadl.ramses.instantiation</artifactId>
+	<artifactId>fr.tpt.aadl.ramses.control.cli.instantiation</artifactId>
 	<version>0.5.0</version>
 	<packaging>eclipse-plugin</packaging>
 </project>

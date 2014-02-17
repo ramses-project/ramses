@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.instantiation;
+package fr.tpt.aadl.ramses.control.cli.instantiation;
 
 import org.osate.annexsupport.AnnexLinkingServiceRegistry;
 import org.osate.xtext.aadl2.naming.Aadl2QualifiedNameProvider;

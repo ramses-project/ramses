@@ -39,7 +39,7 @@ import org.osate.ba.aadlba.SubprogramCallAction;
 import org.osate.utils.PropertyUtils;
 import org.osate.xtext.aadl2.properties.util.GetProperties;
 
-import fr.tpt.aadl.ramses.instantiation.manager.PredefinedPropertiesManager;
+import fr.tpt.aadl.ramses.control.cli.instantiation.manager.PredefinedPropertiesManager ;
 import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
 

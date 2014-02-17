@@ -23,6 +23,6 @@ Require-Bundle: org.eclipse.emf.ecore;bundle-version="2.8.3",
  fr.tpt.aadl.sched.wcetanalysis;bundle-version="1.0.0",
  fr.tpt.aadl.sched.tools.aadlinspector;bundle-version="1.0.0",
  org.osate.workspace,
- fr.tpt.aadl.ramses.instantiation
+ fr.tpt.aadl.ramses.control.cli.instantiation
 Import-Package: org.osate.aadl2,
  org.osate.aadl2.instance

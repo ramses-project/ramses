@@ -19,7 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.instantiation.manager ;
+package fr.tpt.aadl.ramses.control.cli.instantiation.manager ;
 
 import java.io.File ;
 import java.io.FilenameFilter ;
@@ -38,9 +38,9 @@ import org.osate.aadl2.Property ;
 import org.osate.aadl2.PropertyConstant ;
 import org.osate.aadl2.PropertySet ;
 
+import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.instantiation.StandAloneInstantiator ;
 
 public class PredefinedPropertiesManager
 {

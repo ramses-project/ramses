@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.instantiation;
+package fr.tpt.aadl.ramses.control.cli.instantiation;
 
 import org.eclipse.core.runtime.IConfigurationElement ;
 import org.osate.annexsupport.AnnexProxy ;
