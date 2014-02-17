@@ -40,8 +40,8 @@ import org.osate.aadl2.util.Aadl2Switch ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
-import fr.tpt.aadl.ramses.util.generation.AbstractAadlToCMakefileUnparser ;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
+import fr.tpt.aadl.ramses.generation.utils.AbstractAadlToCMakefileUnparser ;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnparser 
 {

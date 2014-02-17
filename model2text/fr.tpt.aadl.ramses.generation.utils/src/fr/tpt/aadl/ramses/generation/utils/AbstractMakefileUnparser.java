@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.util.generation;
+package fr.tpt.aadl.ramses.generation.utils;
 
 import java.io.BufferedReader ;
 import java.io.BufferedWriter ;

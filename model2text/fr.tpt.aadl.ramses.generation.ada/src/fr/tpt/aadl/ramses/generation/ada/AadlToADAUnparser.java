@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessCategory;
@@ -92,7 +93,7 @@ import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGenericUnparser
 {

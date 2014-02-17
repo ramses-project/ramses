@@ -40,8 +40,8 @@ import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
-import fr.tpt.aadl.ramses.util.generation.AbstractAadlToCMakefileUnparser ;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
+import fr.tpt.aadl.ramses.generation.utils.AbstractAadlToCMakefileUnparser ;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
 {

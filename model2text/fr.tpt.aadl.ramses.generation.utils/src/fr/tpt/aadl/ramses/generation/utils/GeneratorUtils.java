@@ -19,7 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.util.generation;
+package fr.tpt.aadl.ramses.generation.utils;
 
 import java.util.ArrayList ;
 import java.util.Iterator ;

@@ -42,7 +42,7 @@ import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 
 public class AadlTargetSpecificCodeGenerator

@@ -135,7 +135,7 @@ import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 
 public class AadlBaToCUnparser extends AadlBaUnparser

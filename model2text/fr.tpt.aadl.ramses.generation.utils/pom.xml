@@ -10,7 +10,7 @@
 		<relativePath>../../../build_and_test/ramses-maven-build/pom.xml</relativePath>
 	</parent>
 	<groupId>ramses</groupId>
-	<artifactId>fr.tpt.aadl.ramses.util.generation</artifactId>
+	<artifactId>fr.tpt.aadl.ramses.generation.utils</artifactId>
 	<version>1.0.0.qualifier</version>
 	<packaging>eclipse-plugin</packaging>
 </project>

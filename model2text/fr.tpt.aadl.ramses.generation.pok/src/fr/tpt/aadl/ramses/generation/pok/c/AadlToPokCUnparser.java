@@ -67,8 +67,8 @@ import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
-import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
+import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
 
 public class AadlToPokCUnparser implements AadlTargetUnparser
 {

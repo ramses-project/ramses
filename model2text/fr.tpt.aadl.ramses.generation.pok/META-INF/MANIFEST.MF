@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.osate.ba;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.target.specific;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.util.generation;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.generation.utils;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.ada;bundle-version="0.5.0"
 Bundle-ActivationPolicy: lazy

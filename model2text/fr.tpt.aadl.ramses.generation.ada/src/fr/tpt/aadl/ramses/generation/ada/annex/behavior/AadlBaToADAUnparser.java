@@ -135,7 +135,7 @@ import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 
 public class AadlBaToADAUnparser extends AadlBaUnparser

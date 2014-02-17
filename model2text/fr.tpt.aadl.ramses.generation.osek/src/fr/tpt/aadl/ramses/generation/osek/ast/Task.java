@@ -7,7 +7,7 @@ import java.util.Map;
 import org.osate.aadl2.DataAccess;
 import org.osate.aadl2.modelsupport.UnparseText;
 
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 public class Task {
 

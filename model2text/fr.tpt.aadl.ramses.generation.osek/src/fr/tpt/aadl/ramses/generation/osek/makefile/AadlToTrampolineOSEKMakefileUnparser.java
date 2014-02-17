@@ -34,7 +34,7 @@ import fr.tpt.aadl.ramses.control.support.FileUtils ;
 import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
-import fr.tpt.aadl.ramses.util.generation.AbstractAadlToCMakefileUnparser ;
+import fr.tpt.aadl.ramses.generation.utils.AbstractAadlToCMakefileUnparser ;
 
 public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefileUnparser
 {

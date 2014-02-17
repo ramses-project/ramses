@@ -24,7 +24,7 @@ http://www.eclipse.org/org/documents/epl-v10.php
 
    <extension point="org.eclipse.emf.ecore.generated_package">
       <package
-            uri="http://fr.tpt.aadl.ramses.transformation.atl.launch"
+            uri="http://fr.tpt.aadl.ramses.control.atl.launch"
             class="fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage"
             genModel="model/ATLHooks.genmodel"/>
    </extension>

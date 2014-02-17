@@ -26,7 +26,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: fr.tpt.aadl.ramses.control.atl,
  fr.tpt.aadl.ramses.control.atl.hooks.impl,
- fr.tpt.aadl.ramses.util.generation,
+ fr.tpt.aadl.ramses.generation.utils,
  org.eclipse.xtext.nodemodel,
  org.osate.xtext.aadl2.properties.linking
 Bundle-Vendor: TELECOM Paristech

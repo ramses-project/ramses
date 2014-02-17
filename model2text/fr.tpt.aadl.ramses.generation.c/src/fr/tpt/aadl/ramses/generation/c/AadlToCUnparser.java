@@ -109,7 +109,7 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
-import fr.tpt.aadl.ramses.util.generation.GeneratorUtils;
+import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 public class AadlToCUnparser extends AadlProcessingSwitch
                              implements AadlGenericUnparser

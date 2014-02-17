@@ -52,7 +52,7 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule ;
-import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
+import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
 
 /**
  * Unparser to generate an oil file for OSEK from aadl.
