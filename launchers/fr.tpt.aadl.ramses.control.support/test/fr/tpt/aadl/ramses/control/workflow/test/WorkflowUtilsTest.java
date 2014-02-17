@@ -7,8 +7,6 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import fr.tpt.aadl.ramses.control.workflow.Analysis;
-import fr.tpt.aadl.ramses.control.workflow.AnalysisOption;
 import fr.tpt.aadl.ramses.control.workflow.File;
 import fr.tpt.aadl.ramses.control.workflow.Generation;
 import fr.tpt.aadl.ramses.control.workflow.List;
@@ -39,7 +37,7 @@ public class WorkflowUtilsTest {
 		while (fileNamesIt.hasNext()) {
 			File f = WorkflowFactory.eINSTANCE.createFile();
 			f.setPath(fileNamesIt.next());
-			l.getFile().add(f);
+//			l.getFile().add(f);
 		}
 
 		t.setElement(g);

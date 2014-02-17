@@ -135,29 +135,37 @@ public class RamsesConfiguration
   
   public ConfigStatus setOutputDir(String path)
   {
-    File outputDir = new File(path) ;
-    
-    if(! outputDir.exists())
+    if(! (path == null || path.isEmpty()))
     {
-      try
+      File outputDir = new File(path) ;
+      
+      if(! outputDir.exists())
       {
-        if(! outputDir.mkdirs())
+        try
         {
-          ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'";
+          if(! outputDir.mkdirs())
+          {
+            ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'";
+            return ConfigStatus.NOT_VALID ;
+          }
+        }
+        catch(Exception e)
+        {
+          ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'. Because:\n\n\t" +
+          e.getMessage() ;
           return ConfigStatus.NOT_VALID ;
         }
       }
-      catch(Exception e)
-      {
-        ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'. Because:\n\n\t" +
-        e.getMessage() ;
-        return ConfigStatus.NOT_VALID ;
-      }
+      
+      _outputDir = outputDir ;
+      ConfigStatus.SET.msg = "Set output directory to \'" + path + "\'" ;
+      return ConfigStatus.SET ;
     }
-    
-    _outputDir = outputDir ;
-    ConfigStatus.SET.msg = "Set output directory to \'" + path + "\'" ;
-    return ConfigStatus.SET ;
+    else
+    {
+      ConfigStatus.NOT_VALID.msg = "Output directory is not configured" ;
+      return ConfigStatus.NOT_VALID ;
+    }
   }
 
   // path can be null.

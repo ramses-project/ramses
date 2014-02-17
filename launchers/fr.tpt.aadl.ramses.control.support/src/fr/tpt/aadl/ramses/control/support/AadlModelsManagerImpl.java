@@ -6,10 +6,8 @@ import java.io.FileWriter ;
 import java.io.IOException ;
 import java.util.List ;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
