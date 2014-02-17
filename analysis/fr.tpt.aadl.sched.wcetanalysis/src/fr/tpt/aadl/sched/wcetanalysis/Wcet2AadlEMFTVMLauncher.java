@@ -14,10 +14,10 @@ import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
 import org.eclipse.m2m.atl.emftvm.Metamodel;
 import org.eclipse.m2m.atl.emftvm.Model;
 
+import fr.tpt.aadl.ramses.control.atl.Aadl2AadlEMFTVMLauncher ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.transformation.atl.Aadl2AadlEMFTVMLauncher;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
 

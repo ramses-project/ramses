@@ -1,47 +1,38 @@
 package fr.tpt.aadl.sched.wcetanalysis.util;
 
-import java.util.List;
+import java.util.List ;
 
-import org.eclipse.core.runtime.Platform;
-import org.osate.aadl2.AccessSpecification;
-import org.osate.aadl2.BasicPropertyAssociation;
-import org.osate.aadl2.BehavioredImplementation;
-import org.osate.aadl2.CallSpecification;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.ComponentPrototypeActual;
-import org.osate.aadl2.ComponentPrototypeBinding;
-import org.osate.aadl2.DataClassifier;
-import org.osate.aadl2.DataPrototype;
-import org.osate.aadl2.DataSubcomponentType;
-import org.osate.aadl2.FeaturePrototypeActual;
-import org.osate.aadl2.FeaturePrototypeBinding;
-import org.osate.aadl2.ListValue;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyConstant;
-import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.PrototypeBinding;
-import org.osate.aadl2.RangeValue;
-import org.osate.aadl2.RecordValue;
-import org.osate.aadl2.StringLiteral;
-import org.osate.aadl2.SubprogramClassifier;
-import org.osate.aadl2.UnitLiteral;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.ConnectionInstanceEnd;
-import org.osate.aadl2.instance.ConnectionKind;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.instance.InstanceReferenceValue;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.ba.aadlba.SubprogramCallAction;
-import org.osate.utils.PropertyUtils;
-import org.osate.xtext.aadl2.properties.util.GetProperties;
+import org.osate.aadl2.AccessSpecification ;
+import org.osate.aadl2.BasicPropertyAssociation ;
+import org.osate.aadl2.BehavioredImplementation ;
+import org.osate.aadl2.CallSpecification ;
+import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.ComponentPrototypeActual ;
+import org.osate.aadl2.ComponentPrototypeBinding ;
+import org.osate.aadl2.DataClassifier ;
+import org.osate.aadl2.DataPrototype ;
+import org.osate.aadl2.DataSubcomponentType ;
+import org.osate.aadl2.FeaturePrototypeActual ;
+import org.osate.aadl2.FeaturePrototypeBinding ;
+import org.osate.aadl2.ListValue ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.PrototypeBinding ;
+import org.osate.aadl2.RangeValue ;
+import org.osate.aadl2.RecordValue ;
+import org.osate.aadl2.SubprogramClassifier ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.ConnectionInstance ;
+import org.osate.aadl2.instance.ConnectionInstanceEnd ;
+import org.osate.aadl2.instance.ConnectionKind ;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.InstanceReferenceValue ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.ba.aadlba.SubprogramCallAction ;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.control.cli.instantiation.manager.PredefinedPropertiesManager ;
-import fr.tpt.aadl.ramses.util.properties.AadlUtil;
-import fr.tpt.aadl.sched.wcetanalysis.model.IOTime;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
+import fr.tpt.aadl.sched.wcetanalysis.model.IOTime ;
 
 public class Aadl2ASTUtil
 {

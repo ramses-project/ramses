@@ -2,9 +2,9 @@ package fr.tpt.aadl.ramses.generation.osek;
 
 import java.util.Map;
 
+import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl ;
 
 public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 

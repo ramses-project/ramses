@@ -44,6 +44,8 @@ import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
+import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
+import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl;
@@ -54,8 +56,6 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
-import fr.tpt.aadl.ramses.transformation.atl.AadlToTargetSpecificAadl ;
 
 
 public class AadlTargetSpecificGenerator implements Generator

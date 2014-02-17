@@ -24,8 +24,8 @@ Require-Bundle: org.eclipse.ui,
  org.osate.xtext.aadl2.properties
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: fr.tpt.aadl.ramses.transformation.atl,
- fr.tpt.aadl.ramses.transformation.atl.hooks.impl,
+Import-Package: fr.tpt.aadl.ramses.control.atl,
+ fr.tpt.aadl.ramses.control.atl.hooks.impl,
  fr.tpt.aadl.ramses.util.generation,
  org.eclipse.xtext.nodemodel,
  org.osate.xtext.aadl2.properties.linking

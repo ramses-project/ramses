@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.ui.ide,
  org.osate.ba;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.support,
  fr.tpt.aadl.ramses.generation.c;bundle-version="0.5.0",
- fr.tpt.aadl.ramses.transformation.atl.launch;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.osek
 Bundle-ActivationPolicy: lazy

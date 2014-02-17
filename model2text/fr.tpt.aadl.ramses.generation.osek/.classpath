@@ -26,6 +26,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.target.specific"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.util.properties"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.c"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.transformation.atl.launch"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.control.atl.launch"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

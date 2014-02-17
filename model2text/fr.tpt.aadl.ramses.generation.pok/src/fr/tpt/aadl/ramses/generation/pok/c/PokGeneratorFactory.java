@@ -27,6 +27,7 @@ import java.io.IOException ;
 
 import org.eclipse.m2m.atl.core.ATLCoreException;
 
+import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -37,7 +38,6 @@ import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Validation;
 import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
-import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
 
 public class PokGeneratorFactory implements GeneratorFactory
 {

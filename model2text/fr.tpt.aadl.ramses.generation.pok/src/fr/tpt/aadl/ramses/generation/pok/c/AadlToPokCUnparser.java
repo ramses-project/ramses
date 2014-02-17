@@ -61,12 +61,12 @@ import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.PropertyUtils ;
 
+import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.FileUtils ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.util.generation.GeneratorUtils ;
 import fr.tpt.aadl.ramses.util.generation.RoutingProperties ;
 

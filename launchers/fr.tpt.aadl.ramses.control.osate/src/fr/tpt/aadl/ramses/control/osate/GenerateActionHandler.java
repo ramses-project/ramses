@@ -58,6 +58,7 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.core.OsateCorePlugin ;
 import org.osate.ui.dialogs.Dialog ;
 
+import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
@@ -66,7 +67,6 @@ import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
-import fr.tpt.aadl.ramses.transformation.atl.hooks.impl.HookAccessImpl ;
 
 public class GenerateActionHandler extends AbstractHandler {
 

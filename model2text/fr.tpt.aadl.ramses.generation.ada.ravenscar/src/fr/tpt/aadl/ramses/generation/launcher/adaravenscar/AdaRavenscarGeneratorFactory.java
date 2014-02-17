@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.generation.launcher.adaravenscar;
 
 import org.eclipse.m2m.atl.core.ATLCoreException;
 
+import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -32,7 +33,6 @@ import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser ;
 import fr.tpt.aadl.ramses.generation.adaravenscar.makefile.AadlToAdaRavenscarMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
-import fr.tpt.aadl.ramses.transformation.atl.AadlModelValidator;
 
 public class AdaRavenscarGeneratorFactory implements GeneratorFactory
 {
