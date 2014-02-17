@@ -72,8 +72,8 @@ public class RamsesPropertyPage extends PropertyPage {
   
   public static final String PREFIX = "fr.tpt.aadl.ramses.";
   public static final String OUTPUT_DIR = "output.directory";
-  public static final String PLATFORM_ID = "platform.id";
-  public static final String PLATFORM_PATH = "platform.path";
+  public static final String TARGET_ID = "target.id";
+  public static final String RUNTIME_PATH = "runtime.path";
   public static final String PREF = "pref_pok";
   
   private static final String _OJR_PLATFORM = "ojr" ;
@@ -369,12 +369,12 @@ public class RamsesPropertyPage extends PropertyPage {
     _project.setPersistentProperty(new QualifiedName(PREFIX, OUTPUT_DIR),
                                   outputDirText.getText());
     
-    _project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_ID),
+    _project.setPersistentProperty(new QualifiedName(PREFIX, TARGET_ID),
                                   target.getData().toString()) ;
     
     if(! _OJR_PLATFORM.equals(target.getData().toString()))
     {
-      _project.setPersistentProperty(new QualifiedName(PREFIX, PLATFORM_PATH),
+      _project.setPersistentProperty(new QualifiedName(PREFIX, RUNTIME_PATH),
                                     runtimePathText.getText());
       System.out.println(runtimePathText.getText()) ;
     }
@@ -543,13 +543,13 @@ public class RamsesPropertyPage extends PropertyPage {
       throw new ConfigurationException(status) ;
     }
     
-    status = result.setGeneretionTargetId(fetchPropertiesValue(project, PLATFORM_ID)) ;
+    status = result.setGeneretionTargetId(fetchPropertiesValue(project, TARGET_ID)) ;
     if(status != ConfigStatus.SET)
     {
       throw new ConfigurationException(status) ;
     }
 
-    status = result.setRuntimePath(fetchPropertiesValue(project, PLATFORM_PATH)) ;
+    status = result.setRuntimePath(fetchPropertiesValue(project, RUNTIME_PATH)) ;
     if(status != ConfigStatus.SET)
     {
       throw new ConfigurationException(status) ;
