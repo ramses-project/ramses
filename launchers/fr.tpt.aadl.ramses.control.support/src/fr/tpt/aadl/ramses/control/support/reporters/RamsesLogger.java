@@ -139,14 +139,10 @@ public class RamsesLogger
   /**
    * Log a execution trace.
    * 
-   * @param clazz the considered class
-   * @param line of an instruction
    * @param msg the trace message 
    */
-  public void trace(Object clazz, int line, String msg)
+  public void trace(String msg)
   {
-    msg = msgFormatter(clazz, line, msg) ;
-    
     if(_streamMode)
     {
       _internalLogger.trace(msg);
