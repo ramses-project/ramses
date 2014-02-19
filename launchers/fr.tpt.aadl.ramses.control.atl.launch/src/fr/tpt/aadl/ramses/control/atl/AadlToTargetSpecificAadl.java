@@ -68,7 +68,7 @@ import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 {
@@ -195,7 +195,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       {
     	// Nothing to do, just continue.
       }  		  
-      ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+      ServiceRegistry sr = ServiceProvider.getServiceRegistry();
       ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
       AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
       Iterator<EObject> iter = xtextResource.getAllContents();
@@ -239,7 +239,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       }
     }
 	  
-    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+    ServiceRegistry sr = ServiceProvider.getServiceRegistry();
     ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
     AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
     Iterator<EObject> iter = xtextResource.getAllContents();

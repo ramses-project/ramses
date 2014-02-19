@@ -4,7 +4,7 @@ import java.io.File ;
 import java.io.FileNotFoundException ;
 
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 
@@ -178,7 +178,7 @@ public class RamsesConfiguration
       {
         runtimePath = fileChecker(path) ;
       }
-      ServiceRegistry reg = ServiceRegistryProvider.getServiceRegistry() ;
+      ServiceRegistry reg = ServiceProvider.getServiceRegistry() ;
       Generator gen = reg.getGenerator(_targetId) ;
       
       // The runtime path can be null.
@@ -235,7 +235,7 @@ public class RamsesConfiguration
   
   public ConfigStatus setGeneretionTargetId(String targetId)
   {
-    ServiceRegistry reg = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry reg = ServiceProvider.getServiceRegistry() ;
     Generator gen = reg.getGenerator(targetId) ;
     if(gen == null)
     {

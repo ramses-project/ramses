@@ -106,7 +106,7 @@ import org.osate.utils.names.DataModelProperties;
 
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.annex.behavior.AadlBaToCUnparserAction;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
@@ -1098,7 +1098,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       {
         String annexName = al.getName() ;
         AnnexUnparser unparser =
-              ServiceRegistryProvider.getServiceRegistry()
+              ServiceProvider.getServiceRegistry()
                     .getUnparser(annexName) ;
 
         if(unparser != null)
@@ -1118,7 +1118,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       public String caseDefaultAnnexLibrary(DefaultAnnexLibrary dal)
       {
         AnnexUnparser unparser =
-              ServiceRegistryProvider.getServiceRegistry().getUnparser("*") ;
+              ServiceProvider.getServiceRegistry().getUnparser("*") ;
 
         if(unparser != null)
         {

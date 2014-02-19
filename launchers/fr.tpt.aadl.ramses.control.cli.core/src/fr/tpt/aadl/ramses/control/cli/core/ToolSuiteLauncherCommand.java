@@ -53,7 +53,7 @@ import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 /**
  * This class provides the main entry point of the Command Line 
@@ -187,7 +187,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
           (QualifiedSwitch) (new QualifiedSwitch(ANALYSIS_LIST_OPTION_ID)
                 .setShortFlag('a').setLongFlag(JSAP.NO_LONGFLAG).setList(true)
                 .setListSeparator(',').setAllowMultipleDeclarations(false)) ;
-    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     Set<String> analysisNames = sr.getAvailableAnalysisNames() ;
     String availableAnalysis = "" ;
 
@@ -374,13 +374,13 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
     setRamsesResourceDir(_includeDirs) ;
         
-    IProgressMonitor monitor = new RamsesProgressMonitor() ;
+    IProgressMonitor monitor = new RamsesProgressMonitor(ServiceProvider.LOGGER, System.out) ;
     
     StandAloneInstantiator instantiator = new StandAloneInstantiator(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                                                      monitor) ;
     PredefinedAadlModelManager modelManager = new ContributedAadlRegistration(instantiator) ;
     
-    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     
     registry.init(instantiator, modelManager);
     /**************************************************************************/
@@ -404,7 +404,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
     String msg = "parsing has " ;
     
-    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     
     if(sr.getNbError() > 0)
     {

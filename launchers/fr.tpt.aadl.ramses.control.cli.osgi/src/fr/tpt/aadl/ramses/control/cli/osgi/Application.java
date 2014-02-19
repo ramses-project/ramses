@@ -28,7 +28,7 @@ import org.eclipse.equinox.app.IApplicationContext ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 /**
  * This class implements an OSGi application for
@@ -47,7 +47,7 @@ public class Application implements IApplication
   public Object start(IApplicationContext context)
         throws Exception
   {
-    ServiceRegistryProvider.setDefault(new OSGiServiceRegistry()) ;
+    ServiceProvider.setDefault(new OSGiServiceRegistry()) ;
     @SuppressWarnings("unchecked")
     Map<String, String[]> argsMap = context.getArguments() ;
     String[] args = argsMap.get("application.args") ;

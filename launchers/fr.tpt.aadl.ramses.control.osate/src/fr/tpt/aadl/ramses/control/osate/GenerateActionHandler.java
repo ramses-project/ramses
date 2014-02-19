@@ -66,7 +66,7 @@ import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class GenerateActionHandler extends AbstractHandler {
 
@@ -200,7 +200,7 @@ public class GenerateActionHandler extends AbstractHandler {
     IEditorPart editor = HandlerUtil.getActiveEditor(event) ;
     WorkbenchUtils.saveEditor(editor);
     
-    ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     AadlModelInstantiatior instantiator =sr.getModelInstantiatior() ;
     
     instantiator.setProgressMonitor(monitor);
@@ -299,7 +299,7 @@ public class GenerateActionHandler extends AbstractHandler {
     try
     {
       ServiceRegistry registry;
-      registry = ServiceRegistryProvider.getServiceRegistry() ;
+      registry = ServiceProvider.getServiceRegistry() ;
       Generator generator = registry.getGenerator(config.getTargetId()) ;
       
       SystemImplementation sysImpl = sinst.getSystemImplementation() ;

@@ -90,7 +90,7 @@ import org.osate.aadl2.util.Aadl2Switch ;
 import org.osate.annexsupport.AnnexUnparser ;
 
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 /**
  * This class implements the converter from an AADL object model to textual
@@ -130,7 +130,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
 
     try
     {
-      serviceRegistry = ServiceRegistryProvider.getServiceRegistry() ;
+      serviceRegistry = ServiceProvider.getServiceRegistry() ;
     }
     catch(Exception e)
     {

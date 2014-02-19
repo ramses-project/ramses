@@ -21,8 +21,9 @@
 
 package fr.tpt.aadl.ramses.control.support.services ;
 
+import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
 
-public class ServiceRegistryProvider
+public class ServiceProvider
 {
   private static ServiceRegistry _sr = new DefaultServiceRegistry() ;
   
@@ -35,4 +36,6 @@ public class ServiceRegistryProvider
   {
     return _sr ;
   }
+  
+  public static RamsesLogger LOGGER ;
 }

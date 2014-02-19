@@ -60,7 +60,7 @@ import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
 
@@ -431,7 +431,7 @@ public class RamsesPropertyPage extends PropertyPage {
 
     if(target != null && target.getData() != null)
     {
-      ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry() ;
+      ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
       Generator gen = sr.getGenerator(target.getData().toString()) ;
       if(gen != null)
       {

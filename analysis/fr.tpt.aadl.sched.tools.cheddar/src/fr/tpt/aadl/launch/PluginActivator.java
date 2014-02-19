@@ -11,7 +11,7 @@ import org.osgi.framework.Bundle ;
 import org.osgi.framework.BundleContext ;
 
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 @SuppressWarnings("restriction")
 public class PluginActivator extends AbstractUIPlugin

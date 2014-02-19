@@ -45,7 +45,7 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 /**
  * This class provides services to the Command 
@@ -167,7 +167,7 @@ public class ToolSuiteLauncher
                                      	 Map<String, Object> parameters)
                                                       throws GenerationException
   {
-    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
@@ -195,7 +195,7 @@ public class ToolSuiteLauncher
                               Map<String, Object> parameters)
                                                       throws GenerationException
   {
-    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
     // DEBUG

@@ -55,7 +55,6 @@ import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis ;
  */
 public class StaticServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {
-
   private Map<String, AnnexParser> _parsers =
         new HashMap<String, AnnexParser>() ;
   private Map<String, AnnexUnparser> _unparsers =

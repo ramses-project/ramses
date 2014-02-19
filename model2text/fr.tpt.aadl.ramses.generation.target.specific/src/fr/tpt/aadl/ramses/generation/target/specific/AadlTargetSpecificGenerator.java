@@ -55,7 +55,7 @@ import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -280,7 +280,7 @@ public class AadlTargetSpecificGenerator implements Generator
     	  currentInstance = (SystemInstance) inputResource.getContents().get(0);
       
       System.out.println("Analysis launched : " + analysisName + " | Analysis mode : " + analysisMode);
-      ServiceRegistry sr = ServiceRegistryProvider.getServiceRegistry();
+      ServiceRegistry sr = ServiceProvider.getServiceRegistry();
       Analyzer a = sr.getAnalyzer(analysisName);
       String outputModelId = workflowPilot.getOutputModelId();
       Map<String, Object> analysisParam = new HashMap<String, Object>();

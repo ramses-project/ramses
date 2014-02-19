@@ -22,8 +22,10 @@
 package fr.tpt.aadl.ramses.control.cli ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
+import fr.tpt.aadl.ramses.control.support.reporters.InternalLogger ;
+import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 /**
  * This class implements a Standalone Java application for
@@ -43,9 +45,19 @@ public class ToolSuiteLauncher
   {
     try
     {
+      Logger4Cli internalLogger = new Logger4Cli() ;
+      
+      RamsesLogger logger = new RamsesLogger(internalLogger) ;
+      /**** DEBUG ****/
+      logger.setStreamMode(true);
+      internalLogger.setLogLevel(InternalLogger.ALL);
+      /***************/
+      
+      ServiceProvider.LOGGER = logger ;
+      
       ServiceRegistry registry = new StaticServiceRegistry() ;
       
-      ServiceRegistryProvider.setDefault(registry) ;
+      ServiceProvider.setDefault(registry) ;
       
       ToolSuiteLauncherCommand.main(args) ;
     }

@@ -1,31 +1,32 @@
-package fr.tpt.aadl.ramses.control.cli.core;
+package fr.tpt.aadl.ramses.control.osate;
 
-import java.io.PrintStream ;
+import org.eclipse.core.runtime.IProgressMonitor ;
 
 import fr.tpt.aadl.ramses.control.support.reporters.AbstractProgressMonitor ;
 import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
 
-public class RamsesProgressMonitor extends AbstractProgressMonitor
+public class ProgressMonitorWrapper extends AbstractProgressMonitor
 {
-  protected PrintStream _output ;
+  protected IProgressMonitor _monitor ;
   
-  public RamsesProgressMonitor(RamsesLogger logger, PrintStream outputStream)
+  public ProgressMonitorWrapper(IProgressMonitor osateMonitor,
+                                RamsesLogger logger)
   {
     super(logger) ;
-    _output = outputStream ;
+    _monitor = osateMonitor ;
   }
   
   @Override
   public void beginTask(String name,
                         int totalWork)
   {
-    if(! _isNotCanceled)
+    if(false == _isNotCanceled)
     {
       _mainTask = name ;
       _totalWork = totalWork ;
+      _monitor.beginTask(name, totalWork);
       String msg = super.formatBeginTask(name, totalWork) ;
-      _output.println(msg) ;
-      _logger.info(msg) ;
+      _logger.info(msg);
       _isNotCanceled = true ;
     }
   }
@@ -36,8 +37,8 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     if(_isNotCanceled)
     {
       _isNotCanceled = false ; // According to the IProgressMonitor definition.
+      _monitor.done();
       String msg = super.formatDone(_mainTask) ;
-      _output.println(msg) ;
       _logger.info(msg) ;
     }
   }
@@ -45,14 +46,13 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
   @Override
   public void internalWorked(double work)
   {
-    // TODO Auto-generated method stub
-    System.out.println("############### internal worked is call : " + work) ;
+    _monitor.internalWorked(work);
   }
 
   @Override
   public boolean isCanceled()
   {
-    return ! _isNotCanceled ;
+    return false == _isNotCanceled ;
   }
 
   @Override
@@ -63,8 +63,8 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
       if(value)
       {
         _isNotCanceled = false ;
+        _monitor.setCanceled(true);
         String msg = super.formatCanceled(_mainTask) ;
-        _output.println(msg) ;
         _logger.info(msg) ;
       }
     }
@@ -75,6 +75,7 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
   public void setTaskName(String name)
   {
     _mainTask = name ;
+    _monitor.setTaskName(name) ;
   }
 
   @Override
@@ -82,8 +83,8 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
   {
     if(_isNotCanceled)
     {
+      _monitor.subTask(name) ;
       String msg = super.formatSubTask(name) ;
-      _output.println(msg) ;
       _logger.info(msg) ;
     }
   }
@@ -93,8 +94,8 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
   {
     if(_isNotCanceled)
     {
+      _monitor.worked(work);
       String msg = super.formatWorked(work, _totalWork) ;
-      _output.println(msg) ;
       _logger.info(msg) ;
     }
   }

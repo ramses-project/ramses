@@ -36,7 +36,7 @@ import org.osate.annexsupport.AnnexParser ;
 import org.osate.annexsupport.AnnexResolver ;
 
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
 {
@@ -59,7 +59,7 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
     ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
     AnalysisErrorReporterManager resolveErrManager =
           ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
-    ServiceRegistry registry = ServiceRegistryProvider.getServiceRegistry() ;
+    ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     List<DefaultAnnexSubclause> asl =
           EcoreUtil2.eAllOfType(model, DefaultAnnexSubclause.class) ;
 

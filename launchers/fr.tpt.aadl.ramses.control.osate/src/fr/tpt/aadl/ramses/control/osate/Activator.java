@@ -29,9 +29,11 @@ import org.osgi.framework.BundleContext ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.reporters.InternalLogger ;
+import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistryProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -60,6 +62,16 @@ public class Activator extends AbstractUIPlugin {
 		
 		try
     {
+		  Logger4Osate internalLogger = new Logger4Osate() ;
+		  RamsesLogger logger = new RamsesLogger(internalLogger) ;
+	    /**** DEBUG ****/
+	    logger.setStreamMode(true);
+	    internalLogger.setLogLevel(InternalLogger.ALL) ;
+	    /***************/
+	    
+	    ServiceProvider.LOGGER = logger ;
+		  
+		  
 		  /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
 		  WorkbenchUtils.setResourceDirectories() ;
     }
@@ -81,7 +93,7 @@ public class Activator extends AbstractUIPlugin {
 		modelManager = new ContributedAadlRegistration() ;
 		
 		sr.init(instantiator, modelManager);
-		ServiceRegistryProvider.setDefault(sr) ;
+		ServiceProvider.setDefault(sr) ;
 		/**************************************************************************/
 	}
 
