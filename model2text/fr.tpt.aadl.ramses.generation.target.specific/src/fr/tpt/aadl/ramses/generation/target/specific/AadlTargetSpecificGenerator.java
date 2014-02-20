@@ -445,6 +445,10 @@ public class AadlTargetSpecificGenerator implements Generator
     if (a instanceof AbstractLoop.Analysis)
     {
        AbstractLoop.Analysis aa = (AbstractLoop.Analysis) a;
+       String inputIdSpecific = aa.getInputModelIdentifier();
+       String outputIdSpecific = aa.getOutputModelIdentifier();
+       inputId = (inputIdSpecific == null) ? inputId : inputIdSpecific;
+       outputId = (outputIdSpecific == null) ? outputId : outputIdSpecific;
        doAnalysis(aa.getMethod(),aa.getMode(),inputId,outputId,errManager,
                   xmlPilot,outputDir,monitor);
       
@@ -454,7 +458,7 @@ public class AadlTargetSpecificGenerator implements Generator
     {
       AbstractLoop.Conjunction c = (AbstractLoop.Conjunction) a;
       for(AbstractLoop.AbstractAnalysis aa : c.getSequence())
-      {
+      { 
          if (! doLoopAnalysis(aa,errManager,xmlPilot,outputDir,monitor,inputId,outputId))
          {
            return false;
