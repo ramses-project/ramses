@@ -30,10 +30,10 @@ import javax.swing.JOptionPane ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.AadlPackage ;
-import org.osate.aadl2.Element;
+import org.osate.aadl2.Element ;
 import org.osate.aadl2.PublicPackageSection ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -48,7 +48,8 @@ import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl;
+import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
+import fr.tpt.aadl.ramses.control.support.AbstractLoop ;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
@@ -78,6 +79,10 @@ public class AadlTargetSpecificGenerator implements Generator
 
   private AadlModelValidator _modelValidator;
   
+  /** Loop debug  (loopValidIteration must be negative to disable debug) **/
+  private static int loopValidIteration = -1;
+  private int loopIteration = -1;
+  /****************/
   
   public AadlTargetSpecificGenerator(AadlToTargetSpecificAadl targetTrans,
                                      AadlTargetSpecificCodeGenerator codeGen,
@@ -217,8 +222,8 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       else if(operation.equals("transformation"))
       {
-    	currentInstance = doTransformation(xmlPilot, r, outputDir);
-    	r = currentInstance.eResource();
+    	  currentInstance = doTransformation(xmlPilot, outputDir);
+    	  r = currentInstance.eResource();
       }
       else if(operation.equals("unparse"))
       {  
@@ -236,7 +241,11 @@ public class AadlTargetSpecificGenerator implements Generator
       else if(operation.equals("generation"))
       {
         doGeneration(runtimeDir, outputDir, includeDirs, r, monitor);
-      }   
+      }
+      else if(operation.equals("loop"))
+      {
+        doLoop(xmlPilot.getLoop(),errManager, xmlPilot, outputDir, monitor);
+      }
       else
       {
         System.err.println("Undefined operation : " + operation);
@@ -250,11 +259,24 @@ public class AadlTargetSpecificGenerator implements Generator
                           IProgressMonitor monitor,
                           AnalysisErrorReporterManager errManager)
   {
+    String analysisName = workflowPilot.getAnalysisName();
+    String analysisMode = workflowPilot.getAnalysisMode();
+    String analysisModelInputIdentifier = workflowPilot.getInputModelId();
+    String analysisModelOutputIdentifier = workflowPilot.getOutputModelId();
+    doAnalysis(analysisName,analysisMode,analysisModelInputIdentifier,
+               analysisModelOutputIdentifier, errManager,workflowPilot,outputDir,monitor);
+  }
+  
+  private void doAnalysis(String analysisName, String analysisMode,
+                          String analysisModelInputIdentifier,
+                          String analysisModelOutputIdentifier,
+                          AnalysisErrorReporterManager errManager,
+                          WorkflowPilot workflowPilot,
+                          File outputDir,
+                          IProgressMonitor monitor)
+  {
 	  _modelInstantiator = new AadlModelsManagerImpl(errManager);
-	  String analysisName = workflowPilot.getAnalysisName();
-      String analysisMode = workflowPilot.getAnalysisMode();
-      String analysisModelInputIdentifier = workflowPilot.getInputModelId();
-      String analysisModelOutputIdentifier = workflowPilot.getOutputModelId();
+	    
       Resource inputResource = modelsMap.get(analysisModelInputIdentifier);
       SystemInstance currentInstance;
       PropertiesLinkingService pls = new PropertiesLinkingService ();
@@ -368,14 +390,114 @@ public class AadlTargetSpecificGenerator implements Generator
       }
   }
   
-  private SystemInstance doTransformation(WorkflowPilot workflowPilot, Resource r, 
-		                                      File generatedDir)
-		                                                 throws GenerationException
+  private void doLoop(AbstractLoop l,AnalysisErrorReporterManager errManager,
+                      WorkflowPilot xmlPilot, File outputDir,
+                      IProgressMonitor monitor)
   {
-	  List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
-      System.out.println("Transformation launched : " + resourceFileNameList);
+    AbstractLoop.AbstractAnalysis a = l.getAnalysis();
+    final String inputId = l.getInputModelIdentifier();
+    final String outputId = l.getOutputModelIdentifier();
+    
+    loopIteration = -1;
+    for(List<String> moduleList : l.getModuleLists())
+    {
+      loopIteration++;
+      System.out.println("Start loop iteration = " + loopIteration);
+      try
+      {
+        doTransformation(moduleList,inputId,outputId,outputDir);
+        if (isValidLoopIteration(a,errManager,xmlPilot,outputDir,outputId,monitor))
+        {
+          break;
+        }
+      }
+      catch(GenerationException e)
+      {
+        e.printStackTrace();
+      }
+    }
+  }
+  
+  private boolean isValidLoopIteration (AbstractLoop.AbstractAnalysis a, AnalysisErrorReporterManager errManager,
+                                        WorkflowPilot xmlPilot, File outputDir,
+                                        String outputId, IProgressMonitor monitor)
+  {
+     if (loopValidIteration >= 0)
+     {
+       /** Debug mode (valid iteration is fixed by the user) */
+       return loopIteration == loopValidIteration;
+     }
+     else
+     {
+       /** Check iteration validity by specified analysis */
+       return doLoopAnalysis(a,errManager,xmlPilot,outputDir,monitor,outputId,outputId);
+     }
+  }
+  
+  private boolean doLoopAnalysis(AbstractLoop.AbstractAnalysis a,
+                              AnalysisErrorReporterManager errManager,
+                              WorkflowPilot xmlPilot,
+                              File outputDir,
+                              IProgressMonitor monitor,
+                              String inputId,
+                              String outputId)
+  {
+    if (a instanceof AbstractLoop.Analysis)
+    {
+       AbstractLoop.Analysis aa = (AbstractLoop.Analysis) a;
+       doAnalysis(aa.getMethod(),aa.getMode(),inputId,outputId,errManager,
+                  xmlPilot,outputDir,monitor);
+      
+       return xmlPilot.getAnalysisResult();
+    }
+    else if (a instanceof AbstractLoop.Conjunction)
+    {
+      AbstractLoop.Conjunction c = (AbstractLoop.Conjunction) a;
+      for(AbstractLoop.AbstractAnalysis aa : c.getSequence())
+      {
+         if (! doLoopAnalysis(aa,errManager,xmlPilot,outputDir,monitor,inputId,outputId))
+         {
+           return false;
+         }
+      }
+      return true;
+    }
+    else if (a instanceof AbstractLoop.Disjunction)
+    {
+      AbstractLoop.Disjunction d = (AbstractLoop.Disjunction) a;
+      for(AbstractLoop.AbstractAnalysis aa : d.getSequence())
+      {
+         if (doLoopAnalysis(aa,errManager,xmlPilot,outputDir,monitor,inputId,outputId))
+         {
+           return true;
+         }
+      }
+      return false;
+    }
+    else
+      return false;
+  }
 
-      String outputModelId = workflowPilot.getOutputModelId();
+  private SystemInstance doTransformation(WorkflowPilot workflowPilot, File generatedDir)
+		                                                 throws GenerationException
+	{
+    List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
+    String inputModelId = workflowPilot.getInputModelId();
+    String outputModelId = workflowPilot.getOutputModelId();
+    return doTransformation(resourceFileNameList,inputModelId,outputModelId,generatedDir);
+	}
+		                                                 
+  private SystemInstance doTransformation(List<String> resourceFileNameList,
+                                          String inputModelId, String outputModelId, 
+                                          File generatedDir) throws GenerationException
+  {
+      Resource r = modelsMap.get(inputModelId);
+    
+      System.out.println("Transformation launched");
+      System.out.println("  Input model  : " + inputModelId);
+      System.out.println("  Module list  : " + resourceFileNameList);
+      System.out.println("  Output model : " + outputModelId);
+
       Resource result = _targetTrans.transformWokflow(r, resourceFileNameList, 
                                                   generatedDir, outputModelId);
 
