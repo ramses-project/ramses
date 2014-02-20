@@ -5,10 +5,10 @@
   <eClassifiers xsi:type="ecore:EClass" name="Workflow">
     <eStructuralFeatures xsi:type="ecore:EReference" name="element" lowerBound="1"
         eType="#//WorkflowElement" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" lowerBound="1"
-        eType="#//ModelIdentifier" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" eType="#//ModelIdentifier"
+        containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="WorkflowElement">
+  <eClassifiers xsi:type="ecore:EClass" name="WorkflowElement" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputModelIdentifier" lowerBound="1"
         eType="#//ModelIdentifier"/>
   </eClassifiers>
@@ -22,13 +22,21 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AnalysisElement" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Generation" eSuperTypes="#//WorkflowElement #//AnalysisElement"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Analysis" eSuperTypes="#//WorkflowElement #//AnalysisElement">
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractAnalysis" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="yesOption" eType="#//AnalysisOption"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="noOption" eType="#//AnalysisOption"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AnalysisSequence" abstract="true" eSuperTypes="#//AbstractAnalysis">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="list" lowerBound="2" upperBound="-1"
+        eType="#//AbstractAnalysis" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Conjunction" eSuperTypes="#//AnalysisSequence"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Disjunction" eSuperTypes="#//AnalysisSequence"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Analysis" eSuperTypes="#//WorkflowElement #//AnalysisElement #//AbstractAnalysis">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="method" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="mode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="yesOption" lowerBound="1"
-        eType="#//AnalysisOption" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="noOption" lowerBound="1"
-        eType="#//AnalysisOption" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"
         eType="#//ModelIdentifier" containment="true"/>
   </eClassifiers>
@@ -54,5 +62,18 @@
         eType="#//AnalysisElement" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"
         eType="#//ModelIdentifier" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Loop" eSuperTypes="#//WorkflowElement #//AnalysisElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="alternatives" lowerBound="2"
+        upperBound="-1" eType="#//List" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="analysis" lowerBound="1"
+        eType="#//AbstractAnalysis" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="initialAnalysis" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"
+        eType="#//ModelIdentifier" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="foundOption" lowerBound="1"
+        eType="#//AnalysisOption" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="notFoundOption" lowerBound="1"
+        eType="#//AnalysisOption" containment="true"/>
   </eClassifiers>
 </ecore:EPackage>

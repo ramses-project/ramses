@@ -19,11 +19,18 @@
     </genClasses>
     <genClasses ecoreClass="RamsesWorkflow.ecore#//AnalysisElement"/>
     <genClasses ecoreClass="RamsesWorkflow.ecore#//Generation"/>
+    <genClasses image="false" ecoreClass="RamsesWorkflow.ecore#//AbstractAnalysis">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//AbstractAnalysis/yesOption"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//AbstractAnalysis/noOption"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="RamsesWorkflow.ecore#//AnalysisSequence">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//AnalysisSequence/list"/>
+    </genClasses>
+    <genClasses ecoreClass="RamsesWorkflow.ecore#//Conjunction"/>
+    <genClasses ecoreClass="RamsesWorkflow.ecore#//Disjunction"/>
     <genClasses ecoreClass="RamsesWorkflow.ecore#//Analysis">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RamsesWorkflow.ecore#//Analysis/method"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RamsesWorkflow.ecore#//Analysis/mode"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Analysis/yesOption"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Analysis/noOption"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Analysis/outputModelIdentifier"/>
     </genClasses>
     <genClasses ecoreClass="RamsesWorkflow.ecore#//ErrorState">
@@ -44,6 +51,14 @@
     <genClasses ecoreClass="RamsesWorkflow.ecore#//Unparse">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Unparse/element"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Unparse/outputModelIdentifier"/>
+    </genClasses>
+    <genClasses ecoreClass="RamsesWorkflow.ecore#//Loop">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Loop/alternatives"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Loop/analysis"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute RamsesWorkflow.ecore#//Loop/initialAnalysis"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Loop/outputModelIdentifier"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Loop/foundOption"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference RamsesWorkflow.ecore#//Loop/notFoundOption"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
