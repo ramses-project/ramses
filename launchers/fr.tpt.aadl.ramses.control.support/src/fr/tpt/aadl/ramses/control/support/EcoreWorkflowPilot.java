@@ -1,26 +1,30 @@
 package fr.tpt.aadl.ramses.control.support;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File ;
+import java.io.FileNotFoundException ;
+import java.util.ArrayList ;
+import java.util.Iterator ;
+import java.util.List ;
 
-import org.eclipse.emf.common.util.Diagnostic;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.Diagnostician;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.emf.common.util.Diagnostic ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
+import org.eclipse.emf.ecore.util.Diagnostician ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
-import fr.tpt.aadl.ramses.control.workflow.Analysis;
-import fr.tpt.aadl.ramses.control.workflow.AnalysisElement;
-import fr.tpt.aadl.ramses.control.workflow.Generation;
-import fr.tpt.aadl.ramses.control.workflow.Transformation;
-import fr.tpt.aadl.ramses.control.workflow.Unparse;
-import fr.tpt.aadl.ramses.control.workflow.Workflow;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
+import fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis ;
+import fr.tpt.aadl.ramses.control.workflow.Analysis ;
+import fr.tpt.aadl.ramses.control.workflow.AnalysisElement ;
+import fr.tpt.aadl.ramses.control.workflow.Conjunction ;
+import fr.tpt.aadl.ramses.control.workflow.Disjunction ;
+import fr.tpt.aadl.ramses.control.workflow.Generation ;
+import fr.tpt.aadl.ramses.control.workflow.Loop ;
+import fr.tpt.aadl.ramses.control.workflow.Transformation ;
+import fr.tpt.aadl.ramses.control.workflow.Unparse ;
+import fr.tpt.aadl.ramses.control.workflow.Workflow ;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
 
 /**
  * This class is an implementation of the WorkflowPilot for workflows
@@ -35,6 +39,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	private AnalysisElement currentWorkflowElement;
 
 	private boolean analysisResult;
+	
+	private String sourceModelId;
 
 	/**
 	 * This method creates an EcoreWorkflowPilot from the file path passed
@@ -69,6 +75,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 			resource = getResourceSet().getResource(workflow_uri, true);
 			Workflow workflowRootObject = (Workflow) resource.getContents()
 					.get(0);
+			
+			sourceModelId = workflowRootObject.getInputModelIdentifier().getId();
 			
 			this.currentWorkflowElement = (AnalysisElement) workflowRootObject.getElement();
 			
@@ -118,6 +126,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 				return "generation";
 			} else if (currentWorkflowElement instanceof Unparse) {
 				return "unparse";
+			} else if (currentWorkflowElement instanceof Loop) {
+			  return "loop";
 			}
 		}
 		return null;
@@ -179,6 +189,14 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	public void setAnalysisResult(boolean analysisResult) {
 		this.analysisResult = analysisResult;
 	}
+	
+	/**
+	 * @see WorkflowPilot#getAnalysisResult
+	 */
+	public boolean getAnalysisResult()
+	{
+	  return analysisResult;
+	}
 
 	/**
 	 * @see WorkflowPilot#goForward()
@@ -191,6 +209,16 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 			} else {
 				currentWorkflowElement = ((Analysis) currentWorkflowElement).getNoOption().getElement();
 			}
+			
+		} else if (currentWorkflowElement instanceof Loop) {
+		  
+		  Loop l = (Loop) currentWorkflowElement;
+		  if (analysisResult) {
+		    currentWorkflowElement = l.getFoundOption().getElement();
+		  } else {
+		    currentWorkflowElement = l.getNotFoundOption().getElement();
+		  }
+			
 		} else if (currentWorkflowElement instanceof Transformation) {
 
 			currentWorkflowElement = ((Transformation) currentWorkflowElement).getElement();
@@ -220,7 +248,7 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	 */
 	@Override
 	public String getInputModelId() {
-		String result=null;
+		String result=sourceModelId;
 		if (currentWorkflowElement instanceof Transformation) {
 			Transformation t = (Transformation) currentWorkflowElement;
 			result = t.getInputModelIdentifier().getId();
@@ -247,7 +275,87 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 			if(a.getOutputModelIdentifier()!=null)
 				result = a.getOutputModelIdentifier().getId();
 		}
+		if (currentWorkflowElement instanceof Loop) {
+		  Loop l = (Loop) currentWorkflowElement;
+		  if (l.getOutputModelIdentifier()!=null)
+		    result = l.getOutputModelIdentifier().getId();
+		}
 		return result;
 	}
 
+	
+	
+	
+	@Override
+  public AbstractLoop getLoop()
+  {
+    if (currentWorkflowElement instanceof Loop)
+    {
+      Loop l = (Loop) currentWorkflowElement;
+      boolean initialAnalysis = l.isInitialAnalysis();
+      String inputModelIdentifier = l.getInputModelIdentifier().getId();
+      String outputModelIdentifier = l.getOutputModelIdentifier().getId();
+      
+      /** Convert analysis */
+      AbstractLoop.AbstractAnalysis aa = convertAnalysis(l.getAnalysis());
+      
+      
+      /** Convert module lists */
+      List<List<String>> moduleLists = new ArrayList<List<String>>();
+      for(fr.tpt.aadl.ramses.control.workflow.List moduleList : l.getAlternatives())
+      {
+        List<String> moduleListStr = new ArrayList<String>();
+        for(fr.tpt.aadl.ramses.control.workflow.File f : moduleList.getFile())
+        {
+          moduleListStr.add(f.getPath());
+        }
+        moduleLists.add(moduleListStr);
+      }
+      
+      return new AbstractLoop(initialAnalysis,aa,moduleLists,
+          inputModelIdentifier,outputModelIdentifier);
+    }
+    return null;
+  }
+  
+  private static AbstractLoop.AbstractAnalysis convertAnalysis(AbstractAnalysis aa)
+  {
+    if (aa instanceof Analysis)
+    {
+      Analysis a = (Analysis) aa;
+      String inputId = a.getInputModelIdentifier().getId();
+      String outputId = inputId;
+      if (a.getOutputModelIdentifier()!=null)
+      {
+        outputId = a.getOutputModelIdentifier().getId();
+      }
+      
+      return new AbstractLoop.Analysis(a.getMethod(), a.getMode(), inputId, outputId);
+    }
+    else if (aa instanceof Conjunction)
+    {
+      Conjunction seq = (Conjunction) aa;
+      AbstractLoop.Conjunction c = new AbstractLoop.Conjunction();
+      
+      for(AbstractAnalysis subAnalysis : seq.getList())
+      {
+        c.add(convertAnalysis(subAnalysis));
+      }
+      return c;
+    }
+    else if (aa instanceof Disjunction)
+    {
+      Disjunction seq = (Disjunction) aa;
+      AbstractLoop.Disjunction d = new AbstractLoop.Disjunction();
+      
+      for(AbstractAnalysis subAnalysis : seq.getList())
+      {
+        d.add(convertAnalysis(subAnalysis));
+      }
+      return d;
+    }
+    else
+      return null;
+  }
+	
 }

@@ -45,6 +45,13 @@ public interface WorkflowPilot {
 	public List<String> getTransformationFileNameList();
 	
 	/**
+   * This method returns the qualitative result of the last
+   * analysis processed in the workflow.
+   * @return qualitative result of the last analysis
+   */
+  public boolean getAnalysisResult();
+	
+	/**
 	 * This method stores the qualitative result of the last 
 	 * analysis processed in the workflow.
 	 * @param analysisResult identifies the qualitative
@@ -73,4 +80,10 @@ public interface WorkflowPilot {
 	 * in the workflow being processed.
 	 */
 	public String getOutputModelId();
+	
+	
+	/**
+   * Returns the current loop executed in the workflow
+   */
+  public AbstractLoop getLoop();
 }
