@@ -31,126 +31,132 @@ import org.eclipse.emf.common.notify.Notification;
  *
  * @generated
  */
-public class WorkflowElementImpl extends EObjectImpl implements WorkflowElement {
+public abstract class WorkflowElementImpl extends EObjectImpl implements WorkflowElement {
 	/**
-	 * The cached value of the '{@link #getInputModelIdentifier() <em>Input Model Identifier</em>}' reference.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getInputModelIdentifier() <em>Input Model Identifier</em>}' reference.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getInputModelIdentifier()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getInputModelIdentifier()
+   * @generated
+   * @ordered
+   */
 	protected ModelIdentifier inputModelIdentifier;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected WorkflowElementImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.WORKFLOW_ELEMENT;
-	}
+    return WorkflowPackage.Literals.WORKFLOW_ELEMENT;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public ModelIdentifier getInputModelIdentifier() {
-		if (inputModelIdentifier != null && inputModelIdentifier.eIsProxy()) {
-			InternalEObject oldInputModelIdentifier = (InternalEObject)inputModelIdentifier;
-			inputModelIdentifier = (ModelIdentifier)eResolveProxy(oldInputModelIdentifier);
-			if (inputModelIdentifier != oldInputModelIdentifier) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
-			}
-		}
-		return inputModelIdentifier;
-	}
+    if (inputModelIdentifier != null && inputModelIdentifier.eIsProxy())
+    {
+      InternalEObject oldInputModelIdentifier = (InternalEObject)inputModelIdentifier;
+      inputModelIdentifier = (ModelIdentifier)eResolveProxy(oldInputModelIdentifier);
+      if (inputModelIdentifier != oldInputModelIdentifier)
+      {
+        if (eNotificationRequired())
+          eNotify(new ENotificationImpl(this, Notification.RESOLVE, WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
+      }
+    }
+    return inputModelIdentifier;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public ModelIdentifier basicGetInputModelIdentifier() {
-		return inputModelIdentifier;
-	}
+    return inputModelIdentifier;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setInputModelIdentifier(ModelIdentifier newInputModelIdentifier) {
-		ModelIdentifier oldInputModelIdentifier = inputModelIdentifier;
-		inputModelIdentifier = newInputModelIdentifier;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
-	}
+    ModelIdentifier oldInputModelIdentifier = inputModelIdentifier;
+    inputModelIdentifier = newInputModelIdentifier;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER, oldInputModelIdentifier, inputModelIdentifier));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
-				if (resolve) return getInputModelIdentifier();
-				return basicGetInputModelIdentifier();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
+        if (resolve) return getInputModelIdentifier();
+        return basicGetInputModelIdentifier();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
-				setInputModelIdentifier((ModelIdentifier)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
+        setInputModelIdentifier((ModelIdentifier)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
-				setInputModelIdentifier((ModelIdentifier)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
+        setInputModelIdentifier((ModelIdentifier)null);
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
-				return inputModelIdentifier != null;
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER:
+        return inputModelIdentifier != null;
+    }
+    return super.eIsSet(featureID);
+  }
 
 } //WorkflowElementImpl

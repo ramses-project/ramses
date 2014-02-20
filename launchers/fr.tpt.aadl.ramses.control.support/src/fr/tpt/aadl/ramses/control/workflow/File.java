@@ -26,29 +26,29 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface File extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Path</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+   * Returns the value of the '<em><b>Path</b></em>' attribute.
+   * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Path</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Path</em>' attribute.
-	 * @see #setPath(String)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getFile_Path()
-	 * @model required="true"
-	 * @generated
-	 */
+   * @return the value of the '<em>Path</em>' attribute.
+   * @see #setPath(String)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getFile_Path()
+   * @model required="true"
+   * @generated
+   */
 	String getPath();
 
 	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.File#getPath <em>Path</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.File#getPath <em>Path</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Path</em>' attribute.
-	 * @see #getPath()
-	 * @generated
-	 */
+   * @param value the new value of the '<em>Path</em>' attribute.
+   * @see #getPath()
+   * @generated
+   */
 	void setPath(String value);
 
 } // File

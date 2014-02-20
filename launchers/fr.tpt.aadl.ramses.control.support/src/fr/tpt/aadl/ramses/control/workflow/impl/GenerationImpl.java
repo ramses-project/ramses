@@ -23,21 +23,21 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  */
 public class GenerationImpl extends WorkflowElementImpl implements Generation {
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected GenerationImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.GENERATION;
-	}
+    return WorkflowPackage.Literals.GENERATION;
+  }
 
 } //GenerationImpl

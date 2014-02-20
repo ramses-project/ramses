@@ -25,21 +25,21 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  */
 public abstract class AnalysisElementImpl extends EObjectImpl implements AnalysisElement {
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected AnalysisElementImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.ANALYSIS_ELEMENT;
-	}
+    return WorkflowPackage.Literals.ANALYSIS_ELEMENT;
+  }
 
 } //AnalysisElementImpl

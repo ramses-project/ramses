@@ -36,184 +36,212 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  */
 public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory {
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc -->
+   * Creates the default factory implementation.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public static WorkflowFactory init() {
-		try {
-			WorkflowFactory theWorkflowFactory = (WorkflowFactory)EPackage.Registry.INSTANCE.getEFactory(WorkflowPackage.eNS_URI);
-			if (theWorkflowFactory != null) {
-				return theWorkflowFactory;
-			}
-		}
-		catch (Exception exception) {
-			EcorePlugin.INSTANCE.log(exception);
-		}
-		return new WorkflowFactoryImpl();
-	}
+    try
+    {
+      WorkflowFactory theWorkflowFactory = (WorkflowFactory)EPackage.Registry.INSTANCE.getEFactory(WorkflowPackage.eNS_URI);
+      if (theWorkflowFactory != null)
+      {
+        return theWorkflowFactory;
+      }
+    }
+    catch (Exception exception)
+    {
+      EcorePlugin.INSTANCE.log(exception);
+    }
+    return new WorkflowFactoryImpl();
+  }
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc -->
+   * Creates an instance of the factory.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public WorkflowFactoryImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public EObject create(EClass eClass) {
-		switch (eClass.getClassifierID()) {
-			case WorkflowPackage.WORKFLOW: return createWorkflow();
-			case WorkflowPackage.WORKFLOW_ELEMENT: return createWorkflowElement();
-			case WorkflowPackage.TRANSFORMATION: return createTransformation();
-			case WorkflowPackage.GENERATION: return createGeneration();
-			case WorkflowPackage.ANALYSIS: return createAnalysis();
-			case WorkflowPackage.ERROR_STATE: return createErrorState();
-			case WorkflowPackage.LIST: return createList();
-			case WorkflowPackage.FILE: return createFile();
-			case WorkflowPackage.ANALYSIS_OPTION: return createAnalysisOption();
-			case WorkflowPackage.MODEL_IDENTIFIER: return createModelIdentifier();
-			case WorkflowPackage.UNPARSE: return createUnparse();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
-		}
-	}
+    switch (eClass.getClassifierID())
+    {
+      case WorkflowPackage.WORKFLOW: return createWorkflow();
+      case WorkflowPackage.TRANSFORMATION: return createTransformation();
+      case WorkflowPackage.GENERATION: return createGeneration();
+      case WorkflowPackage.CONJUNCTION: return createConjunction();
+      case WorkflowPackage.DISJUNCTION: return createDisjunction();
+      case WorkflowPackage.ANALYSIS: return createAnalysis();
+      case WorkflowPackage.ERROR_STATE: return createErrorState();
+      case WorkflowPackage.LIST: return createList();
+      case WorkflowPackage.FILE: return createFile();
+      case WorkflowPackage.ANALYSIS_OPTION: return createAnalysisOption();
+      case WorkflowPackage.MODEL_IDENTIFIER: return createModelIdentifier();
+      case WorkflowPackage.UNPARSE: return createUnparse();
+      case WorkflowPackage.LOOP: return createLoop();
+      default:
+        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+    }
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Workflow createWorkflow() {
-		WorkflowImpl workflow = new WorkflowImpl();
-		return workflow;
-	}
+    WorkflowImpl workflow = new WorkflowImpl();
+    return workflow;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public WorkflowElement createWorkflowElement() {
-		WorkflowElementImpl workflowElement = new WorkflowElementImpl();
-		return workflowElement;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Transformation createTransformation() {
-		TransformationImpl transformation = new TransformationImpl();
-		return transformation;
-	}
+    TransformationImpl transformation = new TransformationImpl();
+    return transformation;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Generation createGeneration() {
-		GenerationImpl generation = new GenerationImpl();
-		return generation;
-	}
+    GenerationImpl generation = new GenerationImpl();
+    return generation;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Conjunction createConjunction()
+  {
+    ConjunctionImpl conjunction = new ConjunctionImpl();
+    return conjunction;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Disjunction createDisjunction()
+  {
+    DisjunctionImpl disjunction = new DisjunctionImpl();
+    return disjunction;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Analysis createAnalysis() {
-		AnalysisImpl analysis = new AnalysisImpl();
-		return analysis;
-	}
+    AnalysisImpl analysis = new AnalysisImpl();
+    return analysis;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public ErrorState createErrorState() {
-		ErrorStateImpl errorState = new ErrorStateImpl();
-		return errorState;
-	}
+    ErrorStateImpl errorState = new ErrorStateImpl();
+    return errorState;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public List createList() {
-		ListImpl list = new ListImpl();
-		return list;
-	}
+    ListImpl list = new ListImpl();
+    return list;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public File createFile() {
-		FileImpl file = new FileImpl();
-		return file;
-	}
+    FileImpl file = new FileImpl();
+    return file;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisOption createAnalysisOption() {
-		AnalysisOptionImpl analysisOption = new AnalysisOptionImpl();
-		return analysisOption;
-	}
+    AnalysisOptionImpl analysisOption = new AnalysisOptionImpl();
+    return analysisOption;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public ModelIdentifier createModelIdentifier() {
-		ModelIdentifierImpl modelIdentifier = new ModelIdentifierImpl();
-		return modelIdentifier;
-	}
+    ModelIdentifierImpl modelIdentifier = new ModelIdentifierImpl();
+    return modelIdentifier;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Unparse createUnparse() {
-		UnparseImpl unparse = new UnparseImpl();
-		return unparse;
-	}
+    UnparseImpl unparse = new UnparseImpl();
+    return unparse;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
+	public Loop createLoop() {
+    LoopImpl loop = new LoopImpl();
+    return loop;
+  }
+
+	/**
+   * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+   * @generated
+   */
 	public WorkflowPackage getWorkflowPackage() {
-		return (WorkflowPackage)getEPackage();
-	}
+    return (WorkflowPackage)getEPackage();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @deprecated
-	 * @generated
-	 */
+   * @deprecated
+   * @generated
+   */
 	public static WorkflowPackage getPackage() {
-		return WorkflowPackage.eINSTANCE;
-	}
+    return WorkflowPackage.eINSTANCE;
+  }
 
 } //WorkflowFactoryImpl

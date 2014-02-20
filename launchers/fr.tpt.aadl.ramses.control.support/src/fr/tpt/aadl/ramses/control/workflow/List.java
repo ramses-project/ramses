@@ -41,6 +41,6 @@ public interface List extends EObject {
 	 * @model type="fr.tpt.aadl.ramses.control.workflow.File" containment="true" required="true"
 	 * @generated
 	 */
-	EList getFile();
+	EList<File> getFile();
 
 } // List

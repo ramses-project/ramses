@@ -6,6 +6,7 @@
  */
 package fr.tpt.aadl.ramses.control.workflow.impl;
 
+import fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
@@ -15,6 +16,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import fr.tpt.aadl.ramses.control.workflow.Analysis;
+import fr.tpt.aadl.ramses.control.workflow.AnalysisElement;
 import fr.tpt.aadl.ramses.control.workflow.AnalysisOption;
 import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
@@ -27,10 +29,10 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getMethod <em>Method</em>}</li>
- *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getMode <em>Mode</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getYesOption <em>Yes Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getNoOption <em>No Option</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getMethod <em>Method</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getMode <em>Mode</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.AnalysisImpl#getOutputModelIdentifier <em>Output Model Identifier</em>}</li>
  * </ul>
  * </p>
@@ -39,390 +41,451 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
  */
 public class AnalysisImpl extends WorkflowElementImpl implements Analysis {
 	/**
-	 * The default value of the '{@link #getMethod() <em>Method</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getYesOption() <em>Yes Option</em>}' containment reference.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getMethod()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String METHOD_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getMethod() <em>Method</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMethod()
-	 * @generated
-	 * @ordered
-	 */
-	protected String method = METHOD_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getMode() <em>Mode</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMode()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String MODE_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getMode() <em>Mode</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMode()
-	 * @generated
-	 * @ordered
-	 */
-	protected String mode = MODE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getYesOption() <em>Yes Option</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getYesOption()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getYesOption()
+   * @generated
+   * @ordered
+   */
 	protected AnalysisOption yesOption;
 
 	/**
-	 * The cached value of the '{@link #getNoOption() <em>No Option</em>}' containment reference.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getNoOption() <em>No Option</em>}' containment reference.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getNoOption()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getNoOption()
+   * @generated
+   * @ordered
+   */
 	protected AnalysisOption noOption;
 
 	/**
-	 * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
-	 * <!-- begin-user-doc -->
+   * The default value of the '{@link #getMethod() <em>Method</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getOutputModelIdentifier()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getMethod()
+   * @generated
+   * @ordered
+   */
+	protected static final String METHOD_EDEFAULT = null;
+
+	/**
+   * The cached value of the '{@link #getMethod() <em>Method</em>}' attribute.
+   * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+   * @see #getMethod()
+   * @generated
+   * @ordered
+   */
+	protected String method = METHOD_EDEFAULT;
+
+	/**
+   * The default value of the '{@link #getMode() <em>Mode</em>}' attribute.
+   * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+   * @see #getMode()
+   * @generated
+   * @ordered
+   */
+	protected static final String MODE_EDEFAULT = null;
+
+	/**
+   * The cached value of the '{@link #getMode() <em>Mode</em>}' attribute.
+   * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+   * @see #getMode()
+   * @generated
+   * @ordered
+   */
+	protected String mode = MODE_EDEFAULT;
+
+	/**
+   * The cached value of the '{@link #getOutputModelIdentifier() <em>Output Model Identifier</em>}' containment reference.
+   * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+   * @see #getOutputModelIdentifier()
+   * @generated
+   * @ordered
+   */
 	protected ModelIdentifier outputModelIdentifier;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected AnalysisImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.ANALYSIS;
-	}
+    return WorkflowPackage.Literals.ANALYSIS;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public String getMethod() {
-		return method;
-	}
+    return method;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setMethod(String newMethod) {
-		String oldMethod = method;
-		method = newMethod;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__METHOD, oldMethod, method));
-	}
+    String oldMethod = method;
+    method = newMethod;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__METHOD, oldMethod, method));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public String getMode() {
-		return mode;
-	}
+    return mode;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setMode(String newMode) {
-		String oldMode = mode;
-		mode = newMode;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__MODE, oldMode, mode));
-	}
+    String oldMode = mode;
+    mode = newMode;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__MODE, oldMode, mode));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisOption getYesOption() {
-		return yesOption;
-	}
+    return yesOption;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public NotificationChain basicSetYesOption(AnalysisOption newYesOption, NotificationChain msgs) {
-		AnalysisOption oldYesOption = yesOption;
-		yesOption = newYesOption;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__YES_OPTION, oldYesOption, newYesOption);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
+    AnalysisOption oldYesOption = yesOption;
+    yesOption = newYesOption;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__YES_OPTION, oldYesOption, newYesOption);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setYesOption(AnalysisOption newYesOption) {
-		if (newYesOption != yesOption) {
-			NotificationChain msgs = null;
-			if (yesOption != null)
-				msgs = ((InternalEObject)yesOption).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__YES_OPTION, null, msgs);
-			if (newYesOption != null)
-				msgs = ((InternalEObject)newYesOption).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__YES_OPTION, null, msgs);
-			msgs = basicSetYesOption(newYesOption, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__YES_OPTION, newYesOption, newYesOption));
-	}
+    if (newYesOption != yesOption)
+    {
+      NotificationChain msgs = null;
+      if (yesOption != null)
+        msgs = ((InternalEObject)yesOption).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__YES_OPTION, null, msgs);
+      if (newYesOption != null)
+        msgs = ((InternalEObject)newYesOption).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__YES_OPTION, null, msgs);
+      msgs = basicSetYesOption(newYesOption, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__YES_OPTION, newYesOption, newYesOption));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisOption getNoOption() {
-		return noOption;
-	}
+    return noOption;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public NotificationChain basicSetNoOption(AnalysisOption newNoOption, NotificationChain msgs) {
-		AnalysisOption oldNoOption = noOption;
-		noOption = newNoOption;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__NO_OPTION, oldNoOption, newNoOption);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
+    AnalysisOption oldNoOption = noOption;
+    noOption = newNoOption;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__NO_OPTION, oldNoOption, newNoOption);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setNoOption(AnalysisOption newNoOption) {
-		if (newNoOption != noOption) {
-			NotificationChain msgs = null;
-			if (noOption != null)
-				msgs = ((InternalEObject)noOption).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__NO_OPTION, null, msgs);
-			if (newNoOption != null)
-				msgs = ((InternalEObject)newNoOption).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__NO_OPTION, null, msgs);
-			msgs = basicSetNoOption(newNoOption, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__NO_OPTION, newNoOption, newNoOption));
-	}
+    if (newNoOption != noOption)
+    {
+      NotificationChain msgs = null;
+      if (noOption != null)
+        msgs = ((InternalEObject)noOption).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__NO_OPTION, null, msgs);
+      if (newNoOption != null)
+        msgs = ((InternalEObject)newNoOption).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__NO_OPTION, null, msgs);
+      msgs = basicSetNoOption(newNoOption, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__NO_OPTION, newNoOption, newNoOption));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public ModelIdentifier getOutputModelIdentifier() {
-		return outputModelIdentifier;
-	}
+    return outputModelIdentifier;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public NotificationChain basicSetOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier, NotificationChain msgs) {
-		ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
-		outputModelIdentifier = newOutputModelIdentifier;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, newOutputModelIdentifier);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
+    ModelIdentifier oldOutputModelIdentifier = outputModelIdentifier;
+    outputModelIdentifier = newOutputModelIdentifier;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, oldOutputModelIdentifier, newOutputModelIdentifier);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setOutputModelIdentifier(ModelIdentifier newOutputModelIdentifier) {
-		if (newOutputModelIdentifier != outputModelIdentifier) {
-			NotificationChain msgs = null;
-			if (outputModelIdentifier != null)
-				msgs = ((InternalEObject)outputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, null, msgs);
-			if (newOutputModelIdentifier != null)
-				msgs = ((InternalEObject)newOutputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, null, msgs);
-			msgs = basicSetOutputModelIdentifier(newOutputModelIdentifier, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, newOutputModelIdentifier, newOutputModelIdentifier));
-	}
+    if (newOutputModelIdentifier != outputModelIdentifier)
+    {
+      NotificationChain msgs = null;
+      if (outputModelIdentifier != null)
+        msgs = ((InternalEObject)outputModelIdentifier).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+      if (newOutputModelIdentifier != null)
+        msgs = ((InternalEObject)newOutputModelIdentifier).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, null, msgs);
+      msgs = basicSetOutputModelIdentifier(newOutputModelIdentifier, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER, newOutputModelIdentifier, newOutputModelIdentifier));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS__YES_OPTION:
-				return basicSetYesOption(null, msgs);
-			case WorkflowPackage.ANALYSIS__NO_OPTION:
-				return basicSetNoOption(null, msgs);
-			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
-				return basicSetOutputModelIdentifier(null, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS__YES_OPTION:
+        return basicSetYesOption(null, msgs);
+      case WorkflowPackage.ANALYSIS__NO_OPTION:
+        return basicSetNoOption(null, msgs);
+      case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+        return basicSetOutputModelIdentifier(null, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS__METHOD:
-				return getMethod();
-			case WorkflowPackage.ANALYSIS__MODE:
-				return getMode();
-			case WorkflowPackage.ANALYSIS__YES_OPTION:
-				return getYesOption();
-			case WorkflowPackage.ANALYSIS__NO_OPTION:
-				return getNoOption();
-			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
-				return getOutputModelIdentifier();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS__YES_OPTION:
+        return getYesOption();
+      case WorkflowPackage.ANALYSIS__NO_OPTION:
+        return getNoOption();
+      case WorkflowPackage.ANALYSIS__METHOD:
+        return getMethod();
+      case WorkflowPackage.ANALYSIS__MODE:
+        return getMode();
+      case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+        return getOutputModelIdentifier();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS__METHOD:
-				setMethod((String)newValue);
-				return;
-			case WorkflowPackage.ANALYSIS__MODE:
-				setMode((String)newValue);
-				return;
-			case WorkflowPackage.ANALYSIS__YES_OPTION:
-				setYesOption((AnalysisOption)newValue);
-				return;
-			case WorkflowPackage.ANALYSIS__NO_OPTION:
-				setNoOption((AnalysisOption)newValue);
-				return;
-			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
-				setOutputModelIdentifier((ModelIdentifier)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS__YES_OPTION:
+        setYesOption((AnalysisOption)newValue);
+        return;
+      case WorkflowPackage.ANALYSIS__NO_OPTION:
+        setNoOption((AnalysisOption)newValue);
+        return;
+      case WorkflowPackage.ANALYSIS__METHOD:
+        setMethod((String)newValue);
+        return;
+      case WorkflowPackage.ANALYSIS__MODE:
+        setMode((String)newValue);
+        return;
+      case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+        setOutputModelIdentifier((ModelIdentifier)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS__METHOD:
-				setMethod(METHOD_EDEFAULT);
-				return;
-			case WorkflowPackage.ANALYSIS__MODE:
-				setMode(MODE_EDEFAULT);
-				return;
-			case WorkflowPackage.ANALYSIS__YES_OPTION:
-				setYesOption((AnalysisOption)null);
-				return;
-			case WorkflowPackage.ANALYSIS__NO_OPTION:
-				setNoOption((AnalysisOption)null);
-				return;
-			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
-				setOutputModelIdentifier((ModelIdentifier)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS__YES_OPTION:
+        setYesOption((AnalysisOption)null);
+        return;
+      case WorkflowPackage.ANALYSIS__NO_OPTION:
+        setNoOption((AnalysisOption)null);
+        return;
+      case WorkflowPackage.ANALYSIS__METHOD:
+        setMethod(METHOD_EDEFAULT);
+        return;
+      case WorkflowPackage.ANALYSIS__MODE:
+        setMode(MODE_EDEFAULT);
+        return;
+      case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+        setOutputModelIdentifier((ModelIdentifier)null);
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case WorkflowPackage.ANALYSIS__METHOD:
-				return METHOD_EDEFAULT == null ? method != null : !METHOD_EDEFAULT.equals(method);
-			case WorkflowPackage.ANALYSIS__MODE:
-				return MODE_EDEFAULT == null ? mode != null : !MODE_EDEFAULT.equals(mode);
-			case WorkflowPackage.ANALYSIS__YES_OPTION:
-				return yesOption != null;
-			case WorkflowPackage.ANALYSIS__NO_OPTION:
-				return noOption != null;
-			case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
-				return outputModelIdentifier != null;
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID)
+    {
+      case WorkflowPackage.ANALYSIS__YES_OPTION:
+        return yesOption != null;
+      case WorkflowPackage.ANALYSIS__NO_OPTION:
+        return noOption != null;
+      case WorkflowPackage.ANALYSIS__METHOD:
+        return METHOD_EDEFAULT == null ? method != null : !METHOD_EDEFAULT.equals(method);
+      case WorkflowPackage.ANALYSIS__MODE:
+        return MODE_EDEFAULT == null ? mode != null : !MODE_EDEFAULT.equals(mode);
+      case WorkflowPackage.ANALYSIS__OUTPUT_MODEL_IDENTIFIER:
+        return outputModelIdentifier != null;
+    }
+    return super.eIsSet(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String toString() {
-		if (eIsProxy()) return super.toString();
+   * @generated
+   */
+	public int eBaseStructuralFeatureID(int derivedFeatureID, Class baseClass) {
+    if (baseClass == AnalysisElement.class)
+    {
+      switch (derivedFeatureID)
+      {
+        default: return -1;
+      }
+    }
+    if (baseClass == AbstractAnalysis.class)
+    {
+      switch (derivedFeatureID)
+      {
+        case WorkflowPackage.ANALYSIS__YES_OPTION: return WorkflowPackage.ABSTRACT_ANALYSIS__YES_OPTION;
+        case WorkflowPackage.ANALYSIS__NO_OPTION: return WorkflowPackage.ABSTRACT_ANALYSIS__NO_OPTION;
+        default: return -1;
+      }
+    }
+    return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
+  }
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (method: ");
-		result.append(method);
-		result.append(", mode: ");
-		result.append(mode);
-		result.append(')');
-		return result.toString();
-	}
+	/**
+   * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+   * @generated
+   */
+	public int eDerivedStructuralFeatureID(int baseFeatureID, Class baseClass) {
+    if (baseClass == AnalysisElement.class)
+    {
+      switch (baseFeatureID)
+      {
+        default: return -1;
+      }
+    }
+    if (baseClass == AbstractAnalysis.class)
+    {
+      switch (baseFeatureID)
+      {
+        case WorkflowPackage.ABSTRACT_ANALYSIS__YES_OPTION: return WorkflowPackage.ANALYSIS__YES_OPTION;
+        case WorkflowPackage.ABSTRACT_ANALYSIS__NO_OPTION: return WorkflowPackage.ANALYSIS__NO_OPTION;
+        default: return -1;
+      }
+    }
+    return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
+  }
+
+	/**
+   * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+   * @generated
+   */
+	public String toString() {
+    if (eIsProxy()) return super.toString();
+
+    StringBuffer result = new StringBuffer(super.toString());
+    result.append(" (method: ");
+    result.append(method);
+    result.append(", mode: ");
+    result.append(mode);
+    result.append(')');
+    return result.toString();
+  }
 
 } //AnalysisImpl
