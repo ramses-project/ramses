@@ -54,8 +54,9 @@ public class ToolSuiteLauncher
       logger.setLogLevel(Logger.ALL);
       /***************/      
       
-      SystemMessageReporter syslogger = new SysMsgReporter4Cli(logger, System.out) ;
-
+      SystemMessageReporter syslogger = new SysMsgReporter4Cli(logger,
+                                                               System.out,
+                                                               System.err) ;
       ServiceProvider.SYS_MSG_REP = syslogger ;
       
       IProgressMonitor monitor = new RamsesProgressMonitor(logger, System.out) ;

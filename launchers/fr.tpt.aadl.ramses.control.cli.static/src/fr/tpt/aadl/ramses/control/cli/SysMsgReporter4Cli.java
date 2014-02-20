@@ -8,8 +8,10 @@ import fr.tpt.aadl.ramses.control.support.reporters.Logger ;
 public class SysMsgReporter4Cli extends AbstractSystemMessageReporter
 {
   protected PrintStream _output ;
+  protected PrintStream _err ;
   
-  public SysMsgReporter4Cli(Logger logger, PrintStream outputStream)
+  public SysMsgReporter4Cli(Logger logger, PrintStream outputStream,
+                                           PrintStream errStream)
   {
     super(logger) ;
     _output = outputStream ;
@@ -24,7 +26,7 @@ public class SysMsgReporter4Cli extends AbstractSystemMessageReporter
    msg = super.msgFormatter(clazz, line, msg) ;
    if(false == _logger.hasConsoleOutputOn())
    {
-     _output.println(msg) ;
+     _err.println(msg) ;
    }
    _logger.fatal(msg, ex);
   }
@@ -42,7 +44,7 @@ public class SysMsgReporter4Cli extends AbstractSystemMessageReporter
   {
     if(false == _logger.hasConsoleOutputOn())
     {
-      _output.println(msg) ;
+      _err.println(msg) ;
     }
     _logger.fatal(msg);
   }
@@ -68,7 +70,7 @@ public class SysMsgReporter4Cli extends AbstractSystemMessageReporter
   {
     if(false == _logger.hasConsoleOutputOn())
     {
-      _output.println(msg) ;
+      _err.println(msg) ;
     }
     _logger.error(msg);
   }
