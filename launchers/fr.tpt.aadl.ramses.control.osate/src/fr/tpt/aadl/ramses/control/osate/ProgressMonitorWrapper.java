@@ -3,14 +3,14 @@ package fr.tpt.aadl.ramses.control.osate;
 import org.eclipse.core.runtime.IProgressMonitor ;
 
 import fr.tpt.aadl.ramses.control.support.reporters.AbstractProgressMonitor ;
-import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
+import fr.tpt.aadl.ramses.control.support.reporters.Logger ;
 
 public class ProgressMonitorWrapper extends AbstractProgressMonitor
 {
   protected IProgressMonitor _monitor ;
   
   public ProgressMonitorWrapper(IProgressMonitor osateMonitor,
-                                RamsesLogger logger)
+                                Logger logger)
   {
     super(logger) ;
     _monitor = osateMonitor ;

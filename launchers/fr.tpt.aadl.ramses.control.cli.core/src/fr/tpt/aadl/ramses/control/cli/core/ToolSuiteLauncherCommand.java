@@ -101,6 +101,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static String _systemToInstantiate ;
   private static ToolSuiteLauncher _launcher ;
   
+  private static IProgressMonitor _monitor ;
+  
   
   /**
    * This method is the main entry point of the Command Line 
@@ -109,8 +111,10 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
    * launches the corresponding actions.
    * @throws Exception 
    */
-  public static void main(String[] args) throws Exception
+  public static void main(String[] args, IProgressMonitor monitor) throws Exception
   {
+    _monitor = monitor ;
+    
     JSAP jsap = new JSAP() ;
 
     try
@@ -340,24 +344,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
     return result ;
   }
-  /*
-  @SuppressWarnings("rawtypes")
-  private static void reportError(Iterator errs,
-                                  String message)
-  {
-    StringBuilder sb = new StringBuilder() ;
-
-    while(errs.hasNext())
-    {
-      sb.append("Error: ") ;
-      sb.append(errs.next()) ;
-      sb.append('\n') ;
-    }
-
-    sb.append(message) ;
-    _errorReporter.internalErrorImpl(sb.toString()) ;
-  }
-  */
   
   private static void commonOptionsHandler(JSAPResult options) throws Exception
   {
@@ -374,10 +360,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
     setRamsesResourceDir(_includeDirs) ;
         
-    IProgressMonitor monitor = new RamsesProgressMonitor(ServiceProvider.LOGGER, System.out) ;
-    
     StandAloneInstantiator instantiator = new StandAloneInstantiator(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
-                                                                     monitor) ;
+                                                                     _monitor) ;
     PredefinedAadlModelManager modelManager = new ContributedAadlRegistration(instantiator) ;
     
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
@@ -386,7 +370,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     /**************************************************************************/
     
     
-    _launcher = new ToolSuiteLauncher(monitor, instantiator, modelManager) ;
+    _launcher = new ToolSuiteLauncher(_monitor, instantiator, modelManager) ;
     
     _mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,

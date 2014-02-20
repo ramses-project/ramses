@@ -5,9 +5,8 @@ import java.io.File ;
 import org.apache.log4j.ConsoleAppender ;
 import org.apache.log4j.Level ;
 import org.apache.log4j.SimpleLayout ;
-import org.apache.log4j.Logger ;
 
-import fr.tpt.aadl.ramses.control.support.reporters.InternalLogger ;
+import fr.tpt.aadl.ramses.control.support.reporters.Logger ;
 
 /**
  * 
@@ -15,26 +14,37 @@ import fr.tpt.aadl.ramses.control.support.reporters.InternalLogger ;
  *
  */
 
-public class Logger4Cli implements InternalLogger
+public class Logger4Cli implements Logger
 {
   private final static String _LOG_FILE_NAME = "ramses.log" ;
   
-  private final static Logger _INT_LOGGER = Logger.getLogger(Logger4Cli.class) ;
+  private final static org.apache.log4j.Logger _INT_LOGGER = 
+                           org.apache.log4j.Logger.getLogger(Logger4Cli.class) ;
+  
+  private final static ConsoleAppender _CA = new ConsoleAppender() ;
+  
+  private boolean _isConsolOutputOn = false ;
+  
+  static
+  {
+    _CA.setLayout(new SimpleLayout());
+    _CA.activateOptions();
+  }
   
   public Logger4Cli()
   {
-    /**** DEBUG ****/
-    ConsoleAppender ca = new ConsoleAppender() ;
-    ca.setLayout(new SimpleLayout());
-    ca.activateOptions();
-    /***************/
-    _INT_LOGGER.addAppender(ca);
   }
 
   @Override
-  public void error(String msg, Throwable ex)
+  public void fatal(String msg, Throwable ex)
   {
     _INT_LOGGER.fatal(msg, ex);
+  }
+  
+  @Override
+  public void fatal(String msg)
+  {
+    _INT_LOGGER.fatal(msg);
   }
 
   @Override
@@ -74,43 +84,43 @@ public class Logger4Cli implements InternalLogger
     
     switch(lvl)
     {
-      case InternalLogger.FATAL:
+      case Logger.FATAL:
       {
         l = Level.FATAL ;
         break ;
       }
       
-      case InternalLogger.ERROR:
+      case Logger.ERROR:
       {
         l = Level.ERROR ;
         break ;
       }
       
-      case InternalLogger.WARNING:
+      case Logger.WARNING:
       {
         l = Level.WARN ;
         break ;
       }
       
-      case InternalLogger.TRACE:
-      {
-        l = Level.TRACE ;
-        break ;
-      }
-      
-      case InternalLogger.INFO:
+      case Logger.INFO:
       {
         l = Level.INFO ;
         break ;
       }
       
-      case InternalLogger.DEBUG:
+      case Logger.DEBUG:
       {
         l = Level.DEBUG ;
         break ;
       }
       
-      case InternalLogger.ALL:
+      case Logger.TRACE:
+      {
+        l = Level.TRACE ;
+        break ;
+      }
+      
+      case Logger.ALL:
       default:
       {
         l = Level.ALL ;
@@ -119,5 +129,27 @@ public class Logger4Cli implements InternalLogger
     }
     
     _INT_LOGGER.setLevel(l);    
+  }
+
+  @Override
+  public void setConsoleOutput(boolean isOn)
+  {
+    if(isOn && (! _isConsolOutputOn))
+    {
+      _INT_LOGGER.addAppender(_CA);
+      _isConsolOutputOn = true ;
+    }
+    else if(_isConsolOutputOn && (! isOn))
+    {
+      _INT_LOGGER.removeAppender(_CA);
+      _isConsolOutputOn = false ;
+    }
+    // else nothing to do.
+  }
+
+  @Override
+  public boolean hasConsoleOutputOn()
+  {
+    return _isConsolOutputOn ;
   }
 }

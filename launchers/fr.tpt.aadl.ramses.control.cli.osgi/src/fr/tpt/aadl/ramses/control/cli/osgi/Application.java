@@ -51,7 +51,7 @@ public class Application implements IApplication
     @SuppressWarnings("unchecked")
     Map<String, String[]> argsMap = context.getArguments() ;
     String[] args = argsMap.get("application.args") ;
-    ToolSuiteLauncherCommand.main(args) ;
+//    ToolSuiteLauncherCommand.main(args) ;
     return IApplication.EXIT_OK ;
   }
 

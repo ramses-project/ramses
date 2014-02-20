@@ -21,9 +21,12 @@
 
 package fr.tpt.aadl.ramses.control.cli ;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
+
+import fr.tpt.aadl.ramses.control.cli.core.RamsesProgressMonitor ;
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
-import fr.tpt.aadl.ramses.control.support.reporters.InternalLogger ;
-import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
+import fr.tpt.aadl.ramses.control.support.reporters.Logger ;
+import fr.tpt.aadl.ramses.control.support.reporters.SystemMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
@@ -45,21 +48,23 @@ public class ToolSuiteLauncher
   {
     try
     {
-      Logger4Cli internalLogger = new Logger4Cli() ;
-      
-      RamsesLogger logger = new RamsesLogger(internalLogger) ;
+      Logger4Cli logger = new Logger4Cli() ;
+      logger.setConsoleOutput(true);
       /**** DEBUG ****/
-      logger.setStreamMode(true);
-      internalLogger.setLogLevel(InternalLogger.ALL);
-      /***************/
+      logger.setLogLevel(Logger.ALL);
+      /***************/      
       
-      ServiceProvider.LOGGER = logger ;
+      SystemMessageReporter syslogger = new SysMsgReporter4Cli(logger, System.out) ;
+
+      ServiceProvider.SYS_MSG_REP = syslogger ;
+      
+      IProgressMonitor monitor = new RamsesProgressMonitor(logger, System.out) ;
       
       ServiceRegistry registry = new StaticServiceRegistry() ;
       
       ServiceProvider.setDefault(registry) ;
       
-      ToolSuiteLauncherCommand.main(args) ;
+      ToolSuiteLauncherCommand.main(args, monitor) ;
     }
     catch(Exception e)
     {

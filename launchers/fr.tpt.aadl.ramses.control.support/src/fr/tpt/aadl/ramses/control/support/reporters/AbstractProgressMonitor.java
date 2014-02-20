@@ -4,12 +4,12 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 
 public abstract class AbstractProgressMonitor implements IProgressMonitor
 {
-  protected RamsesLogger _logger ;
+  protected Logger _logger ;
   protected String _mainTask ;
   protected boolean _isNotCanceled = false ;
   protected int _totalWork = 0;
   
-  public AbstractProgressMonitor(RamsesLogger logger)
+  public AbstractProgressMonitor(Logger logger)
   {
     _logger = logger ;
   }

@@ -1,16 +1,16 @@
 package fr.tpt.aadl.ramses.control.support.reporters;
 
-public interface InternalLogger
+public interface Logger
 {
   // Severity rule:
-  // ALL == DEBUG < INFO < WARN < ERROR < FATAL < OFF
+  // ALL == TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF
   public final static short OFF     = 0 ;
   public final static short FATAL   = 1 ;
   public final static short ERROR   = 2 ;
   public final static short WARNING = 3 ;
-  public final static short TRACE   = 4 ;
-  public final static short INFO    = 5 ;
-  public final static short DEBUG   = 6 ;
+  public final static short INFO    = 4 ;
+  public final static short DEBUG   = 5 ;
+  public final static short TRACE   = 6 ;
   public final static short ALL     = 7 ;
   
   /**
@@ -20,7 +20,14 @@ public interface InternalLogger
    * @param msg the given error message
    * @param ex the given exception
    */
-  public void error(String msg, Throwable ex) ;
+  public void fatal(String msg, Throwable ex) ;
+  
+  /**
+   * Log a fatal error.
+   * 
+   * @param msg the given error message
+   */
+  public void fatal(String msg) ;
   
   /**
    * Log an error message (not fatal).
@@ -60,9 +67,27 @@ public interface InternalLogger
   /**
    * Set the level of log message.
    * Displaying rule:
-   * ALL == DEBUG < INFO < WARN < ERROR < FATAL < OFF
+   * ALL == TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF
    * 
    * @param lvl
    */
   public void setLogLevel(short lvl) ;
+  
+  /**
+   * Enable ({@code true}) to print message to the standard output and
+   * standard error.
+   * 
+   * @param isOn enable console output
+   */
+  public void setConsoleOutput(boolean isOn) ;
+  
+  /**
+   * Return if the console output is enable ({@code true}) or not.
+   * 
+   * @see #setConsoleOutput(boolean)
+   * 
+   * @return {@code true} if the console output is enable. {@code false}
+   * otherwise.
+   */
+  public boolean hasConsoleOutputOn() ;
 }

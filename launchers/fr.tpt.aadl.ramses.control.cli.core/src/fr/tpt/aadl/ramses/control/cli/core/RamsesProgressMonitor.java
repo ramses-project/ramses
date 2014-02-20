@@ -3,13 +3,13 @@ package fr.tpt.aadl.ramses.control.cli.core;
 import java.io.PrintStream ;
 
 import fr.tpt.aadl.ramses.control.support.reporters.AbstractProgressMonitor ;
-import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
+import fr.tpt.aadl.ramses.control.support.reporters.Logger ;
 
 public class RamsesProgressMonitor extends AbstractProgressMonitor
 {
   protected PrintStream _output ;
   
-  public RamsesProgressMonitor(RamsesLogger logger, PrintStream outputStream)
+  public RamsesProgressMonitor(Logger logger, PrintStream outputStream)
   {
     super(logger) ;
     _output = outputStream ;
@@ -24,7 +24,10 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
       _mainTask = name ;
       _totalWork = totalWork ;
       String msg = super.formatBeginTask(name, totalWork) ;
-      _output.println(msg) ;
+      if(false == _logger.hasConsoleOutputOn())
+      {
+        _output.println(msg) ;
+      }
       _logger.info(msg) ;
       _isNotCanceled = true ;
     }
@@ -37,7 +40,10 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     {
       _isNotCanceled = false ; // According to the IProgressMonitor definition.
       String msg = super.formatDone(_mainTask) ;
-      _output.println(msg) ;
+      if(false == _logger.hasConsoleOutputOn())
+      {
+        _output.println(msg) ;
+      }
       _logger.info(msg) ;
     }
   }
@@ -64,7 +70,10 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
       {
         _isNotCanceled = false ;
         String msg = super.formatCanceled(_mainTask) ;
-        _output.println(msg) ;
+        if(false == _logger.hasConsoleOutputOn())
+        {
+          _output.println(msg) ;
+        }
         _logger.info(msg) ;
       }
     }
@@ -83,7 +92,10 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     if(_isNotCanceled)
     {
       String msg = super.formatSubTask(name) ;
-      _output.println(msg) ;
+      if(false == _logger.hasConsoleOutputOn())
+      {
+        _output.println(msg) ;
+      }
       _logger.info(msg) ;
     }
   }
@@ -94,7 +106,10 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     if(_isNotCanceled)
     {
       String msg = super.formatWorked(work, _totalWork) ;
-      _output.println(msg) ;
+      if(false == _logger.hasConsoleOutputOn())
+      {
+        _output.println(msg) ;
+      }
       _logger.info(msg) ;
     }
   }

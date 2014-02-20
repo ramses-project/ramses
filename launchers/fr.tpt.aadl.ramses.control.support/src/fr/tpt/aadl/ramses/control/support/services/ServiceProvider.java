@@ -21,7 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.support.services ;
 
-import fr.tpt.aadl.ramses.control.support.reporters.RamsesLogger ;
+import fr.tpt.aadl.ramses.control.support.reporters.SystemMessageReporter ;
 
 public class ServiceProvider
 {
@@ -37,5 +37,5 @@ public class ServiceProvider
     return _sr ;
   }
   
-  public static RamsesLogger LOGGER ;
+  public static SystemMessageReporter SYS_MSG_REP ;
 }

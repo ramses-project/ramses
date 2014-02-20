@@ -4,7 +4,6 @@ Bundle-Name: fr.tpt.aadl.ramses.control.support
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.support;singleton:=true
 Bundle-Version: 0.5.0
 Bundle-Vendor: TPT
-Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.tpt.aadl.ramses.control.support,
