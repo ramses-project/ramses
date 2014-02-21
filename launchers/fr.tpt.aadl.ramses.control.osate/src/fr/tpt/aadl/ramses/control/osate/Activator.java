@@ -21,6 +21,13 @@
 
 package fr.tpt.aadl.ramses.control.osate;
 
+import org.apache.log4j.FileAppender ;
+import org.apache.log4j.Level ;
+import org.apache.log4j.Logger ;
+import org.apache.log4j.SimpleLayout ;
+import org.eclipse.core.runtime.IStatus ;
+import org.eclipse.core.runtime.Platform ;
+import org.eclipse.core.runtime.Status ;
 import org.eclipse.jface.resource.ImageDescriptor ;
 import org.eclipse.ui.plugin.AbstractUIPlugin ;
 import org.osate.ui.dialogs.Dialog ;
@@ -57,6 +64,21 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
+		// Print a session logging header.
+    getLog().log(new Status(IStatus.OK, "Starting RAMSES plugin suite ...", "RAMSES starting ...")); ;
+    
+    // Configure Log4j.
+    FileAppender fa = new FileAppender() ;
+    fa.setLayout(new SimpleLayout());
+    fa.setFile(Platform.getLogFileLocation().toString());
+    fa.activateOptions();
+    Logger  logger = Logger.getRootLogger() ;
+    logger.addAppender(fa);
+    /*** hard set logging level ***/
+    // TODO let the user choose the logging level: implement a gui.
+    // DEBUG level is set to DEBUG.
+    logger.setLevel(Level.DEBUG);
 		
 		try
     {

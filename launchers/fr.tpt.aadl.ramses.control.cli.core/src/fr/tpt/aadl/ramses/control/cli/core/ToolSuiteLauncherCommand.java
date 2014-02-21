@@ -28,7 +28,6 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
-import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
 import com.martiansoftware.jsap.FlaggedOption ;
@@ -52,8 +51,8 @@ import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
 import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 /**
  * This class provides the main entry point of the Command Line 
@@ -115,8 +114,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     try
     {
       initSwitches(jsap) ;
-      JSAPResult parseConfig = jsap.parse(args) ;
-      boolean helpOnly = parseConfig.getBoolean(HELP_ONLY_OPTION_ID) ;
+      JSAPResult options = jsap.parse(args) ;
+      boolean helpOnly = options.getBoolean(HELP_ONLY_OPTION_ID) ;
 
       if(helpOnly)
       {
@@ -125,22 +124,24 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       }
       else
       {
-        if(parseConfig.success())
+        if(options.success())
         {
-          boolean parseOnly = parseConfig.getBoolean(PARSE_ONLY_OPTION_ID) ;
-          boolean analysisOnly = parseConfig.getBoolean(ANALYSIS_ONLY_OPTION_ID) ;
+          boolean parseOnly = options.getBoolean(PARSE_ONLY_OPTION_ID) ;
+          boolean analysisOnly = options.getBoolean(ANALYSIS_ONLY_OPTION_ID) ;
+          
+          commonOptionsHandler(options) ;
           
           if(parseOnly)
           {
-            parse(parseConfig) ;
+            parse(options) ;
           }
           else if(analysisOnly)
           { 
-            analyse(parseConfig) ;
+            analyse(options) ;
           }
           else // Case of generation.
           {
-            generation(parseConfig) ;
+            generation(options) ;
           }
         }
       
@@ -342,6 +343,10 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   private static void commonOptionsHandler(JSAPResult options) throws Exception
   {
+    /*******************************************************************/
+    /******TODO ********* HANDLE LOGGING OPTIONS ***********************/
+    /*******************************************************************/
+    
     String[] includeFolderNames =
           options.getStringArray(INCLUDES_OPTION_ID) ;
     String[] mainModels = options.getStringArray(SOURCE_MODELS_OPTION_ID) ;
@@ -355,7 +360,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
     setRamsesResourceDir(_includeDirs) ;
     
-    RamsesProgressMonitor monitor = new RamsesProgressMonitor() ;
+    RamsesProgressMonitor monitor = new RamsesProgressMonitor(System.out) ;
     
     
     StandAloneInstantiator instantiator = new StandAloneInstantiator(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
@@ -378,8 +383,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static void parse(JSAPResult options)
         throws Exception
   {
-    commonOptionsHandler(options) ;
-    
     _launcher.parsePredefinedRessources() ;
     List<Resource> modelResources = _launcher.parse(_mainModelFiles) ;
     MessageStatus ms = MessageStatus.INFO ;
@@ -439,7 +442,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
         
   {
     RamsesConfiguration config = new RamsesConfiguration() ;
-    commonOptionsHandler(options);
     instantiationOptionsHandler(options, config);
     
     String[] analysisToPerform =
@@ -487,8 +489,6 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                                                    throws Exception
   {
     RamsesConfiguration config = new RamsesConfiguration() ;
-    
-    commonOptionsHandler(options);
     instantiationOptionsHandler(options, config);
     
     String targetName = options.getString(GENERATION_OPTION_ID) ;

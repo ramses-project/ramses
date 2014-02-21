@@ -21,14 +21,9 @@
 
 package fr.tpt.aadl.ramses.control.cli ;
 
-import org.eclipse.core.runtime.IProgressMonitor ;
-
-import fr.tpt.aadl.ramses.control.cli.core.RamsesProgressMonitor ;
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
-import fr.tpt.aadl.ramses.control.support.reporters.Logger ;
-import fr.tpt.aadl.ramses.control.support.reporters.SystemMessageReporter ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 /**
  * This class implements a Standalone Java application for

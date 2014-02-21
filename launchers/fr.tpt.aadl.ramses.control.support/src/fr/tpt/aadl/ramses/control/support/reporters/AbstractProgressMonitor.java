@@ -4,15 +4,9 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 
 public abstract class AbstractProgressMonitor implements IProgressMonitor
 {
-  protected Logger _logger ;
   protected String _mainTask ;
   protected boolean _isNotCanceled = false ;
   protected int _totalWork = 0;
-  
-  public AbstractProgressMonitor(Logger logger)
-  {
-    _logger = logger ;
-  }
   
   protected String formatBeginTask(String name,
                                    int totalWork)
