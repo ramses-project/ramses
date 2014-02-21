@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 public abstract class AbstractProgressMonitor implements IProgressMonitor
 {
   protected String _mainTask ;
-  protected boolean _isNotCanceled = false ;
+  protected boolean _isNotCanceled = true ;
   protected int _totalWork = 0;
   
   protected String formatBeginTask(String name,

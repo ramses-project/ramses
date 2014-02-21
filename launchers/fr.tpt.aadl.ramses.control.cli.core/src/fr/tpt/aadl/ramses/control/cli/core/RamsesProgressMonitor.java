@@ -17,14 +17,10 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
   public void beginTask(String name,
                         int totalWork)
   {
-    if(! _isNotCanceled)
-    {
-      _mainTask = name ;
-      _totalWork = totalWork ;
-      String msg = super.formatBeginTask(name, totalWork) ;
-      _output.println(msg) ;
-      _isNotCanceled = true ;
-    }
+    _mainTask = name ;
+    _totalWork = totalWork ;
+    String msg = super.formatBeginTask(name, totalWork) ;
+    _output.println(msg) ;
   }
 
   @Override
