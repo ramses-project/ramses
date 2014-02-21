@@ -38,16 +38,42 @@ public class SysErrReporter4Cli extends AbstractSystemErrReporter
   }
 
   @Override
-  public void error(String msg)
+  public void error(String msg, boolean isDelayed)
   {
     msg = super.formatErrorMsg(msg) ;
-    _err.println(msg) ;
+    
+    if(isDelayed)
+    {
+      _delayedErrors.add(msg) ;
+    }
+    else
+    {
+      _err.println(msg) ;
+    }
   }
 
   @Override
-  public void warning(String msg)
+  public void warning(String msg, boolean isDelayed)
   {
     msg = super.formatWarningMsg(msg) ;
-    _err.println(msg) ;
+    
+    if(isDelayed)
+    {
+      _delayedWarnings.add(msg) ;
+    }
+    else
+    {
+      _err.println(msg) ;
+    }
+  }
+
+  @Override
+  public void delayedErrors()
+  {
+    String msg = super.formatDelayedErrors() ;
+    if(msg != null)
+    {
+      _err.println(msg) ;
+    }
   }
 }

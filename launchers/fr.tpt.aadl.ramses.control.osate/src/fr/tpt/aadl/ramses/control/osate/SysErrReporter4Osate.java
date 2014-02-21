@@ -1,36 +1,69 @@
 package fr.tpt.aadl.ramses.control.osate;
 
-import fr.tpt.aadl.ramses.control.support.reporters.SystemErrReporter ;
+import org.osate.ui.dialogs.Dialog ;
 
+import fr.tpt.aadl.ramses.control.support.reporters.AbstractSystemErrReporter ;
 
-public class SysErrReporter4Osate implements SystemErrReporter
+public class SysErrReporter4Osate extends AbstractSystemErrReporter
 {
   @Override
   public void fatal(String msg,
                     Throwable ex)
   {
-    // TODO Auto-generated method stub
-    
+    msg = super.formatFatalMsg(msg, ex) ;
+    Dialog.showError("RAMSES Fatal error", msg);
   }
 
   @Override
   public void fatal(String msg)
   {
-    // TODO Auto-generated method stub
-    
+    msg = super.formatFatalMsg(msg) ;
+    Dialog.showError("RAMSES Fatal error", msg);
   }
 
   @Override
-  public void error(String msg)
+  public void error(String msg, boolean isDelayed)
   {
-    // TODO Auto-generated method stub
-    
+    msg = super.formatErrorMsg(msg) ;
+    if(isDelayed)
+    {
+      _delayedErrors.add(msg) ;
+    }
+    else
+    {
+      Dialog.showError("RAMSES error", msg);
+    }
   }
 
   @Override
-  public void warning(String msg)
+  public void warning(String msg, boolean isDelayed)
   {
-    // TODO Auto-generated method stub
+    msg = super.formatWarningMsg(msg) ;
     
+    if(isDelayed)
+    {
+      _delayedWarnings.add(msg) ;
+    }
+    else
+    {
+      Dialog.showWarning("RAMSES warning", msg);
+    }
+  }
+
+  @Override
+  public void delayedErrors()
+  {
+    String msg = super.formatDelayedErrors() ;
+    if(msg != null)
+    {
+      if(_delayedErrors.isEmpty())
+      {
+        Dialog.showWarning("RAMSES warning", msg);
+      }
+      else
+      {
+        Dialog.showError("RAMSES error", msg);
+      }
+    }
   }
 }

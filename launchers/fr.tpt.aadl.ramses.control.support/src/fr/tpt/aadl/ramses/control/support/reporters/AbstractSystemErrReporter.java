@@ -1,7 +1,12 @@
 package fr.tpt.aadl.ramses.control.support.reporters;
 
+import java.util.LinkedList ;
+
 public abstract class AbstractSystemErrReporter implements SystemErrReporter
 {
+  protected LinkedList<String> _delayedErrors = new LinkedList<String>() ;
+  protected LinkedList<String> _delayedWarnings = new LinkedList<String>() ;
+  
   protected String formatFatalMsg(String initialMsg, Throwable ex)
   {
     // TODO to be implemented.
@@ -32,5 +37,42 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   {
     // TODO to be implemented.
     return "Warning: " + initialMsg ;
+  }
+  
+  protected String formatDelayedErrors()
+  {
+    if(!(_delayedErrors.isEmpty() && _delayedWarnings.isEmpty()))
+    {
+      // TODO to be refined.
+      StringBuilder sb = new StringBuilder() ;
+      
+      sb.append("RAMSES system report:") ;
+      
+      if(false == _delayedErrors.isEmpty())
+      {
+        sb.append("\n\n\tErrors:\n\n");
+        for(String msg : _delayedErrors)
+        {
+          sb.append("\t_ ") ;
+          sb.append(msg) ;
+        }
+      }
+      
+      if(false == _delayedWarnings.isEmpty())
+      {
+        sb.append("\n\n\tWarnings:\n\n");
+        for(String msg : _delayedWarnings)
+        {
+          sb.append("\t_ ") ;
+          sb.append(msg) ;
+        }
+      }
+      
+      return sb.toString() ;
+    }
+    else
+    {
+      return null ;
+    }
   }
 }

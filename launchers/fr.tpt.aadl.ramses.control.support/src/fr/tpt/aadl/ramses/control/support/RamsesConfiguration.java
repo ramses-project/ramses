@@ -3,12 +3,17 @@ package fr.tpt.aadl.ramses.control.support;
 import java.io.File ;
 import java.io.FileNotFoundException ;
 
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import org.apache.log4j.ConsoleAppender ;
+import org.apache.log4j.FileAppender ;
+import org.apache.log4j.Level ;
+import org.apache.log4j.Logger ;
+import org.apache.log4j.PatternLayout ;
+import org.osate.utils.FileUtils ;
+
 import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-
-import org.osate.utils.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 public class RamsesConfiguration
 {
@@ -271,5 +276,70 @@ public class RamsesConfiguration
   public static File getAadlPropertysetDir()
   {
     return _AADL_PROPERTYSET_DIR ;
+  }
+  
+  /**
+   * Setup RAMSES logging system. If loggingLevel is {@code null} or empty
+   * or/and logFile is {@code null}, logging is turn off.
+   * <br><br>
+   * If the logging level is not recognize, it is set to DEBUG.
+   * <br><br>
+   * Level:<br>
+   * <br>
+   * ALL == TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF
+   * <br><br>
+   * ALL, TRACE and DEBUG make logger to print extra informations (class name,
+   * timestamp, method name, code line) and to print to the standard output.
+   * 
+   * @see org.apache.log4j.Level
+   * 
+   * @param loggingLevel logging level
+   * @param logFile the log file
+   */
+  public static void setupLogging(String loggingLevel,
+                                  File logFile)
+  {
+    if(! (loggingLevel == null || loggingLevel.isEmpty() || logFile == null))
+    {
+      Logger rootLogger = Logger.getRootLogger() ;
+      Level lvl = Level.toLevel(loggingLevel) ;
+      PatternLayout layout ;
+      
+      switch(lvl.toInt())
+      {
+        case Level.ALL_INT:
+        case Level.TRACE_INT:
+        case Level.DEBUG_INT:
+        {
+          ConsoleAppender ca = new ConsoleAppender() ;
+          ca.setName(Names.LOG4J_CONSOLE_APPENDER_NAME);
+          String layoutPattern = "<%p> %m (%F::%M line %L ; %d)" ;
+          layout = new PatternLayout(layoutPattern) ;
+          ca.setLayout(layout);
+          ca.activateOptions();
+          rootLogger.addAppender(ca);
+          break;
+        }
+        
+        default:
+        {
+          String layoutPattern = "<%p> %m" ;
+          layout = new PatternLayout(layoutPattern) ;
+        }
+      }
+            
+      rootLogger.setLevel(lvl);
+      
+      // Configure Log4j.
+      FileAppender fa = new FileAppender() ;
+      fa.setLayout(layout);
+      fa.setFile(logFile.toString());
+      fa.activateOptions();
+      rootLogger.addAppender(fa);
+    }
+    else
+    {
+      Logger.getRootLogger().setLevel(Level.OFF); ;
+    }
   }
 }

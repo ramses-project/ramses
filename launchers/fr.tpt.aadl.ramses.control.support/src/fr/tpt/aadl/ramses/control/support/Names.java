@@ -53,4 +53,5 @@ public class Names
   
   public static final String AADL_PREDEFINED_PROPERTIES_DIR_NAME = "propertyset" ;
   
+  public static final String LOG4J_CONSOLE_APPENDER_NAME = "ramses_console_log" ;
 }

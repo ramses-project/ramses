@@ -2,11 +2,15 @@ package fr.tpt.aadl.ramses.control.cli.core;
 
 import java.io.PrintStream ;
 
+import org.apache.log4j.Logger ;
+
 import fr.tpt.aadl.ramses.control.support.reporters.AbstractProgressMonitor ;
 
 public class RamsesProgressMonitor extends AbstractProgressMonitor
 {
   protected PrintStream _output ;
+  
+  private Logger _logger = Logger.getLogger(RamsesProgressMonitor.class) ;
   
   public RamsesProgressMonitor(PrintStream stdOutput)
   {
@@ -20,6 +24,7 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     _mainTask = name ;
     _totalWork = totalWork ;
     String msg = super.formatBeginTask(name, totalWork) ;
+    _logger.info(msg);
     _output.println(msg) ;
   }
 
@@ -30,6 +35,7 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     {
       _isNotCanceled = false ; // According to the IProgressMonitor definition.
       String msg = super.formatDone(_mainTask) ;
+      _logger.info(msg);
       _output.println(msg) ;
     }
   }
@@ -56,6 +62,7 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
       {
         _isNotCanceled = false ;
         String msg = super.formatCanceled(_mainTask) ;
+        _logger.info(msg);
         _output.println(msg) ;
       }
     }
@@ -74,6 +81,7 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     if(_isNotCanceled)
     {
       String msg = super.formatSubTask(name) ;
+      _logger.info(msg);
       _output.println(msg) ;
     }
   }
@@ -84,6 +92,7 @@ public class RamsesProgressMonitor extends AbstractProgressMonitor
     if(_isNotCanceled)
     {
       String msg = super.formatWorked(work, _totalWork) ;
+      _logger.info(msg);
       _output.println(msg) ;
     }
   }

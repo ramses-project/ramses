@@ -83,6 +83,10 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String PARAMETER_OPTION_ID = "key"+ 
                                                            PARAMETER_SEPARATOR +
                                                              "value" ;
+  private static final String LOGGING_OPTION_ID = "logging" ;
+  
+  private static final String LOGGING_FILENAME = ".ramses-log" ;
+  
   private static Switch helpOnlyMode ;
   private static Switch parseOnlyMode ;
   private static Switch analysisOnlyMode ;
@@ -209,6 +213,12 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     analysis
           .setHelp("List of analysis to be performed on instance model; available analysis identifiers are: " +
                 availableAnalysis) ;
+    
+    FlaggedOption logging = new FlaggedOption(LOGGING_OPTION_ID)
+      .setStringParser(JSAP.STRING_PARSER).setRequired(false)
+      .setLongFlag("log").setShortFlag('l').setList(false)
+      .setAllowMultipleDeclarations(false) ;
+    
     FlaggedOption model =
           new FlaggedOption(SOURCE_MODELS_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(true)
@@ -292,6 +302,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
     jsap.registerParameter(helpOnlyMode) ;
     jsap.registerParameter(parseOnlyMode) ;
+    jsap.registerParameter(logging) ;
     jsap.registerParameter(model) ;
     jsap.registerParameter(includes) ;
     
@@ -343,9 +354,13 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   private static void commonOptionsHandler(JSAPResult options) throws Exception
   {
-    /*******************************************************************/
-    /******TODO ********* HANDLE LOGGING OPTIONS ***********************/
-    /*******************************************************************/
+    String loggingOption = options.getString(LOGGING_OPTION_ID) ;
+    
+    String currentDirectory = System.getProperty("user.dir") ;
+    
+    File logFile = new File(currentDirectory + File.separator + LOGGING_FILENAME) ;
+    
+    RamsesConfiguration.setupLogging(loggingOption, logFile) ;
     
     String[] includeFolderNames =
           options.getStringArray(INCLUDES_OPTION_ID) ;

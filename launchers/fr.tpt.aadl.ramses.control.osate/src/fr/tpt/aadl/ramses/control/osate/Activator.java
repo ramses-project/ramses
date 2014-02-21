@@ -21,10 +21,6 @@
 
 package fr.tpt.aadl.ramses.control.osate;
 
-import org.apache.log4j.FileAppender ;
-import org.apache.log4j.Level ;
-import org.apache.log4j.Logger ;
-import org.apache.log4j.SimpleLayout ;
 import org.eclipse.core.runtime.IStatus ;
 import org.eclipse.core.runtime.Platform ;
 import org.eclipse.core.runtime.Status ;
@@ -36,6 +32,7 @@ import org.osgi.framework.BundleContext ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
@@ -68,17 +65,11 @@ public class Activator extends AbstractUIPlugin {
 		// Print a session logging header.
     getLog().log(new Status(IStatus.OK, "Starting RAMSES plugin suite ...", "RAMSES starting ...")); ;
     
-    // Configure Log4j.
-    FileAppender fa = new FileAppender() ;
-    fa.setLayout(new SimpleLayout());
-    fa.setFile(Platform.getLogFileLocation().toString());
-    fa.activateOptions();
-    Logger  logger = Logger.getRootLogger() ;
-    logger.addAppender(fa);
     /*** hard set logging level ***/
-    // TODO let the user choose the logging level: implement a gui.
+    // TODO let the user choose the logging level: implement a gui ???
     // DEBUG level is set to DEBUG.
-    logger.setLevel(Level.DEBUG);
+    String lvl = "DEBUG" ;
+    RamsesConfiguration.setupLogging(lvl, Platform.getLogFileLocation().toFile());
 		
 		try
     {
