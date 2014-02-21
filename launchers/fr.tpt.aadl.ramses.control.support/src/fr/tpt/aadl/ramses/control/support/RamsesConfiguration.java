@@ -3,7 +3,6 @@ package fr.tpt.aadl.ramses.control.support;
 import java.io.File ;
 import java.io.FileNotFoundException ;
 
-import org.apache.log4j.ConsoleAppender ;
 import org.apache.log4j.FileAppender ;
 import org.apache.log4j.Level ;
 import org.apache.log4j.Logger ;
@@ -289,7 +288,7 @@ public class RamsesConfiguration
    * ALL == TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF
    * <br><br>
    * ALL, TRACE and DEBUG make logger to print extra informations (class name,
-   * timestamp, method name, code line) and to print to the standard output.
+   * timestamp, method name, code line).
    * 
    * @see org.apache.log4j.Level
    * 
@@ -303,7 +302,7 @@ public class RamsesConfiguration
     {
       Logger rootLogger = Logger.getRootLogger() ;
       Level lvl = Level.toLevel(loggingLevel) ;
-      PatternLayout layout ;
+      String layoutPattern ;
       
       switch(lvl.toInt())
       {
@@ -311,20 +310,13 @@ public class RamsesConfiguration
         case Level.TRACE_INT:
         case Level.DEBUG_INT:
         {
-          ConsoleAppender ca = new ConsoleAppender() ;
-          ca.setName(Names.LOG4J_CONSOLE_APPENDER_NAME);
-          String layoutPattern = "<%p> %m (%F::%M line %L ; %d)" ;
-          layout = new PatternLayout(layoutPattern) ;
-          ca.setLayout(layout);
-          ca.activateOptions();
-          rootLogger.addAppender(ca);
+          layoutPattern = "<%p> %m (%F::%M line %L ; %d)" ;
           break;
         }
         
         default:
         {
-          String layoutPattern = "<%p> %m" ;
-          layout = new PatternLayout(layoutPattern) ;
+          layoutPattern = "<%p> %m" ;
         }
       }
             
@@ -332,6 +324,7 @@ public class RamsesConfiguration
       
       // Configure Log4j.
       FileAppender fa = new FileAppender() ;
+      PatternLayout layout = new PatternLayout(layoutPattern) ;
       fa.setLayout(layout);
       fa.setFile(logFile.toString());
       fa.activateOptions();
