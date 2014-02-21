@@ -100,10 +100,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static List<File> _mainModelFiles ;
   private static String _systemToInstantiate ;
   private static ToolSuiteLauncher _launcher ;
-  
-  private static IProgressMonitor _monitor ;
-  
-  
+
   /**
    * This method is the main entry point of the Command Line 
    * Interface (CLI) version of RAMSES. It takes as input the 
@@ -111,10 +108,8 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
    * launches the corresponding actions.
    * @throws Exception 
    */
-  public static void main(String[] args, IProgressMonitor monitor) throws Exception
+  public static void main(String[] args) throws Exception
   {
-    _monitor = monitor ;
-    
     JSAP jsap = new JSAP() ;
 
     try
@@ -359,9 +354,12 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
     setRamsesResourceDir(_includeDirs) ;
-        
+    
+    RamsesProgressMonitor monitor = new RamsesProgressMonitor() ;
+    
+    
     StandAloneInstantiator instantiator = new StandAloneInstantiator(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
-                                                                     _monitor) ;
+                                                                     monitor) ;
     PredefinedAadlModelManager modelManager = new ContributedAadlRegistration(instantiator) ;
     
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
@@ -370,7 +368,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     /**************************************************************************/
     
     
-    _launcher = new ToolSuiteLauncher(_monitor, instantiator, modelManager) ;
+    _launcher = new ToolSuiteLauncher(monitor, instantiator, modelManager) ;
     
     _mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,

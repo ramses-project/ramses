@@ -29,7 +29,6 @@ import org.osgi.framework.BundleContext ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.reporters.Logger ;
 import fr.tpt.aadl.ramses.control.support.services.OSGiServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
@@ -61,13 +60,6 @@ public class Activator extends AbstractUIPlugin {
 		
 		try
     {
-		  Logger4Osate logger = new Logger4Osate() ;
-		  /**** DEBUG ****/
-		  logger.setLogLevel(Logger.ALL) ;
-	    /***************/
-	    
-		  ServiceProvider.SYS_MSG_REP = new SysMsgReporter4Osate(logger) ; 
-		  
 		  /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
 		  WorkbenchUtils.setResourceDirectories() ;
     }

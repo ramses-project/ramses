@@ -48,24 +48,11 @@ public class ToolSuiteLauncher
   {
     try
     {
-      Logger4Cli logger = new Logger4Cli() ;
-      logger.setConsoleOutput(true);
-      /**** DEBUG ****/
-      logger.setLogLevel(Logger.ALL);
-      /***************/      
-      
-      SystemMessageReporter syslogger = new SysMsgReporter4Cli(logger,
-                                                               System.out,
-                                                               System.err) ;
-      ServiceProvider.SYS_MSG_REP = syslogger ;
-      
-      IProgressMonitor monitor = new RamsesProgressMonitor(logger, System.out) ;
-      
       ServiceRegistry registry = new StaticServiceRegistry() ;
       
       ServiceProvider.setDefault(registry) ;
       
-      ToolSuiteLauncherCommand.main(args, monitor) ;
+      ToolSuiteLauncherCommand.main(args) ;
     }
     catch(Exception e)
     {
