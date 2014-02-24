@@ -22,7 +22,7 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
-module ProcessInstances;
+module ProcessorInstances;
 create OUT : CV 	from 		IN : AADLI;
 
 abstract rule check_ComponentInstance
@@ -37,43 +37,10 @@ abstract rule check_ComponentInstance
 }
 
 -- @extends check_ComponentInstance
-abstract rule check_ProcessInstance
+abstract rule check_ProcessorInstance
 {
 	from
 	  obj: AADLI!ComponentInstance
-	  (obj.category = #process)
+	  (obj.category = #processor)
 }
 
-
--- @extends check_ProcessInstance
-rule check_HasOneThreadSubcomponent
-{
-	from
-		obj: AADLI!ComponentInstance
-		( obj.componentInstance->select(e|e.category = #thread)->isEmpty())
-	to
-		err: CV!Error
-		(message <- 'Process subcomponent '+obj.subcomponent.name + ' has no thread subcomponent' )
-}
-
--- @extends check_ProcessInstance
-rule check_ProcessorBinding
-{
-	from
-		obj: AADLI!ComponentInstance
-		(not obj.hasProperty('Actual_Processor_Binding'))
-	to
-		err: CV!Error
-		(message <- 'Process subcomponent '+obj.subcomponent.name + ' must be bound to a virtual processor or processor' )
-}
-
--- @extends check_ProcessInstance
-rule check_MemoryBinding
-{
-	from
-		obj: AADLI!ComponentInstance
-		(not obj.hasProperty('Actual_Processor_Binding'))
-	to
-		err: CV!Error
-		(message <- 'Process subcomponent '+obj.subcomponent.name + ' must be bound to a memory component' )
-}

@@ -28,6 +28,10 @@ helper def: callPrefix(): String ='call';
 
 helper def: theHOOK : ATLHOOKS!HookAccess = ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first();
 
+helper def: getAllInstances(category: String) : Sequence(AADLI!ComponentInstance) = 
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.category.getName()=category);
+
+
 helper context AADLBA!ThreadImplementation def : callSequence() : AADLBA!SubprogramCallSequence =
 	self.ownedSubprogramCallSequence->first()
 ;
@@ -214,6 +218,24 @@ helper context AADLI!NamedElement def: isAperiodicThread() : Boolean =
 	endif
 ;
 
+helper context AADLI!NamedElement def: isTimedThread() : Boolean =
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
+	if(mpv.oclIsUndefined()) then
+		false
+	else
+		mpv.ownedValue.namedValue.name.toLower() = 'timed'
+	endif
+;
+
+helper context AADLI!NamedElement def: isHybridThread() : Boolean =
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Dispatch_Protocol') in
+	if(mpv.oclIsUndefined()) then
+		false
+	else
+		mpv.ownedValue.namedValue.name.toLower() = 'hybrid'
+	endif
+;
+
 helper context AADLI!FeatureInstance def: isPeriodicThreadPort(): Boolean =
 	self.isThreadPort() and self.eContainer().isPeriodicThread()
 ;
@@ -254,8 +276,9 @@ helper context AADLI!Connection def : uniqueName(): String =
 	endif
 ;
 
-helper context AADLI!ComponentInstance def : getProcessorBinding() : AADLBA!Subcomponent =
-	self.ownedPropertyAssociation->any(e | e.property = AADLBA!Property->allInstancesFrom('DEPLOYMENT_PROPERTIES')->any(f|f.name = 'Actual_Processor_Binding')).appliesTo
+helper context AADLI!ComponentInstance def : getProcessorBinding() : Sequence(AADLI!ComponentInstance) =
+	self.ownedPropertyAssociation->any(e | e.property.name = 'Actual_Processor_Binding').ownedValue->first().ownedValue.ownedListElement
+	->collect(e|e.referencedInstanceObject)
 ;
 
 helper context AADLI!FeatureInstance def: getInputMessagePortId(): Integer = 

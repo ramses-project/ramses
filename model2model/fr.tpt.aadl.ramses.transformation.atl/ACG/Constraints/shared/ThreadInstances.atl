@@ -62,3 +62,20 @@ helper context AADLI!ComponentInstance def: hasBehaviorAnnex() : Boolean =
 helper context AADLI!ComponentInstance def: hasCallSequence() : Boolean =
 	self.hasProperty('Compute_Entrypoint_Call_Sequence')
 ;
+
+-- @extends check_ThreadInstance
+rule check_HasPeriodIfNeeded
+{
+	from
+	  obj: AADLI!ComponentInstance
+	  (
+	  	(obj.isPeriodicThread() or obj.isSporadicThread() or obj.isHybridThread() or obj.isTimedThread())
+		and
+		not obj.hasProperty('Period')
+	  )
+	to
+	  err: CV!Error
+	  (
+		message <- 'With this dispatch protocol, thread must have a period value'
+	  )
+}

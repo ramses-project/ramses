@@ -22,22 +22,23 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
-module Common;
+module InterPartitionCommunications;
 create OUT : CV 	from 		IN : AADLI;
 
-abstract rule check_ComponentInstance
+-- @extends check_FeatureInstance
+rule check_NoNto1Connections
 {
 	from
-	  obj: AADLI!ComponentInstance
+		obj: AADLI!FeatureInstance
+		(
+			obj.isProcessPort()
+			and
+			obj.isInputFeature()
+			and
+			obj.dstConnectionInstance->size() = 1
+		)
 	to
-	  err: CV!Error
-	  (
-	  	object <:= obj.subcomponent
-	  )
+	err: CV!Error
+		(message <- 'In ARINC, N-to-1 inter partition communications are forbiden' )
 }
 
-helper context AADLI!NamedElement def : hasProperty(propertyName: String) : Boolean =
-	self.ownedPropertyAssociation->exists(
-				e | e.property.name = propertyName
-				)
-;

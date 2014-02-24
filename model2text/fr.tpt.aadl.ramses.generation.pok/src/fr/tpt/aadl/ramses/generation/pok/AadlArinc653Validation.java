@@ -13,9 +13,17 @@ public class AadlArinc653Validation extends Aadl2ConstraintValidationEMFTVMLaunc
 			throws ATLCoreException {
 		super(modelInstantiator, predefinedResourcesManager);
 		ATL_FILE_NAMES = new String[]
-		        {"ACG/Constraints/shared/Common",
+		        {"helpers/Services",
+				"tools/PropertiesTools",
+		        "ACG/Constraints/shared/Common",
+				"ACG/Constraints/shared/ThreadInstances",
 				"ACG/Constraints/shared/ProcessInstances",
-				"ACG/Constraints/shared/ThreadInstances"
+				"ACG/Constraints/shared/ProcessorInstances",
+				"ACG/Constraints/shared/VirtualProcessorInstances",
+				"ACG/Constraints/shared/FeatureInstances",
+				"ACG/Constraints/shared/Subprograms",
+				"ACG/Constraints/arinc653/InterPartitionCommunications",
+				"ACG/Constraints/arinc653/ArincProperties"
 		        };
 	}
 

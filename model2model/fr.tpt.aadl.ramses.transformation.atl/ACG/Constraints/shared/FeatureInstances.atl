@@ -22,22 +22,16 @@
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
-module Common;
+module FeatureInstances;
 create OUT : CV 	from 		IN : AADLI;
 
-abstract rule check_ComponentInstance
+abstract rule check_FeatureInstance
 {
 	from
-	  obj: AADLI!ComponentInstance
+	  obj: AADLI!FeatureInstance
 	to
 	  err: CV!Error
 	  (
-	  	object <:= obj.subcomponent
+	  	object <:= obj.feature
 	  )
 }
-
-helper context AADLI!NamedElement def : hasProperty(propertyName: String) : Boolean =
-	self.ownedPropertyAssociation->exists(
-				e | e.property.name = propertyName
-				)
-;

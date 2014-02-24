@@ -13,9 +13,15 @@ public class AadlAdaRavenscarValidation extends Aadl2ConstraintValidationEMFTVML
 			throws ATLCoreException {
 		super(modelInstantiator, predefinedResourcesManager);
 		ATL_FILE_NAMES = new String[]
-		        {"ACG/Constraints/shared/Common",
+		        {"helpers/Services",
+				"tools/PropertiesTools",
+		        "ACG/Constraints/shared/Common",
 				"ACG/Constraints/shared/ProcessInstances",
-				"ACG/Constraints/shared/ThreadInstances"
+				"ACG/Constraints/shared/ProcessorInstances",
+				"ACG/Constraints/shared/VirtualProcessorInstances",
+				"ACG/Constraints/shared/ThreadInstances",
+				"ACG/Constraints/shared/FeatureInstances",
+				"ACG/Constraints/shared/Subprograms"
 		        };
 	}
 
