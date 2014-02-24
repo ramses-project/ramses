@@ -20,15 +20,11 @@ public class ProgressMonitorWrapper extends AbstractProgressMonitor
   public void beginTask(String name,
                         int totalWork)
   {
-    if(false == _isNotCanceled)
-    {
-      _mainTask = name ;
-      _totalWork = totalWork ;
-      _monitor.beginTask(name, totalWork);
-      String msg = super.formatBeginTask(name, totalWork) ;
-      _logger.info(msg);
-      _isNotCanceled = true ;
-    }
+    _mainTask = name ;
+    _totalWork = totalWork ;
+    _monitor.beginTask(name, totalWork);
+    String msg = super.formatBeginTask(name, totalWork) ;
+    _logger.info(msg);
   }
 
   @Override

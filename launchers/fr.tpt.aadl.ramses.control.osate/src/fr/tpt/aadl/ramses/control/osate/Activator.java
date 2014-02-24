@@ -68,7 +68,7 @@ public class Activator extends AbstractUIPlugin {
     /*** hard set logging level ***/
     // TODO let the user choose the logging level: implement a gui ???
     // DEBUG level is set to DEBUG.
-    String lvl = "DEBUG" ;
+    String lvl = "TRACE" ;
     RamsesConfiguration.setupLogging(lvl, Platform.getLogFileLocation().toFile());
 		
 		try
