@@ -131,16 +131,8 @@ public class GenerateActionHandler extends AbstractHandler {
       return null ;
     }
     
-    // if (config.checkForGeneration())
-    {
-      doGenerate(currentProject, event, config) ;
-    }
-    /*else // Configuration is missing.
-    {
-      // TODO report ?
-      return null ;
-    }
-    */
+    doGenerate(currentProject, event, config) ;
+
     return null ;
   }
   
@@ -194,6 +186,8 @@ public class GenerateActionHandler extends AbstractHandler {
                         IProgressMonitor monitor
                       ) throws Exception
   {
+    monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
+    
     SystemInstance sysInstance = null ;
     
     // Make sur that this xtext editor is saved.
@@ -248,7 +242,8 @@ public class GenerateActionHandler extends AbstractHandler {
           {
             try
             {
-              jobCore(currentProject, event, config, monitor) ;
+              ProgressMonitorWrapper monitorWrapper = new ProgressMonitorWrapper(monitor) ;
+              jobCore(currentProject, event, config, monitorWrapper) ;
               this.setLabel("OK");
             }
             catch(Exception e)
