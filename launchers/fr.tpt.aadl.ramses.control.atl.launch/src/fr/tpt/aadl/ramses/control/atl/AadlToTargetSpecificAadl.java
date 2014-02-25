@@ -102,7 +102,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       Aadl2AadlEMFTVMLauncher atlLauncher =
             new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
                   _predefinedAadlModels) ;
-      atlLauncher.setOutputPackageName("refined") ;
+      atlLauncher.setOutputPackageName("refined_model") ;
       return atlLauncher.generationEntryPoint(inputResource,
                                               atlFiles, outputDir) ;
     }
