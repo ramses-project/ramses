@@ -141,8 +141,9 @@ public class ToolSuiteLauncher
     }
   }
 
-  List<Resource> parse(List<File> aadlFile)
+  List<Resource> performParse(List<File> aadlFile)
   {
+    _monitor.beginTask("Parse", IProgressMonitor.UNKNOWN);
     return _instantiator.parse(aadlFile) ;
   }
 

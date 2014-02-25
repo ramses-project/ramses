@@ -399,7 +399,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
         throws Exception
   {
     _launcher.parsePredefinedRessources() ;
-    List<Resource> modelResources = _launcher.parse(_mainModelFiles) ;
+    List<Resource> modelResources = _launcher.performParse(_mainModelFiles) ;
     MessageStatus ms = MessageStatus.INFO ;
     
     String msg = "parsing has " ;

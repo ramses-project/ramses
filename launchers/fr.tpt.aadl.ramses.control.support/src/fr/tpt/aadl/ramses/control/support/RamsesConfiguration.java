@@ -301,6 +301,10 @@ public class RamsesConfiguration
     if(! (loggingLevel == null || loggingLevel.isEmpty() || logFile == null))
     {
       Logger rootLogger = Logger.getRootLogger() ;
+      
+      // Wipe out any previous appenders like the Eclipse' console appender.
+      rootLogger.removeAllAppenders();
+      
       Level lvl = Level.toLevel(loggingLevel) ;
       String layoutPattern ;
       
@@ -310,13 +314,13 @@ public class RamsesConfiguration
         case Level.TRACE_INT:
         case Level.DEBUG_INT:
         {
-          layoutPattern = "<%p> %m (%F::%M line %L ; %d)" ;
+          layoutPattern = "<%p> %m (%F::%M line %L ; %d)%n" ;
           break;
         }
         
         default:
         {
-          layoutPattern = "<%p> %m" ;
+          layoutPattern = "<%p> %m%n" ;
         }
       }
             
@@ -327,6 +331,7 @@ public class RamsesConfiguration
       PatternLayout layout = new PatternLayout(layoutPattern) ;
       fa.setLayout(layout);
       fa.setFile(logFile.toString());
+      fa.setEncoding("UTF-8");
       fa.activateOptions();
       rootLogger.addAppender(fa);
     }
