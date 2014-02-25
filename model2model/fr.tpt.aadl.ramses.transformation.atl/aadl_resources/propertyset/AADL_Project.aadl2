@@ -9,7 +9,7 @@ property set AADL_Project is
 	Supported_Connection_Patterns: type enumeration (One_To_One, All_To_All, One_To_All, All_To_One,
 													 Next, Previous, Cyclic_Next, Cyclic_Previous);
 	
-	Supported_Concurrency_Control_Protocols: type enumeration (None_Specified, Priority_Ceiling);
+	Supported_Concurrency_Control_Protocols: type enumeration (None_Specified, PRIORITY_CEILING_PROTOCOL);
 	
 	Supported_Dispatch_Protocols: type enumeration (Periodic, Timed, Hybrid, Sporadic, Background, Aperiodic);
 	

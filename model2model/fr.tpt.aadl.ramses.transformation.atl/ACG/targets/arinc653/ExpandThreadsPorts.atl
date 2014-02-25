@@ -19,6 +19,7 @@
 -- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
+-- @nsURI AADLI=http://aadl.info/AADL/2.0/instance
 -- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
 -- @atlcompiler emftvm
 
@@ -195,7 +196,8 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME')
+			dataSubcomponentType <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Concurrency_Control_Protocol','THREAD_PROPERTIES', thisModule.CreateEnumValuePropertyExpression('PRIORITY_CEILING_PROTOCOL'))}
 		)
 }
 

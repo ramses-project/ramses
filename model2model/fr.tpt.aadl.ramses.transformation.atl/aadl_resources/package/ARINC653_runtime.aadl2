@@ -597,13 +597,24 @@ features
 properties
   Programming_Properties::Source_Name => "DISPLAY_BLACKBOARD";
   Programming_Properties::Source_Text => ("arinc653/blackboard.h", "arinc653/apex-blackboards.ads");
+annex behavior_specification {**
+	states
+		s:initial final state;
+	transitions
+		t: s-[]->s{
+			computation(4 us .. 5 us);
+			BLACKBOARD_ID!<;
+			computation(1ms..2ms);
+			BLACKBOARD_ID!>
+		};
+**};
 end Display_Blackboard;
 
 subprogram Read_Blackboard
 prototypes
   MESSAGE_TYPE: data;
 features
-  BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE {Access_Right=>read_only;};
+  BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE { Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL; };
   TIME_OUT: in parameter SYSTEM_TIME_TYPE ;
   MESSAGE_ADDR: out parameter MESSAGE_TYPE ;
   LENGTH: out parameter MESSAGE_SIZE_TYPE ;
