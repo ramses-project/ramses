@@ -123,6 +123,8 @@ public class ToolSuiteLauncher
   {
     if(_analysisToPerform != null && _analysisToPerform.isEmpty() == false)
     {
+      _monitor.beginTask("Analysis", IProgressMonitor.UNKNOWN);
+      
       // to be completed with exceptions in case analysis goes wrong
       for(String analysisName : _analysisToPerform)
       {
@@ -167,6 +169,8 @@ public class ToolSuiteLauncher
                                      	 Map<String, Object> parameters)
                                                       throws GenerationException
   {
+    _monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
+    
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
@@ -195,11 +199,10 @@ public class ToolSuiteLauncher
                               Map<String, Object> parameters)
                                                       throws GenerationException
   {
+    _monitor.beginTask("Code generation (workflow XML)", IProgressMonitor.UNKNOWN);
+    
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
-    
-    // DEBUG
-    System.out.println("Generator.generateXML called");
     
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
 

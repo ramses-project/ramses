@@ -12,7 +12,7 @@ public abstract class AbstractProgressMonitor implements IProgressMonitor
                                    int totalWork)
   {
     // TODO to be implemented.
-    return "Begin task " + name ;
+    return "Begin task \'" + name + '\'';
   }
 
   protected String formatDone(String task)
@@ -29,13 +29,13 @@ public abstract class AbstractProgressMonitor implements IProgressMonitor
   protected String formatSubTask(String name)
   {
     // TODO to be implemented.
-    return "Begin sub task " + name ;
+    return "Begin sub task \'" + name + '\'';
   }
 
   protected String formatWorked(int work, int totalWork)
   {
     // TODO to be implemented.
-    if(totalWork != IProgressMonitor.UNKNOWN)
+    if(totalWork == IProgressMonitor.UNKNOWN)
     {
       return "work " + work ;
     }
