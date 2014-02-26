@@ -25,6 +25,7 @@ import java.io.File ;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -44,6 +45,7 @@ import com.google.inject.Injector ;
 
 import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.AadlResourceValidator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 public class StandAloneInstantiator extends AadlModelsManagerImpl
@@ -62,6 +64,8 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
 	 
   @Inject 
   private IResourceServiceProvider.Registry rspr = injector.getInstance(IResourceServiceProvider.Registry.class);
+  
+  private static Logger _LOGGER = Logger.getLogger(StandAloneInstantiator.class) ;
   
   // Singleton
   public StandAloneInstantiator(AnalysisErrorReporterManager errManager,
@@ -150,8 +154,10 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
       }
       else
       {
-        System.err.println("Exit on parse error") ;
-        java.lang.System.exit(-1) ;
+        String msg = "Abort on parse error. Annex resolving is skiped" ;
+        _LOGGER.info(msg);
+        ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+        java.lang.System.exit(0) ;
       }
     }
 

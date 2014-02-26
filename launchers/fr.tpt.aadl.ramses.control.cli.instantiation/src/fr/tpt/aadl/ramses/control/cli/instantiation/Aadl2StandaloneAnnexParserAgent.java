@@ -23,6 +23,7 @@ package fr.tpt.aadl.ramses.control.cli.instantiation ;
 
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.eclipse.xtext.diagnostics.IDiagnosticConsumer ;
@@ -41,6 +42,8 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
 {
   public static AnnexJobHandler _jobHandler = new AnnexJobHandler() ;
+  
+  private static Logger _LOGGER = Logger.getLogger(Aadl2StandaloneAnnexParserAgent.class) ;
 
   // TODO : ask Peter to externalize part of the method not to copy/paste osate code
 
@@ -90,14 +93,16 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
         
         if(ap == null)
         {
-          System.err.println("RAMSES doesn't parse " + annexName +
-                             "annex subclause ") ; 
+          String msg = "\'" + annexName + "\' annex subclause is not supported";
+          _LOGGER.error(msg);
+          ServiceProvider.SYS_ERR_REP.error(msg, true);
         }
         
         if(ar == null)
         {
-          System.err.println("RAMSES doesn't resolve " + annexName +
-                             "annex subclause ") ; 
+          String msg = "\'" + annexName + "\' annex subclause us not resolved (but is parsed)";
+          _LOGGER.error(msg);
+          ServiceProvider.SYS_ERR_REP.error(msg, true);
         }
         
         _jobHandler.addJob(new AnnexJob(defaultAnnexSubclause, filename, line,

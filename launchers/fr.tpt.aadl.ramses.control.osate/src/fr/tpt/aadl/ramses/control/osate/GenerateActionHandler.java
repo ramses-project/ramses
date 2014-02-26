@@ -132,6 +132,11 @@ public class GenerateActionHandler extends AbstractHandler {
     }
     
     doGenerate(currentProject, event, config) ;
+    
+    if(ServiceProvider.SYS_ERR_REP.hasDelayedErrors())
+    {
+      ServiceProvider.SYS_ERR_REP.displayDelayedErrors();
+    }
 
     return null ;
   }

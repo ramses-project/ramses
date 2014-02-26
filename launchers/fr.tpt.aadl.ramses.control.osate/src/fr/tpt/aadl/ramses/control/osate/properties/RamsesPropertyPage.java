@@ -543,7 +543,7 @@ public class RamsesPropertyPage extends PropertyPage {
       throw new ConfigurationException(status) ;
     }
     
-    status = result.setGeneretionTargetId(fetchPropertiesValue(project, TARGET_ID)) ;
+    status = result.setGenerationTargetId(fetchPropertiesValue(project, TARGET_ID)) ;
     if(status != ConfigStatus.SET)
     {
       throw new ConfigurationException(status) ;

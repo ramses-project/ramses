@@ -21,7 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.support.analysis ;
 
-public class AnalysisResultException extends Exception
+public class AnalysisException extends Exception
 {
 
   /**

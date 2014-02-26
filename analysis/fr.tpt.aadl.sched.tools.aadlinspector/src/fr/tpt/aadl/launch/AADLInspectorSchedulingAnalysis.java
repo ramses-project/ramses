@@ -9,7 +9,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher ;
 import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult ;
 
@@ -89,7 +89,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
                               AnalysisErrorReporterManager errorReporter,
                               IProgressMonitor monitor
                               )
-                              throws AnalysisResultException
+                              throws AnalysisException
   {
 	  try
     {

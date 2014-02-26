@@ -31,6 +31,8 @@ public class RamsesConfiguration
   private static File _AADL_PACKAGE_DIR ;
   private static File _AADL_PROPERTYSET_DIR ;
   
+  private static Logger _LOGGER = Logger.getLogger(RamsesConfiguration.class) ;
+  
   public static ConfigStatus setRamsesResourceDir(String path)
   {
     try
@@ -40,7 +42,8 @@ public class RamsesConfiguration
       if(AbstractPredefinedAadlModelManager.ramsesDirChecker(resourceDir))
       {
         _RAMSES_RESOURCE_DIR = resourceDir ;
-        ConfigStatus.SET.msg = "Set RAMSES resource directory to \'" + path + "\'" ;
+        ConfigStatus.SET.msg = "set RAMSES resource directory to \'" + path + "\'" ;
+        _LOGGER.info(ConfigStatus.SET.msg);
         return ConfigStatus.SET ;
       }
       else
@@ -94,7 +97,8 @@ public class RamsesConfiguration
       if(AbstractAadlToAadl.atlResourceDirChecker(resourceDir))
       {
         _ATL_RESOURCE_DIR = resourceDir ;
-        ConfigStatus.SET.msg = "Set ATL resource directory to \'" + path + "\'" ;
+        ConfigStatus.SET.msg = "set ATL resource directory to \'" + path + "\'" ;
+        _LOGGER.info(ConfigStatus.SET.msg);
         return ConfigStatus.SET ;
       }
       else
@@ -122,7 +126,8 @@ public class RamsesConfiguration
         _AADL_PACKAGE_DIR = new File(resourceDir + File.separator + Names.AADL_PREDEFINED_PACKAGE_DIR_NAME) ;
         _AADL_PROPERTYSET_DIR = new File(resourceDir + File.separator + Names.AADL_PREDEFINED_PROPERTIES_DIR_NAME) ;
         
-        ConfigStatus.SET.msg = "Set AADL predefined resource directory to \'" + path + "\'" ;
+        ConfigStatus.SET.msg = "set AADL predefined resource directory to \'" + path + "\'" ;
+        _LOGGER.info(ConfigStatus.SET.msg);
         return ConfigStatus.SET ;
       }
       else
@@ -149,25 +154,26 @@ public class RamsesConfiguration
         {
           if(! outputDir.mkdirs())
           {
-            ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'";
+            ConfigStatus.NOT_VALID.msg = "can't create the output directory at this location :" +  "\'" + path + "\'";
             return ConfigStatus.NOT_VALID ;
           }
         }
         catch(Exception e)
         {
-          ConfigStatus.NOT_VALID.msg = "Can't create the output directory at this location :" +  "\'" + path + "\'. Because:\n\n\t" +
+          ConfigStatus.NOT_VALID.msg = "can't create the output directory at this location :" +  "\'" + path + "\'. Because:\n\n\t" +
           e.getMessage() ;
           return ConfigStatus.NOT_VALID ;
         }
       }
       
       _outputDir = outputDir ;
-      ConfigStatus.SET.msg = "Set output directory to \'" + path + "\'" ;
+      ConfigStatus.SET.msg = "set output directory to \'" + path + "\'" ;
+      _LOGGER.info(ConfigStatus.SET.msg);
       return ConfigStatus.SET ;
     }
     else
     {
-      ConfigStatus.NOT_VALID.msg = "Output directory is not configured" ;
+      ConfigStatus.NOT_VALID.msg = "output directory is not configured" ;
       return ConfigStatus.NOT_VALID ;
     }
   }
@@ -189,7 +195,8 @@ public class RamsesConfiguration
       if(gen.runtimePathChecker(runtimePath))
       {
         _runtimePath = runtimePath ;
-        ConfigStatus.SET.msg = "Set runtime path to \'" + path + "\'" ;
+        ConfigStatus.SET.msg = "set runtime path to \'" + path + "\'" ;
+        _LOGGER.info(ConfigStatus.SET.msg);
         return ConfigStatus.SET ;
       }
       else
@@ -202,7 +209,8 @@ public class RamsesConfiguration
           if(gen.runtimePathChecker(runtimePath))
           {
             _runtimePath = runtimePath ;
-            ConfigStatus.SET.msg = "Set runtime path to \'" + path + "\'" ;
+            ConfigStatus.SET.msg = "set runtime path to \'" + path + "\'" ;
+            _LOGGER.info(ConfigStatus.SET.msg);
             return ConfigStatus.SET ;
           }
           else
@@ -237,7 +245,7 @@ public class RamsesConfiguration
     }
   }
   
-  public ConfigStatus setGeneretionTargetId(String targetId)
+  public ConfigStatus setGenerationTargetId(String targetId)
   {
     ServiceRegistry reg = ServiceProvider.getServiceRegistry() ;
     Generator gen = reg.getGenerator(targetId) ;
@@ -249,7 +257,8 @@ public class RamsesConfiguration
     else
     {
       _targetId = targetId ;
-      ConfigStatus.SET.msg = "Set generation target id to \'" + targetId + "\'" ;
+      ConfigStatus.SET.msg = "set generation target id to \'" + targetId + "\'" ;
+      _LOGGER.info(ConfigStatus.SET.msg);
       return ConfigStatus.SET ;
     }
   }
@@ -334,9 +343,12 @@ public class RamsesConfiguration
       fa.setEncoding("UTF-8");
       fa.activateOptions();
       rootLogger.addAppender(fa);
+      
+      _LOGGER.info("logger is set to " + lvl.toString());
     }
     else
     {
+      _LOGGER.info("logger is switch off") ;
       Logger.getRootLogger().setLevel(Level.OFF); ;
     }
   }

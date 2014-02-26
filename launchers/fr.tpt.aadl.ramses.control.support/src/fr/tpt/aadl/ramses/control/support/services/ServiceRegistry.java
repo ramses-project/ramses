@@ -31,6 +31,7 @@ import org.osate.annexsupport.AnnexResolver ;
 import org.osate.annexsupport.AnnexUnparser ;
 
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -68,10 +69,11 @@ public interface ServiceRegistry
    * @param modelInstantiatior the provided AADL model instantiator
    * @param predefinedAadlModels the provided predefined AADL models 
    * @param includeDirs the set of directory paths that may contain AADL model or user code.
+   * @throws ConfigurationException 
    * @throws Exception for any initialization errors 
    */
   public void init(AadlModelInstantiatior modelInstantiatior,
-                   PredefinedAadlModelManager predefinedAadlModels) throws Exception ;
+                   PredefinedAadlModelManager predefinedAadlModels) throws ConfigurationException ;
   
   /**
    * This method check if the OSGi platform is used or not.

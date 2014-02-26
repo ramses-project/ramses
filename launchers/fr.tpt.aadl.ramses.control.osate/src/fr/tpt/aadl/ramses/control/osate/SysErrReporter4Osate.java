@@ -51,7 +51,7 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
   }
 
   @Override
-  public void delayedErrors()
+  public void displayDelayedErrors()
   {
     String msg = super.formatDelayedErrors() ;
     if(msg != null)
@@ -59,11 +59,21 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
       if(_delayedErrors.isEmpty())
       {
         Dialog.showWarning("RAMSES warning", msg);
+        _delayedWarnings.clear();
       }
       else
       {
         Dialog.showError("RAMSES error", msg);
+        _delayedErrors.clear();
+        _delayedWarnings.clear();
       }
     }
+  }
+
+  @Override
+  public void abortOnAadlErrors(String msg)
+  {
+    msg = super.formatAbortionOnAadlErrors(msg) ;
+    Dialog.showInfo("RAMSES information", msg) ;
   }
 }

@@ -5,7 +5,6 @@ import org.osate.annexsupport.AnnexProxy ;
 
 public class StandAloneAnnexProxy extends AnnexProxy
 {
-
   StandAloneAnnexProxy(IConfigurationElement configElem)
   {
     super(configElem) ;
@@ -18,5 +17,4 @@ public class StandAloneAnnexProxy extends AnnexProxy
   {
     super(id, name, annexName, className) ;
   }
-  
 }

@@ -71,7 +71,7 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
   @Override
   public void init(AadlModelInstantiatior modelInstantiatior,
                    PredefinedAadlModelManager predefinedAadlModels)
-                     throws Exception
+                     
   {
     _modelInstantiatior = modelInstantiatior ;
     _predefinedAadlModels = predefinedAadlModels ;

@@ -70,6 +70,8 @@ public class Activator extends AbstractUIPlugin {
     // DEBUG level is set to DEBUG.
     String lvl = "TRACE" ;
     RamsesConfiguration.setupLogging(lvl, Platform.getLogFileLocation().toFile());
+    
+    ServiceProvider.SYS_ERR_REP = new SysErrReporter4Osate() ;
 		
 		try
     {

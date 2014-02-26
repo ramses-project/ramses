@@ -25,7 +25,7 @@ import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.sched.wcetanalysis.model.TaskBody ;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.Computation ;
@@ -116,7 +116,7 @@ public class WcetAnalysis extends AbstractAnalyzer {
                               File outputDir,
                               AnalysisErrorReporterManager errManager,
                               IProgressMonitor monitor)
-                                throws AnalysisResultException
+                                throws AnalysisException
   {
     
     AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;

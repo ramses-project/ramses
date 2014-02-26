@@ -28,11 +28,11 @@ public class FileUtils {
 	 * This method checks that files stored in an array of path (String) actually
 	 * exist.
 	 * @param fileNamesArray the array fo String referencing files.
-	 * @param errors errors a storage for error messages when file is not found
+	 * @param faultyFiles the files not found
 	 * @return a set of #{@link java.io.File} identified from the path in 
 	 * {@code includeDirArray}.
 	 */
-	public static Set<File> checkFilesExist(String fileNamesArray[], String errors)
+	public static Set<File> checkFilesExist(String fileNamesArray[], boolean[] faultyFiles)
 	{
 		Set<File> includeDirSet = new LinkedHashSet<File>();
 	    for(int i = 0 ; i < fileNamesArray.length ; i++)
@@ -42,10 +42,13 @@ public class FileUtils {
 	      if(potentialFile.exists())
 	      {
 	    	  includeDirSet.add(potentialFile) ;
+	    	  faultyFiles[i] = false ;
 	        continue ;
 	      }
 	      else
-	    	errors+="\t"+fileNamesArray[i]+"\n";
+	      {
+	        faultyFiles[i] = true ;
+	      }
 	    }
 	    return includeDirSet;
 	}

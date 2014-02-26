@@ -17,5 +17,4 @@ public class Aadl2StandaloneLinkingService extends Aadl2LinkingService
   {
     linkingserviceregistry = new StandAloneAnnexRegistry();
   }
-  
 }

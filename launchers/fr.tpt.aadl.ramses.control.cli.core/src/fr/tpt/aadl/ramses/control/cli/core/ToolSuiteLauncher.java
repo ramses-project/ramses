@@ -29,6 +29,7 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.NamedElement ;
@@ -36,16 +37,18 @@ import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
+import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 /**
  * This class provides services to the Command 
@@ -61,6 +64,8 @@ public class ToolSuiteLauncher
   private IProgressMonitor _monitor  ;
   private PredefinedAadlModelManager _modelManager ;
   
+  private static Logger _LOGGER = Logger.getLogger(ToolSuiteLauncher.class) ;
+  
   ToolSuiteLauncher(IProgressMonitor monitor,
                     StandAloneInstantiator instantiator,
                     PredefinedAadlModelManager modelManager)
@@ -70,16 +75,15 @@ public class ToolSuiteLauncher
     _modelManager = modelManager ;
   }
 
-  void initializeAnalysis(String[] analysisIdentifiers)
-        throws Exception
+  void initializeAnalysis(String[] analysisIdentifiers) throws ConfigurationException
   {
     _analysisToPerform =
           initialize(analysisIdentifiers, _registry.getAvailableAnalysisNames()) ;
   }
   
   private List<String> initialize(String[] processNames,
-                                  Set<String> availableProcessNames)
-        throws Exception
+                                  Set<String> availableProcessNames) throws ConfigurationException
+        
   {
     List<String> result = new ArrayList<String>(processNames.length) ;
     List<String> invalidIdentifiers =
@@ -102,15 +106,16 @@ public class ToolSuiteLauncher
     if(invalidIdentifiers.isEmpty() == false)
     {
       StringBuilder message =
-            new StringBuilder("Invalid analysis identifiers: ") ;
+            new StringBuilder("invalid analysis identifiers: ") ;
 
       for(String s : invalidIdentifiers)
       {
         message.append(s) ;
         message.append(' ') ;
       }
-
-      throw new Exception(message.toString()) ;
+      ConfigStatus.NOT_VALID.msg = message.toString() ;
+      
+      throw new ConfigurationException(ConfigStatus.NOT_VALID) ;
     }
 
     return result ;
@@ -119,7 +124,7 @@ public class ToolSuiteLauncher
   private void performAnalysis(SystemInstance instance,
                                 Map<String, Object> parameters,
                                 File outputDir)
-        throws AnalysisResultException
+                                                  throws AnalysisException
   {
     if(_analysisToPerform != null && _analysisToPerform.isEmpty() == false)
     {
@@ -182,7 +187,10 @@ public class ToolSuiteLauncher
     
     if(instance == null)
     {
-      throw new GenerationException("instanciation failed.") ;
+      String msg = "instanciation has failed" ;
+      _LOGGER.info(msg);
+      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      System.exit(0);
     }
     
     generator.setParameters(parameters) ;
@@ -212,7 +220,9 @@ public class ToolSuiteLauncher
 
     if(instance == null)
     {
-      throw new GenerationException("instanciation failed.") ;
+      String msg = "instanciation failed." ;
+      _LOGGER.fatal(msg);
+      throw new GenerationException(msg) ;
     }
 
     generator.setParameters(parameters) ;
@@ -227,7 +237,7 @@ public class ToolSuiteLauncher
                        String systemToInstantiate,
                        RamsesConfiguration config,
                        Map<String, Object> parameters)
-        throws AnalysisResultException
+                                                        throws AnalysisException
   {
     List<Resource> aadlModels = _instantiator.parse(mainModelFiles) ;
     SystemInstance instance =
@@ -235,7 +245,7 @@ public class ToolSuiteLauncher
     this.performAnalysis(instance, parameters, config.getOutputDir()) ;
   }
 
-  void unparse(List<Resource> resources, RamsesConfiguration config) throws IOException
+  void unparse(List<Resource> resources, RamsesConfiguration config) throws IOException 
   {
     String fileName ;
     File outputFile ;

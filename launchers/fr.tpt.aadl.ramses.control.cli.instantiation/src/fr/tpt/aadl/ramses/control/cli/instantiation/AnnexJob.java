@@ -25,6 +25,7 @@ import java.io.File ;
 import java.util.Collections ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.Classifier ;
@@ -35,6 +36,7 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter ;
 import org.osate.annexsupport.AnnexParser ;
 import org.osate.annexsupport.AnnexResolver ;
 
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import antlr.RecognitionException ;
 
 public class AnnexJob
@@ -59,11 +61,11 @@ public class AnnexJob
   
   private boolean _hasParsingError = false ;
 
-  // DEBUG
   private String _parentContainer ;
+  
+  private static Logger _LOGGER = Logger.getLogger(AnnexJob.class) ;
 
-  public AnnexJob(
-                  DefaultAnnexSubclause annex, String filename, int line,
+  public AnnexJob(DefaultAnnexSubclause annex, String filename, int line,
                   int offset, AnnexParser parser,
                   ParseErrorReporter parserErrReporter, AnnexResolver resolver,
                   AnalysisErrorReporterManager analysisErrManager)
@@ -90,11 +92,10 @@ public class AnnexJob
 
       try
       {
-        //DEBUG
         String filename = (new File(_filename)).getName() ;
         _parentContainer = ((ComponentClassifier) _annex.eContainer()).getName() ;
-        System.out.println("info: Parse " + annexName + " in " +
-              _parentContainer + " from " + filename) ;
+        String msg = "parse " + annexName + " in " + _parentContainer + " from " + filename ;
+        _LOGGER.trace(msg);
 
         if(annexText.length() > 6)
         {
@@ -103,8 +104,7 @@ public class AnnexJob
         
         int nb_errors = _parserErrReporter.getNumErrors() ;
         
-        as =
-              _parser.parseAnnexSubclause(annexName, annexText, _filename, _line,
+        as = _parser.parseAnnexSubclause(annexName, annexText, _filename, _line,
                                           _offset, _parserErrReporter) ;
 
         if(as != null && _parserErrReporter.getNumErrors() == nb_errors)
@@ -135,31 +135,25 @@ public class AnnexJob
     return result ;
   }
 
-  // Caller may add this code after resolve()
-  /*
-  if(_resolveErrManager.getNumErrors()>0)
-  {
-     diagnosticsConsumer.consume(
-                             new XtextSyntaxDiagnostic(node),
-                             Severity.ERROR);
-  }
-  */
   public boolean resolve()
   {
     if(_resolver != null)
     {
       if(_annexElements != null && ! _hasParsingError)
       {
-        //DEBUG
         String filename = (new File(_filename)).getName() ;
-        System.out.println("info: Resolve " + _annex.getName() + " in " +
-              _parentContainer + " from " + filename) ;
+        String msg = "resolve " + _annex.getName() + " in " +
+                     _parentContainer + " from " + filename ;
+        _LOGGER.trace(msg);
+        
         _resolver.resolveAnnex(_annex.getName(), _annexElements, _errManager) ;
         return _errManager.getNumErrors() == 0 ;
       }
       else
       {
-        System.err.println("info: " + _parentContainer + " has parsing errors. Skip resolving for this annex.") ;
+        String msg = _parentContainer + " has parsing errors. Its annexes have not been resolved." ;
+        _LOGGER.warn(msg);
+        ServiceProvider.SYS_ERR_REP.warning(msg, true);
         return false ;
       }
     }

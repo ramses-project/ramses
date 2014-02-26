@@ -68,12 +68,21 @@ public class SysErrReporter4Cli extends AbstractSystemErrReporter
   }
 
   @Override
-  public void delayedErrors()
+  public void displayDelayedErrors()
   {
     String msg = super.formatDelayedErrors() ;
     if(msg != null)
     {
       _err.println(msg) ;
+      _delayedErrors.clear();
+      _delayedWarnings.clear();
     }
+  }
+
+  @Override
+  public void abortOnAadlErrors(String msg)
+  {
+    msg = super.formatAbortionOnAadlErrors(msg) ;
+    _output.println(msg) ;
   }
 }

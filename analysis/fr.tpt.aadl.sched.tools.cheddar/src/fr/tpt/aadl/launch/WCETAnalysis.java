@@ -8,7 +8,7 @@ import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.sched.cheddar.CheddarOptions ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
 
@@ -85,7 +85,7 @@ public class WCETAnalysis extends AbstractAnalyzer
                               File outputDir,
                               AnalysisErrorReporterManager errManager,
                               IProgressMonitor monitor)
-        throws AnalysisResultException
+        throws AnalysisException
   {
     CheddarOptions.CHEDDAR_DEBUG = true ;
     CheddarToolchain cheddar = new CheddarToolchain(root, outputDir, errManager) ;

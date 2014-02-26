@@ -38,8 +38,7 @@ public interface Analyzer extends NamedPlugin
                               AnalysisErrorReporterManager errManager,
                               IProgressMonitor monitor
                               )
-        throws AnalysisResultException ;
+                                                throws AnalysisException ;
 
   public void setParameters(Map<String, Object> parameters) ;
-  
 }

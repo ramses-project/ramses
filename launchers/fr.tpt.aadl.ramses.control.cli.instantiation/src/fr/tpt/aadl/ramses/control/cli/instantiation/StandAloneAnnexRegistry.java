@@ -10,6 +10,7 @@ import org.osate.annexsupport.AnnexRegistry ;
 public class StandAloneAnnexRegistry extends AnnexRegistry
 {
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   protected void initialize(String extensionId) {
     if(Platform.isRunning())

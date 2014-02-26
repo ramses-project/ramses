@@ -22,12 +22,15 @@
 package fr.tpt.aadl.ramses.control.cli.core ;
 
 import java.io.File ;
+import java.io.FileNotFoundException ;
+import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
 import com.martiansoftware.jsap.FlaggedOption ;
@@ -47,10 +50,10 @@ import fr.tpt.aadl.ramses.control.support.FileUtils ;
 import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
-import fr.tpt.aadl.ramses.control.support.reporters.StandAloneInternalErrorReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
@@ -61,7 +64,7 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
  * launches the corresponding actions.
  */
 
-public class ToolSuiteLauncherCommand extends RamsesConfiguration
+public class ToolSuiteLauncherCommand
 {
   private static final String HELP_ONLY_OPTION_ID = "help_only" ;
   private static final String PARSE_ONLY_OPTION_ID = "parse_only" ;
@@ -97,26 +100,34 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   private static final String RUNTIME_PATH_OPTION_ID = "runtime_path" ;
   
   private final static DefaultMessageReporter _reporter = new DefaultMessageReporter();
-  private final static StandAloneInternalErrorReporter _errorReporter = new StandAloneInternalErrorReporter(_reporter);
   
   private static Set<File> _includeDirs ;
   private static List<File> _mainModelFiles ;
   private static String _systemToInstantiate ;
   private static ToolSuiteLauncher _launcher ;
+  
+  private static Logger _logger = Logger.getLogger(ToolSuiteLauncherCommand.class) ;
+  
 
   /**
    * This method is the main entry point of the Command Line 
    * Interface (CLI) version of RAMSES. It takes as input the 
    * set of command line arguments of RAMSES, parses them, and
    * launches the corresponding actions.
+   * @throws JSAPException 
+   * @throws ConfigurationException 
+   * @throws AnalysisException 
+   * @throws GenerationException 
+   * @throws IOException 
    * @throws Exception 
    */
-  public static void main(String[] args) throws Exception
+  public static void main(String[] args) throws AnalysisException,
+                                                GenerationException
   {
-    JSAP jsap = new JSAP() ;
-
     try
     {
+      JSAP jsap = new JSAP() ;
+
       initSwitches(jsap) ;
       JSAPResult options = jsap.parse(args) ;
       boolean helpOnly = options.getBoolean(HELP_ONLY_OPTION_ID) ;
@@ -152,10 +163,12 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
         System.exit(1);
       }
     }
-    catch(Exception e)
+    catch(ConfigurationException | JSAPException ex)
     {
-      e.printStackTrace() ;
-      System.exit(0) ;
+      String msg = "while setting up RAMSES" ;
+      _logger.fatal(msg, ex);
+      ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
+      System.exit(0);
     }
   }
   
@@ -172,8 +185,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   
   // Setup and register switches into the given JASP parser, analysis and
   // transformation.
-  private static void initSwitches(JSAP jsap)
-        throws JSAPException
+  private static void initSwitches(JSAP jsap) throws JSAPException
   {
     helpOnlyMode =
           new Switch(HELP_ONLY_OPTION_ID).setLongFlag("help").setShortFlag('h') ;
@@ -320,7 +332,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   }
 
   private static Map<String, Object> parametersHandler(JSAPResult config)
-        throws Exception
+                                                                throws ConfigurationException
   {
     String[] unparsedParameters = config.getStringArray(PARAMETER_OPTION_ID) ;
 
@@ -338,13 +350,13 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
         {
           result.put(splited[0], splited[1]) ;
         }
-        else
-        // Wrong parameters format.
+        else // Wrong parameters format.
         {
           String errorMsg =
-                "wrong parameters format : must be " + PARAMETER_OPTION_ID ;
-          System.err.println(errorMsg) ;
-          throw new Exception(errorMsg) ;
+                "wrong parameters format: must be " + PARAMETER_OPTION_ID ;
+          _logger.fatal(errorMsg);
+          ConfigStatus.NOT_VALID.msg = errorMsg ;
+          throw new ConfigurationException(ConfigStatus.NOT_VALID) ;
         }
       }
     }
@@ -352,7 +364,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     return result ;
   }
   
-  private static void commonOptionsHandler(JSAPResult options) throws Exception
+  private static void commonOptionsHandler(JSAPResult options) throws ConfigurationException 
   {
     String loggingOption = options.getString(LOGGING_OPTION_ID) ;
     
@@ -366,11 +378,19 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
           options.getStringArray(INCLUDES_OPTION_ID) ;
     String[] mainModels = options.getStringArray(SOURCE_MODELS_OPTION_ID) ;
     
-    String errors = "" ;
+    boolean[] faultyDirs = new boolean[includeFolderNames.length] ;
     
-    _includeDirs = FileUtils.checkFilesExist(includeFolderNames, errors) ;
+    _includeDirs = FileUtils.checkFilesExist(includeFolderNames, faultyDirs) ;
     
-    // TODO : throw warnings for the faulty directories.
+    for (int i = 0 ; i < faultyDirs.length ; i++)
+    {
+      if(faultyDirs[i])
+      {
+        String msg = "the directory \'" + includeFolderNames[i] + "\' is not found" ;
+        _logger.error(msg);
+        ServiceProvider.SYS_ERR_REP.error(msg, true);
+      }
+    }
     
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
     setRamsesResourceDir(_includeDirs) ;
@@ -395,8 +415,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
                                                    _includeDirs) ;
   }
   
-  private static void parse(JSAPResult options)
-        throws Exception
+  private static void parse(JSAPResult options) 
   {
     _launcher.parsePredefinedRessources() ;
     List<Resource> modelResources = _launcher.performParse(_mainModelFiles) ;
@@ -431,14 +450,24 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       
       if(status == ConfigStatus.SET)
       {
-        _launcher.unparse(modelResources, ramsesConfig) ;
+        try
+        {
+          _launcher.unparse(modelResources, ramsesConfig) ;
+        }
+        catch (IOException e)
+        {
+          String errMsg = "while unparsing" ;
+          _logger.fatal(errMsg, e);
+          ServiceProvider.SYS_ERR_REP.fatal(errMsg, e);
+          System.exit(0);
+        }
       }
     }
   }
 
   private static void instantiationOptionsHandler(JSAPResult options,
                                                   RamsesConfiguration config)
-                                                                throws Exception
+                                                                throws ConfigurationException
   {
     _systemToInstantiate =
           options.getString(SYSTEM_TO_INSTANTIATE_OPTION_ID) ;
@@ -449,12 +478,13 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     ConfigStatus status = config.setOutputDir(output_path) ;
     if(status != ConfigStatus.SET)
     {
-      throw new Exception(status.msg) ;
+      _logger.fatal(status.msg);
+      throw new ConfigurationException(status) ;
     }
   }
   
-  private static void analyse(JSAPResult options) throws Exception
-        
+  private static void analyse(JSAPResult options) throws AnalysisException,
+                                                         ConfigurationException
   {
     RamsesConfiguration config = new RamsesConfiguration() ;
     instantiationOptionsHandler(options, config);
@@ -466,30 +496,12 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     
     if(analysisToPerform.length > 0)
     {
-      try
-      {
-        _launcher.initializeAnalysis(analysisToPerform) ;
-      }
-      catch(Exception e)
-      {
-        _errorReporter.internalErrorImpl(e.getMessage());
-        _reporter.reportMessage(MessageStatus.INFO, analysis.getHelp()) ;
-        System.exit(0) ;
-      }
-
-      try
-      {
-        Map<String, Object> parameters = parametersHandler(options) ;
+      _launcher.initializeAnalysis(analysisToPerform) ;
+      
+      Map<String, Object> parameters = parametersHandler(options) ;
         
-        _launcher.performAnalysis(_mainModelFiles, _systemToInstantiate, config,
-                                 parameters) ;
-      }
-      catch(AnalysisResultException e)
-      {
-        _errorReporter.internalErrorImpl("An error ocurred when performing analysis: "+analysisToPerform);
-        _errorReporter.internalErrorImpl(e.getMessage()) ;
-        System.exit(0) ;
-      }
+      _launcher.performAnalysis(_mainModelFiles, _systemToInstantiate, config,
+                                  parameters) ;
     }
   }
   
@@ -500,73 +512,72 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
     return result ;
   }
   
-  private static void generation(JSAPResult options)
-                                                   throws Exception
+  private static void generation(JSAPResult options) throws ConfigurationException,
+                                                            GenerationException
   {
     RamsesConfiguration config = new RamsesConfiguration() ;
     instantiationOptionsHandler(options, config);
     
     String targetName = options.getString(GENERATION_OPTION_ID) ;
-    ConfigStatus status = config.setGeneretionTargetId(targetName) ;
+    ConfigStatus status = config.setGenerationTargetId(targetName) ;
     if(status != ConfigStatus.SET)
     {
-      throw new Exception(status.msg) ;
+      _logger.fatal(status.msg) ;
+      throw new ConfigurationException(status) ;
     }
     
     String path = options.getString(RUNTIME_PATH_OPTION_ID) ;
     status = config.setRuntimePath(path) ;
     if(status != ConfigStatus.SET)
     {
-      throw new Exception(status.msg) ;
+      _logger.fatal(status.msg) ;
+      throw new ConfigurationException(status) ;
     }
     
     _launcher.parsePredefinedRessources() ;
     
     File[] inclDirs = toArray(_includeDirs) ;
     
-    try
+    String workflow_path =
+          options.getString(WORKFLOW_OPTION_ID) ;
+      
+    Map<String, Object> parameters = parametersHandler(options) ;
+      
+    if(workflow_path != null)
     {
-      String workflow_path =
-            options.getString(WORKFLOW_OPTION_ID) ;
-      
-      Map<String, Object> parameters = parametersHandler(options) ;
-      
-      if(workflow_path != null)
+      try
       {
-        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(options.getString(WORKFLOW_OPTION_ID));
+        File workflowFile = org.osate.utils.FileUtils.stringToFile(workflow_path) ;
         
+        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflowFile.toString());
+          
         _launcher.launchWorkflowProcess(_mainModelFiles,
-                                       _systemToInstantiate,
-                                       config,
-                                       inclDirs,
-                                       xmlPilot,
-                                       parameters) ;
+                                        _systemToInstantiate,
+                                        config,
+                                        inclDirs,
+                                        xmlPilot,
+                                        parameters) ;
       }
-      else
+      catch (FileNotFoundException ex)
       {
-        _launcher.launchDefaultGenerationProcess(_mainModelFiles,
-                                                _systemToInstantiate,
-                                                config,
-                                                inclDirs,
-                                                parameters) ;
+        String msg = "generation workflow file \'" + workflow_path + "\' is not found" ;
+        _logger.fatal(msg, ex);
+        ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
+        System.exit(0);
       }
     }
-    catch(Exception e)
+    else
     {
-      if(System.getProperty("DEBUG")!=null)
-        {
-            e.printStackTrace() ;
-        }
-            _errorReporter.internalErrorImpl(e) ;
-            System.exit(0) ;
+      _launcher.launchDefaultGenerationProcess(_mainModelFiles,
+                                               _systemToInstantiate,
+                                               config,
+                                               inclDirs,
+                                               parameters) ;
     }
-
-    
   }
 
   private static List<File> getVerifiedPath(String[] filePath,
-                                            Set<File> includeDirs)
-        throws Exception
+                                            Set<File> includeDirs) throws ConfigurationException
   {
     List<File> verifiedPaths = new ArrayList<File>() ;
     boolean error = false ;
@@ -614,7 +625,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
       
       if(pathFound == false)
       {
-        errorMessage = "file " + new File(filePath[i]).getCanonicalPath() + " could not be found";
+        errorMessage = "file \'" + filePath[i] + "\' not found";
         error = true ;
         break ;
       }
@@ -622,7 +633,9 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
 
     if(error == true)
     {
-      throw new Exception(errorMessage);
+      _logger.fatal(errorMessage) ;
+      ConfigStatus.NOT_FOUND.msg = errorMessage ;
+      throw new ConfigurationException(ConfigStatus.NOT_FOUND);
     }
 
     return verifiedPaths ;
@@ -669,7 +682,7 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
   }
 
   private static void setRamsesResourceDir(Set<File> includeFolder)
-                                                                throws ConfigurationException
+                                                   throws ConfigurationException
   {
     ConfigStatus status = null;
     short count = 0 ;
@@ -733,15 +746,22 @@ public class ToolSuiteLauncherCommand extends RamsesConfiguration
             status = RamsesConfiguration.setPredefinedResourceDir(calculatedPredefinedDir) ;
             if(status != ConfigStatus.SET)
             {
+              _logger.fatal(status.msg);
               hasToThrow = true ;
             }
           }
         }
         else
+        {
+          _logger.fatal(status.msg);
           hasToThrow = true ;
+        }
       }
       else
+      {
+        _logger.fatal(status.msg);
         hasToThrow = true ;
+      }
     }
     
     if(hasToThrow)

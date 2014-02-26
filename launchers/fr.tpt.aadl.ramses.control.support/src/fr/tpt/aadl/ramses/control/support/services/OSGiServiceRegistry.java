@@ -40,6 +40,8 @@ import org.osate.annexsupport.AnnexUnparser ;
 import org.osate.annexsupport.AnnexUnparserRegistry ;
 
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
@@ -65,7 +67,8 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
 
   @Override
   public void init(AadlModelInstantiatior modelInstantiatior,
-                   PredefinedAadlModelManager predefinedAadlModels) throws Exception
+                   PredefinedAadlModelManager predefinedAadlModels)
+                                                   throws ConfigurationException
   {
     _modelInstantiatior = modelInstantiatior ;
     _predefinedAadlModels = predefinedAadlModels ;
@@ -80,9 +83,9 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
           (AnnexUnparserRegistry) AnnexRegistry
                 .getRegistry(AnnexRegistry.ANNEX_UNPARSER_EXT_ID) ;
     initialize(_analyzersRegistry, Names.ANALYSIS_EXT_ID, modelInstantiatior,
-               predefinedAadlModels) ;
+                 predefinedAadlModels) ;
     initialize(_genRegistry, Names.GENERATOR_EXT_ID, modelInstantiatior,
-               predefinedAadlModels) ;
+                 predefinedAadlModels) ;
   }
 
   @SuppressWarnings("all")
@@ -90,7 +93,7 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
                           String extensionId,
                           AadlModelInstantiatior modelInstantiatior,
                           PredefinedAadlModelManager predefinedAadlModels)
-        throws CoreException
+                                                   throws ConfigurationException
   {
     IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry() ;
     IExtensionPoint extensionPoint =
@@ -109,27 +112,57 @@ public class OSGiServiceRegistry extends AbstractServiceRegistry implements Serv
     		{
     			if(extensionId==Names.GENERATOR_EXT_ID)
     			{
-    				GeneratorFactory factory = (GeneratorFactory) configElems[j]
-							                     .createExecutableExtension(Names.ATT_CLASS) ;
-    				Generator gen = factory.createGenerator(modelInstantiatior,
-    				                                        predefinedAadlModels);
-    				registry.put(gen.getRegistryName(), gen) ;
+    				try
+    				{
+    				  GeneratorFactory factory = (GeneratorFactory) configElems[j]
+                    .createExecutableExtension(Names.ATT_CLASS) ;
+    				  Generator gen = factory.createGenerator(modelInstantiatior,
+                                                      predefinedAadlModels);
+    				  registry.put(gen.getRegistryName(), gen) ;
+    				}
+    				catch (CoreException e)
+    				{
+    				  ConfigStatus.NOT_FOUND.msg = "generator factory \'" + 
+    				                               configElems[j].getName() +
+    				                               "\' is not found" ;
+    				  throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
+    				}
     			}
     			else if(extensionId==Names.ANALYSIS_EXT_ID)
     			{
-    				AnalyzerFactory factory = (AnalyzerFactory) configElems[j]
-                                   .createExecutableExtension(Names.ATT_CLASS) ;
-    				
-    				Analyzer analyzer = factory.createAnalyzer(modelInstantiatior,
-    				                                           predefinedAadlModels) ;
-    				registry.put(analyzer.getRegistryName(), analyzer) ;
+    				try
+    				{
+    				  AnalyzerFactory factory = (AnalyzerFactory) configElems[j]
+                    .createExecutableExtension(Names.ATT_CLASS) ;
+
+    				  Analyzer analyzer = factory.createAnalyzer(modelInstantiatior,
+                                                         predefinedAadlModels) ;
+    				  registry.put(analyzer.getRegistryName(), analyzer) ;
+    				}
+    				catch (CoreException e)
+            {
+              ConfigStatus.NOT_FOUND.msg = "analyzer factory \'" + 
+                                           configElems[j].getName() +
+                                           "\' is not found" ;
+              throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
+            }
     			}
     			else // XXX What is it about ???
     			{
-    			  NamedPlugin instance =
-                  (NamedPlugin) configElems[j]
-                      .createExecutableExtension(Names.ATT_CLASS) ;
-            registry.put(instance.getRegistryName(), instance) ;
+    			  try
+    			  {
+    			    NamedPlugin instance =
+                    (NamedPlugin) configElems[j]
+                        .createExecutableExtension(Names.ATT_CLASS) ;
+              registry.put(instance.getRegistryName(), instance) ;
+    			  }
+            catch (CoreException e)
+            {
+              ConfigStatus.NOT_FOUND.msg = "plugin factory \'" + 
+                                           configElems[j].getName() +
+                                           "\' is not found" ;
+              throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
+            }
     			}
     		}
     	}

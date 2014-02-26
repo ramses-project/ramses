@@ -12,7 +12,7 @@ import org.osate.aadl2.instance.SystemOperationMode ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 import org.osate.ui.actions.AbstractInstanceOrDeclarativeModelReadOnlyAction ;
 
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisResultException ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
 
@@ -48,7 +48,7 @@ public class LaunchCheddarUI implements Analyzer
                             File outputDir,
                             AnalysisErrorReporterManager errManager,
                             IProgressMonitor monitor)
-      throws AnalysisResultException
+      throws AnalysisException
   {
     CheddarToolchain cheddar = new CheddarToolchain(systemInstance, outputDir,
                                                     errManager) ;

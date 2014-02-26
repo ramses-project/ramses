@@ -9,13 +9,10 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   
   protected String formatFatalMsg(String initialMsg, Throwable ex)
   {
-    // TODO to be implemented.
-    
-    // DEBUG
     StringBuilder sb = new StringBuilder() ;
-    
+    sb.append("<Fatal error> ");
     sb.append(initialMsg) ;
-    sb.append(":\n\\n\t") ;
+    sb.append(":\n\n\t") ;
     sb.append(ex.getMessage()) ;
     
     return sb.toString() ;
@@ -24,19 +21,19 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   protected String formatFatalMsg(String initialMsg)
   {
     // TODO to be implemented.
-    return "Fatal error: " + initialMsg ;
+    return "<Fatal error> " + initialMsg ;
   }
   
   protected String formatErrorMsg(String initialMsg)
   {
     // TODO to be implemented.
-    return "Error: " + initialMsg ;
+    return "<Error> " + initialMsg ;
   }
   
   protected String formatWarningMsg(String initialMsg)
   {
     // TODO to be implemented.
-    return "Warning: " + initialMsg ;
+    return "<Warning> " + initialMsg ;
   }
   
   protected String formatDelayedErrors()
@@ -74,5 +71,18 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
     {
       return null ;
     }
+  }
+  
+  @Override
+  public boolean hasDelayedErrors()
+  {
+    return (false == _delayedErrors.isEmpty()) ||
+           (false == _delayedWarnings.isEmpty()) ; 
+  }
+  
+  protected String formatAbortionOnAadlErrors(String initialMsg)
+  {
+    // TODO : to be refined.
+    return initialMsg ;
   }
 }
