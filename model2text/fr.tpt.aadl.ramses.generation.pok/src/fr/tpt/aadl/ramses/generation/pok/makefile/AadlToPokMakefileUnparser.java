@@ -166,7 +166,7 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
         
         if(it.hasNext())
         {
-          unparserContent.addOutput("export USER_INCLUDES=");
+          unparserContent.addOutput("export COPTS=");
           File include ;
           while(it.hasNext())
           {
