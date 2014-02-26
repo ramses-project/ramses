@@ -165,7 +165,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
 		
 		if(it.hasNext())
 		{
-		  unparserContent.addOutput("export COPTS=");
+		  unparserContent.addOutput("export USER_INCLUDES=");
 		  while(it.hasNext())
 	    {
 		    include = it.next() ;

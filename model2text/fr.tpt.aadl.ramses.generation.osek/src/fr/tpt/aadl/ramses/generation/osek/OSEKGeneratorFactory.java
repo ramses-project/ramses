@@ -43,7 +43,7 @@ import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator
 public class OSEKGeneratorFactory implements GeneratorFactory {
 	
   public final static String OSEK_GENERATOR_NAME = "osek";
-  private final static String _OSEK_RUNTIME_PATH = "/lego/nxtOSEK/ecrobot/c/ecrobot.c";
+  private final static String _OSEK_RUNTIME_PATH = "/ecrobot/c/ecrobot.c";
 
 	@Override
 	public Generator createGenerator(AadlModelInstantiatior modelInstantiator,
