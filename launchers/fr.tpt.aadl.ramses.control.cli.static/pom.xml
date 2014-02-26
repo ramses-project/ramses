@@ -159,7 +159,7 @@
 
     <dependency>
       <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.ramses.util.generation</artifactId>
+      <artifactId>fr.tpt.aadl.ramses.generation.utils</artifactId>
       <version>1.0.0.qualifier</version>
     </dependency>
 
