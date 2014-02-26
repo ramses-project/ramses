@@ -147,13 +147,13 @@
 
     <dependency>
       <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.ramses.instantiation</artifactId>
+      <artifactId>fr.tpt.aadl.ramses.control.cli.instantiation</artifactId>
       <version>0.5.0</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.ramses.transformation.atl.launch</artifactId>
+      <artifactId>fr.tpt.aadl.ramses.control.atl.launch</artifactId>
       <version>1.0.0.qualifier</version>
     </dependency>
 
