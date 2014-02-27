@@ -26,41 +26,35 @@ import java.util.ArrayList ;
 import java.util.Collections ;
 import java.util.List ;
 
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Platform ;
 import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.NumberValue;
-import org.osate.aadl2.Property;
-import org.osate.aadl2.PropertyConstant;
+import org.osate.aadl2.NamedValue ;
+import org.osate.aadl2.NumberValue ;
+import org.osate.aadl2.Property ;
+import org.osate.aadl2.PropertyConstant ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.Subprogram ;
 import org.osate.aadl2.SubprogramCall ;
 import org.osate.aadl2.SubprogramCallSequence ;
-import org.osate.aadl2.UnitLiteral;
+import org.osate.aadl2.UnitLiteral ;
 import org.osate.aadl2.instance.ComponentInstance ;
-import org.osate.aadl2.instance.FeatureInstance;
+import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.aadl2.instance.InstanceReferenceValue ;
 import org.osate.utils.PropertyUtils ;
-import org.osate.xtext.aadl2.properties.util.GetProperties;
+import org.osate.xtext.aadl2.properties.util.GetProperties ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.manager.PredefinedPropertiesManager ;
 
-
 public class AadlUtil
 {
-
   public enum DispatchProtocol
   {
     Periodic, Aperiodic, Sporadic, Timed, Hybrid, Background, Unknown
   } ;
-
-  private AadlUtil()
-  {
-  }
 
   public static ComponentInstance getHighestPeriodTask(ComponentInstance process)
   {
@@ -110,7 +104,6 @@ public class AadlUtil
     }
     catch(Exception e)
     {
-      e.printStackTrace() ;
       return null ;
     }
   }
@@ -127,26 +120,29 @@ public class AadlUtil
     return cpu ;
   }
 
-  public static double getInfoMaxDuration(NamedElement e, String unit)
+  public static double getInfoMaxDuration(NamedElement e,
+                                          String unit)
   {
     try
     {
-      NumberValue nv =  PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
-      return nv.getScaledValue(unit);
+      NumberValue nv =
+            PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
+      return nv.getScaledValue(unit) ;
     }
     catch(Exception ex)
     {
-      //ex.printStackTrace();
       return 0f ;
     }
   }
 
-  public static double getInfoMinDuration(NamedElement e, String unit)
+  public static double getInfoMinDuration(NamedElement e,
+                                          String unit)
   {
     try
     {
-      NumberValue nv = PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time"); 
-      return nv.getScaledValue(unit);
+      NumberValue nv =
+            PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
+      return nv.getScaledValue(unit) ;
     }
     catch(Exception ex)
     {
@@ -199,7 +195,6 @@ public class AadlUtil
     }
     catch(Exception e)
     {
-      e.printStackTrace() ;
       return 0 ;
     }
   }
@@ -212,7 +207,6 @@ public class AadlUtil
     }
     catch(Exception e)
     {
-      e.printStackTrace() ;
       return 0 ;
     }
   }
@@ -241,24 +235,27 @@ public class AadlUtil
     }
   }
 
-  public static long getInfoPortCriticality(FeatureInstance port) {
-	  try
-	  {
-	    return (int) PropertyUtils.getIntValue(port, "Criticality") ;
-	  }
-	  catch(Exception e)
-	  {
-	    return 0 ;
-	  }
-  }
-  
-  public static double getThreadContextSwitchFor(ComponentInstance processor, String unit)
+  public static long getInfoPortCriticality(FeatureInstance port)
   {
     try
     {
-      NumberValue nv = PropertyUtils.getMaxRangeValue(processor,
-                                            "Thread_Swap_Execution_Time") ;
-      return nv.getScaledValue(unit);
+      return (int) PropertyUtils.getIntValue(port, "Criticality") ;
+    }
+    catch(Exception e)
+    {
+      return 0 ;
+    }
+  }
+
+  public static double getThreadContextSwitchFor(ComponentInstance processor,
+                                                 String unit)
+  {
+    try
+    {
+      NumberValue nv =
+            PropertyUtils.getMaxRangeValue(processor,
+                                           "Thread_Swap_Execution_Time") ;
+      return nv.getScaledValue(unit) ;
     }
     catch(Exception e)
     {
@@ -266,13 +263,15 @@ public class AadlUtil
     }
   }
 
-  public static double getProcessContextSwitchFor(ComponentInstance processor, String unit)
+  public static double getProcessContextSwitchFor(ComponentInstance processor,
+                                                  String unit)
   {
     try
     {
-      NumberValue nv =  PropertyUtils.getMaxRangeValue(processor,
-                                            "Process_Swap_Execution_Time") ;
-      return nv.getScaledValue(unit);
+      NumberValue nv =
+            PropertyUtils.getMaxRangeValue(processor,
+                                           "Process_Swap_Execution_Time") ;
+      return nv.getScaledValue(unit) ;
     }
     catch(Exception e)
     {
@@ -280,12 +279,14 @@ public class AadlUtil
     }
   }
 
-  public static double getSchedulerQuantum(ComponentInstance processor, String unit)
+  public static double getSchedulerQuantum(ComponentInstance processor,
+                                           String unit)
   {
     try
     {
-      NumberValue nv = PropertyUtils.getMaxRangeValue(processor, "Scheduler_Quantum") ;
-      return nv.getScaledValue(unit);
+      NumberValue nv =
+            PropertyUtils.getMaxRangeValue(processor, "Scheduler_Quantum") ;
+      return nv.getScaledValue(unit) ;
     }
     catch(Exception e)
     {
@@ -293,26 +294,28 @@ public class AadlUtil
     }
   }
 
-  public static float getSequenceMaxDuration(List<Subprogram> subprograms, String unit)
+  public static float getSequenceMaxDuration(List<Subprogram> subprograms,
+                                             String unit)
   {
     BigDecimal d = new BigDecimal("0") ;
 
     for(Subprogram s : subprograms)
     {
-      double max = getInfoMaxDuration(s,unit) ;
+      double max = getInfoMaxDuration(s, unit) ;
       d = d.add(new BigDecimal(max + "")) ;
     }
 
     return d.floatValue() ;
   }
 
-  public static float getSequenceMinDuration(List<Subprogram> subprograms, String unit)
+  public static float getSequenceMinDuration(List<Subprogram> subprograms,
+                                             String unit)
   {
     BigDecimal d = new BigDecimal("0") ;
 
     for(Subprogram s : subprograms)
     {
-      double min = getInfoMinDuration(s,unit) ;
+      double min = getInfoMinDuration(s, unit) ;
       d = d.add(new BigDecimal(min + "")) ;
     }
 
@@ -396,31 +399,38 @@ public class AadlUtil
   {
     return getCallSequenceMaxDuration(getAllCallSequence(thread));
   }*/
-  
+
   public static String getPrecision(NamedElement ne)
   {
-	String precision = "";
-	if(Platform.isRunning())
-	{
-		Property prop = null;
-		try{
-			prop = GetProperties.lookupPropertyDefinition(ne, "AADL_Project", "Timing_Precision") ;
-		}
-		catch(Exception e)
-		{
-			return "ms";
-		}
-		if(prop==null)
-			return "ms";
-		UnitLiteral sl = (UnitLiteral) prop.getDefaultValue() ;
-		precision = sl.getName();
-	}
-	else
-	{
-		PropertyConstant prop = PredefinedPropertiesManager.getPropertyConstantDefinition("AADL_Project", "Timing_Precision");
-		NamedValue sl = (NamedValue) prop.getConstantValue() ;
-		precision = ((UnitLiteral)sl.getNamedValue()).getName();
-	}
-	return precision;
+    String precision = "" ;
+    if(Platform.isRunning())
+    {
+      Property prop = null ;
+      try
+      {
+        prop =
+              GetProperties.lookupPropertyDefinition(ne, "AADL_Project",
+                                                     "Timing_Precision") ;
+      }
+      catch(Exception e)
+      {
+        return "ms" ;
+      }
+
+      if(prop == null)
+        return "ms" ;
+      UnitLiteral sl = (UnitLiteral) prop.getDefaultValue() ;
+      precision = sl.getName() ;
+    }
+    else
+    {
+      PropertyConstant prop =
+            PredefinedPropertiesManager
+                  .getPropertyConstantDefinition("AADL_Project",
+                                                 "Timing_Precision") ;
+      NamedValue sl = (NamedValue) prop.getConstantValue() ;
+      precision = ((UnitLiteral) sl.getNamedValue()).getName() ;
+    }
+    return precision ;
   }
 }

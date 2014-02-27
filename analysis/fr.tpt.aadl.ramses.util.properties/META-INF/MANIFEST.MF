@@ -7,7 +7,9 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.modelsupport;bundle-version="1.0.0",
  org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
  org.jdom;bundle-version="1.1.1",
- org.osate.utils;bundle-version="1.0.0"
+ org.osate.utils;bundle-version="1.0.0",
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.control.support
 Export-Package: fr.tpt.aadl.ramses.util.properties,fr.tpt.aadl.ramses.util.workspace
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

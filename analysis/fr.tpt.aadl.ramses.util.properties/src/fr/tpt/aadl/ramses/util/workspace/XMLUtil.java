@@ -26,14 +26,19 @@ import java.io.FileOutputStream ;
 import java.io.IOException ;
 import java.io.OutputStream ;
 
+import org.apache.log4j.Logger ;
 import org.jdom.Document ;
 import org.jdom.Element ;
 import org.jdom.output.Format ;
 import org.jdom.output.XMLOutputter ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+
 public class XMLUtil
 {
-
+  private static Logger _LOGGER = Logger.getLogger(XMLUtil.class) ;
+  
   private static void outputXML(Document doc,
                                 OutputStream stream)
   {
@@ -45,7 +50,9 @@ public class XMLUtil
     }
     catch(IOException e)
     {
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage("xml output has failed", e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
 
@@ -72,7 +79,9 @@ public class XMLUtil
     }
     catch(IOException e)
     {
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage("xml save has failed", e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
 
@@ -89,5 +98,4 @@ public class XMLUtil
   {
     return createEnclosedValue(elementName, value + "") ;
   }
-
 }

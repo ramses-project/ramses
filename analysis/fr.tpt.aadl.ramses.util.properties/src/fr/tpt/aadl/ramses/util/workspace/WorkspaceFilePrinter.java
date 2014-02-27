@@ -27,6 +27,7 @@ import java.io.IOException ;
 import java.io.InputStream ;
 import java.io.PrintStream ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.resources.IFile ;
 import org.eclipse.core.resources.IResource ;
 import org.eclipse.core.resources.IWorkspaceRoot ;
@@ -37,9 +38,14 @@ import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.util.AadlUtil ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+
 public class WorkspaceFilePrinter extends PrintStream
 {
-
+  
+  private static Logger _LOGGER = Logger.getLogger(WorkspaceFilePrinter.class) ;
+  
   public static PrintStream create(SystemInstance root,
                                    String name)
   {
@@ -49,16 +55,14 @@ public class WorkspaceFilePrinter extends PrintStream
     }
     catch(Exception e)
     {
+      return System.out ;
     }
-
-    return System.out ;
   }
 
   private IFile file = null ;
 
-  public WorkspaceFilePrinter(
-                              SystemInstance root, String name)
-        throws CoreException, IOException
+  public WorkspaceFilePrinter(SystemInstance root, String name)
+                                               throws CoreException, IOException
   {
     super(createFile(root, name)) ;
     this.file = getFile(root, name) ;
@@ -68,14 +72,13 @@ public class WorkspaceFilePrinter extends PrintStream
 
   private static File createFile(SystemInstance root,
                                  String name)
-        throws CoreException, IOException
+                                               throws CoreException, IOException
   {
     IFile file = getFile(root, name) ;
 
     if(!file.exists())
     {
       File f = file.getLocation().toFile() ;
-      System.out.println(f.getAbsolutePath()) ;
       f.createNewFile() ;
       file.create(new ByteArrayInputStream(new byte[0]), true, null) ;
     }
@@ -139,7 +142,6 @@ public class WorkspaceFilePrinter extends PrintStream
     buffer += new String(buf, off, len) ;
   }
 
-  @SuppressWarnings("deprecation")
   public void close()
   {
     final InputStream input = new ByteArrayInputStream(buffer.getBytes()) ;
@@ -161,8 +163,9 @@ public class WorkspaceFilePrinter extends PrintStream
     }
     catch(final CoreException e)
     {
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage("cannot close the workspace file printer stream", e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
-
 }
