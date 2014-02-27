@@ -166,7 +166,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     _includeDirs = includeDirs ;
   }
   
-  public Set<File> getListOfReferencedObjects(ProcessImplementation aProcessImplementation) throws GenerationException
+  public Set<File> getListOfReferencedObjects(ProcessImplementation aProcessImplementation)
   {
     Set<File> result = _includeDirManager.getDenpendencies(aProcessImplementation) ;
     
@@ -185,12 +185,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         }
         else
         {
-          // Throw exception, the thread component instance should reference
+          // The thread component instance should reference
           // a thread implementation to call user operations.
           String errMsg =  "the thread component instance should reference a " +
                            "thread implementation to call user operations." ;
           _LOGGER.fatal(errMsg);
-          throw new GenerationException(errMsg) ;
+          ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
       }
       

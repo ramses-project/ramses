@@ -1,23 +1,22 @@
 package fr.tpt.aadl.ramses.control.atl;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File ;
+import java.util.ArrayList ;
+import java.util.List ;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.m2m.atl.core.ATLCoreException;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 
 public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
 
 	public AadlModelValidator(AadlModelInstantiatior modelInstantiator,
-			PredefinedAadlModelManager predefinedResourcesManager)
-			throws ATLCoreException {
+			                      PredefinedAadlModelManager predefinedResourcesManager)
+	{
 		super(modelInstantiator, predefinedResourcesManager);
 	}
 

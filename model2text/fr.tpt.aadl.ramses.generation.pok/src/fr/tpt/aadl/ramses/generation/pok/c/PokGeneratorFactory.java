@@ -25,8 +25,6 @@ import java.io.File ;
 import java.io.FileReader ;
 import java.io.IOException ;
 
-import org.eclipse.m2m.atl.core.ATLCoreException;
-
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
@@ -34,7 +32,7 @@ import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
 import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Transformation ;
-import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Validation;
+import fr.tpt.aadl.ramses.generation.pok.AadlArinc653Validation ;
 import fr.tpt.aadl.ramses.generation.pok.makefile.AadlToPokMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
@@ -65,14 +63,8 @@ public class PokGeneratorFactory implements GeneratorFactory
                                              "helpers/LanguageSpecificitiesC") ;
     
     AadlModelValidator targetVal=null;
-	try {
-		targetVal = new AadlArinc653Validation(
-				 								 modelInstantiatior,
-				 								 predefinedAadlModels);
-	} catch (ATLCoreException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	  targetVal = new AadlArinc653Validation(modelInstantiatior,
+				 								                   predefinedAadlModels);
     AadlTargetSpecificGenerator result = 
                   new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
                                                   modelInstantiatior,

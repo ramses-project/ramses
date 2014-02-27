@@ -22,7 +22,6 @@
 
 package fr.tpt.aadl.ramses.generation.pok.ada;
 
-
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
 
@@ -44,5 +43,4 @@ public class AadlToPokADAUtils
   {
     return GenerationUtilsADA.getGenerationADAIdentifier(instance.getComponentInstancePath());
   }
-  
 }

@@ -27,6 +27,7 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.ProcessImplementation ;
@@ -38,7 +39,9 @@ import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.aadl2.util.Aadl2Switch ;
 import org.osate.utils.PropertyUtils ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.utils.AbstractAadlToCMakefileUnparser ;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
@@ -51,6 +54,8 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
   private List<ProcessSubcomponent> bindedProcess ;
   private final static String RUNTIME_INCL_DIR = "/libpok/include" ;
   public final static String POK_RUNTIME_VAR_ENV = "POK_PATH" ;
+  
+  private static Logger _LOGGER = Logger.getLogger(AadlToPokMakefileUnparser.class) ;
   
   public AadlToPokMakefileUnparser()
   {
@@ -121,8 +126,8 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
       {
         unparserContent
               .addOutputNewline("export DEPLOYMENT_HEADER=$(shell pwd)/main.h") ;
-        unparserContent
-              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/config.mk") ;
+        unparserContent.addOutputNewline("include $(" + _ENV_VAR_NAME +
+              ")/misc/mk/config.mk") ;
 
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
               ".elf") ;
@@ -135,51 +140,47 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
       {
         unparserContent
               .addOutput("OBJS = main.o activity.o subprograms.o gtypes.o deployment.o ") ;
-        
-        Set<File> sourceFileList;
-		try {
-		  sourceFileList = getListOfReferencedObjects(object);
-          for(File sourceFile : sourceFileList)
+
+        Set<File> sourceFileList ;
+
+        sourceFileList = getListOfReferencedObjects(object) ;
+        for(File sourceFile : sourceFileList)
+        {
+          String value = sourceFile.getAbsolutePath() ;
+          if(value.endsWith(".c") || value.endsWith(".o"))
           {
-            String value = sourceFile.getAbsolutePath();
-            if(value.endsWith(".c") || value.endsWith(".o"))
-            {
-        	  value = value.substring(0,value.length()-2);  
-        	  value = value.concat(".o");
-            }
-            else
-        	  continue;
-            unparserContent.addOutput( value + " ") ;
+            value = value.substring(0, value.length() - 2) ;
+            value = value.concat(".o") ;
           }
-          
-		}catch (Exception e) {
-		  // TODO Auto-generated catch block
-		  e.printStackTrace();
-		}
-		unparserContent.addOutput("\n") ;
+          else
+            continue ;
+          unparserContent.addOutput(value + " ") ;
+        }
+
+        unparserContent.addOutput("\n") ;
         unparserContent.addOutputNewline("all: libpok $(TARGET)\n") ;
         unparserContent.addOutputNewline("clean: common-clean\n") ;
-        unparserContent
-              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/common-$(ARCH).mk") ;
+        unparserContent.addOutputNewline("include $(" + _ENV_VAR_NAME +
+              ")/misc/mk/common-$(ARCH).mk") ;
 
         Iterator<File> it = new IncludeDirIterator() ;
-        
+
         if(it.hasNext())
         {
-          unparserContent.addOutput("export COPTS=");
+          unparserContent.addOutput("export COPTS=") ;
           File include ;
           while(it.hasNext())
           {
             include = it.next() ;
-            unparserContent.addOutput("-I"+include.getAbsolutePath()+" ");
+            unparserContent.addOutput("-I" + include.getAbsolutePath() + " ") ;
           }
           unparserContent.addOutput("\n") ;
         }
-        
-        unparserContent
-              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-partition.mk") ;
-        unparserContent
-              .addOutputNewline("include $("+_ENV_VAR_NAME+")/misc/mk/rules-common.mk") ;
+
+        unparserContent.addOutputNewline("include $(" + _ENV_VAR_NAME +
+              ")/misc/mk/rules-partition.mk") ;
+        unparserContent.addOutputNewline("include $(" + _ENV_VAR_NAME +
+              ")/misc/mk/rules-common.mk") ;
         return DONE ;
       }
 
@@ -193,9 +194,11 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
         }
         catch(Exception e)
         {
-          System.err
-                .println("Property Architecture from property set POK, not found for" +
-                      " process subcomponent " + object.getName()) ;
+          String errMsg =  RamsesException.formatRethrowMessage(
+                 "Property Architecture from property set POK, not found for" +
+                 " process subcomponent " + object.getName(), e) ;
+          _LOGGER.error(errMsg);
+          ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
 
         try
@@ -211,9 +214,10 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
         }
         catch(Exception e)
         {
-          System.err
-                .println("Property BSP from property set POK, not found for" +
-                      " process subcomponent " + object.getName()) ;
+          String errMsg = "Property BSP from property set POK, not found for" +
+                          " process subcomponent " + object.getName() ;
+          _LOGGER.error(errMsg);
+          ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
 
         bindedProcess =

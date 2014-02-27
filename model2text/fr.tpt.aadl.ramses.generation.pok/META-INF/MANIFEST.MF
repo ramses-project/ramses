@@ -4,15 +4,16 @@ Bundle-Name: AADL-Ramses-Generation-Pok
 Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.pok;singleton:=true
 Bundle-Version: 0.5.0
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.m2m.atl.engine.emfvm.launch;bundle-version="3.4.0",
+ org.eclipse.m2m.atl.emftvm;bundle-version="3.4.0",
  org.eclipse.emf;bundle-version="2.6.0",
  org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.modelsupport;bundle-version="1.0.0",
  org.osate.utils;bundle-version="0.9.5",
- org.eclipse.m2m.atl.emftvm;bundle-version="3.4.0",
- org.eclipse.m2m.atl.engine.emfvm.launch;bundle-version="3.4.0",
+ org.osate.ba;bundle-version="0.9.5",
+ org.apache.log4j,
  fr.tpt.aadl.ramses.generation.c;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
- org.osate.ba;bundle-version="0.9.5",
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.generation.target.specific;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.utils;bundle-version="1.0.0",
@@ -25,4 +26,3 @@ Export-Package: fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.pok.c,
  fr.tpt.aadl.ramses.generation.pok.makefile
 Bundle-Vendor: TELECOM Paristech
-Import-Package: org.osate.xtext.aadl2.properties.linking

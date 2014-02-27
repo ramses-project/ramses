@@ -52,5 +52,4 @@ public interface AadlTargetUnparser
                          throws GenerationException ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
-  
 }

@@ -26,18 +26,17 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.io.IOException;
+import java.io.IOException ;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.m2m.atl.core.ATLCoreException;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
-import org.eclipse.m2m.atl.emftvm.Metamodel;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EPackage ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
+import org.eclipse.m2m.atl.emftvm.Metamodel ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 
 
 public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
@@ -46,7 +45,7 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 	private String ERROR_REPORTER_URI = "http://fr.tpt.aadl.ramses.constraints.vilation.reporter";
 	
 	public Aadl2ConstraintValidationEMFTVMLauncher(AadlModelInstantiatior modelInstantiator,
-			PredefinedAadlModelManager predefinedResourcesManager) throws ATLCoreException
+			PredefinedAadlModelManager predefinedResourcesManager)
 	{
 		super(modelInstantiator, predefinedResourcesManager);
 	}

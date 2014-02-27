@@ -139,25 +139,21 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
               .addOutput("TARGET_SOURCES = main.c activity.c subprograms.c gtypes.c deployment.c ") ;
         
         Set<File> sourceFileList;
-		try {
-		  sourceFileList = getListOfReferencedObjects(object);
-          for(File sourceFile : sourceFileList)
+        
+        sourceFileList = getListOfReferencedObjects(object);
+        for(File sourceFile : sourceFileList)
+        {
+          String value = sourceFile.getAbsolutePath();
+          if(value.endsWith(".c") || value.endsWith(".o"))
           {
-            String value = sourceFile.getAbsolutePath();
-            if(value.endsWith(".c") || value.endsWith(".o"))
-            {
-        	  value = value.substring(0,value.length()-2);  
-        	  value = value.concat(".c");
-            }
-            else
-        	  continue;
-            unparserContent.addOutput( value + " ") ;
+          value = value.substring(0,value.length()-2);  
+          value = value.concat(".c");
           }
-          
-		}catch (Exception e) {
-		  // TODO Auto-generated catch block
-		  e.printStackTrace();
-		}
+          else
+          continue;
+          unparserContent.addOutput( value + " ") ;
+        }
+        
 		unparserContent.addOutput("\n") ;
 		
 		Iterator<File> it = new IncludeDirIterator() ;

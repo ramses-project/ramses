@@ -50,5 +50,4 @@ public class AadlToPokCUtils
   {
     return GenerationUtilsC.getGenerationCIdentifier(instance.getComponentInstancePath());
   }
-  
 }

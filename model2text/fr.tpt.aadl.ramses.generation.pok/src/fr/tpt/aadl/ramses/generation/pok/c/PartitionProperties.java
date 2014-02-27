@@ -9,7 +9,6 @@ import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.SampleInfo;
 
 public class PartitionProperties
 {
-	
   public PartitionProperties(String prefix)
   {
 	this.prefix=prefix;
@@ -40,5 +39,4 @@ public class PartitionProperties
   public boolean hasSemaphore;
   
   public Set<String> semaphoreNames = new LinkedHashSet<String>() ;
-  
 }

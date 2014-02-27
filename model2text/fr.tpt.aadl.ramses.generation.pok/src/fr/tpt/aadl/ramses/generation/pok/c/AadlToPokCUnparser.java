@@ -28,6 +28,7 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AnnexSubclause ;
@@ -63,9 +64,11 @@ import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
@@ -97,12 +100,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   private int partitionId=0;
   
+  private static Logger _LOGGER = Logger.getLogger(AadlToPokCUnparser.class) ;
+  
   public void process(ProcessorSubcomponent processorSubcomponent,
                       TargetProperties tarProp,
                       File runtimePath,
                       File outputDir,
-                      IProgressMonitor monitor) 
-                                                     throws GenerationException
+                      IProgressMonitor monitor) throws GenerationException
   { 
     ProcessorProperties processorProp = new ProcessorProperties() ;
     ComponentInstance processorInst = (ComponentInstance) HookAccessImpl.
@@ -142,8 +146,8 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
     catch(IOException e)
     {
-      // TODO : error message to handle.
-      e.printStackTrace() ;
+      String msg = "cannot save the generated files" ;
+      throw new GenerationException(msg, e) ;
     }
   }
   
@@ -176,103 +180,114 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
 
   }
   
-  private boolean isUsedInFresh(FeatureInstance fi) {
-	if(fi.getComponentInstance().getCategory()==ComponentCategory.PROCESS)
-  	{
-	  ComponentInstance process = fi.getComponentInstance();
-  	  for(ComponentInstance thread: process.getComponentInstances())
-      {
-    	if(!thread.getCategory().equals(ComponentCategory.THREAD))
-    	  continue;
-    	for(FeatureInstance threadFeature: thread.getFeatureInstances())
-    	{
-    	  if(threadFeature.getDirection() == DirectionType.IN)
-    	  { 
-    		for(ConnectionInstance cnxInst: threadFeature.getDstConnectionInstances())
-    		{
-    		  int last = cnxInst.getConnectionReferences().size() - 1;
-    		  if(cnxInst.getConnectionReferences().get(last).getSource() == fi)
-    		  {
-    			if(isUsedInFresh((FeatureInstance) cnxInst.getConnectionReferences().get(last).getDestination()))
-    		      return true;
-    		  }
-    		}
-    	  }
-    	  if(threadFeature.getDirection() == DirectionType.OUT)
-    	  {
-    		for(ConnectionInstance cnxInst: threadFeature.getSrcConnectionInstances())
-      		{
-      		  if(cnxInst.getConnectionReferences().get(0).getDestination() == fi)
-      		  {
-      			if(isUsedInFresh((FeatureInstance) cnxInst.getConnectionReferences().get(0).getSource()))
-      		      return true;
-      		  }
-      		}
-    	  }
-    	}
-      }
-  	}
-	if(fi.getComponentInstance().getCategory()==ComponentCategory.THREAD)
-	{
-	  Port p = (Port) fi.getFeature();
-	  BehaviorAnnex ba = getBa(fi);
-  	  if(ba!=null)
-  	  {
-  		if(AadlBaVisitors.isFresh(ba, p))
-  			return true;
-  		for(ConnectionInstance cnxi : fi.getSrcConnectionInstances())
-  		{
-  			if(cnxi.getSource() instanceof FeatureInstance)
-  			{
-  				FeatureInstance f = (FeatureInstance) cnxi.getSource();
-  				ba = getBa(f);
-  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-  					return true;
-  			}
-  			if(cnxi.getDestination() instanceof FeatureInstance)
-  			{
-  				FeatureInstance f = (FeatureInstance) cnxi.getDestination();
-  				ba = getBa(f);
-  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-  					return true;
-  			}
-
-  		}
-  		for(ConnectionInstance cnxi : fi.getDstConnectionInstances())
-  		{
-  			if(cnxi.getSource() instanceof FeatureInstance)
-  			{
-  				FeatureInstance f = (FeatureInstance) cnxi.getSource();
-  				ba = getBa(f);
-  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-  					return true;
-  			}
-  			if(cnxi.getDestination() instanceof FeatureInstance)
-  			{
-  				FeatureInstance f = (FeatureInstance) cnxi.getDestination();
-  				ba = getBa(f);
-  				if(f.getFeature() instanceof Port && AadlBaVisitors.isFresh(ba, (Port)f.getFeature()))
-  					return true;
-  			}
-  		}
-  	  }
-  	}
-  	return false;
-}
-
-private BehaviorAnnex getBa(FeatureInstance fi) {
-	ComponentInstance ci = (ComponentInstance) fi.eContainer();
-    BehaviorAnnex ba = null;
-	for(AnnexSubclause as : ci.getSubcomponent().getClassifier().getOwnedAnnexSubclauses())
+  private boolean isUsedInFresh(FeatureInstance fi)
+  {
+    if(fi.getComponentInstance().getCategory() == ComponentCategory.PROCESS)
     {
-  	  if(as.getName().equalsIgnoreCase("behavior_specification"))
-  	  {
-  		  ba = (BehaviorAnnex) as;
-  		  break;
-  	  }
+      ComponentInstance process = fi.getComponentInstance() ;
+      for(ComponentInstance thread : process.getComponentInstances())
+      {
+        if(!thread.getCategory().equals(ComponentCategory.THREAD))
+          continue ;
+        for(FeatureInstance threadFeature : thread.getFeatureInstances())
+        {
+          if(threadFeature.getDirection() == DirectionType.IN)
+          {
+            for(ConnectionInstance cnxInst : threadFeature
+                  .getDstConnectionInstances())
+            {
+              int last = cnxInst.getConnectionReferences().size() - 1 ;
+              if(cnxInst.getConnectionReferences().get(last).getSource() == fi)
+              {
+                if(isUsedInFresh((FeatureInstance) cnxInst
+                      .getConnectionReferences().get(last).getDestination()))
+                  return true ;
+              }
+            }
+          }
+          if(threadFeature.getDirection() == DirectionType.OUT)
+          {
+            for(ConnectionInstance cnxInst : threadFeature
+                  .getSrcConnectionInstances())
+            {
+              if(cnxInst.getConnectionReferences().get(0).getDestination() == fi)
+              {
+                if(isUsedInFresh((FeatureInstance) cnxInst
+                      .getConnectionReferences().get(0).getSource()))
+                  return true ;
+              }
+            }
+          }
+        }
+      }
     }
-	return ba;
-}
+    if(fi.getComponentInstance().getCategory() == ComponentCategory.THREAD)
+    {
+      Port p = (Port) fi.getFeature() ;
+      BehaviorAnnex ba = getBa(fi) ;
+      if(ba != null)
+      {
+        if(AadlBaVisitors.isFresh(ba, p))
+          return true ;
+        for(ConnectionInstance cnxi : fi.getSrcConnectionInstances())
+        {
+          if(cnxi.getSource() instanceof FeatureInstance)
+          {
+            FeatureInstance f = (FeatureInstance) cnxi.getSource() ;
+            ba = getBa(f) ;
+            if(f.getFeature() instanceof Port &&
+                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
+              return true ;
+          }
+          if(cnxi.getDestination() instanceof FeatureInstance)
+          {
+            FeatureInstance f = (FeatureInstance) cnxi.getDestination() ;
+            ba = getBa(f) ;
+            if(f.getFeature() instanceof Port &&
+                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
+              return true ;
+          }
+
+        }
+        for(ConnectionInstance cnxi : fi.getDstConnectionInstances())
+        {
+          if(cnxi.getSource() instanceof FeatureInstance)
+          {
+            FeatureInstance f = (FeatureInstance) cnxi.getSource() ;
+            ba = getBa(f) ;
+            if(f.getFeature() instanceof Port &&
+                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
+              return true ;
+          }
+          if(cnxi.getDestination() instanceof FeatureInstance)
+          {
+            FeatureInstance f = (FeatureInstance) cnxi.getDestination() ;
+            ba = getBa(f) ;
+            if(f.getFeature() instanceof Port &&
+                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
+              return true ;
+          }
+        }
+      }
+    }
+    return false ;
+  }
+
+  private BehaviorAnnex getBa(FeatureInstance fi)
+  {
+    ComponentInstance ci = (ComponentInstance) fi.eContainer() ;
+    BehaviorAnnex ba = null ;
+    for(AnnexSubclause as : ci.getSubcomponent().getClassifier()
+          .getOwnedAnnexSubclauses())
+    {
+      if(as.getName().equalsIgnoreCase("behavior_specification"))
+      {
+        ba = (BehaviorAnnex) as ;
+        break ;
+      }
+    }
+    return ba ;
+  }
 
 //TODO : be refactored with generic interfaces.
   private void queueHandler(String id, FeatureInstance fi, PartitionProperties pp)
@@ -310,9 +325,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
   
   private void bufferHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
-    
     QueueInfo queueInfo = new QueueInfo() ;
-    
     
     queueInfo.id = id;
     queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
@@ -442,8 +455,12 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     }
     catch (Exception e)
     {
-      System.err.println("ERROR: sampling port "+port.getQualifiedName()+" should have property" +
-      		" Sampling_Refresh_Period");
+      String errMsg =  RamsesException.formatRethrowMessage("sampling port " +
+                         port.getQualifiedName() + " should have property" +
+                         " Sampling_Refresh_Period", e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      
       info.refresh = 10;
       //TODO: restore and resolve issue with pingpong-ba result = false ;
     }  
@@ -549,7 +566,7 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
                       File outputDir,
                       IProgressMonitor monitor)
   {
-	StringBuilder sb = new StringBuilder(process.getQualifiedName());
+	  StringBuilder sb = new StringBuilder(process.getQualifiedName());
     PartitionProperties pp = new PartitionProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
     
     ProcessImplementation processImpl = (ProcessImplementation) 
@@ -575,8 +592,10 @@ private BehaviorAnnex getBa(FeatureInstance fi) {
     }
     catch(IOException e)
     {
-      // TODO : error message to handle.
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage("cannot save the generated files for \'" +
+                                                            process.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
   
@@ -1249,7 +1268,11 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
       catch(Exception e)
       {
-    	// do nothting
+        String errMsg =  RamsesException.formatRethrowMessage("cannot fecth the hm errors for \'" +
+                                                              vps + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        // do nothting
       }
     }
     partitionId=0;
@@ -1278,8 +1301,13 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
   		}
   		catch(Exception e)
   		{
-  			// do nothing
+  		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the hm errors or the partition recovery actions for \'" +
+  		                                vps.getName() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+  		  // do nothing
   		}
+  		
   		deploymentImplCode.decrementIndent();
   		deploymentImplCode.addOutputNewline("break;");
   		partitionId++;
@@ -1495,6 +1523,10 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
       catch(Exception e)
       {
+        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the additionnal features for \'"+
+                                  vps.getName() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         // Nothing to do
       }
     }
@@ -1544,20 +1576,26 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       threadNumberPerPartition.add(Integer.valueOf(processImplementation
             .getOwnedThreadSubcomponents().size())) ;
     }
-    for(ThreadSubcomponent th: bindedThreads)
+    for(ThreadSubcomponent th : bindedThreads)
     {
-    	String dispatchProtocol;
-		try {
-			dispatchProtocol = PropertyUtils.getEnumValue(th, "Dispatch_Protocol");
-			if(dispatchProtocol.equalsIgnoreCase("sporadic"))
-	    	{
-	    		deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_THREAD_SLEEP 1");
-	    		break;
-	    	}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+      String dispatchProtocol ;
+      try
+      {
+        dispatchProtocol = PropertyUtils.getEnumValue(th, "Dispatch_Protocol") ;
+        if(dispatchProtocol.equalsIgnoreCase("sporadic"))
+        {
+          deploymentHeaderCode
+                .addOutputNewline("#define POK_NEEDS_THREAD_SLEEP 1") ;
+          break ;
+        }
+      }
+      catch(Exception e)
+      {
+        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the dispatch protocol for \'"+
+                                    th.getName() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      }
     }
     //  The maccro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
     //  the kernel.It comprises the tasks for the partition and the main task of 
@@ -1600,8 +1638,10 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
       catch(Exception e)
       {
-        System.err.println("*** SCHEDULER IS NOT PROVIDED *** ") ;
-//        e.printStackTrace() ;
+        String errMsg =  RamsesException.formatRethrowMessage("scheduler is not provided for \'" +
+                             vps.getName() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
     }
 
@@ -1627,6 +1667,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
       catch(Exception e)
       {
+        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the scheduler" + vps.getName(), e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
     }
 
@@ -1715,25 +1758,25 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
       catch(Exception e)
       {
+        String warnMsg =  RamsesException.formatRethrowMessage("cannot fetch the size of the memory needed for "+
+                                                              p.getName() + ". try to fetch the partition memory", e) ;
+        _LOGGER.warn(warnMsg);
+        ServiceProvider.SYS_ERR_REP.warning(warnMsg, true);
+        
+        MemorySubcomponent bindedMemory =
+              (MemorySubcomponent) GeneratorUtils
+                    .getDeloymentMemorySubcomponent(p) ;
         try
         {
-          MemorySubcomponent bindedMemory =
-                (MemorySubcomponent) GeneratorUtils
-                      .getDeloymentMemorySubcomponent(p) ;
-          try
-          {
-            memorySizePerPartition.add(PropertyUtils.getIntValue(bindedMemory,
-                                                                 "Byte_Count")) ;
-          }
-          catch(Exception e3)
-          {
-            e3.printStackTrace() ;
-          }
+          memorySizePerPartition.add(PropertyUtils.getIntValue(bindedMemory,
+                                                               "Byte_Count")) ;
         }
-        catch(Exception e2)
+        catch(Exception ee)
         {
-          e.printStackTrace() ;
-          e2.printStackTrace() ;
+          String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the partition memory for \'"+
+                                          bindedMemory.getName() + '\'', ee) ;
+          _LOGGER.error(errMsg);
+          ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
       }
     }
@@ -1778,33 +1821,30 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     }
     catch(Exception e)
     {
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the partition slots for \'"+
+                                        processor.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
-    try
-    {
-      List<Subcomponent> slotsAllocation =
-            PropertyUtils.getSubcomponentList(processor, "Slots_Allocation") ;
-      deploymentHeaderCode
-            .addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
+    
+    List<Subcomponent> slotsAllocation =
+          PropertyUtils.getSubcomponentList(processor, "Slots_Allocation") ;
+    deploymentHeaderCode
+          .addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
 
-      for(Subcomponent sAllocation : slotsAllocation)
+    for(Subcomponent sAllocation : slotsAllocation)
+    {
+      int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
+      deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
+
+      if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
       {
-        int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
-        deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
-
-        if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
-        {
-          deploymentHeaderCode.addOutput(",") ;
-        }
+        deploymentHeaderCode.addOutput(",") ;
       }
-
-      deploymentHeaderCode.addOutputNewline("}") ;
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace() ;
     }
 
+    deploymentHeaderCode.addOutputNewline("}") ;
+    
     try
     {
       Long majorFrame =
@@ -1815,9 +1855,12 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     }
     catch(Exception e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the module major frame for \'"+
+                                     processor.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
+    
     try
     {
     	String portsFlushTime = PropertyUtils.getEnumValue(processor, "Ports_Flush_Time");
@@ -1832,9 +1875,11 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     	    }
     	    catch(Exception e)
     	    {
-    	    	System.out.println("ERROR: Ports_Flush_Time was set to Minor_Frame_Switch for "
-    	    			+processor.getName()
-    	      		  	+", but property Module_Minor_Frame.");
+    	      String errMsg =  RamsesException.formatRethrowMessage("Ports_Flush_Time was set to Minor_Frame_Switch for "
+                  +processor.getName()
+                  +", but property Module_Minor_Frame.", e) ;
+            _LOGGER.error(errMsg);
+            ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     	    }
     	}
     	else if (portsFlushTime.equalsIgnoreCase("Partition_Slot_Switch"))
@@ -1843,8 +1888,10 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     }
     catch(Exception e)
     {
-      System.out.println("WARNING: Ports_Flush_Time was not set on "+processor.getName()
-    		  +", default flush policy will be used.");
+      String warnMsg = RamsesException.formatRethrowMessage("Ports_Flush_Time was not set on "+processor.getName()
+          +", default flush policy will be used.", e) ;
+      _LOGGER.warn(warnMsg);
+      ServiceProvider.SYS_ERR_REP.warning(warnMsg, true);
     }
 
 
@@ -1894,8 +1941,13 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     }
     catch(Exception e)
     {
+      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch hm errors for \'"+
+                               processor.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       //do nothing
     }
+    
     ProcessorImplementation pi = (ProcessorImplementation) processor.getSubcomponentType();
     for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
     {
@@ -1907,28 +1959,40 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
       catch(Exception e)
       {
+        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch hm errors for \'"+
+              vps.getName() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         //do nothing
       }
     }
-    for(ProcessSubcomponent ps: bindedProcess)
+    
+    for(ProcessSubcomponent ps : bindedProcess)
     {
       if(needErrorHandler)
-    	break;
-      ProcessImplementation procImpl = (ProcessImplementation) ps.getSubcomponentType();
-      for(ThreadSubcomponent ts:procImpl.getOwnedThreadSubcomponents())
+        break ;
+      ProcessImplementation procImpl =
+            (ProcessImplementation) ps.getSubcomponentType() ;
+      for(ThreadSubcomponent ts : procImpl.getOwnedThreadSubcomponents())
       {
-    	try
+        try
         {
-          PropertyUtils.getStringListValue(ts, "HM_Errors");
-          needErrorHandler = true;
-          break;
+          PropertyUtils.getStringListValue(ts, "HM_Errors") ;
+          needErrorHandler = true ;
+          break ;
         }
-    	catch(Exception e)
+        catch(Exception e)
         {
+          String errMsg =
+                RamsesException
+                      .formatRethrowMessage("cannot fetch hm errors for \'" +
+                                                  ts.getName() + '\'', e) ;
+          _LOGGER.error(errMsg) ;
+          ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+
           //do nothing
         }
       }
-    	  
     }
     
     if(needErrorHandler)
@@ -2151,8 +2215,6 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	      routingImplCode.addOutputNewline("};");	  
 	    }
 	  }
-	  
-	  
 	}
 	
 	List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
@@ -2317,11 +2379,6 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 	public DirectionType direction = null ;
   }
 }
-
-
-
-
-
 
 /*
 TODO

@@ -25,6 +25,7 @@ import java.io.File ;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -53,6 +54,8 @@ public class AadlTargetSpecificCodeGenerator
   protected AadlGenericUnparser _genericUnparser ;
   protected AadlTargetUnparser _targetUnparser ;
   protected TargetBuilderGenerator _targetBuilderGen ;
+  
+  private static Logger _LOGGER = Logger.getLogger(AadlTargetSpecificCodeGenerator.class) ;
   
   public AadlTargetSpecificCodeGenerator(AadlGenericUnparser genericUnparser,
                                          AadlTargetUnparser targetUnparser,
@@ -83,7 +86,9 @@ public class AadlTargetSpecificCodeGenerator
 	
 	if ((inputResource == null ) || (inputResource.getContents() == null) || (inputResource.getContents().size() <= 0))
 	{
-		throw new GenerationException("Cannot find AADL model sources");
+	  String errMsg = "Cannot find AADL model sources" ;
+    _LOGGER.fatal(errMsg) ;
+	  throw new GenerationException(errMsg);
 	}
 	
 	EObject root = inputResource.getContents().get(0);
@@ -102,7 +107,9 @@ public class AadlTargetSpecificCodeGenerator
 	}
 	else
 	{
-	  throw new GenerationException("Try to generate from a resources that is into an AADL model");
+	  String errMsg = "Try to generate from a resources that is into an AADL model" ;
+    _LOGGER.fatal(errMsg) ;
+    throw new GenerationException(errMsg);
 	}
 	File generatedCodeDirectory =
           new File(outputDir + GENERATED_DIR_NAME) ;
@@ -166,19 +173,21 @@ public class AadlTargetSpecificCodeGenerator
     }
  }
 
-private List<SystemImplementation> getListOfSystemImplementation(
-		SystemInstance systemInstance) {
+  private List<SystemImplementation> getListOfSystemImplementation(SystemInstance systemInstance)
+  {
 
-	List<SystemImplementation> systemInstanceList = new ArrayList<SystemImplementation>();
-	if(systemInstance.getSystemImplementation() != null)
-	  systemInstanceList.add(systemInstance.getSystemImplementation());
-	for(ComponentInstance ci : systemInstance.getComponentInstances())
-	{
-	  if(ci instanceof SystemInstance)
-	  {
-		systemInstanceList.addAll(getListOfSystemImplementation((SystemInstance) ci));
-	  }
-	}
-	return systemInstanceList;
-}
+    List<SystemImplementation> systemInstanceList =
+          new ArrayList<SystemImplementation>() ;
+    if(systemInstance.getSystemImplementation() != null)
+      systemInstanceList.add(systemInstance.getSystemImplementation()) ;
+    for(ComponentInstance ci : systemInstance.getComponentInstances())
+    {
+      if(ci instanceof SystemInstance)
+      {
+        systemInstanceList
+              .addAll(getListOfSystemImplementation((SystemInstance) ci)) ;
+      }
+    }
+    return systemInstanceList ;
+  }
 }
