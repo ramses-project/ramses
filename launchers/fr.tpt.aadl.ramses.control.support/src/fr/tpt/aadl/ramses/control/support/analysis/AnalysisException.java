@@ -21,12 +21,28 @@
 
 package fr.tpt.aadl.ramses.control.support.analysis ;
 
-public class AnalysisException extends Exception
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+
+public class AnalysisException extends RamsesException
 {
 
   /**
    *
    */
   private static final long serialVersionUID = 1L ;
-
+  
+  public AnalysisException(String errorMessage)
+  {
+    super(errorMessage) ;
+  }
+  
+  public AnalysisException(Throwable e)
+  {
+    super(e) ;
+  }
+  
+  public AnalysisException(String errorMessage, Throwable e)
+  {
+    super(errorMessage, e) ;
+  }
 }

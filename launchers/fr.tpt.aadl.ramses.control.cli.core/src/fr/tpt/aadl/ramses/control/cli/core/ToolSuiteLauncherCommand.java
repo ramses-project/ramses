@@ -50,6 +50,7 @@ import fr.tpt.aadl.ramses.control.support.FileUtils ;
 import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
@@ -118,11 +119,13 @@ public class ToolSuiteLauncherCommand
    * @throws ConfigurationException 
    * @throws AnalysisException 
    * @throws GenerationException 
+   * @throws TransformationException 
    * @throws IOException 
    * @throws Exception 
    */
   public static void main(String[] args) throws AnalysisException,
-                                                GenerationException
+                                                GenerationException,
+                                                TransformationException
   {
     try
     {
@@ -512,8 +515,10 @@ public class ToolSuiteLauncherCommand
     return result ;
   }
   
-  private static void generation(JSAPResult options) throws ConfigurationException,
-                                                            GenerationException
+  private static void generation(JSAPResult options) throws AnalysisException,
+                                                         ConfigurationException,
+                                                            GenerationException,
+                                                         TransformationException
   {
     RamsesConfiguration config = new RamsesConfiguration() ;
     instantiationOptionsHandler(options, config);

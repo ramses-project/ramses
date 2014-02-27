@@ -35,8 +35,8 @@ import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
 import java.util.concurrent.TimeoutException ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.resources.ResourcesPlugin ;
-import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.Path ;
 import org.eclipse.core.runtime.Platform ;
@@ -65,16 +65,19 @@ import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.AadlResourceValidator ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 {
 	protected AadlModelInstantiatior _modelInstantiator ;
 	
 	protected PredefinedAadlModelManager _predefinedAadlModels ;
+	
+	private static Logger _LOGGER = Logger.getLogger(AadlToTargetSpecificAadl.class) ;
 	
 	public AadlToTargetSpecificAadl(AadlModelInstantiatior modelInstantiator,
 	                                PredefinedAadlModelManager predefinedAadlModels)
@@ -87,11 +90,10 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
    
   public Resource transform(Resource inputResource,
                             File outputDir,
-                            IProgressMonitor monitor) throws GenerationException
+                            IProgressMonitor monitor) throws TransformationException
   {
     initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
 
-    try
     {
       ArrayList<File> atlFiles = new ArrayList<File>(_atlFileNames.length) ;
 
@@ -106,17 +108,11 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       return atlLauncher.generationEntryPoint(inputResource,
                                               atlFiles, outputDir) ;
     }
-    catch(Exception e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace() ;
-      return null ;
-    }
   }
   
   @Override
   public Resource unparse(Resource inputResource, Resource expandedResult,
-                          File outputDir, IProgressMonitor monitor)
+                          File outputDir, IProgressMonitor monitor) throws GenerationException
   {
 	  String aadlGeneratedFileName = expandedResult.getURI().lastSegment();
 	  aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
@@ -130,163 +126,183 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 
 	  _modelInstantiator.serialize(expandedResult, outputFilePath);
 
-	  try {
+	  try
+	  {
 		  return extractAadlResource(inputResource, outputFile);
-	  } catch (Exception e) {
-		  e.printStackTrace();
-		  return null;
+	  }
+	  catch (IOException | RecognitionException ex)
+	  {
+	    String msg = "fail to extract AADL resources" ;
+      throw new GenerationException(msg, ex) ;
 	  }
   }
 
-  public static Resource extractAadlResource(Resource inputResource, File outputFile) throws InterruptedException, ExecutionException, CoreException, IOException, RecognitionException
+  public static Resource extractAadlResource(Resource inputResource,
+                                             File outputFile)
+                                        throws IOException, RecognitionException
   {
-    URI uri;
-    SystemInstance si = (SystemInstance) inputResource.getContents().get(0);
-    final Resource xtextResource;
+    URI uri ;
+    SystemInstance si = (SystemInstance) inputResource.getContents().get(0) ;
+    final Resource xtextResource ;
     if(Platform.isRunning())
-    { 
-	  String workspaceLocation = ResourcesPlugin.getWorkspace()
-				  .getRoot().getLocationURI().getPath();
-	  int outputPathHeaderIndex = workspaceLocation.length();
-	  String outputAbsolutePath = outputFile.getAbsolutePath().toString();
-	  String outputPlatformRelativePath = "";
-	  if(outputPathHeaderIndex>0)
-	  {
-	    String inputURI = inputResource.getURI().toString();
-	    String projectName = inputURI.substring(inputURI.indexOf("resource") + 9);
-	    projectName = projectName.substring(0, projectName.indexOf('/'));
-	    outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName);
-	    outputPlatformRelativePath = outputAbsolutePath.substring(outputPathHeaderIndex);
-	  }
-	  outputPlatformRelativePath = outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
+    {
+      String workspaceLocation =
+            ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath() ;
+      int outputPathHeaderIndex = workspaceLocation.length() ;
+      String outputAbsolutePath = outputFile.getAbsolutePath().toString() ;
+      String outputPlatformRelativePath = "" ;
+      if(outputPathHeaderIndex > 0)
+      {
+        String inputURI = inputResource.getURI().toString() ;
+        String projectName =
+              inputURI.substring(inputURI.indexOf("resource") + 9) ;
+        projectName = projectName.substring(0, projectName.indexOf('/')) ;
+        outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName) ;
+        outputPlatformRelativePath =
+              outputAbsolutePath.substring(outputPathHeaderIndex) ;
+      }
+      outputPlatformRelativePath =
+            outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
 
-	  uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
+      uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
 
-	  ResourceSet rs = OsateResourceUtil.getResourceSet();
-	  xtextResource = rs.getResource(uri, true);
+      ResourceSet rs = OsateResourceUtil.getResourceSet() ;
+      xtextResource = rs.getResource(uri, true) ;
 
     }
     else
     {
       uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
-      xtextResource = si.getSystemImplementation().eResource().getResourceSet().getResource(uri, true) ;
-      xtextResource.load(null);
+      xtextResource =
+            si.getSystemImplementation().eResource().getResourceSet()
+                  .getResource(uri, true) ;
+      xtextResource.load(null) ;
 
       // Implements a timeout of 10s.
 
-      Callable<Boolean> app = new Callable<Boolean>(){
+      Callable<Boolean> app = new Callable<Boolean>()
+      {
 
         @Override
-        public Boolean call() throws Exception
+        public Boolean call()
         {
-          AadlResourceValidator.validate(xtextResource.getResourceSet());
+          AadlResourceValidator.validate(xtextResource.getResourceSet()) ;
           return true ;
         }
-		    
-      };
+
+      } ;
       FutureTask<Boolean> ft = new FutureTask<Boolean>(app) ;
-      new Thread(ft).start() ;		  
-		  
+      new Thread(ft).start() ;
+
       try
       {
         ft.get(10, TimeUnit.SECONDS) ;
       }
-      catch (TimeoutException ee)
+      catch(InterruptedException | ExecutionException | TimeoutException e)
       {
-    	// Nothing to do, just continue.
-      }  		  
-      ServiceRegistry sr = ServiceProvider.getServiceRegistry();
+        String msg = "internal error" ;
+        _LOGGER.error(msg + " : " + e.getMessage()) ;
+        ServiceProvider.SYS_ERR_REP.error(msg, true) ;
+        // Nothing to do, just continue.
+      }
+
+      ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
       ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
-      AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
-      Iterator<EObject> iter = xtextResource.getAllContents();
+      AnalysisErrorReporterManager errManager =
+            ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
+      Iterator<EObject> iter = xtextResource.getAllContents() ;
       while(iter.hasNext())
       {
-    	Collection<Object> dasList = EcoreUtil.getObjectsByType(iter.next().eContents(), Aadl2Package.eINSTANCE.getDefaultAnnexSubclause());
-		for (Object o : dasList)
-		{
-		  DefaultAnnexSubclause das = (DefaultAnnexSubclause) o;
-		  String annexName = das.getName();
-		  if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
-		  {
-		    AnnexParser ap = sr.getParser(annexName);
-		    ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
-		    String annexText = das.getSourceText();
-		    if(annexText.length() > 6)
-		    {
-			  annexText = annexText.substring(3, annexText.length() - 3) ;
-		    }
-		    AnnexSubclause as = ap.parseAnnexSubclause(annexName,
-							  annexText,
-							  outputFile.getName(),
-							  node.getStartLine(),
-							  node.getOffset(),
-							  errReporter);
-		    AnnexResolver ar = sr.getResolver(annexName) ;
-		    if(as != null && errReporter.getNumErrors() == 0)
-		    {
-		      as.setName(annexName) ;
-		      // replace default annex library with the new one.
-		      EList<AnnexSubclause> ael =
-		    		  ((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
-		      int idx = ael.indexOf(das) ;
-		      ael.add(idx, as) ;
-		      ael.remove(das) ;
-		      List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
-		      ar.resolveAnnex(das.getName(), annexElements, errManager) ;
-		    }
-		  }
-		}
+        Collection<Object> dasList =
+              EcoreUtil.getObjectsByType(iter.next().eContents(),
+                                         Aadl2Package.eINSTANCE
+                                               .getDefaultAnnexSubclause()) ;
+        for(Object o : dasList)
+        {
+          DefaultAnnexSubclause das = (DefaultAnnexSubclause) o ;
+          String annexName = das.getName() ;
+          if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
+          {
+            AnnexParser ap = sr.getParser(annexName) ;
+            ICompositeNode node = NodeModelUtils.findActualNodeFor(das) ;
+            String annexText = das.getSourceText() ;
+            if(annexText.length() > 6)
+            {
+              annexText = annexText.substring(3, annexText.length() - 3) ;
+            }
+            AnnexSubclause as =
+                  ap.parseAnnexSubclause(annexName, annexText, outputFile
+                                               .getName(), node.getStartLine(),
+                                         node.getOffset(), errReporter) ;
+            AnnexResolver ar = sr.getResolver(annexName) ;
+            if(as != null && errReporter.getNumErrors() == 0)
+            {
+              as.setName(annexName) ;
+              // replace default annex library with the new one.
+              EList<AnnexSubclause> ael =
+                    ((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
+              int idx = ael.indexOf(das) ;
+              ael.add(idx, as) ;
+              ael.remove(das) ;
+              List<AnnexSubclause> annexElements =
+                    Collections.singletonList(as) ;
+              ar.resolveAnnex(das.getName(), annexElements, errManager) ;
+            }
+          }
+        }
       }
     }
-	  
-    ServiceRegistry sr = ServiceProvider.getServiceRegistry();
+
+    ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
-    AnalysisErrorReporterManager errManager = ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER;
-    Iterator<EObject> iter = xtextResource.getAllContents();
+    AnalysisErrorReporterManager errManager =
+          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
+    Iterator<EObject> iter = xtextResource.getAllContents() ;
     while(iter.hasNext())
     {
-      Collection<Object> dasList = EcoreUtil.getObjectsByType(iter.next().eContents(), Aadl2Package.eINSTANCE.getDefaultAnnexSubclause());
-      for (Object o : dasList)
+      Collection<Object> dasList =
+            EcoreUtil.getObjectsByType(iter.next().eContents(),
+                                       Aadl2Package.eINSTANCE
+                                             .getDefaultAnnexSubclause()) ;
+      for(Object o : dasList)
       {
-    	DefaultAnnexSubclause das = (DefaultAnnexSubclause) o;
-    	String annexName = das.getName();
-    	if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
-    	{
-    	  AnnexParser ap = sr.getParser(annexName);
-    	  ICompositeNode node = NodeModelUtils.findActualNodeFor(das);
-    	  String annexText = das.getSourceText();
-    	  if(annexText.length() > 6)
-    	  {
-    		annexText = annexText.substring(3, annexText.length() - 3) ;
-    	  }
-    	  AnnexSubclause as = ap.parseAnnexSubclause(annexName,
-						  annexText,
-						  outputFile.getName(),
-						  node.getStartLine(),
-						  node.getOffset(),
-						  errReporter);
-    	  AnnexResolver ar = sr.getResolver(annexName) ;
-    	  if(as != null && errReporter.getNumErrors() == 0)
-    	  {
-    		as.setName(annexName) ;
-    		// replace default annex library with the new one.
-    		EList<AnnexSubclause> ael =
-    				((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
-    		int idx = ael.indexOf(das) ;
-    		ael.add(idx, as) ;
-    		ael.remove(das) ;
-    		List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
-    		ar.resolveAnnex(das.getName(), annexElements, errManager) ;
-    	  }
-    	}
+        DefaultAnnexSubclause das = (DefaultAnnexSubclause) o ;
+        String annexName = das.getName() ;
+        if(annexName.equalsIgnoreCase(AadlBaParserAction.ANNEX_NAME))
+        {
+          AnnexParser ap = sr.getParser(annexName) ;
+          ICompositeNode node = NodeModelUtils.findActualNodeFor(das) ;
+          String annexText = das.getSourceText() ;
+          if(annexText.length() > 6)
+          {
+            annexText = annexText.substring(3, annexText.length() - 3) ;
+          }
+          AnnexSubclause as =
+                ap.parseAnnexSubclause(annexName, annexText, outputFile
+                                             .getName(), node.getStartLine(),
+                                       node.getOffset(), errReporter) ;
+          AnnexResolver ar = sr.getResolver(annexName) ;
+          if(as != null && errReporter.getNumErrors() == 0)
+          {
+            as.setName(annexName) ;
+            // replace default annex library with the new one.
+            EList<AnnexSubclause> ael =
+                  ((Classifier) das.eContainer()).getOwnedAnnexSubclauses() ;
+            int idx = ael.indexOf(das) ;
+            ael.add(idx, as) ;
+            ael.remove(das) ;
+            List<AnnexSubclause> annexElements = Collections.singletonList(as) ;
+            ar.resolveAnnex(das.getName(), annexElements, errManager) ;
+          }
+        }
       }
     }
-    return xtextResource;
+    return xtextResource ;
   }
 
 abstract public void setParameters(Map<Enum<?>, Object> parameters);
  
-  public static void validate(ResourceSet rs) throws RecognitionException, CoreException, IOException, InterruptedException, ExecutionException
+  public static void validate(ResourceSet rs)
   {
 	AadlResourceValidator.validate(rs);
   }
@@ -294,29 +310,23 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
   public Resource transformWokflow(Resource inputResource,
 		  							List<String> resourceFileNameList,
 		  							File outputDir,
-		  							String outputPackageName) throws GenerationException
+		  							String outputPackageName) throws TransformationException
   {
-      ArrayList<File> atlFiles = new ArrayList<File>() ;
-      for(String resourceFileName : resourceFileNameList)
-      {
-    	  String resourcePath = resourceFileName;
-    	  if(false == resourceFileName.startsWith(File.separator))
-    		  resourcePath=RamsesConfiguration.getAtlResourceDir()+File.separator+resourceFileName;
-          atlFiles.add(new File(resourcePath)) ;
-      }
+    ArrayList<File> atlFiles = new ArrayList<File>() ;
+    for(String resourceFileName : resourceFileNameList)
+    {
+      String resourcePath = resourceFileName ;
+      if(false == resourceFileName.startsWith(File.separator))
+        resourcePath =
+              RamsesConfiguration.getAtlResourceDir() + File.separator +
+                    resourceFileName ;
+      atlFiles.add(new File(resourcePath)) ;
+    }
+    
+    Aadl2AadlEMFTVMLauncher atlLauncher =
+          new Aadl2AadlEMFTVMLauncher(_modelInstantiator, _predefinedAadlModels) ;
+    atlLauncher.setOutputPackageName(outputPackageName) ;
 
-      try {
-    	  Aadl2AadlEMFTVMLauncher atlLauncher = new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
-    	                                                                    _predefinedAadlModels);
-    	  atlLauncher.setOutputPackageName(outputPackageName);
-          return atlLauncher.generationEntryPoint(inputResource,
-                  atlFiles,
-                  outputDir);
-      } catch (Exception e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-          return null;
-      }
+    return atlLauncher.generationEntryPoint(inputResource, atlFiles, outputDir) ;
   }
-
 }

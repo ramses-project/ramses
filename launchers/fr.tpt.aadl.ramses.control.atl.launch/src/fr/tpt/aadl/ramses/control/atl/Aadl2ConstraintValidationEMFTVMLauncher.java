@@ -91,7 +91,6 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 	
 	@Override
 	protected void initTransformation()
-			throws ATLCoreException
 	{
 		EPackage.Registry.INSTANCE.put(ERROR_REPORTER_URI, 
 				fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE);

@@ -27,6 +27,8 @@ import java.util.Map ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
+
 
 public interface AadlToAadl
 {
@@ -34,12 +36,12 @@ public interface AadlToAadl
 	
   public Resource transform(Resource inputResource,
                             File outputDir,
-                            IProgressMonitor monitor) throws GenerationException;
+                            IProgressMonitor monitor) throws TransformationException;
   
   public Resource unparse(Resource inputResource,
                           Resource expandedResult,
 		                      File outputDir,
-		                      IProgressMonitor monitor);
+		                      IProgressMonitor monitor) throws GenerationException ;
   
   public void setParameters(Map<Enum<?>, Object> parameters) ;
 }

@@ -1,12 +1,12 @@
 package fr.tpt.aadl.ramses.communication.periodic.delayed;
 
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.instance.ComponentInstance;
@@ -21,20 +21,32 @@ import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 
 public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDelayedDimensioning {
 
+  private static Logger _LOGGER = Logger.getLogger(EventDataPortCommunicationDimensioning.class) ;
+  
 	protected EventDataPortCommunicationDimensioning(FeatureInstance receiverPort) throws DimensioningException
 	{
 		boolean isInOrInOutFeature = receiverPort.getDirection().equals(DirectionType.IN)
 				|| receiverPort.getDirection().equals(DirectionType.IN_OUT);
 		if(!isInOrInOutFeature
 				&& !receiverPort.getCategory().equals(FeatureCategory.EVENT_DATA_PORT))
-			throw new DimensioningException("Buffer size can only be computed for an " +
-					"in or inout even data port");
+		{
+		  String errMsg = "Buffer size can only be computed for an " +
+                      "in or inout even data port" ;
+	     _LOGGER.fatal(errMsg) ;
+		  throw new DimensioningException(errMsg);
+		}
 
 		readerReceivingTaskInstance = (ComponentInstance) receiverPort.eContainer();
 
 		if(!readerReceivingTaskInstance.getCategory().equals(ComponentCategory.THREAD))
-			throw new DimensioningException("Buffer size can only be computed for an " +
-					"in or inout even data port of a thread component instance");
+		{
+		  {
+	      String errMsg = "Buffer size can only be computed for an " +
+	                      "in or inout even data port of a thread component instance" ;
+	       _LOGGER.fatal(errMsg) ;
+	      throw new DimensioningException(errMsg);
+	    }
+		}
 
 		writerInstances = new ArrayList<ComponentInstance>();
 		List<ComparableThreadByDeadline> toSortWriters = new ArrayList<ComparableThreadByDeadline>();
@@ -158,8 +170,6 @@ public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDela
 			}
 		}
 	}
-
-	
 
 	protected static final Map<FeatureInstance, EventDataPortCommunicationDimensioning> _instances =
 			new HashMap<FeatureInstance, EventDataPortCommunicationDimensioning>();

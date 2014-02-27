@@ -297,5 +297,4 @@ public class RoutingProperties implements TargetProperties {
     }
     return result;
   }
-
 }

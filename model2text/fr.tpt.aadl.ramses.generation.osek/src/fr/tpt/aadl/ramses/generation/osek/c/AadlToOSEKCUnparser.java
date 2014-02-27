@@ -241,6 +241,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 * 
 	 * @param processor
 	 *            L'AST du processeur.
+	 * @throws GenerationException 
 	 */
 	private void genCpu(ProcessSubcomponent ps) {
 
@@ -296,6 +297,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 * Configuration de l'OS
 	 * 
 	 * @param processSubcomponent
+	 * @throws GenerationException 
 	 */
 	private void genOsConfig(ProcessSubcomponent processSubcomponent) {
 
@@ -556,6 +558,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 * 
 	 * @param thread
 	 *            L'AST du thread.
+	 * @throws GenerationException 
 	 */
 	private void genCData(DataSubcomponent data) {
 		_mainCCode.addOutputNewline("#define OS_START_SEC_VAR_UNSPECIFIED");

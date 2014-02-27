@@ -7,6 +7,7 @@ Export-Package: fr.tpt.aadl.ramses.generation.utils
 Require-Bundle: org.osate.utils;bundle-version="0.9.5",
  org.osate.aadl2;bundle-version="1.0.0",
  org.osate.aadl2.modelsupport,
+ org.apache.log4j,
  fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

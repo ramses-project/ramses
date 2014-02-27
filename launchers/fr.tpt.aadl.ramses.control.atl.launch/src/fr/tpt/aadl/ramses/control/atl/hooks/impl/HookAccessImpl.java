@@ -61,12 +61,12 @@ import org.osate.ba.utils.AadlBaLocationReference ;
 import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.Aadl2Utils ;
 
-import fr.tpt.aadl.ramses.util.properties.AadlUtil;
 import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
 import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
 import fr.tpt.aadl.ramses.control.atl.hooks.utils.ComparablePortByCriticality ;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
 
 /**
  * <!-- begin-user-doc -->

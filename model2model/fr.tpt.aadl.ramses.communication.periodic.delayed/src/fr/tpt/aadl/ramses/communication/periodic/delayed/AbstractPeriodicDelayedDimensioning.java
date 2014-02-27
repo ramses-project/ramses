@@ -1,12 +1,11 @@
 package fr.tpt.aadl.ramses.communication.periodic.delayed;
 
 import java.util.ArrayList;
-
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.FeatureInstance;
 
@@ -27,6 +26,8 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 			new HashMap<FeatureInstance, List<Long>>();
 	protected long bufferSize;
 	protected long hyperperiod;
+	
+	private static Logger _LOGGER = Logger.getLogger(AbstractPeriodicDelayedDimensioning.class) ;
 
 	public long getBufferSize()
 	{
@@ -86,9 +87,14 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 	{
 		long taskPeriod = AadlUtil.getInfoTaskPeriod(ci);
 		if(taskPeriod==0)
-			throw new DimensioningException("Buffer size can only be computed for a periodic " +
-					"task with a specified period; see thread instance: "
-					+ ci.getComponentInstancePath());
+		{
+		  String errMsg = "Buffer size can only be computed for a periodic " +
+	          "task with a specified period; see thread instance: "
+	          + ci.getComponentInstancePath() ;
+	     _LOGGER.fatal(errMsg) ;
+	     throw new DimensioningException(errMsg);
+		}
+			
 		return taskPeriod;
 	}
 
@@ -96,9 +102,14 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 		long taskDeadline = AadlUtil.getInfoTaskDeadline(ci);
 		taskDeadline  = AadlUtil.getInfoTaskPeriod(ci);
 		if(taskDeadline==0)
-			throw new DimensioningException("Buffer size can only be computed for a periodic " +
-					"producer task with a specified deadline; see thread instance: "
-					+ ci.getComponentInstancePath());
+		{
+      String errMsg = "Buffer size can only be computed for a periodic " +
+            "producer task with a specified deadline; see thread instance: "
+            + ci.getComponentInstancePath() ;
+       _LOGGER.fatal(errMsg) ;
+       throw new DimensioningException(errMsg);
+    }
+		  
 		return taskDeadline;
 	}
 	
@@ -151,5 +162,4 @@ public abstract class AbstractPeriodicDelayedDimensioning {
 		consideredPeriods.toArray(periods);
 		return LeastCommonMultiple.lcm(periods);
 	}
-
 }

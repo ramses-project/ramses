@@ -26,49 +26,49 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File ;
+import java.io.IOException ;
+import java.io.InputStream ;
+import java.net.URL ;
+import java.util.ArrayList ;
+import java.util.Collections ;
+import java.util.Iterator ;
+import java.util.List ;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EcorePackage;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
-import org.eclipse.m2m.atl.core.ATLCoreException;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
-import org.eclipse.m2m.atl.emftvm.ExecEnv;
-import org.eclipse.m2m.atl.emftvm.Metamodel;
-import org.eclipse.m2m.atl.emftvm.Model;
-import org.eclipse.m2m.atl.emftvm.Module;
-import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl;
-import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl;
-import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException;
-import org.eclipse.m2m.atl.emftvm.util.ModuleResolver;
-import org.eclipse.m2m.atl.emftvm.util.TimingData;
-import org.eclipse.m2m.atl.emftvm.util.VMException;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.PropertySet;
-import org.osate.aadl2.instance.InstancePackage;
-import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
-import org.osate.ba.aadlba.AadlBaPackage;
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.EPackage ;
+import org.eclipse.emf.ecore.EcorePackage ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
+import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl ;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
+import org.eclipse.m2m.atl.emftvm.ExecEnv ;
+import org.eclipse.m2m.atl.emftvm.Metamodel ;
+import org.eclipse.m2m.atl.emftvm.Model ;
+import org.eclipse.m2m.atl.emftvm.Module ;
+import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl ;
+import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl ;
+import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException ;
+import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
+import org.eclipse.m2m.atl.emftvm.util.TimingData ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.PropertySet ;
+import org.osate.aadl2.instance.InstancePackage ;
+import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl ;
+import org.osate.ba.aadlba.AadlBaPackage ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
@@ -90,6 +90,8 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	protected String outputPackageName = "";
 	
 	protected abstract void registerDefaultTransformationModules();
+	
+	private static Logger _LOGGER = Logger.getLogger(Aadl2XEMFTVMLauncher.class) ;
 	
 	ModuleResolver _moduleResolver = new ModuleResolver() {
 		@Override
@@ -116,12 +118,12 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	};
 	
 	public Aadl2XEMFTVMLauncher(AadlModelInstantiatior modelInstantiator,
-	                               PredefinedAadlModelManager predefinedResourcesManager) throws ATLCoreException
-    {
-	  _modelInstantiator = modelInstantiator ;
-	  _predefinedResourcesManager = predefinedResourcesManager ;
-	  this.initTransformation() ;
-    }
+	                            PredefinedAadlModelManager predefinedResourcesManager)
+  {
+    _modelInstantiator = modelInstantiator ;
+    _predefinedResourcesManager = predefinedResourcesManager ;
+    this.initTransformation() ;
+  }
 	
 	public String getOutputPackageName() {
 		return outputPackageName;
@@ -132,7 +134,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	}
 
 	protected void initTransformation()
-			throws ATLCoreException
 	{
 		EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
 				org.osate.aadl2.Aadl2Package.eINSTANCE) ;
@@ -151,9 +152,10 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		.put("emftvm", new EMFTVMResourceFactoryImpl()) ;
 	}
 
-	public Resource doTransformation(List<File> transformationFileList, Resource inputResource,
-			String outputDirPathName, String resourceSuffix)
-					throws FileNotFoundException, IOException, ATLCoreException, GenerationException
+	public Resource doTransformation(List<File> transformationFileList,
+	                                 Resource inputResource,
+			                             String outputDirPathName,
+			                             String resourceSuffix) throws TransformationException
 	{
 		
 		
@@ -184,17 +186,26 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 					! outModel.getResource().getContents().isEmpty())
 			{
 				outModel.getResource().setURI(outputResource.getURI());
-				outModel.getResource().save(null);
+				try
+				{
+				  outModel.getResource().save(null);
+				}
+				catch(IOException ex)
+				{
+				  String errMsg =  RamsesException.formatRethrowMessage("not enable to save the output AADL model", ex) ;
+	        _LOGGER.error(errMsg);
+	        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+				}
 			}
 		}
 		
 		return outModel.getResource();		
-
 	}
 
 	
 	protected abstract Resource initTransformationOutput(Resource inputResource,
-			String outputDirPathName, String resourceSuffix);
+                                                       String outputDirPathName,
+                                                       String resourceSuffix);
 	
 	
 	protected void registerPredefinedResourcesInLauncher(ExecEnv env,
@@ -215,91 +226,86 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	}
 
 	protected void initTransformationInputs(List<File> transformationFileList,
-			Resource inputResource) {
-		try
-		{
-			ResourceSet rs = inputResource.getResourceSet();
+			                                    Resource inputResource)
+	                                                throws TransformationException
+	{
+    ResourceSet rs = inputResource.getResourceSet();
 
-			// Load metamodels
-			// Load aadl instance metamodel 
-			Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-			aadlInstanceMetaModel.setResource(rs.getResource(URI.createURI(AADLI_MM_URI), true));
-			env.registerMetaModel("AADLI", aadlInstanceMetaModel);
+    // Load metamodels
+    // Load aadl instance metamodel 
+    Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+    aadlInstanceMetaModel.setResource(rs.getResource(URI.createURI(AADLI_MM_URI), true));
+    env.registerMetaModel("AADLI", aadlInstanceMetaModel);
 
-			// Load aadl+BA metamodel
-			Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-			aadlBaMetaModel.setResource(rs.getResource(URI.createURI(AADLBA_MM_URI), true));
-			env.registerMetaModel("AADLBA", aadlBaMetaModel);
+    // Load aadl+BA metamodel
+    Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+    aadlBaMetaModel.setResource(rs.getResource(URI.createURI(AADLBA_MM_URI), true));
+    env.registerMetaModel("AADLBA", aadlBaMetaModel);
 
-			// Load atlHooks metamodel
-			Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-			atlHoolsMetaModel.setResource(rs.getResource(URI.createURI(ATLHOOKS_MM_URI), true));
-			env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
+    // Load atlHooks metamodel
+    Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+    atlHoolsMetaModel.setResource(rs.getResource(URI.createURI(ATLHOOKS_MM_URI), true));
+    env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
 
-			// Load models
-			Model inModel = EmftvmFactory.eINSTANCE.createModel();
-			inModel.setResource(inputResource);
-			env.registerInputModel("IN", inModel);
+    // Load models
+    Model inModel = EmftvmFactory.eINSTANCE.createModel();
+    inModel.setResource(inputResource);
+    env.registerInputModel("IN", inModel);
 
-			List<Resource> registeredReferences = new ArrayList<Resource>();
-			registeredReferences.add(inputResource);
-			Iterator<EObject> iter = inputResource.getAllContents();
-			while(iter.hasNext())
-			{
-				EObject obj = iter.next();
-				for(EObject ref: obj.eCrossReferences())
-				{
-					Resource r = ref.eResource();
-					if(r!=null && !registeredReferences.contains(r))
-					{
-						registeredReferences.add(r);
-						Model referencedModel = EmftvmFactory.eINSTANCE.createModel();
-						referencedModel.setResource(r);
-						env.registerInputModel(r.getURI().lastSegment(), referencedModel);
-					}
-				}
-			}
+    List<Resource> registeredReferences = new ArrayList<Resource>();
+    registeredReferences.add(inputResource);
+    Iterator<EObject> iter = inputResource.getAllContents();
+    while(iter.hasNext())
+    {
+      EObject obj = iter.next();
+      for(EObject ref: obj.eCrossReferences())
+      {
+        Resource r = ref.eResource();
+        if(r!=null && !registeredReferences.contains(r))
+        {
+          registeredReferences.add(r);
+          Model referencedModel = EmftvmFactory.eINSTANCE.createModel();
+          referencedModel.setResource(r);
+          env.registerInputModel(r.getURI().lastSegment(), referencedModel);
+        }
+      }
+    }
 
-			// create and load predefined resources
-			registerPredefinedResourcesInLauncher(env, _predefinedResourcesManager.getPredefinedResources());
+    // create and load predefined resources
+    registerPredefinedResourcesInLauncher(env, _predefinedResourcesManager.getPredefinedResources());
 
-			// create and load ATLHook
-			URI fileURI =
-					URI.createFileURI(RamsesConfiguration.getAtlResourceDir().getAbsolutePath() +
-							"/ATLHook.atlhooks") ;
-			ResourceSet set = new ResourceSetImpl() ;
-			Resource hookResource = set.createResource(fileURI) ;
-			HookAccess atlHook = AtlHooksFactory.eINSTANCE.createHookAccess() ;
-			atlHook.setOutputPackageName(outputPackageName);
-			hookResource.getContents().add(atlHook) ;
-			hookResource.load(null) ;
+    // create and load ATLHook
+    URI fileURI =
+        URI.createFileURI(RamsesConfiguration.getAtlResourceDir().getAbsolutePath() +
+            "/ATLHook.atlhooks") ;
+    ResourceSet set = new ResourceSetImpl() ;
+    Resource hookResource = set.createResource(fileURI) ;
+    HookAccess atlHook = AtlHooksFactory.eINSTANCE.createHookAccess() ;
+    atlHook.setOutputPackageName(outputPackageName);
+    hookResource.getContents().add(atlHook) ;
+    
+    try
+    {
+      hookResource.load(null) ;
+    }
+    catch(IOException e)
+    {
+      String msg = "fail to load ATL hook \'" + hookResource.getURI() + '\'' ;
+      throw new TransformationException(msg, e) ;
+    }
 
-			Model atlHookModel = EmftvmFactory.eINSTANCE.createModel();
-			atlHookModel.setResource(hookResource);
-			env.registerInputModel("HOOKS", atlHookModel);
-
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+    Model atlHookModel = EmftvmFactory.eINSTANCE.createModel();
+    atlHookModel.setResource(hookResource);
+    env.registerInputModel("HOOKS", atlHookModel);
 	}
 
 	public void registerAdditionalTransformationsEMFTVM(List<File> transformationFileList,
-			ModuleResolver mr) {
+			                                                ModuleResolver mr)
+	{
 		
 		for(File f : transformationFileList)
 		{
-			try
-			{
-				env.loadModule(mr, f.getAbsolutePath());
-			}
-			catch(VMException e)
-			{
-				System.out.println("ERROR when loading "+f.getAbsolutePath());
-				e.printStackTrace();
-			}
+		  env.loadModule(mr, f.getAbsolutePath());
 		}
 	}
-	
 }

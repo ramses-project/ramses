@@ -21,7 +21,9 @@
 
 package fr.tpt.aadl.ramses.control.support.generator;
 
-public class GenerationException extends Exception
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+
+public class GenerationException extends RamsesException
 {
 
   /**
@@ -29,8 +31,17 @@ public class GenerationException extends Exception
    */
   private static final long serialVersionUID = -3658578123016824026L ;
   
-  
   public GenerationException(String errorMessage)
+  {
+    super(errorMessage) ;
+  }
+  
+  public GenerationException(Throwable e)
+  {
+    super(e) ;
+  }
+  
+  public GenerationException(String errorMessage, Throwable e)
   {
     super(errorMessage) ;
   }

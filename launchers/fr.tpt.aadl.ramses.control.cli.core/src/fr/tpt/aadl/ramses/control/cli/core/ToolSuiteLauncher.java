@@ -41,6 +41,7 @@ import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
 import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
@@ -173,7 +174,9 @@ public class ToolSuiteLauncher
                                      	 RamsesConfiguration config,
                                      	 File[] includeDirs,
                                      	 Map<String, Object> parameters)
-                                                      throws GenerationException
+                                                      throws AnalysisException,
+                                                             GenerationException,
+                                                         TransformationException
   {
     _monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
     
@@ -206,7 +209,9 @@ public class ToolSuiteLauncher
                               File[] includeDirs,
                               WorkflowPilot xmlPilot,
                               Map<String, Object> parameters)
-                                                      throws GenerationException
+                                                      throws AnalysisException,
+                                                            GenerationException,
+                                                      TransformationException
   {
     _monitor.beginTask("Code generation (workflow XML)", IProgressMonitor.UNKNOWN);
     

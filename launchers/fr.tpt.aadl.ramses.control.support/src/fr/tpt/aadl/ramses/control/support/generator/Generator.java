@@ -28,7 +28,9 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
 
@@ -41,7 +43,9 @@ public interface Generator extends NamedPlugin
                        File outputDir,
                        File[] includeDirs,
                        AnalysisErrorReporterManager errManager,
-                       IProgressMonitor monitor) throws GenerationException ;
+                       IProgressMonitor monitor) throws AnalysisException,
+                                                        GenerationException,
+                                                        TransformationException;
 
   // TODO: doc me !
   // runtimePath can be null.
@@ -51,7 +55,9 @@ public interface Generator extends NamedPlugin
                                File outputDir,
                                File[] includeDirs,
                                AnalysisErrorReporterManager errManager,
-                               IProgressMonitor monitor) throws GenerationException ;
+                               IProgressMonitor monitor) throws AnalysisException,
+                                                                GenerationException,
+                                                                TransformationException;
 
   // runtimePath can be null.
   public boolean runtimePathChecker(File runtimePath) ;

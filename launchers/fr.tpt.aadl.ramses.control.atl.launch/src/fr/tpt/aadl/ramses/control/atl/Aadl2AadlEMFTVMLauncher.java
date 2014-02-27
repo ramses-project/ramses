@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright Â© 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -19,37 +19,36 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/*
- * author: Etienne Borde
- *
- */
-
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File ;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.List ;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.m2m.atl.core.ATLCoreException;
-import org.eclipse.m2m.atl.emftvm.ExecEnv;
-import org.eclipse.m2m.atl.emftvm.util.ModuleResolver;
-import org.osate.aadl2.util.Aadl2Util;
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.m2m.atl.emftvm.ExecEnv ;
+import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
+import org.osate.aadl2.util.Aadl2Util ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
+import antlr.RecognitionException ;
+import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 {
-	
+  private static Logger _LOGGER = Logger.getLogger(Aadl2AadlEMFTVMLauncher.class) ;
+  
 	public Aadl2AadlEMFTVMLauncher(AadlModelInstantiatior modelInstantiator,
-			PredefinedAadlModelManager predefinedResourcesManager) throws ATLCoreException
+			                           PredefinedAadlModelManager predefinedResourcesManager)
 	{
 		super(modelInstantiator, predefinedResourcesManager);
 	}
@@ -57,9 +56,8 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 	public Resource generationEntryPoint(Resource inputResource,
 			                                 List<File> transformationFileList,
 			                                 File outputDir)
-			                                   throws GenerationException
+			                                            throws TransformationException
 	{
-		try {
 
 			String aadlGeneratedFileName = inputResource.getURI().lastSegment();
 			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
@@ -85,14 +83,17 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			File outputFile = new File(outputFilePath);
 
 			_modelInstantiator.serialize(transfoResult, outputFilePath);
-			return AadlToTargetSpecificAadl.extractAadlResource(inputResource, outputFile);
-		
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new GenerationException(e.getMessage());
-		}
+			try
+			{
+			  return AadlToTargetSpecificAadl.extractAadlResource(inputResource,
+			                                                      outputFile);
 			}
+			catch(IOException | RecognitionException ex)
+			{
+			  String msg = "fail to extract AADL resources" ;
+	      throw new TransformationException(msg, ex) ;
+			}
+		}
 
 	protected void registerDefaultTransformationModules()
 	{
@@ -101,7 +102,7 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 	}
 	
 	private void registerDefaultTransformationsEMFTVM(ExecEnv env,
-			ModuleResolver mr)
+			                                              ModuleResolver mr)
 	{
 		List<String> fileName = new ArrayList<String>() ;
 		fileName.add("/helpers/IOHelpers") ;
@@ -133,7 +134,9 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 
 	@Override
 	protected Resource initTransformationOutput(Resource inputResource,
-			String outputDirPathName, String resourceSuffix) {
+			                                        String outputDirPathName,
+			                                        String resourceSuffix)
+	{
 		
 		ResourceSet rs = inputResource.getResourceSet();
 		
@@ -147,14 +150,21 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 		URI uri = URI.createURI(aadlGeneratedFileName);
 		Resource outputResource = rs.getResource(uri, false);
 		if(outputResource==null)
+		{
 		  outputResource = rs.createResource(uri);
+		}
 		else
 		{
-		  try {
-			outputResource.delete(null);
-		  } catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		  try
+		  {
+			  outputResource.delete(null);
+		  }
+		  catch (IOException e)
+		  {
+		    String errMsg =  RamsesException.formatRethrowMessage("cannot erase the previous output resource \'" +
+		                                                          uri.toString() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		  }
 		  outputResource = rs.createResource(uri);
 		}

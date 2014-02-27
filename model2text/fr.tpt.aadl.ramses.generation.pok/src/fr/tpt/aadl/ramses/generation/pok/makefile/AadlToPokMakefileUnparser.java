@@ -58,7 +58,7 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
   }
   
   @Override
-  protected void handleDirs(File runtimePath, File[] includeDirs) throws GenerationException
+  protected void handleDirs(File runtimePath, File[] includeDirs)
   {
     File pokCFile = new File(runtimePath + RUNTIME_INCL_DIR);
     _includeDirManager.addCommonDependency(pokCFile);

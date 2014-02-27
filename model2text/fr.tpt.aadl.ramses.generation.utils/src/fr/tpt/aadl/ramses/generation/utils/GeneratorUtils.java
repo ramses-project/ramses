@@ -26,6 +26,7 @@ import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AccessCategory ;
 import org.osate.aadl2.AccessConnection ;
@@ -36,7 +37,6 @@ import org.osate.aadl2.Data ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataSubcomponent ;
-import org.osate.aadl2.Element ;
 import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.MemorySubcomponent ;
 import org.osate.aadl2.ModalPropertyValue ;
@@ -61,12 +61,15 @@ import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.PropertyUtils ;
 import org.osate.utils.names.DataModelProperties ;
 
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+
 
 public class GeneratorUtils
 {
-
+  private static Logger _LOGGER = Logger.getLogger(GeneratorUtils.class) ;
+  
   @SuppressWarnings("unused")
-  public static String getInitialValue(Element e, String language)
+  public static String getInitialValue(NamedElement e, String language)
   {
     StringBuilder initialization = new StringBuilder() ;
 
@@ -124,17 +127,20 @@ public class GeneratorUtils
 
         dataTypeHolder = AadlBaUtils.getTypeHolder(d) ;
       }
-      catch(DimensionException exp)
+      catch(DimensionException ex)
       {
-        // TODO Auto-generated catch block
-        exp.printStackTrace() ;
+        String errMsg = "fail to fetch the initial value of " +  e.getName();
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
     }
     else if(e instanceof Port)
     {
+    
     }
     else if(e instanceof Parameter)
     {
+    
     }
 
     return initialization.toString() ;
@@ -149,8 +155,10 @@ public class GeneratorUtils
 
     if(aPropertyAssociation == null)
     {
-    	System.out.println("ERROR: Actual_Processor_Binding property not set for component instance "+
-    			aProcessSubcomponent.getName());
+      String errMsg = "Actual_Processor_Binding property not set for component instance "+
+            aProcessSubcomponent.getName() ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     	return null;
     }
     for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
@@ -207,7 +215,7 @@ public class GeneratorUtils
   }
 
   private static void setInitialization(NamedElement obj,
-		  								StringBuilder initialization,
+		  								                  StringBuilder initialization,
                                         List<PropertyExpression> initialValues,
                                         String language)
   {
@@ -249,8 +257,8 @@ public class GeneratorUtils
             	{
 		          	if (AadlBaUtils.getDataRepresentation((DataClassifier)obj) == DataRepresentation.ENUM)	
 		          	{
-		                	initialization.append(obj.getQualifiedName() + "INSERTDOTHERE");
-		
+		              initialization.append(obj.getQualifiedName() +
+		                                    "INSERTDOTHERE");
 		          	}
             	}
             }
@@ -274,41 +282,40 @@ public class GeneratorUtils
     }
   }
   
-  public static Subcomponent getDeloymentMemorySubcomponent(
-                                       ProcessSubcomponent aProcessSubcomponent)
+  public static Subcomponent getDeloymentMemorySubcomponent(ProcessSubcomponent aProcessSubcomponent)
   {
     PropertyAssociation aPropertyAssociation =
           PropertyUtils.findProperty("Actual_Memory_Binding",
                                      aProcessSubcomponent) ;
 
     for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
-            .getOwnedValues())
-  {
-    if(aModalPropertyValue.getOwnedValue() instanceof ListValue)
+          .getOwnedValues())
     {
-      ListValue list = (ListValue) aModalPropertyValue.getOwnedValue() ;
-
-      for(PropertyExpression pe : list.getOwnedListElements())
+      if(aModalPropertyValue.getOwnedValue() instanceof ListValue)
       {
-        if(pe instanceof ReferenceValue)
-        {
-          ReferenceValue rv = (ReferenceValue) pe ;
-          NamedElement anElement =
-               rv.getContainmentPathElements().get(rv.getContainmentPathElements().
-                                                   size()-1).getNamedElement() ;
+        ListValue list = (ListValue) aModalPropertyValue.getOwnedValue() ;
 
-          if(anElement instanceof MemorySubcomponent)
+        for(PropertyExpression pe : list.getOwnedListElements())
+        {
+          if(pe instanceof ReferenceValue)
           {
-            MemorySubcomponent ms = 
-                (MemorySubcomponent) anElement;
-            return ms;
+            ReferenceValue rv = (ReferenceValue) pe ;
+            NamedElement anElement =
+                  rv.getContainmentPathElements()
+                        .get(rv.getContainmentPathElements().size() - 1)
+                        .getNamedElement() ;
+
+            if(anElement instanceof MemorySubcomponent)
+            {
+              MemorySubcomponent ms = (MemorySubcomponent) anElement ;
+              return ms ;
+            }
           }
         }
       }
     }
-  }
 
-  return null ;
+    return null ;
   }
   
   //Builds the data access mapping via the connections described in the

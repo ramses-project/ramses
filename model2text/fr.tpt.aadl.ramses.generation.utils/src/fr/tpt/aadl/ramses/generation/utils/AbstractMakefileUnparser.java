@@ -12,6 +12,7 @@ import java.util.LinkedHashSet ;
 import java.util.NoSuchElementException ;
 import java.util.Set ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.AnnexSubclause ;
@@ -41,9 +42,11 @@ import org.osate.ba.aadlba.BehaviorActionBlock ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.SubprogramCallAction ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.DependencyManager ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
                                                implements TargetBuilderGenerator
@@ -108,6 +111,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
   protected File[] _includeDirs ;
   
   protected static String _ENV_VAR_NAME ;
+
+  private static Logger _LOGGER = Logger.getLogger(AbstractMakefileUnparser.class) ;
   
   @Override
   public String getRuntimePathEnvVar()
@@ -155,16 +160,13 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
   
   abstract protected void setupCommonDirs() ;
   
-  protected void handleDirs(File runtimePath, File[] includeDirs) throws GenerationException
+  protected void handleDirs(File runtimePath, File[] includeDirs)
   {
     _runtimePath = runtimePath ;
     _includeDirs = includeDirs ;
   }
-
   
-  
-  public Set<File> getListOfReferencedObjects(ProcessImplementation aProcessImplementation)
-                                                                throws Exception
+  public Set<File> getListOfReferencedObjects(ProcessImplementation aProcessImplementation) throws GenerationException
   {
     Set<File> result = _includeDirManager.getDenpendencies(aProcessImplementation) ;
     
@@ -185,8 +187,10 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         {
           // Throw exception, the thread component instance should reference
           // a thread implementation to call user operations.
-          throw new Exception(
-                "the thread component instance should reference a thread implementation to call user operations.") ;
+          String errMsg =  "the thread component instance should reference a " +
+                           "thread implementation to call user operations." ;
+          _LOGGER.fatal(errMsg);
+          throw new GenerationException(errMsg) ;
         }
       }
       
@@ -198,7 +202,6 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
   
   protected void getListOfReferencedObjects(ThreadImplementation aThreadImplementation,
                                             Set<File> result)
-        throws Exception
   {
     Set<File> tmp = _includeDirManager.getDenpendencies(aThreadImplementation) ;
     
@@ -212,31 +215,13 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         for(CallSpecification aCallSpecification : aCallSequence
               .getOwnedCallSpecifications())
         {
-          try
-          {
-            getListOfReferencedObjects(aCallSpecification, tmp) ;
-          }
-          catch(Exception e)
-          {
-            System.err.println(e.getMessage()) ;
-            e.printStackTrace() ;
-            continue ;
-          }
+          getListOfReferencedObjects(aCallSpecification, tmp) ;
         }
       }
       for(SubprogramSubcomponent sc : aThreadImplementation
             .getOwnedSubprogramSubcomponents())
       {
-        try
-        {
-          getListOfReferencedObjects(sc, tmp) ;
-        }
-        catch(Exception e)
-        {
-          System.err.println(e.getMessage()) ;
-          e.printStackTrace() ;
-          continue ;
-        }
+        getListOfReferencedObjects(sc, tmp) ;
       }
       
       _includeDirManager.addDependencies(aThreadImplementation, tmp) ;
@@ -248,7 +233,6 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
 
   protected void getListOfReferencedObjects(SubprogramSubcomponent sc,
                                             Set<File> result)
-        throws Exception
   {
     Set<File> tmp = _includeDirManager.getDenpendencies(sc) ;
     
@@ -280,7 +264,6 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
 
   protected void getListOfReferencedObjects(CallSpecification aCallSpecification,
                                             Set<File> result)
-        throws Exception
   {
     if(aCallSpecification instanceof SubprogramCall)
     {
@@ -304,7 +287,6 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
 
   protected boolean getListOfReferencedObjects(Subprogram aSubprogram,
                                                Set<File> result)
-        throws Exception
   {
     Set<File> tmp = _includeDirManager.getDenpendencies(aSubprogram) ;
     
@@ -391,7 +373,6 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
 
   protected void getListOfReferencedObjects(BehaviorAnnex ba,
                                             Set<File> result)
-        throws Exception
   {
     Set<File> tmp = _includeDirManager.getDenpendencies(ba) ;
     
@@ -422,7 +403,6 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
 
   protected boolean getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
                                                Set<File> result)
-        throws Exception
   {
     Set<File> tmp = _includeDirManager.getDenpendencies(aPropertyAssociation) ;
     
@@ -465,9 +445,13 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
               }
             }
             if(!found)
-              System.err.println("file referenced in object " +
+            {
+              String errMsg = "file referenced in object " +
                     aPropertyAssociation.getContainingClassifier().getFullName() +
-                    " could not be found " + value) ;
+                    " could not be found " + value ;
+              _LOGGER.error(errMsg);
+              ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+            }
           }
           else if(aPE instanceof ListValue)
           {
@@ -491,9 +475,13 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
                 }
               }
               if(!found)
-                System.err.println("file referenced in object " +
+              {
+                String errMsg = "file referenced in object " +
                       aPropertyAssociation.getContainingClassifier()
-                            .getFullName() + " could not be found " + value) ;
+                      .getFullName() + " could not be found " + value ;
+                _LOGGER.error(errMsg);
+                ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+              }
             }
           }
         }
@@ -520,23 +508,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
       File makeFile = new File(makeFileDir.getAbsolutePath() + "/Makefile") ;
       FileWriter fileW = new FileWriter(makeFile) ;
       BufferedWriter output ;
-
-      try
-      {
-        output = new BufferedWriter(fileW) ;
-        output.write(text.getParseOutput()) ;
-        output.close() ;
-      }
-      catch(IOException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace() ;
-      }
+      
+      output = new BufferedWriter(fileW) ;
+      output.write(text.getParseOutput()) ;
+      output.close() ;
     }
-    catch(IOException e)
+    catch(IOException ex)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace() ;
+      String errMsg = "cannot save the makefile" ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
   
@@ -558,7 +539,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         makeProcess.waitFor() ;
         if(makeProcess.exitValue() != 0)
         {
-          System.err.println("Error when compiling generated code: ") ;
+          String errMsg = "while compiling generated code: " ;
+          _LOGGER.error(errMsg);
+          ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 
           InputStream is ;
           is = makeProcess.getInputStream() ;
@@ -567,14 +550,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           String line = null ;
           while((line = in.readLine()) != null)
           {
-            System.err.println(line) ;
+            _LOGGER.error(line);
+            ServiceProvider.SYS_ERR_REP.error(line, true);
           }
           is = makeProcess.getErrorStream() ;
           in = new BufferedReader(new InputStreamReader(is)) ;
           line = null ;
           while((line = in.readLine()) != null)
           {
-            System.err.println(line) ;
+            _LOGGER.error(line);
+            ServiceProvider.SYS_ERR_REP.error(line, true);
           }
         }
         else
@@ -586,27 +571,25 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           String line = null ;
           while((line = in.readLine()) != null)
           {
-            System.out.println(line) ;
+            _LOGGER.trace(line);
           }
-          System.out.println("Generated code was successfully built.\n") ;
+          String msg = "Generated code was successfully built.\n" ;
+          _LOGGER.info(msg);
         }
       }
-      catch(IOException e)
+      catch(IOException | InterruptedException ex)
       {
-        // TODO Auto-generated catch block
-        e.printStackTrace() ;
+        String errMsg = RamsesException.formatRethrowMessage("could not build generated code",
+                                                             ex) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
-      catch(InterruptedException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace() ;
-      }
-
     }
     else
     {
-      System.out
-            .println("ERROR: could not build generated code, runtime path not found") ;
+      String errMsg = "ERROR: could not build generated code, runtime path not found" ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
 }

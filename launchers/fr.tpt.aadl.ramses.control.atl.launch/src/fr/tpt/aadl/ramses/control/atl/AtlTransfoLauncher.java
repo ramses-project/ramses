@@ -21,11 +21,10 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.util.List;
+import java.util.List ;
 
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.m2m.atl.core.ATLCoreException ;
 import org.eclipse.m2m.atl.core.emf.EMFInjector ;
 import org.eclipse.m2m.atl.core.emf.EMFModel ;
 import org.eclipse.m2m.atl.core.emf.EMFModelFactory ;
@@ -50,7 +49,7 @@ public abstract class AtlTransfoLauncher
   private static final EMFModelFactory factory = new EMFModelFactory() ;
   protected static EMFReferenceModel aadlbaMetamodel ;
   
-  protected abstract void initTransformation() throws ATLCoreException;
+  protected abstract void initTransformation() ;
   
   protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher,
                                                        List<Resource> predefinedAadlModels)

@@ -1,25 +1,23 @@
 package fr.tpt.aadl.sched.wcetanalysis;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
+import java.io.File ;
+import java.util.List ;
 
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.m2m.atl.core.ATLCoreException;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
-import org.eclipse.m2m.atl.emftvm.Metamodel;
-import org.eclipse.m2m.atl.emftvm.Model;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EPackage ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.m2m.atl.core.ATLCoreException ;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
+import org.eclipse.m2m.atl.emftvm.Metamodel ;
+import org.eclipse.m2m.atl.emftvm.Model ;
 
 import fr.tpt.aadl.ramses.control.atl.Aadl2AadlEMFTVMLauncher ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel;
-import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
+import fr.tpt.aadl.ramses.control.support.TransformationException ;
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage ;
 
 public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 
@@ -46,7 +44,8 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	}
 
 	@Override
-	protected void initTransformation() throws ATLCoreException {
+	protected void initTransformation()
+	{
 		// register reducedBa
 		super.initTransformation();
 	}
@@ -55,8 +54,8 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	public Resource doTransformation(List<File> transformationFileList,
 			Resource inputResource, String outputDirPathName,
 			String resourceSuffix)
-			throws FileNotFoundException, IOException, ATLCoreException,
-			GenerationException {
+			throws TransformationException
+  {
 		
 		ResourceSet rs = inputResource.getResourceSet();
 		

@@ -3,6 +3,7 @@ package fr.tpt.aadl.ramses.communication.periodic.delayed;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.ComponentCategory;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.instance.ComponentInstance;
@@ -14,20 +15,30 @@ import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
 
 public class DataPortCommunicationDimensioning extends AbstractPeriodicDelayedDimensioning {
 
+  private static Logger _LOGGER = Logger.getLogger(DataPortCommunicationDimensioning.class) ;
+  
 	public DataPortCommunicationDimensioning(FeatureInstance receiverPort) throws DimensioningException
 	{
 		boolean isInOrInOutFeature = receiverPort.getDirection().equals(DirectionType.IN)
 				|| receiverPort.getDirection().equals(DirectionType.IN_OUT);
 		if(!isInOrInOutFeature
 				&& !receiverPort.getCategory().equals(FeatureCategory.DATA_PORT))
-			throw new DimensioningException("Data port dimensioning can only be computed for an " +
-					"in or inout data port");
+		{
+		  String errMsg = "Data port dimensioning can only be computed for an " +
+                      "in or inout data port" ;
+	     _LOGGER.fatal(errMsg) ;
+	     throw new DimensioningException(errMsg);
+		}
 		
 		readerReceivingTaskInstance = (ComponentInstance) receiverPort.eContainer();
 		
 		if(!readerReceivingTaskInstance.getCategory().equals(ComponentCategory.THREAD))
-			throw new DimensioningException("Data port dimensioning can only be computed for an " +
-					"in or inout even data port of a thread component instance");
+		{
+      String errMsg = "Data port dimensioning can only be computed for an " +
+                      "in or inout even data port of a thread component instance" ;
+       _LOGGER.fatal(errMsg) ;
+       throw new DimensioningException(errMsg);
+    }
 		
 		for(ConnectionInstance cnxInst:receiverPort.getDstConnectionInstances())
 		{
@@ -52,9 +63,14 @@ public class DataPortCommunicationDimensioning extends AbstractPeriodicDelayedDi
 	private void setCurrentDeadlineWriteIndex(FeatureInstance writerFeatureInstance) throws DimensioningException 
 	{
 		if(!this.writerInstances.contains(writerFeatureInstance))
-			throw new DimensioningException("ERROR: "+writerFeatureInstance.getComponentInstancePath()
-					+"\n is not connected to: "+this.readerReceivingTaskInstance.getComponentInstancePath());
-		
+		{
+      String errMsg = writerFeatureInstance.getComponentInstancePath() +
+                      "\n is not connected to: " +
+                      this.readerReceivingTaskInstance.getComponentInstancePath() ;
+       _LOGGER.fatal(errMsg) ;
+       throw new DimensioningException(errMsg);
+    }
+		  
 		for(int iteration=0;iteration<this.CDWSize.get(writerFeatureInstance);iteration++)
 		{
 			long CDW = 0;
@@ -82,17 +98,21 @@ public class DataPortCommunicationDimensioning extends AbstractPeriodicDelayedDi
 				this.CurrentPeriodRead.add(readIndexValue);
 			}
 		}
-		
 	}
 	
 	private long inverseOf(long readIndexValue) throws DimensioningException
 	{
 		if(readIndexValue==1)
-			return 0;
+		{
+		  return 0;
+		}
 		else if(readIndexValue==0)
-			return 1;
-		throw new DimensioningException("ERROR: data port buffer contains only two slots");
+		{
+		  return 1;
+		}
+		
+		String errMsg = "data port buffer contains only two slots" ;
+		_LOGGER.fatal(errMsg) ;
+		throw new DimensioningException(errMsg);
 	}
-	
-	
 }

@@ -61,7 +61,7 @@ public class AadlToAdaRavenscarMakefileUnparser extends AbstractMakefileUnparser
 	}
 	
 	@Override
-	protected void handleDirs(File runtimePath, File[] includeDirs) throws GenerationException
+	protected void handleDirs(File runtimePath, File[] includeDirs)
 	{
     File pokAdaFile = new File(runtimePath + RUNTIME_INCL_DIR);
     _includeDirManager.addCommonDependency(pokAdaFile) ;
