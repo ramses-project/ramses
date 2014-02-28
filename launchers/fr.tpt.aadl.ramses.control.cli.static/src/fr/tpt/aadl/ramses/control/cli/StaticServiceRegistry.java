@@ -34,6 +34,7 @@ import org.osate.ba.AadlBaResolver ;
 import org.osate.ba.AadlBaUnParserAction ;
 
 import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis ;
+import fr.tpt.aadl.ramses.analysis.eg.EGAnalyzer ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
@@ -47,7 +48,6 @@ import fr.tpt.aadl.ramses.generation.launcher.adaravenscar.AdaRavenscarGenerator
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.pok.ada.AdaPokGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
-import fr.tpt.aadl.sched.wcetanalysis.WcetAnalysis ;
 
 /**
  * This class implements the API to register statically services into RAMSES. These
@@ -87,7 +87,10 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _unparsers.put(AadlBaToADAUnparserAction.ANNEX_NAME,
             new AadlBaToADAUnparserAction()) ;
     
-    _analyzers.put(WcetAnalysis.PLUGIN_NAME, new WcetAnalysis(modelInstantiatior,
+    /*_analyzers.put(WcetAnalysis.PLUGIN_NAME, new WcetAnalysis(modelInstantiatior,
+                                                              predefinedAadlModels));*/
+    
+    _analyzers.put(EGAnalyzer.PLUGIN_NAME, new EGAnalyzer(modelInstantiatior,
                                                               predefinedAadlModels));
     
     _analyzers.put(AADLInspectorSchedulingAnalysis.PLUGIN_NAME, new AADLInspectorSchedulingAnalysis());
