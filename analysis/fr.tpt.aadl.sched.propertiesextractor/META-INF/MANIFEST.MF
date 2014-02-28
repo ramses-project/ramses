@@ -49,7 +49,7 @@ Export-Package: fr.tpt.aadl.flow.analysis.util,
  fr.tpt.aadl.flow.extraction.util,
  fr.tpt.aadl.flow.model,
  fr.tpt.aadl.flow.util
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  antlr.jar,
  ant-antlr.jar,

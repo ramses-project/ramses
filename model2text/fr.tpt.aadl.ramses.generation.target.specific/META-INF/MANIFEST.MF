@@ -22,6 +22,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  fr.tpt.aadl.ramses.constraints.reporter.metamodel;bundle-version="1.0.0",
  org.eclipse.m2m.atl.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.generation.target.specific
 Bundle-Vendor: TELECOM Paristech

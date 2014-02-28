@@ -8,6 +8,6 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.util.math;bundle-version="0.0.1",
  org.apache.log4j
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.communication.dimensioning,
  fr.tpt.aadl.ramses.communication.periodic.delayed
