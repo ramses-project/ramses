@@ -26,4 +26,4 @@ Require-Bundle: org.eclipse.ui.ide,
  fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.osek
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
