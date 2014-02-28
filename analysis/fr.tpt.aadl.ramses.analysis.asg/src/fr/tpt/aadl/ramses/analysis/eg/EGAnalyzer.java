@@ -2,7 +2,6 @@ package fr.tpt.aadl.ramses.analysis.eg ;
 
 import java.io.BufferedWriter ;
 import java.io.File ;
-import java.io.FileWriter ;
 import java.io.IOException ;
 import java.io.OutputStreamWriter ;
 import java.io.Writer ;
@@ -23,8 +22,6 @@ import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGModels ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
-import fr.tpt.aadl.ramses.analysis.eg.util.export.EG2DOT ;
-import fr.tpt.aadl.ramses.analysis.eg.util.export.EG2DOT.DOTLayout ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
@@ -82,15 +79,15 @@ public class EGAnalyzer extends AbstractAnalyzer
   
   private Writer createDebug()
   {
-    Writer w = null;
-    try
+    Writer w = new BufferedWriter (new OutputStreamWriter(System.out));
+    /*try
     {
       w = new BufferedWriter(new FileWriter ("/home/fabien/execution_graphs/reduced/reduction.txt"));
     }
     catch(IOException e)
     {
       w = new BufferedWriter (new OutputStreamWriter(System.out));
-    }
+    }*/
     return w;
   }
   
@@ -109,8 +106,8 @@ public class EGAnalyzer extends AbstractAnalyzer
   
     EGModels models = launcher.lastLaunchResults() ;
     
-    EG2DOT eg2dot = new EG2DOT ("/home/fabien/execution_graphs/", DOTLayout.dot);
-    eg2dot.launch(models,systemInstance);
+    //EG2DOT eg2dot = new EG2DOT ("/home/fabien/execution_graphs/", DOTLayout.dot);
+    //eg2dot.launch(models,systemInstance);
     
     /** Clone graph and reduce to a sequence **/
     
@@ -122,8 +119,8 @@ public class EGAnalyzer extends AbstractAnalyzer
     }
     catch(IOException e){}
     
-    EG2DOT eg2dot2 = new EG2DOT ("/home/fabien/execution_graphs/reduced/", DOTLayout.dot);
-    eg2dot2.launch(models2,systemInstance);
+    //EG2DOT eg2dot2 = new EG2DOT ("/home/fabien/execution_graphs/reduced/", DOTLayout.dot);
+    //eg2dot2.launch(models2,systemInstance);
     
     /** Print WCET overhead */
     
