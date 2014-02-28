@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0
 Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: fr.tpt.aadl.sched.wcetanalysis.result.reducedba,
  fr.tpt.aadl.sched.wcetanalysis.result.reducedba.impl,
  fr.tpt.aadl.sched.wcetanalysis.result.reducedba.util

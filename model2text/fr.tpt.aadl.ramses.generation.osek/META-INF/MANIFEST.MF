@@ -19,7 +19,7 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.utils;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: fr.tpt.aadl.ramses.generation.osek,
  fr.tpt.aadl.ramses.generation.osek.c,
  fr.tpt.aadl.ramses.generation.osek.makefile

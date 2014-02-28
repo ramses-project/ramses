@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.ada;bundle-version="0.5.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.pok.ada,
  fr.tpt.aadl.ramses.generation.pok.c,

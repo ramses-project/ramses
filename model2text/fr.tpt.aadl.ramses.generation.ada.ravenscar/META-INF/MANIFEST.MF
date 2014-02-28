@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.ui,
  fr.tpt.aadl.ramses.generation.ada;bundle-version="0.5.0",
  org.osate.xtext.aadl2.properties
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: fr.tpt.aadl.ramses.control.atl,
  fr.tpt.aadl.ramses.control.atl.hooks.impl,
  fr.tpt.aadl.ramses.generation.utils,

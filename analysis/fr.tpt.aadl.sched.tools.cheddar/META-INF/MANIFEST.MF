@@ -37,4 +37,4 @@ Export-Package: fr.tpt.aadl.sched.cheddar,
  fr.tpt.aadl.sched.cheddar.strategies,
  fr.tpt.aadl.sched.cheddar.strategies.arinc
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

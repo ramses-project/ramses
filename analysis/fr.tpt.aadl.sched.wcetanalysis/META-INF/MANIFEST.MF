@@ -24,7 +24,7 @@ Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  fr.tpt.aadl.sched.wcetanalysis.results;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.control.cli.instantiation;bundle-version="0.5.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: resources/lib/jgrapht-jdk1.6.jar,
  .
