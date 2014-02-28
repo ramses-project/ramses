@@ -34,5 +34,4 @@ public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 	public void setParameters(Map<Enum<?>, Object> parameters) {
 		throw new UnsupportedOperationException();
 	}
-
 }

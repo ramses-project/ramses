@@ -124,7 +124,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
         unparserContent.addOutputNewline("TARGET = " + object.getName() +
               "_OSEK") ;
 
-		unparserContent.addOutputNewline("TOPPERS_OSEK_OIL_SOURCE = ./"+object.getName()+".oil");
+		    unparserContent.addOutputNewline("TOPPERS_OSEK_OIL_SOURCE = ./"+object.getName()+".oil");
 
         process(object.getComponentImplementation()) ;
         unparserContent.addOutputNewline("O_PATH ?= build");
@@ -219,7 +219,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
 	                    File outputDir,
 	                    File[] includeDirs,
 	                    IProgressMonitor monitor)
-	                          throws GenerationException
+	                                                    throws GenerationException
   {
 	  super.process(system, runtimeDir, outputDir, includeDirs, monitor);
 	  generateMakefile((NamedElement) system, outputDir) ;

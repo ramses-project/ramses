@@ -1,8 +1,6 @@
-package fr.tpt.aadl.ramses.control.cli;
+package fr.tpt.aadl.ramses.control.support.reporters;
 
 import java.io.PrintStream ;
-
-import fr.tpt.aadl.ramses.control.support.reporters.AbstractSystemErrReporter ;
 
 /**
  * 

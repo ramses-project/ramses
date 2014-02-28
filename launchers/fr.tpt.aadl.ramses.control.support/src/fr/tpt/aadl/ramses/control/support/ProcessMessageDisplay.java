@@ -7,6 +7,10 @@ import java.io.InputStream ;
 import java.io.InputStreamReader ;
 import java.io.PrintStream ;
 
+import org.apache.log4j.Logger ;
+
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+
 // TODO: should go in a Utils project
 /**
  * This class is meant to display messages of external processes launched
@@ -14,6 +18,8 @@ import java.io.PrintStream ;
  */
 public class ProcessMessageDisplay
 {
+  private static Logger _LOGGER = Logger.getLogger(ProcessMessageDisplay.class) ;
+  
   /**
    * This method displays in console messages printed on 
    * standard output by the external process launched.
@@ -22,14 +28,7 @@ public class ProcessMessageDisplay
   public static void displayOutputMessage(Process p)
   {
     InputStream is = p.getInputStream();
-    try
-    {
-      display(is, System.out) ;
-    }
-    catch(IOException e)
-    {
-      // Do nothing: it should not happen
-    }
+    display(is, false) ;
   }
 
   /**
@@ -40,14 +39,7 @@ public class ProcessMessageDisplay
   public static void displayErrorMessage(Process p)
   {
     InputStream is = p.getErrorStream();
-    try
-    {
-      display(is, System.err) ;
-    }
-    catch(IOException e)
-    {
-      // Do nothing: it should not happen
-    }
+    display(is, true) ;
   }
   
   /**
@@ -61,7 +53,7 @@ public class ProcessMessageDisplay
   {
     PrintStream ps = new PrintStream(log) ;
     InputStream is = p.getInputStream() ;
-    display(is, ps) ;
+    displayInStream(is, ps) ;
     ps.close() ;
   }
   
@@ -76,17 +68,55 @@ public class ProcessMessageDisplay
   {
     PrintStream ps = new PrintStream(log) ;
     InputStream is = p.getErrorStream();
-    display(is, ps) ;
+    displayInStream(is, ps) ;
     ps.close() ;
   }
   
-  private static void display(InputStream is, PrintStream os) throws IOException
+  private static void displayInStream(InputStream is, PrintStream ps)
   {
-    BufferedReader in = new BufferedReader(new InputStreamReader(is));
-    String line = null;
-    while ((line = in.readLine()) != null)
+    try
     {
-      os.println(line);
+      BufferedReader in = new BufferedReader(new InputStreamReader(is));
+      String line = null;
+      while ((line = in.readLine()) != null)
+      {
+        ps.println(line);
+      }
+    }
+    catch (IOException e)
+    {
+      String errMsg =  RamsesException.formatRethrowMessage(
+                                        "writting in the process log file", e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+    }
+  }
+  
+  private static void display(InputStream is, boolean isError)
+  {
+    try
+    {
+      BufferedReader in = new BufferedReader(new InputStreamReader(is));
+      String line = null;
+      while ((line = in.readLine()) != null)
+      {
+        if(isError)
+        {
+          _LOGGER.error(line);
+          ServiceProvider.SYS_ERR_REP.error(line, true);
+        }
+        else
+        {
+          _LOGGER.trace(line) ;
+        }
+      }
+    }
+    catch (IOException e)
+    {
+      String errMsg =  RamsesException.formatRethrowMessage(
+                                        "writting in the process log file", e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
 }

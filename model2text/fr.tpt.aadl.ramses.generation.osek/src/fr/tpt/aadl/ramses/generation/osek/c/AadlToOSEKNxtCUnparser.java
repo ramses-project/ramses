@@ -7,6 +7,7 @@ import java.util.LinkedHashMap ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AccessCategory ;
@@ -32,13 +33,14 @@ import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.ThreadType ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.Aadl2Utils ;
-import org.osate.utils.PropertyNotFound ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Alarm ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Alarm.Action ;
@@ -103,6 +105,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
 	private Map<DataAccess, String> dataAccessMapping = new LinkedHashMap<DataAccess, String>();
 	
+	private static Logger _LOGGER = Logger.getLogger(AadlToOSEKNxtCUnparser.class) ;
+	
 	public AadlToOSEKNxtCUnparser(OIL oil) {
 		this.oil = oil;
 		oil.setVersion(OIL_VERSION);
@@ -133,35 +137,42 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	/**
 	 * Method call on subprogram implementation
 	 */
-	public void process(SubprogramType elt, File generatedFilePath) {
+  public void process(SubprogramType elt,
+                      File generatedFilePath)
+  {
+    //		Os os = oil.getCpu().getOs();
 
-//		Os os = oil.getCpu().getOs();
+    if(_startupHook.getReferences().contains(elt.getName()))
+    {
+      try
+      {
+        Subprogram subprogram = new Subprogram() ;
+        subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name")) ;
+        subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport")) ;
+        _startupHook.addSubrogram(subprogram) ;
 
-		if (_startupHook.getReferences().contains(elt.getName())) {
-			try {
-				Subprogram subprogram = new Subprogram();
-				subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name"));
-				subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport"));
-				_startupHook.addSubrogram(subprogram);
-	
-			} catch (Exception e) {
-	
-			}
-		} else if (_shutdownHook.getReferences().contains(elt.getName())) {
-	
-			try {
-				Subprogram subprogram = new Subprogram();
-				subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name"));
-				subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport"));
-				_shutdownHook.addSubrogram(subprogram);
-			} catch (Exception e) {
-	
-			}
-		}
-		
-		
-	}
+      }
+      catch(Exception e)
+      {
 
+      }
+    }
+    else if(_shutdownHook.getReferences().contains(elt.getName()))
+    {
+
+      try
+      {
+        Subprogram subprogram = new Subprogram() ;
+        subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name")) ;
+        subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport")) ;
+        _shutdownHook.addSubrogram(subprogram) ;
+      }
+      catch(Exception e)
+      {
+
+      }
+    }
+  }
 
 	private void genDevice(SystemImplementation si) {
 
@@ -169,26 +180,38 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
 		for (DeviceSubcomponent device : si.getOwnedDeviceSubcomponents()) {
 			
-			try {
+			try
+			{
 				Classifier classifier = PropertyUtils.getClassifierValue(device, "Initialize_Entrypoint");
 				/*
 				 * If one thread/device contains Initialize_Entrypoint STARTUPHOOK = true
 				 */
 				os.setStartupHook(true);
 				_startupHook.addReference(classifier.getName());
-			} catch (Exception e) {
-
+			}
+			catch (Exception e)
+			{
+			  String errMsg = RamsesException.formatRethrowMessage(
+			                  "cannot fetch initialize entrypoint for " + device, e) ;
+		    _LOGGER.error(errMsg);
+		    ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
 
-			try {
+			try
+			{
 				Classifier classifier = PropertyUtils.getClassifierValue(device, "Finalize_Entrypoint");
 				/*
 				 * If one thread/device contains Finalize_Entrypoint SHUTDOWNHOOK = true
 				 */
 				os.setShutdownHook(true);
 				_shutdownHook.addReference(classifier.getName());
-			} catch (Exception e) {
-
+			}
+			catch (Exception e)
+			{
+			  String errMsg = RamsesException.formatRethrowMessage(
+			                    "cannot fetch finalize entrypoint for " + device, e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
 		}
 	}
@@ -232,14 +255,21 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		  for (Subcomponent s : subcmpts) {
 		    if (s instanceof DataSubcomponent) {
 		      String value;
-		      try {
+		      try
+		      {
 		        value = PropertyUtils.getEnumValue(s, "Concurrency_Control_Protocol");
-		        if (value.equals("Priority_Ceiling")) {
+		        if (value.equals("Priority_Ceiling"))
+		        {
 		          os.setStatus(Status.EXTENDED);
 		          break;
 		        }
-		      } catch (Exception e) {
-		        // DO NOTHING
+		      }
+		      catch (Exception e)
+		      {
+		        String errMsg = RamsesException.formatRethrowMessage(
+		                  "cannot fetch concurrency control protocol for " + s, e) ;
+		        _LOGGER.error(errMsg);
+		        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		      }
 		    }
 		  }
@@ -247,8 +277,6 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		cpu.setAppmode(MAIN_APP_MODE);
 		cpu.setName(ps.getName());
 		genOsConfig(ps);
-		
-
 	}
 
 	/**
@@ -289,17 +317,22 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	private void genCounters(ProcessorSubcomponent processor) {
 
 		Counter counter = oil.getCpu().getCounter();
-		int maxValue;
-		int ticksPerBase;
-		int minCycle;
+		int maxValue = -1;
+		int ticksPerBase = -1;
+		int minCycle = -1 ;
 
-		try {
+		try
+		{
 			maxValue = (int) PropertyUtils.getIntValue(processor, "SystemCounter_MaxAllowedValue");
 			ticksPerBase = (int) PropertyUtils.getIntValue(processor, "SystemCounter_TicksPerBase");
 			minCycle = (int) PropertyUtils.getIntValue(processor, "SystemCounter_MinCycle");
-
-		} catch (Exception exception) {
-			throw new PropertyNotFound(exception);
+		}
+		catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage(
+		                       "cannot fetch counters values for " + processor, e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 
 		counter.setName(processor.getName()+"_"+COUNTER_NAME);
@@ -344,32 +377,47 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		/* Begin task */
 
 		Task task = new Task();
-		int priority;
+		int priority = -1;
 		Schedule schedule;
 		int stackSize;
 
-		try {
+		try
+		{
 			priority = (int) PropertyUtils.getIntValue(thread, "Priority");
-		} catch (Exception exception) {
-			throw new PropertyNotFound(exception);
+		} catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage(
+		            "cannot fetch the priority for " + thread, e) ;
+		   _LOGGER.error(errMsg);
+		   ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 
-		try {
-			boolean scheduler = PropertyUtils.getBooleanValue(ps, "Preemptive_Scheduler");
-			if (scheduler)
-				schedule = Schedule.FULL;
-			else
-				schedule = Schedule.NON;
-		} catch (Exception exception) {
-			schedule = Schedule.FULL;
-		}
+    try
+    {
+      boolean scheduler =
+            PropertyUtils.getBooleanValue(ps, "Preemptive_Scheduler") ;
+      if(scheduler)
+        schedule = Schedule.FULL ;
+      else
+        schedule = Schedule.NON ;
+    }
+    catch(Exception exception)
+    {
+      schedule = Schedule.FULL ;
+    }
 
 		stackSize = THREAD_STACKSIZE;
 
-		try {
+		try
+		{
 			stackSize = (int) PropertyUtils.getIntValue(thread, "Source_Stack_Size");
-		} catch (Exception exception) {
-
+		}
+		catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage(
+		               "cannot fetch source stack size for " + thread, e) ;
+		  _LOGGER.error(errMsg);
+		  ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 
 		task.setName(thread.getName());
@@ -385,15 +433,16 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		ThreadType tt = (ThreadType) ti.getType();
 		for(DataAccess da: this.dataAccessMapping.keySet())
 		{
-		  for(DataAccess tda: tt.getOwnedDataAccesses())
-		  {
-			if(tda.equals(da))
-			{
-			  task.addResource(this.dataAccessMapping.get(tda));
-			  if(da.getDataFeatureClassifier().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE))
-				task.addEvent(this.dataAccessMapping.get(da));
-			}
-		  }
+      for(DataAccess tda : tt.getOwnedDataAccesses())
+      {
+        if(tda.equals(da))
+        {
+          task.addResource(this.dataAccessMapping.get(tda)) ;
+          if(da.getDataFeatureClassifier().getName()
+                .equalsIgnoreCase(EVENTDATA_PORT_TYPE))
+            task.addEvent(this.dataAccessMapping.get(da)) ;
+        }
+      }
 		}
 		for(SubprogramCallSequence scs: ti.getOwnedSubprogramCallSequences())
 		{
@@ -413,7 +462,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		/*
 		 * Generate alarme associated to periodic tasks
 		 */
-		try {
+		try
+		{
 			String dispatchProtocol = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol");
 
 			if (dispatchProtocol.equals("Periodic")) {
@@ -443,8 +493,13 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 				task.setAutostart(true);
 				cpu.addTask(task);
 			}
-		} catch (Exception exception) {
-			throw new PropertyNotFound(exception);
+		}
+		catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage(
+		                 "cannot fetch dispatch values for " + thread, e) ;
+		  _LOGGER.error(errMsg);
+		  ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 	}
 
@@ -453,7 +508,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	 */
 	public void close() {
 
-		System.out.println("======== Hooks generation ============");
+	  String msg = "Hooks generation" ;
+    _LOGGER.trace(msg);
 		
 		_mainCCode.addOutputNewline("void StartupHook(void)");
 		_mainCCode.addOutputNewline("{");
@@ -510,10 +566,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		// Generate OIL
 		oil.generateOil(_oilCode);
 
-		
 		_mainHCode.addOutputNewline("#include \"gtypes.h\"");
 		_mainHCode.addOutputNewline("#endif");
-		
 	}
 
 	private void genCTask(ProcessSubcomponent ps, ThreadSubcomponent thread) {
@@ -545,7 +599,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	                    File runtimePath,
                       File outputDir,
                       IProgressMonitor monitor)
-			throws GenerationException {
+	                                                		throws GenerationException
+  {
 		genCounters(processor);
 	}
 
@@ -555,14 +610,14 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	                    File runtimePath,
                       File outputDir,
                       IProgressMonitor monitor)
-			throws GenerationException {
+			                                                throws GenerationException
+	{
     
     // Generate main.h
     genMainHeader() ;
     
     // Generate main.c
     genMainImpl(process) ;
-    
     
     close();
     
@@ -580,26 +635,21 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
     }
     catch(IOException e)
     {
-      // TODO : error message to handle.
-      e.printStackTrace() ;
+      String msg = "cannot save the generated files" ;
+      throw new GenerationException(msg, e) ;
     }
-    
 	}
 
 	private void genMainHeader()
   {
     String guard = GenerationUtilsC.generateHeaderInclusionGuard("main.h") ;
     _mainHCode.addOutputNewline(guard) ;
-    
   }
 	
 	private void genMainImpl(ProcessSubcomponent process)
 	{
 	  _mainCCode.addOutputNewline("#include \"main.h\"");
-
 	  genCpu(process);
-
-
 	}
 	
 	@Override
@@ -609,77 +659,76 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	
 	  //Builds the data access mapping via the connections described in the
 	  // process implementation.
-	  private void buildDataAccessMapping(ComponentImplementation cptImpl,
-	                                        Map<DataAccess, String> _dataAccessMapping)
-	  {
-	    
-	    EList<Subcomponent> subcmpts = cptImpl.getAllSubcomponents() ;
-	    
-	    List<String> dataSubcomponentNames = new ArrayList<String>() ;
-	    
-	    // Fetches data subcomponent names.
-	    for(Subcomponent s : subcmpts)
-	    {
-	      if(s instanceof DataSubcomponent)
-	      {
-	    	if(s.getSubcomponentType().getName().equalsIgnoreCase(EVENTDATA_PORT_TYPE)
-	  		   || s.getSubcomponentType().getName().equalsIgnoreCase(DATA_PORT_TYPE))
-	    	{
-	    	  dataSubcomponentNames.add(s.getName()) ;
-	    	}
-	      }
-	    }
-	    
-	    // Binds data subcomponent names with DataAcess objects
-	    // of threads.
-	    // See process implementation's connections.
-	    for(Connection connect : cptImpl.getAllConnections())
-	    {
-	      if (connect instanceof AccessConnection &&
-	         ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
-	      {
+  private void buildDataAccessMapping(ComponentImplementation cptImpl,
+                                      Map<DataAccess, String> _dataAccessMapping)
+  {
+    EList<Subcomponent> subcmpts = cptImpl.getAllSubcomponents() ;
 
-	      if(connect.getAllDestination() instanceof DataSubcomponent)
-	      {
-	        DataSubcomponent destination =  (DataSubcomponent) connect.
-	                                                       getAllDestination() ;
-	        
-	          if(Aadl2Utils.contains(destination.getName(), dataSubcomponentNames))
-	          {
-	            ConnectedElement source = (ConnectedElement) connect.getSource() ;
-	            DataAccess da = (DataAccess) source.getConnectionEnd() ;
-	            _dataAccessMapping.put(da, destination.getName()) ; 
-	          }
-	      }
-	        else if(connect.getAllSource() instanceof DataSubcomponent)
-	        {
-	          DataSubcomponent source =  (DataSubcomponent) connect.
-	              getAllSource() ;
-	          if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
-	          {
-	            ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
-	             
-	            DataAccess da = (DataAccess) dest.getConnectionEnd() ;
-	            _dataAccessMapping.put(da, source.getName()) ;
-	          }
-	        }
-	        else if(connect.getAllDestination() instanceof DataAccess
-	            && connect.getAllSource() instanceof DataAccess)
-	        {
-	          if(!(connect.getAllDestination().eContainer() instanceof Thread)
-	            && !(connect.getAllSource().eContainer() instanceof Thread))
-	            continue;
-	          DataAccess destination = (DataAccess) connect.getAllDestination();
-	          DataAccess source = (DataAccess) connect.getAllSource();
-	          if(_dataAccessMapping.containsKey(destination) &&
-	              !_dataAccessMapping.containsKey(source))
-	            _dataAccessMapping.put(source, _dataAccessMapping.get(destination)) ;
-	          if(_dataAccessMapping.containsKey(source) &&
-	              !_dataAccessMapping.containsKey(destination))
-	            _dataAccessMapping.put(destination, _dataAccessMapping.get(source)) ;
-	          
-	        }
-	      }
-	    }
-	  }
+    List<String> dataSubcomponentNames = new ArrayList<String>() ;
+
+    // Fetches data subcomponent names.
+    for(Subcomponent s : subcmpts)
+    {
+      if(s instanceof DataSubcomponent)
+      {
+        if(s.getSubcomponentType().getName()
+              .equalsIgnoreCase(EVENTDATA_PORT_TYPE) ||
+              s.getSubcomponentType().getName()
+                    .equalsIgnoreCase(DATA_PORT_TYPE))
+        {
+          dataSubcomponentNames.add(s.getName()) ;
+        }
+      }
+    }
+
+    // Binds data subcomponent names with DataAcess objects
+    // of threads.
+    // See process implementation's connections.
+    for(Connection connect : cptImpl.getAllConnections())
+    {
+      if(connect instanceof AccessConnection &&
+            ((AccessConnection) connect).getAccessCategory() == AccessCategory.DATA)
+      {
+
+        if(connect.getAllDestination() instanceof DataSubcomponent)
+        {
+          DataSubcomponent destination =
+                (DataSubcomponent) connect.getAllDestination() ;
+
+          if(Aadl2Utils.contains(destination.getName(), dataSubcomponentNames))
+          {
+            ConnectedElement source = (ConnectedElement) connect.getSource() ;
+            DataAccess da = (DataAccess) source.getConnectionEnd() ;
+            _dataAccessMapping.put(da, destination.getName()) ;
+          }
+        }
+        else if(connect.getAllSource() instanceof DataSubcomponent)
+        {
+          DataSubcomponent source = (DataSubcomponent) connect.getAllSource() ;
+          if(Aadl2Utils.contains(source.getName(), dataSubcomponentNames))
+          {
+            ConnectedElement dest = (ConnectedElement) connect.getDestination() ;
+
+            DataAccess da = (DataAccess) dest.getConnectionEnd() ;
+            _dataAccessMapping.put(da, source.getName()) ;
+          }
+        }
+        else if(connect.getAllDestination() instanceof DataAccess &&
+              connect.getAllSource() instanceof DataAccess)
+        {
+          if(!(connect.getAllDestination().eContainer() instanceof Thread) &&
+                !(connect.getAllSource().eContainer() instanceof Thread))
+            continue ;
+          DataAccess destination = (DataAccess) connect.getAllDestination() ;
+          DataAccess source = (DataAccess) connect.getAllSource() ;
+          if(_dataAccessMapping.containsKey(destination) &&
+                !_dataAccessMapping.containsKey(source))
+            _dataAccessMapping.put(source, _dataAccessMapping.get(destination)) ;
+          if(_dataAccessMapping.containsKey(source) &&
+                !_dataAccessMapping.containsKey(destination))
+            _dataAccessMapping.put(destination, _dataAccessMapping.get(source)) ;
+        }
+      }
+    }
+  }
 }

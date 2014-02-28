@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.control.cli ;
 import org.apache.log4j.Logger ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
+import fr.tpt.aadl.ramses.control.support.reporters.SysErrReporter4Cli ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 

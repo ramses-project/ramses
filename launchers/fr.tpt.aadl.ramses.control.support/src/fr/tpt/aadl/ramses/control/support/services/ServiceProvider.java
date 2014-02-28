@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.support.services ;
 
+import fr.tpt.aadl.ramses.control.support.reporters.SysErrReporter4Cli ;
 import fr.tpt.aadl.ramses.control.support.reporters.SystemErrReporter ;
 
 public class ServiceProvider
@@ -37,5 +38,8 @@ public class ServiceProvider
     return _sr ;
   }
   
-  public static SystemErrReporter SYS_ERR_REP ;
+  // Set a default system error reporter for the Junit test which could use
+  // util classes that may call the system error reporter.
+  public static SystemErrReporter SYS_ERR_REP = new SysErrReporter4Cli(System.out,
+                                                                       System.err);
 }

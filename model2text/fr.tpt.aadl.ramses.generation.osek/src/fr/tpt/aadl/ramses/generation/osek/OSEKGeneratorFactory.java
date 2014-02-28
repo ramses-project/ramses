@@ -25,8 +25,6 @@ import java.io.File ;
 import java.io.FileReader ;
 import java.io.IOException ;
 
-import org.eclipse.m2m.atl.core.ATLCoreException;
-
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
@@ -71,13 +69,8 @@ public class OSEKGeneratorFactory implements GeneratorFactory {
 
 	    // Generate oil and C
 	    AadlModelValidator targetVal=null;
-		try {
-			targetVal = new AadlOSEKValidation(modelInstantiator,
+		  targetVal = new AadlOSEKValidation(modelInstantiator,
 					 						   predefinedAadlModels);
-		} catch (ATLCoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	    AadlTargetSpecificGenerator result = 
 	                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
 	                		  						  modelInstantiator,

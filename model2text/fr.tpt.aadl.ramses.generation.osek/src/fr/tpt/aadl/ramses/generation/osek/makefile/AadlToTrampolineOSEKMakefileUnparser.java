@@ -25,12 +25,14 @@ import java.io.File ;
 import java.io.IOException ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 
 import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
@@ -41,6 +43,8 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
 	private OIL oil;
 	
 	public final static String TRAMPOLINE_ENV_VAR_NAME = "TRAMPOLINEPATH" ;
+	
+	private static Logger _LOGGER = Logger.getLogger(AadlToTrampolineOSEKMakefileUnparser.class) ;
 
 	public AadlToTrampolineOSEKMakefileUnparser(OIL oil) 
 	{
@@ -53,19 +57,21 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
                       File runtimeDir,
                       File outputDir,
                       File[] includeDirs,
-                      IProgressMonitor monitor) throws GenerationException {
-    
-	super.process(process, runtimeDir, outputDir, includeDirs, monitor);
-	  String OS = (String) System.getProperties().get("os.name");	
-	if(OS.toLowerCase().contains("windows"))
-	{
-	  System.out.println("Deployment to osek supported from UNIX systems only");
-	  return;
-	}
-    Runtime runtime = Runtime.getRuntime();
-    
-    System.out.println("* Prepare Make ...");
-    
+                      IProgressMonitor monitor) throws GenerationException
+  {
+
+    super.process(process, runtimeDir, outputDir, includeDirs, monitor) ;
+    String OS = (String) System.getProperties().get("os.name") ;
+    if(OS.toLowerCase().contains("windows"))
+    {
+      String errMsg = "Deployment to osek supported from UNIX systems only" ;
+      _LOGGER.fatal(errMsg) ;
+      throw new GenerationException(errMsg) ;
+    }
+    Runtime runtime = Runtime.getRuntime() ;
+
+    monitor.subTask("Generating the Trampoline make files") ;
+
     // XXX Kept in case of refactoring.
     File inputDir = null ;
     try
@@ -74,75 +80,115 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
     }
     catch(IOException e1)
     {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+      String errMsg = "cannot create temporary files" ;
+      throw new GenerationException(errMsg, e1) ;
     }
-    
-    File preparemake = new File(inputDir, "/preparemake.sh");
-    
-    FileUtils.copyFile(preparemake, outputDir);
-    preparemake.setExecutable(true);
 
-    File refineOil = new File(inputDir, "/refine_oil.sh");
-    FileUtils.copyFile(refineOil, outputDir);
-    refineOil.setExecutable(true);
-    
-    File oilTrashFile = new File(outputDir, process.getName());
-    try {
+    File preparemake = new File(inputDir, "/preparemake.sh") ;
 
+    FileUtils.copyFile(preparemake, outputDir) ;
+    preparemake.setExecutable(true) ;
+
+    File refineOil = new File(inputDir, "/refine_oil.sh") ;
+    FileUtils.copyFile(refineOil, outputDir) ;
+    refineOil.setExecutable(true) ;
+
+    File oilTrashFile = new File(outputDir, process.getName()) ;
+    try
+    {
       // TrampolineBasePath NOT found
-      if (oil.getCpu().getOs().getTrampolineBasePath() == null) {
-
-        Process makeProcess = runtime.exec(new String[] { refineOil.getCanonicalPath(), oilTrashFile.getCanonicalPath() + ".oil"});
-        makeProcess.waitFor();
-        if (makeProcess.exitValue() != 0) {
-          System.err.println("Error on goil generation: refine_oil;");
-          ProcessMessageDisplay.displayErrorMessage(makeProcess);
+      if(oil.getCpu().getOs().getTrampolineBasePath() == null)
+      {
+        Process makeProcess =
+              runtime.exec(new String[]
+              {refineOil.getCanonicalPath(),
+               oilTrashFile.getCanonicalPath() + ".oil"}) ;
+        makeProcess.waitFor() ;
+        if(makeProcess.exitValue() != 0)
+        {
+          String errMsg = "while goil generation: refine_oil" ;
+          _LOGGER.fatal(errMsg) ;
+          ProcessMessageDisplay.displayErrorMessage(makeProcess) ;
         }
-        
-        System.err.println("Unable to generate Makefile.");
-        System.err.println("The environment variable TRAMPOLINEPATH is not defined.");
-        System.err.println("To fix this probleme you can : ");
-        System.err.println("\t 1) add this variable in your bashrc");
-        System.err.println("\t 2) - execute 'source env' on lejos directory");
-        System.err.println("\t    - run eclipse on the same shell");
-        System.err.println("You can also generate manually the Makefile :");
-        System.err.println("\t 1) - execute source env on lejos directory");
-        System.err.println("\t 2) - execute ./refine_oil.sh " + oilTrashFile.getCanonicalPath() + ".oil");
-        System.err.println("\t 3) - execute ./preparemake.sh " + oilTrashFile.getCanonicalPath() + ".oil");
 
-        return;
+        StringBuilder sb = new StringBuilder() ;
+
+        sb.append("Unable to generate Makefile.") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("The environment variable TRAMPOLINEPATH is not defined.") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("To fix this probleme you can : ") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("\t 1) add this variable in your bashrc") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("\t 2) - execute 'source env' on lejos directory") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("\t    - run eclipse on the same shell") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("You can also generate manually the Makefile :") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("\t 1) - execute source env on lejos directory") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("\t 2) - execute ./refine_oil.sh ") ;
+        sb.append(oilTrashFile.getCanonicalPath()) ;
+        sb.append(".oil") ;
+        sb.append(Names.NEW_LINE) ;
+
+        sb.append("\t 3) - execute ./preparemake.sh ") ;
+        sb.append(oilTrashFile.getCanonicalPath()) ;
+        sb.append(".oil") ;
+        sb.append(Names.NEW_LINE) ;
+
+        String errMsg = sb.toString() ;
+        _LOGGER.fatal(errMsg) ;
+        throw new GenerationException(errMsg) ;
       }
+      else
       // Generate Makefile
-      else {
-        System.out.println("Premaring Make");
-        Process makeProcess = runtime.exec(new String[] { preparemake.getCanonicalPath(), oilTrashFile.getCanonicalPath() + ".oil"});
-        makeProcess.waitFor();
+      {
+        _LOGGER.trace("Preparing Trampoline Make") ;
+        Process makeProcess =
+              runtime.exec(new String[]
+              {preparemake.getCanonicalPath(),
+               oilTrashFile.getCanonicalPath() + ".oil"}) ;
+        makeProcess.waitFor() ;
 
-        if (makeProcess.exitValue() != 0) {
-          System.err.println("Error on goil generation: PrepareMake");
-          ProcessMessageDisplay.displayErrorMessage(makeProcess);
+        if(makeProcess.exitValue() != 0)
+        {
+          String errMsg = "while goil generation: PrepareMake" ;
+          _LOGGER.fatal(errMsg) ;
+          ProcessMessageDisplay.displayErrorMessage(makeProcess) ;
         }
         else
         {
-          System.out.println("Compiling Code");
-          makeProcess = runtime.exec("make -o Makefile", null, outputDir);
-          ProcessMessageDisplay.displayOutputMessage(makeProcess);
-          makeProcess.waitFor();
-          if (makeProcess.exitValue() != 0) {
-            ProcessMessageDisplay.displayErrorMessage(makeProcess);
+          monitor.subTask("Compiling Trampoline Code") ;
+          makeProcess = runtime.exec("make -o Makefile", null, outputDir) ;
+          ProcessMessageDisplay.displayOutputMessage(makeProcess) ;
+          makeProcess.waitFor() ;
+          if(makeProcess.exitValue() != 0)
+          {
+            ProcessMessageDisplay.displayErrorMessage(makeProcess) ;
           }
         }
 
       }
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
     }
-	}
+    catch(Exception e)
+    {
+      String errMsg = "while generating Trampoline make file or compiling code" ;
+      throw new GenerationException(errMsg, e) ;
+    }
+  }
 	
-	// XXX: Not implemented, just used for conformance with the interface
+	// XXX: Not implemented, just used to be compliant with the interface
 	// definition
 
 	@Override

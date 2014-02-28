@@ -5,6 +5,7 @@ import java.io.IOException ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.CallSpecification ;
@@ -22,13 +23,14 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.modelsupport.UnparseText ;
-import org.osate.utils.PropertyNotFound ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.osek.Resources ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Alarm ;
@@ -124,6 +126,8 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 * Application resources for compilation 
 	 */
 	private Resources resources;
+	
+	 private static Logger _LOGGER = Logger.getLogger(AadlToOSEKCUnparser.class) ;
 
 	public AadlToOSEKCUnparser(OIL oil) {
 		this.oil = oil;
@@ -164,30 +168,36 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 //		Os os = oil.getCpu().getOs();
 
 		if (_startupHook.getReferences().contains(elt.getName())) {
-			try {
+			try
+			{
 				Subprogram subprogram = new Subprogram();
 				subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name"));
 				subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport"));
 				_startupHook.addSubrogram(subprogram);
 	
-			} catch (Exception e) {
-	
+			} catch (Exception e)
+			{
+			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch source name or nxt port", e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
 		} else if (_shutdownHook.getReferences().contains(elt.getName())) {
 	
-			try {
+			try
+			{
 				Subprogram subprogram = new Subprogram();
 				subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name"));
 				subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport"));
 				_shutdownHook.addSubrogram(subprogram);
-			} catch (Exception e) {
-	
+			}
+			catch (Exception e)
+			{
+			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch source name or nxt port for \'"+ elt.getName() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
 		}
-		
-		
 	}
-
 
 	private void genDevice(SystemImplementation si) {
 
@@ -202,8 +212,11 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 				 */
 				os.setStartupHook(true);
 				_startupHook.addReference(classifier.getName());
-			} catch (Exception e) {
-
+			} catch (Exception e)
+			{
+			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch initialize entry point for \'" + device + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
 
 			try {
@@ -213,8 +226,12 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 				 */
 				os.setShutdownHook(true);
 				_shutdownHook.addReference(classifier.getName());
-			} catch (Exception e) {
-
+			}
+			catch (Exception e)
+			{
+			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch finalize entry point for \'" + device.getName() + '\'', e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
 		}
 	}
@@ -279,8 +296,11 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		          os.setStatus(Status.EXTENDED);
 		          break;
 		        }
-		      } catch (Exception e) {
-		        // DO NOTHING
+		      } catch (Exception e)
+		      {
+		        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch concurrencey control protocol for \'" + s.getName() + '\'', e) ;
+		        _LOGGER.error(errMsg);
+		        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		      }
 		    }
 		  }
@@ -355,10 +375,10 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	private void genCounters(SystemImplementation si) {
 
 		Counter counter = oil.getCpu().getCounter();
-		String source;
-		int maxValue;
-		int ticksPerBase;
-		int minCycle;
+		String source = "";
+		int maxValue = -1;
+		int ticksPerBase= -1;
+		int minCycle= -1;
 
 		try {
 			source = PropertyUtils.getStringValue(si, "SystemCounter_Source");
@@ -366,8 +386,11 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 			ticksPerBase = (int) PropertyUtils.getIntValue(si, "SystemCounter_TicksPerBase");
 			minCycle = (int) PropertyUtils.getIntValue(si, "SystemCounter_MinCycle");
 
-		} catch (Exception exception) {
-			throw new PropertyNotFound(exception);
+		} catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch system counter values for \'" + si.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 
 		counter.setName(COUNTER_NAME);
@@ -414,14 +437,17 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		/* Begin task */
 
 		Task task = new Task();
-		int priority;
+		int priority = -1;
 		Schedule schedule;
 		int stackSize;
 
 		try {
 			priority = (int) PropertyUtils.getIntValue(thread, "Priority");
-		} catch (Exception exception) {
-			throw new PropertyNotFound(exception);
+		} catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch priority for \'" + thread.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 
 		try {
@@ -438,8 +464,11 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 
 		try {
 			stackSize = (int) PropertyUtils.getIntValue(thread, "Source_Stack_Size");
-		} catch (Exception exception) {
-
+		} catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch source stack size for \'" + thread.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 
 		task.setName(thread.getName());
@@ -470,7 +499,8 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		/*
 		 * Generate alarme associated to periodic tasks
 		 */
-		try {
+		try
+		{
 			String dispatchProtocol = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol");
 
 			if (dispatchProtocol.equals("Periodic")) {
@@ -500,8 +530,11 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 				task.setAutostart(true);
 				cpu.addTask(task);
 			}
-		} catch (Exception exception) {
-			throw new PropertyNotFound(exception);
+		} catch (Exception e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch dispatch values for \'" + thread.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 	}
 
@@ -510,8 +543,9 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 */
 	public void close() {
 
-		System.out.println("======== Hooks generation ============");
-		
+	  String msg = "hooks generation" ;
+    _LOGGER.trace(msg);
+	  
 		_mainCCode.addOutputNewline("void StartupHook(void)");
 		_mainCCode.addOutputNewline("{");
 		_mainCCode.incrementIndent();
@@ -546,11 +580,9 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		
 		// Generate OIL
 		oil.generateOil(_oilCode);
-
 		
 		_mainHCode.addOutputNewline("#include \"gtypes.h\"");
 		_mainHCode.addOutputNewline("#endif");
-		
 	}
 
 	/**
@@ -707,17 +739,15 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
     }
     catch(IOException e)
     {
-      // TODO : error message to handle.
-      e.printStackTrace() ;
+      String msg = "cannot save the generated files" ;
+      throw new GenerationException(msg, e) ; 
     }
-    
 	}
 
 	private void genMainHeader()
   {
     String guard = GenerationUtilsC.generateHeaderInclusionGuard("main.h") ;
     _mainHCode.addOutputNewline(guard) ;
-    
   }
 	
 	private void genMainImpl(ProcessSubcomponent process)
