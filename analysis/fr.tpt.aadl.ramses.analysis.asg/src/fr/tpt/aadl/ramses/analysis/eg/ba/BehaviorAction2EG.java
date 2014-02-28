@@ -440,7 +440,7 @@ public class BehaviorAction2EG
       }
     }
     
-    return threadDA;
+    return threadDA == null ? da : threadDA;
   }
   
   private static ComponentInstance getDataAccessElement (DataAccess threadDA)
