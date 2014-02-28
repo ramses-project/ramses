@@ -5,6 +5,7 @@ import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentPrototypeActual ;
 import org.osate.aadl2.ComponentPrototypeBinding ;
@@ -17,6 +18,7 @@ import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.PrototypeBinding ;
 import org.osate.aadl2.SubcomponentType ;
 import org.osate.aadl2.SubprogramCall ;
+import org.osate.aadl2.SubprogramCallSequence ;
 import org.osate.aadl2.SubprogramClassifier ;
 import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramType ;
@@ -190,7 +192,10 @@ public class SubprogramCallContext
     final NamedElement e = (SubprogramClassifier) call.getCalledSubprogram();
     SubprogramCallContext ctxt = new SubprogramCallContext (e);
     
-    //TODO: create context for subprogram call (in call sequence)
+    /*SubprogramCallSequence seq = (SubprogramCallSequence) call.eContainer();
+    BehavioredImplementation impl = (BehavioredImplementation) seq.eContainer();*/
+    
+    //TODO: fill context parameters
     
     return ctxt;
   }

@@ -115,7 +115,10 @@ public class EGLauncher {
 	        CalledSubprogram called = call.getCalledSubprogram();
 	        if (called instanceof SubprogramClassifier)
 	        {
-	          return entrypoint ((SubprogramClassifier) called);
+	          EGContext.getInstance().pushCurrentSubprogram(call);
+	          EGNode e = entrypoint ((SubprogramClassifier) called);
+	          EGContext.getInstance().popCurrentSubprogram();
+	          return e;
 	        }
 	        else // subprogram prototype ?
 	        {
