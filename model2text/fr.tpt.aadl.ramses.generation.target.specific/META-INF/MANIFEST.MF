@@ -17,7 +17,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  fr.tpt.aadl.ramses.generation.utils;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.analysis.result;bundle-version="0.0.1",
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
- fr.tpt.aadl.sched.wcetanalysis;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.constraints.reporter.metamodel;bundle-version="1.0.0",
  org.eclipse.m2m.atl.core
