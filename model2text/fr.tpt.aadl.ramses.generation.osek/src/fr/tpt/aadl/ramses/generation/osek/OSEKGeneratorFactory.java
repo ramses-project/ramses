@@ -31,7 +31,6 @@ import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser ;
-import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
 import fr.tpt.aadl.ramses.generation.osek.c.AadlOSEKCodeGenerator ;
 import fr.tpt.aadl.ramses.generation.osek.c.AadlToOSEKNxtCUnparser ;
 import fr.tpt.aadl.ramses.generation.osek.makefile.AadlToOSEKnxtMakefileUnparser ;
@@ -47,13 +46,12 @@ public class OSEKGeneratorFactory implements GeneratorFactory {
 	public Generator createGenerator(AadlModelInstantiatior modelInstantiator,
 	                                 PredefinedAadlModelManager predefinedAadlModels)
 	{
-	   OIL oil = new OIL();
 	    
 	    // Instantiate generator ADDL-- to C
 	    AadlToCUnparser genericCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
 
 	    // Instantiate generator OIL
-	    AadlToOSEKNxtCUnparser osekCUnparser = new AadlToOSEKNxtCUnparser(oil);
+	    AadlToOSEKNxtCUnparser osekCUnparser = new AadlToOSEKNxtCUnparser();
 
 	    // Call "goil" trampoline program
 	    AadlToOSEKnxtMakefileUnparser osekMakefileUnparser = new AadlToOSEKnxtMakefileUnparser();

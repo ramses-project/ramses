@@ -104,13 +104,9 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
 
 	private Map<DataAccess, String> dataAccessMapping = new LinkedHashMap<DataAccess, String>();
-	
+
 	private static Logger _LOGGER = Logger.getLogger(AadlToOSEKNxtCUnparser.class) ;
 	
-	public AadlToOSEKNxtCUnparser(OIL oil) {
-		this.oil = oil;
-		oil.setVersion(OIL_VERSION);
-	}
 
 	/**
 	 * Methode appelée sur chaque noeud implémentant un système.
@@ -122,7 +118,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	                                IProgressMonitor monitor)
 	                                      throws GenerationException
 	{
-	  
+	  oil = new OIL();
+	  oil.setVersion(OIL_VERSION);
 	  _generatedCodeDirectory = outputDir;
     _oilCode = new UnparseText();
     _mainCCode = new UnparseText();
