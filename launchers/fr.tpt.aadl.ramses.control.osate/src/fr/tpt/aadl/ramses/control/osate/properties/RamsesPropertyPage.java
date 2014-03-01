@@ -264,7 +264,7 @@ public class RamsesPropertyPage extends PropertyPage {
     // TODO :  Should be deduced from the plugin.xml of generators;
     // see ramses (OSGI)
     Button arinc = new Button(composite, SWT.RADIO);
-    arinc.setText("ARINC653 - POK");
+    arinc.setText("ARINC653 - POK (http://pok.tuxfamily.org/)");
     arinc.setData(PokGeneratorFactory.POK_GENERATOR_NAME);
 
     Button ojr = new Button(composite, SWT.RADIO);
@@ -272,7 +272,7 @@ public class RamsesPropertyPage extends PropertyPage {
     ojr.setData(_OJR_PLATFORM);
 
     Button osek = new Button(composite, SWT.RADIO);
-    osek.setText("OSEX/NXT - TRAMPOLINE");
+    osek.setText("OSEX/NXT - nxtOSEK (http://lejos-osek.sourceforge.net/)");
     osek.setData(OSEKGeneratorFactory.OSEK_GENERATOR_NAME);
     
     if(config.getTargetId() != null)
