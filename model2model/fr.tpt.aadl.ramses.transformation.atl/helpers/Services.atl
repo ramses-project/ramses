@@ -23,6 +23,70 @@
 
 library Services;
 
+--- Returns the same as thisModule.resolveTemp(var : OclAny, rule_name : String, target_pattern_name : String),
+--- except that it returns OclUndefined if no trace exists instead of throwing an error.
+--helper def : resolveLazyIfExists(var : Sequence(OclAny), rule_name : String, target_pattern_name : String) : OclAny =
+--    let tr : OclAny = thisModule.traces.getLinksByRule(rule_name, false) in
+--    if tr.oclIsUndefined() then
+--    	OclUndefined
+--    else
+--    	let sel : OclAny = tr.getUniqueSourceElements(var) in
+--        if sel.oclIsUndefined() then
+--        	OclUndefined
+--        else
+--        	let te : OclAny = sel.getSourceElements().get(0).getSourceOf().getTargetElement(target_pattern_name) in
+--            if te.oclIsUndefined() then
+--            	OclUndefined
+--            else
+--            	te.getObject()
+--            endif
+--        endif
+--       endif;
+
+helper def : resolveLazyIfExists(var :OclAny, rule_name : String, target_pattern_name : String) : OclAny =
+    let tr : OclAny = thisModule.traces.getLinksByRule(rule_name, false) in
+    if tr.oclIsUndefined() then
+    	OclUndefined
+    else
+    	let sel : OclAny = tr.getUniqueSourceElement(var) in
+        if sel.oclIsUndefined() then
+        	OclUndefined
+        else
+        	let te : OclAny = sel.getSourceOf().getTargetElement(target_pattern_name) in
+            if te.oclIsUndefined() then
+            	OclUndefined
+            else
+            	te.getObject()
+            endif
+        endif
+       endif;
+        
+helper def : resolveMatchedTupleIfExists(var : Sequence(OclAny), target_pattern_name : String) : OclAny =
+   	let sel : OclAny = thisModule.traces.getDefaultSourceElements(var) in
+       if sel.oclIsUndefined() then
+       	OclUndefined
+       else
+       	let te : OclAny = sel.getSourceElements().get(0).getSourceOf().getTargetElement(target_pattern_name) in
+           if te.oclIsUndefined() then
+           	OclUndefined
+           else
+           	te.getObject()
+           endif
+      endif;
+
+helper def : resolveMatchedSingleIfExists(var : OclAny, target_pattern_name : String) : OclAny =
+   	let sel : OclAny = thisModule.traces.getDefaultSourceElement(var) in
+       if sel.oclIsUndefined() then
+       	OclUndefined
+       else
+       	let te : OclAny = sel.getSourceOf().getTargetElement(target_pattern_name) in
+           if te.oclIsUndefined() then
+           	OclUndefined
+           else
+           	te.getObject()
+           endif
+      endif;
+       
 helper def: dataAccessSuffix(): String ='_PortIdAccess_';
 helper def: callPrefix(): String ='call';
 

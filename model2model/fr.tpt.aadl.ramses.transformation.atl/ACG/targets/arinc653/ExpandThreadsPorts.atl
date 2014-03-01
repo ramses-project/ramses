@@ -44,14 +44,14 @@ helper def : getRuntimeSizeType: AADLBA!DataType =
 ;
 
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
-	callSequences->collect(e | thisModule.resolveTemp(c, 'returnData'))
+	callSequences->collect(e | thisModule.resolveMatchedSingleIfExists(c, 'returnData'))
 	->union
 	(c.featureInstance->select(e|e.feature.oclIsKindOf(AADLI!Port) and not e.isPeriodicDelayedPort())
 		->collect(fi|
 			Sequence
 			{
 				fi.retreiveMessageAddress(),
-				thisModule.resolveTemp(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')
+				thisModule.resolveLazyIfExists(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')
 			}
 		)
 	)
@@ -67,7 +67,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 			Sequence
 			{
 				fi.retreiveMessageAddress(),
-				thisModule.resolveTemp(fi, 'CreateValidityDataSubcomponent', 'dataSubcomponent')
+				thisModule.resolveLazyIfExists(fi, 'CreateValidityDataSubcomponent', 'dataSubcomponent')
 			}
 		)
 	)
@@ -79,7 +79,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 		and
 		not e.isPeriodicDelayedPort())
 		->collect(fi|
-			thisModule.resolveTemp(fi, 'CreateTimeOutSubcomponentFromPort', 'dataSubcomponent')
+			thisModule.resolveLazyIfExists(fi, 'CreateTimeOutSubcomponentFromPort', 'dataSubcomponent')
 		)
 	)
 	->union
@@ -91,7 +91,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 				and
 				callSequence.isComputeEntryPointOf(c)
 			)->collect(
-				paramCnx | thisModule.resolveTemp(Sequence{c, callSequence, paramCnx}, 'paramCnxVariable')
+				paramCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, paramCnx}, 'paramCnxVariable')
 			)
 		)
 	)

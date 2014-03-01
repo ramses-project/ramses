@@ -213,7 +213,7 @@ unique lazy rule collectComputeEntryPoint_rule
 		),
 		cpe: AADLBA!ContainmentPathElement
 		(
-			namedElement <- thisModule.resolveTemp(c, 'callSequenceImg')
+			namedElement <- thisModule.resolveMatchedSingleIfExists(c, 'callSequenceImg')
 		)
 	do
 	{
@@ -259,7 +259,7 @@ rule m_create_Thread_BA
 													impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
 													->collect
 													(
-														ba | thisModule.resolveTemp(Sequence{c,ba},'currentState')
+														ba | thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'currentState')
 													)
 												)
 												->union
@@ -273,7 +273,7 @@ rule m_create_Thread_BA
 												)
 												->flatten()->excluding(OclUndefined),
 			ownedSubprogramCallSequence     <- Sequence{
- 															thisModule.resolveTemp(c, 'callSequenceImg'),
+ 															thisModule.resolveMatchedSingleIfExists(c, 'callSequenceImg'),
  															thisModule.collectInitCallSequence(c)
 														}
  												->excluding(OclUndefined),
@@ -288,7 +288,7 @@ rule m_create_Thread_BA
 													->collect(e|
 														impl.ownedSubprogramCallSequence
 														->collect(callSequence|
-															thisModule.resolveTemp(Sequence{c.subcomponent->any(e|e.subcomponent = e.source.connectionEnd), callSequence, e}, 'parameterConnection')
+															thisModule.resolveMatchedTupleIfExists(Sequence{c.subcomponent->any(e|e.subcomponent = e.source.connectionEnd), callSequence, e}, 'parameterConnection')
 														)
 													)
 												)
@@ -300,7 +300,7 @@ rule m_create_Thread_BA
 													->collect(e|
 														impl.ownedSubprogramCallSequence
 														->collect(callSequence|
-															thisModule.resolveTemp(Sequence{c.componentInstance->any(f|f.subcomponent = e.destination.connectionEnd), callSequence, e}, 'parameterConnection')
+															thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent = e.destination.connectionEnd), callSequence, e}, 'parameterConnection')
 														)
 													)
 												)
@@ -309,10 +309,10 @@ rule m_create_Thread_BA
 												->collect(fi| impl.ownedSubprogramCallSequence
 													->collect(callSequence|
 														if(fi.isInputFeature()) then
-															thisModule.resolveTemp(Sequence{fi,callSequence}, 'f_connection')
+															thisModule.resolveMatchedTupleIfExists(Sequence{fi,callSequence}, 'f_connection')
 														else
 															fi.srcConnectionInstance->collect( cnxInst |
-																thisModule.resolveTemp(Sequence{fi,callSequence,cnxInst.connectionReference->first().connection}, 'f_connection')
+																thisModule.resolveMatchedTupleIfExists(Sequence{fi,callSequence,cnxInst.connectionReference->first().connection}, 'f_connection')
 															)
 														endif
 													)
@@ -324,10 +324,10 @@ rule m_create_Thread_BA
 														impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
 														->collect(ba |
 															if(fi.isInputFeature()) then
-																thisModule.resolveTemp(Sequence{fi,ba}, 'f_connection')
+																thisModule.resolveMatchedTupleIfExists(Sequence{fi,ba}, 'f_connection')
 															else
 																fi.srcConnectionInstance->collect( cnxInst |
-																	thisModule.resolveTemp(Sequence{fi,ba,cnxInst.connectionReference->first().connection}, 'f_connection')
+																	thisModule.resolveMatchedTupleIfExists(Sequence{fi,ba,cnxInst.connectionReference->first().connection}, 'f_connection')
 																)
 															endif
 														)
@@ -344,7 +344,7 @@ rule m_create_Thread_BA
 															callSequence.isComputeEntryPointOf(c)
 														)
 														->collect(
-															accessCnx | thisModule.resolveTemp(Sequence{c, callSequence, accessCnx}, 'accessConnection')
+															accessCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, accessCnx}, 'accessConnection')
 														)
 													)
 												)->flatten()
@@ -361,13 +361,13 @@ rule m_create_Thread_BA
 													impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
 													->collect
 													(
-														ba | thisModule.resolveTemp(Sequence{c,ba},'accessConnection_CURRENT_STATE')
+														ba | thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'accessConnection_CURRENT_STATE')
 													)
 												)
 												->union
 												(
 													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
-													->collect(e|thisModule.resolveTemp(e, 'createFreshnessIndicator','freshnessIndicator_Connection'))	
+													->collect(e|thisModule.resolveLazyIfExists(e, 'createFreshnessIndicator','freshnessIndicator_Connection'))	
 												)
 												->union(
 													impl.ownedSubprogramCallSequence->collect(callSequence |
@@ -402,7 +402,7 @@ rule m_create_Thread_BA
 														c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
 														->collect(
 	 														f| f.srcConnectionInstance->collect(cnxInst |
-																thisModule.resolveTemp(Sequence{f,cnxInst.connectionReference->first().connection}, 'f')
+																thisModule.resolveMatchedTupleIfExists(Sequence{f,cnxInst.connectionReference->first().connection}, 'f')
 															)
 														)
 													)->union(
@@ -438,7 +438,7 @@ unique lazy rule createAccessConnectionFromBA
 		),
 		accessCnx_Source: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveTemp(fi, 'f_entrypoint')
+			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
 		),
 		accessCnx_Destination: AADLBA!ConnectedElement
 		(
@@ -446,7 +446,7 @@ unique lazy rule createAccessConnectionFromBA
 		)
 	do
 	{
-		accessCnx_Source.setContext(thisModule.resolveTemp(fi.eContainer(), 'callEntryPoint'));
+		accessCnx_Source.setContext(thisModule.resolveMatchedSingleIfExists(fi.eContainer(), 'callEntryPoint'));
 		accessCnx;
 	}
 }
@@ -527,7 +527,7 @@ rule m_Thread_Instance {
 }
 
 helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
-	Sequence{thisModule.resolveTemp(self, 'globalVariable')}
+	Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')}
 ;
 
 helper context AADLI!ComponentInstance def: collectGlobalVariableImg()  : Sequence(AADLBA!DataSubcomponent) =
@@ -613,7 +613,7 @@ rule m_Process_Instance {
 														->collect(fi |
 															fi.srcConnectionInstance
 															->collect(cnxInst |
-																thisModule.resolveTemp(Sequence{fi,cnxInst.connectionReference->first().connection}, 'accessConnection')
+																thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'accessConnection')
 															)->asSet()	
 														)
 													)
@@ -622,7 +622,7 @@ rule m_Process_Instance {
 													->collect(c| c.featureInstance
 														->select (fi | fi.isInputFeature())
 														->collect(fi |
-															thisModule.resolveTemp(fi, 'accessConnection')	
+															thisModule.resolveMatchedSingleIfExists(fi, 'accessConnection')	
 														)
 													)
 												)

@@ -49,8 +49,8 @@ helper def : collectPeriodicDelayed_GlobalVariables_LowMFP(c: AADLI!ComponentIns
 					->collect(fi | 
 						Sequence{
 						
-							thisModule.resolveTemp(fi, 'createContextSubcomponent', 'componentInstancesArray'),
-							thisModule.resolveTemp(fi, 'createContextSubcomponent', 'contextSubcomponent')
+							thisModule.resolveLazyIfExists(fi, 'createContextSubcomponent', 'componentInstancesArray'),
+							thisModule.resolveLazyIfExists(fi, 'createContextSubcomponent', 'contextSubcomponent')
 						
 					}
 					)
@@ -65,7 +65,7 @@ helper def : collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c: AADLI!Comp
 									fi.isIntraProcessFeatureInstance()
 									and
 									fi.isPeriodicDelayedPort())
-					->collect(fi | thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Access'))
+					->collect(fi | thisModule.resolveMatchedSingleIfExists(fi, 'PeriodicDelayedContext_Access'))
 	->union
 	(
 		c.featureInstance->select(fi | 	fi.isOutputFeature()
@@ -78,7 +78,7 @@ helper def : collectPeriodicDelayed_GlobalVariablesAccesses_LowMFP(c: AADLI!Comp
 					->collect(fi |
 						fi.srcConnectionInstance->collect
 						(
-							cnxInst | thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Access'))
+							cnxInst | thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Access'))
 						)
 						
 	)
@@ -92,7 +92,7 @@ helper def : collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c: AADLI!C
 									fi.isIntraProcessFeatureInstance()
 									and
 									fi.isPeriodicDelayedPort())
-					->collect(fi | thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Connection'))
+					->collect(fi | thisModule.resolveMatchedSingleIfExists(fi, 'PeriodicDelayedContext_Connection'))
 	->union
 	(
 		c.featureInstance->select(fi | 	fi.isOutputFeature()
@@ -105,7 +105,7 @@ helper def : collectPeriodicDelayed_GlobalVariablesConnections_LowMFP(c: AADLI!C
 					->collect(fi |
 						fi.srcConnectionInstance->collect
 						(
-							cnxInst | thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Connection')
+							cnxInst | thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_Connection')
 						)
 					)
 						
@@ -120,7 +120,7 @@ helper def : collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c: AADLI!Compo
 									fi.isIntraProcessFeatureInstance()
 									and
 									fi.isPeriodicDelayedPort())
-					->collect(fi | thisModule.resolveTemp(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointAccess'))
+					->collect(fi | thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointAccess'))
 	->union
 	(
 		c.featureInstance->select(fi | 	fi.isOutputFeature()
@@ -133,7 +133,7 @@ helper def : collectPeriodicDelayed_LocalVariablesAccesses_LowMFP(c: AADLI!Compo
 					->collect(fi |
 						fi.srcConnectionInstance->collect
 						(
-							cnxInst | thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointAccess'))
+							cnxInst | thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointAccess'))
 						)
 						
 	)
@@ -147,7 +147,7 @@ helper def : collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c: AADLI!Co
 									fi.isIntraProcessFeatureInstance()
 									and
 									fi.isPeriodicDelayedPort())
-					->collect(fi | thisModule.resolveTemp(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointConnection'))
+					->collect(fi | thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointConnection'))
 	->union
 	(
 		c.featureInstance->select(fi | 	fi.isOutputFeature()
@@ -160,7 +160,7 @@ helper def : collectPeriodicDelayed_LocalVariablesConnections_LowMFP(c: AADLI!Co
 					->collect(fi |
 						fi.srcConnectionInstance->collect
 						(
-							cnxInst | thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointConnection'))
+							cnxInst | thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, cnxInst.connectionReference->first().connection}, 'PeriodicDelayedContext_EntryPointConnection'))
 						)
 						
 	)
@@ -330,7 +330,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		(
 			name <- 'buffer',
 			refined <- Put_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'buffer'),
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayImpl'),
+			dataFeatureClassifier <- thisModule.resolveMatchedSingleIfExists(cnxInst.destination, 'bufferArrayImpl'),
 			kind<-#requires
 		),
 		putValueSpg: AADLBA!SubprogramType
@@ -364,7 +364,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		-- next is a workaround
 		thisModule.theHOOK.setDirection(putValueValueParam, 'in');
 		putValueOutputActual.setClassifier(fi.feature.dataFeatureClassifier);
-		putValueContextActual.setClassifier(thisModule.resolveTemp(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
+		putValueContextActual.setClassifier(thisModule.resolveLazyIfExists(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
 	}
 }
 
@@ -390,11 +390,11 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		connected_PeriodicDelayedContext_Access: AADLBA!ConnectedElement
 		(
 			connectionEnd<-PeriodicDelayedContext_EntryPointAccess,
-			context<-thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint')
+			context<-thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint')
 		),
 		connected_PeriodicDelayedContext_Subcomponent: AADLBA!ConnectedElement
 		(
-			connectionEnd<-thisModule.resolveTemp(Sequence{fi,cnxRef}, 'PeriodicDelayedContext_Access')
+			connectionEnd<-thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'PeriodicDelayedContext_Access')
 		),
 		PeriodicDelayedContext_EntryPointConnection: AADLBA!AccessConnection
 		(
@@ -436,7 +436,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		putValueSpgHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- thisModule.resolveTemp(Sequence{fi, cnxRef}, 'putValueSpg')
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'putValueSpg')
 		),
 		--- connect taskID: in parameter Base_Types::Integer_16;
 		TaskID_Holder: AADLBA!DataSubcomponentHolder
@@ -452,24 +452,24 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
         --- connect CDWSize: in parameter Base_Types::Integer_16;
 		CDWSize_Holder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(Sequence{fi, cnxRef}, 'CDWSize')
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'CDWSize')
 		),
 
 		--- connect value: in parameter value_type;
 		Value_Holder: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveTemp(fi, 'localVariable')	
+			element<-thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')	
 		),
         --- connect periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
 		PeriodicDelayedContext_Holder: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveTemp(Sequence{fi, behavior, cnxRef}, 'PeriodicDelayedContext_EntryPointAccess')
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, cnxRef}, 'PeriodicDelayedContext_EntryPointAccess')
 		),
 		
      	--- connect buffer: requires data access ArrayDataType {Access_Right=>write_only;};
 		Buffer_Holder: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveTemp(Sequence{fi, cnxRef} ,'f_entrypoint')
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef} ,'f_entrypoint')
 		)
 }
 
@@ -605,7 +605,7 @@ unique lazy rule createContextSubcomponent
 		componentInstancesArray: AADLBA!DataSubcomponent
 		(
 			name <- 'writer_instances_'+fi.getComponentInstance().name+'_'+fi.name,
-			dataSubcomponentType <- thisModule.resolveTemp(fi, 'createContextDataImpl', 'ComponentInstanceArrayDataType'),
+			dataSubcomponentType <- thisModule.resolveLazyIfExists(fi, 'createContextDataImpl', 'ComponentInstanceArrayDataType'),
 			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
 												 	'Initial_Value',
 													'DATA_MODEL',
@@ -744,11 +744,11 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	connected_PeriodicDelayedContext_Access: AADLBA!ConnectedElement
 	(
 		connectionEnd<-PeriodicDelayedContext_EntryPointAccess,
-		context<-thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint')
+		context<-thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint')
 	),
 	connected_PeriodicDelayedContext_Subcomponent: AADLBA!ConnectedElement
 	(
-		connectionEnd<-thisModule.resolveTemp(fi, 'PeriodicDelayedContext_Access')
+		connectionEnd<-thisModule.resolveMatchedSingleIfExists(fi, 'PeriodicDelayedContext_Access')
 	),
 	PeriodicDelayedContext_EntryPointConnection: AADLBA!AccessConnection
 	(
@@ -773,7 +773,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	),	  
 	receiveInput_Holder: AADLBA!SubprogramHolder
 	(
-		element <- thisModule.resolveTemp(fi,'receiveInputSpg')
+		element <- thisModule.resolveMatchedSingleIfExists(fi,'receiveInputSpg')
 	),
 	
 	--- connect iteration_counter: in out parameter Base_Types::Integer_16;
@@ -785,25 +785,25 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
     --- connect CPRSize: in parameter Base_Types::Integer_16;
     PeriodicDelayedContext_Holder: AADLBA!DataAccessHolder
 	(
-		element <- thisModule.resolveTemp(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointAccess')
+		element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior}, 'PeriodicDelayedContext_EntryPointAccess')
 	),
   
     --- connect periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
     CPRSize_Holder: AADLBA!DataSubcomponentHolder
 	(
-		element<-thisModule.resolveTemp(fi, 'CPRSize')
+		element<-thisModule.resolveMatchedSingleIfExists(fi, 'CPRSize')
 	),
 	
     --- connect first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
     ReadIndex_Holder: AADLBA!DataAccessHolder
 	(
-		element<-thisModule.resolveTemp(fi,'readIndex')
+		element<-thisModule.resolveMatchedSingleIfExists(fi,'readIndex')
 	),
 	
     --- connect last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
 	LastIndex_Holder: AADLBA!DataAccessHolder
 	(
-		element<-thisModule.resolveTemp(fi,'lastIndex')
+		element<-thisModule.resolveMatchedSingleIfExists(fi,'lastIndex')
 	),
 	
 	ErrorCode_Holder: AADLBA!DataSubcomponentHolder

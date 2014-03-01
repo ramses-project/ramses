@@ -33,7 +33,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 helper context AADLI!ComponentInstance def: retrieveErrorHandler(): Sequence(AADLBA!SubprogramSubcomponent) =
 	let pa: AADLI!PropertyAssociation = self.ownedPropertyAssociation->any(e|e.property.name='Recovery_Actions') in
 	if(not pa.oclIsUndefined()) then
-		Sequence{thisModule.resolveTemp(Sequence{self,pa},'subprogramSubcomponent')}
+		Sequence{thisModule.resolveMatchedTupleIfExists(Sequence{self,pa},'subprogramSubcomponent')}
 	else 
 		Sequence{}
 	endif
@@ -165,7 +165,7 @@ rule m_Threads_HM
 			transitions <- errorIds->asSequence()->flatten()
 							->collect(e|thisModule.createTransition(c,e))
 							->append(firstTransition),
-			actions		<- Sequence{recoveryActionBlock}->union(errorIds->asSequence()->flatten()->collect(e|thisModule.resolveTemp(Sequence{c,e}, 'createTransition', 'recoveryActionBlock'))),
+			actions		<- Sequence{recoveryActionBlock}->union(errorIds->asSequence()->flatten()->collect(e|thisModule.resolveMatchedTupleIfExists(Sequence{c,e}, 'createTransition', 'recoveryActionBlock'))),
 			variables   <- Sequence{errorStatus,errorCode}
 		),
 		firstState: AADLBA!BehaviorState
@@ -234,9 +234,9 @@ unique lazy rule createTransition
 	errorId: String
   using
   {
-	source: AADLBA!BehaviorState = thisModule.resolveTemp(c,'switchErrorState');
-	destination: AADLBA!BehaviorState = thisModule.resolveTemp(c,'firstState');
-	statusVariable: AADLBA!BehaviorVariable = thisModule.resolveTemp(c,'errorStatus');
+	source: AADLBA!BehaviorState = thisModule.resolveMatchedSingleIfExists(c,'switchErrorState');
+	destination: AADLBA!BehaviorState = thisModule.resolveMatchedSingleIfExists(c,'firstState');
+	statusVariable: AADLBA!BehaviorVariable = thisModule.resolveMatchedSingleIfExists(c,'errorStatus');
 	threadWith_HM: Sequence(AADLI!ComponentInstance) = c.componentInstance->select(e|	
 											e.category = #thread
 											and 
@@ -458,7 +458,7 @@ lazy rule createCallStop
 	),
 	errorStatusForCheckHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorStatus')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorStatus')
 	),
 	processIdFieldForCheckHolder: AADLBA!DataSubcomponentHolder
 	(
@@ -490,7 +490,7 @@ lazy rule createCallStop
 	(element <- stopSpg),
 	errorCodeHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorCode')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorCode')
 	),
 	errorStatus:AADLBA!DataComponentReference
 	(
@@ -498,7 +498,7 @@ lazy rule createCallStop
 	),
 	errorStatusHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorStatus')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorStatus')
 	),
 	processIdFieldHolder: AADLBA!DataSubcomponentHolder
 	(
@@ -560,7 +560,7 @@ lazy rule createCallRestart
 	),
 	errorStatusForCheckHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorStatus')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorStatus')
 	),
 	processIdFieldForCheckHolder: AADLBA!DataSubcomponentHolder
 	(
@@ -592,7 +592,7 @@ lazy rule createCallRestart
 	(element <- startSpg),
 	errorCodeHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorCode')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorCode')
 	),
 	errorStatus:AADLBA!DataComponentReference
 	(
@@ -600,7 +600,7 @@ lazy rule createCallRestart
 	),
 	errorStatusHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorStatus')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorStatus')
 	),
 	processIdFieldHolder: AADLBA!DataSubcomponentHolder
 	(
@@ -615,7 +615,7 @@ lazy rule createCallRestart
 	(element <- stopSpg),
 	errorCodeHolderForStop: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorCode')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorCode')
 	),
 	errorStatusForStop:AADLBA!DataComponentReference
 	(
@@ -623,7 +623,7 @@ lazy rule createCallRestart
 	),
 	errorStatusHolderForStop: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorStatus')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorStatus')
 	),
 	processIdFieldHolderForStop: AADLBA!DataSubcomponentHolder
 	(
@@ -685,7 +685,7 @@ lazy rule createCallSetPartitionMode
 	),
 	errorStatusHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorStatus')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorStatus')
 	),
 	processIdFieldHolder: AADLBA!DataSubcomponentHolder
 	(
@@ -717,7 +717,7 @@ lazy rule createCallSetPartitionMode
 	(element <- setPartitionModeSpg),
 	errorCodeHolder: AADLBA!BehaviorVariableHolder
 	(
-		element <- thisModule.resolveTemp(processInstance, 'errorCode')
+		element <- thisModule.resolveMatchedSingleIfExists(processInstance, 'errorCode')
 	),
 	modeValueExpression: AADLBA!ValueExpression
 	(

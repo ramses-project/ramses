@@ -93,30 +93,30 @@ helper context AADLI!ComponentInstance def : owner() : AADLI!ComponentInstance =
 
 helper context AADLI!ComponentInstance def : ownerImplImg() : AADLBA!ComponentImplementation = 
 	if (self.eContainer().category = #system) then
-		thisModule.resolveTemp(self.eContainer().systemImplementation, 'implImg')
+		thisModule.resolveMatchedSingleIfExists(self.eContainer().systemImplementation, 'implImg')
 	else
-		thisModule.resolveTemp(self.eContainer(), 'sub').getSubcomponentType()
+		thisModule.resolveMatchedSingleIfExists(self.eContainer(), 'sub').getSubcomponentType()
 	endif
 ;
 
 helper context AADLI!ConnectionInstanceEnd def : getSubcomponentImg() : AADLBA!Subcomponent =
-	thisModule.resolveTemp(self, 'sub')
+	thisModule.resolveMatchedSingleIfExists(self, 'sub')
 ;
 
 helper context AADLI!ConnectionInstanceEnd def : getFeatureImg() : AADLBA!Feature =
-	thisModule.resolveTemp(self, 'f')
+	thisModule.resolveMatchedSingleIfExists(self, 'f')
 ;
 
 helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
-		thisModule.resolveTemp(Sequence{self,cnxInst.connectionReference->first()}, 'f')
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnxInst.connectionReference->first()}, 'f')
 ;
 
 helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature() : AADLBA!DataAccess =
-	thisModule.resolveTemp(self, 'f_entrypoint')
+	thisModule.resolveMatchedSingleIfExists(self, 'f_entrypoint')
 ;
 
 helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnx: AADLI!PortConnection) : AADLBA!Feature =
-		thisModule.resolveTemp(Sequence{self,cnx}, 'f_entrypoint')
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnx}, 'f_entrypoint')
 ;
 
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
@@ -127,7 +127,7 @@ helper context Sequence(AADLBA!PropertyAssociation) def : collectSelfPropertyAss
 	self->select(e|(e.collectInstanceReferenceValue()->isEmpty()))
 								 ->union(self->select(e|not e.collectInstanceReferenceValue()->isEmpty() 
 								 											  and e.collectInstanceReferenceValue()->select(f| not f.referencedInstanceObject.isContainedIn(f.eContainer().eContainer().eContainer().eContainer()))->isEmpty())) -- econtainer() 4 times retreives container component instance; recursive helper would be better...
-													 ->collect ( p |  thisModule.resolveTemp(p, 'p2'))
+													 ->collect ( p |  thisModule.resolveMatchedSingleIfExists(p, 'p2'))
 ;
 
 helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(category : String) : Sequence(AADLI!ComponentInstance) =

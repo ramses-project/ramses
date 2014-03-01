@@ -126,7 +126,7 @@ rule m_SporadicThread
 		(
 			name <- 'Global_Queue_'+c.uniqueName(),
 			ownedExtension  <- extendedQueueType,
-			ownedDataAccess <- c.featureInstance->collect(fi|thisModule.resolveTemp(fi, 'queueFieldAccess'))
+			ownedDataAccess <- c.featureInstance->collect(fi|thisModule.resolveMatchedSingleIfExists(fi, 'queueFieldAccess'))
 		),
 		extendedQueueType: AADLBA!TypeExtension
 		(
@@ -135,8 +135,8 @@ rule m_SporadicThread
     	GlobalQueueDataImpl: AADLBA!DataImplementation
 		(
 			name <- 'Global_Queue_'+c.uniqueName()+'.impl',
-			ownedDataSubcomponent <- c.featureInstance->collect(fi|thisModule.resolveTemp(fi, 'queueSubcomponent')),
-			ownedAccessConnection <- c.featureInstance->collect(fi|thisModule.resolveTemp(fi,'f_connection'))
+			ownedDataSubcomponent <- c.featureInstance->collect(fi|thisModule.resolveMatchedSingleIfExists(fi, 'queueSubcomponent')),
+			ownedAccessConnection <- c.featureInstance->collect(fi|thisModule.resolveMatchedSingleIfExists(fi,'f_connection'))
 		)
 		
 }

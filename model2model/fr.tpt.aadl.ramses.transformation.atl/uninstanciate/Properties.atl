@@ -41,7 +41,7 @@ from
 
 helper context AADLI!NamedElement def : getPropertyAssociationImg() : Sequence (AADLBA!PropertyAssociation) = 
     self.ownedPropertyAssociation -> 
-    	collect ( p |  thisModule.resolveTemp(p, 'p2'))
+    	collect ( p |  thisModule.resolveMatchedSingleIfExists(p, 'p2'))
 ;
 
 helper context AADLI!Element def: getContainerInstance(): AADLI!InstanceObject = 
@@ -327,7 +327,7 @@ rule m_ContainmentPathElement {
 --   		 	    	cpe.namedElement.getOwner().oclType().toString())
    		 	-- a modifier pour faire une recherche des éléments dans le modèle de sortie
    		 	if ( cpe.namedElement.oclIsKindOf(AADLI!Subcomponent) ) then
-   		 		thisModule.resolveTemp(cpe.namedElement.getInstance(), 'sub')
+   		 		thisModule.resolveMatchedSingleIfExists(cpe.namedElement.getInstance(), 'sub')
    		 	else if ( cpe.namedElement.oclIsKindOf(AADLI!Connection) ) then 
    		 		cpe.namedElement.getInstance()
    		 	else
@@ -467,14 +467,14 @@ rule m_RangeValue extends m_PropertyValue {
 --						if(v.minimum.isSimpleValueType())then
 --    						v.minimum.PropertyExpression()
 --						else
---							thisModule.resolveTemp(v.minimum, 'v2')
+--							thisModule.resolveMatchedSingleIfExists(v.minimum, 'v2')
 --						endif,
     				
     		maximum <- v.maximum
 --						if(v.maximum.isSimpleValueType())then
 --    						v.maximum.PropertyExpression()
 --						else
---							thisModule.resolveTemp(v.maximum, 'v2')
+--							thisModule.resolveMatchedSingleIfExists(v.maximum, 'v2')
 --						endif
     	)
 }
@@ -727,7 +727,7 @@ lazy rule NamedValue {
 --			
 --		o : AADLI!ComponentInstance = l.getOwnerComponent();
 --		subi : AADLI!ComponentInstance = o.getReferenceValueContainer(l);
---		sub : AADLBA!Subcomponent = thisModule.resolveTemp(subi,'sub');
+--		sub : AADLBA!Subcomponent = thisModule.resolveMatchedSingleIfExists(subi,'sub');
 --	}
 --	to
 --		l2 : AADLBA!ReferenceValue (containmentPathElement <- Sequence {cpe2,cpe1}),

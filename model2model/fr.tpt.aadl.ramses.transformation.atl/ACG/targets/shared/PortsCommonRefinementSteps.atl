@@ -36,11 +36,11 @@ create OUT : AADLBA 	from 		IN : AADLI,
 ------------------------------------------------------------
 
 helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!DataSubcomponent =
-	thisModule.resolveTemp(self,'globalVariable')
+	thisModule.resolveMatchedSingleIfExists(self,'globalVariable')
 ;
 
 helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
-	thisModule.resolveTemp(self, 'localVariable')
+	thisModule.resolveMatchedSingleIfExists(self, 'localVariable')
 ;
 
 abstract rule m_Not_PeriodicDelayed_Port
@@ -96,9 +96,9 @@ rule m_Thread_Output_Port_Instance
 		accessConnection: AADLBA!AccessConnection
 		(
 			name <- cnxRef.uniqueName()+'_'+cnxRef.destination.connectionEnd.name+'_to_globalVariable',
-			source<-connectedAccess,
+			source<-connectedSubcomponent,
 			accessCategory<-#data,
-			destination<-connectedSubcomponent
+			destination<-connectedAccess
 		),
 		connectedSubcomponent: AADLBA!ConnectedElement
 		(
@@ -110,7 +110,7 @@ rule m_Thread_Output_Port_Instance
 		)
 	do
 	{
-		connectedAccess.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'sub'));
+		connectedAccess.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'sub'));
 	}
 }
 
@@ -146,9 +146,9 @@ rule m_Thread_Input_Port_Instance
 		accessConnection: AADLBA!AccessConnection
 		(
 			name <- 'Id_instance_to_'+fi.getComponentInstance().name+'_'+fi.name,
-			source<-connectedAccess,
+			source<-connectedSubcomponent,
 			accessCategory<-#data,
-			destination<-connectedSubcomponent
+			destination<-connectedAccess
 		),
 		connectedAccess: AADLBA!ConnectedElement
 		(
@@ -156,7 +156,7 @@ rule m_Thread_Input_Port_Instance
 		)
 	do
 	{
-		connectedAccess.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'sub'));
+		connectedAccess.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'sub'));
 	}
 }
 

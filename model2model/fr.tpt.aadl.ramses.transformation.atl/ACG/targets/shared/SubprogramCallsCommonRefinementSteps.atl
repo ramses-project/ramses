@@ -40,28 +40,28 @@ helper def : Unique_Send_Output_Per_Thread : Boolean = false;
 
 
 helper def: collectDataNextValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence): Sequence(AADLBA!SubprogramCall) =
-	Sequence{thisModule.resolveTemp(Sequence{fi, behavior} ,'call')}
+	Sequence{thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior} ,'call')}
 ;
 
 helper def: collectEventDataNextValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence, paramCnx:AADLBA!ParameterConnection): Sequence(AADLBA!SubprogramCall) =
-	Sequence{thisModule.resolveTemp(Sequence{fi, behavior, paramCnx} ,'call')}
+	Sequence{thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, paramCnx} ,'call')}
 ;
 
 helper def: collectDataPutValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence, cnxInst:AADLI!ConnectionInstance): Sequence(AADLBA!SubprogramCall) =
 	Sequence{
-		thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection} ,'call')
+		thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, cnxInst.connectionReference->first().connection} ,'call')
 	}
 ;
 
 helper def: collectEventDataPutValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence, paramCnx:AADLBA!Connection, cnxInst:AADLI!ConnectionInstance): Sequence(AADLBA!SubprogramCall) =
 	Sequence{
-		thisModule.resolveTemp(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call')
+		thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call')
 	}
 ;
 
 helper def: collectReceiveInputsCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence) : Sequence(AADLBA!SubprogramCall) =
 	Sequence{
-		thisModule.resolveTemp(Sequence{fi, behavior} ,'callReceiveInputs')
+		thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior} ,'callReceiveInputs')
 	}
 ;
 
@@ -79,11 +79,11 @@ helper def: collectComputeEntryPointTransitions(c: AADLI!ComponentInstance): Seq
 	( fi |
 		fi.getComputeEntryPoints()->collect
 			(
-				cep | thisModule.resolveTemp(Sequence{fi, cep}, 'computeEntryPointTransition')
+				cep | thisModule.resolveMatchedTupleIfExists(Sequence{fi, cep}, 'computeEntryPointTransition')
 			)
 	)
 	->union(
-			c.getComputeEntryPoints()->collect(cep | thisModule.resolveTemp(Sequence{c, cep}, 'computeEntryPointTransition'))
+			c.getComputeEntryPoints()->collect(cep | thisModule.resolveMatchedTupleIfExists(Sequence{c, cep}, 'computeEntryPointTransition'))
 		)
 	->flatten()
 ;
@@ -92,14 +92,14 @@ helper def: collectComputeEntryPointTransitions(c: AADLI!ComponentInstance): Seq
 helper def: collectBAEntryPointTransitions(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorTransition) =
 	c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
 	->collect(
-		ba | thisModule.resolveTemp(Sequence{c, ba}, 'computeEntryPointTransition')
+		ba | thisModule.resolveMatchedTupleIfExists(Sequence{c, ba}, 'computeEntryPointTransition')
 	)
 ;
 
 helper def: collectBAEntryPointActionBlocks(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorActionBlock) =
 	c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
 	->collect(
-		ba | thisModule.resolveTemp(Sequence{c, ba}, 'computeEntryPointActionBlock')
+		ba | thisModule.resolveMatchedTupleIfExists(Sequence{c, ba}, 'computeEntryPointActionBlock')
 	)
 ;
 
@@ -109,13 +109,13 @@ helper def: collectComputeEntryPointActionBlocks(c: AADLI!ComponentInstance): Se
 	( fi |
 		fi.getComputeEntryPoints()->collect
 			(
-				cep | thisModule.resolveTemp(Sequence{fi, cep}, 'computeEntryPointActionBlock')
+				cep | thisModule.resolveMatchedTupleIfExists(Sequence{fi, cep}, 'computeEntryPointActionBlock')
 			)
 	)
 	->union(
-			c.getComputeEntryPoints()->collect(cep | thisModule.resolveTemp(Sequence{c, cep}, 'computeEntryPointActionBlock'))
+			c.getComputeEntryPoints()->collect(cep | thisModule.resolveMatchedTupleIfExists(Sequence{c, cep}, 'computeEntryPointActionBlock'))
 		)
-	->append(thisModule.resolveTemp(c, 'whichPortActionBlock'))
+	->append(thisModule.resolveMatchedSingleIfExists(c, 'whichPortActionBlock'))
 	->flatten()
 ;
 
@@ -137,19 +137,19 @@ rule m_ThreadEntrypoint {
 			ownedDataAccess <- 	
 									c.featureInstance->select(e| e.feature.oclIsTypeOf(AADLI!DataAccess))
 									->collect(
-											e|thisModule.resolveTemp(e, 'f_entrypoint')
+											e|thisModule.resolveMatchedSingleIfExists(e, 'f_entrypoint')
 										)	
 									->union(
 										c.featureInstance->select(e| e.isInputFeature())
 											->collect(
-											e|thisModule.resolveTemp(e, 'f_entrypoint')
+											e|thisModule.resolveMatchedSingleIfExists(e, 'f_entrypoint')
 										)	
 									)
 									->union(
 										c.featureInstance->select(e| e.isOutputFeature())
 											->collect
 											(
-												e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveTemp(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
+												e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveMatchedTupleIfExists(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
 											)
 									)
 									->union
@@ -158,7 +158,7 @@ rule m_ThreadEntrypoint {
 											impl.ownedAccessConnection->select(accessCnx | accessCnx.isPartOfCallSequence(behavior))
 											->collect
 											(
-												accessCnx| thisModule.resolveTemp(Sequence{c,behavior,accessCnx}, 'dataAccess')
+												accessCnx| thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior,accessCnx}, 'dataAccess')
 											)
 										)
 									)
@@ -167,7 +167,7 @@ rule m_ThreadEntrypoint {
 										impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
 										->collect
 										(
-											ba | thisModule.resolveTemp(Sequence{c,ba},'currentStateAccess')
+											ba | thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'currentStateAccess')
 										)
 									)
 									->union
@@ -198,7 +198,7 @@ rule m_ThreadEntrypoint {
 								->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
 								->collect(e|
 									callSequences->collect(behavior |
-										thisModule.resolveTemp(Sequence{c.componentInstance->any(f|f.subcomponent=e.source.connectionEnd), behavior, e},'featureImg'))
+										thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent=e.source.connectionEnd), behavior, e},'featureImg'))
 									)
 								->union
 								(
@@ -206,7 +206,7 @@ rule m_ThreadEntrypoint {
 									->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
 									->collect(e|
 										callSequences->collect(behavior |
-											thisModule.resolveTemp(Sequence{c.componentInstance->any(f|f.subcomponent=e.destination.connectionEnd), behavior, e},'featureImg'))
+											thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent=e.destination.connectionEnd), behavior, e},'featureImg'))
 										)
 								)
 								->flatten()
@@ -223,7 +223,7 @@ rule m_ThreadEntrypoint {
 													c.featureInstance->select(e|e.isDataOrEventDataPort())
 													->collect
 													(
-														f| thisModule.resolveTemp(f, 'localVariable')
+														f| thisModule.resolveMatchedSingleIfExists(f, 'localVariable')
 													)
 												)
 												->union
@@ -347,7 +347,7 @@ rule m_ThreadEntrypoint {
 		),
 		updateDefaultBehaviorVariableHolder: AADLBA!BehaviorVariableHolder
 		(
-			element <- thisModule.resolveTemp(c, 'activatedPort')
+			element <- thisModule.resolveMatchedSingleIfExists(c, 'activatedPort')
 		),
 		updateDefaultBehaviorValueExpression: AADLBA!ValueExpression
 		(
@@ -413,7 +413,7 @@ rule m_ThreadEntrypoint {
 }
 
 helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AADLBA!BehaviorAction) = 
-	if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveTemp(self,'waitDispatchCall')} endif
+	if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveMatchedSingleIfExists(self,'waitDispatchCall')} endif
 		->union(
 				self.featureInstance->select(fi| 
 					fi.isInputFeature() and
@@ -448,11 +448,11 @@ unique lazy rule collectTransitionChoiceActions
 			{
 				for(b in c.subcomponent.classifier.ownedSubprogramCallSequence->select(b | b.isComputeEntryPointOf(port)))
 				{
-					checkforMessageAction <- thisModule.resolveTemp(Sequence{port, b},'checkforMessageAction');
+					checkforMessageAction <- thisModule.resolveMatchedTupleIfExists(Sequence{port, b},'checkforMessageAction');
 					if(not orderedPorts->first().equals(port))
 						checkforMessageAction.elif<-true;
-					results<-results.including(thisModule.resolveTemp(Sequence{port, b}, 'getCountAction'));
-					results<-results.including(thisModule.resolveTemp(Sequence{port, b}, 'count_assignement'));
+					results<-results.including(thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'getCountAction'));
+					results<-results.including(thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'count_assignement'));
 					results<-results.including(checkforMessageAction);
 					if(orderedPorts->last().equals(port))
 						checkforMessageAction.elseStatement<-thisModule.createDefaultAssignement(c);
@@ -477,7 +477,7 @@ rule createDefaultAssignement(c:AADLI!ComponentInstance)
 		),
 		updateDefaultBehaviorVariableHolder: AADLBA!BehaviorVariableHolder
 		(
-			element <- thisModule.resolveTemp(c, 'activatedPort')
+			element <- thisModule.resolveMatchedSingleIfExists(c, 'activatedPort')
 		),
 		updateDefaultBehaviorValueExpression: AADLBA!ValueExpression
 		(
@@ -502,8 +502,8 @@ rule createDefaultAssignement(c:AADLI!ComponentInstance)
 		),
 		updateDefaultBehavior: AADLBA!BehaviorEnumerationLiteral
 		(
-			component <- thisModule.resolveTemp(c, 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- thisModule.resolveTemp(c, 'portIDEnumLiteral')
+			component <- thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
+			enumLiteral <- thisModule.resolveMatchedSingleIfExists(c, 'portIDEnumLiteral')
 		),
 		res: AADLBA!ElseStatement
 		(
@@ -518,7 +518,7 @@ rule createDefaultAssignement(c:AADLI!ComponentInstance)
 --helper def: collectTransitionChoiceActions(c: AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorActions)=
 --	let orderedPorts : Sequence(AADLI!FeatureInstance) = thisModule.theHOOK.getFeaturesOrderedByCriticality(c) in
 --	if(orderedPorts->select(port | c.subcomponent.classifier.ownedSubprogramCallSequence->exists(b | b.isComputeEntryPointOf(port) ) )->isEmpty()) then
---		Sequence{thisModule.resolveTemp(c, 'updateDefaultBehaviorAction')}
+--		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'updateDefaultBehaviorAction')}
 --	else
 --		orderedPorts->select(port | c.subcomponent.classifier.ownedSubprogramCallSequence->exists(b | b.isComputeEntryPointOf(port)))
 --				->collect(port | 
@@ -526,9 +526,9 @@ rule createDefaultAssignement(c:AADLI!ComponentInstance)
 --					->collect(
 --						b|
 --							Sequence{
---								thisModule.resolveTemp(Sequence{port, b}, 'getCountAction'),
---								thisModule.resolveTemp(Sequence{port, b}, 'count_assignement'),
---								thisModule.resolveTemp(Sequence{port, b}, 'checkforMessageAction')
+--								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'getCountAction'),
+--								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'count_assignement'),
+--								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'checkforMessageAction')
 --							}
 --					)
 --				)
@@ -544,8 +544,8 @@ helper def: collectBehaviorVariable(c: AADLI!ComponentInstance): Sequence(AADLBA
 					->collect(
 						b|
 							Sequence{
-								thisModule.resolveTemp(Sequence{port, b}, 'count_variable'),
-								thisModule.resolveTemp(Sequence{port, b}, 'status_variable')
+								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'count_variable'),
+								thisModule.resolveMatchedTupleIfExists(Sequence{port, b}, 'status_variable')
 							}
 					)
 				)
@@ -568,8 +568,8 @@ abstract rule m_ThreadBehavior
 		computeEntryPointTransition: AADLBA!BehaviorTransition
 		(
 			name <- behavior.name,
-			sourceState <- thisModule.resolveTemp(c, 'execState'),
-			destinationState <- thisModule.resolveTemp(c, 'waitDispatchState'), --- TODO: add 'if(c.modeInstance->isEmpty()) ... else ... endif
+			sourceState <- thisModule.resolveMatchedSingleIfExists(c, 'execState'),
+			destinationState <- thisModule.resolveMatchedSingleIfExists(c, 'waitDispatchState'), --- TODO: add 'if(c.modeInstance->isEmpty()) ... else ... endif
 			actionBlock <- computeEntryPointActionBlock,
 			condition <- thisModule.createComputeEntryPointConditionForComponent(c),
 			priority <- 0.longValue()
@@ -641,11 +641,11 @@ unique lazy rule createComputeEntryPointConditionForPort
 		),
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
-			element <- thisModule.resolveTemp(object.getComponentInstance(), 'activatedPort')
+			element <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'activatedPort')
 		),
 		portIDEnum: AADLBA!BehaviorEnumerationLiteral
 		(
-			component <- thisModule.resolveTemp(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
+			component <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
 			enumLiteral <- portIDEnumLiteral
 		)
 	do
@@ -662,12 +662,12 @@ lazy rule createComputeEntryPointConditionForComponent
 		computeEntryPointCondition: AADLBA!ValueExpression,
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
-			element <- thisModule.resolveTemp(object, 'activatedPort')
+			element <- thisModule.resolveMatchedSingleIfExists(object, 'activatedPort')
 		),
 		portIDEnum: AADLBA!BehaviorEnumerationLiteral
 		(
-			component <- thisModule.resolveTemp(object, 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- thisModule.resolveTemp(object, 'portIDEnumLiteral')
+			component <- thisModule.resolveMatchedSingleIfExists(object, 'whichPortActivatedDataDlassifier'),
+			enumLiteral <- thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral')
 		)
 	do
 	{
@@ -708,15 +708,15 @@ rule m_PortBehavior
 		),
 		destinationCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveTemp(fi, 'f_entrypoint')
+			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
 		),
 		
 		-- Behavior for selectioning port behavior
 		computeEntryPointTransition: AADLBA!BehaviorTransition
 		(
 			name <- behavior.name,
-			sourceState <- thisModule.resolveTemp(c, 'execState'), --- TODO: add 'if(c.modeInstance->isEmpty()) ... else ... endif
-			destinationState <- thisModule.resolveTemp(c, 'waitDispatchState'),
+			sourceState <- thisModule.resolveMatchedSingleIfExists(c, 'execState'), --- TODO: add 'if(c.modeInstance->isEmpty()) ... else ... endif
+			destinationState <- thisModule.resolveMatchedSingleIfExists(c, 'waitDispatchState'),
 			actionBlock <- computeEntryPointActionBlock,
 			condition <- thisModule.createComputeEntryPointConditionForPort(fi),
 			priority <- thisModule.theHOOK.getFeaturesOrderedByCriticality(c)->indexOf(fi).longValue()
@@ -784,7 +784,7 @@ rule m_PortBehavior
 		
 		updateActivatedPortAction: AADLBA!BehaviorActionSequence
 		(
-			actions <- Sequence{updateActivatedPortAssignment, thisModule.resolveTemp(Sequence{fi, behavior}, 'call')}
+			actions <- Sequence{updateActivatedPortAssignment, thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior}, 'call')}
 		),
 		-- 2) AssignmentAction
 		updateActivatedPortAssignment: AADLBA!AssignmentAction
@@ -794,7 +794,7 @@ rule m_PortBehavior
 		),
 		updateActivatedPortBehaviorVariableHolder: AADLBA!BehaviorVariableHolder
 		(
-			element <- thisModule.resolveTemp(c, 'activatedPort')
+			element <- thisModule.resolveMatchedSingleIfExists(c, 'activatedPort')
 		),
 		updateActivatedPortValueExpression: AADLBA!ValueExpression
 		(
@@ -819,13 +819,13 @@ rule m_PortBehavior
 		),
 		updateActivatedPort: AADLBA!BehaviorEnumerationLiteral
 		(
-			component <- thisModule.resolveTemp(c, 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- thisModule.resolveTemp(fi, 'createComputeEntryPointConditionForPort', 'portIDEnumLiteral')
+			component <- thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
+			enumLiteral <- thisModule.resolveMatchedSingleIfExists(fi, 'createComputeEntryPointConditionForPort', 'portIDEnumLiteral')
 		)
 		
   	do
   	{
-  		destinationCE.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint'));
+  		destinationCE.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint'));
 		computeEntryPointActions.actions <- thisModule.populateFeatureComputeEntryPointActions(fi, behavior);
   	}
 }
@@ -871,7 +871,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 			{
 				intermediateCallActionSequence <- intermediateCallActionSequence.append
 					(
-						thisModule.resolveTemp(Sequence{fi,behavior,call}, 'subprogramCallAction')
+						thisModule.resolveMatchedTupleIfExists(Sequence{fi,behavior,call}, 'subprogramCallAction')
 					);
 			}
 			else
@@ -881,7 +881,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 						thisModule.createCheckedCall
 						(
 							thisModule.getPortsInvoledInCall(c,call),
-							thisModule.resolveTemp(Sequence{fi,behavior,call}, 'subprogramCallAction')
+							thisModule.resolveMatchedTupleIfExists(Sequence{fi,behavior,call}, 'subprogramCallAction')
 						)
 					);
 			}
@@ -929,7 +929,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 		{
 			for(cnxInst in fi.srcConnectionInstance)
 			{
-				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{fi, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
+				intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
 			}
 		}
 		intermediateCallActionSequence;
@@ -1114,7 +1114,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 			{
 				intermediateCallActionSequence <- intermediateCallActionSequence.append
 					(
-						thisModule.resolveTemp(Sequence{c,behavior,call}, 'subprogramCallAction')
+						thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior,call}, 'subprogramCallAction')
 					);
 			}
 			else
@@ -1124,7 +1124,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 						thisModule.createCheckedCall
 						(
 							thisModule.getPortsInvoledInCall(c,call),
-							thisModule.resolveTemp(Sequence{c,behavior,call}, 'subprogramCallAction')
+							thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior,call}, 'subprogramCallAction')
 						)
 					);
 			}
@@ -1171,7 +1171,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 		if (thisModule.Unique_Send_Output_Per_Thread)
 		{
 			intermediateCallActionSequence <- intermediateCallActionSequence.append(
-				thisModule.resolveTemp(c,'callSendOutput'));
+				thisModule.resolveMatchedSingleIfExists(c,'callSendOutput'));
 		}
 		else
 		{
@@ -1179,7 +1179,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 			{
 				for(cnxInst in source.srcConnectionInstance)
 				{
-					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveTemp(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
+					intermediateCallActionSequence <- intermediateCallActionSequence.append(thisModule.resolveMatchedTupleIfExists(Sequence{source, behavior, cnxInst.connectionReference->first().connection} ,'callSendOutput'));
 				}
 			}
 		}
@@ -1272,11 +1272,11 @@ lazy rule populateParameterLabels
  			{
   				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.source.connectionEnd = feature and behavior.ownedCallSpecification->exists(f | e.source.context = f)))
 				{
-  					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveTemp(Sequence{c,behavior, cnx}, 'dataAccess')));
+  					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior, cnx}, 'dataAccess')));
 				}
   				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.destination.connectionEnd = feature and behavior.ownedCallSpecification->exists(f | e.destination.context = f)))
 				{
-  					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveTemp(Sequence{c,behavior, cnx}, 'dataAccess')));
+  					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior, cnx}, 'dataAccess')));
 				}
   			}
   			else if(feature.oclIsKindOf(AADLI!Parameter))
@@ -1289,11 +1289,11 @@ lazy rule populateParameterLabels
 					}
 					else if(cnx.destination.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(thisModule.resolveTemp(Sequence{c.componentInstance->any(e|cnx.destination.connectionEnd = e.subcomponent), behavior, cnx}, 'featureImg')));
+						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(e|cnx.destination.connectionEnd = e.subcomponent), behavior, cnx}, 'featureImg')));
 					}
 					else if(cnx.destination.connectionEnd.oclIsKindOf(AADLI!Port))
 					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.resolveTemp(Sequence{c.featureInstance->any(e|e.feature = cnx.destination.connectionEnd), behavior, cnx}, 'holder'));
+						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.resolveMatchedTupleIfExists(Sequence{c.featureInstance->any(e|e.feature = cnx.destination.connectionEnd), behavior, cnx}, 'holder'));
 					}
 				}
   				for(cnx in impl.ownedParameterConnection->select(e | e.destination.connectionEnd = feature and e.destination.context = subprogramCall))
@@ -1304,11 +1304,11 @@ lazy rule populateParameterLabels
 					}
 					else if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(thisModule.resolveTemp(Sequence{c.componentInstance->any(e|cnx.source.connectionEnd = e), behavior, cnx}, 'featureImg')));
+						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(e|cnx.source.connectionEnd = e), behavior, cnx}, 'featureImg')));
 					}
 					else if(cnx.source.connectionEnd.oclIsKindOf(AADLI!Port))
 					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.resolveTemp(Sequence{c.featureInstance->any(e|e.feature = cnx.source.connectionEnd), behavior, cnx}, 'holder'));
+						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.resolveMatchedTupleIfExists(Sequence{c.featureInstance->any(e|e.feature = cnx.source.connectionEnd), behavior, cnx}, 'holder'));
 					}
 				}
   			}
@@ -1464,7 +1464,7 @@ rule m_Parameter_to_DataAccess_SourceConnection
 		(connectionEnd <- accessCnx.destination.connectionEnd)
 	do
 	{
-		ceSource.setContext(thisModule.resolveTemp(c,'callEntryPoint'));
+		ceSource.setContext(thisModule.resolveMatchedSingleIfExists(c,'callEntryPoint'));
 	}
 }
 
@@ -1500,7 +1500,7 @@ rule m_Parameter_to_DataAccess_DestinationConnection
 		(connectionEnd <- dataAccess)
 	do
 	{
-		ceDestination.setContext(thisModule.resolveTemp(c,'callEntryPoint'));
+		ceDestination.setContext(thisModule.resolveMatchedSingleIfExists(c,'callEntryPoint'));
 	}
 }
 
@@ -1524,7 +1524,7 @@ rule m_Parameter_to_PortInstance_Connection
 	to
 		holder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi, 'localVariable')
+			element <- thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')
 		)
 }
 
@@ -1558,7 +1558,7 @@ abstract rule m_Parameter_to_DataInstance_Connection
 		),
 		subcomponentConnectedElement: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveTemp(c,'sub')
+			connectionEnd <- thisModule.resolveMatchedSingleIfExists(c,'sub')
 		),
 		featureImg: AADLBA!Parameter
 		(
@@ -1566,7 +1566,7 @@ abstract rule m_Parameter_to_DataInstance_Connection
 		)
 	do
 	{
-		paramConnectedElement.setContext(thisModule.resolveTemp(c.getContainingThread(), 'callEntryPoint'));
+		paramConnectedElement.setContext(thisModule.resolveMatchedSingleIfExists(c.getContainingThread(), 'callEntryPoint'));
 	}
 		
 }
@@ -1673,7 +1673,7 @@ lazy rule Parameter_to_Parameter_Connection
 	to
 		holder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(Sequence{c,behavior,paramCnx}, 'paramCnxVariable')
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior,paramCnx}, 'paramCnxVariable')
 		)
 	do
 	{
@@ -1730,11 +1730,11 @@ rule m_Input_Port_ComputeEntrypointCallSequence
 		),
 		destinationCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveTemp(fi, 'f_entrypoint')
+			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint'));
 	}
 }
 
@@ -1851,15 +1851,15 @@ rule m_Output_Port_ComputeEntrypointCallSequence
 		),
 		sourceCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveTemp(Sequence{fi,cnxRef},'f')
+			connectionEnd <- thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef},'f')
 		),
 		destinationCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint')
+			connectionEnd <- thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint')
 		)
 	do
 	{
-		destinationCE.setContext(thisModule.resolveTemp(fi.getComponentInstance(), 'callEntryPoint'));
+		destinationCE.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint'));
 	}
 }
 

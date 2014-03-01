@@ -156,7 +156,7 @@ abstract rule m_Output_Sampling
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
+		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -195,7 +195,7 @@ rule m_Output_Sampling_ComputeEntrypointCallSequence
 		)
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.eContainer(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
@@ -214,7 +214,7 @@ rule m_Output_Sampling_BehaviorAnnex
 		cnxRef: AADLI!PortConnection
 	using
 	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.eContainer(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.eContainer(), 'returnData');
 	}
 	to
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder

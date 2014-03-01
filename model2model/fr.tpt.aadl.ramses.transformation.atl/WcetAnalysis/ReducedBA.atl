@@ -31,6 +31,149 @@ helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : 
 									)->collectSelfPropertyAssociationImg()
 ;
 
+-- @extends m_Component_Instance
+rule m_Process_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #process)
+	using
+	{
+ 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+	}
+	to 
+		sub : AADLBA!ProcessSubcomponent
+		(
+			processSubcomponentType <- implImg
+		),
+		implImg : AADLBA!ProcessImplementation (
+			name 							<- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then c.processSubcomponentType.name+'.impl'
+											else c.subcomponent.processSubcomponentType.name
+											endif,
+			ownedRealization 				<- thisModule.Realization(type),
+			ownedThreadSubcomponent         <- c.componentInstance->select(e|e.category=#thread),
+			ownedDataSubcomponent         <- c.componentInstance->select(e|e.category=#data),
+			ownedAccessConnection			<- impl.getConnectionsInstancesImg('accessConnection')
+		),
+		type:AADLBA!ProcessType (
+			name 							<- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then c.processSubcomponentType.name
+											else c.subcomponent.processSubcomponentType.type.name
+											endif
+		)
+}
+
+rule m_Process_Type {
+ from
+ 	type : AADLI!ProcessType
+}
+
+rule m_Process_Implementation {
+ from
+ 	type : AADLI!ProcessImplementation
+}
+
+rule m_Processor_Type {
+ from
+ 	type : AADLI!ProcessorType
+}
+
+rule m_Processor_Implementation {
+ from
+ 	type : AADLI!ProcessorImplementation
+}
+
+rule m_VirtualProcessor_Type {
+ from
+ 	type : AADLI!VirtualProcessorType
+}
+
+rule m_VirtualProcessor_Implementation {
+ from
+ 	type : AADLI!VirtualProcessorImplementation
+}
+
+rule m_Memory_Type {
+ from
+ 	type : AADLI!MemoryType
+}
+
+rule m_Memory_Implementation {
+ from
+ 	impl : AADLI!MemoryImplementation
+}
+
+-- @extends m_Component_Type
+rule m_System_Type {
+ from
+ 	type : AADLI!SystemType
+	(AADLI!ComponentInstance.allInstancesFrom('IN')->select(e| e.category=#system)->exists(e|e.systemImplementation.type=type))
+ to
+ 	typeImg: AADLBA!SystemType
+	(
+		name                              <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
+											 type.name
+											 else
+											 thisModule.theHOOK.getOutputPackageName()
+											 endif
+	)
+ do
+ {
+	thisModule.addImportedUnitFromInputModel(thisModule.public(), type);
+ }
+}
+
+--@extends m_Component_Implementation
+rule m_System_Implementation {
+  from
+  	impl : AADLI!SystemImplementation
+	(AADLI!ComponentInstance.allInstancesFrom('IN')->select(e| e.category=#system)->exists(e|e.systemImplementation=impl))
+  to
+  	implImg : AADLBA!SystemImplementation
+	(
+		name                              <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
+											 impl.name
+											 else
+											 thisModule.theHOOK.getOutputPackageName()+'.impl'
+											 endif,
+		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory'),
+		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor'),
+		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device'),
+		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
+		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
+		ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
+		ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system'),
+		ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')
+	)
+}
+
+
+---- @extends m_RootSystem_Instance
+--rule m_RootSystem_Instance_ReducedBA {
+--	from
+--		c : AADLI!SystemInstance
+--	using
+--	{
+--		impl: AADLBA!SystemImplementation = c.systemImplementation;
+--	}
+--	to
+--		section : AADLBA!PublicPackageSection,
+--		pkg : AADLBA!AadlPackage,
+--		implImg : AADLBA!SystemImplementation
+--		(
+--			name                              <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
+--												 impl.name
+--												 else
+--												 thisModule.theHOOK.getOutputPackageName()+'.impl'
+--												 endif,
+--			ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory'),
+--			ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor'),
+--			ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device'),
+--			ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
+--			ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
+--			ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
+--			ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system'),
+--			ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')
+--		)
+--}
+
 --@extends m_Component_Implementation
 rule m_Thread_Implementation {
  from 
@@ -41,6 +184,17 @@ rule m_Thread_Implementation {
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
 	)
+}
+
+-- @extends m_Component_Type
+rule m_Thread_Type {
+ from 
+ 	type : AADLI!ThreadType
+ to 
+ 	typeImg : AADLBA!ThreadType (
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+ 	)
 }
 
 ---- next rule overrides the existing "copy" since we use already defined types referencing them instead of copying them

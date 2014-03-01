@@ -145,7 +145,7 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 	(
 	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort())
 		->collect(fi|
-			thisModule.resolveTemp(fi, 'localVariable')
+			thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')
 		)
 	)
 	->union
@@ -155,7 +155,7 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 			fi.srcConnectionInstance->collect(cnxInst|
 				Sequence
 				{
-					thisModule.resolveTemp(Sequence{fi, cnxInst.connectionReference->first().connection}, 'CDWSize')
+					thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxInst.connectionReference->first().connection}, 'CDWSize')
 				}
 			)
 		)
@@ -165,11 +165,11 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 		->collect(fi|
 			Sequence
 			{
-				thisModule.resolveTemp(fi, 'CPRSize'),
-				thisModule.resolveTemp(fi, 'lastIndex'),
-				thisModule.resolveTemp(fi, 'readIndex'),
-				thisModule.resolveTemp(fi, 'localVariable'),
-				thisModule.resolveTemp(fi, 'bufferSizeSubcomponent')
+				thisModule.resolveMatchedSingleIfExists(fi, 'CPRSize'),
+				thisModule.resolveMatchedSingleIfExists(fi, 'lastIndex'),
+				thisModule.resolveMatchedSingleIfExists(fi, 'readIndex'),
+				thisModule.resolveMatchedSingleIfExists(fi, 'localVariable'),
+				thisModule.resolveMatchedSingleIfExists(fi, 'bufferSizeSubcomponent')
 			}
 		)
 	)
@@ -319,17 +319,17 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		--- Buffer
 		f: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayImpl'),
+			dataFeatureClassifier <- thisModule.resolveMatchedSingleIfExists(cnxInst.destination, 'bufferArrayImpl'),
 			kind<-#requires
 		),
 		f_entrypoint: AADLBA!DataAccess
 		(
-			dataFeatureClassifier <- thisModule.resolveTemp(cnxInst.destination, 'bufferArrayImpl'),
+			dataFeatureClassifier <- thisModule.resolveMatchedSingleIfExists(cnxInst.destination, 'bufferArrayImpl'),
 			kind<-#requires
 		),
 		buffer_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveTemp(cnxInst.destination, 'globalVariable')
+			element<-thisModule.resolveMatchedSingleIfExists(cnxInst.destination, 'globalVariable')
 		)
 }
 
@@ -378,7 +378,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		--- connect CDWSize
 		CDWSize_Data_Holder_SendOutput: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveTemp(Sequence{fi, cnxRef}, 'CDWSize')
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'CDWSize')
 		),
 		
 		--- connect IterationCounter

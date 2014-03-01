@@ -40,7 +40,7 @@ helper context AADLI!Classifier def : getConnectionsInstancesImg(connectionKind:
 ;
 
 helper context AADLI!ConnectionReference def: getConnectionsReferencesImg() : AADLBA!Connection =
-	thisModule.resolveTemp(self, 'cnxImg')
+	thisModule.resolveMatchedSingleIfExists(self, 'cnxImg')
 ;
 	
 abstract rule m_Connection_Reference
@@ -58,12 +58,12 @@ abstract rule m_Connection_Reference
 			connectionEnd <- cnxRef.source,
 			context <- if(cnxRef.connection.bidirectional)then
 							if(not cnxRef.connection.destination.context.oclIsUndefined()) then 
-								cnxRef.source.eContainer().debug(' !!!! 1')
+								cnxRef.source.eContainer()
 							else
 								OclUndefined
 							endif
 						else if(not cnxRef.connection.source.context.oclIsUndefined()) then 
-							cnxRef.source.eContainer().debug(' !!!! 2')
+							cnxRef.source.eContainer()
 							else
 								OclUndefined
 							endif
@@ -73,12 +73,12 @@ abstract rule m_Connection_Reference
 			connectionEnd <- cnxRef.destination,
 			context <- if(cnxRef.connection.bidirectional)then
 							if(not cnxRef.connection.source.context.oclIsUndefined()) then 
-								cnxRef.destination.eContainer().debug(' !!!! 3')
+								cnxRef.destination.eContainer()
 							else
 								OclUndefined
 							endif
 						else if(not cnxRef.connection.destination.context.oclIsUndefined()) then 
-							cnxRef.destination.eContainer().debug(' !!!! 4')
+							cnxRef.destination.eContainer()
 							else
 								OclUndefined
 							endif

@@ -401,7 +401,7 @@ helper def : getTimeOutInitValue(port : AADLBA!Feature) : AADLBA!PropertyExpress
 ;
 
 helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
-	thisModule.resolveTemp(self, 'localVariable')
+	thisModule.resolveMatchedSingleIfExists(self, 'localVariable')
 ;
 
 unique lazy rule createResolvedSpg

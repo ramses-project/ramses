@@ -39,7 +39,7 @@ abstract rule m_Not_PeriodicDelayed_Port
 }
 
 helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, callSequences: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
-	callSequences->collect(e | thisModule.resolveTemp(c, 'returnData'))
+	callSequences->collect(e | thisModule.resolveMatchedSingleIfExists(c, 'returnData'))
 	->union
 	(
 		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 
@@ -49,14 +49,14 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 				and
 				callSequence.isComputeEntryPointOf(c)
 			)->collect(
-				paramCnx | thisModule.resolveTemp(Sequence{c, callSequence, paramCnx}, 'paramCnxVariable')
+				paramCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, paramCnx}, 'paramCnxVariable')
 			)
 		)
 	)
 	->union
 	(
 		c.featureInstance->select(e|not e.oclIsKindOf(AADLBA!DataAccess) and e.isInputFeature() and not e.isPeriodicDelayedPort())
-		->collect(fi| thisModule.resolveTemp(fi, 'CreateReturnSubcomponentFromPort', 'dataSubcomponent'))
+		->collect(fi| thisModule.resolveLazyIfExists(fi, 'CreateReturnSubcomponentFromPort', 'dataSubcomponent'))
 		
 	)
 	->flatten()

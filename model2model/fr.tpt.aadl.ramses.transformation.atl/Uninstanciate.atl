@@ -64,7 +64,8 @@ rule m_RootSystem_Instance {
 	do
 	{
 		thisModule.allImportedUnits <- thisModule.allImportedUnits->including(src_package.ownedPublicSection.importedUnit);
-		c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveTemp(p, 'p2')));
+		if(AADLBA!SystemImplementation.allInstancesFrom('OUT')->contains(c.systemImplementation.resolve()))
+			c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveMatchedSingleIfExists(p, 'p2')));
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
 	}
 }
@@ -232,9 +233,9 @@ rule m_Data_Instance {
 }
 
 helper def : getContainingImplementation(cnx: AADLI!Connection) : AADLBA!ComponentImplementation =
-	if(thisModule.resolveTemp(cnx.context, 'sub').oclIsUndefined()) then
-		thisModule.resolveTemp(cnx.context, 'impl').debug('Retreived System Implementation')
+	if(thisModule.resolveMatchedSingleIfExists(cnx.context, 'sub').oclIsUndefined()) then
+		thisModule.resolveMatchedSingleIfExists(cnx.context, 'impl').debug('Retreived System Implementation')
 	else
-		thisModule.resolveTemp(cnx.context, 'sub').subcomponentType.debug('Retreived Component Implementation')
+		thisModule.resolveMatchedSingleIfExists(cnx.context, 'sub').subcomponentType.debug('Retreived Component Implementation')
 	endif
 ;

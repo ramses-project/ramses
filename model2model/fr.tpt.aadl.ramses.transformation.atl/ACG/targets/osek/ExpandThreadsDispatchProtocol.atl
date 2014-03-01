@@ -64,7 +64,7 @@ rule m_PeriodicThread
 
 helper context AADLI!ComponentInstance def: collectGlobalVariableImg()  : Sequence(AADLBA!DataSubcomponent) =
 	if(self.needsGlobalQueue()) then
-		Sequence{thisModule.resolveTemp(self, 'globalQueue')}
+		Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalQueue')}
 	else
 		Sequence{}
 	endif
@@ -82,9 +82,9 @@ helper context AADLI!ComponentInstance def: needsGlobalQueue(): Boolean =
 
 helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!DataSubcomponent =
 	if(self.isEventPort() or self.isEventDataPort()) then
-		thisModule.resolveTemp(self.getComponentInstance(),'globalQueue')
+		thisModule.resolveMatchedSingleIfExists(self.getComponentInstance(),'globalQueue')
 	else
-		thisModule.resolveTemp(self,'globalVariable')
+		thisModule.resolveMatchedSingleIfExists(self,'globalVariable')
 	endif
 ;
 
@@ -120,7 +120,7 @@ rule m_PeriodicThread_with_InputPort
 									c.featureInstance->select(e| 
 										e.isInputFeature() and (e.isEventPort() or e.isEventDataPort()))
 										->collect(e|
-											'&'+thisModule.resolveTemp(e, 'globalVariable').name
+											'&'+thisModule.resolveMatchedSingleIfExists(e, 'globalVariable').name
 										)
 								)+
 								thisModule.structInitTerminator		
@@ -137,7 +137,7 @@ helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AA
 			->collect(fi|thisModule.createReceiveInputCall(fi))
 		->union(thisModule.collectTransitionChoiceActions(self))
 		->union(
-			if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveTemp(self,'waitDispatchCall')} endif			
+			if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveMatchedSingleIfExists(self,'waitDispatchCall')} endif			
 		)
 		->excluding(OclUndefined)
 ;

@@ -120,8 +120,8 @@ rule m_Output_Buffer_ComputeEntrypointCallSequence
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
-		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
+		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -174,8 +174,8 @@ rule m_OutputBuffer_EventPort
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
-		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveTemp(Sequence{fi,cnxRef}, 'f_entrypoint');
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
+		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -228,7 +228,7 @@ rule m_BufferBehavior
 		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		BUFFER_ID: AADLBA!DataAccess = fi.getFeatureImg();
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveTemp(fi.getComponentInstance(), 'returnData');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to
 		count_variable: AADLBA!BehaviorVariable

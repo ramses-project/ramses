@@ -51,7 +51,7 @@ helper def : SharedStruct_Prototype : AADLBA!DataClassifier = 'SharedStructure'
 
 helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
   if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
-	thisModule.resolveTemp(c, 'initCallSequence')
+	thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence')
   else
   	OclUndefined
   endif
@@ -61,8 +61,8 @@ helper def : collectPeriodicDelayed_LocalVariablesConnections_Mutex(c: AADLI!Com
 	c.featureInstance->select(e|e.isInputFeature())
 	->collect(e|
 		Sequence{
-			thisModule.resolveTemp(e, 'cnxBuffer'), 
-			thisModule.resolveTemp(e, 'cnxSize')
+			thisModule.resolveMatchedSingleIfExists(e, 'cnxBuffer'), 
+			thisModule.resolveMatchedSingleIfExists(e, 'cnxSize')
 		}
 	)
 ;
@@ -70,20 +70,20 @@ helper def : collectPeriodicDelayed_LocalVariablesConnections_Mutex(c: AADLI!Com
 helper def : collectPeriodicDelayed_ThreadVariables_Mutex(c: AADLI!ComponentInstance): Sequence(AADLBA!AccessConnection) =
 	c.featureInstance->select(e|e.isInputFeature())
 	->collect(e|
-			thisModule.resolveTemp(e, 'queueSizeVariable')
+			thisModule.resolveMatchedSingleIfExists(e, 'queueSizeVariable')
 	)
 ;
 
 helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
 	Sequence
 	{
-		thisModule.resolveTemp(c, 'currentDeadlineSub'),
-		thisModule.resolveTemp(c, 'deadlineSub'),
-		thisModule.resolveTemp(c, 'periodSub'),
-		thisModule.resolveTemp(c, 'currentPeriodSub')
+		thisModule.resolveMatchedSingleIfExists(c, 'currentDeadlineSub'),
+		thisModule.resolveMatchedSingleIfExists(c, 'deadlineSub'),
+		thisModule.resolveMatchedSingleIfExists(c, 'periodSub'),
+		thisModule.resolveMatchedSingleIfExists(c, 'currentPeriodSub')
 	}
 	->union(if (c.featureInstance->exists(e|e.isOutputFeature() and e.isPeriodicDelayedPort()))
-			then Sequence{thisModule.resolveTemp(c, 'msgPrioritySub')}
+			then Sequence{thisModule.resolveMatchedSingleIfExists(c, 'msgPrioritySub')}
 	        else Sequence{}
 	        endif)
 	->union(thisModule.collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c, behavior))
@@ -95,7 +95,7 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInsta
 	(
 	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort())
 		->collect(fi|
-			thisModule.resolveTemp(fi, 'localVariable')
+			thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')
 		)
 	)
 	->flatten()
@@ -108,7 +108,7 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c: AADLI!Compone
 
 helper def : collectInitializationEntryPoint(c: AADLI!ComponentInstance): AADLBA!PropertyAssociation =
   if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
-	thisModule.resolveTemp(c, 'pa')
+	thisModule.resolveMatchedSingleIfExists(c, 'pa')
   else
   	OclUndefined
   endif
@@ -175,7 +175,7 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		(
 			name <- 'initLikedList',
 			ownedCallSpecification <- c.featureInstance->select(e|e.isInputFeature())
-										->collect(e|thisModule.resolveTemp(e,'callInit'))
+										->collect(e|thisModule.resolveMatchedSingleIfExists(e,'callInit'))
 		)
 	do
 	{
@@ -303,7 +303,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
 
 		t_data: AADLBA!DataClassifier = fi.feature.dataFeatureClassifier;
-		bufferQueueImpl: AADLBA!DataImplementation = thisModule.resolveTemp(consumerPort,'bufferArrayImpl');
+		bufferQueueImpl: AADLBA!DataImplementation = thisModule.resolveMatchedSingleIfExists(consumerPort,'bufferArrayImpl');
 	}
 	to
 		-----------------------
@@ -377,27 +377,27 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		putValueSpgHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- thisModule.resolveTemp(Sequence{fi,cnxRef}, 'putValueSpgImpl')
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'putValueSpgImpl')
 		),
 --		PortVariable    : requires data access t_aadl_thread_data_queue.impl; 
 		portVariableHolder: AADLBA!DataAccessHolder
 		(
-			element <- thisModule.resolveTemp(Sequence{fi, cnxRef}, 'f_entrypoint')
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'f_entrypoint')
 		),
 --  	DataValue       : requires data access t_request;
 		dataValueHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi, 'localVariable')
+			element <- thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')
 		),	
 --  	CurrentDeadline : in parameter Base_Types::Integer_16;
 		currentDeadlineHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentDeadlineSub')
+			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'currentDeadlineSub')
 		),
 --  	Priority        : in parameter Base_Types::Integer_16;
 		priorityHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi.getComponentInstance(),'msgPrioritySub')
+			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(),'msgPrioritySub')
 		),
 		sizeHolder: AADLBA!ValueExpression
 		(
@@ -456,19 +456,19 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	),
 	receiveInputsHolder: AADLBA!CalledSubprogramHolder
 	(
-		element <- thisModule.resolveTemp(fi, 'receiveInputSpgImpl')
+		element <- thisModule.resolveMatchedSingleIfExists(fi, 'receiveInputSpgImpl')
 	),
   	periodHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- thisModule.resolveTemp(fi.getComponentInstance(), 'periodSub')
+		element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'periodSub')
 	),
   	currentPeriodHolder: AADLBA!DataSubcomponentHolder
 	(
-		element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentPeriodSub')
+		element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'currentPeriodSub')
 	),
   	portVariableHolder: AADLBA!DataAccessHolder
 	(
-		element <- thisModule.resolveTemp(fi, 'f_entrypoint')	
+		element <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')	
 	)
 }
 
@@ -664,19 +664,19 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 		),
 		nextValueHolder: AADLBA!CalledSubprogramHolder
 		(
-			element <- thisModule.resolveTemp(fi, 'nextValueSpgImpl')
+			element <- thisModule.resolveMatchedSingleIfExists(fi, 'nextValueSpgImpl')
 		),
 		portVariableHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi, 'f_entrypoint')
+			element <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
 		),
 		dataValueHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi, 'localVariable')
+			element <- thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')
 		),
 		currentPeriodHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentPeriodSub')
+			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'currentPeriodSub')
 		),
 		returnCodeHolder: AADLBA!DataSubcomponentHolder
 		(
@@ -753,7 +753,7 @@ rule m_Input_PeriodicDelayed_Port_Mutex
 		),
 		sourceBufferCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveTemp(fi, 'f')
+			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'f')
 		),
 		destinationBufferCE: AADLBA!ConnectedElement
 		(
@@ -778,7 +778,7 @@ rule m_Input_PeriodicDelayed_Port_Mutex
 		initSpgPrototypeActual : AADLBA!ComponentPrototypeActual
 		(
 			category <-  #data,
-			subcomponentType <- thisModule.resolveTemp(fi,'bufferArrayImpl')
+			subcomponentType <- thisModule.resolveMatchedSingleIfExists(fi,'bufferArrayImpl')
 		),
 		CPRInit: AADLBA!ListValue
 		(
@@ -877,7 +877,7 @@ helper context AADLI!ComponentInstance def : getMsgPriority() : Integer =
 ;
 
 helper context AADLI!ComponentInstance def : getImgSubcomponent(name : String) : 
-	AADLBA!Subcomponent = thisModule.resolveTemp(self,'sub')
+	AADLBA!Subcomponent = thisModule.resolveMatchedSingleIfExists(self,'sub')
 			.threadSubcomponentType.getAllSubcomponents()
 			->any(s|s.name=name)
 ;
