@@ -10,6 +10,9 @@ import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentPrototypeActual ;
 import org.osate.aadl2.ComponentPrototypeBinding ;
 import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.ConnectedElement;
+import org.osate.aadl2.Connection;
+import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataPrototype ;
 import org.osate.aadl2.DataSubcomponentType ;
@@ -23,6 +26,8 @@ import org.osate.aadl2.SubprogramClassifier ;
 import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.ba.aadlba.BehaviorIntegerLiteral ;
+import org.osate.ba.aadlba.DataSubcomponentHolder;
+import org.osate.ba.aadlba.ElementHolder;
 import org.osate.ba.aadlba.Factor ;
 import org.osate.ba.aadlba.ParameterLabel ;
 import org.osate.ba.aadlba.Relation ;
@@ -163,6 +168,15 @@ public class SubprogramCallContext
           ctxt.putParameter (fe.getName(), bil.getValue());
         }
       }
+      else if(l instanceof ElementHolder)
+      {
+    	  ElementHolder eh = (ElementHolder) l;
+    	  if(eh.getElement() instanceof NamedElement)
+    	  {
+    		  NamedElement ne = (NamedElement) eh.getElement();
+    		  ctxt.parameterValues.put (fe.getName(), ne.getName());
+    	  }
+      }
       indexParam++;
     }
     
@@ -189,15 +203,40 @@ public class SubprogramCallContext
   
   public static SubprogramCallContext create (SubprogramCall call)
   {
-    final NamedElement e = (SubprogramClassifier) call.getCalledSubprogram();
+    final SubprogramClassifier e = (SubprogramClassifier) call.getCalledSubprogram();
     SubprogramCallContext ctxt = new SubprogramCallContext (e);
     
-    /*SubprogramCallSequence seq = (SubprogramCallSequence) call.eContainer();
-    BehavioredImplementation impl = (BehavioredImplementation) seq.eContainer();*/
-    
-    //TODO: fill context parameters
-    
-    return ctxt;
+    SubprogramCallSequence seq = (SubprogramCallSequence) call.eContainer();
+    BehavioredImplementation impl = (BehavioredImplementation) seq.eContainer();
+    SubprogramType st = null;
+    if(e instanceof SubprogramType)
+    	st = (SubprogramType) e;
+    else
+    	st = ((SubprogramImplementation) e).getType();
+    for(Feature f: st.getOwnedFeatures())
+    {
+    	for(Connection cnx: impl.getOwnedConnections())
+    	{
+    		ConnectedElement target = (ConnectedElement) cnx.getDestination();
+    		if(target.getConnectionEnd().equals(f))
+    		{
+    			ConnectedElement source = (ConnectedElement) cnx.getSource();
+    			ctxt.parameterValues.put(f.getName(), ((NamedElement)source.getConnectionEnd()).getName());
+    			return ctxt;
+    		}
+    		else
+    		{
+    			ConnectedElement source = (ConnectedElement) cnx.getSource();
+        		if(target.getConnectionEnd().equals(f))
+        		{
+        			target = (ConnectedElement) cnx.getDestination();
+        			ctxt.parameterValues.put(f.getName(), ((NamedElement)target.getConnectionEnd()	).getName());
+        			return ctxt;
+        		}
+    		}
+    	}
+    }
+    return null;
   }
   
   

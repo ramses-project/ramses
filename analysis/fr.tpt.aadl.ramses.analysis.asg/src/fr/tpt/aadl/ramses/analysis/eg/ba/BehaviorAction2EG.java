@@ -3,12 +3,16 @@ package fr.tpt.aadl.ramses.analysis.eg.ba;
 import java.util.List ;
 
 import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.ComponentClassifier;
+import org.osate.aadl2.ComponentType;
 import org.osate.aadl2.ConnectedElement ;
 import org.osate.aadl2.Connection ;
 import org.osate.aadl2.ConnectionEnd ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.Feature ;
+import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.SubprogramClassifier ;
+import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.instance.ComponentInstance ;
@@ -50,6 +54,7 @@ import fr.tpt.aadl.ramses.analysis.eg.ba.ValueExpressionUtil.ExpressionToken ;
 import fr.tpt.aadl.ramses.analysis.eg.ba.ValueExpressionUtil.ExpressionTokens ;
 import fr.tpt.aadl.ramses.analysis.eg.ba.ValueExpressionUtil.OperatorToken ;
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
+import fr.tpt.aadl.ramses.analysis.eg.context.SubprogramCallContext;
 import fr.tpt.aadl.ramses.analysis.eg.error.NYI ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNodeKind ;
@@ -438,6 +443,21 @@ public class BehaviorAction2EG
           break;
         }
       }
+      else 
+      {
+    	  ConnectedElement source = (ConnectedElement) ci.getSource();
+    	  cend = source.getConnectionEnd();
+    	  if (cend == da)
+          {
+            ConnectedElement dst = (ConnectedElement) ci.getDestination();
+            ConnectionEnd cfini = dst.getConnectionEnd();
+            if (cfini instanceof DataAccess)
+            {
+              threadDA = (DataAccess) cfini;
+              break;
+            }
+          }
+      }
     }
     
     return threadDA == null ? da : threadDA;
@@ -504,29 +524,62 @@ public class BehaviorAction2EG
   private static EGNode lockActionToEG(LockAction a)
   {
     DataAccessHolder h = a.getDataAccess();
-    DataAccess da = getDataAccess(h);
-    ComponentInstance data = getDataAccessElement (da);
-    
+    DataAccess da = h.getDataAccess();
     EGNode n = new EGNode("LockAction");
-    n.setKind(EGNodeKind.CriticalSectionStart);
-    n.setSharedDataAccess(da);
-    n.setSharedData(data);
-    
+    configureLockAction(n, da, EGNodeKind.CriticalSectionStart);
     return n;
   }
   
+  private static void configureLockAction(EGNode n, DataAccess da, EGNodeKind kind)
+  {
+	NamedElement currentVisiting = EGContext.getInstance().getCurrentThread();
+	int size = EGContext.getInstance().getVisitingSubprogramCallActionSize();
+	
+	SubprogramType spg = (SubprogramType) da.getContainingClassifier();
+	int containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+	String paramValue = "";
+	for(int i=size;i>0;i--)
+	{
+	  String paramName = spg.getOwnedFeatures().get(containerFeatureIdx).getName();
+	  SubprogramCallContext scc = EGContext.getInstance().getVisitingSubprogramCallAction(i-1);
+	  paramValue = scc.getParameterStringValue(paramName);
+	  SubprogramClassifier sc = (SubprogramClassifier) scc.getElement();
+	  if(sc instanceof SubprogramType)
+	    spg = (SubprogramType) sc;
+	  else
+		spg = ((SubprogramImplementation) sc).getType();
+	    containerFeatureIdx = getFeatureIndex(spg, paramValue);
+	}
+	
+	ComponentInstance ci = (ComponentInstance) currentVisiting;
+	ComponentType ct = ci.getSubcomponent().getComponentType();
+	int daIndex = getFeatureIndex(ct, paramValue);
+	da = (DataAccess) ct.getOwnedFeatures().get(daIndex);
+	n.setKind(kind);
+	n.setSharedDataAccess(da);
+	ComponentInstance data = getDataAccessElement (da);
+	n.setSharedData(data);
+  }
+  
+  private static int getFeatureIndex(ComponentType ct, String featureName)
+  {
+	  int res = -1;
+	  for(Feature f:ct.getOwnedFeatures())
+	  {
+		  res++;
+		  if(f.getName().equals(featureName))
+			  return res;
+	  }
+	  return -1;
+  }
+
   private static EGNode unlockActionToEG(UnlockAction a)
   {
-    DataAccessHolder h = a.getDataAccess();
-    DataAccess da = getDataAccess(h);
-    ComponentInstance data = getDataAccessElement (da);
-    
-    EGNode n = new EGNode("LockAction");
-    n.setKind(EGNodeKind.CriticalSectionEnd);
-    n.setSharedDataAccess(da);
-    n.setSharedData(data);
-    
-    return n;
+	DataAccessHolder h = a.getDataAccess();
+	DataAccess da = h.getDataAccess();
+	EGNode n = new EGNode("UnlockAction");
+	configureLockAction(n, da, EGNodeKind.CriticalSectionEnd);
+	return n;
   }
   
   private static EGNode ifToEG (IfStatement a)

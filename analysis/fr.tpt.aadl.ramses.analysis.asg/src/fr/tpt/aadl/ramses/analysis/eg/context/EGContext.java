@@ -78,4 +78,12 @@ public class EGContext {
 	{
 		systemProperties = props;
 	}
+
+	public int getVisitingSubprogramCallActionSize() {
+		return currentSubprograms.size();
+	}
+
+	public SubprogramCallContext getVisitingSubprogramCallAction(int i) {
+		return currentSubprograms.get(i);
+	}
 }
