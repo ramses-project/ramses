@@ -165,7 +165,7 @@ rule m_Threads_HM
 			transitions <- errorIds->asSequence()->flatten()
 							->collect(e|thisModule.createTransition(c,e))
 							->append(firstTransition),
-			actions		<- Sequence{recoveryActionBlock}->union(errorIds->asSequence()->flatten()->collect(e|thisModule.resolveMatchedTupleIfExists(Sequence{c,e}, 'createTransition', 'recoveryActionBlock'))),
+			actions		<- Sequence{recoveryActionBlock}->union(errorIds->asSequence()->flatten()->collect(e|thisModule.resolveLazyIfExists(Sequence{c,e}, 'createTransition', 'recoveryActionBlock'))),
 			variables   <- Sequence{errorStatus,errorCode}
 		),
 		firstState: AADLBA!BehaviorState
