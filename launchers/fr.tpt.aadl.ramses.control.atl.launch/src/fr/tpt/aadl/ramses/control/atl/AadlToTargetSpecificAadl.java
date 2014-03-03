@@ -130,10 +130,10 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 	  {
 		  return extractAadlResource(inputResource, outputFile);
 	  }
-	  catch (IOException | RecognitionException ex)
+	  catch (Exception ex)
 	  {
 	    String msg = "fail to extract AADL resources" ;
-      throw new GenerationException(msg, ex) ;
+        throw new GenerationException(msg, ex) ;
 	  }
   }
 
