@@ -367,7 +367,7 @@ rule m_create_Thread_BA
 												->union
 												(
 													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
-													->collect(e|thisModule.resolveLazyIfExists(e, 'createFreshnessIndicator','freshnessIndicator_Connection'))	
+													->collect(e|thisModule.resolveLazySingleIfExists(e, 'createFreshnessIndicator','freshnessIndicator_Connection'))	
 												)
 												->union(
 													impl.ownedSubprogramCallSequence->collect(callSequence |

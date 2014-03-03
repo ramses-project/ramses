@@ -25,25 +25,25 @@ library Services;
 
 --- Returns the same as thisModule.resolveTemp(var : OclAny, rule_name : String, target_pattern_name : String),
 --- except that it returns OclUndefined if no trace exists instead of throwing an error.
---helper def : resolveLazyIfExists(var : Sequence(OclAny), rule_name : String, target_pattern_name : String) : OclAny =
---    let tr : OclAny = thisModule.traces.getLinksByRule(rule_name, false) in
---    if tr.oclIsUndefined() then
---    	OclUndefined
---    else
---    	let sel : OclAny = tr.getUniqueSourceElements(var) in
---        if sel.oclIsUndefined() then
---        	OclUndefined
---        else
---        	let te : OclAny = sel.getSourceElements().get(0).getSourceOf().getTargetElement(target_pattern_name) in
---            if te.oclIsUndefined() then
---            	OclUndefined
---            else
---            	te.getObject()
---            endif
---        endif
---       endif;
+helper def : resolveLazyTupleSingleIfExists(var : Sequence(OclAny), rule_name : String, target_pattern_name : String) : OclAny =
+    let tr : OclAny = thisModule.traces.getLinksByRule(rule_name, false) in
+    if tr.oclIsUndefined() then
+    	OclUndefined
+    else
+    	let sel : OclAny = tr.getUniqueSourceElements(var) in
+        if sel.oclIsUndefined() then
+        	OclUndefined
+        else
+        	let te : OclAny = sel.getSourceElements().get(0).getSourceOf().getTargetElement(target_pattern_name) in
+            if te.oclIsUndefined() then
+            	OclUndefined
+            else
+            	te.getObject()
+            endif
+        endif
+       endif;
 
-helper def : resolveLazyIfExists(var :OclAny, rule_name : String, target_pattern_name : String) : OclAny =
+helper def : resolveLazySingleIfExists(var :OclAny, rule_name : String, target_pattern_name : String) : OclAny =
     let tr : OclAny = thisModule.traces.getLinksByRule(rule_name, false) in
     if tr.oclIsUndefined() then
     	OclUndefined

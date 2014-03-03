@@ -49,8 +49,8 @@ helper def : collectPeriodicDelayed_GlobalVariables_LowMFP(c: AADLI!ComponentIns
 					->collect(fi | 
 						Sequence{
 						
-							thisModule.resolveLazyIfExists(fi, 'createContextSubcomponent', 'componentInstancesArray'),
-							thisModule.resolveLazyIfExists(fi, 'createContextSubcomponent', 'contextSubcomponent')
+							thisModule.resolveLazySingleIfExists(fi, 'createContextSubcomponent', 'componentInstancesArray'),
+							thisModule.resolveLazySingleIfExists(fi, 'createContextSubcomponent', 'contextSubcomponent')
 						
 					}
 					)
@@ -364,7 +364,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		-- next is a workaround
 		thisModule.theHOOK.setDirection(putValueValueParam, 'in');
 		putValueOutputActual.setClassifier(fi.feature.dataFeatureClassifier);
-		putValueContextActual.setClassifier(thisModule.resolveLazyIfExists(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
+		putValueContextActual.setClassifier(thisModule.resolveLazySingleIfExists(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
 	}
 }
 
@@ -605,7 +605,7 @@ unique lazy rule createContextSubcomponent
 		componentInstancesArray: AADLBA!DataSubcomponent
 		(
 			name <- 'writer_instances_'+fi.getComponentInstance().name+'_'+fi.name,
-			dataSubcomponentType <- thisModule.resolveLazyIfExists(fi, 'createContextDataImpl', 'ComponentInstanceArrayDataType'),
+			dataSubcomponentType <- thisModule.resolveLazySingleIfExists(fi, 'createContextDataImpl', 'ComponentInstanceArrayDataType'),
 			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
 												 	'Initial_Value',
 													'DATA_MODEL',

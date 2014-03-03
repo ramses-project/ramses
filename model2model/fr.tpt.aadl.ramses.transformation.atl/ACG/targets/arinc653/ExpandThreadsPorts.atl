@@ -51,7 +51,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 			Sequence
 			{
 				fi.retreiveMessageAddress(),
-				thisModule.resolveLazyIfExists(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')
+				thisModule.resolveLazySingleIfExists(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')
 			}
 		)
 	)
@@ -67,7 +67,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 			Sequence
 			{
 				fi.retreiveMessageAddress(),
-				thisModule.resolveLazyIfExists(fi, 'CreateValidityDataSubcomponent', 'dataSubcomponent')
+				thisModule.resolveLazySingleIfExists(fi, 'CreateValidityDataSubcomponent', 'dataSubcomponent')
 			}
 		)
 	)
@@ -79,7 +79,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 		and
 		not e.isPeriodicDelayedPort())
 		->collect(fi|
-			thisModule.resolveLazyIfExists(fi, 'CreateTimeOutSubcomponentFromPort', 'dataSubcomponent')
+			thisModule.resolveLazySingleIfExists(fi, 'CreateTimeOutSubcomponentFromPort', 'dataSubcomponent')
 		)
 	)
 	->union

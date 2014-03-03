@@ -68,7 +68,7 @@ unique lazy rule createUpdateFreshnessToSend
 		),
 		dataSubcomponentStructSend: AADLBA!DataSubcomponentHolder
 		(
-			element<-thisModule.resolveLazyIfExists(fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
+			element<-thisModule.resolveLazySingleIfExists(fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
 		),
 		sendValueExpressionOutput: AADLBA!ValueExpression
 		(
@@ -315,7 +315,7 @@ rule m_Compute_EntryPoint_from_BA {
  	thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
  	for(fi in c.featureInstance->select(fi | fi.feature.oclIsKindOf(AADLBA!Port) and fi.isUsedInFresh()))
  	{
- 		thisModule.resolveLazyIfExists(fi, 'createFreshnessIndicator', 'freshnessIndicator_CnxDestination').setContext(thisModule.resolveMatchedSingleIfExists(c, 'callEntryPoint'));
+ 		thisModule.resolveLazySingleIfExists(fi, 'createFreshnessIndicator', 'freshnessIndicator_CnxDestination').setContext(thisModule.resolveMatchedSingleIfExists(c, 'callEntryPoint'));
  	}
  }
 }
@@ -368,7 +368,7 @@ lazy rule getValueComponentReference
 		),
 		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveLazyIfExists(
+			element <- thisModule.resolveLazySingleIfExists(
 							fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_functional_data_subcomponent'
 						)
 		)
@@ -662,7 +662,7 @@ unique lazy rule createFreshnessIndicatorUpdateAction
 		),
 		dataFreshnessSubcomponentHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveLazyIfExists(fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
+			element <- thisModule.resolveLazySingleIfExists(fi.feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent')
 		)
 	do
 	{
@@ -807,7 +807,7 @@ rule m_DataPortHolder_withFresh
 		functionalPartHolder: AADLBA!DataSubcomponentHolder
 	do
 	{
-		functionalPartHolder.element<-thisModule.resolveLazyIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name).feature.dataFeatureClassifier, 'createFreshnessDataStructure','struct_functional_data_subcomponent');
+		functionalPartHolder.element<-thisModule.resolveLazySingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name).feature.dataFeatureClassifier, 'createFreshnessDataStructure','struct_functional_data_subcomponent');
 	}
 }
 
@@ -1067,7 +1067,7 @@ rule m_PortFreshValue
 		portImgFreshPrevSubcomponentHolder: AADLBA!DataSubcomponentHolder
 	do
 	{
-		portImgFreshPrevSubcomponentHolder.element <- thisModule.resolveLazyIfExists(
+		portImgFreshPrevSubcomponentHolder.element <- thisModule.resolveLazySingleIfExists(
 							c.featureInstance->any(e|e.feature = src_PortFreshValue.element).feature.dataFeatureClassifier, 'createFreshnessDataStructure', 'struct_freshness_data_subcomponent'
 						);
 	}
