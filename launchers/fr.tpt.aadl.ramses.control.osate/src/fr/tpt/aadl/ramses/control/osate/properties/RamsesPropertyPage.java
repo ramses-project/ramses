@@ -277,27 +277,21 @@ public class RamsesPropertyPage extends PropertyPage {
     
     if(config.getTargetId() != null)
     {
-      switch(config.getTargetId())
+      if(config.getTargetId().
+    		  equals(_OJR_PLATFORM ))
       {
-        case _OJR_PLATFORM :
-        {
-          target = ojr ;
-          break ;
-        }
-        
-        case PokGeneratorFactory.POK_GENERATOR_NAME :
-        {
-          target = arinc ;
-          break ;
-        }
-        
-        case OSEKGeneratorFactory.OSEK_GENERATOR_NAME :
-        {
-          target = osek ;
-          break ;
-        }
+        target = ojr ;
       }
-
+      else if(config.getTargetId().
+    		  equals(PokGeneratorFactory.POK_GENERATOR_NAME))
+      {
+    	target = arinc ;
+      }
+      else if(config.getTargetId().
+    		  equals(OSEKGeneratorFactory.OSEK_GENERATOR_NAME))
+      {
+          target = osek ;
+      }
       target.setSelection(true) ;
     }
     
