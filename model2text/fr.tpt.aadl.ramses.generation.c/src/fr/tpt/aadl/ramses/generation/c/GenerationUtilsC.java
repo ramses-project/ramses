@@ -21,29 +21,26 @@
 
 package fr.tpt.aadl.ramses.generation.c ;
 
-import java.util.List;
-import java.util.Set;
+import java.util.List ;
+import java.util.Set ;
 
-import org.osate.aadl2.BooleanLiteral;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentPrototype;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.DataPrototype;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.Parameter;
-import org.osate.aadl2.Property;
-import org.osate.aadl2.ThreadImplementation;
+import org.apache.log4j.Logger ;
+import org.osate.aadl2.ComponentImplementation ;
+import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.Parameter ;
+import org.osate.aadl2.ThreadImplementation ;
 import org.osate.utils.PropertyUtils ;
-import org.osate.xtext.aadl2.properties.util.GetProperties;
 
-
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class GenerationUtilsC
 {
-  
   public final static String THREAD_SUFFIX = "_Job" ;
   public final static String THREAD_INIT_SUFFIX = "_Init" ;
   
+  private static Logger _LOGGER = Logger.getLogger(GenerationUtilsC.class) ;
   
   public static String getInitializationCall(ThreadImplementation object)
   {
@@ -146,10 +143,18 @@ public class GenerationUtilsC
   public static boolean isReturnParameter(Parameter p)
   {
 	  boolean isReturnParam=false;
-	  try {
-		isReturnParam =
-				  PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
-	  } catch (Exception e) {
+	  try
+	  {
+		  isReturnParam =
+			PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
+	  }
+	  catch (Exception e)
+	  {
+	    String errMsg =  RamsesException.formatRethrowMessage("cannot fetch return parameter for \'"+
+	                    p.getName() + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);  
+	    
 		  // DO NOT COMIT.
 //	    Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
 //		BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
@@ -158,14 +163,16 @@ public class GenerationUtilsC
 	  return isReturnParam;
   }
   
-  public static String resolveExistingCodeDependencies(NamedElement object,
-		  										 Set<String> additionalHeaders)
+  public static String
+      resolveExistingCodeDependencies(NamedElement object,
+                                      Set<String> additionalHeaders)
   {
-	  try
+    try
     {
       NamedElement ne = object ;
       List<String> sourceText =
-              PropertyUtils.getStringListValue(ne, "Source_Text") ;
+                                PropertyUtils.getStringListValue(ne,
+                                                                 "Source_Text") ;
       for(String s : sourceText)
       {
         if(s.endsWith(".h"))
@@ -173,25 +180,31 @@ public class GenerationUtilsC
           additionalHeaders.add(s) ;
         }
       }
+      
       String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-      System.out.println("sourceName : "+sourceName);
-      return sourceName;
+      
+      _LOGGER.trace("sourceName : " + sourceName);
+      
+      return sourceName ;
     }
     catch(Exception e)
     {
-
-    	if(object instanceof ComponentType)
+      if(object instanceof ComponentType)
       {
-        ComponentType c = (ComponentType) object;
-        if(c.getOwnedExtension()!=null)
-    	  return resolveExistingCodeDependencies(c.getOwnedExtension().getExtended(), additionalHeaders);
+        ComponentType c = (ComponentType) object ;
+        if(c.getOwnedExtension() != null)
+          return resolveExistingCodeDependencies(c.getOwnedExtension()
+                                                  .getExtended(),
+                                                 additionalHeaders) ;
       }
       /*else   FIXME: ComponentPrototype */
-      else if (object instanceof ComponentImplementation)
+      else if(object instanceof ComponentImplementation)
       {
-        ComponentImplementation ci = (ComponentImplementation) object;
-        if(ci.getOwnedExtension()!=null)
-    	  return resolveExistingCodeDependencies(ci.getOwnedExtension().getExtended(), additionalHeaders);
+        ComponentImplementation ci = (ComponentImplementation) object ;
+        if(ci.getOwnedExtension() != null)
+          return resolveExistingCodeDependencies(ci.getOwnedExtension()
+                                                   .getExtended(),
+                                                 additionalHeaders) ;
       }
       return null ;
     }

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.AccessSpecification;
@@ -104,6 +105,7 @@ import org.osate.utils.Aadl2Utils;
 import org.osate.utils.PropertyUtils;
 import org.osate.utils.names.DataModelProperties;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
@@ -158,6 +160,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   
   private SubprogramCallSequence _currentBehaviorCallSequence = null;
   private SubprogramCallSequence _initBehaviorCallSequence = null;
+  
+  private static Logger _LOGGER = Logger.getLogger(AadlToCUnparser.class) ;
+  
   public static AadlToCUnparser getAadlToCUnparser()
   {
     if(singleton==null)
@@ -175,43 +180,42 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   {
     _gtypesImplCode = new AadlToCSwitchProcess(this) ;
     _gtypesImplCode.addOutputNewline("#include \"gtypes.h\"") ;
-    
+
     _gtypesHeaderCode = new AadlToCSwitchProcess(this) ;
-    
+
     _subprogramImplCode = new AadlToCSwitchProcess(this) ;
     _subprogramImplCode.addOutputNewline("#include \"subprograms.h\"") ;
-    
+
     _subprogramHeaderCode = new AadlToCSwitchProcess(this) ;
-    _subprogramHeaderCode.addOutputNewline("#include \"gtypes.h\"") ;    
-    _subprogramHeaderCode.addOutputNewline("#include \"main.h\"") ;    
-    
+    _subprogramHeaderCode.addOutputNewline("#include \"gtypes.h\"") ;
+    _subprogramHeaderCode.addOutputNewline("#include \"main.h\"") ;
+
     _activityImplCode = new AadlToCSwitchProcess(this) ;
     _activityImplCode.addOutputNewline("#include \"activity.h\"") ;
-    _activityImplCode.addOutputNewline(MAIN_HEADER_INCLUSION);
-    
+    _activityImplCode.addOutputNewline(MAIN_HEADER_INCLUSION) ;
+
     _activityHeaderCode = new AadlToCSwitchProcess(this) ;
     _activityHeaderCode.addOutputNewline("#include \"subprograms.h\"") ;
-        
+
     _deploymentImplCode = new AadlToCSwitchProcess(this) ;
     _deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
-    
+
     _deploymentHeaderCode = new AadlToCSwitchProcess(this) ;
     _deploymentHeaderCode.addOutputNewline("#include \"gtypes.h\"") ;
-    
+
     _processedTypes = new ArrayList<String>() ;
-    
+
     _additionalHeaders = new HashMap<AadlToCSwitchProcess, Set<String>>() ;
-    
   }
   
   public List<PrototypeBinding> getCurrentPrototypeBindings(String ctxt)
   {
-	  System.out.println("Inherited prototype bindings for " + ctxt);
-	  
+    _LOGGER.trace("Inherited prototype bindings for " + ctxt);
+    
 	  List<PrototypeBinding> bindings = new ArrayList<PrototypeBinding>();
 	  for(SubprogramClassifier c: subprogramsUnparsingStack)
 	  {
-		  System.out.println("  prototype bindings from " + c.getName());
+	    _LOGGER.trace("prototype bindings from " + c.getName());
 		  List<PrototypeBinding> cBindings = c.getOwnedPrototypeBindings();
 		  for(PrototypeBinding b : cBindings)
 		  {
@@ -227,17 +231,16 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 				  {
 					  st = ((PortSpecification)cpb.getActual()).getClassifier();
 				  }
-				  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
-
+				  _LOGGER.trace("prototype binding " + b.getFormal().getName() +
+				                                                 " => " + st.getName());
 			  }
 			  else
 			  {
 				  ComponentPrototypeBinding cpb = (ComponentPrototypeBinding) b;
 				  SubcomponentType st = cpb.getActuals().get(0).getSubcomponentType();
-				  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
-
+				  _LOGGER.trace("    prototype binding " + b.getFormal().getName() +
+				                                                 " => " + st.getName());
 			  }
-			  
 		  }
 		  
 		  bindings.addAll(cBindings);
@@ -321,14 +324,17 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
     catch(IOException e)
     {
-      // TODO: handle error message.
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage
+                               ("cannot write or save the generated files", e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
   }
 
-  private void clean() {
-	this._additionalHeaders.clear();
-	this._dataAccessMapping.clear();
+  private void clean()
+  {
+	  this._additionalHeaders.clear();
+	  this._dataAccessMapping.clear();
   }
 
   private String getAdditionalHeader(AadlToCSwitchProcess fileUnparser)
@@ -350,7 +356,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   }
 
   private void saveFile(FileWriter file,
-                        String ... content)
+                        String ... content) throws IOException
   {
     BufferedWriter output ;
     StringBuilder sb = new StringBuilder() ;
@@ -360,58 +366,59 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       sb.append(s) ;
     }
     
-    try
-    {
-      output = new BufferedWriter(file) ;
-      
-      output.write(sb.toString()) ;
-      
-      output.close() ;
-    }
-    catch(IOException e)
-    {
-      // TODO: handle error message.
-      e.printStackTrace() ;
-    }
+    output = new BufferedWriter(file) ;
+    output.write(sb.toString()) ;
+    output.close() ;
   }
 
-  public boolean resolveExistingCodeDependencies(NamedElement object,
-          AadlToCSwitchProcess sourceNameDest,
-          AadlToCSwitchProcess sourceTextDest) throws Exception
+  public
+      boolean
+      resolveExistingCodeDependencies(NamedElement object,
+                                      AadlToCSwitchProcess sourceNameDest,
+                                      AadlToCSwitchProcess sourceTextDest)
+                                                      throws GenerationException
   {
-	Set<String> l;
-	if(_additionalHeaders.containsKey(sourceTextDest) == false)
-	{
-	  l = new HashSet<String>() ;
-	  _additionalHeaders.put(sourceTextDest, l) ;
-	}
-	else
-	{
-	  l = _additionalHeaders.get(sourceTextDest) ;
-	}
-	String sourceName = GenerationUtilsC.resolveExistingCodeDependencies(object, l);
-	if(sourceName!=null)
-	{
-	  if(sourceNameDest!=null)
-		sourceNameDest.addOutput(sourceName);
-	  return true;
-	}
-	else
-		throw new Exception("In component "+object.getName()+": Source_Text " +
-	      		"property should also reference a header (.h extension) file");
+    Set<String> l ;
+    if(_additionalHeaders.containsKey(sourceTextDest) == false)
+    {
+      l = new HashSet<String>() ;
+      _additionalHeaders.put(sourceTextDest, l) ;
+    }
+    else
+    {
+      l = _additionalHeaders.get(sourceTextDest) ;
+    }
+    String sourceName =
+                        GenerationUtilsC.resolveExistingCodeDependencies(object,
+                                                                         l) ;
+    if(sourceName != null)
+    {
+      if(sourceNameDest != null)
+        sourceNameDest.addOutput(sourceName) ;
+      return true ;
+    }
+    else
+    {
+      String errMsg = "In component " + object.getName() + ": Source_Text " +
+                 "property should also reference a header (.h extension) file" ;
+      _LOGGER.fatal(errMsg) ;
+      throw new GenerationException(errMsg) ;
+    }
   }
   
-  protected void processDataSubcomponentType(DataSubcomponentType dst,
-		  AadlToCSwitchProcess sourceNameDest, 
-		  AadlToCSwitchProcess sourceTextDest)
+  protected void
+      processDataSubcomponentType(DataSubcomponentType dst,
+                                  AadlToCSwitchProcess sourceNameDest,
+                                  AadlToCSwitchProcess sourceTextDest)
   {
-	  processDataSubcomponentType((Classifier)_owner, dst, sourceNameDest, sourceTextDest);
+    processDataSubcomponentType((Classifier) _owner, dst, sourceNameDest,
+                                sourceTextDest) ;
   }
   
-  protected void processDataSubcomponentType(Classifier owner,
-		  DataSubcomponentType dst,
-		  AadlToCSwitchProcess sourceNameDest, 
-		  AadlToCSwitchProcess sourceTextDest)
+  protected void
+      processDataSubcomponentType(Classifier owner, DataSubcomponentType dst,
+                                  AadlToCSwitchProcess sourceNameDest,
+                                  AadlToCSwitchProcess sourceTextDest)
   {
 
     try
@@ -493,18 +500,18 @@ public class AadlToCUnparser extends AadlProcessingSwitch
    */
   public String processAnnexSubclause(AnnexSubclause as, NamedElement owner)
   {
-	AadlToCSwitchProcess codeUnparser;
-	AadlToCSwitchProcess headerUnparser;
-	if(owner instanceof SubprogramClassifier)
-	{
-	  codeUnparser = _subprogramImplCode;
-	  headerUnparser = _subprogramHeaderCode;
-	}
-	else
-	{
-	  codeUnparser = _activityImplCode;
-	  headerUnparser = _subprogramHeaderCode;
-	}
+    AadlToCSwitchProcess codeUnparser ;
+    AadlToCSwitchProcess headerUnparser ;
+    if(owner instanceof SubprogramClassifier)
+    {
+      codeUnparser = _subprogramImplCode ;
+      headerUnparser = _subprogramHeaderCode ;
+    }
+    else
+    {
+      codeUnparser = _activityImplCode ;
+      headerUnparser = _subprogramHeaderCode ;
+    }
 
     // XXX May AadlBaToCUnparser have its own interface ???
     // XXX NO, using interfaces and in particular extension points is an overkill
@@ -517,8 +524,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
     baToCUnparserAction.unparseAnnexSubclause(as,
     		codeUnparser.getIndent()) ;
-
-
 
     baToCUnparser.addIndent_C(codeUnparser.getIndent()) ;
     baToCUnparser.addIndent_H(headerUnparser.getIndent()) ;
@@ -553,7 +558,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	  return processBehavioredImplementation(object, object);
   }
   
-  public boolean processBehavioredImplementation(BehavioredImplementation object, BehavioredImplementation owner)
+  public boolean processBehavioredImplementation(BehavioredImplementation object,
+                                                 BehavioredImplementation owner)
   {
 	  boolean foundRestrictedAnnex = false;
 	  for(AnnexSubclause annex : object.getOwnedAnnexSubclauses())
@@ -573,7 +579,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	    {
 	  	  for(SubprogramCallSequence scs: object.getOwnedSubprogramCallSequences())
 	  	  {
-	  		process(scs);
+	  		  process(scs);
 	  	  }
 	  	}
 	  	foundRestrictedAnnex=true;
@@ -583,10 +589,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 	  return foundRestrictedAnnex;
   }
   
-  
   protected void getCTypeDeclarator(NamedElement object)
   {
-    
     String id =
           GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
     TypeHolder dataTypeHolder = null ;
@@ -597,8 +601,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
     catch(DimensionException e)
     {
-      // TODO: handle error message.
-      e.printStackTrace() ;
+      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the type of \'" +
+                               object + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
 
     EList<PropertyExpression> numberRepresentation =
@@ -1011,9 +1017,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           _gtypesHeaderCode.addOutput(id) ;
           _gtypesHeaderCode.addOutputNewline(";") ;
         }
-        catch(Exception e)
+        catch(GenerationException e)
         {
-          return ;
+          String errMsg =  RamsesException.formatRethrowMessage("cannot resolve dependencies for \'"+
+                          object + '\'', e) ;
+          _LOGGER.error(errMsg);
+          ServiceProvider.SYS_ERR_REP.error(errMsg, true); ;
         }
 
         break ;
@@ -1023,45 +1032,44 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   
   boolean isAbstractType(DataClassifier dc)
   {
-	if(dc instanceof DataImplementation)
-	{
-	  DataImplementation di = (DataImplementation) dc;
-	  for(DataSubcomponent ds:getAllDataSubcomponents(di))
+    if(dc instanceof DataImplementation)
+    {
+      DataImplementation di = (DataImplementation) dc ;
+      for(DataSubcomponent ds : getAllDataSubcomponents(di))
       {
-	    DataSubcomponentType dst = ds.getDataSubcomponentType();
-	    if(dst instanceof DataPrototype)
-	    {
-		  boolean bounded = false;
-		  Classifier cl = (Classifier) _owner;
-	      for(PrototypeBinding pb: cl.getOwnedPrototypeBindings())
-	      {
-	        if(pb.getFormal().equals(dst))
-	        {
-	          bounded = true;
-	          break;
-	        }
-	      }
-		  if(bounded==false)
-		  {
-		    return true;
-		  }
-	    }
-	  }
-	}
-	return false;
+        DataSubcomponentType dst = ds.getDataSubcomponentType() ;
+        if(dst instanceof DataPrototype)
+        {
+          boolean bounded = false ;
+          Classifier cl = (Classifier) _owner ;
+          for(PrototypeBinding pb : cl.getOwnedPrototypeBindings())
+          {
+            if(pb.getFormal().equals(dst))
+            {
+              bounded = true ;
+              break ;
+            }
+          }
+          if(bounded == false)
+          {
+            return true ;
+          }
+        }
+      }
+    }
+    return false ;
   }
-  
+
   List<DataSubcomponent> getAllDataSubcomponents(ComponentImplementation ci)
   {
-	List<DataSubcomponent> result = new ArrayList<DataSubcomponent>();
-	for(Subcomponent s: ci.getAllSubcomponents())
-	{
-	  if(s instanceof DataSubcomponent)
-	    result.add((DataSubcomponent)s);
-	}
-	return result;
+    List<DataSubcomponent> result = new ArrayList<DataSubcomponent>() ;
+    for(Subcomponent s : ci.getAllSubcomponents())
+    {
+      if(s instanceof DataSubcomponent)
+        result.add((DataSubcomponent) s) ;
+    }
+    return result ;
   }
-	  
 
   @Override
   protected void initSwitches()
@@ -1129,11 +1137,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
       public String caseDataImplementation(DataImplementation object)
       {
-    	if(_processedTypes.contains(object.getQualifiedName()))
+        if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;
         }
-        _processedTypes.add(object.getQualifiedName());
+        _processedTypes.add(object.getQualifiedName()) ;
         _currentHeaderUnparser = _gtypesHeaderCode ;
         _gtypesHeaderCode.processComments(object) ;
         getCTypeDeclarator((NamedElement) object) ;
@@ -1249,166 +1257,169 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseThreadImplementation(ThreadImplementation object)
       {
-    	for(SubprogramSubcomponent sc:object.getOwnedSubprogramSubcomponents())
-    	{
-    		process(sc);
-    	}
-    	if(_processedTypes.contains(object.getQualifiedName()))
+        for(SubprogramSubcomponent sc : object.getOwnedSubprogramSubcomponents())
+        {
+          process(sc) ;
+        }
+        if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;
         }
-        _processedTypes.add(object.getQualifiedName());
-    	_currentImplUnparser = _activityImplCode ;
+        _processedTypes.add(object.getQualifiedName()) ;
+        _currentImplUnparser = _activityImplCode ;
         _currentHeaderUnparser = _activityHeaderCode ;
         GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         process(object.getType()) ;
-        
+
         _currentImplUnparser.addOutput("void ") ;
-        _currentImplUnparser.addOutput(GenerationUtilsC
-              .getGenerationCIdentifier(object.getQualifiedName())) ;
-        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_INIT_SUFFIX + "()") ;
+        _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
+        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_INIT_SUFFIX +
+                                              "()") ;
         _currentImplUnparser.addOutputNewline("{") ;
         _currentImplUnparser.incrementIndent() ;
-        
-        
-        if(_initBehaviorCallSequence!=null)
+
+        if(_initBehaviorCallSequence != null)
         {
           for(DataSubcomponent d : getAllDataSubcomponents(object))
           {
             if(isUsedInCallSequence(d, _initBehaviorCallSequence))
-          	  process(d) ;
+              process(d) ;
           }
-          process(_initBehaviorCallSequence);
-          _initBehaviorCallSequence=null;
+          process(_initBehaviorCallSequence) ;
+          _initBehaviorCallSequence = null ;
         }
-        
+
         _activityImplCode.decrementIndent() ;
         _activityImplCode.addOutputNewline("}") ;
         _activityImplCode.addOutputNewline("") ;
-        
+
         _currentImplUnparser.addOutput("void* ") ;
-        _currentImplUnparser.addOutput(GenerationUtilsC
-              .getGenerationCIdentifier(object.getQualifiedName())) ;
-        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + "()") ;
+        _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
+        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX +
+                                              "()") ;
         _currentImplUnparser.addOutputNewline("{") ;
         _currentImplUnparser.incrementIndent() ;
-        _owner = object;
-        
-        
+        _owner = object ;
+
         for(DataSubcomponent d : getAllDataSubcomponents(object))
         {
           if(isUsedInCallSequence(d, _currentBehaviorCallSequence))
             process(d) ;
         }
-        
+
         _currentImplUnparser.addOutputNewline("while (1) {") ;
         _currentImplUnparser.incrementIndent() ;
-        
-        processBehavioredImplementation(object);
-        
+
+        processBehavioredImplementation(object) ;
+
         _activityImplCode.decrementIndent() ;
         _activityImplCode.addOutputNewline("}") ;
-        
+
         _activityImplCode.addOutputNewline("return 0;") ;
         _activityImplCode.decrementIndent() ;
         _activityImplCode.addOutputNewline("}") ;
-        
-        if(_currentBehaviorCallSequence!=null)
-          _currentBehaviorCallSequence=null;
-        
+
+        if(_currentBehaviorCallSequence != null)
+          _currentBehaviorCallSequence = null ;
+
         _activityHeaderCode.addOutput("void*  ") ;
-        _activityHeaderCode.addOutput(GenerationUtilsC
-              .getGenerationCIdentifier(object.getQualifiedName())) ;
-        _activityHeaderCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX + "();\n") ;
-        
+        _activityHeaderCode.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
+        _activityHeaderCode.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX +
+                                             "();\n") ;
+
         return null ;
       }
 
-    private boolean isUsedInCallSequence(DataSubcomponent d,
-		SubprogramCallSequence callSequence) {
-	  ComponentImplementation ci = (ComponentImplementation) callSequence.getContainingClassifier();
-	  for(Connection cnx: ci.getOwnedConnections())
-	  {
-	    if(cnx.getAllDestinationContext() != null)
-	    {
-	      if(cnx.getAllDestinationContext().eContainer().equals(callSequence)
-	    		  && cnx.getAllSource().equals(d))
-	      {
-	    	return true;
-	      }
-	    }
-	    if(cnx.getAllSourceContext() != null)
-	    {
-	      if(cnx.getAllSourceContext().eContainer().equals(callSequence)
-	    		&& cnx.getAllDestination().equals(d))
-	      {
-	    	return true;
-	      }
-	    }
-	  }
-	  return false;
-    }
-    
-	public String caseSubprogramCallSequence(SubprogramCallSequence object)
+      private boolean isUsedInCallSequence(DataSubcomponent d,
+                                           SubprogramCallSequence callSequence)
       {
-    	for(CallSpecification cs : object.getOwnedCallSpecifications())
-    	{
-    		if(cs instanceof SubprogramCall)
-    		{
-    			SubprogramCall sc = (SubprogramCall) cs;
-    			process(sc);
-    			if(cs.eContainer().eContainer() instanceof ThreadImplementation)
-    	  		{
-    	  			_currentImplUnparser = _activityImplCode ;
-    	  	        _currentHeaderUnparser = _activityHeaderCode ;
-    	  		}
-    		}
-    	}
-    	return null ;
+        ComponentImplementation ci = (ComponentImplementation) callSequence.
+                                                     getContainingClassifier() ;
+        for(Connection cnx : ci.getOwnedConnections())
+        {
+          if(cnx.getAllDestinationContext() != null)
+          {
+            if(cnx.getAllDestinationContext().eContainer().equals(callSequence) &&
+               cnx.getAllSource().equals(d))
+            {
+              return true ;
+            }
+          }
+          if(cnx.getAllSourceContext() != null)
+          {
+            if(cnx.getAllSourceContext().eContainer().equals(callSequence) &&
+               cnx.getAllDestination().equals(d))
+            {
+              return true ;
+            }
+          }
+        }
+        return false ;
+      }
+    
+      public String caseSubprogramCallSequence(SubprogramCallSequence object)
+      {
+        for(CallSpecification cs : object.getOwnedCallSpecifications())
+        {
+          if(cs instanceof SubprogramCall)
+          {
+            SubprogramCall sc = (SubprogramCall) cs ;
+            process(sc) ;
+            if(cs.eContainer().eContainer() instanceof ThreadImplementation)
+            {
+              _currentImplUnparser = _activityImplCode ;
+              _currentHeaderUnparser = _activityHeaderCode ;
+            }
+          }
+        }
+        return null ;
       }
       
       public String caseSubprogramType(SubprogramType object)
       {
-    	_currentImplUnparser = _subprogramImplCode;
-      	_currentHeaderUnparser = _subprogramHeaderCode; 
-      	
-    	if(_processedTypes.contains(object.getQualifiedName()))
+        _currentImplUnparser = _subprogramImplCode ;
+        _currentHeaderUnparser = _subprogramHeaderCode ;
+
+        if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;
         }
-        _processedTypes.add(object.getQualifiedName());
-    	
-        try {
-          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
-        } catch (Exception e1) {
-          caseSubprogramClassifier((SubprogramClassifier) object);
-                
-          processBehavioredType(object) ;
-          	    
-          _subprogramImplCode.decrementIndent();
-          _subprogramImplCode.addOutputNewline("}");	
+        _processedTypes.add(object.getQualifiedName()) ;
+
+        try
+        {
+          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode) ;
         }
-  	    
-  	    return DONE;
+        catch(Exception e1)
+        {
+          caseSubprogramClassifier((SubprogramClassifier) object) ;
+
+          processBehavioredType(object) ;
+
+          _subprogramImplCode.decrementIndent() ;
+          _subprogramImplCode.addOutputNewline("}") ;
+        }
+
+        return DONE ;
       }
       
       private BehaviorAnnex getAnnexSubclause(SubprogramClassifier object)
       {
-    	  for(AnnexSubclause as: object.getOwnedAnnexSubclauses())
+        for(AnnexSubclause as : object.getOwnedAnnexSubclauses())
+        {
+          if(as instanceof BehaviorAnnex)
           {
-            if(as instanceof BehaviorAnnex)
-            {
-          	  return (BehaviorAnnex) as;
-            }
+            return (BehaviorAnnex) as ;
           }
-    	  if(object.getExtended()!=null)
-    		return getAnnexSubclause((SubprogramClassifier) object.getExtended());
-    	  return null;
+        }
+        if(object.getExtended() != null)
+          return getAnnexSubclause((SubprogramClassifier) object.getExtended()) ;
+        return null ;
       }
       
       public String caseSubprogramClassifier(SubprogramClassifier object)
       {
-    	subprogramsUnparsingStack.add(object);
+    	  subprogramsUnparsingStack.add(object);
     	  
         Parameter returnParameter = null;
         List<Feature> orderedFeatureList = null;
@@ -1447,6 +1458,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         	isReturnParam = GenerationUtilsC.isReturnParameter(p);
           }
         }
+        
         if(!isReturnParam)
         {
           _subprogramImplCode.addOutput("void ");
@@ -1459,98 +1471,111 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _subprogramImplCode.addOutput("(");
         _subprogramHeaderCode.addOutput("(");
       	
-    	boolean first = true;
-    	for(Feature f: orderedFeatureList)
-    	{
-    	  if(f instanceof Parameter)
-  		  {
-  		    Parameter p = (Parameter) f ;
-  		    String paramUsage = Aadl2Utils.getParameter_Usage(p);
-  			if(p==returnParameter)
-  			  continue;
-  			if(first==false)
-  			{
-  			  _subprogramImplCode.addOutput(", ") ;
-  			  _subprogramHeaderCode.addOutput(", ") ;
-  			}
-  			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramImplCode, _subprogramImplCode);
-  			processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramHeaderCode, _subprogramHeaderCode);
-  			if(Aadl2Utils.isInOutParameter(p) ||
-  					Aadl2Utils.isOutParameter(p)
-  					|| paramUsage.equalsIgnoreCase("by_reference"))
-  			{
-  			  _subprogramImplCode.addOutput(" * ") ;
-  			  _subprogramHeaderCode.addOutput(" * ") ;
-  			}
-  			_subprogramImplCode.addOutput(" "+p.getName());
-  			_subprogramHeaderCode.addOutput(" "+p.getName());
-  			first=false;
-  			
-  			process(p.getDataFeatureClassifier());
-  		  }
-  		  else if(f instanceof DataAccess)
-  		  {
-  			DataAccess da = (DataAccess) f ;
-  			if(first==false)
-  			{
-  			  _subprogramImplCode.addOutput(", ") ;
-  			  _subprogramHeaderCode.addOutput(", ") ;
-  			}
-  			processDataSubcomponentType(object, da.getDataFeatureClassifier(), _subprogramImplCode, _currentImplUnparser);
-  			processDataSubcomponentType(object, da.getDataFeatureClassifier(), _subprogramHeaderCode, _subprogramHeaderCode);
-  			if(da.getKind().equals(AccessType.REQUIRES))
-  			{
-  			  if(Aadl2Utils.isReadWriteDataAccess(da) ||
-  					  Aadl2Utils.isWriteOnlyDataAccess(da))
-  			  {
-  				_subprogramImplCode.addOutput(" * ") ;
-  			    _subprogramHeaderCode.addOutput(" * ") ;
-  			  }
-  			  _subprogramImplCode.addOutput(" "+da.getName());
-  			  _subprogramHeaderCode.addOutput(" "+da.getName());
-  			}
-  			first=false;
-  			
-  			process(da.getDataFeatureClassifier());
-  		  }
-    	}
+        boolean first = true ;
+        for(Feature f : orderedFeatureList)
+        {
+          if(f instanceof Parameter)
+          {
+            Parameter p = (Parameter) f ;
+            String paramUsage = Aadl2Utils.getParameter_Usage(p) ;
+            if(p == returnParameter)
+              continue ;
+            if(first == false)
+            {
+              _subprogramImplCode.addOutput(", ") ;
+              _subprogramHeaderCode.addOutput(", ") ;
+            }
+            processDataSubcomponentType(object, p.getDataFeatureClassifier(),
+                                        _subprogramImplCode,
+                                        _subprogramImplCode) ;
+            processDataSubcomponentType(object, p.getDataFeatureClassifier(),
+                                        _subprogramHeaderCode,
+                                        _subprogramHeaderCode) ;
+            if(Aadl2Utils.isInOutParameter(p) || Aadl2Utils.isOutParameter(p) ||
+               paramUsage.equalsIgnoreCase("by_reference"))
+            {
+              _subprogramImplCode.addOutput(" * ") ;
+              _subprogramHeaderCode.addOutput(" * ") ;
+            }
+            _subprogramImplCode.addOutput(" " + p.getName()) ;
+            _subprogramHeaderCode.addOutput(" " + p.getName()) ;
+            first = false ;
 
-    	_subprogramImplCode.addOutputNewline(")");
-    	_subprogramHeaderCode.addOutputNewline(");");
-    	_subprogramHeaderCode.addOutputNewline("");
-  	  
-  	    _subprogramImplCode.addOutputNewline("{");
-  	    _subprogramImplCode.incrementIndent();
-      	
-    	return null;
+            process(p.getDataFeatureClassifier()) ;
+          }
+          else if(f instanceof DataAccess)
+          {
+            DataAccess da = (DataAccess) f ;
+            if(first == false)
+            {
+              _subprogramImplCode.addOutput(", ") ;
+              _subprogramHeaderCode.addOutput(", ") ;
+            }
+            processDataSubcomponentType(object, da.getDataFeatureClassifier(),
+                                        _subprogramImplCode,
+                                        _currentImplUnparser) ;
+            processDataSubcomponentType(object, da.getDataFeatureClassifier(),
+                                        _subprogramHeaderCode,
+                                        _subprogramHeaderCode) ;
+            if(da.getKind().equals(AccessType.REQUIRES))
+            {
+              if(Aadl2Utils.isReadWriteDataAccess(da) ||
+                 Aadl2Utils.isWriteOnlyDataAccess(da))
+              {
+                _subprogramImplCode.addOutput(" * ") ;
+                _subprogramHeaderCode.addOutput(" * ") ;
+              }
+              _subprogramImplCode.addOutput(" " + da.getName()) ;
+              _subprogramHeaderCode.addOutput(" " + da.getName()) ;
+            }
+            first = false ;
+
+            process(da.getDataFeatureClassifier()) ;
+          }
+        }
+
+        _subprogramImplCode.addOutputNewline(")") ;
+        _subprogramHeaderCode.addOutputNewline(");") ;
+        _subprogramHeaderCode.addOutputNewline("") ;
+
+        _subprogramImplCode.addOutputNewline("{") ;
+        _subprogramImplCode.incrementIndent() ;
+
+        return null ;
       }
       
       public String caseSubprogramImplementation(SubprogramImplementation object)
       {
-    	_currentImplUnparser = _subprogramImplCode;
-    	_currentHeaderUnparser = _subprogramHeaderCode; 
-    	if(_processedTypes.contains(object.getQualifiedName()))
+        _currentImplUnparser = _subprogramImplCode ;
+        _currentHeaderUnparser = _subprogramHeaderCode ;
+        
+        if(_processedTypes.contains(object.getQualifiedName()))
         {
           return DONE ;
         }
-        _processedTypes.add(object.getQualifiedName());
-        try {
-          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
-        } catch (Exception e1) {
-      	  caseSubprogramClassifier((SubprogramClassifier) object);
-      	  _owner = object;
-    	  for(DataSubcomponent d : getAllDataSubcomponents(object))
+        
+        _processedTypes.add(object.getQualifiedName()) ;
+        
+        try
+        {
+          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode) ;
+        }
+        catch(Exception e1)
+        {
+          caseSubprogramClassifier((SubprogramClassifier) object) ;
+          _owner = object ;
+          for(DataSubcomponent d : getAllDataSubcomponents(object))
           {
             process(d) ;
           }
 
           processBehavioredImplementation(object) ;
 
-          _subprogramImplCode.decrementIndent();
-          _subprogramImplCode.addOutputNewline("}");
+          _subprogramImplCode.decrementIndent() ;
+          _subprogramImplCode.addOutputNewline("}") ;
         }
-    	  
-    	return DONE;
+
+        return DONE ;
       }
       
       public String caseSubprogramCall(SubprogramCall object)
@@ -1596,19 +1621,25 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     				  if(isReturnParam)
     				  {
     					  returnParameter = p;
-    					  ConnectionEnd ce = orderedParamValue.get(orderedFeatureList.indexOf(p));
-						  processConnectionEnd(ce);
-						  _currentImplUnparser.addOutput(" = ");
+    					  ConnectionEnd ce = orderedParamValue.get(orderedFeatureList.
+    					                                                      indexOf(p));
+						    processConnectionEnd(ce);
+						    _currentImplUnparser.addOutput(" = ");
     					  break;
     				  }
     			  }
     		  }
 
-    		  try {
-    			resolveExistingCodeDependencies(sct, _currentImplUnparser, _currentHeaderUnparser);
-    		  } catch (Exception e1) {
-    			_currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(sct.getQualifiedName()));
-    		  }
+          try
+          {
+            resolveExistingCodeDependencies(sct, _currentImplUnparser,
+                                            _currentHeaderUnparser) ;
+          }
+          catch(Exception e1)
+          {
+            _currentImplUnparser.addOutput(GenerationUtilsC.
+                             getGenerationCIdentifier(sct.getQualifiedName())) ;
+          }
     		  
     		  if(st != null)
     		  {  
@@ -1682,26 +1713,33 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       private void processConnectionEnd(ConnectionEnd ce)
       {
-		  if(ce instanceof DataSubcomponent)
-			  _currentImplUnparser.addOutput(
-					  GenerationUtilsC.getGenerationCIdentifier(ce.getQualifiedName()));
-		  else
-		  {
-			_currentImplUnparser.addOutput(ce.getName());
-		  }
+        if(ce instanceof DataSubcomponent)
+          _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(ce.getQualifiedName())) ;
+        else
+        {
+          _currentImplUnparser.addOutput(ce.getName()) ;
+        }
       }
       
       public String caseThreadSubcomponent(ThreadSubcomponent object)
       {
-        PropertyAssociation pa = PropertyUtils.getPropertyAssociation(object, "Compute_Entrypoint_Call_Sequence");
-        ReferenceValue rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue();
-	  	_currentBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements().get(0).getNamedElement();
-	  	
-	  	pa = PropertyUtils.getPropertyAssociation(object, "Initialize_Entrypoint_Call_Sequence");
-	  	if(pa!=null)
-	  	{
-	  	  rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue();
-	  	  _initBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements().get(0).getNamedElement();
+        PropertyAssociation pa = PropertyUtils.getPropertyAssociation(object,
+                                           "Compute_Entrypoint_Call_Sequence") ;
+        ReferenceValue rv = (ReferenceValue) pa.getOwnedValues().get(0)
+                                               .getOwnedValue() ;
+        _currentBehaviorCallSequence =
+                                       (SubprogramCallSequence) rv.getContainmentPathElements()
+                                                                  .get(0)
+                                                                  .getNamedElement() ;
+
+        pa = PropertyUtils.getPropertyAssociation(object,
+                                        "Initialize_Entrypoint_Call_Sequence") ;
+        if(pa != null)
+        {
+          rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue() ;
+          _initBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements()
+                                                                 .get(0)
+                                                                 .getNamedElement() ;
         }
         process(object.getComponentImplementation()) ;
         return null ;

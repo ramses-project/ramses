@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.AbstractEnumerator;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtext.EcoreUtil2;
@@ -133,10 +134,11 @@ import org.osate.ba.utils.DimensionException;
 import org.osate.utils.Aadl2Utils;
 import org.osate.utils.PropertyUtils;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
-
 
 public class AadlBaToCUnparser extends AadlBaUnparser
 {
@@ -148,6 +150,8 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   private NamedElement _owner ;
   
   private List<NamedElement> coreElementsToBeUnparsed = new ArrayList<NamedElement>();
+  
+  private static Logger _LOGGER = Logger.getLogger(AadlBaToCUnparser.class) ;
   
   public List<NamedElement> getCoreElementsToBeUnparsed() {
 	return coreElementsToBeUnparsed;
@@ -234,8 +238,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       process(it.next()) ;
     }
   }
-
-  
 
   public static String getInitialStateIdentifier(BehaviorAnnex ba)
   {
@@ -346,8 +348,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
   {
     aadlbaSwitch = new AadlBaSwitch<String>()
     {
-
-	/**
+      /**
        * Top-level method to unparse "behavior_specification"
        * annexsubclause
        */
@@ -362,22 +363,21 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseBehaviorAnnex(BehaviorAnnex object)
       {
-    	BehaviorAnnex ba = (BehaviorAnnex) object ;
-    	NamedElement aadlComponent = _owner ;
-    	String aadlComponentCId =
-    		  GenerationUtilsC.getGenerationCIdentifier(aadlComponent
-                  .getQualifiedName()) ;
-        
+        BehaviorAnnex ba = (BehaviorAnnex) object ;
+        NamedElement aadlComponent = _owner ;
+        String aadlComponentCId = GenerationUtilsC.getGenerationCIdentifier(
+                                             aadlComponent.getQualifiedName()) ;
+
         _cFileContent = new UnparseText() ;
         _headerFileContent = new UnparseText() ;
-        
+
         processEList(_cFileContent, ba.getVariables()) ;
         _cFileContent.addOutputNewline("while(1)") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
         _cFileContent.addOutputNewline("switch(" +
-        		_owner.getName().replace('.', '_')+
-                "_current_state)") ;
+                                       _owner.getName().replace('.', '_') +
+                                       "_current_state)") ;
         _cFileContent.addOutputNewline("{") ;
         _cFileContent.incrementIndent() ;
         _headerFileContent.addOutputNewline("typedef enum {") ;
@@ -385,23 +385,22 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         for(BehaviorState state : ba.getStates())
         {
-          if(AadlBaVisitors.getTransitionWhereSrc
-                (state).isEmpty() == false)
+          if(AadlBaVisitors.getTransitionWhereSrc(state).isEmpty() == false)
           {
             _cFileContent.addOutputNewline("case " + aadlComponentCId + "_" +
-                  state.getName() + ":") ;
-            processEList(_cFileContent, (ArrayList<BehaviorTransition>) AadlBaVisitors.
-                         getTransitionWhereSrc(state)) ;
+                                           state.getName() + ":") ;
+            processEList(_cFileContent,
+                         (ArrayList<BehaviorTransition>) AadlBaVisitors.
+                                                 getTransitionWhereSrc(state)) ;
           }
-          
-          String stateCId = GenerationUtilsC.
-                getGenerationCIdentifier(aadlComponent.getQualifiedName()+
-                                         "_"+state.getName());
-          _headerFileContent.addOutput(stateCId);
 
+          String stateCId = GenerationUtilsC.getGenerationCIdentifier(
+                                              aadlComponent.getQualifiedName() +
+                                                                           "_" +
+                                                              state.getName()) ;
+          _headerFileContent.addOutput(stateCId) ;
 
-          if(ba.getStates().indexOf(state) < ba.getStates()
-                .size() - 1)
+          if(ba.getStates().indexOf(state) < ba.getStates().size() - 1)
           {
             _headerFileContent.addOutput(",") ;
           }
@@ -411,14 +410,14 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         _headerFileContent.decrementIndent() ;
         _headerFileContent.addOutputNewline("} " + aadlComponentCId +
-              "_BA_State_t;") ;
+                                            "_BA_State_t;") ;
         _headerFileContent.addOutputNewline("") ;
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         _cFileContent.decrementIndent() ;
         _cFileContent.addOutputNewline("}") ;
         _cFileContent.decrementIndent() ;
-        
+
         return DONE ;
       }
 
@@ -430,37 +429,39 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         String sourceName ;
         try
         {
-          sourceName = PropertyUtils.
-                getStringValue(object.getDataClassifier(), "Source_Name") ;
-          List<String> sourceText =
-					PropertyUtils.getStringListValue(object.getDataClassifier(), "Source_Text") ;
-			for(String s : sourceText)
-			{
-				if(s.endsWith(".h"))
-				{
-					_additionalHeaders.add(s);
-				}
-			}
+          sourceName =
+                       PropertyUtils.getStringValue(object.getDataClassifier(),
+                                                    "Source_Name") ;
+          List<String> sourceText = PropertyUtils.getStringListValue(
+                                                     object.getDataClassifier(),
+                                                                "Source_Text") ;
+          for(String s : sourceText)
+          {
+            if(s.endsWith(".h"))
+            {
+              _additionalHeaders.add(s) ;
+            }
+          }
         }
-        catch (Exception e)
+        catch(Exception e)
         {
-          sourceName = GenerationUtilsC.
-                getGenerationCIdentifier(object.
-                                         getDataClassifier().getQualifiedName());
-          coreElementsToBeUnparsed.add(object.getDataClassifier());
+          sourceName = GenerationUtilsC.getGenerationCIdentifier(
+                                                      object.getDataClassifier()
+                                                          .getQualifiedName()) ;
+          coreElementsToBeUnparsed.add(object.getDataClassifier()) ;
         }
-        _cFileContent.addOutput(sourceName);
+        _cFileContent.addOutput(sourceName) ;
         _cFileContent.addOutput(" " + object.getName()) ;
         caseArrayDimensions(object.getArrayDimensions()) ;
-        String init = GeneratorUtils.getInitialValue(object.getDataClassifier(), "c") ;
+        String init =
+                      GeneratorUtils.getInitialValue(object.getDataClassifier(),
+                                                     "c") ;
         if(!init.isEmpty())
         {
-        	_cFileContent.addOutput(init) ;
+          _cFileContent.addOutput(init) ;
         }
         _cFileContent.addOutputNewline(";") ;
-        
-        
-        
+
         return DONE ;
       }
 
@@ -600,9 +601,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         aadlbaText = _cFileContent ;
         long num = object.getPriority() ;
 
-
         _cFileContent.addOutput("// Transition id: " + object.getName()) ;
-
 
         if(num != -1) // numeral
         {
@@ -702,7 +701,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         throw new UnsupportedOperationException() ;
       }
 
-      
       /**
        * Unparse elsestatement
        */
@@ -814,8 +812,10 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           }
           catch(DimensionException e)
           {
-            // TODO Auto-generated catch block
-            e.printStackTrace() ;
+            String errMsg =  RamsesException.formatRethrowMessage("while fetching type for \'"+
+                object.getIteratedValues() + '\'' , e) ;
+            _LOGGER.error(errMsg);
+            ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
           }
 
           int numberOfLoop = dataReferenceTypeHolder.dimension ;
@@ -1077,13 +1077,13 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           {
         	//TODO: if da not by_reference
         	if(actual instanceof DataAccessHolder)
-          	{
-          		DataAccessHolder dah = (DataAccessHolder) actual;
-          		// in to inout
-        		if(Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()) ||
-            		Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()))
-        			_cFileContent.addOutput("*") ;
-          	}
+          {
+            DataAccessHolder dah = (DataAccessHolder) actual ;
+            // in to inout
+            if(Aadl2Utils.isWriteOnlyDataAccess(dah.getDataAccess()) ||
+               Aadl2Utils.isReadWriteDataAccess(dah.getDataAccess()))
+              _cFileContent.addOutput("*") ;
+          }
           }
     	  return remainingParenthesis;
       }
@@ -1180,7 +1180,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
               ParameterConnectionEnd pce =
                     (ParameterConnectionEnd) ordereFeatureList.get(object
                                                                    .getParameterLabels().indexOf(pl)) ;
-
               if(pce instanceof Parameter)
               {
                 Parameter p = (Parameter) pce ;
@@ -1309,79 +1308,81 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         return DONE ;
       }
       
-      private void additionalSubprogramsToUnparse(SubprogramSubcomponentType sct) {
-    	AadlToCUnparser aadlCUnparser = AadlToCUnparser.getAadlToCUnparser();   
-    	if(false == aadlCUnparser.additionalUnparsing.contains(sct))
-    	  aadlCUnparser.additionalUnparsing.add(sct);
-        for(AnnexSubclause as: ((SubprogramClassifier)sct).getAllAnnexSubclauses() )
+      private void
+          additionalSubprogramsToUnparse(SubprogramSubcomponentType sct)
+      {
+        AadlToCUnparser aadlCUnparser = AadlToCUnparser.getAadlToCUnparser() ;
+        if(false == aadlCUnparser.additionalUnparsing.contains(sct))
+          aadlCUnparser.additionalUnparsing.add(sct) ;
+        for(AnnexSubclause as : ((SubprogramClassifier) sct).getAllAnnexSubclauses())
         {
           if(as instanceof BehaviorAnnex)
           {
-        	for(SubprogramHolder otherSpg: EcoreUtil2.getAllContentsOfType(as, SubprogramHolder.class))
-        	{
-        	  if(true == aadlCUnparser.additionalUnparsing.contains(otherSpg))
-        		continue;
-        	  aadlCUnparser.additionalUnparsing.add(otherSpg.getSubprogram());
-        	  additionalSubprogramsToUnparse((SubprogramSubcomponentType) otherSpg.getSubprogram());
-        	}
-        	return;
+            for(SubprogramHolder otherSpg : EcoreUtil2.getAllContentsOfType(as,
+                                                                            SubprogramHolder.class))
+            {
+              if(true == aadlCUnparser.additionalUnparsing.contains(otherSpg))
+                continue ;
+              aadlCUnparser.additionalUnparsing.add(otherSpg.getSubprogram()) ;
+              additionalSubprogramsToUnparse((SubprogramSubcomponentType) otherSpg.getSubprogram()) ;
+            }
+            return ;
           }
         }
-	 }
+      }
 
-	public String caseElementHolder(ElementHolder object)
+      public String caseElementHolder(ElementHolder object)
       {
-    	NamedElement elt = object.getElement();
-    	String id;
-    	boolean pointer=false;
-    	if(elt instanceof Parameter)
-		{
-			Parameter p = (Parameter) elt;
-			if(false==(object.eContainer() instanceof SubprogramCallAction))
-			{
-			  String usageP = Aadl2Utils.getParameter_Usage(p);
-			  if(Aadl2Utils.isInOutParameter(p)
-				  || Aadl2Utils.isOutParameter(p)
-				  || usageP.equalsIgnoreCase("by_reference"))
-			  {
-			    aadlbaText.addOutput("(*");
-			    pointer=true;
-			  }
-			
-			}
-			id = elt.getName();
-			
-		}
-		else if (elt instanceof DataAccess)
-		{
-		  DataAccess da = (DataAccess) elt;
-		  
-		  if(false==(object.eContainer() instanceof SubprogramCallAction))
-		  {
-			if(Aadl2Utils.isReadWriteDataAccess(da)
-			  || Aadl2Utils.isWriteOnlyDataAccess(da))
-			{
-  			   aadlbaText.addOutput("(*");
-			   pointer=true;		
-			}
-		  }
-  		  id = elt.getName();
-		}
-    	else	
-    		id = elt.getQualifiedName();
-    	aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(id));
-    	if(pointer)
-    		aadlbaText.addOutput(")");
-    	if(object instanceof IndexableElement)
-    	{	
-    	  IndexableElement ie = (IndexableElement) object;
-    	  for(IntegerValue iv: ie.getArrayIndexes())
-    	  {
-    		aadlbaText.addOutput("[");
-    		process(iv);
-    		aadlbaText.addOutput("]");
-    	  }
-    	}
+        NamedElement elt = object.getElement() ;
+        String id ;
+        boolean pointer = false ;
+        if(elt instanceof Parameter)
+        {
+          Parameter p = (Parameter) elt ;
+          if(false == (object.eContainer() instanceof SubprogramCallAction))
+          {
+            String usageP = Aadl2Utils.getParameter_Usage(p) ;
+            if(Aadl2Utils.isInOutParameter(p) || Aadl2Utils.isOutParameter(p) ||
+               usageP.equalsIgnoreCase("by_reference"))
+            {
+              aadlbaText.addOutput("(*") ;
+              pointer = true ;
+            }
+
+          }
+          id = elt.getName() ;
+
+        }
+        else if(elt instanceof DataAccess)
+        {
+          DataAccess da = (DataAccess) elt ;
+
+          if(false == (object.eContainer() instanceof SubprogramCallAction))
+          {
+            if(Aadl2Utils.isReadWriteDataAccess(da) ||
+               Aadl2Utils.isWriteOnlyDataAccess(da))
+            {
+              aadlbaText.addOutput("(*") ;
+              pointer = true ;
+            }
+          }
+          id = elt.getName() ;
+        }
+        else
+          id = elt.getQualifiedName() ;
+        aadlbaText.addOutput(GenerationUtilsC.getGenerationCIdentifier(id)) ;
+        if(pointer)
+          aadlbaText.addOutput(")") ;
+        if(object instanceof IndexableElement)
+        {
+          IndexableElement ie = (IndexableElement) object ;
+          for(IntegerValue iv : ie.getArrayIndexes())
+          {
+            aadlbaText.addOutput("[") ;
+            process(iv) ;
+            aadlbaText.addOutput("]") ;
+          }
+        }
         return DONE ;
       }
       
@@ -1586,8 +1587,6 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                                                              .getUnaryBooleanOperator())) ;
           _cFileContent.addOutput("(") ;
         }
-
-
 
         if(object.getFirstValue() instanceof ValueExpression)
         {

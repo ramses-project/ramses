@@ -21,31 +21,28 @@
 
 package fr.tpt.aadl.ramses.generation.c.annex.behavior ;
 
-
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.ba.AadlBaUnParserAction ;
 import org.osate.ba.aadlba.BehaviorElement ;
 
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
-import fr.tpt.aadl.ramses.generation.c.AadlToCUnparser;
 
 // ** AADL RESTRICTED BA HAS TO BE SET AS A STANDALONE ECLIPSE PLUGIN PROJECT ** 
 
-public class AadlBaToCUnparserAction extends AadlBaUnParserAction
-                                     implements NamedPlugin
+public class AadlBaToCUnparserAction extends AadlBaUnParserAction implements
+                                                                 NamedPlugin
 {
 
   public static final String ANNEX_NAME = "c_behavior_specification" ;
   protected AadlBaToCUnparser _unparser = null ;
-  
+
   public AadlBaToCUnparserAction()
   {
     _unparser = new AadlBaToCUnparser() ;
   }
-  
+
   @Override
-  public String unparseAnnexSubclause(AnnexSubclause subclause,
-                                      String indent)
+  public String unparseAnnexSubclause(AnnexSubclause subclause, String indent)
   {
     return _unparser.process((BehaviorElement) subclause) ;
   }
