@@ -177,7 +177,7 @@
 
     <dependency>
       <groupId>ramses</groupId>
-      <artifactId>fr.tpt.aadl.sched.wcetanalysis</artifactId>
+      <artifactId>fr.tpt.aadl.ramses.analysis.asg</artifactId>
       <version>1.0.0</version>
     </dependency>
 
