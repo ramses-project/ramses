@@ -88,10 +88,15 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			  return AadlToTargetSpecificAadl.extractAadlResource(inputResource,
 			                                                      outputFile);
 			}
-			catch(IOException | RecognitionException ex)
+			catch(IOException ex)
 			{
 			  String msg = "fail to extract AADL resources" ;
 	      throw new TransformationException(msg, ex) ;
+			}
+			catch(RecognitionException ex)
+			{
+			  String msg = "fail to extract AADL resources" ;
+        throw new TransformationException(msg, ex) ;
 			}
 		}
 

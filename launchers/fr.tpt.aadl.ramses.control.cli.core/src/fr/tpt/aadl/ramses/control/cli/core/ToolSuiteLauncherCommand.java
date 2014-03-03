@@ -166,7 +166,14 @@ public class ToolSuiteLauncherCommand
         System.exit(1);
       }
     }
-    catch(ConfigurationException | JSAPException ex)
+    catch(ConfigurationException ex)
+    {
+      String msg = "while setting up RAMSES" ;
+      _logger.fatal(msg, ex);
+      ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
+      System.exit(0);
+    }
+    catch(JSAPException ex)
     {
       String msg = "while setting up RAMSES" ;
       _logger.fatal(msg, ex);

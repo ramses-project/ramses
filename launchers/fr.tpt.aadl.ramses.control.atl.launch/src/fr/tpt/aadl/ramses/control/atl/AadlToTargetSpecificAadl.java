@@ -198,7 +198,21 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       {
         ft.get(10, TimeUnit.SECONDS) ;
       }
-      catch(InterruptedException | ExecutionException | TimeoutException e)
+      catch(InterruptedException e)
+      {
+        String msg = "internal error" ;
+        _LOGGER.error(msg + " : " + e.getMessage()) ;
+        ServiceProvider.SYS_ERR_REP.error(msg, true) ;
+        // Nothing to do, just continue.
+      }
+      catch(ExecutionException e)
+      {
+        String msg = "internal error" ;
+        _LOGGER.error(msg + " : " + e.getMessage()) ;
+        ServiceProvider.SYS_ERR_REP.error(msg, true) ;
+        // Nothing to do, just continue.
+      }
+      catch(TimeoutException e)
       {
         String msg = "internal error" ;
         _LOGGER.error(msg + " : " + e.getMessage()) ;

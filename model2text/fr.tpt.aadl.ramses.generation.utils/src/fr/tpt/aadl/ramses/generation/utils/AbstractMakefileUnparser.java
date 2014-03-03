@@ -577,7 +577,14 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           _LOGGER.info(msg);
         }
       }
-      catch(IOException | InterruptedException ex)
+      catch(IOException ex)
+      {
+        String errMsg = RamsesException.formatRethrowMessage("could not build generated code",
+                                                             ex) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      }
+      catch(InterruptedException ex)
       {
         String errMsg = RamsesException.formatRethrowMessage("could not build generated code",
                                                              ex) ;
