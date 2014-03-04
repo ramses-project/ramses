@@ -225,7 +225,7 @@ public class RamsesConfiguration
           }
           else
           {
-            ConfigStatus.NOT_VALID.msg = "the $\'" + gen.getRuntimePathEnvVar() + "\' doesn't point to a valid runtime path" ;
+            ConfigStatus.NOT_VALID.msg = "the \'$" + gen.getRuntimePathEnvVar() + "\' doesn't point to a valid runtime path" ;
             return ConfigStatus.NOT_VALID ;
           }
         }
@@ -281,7 +281,15 @@ public class RamsesConfiguration
     }
     catch(FileNotFoundException e)
     {
-      ConfigStatus.NOT_FOUND.msg = "\'" + path + "\' is not found" ;
+      
+      
+      ConfigStatus.NOT_FOUND.msg = "\'" + path + "\' is not found";
+      
+      if(false == (e.getMessage() == null || e.getMessage().isEmpty()))
+      {
+        ConfigStatus.NOT_FOUND.msg += '(' + e.getMessage() + ')' ;
+      }
+      
       throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
     }
   }
