@@ -8,7 +8,6 @@ import java.util.Map ;
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
-import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DeviceSubcomponent ;
@@ -483,7 +482,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		
 		for(SubprogramCallSequence scs: ti.getOwnedSubprogramCallSequences())
 		{
-		  for(CallSpecification cs: scs.getOwnedCallSpecifications())
+		  for(SubprogramCall cs: scs.getOwnedSubprogramCalls())
 		  {
 		    if(cs instanceof SubprogramCall)
 		    {

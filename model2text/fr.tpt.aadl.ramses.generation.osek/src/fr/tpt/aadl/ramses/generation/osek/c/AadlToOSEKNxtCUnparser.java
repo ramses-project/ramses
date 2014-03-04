@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AccessCategory ;
 import org.osate.aadl2.AccessConnection ;
-import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ConnectedElement ;
@@ -443,7 +442,7 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		}
 		for(SubprogramCallSequence scs: ti.getOwnedSubprogramCallSequences())
 		{
-		  for(CallSpecification cs: scs.getOwnedCallSpecifications())
+		  for(SubprogramCall cs: scs.getOwnedSubprogramCalls())
 		  {
 		    if(cs instanceof SubprogramCall)
 		    {

@@ -1382,7 +1382,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         processComments(object) ;
         String n = object.getName() ;
         aadlText.addOutput(n + ": ") ;
-        EList<CallSpecification> list = object.getOwnedCallSpecifications() ;
+        EList<SubprogramCall> list = object.getOwnedSubprogramCalls() ;
         processComments(object) ;
 
         if(list != null && !list.isEmpty())
@@ -1452,15 +1452,15 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         return DONE ;
       }
 
-      public String caseProcessorCall(ProcessorCall object)
-      {
-        processComments(object) ;
-        aadlText.addOutput(object.getName() + ": " + "subprogram processor." +
-              object.getSubprogramAccessName()) ;
-        processCurlyList(object.getOwnedPropertyAssociations()) ;
-        aadlText.addOutputNewline(";") ;
-        return DONE ;
-      }
+//      public String caseProcessorCall(ProcessorCall object)
+//      {
+//        processComments(object) ;
+//        aadlText.addOutput(object.getName() + ": " + "subprogram processor." +
+//              object.getSubprogramAccessName()) ;
+//        processCurlyList(object.getOwnedPropertyAssociations()) ;
+//        aadlText.addOutputNewline(";") ;
+//        return DONE ;
+//      }
 
       public String casePortConnection(PortConnection object)
       {

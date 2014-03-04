@@ -1,6 +1,5 @@
 package fr.tpt.aadl.flow.extraction.seq.types ;
 
-import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentClassifier ;
 import org.osate.aadl2.Element ;
@@ -78,7 +77,7 @@ public class SubprogramSA extends CallSequenceAnalyzer
       {
         SubprogramCallSequence seq = (SubprogramCallSequence) e ;
 
-        for(CallSpecification eCall : seq.getOwnedCallSpecifications())
+        for(SubprogramCall eCall : seq.getOwnedSubprogramCalls())
         {
           if(eCall instanceof SubprogramCall)
           {

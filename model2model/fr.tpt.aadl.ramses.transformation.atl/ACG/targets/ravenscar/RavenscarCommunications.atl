@@ -36,7 +36,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 helper def: getRuntimeEventType() : AADLBA!DataSubcomponentType = 'Global_Queue'.asDataType('RAVENSCAR_RUNTIME');
 
 -- @extends m_Not_PeriodicDelayed_Port
-abstract rule m_RavenscarCallSpecification
+abstract rule m_RavenscarSubprogramCall
 {
 	from
 		fi: AADLI!FeatureInstance,
@@ -52,7 +52,7 @@ abstract rule m_RavenscarCallSpecification
 }
 
 
--- @extends m_RavenscarCallSpecification,m_Input_EventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
+-- @extends m_RavenscarSubprogramCall,m_Input_EventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
 rule m_Input_Ravenscar_ComputeEntrypointCallSequence
 {
 	from
@@ -81,7 +81,7 @@ rule m_Input_Ravenscar_ComputeEntrypointCallSequence
 		)
 }
 
--- @extends m_RavenscarCallSpecification,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+-- @extends m_RavenscarSubprogramCall,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 rule m_Output_Ravenscar_ComputeEntrypointCallSequence
 {
 	from

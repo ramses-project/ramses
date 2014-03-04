@@ -8,7 +8,6 @@ import java.util.Map ;
 
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BehavioredImplementation ;
-import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.CalledSubprogram ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.IntegerLiteral ;
@@ -217,12 +216,12 @@ public class BehaviorUtil {
 		{
 			BehavioredImplementation bi = (BehavioredImplementation) e;
 			SubprogramCallSequence seq = getMainCallSequence (bi);
-			List<CallSpecification> specs = (seq==null?null:seq.getOwnedCallSpecifications());
+			List<SubprogramCall> specs = (seq==null?null:seq.getOwnedSubprogramCalls());
 			
 			if (specs != null)
 			{
 				List<SubprogramCall> list = new ArrayList<SubprogramCall>();
-				for(CallSpecification cs : specs)
+				for(SubprogramCall cs : specs)
 				{
 					if (cs instanceof SubprogramCall)
 					{

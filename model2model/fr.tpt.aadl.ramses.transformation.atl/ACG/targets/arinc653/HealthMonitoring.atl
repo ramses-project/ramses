@@ -99,7 +99,7 @@ rule m_Threads_HM
 		cs: AADLBA!SubprogramCallSequence
 		(
 			name <- c.name+'_error_handler_cs',
-			ownedCallSpecification <- Sequence{call}
+			ownedSubprogramCall <- Sequence{call}
 		),
 		call: AADLBA!SubprogramCall
 		(

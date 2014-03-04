@@ -255,7 +255,7 @@ rule m_ThreadEntrypoint {
 		callSequenceImg: AADLBA!SubprogramCallSequence 
 		(
 			name <- 'main_call',
-			ownedCallSpecification <- Sequence{callEntryPoint}
+			ownedSubprogramCall <- Sequence{callEntryPoint}
 		),
 		behaviorAnnex: AADLBA!BehaviorAnnex
 		(
@@ -852,7 +852,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 			intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataNextValueCalls(fi,behavior));
 		}
 
-		for(call in behavior.ownedCallSpecification)
+		for(call in behavior.ownedSubprogramCall)
 		{
 			if(fi.isInputFeature() and fi.isEventOrEventDataPort())
 			{
@@ -1096,7 +1096,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 			intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataNextValueCalls(destination, behavior));
 		}
 
-		for(call in behavior.ownedCallSpecification)
+		for(call in behavior.ownedSubprogramCall)
 		{
 			for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventOrEventDataPort()))
 			{
@@ -1270,11 +1270,11 @@ lazy rule populateParameterLabels
   		{
   			if(feature.oclIsTypeOf(AADLI!DataAccess))
  			{
-  				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.source.connectionEnd = feature and behavior.ownedCallSpecification->exists(f | e.source.context = f)))
+  				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.source.connectionEnd = feature and behavior.ownedSubprogramCall->exists(f | e.source.context = f)))
 				{
   					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior, cnx}, 'dataAccess')));
 				}
-  				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.destination.connectionEnd = feature and behavior.ownedCallSpecification->exists(f | e.destination.context = f)))
+  				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.destination.connectionEnd = feature and behavior.ownedSubprogramCall->exists(f | e.destination.context = f)))
 				{
   					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior, cnx}, 'dataAccess')));
 				}
@@ -1400,7 +1400,7 @@ helper context AADLI!AccessConnection def: isAccessToParamConnection(): Boolean 
 
 helper context AADLI!Connection def: isPartOfCallSequence(behavior: AADLI!Element): Boolean =
 	if(behavior.oclIsKindOf(AADLI!SubprogramCallSequence)) then
-		behavior.ownedCallSpecification->exists(e|self.source.context = e or self.destination.context = e)
+		behavior.ownedSubprogramCall->exists(e|self.source.context = e or self.destination.context = e)
 	else
 		false
 	endif
@@ -1440,7 +1440,7 @@ rule m_Parameter_to_DataAccess_SourceConnection
 		behavior: AADLI!SubprogramCallSequence,
 		accessCnx: AADLI!AccessConnection
 		(
-			behavior.ownedCallSpecification->exists(e|accessCnx.source.context = e)
+			behavior.ownedSubprogramCall->exists(e|accessCnx.source.context = e)
 			and
 			accessCnx.source.connectionEnd.oclIsKindOf(AADLI!DataAccess)
 		)
@@ -1478,7 +1478,7 @@ rule m_Parameter_to_DataAccess_DestinationConnection
 		(
 			accessCnx.destination.connectionEnd.oclIsKindOf(AADLI!DataAccess)
 			and
-			behavior.ownedCallSpecification->exists(e|accessCnx.destination.context = e)
+			behavior.ownedSubprogramCall->exists(e|accessCnx.destination.context = e)
 		)
 	using
 	{
@@ -1922,7 +1922,7 @@ rule m_Output_EventPort
 			and
 			portCnx.destination.connectionEnd = fi.feature
 			and
-			(behavior.ownedCallSpecification->exists(e| portCnx.source.context = e))
+			(behavior.ownedSubprogramCall->exists(e| portCnx.source.context = e))
 		)
 	to
 		call: AADLBA!SubprogramCallAction
@@ -2002,7 +2002,7 @@ unique lazy rule mapComputeEntrypoint
 --		{
 --			thisModule.addNextValueSubprogramCall(seq, impl, implImg, fi);
 --		}
---		seq.ownedCallSpecification->add(call);
+--		seq.ownedSubprogramCall->add(call);
 --		if (referencedSubprogram.oclIsKindOf(AADLI!SubprogramType))
 --			call.calledSubprogram <- thisModule.Type(OclUndefined,referencedSubprogram);
 --		else if(referencedSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
@@ -2106,7 +2106,7 @@ unique lazy rule mapComputeEntrypoint
 --	to
 --		s2 : AADLBA!SubprogramCallSequence (
 --			name <- impl.behaviorFromImpl().name,
---			ownedCallSpecification <- impl.behaviorFromImpl().ownedCallSpecification
+--			ownedSubprogramCall <- impl.behaviorFromImpl().ownedSubprogramCall
 --										->collect(e| thisModule.SubprogramCall(c, e, impl, implImg))
 --		)
 --		
@@ -2114,7 +2114,7 @@ unique lazy rule mapComputeEntrypoint
 --	{
 --		impl.behaviorFromImpl().debug('  copy call sequence');
 --		thisModule.ThreadSubprogramCallSequence <- s2;
---		for(call in thisModule.getThreadSubprogramCallSequence().ownedCallSpecification)
+--		for(call in thisModule.getThreadSubprogramCallSequence().ownedSubprogramCall)
 --		{
 --			
 --			-- if an in parameter is connected to an input port
@@ -2130,12 +2130,12 @@ unique lazy rule mapComputeEntrypoint
 --			
 --			call.debug('  copy subprogram call');
 --		}
---		s2.ownedCallSpecification <- thisModule.getThreadSubprogramCallSequence().ownedCallSpecification;
+--		s2.ownedSubprogramCall <- thisModule.getThreadSubprogramCallSequence().ownedSubprogramCall;
 --		s2;
 --	}
 --}
 
-helper def:getCalledSubprogram(call: AADLBA!CallSpecification) : AADLBA!SubprogramClassifier =
+helper def:getCalledSubprogram(call: AADLBA!SubprogramCall) : AADLBA!SubprogramClassifier =
 	if(call.calledSubprogram.oclIsKindOf(AADLBA!SubprogramAccess)) then
 		call.calledSubprogram.subprogramFeatureClassifier
 	else

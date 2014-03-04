@@ -43,7 +43,7 @@ import org.osate.aadl2.AccessType;
 import org.osate.aadl2.AnnexLibrary;
 import org.osate.aadl2.AnnexSubclause;
 import org.osate.aadl2.BehavioredImplementation;
-import org.osate.aadl2.CallSpecification;
+import org.osate.aadl2.SubprogramCall;
 import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ClassifierValue;
 import org.osate.aadl2.ComponentImplementation;
@@ -1359,7 +1359,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     
       public String caseSubprogramCallSequence(SubprogramCallSequence object)
       {
-        for(CallSpecification cs : object.getOwnedCallSpecifications())
+        for(SubprogramCall cs : object.getOwnedSubprogramCalls())
         {
           if(cs instanceof SubprogramCall)
           {

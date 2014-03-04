@@ -27,7 +27,6 @@ import java.util.Collections ;
 import java.util.List ;
 
 import org.eclipse.core.runtime.Platform ;
-import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.Element ;
@@ -376,7 +375,7 @@ public class AadlUtil
   {
     List<SubprogramCall> l = new ArrayList<SubprogramCall>() ;
 
-    for(CallSpecification call : seq.getOwnedCallSpecifications())
+    for(SubprogramCall call : seq.getOwnedSubprogramCalls())
     {
       SubprogramCall sCall = (SubprogramCall) call ;
       Subprogram s = (Subprogram) sCall.getCalledSubprogram() ;

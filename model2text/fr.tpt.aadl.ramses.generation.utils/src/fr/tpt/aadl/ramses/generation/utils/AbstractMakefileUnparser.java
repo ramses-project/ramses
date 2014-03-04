@@ -16,7 +16,6 @@ import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.AnnexSubclause ;
-import org.osate.aadl2.CallSpecification ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.ModalPropertyValue ;
@@ -212,8 +211,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
       for(SubprogramCallSequence aCallSequence : aThreadImplementation
             .getOwnedSubprogramCallSequences())
       {
-        for(CallSpecification aCallSpecification : aCallSequence
-              .getOwnedCallSpecifications())
+        for(SubprogramCall aCallSpecification : aCallSequence
+              .getOwnedSubprogramCalls())
         {
           getListOfReferencedObjects(aCallSpecification, tmp) ;
         }
@@ -262,7 +261,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     result.addAll(tmp) ;
   }
 
-  protected void getListOfReferencedObjects(CallSpecification aCallSpecification,
+  protected void getListOfReferencedObjects(SubprogramCall aCallSpecification,
                                             Set<File> result)
   {
     if(aCallSpecification instanceof SubprogramCall)
@@ -356,8 +355,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
                                                  .getExtended().getType(),
                                       tmp) ;
         }
-        for(CallSpecification aCallSpecification : aSubprogramImplementation
-              .getCallSpecifications())
+        for(SubprogramCall aCallSpecification : aSubprogramImplementation
+              .getSubprogramCalls())
         {
           getListOfReferencedObjects(aCallSpecification, tmp) ;
         }

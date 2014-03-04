@@ -156,7 +156,7 @@ helper context AADLI!ConnectedElement def : getConnContextImg(owner : AADLBA!Com
 		OclUndefined
 	else
 		if (self.context.oclIsKindOf(AADLI!SubprogramCall).debug('Context is subprogram call')) then
-			owner.debug('1111').ownedSubprogramCallSequence.debug('222')->first().ownedCallSpecification->any(call|call.name = self.context.name)
+			owner.debug('1111').ownedSubprogramCallSequence.debug('222')->first().ownedSubprogramCall->any(call|call.name = self.context.name)
 		else
 			-- can return OclUndefined if the subcomponent is not yet mapped
 			owner.getAllSubcomponents()->any(s|s.name = self.context.name)
@@ -223,7 +223,7 @@ helper context AADLI!ComponentType def : callSequenceFromComputeEntryPoint() : A
 ;
 
 helper context AADLI!SubprogramCallSequence def : getAllOutParameters() : Sequence(AADLI!Parameter) =
-	self.ownedCallSpecification->collect(c|c.calledSubprogram.ownedParameter)->flatten()->select(p|p.direction=#out)
+	self.ownedSubprogramCall->collect(c|c.calledSubprogram.ownedParameter)->flatten()->select(p|p.direction=#out)
 ;
 
 

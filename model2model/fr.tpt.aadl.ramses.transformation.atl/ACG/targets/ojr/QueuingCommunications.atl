@@ -38,7 +38,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 --------------------------------------------
 
 -- @extends m_Not_PeriodicDelayed_Port
-abstract rule m_QueueingCallSpecification
+abstract rule m_QueueingSubprogramCall
 {
 	from
 		fi: AADLI!FeatureInstance,
@@ -53,7 +53,7 @@ abstract rule m_QueueingCallSpecification
 		)
 }
 
--- @extends m_QueueingCallSpecification,m_Input_EventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
+-- @extends m_QueueingSubprogramCall,m_Input_EventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
 rule m_Input_Queuing_ComputeEntrypointCallSequence
 {
 	from
@@ -107,7 +107,7 @@ rule m_Input_Queuing_ComputeEntrypointCallSequence
 		)
 }
 
--- @extends m_QueueingCallSpecification,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+-- @extends m_QueueingSubprogramCall,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
 rule m_Output_Queuing_ComputeEntrypointCallSequence
 {
 	from

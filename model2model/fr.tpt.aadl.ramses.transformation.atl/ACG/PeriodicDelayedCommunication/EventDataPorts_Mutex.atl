@@ -174,7 +174,7 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		initCallSequence: AADLBA!SubprogramCallSequence
 		(
 			name <- 'initLikedList',
-			ownedCallSpecification <- c.featureInstance->select(e|e.isInputFeature())
+			ownedSubprogramCall <- c.featureInstance->select(e|e.isInputFeature())
 										->collect(e|thisModule.resolveMatchedSingleIfExists(e,'callInit'))
 		)
 	do
@@ -845,7 +845,7 @@ unique lazy rule Queue_Element_Type
 
 helper context AADLBA!ThreadImplementation def : getCall(name: String) : AADLBA!SubprogramCall =
 	self.getOwnedSubprogramCallSequences()
-	     ->first().ownedCallSpecification->any(call|call.name=name)
+	     ->first().ownedSubprogramCall->any(call|call.name=name)
 ;
 
 helper context AADLI!FeatureInstance def : getAllInternalConnections() : Sequence(AADLI!Connection) =
@@ -864,7 +864,7 @@ helper context AADLBA!ComponentImplementation def : subprogramCalls() :
 		0
 	else
 		self.getOwnedSubprogramCallSequences()->first()
-			.getOwnedCallSpecifications()
+			.getOwnedSubprogramCalls()
 	endif
 ;
 
