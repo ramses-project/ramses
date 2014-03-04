@@ -241,6 +241,8 @@ public class ToolSuiteLauncherCommand
       .setLongFlag("log").setShortFlag('l').setList(false)
       .setAllowMultipleDeclarations(false) ;
     
+    logging.setHelp("enable the logging file and set the level (ALL | TRACE | DEBUG | INFO | WARN | ERROR | FATAL") ;
+    
     FlaggedOption model =
           new FlaggedOption(SOURCE_MODELS_OPTION_ID)
                 .setStringParser(JSAP.STRING_PARSER).setRequired(true)
