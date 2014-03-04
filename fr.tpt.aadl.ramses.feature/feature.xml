@@ -48,7 +48,6 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="fr.tpt.aadl.ramses.control.support" version="0.5.0" match="greaterOrEqual"/>
       <import plugin="fr.tpt.aadl.ramses.generation.target.specific" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.ramses.util.generation" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
       <import plugin="fr.tpt.aadl.sched.wcetanalysis" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="fr.tpt.aadl.ramses.analysis.result" version="0.0.1" match="greaterOrEqual"/>
@@ -76,7 +75,6 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.osate.aadl2.instantiation" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.xtext.ui.shared"/>
       <import plugin="org.osate.xtext.aadl2.properties.ui"/>
-      <import plugin="fr.tpt.aadl.ramses.transformation.atl.launch" version="0.0.1" match="greaterOrEqual"/>
       <import plugin="org.osate.ba" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.osate.utils" version="1.0.0" match="greaterOrEqual"/>
    </requires>
@@ -134,27 +132,13 @@ You should have received a copy of the Eclipse Public License along with this pr
          id="fr.tpt.aadl.ramses.transformation.atl"
          download-size="0"
          install-size="0"
-         version="0.0.1"/>
-
-   <plugin
-         id="fr.tpt.aadl.ramses.transformation.atl.launch"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="fr.tpt.aadl.ramses.util.generation"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="fr.tpt.aadl.ramses.util.math"
          download-size="0"
          install-size="0"
-         version="0.0.1"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -236,6 +220,20 @@ You should have received a copy of the Eclipse Public License along with this pr
 
    <plugin
          id="fr.tpt.aadl.ramses.generation.ada.ravenscar"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.atl.launch"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.utils"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -3,31 +3,27 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AdaRavenscar
 Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.ada.ravenscar
 Bundle-Version: 0.5.0
-Bundle-Activator: fr.tpt.aadl.ramses.generation.adaravenscar.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.emf.ecore,
- org.osate.aadl2.modelsupport;bundle-version="1.0.0",
  org.eclipse.m2m.atl.core;bundle-version="3.4.0",
  org.eclipse.m2m.atl.emftvm;bundle-version="3.4.0",
  org.eclipse.m2m.atl.engine.emfvm.launch;bundle-version="3.4.0",
- org.osate.aadl2,
- org.osate.annexsupport,
  org.osate.xtext.aadl2,
+ org.osate.xtext.aadl2.properties,
+ org.osate.aadl2,
+ org.osate.aadl2.modelsupport;bundle-version="1.0.0",
+ org.osate.annexsupport,
  org.eclipse.xtext,
  org.osate.utils;bundle-version="0.9.5",
- fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
  org.osate.ba;bundle-version="0.9.5",
+ fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
+ fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.generation.utils,
  fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.generation.target.specific;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.generation.ada;bundle-version="0.5.0",
- org.osate.xtext.aadl2.properties
+ fr.tpt.aadl.ramses.generation.ada;bundle-version="0.5.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: fr.tpt.aadl.ramses.control.atl,
- fr.tpt.aadl.ramses.control.atl.hooks.impl,
- fr.tpt.aadl.ramses.generation.utils,
- org.eclipse.xtext.nodemodel,
- org.osate.xtext.aadl2.properties.linking
 Bundle-Vendor: TELECOM Paristech
 Export-Package: fr.tpt.aadl.ramses.generation.launcher.adaravenscar

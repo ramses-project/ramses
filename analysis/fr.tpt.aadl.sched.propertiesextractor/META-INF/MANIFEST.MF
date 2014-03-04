@@ -1,44 +1,8 @@
 Manifest-Version: 1.0
 Bundle-Name: PropertiesExtractor
-Bundle-SymbolicName: PropertiesExtractor;singleton=true
+Bundle-SymbolicName: PropertiesExtractor;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Vendor: TELECOM Paristech
-Provide-Package: fr.tpt.aadl.flow,
- fr.tpt.aadl.flow.analysis.util,
- fr.tpt.aadl.flow.extraction,
- fr.tpt.aadl.flow.extraction.ba,
- fr.tpt.aadl.flow.extraction.ba.types,
- fr.tpt.aadl.flow.extraction.seq,
- fr.tpt.aadl.flow.extraction.seq.types,
- fr.tpt.aadl.flow.extraction.types,
- fr.tpt.aadl.flow.extraction.util,
- fr.tpt.aadl.flow.model,
- fr.tpt.aadl.flow.util,
- org.jgrapht,
- org.jgrapht.alg,
- org.jgrapht.alg.util,
- org.jgrapht.demo,
- org.jgrapht.event,
- org.jgrapht.experimental,
- org.jgrapht.experimental.alg,
- org.jgrapht.experimental.alg.color,
- org.jgrapht.experimental.dag,
- org.jgrapht.experimental.equivalence,
- org.jgrapht.experimental.isomorphism,
- org.jgrapht.experimental.permutation,
- org.jgrapht.experimental.touchgraph,
- org.jgrapht.ext,
- org.jgrapht.generate,
- org.jgrapht.graph,
- org.jgrapht.traverse,
- org.jgrapht.util
-Require-Bundle: org.eclipse.emf.common;bundle-version="2.6.0",
- org.eclipse.core.runtime;bundle-version="3.6.0",
- org.osate.aadl2;bundle-version="1.0.0",
- org.osate.aadl2.modelsupport;bundle-version="1.0.0",
- org.osate.utils;bundle-version="0.8.5",
- fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
- org.osate.ba;bundle-version="0.8.0"
 Export-Package: fr.tpt.aadl.flow.analysis.util,
  fr.tpt.aadl.flow.extraction,
  fr.tpt.aadl.flow.extraction.ba,
@@ -48,7 +12,27 @@ Export-Package: fr.tpt.aadl.flow.analysis.util,
  fr.tpt.aadl.flow.extraction.types,
  fr.tpt.aadl.flow.extraction.util,
  fr.tpt.aadl.flow.model,
- fr.tpt.aadl.flow.util
+ fr.tpt.aadl.flow.util,org.jgrapht,
+ org.jgrapht.alg,org.jgrapht.alg.util,
+ org.jgrapht.demo,org.jgrapht.event,
+ org.jgrapht.experimental,
+ org.jgrapht.experimental.alg,
+ org.jgrapht.experimental.alg.color,
+ org.jgrapht.experimental.dag,
+ org.jgrapht.experimental.equivalence,
+ org.jgrapht.experimental.isomorphism,
+ org.jgrapht.experimental.permutation,
+ org.jgrapht.experimental.touchgraph,
+ org.jgrapht.ext,org.jgrapht.generate,
+ org.jgrapht.graph,org.jgrapht.traverse,
+ org.jgrapht.util
+Require-Bundle: org.eclipse.emf.common;bundle-version="2.6.0",
+ org.eclipse.core.runtime;bundle-version="3.6.0",
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.osate.aadl2.modelsupport;bundle-version="1.0.0",
+ org.osate.utils,
+ org.osate.ba,
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  antlr.jar,
@@ -78,4 +62,5 @@ Bundle-ClassPath: .,
  jdimodel.jar,
  lib/jgrapht-jdk1.6.jar
 Eclipse-AutoStart: true
-
+Bundle-ManifestVersion: 2
+Bundle-ActivationPolicy: lazy
