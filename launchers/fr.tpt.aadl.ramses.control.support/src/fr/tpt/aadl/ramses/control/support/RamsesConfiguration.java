@@ -183,13 +183,20 @@ public class RamsesConfiguration
   {
     try
     {
+      ServiceRegistry reg = ServiceProvider.getServiceRegistry() ;
+      Generator gen = reg.getGenerator(_targetId) ;
+      
       File runtimePath = null ;
       if(path != null)
       {
         runtimePath = fileChecker(path) ;
       }
-      ServiceRegistry reg = ServiceProvider.getServiceRegistry() ;
-      Generator gen = reg.getGenerator(_targetId) ;
+      else
+      {
+        _LOGGER.info("runtime path has not been set. It can be the normal behavior." +
+            " Otherwise, \'" + _targetId + "\' generator will try to fetch the runtime path "+
+            "from the \'$" + gen.getRuntimePathEnvVar() +"\' environment variable.");
+      }
       
       // The runtime path can be null.
       if(gen.runtimePathChecker(runtimePath))
@@ -201,6 +208,9 @@ public class RamsesConfiguration
       }
       else
       {
+        _LOGGER.warn("the given runtime path is not valid. Try to fetch the " +
+            "runtime path from \'$" + gen.getRuntimePathEnvVar() + "\' environment variable");
+        
         String envPath = EnvUtils.getEnvVariable(gen.getRuntimePathEnvVar()) ;
         
         if(envPath != null)
@@ -215,7 +225,7 @@ public class RamsesConfiguration
           }
           else
           {
-            ConfigStatus.NOT_VALID.msg = "the $" + gen.getRuntimePathEnvVar() + " doesn't point to a valid runtime path" ;
+            ConfigStatus.NOT_VALID.msg = "the $\'" + gen.getRuntimePathEnvVar() + "\' doesn't point to a valid runtime path" ;
             return ConfigStatus.NOT_VALID ;
           }
         }
