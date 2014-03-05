@@ -16,6 +16,6 @@ public class ConfigurationException extends Exception
   @Override
   public String getMessage()
   {
-    return "configuration failed: " + status.msg + " (" + status.name() + ')' ;
+    return "configuration failed: " + status.msg + " (" + status.cardinal + ')' ;
   }
 }

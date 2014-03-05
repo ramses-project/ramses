@@ -28,6 +28,7 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
+import java.util.Map.Entry ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
@@ -147,7 +148,7 @@ public class ToolSuiteLauncherCommand
           boolean parseOnly = options.getBoolean(PARSE_ONLY_OPTION_ID) ;
           boolean analysisOnly = options.getBoolean(ANALYSIS_ONLY_OPTION_ID) ;
           
-          commonOptionsHandler(options) ;
+          commonOptionsHandler(options, args) ;
           
           if(parseOnly)
           {
@@ -376,7 +377,8 @@ public class ToolSuiteLauncherCommand
     return result ;
   }
   
-  private static void commonOptionsHandler(JSAPResult options) throws ConfigurationException 
+  private static void commonOptionsHandler(JSAPResult options, String[] args)
+                                                   throws ConfigurationException 
   {
     String loggingOption = options.getString(LOGGING_OPTION_ID) ;
     
@@ -385,6 +387,8 @@ public class ToolSuiteLauncherCommand
     File logFile = new File(currentDirectory + File.separator + LOGGING_FILENAME) ;
     
     RamsesConfiguration.setupLogging(loggingOption, logFile) ;
+    String sessionHeader = createSessionHeader(args) ; 
+    _logger.info(sessionHeader);
     
     String[] includeFolderNames =
           options.getStringArray(INCLUDES_OPTION_ID) ;
@@ -541,8 +545,6 @@ public class ToolSuiteLauncherCommand
     }
     
     String path = options.getString(RUNTIME_PATH_OPTION_ID) ;
-    
-    _logger.trace("runtime path given as an arg: \'" + path + '\'') ;
     
     status = config.setRuntimePath(path) ;
     if(status != ConfigStatus.SET)
@@ -785,5 +787,40 @@ public class ToolSuiteLauncherCommand
     {
       throw new ConfigurationException(status) ;
     }
+  }
+  
+  private static String createSessionHeader(String[] args)
+  {
+    StringBuffer sb = new StringBuffer() ;
+    
+    sb.append(Names.NEW_LINE) ;
+    sb.append(Names.NEW_LINE) ;
+    sb.append("********************************************************************************");
+    sb.append(Names.NEW_LINE) ;
+    sb.append("*                           Starting RAMSES CLI ...                            *" );
+    sb.append(Names.NEW_LINE) ;
+    sb.append(Names.NEW_LINE) ;
+    sb.append("line arguments are:") ;
+    sb.append(Names.NEW_LINE) ;
+    for(String arg : args)
+    {
+      sb.append(' ') ;
+      sb.append(arg) ;
+    }
+    sb.append(Names.NEW_LINE) ;
+    sb.append(Names.NEW_LINE) ;
+    sb.append("environment variables are:") ;
+    for (Entry<String,String> ent : System.getenv().entrySet())
+    {
+      sb.append(Names.NEW_LINE) ;
+      sb.append("$");
+      sb.append(ent.getKey()) ;
+      sb.append('=') ;
+      sb.append(ent.getValue()) ;
+    }
+    sb.append(Names.NEW_LINE) ;
+    sb.append("********************************************************************************");
+    sb.append(Names.NEW_LINE) ;
+    return sb.toString() ;
   }
 }
