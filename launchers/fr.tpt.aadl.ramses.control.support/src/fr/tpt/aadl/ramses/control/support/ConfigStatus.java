@@ -2,11 +2,15 @@ package fr.tpt.aadl.ramses.control.support;
 
 public enum ConfigStatus
 {
-  SET, NOT_FOUND, NOT_VALID ;
+  SET ("data set", ""),
+  NOT_FOUND ("data not found", ""),
+  NOT_VALID ("data not valid", "")
+  ;
   
+  public String cardinal ; 
   public String msg ;
   
-  private ConfigStatus(String msg)
+  private ConfigStatus(String cardinal, String msg)
   {
     this.msg = msg ;
   }

@@ -541,6 +541,9 @@ public class ToolSuiteLauncherCommand
     }
     
     String path = options.getString(RUNTIME_PATH_OPTION_ID) ;
+    
+    _logger.trace("runtime path given as an arg: \'" + path + '\'') ;
+    
     status = config.setRuntimePath(path) ;
     if(status != ConfigStatus.SET)
     {

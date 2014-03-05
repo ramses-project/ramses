@@ -281,8 +281,6 @@ public class RamsesConfiguration
     }
     catch(FileNotFoundException e)
     {
-      _LOGGER.debug("file \'" + path + "\' is not found" , e);
-      
       ConfigStatus.NOT_FOUND.msg = "\'" + path + "\' is not found";
       
       if(false == (e.getMessage() == null || e.getMessage().isEmpty()))

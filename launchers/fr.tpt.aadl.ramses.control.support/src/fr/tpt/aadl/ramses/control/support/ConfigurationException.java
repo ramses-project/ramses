@@ -12,4 +12,10 @@ public class ConfigurationException extends Exception
   {
     this.status = status ; 
   }
+  
+  @Override
+  public String getMessage()
+  {
+    return "configuration failed: " + status.msg + " (" + status.name() + ')' ;
+  }
 }
