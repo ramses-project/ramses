@@ -298,6 +298,23 @@ public class RamsesConfiguration
   }
   
   /**
+   * Setup RAMSES logging system with the default log file : ./.ramses-log.
+   * 
+   * @see#setupLogging(String,File)
+   * 
+   * 
+   * @param loggingLevel
+   */
+  public static void setupLogging(String loggingLevel)
+  {
+    String currentDirectory = System.getProperty("user.dir") ;
+    File logFile = new File(currentDirectory + File.separator + Names. 
+                                                             LOGGING_FILENAME) ;
+    setupLogging(loggingLevel, logFile);
+  }
+  
+  
+  /**
    * Setup RAMSES logging system. If loggingLevel is {@code null} or empty
    * or/and logFile is {@code null}, logging is turn off.
    * <br><br>

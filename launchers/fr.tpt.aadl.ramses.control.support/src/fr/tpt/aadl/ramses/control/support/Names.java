@@ -56,4 +56,6 @@ public class Names
   public static final String LOG4J_CONSOLE_APPENDER_NAME = "ramses_console_log" ;
   
   public static final String NEW_LINE = System.getProperty("line.separator");
+  
+  public static final String LOGGING_FILENAME = ".ramses-log" ;
 }

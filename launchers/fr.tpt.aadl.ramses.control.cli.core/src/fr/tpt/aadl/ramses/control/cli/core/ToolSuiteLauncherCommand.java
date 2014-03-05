@@ -90,8 +90,6 @@ public class ToolSuiteLauncherCommand
                                                              "value" ;
   private static final String LOGGING_OPTION_ID = "logging" ;
   
-  private static final String LOGGING_FILENAME = ".ramses-log" ;
-  
   private static Switch helpOnlyMode ;
   private static Switch parseOnlyMode ;
   private static Switch analysisOnlyMode ;
@@ -381,12 +379,7 @@ public class ToolSuiteLauncherCommand
                                                    throws ConfigurationException 
   {
     String loggingOption = options.getString(LOGGING_OPTION_ID) ;
-    
-    String currentDirectory = System.getProperty("user.dir") ;
-    
-    File logFile = new File(currentDirectory + File.separator + LOGGING_FILENAME) ;
-    
-    RamsesConfiguration.setupLogging(loggingOption, logFile) ;
+    RamsesConfiguration.setupLogging(loggingOption) ;
     String sessionHeader = createSessionHeader(args) ; 
     _logger.info(sessionHeader);
     
