@@ -820,7 +820,7 @@ rule m_PortBehavior
 		updateActivatedPort: AADLBA!BehaviorEnumerationLiteral
 		(
 			component <- thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- thisModule.resolveMatchedSingleIfExists(fi, 'createComputeEntryPointConditionForPort', 'portIDEnumLiteral')
+			enumLiteral <- thisModule.resolveLazySingleIfExists(fi, 'createComputeEntryPointConditionForPort', 'portIDEnumLiteral')
 		)
 		
   	do
