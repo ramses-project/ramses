@@ -283,11 +283,6 @@ public class RamsesConfiguration
     {
       ConfigStatus.NOT_FOUND.msg = "\'" + path + "\' is not found";
       
-      if(false == (e.getMessage() == null || e.getMessage().isEmpty()))
-      {
-        ConfigStatus.NOT_FOUND.msg += '(' + e.getMessage() + ')' ;
-      }
-      
       throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
     }
   }

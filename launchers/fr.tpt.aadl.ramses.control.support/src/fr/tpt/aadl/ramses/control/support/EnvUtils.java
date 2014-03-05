@@ -17,7 +17,7 @@ public class EnvUtils
       if(result==null || result=="")
       { 
         result = System.getProperty(envVarName);
-        _LOGGER.trace('\'' + envVarName + "\' environment variable returns: \'"+
+        _LOGGER.trace("\'$" + envVarName + "\' environment variable returns: \'"+
                       result + '\'');
       }
     }
