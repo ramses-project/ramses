@@ -425,7 +425,7 @@
     <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl</artifactId>
-      <version>3.5.0</version>
+      <version>3.2.1.v20110914-0724</version>
     </dependency>
     
     <dependency>
@@ -443,31 +443,31 @@
     <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.common</artifactId>
-      <version>3.5.0</version>
+      <version>3.2.1.v20110914-0724</version>
     </dependency>
 
     <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.core.emf</artifactId>
-      <version>3.5.0</version>
+      <version>3.2.1.v20110914-0724</version>
     </dependency>
 
    <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.core</artifactId>
-      <version>3.5.0</version>
+      <version>3.2.1.v20110914-0724</version>
     </dependency>
 
    <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.engine.emfvm</artifactId>
-      <version>3.5.0</version>
+      <version>3.2.1.v20110914-0724</version>
     </dependency>
 
    <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.engine.emfvm.launch</artifactId>
-      <version>3.5.0</version>
+      <version>3.2.1.v20110914-0724</version>
     </dependency>
 
    <dependency>
@@ -503,7 +503,7 @@
     <dependency>
       <groupId>org.eclipse.xtext</groupId>
       <artifactId>org.eclipse.xtext.standalone</artifactId>
-      <version>2.5.1</version>
+      <version>2.4.3</version>
     </dependency>
 
    <dependency>
