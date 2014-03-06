@@ -3,29 +3,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.ui"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.aadl2"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.aadl2.edit"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.aadl2.instantiation"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.aadl2.model.editor"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.aadl2.modelsupport"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.annexsupport"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.branding"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.contribution.sei"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.pluginsupport"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.reporter"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.wizards"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.workspace"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.xtext.aadl2"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.xtext.aadl2.properties"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.xtext.aadl2.properties.ui"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.osate.xtext.aadl2.ui"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.pok"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.control.support"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.target.specific"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.util.properties"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.generation.c"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fr.tpt.aadl.ramses.control.atl.launch"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
