@@ -502,21 +502,21 @@
 
     <dependency>
       <groupId>org.eclipse.xtext</groupId>
-      <artifactId>org.eclipse.xtext.standalone</artifactId>
-      <version>2.4.3</version>
+      <artifactId>org.eclipse.xtext.builder.standalone</artifactId>
+      <version>2.5.1</version>
     </dependency>
 
    <dependency>
       <groupId>org.eclipse.ui</groupId>
       <artifactId>ui</artifactId>
       <version>3.7.0.I20110602-0100</version>
-    </dependency>
+   </dependency>
 
    <dependency>
       <groupId>org.eclipse.ui</groupId>
       <artifactId>ui.workbench</artifactId>
       <version>3.7.0.I20110519-0100</version>
-    </dependency>
+   </dependency>
    
   </dependencies>
 
