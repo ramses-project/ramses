@@ -318,13 +318,13 @@ public class RamsesConfiguration
    * Setup RAMSES logging system. If loggingLevel is {@code null} or empty
    * or/and logFile is {@code null}, logging is turn off.
    * <br><br>
-   * If the logging level is not recognize, it is set to DEBUG.
+   * If the logging level is not recognize, it is set to debug.
    * <br><br>
    * Level:<br>
    * <br>
-   * ALL == TRACE < DEBUG < INFO < WARN < ERROR < FATAL < OFF
+   * all == trace < debug < info < warn < error < fatal < off
    * <br><br>
-   * ALL, TRACE and DEBUG make logger to print extra informations (class name,
+   * all, trace and debug make logger to print extra informations (class name,
    * timestamp, method name, code line).
    * 
    * @see org.apache.log4j.Level
