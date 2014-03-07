@@ -26,7 +26,7 @@ import fr.tpt.aadl.ramses.control.support.reporters.SystemErrReporter ;
 
 public class ServiceProvider
 {
-  private static ServiceRegistry _sr = new DefaultServiceRegistry() ;
+  private static ServiceRegistry _sr ;
   
   public static void setDefault(ServiceRegistry sr)
   {
