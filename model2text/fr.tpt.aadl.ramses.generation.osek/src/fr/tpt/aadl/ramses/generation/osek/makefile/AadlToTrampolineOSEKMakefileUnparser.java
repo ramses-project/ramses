@@ -108,7 +108,7 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
         {
           String errMsg = "while goil generation: refine_oil" ;
           _LOGGER.fatal(errMsg) ;
-          ProcessMessageDisplay.displayErrorMessage(makeProcess) ;
+          ProcessMessageDisplay.displayErrorMessage(makeProcess, false) ;
         }
 
         StringBuilder sb = new StringBuilder() ;
@@ -165,17 +165,17 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
         {
           String errMsg = "while goil generation: PrepareMake" ;
           _LOGGER.fatal(errMsg) ;
-          ProcessMessageDisplay.displayErrorMessage(makeProcess) ;
+          ProcessMessageDisplay.displayErrorMessage(makeProcess, false) ;
         }
         else
         {
           monitor.subTask("Compiling Trampoline Code") ;
           makeProcess = runtime.exec("make -o Makefile", null, outputDir) ;
-          ProcessMessageDisplay.displayOutputMessage(makeProcess) ;
+          ProcessMessageDisplay.displayOutputMessage(makeProcess, false) ;
           makeProcess.waitFor() ;
           if(makeProcess.exitValue() != 0)
           {
-            ProcessMessageDisplay.displayErrorMessage(makeProcess) ;
+            ProcessMessageDisplay.displayErrorMessage(makeProcess, false) ;
           }
         }
 

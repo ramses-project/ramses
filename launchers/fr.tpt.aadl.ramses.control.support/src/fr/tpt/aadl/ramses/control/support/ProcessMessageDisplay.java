@@ -45,22 +45,26 @@ public class ProcessMessageDisplay
    * This method displays in console messages printed on 
    * standard output by the external process launched.
    * @param p the external process that was launched.
+   * @param hasToPrintOnStdout if {@code true}, it also prints on standard output.
+   * Otherwise, it does not.
    */
-  public static void displayOutputMessage(Process p)
+  public static void displayOutputMessage(Process p, boolean hasToPrintOnStdout)
   {
     InputStream is = p.getInputStream();
-    display(is, false) ;
+    display(is, false, hasToPrintOnStdout) ;
   }
 
   /**
    * This method displays on console messages printed on
    * error output by the external process launched.
    * @param p the external process that was launched.
+   * @param hasToPrintOnStderr if {@code true} it also prints on standard error.
+   * Otherwise, it does not.
    */
-  public static void displayErrorMessage(Process p)
+  public static void displayErrorMessage(Process p, boolean hasToPrintOnStderr)
   {
     InputStream is = p.getErrorStream();
-    display(is, true) ;
+    display(is, true, hasToPrintOnStderr) ;
   }
   
   /**
@@ -113,7 +117,8 @@ public class ProcessMessageDisplay
     }
   }
   
-  private static void display(InputStream is, boolean isError)
+  private static void display(InputStream is, boolean isError,
+                              boolean hasToPrintOnStd)
   {
     try
     {
@@ -125,10 +130,18 @@ public class ProcessMessageDisplay
         {
           _LOGGER.error(line);
           ServiceProvider.SYS_ERR_REP.error(line, true);
+          if(hasToPrintOnStd)
+          {
+            System.err.println(line) ;
+          }
         }
         else
         {
           _LOGGER.trace(line) ;
+          if(hasToPrintOnStd)
+          {
+            System.out.println(line) ;
+          }
         }
       }
     }
