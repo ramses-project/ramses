@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.cli ;
 
+import org.apache.log4j.LogManager ;
 import org.apache.log4j.Logger ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
@@ -61,6 +62,7 @@ public class ToolSuiteLauncher
       {
         errReporter.displayDelayedErrors();
       }
+      LogManager.shutdown();
     }
     catch(Exception e) // The top level exception handler.
     {

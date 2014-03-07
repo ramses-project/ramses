@@ -23,6 +23,7 @@ package fr.tpt.aadl.ramses.control.cli.osgi ;
 
 import java.util.Map ;
 
+import org.apache.log4j.LogManager ;
 import org.eclipse.equinox.app.IApplication ;
 import org.eclipse.equinox.app.IApplicationContext ;
 
@@ -52,6 +53,7 @@ public class Application implements IApplication
     Map<String, String[]> argsMap = context.getArguments() ;
     String[] args = argsMap.get("application.args") ;
     ToolSuiteLauncherCommand.main(args) ;
+    LogManager.shutdown();
     return IApplication.EXIT_OK ;
   }
 
