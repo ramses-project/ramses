@@ -71,19 +71,24 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
   public StandAloneInstantiator(AnalysisErrorReporterManager errManager,
                                 IProgressMonitor monitor)
   {
-	  super(errManager, monitor) ;
-    
-    try {
-	  corePlugin.registerInjectorFor("org.osate.xtext.aadl2.properties.Properties", injector);
-	} catch (Exception e) {
-	  // TODO Auto-generated catch block
-	  e.printStackTrace();
-	}
-	
-    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-          .put("aaxl2", new Aadl2ResourceFactoryImpl()) ;
+    super(errManager, monitor) ;
 
-    EMFIndexRetrieval.registerResourceProviders(rdp, rspr);
+    try
+    {
+      corePlugin.registerInjectorFor("org.osate.xtext.aadl2.properties.Properties",
+                                     injector) ;
+    }
+    catch(Exception e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace() ;
+    }
+
+    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+                                      .put("aaxl2",
+                                           new Aadl2ResourceFactoryImpl()) ;
+
+    EMFIndexRetrieval.registerResourceProviders(rdp, rspr) ;
   }
 
   private Resource parse(File aadlFile)
@@ -92,6 +97,7 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
     // using OSGi mechanism.
     // TODO: implement test osgi and add "file:" in case osgi is used
     URI uri = URI.createFileURI(aadlFile.getAbsolutePath().toString()) ;
+    _LOGGER.debug(uri.toString()) ;
     Resource input_resource = resourceSet.getResource(uri, true) ;
     if(input_resource.getErrors().isEmpty() == false)
     {
@@ -157,7 +163,7 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
         String msg = "Abort on parse error. Annex resolving is skiped" ;
         _LOGGER.info(msg);
         ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
-        java.lang.System.exit(0) ;
+        java.lang.System.exit(-1) ;
       }
     }
 

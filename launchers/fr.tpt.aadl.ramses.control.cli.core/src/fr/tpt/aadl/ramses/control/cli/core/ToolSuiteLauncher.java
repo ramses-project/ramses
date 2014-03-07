@@ -193,7 +193,7 @@ public class ToolSuiteLauncher
       String msg = "instanciation has failed" ;
       _LOGGER.info(msg);
       ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
-      System.exit(0);
+      System.exit(-1);
     }
     
     generator.setParameters(parameters) ;

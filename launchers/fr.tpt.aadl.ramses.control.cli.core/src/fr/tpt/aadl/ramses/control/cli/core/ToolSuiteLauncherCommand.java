@@ -137,7 +137,7 @@ public class ToolSuiteLauncherCommand
       if(helpOnly)
       {
         printHelp(jsap, args);
-        System.exit(1) ; 
+        System.exit(0) ; 
       }
       else
       {
@@ -162,7 +162,7 @@ public class ToolSuiteLauncherCommand
           }
         }
       
-        System.exit(1);
+        System.exit(0);
       }
     }
     catch(ConfigurationException ex)
@@ -170,14 +170,14 @@ public class ToolSuiteLauncherCommand
       String msg = "while setting up RAMSES" ;
       _logger.fatal(msg, ex);
       ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
-      System.exit(0);
+      System.exit(-1);
     }
     catch(JSAPException ex)
     {
       String msg = "while setting up RAMSES" ;
       _logger.fatal(msg, ex);
       ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
-      System.exit(0);
+      System.exit(-1);
     }
   }
   
@@ -240,7 +240,7 @@ public class ToolSuiteLauncherCommand
       .setLongFlag("log").setShortFlag('l').setList(false)
       .setAllowMultipleDeclarations(false) ;
     
-    logging.setHelp("enable the logging file and set the level (ALL | TRACE | DEBUG | INFO | WARN | ERROR | FATAL") ;
+    logging.setHelp("enable the logging file and set the level (all | trace | debug | info | warn | error | fatal") ;
     
     FlaggedOption model =
           new FlaggedOption(SOURCE_MODELS_OPTION_ID)
@@ -468,7 +468,7 @@ public class ToolSuiteLauncherCommand
           String errMsg = "while unparsing" ;
           _logger.fatal(errMsg, e);
           ServiceProvider.SYS_ERR_REP.fatal(errMsg, e);
-          System.exit(0);
+          System.exit(-1);
         }
       }
     }
@@ -575,7 +575,7 @@ public class ToolSuiteLauncherCommand
         String msg = "generation workflow file \'" + workflow_path + "\' is not found" ;
         _logger.fatal(msg, ex);
         ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
-        System.exit(0);
+        System.exit(-1);
       }
     }
     else

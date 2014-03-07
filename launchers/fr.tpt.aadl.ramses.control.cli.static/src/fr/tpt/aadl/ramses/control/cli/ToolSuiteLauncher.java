@@ -66,8 +66,8 @@ public class ToolSuiteLauncher
     {
       Logger.getLogger(ToolSuiteLauncher.class).fatal("", e); 
       ServiceProvider.SYS_ERR_REP.fatal("", e);
-      System.exit(0) ;
+      System.exit(-1) ;
     }
-    System.exit(1) ;
+    System.exit(0) ;
   }
 }
