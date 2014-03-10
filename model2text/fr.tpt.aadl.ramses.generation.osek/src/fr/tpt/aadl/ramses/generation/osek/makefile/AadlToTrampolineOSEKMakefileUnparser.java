@@ -32,8 +32,8 @@ import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 
 import fr.tpt.aadl.ramses.control.support.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.LogProcessTraceDisplay ;
 import fr.tpt.aadl.ramses.control.support.Names ;
-import fr.tpt.aadl.ramses.control.support.ProcessMessageDisplay ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
 import fr.tpt.aadl.ramses.generation.utils.AbstractAadlToCMakefileUnparser ;
@@ -108,7 +108,8 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
         {
           String errMsg = "while goil generation: refine_oil" ;
           _LOGGER.fatal(errMsg) ;
-          ProcessMessageDisplay.displayErrorMessage(makeProcess, false) ;
+          
+          LogProcessTraceDisplay.INSTANCE.displayErrorMessage(makeProcess);
         }
 
         StringBuilder sb = new StringBuilder() ;
@@ -165,17 +166,17 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
         {
           String errMsg = "while goil generation: PrepareMake" ;
           _LOGGER.fatal(errMsg) ;
-          ProcessMessageDisplay.displayErrorMessage(makeProcess, false) ;
+          LogProcessTraceDisplay.INSTANCE.displayErrorMessage(makeProcess);
         }
         else
         {
           monitor.subTask("Compiling Trampoline Code") ;
           makeProcess = runtime.exec("make -o Makefile", null, outputDir) ;
-          ProcessMessageDisplay.displayOutputMessage(makeProcess, false) ;
+          LogProcessTraceDisplay.INSTANCE.displayErrorMessage(makeProcess);
           makeProcess.waitFor() ;
           if(makeProcess.exitValue() != 0)
           {
-            ProcessMessageDisplay.displayErrorMessage(makeProcess, false) ;
+            LogProcessTraceDisplay.INSTANCE.displayErrorMessage(makeProcess);
           }
         }
 

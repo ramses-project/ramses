@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2014 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -28,43 +28,30 @@ import java.io.InputStream ;
 import java.io.InputStreamReader ;
 import java.io.PrintStream ;
 
-import org.apache.log4j.Logger ;
-
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
-
-// TODO: should go in a Utils project
-/**
- * This class is meant to display messages of external processes launched
- * from RAMSES (output or error messages).
- */
-public class ProcessMessageDisplay
+public abstract class AbstractProcessTraceDisplay
 {
-  private static Logger _LOGGER = Logger.getLogger(ProcessMessageDisplay.class) ;
-  
   /**
    * This method displays in console messages printed on 
    * standard output by the external process launched.
    * @param p the external process that was launched.
-   * @param hasToPrintOnStdout if {@code true}, it also prints on standard output.
    * Otherwise, it does not.
    */
-  public static void displayOutputMessage(Process p, boolean hasToPrintOnStdout)
+  public void displayOutputMessage(Process p) throws IOException
   {
     InputStream is = p.getInputStream();
-    display(is, false, hasToPrintOnStdout) ;
+    display(is, false) ;
   }
 
   /**
    * This method displays on console messages printed on
    * error output by the external process launched.
    * @param p the external process that was launched.
-   * @param hasToPrintOnStderr if {@code true} it also prints on standard error.
    * Otherwise, it does not.
    */
-  public static void displayErrorMessage(Process p, boolean hasToPrintOnStderr)
+  public void displayErrorMessage(Process p) throws IOException
   {
     InputStream is = p.getErrorStream();
-    display(is, true, hasToPrintOnStderr) ;
+    display(is, true) ;
   }
   
   /**
@@ -97,60 +84,16 @@ public class ProcessMessageDisplay
     ps.close() ;
   }
   
-  private static void displayInStream(InputStream is, PrintStream ps)
+  protected static void displayInStream(InputStream is, PrintStream ps) 
+                                                              throws IOException
   {
-    try
+    BufferedReader in = new BufferedReader(new InputStreamReader(is));
+    String line = null;
+    while ((line = in.readLine()) != null)
     {
-      BufferedReader in = new BufferedReader(new InputStreamReader(is));
-      String line = null;
-      while ((line = in.readLine()) != null)
-      {
-        ps.println(line);
-      }
-    }
-    catch (IOException e)
-    {
-      String errMsg =  RamsesException.formatRethrowMessage(
-                                        "writting in the process log file", e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      ps.println(line);
     }
   }
   
-  private static void display(InputStream is, boolean isError,
-                              boolean hasToPrintOnStd)
-  {
-    try
-    {
-      BufferedReader in = new BufferedReader(new InputStreamReader(is));
-      String line = null;
-      while ((line = in.readLine()) != null)
-      {
-        if(isError)
-        {
-          _LOGGER.error(line);
-          ServiceProvider.SYS_ERR_REP.error(line, true);
-          if(hasToPrintOnStd)
-          {
-            System.err.println(line) ;
-          }
-        }
-        else
-        {
-          _LOGGER.trace(line) ;
-          if(hasToPrintOnStd)
-          {
-            System.out.println(line) ;
-          }
-        }
-      }
-    }
-    catch (IOException e)
-    {
-      String errMsg =  RamsesException.formatRethrowMessage(
-                                        "writting in the process log file", e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-    }
-  }
+  abstract protected void display(InputStream is, boolean isError) throws IOException ;
 }
