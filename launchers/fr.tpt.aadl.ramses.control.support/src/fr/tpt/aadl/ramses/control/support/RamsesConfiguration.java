@@ -54,6 +54,7 @@ public class RamsesConfiguration
     }
     catch(ConfigurationException e)
     {
+      e.status.msg ="RAMSES directory not found (\'" + e.status.msg + "\')" ;
       return e.status ;
     }
   }
@@ -109,6 +110,7 @@ public class RamsesConfiguration
     }
     catch(ConfigurationException e)
     {
+      e.status.msg ="ATL resource directory not found (" + e.status.msg + ')' ; 
       return e.status ;
     }
   }
@@ -138,6 +140,7 @@ public class RamsesConfiguration
     }
     catch(ConfigurationException e)
     {
+      e.status.msg ="predefined AADL resource directory not found (" + e.status.msg + ')' ;
       return e.status ;
     }
   }
