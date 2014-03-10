@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright �� 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -240,7 +240,7 @@ public class ToolSuiteLauncherCommand
       .setLongFlag("log").setShortFlag('l').setList(false)
       .setAllowMultipleDeclarations(false) ;
     
-    logging.setHelp("enable the logging file and set the level (all | trace | debug | info | warn | error | fatal") ;
+    logging.setHelp("enable the logging file and set the level (all | trace |��debug |��info |��warn | error |��fatal") ;
     
     FlaggedOption model =
           new FlaggedOption(SOURCE_MODELS_OPTION_ID)
@@ -793,16 +793,28 @@ public class ToolSuiteLauncherCommand
     sb.append("*                           Starting RAMSES CLI ...                            *" );
     sb.append(Names.NEW_LINE) ;
     sb.append(Names.NEW_LINE) ;
-    sb.append("line arguments are:") ;
+    sb.append("RAMSES arguments are:") ;
     sb.append(Names.NEW_LINE) ;
     for(String arg : args)
     {
       sb.append(' ') ;
       sb.append(arg) ;
     }
+    
     sb.append(Names.NEW_LINE) ;
     sb.append(Names.NEW_LINE) ;
-    sb.append("environment variables are:") ;
+    sb.append("VM arguments (-D) are:") ;
+    for (Entry<Object,Object> ent : System.getProperties().entrySet())
+    {
+      sb.append(Names.NEW_LINE) ;
+      sb.append(ent.getKey()) ;
+      sb.append('=') ;
+      sb.append(ent.getValue()) ;
+    }
+    
+    sb.append(Names.NEW_LINE) ;
+    sb.append(Names.NEW_LINE) ;
+    sb.append("Environment variables are:") ;
     for (Entry<String,String> ent : System.getenv().entrySet())
     {
       sb.append(Names.NEW_LINE) ;
