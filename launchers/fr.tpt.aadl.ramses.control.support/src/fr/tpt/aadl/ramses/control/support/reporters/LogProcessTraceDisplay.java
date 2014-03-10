@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.reporters;
 
 import java.io.BufferedReader ;
 import java.io.IOException ;
