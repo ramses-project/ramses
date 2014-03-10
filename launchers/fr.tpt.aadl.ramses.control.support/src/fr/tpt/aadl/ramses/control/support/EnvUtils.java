@@ -8,7 +8,12 @@ public class EnvUtils
     
     if(envVarName != null)
     {
-      result=System.getenv(envVarName);      
+      result= System.getProperty(envVarName) ;
+      
+      if(result == null || result.isEmpty())
+      {
+        result=System.getenv(envVarName) ;
+      }
     }
 
     return result ;
