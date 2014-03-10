@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright � 2012 TELECOM ParisTech and CNRS
+ * Copyright ��� 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -97,7 +97,7 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
     // using OSGi mechanism.
     // TODO: implement test osgi and add "file:" in case osgi is used
     URI uri = URI.createFileURI(aadlFile.getAbsolutePath().toString()) ;
-    _LOGGER.debug(uri.toString()) ;
+    
     Resource input_resource = resourceSet.getResource(uri, true) ;
     if(input_resource.getErrors().isEmpty() == false)
     {
