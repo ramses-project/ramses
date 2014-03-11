@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList;
 import org.osate.aadl2.DirectionType;
@@ -46,6 +47,7 @@ import fr.tpt.aadl.ramses.control.support.FileUtils;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
 import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
 
@@ -57,24 +59,25 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 	List<String> periodicThreads = new ArrayList<String>();
 	List<String> portTypeThreads = new ArrayList<String>();
 
-    int nbSporadic = 0;
-    int nbPeriodic=0;
-    public static int compteurPer=0; 
-    
-    UnparseText deploymentHeaderCode = new UnparseText() ;
+  int nbSporadic = 0 ;
+  int nbPeriodic = 0 ;
+  public static int compteurPer = 0 ;
+
+  UnparseText deploymentHeaderCode = new UnparseText() ;
+  
+  private static Logger _LOGGER = Logger.getLogger(AadlToConfAdaRavenscarUnparser.class) ;
 
 	public void process(ProcessorSubcomponent processor,
 	                    TargetProperties tarProp,
 	                    File runtimePath,
                       File outputDir,
-                      IProgressMonitor monitor) 
-					throws GenerationException
-					{ 
-		ProcessorProperties processorProp = new ProcessorProperties() ;
+                      IProgressMonitor monitor) throws GenerationException
+  {
+    ProcessorProperties processorProp = new ProcessorProperties() ;
 
-		// Discard older processor properties !
-		_processorProp = processorProp ;
-					}
+    // Discard older processor properties !
+    _processorProp = processorProp ;
+  }
 
 //	private Port getProcessPort(FeatureInstance fi)
 //	{
@@ -107,7 +110,7 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 			                TargetProperties tarProp,
 			                File runtimePath,
                       File outputDir,
-                      IProgressMonitor monitor)
+                      IProgressMonitor monitor) throws GenerationException
 	{
 		PartitionProperties pp = new PartitionProperties();
 
@@ -130,7 +133,6 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		UnparseText rootingHeaderCode = new UnparseText() ;
 		genRootingHeader(processImpl, rootingHeaderCode, pp) ;
 
-
 		try
 		{
 			FileUtils.saveFile(outputDir, "main.gpr",
@@ -141,20 +143,19 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 			
 			FileUtils.saveFile(outputDir, "rooting.ads",
 					rootingHeaderCode.getParseOutput()) ;
-			
 		}
 		catch(IOException e)
 		{
-			// TODO : error message to handle.
-			e.printStackTrace() ;
+		  String msg = "cannot save the generated files" ;
+      throw new GenerationException(msg, e) ;
 		}
 	}
 	
 	
 	private PartitionProperties genMainHeader(ProcessImplementation process,
-			UnparseText mainHeaderCode,
-			ProcessorProperties processorProp,
-			PartitionProperties pp)
+			                                      UnparseText mainHeaderCode,
+			                                      ProcessorProperties processorProp,
+			                                      PartitionProperties pp)
 	{
 //		List<ThreadSubcomponent> bindedThreads =
 //				process.getOwnedThreadSubcomponents() ;
@@ -167,9 +168,10 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 
 	
 	//Generate global variables.
-	private void genGlobalVariablesMainImpl(ProcessImplementation process, EList<ThreadSubcomponent> lthreads,
-			UnparseText mainImplCode,
-			PartitionProperties pp)
+	private void genGlobalVariablesMainImpl(ProcessImplementation process,
+	                                        EList<ThreadSubcomponent> lthreads,
+			                                    UnparseText mainImplCode,
+			                                    PartitionProperties pp)
 	{
 		String guard = GenerationUtilsADA.generateHeaderInclusionGuard("main.adb") ;
 		mainImplCode.addOutput(guard) ;
@@ -219,9 +221,9 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 	}
 	
 	private void genTaskDeclarationMainImpl(ThreadSubcomponent thread,
-			int threadIndex,
-			UnparseText mainImplCode,
-			ProcessImplementation procImpl)
+			                                    int threadIndex,
+			                                    UnparseText mainImplCode,
+			                                    ProcessImplementation procImpl)
 	{
 			
 		ThreadImplementation timpl =
@@ -231,111 +233,136 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		mainImplCode.decrementIndent();
 	}
 
-	private void genTaskMainImpl(ThreadSubcomponent thread,
-			int threadIndex,
-			UnparseText mainImplCode,
-			ProcessImplementation procImpl)
+  private void genTaskMainImpl(ThreadSubcomponent thread, int threadIndex,
+                               UnparseText mainImplCode,
+                               ProcessImplementation procImpl)
 	{
 		ThreadImplementation timpl =
 				(ThreadImplementation) thread.getComponentImplementation() ;
 		mainImplCode.incrementIndent();
-		mainImplCode.addOutputNewline("New_"+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName())+" : array (1..1) of "+timpl.getFullName()+";");
+		mainImplCode.addOutputNewline("New_"+GenerationUtilsADA.
+		                              getGenerationADAIdentifier(timpl.getFullName())+
+		                              " : array (1..1) of "+timpl.getFullName()+";");
 		mainImplCode.decrementIndent();		
 	}
 
-	private void genThreadDeclarationMainImpl(ThreadSubcomponent thread,
-			int threadIndex,
-			UnparseText mainImplCode,
-			ProcessImplementation procImpl)
-	{
-			
-		ThreadImplementation timpl =
-				(ThreadImplementation) thread.getComponentImplementation() ;
-		
-		mainImplCode.incrementIndent();		
-		String Dispatch = null;
-		 
-			    try {
-					Dispatch = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol");
-				} catch (Exception exception) {
-					System.out.println("exception");
-				}
-			 if (Dispatch.equals("Sporadic"))
-			 {   
-				 nbSporadic++;
-				 portTypeThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(thread.getFullName())+"_Port_Type");
-				 sporadicThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(thread.getFullName())+"_K");
-			 }
-			 else
-			 {
-				 nbPeriodic++;
-				 periodicThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName())+"_"+GenerationUtilsADA.getGenerationADAIdentifier(thread.getFullName())+"_K");
-			 }
-			
-	    mainImplCode.addOutputNewline("");
-		mainImplCode.addOutputNewline("task body "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName())+" is");
-		
-	    mainImplCode.addOutputNewline("");
-		mainImplCode.addOutput("package "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getQualifiedName())+"_Task "+ "is new PolyORB_HI.Periodic_Task");
-		mainImplCode.addOutputNewline(" (");
+  private void genThreadDeclarationMainImpl(ThreadSubcomponent thread,
+                                            int threadIndex,
+                                            UnparseText mainImplCode,
+                                            ProcessImplementation procImpl)
+  {
+    ThreadImplementation timpl =
+                                 (ThreadImplementation) thread.getComponentImplementation() ;
 
-		mainImplCode.addOutputNewline("Entity => Rooting."+periodicThreads.get(compteurPer).toString()+",") ;
-		compteurPer++;
-		 
-		String period = null ;
+    mainImplCode.incrementIndent() ;
+    String Dispatch = null ;
 
-		try
-		{
-			long value = PropertyUtils.getIntValue(thread, "Period") ;
-			period = Long.toString(value) ;
-		}
-		catch(Exception e)
-		{
-			period = null ;
-		}
+    try
+    {
+      Dispatch = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol") ;
+    }
+    catch(Exception exception)
+    {
+      String errMsg = "cannot fetch dispatch protocol for \'" + thread + '\'' ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
+    }
+    
+    if(Dispatch.equals("Sporadic"))
+    {
+      nbSporadic++ ;
+      portTypeThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName()) +
+                          "_" +
+                          GenerationUtilsADA.getGenerationADAIdentifier(thread.getFullName()) +
+                          "_Port_Type") ;
+      sporadicThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName()) +
+                          "_" +
+                          GenerationUtilsADA.getGenerationADAIdentifier(thread.getFullName()) +
+                          "_K") ;
+    }
+    else
+    {
+      nbPeriodic++ ;
+      periodicThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName()) +
+                          "_" +
+                          GenerationUtilsADA.getGenerationADAIdentifier(thread.getFullName()) +
+                          "_K") ;
+    }
 
-		if(period != null)
-		{
-			mainImplCode.addOutput("Task_Period => Ada.Real_Time.Milliseconds ") ;
-			mainImplCode.addOutputNewline("("+period+")" + ',') ;
-		}
-		mainImplCode.addOutput("Task_Deadline => Ada.Real_Time.Milliseconds ") ;
-		mainImplCode.addOutputNewline("("+period+")" + ',') ;
-		
-		String priority;
+    mainImplCode.addOutputNewline("") ;
+    mainImplCode.addOutputNewline("task body " +
+                                  GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName()) +
+                                  " is") ;
 
-		try
-		{
-			float value =
-					PropertyUtils.getIntValue(thread, "Priority") ;
-			priority = Integer.toString((int) value) ;
-		}
-		catch(Exception e)
-		{
-			priority = null ;
-		}
-		
-		if(priority != null)
-		{
-			mainImplCode.addOutput("Task_Priority => ") ;
-			mainImplCode.addOutputNewline("("+priority+")" + ',') ;
-		}
-		
-		mainImplCode.addOutputNewline("Task_Stack_Size => 10000,");
-		mainImplCode.addOutputNewline("Job => "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getQualifiedName())+GenerationUtilsADA.THREAD_SUFFIX);
-		mainImplCode.addOutputNewline(");");
-		mainImplCode.addOutputNewline("begin");
-		mainImplCode.incrementIndent();
-		mainImplCode.addOutputNewline("null;");
-		mainImplCode.decrementIndent();
-		mainImplCode.addOutputNewline("end "+GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName())+";");
-		mainImplCode.addOutputNewline("");
-		mainImplCode.decrementIndent();		
-	}
+    mainImplCode.addOutputNewline("") ;
+    mainImplCode.addOutput("package " +
+                           GenerationUtilsADA.getGenerationADAIdentifier(timpl.getQualifiedName()) +
+                           "_Task " + "is new PolyORB_HI.Periodic_Task") ;
+    mainImplCode.addOutputNewline(" (") ;
 
-	private void genRootingHeader(ProcessImplementation process,
-			UnparseText rootingHeaderCode,
-			PartitionProperties pp)
+    mainImplCode.addOutputNewline("Entity => Rooting." +
+                                  periodicThreads.get(compteurPer).toString() +
+                                  ",") ;
+    compteurPer++ ;
+
+    String period = null ;
+
+    try
+    {
+      long value = PropertyUtils.getIntValue(thread, "Period") ;
+      period = Long.toString(value) ;
+    }
+    catch(Exception e)
+    {
+      period = null ;
+    }
+
+    if(period != null)
+    {
+      mainImplCode.addOutput("Task_Period => Ada.Real_Time.Milliseconds ") ;
+      mainImplCode.addOutputNewline("(" + period + ")" + ',') ;
+    }
+    
+    mainImplCode.addOutput("Task_Deadline => Ada.Real_Time.Milliseconds ") ;
+    mainImplCode.addOutputNewline("(" + period + ")" + ',') ;
+
+    String priority ;
+
+    try
+    {
+      float value = PropertyUtils.getIntValue(thread, "Priority") ;
+      priority = Integer.toString((int) value) ;
+    }
+    catch(Exception e)
+    {
+      priority = null ;
+    }
+
+    if(priority != null)
+    {
+      mainImplCode.addOutput("Task_Priority => ") ;
+      mainImplCode.addOutputNewline("(" + priority + ")" + ',') ;
+    }
+
+    mainImplCode.addOutputNewline("Task_Stack_Size => 10000,") ;
+    mainImplCode.addOutputNewline("Job => " +
+                                  GenerationUtilsADA.getGenerationADAIdentifier(timpl.getQualifiedName()) +
+                                  GenerationUtilsADA.THREAD_SUFFIX) ;
+    mainImplCode.addOutputNewline(");") ;
+    mainImplCode.addOutputNewline("begin") ;
+    mainImplCode.incrementIndent() ;
+    mainImplCode.addOutputNewline("null;") ;
+    mainImplCode.decrementIndent() ;
+    mainImplCode.addOutputNewline("end " +
+                                  GenerationUtilsADA.getGenerationADAIdentifier(timpl.getFullName()) +
+                                  ";") ;
+    mainImplCode.addOutputNewline("") ;
+    mainImplCode.decrementIndent() ;
+  }
+
+  private void genRootingHeader(ProcessImplementation process,
+                                UnparseText rootingHeaderCode,
+                                PartitionProperties pp)
 	{
 		rootingHeaderCode.addOutputNewline("package Rooting is");
 		rootingHeaderCode.incrementIndent();
@@ -471,7 +498,6 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		 
 		 for (ThreadSubcomponent th : process.getOwnedThreadSubcomponents())
 		 {
-			 
 			 taille3--;
 			 if(taille3 >= 1)
 			 {
@@ -743,9 +769,8 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
  		 rootingHeaderCode.addOutputNewline("end Rooting;");
 	}
 
-	private void genMainImpl(ProcessImplementation process,
-			UnparseText mainImplCode,
-			PartitionProperties pp)
+  private void genMainImpl(ProcessImplementation process,
+                           UnparseText mainImplCode, PartitionProperties pp)
 	{
 		EList<ThreadSubcomponent> lthreads =
 				process.getOwnedThreadSubcomponents() ;
@@ -807,20 +832,21 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		mainImplCode.addOutputNewline("end Main;") ;
 	}
 
-	protected void genMainImplEnd(ProcessImplementation process,
-			UnparseText mainImplCode){}
+  protected void genMainImplEnd(ProcessImplementation process,
+                                UnparseText mainImplCode)
+  {
+    // NOTHING
+  }
 
 	private PartitionProperties genMainSpecification(ProcessImplementation process,
-			UnparseText mainHeaderCode,
-			ProcessorProperties processorProp,
-			PartitionProperties pp)
+                           UnparseText mainHeaderCode,
+                           ProcessorProperties processorProp,
+                           PartitionProperties pp)
 	{
-
 		// Included files.
 		genFileIncludedMainHeader(mainHeaderCode) ;
 		
 		// conditioned files included:
-
 
 		mainHeaderCode.addOutputNewline(GenerationUtilsADA.generateSectionMarkAda()) ;
 		mainHeaderCode.addOutputNewline(GenerationUtilsADA
@@ -887,7 +913,6 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		  routing.setRoutingProperties(system);
 		  
 		  return routing ;
-
 	  }
 //	  
 //	  private List<FeatureInstance> getLocalPorts(ComponentInstance processor,
@@ -904,53 +929,51 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 //		return localPorts;
 //	  }
 	  
-	  public static class BlackBoardInfo
-	  {
-	  	public String id = null ;
-	      
-	  	public String dataType = null;
-	  }
-	  
-	  public static class QueueInfo
-	  {
-		public String id = null ;
-	    
-		public String uniqueId = null;
-	    
-		public long size = -1 ;
-	    
-		public String type = null ;
-	    
-		public String dataType = null;
-	    
-		public DirectionType direction = null ;
-	  }
-	  
-	  public static class SampleInfo
-	  {
-		public String id = null ;
-	    
-		public String uniqueId = null;
-	    
-		public long refresh = -1 ;
-	    
-		public String dataType = null;
-	    
-		public DirectionType direction = null ;
-	  }
-	  
-	  public static class BufferInfo
-	  {
-		public String id = null ;
-	    
-		public String uniqueId = null;
-	    
-		public long refresh = -1 ;
-	    
-		public String dataType = null;
-	    
-		public DirectionType direction = null ;
-	  }
-	}
+  public static class BlackBoardInfo
+  {
+    public String id = null ;
 
+    public String dataType = null ;
+  }
 
+  public static class QueueInfo
+  {
+    public String id = null ;
+
+    public String uniqueId = null ;
+
+    public long size = -1 ;
+
+    public String type = null ;
+
+    public String dataType = null ;
+
+    public DirectionType direction = null ;
+  }
+
+  public static class SampleInfo
+  {
+    public String id = null ;
+
+    public String uniqueId = null ;
+
+    public long refresh = -1 ;
+
+    public String dataType = null ;
+
+    public DirectionType direction = null ;
+  }
+
+  public static class BufferInfo
+  {
+    public String id = null ;
+
+    public String uniqueId = null ;
+
+    public long refresh = -1 ;
+
+    public String dataType = null ;
+
+    public DirectionType direction = null ;
+  }
+}

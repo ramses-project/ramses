@@ -56,5 +56,4 @@ public class AadlAdaRavenscarTransformation extends
 		  		 module
 		        };
 		  }
-	  
 }

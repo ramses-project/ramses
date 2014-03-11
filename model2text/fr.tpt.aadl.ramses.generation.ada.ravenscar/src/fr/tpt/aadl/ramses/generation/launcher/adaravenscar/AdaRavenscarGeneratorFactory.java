@@ -19,10 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-
 package fr.tpt.aadl.ramses.generation.launcher.adaravenscar;
-
-import org.eclipse.m2m.atl.core.ATLCoreException;
 
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
@@ -55,13 +52,10 @@ public class AdaRavenscarGeneratorFactory implements GeneratorFactory
     AadlAdaRavenscarTransformation targetTrans = new AadlAdaRavenscarTransformation(modelInstantiator, predefinedAadlModels, "helpers/LanguageSpecificitiesAda");
     
     AadlModelValidator targetVal=null;
-	try {
-		targetVal = new AadlAdaRavenscarValidation(modelInstantiator,
-				 						   predefinedAadlModels);
-	} catch (ATLCoreException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+    
+    targetVal = new AadlAdaRavenscarValidation(modelInstantiator,
+                                               predefinedAadlModels);
+    
     AadlTargetSpecificGenerator result = 
                   new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
                 		  						  modelInstantiator,
