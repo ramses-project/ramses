@@ -614,7 +614,7 @@ subprogram Read_Blackboard
 prototypes
   MESSAGE_TYPE: data;
 features
-  BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE { Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL; };
+  BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE { Access_Right=>read_only; Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL; };
   TIME_OUT: in parameter SYSTEM_TIME_TYPE ;
   MESSAGE_ADDR: out parameter MESSAGE_TYPE ;
   LENGTH: out parameter MESSAGE_SIZE_TYPE ;
