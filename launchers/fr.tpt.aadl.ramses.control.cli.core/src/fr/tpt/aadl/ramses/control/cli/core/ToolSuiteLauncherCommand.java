@@ -753,9 +753,8 @@ public class ToolSuiteLauncherCommand
           status = RamsesConfiguration.setPredefinedResourceDir(folder) ;
           if(status != ConfigStatus.SET)
           {
-            String calculatedPredefinedDir = folder + File.separator + Names.AADL_RESOURCE_DIRECTORY_NAME ; 
-            
-            status = RamsesConfiguration.setPredefinedResourceDir(calculatedPredefinedDir) ;
+            File calculatedPredefinedDir = new File(folder + File.separator + Names.AADL_RESOURCE_DIRECTORY_NAME) ;
+            status = RamsesConfiguration.setPredefinedResourceDir(calculatedPredefinedDir.toString()) ;
             if(status != ConfigStatus.SET)
             {
               _logger.fatal(status.msg);
@@ -803,7 +802,7 @@ public class ToolSuiteLauncherCommand
     
     sb.append(Names.NEW_LINE) ;
     sb.append(Names.NEW_LINE) ;
-    sb.append("VM arguments (-D) are:") ;
+    sb.append("VM settings are:") ;
     for (Entry<Object,Object> ent : System.getProperties().entrySet())
     {
       sb.append(Names.NEW_LINE) ;
