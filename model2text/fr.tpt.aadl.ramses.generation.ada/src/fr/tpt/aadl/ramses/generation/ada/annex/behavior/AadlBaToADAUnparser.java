@@ -25,39 +25,37 @@
 
 package fr.tpt.aadl.ramses.generation.ada.annex.behavior;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList ;
+import java.util.HashSet ;
+import java.util.Iterator ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.eclipse.emf.common.util.AbstractEnumerator;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.xtext.EcoreUtil2;
-import org.osate.aadl2.AccessType;
-import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.ArrayDimension;
-import org.osate.aadl2.BehavioredImplementation;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.DataAccess;
-import org.osate.aadl2.DataClassifier;
-import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.Feature;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.Parameter;
-import org.osate.aadl2.ParameterConnectionEnd;
-import org.osate.aadl2.PrototypeBinding;
-import org.osate.aadl2.Subprogram;
-import org.osate.aadl2.SubprogramClassifier;
-import org.osate.aadl2.SubprogramImplementation;
-import org.osate.aadl2.SubprogramSubcomponentType;
-import org.osate.aadl2.SubprogramType;
-import org.osate.aadl2.ThreadClassifier;
-import org.osate.aadl2.modelsupport.AadlConstants;
-import org.osate.aadl2.modelsupport.UnparseText;
-import org.osate.aadl2.modelsupport.util.AadlUtil;
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.common.util.AbstractEnumerator ;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.xtext.EcoreUtil2 ;
+import org.osate.aadl2.AccessType ;
+import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.ArrayDimension ;
+import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.DataAccess ;
+import org.osate.aadl2.DataClassifier ;
+import org.osate.aadl2.DataSubcomponent ;
+import org.osate.aadl2.Feature ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.Parameter ;
+import org.osate.aadl2.ParameterConnectionEnd ;
+import org.osate.aadl2.PrototypeBinding ;
+import org.osate.aadl2.SubprogramClassifier ;
+import org.osate.aadl2.SubprogramImplementation ;
+import org.osate.aadl2.SubprogramSubcomponentType ;
+import org.osate.aadl2.SubprogramType ;
+import org.osate.aadl2.ThreadClassifier ;
+import org.osate.aadl2.modelsupport.AadlConstants ;
+import org.osate.aadl2.modelsupport.UnparseText ;
+import org.osate.aadl2.modelsupport.util.AadlUtil ;
 import org.osate.ba.aadlba.Any ;
 import org.osate.ba.aadlba.AssignmentAction ;
 import org.osate.ba.aadlba.BehaviorActionBlock ;
@@ -133,24 +131,27 @@ import org.osate.ba.utils.DimensionException ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
-import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser ;
+import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA ;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 
 public class AadlBaToADAUnparser extends AadlBaUnparser
 {
-
   protected Map<DataAccess, String> _dataAccessMapping = null ;
   protected UnparseText _adaFileContent = null ;
   protected UnparseText _headerFileContent = null ;
   protected Set<String> _additionalHeaders = new HashSet<String>() ;
   private NamedElement _owner ;
   private List<NamedElement> coreElementsToBeUnparsed = new ArrayList<NamedElement>();
+  
+  private static Logger _LOGGER = Logger.getLogger(AadlBaToADAUnparser.class) ;
 
   public AadlBaToADAUnparser(AnnexSubclause subclause,
-                           String indent,
-                           Map<DataAccess, String> dataAccessMapping)
+                             String indent,
+                             Map<DataAccess, String> dataAccessMapping)
   {
     super(subclause, indent) ;
     _dataAccessMapping = dataAccessMapping ;
@@ -217,6 +218,9 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
       else
       {
         aadlText.addOutput("processEList: oh my, oh my!!") ;
+        String errMsg = "unsuported type when process EList" ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
     }
   }
@@ -229,8 +233,6 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
       process(it.next()) ;
     }
   }
-
-  
 
   protected static String getInitialStateIdentifier(BehaviorAnnex ba)
   {
@@ -285,7 +287,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
     // TODO: find mapping for REM operator
     if(operator.equals(MultiplyingOperator.REM))
     {
-      throw new UnsupportedOperationException() ;
+      throw new UnsupportedOperationException("unsupported operator rem") ;
     }
 
     return operator.getLiteral() ;
@@ -342,7 +344,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
     aadlbaSwitch = new AadlBaSwitch<String>()
     {
 
-	/**
+	   /**
        * Top-level method to unparse "behavior_specification"
        * annexsubclause
        */
@@ -357,59 +359,59 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
        */
       public String caseBehaviorAnnex(BehaviorAnnex object)
       {
-    	BehaviorAnnex ba = (BehaviorAnnex) object ;
-    	NamedElement aadlComponent = _owner ;
-    	String aadlComponentADAId =
-    		  GenerationUtilsADA.getGenerationADAIdentifier(aadlComponent
-                  .getQualifiedName()) ;
+        BehaviorAnnex ba = (BehaviorAnnex) object ;
+        NamedElement aadlComponent = _owner ;
+        String aadlComponentADAId = GenerationUtilsADA.getGenerationADAIdentifier(
+                                             aadlComponent.getQualifiedName()) ;
 
         _adaFileContent = new UnparseText() ;
         _headerFileContent = new UnparseText() ;
-        
-        _adaFileContent.addOutputNewline("current_state : "+aadlComponentADAId +
-	              "_BA_State_t := " + aadlComponentADAId + "_" +
-	              AadlBaToADAUnparser.getInitialStateIdentifier(ba) + ";") ;
+
+        _adaFileContent.addOutputNewline("current_state : " +
+                                         aadlComponentADAId +
+                                         "_BA_State_t := " +
+                                         aadlComponentADAId +
+                                         "_" +
+                                         AadlBaToADAUnparser.getInitialStateIdentifier(ba) +
+                                         ";") ;
         processEList(_adaFileContent, ba.getVariables()) ;
         _adaFileContent.addOutputNewline("final : integer := 0;") ;
-        _adaFileContent.addOutputNewline("begin");
+        _adaFileContent.addOutputNewline("begin") ;
 
-        
         _adaFileContent.addOutputNewline("while (final /= 1) loop") ;
         _adaFileContent.incrementIndent() ;
         _adaFileContent.addOutputNewline("case current_state is") ;
         _adaFileContent.incrementIndent() ;
 
-        _headerFileContent.addOutputNewline("type "+ aadlComponentADAId +
-                "_BA_State_t is (") ;
+        _headerFileContent.addOutputNewline("type " + aadlComponentADAId +
+                                            "_BA_State_t is (") ;
         _headerFileContent.incrementIndent() ;
 
         for(BehaviorState state : ba.getStates())
         {
-          if(AadlBaVisitors.getTransitionWhereSrc
-                (state).isEmpty() == false)
+          if(AadlBaVisitors.getTransitionWhereSrc(state).isEmpty() == false)
           {
-            _adaFileContent.addOutputNewline("when " + aadlComponentADAId + "_" +
-                  state.getName() + " => ") ;
-            processEList(_adaFileContent, (ArrayList<BehaviorTransition>) AadlBaVisitors.
-                         getTransitionWhereSrc(state)) ;
+            _adaFileContent.addOutputNewline("when " + aadlComponentADAId +
+                                             "_" + state.getName() + " => ") ;
+            processEList(_adaFileContent,
+                         (ArrayList<BehaviorTransition>) AadlBaVisitors.
+                                                 getTransitionWhereSrc(state)) ;
           }
-          
-          String stateADAId = GenerationUtilsADA.
-                getGenerationADAIdentifier(aadlComponent.getQualifiedName()+
-                                         "_"+state.getName());
-          _headerFileContent.addOutput(stateADAId);
 
+          String stateADAId = GenerationUtilsADA.getGenerationADAIdentifier(
+                                              aadlComponent.getQualifiedName() +
+                                                    "_" + state.getName()) ;
+          _headerFileContent.addOutput(stateADAId) ;
 
-          if(ba.getStates().indexOf(state) < ba.getStates()
-                .size() - 1)
+          if(ba.getStates().indexOf(state) < ba.getStates().size() - 1)
           {
             _headerFileContent.addOutput(",") ;
           }
-          
-          if(ba.getStates().indexOf(state)==ba.getStates().size()-1)
+
+          if(ba.getStates().indexOf(state) == ba.getStates().size() - 1)
           {
-        	  _adaFileContent.addOutputNewline("when others =>") ;
-        	  _adaFileContent.addOutputNewline("final := 1;") ;
+            _adaFileContent.addOutputNewline("when others =>") ;
+            _adaFileContent.addOutputNewline("final := 1;") ;
           }
           _headerFileContent.addOutputNewline("") ;
         }
@@ -419,11 +421,11 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         _headerFileContent.addOutputNewline("") ;
         _adaFileContent.decrementIndent() ;
         _adaFileContent.addOutputNewline("end case;") ;
-        
+
         _adaFileContent.decrementIndent() ;
         _adaFileContent.addOutputNewline("end loop;") ;
         _adaFileContent.decrementIndent() ;
-        
+
         return DONE ;
       }
 
@@ -474,7 +476,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 
       public String caseBehaviorEnumerationLiteral(BehaviorEnumerationLiteral object)
       {
-          // ComponentPropertyValue is defined to refer Enumerated data
+        // ComponentPropertyValue is defined to refer Enumerated data
       	NamedElement component = object.getComponent();
       	if(component!=null)
       	{
@@ -485,7 +487,9 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
       	    }
       		catch(Exception e)
       		{
-      			_adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(component.getQualifiedName())+"_"+object.getEnumLiteral().getValue());
+      			_adaFileContent.addOutput(GenerationUtilsADA.getGenerationADAIdentifier
+      			                         (component.getQualifiedName())+
+      			                         "_"+object.getEnumLiteral().getValue());
       		}
       	}
       	else
@@ -499,12 +503,13 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
        */
       public String caseDataComponentReference(DataComponentReference object)
       {
-    	Iterator<DataHolder> itDataHolder = object.getData().iterator() ;
-    	process(itDataHolder.next());
+        Iterator<DataHolder> itDataHolder = object.getData().iterator() ;
+        process(itDataHolder.next()) ;
         while(itDataHolder.hasNext())
         {
-        	_adaFileContent.addOutput(".");
-        	_adaFileContent.addOutput(((DataHolder)itDataHolder.next()).getElement().getName());
+          _adaFileContent.addOutput(".") ;
+          _adaFileContent.addOutput(((DataHolder) itDataHolder.next()).getElement()
+                                                                      .getName()) ;
         }
 
         return DONE ;
@@ -543,9 +548,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         aadlbaText = _adaFileContent ;
         long num = object.getPriority() ;
 
-
         _adaFileContent.addOutput("-- Transition id: " + object.getName()) ;
-
 
         if(num != -1) // numeral
         {
@@ -637,9 +640,8 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 
       public String caseBehaviorActionSet(BehaviorActionSet object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("unsupported BehaviorActionSet unparsing") ;
       }
-
       
       /**
        * Unparse elsestatement
@@ -716,12 +718,15 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
 	          String lowerRangeValue = this.toInteger(range.getLowerIntegerValue()) ;
 	          String upperRangeValue = this.toInteger(range.getUpperIntegerValue()) ;
 	          _adaFileContent.addOutputNewline("iter : Integer;") ;
-	          _adaFileContent.addOutputNewline("for iter in " + lowerRangeValue + " .. " + upperRangeValue + " loop") ;
+	          _adaFileContent.addOutputNewline("for iter in " + lowerRangeValue +
+	                                           " .. " + upperRangeValue + " loop") ;
 	          _adaFileContent.incrementIndent() ;
-          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().getDataClassifier() ;
+          DataClassifier iterativeVariableClassifier = object.getIterativeVariable().
+                                                           getDataClassifier() ;
           try
           {
-            GenerationUtilsADA.resolveExistingCodeDependencies(iterativeVariableClassifier,_additionalHeaders);
+            GenerationUtilsADA.resolveExistingCodeDependencies(iterativeVariableClassifier,
+                                                               _additionalHeaders);
           } catch(Exception e)
           {
             _adaFileContent.addOutput(GenerationUtilsADA.
@@ -748,8 +753,10 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
           }
           catch(DimensionException e)
           {
-            // TODO Auto-generated catch block
-            e.printStackTrace() ;
+            String errMsg = RamsesException.formatRethrowMessage("cannot fetch type holder for \'" + object.getIteratedValues() +
+                '\'', e);
+            _LOGGER.error(errMsg);
+            ServiceProvider.SYS_ERR_REP.error(errMsg, true);
           }
 
           int numberOfLoop = dataReferenceTypeHolder.dimension ;
@@ -1197,21 +1204,21 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                   
                 }
 
-                if (name != null)
+                if(name != null)
                 {
-                  _adaFileContent.addOutput(name);
+                  _adaFileContent.addOutput(name) ;
                 }
-                else // Otherwise, process parameter label as usual.
+                else
+                // Otherwise, process parameter label as usual.
                 {
                   process((ParameterLabel) pl) ;
                 }
                 if(paramAsPrototype(da, st))
                 {
-        		  _adaFileContent.addOutput("'Address") ;
-        		}
-                first=false;
+                  _adaFileContent.addOutput("'Address") ;
+                }
+                first = false ;
               }
-
             }
 
             _adaFileContent.addOutputNewline(");") ;
@@ -1230,139 +1237,148 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
         return DONE ;
       }
       
-      private boolean paramAsPrototype(NamedElement element, SubprogramClassifier subprogram) {
-		if(subprogram.getExtended()==null)
-			return false;
-    	if(element instanceof Feature)
-		{
-			Feature f = (Feature) element;
-			Classifier extendedSc = subprogram.getExtended();
-			for(Feature extendedFeature:extendedSc.getAllFeatures())
-			{
-				if(false == extendedFeature.getName().equals(element.getName()))
-					continue;
-				if(extendedFeature instanceof DataAccess)
-				{
-					DataAccess da = (DataAccess) extendedFeature;
-					if(da.getPrototype()==null)
-					{
-						if(subprogram.getExtended()!=null)
-							return paramAsPrototype(element, (SubprogramClassifier)subprogram.getExtended());
-						else
-							return false;
-					}
-				}
-				if(extendedFeature instanceof Parameter)
-				{
-					Parameter da = (Parameter) extendedFeature;
-					if(da.getPrototype()==null)
-					{
-						if(subprogram.getExtended()!=null)
-							return paramAsPrototype(element, (SubprogramClassifier)subprogram.getExtended());
-						else
-							return false;
-					}
-				}
-			}
-			
-			try
-			{
-				NamedElement ne = extendedSc ;
-				String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-				List<String> sourceText =
-						PropertyUtils.getStringListValue(ne, "Source_Text") ;
-				for(String s : sourceText)
-				{
-					if(s.endsWith(".ads"))
-					{
-						return true;
-					}
-				}
-				return false;
-			}
-			catch(Exception e)
-			{
-				return false;
-			}
-		}
-		return false;
-	}
+      private boolean paramAsPrototype(NamedElement element,
+                                       SubprogramClassifier subprogram)
+      {
+        if(subprogram.getExtended() == null)
+          return false ;
+        if(element instanceof Feature)
+        {
+          Feature f = (Feature) element ;
+          Classifier extendedSc = subprogram.getExtended() ;
+          for(Feature extendedFeature : extendedSc.getAllFeatures())
+          {
+            if(false == extendedFeature.getName().equals(element.getName()))
+              continue ;
+            if(extendedFeature instanceof DataAccess)
+            {
+              DataAccess da = (DataAccess) extendedFeature ;
+              if(da.getPrototype() == null)
+              {
+                if(subprogram.getExtended() != null)
+                  return paramAsPrototype(element,
+                                          (SubprogramClassifier) subprogram.getExtended()) ;
+                else
+                  return false ;
+              }
+            }
+            if(extendedFeature instanceof Parameter)
+            {
+              Parameter da = (Parameter) extendedFeature ;
+              if(da.getPrototype() == null)
+              {
+                if(subprogram.getExtended() != null)
+                  return paramAsPrototype(element,
+                                          (SubprogramClassifier) subprogram.getExtended()) ;
+                else
+                  return false ;
+              }
+            }
+          }
 
-	private void additionalSubprogramsToUnparse(SubprogramSubcomponentType sct) {
-    	AadlToADAUnparser aadlADAUnparser = AadlToADAUnparser.getAadlToADAUnparser();   
-    	if(false == aadlADAUnparser.additionalUnparsing.contains(sct))
-    	  aadlADAUnparser.additionalUnparsing.add(sct);
-        for(AnnexSubclause as: ((SubprogramClassifier)sct).getAllAnnexSubclauses() )
+          try
+          {
+            NamedElement ne = extendedSc ;
+            String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+            List<String> sourceText =
+                                      PropertyUtils.getStringListValue(ne,
+                                                                       "Source_Text") ;
+            for(String s : sourceText)
+            {
+              if(s.endsWith(".ads"))
+              {
+                return true ;
+              }
+            }
+            return false ;
+          }
+          catch(Exception e)
+          {
+            return false ;
+          }
+        }
+        return false ;
+      }
+
+      private void
+          additionalSubprogramsToUnparse(SubprogramSubcomponentType sct)
+      {
+        AadlToADAUnparser aadlADAUnparser =
+                                            AadlToADAUnparser.getAadlToADAUnparser() ;
+        if(false == aadlADAUnparser.additionalUnparsing.contains(sct))
+          aadlADAUnparser.additionalUnparsing.add(sct) ;
+        for(AnnexSubclause as : ((SubprogramClassifier) sct).getAllAnnexSubclauses())
         {
           if(as instanceof BehaviorAnnex)
           {
-        	for(SubprogramHolder otherSpg: EcoreUtil2.getAllContentsOfType(as, SubprogramHolder.class))
-        	{
-        	  if(true == aadlADAUnparser.additionalUnparsing.contains(otherSpg))
-        		continue;
-        	  aadlADAUnparser.additionalUnparsing.add(otherSpg.getSubprogram());
-        	  additionalSubprogramsToUnparse((SubprogramSubcomponentType) otherSpg.getSubprogram());
-        	}
-        	return;
+            for(SubprogramHolder otherSpg : EcoreUtil2.getAllContentsOfType(as,
+                                                                            SubprogramHolder.class))
+            {
+              if(true == aadlADAUnparser.additionalUnparsing.contains(otherSpg))
+                continue ;
+              aadlADAUnparser.additionalUnparsing.add(otherSpg.getSubprogram()) ;
+              additionalSubprogramsToUnparse((SubprogramSubcomponentType) otherSpg.getSubprogram()) ;
+            }
+            return ;
           }
         }
-	 }
+      }
 
-	public String caseElementHolder(ElementHolder object)
+      public String caseElementHolder(ElementHolder object)
       {
-    	NamedElement elt = object.getElement();
-    	String id;
-    	if(elt instanceof Parameter)
-		{
-			Parameter p = (Parameter) elt;
-			id = elt.getName();
-			
-		}
-		else if (elt instanceof DataAccess)
-		{
-		  DataAccess da = (DataAccess) elt;
-		  
-  		  id = elt.getName();
-		}
-    	else	
-    		id = elt.getQualifiedName();
-    	aadlbaText.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(id));
-    	if(object instanceof IndexableElement)
-    	{	
-    	  IndexableElement ie = (IndexableElement) object;
-    	  for(IntegerValue iv: ie.getArrayIndexes())
-    	  {
-    		aadlbaText.addOutput("(");
-    		process(iv);
-    		aadlbaText.addOutput(")");
-    	  }
-    	}
+        NamedElement elt = object.getElement() ;
+        String id ;
+        if(elt instanceof Parameter)
+        {
+          Parameter p = (Parameter) elt ;
+          id = elt.getName() ;
+
+        }
+        else if(elt instanceof DataAccess)
+        {
+          DataAccess da = (DataAccess) elt ;
+
+          id = elt.getName() ;
+        }
+        else
+          id = elt.getQualifiedName() ;
+        aadlbaText.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(id)) ;
+        if(object instanceof IndexableElement)
+        {
+          IndexableElement ie = (IndexableElement) object ;
+          for(IntegerValue iv : ie.getArrayIndexes())
+          {
+            aadlbaText.addOutput("(") ;
+            process(iv) ;
+            aadlbaText.addOutput(")") ;
+          }
+        }
         return DONE ;
       }
       
       public String casePortSendAction(PortSendAction object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("PortSendAction unparsing not supported") ;
       }
 
       public String casePortFreezeAction(PortFreezeAction object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("PortFreezeAction unparsing not supported") ;
       }
 
       public String casePortDequeueAction(PortDequeueAction object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("PortDequeueAction unparsing not supported") ;
       }
 
       public String caseLockAction(LockAction object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("LockAction unparsing not supported") ;
       }
 
       public String caseUnlockAction(UnlockAction object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("UnlockAction unparsing not supported") ;
       }
 
       /**
@@ -1370,22 +1386,22 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
        */
       public String caseBehaviorTime(BehaviorTime object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("BehaviorTime unparsing not supported") ;
       }
 
       public String casePortDequeueValue(PortDequeueValue object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("PortDequeueValue unparsing not supported") ;
       }
 
       public String casePortCountValue(PortCountValue object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("PortCountValue unparsing not supported") ;
       }
 
       public String casePortFreshValue(PortFreshValue object)
       {
-        throw new UnsupportedOperationException() ;
+        throw new UnsupportedOperationException("PortFreshValue unparsing not supported") ;
       }
 
       /**
@@ -1613,5 +1629,4 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
   public List<NamedElement> getCoreElementsToBeUnparsed() {
 	return coreElementsToBeUnparsed;
   }
-  
 }

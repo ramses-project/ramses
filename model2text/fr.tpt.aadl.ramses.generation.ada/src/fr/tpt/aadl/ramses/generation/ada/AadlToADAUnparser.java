@@ -1,79 +1,92 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2012 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.generation.ada;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.BufferedWriter ;
+import java.io.File ;
+import java.io.FileWriter ;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.HashMap ;
+import java.util.HashSet ;
+import java.util.Iterator ;
+import java.util.LinkedHashMap ;
+import java.util.LinkedHashSet ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.eclipse.emf.common.util.EList;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.AccessCategory;
-import org.osate.aadl2.AccessConnection;
-import org.osate.aadl2.AccessSpecification;
-import org.osate.aadl2.AccessType;
-import org.osate.aadl2.AnnexLibrary;
-import org.osate.aadl2.AnnexSubclause;
-import org.osate.aadl2.BehavioredImplementation;
-import org.osate.aadl2.Classifier;
-import org.osate.aadl2.ClassifierValue;
-import org.osate.aadl2.ComponentClassifier;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentPrototypeActual;
-import org.osate.aadl2.ComponentPrototypeBinding;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.ConnectedElement;
-import org.osate.aadl2.Connection;
-import org.osate.aadl2.ConnectionEnd;
-import org.osate.aadl2.DataAccess;
-import org.osate.aadl2.DataClassifier;
-import org.osate.aadl2.DataImplementation;
-import org.osate.aadl2.DataPrototype;
-import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.DataSubcomponentType;
-import org.osate.aadl2.DataType;
-import org.osate.aadl2.DefaultAnnexLibrary;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.EnumerationLiteral;
-import org.osate.aadl2.Feature;
-import org.osate.aadl2.FeaturePrototypeBinding;
-import org.osate.aadl2.IntegerLiteral;
-import org.osate.aadl2.ListValue;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.NamedValue;
-import org.osate.aadl2.Parameter;
-import org.osate.aadl2.PortSpecification;
-import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.ProcessSubcomponent;
-import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.PrototypeBinding;
-import org.osate.aadl2.StringLiteral;
-import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.SubcomponentType;
-import org.osate.aadl2.SubprogramAccess;
-import org.osate.aadl2.SubprogramCall;
-import org.osate.aadl2.SubprogramCallSequence;
-import org.osate.aadl2.SubprogramClassifier;
-import org.osate.aadl2.SubprogramGroupAccess;
-import org.osate.aadl2.SubprogramImplementation;
-import org.osate.aadl2.SubprogramSubcomponent;
-import org.osate.aadl2.SubprogramSubcomponentType;
-import org.osate.aadl2.SubprogramType;
-import org.osate.aadl2.ThreadClassifier;
-import org.osate.aadl2.ThreadImplementation;
-import org.osate.aadl2.ThreadSubcomponent;
-import org.osate.aadl2.ThreadType;
-import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch;
-import org.osate.aadl2.util.Aadl2Switch;
-import org.osate.annexsupport.AnnexUnparser;
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.common.util.EList ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.AccessSpecification ;
+import org.osate.aadl2.AccessType ;
+import org.osate.aadl2.AnnexLibrary ;
+import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.BehavioredImplementation ;
+import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.ClassifierValue ;
+import org.osate.aadl2.ComponentPrototypeActual ;
+import org.osate.aadl2.ComponentPrototypeBinding ;
+import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.ConnectionEnd ;
+import org.osate.aadl2.DataAccess ;
+import org.osate.aadl2.DataImplementation ;
+import org.osate.aadl2.DataPrototype ;
+import org.osate.aadl2.DataSubcomponent ;
+import org.osate.aadl2.DataSubcomponentType ;
+import org.osate.aadl2.DataType ;
+import org.osate.aadl2.DefaultAnnexLibrary ;
+import org.osate.aadl2.Element ;
+import org.osate.aadl2.EnumerationLiteral ;
+import org.osate.aadl2.Feature ;
+import org.osate.aadl2.FeaturePrototypeBinding ;
+import org.osate.aadl2.IntegerLiteral ;
+import org.osate.aadl2.ListValue ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.NamedValue ;
+import org.osate.aadl2.Parameter ;
+import org.osate.aadl2.PortSpecification ;
+import org.osate.aadl2.ProcessImplementation ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.PrototypeBinding ;
+import org.osate.aadl2.StringLiteral ;
+import org.osate.aadl2.SubcomponentType ;
+import org.osate.aadl2.SubprogramAccess ;
+import org.osate.aadl2.SubprogramCall ;
+import org.osate.aadl2.SubprogramCallSequence ;
+import org.osate.aadl2.SubprogramClassifier ;
+import org.osate.aadl2.SubprogramGroupAccess ;
+import org.osate.aadl2.SubprogramImplementation ;
+import org.osate.aadl2.SubprogramSubcomponent ;
+import org.osate.aadl2.SubprogramSubcomponentType ;
+import org.osate.aadl2.SubprogramType ;
+import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.ThreadSubcomponent ;
+import org.osate.aadl2.ThreadType ;
+import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
+import org.osate.aadl2.util.Aadl2Switch ;
+import org.osate.annexsupport.AnnexUnparser ;
 import org.osate.ba.AadlBaParserAction ;
 import org.osate.ba.AadlBaUnParserAction ;
 import org.osate.ba.analyzers.TypeHolder ;
@@ -84,14 +97,12 @@ import org.osate.utils.PropertyNotFound ;
 import org.osate.utils.PropertyUtils ;
 import org.osate.utils.names.DataModelProperties ;
 
-import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
-import fr.tpt.aadl.ramses.generation.ada.AadlToADASwitchProcess;
-import fr.tpt.aadl.ramses.generation.ada.AadlToADAUnparser;
-import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
-import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparser;
-import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.generator.AadlGenericUnparser ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparser ;
+import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction ;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 
 public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGenericUnparser
@@ -99,11 +110,10 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	private AadlBaToADAUnparserAction baToADAUnparserAction = new AadlBaToADAUnparserAction();
 	private static AadlToADAUnparser singleton;
 
-	
-    public static String period = null ;
-    public static String deadline = null ;
-    public static String dispatchProtocol = null;
-    public static String priority =null;
+  public static String period = null ;
+  public static String deadline = null ;
+  public static String dispatchProtocol = null ;
+  public static String priority = null ;
     
     // gtype.ads and .adb
 	protected AadlToADASwitchProcess _gtypesHeaderCode ;
@@ -131,8 +141,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	private Map<AadlToADASwitchProcess, Set<String>> _additionalHeaders ;
 
 	private List<String> _processedTypes  ;
-    public Set<NamedElement> additionalUnparsing = new LinkedHashSet<NamedElement>();
-    private static final String MAIN_HEADER_INCLUSION = "" ;
+  public Set<NamedElement> additionalUnparsing = new LinkedHashSet<NamedElement>();
+  private static final String MAIN_HEADER_INCLUSION = "" ;
 
 //    private static final String MAIN_HEADER_INCLUSION = "#include \"main.h\"\n" ;
 	// Map Data Access with their relative Data Subcomponent. Relations 
@@ -141,6 +151,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	
 	private List<SubprogramClassifier> subprogramsUnparsingStack = new ArrayList<SubprogramClassifier>();
 
+	private static Logger _LOGGER = Logger.getLogger(AadlToADAUnparser.class) ;
+	
 	public static AadlToADAUnparser getAadlToADAUnparser()
 	{
 		if(singleton==null)
@@ -156,7 +168,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 	private void init()
 	{
-		
 		_gtypesHeaderCode = new AadlToADASwitchProcess(this) ;
 		_gtypesImplCode = new AadlToADASwitchProcess(this) ;
 		_gtypesImplCode.addOutputNewline("\npackage body Gtypes is") ;
@@ -185,17 +196,16 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		_processedTypes = new ArrayList<String>() ;
 
 		_additionalHeaders = new HashMap<AadlToADASwitchProcess, Set<String>>() ;
-
 	}
 
 	public List<PrototypeBinding> getCurrentPrototypeBindings(String ctxt)
 	  {
-		  System.out.println("Inherited prototype bindings for " + ctxt);
+		  _LOGGER.trace("Inherited prototype bindings for " + ctxt);
 		  
 		  List<PrototypeBinding> bindings = new ArrayList<PrototypeBinding>();
 		  for(SubprogramClassifier c: subprogramsUnparsingStack)
 		  {
-			  System.out.println("  prototype bindings from " + c.getName());
+		    _LOGGER.trace("prototype bindings from " + c.getName());
 			  List<PrototypeBinding> cBindings = c.getOwnedPrototypeBindings();
 			  for(PrototypeBinding b : cBindings)
 			  {
@@ -211,14 +221,14 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 					  {
 						  st = ((PortSpecification)cpb.getActual()).getClassifier();
 					  }
-					  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
+					  _LOGGER.trace("prototype binding " + b.getFormal().getName() + " => " + st.getName());
 
 				  }
 				  else
 				  {
 					  ComponentPrototypeBinding cpb = (ComponentPrototypeBinding) b;
 					  SubcomponentType st = cpb.getActuals().get(0).getSubcomponentType();
-					  System.out.println("    prototype binding " + b.getFormal().getName() + " => " + st.getName());
+					  _LOGGER.trace("prototype binding " + b.getFormal().getName() + " => " + st.getName());
 
 				  }
 				  
@@ -227,9 +237,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		  }
 		  return bindings;
 	  }
-	public void saveGeneratedFilesContent(File targetDirectory)
+	public void saveGeneratedFilesContent(File targetDirectory) throws GenerationException
 	{
-
 		_gtypesHeaderCode.addOutputNewline("\nend Gtypes;\n") ;
 		_gtypesImplCode.addOutputNewline("\nend Gtypes;\n") ;
 		
@@ -250,7 +259,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		try
 		{
 			String headerGuard = null ;
-    		
     		
 			// gtypes.ads
 			FileWriter typesFile_ADS =
@@ -325,16 +333,16 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		}
 		catch(IOException e)
 		{
-			// TODO: handle error message.
-			e.printStackTrace() ;
+		  String msg = "cannot save the generated files" ;
+      throw new GenerationException(msg, e) ;
 		}
-
 	}
 
-	  private void clean() {
-			this._additionalHeaders.clear();
-			this._dataAccessMapping.clear();
-		  }
+  private void clean()
+  {
+    this._additionalHeaders.clear() ;
+    this._dataAccessMapping.clear() ;
+  }
 
 	private String getGeneratedCodeForAdditionalHeaders(AadlToADASwitchProcess fileUnparser)
 	{
@@ -363,30 +371,30 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		return res.replace('-', '.');
 	}
 	
-	private void saveFile(FileWriter file,
-			String ... content)
-	{
-		BufferedWriter output ;
-		StringBuilder sb = new StringBuilder() ;
+  private void saveFile(FileWriter file, String... content)
+                                                      throws GenerationException
+  {
+    BufferedWriter output ;
+    StringBuilder sb = new StringBuilder() ;
 
-		for(String s : content)
-		{
-			sb.append(s) ;
-		}
+    for(String s : content)
+    {
+      sb.append(s) ;
+    }
 
-		try
-		{
-			output = new BufferedWriter(file) ;
+    try
+    {
+      output = new BufferedWriter(file) ;
 
-			output.write(sb.toString()) ;
+      output.write(sb.toString()) ;
 
-			output.close() ;
-		}
-		catch(IOException e)
-		{
-			// TODO: handle error message.
-			e.printStackTrace() ;
-		}
+      output.close() ;
+    }
+    catch(IOException e)
+    {
+      String msg = "cannot save the generated files" ;
+      throw new GenerationException(msg, e) ;
+    }
 	}
 
 	Set<String> getAdditionalHeaderSet(AadlToADASwitchProcess sourceTextDest)
@@ -404,57 +412,69 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		return l;
 	}
 	
-	public boolean resolveExistingCodeDependencies(NamedElement object,
-			AadlToADASwitchProcess sourceNameDest,
-			AadlToADASwitchProcess sourceTextDest)
-					throws Exception
-					{
-		Set<String> l = getAdditionalHeaderSet(sourceTextDest);
-		String sourceName = GenerationUtilsADA.resolveExistingCodeDependencies(object, l);
-		if(sourceName!=null)
-		{
-		  if(sourceNameDest!=null)
-			sourceNameDest.addOutput(sourceName);
-		  return true;
-		}
-		else
-			throw new Exception("In component "+object.getName()+": Source_Text " +
-		      		"property should also reference a header (.h extension) file");
-		
-					}
+  public
+      boolean
+      resolveExistingCodeDependencies(NamedElement object,
+                                      AadlToADASwitchProcess sourceNameDest,
+                                      AadlToADASwitchProcess sourceTextDest)
+					                                                      throws GenerationException
+  {
+    Set<String> l = getAdditionalHeaderSet(sourceTextDest) ;
+    String sourceName =
+                        GenerationUtilsADA.resolveExistingCodeDependencies(object,
+                                                                           l) ;
+    if(sourceName != null)
+    {
+      if(sourceNameDest != null)
+        sourceNameDest.addOutput(sourceName) ;
+      return true ;
+    }
+    else
+    {
+      String errMsg = "In component " + object.getName() +
+                      ": Source_Text " +
+                      "property should also reference a header (.h extension) file" ;
+      _LOGGER.fatal(errMsg) ;
+      throw new GenerationException(errMsg) ;
+    }
+  }
 
 	
-	  protected void processDataSubcomponentType(DataSubcomponentType dst,
-			  DataSubcomponentType childDst)
-	  {
-		  if(childDst instanceof DataImplementation)
-		  {
-			  DataImplementation compImpl = (DataImplementation) childDst;
-			  for(DataSubcomponent ds: compImpl.getOwnedDataSubcomponents())
-			  {
-				  if(ds.getRefined()!=null)
-				  {
-					  DataSubcomponent refinedDs = (DataSubcomponent) ds.getRefined();
-					  AadlToADAUnparser.getAadlToADAUnparser().process(refinedDs.getDataSubcomponentType());
-				  }
-			  }
-			  boolean refined=false;
-			  for(DataSubcomponent ds: compImpl.getOwnedDataSubcomponents())
-			  {
-				  if(ds.getRefined()!=null)
-				  {
-					  refined=true;
-					  _gtypesHeaderCode.addOutput(ds.getRefined().getName()+": ");
-					  String refineDsName = GenerationUtilsADA.resolveExistingCodeDependencies(ds.getDataSubcomponentType(), 
-							_additionalHeaders.get(AadlToADAUnparser.getAadlToADAUnparser()._gtypesHeaderCode));
-					  if(refineDsName==null)
-						  refineDsName = GenerationUtilsADA.getGenerationADAIdentifier(ds.getDataSubcomponentType().getQualifiedName());
-					  _gtypesHeaderCode.addOutput(refineDsName);
-					  _gtypesHeaderCode.addOutputNewline(";");
-				  }
-			  }
-		  }
-	  }
+  protected void processDataSubcomponentType(DataSubcomponentType dst,
+                                             DataSubcomponentType childDst)
+  {
+    if(childDst instanceof DataImplementation)
+    {
+      DataImplementation compImpl = (DataImplementation) childDst ;
+      for(DataSubcomponent ds : compImpl.getOwnedDataSubcomponents())
+      {
+        if(ds.getRefined() != null)
+        {
+          DataSubcomponent refinedDs = (DataSubcomponent) ds.getRefined() ;
+          AadlToADAUnparser.getAadlToADAUnparser()
+                           .process(refinedDs.getDataSubcomponentType()) ;
+        }
+      }
+      boolean refined = false ;
+      for(DataSubcomponent ds : compImpl.getOwnedDataSubcomponents())
+      {
+        if(ds.getRefined() != null)
+        {
+          refined = true ;
+          _gtypesHeaderCode.addOutput(ds.getRefined().getName() + ": ") ;
+          String refineDsName =
+                                GenerationUtilsADA.resolveExistingCodeDependencies(ds.getDataSubcomponentType(),
+                                                                                   _additionalHeaders.get(AadlToADAUnparser.getAadlToADAUnparser()._gtypesHeaderCode)) ;
+          if(refineDsName == null)
+            refineDsName =
+                           GenerationUtilsADA.getGenerationADAIdentifier(ds.getDataSubcomponentType()
+                                                                           .getQualifiedName()) ;
+          _gtypesHeaderCode.addOutput(refineDsName) ;
+          _gtypesHeaderCode.addOutputNewline(";") ;
+        }
+      }
+    }
+  }
 	
 	protected void processDataSubcomponentType(DataSubcomponentType dst,
 			AadlToADASwitchProcess sourceNameDest, 
@@ -634,7 +654,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 	 protected void getADATypeDeclarator(NamedElement object)
 	 {
-
 		 boolean referencedType = true;
 		 try {
 			GenerationUtilsADA.resolveExistingDependency(object, _additionalHeaders.get(_currentHeaderUnparser));
@@ -654,8 +673,10 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 }
 		 catch(DimensionException e)
 		 {
-			 // TODO: handle error message.
-			 e.printStackTrace() ;
+		   String errMsg = RamsesException.formatRethrowMessage("cannot fetch the type holder for \'" +
+		           object + '\'', e) ;
+	     _LOGGER.error(errMsg);
+	     ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		 }
 
 		 EList<PropertyExpression> numberRepresentation =
@@ -1179,37 +1200,33 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 }
 		 }
 	 }
-
-	 
-  	  
         	  
-	 private DataSubcomponentType processParentDataSubcomponentType(
-			NamedElement object) {
-		 DataSubcomponentType parentDst = null;
-		 if(object instanceof DataType)
-		 {
-			 DataType dt = (DataType) object;
-			 if(dt.getOwnedExtension()!=null)
-			 {
-				 parentDst = (DataSubcomponentType) dt.getExtended();
-			 }
-			 
-		 }
-		 else if(object instanceof DataImplementation)
-		 {
-			 DataImplementation di = (DataImplementation) object;
-			 if(di.getOwnedExtension()!=null)
-			 {
-				 parentDst = (DataSubcomponentType) di.getExtended();
-				 
-			 }
-		 }
-		 if(parentDst!=null && parentDst!=object)
-		 {
-			 process(parentDst);
-			 return parentDst;
-		 }
-		 return null;
+  private DataSubcomponentType
+      processParentDataSubcomponentType(NamedElement object)
+  {
+    DataSubcomponentType parentDst = null ;
+    if(object instanceof DataType)
+    {
+      DataType dt = (DataType) object ;
+      if(dt.getOwnedExtension() != null)
+      {
+        parentDst = (DataSubcomponentType) dt.getExtended() ;
+      }
+    }
+    else if(object instanceof DataImplementation)
+    {
+      DataImplementation di = (DataImplementation) object ;
+      if(di.getOwnedExtension() != null)
+      {
+        parentDst = (DataSubcomponentType) di.getExtended() ;
+      }
+    }
+    if(parentDst != null && parentDst != object)
+    {
+      process(parentDst) ;
+      return parentDst ;
+    }
+    return null;
 	}
 
 	@Override
@@ -1271,10 +1288,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 {
 				 AnnexUnparser unparser =
 						 ServiceProvider.getServiceRegistry().getUnparser("--") ;
-
-				 if(unparser != null)
-				 {
-				 }
 
 				 return DONE ;
 			 }
@@ -1418,7 +1431,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 					 }
 				 }
 				 
-				 
 				 _deploymentHeaderCode.addOutputNewline("procedure Init_Global_Variables;");
 				 _deploymentHeaderCode.addOutputNewline("pragma Export (C, Init_Global_Variables, \"Init_Global_Variables\");");
 
@@ -1445,11 +1457,11 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 @Override
 			 public String caseProcessSubcomponent(ProcessSubcomponent object)
 			 {
-			        process(object.getComponentImplementation()) ;
-			        for(NamedElement ne: additionalUnparsing)
-			        	process(ne);
-			        additionalUnparsing.clear();
-			        return DONE ;
+        process(object.getComponentImplementation()) ;
+        for(NamedElement ne : additionalUnparsing)
+          process(ne) ;
+        additionalUnparsing.clear() ;
+        return DONE ;
 			 }
 
 			 @Override
@@ -1580,7 +1592,11 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				  }
 				 catch (Exception e)
 				 {
-					 
+				   String errMsg =  RamsesException.formatRethrowMessage(
+				            "cannot fetch source name or source text for \'" + object + '\''
+				            , e) ;
+		        _LOGGER.error(errMsg);
+		        ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
 				 }
 			 }
 			 
@@ -1797,7 +1813,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 							 processDataSubcomponentType(object, p.getDataFeatureClassifier(), _subprogramHeaderCode, _subprogramHeaderCode);
 						 }
 
-
 						 first=false;
 
 						 process(p.getDataFeatureClassifier());
@@ -1968,72 +1983,77 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 }
 
 			 @Override
-			 public String caseSubprogramImplementation(SubprogramImplementation object)
-			 {
-//				 	sourceTextName(object);
-//
-//				    _currentImplUnparser = _subprogramImplCode;
-//			    	_currentHeaderUnparser = _subprogramHeaderCode; 
-//			    	if(_processedTypes.contains(object.getQualifiedName()))
-//			        {
-//			          return DONE ;
-//			        }
-//			        _processedTypes.add(object.getQualifiedName());
-//			        try {
-//			          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
-//			        } catch (Exception e1) {
-//			      	  caseSubprogramClassifier((SubprogramClassifier) object);
-//			        
-//			    	  for(DataSubcomponent d : object.getOwnedDataSubcomponents())
-//			          {
-//			            process(d) ;
-//			          }
-//
-//			          processBehavioredImplementation(object) ;
-//
-//						 _subprogramImplCode.decrementIndent();
-//			  		     _subprogramImplCode.addOutputNewline("end "+GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+";");
-//			        }
-//
-//				 
-//				 return DONE;
-				 
-				 _currentImplUnparser = _subprogramImplCode;
-			    	_currentHeaderUnparser = _subprogramHeaderCode; 
-			    	if(_processedTypes.contains(object.getQualifiedName()))
-			        {
-			          return DONE ;
-			        }
-			        _processedTypes.add(object.getQualifiedName());
-			        try {
-			          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
-			          addExternalCSubprograms(object, _subprogramHeaderCode);
-			        } catch (Exception e1) {
-			      	  caseSubprogramClassifier((SubprogramClassifier) object);
-			        
-			    	  for(DataSubcomponent d : object.getOwnedDataSubcomponents())
-			          {
-			            process(d) ;
-			          }
+      public String caseSubprogramImplementation(SubprogramImplementation object)
+      {
+        //				 	sourceTextName(object);
+        //
+        //				    _currentImplUnparser = _subprogramImplCode;
+        //			    	_currentHeaderUnparser = _subprogramHeaderCode; 
+        //			    	if(_processedTypes.contains(object.getQualifiedName()))
+        //			        {
+        //			          return DONE ;
+        //			        }
+        //			        _processedTypes.add(object.getQualifiedName());
+        //			        try {
+        //			          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
+        //			        } catch (Exception e1) {
+        //			      	  caseSubprogramClassifier((SubprogramClassifier) object);
+        //			        
+        //			    	  for(DataSubcomponent d : object.getOwnedDataSubcomponents())
+        //			          {
+        //			            process(d) ;
+        //			          }
+        //
+        //			          processBehavioredImplementation(object) ;
+        //
+        //						 _subprogramImplCode.decrementIndent();
+        //			  		     _subprogramImplCode.addOutputNewline("end "+GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())+";");
+        //			        }
+        //
+        //				 
+        //				 return DONE;
 
-			          processBehavioredImplementation(object) ;
-			          Set<String> l = getAdditionalHeaderSet(_subprogramHeaderCode);
-			          _subprogramImplCode.decrementIndent();
-			          _subprogramImplCode.addOutput("end ");
-			          try
-						 {
-							 String sourceName = PropertyUtils.getStringValue(object, "Source_Name") ;
-							 _subprogramImplCode.addOutput(sourceName);
-						 }
-						 catch(Exception e)
-						 {
-							 _subprogramImplCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
-						 }
-			          _subprogramImplCode.addOutputNewline(";");
-			        }
-			    	  
-			    	return DONE;
-			 }
+        _currentImplUnparser = _subprogramImplCode ;
+        _currentHeaderUnparser = _subprogramHeaderCode ;
+        if(_processedTypes.contains(object.getQualifiedName()))
+        {
+          return DONE ;
+        }
+        _processedTypes.add(object.getQualifiedName()) ;
+        try
+        {
+          resolveExistingCodeDependencies(object, null, _subprogramHeaderCode) ;
+          addExternalCSubprograms(object, _subprogramHeaderCode) ;
+        }
+        catch(Exception e1)
+        {
+          caseSubprogramClassifier((SubprogramClassifier) object) ;
+
+          for(DataSubcomponent d : object.getOwnedDataSubcomponents())
+          {
+            process(d) ;
+          }
+
+          processBehavioredImplementation(object) ;
+          Set<String> l = getAdditionalHeaderSet(_subprogramHeaderCode) ;
+          _subprogramImplCode.decrementIndent() ;
+          _subprogramImplCode.addOutput("end ") ;
+          try
+          {
+            String sourceName =
+                                PropertyUtils.getStringValue(object,
+                                                             "Source_Name") ;
+            _subprogramImplCode.addOutput(sourceName) ;
+          }
+          catch(Exception e)
+          {
+            _subprogramImplCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())) ;
+          }
+          _subprogramImplCode.addOutputNewline(";") ;
+        }
+
+        return DONE ;
+      }
 
 			 @Override
 			 public String caseSubprogramCall(SubprogramCall object)
@@ -2206,8 +2226,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 						throw new PropertyNotFound(exception);
 					}
 				    
-					
-				    
 				 process(object.getComponentImplementation()) ;
 				 return null ;
 			 }
@@ -2296,21 +2314,18 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	 
 
 	 @Override
-	 public void process(Element element, File generatedFilePath) 
-			 throws GenerationException
-			 {
-		 AadlToADASwitchProcess.process(element) ;
-		 saveGeneratedFilesContent(generatedFilePath) ;
-		 // Reset all AadlToADASwitchProcess private attributes !
-		 init() ;
-			 }
+  public void process(Element element, File generatedFilePath)
+                                                      throws GenerationException
+  {
+    AadlToADASwitchProcess.process(element) ;
+    saveGeneratedFilesContent(generatedFilePath) ;
+    // Reset all AadlToADASwitchProcess private attributes !
+    init() ;
+  }
 
 	 @Override
 	 public void setParameters(Map<Enum<?>, Object> parameters)
 	 {
 		 throw new UnsupportedOperationException() ;
 	 }
-
-
-		
 }

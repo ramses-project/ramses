@@ -1,21 +1,37 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2012 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.generation.ada;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.List ;
+import java.util.Set ;
 
-import org.osate.aadl2.BooleanLiteral;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.DataImplementation;
-import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.Parameter;
-import org.osate.aadl2.Property;
-import org.osate.aadl2.SubprogramClassifier;
+import org.osate.aadl2.BooleanLiteral ;
+import org.osate.aadl2.ComponentImplementation ;
+import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.Parameter ;
+import org.osate.aadl2.Property ;
 import org.osate.utils.PropertyUtils ;
-import org.osate.xtext.aadl2.properties.util.GetProperties;
+import org.osate.xtext.aadl2.properties.util.GetProperties ;
 
 
 public class GenerationUtilsADA
@@ -239,29 +255,33 @@ public class GenerationUtilsADA
 		  return null ;
 	  }
 	  
-	  public static String resolveExistingCodeDependencies(NamedElement object,
-				 Set<String> additionalHeaders)
-	  {
-		  try
-		  {
-			  return resolveExistingDependency(object,additionalHeaders);
-		  }
-		  catch(Exception e)
-		  {
-			  if(object instanceof ComponentType)
-			  {
-				  ComponentType c = (ComponentType) object;
-				  if(c.getOwnedExtension()!=null)
-					  return resolveExistingCodeDependencies(c.getOwnedExtension().getExtended(), additionalHeaders);
-			  }
-			  /*else   FIXME: ComponentPrototype */
-			  else if (object instanceof ComponentImplementation)
-			  {
-				  ComponentImplementation ci = (ComponentImplementation) object;
-				  if(ci.getOwnedExtension()!=null)
-					  return resolveExistingCodeDependencies(ci.getOwnedExtension().getExtended(), additionalHeaders);
-			  }
-			  return null ;
-		  }
-}
+  public static String resolveExistingCodeDependencies(NamedElement object,
+                                                  Set<String> additionalHeaders)
+  {
+    try
+    {
+      return resolveExistingDependency(object, additionalHeaders) ;
+    }
+    catch(Exception e)
+    {
+      if(object instanceof ComponentType)
+      {
+        ComponentType c = (ComponentType) object ;
+        if(c.getOwnedExtension() != null)
+          return resolveExistingCodeDependencies(c.getOwnedExtension()
+                                                  .getExtended(),
+                                                 additionalHeaders) ;
+      }
+      /*else   FIXME: ComponentPrototype */
+      else if(object instanceof ComponentImplementation)
+      {
+        ComponentImplementation ci = (ComponentImplementation) object ;
+        if(ci.getOwnedExtension() != null)
+          return resolveExistingCodeDependencies(ci.getOwnedExtension()
+                                                   .getExtended(),
+                                                 additionalHeaders) ;
+      }
+      return null ;
+    }
+  }
 }
