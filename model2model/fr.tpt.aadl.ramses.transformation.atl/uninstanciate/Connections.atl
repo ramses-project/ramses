@@ -56,7 +56,7 @@ abstract rule m_Connection_Reference
 		),
 		cnxSourceImg : AADLBA!ConnectedElement(
 			connectionEnd <- cnxRef.source,
-			context <- if(cnxRef.connection.bidirectional)then
+			context <- if(cnxRef.connection.bidirectional and not cnxRef.connection.oclIsKindOf(AADLBA!AccessConnection))then
 							if(not cnxRef.connection.destination.context.oclIsUndefined()) then 
 								cnxRef.source.eContainer()
 							else
@@ -71,7 +71,7 @@ abstract rule m_Connection_Reference
 		),
 		cnxDestinationImg : AADLBA!ConnectedElement(
 			connectionEnd <- cnxRef.destination,
-			context <- if(cnxRef.connection.bidirectional)then
+			context <- if(cnxRef.connection.bidirectional and not cnxRef.connection.oclIsKindOf(AADLBA!AccessConnection))then
 							if(not cnxRef.connection.source.context.oclIsUndefined()) then 
 								cnxRef.destination.eContainer()
 							else
