@@ -214,7 +214,7 @@ public class RamsesConfiguration
         _LOGGER.warn("the given runtime path is not valid. Try to fetch the " +
             "runtime path from \'$" + gen.getRuntimePathEnvVar() + "\' environment variable");
         
-        String envPath = EnvUtils.getEnvVariable(gen.getRuntimePathEnvVar()) ;
+        String envPath = EnvUtils.getExternalVariable(gen.getRuntimePathEnvVar()) ;
         
         if(envPath != null)
         {
