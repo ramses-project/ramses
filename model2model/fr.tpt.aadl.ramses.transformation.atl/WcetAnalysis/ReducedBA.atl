@@ -178,6 +178,9 @@ rule m_System_Implementation {
 rule m_Thread_Implementation {
  from 
  	impl : AADLI!ThreadImplementation
+	(
+		REDUCEDBA!ReducedThreadBA.allInstancesFrom('WCET')->exists(e|e.thread.subcomponent.subcomponentType = impl)
+	)
  to 
  	implImg : AADLBA!ThreadImplementation (
  		name <- impl.name,
