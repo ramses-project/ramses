@@ -12,11 +12,6 @@ public class TransformationException extends RamsesException
     super(errorMessage) ;
   }
   
-  public TransformationException(Throwable e)
-  {
-    super(e) ;
-  }
-  
   public TransformationException(String errorMessage, Throwable e)
   {
     super(errorMessage) ;

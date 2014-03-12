@@ -14,11 +14,6 @@ public abstract class RamsesException extends Exception
     super(errorMessage) ;
   }
   
-  public RamsesException(Throwable e)
-  {
-    super(e) ;
-  }
-  
   /**
    * Rethrow encapsulation
    * 

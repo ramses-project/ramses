@@ -33,11 +33,6 @@ public class ParseException extends RamsesException
     super(errorMessage) ;
   }
   
-  public ParseException(Throwable e)
-  {
-    super(e) ;
-  }
-  
   /**
    * Rethrow encapsulation
    * 

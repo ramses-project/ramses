@@ -36,11 +36,6 @@ public class AnalysisException extends RamsesException
     super(errorMessage) ;
   }
   
-  public AnalysisException(Throwable e)
-  {
-    super(e) ;
-  }
-  
   public AnalysisException(String errorMessage, Throwable e)
   {
     super(errorMessage, e) ;

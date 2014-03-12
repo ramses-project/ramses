@@ -36,11 +36,6 @@ public class GenerationException extends RamsesException
     super(errorMessage) ;
   }
   
-  public GenerationException(Throwable e)
-  {
-    super(e) ;
-  }
-  
   public GenerationException(String errorMessage, Throwable e)
   {
     super(errorMessage) ;
