@@ -26,13 +26,16 @@ import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 
-import javax.swing.JOptionPane ;
-
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.PublicPackageSection ;
@@ -396,12 +399,10 @@ public class AadlTargetSpecificGenerator implements Generator
     }
     else if(analysisMode.equals("manual"))
     {
-      int res =
-            JOptionPane.showConfirmDialog(null, "Was the analysis " +
-                                                analysisName + " successfull?",
-                                          "Confirmation",
-                                          JOptionPane.YES_NO_OPTION) ;
-      if(res == JOptionPane.YES_OPTION)
+      AnalysisChoiceRunnable choiceWindow = new AnalysisChoiceRunnable(analysisName);
+      PlatformUI.getWorkbench().getDisplay().syncExec(choiceWindow);
+      int res = choiceWindow.getRes();
+      if(res == SWT.YES)
       {
         workflowPilot.setAnalysisResult(true) ;
         msg = ">> " + analysisName + " result set at true" ;
@@ -414,6 +415,41 @@ public class AadlTargetSpecificGenerator implements Generator
         _LOGGER.trace(msg);
       }
     }
+  }
+  
+  private class AnalysisChoiceRunnable implements Runnable
+  {
+
+	private String analysisName;
+	private int res;
+	
+	AnalysisChoiceRunnable (String analysisName)
+	{
+		this.analysisName = analysisName;
+	}
+	
+	@Override
+	public void run() 
+	{
+	  Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+	  MessageBox messageBox = new MessageBox(shell, SWT.ICON_QUESTION|
+			  SWT.YES|SWT.NO);
+	  messageBox.setMessage("Was the analysis " +
+			  analysisName + " successfull?");
+	  messageBox.setText("Manual analysis result");
+	  setRes(messageBox.open());
+	}
+
+	public int getRes() 
+	{
+	  return res;
+	}
+
+	private void setRes(int res) 
+	{
+		this.res = res;
+	}
+	  
   }
   
   private void doLoop(AbstractLoop l,AnalysisErrorReporterManager errManager,
