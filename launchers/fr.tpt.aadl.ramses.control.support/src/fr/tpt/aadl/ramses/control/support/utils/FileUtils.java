@@ -1,21 +1,20 @@
 package fr.tpt.aadl.ramses.control.support.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.BufferedReader ;
+import java.io.BufferedWriter ;
+import java.io.File ;
+import java.io.FileInputStream ;
+import java.io.FileOutputStream ;
+import java.io.FileReader ;
+import java.io.FileWriter ;
+import java.io.IOException ;
+import java.io.InputStream ;
+import java.io.OutputStream ;
+import java.io.PrintWriter ;
+import java.util.ArrayList ;
+import java.util.LinkedHashSet ;
+import java.util.List ;
+import java.util.Set ;
 
 /**
  * This class gives different util methods to manipulate (create, save, delete...)
@@ -136,43 +135,40 @@ public class FileUtils {
 	 * method.
 	 * @param src the source file that will be copied.
 	 * @param dest the destination file, result of the copy.
+	 * @throws for any IO problems
 	 */
-	public static void copyFile(File src, File dest) {
-		InputStream in = null;
-		OutputStream out = null;
+	public static void copyFile(File src, File dest) throws IOException
+	{
+    InputStream in = null ;
+    OutputStream out = null ;
 
-		if (dest.isDirectory())
-			dest = new File(dest, src.getName());
+    if(dest.isDirectory())
+      dest = new File(dest, src.getName()) ;
 
-		try {
-			in = new FileInputStream(src);
-			out = new FileOutputStream(dest);
+    try
+    {
+      in = new FileInputStream(src) ;
+      out = new FileOutputStream(dest) ;
 
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
+      byte[] buf = new byte[1024] ;
+      int len ;
+      while((len = in.read(buf)) > 0)
+      {
+        out.write(buf, 0, len) ;
+      }
+    }
+    finally
+    {
+      if(in != null)
+      {
+        in.close() ;
+      }
 
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException(e);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		} finally {
-			if (in != null)
-				try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-			if (out != null)
-				try {
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		}
+      if(out != null)
+      {
+        out.close() ;
+      }
+    }
 	}
 
 	/**
@@ -183,7 +179,9 @@ public class FileUtils {
 	 * @param filenameExtension a list of file extension to find which file
 	 * to copy.
 	 */
-	public static void copyFiles(File src, File dest, String... filenameExtension) {
+	public static void copyFiles(File src, File dest, String... filenameExtension)
+	                                                            throws IOException
+	{
 
 		List<File> files = new ArrayList<File>();
 
@@ -219,9 +217,8 @@ public class FileUtils {
 	 * @param content the content saved in the created file.
 	 * @throws IOException {@link IOException}
 	 */
-	public static void saveFile(File directory,
-			String fileName,
-			String content) throws IOException
+	public static void saveFile(File directory, String fileName, String content)
+	                                                            throws IOException
 	{
 		BufferedWriter output ;
 
@@ -235,8 +232,7 @@ public class FileUtils {
 		output.close() ;
 	}
 	
-	public static String getFileInBuffer(String filename)
-	        throws IOException
+	public static String getFileInBuffer(String filename) throws IOException
 	  {
 	    BufferedReader reader =
 	          new BufferedReader(new FileReader(new File(filename))) ;
@@ -251,5 +247,4 @@ public class FileUtils {
 	    reader.close() ;
 	    return buffer ;
 	  }
-	
 }

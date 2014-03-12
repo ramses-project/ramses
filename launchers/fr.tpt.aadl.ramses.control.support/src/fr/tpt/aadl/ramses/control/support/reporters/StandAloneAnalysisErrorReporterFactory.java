@@ -28,7 +28,6 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterFactory 
 public class StandAloneAnalysisErrorReporterFactory implements
                                                    AnalysisErrorReporterFactory
 {
-
   private MessageReporter _reporter ;
 
   public StandAloneAnalysisErrorReporterFactory(

@@ -87,8 +87,7 @@ public class DefaultServiceRegistry extends AbstractServiceRegistry implements S
   public void init(AadlModelInstantiatior modelInstantiatior,
                    PredefinedAadlModelManager predefinedAadlModels)
   {
-    // TODO Auto-generated method stub
-    
+
   }
 
   @Override

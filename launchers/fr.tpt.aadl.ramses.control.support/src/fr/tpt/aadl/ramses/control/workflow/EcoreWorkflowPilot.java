@@ -27,6 +27,7 @@ import java.util.ArrayList ;
 import java.util.Iterator ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.Diagnostic ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -50,6 +51,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	private boolean analysisResult;
 	
 	private String sourceModelId;
+	
+	private static Logger _LOGGER = Logger.getLogger(EcoreWorkflowPilot.class) ;
 
 	/**
 	 * This method creates an EcoreWorkflowPilot from the file path passed
@@ -76,7 +79,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 		File testExist = new File(this.workflowFileName);
 		if (!testExist.exists())
 		{
-			System.out.println("Workflow file does not exist: " + testExist.getAbsolutePath());
+		  String errMsg = "workflow file does not exist: " + testExist.getAbsolutePath() ;
+	    _LOGGER.fatal(errMsg) ;
 			throw new FileNotFoundException();
 		}
 
@@ -291,9 +295,6 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 		}
 		return result;
 	}
-
-	
-	
 	
 	@Override
   public AbstractLoop getLoop()
@@ -307,7 +308,6 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
       
       /** Convert analysis */
       AbstractLoop.AbstractAnalysis aa = convertAnalysis(l.getAnalysis());
-      
       
       /** Convert module lists */
       List<List<String>> moduleLists = new ArrayList<List<String>>();
@@ -366,5 +366,4 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
     else
       return null;
   }
-	
 }

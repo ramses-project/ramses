@@ -32,7 +32,6 @@ import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 
-
 public interface Generator extends NamedPlugin
 {
   //TODO: doc me !

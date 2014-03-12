@@ -85,13 +85,23 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
     }
 
     File preparemake = new File(inputDir, "/preparemake.sh") ;
+    
+    File refineOil = null ;
+    
+    try
+    {
+      FileUtils.copyFile(preparemake, outputDir) ;
+      preparemake.setExecutable(true) ;
 
-    FileUtils.copyFile(preparemake, outputDir) ;
-    preparemake.setExecutable(true) ;
-
-    File refineOil = new File(inputDir, "/refine_oil.sh") ;
-    FileUtils.copyFile(refineOil, outputDir) ;
-    refineOil.setExecutable(true) ;
+      refineOil = new File(inputDir, "/refine_oil.sh") ;
+      FileUtils.copyFile(refineOil, outputDir) ;
+      refineOil.setExecutable(true) ;
+    }
+    catch(IOException ex)
+    {
+      String msg = "cannot copy files" ;
+      throw new GenerationException(msg, ex) ;
+    }
 
     File oilTrashFile = new File(outputDir, process.getName()) ;
     try

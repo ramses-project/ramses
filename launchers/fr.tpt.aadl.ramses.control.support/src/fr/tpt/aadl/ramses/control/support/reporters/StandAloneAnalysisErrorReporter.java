@@ -28,7 +28,6 @@ import org.osate.aadl2.modelsupport.errorreporting.AbstractAnalysisErrorReporter
 public class StandAloneAnalysisErrorReporter extends
                                             AbstractAnalysisErrorReporter
 {
-
   private MessageReporter _reporter ;
   private final static String STAGE = "resolver" ;
 

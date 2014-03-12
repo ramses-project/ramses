@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2014 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 

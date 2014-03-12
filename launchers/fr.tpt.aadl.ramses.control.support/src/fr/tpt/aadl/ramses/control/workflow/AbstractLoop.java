@@ -57,11 +57,6 @@ public class AbstractLoop {
 	public List<List<String>> getModuleLists() {
 		return moduleLists;
 	}
-	
-
-
-
-
 
 	public static abstract class AbstractAnalysis {}
 	public static class Analysis extends AbstractAnalysis

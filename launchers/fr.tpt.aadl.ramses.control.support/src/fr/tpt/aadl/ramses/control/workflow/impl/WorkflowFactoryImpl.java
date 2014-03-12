@@ -1,32 +1,47 @@
 /**
- * <copyright>
- * </copyright>
- *
- * $Id$
+ * AADL-RAMSES
+ * 
+ * Copyright © 2012 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
  */
+
 package fr.tpt.aadl.ramses.control.workflow.impl;
 
-import fr.tpt.aadl.ramses.control.workflow.*;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.impl.EFactoryImpl;
-import org.eclipse.emf.ecore.plugin.EcorePlugin;
+import org.eclipse.emf.ecore.EClass ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.EPackage ;
+import org.eclipse.emf.ecore.impl.EFactoryImpl ;
+import org.eclipse.emf.ecore.plugin.EcorePlugin ;
 
-import fr.tpt.aadl.ramses.control.workflow.Analysis;
-import fr.tpt.aadl.ramses.control.workflow.AnalysisElement;
-import fr.tpt.aadl.ramses.control.workflow.AnalysisOption;
-import fr.tpt.aadl.ramses.control.workflow.ErrorState;
-import fr.tpt.aadl.ramses.control.workflow.File;
-import fr.tpt.aadl.ramses.control.workflow.Generation;
-import fr.tpt.aadl.ramses.control.workflow.List;
-import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier;
-import fr.tpt.aadl.ramses.control.workflow.Transformation;
-import fr.tpt.aadl.ramses.control.workflow.Unparse;
-import fr.tpt.aadl.ramses.control.workflow.Workflow;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowElement;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
+import fr.tpt.aadl.ramses.control.workflow.Analysis ;
+import fr.tpt.aadl.ramses.control.workflow.AnalysisOption ;
+import fr.tpt.aadl.ramses.control.workflow.Conjunction ;
+import fr.tpt.aadl.ramses.control.workflow.Disjunction ;
+import fr.tpt.aadl.ramses.control.workflow.ErrorState ;
+import fr.tpt.aadl.ramses.control.workflow.File ;
+import fr.tpt.aadl.ramses.control.workflow.Generation ;
+import fr.tpt.aadl.ramses.control.workflow.List ;
+import fr.tpt.aadl.ramses.control.workflow.Loop ;
+import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier ;
+import fr.tpt.aadl.ramses.control.workflow.Transformation ;
+import fr.tpt.aadl.ramses.control.workflow.Unparse ;
+import fr.tpt.aadl.ramses.control.workflow.Workflow ;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory ;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
 
 /**
  * <!-- begin-user-doc -->

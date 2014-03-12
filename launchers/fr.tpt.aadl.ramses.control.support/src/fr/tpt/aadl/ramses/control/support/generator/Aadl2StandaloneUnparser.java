@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright � 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -62,6 +62,7 @@ package fr.tpt.aadl.ramses.control.support.generator ;
 import java.io.ByteArrayInputStream ;
 import java.io.File ;
 import java.io.FileOutputStream ;
+import java.io.IOException ;
 import java.io.InputStream ;
 import java.util.Iterator ;
 
@@ -89,8 +90,8 @@ import org.osate.aadl2.modelsupport.util.AadlUtil ;
 import org.osate.aadl2.util.Aadl2Switch ;
 import org.osate.annexsupport.AnnexUnparser ;
 
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 /**
  * This class implements the converter from an AADL object model to textual
@@ -127,16 +128,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
   {
     super(PROCESS_PRE_ORDER_ALL) ;
     aadlText = new UnparseText() ;
-
-    try
-    {
-      serviceRegistry = ServiceProvider.getServiceRegistry() ;
-    }
-    catch(Exception e)
-    {
-      // TODO Manage with error reporter  
-      e.printStackTrace() ;
-    }
+    serviceRegistry = ServiceProvider.getServiceRegistry() ;
   }
 
   protected final void initSwitches()
@@ -2947,7 +2939,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     }
   }
 
-  public void doUnparseToFile(IResource aaxlFile)
+  public void doUnparseToFile(IResource aaxlFile) throws GenerationException
   {
     IPath path = aaxlFile.getFullPath() ;
     IPath txtpath = path.removeFileExtension().addFileExtension("aadl") ;
@@ -2964,9 +2956,10 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    *            Element. If it is an Instance object nothing is unparsed.
    * @param path
    *            The file path to unparse to.
+   * @throws GenerationException 
    */
   public IFile doUnparseToFile(Element obj,
-                               IPath path)
+                               IPath path) throws GenerationException
   {
     aadlText = new UnparseText() ;
     Element root = obj.getElementRoot() ;
@@ -3002,6 +2995,8 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         }
         catch(final CoreException e)
         {
+          String msg = "cannot delete error markers" ;
+          throw new GenerationException(msg, e) ;
         }
       }
 
@@ -3013,9 +3008,10 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
 
   /**
    * Used to unparse to files outside the scope of Eclipse.
+   * @throws GenerationException 
    */
   public void doUnparseToExternalFile(Element obj,
-                                      File file)
+                                      File file) throws GenerationException
   {
     Element root = obj.getElementRoot() ;
 
@@ -3035,8 +3031,10 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         os.flush() ;
         os.close() ;
       }
-      catch(Exception e)
+      catch(IOException e)
       {
+        String msg = "write in the file \'" + file + '\'' ;
+        throw new GenerationException(msg, e) ;
       }
     }
   }
@@ -3082,5 +3080,4 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
           ("ML_COMMENT".equals(rule.getName()) || "SL_COMMENT".equals(rule
                 .getName())) ;
   }
-
 }
