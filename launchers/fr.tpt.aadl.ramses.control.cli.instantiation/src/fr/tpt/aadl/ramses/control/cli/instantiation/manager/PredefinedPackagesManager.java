@@ -33,6 +33,7 @@ import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataType ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.ramses.control.support.AADLFileFilter ;
 import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 
@@ -42,9 +43,10 @@ public class PredefinedPackagesManager
 
   // File names without their extension.
   private static String[] names =
-  {"base_types", "aadl_runtime", "RAVENSCAR_runtime", "OJR_runtime", "ARINC653_runtime", "OSEK_runtime", "PeriodicDelayed_runtime",
-	  "PeriodicDelayedMutex_runtime"
-        } ;
+  {"base_types", "aadl_runtime", "RAVENSCAR_runtime", "OJR_runtime",
+   "ARINC653_runtime", "OSEK_runtime", "PeriodicDelayed_runtime",
+   "PeriodicDelayedMutex_runtime"} ;
+  
   private static HashMap<String, Resource> resources = new HashMap<String, Resource>() ;
   
   public PredefinedPackagesManager(StandAloneInstantiator instantiator)

@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright ��� 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -45,6 +45,7 @@ import com.google.inject.Injector ;
 
 import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.AadlResourceValidator ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
@@ -67,7 +68,6 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
   
   private static Logger _LOGGER = Logger.getLogger(StandAloneInstantiator.class) ;
   
-  // Singleton
   public StandAloneInstantiator(AnalysisErrorReporterManager errManager,
                                 IProgressMonitor monitor)
   {
@@ -80,8 +80,11 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
     }
     catch(Exception e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace() ;
+      String msg = RamsesException.formatRethrowMessage("Abort on initialization error.",
+                                                        e);
+      _LOGGER.fatal(msg, e);
+      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      java.lang.System.exit(-1) ;
     }
 
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
@@ -161,7 +164,7 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
       else
       {
         String msg = "Abort on parse error. Annex resolving is skiped" ;
-        _LOGGER.info(msg);
+        _LOGGER.fatal(msg);
         ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
         java.lang.System.exit(-1) ;
       }

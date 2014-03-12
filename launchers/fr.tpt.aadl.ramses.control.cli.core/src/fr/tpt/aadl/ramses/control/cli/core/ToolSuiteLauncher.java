@@ -39,6 +39,7 @@ import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
 import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.ParseException ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.TransformationException ;
@@ -47,7 +48,6 @@ import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
@@ -58,7 +58,6 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
 public class ToolSuiteLauncher
 {
-
   private ServiceRegistry _registry ;
   private StandAloneInstantiator _instantiator ;
   private List<String> _analysisToPerform ;
@@ -129,8 +128,6 @@ public class ToolSuiteLauncher
   {
     if(_analysisToPerform != null && _analysisToPerform.isEmpty() == false)
     {
-      _monitor.beginTask("Analysis", IProgressMonitor.UNKNOWN);
-      
       // to be completed with exceptions in case analysis goes wrong
       for(String analysisName : _analysisToPerform)
       {
@@ -149,24 +146,19 @@ public class ToolSuiteLauncher
 
   List<Resource> performParse(List<File> aadlFile)
   {
-    _monitor.beginTask("Parse", IProgressMonitor.UNKNOWN);
-    return _instantiator.parse(aadlFile) ;
+    List<Resource> result = _instantiator.parse(aadlFile) ;
+    return result ;
   }
 
   /**
    * This method parses AADL predefined packages and property sets
    * and registers them in the OSATE resource set.
+   * @throws ParseException 
    */
-  void parsePredefinedRessources()
+  void parsePredefinedRessources() throws ParseException
   {
-    try
-    {
-      _modelManager.parsePredefinedAadlModels();
-    }
-    catch(Exception e1)
-    {
-      e1.printStackTrace() ;
-    }
+    _monitor.subTask("Parse predefined AADL models");
+    _modelManager.parsePredefinedAadlModels();
   }
   
   void launchDefaultGenerationProcess (List<File> mainModels,
@@ -178,20 +170,20 @@ public class ToolSuiteLauncher
                                                              GenerationException,
                                                          TransformationException
   {
-    _monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
-    
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
+    _monitor.subTask("Parse the AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
     
+    _monitor.subTask("Instantiate the AADL models");
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
     
     if(instance == null)
     {
       String msg = "instanciation has failed" ;
-      _LOGGER.info(msg);
+      _LOGGER.fatal(msg);
       ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
       System.exit(-1);
     }
@@ -213,21 +205,22 @@ public class ToolSuiteLauncher
                                                             GenerationException,
                                                       TransformationException
   {
-    _monitor.beginTask("Code generation (workflow XML)", IProgressMonitor.UNKNOWN);
-    
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
+    _monitor.subTask("Parse the AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
-
+    
+    _monitor.subTask("Instantiate the AADL models");
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
-
+    
     if(instance == null)
     {
       String msg = "instanciation failed." ;
       _LOGGER.fatal(msg);
-      throw new GenerationException(msg) ;
+      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      System.exit(-1);
     }
 
     generator.setParameters(parameters) ;
@@ -244,18 +237,30 @@ public class ToolSuiteLauncher
                        Map<String, Object> parameters)
                                                         throws AnalysisException
   {
+    _monitor.subTask("Parse the AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModelFiles) ;
+    
+    _monitor.subTask("Instantiate the AADL models");
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
+    
+    if(instance == null)
+    {
+      String msg = "instanciation failed." ;
+      _LOGGER.fatal(msg);
+      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      System.exit(-1);
+    }
     this.performAnalysis(instance, parameters, config.getOutputDir()) ;
   }
 
   void unparse(List<Resource> resources, RamsesConfiguration config) throws IOException 
   {
+    _monitor.subTask("Unparse the AADL resources");
+    
     String fileName ;
     File outputFile ;
     PrintStream ps ;
-    String msg ;
     
     for(Resource r : resources)
     {
@@ -272,9 +277,6 @@ public class ToolSuiteLauncher
       
       Aadl2StandaloneUnparser unparser = Aadl2StandaloneUnparser.getAadlUnparser();
       NamedElement el = (NamedElement) r.getContents().get(0);
-      
-      msg = "Unparse " + el.getName() + " into " + outputFile.getAbsolutePath() ;
-      ServiceRegistry.MSG_REPORTER.reportMessage(MessageStatus.INFO, msg) ;      
       
       unparser.doUnparse(el) ;
       ps = new PrintStream(outputFile) ;

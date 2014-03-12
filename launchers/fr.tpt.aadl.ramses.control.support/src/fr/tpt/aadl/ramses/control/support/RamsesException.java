@@ -1,6 +1,6 @@
 package fr.tpt.aadl.ramses.control.support;
 
-public class RamsesException extends Exception
+public abstract class RamsesException extends Exception
 {
   protected String _encapsMessage ;  
   
@@ -40,7 +40,7 @@ public class RamsesException extends Exception
   public static String formatRethrowMessage(String initialMessage,
                                             Throwable ex)
   {
-    if(ex.getMessage() != null)
+    if(ex != null && ex.getMessage() != null)
     {
       initialMessage += " (" + ex.getMessage() + ')' ;
     }

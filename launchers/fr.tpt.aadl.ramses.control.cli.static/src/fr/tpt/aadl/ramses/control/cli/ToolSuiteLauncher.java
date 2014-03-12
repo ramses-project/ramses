@@ -37,7 +37,6 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
  */
 public class ToolSuiteLauncher
 {
-
   /**
    * This method is the main entrypoint for the Java standalone 
    * version of RAMSES.
@@ -49,7 +48,6 @@ public class ToolSuiteLauncher
     {
       SysErrReporter4Cli errReporter = new SysErrReporter4Cli(System.out,
                                                   System.err) ;
-      
       ServiceProvider.SYS_ERR_REP = errReporter ;
       
       ServiceRegistry registry = new StaticServiceRegistry() ;

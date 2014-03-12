@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2014 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -19,23 +19,34 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.cli.instantiation;
+package fr.tpt.aadl.ramses.control.support;
 
-import org.eclipse.core.runtime.IConfigurationElement ;
-import org.osate.annexsupport.AnnexProxy ;
-
-public class StandAloneAnnexProxy extends AnnexProxy
+public class ParseException extends RamsesException 
 {
-  StandAloneAnnexProxy(IConfigurationElement configElem)
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 6961916184290232374L ;
+  
+  public ParseException(String errorMessage)
   {
-    super(configElem) ;
+    super(errorMessage) ;
   }
-
-  StandAloneAnnexProxy(String id,
-                       String name,
-                       String annexName,
-                       String className)
+  
+  public ParseException(Throwable e)
   {
-    super(id, name, annexName, className) ;
+    super(e) ;
+  }
+  
+  /**
+   * Rethrow encapsulation
+   * 
+   * @param errorMessage the encapsulating message
+   * @param e the exception been encapsulated
+   */
+  public ParseException(String errorMessage, Throwable e)
+  {
+    super(errorMessage, e) ;
+    _encapsMessage = errorMessage ;
   }
 }

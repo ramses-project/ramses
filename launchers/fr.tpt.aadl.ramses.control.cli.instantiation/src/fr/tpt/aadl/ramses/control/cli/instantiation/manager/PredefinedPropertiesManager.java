@@ -39,6 +39,7 @@ import org.osate.aadl2.PropertyConstant ;
 import org.osate.aadl2.PropertySet ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
+import fr.tpt.aadl.ramses.control.support.AADLFileFilter ;
 import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 
@@ -50,12 +51,11 @@ public class PredefinedPropertiesManager
         new HashMap<String, Resource>() ;
 
   private static String[] names =
-      {"AADL_Project", "Communication_Properties", "Data_Model", "Deployment_Properties",
-       "Memory_Properties", "Modeling_Properties", "Programming_Properties",
-       "Thread_Properties", "Timing_Properties", "Scheduler_Constants",
-       "Generation_Properties", "pok_properties", "oseknxt_properties",
-       "osek_properties"
-            } ;
+  {"AADL_Project", "Communication_Properties", "Data_Model",
+   "Deployment_Properties", "Memory_Properties", "Modeling_Properties",
+   "Programming_Properties", "Thread_Properties", "Timing_Properties",
+   "Scheduler_Constants", "Generation_Properties", "pok_properties",
+   "oseknxt_properties", "osek_properties"} ;
   
   private StandAloneInstantiator _instanciator ;
   
@@ -67,7 +67,6 @@ public class PredefinedPropertiesManager
   }
   
   public Map<String, Resource> parsePredefinedPropertySets()
-        throws Exception
   {
     File propertyDir = new File(RamsesConfiguration.getPredefinedResourceDir() + File.separator + Names.AADL_PREDEFINED_PROPERTIES_DIR_NAME) ;
     FilenameFilter filter = new AADLFileFilter() ;
@@ -199,5 +198,4 @@ public class PredefinedPropertiesManager
   {
     return predefinedPropertySets.get(name);
   }
-
 }

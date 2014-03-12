@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright �� 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -32,7 +32,9 @@ import java.util.Map.Entry ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.utils.Aadl2Utils ;
 
 import com.martiansoftware.jsap.FlaggedOption ;
 import com.martiansoftware.jsap.JSAP ;
@@ -49,6 +51,7 @@ import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.EnvUtils ;
 import fr.tpt.aadl.ramses.control.support.FileUtils ;
 import fr.tpt.aadl.ramses.control.support.Names ;
+import fr.tpt.aadl.ramses.control.support.ParseException ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.TransformationException ;
@@ -105,6 +108,7 @@ public class ToolSuiteLauncherCommand
   private static List<File> _mainModelFiles ;
   private static String _systemToInstantiate ;
   private static ToolSuiteLauncher _launcher ;
+  private static RamsesProgressMonitor _monitor ;
   
   private static Logger _logger = Logger.getLogger(ToolSuiteLauncherCommand.class) ;
   
@@ -124,7 +128,8 @@ public class ToolSuiteLauncherCommand
    */
   public static void main(String[] args) throws AnalysisException,
                                                 GenerationException,
-                                                TransformationException
+                                                TransformationException,
+                                                ParseException
   {
     try
     {
@@ -165,14 +170,7 @@ public class ToolSuiteLauncherCommand
         System.exit(0);
       }
     }
-    catch(ConfigurationException ex)
-    {
-      String msg = "while setting up RAMSES" ;
-      _logger.fatal(msg, ex);
-      ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
-      System.exit(-1);
-    }
-    catch(JSAPException ex)
+    catch(Exception ex)
     {
       String msg = "while setting up RAMSES" ;
       _logger.fatal(msg, ex);
@@ -240,7 +238,7 @@ public class ToolSuiteLauncherCommand
       .setLongFlag("log").setShortFlag('l').setList(false)
       .setAllowMultipleDeclarations(false) ;
     
-    logging.setHelp("enable the logging file and set the level (all | trace |��debug |��info |��warn | error |��fatal") ;
+    logging.setHelp("enable the logging file and set the level (all | trace | debug | info | warn | error | fatal") ;
     
     FlaggedOption model =
           new FlaggedOption(SOURCE_MODELS_OPTION_ID)
@@ -404,11 +402,10 @@ public class ToolSuiteLauncherCommand
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
     setRamsesResourceDir(_includeDirs) ;
     
-    RamsesProgressMonitor monitor = new RamsesProgressMonitor(System.out) ;
-    
+    _monitor = new RamsesProgressMonitor(System.out) ;
     
     StandAloneInstantiator instantiator = new StandAloneInstantiator(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
-                                                                     monitor) ;
+                                                                     _monitor) ;
     PredefinedAadlModelManager modelManager = new ContributedAadlRegistration(instantiator) ;
     
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
@@ -417,34 +414,15 @@ public class ToolSuiteLauncherCommand
     /**************************************************************************/
     
     
-    _launcher = new ToolSuiteLauncher(monitor, instantiator, modelManager) ;
+    _launcher = new ToolSuiteLauncher(_monitor, instantiator, modelManager) ;
     
     _mainModelFiles =
           ToolSuiteLauncherCommand.getVerifiedPath(mainModels,
                                                    _includeDirs) ;
   }
   
-  private static void parse(JSAPResult options) 
+  private static void parse(JSAPResult options) throws ParseException 
   {
-    _launcher.parsePredefinedRessources() ;
-    List<Resource> modelResources = _launcher.performParse(_mainModelFiles) ;
-    MessageStatus ms = MessageStatus.INFO ;
-    
-    String msg = "parsing has " ;
-    
-    ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
-    
-    if(sr.getNbError() > 0)
-    {
-      msg += "FAILED" ;
-    }
-    else
-    {
-      msg += "SUCCEEDED" ;
-    }
-    
-    _reporter.reportMessage(ms, msg) ;
-    
     // Unparse if --output option is set.
     // Unparsing will crash if the model have name resolution errors. But it 
     // still can't be possible to discriminate the nature of the errors.
@@ -452,7 +430,14 @@ public class ToolSuiteLauncherCommand
     String unparse_file_path =
         options.getString(OUTPUT_DIR_OPTION_ID) ;
     
-    if (unparse_file_path != null && !unparse_file_path.isEmpty())
+    boolean hasToUnparse = unparse_file_path != null &&
+                           !unparse_file_path.isEmpty() ;
+    
+    _monitor.beginTask("Parse the AADL models", IProgressMonitor.UNKNOWN);
+    _launcher.parsePredefinedRessources() ;
+    List<Resource> modelResources = _launcher.performParse(_mainModelFiles) ;
+    
+    if(hasToUnparse)
     {
       RamsesConfiguration ramsesConfig = new RamsesConfiguration() ;
       ConfigStatus status = ramsesConfig.setOutputDir(unparse_file_path) ;
@@ -472,6 +457,9 @@ public class ToolSuiteLauncherCommand
         }
       }
     }
+    _monitor.done();
+    
+    // TODO REPORT PARSING STATE (FAILED OR SUCCEEDED) AND SYSTEM ERRORS.
   }
 
   private static void instantiationOptionsHandler(JSAPResult options,
@@ -493,7 +481,8 @@ public class ToolSuiteLauncherCommand
   }
   
   private static void analyse(JSAPResult options) throws AnalysisException,
-                                                         ConfigurationException
+                                                         ConfigurationException,
+                                                         ParseException
   {
     RamsesConfiguration config = new RamsesConfiguration() ;
     instantiationOptionsHandler(options, config);
@@ -501,17 +490,26 @@ public class ToolSuiteLauncherCommand
     String[] analysisToPerform =
           options.getStringArray(ANALYSIS_LIST_OPTION_ID) ;
    
-    _launcher.parsePredefinedRessources() ;
-    
     if(analysisToPerform.length > 0)
     {
       _launcher.initializeAnalysis(analysisToPerform) ;
       
       Map<String, Object> parameters = parametersHandler(options) ;
+      
+      String msg = "Perform " + Aadl2Utils.concatenateString(", ", analysisToPerform)
+          + " analysis" ;
+
+      _monitor.beginTask(msg, IProgressMonitor.UNKNOWN);
+      
+      _launcher.parsePredefinedRessources() ;
         
       _launcher.performAnalysis(_mainModelFiles, _systemToInstantiate, config,
                                   parameters) ;
     }
+    
+    _monitor.done();
+    
+    // TODO REPORT ANALYSIS STATE AND SYSTEM ERRORS.
   }
   
   private static File[] toArray(Set<File> fileSet)
@@ -524,7 +522,8 @@ public class ToolSuiteLauncherCommand
   private static void generation(JSAPResult options) throws AnalysisException,
                                                          ConfigurationException,
                                                             GenerationException,
-                                                         TransformationException
+                                                         TransformationException,
+                                                         ParseException
   {
     RamsesConfiguration config = new RamsesConfiguration() ;
     instantiationOptionsHandler(options, config);
@@ -546,16 +545,27 @@ public class ToolSuiteLauncherCommand
       throw new ConfigurationException(status) ;
     }
     
-    _launcher.parsePredefinedRessources() ;
-    
     File[] inclDirs = toArray(_includeDirs) ;
     
     String workflow_path =
           options.getString(WORKFLOW_OPTION_ID) ;
       
     Map<String, Object> parameters = parametersHandler(options) ;
-      
-    if(workflow_path != null)
+    
+    boolean isWorkflow = workflow_path != null ; 
+    
+    String mainTaskName = "Generate code for " + targetName ;
+    
+    if(isWorkflow)
+    {
+      mainTaskName += " (workflow XML)" ;
+    }
+    
+    _monitor.beginTask(mainTaskName, IProgressMonitor.UNKNOWN);
+    
+    _launcher.parsePredefinedRessources() ;
+    
+    if(isWorkflow)
     {
       try
       {
@@ -586,6 +596,10 @@ public class ToolSuiteLauncherCommand
                                                inclDirs,
                                                parameters) ;
     }
+    
+    _monitor.done();
+    
+    // TODO REPORT GENERATION STATE AND SYSTEM ERRORS.
   }
 
   private static List<File> getVerifiedPath(String[] filePath,
