@@ -19,12 +19,6 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package fr.tpt.aadl.ramses.control.atl.hooks.impl ;
 
 import java.util.ArrayList;
@@ -33,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
@@ -66,6 +61,8 @@ import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicat
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
 import fr.tpt.aadl.ramses.control.atl.hooks.utils.ComparablePortByCriticality ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
 
 /**
@@ -81,6 +78,8 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 {
 
   private String outputPackageName;
+  
+  private static Logger _LOGGER = Logger.getLogger(HookAccessImpl.class);
 
 /**
 	 * <!-- begin-user-doc -->
@@ -194,7 +193,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 			
 			String CPRString = "";
 			long CPRSize = EDPCD.getCPRSize();
-			System.out.println("CPRSize "+CPRSize);
+			_LOGGER.trace("CPRSize "+CPRSize);
 			for(int iteration=0;iteration<CPRSize;iteration++)
 			{
 				long CPR_iteration = EDPCD.getCurrentPeriodReadIndex(iteration);
@@ -203,10 +202,13 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 					CPRString = CPRString + ", ";
 				CPRTable.add(CPR_iteration);
 			}
-			System.out.println("CPR Table "+CPRString);
-		} catch (DimensioningException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			_LOGGER.trace("CPR Table "+CPRString);
+		} catch (DimensioningException e)
+		{
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot get current period on read table for \'"+
+		port + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return CPRTable;
 	}
@@ -229,8 +231,10 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 			threads.add((ComponentInstance) port.eContainer());
 			hyperperiod = EDPCD.getHyperperiod(threads);
 		} catch (DimensioningException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot get the hyper period for \'"+
+		port + '\'', e) ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return hyperperiod;
 	}
@@ -245,9 +249,9 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		try {
 			EventDataPortCommunicationDimensioning EDPCD = 
 					EventDataPortCommunicationDimensioning.create(destinationPort);
-			System.out.println(port.getInstanceObjectPath());
+			_LOGGER.trace(port.getInstanceObjectPath());
 			long CDWSize = EDPCD.getCDWSize(port);
-			System.out.println("CDWSize " + CDWSize);
+			_LOGGER.trace("CDWSize " + CDWSize);
 			String CDWString = "";
 			for(int iteration=0;iteration<CDWSize;iteration++)
 			{
@@ -257,10 +261,12 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 					CDWString = CDWString + ", ";
 				CDWTable.add(CDW_iteration);
 			}
-			System.out.println("CDW Table "+CDWString);
+			_LOGGER.trace("CDW Table "+CDWString);
 		} catch (DimensioningException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot get current dead line for \'"+
+		      port + '\'', e) ;
+		        _LOGGER.error(errMsg);
+		        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return CDWTable;
 	}
@@ -276,11 +282,13 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 			EventDataPortCommunicationDimensioning EDPCD =
 					EventDataPortCommunicationDimensioning.create(destinationFeatureInstance);
 			long size = EDPCD.getBufferSize();
-			System.out.println("Buffer size " + size);
+			_LOGGER.trace("Buffer size " + size);
 			return size;
 		} catch (DimensioningException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		  String errMsg =  RamsesException.formatRethrowMessage("cannot get the buffer size for \'"+
+		      destinationFeatureInstance + '\'', e) ;
+		        _LOGGER.error(errMsg);
+		        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return 0;
 	}

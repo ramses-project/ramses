@@ -19,12 +19,6 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package fr.tpt.aadl.ramses.control.atl.hooks.utils;
 
 import org.eclipse.emf.common.util.URI;
@@ -76,5 +70,4 @@ public class AtlHooksResourceFactoryImpl extends ResourceFactoryImpl
 		result.getDefaultLoadOptions().put(XMLResource.OPTION_USE_LEXICAL_HANDLER, Boolean.TRUE);
 		return result;
 	}
-
 } //AtlHooksResourceFactoryImpl

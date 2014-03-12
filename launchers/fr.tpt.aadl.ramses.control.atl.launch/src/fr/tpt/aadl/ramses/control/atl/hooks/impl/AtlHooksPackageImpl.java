@@ -19,14 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package fr.tpt.aadl.ramses.control.atl.hooks.impl;
-
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
@@ -234,5 +227,4 @@ public class AtlHooksPackageImpl extends EPackageImpl implements AtlHooksPackage
 		// Create resource
 		createResource(eNS_URI);
 	}
-
 } //AtlHooksPackageImpl

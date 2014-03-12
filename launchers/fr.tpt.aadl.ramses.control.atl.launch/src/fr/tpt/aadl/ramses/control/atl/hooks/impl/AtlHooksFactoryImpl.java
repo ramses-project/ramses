@@ -19,12 +19,6 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package fr.tpt.aadl.ramses.control.atl.hooks.impl;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.* ;
@@ -121,5 +115,4 @@ public class AtlHooksFactoryImpl extends EFactoryImpl implements AtlHooksFactory
   {
 		return AtlHooksPackage.eINSTANCE;
 	}
-
 } //AtlHooksFactoryImpl

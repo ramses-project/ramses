@@ -19,12 +19,6 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package fr.tpt.aadl.ramses.control.atl.hooks;
 
 import org.eclipse.emf.ecore.EClass;
@@ -143,5 +137,4 @@ public interface AtlHooksPackage extends EPackage
     EClass HOOK_ACCESS = eINSTANCE.getHookAccess();
 
   }
-
 } //AtlHooksPackage

@@ -19,12 +19,6 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package fr.tpt.aadl.ramses.control.atl.hooks.utils;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
@@ -43,7 +37,6 @@ import org.eclipse.emf.ecore.xmi.util.XMLProcessor;
  */
 public class AtlHooksXMLProcessor extends XMLProcessor
 {
-
   /**
 	 * Public constructor to instantiate the helper.
 	 * <!-- begin-user-doc -->
@@ -72,5 +65,4 @@ public class AtlHooksXMLProcessor extends XMLProcessor
 		}
 		return registrations;
 	}
-
 } //AtlHooksXMLProcessor

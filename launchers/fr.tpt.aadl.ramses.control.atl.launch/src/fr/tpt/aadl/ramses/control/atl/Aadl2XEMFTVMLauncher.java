@@ -157,8 +157,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 			                             String outputDirPathName,
 			                             String resourceSuffix) throws TransformationException
 	{
-		
-		
 		initTransformationInputs(transformationFileList, 
 				inputResource);
 		
@@ -192,7 +190,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 				}
 				catch(IOException ex)
 				{
-				  String errMsg =  RamsesException.formatRethrowMessage("not enable to save the output AADL model", ex) ;
+				  String errMsg =  RamsesException.formatRethrowMessage("cannot save the output AADL model", ex) ;
 	        _LOGGER.error(errMsg);
 	        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 				}

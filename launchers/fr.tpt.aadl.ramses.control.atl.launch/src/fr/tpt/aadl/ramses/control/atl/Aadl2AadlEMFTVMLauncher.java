@@ -34,7 +34,6 @@ import org.eclipse.m2m.atl.emftvm.ExecEnv ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
 import org.osate.aadl2.util.Aadl2Util ;
 
-import antlr.RecognitionException ;
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
@@ -58,7 +57,6 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			                                 File outputDir)
 			                                            throws TransformationException
 	{
-
 			String aadlGeneratedFileName = inputResource.getURI().lastSegment();
 			aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 					".aaxl2", "_extended.aadl2");
@@ -88,15 +86,10 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			  return AadlToTargetSpecificAadl.extractAadlResource(inputResource,
 			                                                      outputFile);
 			}
-			catch(IOException ex)
+			catch(Exception ex)
 			{
 			  String msg = "fail to extract AADL resources" ;
 	      throw new TransformationException(msg, ex) ;
-			}
-			catch(RecognitionException ex)
-			{
-			  String msg = "fail to extract AADL resources" ;
-        throw new TransformationException(msg, ex) ;
 			}
 		}
 
@@ -134,7 +127,6 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 		{
 			env.loadModule(mr, RamsesConfiguration.getAtlResourceDir().getAbsolutePath()+s);
 		}
-		
 	}
 
 	@Override
@@ -142,7 +134,6 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			                                        String outputDirPathName,
 			                                        String resourceSuffix)
 	{
-		
 		ResourceSet rs = inputResource.getResourceSet();
 		
 		String aadlGeneratedFileName = inputResource.getURI().path();

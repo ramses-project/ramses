@@ -19,12 +19,6 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
- */
 package fr.tpt.aadl.ramses.control.atl.hooks.utils;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.* ;
@@ -145,5 +139,4 @@ public class AtlHooksAdapterFactory extends AdapterFactoryImpl
   {
 		return null;
 	}
-
 } //AtlHooksAdapterFactory

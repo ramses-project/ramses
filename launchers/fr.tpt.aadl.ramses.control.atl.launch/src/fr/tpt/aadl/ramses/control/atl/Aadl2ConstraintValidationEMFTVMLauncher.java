@@ -28,6 +28,7 @@ package fr.tpt.aadl.ramses.control.atl ;
 
 import java.io.IOException ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EPackage ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -37,12 +38,16 @@ import org.eclipse.m2m.atl.emftvm.Metamodel ;
 
 import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 {
 	
 	private String ERROR_REPORTER_URI = "http://fr.tpt.aadl.ramses.constraints.vilation.reporter";
+	
+	private static Logger _LOGGER = Logger.getLogger(Aadl2ConstraintValidationEMFTVMLauncher.class) ;
 	
 	public Aadl2ConstraintValidationEMFTVMLauncher(AadlModelInstantiatior modelInstantiator,
 			PredefinedAadlModelManager predefinedResourcesManager)
@@ -75,18 +80,21 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 		  outputResource = rs.createResource(uri);
 		else
 		{
-		  try {
-			outputResource.delete(null);
-		  } catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		  }
-		  outputResource = rs.createResource(uri);
+      try
+      {
+        outputResource.delete(null) ;
+      }
+      catch(IOException e)
+      {
+        String errMsg =  RamsesException.formatRethrowMessage("cannot delete the last output resource", e) ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      }
+      outputResource = rs.createResource(uri) ;
 		}
 		
 		return outputResource;
 	}
-
 	
 	@Override
 	protected void initTransformation()
