@@ -66,6 +66,7 @@ import java.io.IOException ;
 import java.io.InputStream ;
 import java.util.Iterator ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.resources.IFile ;
 import org.eclipse.core.resources.IResource ;
 import org.eclipse.core.resources.ResourcesPlugin ;
@@ -113,6 +114,8 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
   private static ServiceRegistry serviceRegistry ;
 
   protected static Aadl2StandaloneUnparser unparser = null ;
+  
+  private static Logger _LOGGER = Logger.getLogger(Aadl2StandaloneUnparser.class) ;
 
   public static Aadl2StandaloneUnparser getAadlUnparser()
   {
@@ -3011,7 +3014,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    * @throws GenerationException 
    */
   public void doUnparseToExternalFile(Element obj,
-                                      File file) throws GenerationException
+                                      File file)
   {
     Element root = obj.getElementRoot() ;
 
@@ -3033,8 +3036,9 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
       }
       catch(IOException e)
       {
-        String msg = "write in the file \'" + file + '\'' ;
-        throw new GenerationException(msg, e) ;
+        String errMsg = "write in the file \'" + file + '\'' ;
+        _LOGGER.fatal(errMsg, e) ;
+        throw new RuntimeException(errMsg, e) ;
       }
     }
   }

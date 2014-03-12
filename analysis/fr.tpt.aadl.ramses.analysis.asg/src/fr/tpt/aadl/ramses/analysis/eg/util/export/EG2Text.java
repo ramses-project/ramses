@@ -4,12 +4,15 @@ import java.io.BufferedWriter ;
 import java.io.FileWriter ;
 import java.io.IOException ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.instance.ComponentInstance ;
 
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 
 public class EG2Text extends EGExport
 {
+  private static Logger _LOGGER = Logger.getLogger(EG2Text.class) ;
+  
   public EG2Text(String outputDir)
   {
     super(outputDir);
@@ -33,7 +36,9 @@ public class EG2Text extends EGExport
     }
     catch(IOException e)
     {
-      e.printStackTrace();
+      String errMsg = "cannot write to file" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
   }
 
@@ -91,7 +96,9 @@ public class EG2Text extends EGExport
     }
     catch(IOException e)
     {
-      e.printStackTrace();
+      String errMsg = "cannot write to file" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
     
     for(EGNode next : n.getAllNext())

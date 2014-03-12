@@ -63,12 +63,9 @@ import org.osate.ba.aadlba.AadlBaPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
@@ -155,7 +152,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	public Resource doTransformation(List<File> transformationFileList,
 	                                 Resource inputResource,
 			                             String outputDirPathName,
-			                             String resourceSuffix) throws TransformationException
+			                             String resourceSuffix)
 	{
 		initTransformationInputs(transformationFileList, 
 				inputResource);
@@ -190,9 +187,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 				}
 				catch(IOException ex)
 				{
-				  String errMsg =  RamsesException.formatRethrowMessage("cannot save the output AADL model", ex) ;
-	        _LOGGER.error(errMsg);
-	        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+				  String errMsg = "cannot save the output AADL model" ;
+	        _LOGGER.fatal(errMsg, ex);
+	        throw new RuntimeException(errMsg, ex);
 				}
 			}
 		}
@@ -225,7 +222,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 
 	protected void initTransformationInputs(List<File> transformationFileList,
 			                                    Resource inputResource)
-	                                                throws TransformationException
 	{
     ResourceSet rs = inputResource.getResourceSet();
 
@@ -288,8 +284,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
     }
     catch(IOException e)
     {
-      String msg = "fail to load ATL hook \'" + hookResource.getURI() + '\'' ;
-      throw new TransformationException(msg, e) ;
+      String errMsg = "fail to load ATL hook \'" + hookResource.getURI() + '\'' ;
+      _LOGGER.fatal(errMsg, e);
+      throw new RuntimeException(errMsg, e);
     }
 
     Model atlHookModel = EmftvmFactory.eINSTANCE.createModel();

@@ -8,6 +8,7 @@ import java.io.InputStreamReader ;
 import javax.xml.parsers.DocumentBuilder ;
 import javax.xml.parsers.DocumentBuilderFactory ;
 
+import org.apache.log4j.Logger ;
 import org.w3c.dom.Document ;
 
 import fr.tpt.aadl.sched.cheddar.model.CheddarModel ;
@@ -22,6 +23,8 @@ public class CheddarSimulator
   private boolean executed = false ;
 
   private long lastSimulationDuration = 0l ;
+  
+  private static Logger _LOGGER = Logger.getLogger(CheddarSimulator.class) ;
 
   public CheddarSimulator(
                           CheddarModel cheddarModel, String inputXMLPath)
@@ -184,7 +187,9 @@ public class CheddarSimulator
       }
       catch(IOException e)
       {
-        e.printStackTrace() ;
+        String errMsg =  "cannot read simulation result" ;
+        _LOGGER.fatal(errMsg, e) ;
+        throw new RuntimeException(errMsg, e) ;
       }
     }
 

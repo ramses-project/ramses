@@ -713,14 +713,12 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	                    File runtimePath,
                       File outputDir,
                       IProgressMonitor monitor)
-			throws GenerationException {
-    
+	{
     // Generate main.h
     genMainHeader() ;
     
     // Generate main.c
     genMainImpl(process) ;
-    
     
     close();
     
@@ -738,8 +736,9 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
     }
     catch(IOException e)
     {
-      String msg = "cannot save the generated files" ;
-      throw new GenerationException(msg, e) ; 
+      String errMsg = "cannot save the generated files" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
 	}
 

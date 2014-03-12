@@ -36,10 +36,8 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
 import org.eclipse.m2m.atl.emftvm.Metamodel ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
@@ -57,8 +55,9 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 
 	@Override
 	protected Resource initTransformationOutput(Resource inputResource,
-			String outputDirPathName, String resourceSuffix) {
-		
+			                                        String outputDirPathName,
+			                                        String resourceSuffix)
+	{
 		ResourceSet rs = inputResource.getResourceSet();
 		
 		// Load metamodels
@@ -86,9 +85,9 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
       }
       catch(IOException e)
       {
-        String errMsg =  RamsesException.formatRethrowMessage("cannot delete the last output resource", e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        String errMsg = "cannot delete the last output resource" ;
+        _LOGGER.fatal(errMsg, e);
+        throw new RuntimeException(errMsg, e);
       }
       outputResource = rs.createResource(uri) ;
 		}

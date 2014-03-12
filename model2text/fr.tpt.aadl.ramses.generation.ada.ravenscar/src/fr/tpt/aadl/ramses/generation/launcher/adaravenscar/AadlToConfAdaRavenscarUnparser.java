@@ -110,7 +110,7 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 			                TargetProperties tarProp,
 			                File runtimePath,
                       File outputDir,
-                      IProgressMonitor monitor) throws GenerationException
+                      IProgressMonitor monitor)
 	{
 		PartitionProperties pp = new PartitionProperties();
 
@@ -146,8 +146,9 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 		}
 		catch(IOException e)
 		{
-		  String msg = "cannot save the generated files" ;
-      throw new GenerationException(msg, e) ;
+		  String errMsg = "cannot save the generated files" ;
+		  _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
 		}
 	}
 	

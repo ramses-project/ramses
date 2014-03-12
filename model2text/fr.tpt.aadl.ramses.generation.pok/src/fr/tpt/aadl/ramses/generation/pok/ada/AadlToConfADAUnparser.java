@@ -143,8 +143,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     }
     catch(IOException e)
     {
-      String msg = "cannot save the generated files" ;
-      throw new GenerationException(msg, e) ;
+      String errMsg = "cannot save the generated files" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
   }
 
@@ -500,8 +501,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		}
 		catch(IOException e)
 		{
-		  String msg = "cannot save the generated files" ;
-      throw new GenerationException(msg, e) ;
+		  String errMsg = "cannot save the generated files" ;
+		  _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
 		}
 	}
 

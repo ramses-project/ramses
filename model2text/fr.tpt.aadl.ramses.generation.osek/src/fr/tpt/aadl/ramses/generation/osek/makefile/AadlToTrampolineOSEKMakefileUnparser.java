@@ -81,7 +81,8 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
     catch(IOException e1)
     {
       String errMsg = "cannot create temporary files" ;
-      throw new GenerationException(errMsg, e1) ;
+      _LOGGER.fatal(errMsg, e1) ;
+      throw new RuntimeException(errMsg, e1) ;
     }
 
     File preparemake = new File(inputDir, "/preparemake.sh") ;
@@ -99,8 +100,9 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
     }
     catch(IOException ex)
     {
-      String msg = "cannot copy files" ;
-      throw new GenerationException(msg, ex) ;
+      String errMsg = "cannot copy files" ;
+      _LOGGER.fatal(errMsg, ex) ;
+      throw new RuntimeException(errMsg, ex) ;
     }
 
     File oilTrashFile = new File(outputDir, process.getName()) ;

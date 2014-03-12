@@ -78,13 +78,11 @@ public class Resources {
       fis = new FileInputStream(path) ;
       properties.load(fis) ;
     }
-    catch(FileNotFoundException e)
-    {
-      new RessourceNotFoundException(e) ;
-    }
     catch(IOException e)
     {
-      new RessourceNotFoundException(e) ;
+      String errMsg = "cannot load properties" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
     finally
     {
@@ -95,9 +93,9 @@ public class Resources {
         }
         catch(IOException e)
         {
-          String errMsg =  RamsesException.formatRethrowMessage("cannot close the resource file", e) ;
-          _LOGGER.error(errMsg);
-          ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+          String errMsg =  "cannot close the resource file" ;
+          _LOGGER.fatal(errMsg, e) ;
+          throw new RuntimeException(errMsg, e) ;
         }
     }
   }

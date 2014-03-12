@@ -515,8 +515,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     catch(IOException ex)
     {
       String errMsg = "cannot save the makefile" ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      _LOGGER.fatal(errMsg, ex) ;
+      throw new RuntimeException(errMsg, ex) ;
     }
   }
   
@@ -578,17 +578,15 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
       }
       catch(IOException ex)
       {
-        String errMsg = RamsesException.formatRethrowMessage("could not build generated code",
-                                                             ex) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        String errMsg = "could not build generated code" ;
+        _LOGGER.fatal(errMsg, ex) ;
+        throw new RuntimeException(errMsg, ex) ;
       }
       catch(InterruptedException ex)
       {
-        String errMsg = RamsesException.formatRethrowMessage("could not build generated code",
-                                                             ex) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        String errMsg = "could not build generated code" ;
+        _LOGGER.fatal(errMsg, ex) ;
+        throw new RuntimeException(errMsg, ex) ;
       }
     }
     else

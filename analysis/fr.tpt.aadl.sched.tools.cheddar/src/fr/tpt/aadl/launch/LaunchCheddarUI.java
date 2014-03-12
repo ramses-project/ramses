@@ -4,14 +4,12 @@ import java.io.File ;
 import java.io.IOException ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.Element ;
 import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.instance.SystemOperationMode ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
-import org.osate.ui.actions.AbstractInstanceOrDeclarativeModelReadOnlyAction ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
@@ -43,6 +41,9 @@ public class LaunchCheddarUI implements Analyzer
                                       SystemInstance root,
                                       SystemOperationMode som)
   */
+  
+  private static Logger _LOGGER = Logger.getLogger(LaunchCheddarUI.class) ;
+  
   @Override
   public void performAnalysis(SystemInstance systemInstance,
                             File outputDir,
@@ -58,15 +59,17 @@ public class LaunchCheddarUI implements Analyzer
       cheddar.createCheddarModel() ;
       cheddar.exportAndSimule(true) ;
     }
-    catch(IOException e1)
+    catch(IOException e)
     {
-      System.err
-            .println("Simulation aborted (no generated file) : bad xml model") ;
-      e1.printStackTrace() ;
+      String errMsg = "Simulation aborted (no generated file) : bad xml model" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
     catch(Exception e2)
     {
-      e2.printStackTrace() ;
+      String errMsg = RamsesException.formatRethrowMessage("Simulation aborted (no generated file) : bad xml model", e2) ;
+      _LOGGER.fatal(errMsg, e2) ;
+      throw new AnalysisException(errMsg, e2) ;
     }
   }
   

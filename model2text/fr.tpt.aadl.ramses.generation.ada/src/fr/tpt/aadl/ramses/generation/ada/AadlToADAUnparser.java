@@ -237,7 +237,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		  }
 		  return bindings;
 	  }
-	public void saveGeneratedFilesContent(File targetDirectory) throws GenerationException
+	public void saveGeneratedFilesContent(File targetDirectory)
 	{
 		_gtypesHeaderCode.addOutputNewline("\nend Gtypes;\n") ;
 		_gtypesImplCode.addOutputNewline("\nend Gtypes;\n") ;
@@ -333,8 +333,9 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		}
 		catch(IOException e)
 		{
-		  String msg = "cannot save the generated files" ;
-      throw new GenerationException(msg, e) ;
+		  String errMsg = "cannot save the generated files" ;
+		  _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
 		}
 	}
 
@@ -372,7 +373,6 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	}
 	
   private void saveFile(FileWriter file, String... content)
-                                                      throws GenerationException
   {
     BufferedWriter output ;
     StringBuilder sb = new StringBuilder() ;
@@ -392,8 +392,9 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
     }
     catch(IOException e)
     {
-      String msg = "cannot save the generated files" ;
-      throw new GenerationException(msg, e) ;
+      String errMsg = "cannot save the generated files" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
 	}
 

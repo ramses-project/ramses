@@ -146,8 +146,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
     catch(IOException e)
     {
-      String msg = "cannot save the generated files" ;
-      throw new GenerationException(msg, e) ;
+      String errMsg = "cannot save the generated files" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
   }
   
@@ -592,10 +593,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
     catch(IOException e)
     {
-      String errMsg =  RamsesException.formatRethrowMessage("cannot save the generated files for \'" +
-                                                            process.getName() + '\'', e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      String errMsg = "cannot save the generated files for \'" +
+                                                            process.getName() + '\'' ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
   }
   

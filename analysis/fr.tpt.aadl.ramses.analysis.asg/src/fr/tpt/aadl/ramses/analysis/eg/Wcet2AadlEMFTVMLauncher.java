@@ -13,7 +13,6 @@ import org.eclipse.m2m.atl.emftvm.Metamodel ;
 import org.eclipse.m2m.atl.emftvm.Model ;
 
 import fr.tpt.aadl.ramses.control.atl.Aadl2AadlEMFTVMLauncher ;
-import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
@@ -54,8 +53,7 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	public Resource doTransformation(List<File> transformationFileList,
 			Resource inputResource, String outputDirPathName,
 			String resourceSuffix)
-			throws TransformationException {
-		
+	{
 		ResourceSet rs = inputResource.getResourceSet();
 		
 		Resource wcetResource = wcetModel.eResource();
@@ -77,5 +75,4 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		return super.doTransformation(transformationFileList, inputResource,
 				outputDirPathName, resourceSuffix);
 	}
-	
 }

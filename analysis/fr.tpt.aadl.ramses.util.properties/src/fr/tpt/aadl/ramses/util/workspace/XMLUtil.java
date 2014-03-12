@@ -32,9 +32,6 @@ import org.jdom.Element ;
 import org.jdom.output.Format ;
 import org.jdom.output.XMLOutputter ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
-
 public class XMLUtil
 {
   private static Logger _LOGGER = Logger.getLogger(XMLUtil.class) ;
@@ -50,9 +47,9 @@ public class XMLUtil
     }
     catch(IOException e)
     {
-      String errMsg =  RamsesException.formatRethrowMessage("xml output has failed", e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      String errMsg =  "xml output has failed" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
   }
 
@@ -79,9 +76,9 @@ public class XMLUtil
     }
     catch(IOException e)
     {
-      String errMsg =  RamsesException.formatRethrowMessage("xml save has failed", e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      String errMsg =  "xml save has failed" ;
+      _LOGGER.fatal(errMsg, e) ;
+      throw new RuntimeException(errMsg, e) ;
     }
   }
 
