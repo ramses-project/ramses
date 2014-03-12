@@ -22,8 +22,8 @@
 package fr.tpt.aadl.ramses.generation.launcher.adaravenscar;
 
 import fr.tpt.aadl.ramses.control.atl.Aadl2ConstraintValidationEMFTVMLauncher ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 
 public class AadlAdaRavenscarValidation extends Aadl2ConstraintValidationEMFTVMLauncher {
 

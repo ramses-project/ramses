@@ -19,24 +19,25 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.config;
 
-public class ConfigurationException extends Exception
+public enum ConfigStatus
 {
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L ;
-  public ConfigStatus status ;
+  SET ("data set", ""),
+  NOT_FOUND ("missing data", ""),
+  NOT_VALID ("data not valid", "")
+  ;
   
-  public ConfigurationException (ConfigStatus status)
+  public String cardinal ; 
+  public String msg ;
+  
+  private ConfigStatus(String cardinal, String msg)
   {
-    this.status = status ; 
+    this.msg = msg ;
   }
   
-  @Override
-  public String getMessage()
+  private ConfigStatus()
   {
-    return "configuration failed: " + status.msg + " (" + status.cardinal + ')' ;
+    this.msg  = "" ;
   }
 }

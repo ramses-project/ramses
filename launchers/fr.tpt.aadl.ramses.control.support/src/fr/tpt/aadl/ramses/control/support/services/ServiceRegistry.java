@@ -30,11 +30,11 @@ import org.osate.annexsupport.AnnexParser ;
 import org.osate.annexsupport.AnnexResolver ;
 import org.osate.annexsupport.AnnexUnparser ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneAnalysisErrorReporterFactory ;

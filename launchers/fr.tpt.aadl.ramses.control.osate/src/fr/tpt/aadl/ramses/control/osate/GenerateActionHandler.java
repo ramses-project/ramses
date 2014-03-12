@@ -60,13 +60,13 @@ import org.osate.ui.dialogs.Dialog ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
-import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
 
 public class GenerateActionHandler extends AbstractHandler {
 

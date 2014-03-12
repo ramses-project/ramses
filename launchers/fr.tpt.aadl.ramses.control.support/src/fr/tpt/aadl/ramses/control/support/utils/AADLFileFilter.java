@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2014 TELECOM ParisTech and CNRS
+ * Copyright © 2012 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -19,29 +19,17 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.utils ;
 
-public class ParseException extends RamsesException 
+import java.io.File ;
+import java.io.FilenameFilter ;
+
+public class AADLFileFilter implements FilenameFilter
 {
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 6961916184290232374L ;
-  
-  public ParseException(String errorMessage)
+  public boolean accept(File dir,
+                        String name)
   {
-    super(errorMessage) ;
-  }
-  
-  /**
-   * Rethrow encapsulation
-   * 
-   * @param errorMessage the encapsulating message
-   * @param e the exception been encapsulated
-   */
-  public ParseException(String errorMessage, Throwable e)
-  {
-    super(errorMessage, e) ;
-    _encapsMessage = errorMessage ;
+    return name.endsWith(Names.FILE_EXTENSIONS[0]) ||
+          name.endsWith(Names.FILE_EXTENSIONS[1]) ;
   }
 }

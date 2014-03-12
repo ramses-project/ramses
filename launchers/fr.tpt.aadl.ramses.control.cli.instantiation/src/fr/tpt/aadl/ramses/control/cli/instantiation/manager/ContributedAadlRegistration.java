@@ -28,8 +28,8 @@ import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
-import fr.tpt.aadl.ramses.control.support.AbstractPredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.ParseException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AbstractPredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 
 public class ContributedAadlRegistration extends AbstractPredefinedAadlModelManager
 { 
@@ -69,7 +69,7 @@ public class ContributedAadlRegistration extends AbstractPredefinedAadlModelMana
   }
 
   /**
-   * @see fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager#getPredefinedResources()
+   * @see fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager#getPredefinedResources()
    */
   @Override
   public List<Resource> getPredefinedResources()

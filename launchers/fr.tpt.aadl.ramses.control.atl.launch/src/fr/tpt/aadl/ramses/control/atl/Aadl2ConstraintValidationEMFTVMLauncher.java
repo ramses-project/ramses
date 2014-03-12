@@ -36,9 +36,9 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
 import org.eclipse.m2m.atl.emftvm.Metamodel ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 

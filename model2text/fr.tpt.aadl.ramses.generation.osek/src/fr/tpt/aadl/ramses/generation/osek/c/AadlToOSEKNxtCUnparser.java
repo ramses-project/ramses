@@ -34,12 +34,12 @@ import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.control.support.FileUtils ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.utils.FileUtils ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Alarm ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Alarm.Action ;

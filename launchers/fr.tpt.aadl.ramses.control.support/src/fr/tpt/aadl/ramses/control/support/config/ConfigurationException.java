@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2014 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -19,17 +19,24 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.support ;
+package fr.tpt.aadl.ramses.control.support.config;
 
-import java.io.File ;
-import java.io.FilenameFilter ;
-
-public class AADLFileFilter implements FilenameFilter
+public class ConfigurationException extends Exception
 {
-  public boolean accept(File dir,
-                        String name)
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L ;
+  public ConfigStatus status ;
+  
+  public ConfigurationException (ConfigStatus status)
   {
-    return name.endsWith(Names.FILE_EXTENSIONS[0]) ||
-          name.endsWith(Names.FILE_EXTENSIONS[1]) ;
+    this.status = status ; 
+  }
+  
+  @Override
+  public String getMessage()
+  {
+    return "configuration failed: " + status.msg + " (" + status.cardinal + ')' ;
   }
 }

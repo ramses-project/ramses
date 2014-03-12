@@ -22,12 +22,12 @@ import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGModels ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
 
 public class EGAnalyzer extends AbstractAnalyzer

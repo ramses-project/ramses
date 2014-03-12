@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.instantiation;
 
 import java.util.List;
 

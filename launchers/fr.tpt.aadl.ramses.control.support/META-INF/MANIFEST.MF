@@ -8,10 +8,13 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.tpt.aadl.ramses.control.support,
  fr.tpt.aadl.ramses.control.support.analysis,
+ fr.tpt.aadl.ramses.control.support.config,
  fr.tpt.aadl.ramses.control.support.generator,
+ fr.tpt.aadl.ramses.control.support.instantiation,
  fr.tpt.aadl.ramses.control.support.plugins,
  fr.tpt.aadl.ramses.control.support.reporters,
  fr.tpt.aadl.ramses.control.support.services,
+ fr.tpt.aadl.ramses.control.support.utils,
  fr.tpt.aadl.ramses.control.workflow,
  fr.tpt.aadl.ramses.control.workflow.impl,
  fr.tpt.aadl.ramses.control.workflow.util,

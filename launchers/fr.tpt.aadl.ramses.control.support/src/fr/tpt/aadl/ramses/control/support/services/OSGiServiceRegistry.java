@@ -39,16 +39,16 @@ import org.osate.annexsupport.AnnexResolverRegistry ;
 import org.osate.annexsupport.AnnexUnparser ;
 import org.osate.annexsupport.AnnexUnparserRegistry ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
-import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
-import fr.tpt.aadl.ramses.control.support.Names ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalyzerFactory ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class OSGiServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {

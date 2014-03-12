@@ -1,4 +1,6 @@
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.generator;
+
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 
 public class TransformationException extends RamsesException
 {

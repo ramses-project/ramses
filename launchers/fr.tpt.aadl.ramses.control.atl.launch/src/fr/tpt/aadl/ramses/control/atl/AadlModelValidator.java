@@ -8,10 +8,10 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.support.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 
 public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
 

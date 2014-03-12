@@ -55,9 +55,9 @@ import org.osate.ui.dialogs.Dialog ;
 import org.osate.utils.FileUtils ;
 
 import fr.tpt.aadl.ramses.control.osate.WorkbenchUtils ;
-import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;

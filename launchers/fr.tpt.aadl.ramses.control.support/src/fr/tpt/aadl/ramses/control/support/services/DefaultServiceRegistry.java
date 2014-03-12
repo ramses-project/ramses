@@ -28,10 +28,10 @@ import org.osate.annexsupport.AnnexParser ;
 import org.osate.annexsupport.AnnexResolver ;
 import org.osate.annexsupport.AnnexUnparser ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 
 public class DefaultServiceRegistry extends AbstractServiceRegistry implements ServiceRegistry
 {

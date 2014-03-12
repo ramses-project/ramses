@@ -35,11 +35,11 @@ import org.osate.ba.AadlBaUnParserAction ;
 
 import fr.tpt.aadl.launch.AADLInspectorSchedulingAnalysis ;
 import fr.tpt.aadl.ramses.analysis.eg.EGAnalyzer ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.generator.GeneratorFactory ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.AbstractServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.generation.ada.annex.behavior.AadlBaToADAUnparserAction ;

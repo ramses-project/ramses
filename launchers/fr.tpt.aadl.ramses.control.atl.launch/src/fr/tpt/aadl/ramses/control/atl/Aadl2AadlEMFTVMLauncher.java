@@ -34,11 +34,11 @@ import org.eclipse.m2m.atl.emftvm.ExecEnv ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
 import org.osate.aadl2.util.Aadl2Util ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
-import fr.tpt.aadl.ramses.control.support.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 

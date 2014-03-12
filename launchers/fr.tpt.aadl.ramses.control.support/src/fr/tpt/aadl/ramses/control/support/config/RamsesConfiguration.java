@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.config;
 
 import java.io.File ;
 import java.io.FileNotFoundException ;
@@ -11,8 +11,11 @@ import org.osate.utils.FileUtils ;
 
 import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AbstractPredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.utils.EnvUtils ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class RamsesConfiguration
 {

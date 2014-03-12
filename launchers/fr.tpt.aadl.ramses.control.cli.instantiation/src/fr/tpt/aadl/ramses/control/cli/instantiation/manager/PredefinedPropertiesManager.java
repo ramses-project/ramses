@@ -39,9 +39,9 @@ import org.osate.aadl2.PropertyConstant ;
 import org.osate.aadl2.PropertySet ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
-import fr.tpt.aadl.ramses.control.support.AADLFileFilter ;
-import fr.tpt.aadl.ramses.control.support.Names ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.utils.AADLFileFilter ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class PredefinedPropertiesManager
 {

@@ -10,7 +10,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin ;
 import org.osgi.framework.Bundle ;
 import org.osgi.framework.BundleContext ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 @SuppressWarnings("restriction")

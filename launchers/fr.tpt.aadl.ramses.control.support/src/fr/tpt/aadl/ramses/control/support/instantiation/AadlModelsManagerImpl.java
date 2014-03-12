@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.instantiation;
 
 import java.io.BufferedWriter ;
 import java.io.File ;
@@ -20,6 +20,8 @@ import org.osate.aadl2.instantiation.InstantiateModel ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
+
+import fr.tpt.aadl.ramses.control.support.generator.Aadl2StandaloneUnparser ;
 
 
 public class AadlModelsManagerImpl implements AadlModelInstantiatior {

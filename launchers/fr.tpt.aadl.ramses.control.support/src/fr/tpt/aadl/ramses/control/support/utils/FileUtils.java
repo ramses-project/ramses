@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

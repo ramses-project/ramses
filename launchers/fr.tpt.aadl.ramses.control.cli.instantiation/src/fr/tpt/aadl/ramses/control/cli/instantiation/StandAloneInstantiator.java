@@ -43,9 +43,9 @@ import org.osate.xtext.aadl2.properties.util.EMFIndexRetrieval ;
 import com.google.inject.Inject ;
 import com.google.inject.Injector ;
 
-import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
-import fr.tpt.aadl.ramses.control.support.AadlResourceValidator ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelsManagerImpl ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlResourceValidator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 

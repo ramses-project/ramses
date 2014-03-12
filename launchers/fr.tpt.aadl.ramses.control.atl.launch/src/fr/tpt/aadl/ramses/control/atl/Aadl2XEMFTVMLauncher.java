@@ -63,11 +63,11 @@ import org.osate.ba.aadlba.AadlBaPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
-import fr.tpt.aadl.ramses.control.support.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 

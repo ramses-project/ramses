@@ -24,8 +24,8 @@ package fr.tpt.aadl.ramses.generation.pok ;
 import java.util.Map;
 
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 
 public class AadlArinc653Transformation extends
                                        AadlToTargetSpecificAadl

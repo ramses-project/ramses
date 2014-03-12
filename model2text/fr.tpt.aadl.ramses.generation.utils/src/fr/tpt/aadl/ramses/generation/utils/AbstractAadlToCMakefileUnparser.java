@@ -2,7 +2,7 @@ package fr.tpt.aadl.ramses.generation.utils;
 
 import java.io.File ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 
 public abstract class AbstractAadlToCMakefileUnparser extends AbstractMakefileUnparser 
 {

@@ -19,7 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.workflow;
 
 import java.util.ArrayList;
 import java.util.List;

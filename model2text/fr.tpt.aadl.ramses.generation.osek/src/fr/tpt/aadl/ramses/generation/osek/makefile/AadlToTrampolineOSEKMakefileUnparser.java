@@ -31,10 +31,10 @@ import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 
-import fr.tpt.aadl.ramses.control.support.FileUtils ;
-import fr.tpt.aadl.ramses.control.support.Names ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.reporters.LogProcessTraceDisplay ;
+import fr.tpt.aadl.ramses.control.support.utils.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.generation.osek.ast.OIL ;
 import fr.tpt.aadl.ramses.generation.utils.AbstractAadlToCMakefileUnparser ;
 

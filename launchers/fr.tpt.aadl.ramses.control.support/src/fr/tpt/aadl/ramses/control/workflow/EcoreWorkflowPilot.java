@@ -19,7 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.workflow;
 
 import java.io.File ;
 import java.io.FileNotFoundException ;
@@ -34,18 +34,6 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.emf.ecore.util.Diagnostician ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
-
-import fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis ;
-import fr.tpt.aadl.ramses.control.workflow.Analysis ;
-import fr.tpt.aadl.ramses.control.workflow.AnalysisElement ;
-import fr.tpt.aadl.ramses.control.workflow.Conjunction ;
-import fr.tpt.aadl.ramses.control.workflow.Disjunction ;
-import fr.tpt.aadl.ramses.control.workflow.Generation ;
-import fr.tpt.aadl.ramses.control.workflow.Loop ;
-import fr.tpt.aadl.ramses.control.workflow.Transformation ;
-import fr.tpt.aadl.ramses.control.workflow.Unparse ;
-import fr.tpt.aadl.ramses.control.workflow.Workflow ;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
 
 /**
  * This class is an implementation of the WorkflowPilot for workflows

@@ -29,7 +29,7 @@ import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 
-import fr.tpt.aadl.ramses.control.support.AbstractPredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AbstractPredefinedAadlModelManager ;
 
 /**
  * This class is registers statically the predefined resources needed for RAMSES.
@@ -39,7 +39,7 @@ public class ContributedAadlRegistration extends AbstractPredefinedAadlModelMana
 { 
 
   /**
-   * @see fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager#setPredefinedResourcesDir(File)
+   * @see fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager#setPredefinedResourcesDir(File)
    */
   @Override
   public void parsePredefinedAadlModels()
@@ -49,7 +49,7 @@ public class ContributedAadlRegistration extends AbstractPredefinedAadlModelMana
   }
 
   /**
-   * @see fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager#getPredefinedAadlResourceDir()
+   * @see fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager#getPredefinedAadlResourceDir()
    */
   @Override
   public List<Resource> getPredefinedResources() {	  

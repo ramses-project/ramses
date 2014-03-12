@@ -27,8 +27,6 @@ import java.util.Map ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
 
-import fr.tpt.aadl.ramses.control.support.TransformationException ;
-
 
 public interface AadlToAadl
 {

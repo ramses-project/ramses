@@ -57,7 +57,7 @@
  *
  * @version $Id: AadlUnparser.java,v 1.100 2008-01-24 21:40:34 jseibel Exp $
  */
-package fr.tpt.aadl.ramses.control.support ;
+package fr.tpt.aadl.ramses.control.support.generator ;
 
 import java.io.ByteArrayInputStream ;
 import java.io.File ;

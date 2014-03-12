@@ -45,22 +45,22 @@ import com.martiansoftware.jsap.Switch ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.cli.instantiation.manager.ContributedAadlRegistration ;
-import fr.tpt.aadl.ramses.control.support.ConfigStatus ;
-import fr.tpt.aadl.ramses.control.support.ConfigurationException ;
-import fr.tpt.aadl.ramses.control.support.EcoreWorkflowPilot ;
-import fr.tpt.aadl.ramses.control.support.EnvUtils ;
-import fr.tpt.aadl.ramses.control.support.FileUtils ;
-import fr.tpt.aadl.ramses.control.support.Names ;
-import fr.tpt.aadl.ramses.control.support.ParseException ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.support.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.utils.EnvUtils ;
+import fr.tpt.aadl.ramses.control.support.utils.FileUtils ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
+import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
 
 /**
  * This class provides the main entry point of the Command Line 

@@ -50,19 +50,19 @@ import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
-import fr.tpt.aadl.ramses.control.support.Aadl2StandaloneUnparser ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.AadlModelsManagerImpl ;
-import fr.tpt.aadl.ramses.control.support.AbstractLoop ;
-import fr.tpt.aadl.ramses.control.support.TransformationException ;
-import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.generator.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 
 
 public class AadlTargetSpecificGenerator implements Generator

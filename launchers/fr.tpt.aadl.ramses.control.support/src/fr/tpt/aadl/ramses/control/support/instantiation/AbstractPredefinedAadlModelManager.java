@@ -19,11 +19,13 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.instantiation;
 
 import java.io.File ;
 
 import org.osate.utils.FileUtils ;
+
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public abstract class AbstractPredefinedAadlModelManager implements PredefinedAadlModelManager
 {

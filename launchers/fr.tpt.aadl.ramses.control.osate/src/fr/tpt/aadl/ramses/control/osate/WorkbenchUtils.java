@@ -23,8 +23,8 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.FileUtils ;
 
-import fr.tpt.aadl.ramses.control.support.Names ;
-import fr.tpt.aadl.ramses.control.support.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class WorkbenchUtils
 {

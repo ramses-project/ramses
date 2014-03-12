@@ -19,25 +19,31 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.control.support;
+package fr.tpt.aadl.ramses.control.support.instantiation;
 
-public enum ConfigStatus
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+
+public class ParseException extends RamsesException 
 {
-  SET ("data set", ""),
-  NOT_FOUND ("missing data", ""),
-  NOT_VALID ("data not valid", "")
-  ;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 6961916184290232374L ;
   
-  public String cardinal ; 
-  public String msg ;
-  
-  private ConfigStatus(String cardinal, String msg)
+  public ParseException(String errorMessage)
   {
-    this.msg = msg ;
+    super(errorMessage) ;
   }
   
-  private ConfigStatus()
+  /**
+   * Rethrow encapsulation
+   * 
+   * @param errorMessage the encapsulating message
+   * @param e the exception been encapsulated
+   */
+  public ParseException(String errorMessage, Throwable e)
   {
-    this.msg  = "" ;
+    super(errorMessage, e) ;
+    _encapsMessage = errorMessage ;
   }
 }

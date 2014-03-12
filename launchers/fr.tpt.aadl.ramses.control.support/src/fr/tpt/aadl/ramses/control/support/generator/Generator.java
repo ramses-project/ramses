@@ -28,10 +28,9 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
-import fr.tpt.aadl.ramses.control.support.TransformationException ;
-import fr.tpt.aadl.ramses.control.support.WorkflowPilot ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 
 
 public interface Generator extends NamedPlugin
