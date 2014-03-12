@@ -26,7 +26,7 @@ typedef struct periodic_delayed_context_t
   int writer_count; 			// writer tasks number
   int buffer_size;
   int hyperperiod;
-  component_instance_t writer_instances[]; // writer tasks data
+  component_instance_t * writer_instances; // writer tasks data
 } periodic_delayed_context_t;
 
 void Compute_CDW(int taskID, int  iteration_counter, periodic_delayed_context_t *context, int * CDW);
