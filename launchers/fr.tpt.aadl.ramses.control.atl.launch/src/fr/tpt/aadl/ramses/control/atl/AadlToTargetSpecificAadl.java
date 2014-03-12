@@ -30,10 +30,8 @@ import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.concurrent.Callable ;
-import java.util.concurrent.ExecutionException ;
 import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
-import java.util.concurrent.TimeoutException ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.resources.ResourcesPlugin ;
@@ -198,26 +196,12 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       {
         ft.get(10, TimeUnit.SECONDS) ;
       }
-      catch(InterruptedException e)
+      catch(Exception e) //catch InterruptedException &
+                                    // TimeoutException & ExecutionException
       {
-        String msg = "internal error" ;
-        _LOGGER.error(msg + " : " + e.getMessage()) ;
-        ServiceProvider.SYS_ERR_REP.error(msg, true) ;
-        // Nothing to do, just continue.
-      }
-      catch(ExecutionException e)
-      {
-        String msg = "internal error" ;
-        _LOGGER.error(msg + " : " + e.getMessage()) ;
-        ServiceProvider.SYS_ERR_REP.error(msg, true) ;
-        // Nothing to do, just continue.
-      }
-      catch(TimeoutException e)
-      {
-        String msg = "internal error" ;
-        _LOGGER.error(msg + " : " + e.getMessage()) ;
-        ServiceProvider.SYS_ERR_REP.error(msg, true) ;
-        // Nothing to do, just continue.
+       String errMsg = "internal error" ;
+        _LOGGER.fatal(errMsg, e) ;
+        throw new RuntimeException(errMsg, e) ;
       }
 
       ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
