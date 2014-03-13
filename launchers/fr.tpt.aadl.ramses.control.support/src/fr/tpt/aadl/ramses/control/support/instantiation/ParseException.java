@@ -44,6 +44,5 @@ public class ParseException extends RamsesException
   public ParseException(String errorMessage, Throwable e)
   {
     super(errorMessage, e) ;
-    _encapsMessage = errorMessage ;
   }
 }

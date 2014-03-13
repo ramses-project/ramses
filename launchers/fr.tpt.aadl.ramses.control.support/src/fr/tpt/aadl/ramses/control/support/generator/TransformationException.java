@@ -37,6 +37,6 @@ public class TransformationException extends RamsesException
   
   public TransformationException(String errorMessage, Throwable e)
   {
-    super(errorMessage) ;
+    super(errorMessage, e) ;
   }
 }

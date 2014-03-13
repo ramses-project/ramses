@@ -41,7 +41,6 @@ import org.osate.ba.aadlba.BehaviorActionBlock ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.SubprogramCallAction ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;

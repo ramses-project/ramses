@@ -32,6 +32,7 @@ import java.util.Map ;
 import java.util.concurrent.Callable ;
 import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
+import java.util.concurrent.TimeoutException ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.resources.ResourcesPlugin ;
@@ -196,10 +197,13 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       {
         ft.get(10, TimeUnit.SECONDS) ;
       }
-      catch(Exception e) //catch InterruptedException &
-                                    // TimeoutException & ExecutionException
+      catch(TimeoutException e)
       {
-       String errMsg = "internal error" ;
+        //Do nothing. Don't rethrow nor log: validation may never end.
+      }
+      catch(Exception e) //catch InterruptedException & ExecutionException
+      {
+        String errMsg = "internal error" ;
         _LOGGER.fatal(errMsg, e) ;
         throw new RuntimeException(errMsg, e) ;
       }

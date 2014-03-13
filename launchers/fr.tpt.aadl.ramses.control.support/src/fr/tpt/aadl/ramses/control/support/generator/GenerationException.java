@@ -25,7 +25,6 @@ import fr.tpt.aadl.ramses.control.support.RamsesException ;
 
 public class GenerationException extends RamsesException
 {
-
   /**
    * 
    */
@@ -38,6 +37,6 @@ public class GenerationException extends RamsesException
   
   public GenerationException(String errorMessage, Throwable e)
   {
-    super(errorMessage) ;
+    super(errorMessage, e) ;
   }
 }

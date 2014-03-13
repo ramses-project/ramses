@@ -25,12 +25,11 @@ import fr.tpt.aadl.ramses.control.support.RamsesException ;
 
 public class AnalysisException extends RamsesException
 {
-
   /**
-   *
+   * 
    */
-  private static final long serialVersionUID = 1L ;
-  
+  private static final long serialVersionUID = -3971969151173072055L ;
+
   public AnalysisException(String errorMessage)
   {
     super(errorMessage) ;
