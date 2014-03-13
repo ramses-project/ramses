@@ -453,7 +453,9 @@ public class AadlTargetSpecificGenerator implements Generator
   
   private void doLoop(AbstractLoop l,AnalysisErrorReporterManager errManager,
                       WorkflowPilot xmlPilot, File outputDir,
-                      IProgressMonitor monitor) throws AnalysisException, TransformationException
+                      IProgressMonitor monitor) throws AnalysisException,
+                                                       TransformationException,
+                                                       GenerationException
   {
     AbstractLoop.AbstractAnalysis a = l.getAnalysis();
     final String inputId = l.getInputModelIdentifier();
@@ -465,17 +467,11 @@ public class AadlTargetSpecificGenerator implements Generator
       loopIteration++;
       String msg = "Start loop iteration = " + loopIteration ;
       _LOGGER.trace(msg);
-      try
+      
+      doTransformation(moduleList,inputId,outputId,outputDir);
+      if (isValidLoopIteration(a,errManager,xmlPilot,outputDir,outputId,monitor))
       {
-        doTransformation(moduleList,inputId,outputId,outputDir);
-        if (isValidLoopIteration(a,errManager,xmlPilot,outputDir,outputId,monitor))
-        {
-          break;
-        }
-      }
-      catch(GenerationException e)
-      {
-        e.printStackTrace();
+        break;
       }
     }
   }
