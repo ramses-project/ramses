@@ -61,7 +61,7 @@ public interface SystemErrReporter
    * Show the delayed errors and warnings that don't abort RAMSES.
    * Do nothing if there is not any delayed error or warning.
    */
-  public void displayDelayedErrors() ;
+//  public void displayDelayedErrors() ;
   
   /**
    * Returns {@code true} if the error reporter has delayed errors to be printed.
@@ -73,9 +73,18 @@ public interface SystemErrReporter
   public boolean hasDelayedErrors() ;
   
   /**
-   * Report an abortion on AADL errors (parsing, etc.).
+   * Returns the number of errors.
    * 
-   * @param msg the abortion message
+   * @return the number of errors
    */
-  public void abortOnAadlErrors(String msg) ;
+  public int getNbErrors() ;
+  
+  /**
+   * the number of warnings.
+   * 
+   * @return the number of warnings
+   */
+  public int getNbWarnings() ;
+  
+  public String formatDelayedErrors() ;
 }

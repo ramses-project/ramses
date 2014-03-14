@@ -142,7 +142,6 @@ public class ToolSuiteLauncherCommand
       if(helpOnly)
       {
         printHelp(jsap, args);
-        System.exit(0) ; 
       }
       else
       {
@@ -165,16 +164,18 @@ public class ToolSuiteLauncherCommand
           {
             generation(options) ;
           }
+          
+          if(ServiceProvider.SYS_ERR_REP.hasDelayedErrors())
+          {
+            // No use because RAMSES CLI does not delayed error reporting.
+          }
         }
-      
-        System.exit(0);
       }
     }
     catch(Exception ex)
     {
-      String msg = "while setting up RAMSES" ;
-      _logger.fatal(msg, ex);
-      ServiceProvider.SYS_ERR_REP.fatal(msg, ex);
+      _logger.fatal(ex);
+      ServiceProvider.SYS_ERR_REP.fatal("", ex);
       System.exit(-1);
     }
   }

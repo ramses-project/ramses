@@ -47,7 +47,7 @@ public class ToolSuiteLauncher
     try
     {
       SysErrReporter4Cli errReporter = new SysErrReporter4Cli(System.out,
-                                                  System.err) ;
+                                                              System.err) ;
       ServiceProvider.SYS_ERR_REP = errReporter ;
       
       ServiceRegistry registry = new StaticServiceRegistry() ;
@@ -56,10 +56,6 @@ public class ToolSuiteLauncher
       
       ToolSuiteLauncherCommand.main(args) ;
       
-      if(errReporter.hasDelayedErrors())
-      {
-        errReporter.displayDelayedErrors();
-      }
       LogManager.shutdown();
     }
     catch(Exception e) // The top level exception handler.

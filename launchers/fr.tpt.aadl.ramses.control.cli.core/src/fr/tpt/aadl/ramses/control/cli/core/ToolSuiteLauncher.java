@@ -173,10 +173,10 @@ public class ToolSuiteLauncher
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
-    _monitor.subTask("Parse the AADL models");
+    _monitor.subTask("Parse AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
     
-    _monitor.subTask("Instantiate the AADL models");
+    _monitor.subTask("Instantiate AADL models");
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
     
@@ -184,7 +184,7 @@ public class ToolSuiteLauncher
     {
       String msg = "instanciation has failed" ;
       _LOGGER.fatal(msg);
-      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      ServiceProvider.SYS_ERR_REP.fatal(msg);
       System.exit(-1);
     }
     
@@ -208,18 +208,18 @@ public class ToolSuiteLauncher
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
-    _monitor.subTask("Parse the AADL models");
+    _monitor.subTask("Parse AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
     
-    _monitor.subTask("Instantiate the AADL models");
+    _monitor.subTask("Instantiate AADL models");
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
     
     if(instance == null)
     {
-      String msg = "instanciation failed." ;
+      String msg = "instanciation has failed" ;
       _LOGGER.fatal(msg);
-      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      ServiceProvider.SYS_ERR_REP.fatal(msg);
       System.exit(-1);
     }
 
@@ -237,18 +237,18 @@ public class ToolSuiteLauncher
                        Map<String, Object> parameters)
                                                         throws AnalysisException
   {
-    _monitor.subTask("Parse the AADL models");
+    _monitor.subTask("Parse AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModelFiles) ;
     
-    _monitor.subTask("Instantiate the AADL models");
+    _monitor.subTask("Instantiate AADL models");
     SystemInstance instance =
           _instantiator.instantiate(aadlModels, systemToInstantiate) ;
     
     if(instance == null)
     {
-      String msg = "instanciation failed." ;
+      String msg = "instanciation has failed" ;
       _LOGGER.fatal(msg);
-      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      ServiceProvider.SYS_ERR_REP.fatal(msg);
       System.exit(-1);
     }
     this.performAnalysis(instance, parameters, config.getOutputDir()) ;
@@ -256,7 +256,7 @@ public class ToolSuiteLauncher
 
   void unparse(List<Resource> resources, RamsesConfiguration config) throws IOException 
   {
-    _monitor.subTask("Unparse the AADL resources");
+    _monitor.subTask("Unparse AADL resources");
     
     String fileName ;
     File outputFile ;

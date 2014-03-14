@@ -23,26 +23,45 @@ package fr.tpt.aadl.ramses.control.support.reporters;
 
 import java.util.LinkedList ;
 
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
+
 public abstract class AbstractSystemErrReporter implements SystemErrReporter
 {
   protected LinkedList<String> _delayedErrors = new LinkedList<String>() ;
   protected LinkedList<String> _delayedWarnings = new LinkedList<String>() ;
   
+  protected int _nbErrors = 0;
+  protected int _nbWarnings = 0;
+  
   protected String formatFatalMsg(String initialMsg, Throwable ex)
   {
     StringBuilder sb = new StringBuilder() ;
-    sb.append("<Fatal error> ");
+    sb.append("Abort on fatal error (see log file for more information): ");
     sb.append(initialMsg) ;
-    sb.append(":\n\n\t") ;
-    sb.append(ex.getMessage()) ;
+    sb.append(" (") ;
     
+    if(! ( ex.getMessage() == null ||
+           ex.getMessage().isEmpty() ||
+           "null".equals(ex.getMessage())
+         )
+      )
+    {
+      sb.append(ex.getMessage()) ;
+    }
+    else
+    {
+      sb.append(ex.getClass().getSimpleName()) ;
+    }
+    sb.append(')') ;
+
     return sb.toString() ;
   }
   
   protected String formatFatalMsg(String initialMsg)
   {
     // TODO to be implemented.
-    return "<Fatal error> " + initialMsg ;
+    return "Abort on fatal error (see log file for more information): " +
+            initialMsg ;
   }
   
   protected String formatErrorMsg(String initialMsg)
@@ -57,7 +76,8 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
     return "<Warning> " + initialMsg ;
   }
   
-  protected String formatDelayedErrors()
+  @Override
+  public String formatDelayedErrors()
   {
     if(!(_delayedErrors.isEmpty() && _delayedWarnings.isEmpty()))
     {
@@ -68,7 +88,11 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
       
       if(false == _delayedErrors.isEmpty())
       {
-        sb.append("\n\n\tErrors:\n\n");
+        sb.append(Names.NEW_LINE);
+        sb.append(Names.NEW_LINE);
+        sb.append("\tErrors:");
+        sb.append(Names.NEW_LINE);
+        sb.append(Names.NEW_LINE);
         for(String msg : _delayedErrors)
         {
           sb.append("\t_ ") ;
@@ -78,7 +102,11 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
       
       if(false == _delayedWarnings.isEmpty())
       {
-        sb.append("\n\n\tWarnings:\n\n");
+        sb.append(Names.NEW_LINE);
+        sb.append(Names.NEW_LINE);
+        sb.append("\tWarnings:");
+        sb.append(Names.NEW_LINE);
+        sb.append(Names.NEW_LINE);
         for(String msg : _delayedWarnings)
         {
           sb.append("\t_ ") ;
@@ -101,9 +129,15 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
            (false == _delayedWarnings.isEmpty()) ; 
   }
   
-  protected String formatAbortionOnAadlErrors(String initialMsg)
+  @Override
+  public int getNbErrors()
   {
-    // TODO : to be refined.
-    return initialMsg ;
+    return _nbErrors ;
+  }
+  
+  @Override
+  public int getNbWarnings()
+  {
+    return _nbWarnings ;
   }
 }

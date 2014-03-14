@@ -59,33 +59,25 @@ public class SysErrReporter4Cli extends AbstractSystemErrReporter
   @Override
   public void error(String msg, boolean isDelayed)
   {
+    _nbErrors++ ;
+    
     msg = super.formatErrorMsg(msg) ;
     
-    if(isDelayed)
-    {
-      _delayedErrors.add(msg) ;
-    }
-    else
-    {
-      _err.println(msg) ;
-    }
+    // Never delayed: better visibility when executing RAMSES CLI.
+    _err.println(msg) ;
   }
 
   @Override
   public void warning(String msg, boolean isDelayed)
   {
+    _nbWarnings++ ;
+    
     msg = super.formatWarningMsg(msg) ;
     
-    if(isDelayed)
-    {
-      _delayedWarnings.add(msg) ;
-    }
-    else
-    {
-      _err.println(msg) ;
-    }
+    // Never delayed: better visibility when executing RAMSES CLI.
+    _err.println(msg) ;
   }
-
+  /*
   @Override
   public void displayDelayedErrors()
   {
@@ -97,11 +89,5 @@ public class SysErrReporter4Cli extends AbstractSystemErrReporter
       _delayedWarnings.clear();
     }
   }
-
-  @Override
-  public void abortOnAadlErrors(String msg)
-  {
-    msg = super.formatAbortionOnAadlErrors(msg) ;
-    _output.println(msg) ;
-  }
+  */
 }

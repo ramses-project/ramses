@@ -273,7 +273,7 @@ public class GenerateActionHandler extends AbstractHandler {
               result = Status.OK_STATUS ;
               if(ServiceProvider.SYS_ERR_REP.hasDelayedErrors())
               {
-                ServiceProvider.SYS_ERR_REP.displayDelayedErrors();
+                // TODO SOMETHING !
               }
             }
             else

@@ -49,6 +49,8 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
   @Override
   public void error(String msg, boolean isDelayed)
   {
+    _nbErrors++ ;
+    
     msg = super.formatErrorMsg(msg) ;
     if(isDelayed)
     {
@@ -63,6 +65,8 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
   @Override
   public void warning(String msg, boolean isDelayed)
   {
+    _nbWarnings++ ;
+    
     msg = super.formatWarningMsg(msg) ;
     
     if(isDelayed)
@@ -75,6 +79,7 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
     }
   }
 
+  /*
   @Override
   public void displayDelayedErrors()
   {
@@ -94,14 +99,7 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
       }
     }
   }
-
-  @Override
-  public void abortOnAadlErrors(String msg)
-  {
-    msg = super.formatAbortionOnAadlErrors(msg) ;
-    openFatalErrorDialog(msg);
-  }
-  
+  */
   private void openFatalErrorDialog(String msg, Throwable e)
   {
     openDialog(IStatus.ERROR, msg, e);

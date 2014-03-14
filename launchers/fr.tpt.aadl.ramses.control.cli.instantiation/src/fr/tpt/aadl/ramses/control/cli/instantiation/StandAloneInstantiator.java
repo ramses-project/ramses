@@ -80,10 +80,10 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
     }
     catch(Exception e)
     {
-      String msg = RamsesException.formatRethrowMessage("Abort on initialization error.",
+      String msg = RamsesException.formatRethrowMessage("initialization error",
                                                         e);
       _LOGGER.fatal(msg, e);
-      ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+      ServiceProvider.SYS_ERR_REP.fatal(msg, e);
       java.lang.System.exit(-1) ;
     }
 
@@ -163,9 +163,9 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
       }
       else
       {
-        String msg = "Abort on parse error. Annex resolving is skiped" ;
+        String msg = "parse error. Note that annexes were not resolved" ;
         _LOGGER.fatal(msg);
-        ServiceProvider.SYS_ERR_REP.abortOnAadlErrors(msg);
+        ServiceProvider.SYS_ERR_REP.fatal(msg);
         java.lang.System.exit(-1) ;
       }
     }
