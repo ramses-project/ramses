@@ -1,24 +1,49 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.control.osate;
 
-import org.osate.ui.dialogs.Dialog ;
+import org.eclipse.core.runtime.IStatus ;
+import org.eclipse.core.runtime.Status ;
+import org.eclipse.ui.statushandlers.StatusManager ;
 
 import fr.tpt.aadl.ramses.control.support.reporters.AbstractSystemErrReporter ;
 
 public class SysErrReporter4Osate extends AbstractSystemErrReporter
 {
+  private static StatusManager _MANAGER = StatusManager.getManager() ;
+  
   @Override
   public void fatal(String msg,
                     Throwable ex)
   {
     msg = super.formatFatalMsg(msg, ex) ;
-    Dialog.showError("RAMSES Fatal error", msg);
+    openFatalErrorDialog(msg, ex);
   }
 
   @Override
   public void fatal(String msg)
   {
     msg = super.formatFatalMsg(msg) ;
-    Dialog.showError("RAMSES Fatal error", msg);
+    openFatalErrorDialog(msg);
   }
 
   @Override
@@ -31,7 +56,7 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
     }
     else
     {
-      Dialog.showError("RAMSES error", msg);
+      openErrorDialog(msg);
     }
   }
 
@@ -46,7 +71,7 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
     }
     else
     {
-      Dialog.showWarning("RAMSES warning", msg);
+      openWarningDialog(msg);
     }
   }
 
@@ -58,12 +83,12 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
     {
       if(_delayedErrors.isEmpty())
       {
-        Dialog.showWarning("RAMSES warning", msg);
+        openWarningDialog(msg);
         _delayedWarnings.clear();
       }
       else
       {
-        Dialog.showError("RAMSES error", msg);
+        openErrorDialog(msg);
         _delayedErrors.clear();
         _delayedWarnings.clear();
       }
@@ -74,6 +99,38 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
   public void abortOnAadlErrors(String msg)
   {
     msg = super.formatAbortionOnAadlErrors(msg) ;
-    Dialog.showInfo("RAMSES information", msg) ;
+    openFatalErrorDialog(msg);
+  }
+  
+  private void openFatalErrorDialog(String msg, Throwable e)
+  {
+    openDialog(IStatus.ERROR, msg, e);
+  }
+  
+  private void openFatalErrorDialog(String msg)
+  {
+    openDialog(IStatus.ERROR, msg);
+  }
+  
+  private void openErrorDialog(String msg)
+  {
+    openDialog(IStatus.ERROR, msg);
+  }
+  
+  private void openWarningDialog(String msg)
+  {
+    openDialog(IStatus.WARNING, msg);
+  }
+  
+  private void openDialog(int severity, String msg)
+  {
+    Status status = new Status(severity, Activator.PLUGIN_ID, msg) ;
+    _MANAGER.handle(status, StatusManager.BLOCK);
+  }
+  
+  private void openDialog(int severity, String msg, Throwable e)
+  {
+    Status status = new Status(severity, Activator.PLUGIN_ID, msg, e) ;
+    _MANAGER.handle(status, StatusManager.BLOCK);
   }
 }

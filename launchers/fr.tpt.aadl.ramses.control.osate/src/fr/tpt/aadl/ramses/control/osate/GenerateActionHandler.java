@@ -1,7 +1,7 @@
 /**
  * AADL-RAMSES
  * 
- * Copyright © 2012 TELECOM ParisTech and CNRS
+ * Copyright © 2014 TELECOM ParisTech and CNRS
  * 
  * TELECOM ParisTech/LTCI
  * 
@@ -22,8 +22,10 @@
 package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File ;
+import java.io.FileNotFoundException ;
 import java.util.Set ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.commands.AbstractHandler ;
 import org.eclipse.core.commands.ExecutionEvent ;
 import org.eclipse.core.commands.ExecutionException ;
@@ -52,17 +54,17 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.instantiation.InstantiateModel ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
-import org.osate.aadl2.modelsupport.errorreporting.InternalErrorReporter ;
-import org.osate.aadl2.modelsupport.errorreporting.LogInternalErrorReporter ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
-import org.osate.core.OsateCorePlugin ;
-import org.osate.ui.dialogs.Dialog ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
@@ -72,86 +74,84 @@ public class GenerateActionHandler extends AbstractHandler {
 
   private static final String _JOB_NAME = "RAMSES code generation" ;
   
-  protected static final InternalErrorReporter 
-                                             internalErrorLogger = 
-                                             new LogInternalErrorReporter
-                                             (OsateCorePlugin
-                                             .getDefault().getBundle());
+  private static Logger _LOGGER = Logger.getLogger(GenerateActionHandler.class) ;
 
   private static final String _OUTLINE_COMMAND_ID = 
                          "fr.tpt.aadl.ramses.control.osate.outline.generation" ;
 //  private static final String MENU_OR_BUTTON_COMMAND_ID = 
 //                        "fr.tpt.aadl.ramses.control.osate.instance.generation" ;
   
+  // Call init method to setup these attributes.
+  private boolean _isOutline = false ;
+  private RamsesConfiguration _config = null ;
+  private IProject _currentProject = null ;
+  private ExecutionEvent _event = null ;
+  
+  private SystemImplementation _sysImpl = null ;
+  //OR (init will not initialize both)
+  private SystemInstance _sysInst = null ;
+  
   @Override
-  public Object execute(final ExecutionEvent event) throws ExecutionException
+  public Object execute(ExecutionEvent event) throws ExecutionException
   {
-    IProject currentProject = WorkbenchUtils.getProjectResource() ;
-    
-    // Reinitialize the registry as include directors (eg projects directories),
-    // may be added or deleted.
-
-    // Fetch RAMSES configuration.
-    RamsesConfiguration config = null ;
     try
     {
-      config = RamsesPropertyPage.fetchProperties(currentProject) ;
-    }
-    catch (ConfigurationException ee)
-    {
-      if(RamsesPropertyPage.openPropertyDialog(currentProject))
+      init(event) ;
+      
+      // Fetch RAMSES configuration.
+      try
       {
-        try
+        _config = RamsesPropertyPage.fetchProperties(_currentProject) ;
+      }
+      catch (ConfigurationException ee)
+      {
+        if(RamsesPropertyPage.openPropertyDialog(_currentProject))
         {
           // Reload configuration.
-          config = RamsesPropertyPage.fetchProperties(currentProject) ;
+          _config = RamsesPropertyPage.fetchProperties(_currentProject) ;
         }
-        catch (Exception e)
+        else // User has canceled.
         {
-          Dialog.showError("Configuration Error",
-                           "Not enable to load RAMSES properties: \n\n" +
-                           e.getMessage());
-          
-          // Abort generation. Error has already been reported at this point.
           return null ;
         }
       }
-      else // User has canceled.
-      {
-        return null ;
-      }
     }
-    catch (CoreException e)
+    catch (Exception e) // Configuration and CoreException caught.
     {
-      Dialog.showError("Configuration Error",
-                       "Not enable to load RAMSES properties: \n\n" +
-                       e.getMessage());
-      
-      // Abort generation. Error has already been reported at this point.
+      String msg = "cannot load RAMSES properties" ;
+      _LOGGER.fatal(msg, e);
+      ServiceProvider.SYS_ERR_REP.fatal(msg, e);
+      // Abort generation.
       return null ;
     }
     
-    doGenerate(currentProject, event, config) ;
+    doGenerate() ;
     
-    if(ServiceProvider.SYS_ERR_REP.hasDelayedErrors())
-    {
-      ServiceProvider.SYS_ERR_REP.displayDelayedErrors();
-    }
-
     return null ;
   }
   
-  private SystemInstance getSelectedSystemInstance(ExecutionEvent event)
+  private void init(ExecutionEvent event) throws ConfigurationException
   {
-    ISelection s = HandlerUtil.getCurrentSelection(event) ;
-    IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;
-    Resource resource = OsateResourceUtil.getResource((IResource) node) ;
-    return (SystemInstance) resource.getContents().get(0) ;
+    _event = event ;
+    _isOutline = _OUTLINE_COMMAND_ID.equals(event.getCommand().getId()) ;
+    if(_isOutline)
+    {
+      _currentProject = WorkbenchUtils.getProjectByActiveEditor() ;
+      _sysImpl = getOutlineSelectedSystem(event) ;
+    }
+    else
+    {
+      ISelection s = HandlerUtil.getCurrentSelection(event) ;
+      IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;
+      _currentProject = node.getProject() ;
+      Resource resource = OsateResourceUtil.getResource((IResource) node) ;
+      // Fetch system implementation model.
+      _sysInst = (SystemInstance) resource.getContents().get(0) ;
+    }
   }
-  
-  private SystemImplementation getOutlineSelectedSystem(ExecutionEvent event,
-                                                        IEditorPart editor)
-                                                        throws Exception
+
+  private SystemImplementation getOutlineSelectedSystem(ExecutionEvent event)
+                                                        throws ConfigurationException
   {
     SystemImplementation result = null ;
     
@@ -177,27 +177,22 @@ public class GenerateActionHandler extends AbstractHandler {
         message = message + " - reason: " + InstantiateModel.getErrorMessage() +
                      "\nRefer to the help content and FAQ for more information";
       }
-      Dialog.showError("Model Instantiate", message);
       
-      throw e ;
+      ConfigStatus.NOT_VALID.msg = message ;
+      throw new ConfigurationException(ConfigStatus.NOT_VALID) ;
     }
     
     return result ;
   }
   
-  private void jobCore( IProject currentProject,
-                        ExecutionEvent event,
-                        RamsesConfiguration config,
-                        IProgressMonitor monitor
-                      ) throws Exception
+  private void jobCore(IProgressMonitor monitor) throws ConfigurationException,
+                                                        AnalysisException,
+                                                        GenerationException,
+                                                        TransformationException,
+                                                        FileNotFoundException,
+                                                        CoreException
   {
     monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
-    
-    SystemInstance sysInstance = null ;
-    
-    // Make sur that this xtext editor is saved.
-    IEditorPart editor = HandlerUtil.getActiveEditor(event) ;
-    WorkbenchUtils.saveEditor(editor);
     
     ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     AadlModelInstantiatior instantiator =sr.getModelInstantiatior() ;
@@ -206,28 +201,18 @@ public class GenerateActionHandler extends AbstractHandler {
     
     // For the executed command from outline menu,the system implementation 
     // root has to be instantiated prior to the code generation.
-    if(_OUTLINE_COMMAND_ID.equals(event.getCommand().getId()))
+    if(_isOutline)
     {
-      SystemImplementation sysImpl = null ;
-      // Fetch system implementation model.
-      sysImpl = getOutlineSelectedSystem(event, editor) ;
-      
       // Fetch instantiate the model.
-      sysInstance = instantiator.instantiate(sysImpl) ;
+      _sysInst = instantiator.instantiate(_sysImpl) ;
     }
-    else
-    {
-      // For executed command from the button or the RAMSES menu,system
-      // implementation has already been instantiated.
-      sysInstance = getSelectedSystemInstance(event) ;
-    }
+    // For executed command from the button or the RAMSES menu,system
+    // implementation has already been instantiated.
     
-    generate(currentProject, sysInstance, config, monitor);
+    generate(_currentProject, _sysInst, _config, monitor);
   }
   
-  private void doGenerate(final IProject currentProject,
-                          final ExecutionEvent event,
-                          final RamsesConfiguration config)
+  private void doGenerate()
   {
     Job job = new Job(_JOB_NAME)
     {
@@ -236,50 +221,71 @@ public class GenerateActionHandler extends AbstractHandler {
       {
         IStatus result = null ;
         
-        final TransactionalEditingDomain domain =
-              TransactionalEditingDomain.Registry.INSTANCE
-                    .getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
-        // We execute this command on the command stack because otherwise, we will
-        // not have write permissions on the editing domain.
-        RecordingCommand cmd = new RecordingCommand(domain)
-        {
-          protected void doExecute()
-          {
-            try
-            {
-              ProgressMonitorWrapper monitorWrapper = new ProgressMonitorWrapper(monitor) ;
-              jobCore(currentProject, event, config, monitorWrapper) ;
-              this.setLabel("OK");
-            }
-            catch(Exception e)
-            {
-              // TODO Manage with error reporter
-              e.printStackTrace() ;
-              this.setLabel("CANCEL");
-            }
-          }
-        } ;
-
         try
         {
+          final TransactionalEditingDomain domain = TransactionalEditingDomain.
+              Registry.INSTANCE.
+              getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
+          // We execute this command on the command stack because otherwise, we will
+          // not have write permissions on the editing domain.
+          RecordingCommandWithException cmd = new RecordingCommandWithException(domain)
+          {
+            protected void doExecute()
+            {
+              try
+              {
+                ProgressMonitorWrapper monitorWrapper = new ProgressMonitorWrapper(
+                                                                      monitor) ;
+                // Make sur that this xtext editor is saved.
+                IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
+                WorkbenchUtils.saveEditor(editor);
+                
+                jobCore(monitorWrapper) ;
+                this.setLabel("OK") ;
+              }
+              catch(Exception e)
+              {
+                _LOGGER.fatal(e) ;
+                // Don't report error to the user.
+                // Eclipse will open an error dialog thanks to the status.
+                this.setLabel("FATAL") ;
+                this.exceptionCaught = e ;
+              }
+            }
+          } ;
+
           ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
                                                                          null) ;
+          if("FATAL".equals(cmd.getLabel()))
+          {
+            result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                                "FATAL ERROR", cmd.exceptionCaught) ;
+          }
+          else
+          {
+            // Don't show error if any exception has been raised: escape side effects.
+            if("OK".equals(cmd.getLabel()))
+            {
+              result = Status.OK_STATUS ;
+              if(ServiceProvider.SYS_ERR_REP.hasDelayedErrors())
+              {
+                ServiceProvider.SYS_ERR_REP.displayDelayedErrors();
+              }
+            }
+            else
+            {
+              result = Status.CANCEL_STATUS ;
+            }
+          }
         }
         catch(Exception e)
         {
-          // TODO Manage with error reporter
-          e.printStackTrace() ;
-          result = Status.CANCEL_STATUS ;
+          _LOGGER.fatal(e);
+          result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "FATAL ERROR", e) ;
         }
         finally
         {
           HookAccessImpl.cleanupTransformationTrace() ;
-        }
-        
-        if(result == null)
-        {
-          result = ("OK".equals(cmd.getLabel())) ? Status.OK_STATUS :
-                                                   Status.CANCEL_STATUS ; 
         }
         
         return result ;
@@ -293,66 +299,65 @@ public class GenerateActionHandler extends AbstractHandler {
   private void generate(IProject currentProject,
                         SystemInstance sinst,
                         RamsesConfiguration config,
-                        IProgressMonitor monitor)
-                        throws Exception
+                        IProgressMonitor monitor) throws AnalysisException,
+                                                         GenerationException,
+                                                         TransformationException,
+                                                         FileNotFoundException,
+                                                         CoreException
   {
-    try
+    ServiceRegistry registry;
+    registry = ServiceProvider.getServiceRegistry() ;
+    Generator generator = registry.getGenerator(config.getTargetId()) ;
+    
+    SystemImplementation sysImpl = sinst.getSystemImplementation() ;
+    
+    IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+    
+    // look for a workflow file
+    Resource r = sysImpl.eResource();
+    String s = r.getURI().segment(1);
+    File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
+    String workflow = GenerateActionUtils.findWorkflow(rootDir);
+    
+    AnalysisErrorReporterManager errReporter = 
+                              WorkbenchUtils.getAnalysisErrReporterManager() ;
+    
+    // Reinitialize the registry as include directors (eg projects directories),
+    // may be added or deleted.
+    Set<File> tmp = WorkbenchUtils.getIncludeDirs(currentProject) ;
+    File[] includeDirs = new File[tmp.size()] ;
+    tmp.toArray(includeDirs) ;
+    
+    if(workflow==null)
+      generator.generate(sinst, 
+                         config.getRuntimePath(),
+                         config.getOutputDir(),
+                         includeDirs,
+                         errReporter,
+                         monitor) ;
+    else
     {
-      ServiceRegistry registry;
-      registry = ServiceProvider.getServiceRegistry() ;
-      Generator generator = registry.getGenerator(config.getTargetId()) ;
-      
-      SystemImplementation sysImpl = sinst.getSystemImplementation() ;
-      
-      IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-      
-      // look for a workflow file
-      Resource r = sysImpl.eResource();
-      String s = r.getURI().segment(1);
-      File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
-      String workflow = GenerateActionUtils.findWorkflow(rootDir);
-      
-      AnalysisErrorReporterManager errReporter = 
-                                WorkbenchUtils.getAnalysisErrReporterManager() ;
-      
-      Set<File> tmp = WorkbenchUtils.getIncludeDirs(currentProject) ;
-      File[] includeDirs = new File[tmp.size()] ;
-      tmp.toArray(includeDirs) ;
-      
-      if(workflow==null)
-        generator.generate(sinst, 
-                           config.getRuntimePath(),
-                           config.getOutputDir(),
-                           includeDirs,
-                           errReporter,
-                           monitor) ;
-      else
-      {
-        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
-        generator.generateWorkflow(sinst,
-                                   xmlPilot,
-                                   config.getRuntimePath(),
-                                   config.getOutputDir(),
-                                   includeDirs,
-                                   errReporter,
-                                   monitor);
-      }
-      
-      ResourcesPlugin.getWorkspace().getRoot().
-      refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); 
+      EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
+      generator.generateWorkflow(sinst,
+                                 xmlPilot,
+                                 config.getRuntimePath(),
+                                 config.getOutputDir(),
+                                 includeDirs,
+                                 errReporter,
+                                 monitor);
     }
-    catch (UnsupportedOperationException uoe)
-    {
-      Dialog.showError("Code Generation", "Operation is not supported:\n" +
-                       uoe.getMessage());
-      throw uoe ;
-    }
-    catch (Exception other)
-    {
-      other.printStackTrace();
-      Dialog.showError("Code Generation", "Error when generating code:\n" +
-                       other.getMessage());
-      throw other ;
-    }
+    
+    ResourcesPlugin.getWorkspace().getRoot().
+    refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); 
   }
+}
+
+abstract class RecordingCommandWithException extends RecordingCommand
+{
+  public RecordingCommandWithException(TransactionalEditingDomain domain)
+  {
+    super(domain) ;
+  }
+
+  public Throwable exceptionCaught = null ;
 }

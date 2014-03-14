@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File ;
@@ -8,6 +29,8 @@ import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IWorkspaceRoot ;
 import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
+import org.eclipse.jface.viewers.ISelection ;
+import org.eclipse.jface.viewers.IStructuredSelection ;
 import org.eclipse.swt.SWT ;
 import org.eclipse.swt.widgets.Display ;
 import org.eclipse.swt.widgets.Shell ;
@@ -23,6 +46,8 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.FileUtils ;
 
+import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
@@ -49,7 +74,32 @@ public class WorkbenchUtils
     }
   }
   
-  public static IProject getProjectResource()
+  // May return null !
+  public static IProject getProjectByExplorer()
+  {
+    IProject result = null;
+    
+    IWorkbench wb = PlatformUI.getWorkbench();
+    IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+    IWorkbenchPage page = win.getActivePage();
+
+    ISelection sel = page.getSelection() ;
+    
+    if (sel instanceof IStructuredSelection)
+    {
+      IStructuredSelection structSel = (IStructuredSelection) sel ;
+      
+      if(structSel.getFirstElement() instanceof IProject)
+      {
+        result = (IProject) structSel.getFirstElement() ;
+      }
+    }
+    
+    return result ;
+  }
+  
+  //May return null !
+  public static IProject getProjectByActiveEditor()
   {
     IWorkbench wb = PlatformUI.getWorkbench();
     IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
@@ -60,10 +110,8 @@ public class WorkbenchUtils
     IProject projects[] = root.getProjects();
     for(IProject p : projects)
     {
-
       if(!p.getName().equals(OsateResourceUtil.PLUGIN_RESOURCES_DIRECTORY_NAME))
       {
-
         if(p.isOpen())
         {
           activeEditor = page.getActiveEditor();
@@ -101,9 +149,21 @@ public class WorkbenchUtils
                    WorkbenchUtils.ANALYSIS_ERROR_REPORTER_MARKER)) ;
   }
   
-  public static void setResourceDirectories() throws Exception
+  public static void setResourceDirectories() throws ConfigurationException
   {
-    String ramsesDirPath = Aadl2Utils.getAbsolutePluginPath(Names.ATL_TRANSFORMATION_PLUGIN_ID).toString() ;
+    String ramsesDirPath = null ;
+    
+    try
+    {
+      ramsesDirPath = Aadl2Utils.getAbsolutePluginPath(Names.
+                                      ATL_TRANSFORMATION_PLUGIN_ID).toString() ;
+    }
+    catch(Exception e)
+    {
+      ConfigStatus.NOT_FOUND.msg = e.getMessage() ;
+      throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
+    }
+    
     RamsesConfiguration.setRamsesResourceDir(ramsesDirPath) ;
     RamsesConfiguration.setAtlResourceDir(ramsesDirPath) ;
     RamsesConfiguration.setPredefinedResourceDir(ramsesDirPath + File.separator + Names.AADL_RESOURCE_DIRECTORY_NAME) ;
@@ -112,7 +172,7 @@ public class WorkbenchUtils
   //TODO provide an ui to select the include directories.
   // For the moment, only the directory that contains the aadl model is
   // included.
-  public static Set<File> getIncludeDirs(IProject p) throws Exception
+  public static Set<File> getIncludeDirs(IProject p)
   {
     String fullProjectPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() + p.getFullPath().toOSString() ;
     

@@ -56,7 +56,9 @@ public abstract class RamsesException extends Exception
   public static String formatRethrowMessage(String initialMessage,
                                             Throwable ex)
   {
-    if(ex != null && ex.getMessage() != null)
+    if(ex != null &&
+       ex.getMessage() != null &&
+       ! ex.getMessage().equalsIgnoreCase("null"))
     {
       initialMessage += " (" + ex.getMessage() + ')' ;
     }

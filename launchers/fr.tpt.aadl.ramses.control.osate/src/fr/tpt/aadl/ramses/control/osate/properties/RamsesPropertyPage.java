@@ -24,13 +24,13 @@ package fr.tpt.aadl.ramses.control.osate.properties;
 import java.io.File ;
 import java.io.FileNotFoundException ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.resources.IContainer ;
 import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource ;
 import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.Path ;
 import org.eclipse.core.runtime.QualifiedName ;
-import org.eclipse.jface.dialogs.MessageDialog ;
 import org.eclipse.jface.preference.PreferenceDialog ;
 import org.eclipse.jface.preference.PreferencePage ;
 import org.eclipse.jface.window.Window ;
@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Text ;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog ;
 import org.eclipse.ui.dialogs.PreferencesUtil ;
 import org.eclipse.ui.dialogs.PropertyPage ;
-import org.osate.ui.dialogs.Dialog ;
 import org.osate.utils.FileUtils ;
 
 import fr.tpt.aadl.ramses.control.osate.WorkbenchUtils ;
@@ -59,8 +58,8 @@ import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.generation.osek.OSEKGeneratorFactory ;
 import fr.tpt.aadl.ramses.generation.pok.c.PokGeneratorFactory ;
 
@@ -90,19 +89,21 @@ public class RamsesPropertyPage extends PropertyPage {
   
   private IProject _project ;
   
+  private static Logger _LOGGER = Logger.getLogger(RamsesPropertyPage.class) ;
+  
   /**
    * Constructor for SamplePropertyPage.
    */
   public RamsesPropertyPage() {
     super();
-    
-    _project = WorkbenchUtils.getProjectResource() ;
   }
 
   private RamsesConfiguration loadConfig()
   {
     try
     {
+      _project = (IProject) getElement() ;
+      
       return fetchProperties(_project) ;
     }
     catch (ConfigurationException ee)
@@ -110,13 +111,11 @@ public class RamsesPropertyPage extends PropertyPage {
       // Missing configuration or first time configuration.
       return new RamsesConfiguration() ;
     }
-    catch(CoreException e)
+    catch(Exception e)
     {
-      MessageDialog.openError(getShell(),
-                              "Configuration Error",
-                              "Not enable to load the RAMSES configuration:\n" + 
-                              e.getMessage()) ;
-      return null ;
+      String msg = "cannot load RAMSES configuration" ;
+      _LOGGER.fatal(msg, e) ;
+      throw new RuntimeException(msg, e) ;
     }
   }
 
@@ -144,8 +143,6 @@ public class RamsesPropertyPage extends PropertyPage {
   private void addOutputDirectorySection(Composite parent,
                                          RamsesConfiguration config)
   {
-
-    
     Label label = new Label(parent, SWT.BOLD);
     label.setText("1 - Select output directory to generate code in");
 
@@ -242,7 +239,7 @@ public class RamsesPropertyPage extends PropertyPage {
     GridData data = new GridData(GridData.FILL);
     data.grabExcessHorizontalSpace = true;
     composite.setLayoutData(data);
-    
+
     RamsesConfiguration config = loadConfig() ; 
     
     addInformationSection(composite);
@@ -297,7 +294,6 @@ public class RamsesPropertyPage extends PropertyPage {
     
     Listener listener = new Listener()
     {
-
       @Override
       public void handleEvent(Event event)
       {
@@ -370,7 +366,6 @@ public class RamsesPropertyPage extends PropertyPage {
     {
       _project.setPersistentProperty(new QualifiedName(PREFIX, RUNTIME_PATH),
                                     runtimePathText.getText());
-      System.out.println(runtimePathText.getText()) ;
     }
   }
 
@@ -406,11 +401,9 @@ public class RamsesPropertyPage extends PropertyPage {
     }
     catch (CoreException e)
     {
-      MessageDialog.openError(getShell(),
-                              "Configuration Error",
-                              "Not enable to save the RAMSES configuration:\n" + 
-                              e.getMessage()) ;
-      return false;
+      String msg = "cannot save RAMSES configuration" ;
+      _LOGGER.fatal(msg, e) ;
+      throw new RuntimeException(msg, e) ;
     }
   }
 
@@ -465,7 +458,7 @@ public class RamsesPropertyPage extends PropertyPage {
   private void popupConfigurationErrorMessage(short errno)
   {
     StringBuilder msg =
-             new StringBuilder("Not enable to save the RAMSES configuration:\n\n");
+             new StringBuilder("Cannot save RAMSES configuration:\n\n");
 
     if(errno == 1)
     {
@@ -508,8 +501,7 @@ public class RamsesPropertyPage extends PropertyPage {
       }
     }
     
-    Dialog.showError("RAMSES Configuration error",
-                     msg.toString()) ;
+    ServiceProvider.SYS_ERR_REP.error(msg.toString(), false);
   }
   
   private static String fetchPropertiesValue(IProject project,
@@ -519,14 +511,12 @@ public class RamsesPropertyPage extends PropertyPage {
     String value = project.getPersistentProperty(new QualifiedName(
                                                    RamsesPropertyPage.PREFIX,
                                                    property));
-    
     return value ;
   }
   
   public static RamsesConfiguration fetchProperties(IProject project) throws
                                                                    CoreException,
                                                                    ConfigurationException
-                                                           
   {
     RamsesConfiguration result = new RamsesConfiguration() ;
     ConfigStatus status ;
@@ -553,14 +543,14 @@ public class RamsesPropertyPage extends PropertyPage {
   }
   
   // Return false if user has canceled.
-  public static boolean openPropertyDialog(IProject currentProject)
+  public static boolean openPropertyDialog(IProject project)
   {
     Shell shell = WorkbenchUtils.getCurrentShell() ;
     
     //Instantiate the project propertyPage.
     PreferenceDialog prefDiag = PreferencesUtil.
-          createPropertyDialogOn(shell, currentProject, _PROPERTY_PAGE_ID, null,
-                                 null);
+        createPropertyDialogOn(shell, project, _PROPERTY_PAGE_ID, null,
+                               null);
     
     // TODO: display the missing informations.
     

@@ -51,7 +51,7 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
 
     @Override
     protected Map<String, List<Integer>> loadExamples(String examplesPath) 
-          throws Exception
+                                                                throws Exception
     {
       File rootPath = Aadl2Utils.getPluginFile(Activator.PLUGIN_ID,
                                                examplesPath) ;
@@ -108,7 +108,7 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
       }
       else
       {
-        throw new Exception(examplesPath + " is not directory") ;
+        throw new Exception('\'' + examplesPath + "\' is not directory") ;
       }
     }
   }

@@ -21,12 +21,12 @@
 
 package fr.tpt.aadl.ramses.control.osate;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IStatus ;
 import org.eclipse.core.runtime.Platform ;
 import org.eclipse.core.runtime.Status ;
 import org.eclipse.jface.resource.ImageDescriptor ;
 import org.eclipse.ui.plugin.AbstractUIPlugin ;
-import org.osate.ui.dialogs.Dialog ;
 import org.osgi.framework.BundleContext ;
 
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
@@ -59,45 +59,44 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-		
-		// Print a session logging header.
-    getLog().log(new Status(IStatus.OK, "Starting RAMSES plugin suite ...", "RAMSES starting ...")); ;
-    
+	// Print a session logging header.
+    getLog().log(new Status(IStatus.OK, "Starting RAMSES plugin suite ...",
+                            "RAMSES starting ...")); ;
     /*** hard set logging level ***/
     // TODO let the user choose the logging level: implement a gui ???
     // DEBUG level is set to DEBUG.
     String lvl = "TRACE" ;
     RamsesConfiguration.setupLogging(lvl, Platform.getLogFileLocation().toFile());
-    
-    ServiceProvider.SYS_ERR_REP = new SysErrReporter4Osate() ;
-		
-		try
-    {
-		  /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
-		  WorkbenchUtils.setResourceDirectories() ;
-    }
-    catch(Exception e)
-    {
-      // DEBUG
-      e.printStackTrace();
-      
-      Dialog.showError("Configuration Error",
-                       "Not enable to fetch RAMSES directory: \n\n" +
-                       e.getMessage());
-    }
-		
-		ServiceRegistry sr = new OSGiServiceRegistry() ;
-		AadlModelInstantiatior instantiator ;
-		instantiator = new AadlModelsManagerImpl(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
-		
-		PredefinedAadlModelManager modelManager ;
-		modelManager = new ContributedAadlRegistration() ;
-		
-		sr.init(instantiator, modelManager);
-		ServiceProvider.setDefault(sr) ;
-		/**************************************************************************/
+                            
+	  ServiceProvider.SYS_ERR_REP = new SysErrReporter4Osate() ;
+	  
+	  try
+		{
+		  super.start(context);
+	    plugin = this;
+	    
+	    /****** Always set Ramses resouce dirs before initialize Service Registry,
+	     *  instantiator and AADL models manager !!! ****************************/
+	    
+	    WorkbenchUtils.setResourceDirectories() ;
+	    
+	    ServiceRegistry sr = new OSGiServiceRegistry() ;
+	    AadlModelInstantiatior instantiator ;
+	    instantiator = new AadlModelsManagerImpl(ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER) ;
+	    
+	    PredefinedAadlModelManager modelManager ;
+	    modelManager = new ContributedAadlRegistration() ;
+	    
+	    sr.init(instantiator, modelManager);
+	    ServiceProvider.setDefault(sr) ;
+	    
+	    /**************************************************************************/
+		}
+		catch(Exception e) // Top level exception handler. Stop all process.
+		{
+		  Logger.getLogger(Activator.class).fatal(e); 
+		  ServiceProvider.SYS_ERR_REP.fatal("", e);
+		}
 	}
 
 	/*
