@@ -164,7 +164,6 @@ public class AadlTargetSpecificGenerator implements Generator
       monitor.subTask("Model transformation (refinement) ..."); 
 //      RamsesConfiguration.waitUnitOfTime(1);
       r = _targetTrans.transform(inputResource, outputDir, monitor);
-      monitor.worked(1);
     }
     else
      r = inputResource;

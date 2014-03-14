@@ -304,14 +304,12 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
                         throws GenerationException
   {
     super.process(system, runtimeDir, outputDir, includeDirs, monitor); 
-    monitor.worked(1);
     monitor.subTask("Compilation of the generated code..."); 
 //    RamsesConfiguration.waitUnitOfTime(1);
     
     generateMakefile((NamedElement) system, outputDir) ;
     
     super.executeMake(outputDir, runtimeDir);
-    monitor.worked(1);
   }
 
   @Override

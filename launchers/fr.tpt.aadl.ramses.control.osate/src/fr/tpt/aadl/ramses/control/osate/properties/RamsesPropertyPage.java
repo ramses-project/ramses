@@ -298,8 +298,6 @@ public class RamsesPropertyPage extends PropertyPage {
       public void handleEvent(Event event)
       {
         Button button = (Button)(event.widget);
-
-        System.out.println("Button =" + button.getText());
         selectedPathLabel.setText("Select path for :"+button);
         selectedPathLabel.redraw();
         if (button.getSelection())

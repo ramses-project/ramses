@@ -138,6 +138,8 @@ public class GenerateActionHandler extends AbstractHandler {
     {
       _currentProject = WorkbenchUtils.getProjectByActiveEditor() ;
       _sysImpl = getOutlineSelectedSystem(event) ;
+      _LOGGER.info("OSATE project is \'" + _currentProject.getName() + '\'');
+      _LOGGER.info("system implementation to generate (outline action) is \'" + _sysImpl.getFullName() + '\'');
     }
     else
     {
@@ -147,6 +149,8 @@ public class GenerateActionHandler extends AbstractHandler {
       Resource resource = OsateResourceUtil.getResource((IResource) node) ;
       // Fetch system implementation model.
       _sysInst = (SystemInstance) resource.getContents().get(0) ;
+      _LOGGER.info("OSATE project is \'" + _currentProject.getName() + '\'');
+      _LOGGER.info("system implementation to generate (button action) is \'" + _sysInst.getFullName() + '\'');
     }
   }
 
