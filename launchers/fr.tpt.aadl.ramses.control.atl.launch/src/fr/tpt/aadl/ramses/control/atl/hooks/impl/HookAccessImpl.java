@@ -400,12 +400,30 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   
   public long getFloor(Double d)
   {
-	  return d.longValue();
+	return d.longValue();
   }
   
   public long getCeil(Double d)
   {
-	  Double res = Math.ceil(d);
-	  return res.longValue();
+	Double res = Math.ceil(d);
+	return res.longValue();
   }
+  
+  public Object log(String msg, Object o)
+  {
+	if(o instanceof NamedElement)
+	{
+	  NamedElement ne = (NamedElement) o;
+	  _LOGGER.trace("\t"+ne.getFullName()+": "+ msg);
+	}
+	else if(o instanceof Boolean)
+	{
+	  Boolean b = (Boolean) o;
+	  _LOGGER.trace("\t"+b.toString()+": "+ msg);
+	}
+	else
+	  _LOGGER.trace("\t"+o.toString()+": "+ msg);
+	return o;
+  }
+  
 } //HookAccessImpl
