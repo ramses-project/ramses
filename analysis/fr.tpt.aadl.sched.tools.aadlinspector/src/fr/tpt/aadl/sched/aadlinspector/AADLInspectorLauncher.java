@@ -1,20 +1,45 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.sched.aadlinspector;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File ;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.List ;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.ModelUnit;
-import org.osate.aadl2.PublicPackageSection;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.SystemInstance;
+import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.Platform ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.ModelUnit ;
+import org.osate.aadl2.PublicPackageSection ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.SystemInstance ;
 
-import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult;
-import fr.tpt.aadl.sched.aadlinspector.output.XMLResultsProvider;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult ;
+import fr.tpt.aadl.sched.aadlinspector.output.XMLResultsProvider ;
 
 public class AADLInspectorLauncher 
 {
@@ -26,6 +51,9 @@ public class AADLInspectorLauncher
 	private static String BIN_PATH;
 	private static String OUTPUT_FILE_PATH;
 	private static String extension = "";
+	
+	private static Logger _LOGGER = Logger.getLogger(AADLInspectorLauncher.class) ;
+	
 	private AADLInspectorLauncher() {}
 	
 	private static String getPath()
@@ -38,18 +66,25 @@ public class AADLInspectorLauncher
 		  aIPath = aIPath.endsWith(File.separator) ? aIPath : aIPath + File.separator;
 		  return aIPath;
 		}
-		System.err.println("AADLINSPECTOR_PATH environment variable should be initialized.");
+		
+		String msg = ENV_VAR + " environment variable should be initialized." ;
+		_LOGGER.error(msg) ;
+		ServiceProvider.SYS_ERR_REP.error(msg, true);
 		return "";
 	}
 	
 	private static AnalysisResult launchAnalysis(String[] aadlModelsPath, 
-			File outputDir,
-			String mode, SystemInstance model)
-		throws Exception
+			                                         File outputDir,
+			                                         String mode,
+			                                         SystemInstance model)
+		                                               throws AnalysisException
 	{
 		if (PATH.isEmpty())
 		{
-			throw new Exception("environment variable " + ENV_VAR + " not initialized");
+		  String msg = "environment variable " + ENV_VAR +
+		                               " not initialized" ;
+		  _LOGGER.fatal(msg) ;
+		  throw new RuntimeException(msg);
 		}
 		
 		OUTPUT_FILE_PATH = outputDir.getAbsolutePath() + "/AADL_Inspector_output.xml";
@@ -71,40 +106,76 @@ public class AADLInspectorLauncher
 		}
 		
 		final String command = BIN_PATH + "AADLInspector" + extension;
-		Process p = Runtime.getRuntime().exec(new String[] {
-				command, 
-				"-a", modelList, 
-				"--plugin", "schedulability.cheddarSimTest", 
-				"--result", OUTPUT_FILE_PATH, 
-				"--show", modeOption});
+		Process p ;
+    try
+    {
+      p = Runtime.getRuntime().exec(new String[] {
+      		command, 
+      		"-a", modelList, 
+      		"--plugin", "schedulability.cheddarSimTest", 
+      		"--result", OUTPUT_FILE_PATH, 
+      		"--show", modeOption}) ;
+    }
+    catch(IOException e)
+    {
+      String msg = "cannot execute AADLInspector" ;
+      _LOGGER.fatal(msg, e) ;
+      throw new RuntimeException(msg, e) ;
+    }
 		
 		String debugCommand = command+" -a "+modelList+ 
 				" --plugin "+ "schedulability.cheddarSimTest"+ 
 				//" --result "+ OUTPUT_FILE_PATH+
 				" --show "+ modeOption;
-		System.out.println("AADL Inspector command: "+debugCommand);
 		
-		int exitValue = p.waitFor();
+		_LOGGER.trace("AADL Inspector command: "+debugCommand) ;
+		
+		int exitValue = -1 ;
+    try
+    {
+      exitValue = p.waitFor() ;
+    }
+    catch(InterruptedException e)
+    {
+      String msg = "AADLInspector was interrupted" ;
+      _LOGGER.fatal(msg, e) ;
+      throw new RuntimeException(msg, e) ;
+    }
+    
 		if (exitValue!=0)
 		{
-			throw new Exception("exit value " + exitValue);
+		  String msg = "AADLInspector failed with exit value = " + exitValue ;
+		  _LOGGER.fatal(msg) ;
+		  throw new AnalysisException(msg);
 		}
 		
 		final File f = new File (OUTPUT_FILE_PATH);
 		if (! f.exists())
 		{
-			throw new Exception("output file " + OUTPUT_FILE_PATH 
-					+ " is missing !\nMaybe there is some elements in the AADL model that are not supported" +
-					" actually.");
+			String msg = "output file \'" + OUTPUT_FILE_PATH 
+          + "\' is not found ! Maybe there is some elements in the AADL model that are not supported" +
+          " actually" ; 
+		  _LOGGER.fatal(msg) ;
+		  throw new RuntimeException(msg) ;
 		}
 		
 		/** If output format change, modify here the name of the class */
-		return new XMLResultsProvider(f).getResult(model); 
+		try
+    {
+      return new XMLResultsProvider(f).getResult(model);
+    }
+    catch(Exception e)
+    {
+      String msg = "cannot fetch AADLInspector XML result" ;
+      _LOGGER.fatal(msg) ;
+      throw new AnalysisException(msg);
+    }
 	}
 	
-	
-	public static AnalysisResult launchAnalysis(SystemInstance root, File outputDir, String mode)
-			throws Exception
+	public static AnalysisResult launchAnalysis(SystemInstance root,
+	                                            File outputDir,
+	                                            String mode)
+	                                                throws AnalysisException
 	{
 		String OS = (String) System.getProperties().get("os.name");
 		if(OS.equalsIgnoreCase("linux"))
