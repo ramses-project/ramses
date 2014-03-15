@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.flow.model ;
 
 import java.util.ArrayList ;
@@ -24,7 +45,6 @@ import fr.tpt.aadl.flow.extraction.ExtractionContext ;
 
 public class ExecutionGraphRegistry
 {
-
   private Map<NamedElement, List<ExecutionGraph>> processToExecutionList =
         new HashMap<NamedElement, List<ExecutionGraph>>() ;
   private List<NamedElement> ignoreForVisitors = new ArrayList<NamedElement>() ;
@@ -32,8 +52,7 @@ public class ExecutionGraphRegistry
   private List<ExecutionGraphVisitor> visitors =
         new ArrayList<ExecutionGraphVisitor>() ;
 
-  public ExecutionGraphRegistry(
-                                SystemInstance root,
+  public ExecutionGraphRegistry(SystemInstance root,
                                 AnalysisErrorReporterManager errManager)
   {
     for(ComponentInstance i : root.getAllComponentInstances())

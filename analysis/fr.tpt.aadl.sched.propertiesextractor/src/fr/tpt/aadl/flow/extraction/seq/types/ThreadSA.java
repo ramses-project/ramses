@@ -1,5 +1,27 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.flow.extraction.seq.types ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.SubprogramClassifier ;
 import org.osate.aadl2.instance.ComponentInstance ;
@@ -11,12 +33,14 @@ import fr.tpt.aadl.flow.extraction.util.ComputationUtil ;
 import fr.tpt.aadl.flow.model.ExecutionGraph ;
 import fr.tpt.aadl.flow.model.RTAction ;
 import fr.tpt.aadl.flow.model.RTActionType ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class ThreadSA extends CallSequenceAnalyzer
 {
-
-  public ThreadSA(
-                  ExtractionContext ctxt)
+  private static Logger _LOGGER = Logger.getLogger(ThreadSA.class) ;
+  
+  public ThreadSA(ExtractionContext ctxt)
   {
     super(ctxt) ;
   }
@@ -48,6 +72,10 @@ public class ThreadSA extends CallSequenceAnalyzer
     }
     catch(Exception e)
     {
+      String msg = RamsesException.formatRethrowMessage("cannot find Initialize_Entrypoint for \'"+
+                     comp.getName() + '\'', e) ;
+      _LOGGER.warn(msg) ;
+      ServiceProvider.SYS_ERR_REP.warning(msg, true);
     }
 
     if(sc == null)
@@ -110,8 +138,6 @@ public class ThreadSA extends CallSequenceAnalyzer
       }
     }
   
-  
-  
     TaskAction last = taskStart;
     for(int index=0; index < inputs.size(); index++)
     {
@@ -131,7 +157,6 @@ public class ThreadSA extends CallSequenceAnalyzer
   
     return last;
   }
-  
   
   private static void createPortAction(FeatureInstance f, List<TaskAction> inputs, List<TaskAction> outputs, TaskAction start)
   {

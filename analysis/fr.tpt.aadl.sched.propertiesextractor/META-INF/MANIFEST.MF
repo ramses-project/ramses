@@ -32,7 +32,9 @@ Require-Bundle: org.eclipse.emf.common;bundle-version="2.6.0",
  org.osate.aadl2.modelsupport;bundle-version="1.0.0",
  org.osate.utils,
  org.osate.ba,
- fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0"
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.control.support
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
  antlr.jar,

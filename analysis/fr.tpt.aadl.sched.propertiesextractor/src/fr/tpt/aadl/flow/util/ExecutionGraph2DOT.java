@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.flow.util ;
 
 import java.io.BufferedWriter ;
@@ -6,6 +27,8 @@ import java.io.FileWriter ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.List ;
+
+import org.apache.log4j.Logger ;
 
 import fr.tpt.aadl.flow.model.ExecutionGraph ;
 import fr.tpt.aadl.flow.model.ExecutionGraphVisitor ;
@@ -24,9 +47,10 @@ public class ExecutionGraph2DOT implements ExecutionGraphVisitor
 
   private HashMap<String, String> actionToResource =
         new HashMap<String, String>() ;
+  
+  private static Logger _LOGGER = Logger.getLogger(ExecutionGraph2DOT.class) ;
 
-  public ExecutionGraph2DOT(
-                            String outputDir)
+  public ExecutionGraph2DOT(String outputDir)
   {
     this.outputDir = outputDir ;
 
@@ -48,62 +72,63 @@ public class ExecutionGraph2DOT implements ExecutionGraphVisitor
     final String ITER_GLOBAL_PATH = outputDir + TASK_NAME + "_steady.dot" ;
     final String STEADY_PATH = outputDir + TASK_NAME + "_reduced.dot" ;
 
-    try
+    if(exportInit)
     {
-      if(exportInit)
-      {
-        saveFlowModelAsPng(INIT_GLOBAL, INIT_GLOBAL_PATH, priority) ;
-      }
-
-      if(exportSteadyGlobal)
-      {
-        saveFlowModelAsPng(ITER_GLOBAL, ITER_GLOBAL_PATH, priority) ;
-      }
-
-      saveFlowModelAsPng(STEADY, STEADY_PATH, priority) ;
+      saveFlowModelAsPng(INIT_GLOBAL, INIT_GLOBAL_PATH, priority) ;
     }
-    catch(Exception e)
+
+    if(exportSteadyGlobal)
     {
-      e.printStackTrace() ;
+      saveFlowModelAsPng(ITER_GLOBAL, ITER_GLOBAL_PATH, priority) ;
     }
+
+    saveFlowModelAsPng(STEADY, STEADY_PATH, priority) ;
   }
 
   private void saveFlowModelAsPng(RTAction flow,
                                   String outputPath,
                                   int priority)
-        throws Exception
   {
-    File f ;
-    BufferedWriter writer ;
-    String title ;
-    String content ;
-    List<String> actionNames ;
-    List<String> transitionNames ;
-    f = new File(outputPath) ;
-
-    if(!f.exists())
+    try
     {
-      f.createNewFile() ;
+      File f ;
+      BufferedWriter writer ;
+      String title ;
+      String content ;
+      List<String> actionNames ;
+      List<String> transitionNames ;
+      f = new File(outputPath) ;
+
+      if(!f.exists())
+      {
+        f.createNewFile() ;
+      }
+
+      writer = new BufferedWriter(new FileWriter(outputPath)) ;
+      actionNames = new ArrayList<String>() ;
+      transitionNames = new ArrayList<String>() ;
+      title = flow.getElement().getName() + " [Priority : " + priority + "]" ;
+      collectActionNames(flow, actionNames) ;
+      collectTransitionNames(flow, transitionNames, new ArrayList<RTAction>()) ;
+      content = getGlobalContent(title, actionNames, transitionNames) ;
+      writer.write(content) ;
+      writer.close() ;
+      String outputImage = outputPath.replace(".dot", ".png") ;
+      String cmd = "dot " + outputPath + " -Tpng -o " + outputImage ;
+      //System.out.println(cmd);
+      Process cmdP = Runtime.getRuntime().exec(cmd) ;
+      cmdP.waitFor() ;
+
+      if(DELETE_DOT_FILES)
+      {
+        f.delete() ;
+      }
     }
-
-    writer = new BufferedWriter(new FileWriter(outputPath)) ;
-    actionNames = new ArrayList<String>() ;
-    transitionNames = new ArrayList<String>() ;
-    title = flow.getElement().getName() + " [Priority : " + priority + "]" ;
-    collectActionNames(flow, actionNames) ;
-    collectTransitionNames(flow, transitionNames, new ArrayList<RTAction>()) ;
-    content = getGlobalContent(title, actionNames, transitionNames) ;
-    writer.write(content) ;
-    writer.close() ;
-    String outputImage = outputPath.replace(".dot", ".png") ;
-    String cmd = "dot " + outputPath + " -Tpng -o " + outputImage ;
-    //System.out.println(cmd);
-    Process cmdP = Runtime.getRuntime().exec(cmd) ;
-    cmdP.waitFor() ;
-
-    if(DELETE_DOT_FILES)
+    catch(Exception e) // IOException & InterruptedException
     {
-      f.delete() ;
+      String msg = "cannot save the flow model into png" ;
+      _LOGGER.fatal(msg, e) ;
+      throw new RuntimeException(msg, e) ;
     }
   }
 
@@ -235,5 +260,4 @@ public class ExecutionGraph2DOT implements ExecutionGraphVisitor
       }
     }
   }
-
 }

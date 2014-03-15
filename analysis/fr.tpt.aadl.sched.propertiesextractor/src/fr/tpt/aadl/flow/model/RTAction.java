@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.flow.model ;
 
 import java.util.ArrayList ;
@@ -7,6 +28,7 @@ import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.instance.ComponentInstance ;
 
 import fr.tpt.aadl.flow.analysis.util.LongestAndShortestPath ;
@@ -45,6 +67,8 @@ public class RTAction
 
   /** Maximum execution time. */
   private float maxExecutionTime = 0 ;
+  
+  private static Logger _LOGGER = Logger.getLogger(RTAction.class) ;
 
   public static RTAction createEmptyAction(String name,
                                            final ComponentInstance task)
@@ -344,7 +368,9 @@ public class RTAction
       }
       else
       {
-        throw new RuntimeException("Not yet implemented") ;
+        String msg = '\'' + type.name() + "\' type not yet implemented" ;
+        _LOGGER.fatal(msg) ;
+        throw new RuntimeException(msg) ;
       }
     }
     else if(next.size() == 1)
