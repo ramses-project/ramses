@@ -1,5 +1,27 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.util;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ClassifierValue ;
 import org.osate.aadl2.ComponentClassifier ;
@@ -22,8 +44,13 @@ import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.SubcomponentType ;
 import org.osate.utils.PropertyUtils ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+
 public class DataClassifierUtil
 { 
+  private static Logger _LOGGER = Logger.getLogger(DataClassifierUtil.class) ;
+  
   private DataClassifierUtil(){}
   
   /*private static long getDimension (NamedElement e, int index)
@@ -36,6 +63,7 @@ public class DataClassifierUtil
     }
     catch(Exception e1)
     {
+      THANK YOU FOR LOGGING
       //System.err.println("getDimension(): " + e1.getMessage());
     }
     return dim;
@@ -63,7 +91,13 @@ public class DataClassifierUtil
         }
       }
     }
-    catch(Exception e1){}
+    catch(Exception e1)
+    {
+      String msg = RamsesException.formatRethrowMessage("cannot find Base_Type for \'" +
+                     e.getName() + '\'',e1) ;
+      _LOGGER.warn(msg) ;
+      ServiceProvider.SYS_ERR_REP.warning(msg, true);
+    }
     
     return dc;
   }
@@ -77,7 +111,10 @@ public class DataClassifierUtil
     } 
     catch (Exception e1) 
     {
-      //System.err.println("getSourceDataSize(): " + e1.getMessage());
+      String msg = RamsesException.formatRethrowMessage("cannot find Source_Data_Size for \'" +
+          e.getName() + '\'',e1) ;
+      _LOGGER.warn(msg) ;
+      ServiceProvider.SYS_ERR_REP.warning(msg, true);
     }
     return (int) size;
   }
@@ -91,7 +128,10 @@ public class DataClassifierUtil
     }
     catch(Exception e1)
     {
-      //System.err.println("getDataRepresentation(): " + e1.getMessage());
+      String msg = RamsesException.formatRethrowMessage("cannot find Data_Representation for \'" +
+          e.getName() + '\'',e1) ;
+      _LOGGER.warn(msg) ;
+      ServiceProvider.SYS_ERR_REP.warning(msg, true);
     }
     return rep;
   }

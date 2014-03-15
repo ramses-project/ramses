@@ -1,9 +1,31 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.ba;
 
 import java.util.ArrayList ;
 import java.util.Collections ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataPrototype ;
@@ -43,10 +65,13 @@ import fr.tpt.aadl.ramses.analysis.eg.model.IOTime ;
 import fr.tpt.aadl.ramses.analysis.eg.model.OP_KIND ;
 import fr.tpt.aadl.ramses.analysis.eg.model.SystemProperties ;
 import fr.tpt.aadl.ramses.analysis.eg.util.DataClassifierUtil ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class ValueExpressionUtil {
   
   private static final EGContext ctxt = EGContext.getInstance();
+  
+  private static Logger _LOGGER = Logger.getLogger(ValueExpressionUtil.class) ;
 
 	private ValueExpressionUtil(){}
 	
@@ -211,8 +236,10 @@ public class ValueExpressionUtil {
 		}
 		else
 		{
-		  System.err.println("Cannot get tokens for expression of type " 
-					+ v.getClass().getSimpleName());
+		  String msg = "Cannot get tokens for expression of type \'" + 
+                    v.getClass().getSimpleName() + '\'' ;
+		  _LOGGER.error(msg) ;
+		  ServiceProvider.SYS_ERR_REP.error(msg, true);
 			return Collections.emptyList();
 		}
 	}
@@ -248,8 +275,10 @@ public class ValueExpressionUtil {
 	  }
 	  else
     {
-      System.err.println("Cannot get tokens for holder of type " 
-          + h.getClass().getSimpleName());
+	    String msg = "Cannot get tokens for holder of type \'" 
+          + h.getClass().getSimpleName() + '\'' ;
+	    _LOGGER.error(msg) ;
+	    ServiceProvider.SYS_ERR_REP.error(msg, true);
       return Collections.emptyList();
     }
 	}
@@ -283,7 +312,10 @@ public class ValueExpressionUtil {
     }
     else
     {
-      System.err.println("DataSubcomponentHolder: cannot get tokens for " + dst);
+      String msg = "DataSubcomponentHolder: cannot get tokens for \'" + dst +
+                   '\'' ;
+      _LOGGER.error(msg) ;
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
     }
     
     tokens.add (new DataToken (h.getElement().getName(),dc));
@@ -303,11 +335,13 @@ public class ValueExpressionUtil {
         }
         else
         {
-          System.err.println("DataSubcomponentHolder indice: cannot get tokens for " + indice);
+          String msg = "DataSubcomponentHolder indice: cannot get tokens for " +
+                       indice + '\'' ;
+          _LOGGER.error(msg) ;
+          ServiceProvider.SYS_ERR_REP.error(msg, true);
         }
       }
     }
-    
     
     return tokens;
 	}
@@ -375,6 +409,7 @@ public class ValueExpressionUtil {
 					}
 					else
 					{
+					  // _LOGGER.trace ?
 					  //System.out.println("Ignore unary operator: " + ot.getName());
 					}
 				}
@@ -389,7 +424,6 @@ public class ValueExpressionUtil {
 		{
 			return tokens;
 		}
-		
 		
 		/*
 	   * A = B op1 C op2 D op3 E
@@ -602,12 +636,10 @@ public class ValueExpressionUtil {
 	
 	public static class DataAccessToken extends DataToken
 	{
-
     public DataAccessToken(String name, DataClassifier dc)
     {
       super(name, dc) ;
     }
-	  
 	}
 	
 	public static class OperatorToken extends ExpressionToken

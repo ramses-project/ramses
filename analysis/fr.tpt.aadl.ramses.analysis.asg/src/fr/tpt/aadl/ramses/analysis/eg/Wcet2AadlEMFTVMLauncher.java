@@ -7,7 +7,6 @@ import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EPackage ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.m2m.atl.core.ATLCoreException ;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
 import org.eclipse.m2m.atl.emftvm.Metamodel ;
 import org.eclipse.m2m.atl.emftvm.Model ;
@@ -34,7 +33,6 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	public Wcet2AadlEMFTVMLauncher(AnalysisModel model,
 	                               AadlModelInstantiatior modelInstantiator,
 	                               PredefinedAadlModelManager predefinedResourcesManager)
-	                                     throws ATLCoreException
 	{
 		super(modelInstantiator, predefinedResourcesManager) ;
 	  EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, ReducedbaPackage.eINSTANCE) ;
@@ -51,8 +49,9 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	
 	@Override
 	public Resource doTransformation(List<File> transformationFileList,
-			Resource inputResource, String outputDirPathName,
-			String resourceSuffix)
+			                             Resource inputResource,
+			                             String outputDirPathName,
+			                             String resourceSuffix)
 	{
 		ResourceSet rs = inputResource.getResourceSet();
 		

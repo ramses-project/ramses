@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.util;
 
 import java.util.ArrayList ;
@@ -6,6 +27,7 @@ import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.CalledSubprogram ;
@@ -33,12 +55,13 @@ import org.osate.ba.aadlba.SubprogramCallAction ;
 import org.osate.utils.IntegerRange ;
 import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.analysis.eg.error.NYI ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class BehaviorUtil {
 	
 	private static final String WCET_PROPERTY = "Compute_Execution_Time";
 	
+	private static Logger _LOGGER = Logger.getLogger(BehaviorUtil.class) ;
 	
 	public static DoubleRange getComputeExecutionTimeInMs(NamedElement e)
 	{
@@ -51,7 +74,6 @@ public class BehaviorUtil {
 		  double wcet = getScaledValue (max, "ms");
 		  DoubleRange r = new DoubleRange (bcet, wcet);
 		  return r;
-		  
 		  
 			//long bcet = ((IntegerLiteral) rv.getMinimumValue()).getValue();
 			//long wcet = ((IntegerLiteral) rv.getMaximumValue()).getValue();
@@ -75,7 +97,7 @@ public class BehaviorUtil {
 	}
 	
 	public static SubprogramClassifier getSubprogramClassifier (
-	    SubprogramCallAction action) throws NYI
+	    SubprogramCallAction action)
 	{
 	  NamedElement spg = action.getSubprogram().getElement(); 
     if (spg instanceof SubprogramClassifier)
@@ -84,11 +106,12 @@ public class BehaviorUtil {
     }
     else
     {
-      throw new NYI(spg);
+      throw new UnsupportedOperationException('\'' + spg.getClass().getSimpleName() +
+                                              "\' is not supported");
     }
 	}
 	
-	public static BehaviorAnnex getBehaviorAnnex(NamedElement e) throws NYI
+	public static BehaviorAnnex getBehaviorAnnex(NamedElement e)
 	{
 	    if(e instanceof ComponentInstance)
 	    {
@@ -107,7 +130,8 @@ public class BehaviorUtil {
 	      }
 	      else
 	      {
-	        throw new NYI (called);
+	        throw new UnsupportedOperationException('\'' + called.getClass().getSimpleName() +
+              "\' is not supported");
 	      }
 	    }
 	    else if(e instanceof Classifier)
@@ -198,9 +222,11 @@ public class BehaviorUtil {
     }
     else
     {
-      System.err.println(
-          "getBehaviorActions(): not supported BehaviorActions kind: " +
-              actions.getClass().getSimpleName());
+      String msg = 
+          "not supported BehaviorActions kind \'" +
+              actions.getClass().getSimpleName() + '\'' ;
+      _LOGGER.error(msg) ;
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
       return Collections.emptyList();
     }
   }
@@ -248,7 +274,7 @@ public class BehaviorUtil {
 	    
 	}
 	
-	public static IntegerRange getForStatementRange(ForOrForAllStatement action) throws NYI
+	public static IntegerRange getForStatementRange(ForOrForAllStatement action)
   {
     ElementValues values = action.getIteratedValues();
     if (values instanceof org.osate.ba.aadlba.IntegerRange)
@@ -262,11 +288,12 @@ public class BehaviorUtil {
     }
     else
     {
-      throw new NYI (values);
+      throw new UnsupportedOperationException ('\'' +
+                     values.getClass().getSimpleName() + "\' is not supported");
     }
   }
 	
-	private static int getValue(IntegerValue iv) throws NYI
+	private static int getValue(IntegerValue iv)
   {
     if (iv instanceof BehaviorIntegerLiteral)
     {
@@ -275,7 +302,7 @@ public class BehaviorUtil {
     }
     else if (iv instanceof DataComponentReference)
     {
-      DataComponentReference dcr = (DataComponentReference) iv;
+//      DataComponentReference dcr = (DataComponentReference) iv;
       //TODO: "For" statement: get DataComponentReference integer value
       /*NamedElement ne = SubprogramCallUtil.getAssignedValue(dcr);
       if (ne != null)
@@ -290,7 +317,8 @@ public class BehaviorUtil {
     }
     else
     {
-      throw new NYI (iv);
+      throw new UnsupportedOperationException ('\'' +
+                         iv.getClass().getSimpleName() + "\' is not supported");
     }
   }
 	

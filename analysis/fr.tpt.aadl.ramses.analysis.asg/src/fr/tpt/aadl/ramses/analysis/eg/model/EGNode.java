@@ -1,14 +1,36 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.model;
 
-import java.io.IOException ;
-import java.io.Writer ;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.NamedElement ;
 
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
 import fr.tpt.aadl.ramses.analysis.eg.util.EGNodeUtil ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public final class EGNode {
 
@@ -25,6 +47,8 @@ public final class EGNode {
 	private EGNode blockEnd = null;
 	
 	private final NamedElement thread;
+	
+	private static Logger _LOGGER = Logger.getLogger(EGNode.class) ;
 	
 	private static int instanceCounter = 0;
 	private final int instanceIndex;
@@ -78,7 +102,13 @@ public final class EGNode {
 	      Integer.parseInt(suffix);
 	      name = name.substring(0,indexSep);
 	    } 
-	    catch (NumberFormatException e){}
+	    catch (NumberFormatException e)
+	    {
+	      String msg = RamsesException.formatRethrowMessage("cannot parse integer",
+	                                                        e);
+	      _LOGGER.error(msg);
+	      ServiceProvider.SYS_ERR_REP.error(msg, true);
+	    }
 	  }
 	  
 		this.name = name + "_" + instanceIndex;
@@ -197,9 +227,9 @@ public final class EGNode {
 		  final double min = EGNodeUtil.computeBCET(this);
 		  final double max = EGNodeUtil.computeWCET(this);
       
-		  debug("Merge branches from " + this.getName() 
-		                     + " ("+nextNodes.get(0).getName()+","+nextNodes.get(1).getName()+")");
-		  debug(" => BCET: " + min + "\t" + "WCET: " + max);
+		  _LOGGER.debug("Merge branches from " + this.getName() + 
+		                     " ("+nextNodes.get(0).getName()+","+nextNodes.get(1).getName()+")");
+		  _LOGGER.debug(" => BCET: " + min + "\t" + "WCET: " + max);
 		  
 			setBCET(min);
       setWCET(max);
@@ -233,14 +263,14 @@ public final class EGNode {
 		
 		if (this.isMergeable() && next.isMergeable())
 		{
-		  debug("Merge sequence: " + getName() + " with " + next.getName());
-      debug(" => This BCET: " + bcet + "\t" + "This WCET: " + wcet);
-      debug(" => Next BCET: " + next.getBCET() + "\t" + "Next WCET: " + next.getWCET());
+		  _LOGGER.debug("Merge sequence: " + getName() + " with " + next.getName());
+		  _LOGGER.debug(" => This BCET: " + bcet + "\t" + "This WCET: " + wcet);
+		  _LOGGER.debug(" => Next BCET: " + next.getBCET() + "\t" + "Next WCET: " + next.getWCET());
       
       setBCET(bcet + next.getBCET());
       setWCET(wcet + next.getWCET());
       
-      debug(" => New BCET: " + bcet + "\t" + "New WCET: " + wcet);
+      _LOGGER.debug(" => New BCET: " + bcet + "\t" + "New WCET: " + wcet);
       
       setName("Computation_Block");
       nextNodes.clear();
@@ -263,21 +293,5 @@ public final class EGNode {
 	private boolean isMergeable()
 	{
 	  return kind.isMergeable() && nextNodes.size()<2;
-	}
-	
-	private static Writer w = null;
-	
-	public static void debug(String s)
-	{
-	  try
-    {
-      w.write(s + "\n");
-    }
-    catch(IOException e){}
-	}
-	
-	public static void setDebug(Writer w_)
-	{
-	  w = w_;
 	}
 }

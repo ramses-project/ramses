@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.util;
 
 import java.util.List ;
@@ -27,9 +48,9 @@ import org.osate.aadl2.SubprogramClassifier ;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.ba.aadlba.BehaviorVariable ;
 import org.osate.ba.aadlba.Target ;
+import org.osate.ba.utils.AadlBaUtils ;
 import org.osate.utils.Aadl2Utils ;
 
-import fr.tpt.aadl.ramses.analysis.eg.ba.AssignmentActionUtil ;
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
 
 public class ClassifierUtil {
@@ -38,7 +59,7 @@ public class ClassifierUtil {
 	
 	public static DataClassifier getDataClassifier(Target t)
 	{
-		NamedElement e = AssignmentActionUtil.getTargetElement(t);
+		NamedElement e = AadlBaUtils.getDataClassifier(t);
 		return getDataClassifier(e);
 	}
 	
@@ -180,7 +201,7 @@ public class ClassifierUtil {
         baseType = (DataClassifier) PropertyUtils
             .getClassifierValue(dataClassifier, "Base_Type");
       }
-      catch (Exception ex){}
+      catch (Exception ex){HAS TO LOGGING ?}
       
       if (baseType != null)
       {
@@ -202,7 +223,7 @@ public class ClassifierUtil {
                                                       "Initial_Value");
             size = (int) Integer.parseInt(val);
           }
-          catch(Exception e1){}
+          catch(Exception e1){HAS TO LOGGING ?}
         }
         return size;
       }

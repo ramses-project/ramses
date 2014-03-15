@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.context;
 
 import java.util.Collections ;
@@ -10,9 +31,8 @@ import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentPrototypeActual ;
 import org.osate.aadl2.ComponentPrototypeBinding ;
 import org.osate.aadl2.ComponentType ;
-import org.osate.aadl2.ConnectedElement;
-import org.osate.aadl2.Connection;
-import org.osate.aadl2.ConnectionEnd;
+import org.osate.aadl2.ConnectedElement ;
+import org.osate.aadl2.Connection ;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataPrototype ;
 import org.osate.aadl2.DataSubcomponentType ;
@@ -26,8 +46,7 @@ import org.osate.aadl2.SubprogramClassifier ;
 import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.ba.aadlba.BehaviorIntegerLiteral ;
-import org.osate.ba.aadlba.DataSubcomponentHolder;
-import org.osate.ba.aadlba.ElementHolder;
+import org.osate.ba.aadlba.ElementHolder ;
 import org.osate.ba.aadlba.Factor ;
 import org.osate.ba.aadlba.ParameterLabel ;
 import org.osate.ba.aadlba.Relation ;
@@ -142,7 +161,6 @@ public class SubprogramCallContext
     return null;
   }
   
-  
   public static SubprogramCallContext create (SubprogramCallAction action)
   {
     final NamedElement e = action.getSubprogram().getElement();
@@ -226,7 +244,7 @@ public class SubprogramCallContext
     		}
     		else
     		{
-    			ConnectedElement source = (ConnectedElement) cnx.getSource();
+//    			ConnectedElement source = (ConnectedElement) cnx.getSource();
         		if(target.getConnectionEnd().equals(f))
         		{
         			target = (ConnectedElement) cnx.getDestination();
@@ -238,6 +256,4 @@ public class SubprogramCallContext
     }
     return null;
   }
-  
-  
 }

@@ -1,10 +1,27 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg ;
 
-import java.io.BufferedWriter ;
 import java.io.File ;
-import java.io.IOException ;
-import java.io.OutputStreamWriter ;
-import java.io.Writer ;
 import java.util.ArrayList ;
 import java.util.List ;
 import java.util.Map ;
@@ -21,7 +38,6 @@ import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGModels ;
-import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
@@ -77,20 +93,6 @@ public class EGAnalyzer extends AbstractAnalyzer
   	return ACTION_NAME;
   }*/
   
-  private Writer createDebug()
-  {
-    Writer w = new BufferedWriter (new OutputStreamWriter(System.out));
-    /*try
-    {
-      w = new BufferedWriter(new FileWriter ("/home/fabien/execution_graphs/reduced/reduction.txt"));
-    }
-    catch(IOException e)
-    {
-      w = new BufferedWriter (new OutputStreamWriter(System.out));
-    }*/
-    return w;
-  }
-  
   @Override
   public void performAnalysis(SystemInstance systemInstance,
                               File outputDir,
@@ -98,9 +100,6 @@ public class EGAnalyzer extends AbstractAnalyzer
                               IProgressMonitor monitor)
         throws AnalysisException
   {
-    final Writer wDebug = createDebug();
-    EGNode.setDebug(wDebug);
-    
     EGLauncher launcher = new EGLauncher(systemInstance) ;
     launcher.launch() ;
   
@@ -113,11 +112,6 @@ public class EGAnalyzer extends AbstractAnalyzer
     
     EGModels models2 = models.clone();
     models2.reduce();
-    try
-    {
-      wDebug.close();
-    }
-    catch(IOException e){}
     
     //EG2DOT eg2dot2 = new EG2DOT ("/home/fabien/execution_graphs/reduced/", DOTLayout.dot);
     //eg2dot2.launch(models2,systemInstance);
@@ -143,38 +137,28 @@ public class EGAnalyzer extends AbstractAnalyzer
   private void produceAnalysisAADLModel(AnalysisModel m, File outputDir,
                                         SystemInstance systemInstance)
   {
-    try
-    {
-      Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager);
-      List<File> transformationFileList = new ArrayList<File>();
-      Aadl2Util.setUseTunedEqualsMethods (false);
-      
-      transformationFileList.add(new File(RamsesConfiguration.getAtlResourceDir().getAbsolutePath()+"/WcetAnalysis/ReducedBA"));
-      
-      launcher.setOutputPackageName(outputModelIdentifier);
-      File wcetOutputDir = new File(outputDir.getAbsolutePath()+"/wcet");
-      if(wcetOutputDir.exists()==false)
-        wcetOutputDir.mkdir();
-      File aadlWithWcetFile = new File(wcetOutputDir.getAbsolutePath()+File.separator+outputModelIdentifier+".aadl2");
-      Resource rootResource = systemInstance.eResource();
-      aadlWithWcet = launcher.doTransformation(transformationFileList, 
-                    rootResource,
-                    outputDir.getAbsolutePath(),
-                    "_"+outputModelIdentifier);
-      
-      aadlWithWcet.setURI(URI.createFileURI(aadlWithWcetFile.getAbsolutePath()));
-      
-      _instantiator.serialize(aadlWithWcet, aadlWithWcetFile.getAbsolutePath());
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-      System.exit(-1);
-    }
-    finally
-    {
-      Aadl2Util.setUseTunedEqualsMethods (false);
-    }
+    Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager);
+    List<File> transformationFileList = new ArrayList<File>();
+    Aadl2Util.setUseTunedEqualsMethods (false);
+    
+    transformationFileList.add(new File(RamsesConfiguration.getAtlResourceDir().getAbsolutePath()+"/WcetAnalysis/ReducedBA"));
+    
+    launcher.setOutputPackageName(outputModelIdentifier);
+    File wcetOutputDir = new File(outputDir.getAbsolutePath()+"/wcet");
+    if(wcetOutputDir.exists()==false)
+      wcetOutputDir.mkdir();
+    File aadlWithWcetFile = new File(wcetOutputDir.getAbsolutePath()+File.separator+outputModelIdentifier+".aadl2");
+    Resource rootResource = systemInstance.eResource();
+    aadlWithWcet = launcher.doTransformation(transformationFileList, 
+                  rootResource,
+                  outputDir.getAbsolutePath(),
+                  "_"+outputModelIdentifier);
+    
+    aadlWithWcet.setURI(URI.createFileURI(aadlWithWcetFile.getAbsolutePath()));
+    
+    _instantiator.serialize(aadlWithWcet, aadlWithWcetFile.getAbsolutePath());
+    
+    Aadl2Util.setUseTunedEqualsMethods (false);
   }
 
   @Override

@@ -1,5 +1,27 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.model;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.BasicPropertyAssociation ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.IntegerLiteral ;
@@ -11,6 +33,8 @@ import org.osate.aadl2.instance.InstanceReferenceValue ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.analysis.eg.util.BehaviorUtil ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class SystemProperties {
 
@@ -27,8 +51,8 @@ public class SystemProperties {
 	private final int CYCLES_LOAD = 5;
 	private final int CYCLES_STORE = 5;
 	
+	private static Logger _LOGGER = Logger.getLogger(SystemProperties.class) ;
 	
-
 	public double getOperationMs(OP_KIND op)
 	{
 		int cycles = 0;
@@ -65,7 +89,6 @@ public class SystemProperties {
 		return 1; // octets
 	}
 	
-	
 	public IOTime getAssignTimeInMs(ComponentInstance c)
 	{
 		return getIOTime(c,"Assign_Time");
@@ -79,7 +102,6 @@ public class SystemProperties {
 		return getIOTime(c,"Write_Time");
 	}
 	
-	
 	private static IOTime getIOTime(ComponentInstance c, String property)
 	{
 		switch (c.getCategory())
@@ -91,7 +113,10 @@ public class SystemProperties {
 			} 
 			catch (Exception e) 
 			{
-				System.err.println("getIOTime(): " + e.getMessage());
+				String msg = RamsesException.formatRethrowMessage("cannot getIOTime for\'"+
+			  c.getName() + '\'', e) ;
+				_LOGGER.warn(msg) ;
+				ServiceProvider.SYS_ERR_REP.warning(msg, true) ;
 				return new IOTime();
 			}
 		}
@@ -154,7 +179,13 @@ public class SystemProperties {
 				return t;
 			}
 		}
-		catch (Exception e){}
+		catch (Exception e)
+		{
+		  String msg = RamsesException.formatRethrowMessage("cannot get actual memory binding for \'" + process.getName() +
+		      '\'', e) ;
+		  _LOGGER.warn(msg) ;
+		  ServiceProvider.SYS_ERR_REP.warning(msg, true);
+		}
 		
 		return new IOTime();
 	}

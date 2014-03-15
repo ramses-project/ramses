@@ -1,9 +1,29 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.ba;
 
-import java.util.ArrayList ;
-import java.util.Collections ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Parameter ;
@@ -26,17 +46,20 @@ import org.osate.ba.aadlba.Value ;
 import org.osate.ba.aadlba.ValueExpression ;
 import org.osate.ba.aadlba.ValueVariable ;
 import org.osate.ba.aadlba.WhileOrDoUntilStatement ;
+import org.osate.ba.utils.AadlBaUtils ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
 import fr.tpt.aadl.ramses.analysis.eg.context.SubprogramCallContext ;
 import fr.tpt.aadl.ramses.analysis.eg.util.BehaviorUtil ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public class WhileLoopUtil
 {	
   private final static EGContext ctxt = EGContext.getInstance();
   
+  private static Logger _LOGGER = Logger.getLogger(WhileLoopUtil.class) ;
   
   private WhileLoopUtil(){}
 	
@@ -47,7 +70,9 @@ public class WhileLoopUtil
 	  
 		if (!hasCompatibleGlobalCondition(action))
 		{
-		  error("Only logical operator AND is allowed on main condition");
+		  String msg = error("Only logical operator AND is allowed on main condition");
+		  _LOGGER.error(msg);
+		  ServiceProvider.SYS_ERR_REP.error(msg, true);
 		  return -1;
 		}
 		
@@ -56,7 +81,9 @@ public class WhileLoopUtil
 			Relation indexCond = findSubconditionWithIndexTest(action, iRelation+1);
 			if (indexCond==null)
 			{
-			  error("Subcondition is not found (index condition)");
+			  String msg = error("Subcondition is not found (index condition)");
+			  _LOGGER.error(msg);
+	      ServiceProvider.SYS_ERR_REP.error(msg, true);
 			  return -1;
 			}
 			
@@ -70,32 +97,34 @@ public class WhileLoopUtil
 				
 				/*if (bound == -1)
 				{
-					error("No bound found for index " + elementName);
+					String msg = error("No bound found for index " + elementName);
+					_LOGGER.error(msg);
+          ServiceProvider.SYS_ERR_REP.error(msg, true);
 				}*/
 				if (bound != -1)
 				{
-					debug("Subcondition is found: " + elementName 
-							+ " " + rop.getLiteral() + " " + bound, "*");
+					_LOGGER.debug(debug("Subcondition is found: " + elementName 
+							+ " " + rop.getLiteral() + " " + bound, "*"));
 					
 					return bound;
 				}
 			}
 		}
-		error("Subcondition is not found (index condition)");
+		String msg = error("Subcondition is not found (index condition)");
+		_LOGGER.error(msg);
+    ServiceProvider.SYS_ERR_REP.error(msg, true);
 		return -1;
 	}
 	
-	private static void debug(String msg, String prefix)
+	private static String debug(String msg, String prefix)
 	{
 		String p = "[" + prefix + "]";
-		System.err.flush();
-		System.out.println(p + msg);
+		return (p + msg) ;
 	}
 	
-	private static void error(String msg)
+	private static String error(String msg)
 	{
-		System.out.flush();
-		System.err.println("[*]" + msg);
+		return ("[*]" + msg);
 	}
 	
 	private static String name (Element v)
@@ -106,19 +135,9 @@ public class WhileLoopUtil
 	
 	private static NamedElement getNamedElement (Element e)
 	{
-	  if (e instanceof ValueVariable)
+	  if (e instanceof Value)
 	  {
-	    ValueVariable v = (ValueVariable) e;
-	    List<DataHolder> l = getDataHolders (v);
-	    if (!l.isEmpty())
-	    {
-	      DataHolder h = l.get(l.size()-1);
-	      return h.getElement();
-	    }
-	    else
-	    {
-	      return null;
-	    }
+	    return AadlBaUtils.getDataClassifier((Value) e) ;
 	  }
 	  else if (e instanceof NamedElement)
 	  {
@@ -129,25 +148,7 @@ public class WhileLoopUtil
 	    return null;
 	  }
 	}
-	
-	private static List<DataHolder> getDataHolders(ValueVariable v)
-	{
-	  if (v instanceof DataHolder)
-	  {
-	    List<DataHolder> l = new ArrayList<DataHolder>();
-	    l.add((DataHolder) v);
-	    return l;
-	  }
-	  else if (v instanceof DataComponentReference)
-	  {
-	    return ((DataComponentReference) v).getData();
-	  }
-	  else
-	  {
-	    return Collections.emptyList();
-	  }
-	}
-	
+		
 	private static boolean hasCompatibleGlobalCondition(WhileOrDoUntilStatement action)
 	{
 		ValueExpression cond = action.getLogicalValueExpression();
@@ -173,7 +174,6 @@ public class WhileLoopUtil
 		{
 		  return -1;
 		}
-		
 		
 		Value v = se.getTerms().get(0).getFactors().get(0).getFirstValue();
 		if (v instanceof DataComponentReference)
@@ -372,7 +372,7 @@ public class WhileLoopUtil
 			{
 				AssignmentAction aa = (AssignmentAction) a;
 				Target t = aa.getTarget();
-				NamedElement target = AssignmentActionUtil.getTargetElement(t);
+				NamedElement target = AadlBaUtils.getDataClassifier(t);
 				
 				if (target == indexElement)
 				{

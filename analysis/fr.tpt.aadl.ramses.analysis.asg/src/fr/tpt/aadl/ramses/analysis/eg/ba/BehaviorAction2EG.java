@@ -1,18 +1,39 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.ba;
 
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.ComponentCategory ;
-import org.osate.aadl2.ComponentClassifier;
-import org.osate.aadl2.ComponentType;
+import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.ConnectedElement ;
 import org.osate.aadl2.Connection ;
 import org.osate.aadl2.ConnectionEnd ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.Feature ;
-import org.osate.aadl2.NamedElement;
+import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.SubprogramClassifier ;
-import org.osate.aadl2.SubprogramImplementation;
+import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.instance.ComponentInstance ;
@@ -45,6 +66,7 @@ import org.osate.ba.aadlba.UnlockAction ;
 import org.osate.ba.aadlba.Value ;
 import org.osate.ba.aadlba.ValueExpression ;
 import org.osate.ba.aadlba.WhileOrDoUntilStatement ;
+import org.osate.ba.utils.AadlBaUtils ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.IntegerRange ;
 
@@ -54,20 +76,23 @@ import fr.tpt.aadl.ramses.analysis.eg.ba.ValueExpressionUtil.ExpressionToken ;
 import fr.tpt.aadl.ramses.analysis.eg.ba.ValueExpressionUtil.ExpressionTokens ;
 import fr.tpt.aadl.ramses.analysis.eg.ba.ValueExpressionUtil.OperatorToken ;
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
-import fr.tpt.aadl.ramses.analysis.eg.context.SubprogramCallContext;
-import fr.tpt.aadl.ramses.analysis.eg.error.NYI ;
+import fr.tpt.aadl.ramses.analysis.eg.context.SubprogramCallContext ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNodeKind ;
 import fr.tpt.aadl.ramses.analysis.eg.model.SystemProperties ;
 import fr.tpt.aadl.ramses.analysis.eg.util.BehaviorUtil ;
 import fr.tpt.aadl.ramses.analysis.eg.util.ClassifierUtil ;
 import fr.tpt.aadl.ramses.analysis.eg.util.SharedResourceUtil ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class BehaviorAction2EG
 {
+  private static final Logger _LOGGER = Logger.getLogger(BehaviorAction2EG.class) ; 
+  
   private BehaviorAction2EG(){}
 
-  public static EGNode actionBlockToEG (BehaviorActionBlock block, String name) throws NYI
+  public static EGNode actionBlockToEG (BehaviorActionBlock block, String name)
   {
     return actionsToEG (block.getContent(), name);
   }
@@ -88,9 +113,12 @@ public class BehaviorAction2EG
       {
         actionNode = actionToEG(action) ;
       }
-      catch(NYI e)
+      catch(UnsupportedOperationException e)
       {
-        e.printStackTrace();
+        String msg = RamsesException.formatRethrowMessage("cannot do action to EG",
+                                                          e) ;
+        _LOGGER.error(e) ;
+        ServiceProvider.SYS_ERR_REP.error(msg, true);
         actionNode = new EGNode (name + "_<error>");
       }
       lastNode.addNext(actionNode);
@@ -104,9 +132,8 @@ public class BehaviorAction2EG
    * Returns the root node of the subgraph corresponding to the given action
    * @param action behavior action
    * @return root node of the subgraph corresponding to the given action
-   * @throws NYI raised when some behavior actions are not supported yet
    */
-  public static EGNode actionToEG (BehaviorAction action) throws NYI
+  public static EGNode actionToEG (BehaviorAction action)
   {
     if (action instanceof BasicAction)
     {
@@ -132,7 +159,8 @@ public class BehaviorAction2EG
       }
       else
       {
-        throw new NYI(action);
+        throw new UnsupportedOperationException('\'' +
+                    action.getClass().getSimpleName() + "\' is not supported");
       }
     }
     else if (action instanceof CondStatement)
@@ -167,12 +195,14 @@ public class BehaviorAction2EG
       }
       else
       {
-        throw new NYI(action);
+        throw new UnsupportedOperationException('\'' +
+                     action.getClass().getSimpleName() + "\' is not supported");
       }
     }
     else
     {
-      throw new NYI (action);
+      throw new UnsupportedOperationException('\'' +
+                     action.getClass().getSimpleName() + "\' is not supported");
     }
   }
   
@@ -184,10 +214,9 @@ public class BehaviorAction2EG
     boolean ignoreCopy = ((target instanceof DataAccessHolder) 
                       || (target instanceof DataAccessPrototypeHolder));
     
-    String targetName = AssignmentActionUtil.getTargetElementName(target);
+    String targetName = AadlBaUtils.getDataClassifier(target).getName() ;
     EGNode assignmentNode = subExpressionsToEG(assigned,"Assign_"+ targetName, 
                                                false, ignoreCopy);
-    
     return assignmentNode;
   }
   
@@ -253,12 +282,6 @@ public class BehaviorAction2EG
     return nAssign;
   }
   
-  
-  
-  
-  
-  
-  
   private static EGNode subprogramCallToEG (SubprogramCallAction a)
   {
     EGContext.getInstance().pushCurrentSubprogram(a);
@@ -294,13 +317,15 @@ public class BehaviorAction2EG
       
       return nCall;
     }
-    catch(NYI e)
+    catch(UnsupportedOperationException e)
     {
-      e.printStackTrace();
+      String msg = RamsesException.formatRethrowMessage("unsupported operation", e);
+      _LOGGER.error(e);
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
     }
     
     EGContext.getInstance().popCurrentSubprogram();
-    
+    // Is it for DEBUG ?
     return new EGNode("subprogramcall_block");
   }
 
@@ -367,14 +392,8 @@ public class BehaviorAction2EG
   private static void getSharedData (SubprogramCallAction action, EGNode accessNode)
   {
     SubprogramClassifier sc = null;
-    try
-    {
-      sc = BehaviorUtil.getSubprogramClassifier(action) ;
-    }
-    catch(NYI e1)
-    {
-      //return null;
-    }
+    
+    sc = BehaviorUtil.getSubprogramClassifier(action) ;
     
     SubprogramType st = (SubprogramType) ClassifierUtil.getTypeClassifier(sc);
     List<Feature> features = Aadl2Utils.orderFeatures(st);
@@ -392,8 +411,10 @@ public class BehaviorAction2EG
     }
     if (resourceIndex==-1)
     {
-      System.err.println("Cannot find shared resource for SubprogramCallAction " + sc.getName());
-      //return null;
+      String msg = "Cannot find shared resource for SubprogramCallAction \'" +
+          sc.getName() + '\'' ;
+      _LOGGER.error(msg);
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
     }
     
     ParameterLabel l = action.getParameterLabels().get(resourceIndex);
@@ -410,7 +431,10 @@ public class BehaviorAction2EG
     
     if (da==null)
     {
-      System.err.println("Cannot find shared resource for SubprogramCallAction " + sc.getName());
+      String msg = "Cannot find shared resource for SubprogramCallAction \'" +
+                   sc.getName() + '\'' ; 
+      _LOGGER.error(msg);
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
     }
     else
     {
@@ -492,7 +516,7 @@ public class BehaviorAction2EG
     return null;
   }
   
-  private static EGNode timedActionToEG(TimedAction a) throws NYI
+  private static EGNode timedActionToEG(TimedAction a)
   {
     BehaviorTime min = a.getLowerTime();
     BehaviorTime max = a.getUpperTime();
@@ -530,35 +554,40 @@ public class BehaviorAction2EG
     return n;
   }
   
-  private static void configureLockAction(EGNode n, DataAccess da, EGNodeKind kind)
+  private static void configureLockAction(EGNode n, DataAccess da,
+                                          EGNodeKind kind)
   {
-	NamedElement currentVisiting = EGContext.getInstance().getCurrentThread();
-	int size = EGContext.getInstance().getVisitingSubprogramCallActionSize();
+	  NamedElement currentVisiting = EGContext.getInstance().getCurrentThread();
+	  int size = EGContext.getInstance().getVisitingSubprogramCallActionSize();
 	
-	SubprogramType spg = (SubprogramType) da.getContainingClassifier();
-	int containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
-	String paramValue = "";
-	for(int i=size;i>0;i--)
-	{
-	  String paramName = spg.getOwnedFeatures().get(containerFeatureIdx).getName();
-	  SubprogramCallContext scc = EGContext.getInstance().getVisitingSubprogramCallAction(i-1);
-	  paramValue = scc.getParameterStringValue(paramName);
-	  SubprogramClassifier sc = (SubprogramClassifier) scc.getElement();
-	  if(sc instanceof SubprogramType)
-	    spg = (SubprogramType) sc;
-	  else
-		spg = ((SubprogramImplementation) sc).getType();
+	  SubprogramType spg = (SubprogramType) da.getContainingClassifier();
+	  int containerFeatureIdx = Aadl2Utils.orderFeatures(spg).indexOf(da);
+	  String paramValue = "";
+	  for(int i=size;i>0;i--)
+	  {
+	    String paramName = spg.getOwnedFeatures().get(containerFeatureIdx).
+	                                                                    getName();
+	    SubprogramCallContext scc = EGContext.getInstance().
+	                                         getVisitingSubprogramCallAction(i-1);
+	    paramValue = scc.getParameterStringValue(paramName);
+	    SubprogramClassifier sc = (SubprogramClassifier) scc.getElement();
+	    
+	    if(sc instanceof SubprogramType)
+	      spg = (SubprogramType) sc;
+	    else
+		  spg = ((SubprogramImplementation) sc).getType();
+	    
 	    containerFeatureIdx = getFeatureIndex(spg, paramValue);
-	}
+	  }
 	
-	ComponentInstance ci = (ComponentInstance) currentVisiting;
-	ComponentType ct = ci.getSubcomponent().getComponentType();
-	int daIndex = getFeatureIndex(ct, paramValue);
-	da = (DataAccess) ct.getOwnedFeatures().get(daIndex);
-	n.setKind(kind);
-	n.setSharedDataAccess(da);
-	ComponentInstance data = getDataAccessElement (da);
-	n.setSharedData(data);
+	  ComponentInstance ci = (ComponentInstance) currentVisiting;
+	  ComponentType ct = ci.getSubcomponent().getComponentType();
+	  int daIndex = getFeatureIndex(ct, paramValue);
+	  da = (DataAccess) ct.getOwnedFeatures().get(daIndex);
+	  n.setKind(kind);
+	  n.setSharedDataAccess(da);
+	  ComponentInstance data = getDataAccessElement (da);
+	  n.setSharedData(data);
   }
   
   private static int getFeatureIndex(ComponentType ct, String featureName)
@@ -575,11 +604,11 @@ public class BehaviorAction2EG
 
   private static EGNode unlockActionToEG(UnlockAction a)
   {
-	DataAccessHolder h = a.getDataAccess();
-	DataAccess da = h.getDataAccess();
-	EGNode n = new EGNode("UnlockAction");
-	configureLockAction(n, da, EGNodeKind.CriticalSectionEnd);
-	return n;
+    DataAccessHolder h = a.getDataAccess() ;
+    DataAccess da = h.getDataAccess() ;
+    EGNode n = new EGNode("UnlockAction") ;
+    configureLockAction(n, da, EGNodeKind.CriticalSectionEnd) ;
+    return n ;
   }
   
   private static EGNode ifToEG (IfStatement a)
@@ -587,7 +616,8 @@ public class BehaviorAction2EG
     EGNode nIf = new EGNode("if");
     
     EGNode nEndif = new EGNode("endif");
-    EGNode nCond = subExpressionsToEG (a.getLogicalValueExpression(), "ifcond",false,true);
+    EGNode nCond = subExpressionsToEG (a.getLogicalValueExpression(), "ifcond",
+                                                                    false,true);
     EGNode nThenStart = actionsToEG (a.getBehaviorActions(), "ifthen") ;
     
     nIf.addNext(nCond);
@@ -613,18 +643,6 @@ public class BehaviorAction2EG
     
     return nIf;
   }
-
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
-  
   
   private static EGNode forToEG (ForOrForAllStatement a)
   {
@@ -633,9 +651,12 @@ public class BehaviorAction2EG
     {
       r = BehaviorUtil.getForStatementRange(a) ;
     }
-    catch(NYI e)
+    catch(UnsupportedOperationException e)
     {
-      e.printStackTrace();
+      String msg = RamsesException.formatRethrowMessage("cannot getForStatementRange",
+                                                        e);
+      _LOGGER.error(msg);
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
       
       EGNode n = new EGNode ("for_block_<error>");
       n.setBlockEnd(n);
@@ -659,12 +680,6 @@ public class BehaviorAction2EG
     return nodeFor;
   }
 
-  
-  
-  
-  
-  
-  
   private static EGNode whileToEG (WhileOrDoUntilStatement a)
   {
     final int iterations = WhileLoopUtil.computeMaxIterations(a);

@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.ba;
 
 import java.util.HashMap ;
@@ -12,7 +33,6 @@ import org.osate.ba.aadlba.BehaviorState ;
 import org.osate.ba.aadlba.BehaviorTransition ;
 
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
-import fr.tpt.aadl.ramses.analysis.eg.error.NYI ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNodeKind ;
 import fr.tpt.aadl.ramses.analysis.eg.util.BehaviorUtil ;
@@ -58,9 +78,8 @@ public class BA2EG
     }
     else
     {
-      
+      // Nothing todo ?
     }
-    
     
     EGNode baRootNode = new EGNode(ownerName + "_ba_node");
     
@@ -139,17 +158,10 @@ public class BA2EG
     BehaviorActionBlock bak = tr.getActionBlock();
     if (bak != null)
     {
-      try
-      {
-        EGNode nTrans = BehaviorAction2EG.actionBlockToEG(bak, name);
-        nTrans.setKind(EGNodeKind.TransitionStart);
-        nTrans.getBlockEnd().setKind(EGNodeKind.TransitionEnd);
-        return nTrans;
-      }
-      catch(NYI e)
-      {
-        e.printStackTrace();
-      }
+      EGNode nTrans = BehaviorAction2EG.actionBlockToEG(bak, name);
+      nTrans.setKind(EGNodeKind.TransitionStart);
+      nTrans.getBlockEnd().setKind(EGNodeKind.TransitionEnd);
+      return nTrans;
     }
     return null;
   }

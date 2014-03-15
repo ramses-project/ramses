@@ -71,8 +71,6 @@ public class EG2Text extends EGExport
       String kindStr = fill (20,kind);
       String nameStr = fill (90,n.getName());
       String line = indent+kindStr + "\t" + nameStr + "\t[" + bcet + ", " + wcet + "]";
-     
-     
       
       //if (n.getName().startsWith("if_") || n.getName().startsWith("while_"))
       if (containsBlock(blockStart, n.getName()))

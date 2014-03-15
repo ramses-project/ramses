@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg;
 
 import java.util.List ;
@@ -13,7 +34,6 @@ import org.osate.ba.aadlba.BehaviorAnnex ;
 
 import fr.tpt.aadl.ramses.analysis.eg.ba.BA2EG ;
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
-import fr.tpt.aadl.ramses.analysis.eg.error.NYI ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGModels ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.analysis.eg.seq.CallSequence2EG ;
@@ -63,16 +83,8 @@ public class EGLauncher {
 	{
 		EGContext.getInstance().setCurrentThread(thread);
 		
-    try
-    {
-      EGNode entryNode = entrypoint (thread) ;
-      models.put(thread, entryNode);
-    }
-    catch(NYI e)
-    {
-      System.err.println("Cannot find behavior description (BA/call sequence) " +
-            "for thread " + thread.getName());
-    }
+		EGNode entryNode = entrypoint (thread) ;
+    models.put(thread, entryNode);
 	}
 	
 	/**
@@ -81,20 +93,13 @@ public class EGLauncher {
 	 * @param entry current entrypoint (default: the thread component)
 	 * @param thread the thread component
 	 * @return the root of the execution graph 
-	 * @throws NYI raised if there is some elements not supported yet
 	 */
-	public static EGNode entrypoint (NamedElement entry) throws NYI
+	public static EGNode entrypoint (NamedElement entry)
 	{
 	  /** Try to find a behavior annex in the current entrypoint */
 	  BehaviorAnnex ba = null;
-    try
-    {
-      ba = BehaviorUtil.getBehaviorAnnex(entry) ;
-    }
-    catch(NYI e)
-    {
-      e.printStackTrace();
-    }
+    
+	  ba = BehaviorUtil.getBehaviorAnnex(entry) ;
     
 	  if (ba != null)
     {
@@ -122,7 +127,8 @@ public class EGLauncher {
 	        }
 	        else // subprogram prototype ?
 	        {
-	          throw new NYI (called);
+	          throw new UnsupportedOperationException("unsupported type \'" +
+	            called.getClass().getSimpleName() + '\'');
 	        }
 	      }
 	      else if (sequence.size() > 1)
@@ -131,19 +137,14 @@ public class EGLauncher {
 	        return new CallSequence2EG (sequence).toEG();
 	      }
 	    }
-	    
 	  }
 	  
 	  /** No behavior */
 	  double bcet = 0;
 	  double wcet = 0;
-	  try
-    {
-      DoubleRange range = BehaviorUtil.getComputeExecutionTimeInMs(entry);
-      bcet = range.getMin();
-      wcet = range.getMax();
-    }
-    catch(Exception e){}
+	  DoubleRange range = BehaviorUtil.getComputeExecutionTimeInMs(entry);
+    bcet = range.getMin();
+    wcet = range.getMax();
 	  
 	  EGNode nCompute = new EGNode ("No_Behavior_Call_" + entry.getName());
     nCompute.setBCET(bcet);

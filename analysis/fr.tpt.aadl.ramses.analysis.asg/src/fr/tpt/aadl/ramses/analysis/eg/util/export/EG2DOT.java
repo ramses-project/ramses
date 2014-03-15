@@ -1,3 +1,24 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.eg.util.export;
 
 import java.io.BufferedWriter ;
@@ -8,15 +29,18 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.instance.ComponentInstance ;
 
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class EG2DOT extends EGExport
 {
 	public enum DOTLayout {dot,neato,twopi,fdp,sfdp};
 	
+	private static Logger _LOGGER = Logger.getLogger(EG2DOT.class) ;
 	
 	public static final boolean DELETE_DOT_FILES = false;
 
@@ -65,72 +89,71 @@ public class EG2DOT extends EGExport
 
 		if (programFound)
 		{
-			try
-			{
-				/*if (exportInit)
-				{
-					saveFlowModelAsPng(INIT_AST, INIT_AST_PATH, priority);
-				}*/
-				saveModelAsPng(TASK_NAME, MAIN_AST, MAIN_AST_PATH);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
+		  /*if (exportInit)
+      {
+        saveFlowModelAsPng(INIT_AST, INIT_AST_PATH, priority);
+      }*/
+      saveModelAsPng(TASK_NAME, MAIN_AST, MAIN_AST_PATH);
 		}
 		else
 		{
-			System.out.flush();
-			System.err.println("Cannot export AST to image: command " 
-					+ layout.name() + " is not found");
-			System.err.flush();
+			String msg = "cannot export AST to image: command \'" + layout.name() + 
+			    "\' is not found";
+			_LOGGER.error(msg) ;
+			ServiceProvider.SYS_ERR_REP.error(msg, true);
 		}
 	}
 
 	private void saveModelAsPng(String title, EGNode node, String outputPath)
-			throws Exception
 	{
-		File f;
-		BufferedWriter writer;
-		String content;
-		List<String> actionNames;
-		List<String> transitionNames;
-		f = new File(outputPath);
-
-		if (!f.exists())
+		try
 		{
-			f.createNewFile();
+		  File f;
+	    BufferedWriter writer;
+	    String content;
+	    List<String> actionNames;
+	    List<String> transitionNames;
+	    f = new File(outputPath);
+
+	    if (!f.exists())
+	    {
+	      f.createNewFile();
+	    }
+
+	    writer = new BufferedWriter(new FileWriter(outputPath));
+	    actionNames = new ArrayList<String>();
+	    transitionNames = new ArrayList<String>();
+	    collectActionNames(node, actionNames);
+	    collectTransitionNames(node, transitionNames, new ArrayList<EGNode>());
+	    content = getGlobalContent(title, actionNames, transitionNames);
+	    writer.write(content);
+	    writer.close();
+	    String outputImage = outputPath.replace(".dot", ".svg");
+	    String cmd = layout.name() + " " + outputPath + " -Tsvg -o " + outputImage;
+	    // System.out.println(cmd);
+	    Process cmdP = Runtime.getRuntime().exec(cmd);
+	    cmdP.waitFor();
+
+	    if (DELETE_DOT_FILES)
+	    {
+	      f.delete();
+	    }
 		}
-		
-
-		writer = new BufferedWriter(new FileWriter(outputPath));
-		actionNames = new ArrayList<String>();
-		transitionNames = new ArrayList<String>();
-		collectActionNames(node, actionNames);
-		collectTransitionNames(node, transitionNames, new ArrayList<EGNode>());
-		content = getGlobalContent(title, actionNames, transitionNames);
-		writer.write(content);
-		writer.close();
-		String outputImage = outputPath.replace(".dot", ".svg");
-		String cmd = layout.name() + " " + outputPath + " -Tsvg -o " + outputImage;
-		// System.out.println(cmd);
-		Process cmdP = Runtime.getRuntime().exec(cmd);
-		cmdP.waitFor();
-
-		if (DELETE_DOT_FILES)
+		catch(Exception e) // IOException & InterruptExecutionException.
 		{
-			f.delete();
+		  String msg = "cannot save the model into png" ;
+		  _LOGGER.fatal(msg, e) ;
+		  throw new RuntimeException(msg, e) ;
 		}
 	}
 
 	private String getGlobalContent(String title, List<String> actionNames,
-			List<String> transitionNames)
+			                            List<String> transitionNames)
 	{
 		String s = "digraph TaskFlow {\n\t label = \"" + title + "\";\n\n";
 
 		for (int index = 0; index < actionNames.size(); index++)
 		{
-			
 		  String actionName = actionNames.get(index);
 		  String sharedData = actionToResource.get(actionName);
 			String shape = "";
@@ -291,7 +314,6 @@ public class EG2DOT extends EGExport
 			}
 		}
 	}
-
 	
 	private static boolean commandExists(String cmd)
 	{
