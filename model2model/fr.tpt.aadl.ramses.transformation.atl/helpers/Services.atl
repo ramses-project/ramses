@@ -86,6 +86,10 @@ helper def : resolveMatchedSingleIfExists(var : OclAny, target_pattern_name : St
            	te.getObject()
            endif
       endif;
+
+helper context OclAny def : debug(msg: String) : OclAny =
+	thisModule.theHOOK.log(msg, self)
+;
        
 helper def: dataAccessSuffix(): String ='_PortIdAccess_';
 helper def: callPrefix(): String ='call';
