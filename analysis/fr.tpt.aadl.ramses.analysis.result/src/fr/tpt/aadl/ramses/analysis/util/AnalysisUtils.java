@@ -1,7 +1,29 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.ramses.analysis.util;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -14,12 +36,13 @@ import fr.tpt.aadl.ramses.analysis.AnalysisSource;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class AnalysisUtils {
 
 	private static ResourceSet resourceSet;
 	private static Resource resource;
-
+	private static Logger _LOGGER = Logger.getLogger(AnalysisUtils.class) ;
 	
 	/**
 	 * Creates a new Analysis artifact of a specified path 
@@ -40,8 +63,11 @@ public class AnalysisUtils {
 			resource = getResourceSet().createResource(analysis_uri);
 			resource.getContents().add(analysisSpec);
 			return resource;
-		} else {
-			System.out.println("Analysis artifact of the specified path: "+analysisPath+" already exists.");
+		} else
+		{
+		  String msg = "analysis artifact of the specified path \'"+analysisPath+"\' already exists" ;
+      _LOGGER.error(msg) ;
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
 		}
 		return null;
 	}
@@ -109,9 +135,6 @@ public class AnalysisUtils {
 					
 	}
 
-	
-	
-	
 	/**
 	 * Saves the given specification at the resource location 
 	 *
@@ -121,14 +144,17 @@ public class AnalysisUtils {
 	public static void saveAnalysisArtifact(Resource resource){
 		resource.unload();
 		
-		try {
+		try
+		{
 			resource.save(null);
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			String msg = "cannot save resource" ;
+			_LOGGER.fatal(msg, e);
+		  throw new RuntimeException(msg, e) ;
 		}
 	}
-	
-	
 	
 	/**
 	 * Returns either existing ResourceSet object or a new one in case it was not already existing 
@@ -158,5 +184,4 @@ public class AnalysisUtils {
 
 		return resource;
 	}
-	
 }
