@@ -26,6 +26,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.Diagnostician;
+import org.osate.aadl2.Element ;
 
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
@@ -39,31 +40,35 @@ public class AadlResourceValidator {
    * @param resourceSet the resource set from which all resources will be
    * validated
    */
-  public static void validate (ResourceSet resourceSet)
+  public static void validate(ResourceSet resourceSet)
   {
     for(Resource input_resource : resourceSet.getResources())
     {
       for(EObject myModel : input_resource.getContents())
       {
         Diagnostic diagnostic = Diagnostician.INSTANCE.validate(myModel) ;
-	    switch ( diagnostic.getSeverity() )
-	    {
-	      case Diagnostic.ERROR :
-	        for(Diagnostic d : diagnostic.getChildren())
-	        {
-	          System.err.println("Model has warnings: " + d.getMessage()) ;
-	          
-//	          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.error(null,
-//	                                                              d.getMessage());
-	        }
-            break ;
-          case Diagnostic.WARNING :
+        switch ( diagnostic.getSeverity() )
+        {
+          case Diagnostic.ERROR :
+          {
             for(Diagnostic d : diagnostic.getChildren())
             {
-              System.err.println("Model has warnings: " + d.getMessage()) ;
+              ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.error((Element) myModel,
+                                                                  d.getMessage()) ;
+            }
+            break ;
+          }
+
+          case Diagnostic.WARNING:
+          {
+            for(Diagnostic d : diagnostic.getChildren())
+            {
+              ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.warning((Element) myModel,
+                                                                  d.getMessage()) ;
             }
 
             break ;
+          }
         }
       }
     }

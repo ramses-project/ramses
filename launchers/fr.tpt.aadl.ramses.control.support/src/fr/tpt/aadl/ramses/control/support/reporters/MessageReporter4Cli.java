@@ -38,13 +38,15 @@ public class MessageReporter4Cli implements MessageReporter
   {
     File file = new File(filename) ;
     filename = file.getName() ;
-    StringBuilder sb = new StringBuilder(status.toString()) ;
+    
+    StringBuilder sb = new StringBuilder() ;
+    
+    sb.append(message) ;
     sb.append(" in ") ;
     sb.append(filename) ;
     sb.append(" at line ") ;
     sb.append(line) ;
-    sb.append(": ") ;
-    sb.append(message) ;
+    
     printMessage(sb.toString(), status) ;
   }
 
@@ -63,12 +65,6 @@ public class MessageReporter4Cli implements MessageReporter
     LocationReference locref = Aadl2Utils.getLocationReference(where) ; 
     
     String filename = locref.getFilename() ;
-    if (filename==null)
-    {
-      System.err.println(where + " -> " + message);
-      System.err.flush();
-      return;
-    }
 
     if(filename.contains("null"))
     {
@@ -78,13 +74,13 @@ public class MessageReporter4Cli implements MessageReporter
     File file = new File(filename) ;
     filename = file.getName() ;
     int line = locref.getLine() ;
-    StringBuilder sb = new StringBuilder(status.toString()) ;
+    
+    StringBuilder sb = new StringBuilder() ;
+    sb.append(message) ;
     sb.append(" in ") ;
     sb.append(filename) ;
     sb.append(" at line ") ;
     sb.append(line) ;
-    sb.append(": ") ;
-    sb.append(message) ;
     printMessage(sb.toString(), status) ;
   }
   

@@ -30,8 +30,7 @@ public class StandAloneAnalysisErrorReporterFactory implements
 {
   private MessageReporter _reporter ;
 
-  public StandAloneAnalysisErrorReporterFactory(
-                                                MessageReporter reporter)
+  public StandAloneAnalysisErrorReporterFactory(MessageReporter reporter)
   {
     _reporter = reporter ;
   }
