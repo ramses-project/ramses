@@ -251,7 +251,7 @@ public class GenerateActionHandler extends AbstractHandler {
               }
               catch(Exception e)
               {
-                _LOGGER.fatal(e) ;
+                _LOGGER.fatal("", e) ;
                 // Don't report error to the user.
                 // Eclipse will open an error dialog thanks to the status.
                 this.setLabel("FATAL") ;
@@ -286,7 +286,7 @@ public class GenerateActionHandler extends AbstractHandler {
         }
         catch(Exception e)
         {
-          _LOGGER.fatal(e);
+          _LOGGER.fatal("", e);
           result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "FATAL ERROR", e) ;
         }
         finally

@@ -29,10 +29,9 @@ public class StandAloneAnalysisErrorReporter extends
                                             AbstractAnalysisErrorReporter
 {
   private MessageReporter _reporter ;
-  private final static String STAGE = "RESOLVER" ;
+  private final static String STAGE = "Analysis" ;
 
-  public StandAloneAnalysisErrorReporter(
-                                         Resource rsrc, MessageReporter reporter)
+  public StandAloneAnalysisErrorReporter(Resource rsrc, MessageReporter reporter)
   {
     super(rsrc) ;
     _reporter = reporter ;

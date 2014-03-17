@@ -27,6 +27,8 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.Diagnostician;
 
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+
 /**
  * This class provides a static method for EMF validation of a given resource set
  */
@@ -49,9 +51,8 @@ public class AadlResourceValidator {
 	      case Diagnostic.ERROR :
 	        for(Diagnostic d : diagnostic.getChildren())
 	        {
-	          
-	          System.err.println("Model has errors: "
-	                + input_resource.getURI().lastSegment() + " " + d.getMessage()) ;
+	          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.error(null,
+	                                                              d.getMessage());
 	        }
             break ;
           case Diagnostic.WARNING :

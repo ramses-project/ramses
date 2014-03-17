@@ -79,7 +79,6 @@ public class Activator extends AbstractUIPlugin {
 	    WorkbenchUtils.setResourceDirectories() ;
 	    
 	    MessageReporter4Osate msgReporter = new MessageReporter4Osate() ;
-	    ServiceProvider.MSG_REPORTER = msgReporter ;
 	    ServiceProvider.SYS_ERR_REP = new SysErrReporter4Osate(msgReporter) ;
 	    
 	    ServiceRegistry sr = new OSGiServiceRegistry() ;
@@ -96,7 +95,7 @@ public class Activator extends AbstractUIPlugin {
 		}
 		catch(Exception e) // Top level exception handler. Stop all process.
 		{
-		  Logger.getLogger(Activator.class).fatal(e); 
+		  Logger.getLogger(Activator.class).fatal("", e); 
 		  ServiceProvider.SYS_ERR_REP.fatal("", e);
 		}
 	}

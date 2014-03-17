@@ -175,7 +175,7 @@ public class ToolSuiteLauncherCommand
     }
     catch(Exception ex)
     {
-      _logger.fatal(ex);
+      _logger.fatal("", ex);
       ServiceProvider.SYS_ERR_REP.fatal("", ex);
       System.exit(-1);
     }
@@ -831,7 +831,7 @@ public class ToolSuiteLauncherCommand
     sb.append("******************************************") ;
     sb.append(Names.NEW_LINE) ;
     
-    ServiceProvider.MSG_REPORTER.reportMessage(MessageStatus.INFO, sb.toString());
+    new MessageReporter4Cli().reportMessage(MessageStatus.INFO, sb.toString());
   }
   
   private static String createSessionHeader(String[] args)

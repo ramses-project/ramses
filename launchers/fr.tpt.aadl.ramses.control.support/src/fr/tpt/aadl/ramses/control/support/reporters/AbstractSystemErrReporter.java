@@ -37,22 +37,30 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   {
     StringBuilder sb = new StringBuilder() ;
     sb.append("Abort on fatal error (see log file for more information): ");
-    sb.append(initialMsg) ;
-    sb.append(" (") ;
     
-    if(! ( ex.getMessage() == null ||
-           ex.getMessage().isEmpty() ||
-           "null".equals(ex.getMessage())
-         )
-      )
+    if(! (initialMsg == null || initialMsg.isEmpty()))
     {
-      sb.append(ex.getMessage()) ;
+      sb.append(initialMsg) ;
+      sb.append(" (") ;
+      
+      if(! ( ex.getMessage() == null ||
+             ex.getMessage().isEmpty() ||
+             "null".equals(ex.getMessage())
+           )
+        )
+      {
+        sb.append(ex.getMessage()) ;
+      }
+      else
+      {
+        sb.append(ex.getClass().getSimpleName()) ;
+      }
+      sb.append(')') ;
     }
     else
     {
       sb.append(ex.getClass().getSimpleName()) ;
     }
-    sb.append(')') ;
 
     return sb.toString() ;
   }
