@@ -211,7 +211,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
       ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
       AnalysisErrorReporterManager errManager =
-            ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
+          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
       Iterator<EObject> iter = xtextResource.getAllContents() ;
       while(iter.hasNext())
       {
@@ -258,7 +258,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
     ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
     AnalysisErrorReporterManager errManager =
-          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
+        ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
     Iterator<EObject> iter = xtextResource.getAllContents() ;
     while(iter.hasNext())
     {

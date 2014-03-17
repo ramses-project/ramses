@@ -68,8 +68,6 @@ public class Activator extends AbstractUIPlugin {
     String lvl = "TRACE" ;
     RamsesConfiguration.setupLogging(lvl, Platform.getLogFileLocation().toFile());
                             
-	  ServiceProvider.SYS_ERR_REP = new SysErrReporter4Osate() ;
-	  
 	  try
 		{
 		  super.start(context);
@@ -79,6 +77,10 @@ public class Activator extends AbstractUIPlugin {
 	     *  instantiator and AADL models manager !!! ****************************/
 	    
 	    WorkbenchUtils.setResourceDirectories() ;
+	    
+	    MessageReporter4Osate msgReporter = new MessageReporter4Osate() ;
+	    ServiceProvider.MSG_REPORTER = msgReporter ;
+	    ServiceProvider.SYS_ERR_REP = new SysErrReporter4Osate(msgReporter) ;
 	    
 	    ServiceRegistry sr = new OSGiServiceRegistry() ;
 	    AadlModelInstantiatior instantiator ;

@@ -26,7 +26,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AbstractParseErrorReporter ;
 public class StandAloneParseErrorReporter extends AbstractParseErrorReporter
 {
   private MessageReporter _reporter ;
-  private final static String STAGE = "parser" ;
+  private final static String STAGE = "PARSER" ;
 
   public StandAloneParseErrorReporter(
                                       MessageReporter reporter)
@@ -45,8 +45,9 @@ public class StandAloneParseErrorReporter extends AbstractParseErrorReporter
                            int line,
                            String message)
   {
-    MessageStatus ms = MessageStatus.ERROR ;
+    MessageStatus ms = MessageStatus.AADL_ERROR ;
     ms._stage = STAGE ;
+    message = ms.toString() +  " " + message ; 
     _reporter.reportMessage(ms, filename, line, message) ;
   }
 
@@ -55,8 +56,9 @@ public class StandAloneParseErrorReporter extends AbstractParseErrorReporter
                              int line,
                              String message)
   {
-    MessageStatus ms = MessageStatus.WARNING ;
+    MessageStatus ms = MessageStatus.AADL_WARNING ;
     ms._stage = STAGE ;
+    message = ms.toString() +  " " + message ; 
     _reporter.reportMessage(ms, filename, line, message) ;
   }
 
@@ -65,8 +67,9 @@ public class StandAloneParseErrorReporter extends AbstractParseErrorReporter
                           int line,
                           String message)
   {
-    MessageStatus ms = MessageStatus.INFO ;
+    MessageStatus ms = MessageStatus.AADL_INFO ;
     ms._stage = STAGE ;
+    message = ms.toString() +  " " + message ; 
     _reporter.reportMessage(ms, filename, line, message) ;
   }
 }

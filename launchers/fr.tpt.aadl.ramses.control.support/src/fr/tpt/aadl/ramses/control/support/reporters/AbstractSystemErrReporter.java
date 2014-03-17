@@ -21,9 +21,9 @@
 
 package fr.tpt.aadl.ramses.control.support.reporters;
 
+import java.util.Collections ;
 import java.util.LinkedList ;
-
-import fr.tpt.aadl.ramses.control.support.utils.Names ;
+import java.util.List ;
 
 public abstract class AbstractSystemErrReporter implements SystemErrReporter
 {
@@ -59,67 +59,18 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   
   protected String formatFatalMsg(String initialMsg)
   {
-    // TODO to be implemented.
-    return "Abort on fatal error (see log file for more information): " +
+    return "<Fatal Error> Abort on fatal error (see log file for more information): " +
             initialMsg ;
   }
   
   protected String formatErrorMsg(String initialMsg)
   {
-    // TODO to be implemented.
-    return "<Error> " + initialMsg ;
+    return "<Internal Error> " + initialMsg ;
   }
   
   protected String formatWarningMsg(String initialMsg)
   {
-    // TODO to be implemented.
-    return "<Warning> " + initialMsg ;
-  }
-  
-  @Override
-  public String formatDelayedErrors()
-  {
-    if(!(_delayedErrors.isEmpty() && _delayedWarnings.isEmpty()))
-    {
-      // TODO to be refined.
-      StringBuilder sb = new StringBuilder() ;
-      
-      sb.append("RAMSES system report:") ;
-      
-      if(false == _delayedErrors.isEmpty())
-      {
-        sb.append(Names.NEW_LINE);
-        sb.append(Names.NEW_LINE);
-        sb.append("\tErrors:");
-        sb.append(Names.NEW_LINE);
-        sb.append(Names.NEW_LINE);
-        for(String msg : _delayedErrors)
-        {
-          sb.append("\t_ ") ;
-          sb.append(msg) ;
-        }
-      }
-      
-      if(false == _delayedWarnings.isEmpty())
-      {
-        sb.append(Names.NEW_LINE);
-        sb.append(Names.NEW_LINE);
-        sb.append("\tWarnings:");
-        sb.append(Names.NEW_LINE);
-        sb.append(Names.NEW_LINE);
-        for(String msg : _delayedWarnings)
-        {
-          sb.append("\t_ ") ;
-          sb.append(msg) ;
-        }
-      }
-      
-      return sb.toString() ;
-    }
-    else
-    {
-      return null ;
-    }
+    return "<Internal Warning> " + initialMsg ;
   }
   
   @Override
@@ -139,5 +90,26 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   public int getNbWarnings()
   {
     return _nbWarnings ;
+  }
+  
+  @Override
+  public List<String> getDelayedErrors()
+  {
+    return Collections.unmodifiableList(_delayedErrors) ;
+  }
+
+  @Override
+  public List<String> getDelayedWarnings()
+  {
+    return Collections.unmodifiableList(_delayedWarnings) ;
+  }
+
+  @Override
+  public void clearErrorsAndWarnings()
+  {
+    _delayedErrors.clear();
+    _delayedWarnings.clear();
+    _nbErrors = 0 ;
+    _nbWarnings = 0 ;
   }
 }

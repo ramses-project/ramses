@@ -214,6 +214,8 @@ public class GenerateActionHandler extends AbstractHandler {
     // implementation has already been instantiated.
     
     generate(_currentProject, _sysInst, _config, monitor);
+    
+    WorkbenchUtils.showGenerationReport() ;
   }
   
   private void doGenerate()
@@ -324,7 +326,7 @@ public class GenerateActionHandler extends AbstractHandler {
     String workflow = GenerateActionUtils.findWorkflow(rootDir);
     
     AnalysisErrorReporterManager errReporter = 
-                              WorkbenchUtils.getAnalysisErrReporterManager() ;
+                                 ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
     
     // Reinitialize the registry as include directors (eg projects directories),
     // may be added or deleted.

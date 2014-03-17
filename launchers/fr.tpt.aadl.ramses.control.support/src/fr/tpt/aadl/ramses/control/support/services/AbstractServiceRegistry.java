@@ -28,6 +28,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry
    public int getNbError()
    {
      return ServiceRegistry.PARSE_ERR_REPORTER.getNumErrors() +
-             ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.getNumErrors() ;
+         ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.getNumErrors() ;
    }
 }

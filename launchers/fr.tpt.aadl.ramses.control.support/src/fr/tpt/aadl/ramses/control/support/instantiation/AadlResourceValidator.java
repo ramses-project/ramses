@@ -49,6 +49,7 @@ public class AadlResourceValidator {
 	      case Diagnostic.ERROR :
 	        for(Diagnostic d : diagnostic.getChildren())
 	        {
+	          
 	          System.err.println("Model has errors: "
 	                + input_resource.getURI().lastSegment() + " " + d.getMessage()) ;
 	        }

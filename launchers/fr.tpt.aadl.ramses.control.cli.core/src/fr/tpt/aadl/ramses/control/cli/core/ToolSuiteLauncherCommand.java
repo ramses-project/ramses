@@ -53,8 +53,9 @@ import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
+import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter4Cli ;
 import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
+import fr.tpt.aadl.ramses.control.support.reporters.SystemErrReporter ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.utils.EnvUtils ;
@@ -102,7 +103,7 @@ public class ToolSuiteLauncherCommand
   
   private static final String RUNTIME_PATH_OPTION_ID = "runtime_path" ;
   
-  private final static DefaultMessageReporter _reporter = new DefaultMessageReporter();
+  private final static MessageReporter4Cli _reporter = new MessageReporter4Cli();
   
   private static Set<File> _includeDirs ;
   private static List<File> _mainModelFiles ;
@@ -600,7 +601,7 @@ public class ToolSuiteLauncherCommand
     
     _monitor.done();
     
-    // TODO REPORT GENERATION STATE AND SYSTEM ERRORS.
+    showGenerationReport();
   }
 
   private static List<File> getVerifiedPath(String[] filePath,
@@ -794,6 +795,43 @@ public class ToolSuiteLauncherCommand
     {
       throw new ConfigurationException(status) ;
     }
+  }
+  
+  private static void showGenerationReport()
+  {
+    SystemErrReporter sysRep = ServiceProvider.SYS_ERR_REP  ;
+    StringBuilder sb = new StringBuilder() ;
+    
+    sb.append(Names.NEW_LINE) ;
+    sb.append(Names.NEW_LINE) ;
+    sb.append("******************************************") ;
+    sb.append(Names.NEW_LINE) ;
+              
+    sb.append("CODE GENERATION HAS SUCCESSFULLY COMPLETED") ;
+    sb.append(Names.NEW_LINE) ;
+    
+    
+    if(sysRep.getNbWarnings() != 0)
+    {
+      sb.append(" with ") ;
+      sb.append(sysRep.getNbWarnings()) ;
+      sb.append(" internal warning(s)");
+      sb.append(Names.NEW_LINE) ;
+    }
+    
+    if(sysRep.getNbErrors() != 0)
+    {
+      sb.append(" with ") ;
+      sb.append(sysRep.getNbErrors()) ;
+      sb.append(" internal error(s)") ;
+      sb.append(Names.NEW_LINE) ;
+    }
+    
+    sb.append(Names.NEW_LINE) ;
+    sb.append("******************************************") ;
+    sb.append(Names.NEW_LINE) ;
+    
+    ServiceProvider.MSG_REPORTER.reportMessage(MessageStatus.INFO, sb.toString());
   }
   
   private static String createSessionHeader(String[] args)

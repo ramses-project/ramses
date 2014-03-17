@@ -137,7 +137,7 @@ public class ToolSuiteLauncher
         analyzer.setParameters(parameters) ;
         analyzer.performAnalysis(instance,
                                  outputDir,
-                               ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
+                                 ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor
                                ) ;
       }

@@ -21,7 +21,6 @@
 
 package fr.tpt.aadl.ramses.control.support.reporters;
 
-import java.io.PrintStream ;
 
 /**
  * 
@@ -31,14 +30,11 @@ import java.io.PrintStream ;
  */
 public class SysErrReporter4Cli extends AbstractSystemErrReporter
 {
-  protected PrintStream _output ;
-  protected PrintStream _err ;
+  protected MessageReporter4Cli _msgReporter ;
   
-  public SysErrReporter4Cli(PrintStream outputStream,
-                            PrintStream errStream)
+  public SysErrReporter4Cli(MessageReporter4Cli msgReporter)
   {
-    _output = outputStream ;
-    _err = errStream ;
+    _msgReporter = msgReporter ;
   }
 
   @Override
@@ -46,14 +42,14 @@ public class SysErrReporter4Cli extends AbstractSystemErrReporter
                     Throwable ex)
   {
     msg = super.formatFatalMsg(msg, ex) ;
-    _err.println(msg) ;
+    _msgReporter.reportMessage(MessageStatus.INTERNAL_FATAL_ERROR, msg, ex);
   }
 
   @Override
   public void fatal(String msg)
   {
     msg = super.formatFatalMsg(msg) ;
-    _err.println(msg) ;
+    _msgReporter.reportMessage(MessageStatus.INTERNAL_FATAL_ERROR, msg) ;
   }
 
   @Override
@@ -63,8 +59,8 @@ public class SysErrReporter4Cli extends AbstractSystemErrReporter
     
     msg = super.formatErrorMsg(msg) ;
     
-    // Never delayed: better visibility when executing RAMSES CLI.
-    _err.println(msg) ;
+    // Never delay better visibility when executing RAMSES CLI.
+    _msgReporter.reportMessage(MessageStatus.INTERNAL_ERROR, msg) ;
   }
 
   @Override
@@ -74,20 +70,7 @@ public class SysErrReporter4Cli extends AbstractSystemErrReporter
     
     msg = super.formatWarningMsg(msg) ;
     
-    // Never delayed: better visibility when executing RAMSES CLI.
-    _err.println(msg) ;
+    // Never delay: better visibility when executing RAMSES CLI.
+    _msgReporter.reportMessage(MessageStatus.INTERNAL_WARNING, msg) ;
   }
-  /*
-  @Override
-  public void displayDelayedErrors()
-  {
-    String msg = super.formatDelayedErrors() ;
-    if(msg != null)
-    {
-      _err.println(msg) ;
-      _delayedErrors.clear();
-      _delayedWarnings.clear();
-    }
-  }
-  */
 }

@@ -21,29 +21,31 @@
 
 package fr.tpt.aadl.ramses.control.osate;
 
-import org.eclipse.core.runtime.IStatus ;
-import org.eclipse.core.runtime.Status ;
-import org.eclipse.ui.statushandlers.StatusManager ;
-
 import fr.tpt.aadl.ramses.control.support.reporters.AbstractSystemErrReporter ;
+import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 
 public class SysErrReporter4Osate extends AbstractSystemErrReporter
 {
-  private static StatusManager _MANAGER = StatusManager.getManager() ;
+  protected MessageReporter4Osate _msgReporter ;
+  
+  public SysErrReporter4Osate(MessageReporter4Osate msgReporter)
+  {
+    _msgReporter = msgReporter ;
+  }
   
   @Override
   public void fatal(String msg,
                     Throwable ex)
   {
     msg = super.formatFatalMsg(msg, ex) ;
-    openFatalErrorDialog(msg, ex);
+    _msgReporter.reportMessage(MessageStatus.INTERNAL_FATAL_ERROR, msg, ex);
   }
 
   @Override
   public void fatal(String msg)
   {
     msg = super.formatFatalMsg(msg) ;
-    openFatalErrorDialog(msg);
+    _msgReporter.reportMessage(MessageStatus.INTERNAL_FATAL_ERROR, msg);
   }
 
   @Override
@@ -58,7 +60,7 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
     }
     else
     {
-      openErrorDialog(msg);
+      _msgReporter.reportMessage(MessageStatus.INTERNAL_ERROR, msg);
     }
   }
 
@@ -75,60 +77,7 @@ public class SysErrReporter4Osate extends AbstractSystemErrReporter
     }
     else
     {
-      openWarningDialog(msg);
+      _msgReporter.reportMessage(MessageStatus.INTERNAL_WARNING, msg);
     }
-  }
-
-  /*
-  @Override
-  public void displayDelayedErrors()
-  {
-    String msg = super.formatDelayedErrors() ;
-    if(msg != null)
-    {
-      if(_delayedErrors.isEmpty())
-      {
-        openWarningDialog(msg);
-        _delayedWarnings.clear();
-      }
-      else
-      {
-        openErrorDialog(msg);
-        _delayedErrors.clear();
-        _delayedWarnings.clear();
-      }
-    }
-  }
-  */
-  private void openFatalErrorDialog(String msg, Throwable e)
-  {
-    openDialog(IStatus.ERROR, msg, e);
-  }
-  
-  private void openFatalErrorDialog(String msg)
-  {
-    openDialog(IStatus.ERROR, msg);
-  }
-  
-  private void openErrorDialog(String msg)
-  {
-    openDialog(IStatus.ERROR, msg);
-  }
-  
-  private void openWarningDialog(String msg)
-  {
-    openDialog(IStatus.WARNING, msg);
-  }
-  
-  private void openDialog(int severity, String msg)
-  {
-    Status status = new Status(severity, Activator.PLUGIN_ID, msg) ;
-    _MANAGER.handle(status, StatusManager.BLOCK);
-  }
-  
-  private void openDialog(int severity, String msg, Throwable e)
-  {
-    Status status = new Status(severity, Activator.PLUGIN_ID, msg, e) ;
-    _MANAGER.handle(status, StatusManager.BLOCK);
   }
 }

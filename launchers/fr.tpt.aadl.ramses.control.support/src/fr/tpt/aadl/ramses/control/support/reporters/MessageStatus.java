@@ -23,27 +23,39 @@ package fr.tpt.aadl.ramses.control.support.reporters ;
 
 public enum MessageStatus
 {
-  ERROR("error"), INTERNAL_ERROR("internal error"), WARNING("warning"), INFO(
-        "info") ;
-
+  AADL_ERROR("Error"),
+  AADL_WARNING("Warning"),
+  AADL_INFO("Info"),
+  
+  INTERNAL_FATAL_ERROR("Internal Fatal Error"),
+  INTERNAL_ERROR("Internal Error"),
+  INTERNAL_WARNING("Internal Warning"),
+  
+  INFO("");
+  
   public final String _literal ;
-  public String _stage ;
+  public String _stage = null ;
 
-  private MessageStatus(
-                        String literal)
+  private MessageStatus(String literal)
   {
     this._literal = literal ;
   }
 
   public String toString()
   {
-    if(this._stage != null && (!this._stage.isEmpty()))
+    StringBuilder sb = new StringBuilder() ;
+
+    sb.append('<') ;
+    
+    if(! (_stage == null || _stage.isEmpty()))
     {
-      return this._stage + " " + this._literal + ':';
+      sb.append(_stage) ;
+      sb.append(' ') ;
     }
-    else
-    {
-      return this._literal + ':';
-    }
+    
+    sb.append(_literal) ;
+    sb.append('>') ;
+    
+    return sb.toString() ;
   }
 }

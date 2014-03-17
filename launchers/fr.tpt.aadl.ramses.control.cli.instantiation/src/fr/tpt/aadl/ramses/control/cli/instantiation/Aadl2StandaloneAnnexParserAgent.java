@@ -61,7 +61,7 @@ public class Aadl2StandaloneAnnexParserAgent extends LazyLinker
     // set up reporter for ParseErrors
     ParseErrorReporter errReporter = ServiceRegistry.PARSE_ERR_REPORTER ;
     AnalysisErrorReporterManager resolveErrManager =
-          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
+        ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     List<DefaultAnnexSubclause> asl =
           EcoreUtil2.eAllOfType(model, DefaultAnnexSubclause.class) ;

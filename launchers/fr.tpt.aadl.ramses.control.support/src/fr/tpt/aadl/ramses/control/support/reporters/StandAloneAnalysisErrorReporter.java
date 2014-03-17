@@ -29,7 +29,7 @@ public class StandAloneAnalysisErrorReporter extends
                                             AbstractAnalysisErrorReporter
 {
   private MessageReporter _reporter ;
-  private final static String STAGE = "resolver" ;
+  private final static String STAGE = "RESOLVER" ;
 
   public StandAloneAnalysisErrorReporter(
                                          Resource rsrc, MessageReporter reporter)
@@ -44,8 +44,9 @@ public class StandAloneAnalysisErrorReporter extends
                            String[] attrs,
                            Object[] values)
   {
-    MessageStatus ms = MessageStatus.ERROR ;
+    MessageStatus ms = MessageStatus.AADL_ERROR ;
     ms._stage = STAGE ;
+    message = ms.toString() + " " + message ;
     _reporter.reportMessage(ms, where, message) ;
   }
 
@@ -55,8 +56,9 @@ public class StandAloneAnalysisErrorReporter extends
                              String[] attrs,
                              Object[] values)
   {
-    MessageStatus ms = MessageStatus.WARNING ;
+    MessageStatus ms = MessageStatus.AADL_WARNING ;
     ms._stage = STAGE ;
+    message = ms.toString() + " " + message ;
     _reporter.reportMessage(ms, where, message) ;
   }
 
@@ -66,8 +68,9 @@ public class StandAloneAnalysisErrorReporter extends
                           String[] attrs,
                           Object[] values)
   {
-    MessageStatus ms = MessageStatus.INFO ;
+    MessageStatus ms = MessageStatus.AADL_INFO ;
     ms._stage = STAGE ;
+    message = ms.toString() + " " + message ;
     _reporter.reportMessage(ms, where, message) ;
   }
 

@@ -33,8 +33,6 @@ import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
-import fr.tpt.aadl.ramses.control.support.reporters.DefaultMessageReporter ;
-import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneAnalysisErrorReporterFactory ;
 import fr.tpt.aadl.ramses.control.support.reporters.StandAloneParseErrorReporter ;
 
@@ -44,15 +42,14 @@ import fr.tpt.aadl.ramses.control.support.reporters.StandAloneParseErrorReporter
  */
 public interface ServiceRegistry
 {
-  public final static MessageReporter MSG_REPORTER =
-        new DefaultMessageReporter() ;
+  public static StandAloneParseErrorReporter PARSE_ERR_REPORTER =
+      new StandAloneParseErrorReporter(ServiceProvider.MSG_REPORTER) ;
 
-  public final static StandAloneParseErrorReporter PARSE_ERR_REPORTER =
-        new StandAloneParseErrorReporter(MSG_REPORTER) ;
-
-  public final static AnalysisErrorReporterManager ANALYSIS_ERR_REPORTER_MANAGER =
-        new AnalysisErrorReporterManager(new StandAloneAnalysisErrorReporterFactory(MSG_REPORTER)) ;
-
+  public static AnalysisErrorReporterManager ANALYSIS_ERR_REPORTER_MANAGER =
+      new AnalysisErrorReporterManager(
+                     new StandAloneAnalysisErrorReporterFactory(
+                                                ServiceProvider.MSG_REPORTER)) ;
+  
   /**
    * Initialize the registry. This method has to be called prior calling the
    * others methods.

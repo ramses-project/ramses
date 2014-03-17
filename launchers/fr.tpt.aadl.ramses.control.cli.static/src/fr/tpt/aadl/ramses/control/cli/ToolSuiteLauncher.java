@@ -25,7 +25,6 @@ import org.apache.log4j.LogManager ;
 import org.apache.log4j.Logger ;
 
 import fr.tpt.aadl.ramses.control.cli.core.ToolSuiteLauncherCommand ;
-import fr.tpt.aadl.ramses.control.support.reporters.SysErrReporter4Cli ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
@@ -46,10 +45,6 @@ public class ToolSuiteLauncher
   {
     try
     {
-      SysErrReporter4Cli errReporter = new SysErrReporter4Cli(System.out,
-                                                              System.err) ;
-      ServiceProvider.SYS_ERR_REP = errReporter ;
-      
       ServiceRegistry registry = new StaticServiceRegistry() ;
       
       ServiceProvider.setDefault(registry) ;

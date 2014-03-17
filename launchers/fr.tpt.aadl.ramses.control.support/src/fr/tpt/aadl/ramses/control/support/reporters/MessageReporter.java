@@ -36,4 +36,8 @@ public interface MessageReporter
 
   public void reportMessage(MessageStatus status,
                             String message) ;
+  
+  public void reportMessage(MessageStatus status,
+                            String message,
+                            Throwable e) ;
 }

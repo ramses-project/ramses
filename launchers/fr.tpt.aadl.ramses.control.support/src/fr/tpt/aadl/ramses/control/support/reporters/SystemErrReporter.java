@@ -21,6 +21,8 @@
 
 package fr.tpt.aadl.ramses.control.support.reporters;
 
+import java.util.List ;
+
 public interface SystemErrReporter
 {
   /**
@@ -58,17 +60,11 @@ public interface SystemErrReporter
   public void warning(String msg, boolean isDelayed) ;
   
   /**
-   * Show the delayed errors and warnings that don't abort RAMSES.
-   * Do nothing if there is not any delayed error or warning.
-   */
-//  public void displayDelayedErrors() ;
-  
-  /**
-   * Returns {@code true} if the error reporter has delayed errors to be printed.
-   * Otherwise, returns {@code false}. 
+   * Returns {@code true} if the error reporter has delayed errors and warnings 
+   * to be printed. Otherwise, returns {@code false}. 
    * 
-   * @return {@code true} if the error reporter has delayed errors to be printed.
-   * Otherwise, returns {@code false}.
+   * @return {@code true} if the error reporter has delayed errors and warnings
+   * to be printed. Otherwise, returns {@code false}.
    */
   public boolean hasDelayedErrors() ;
   
@@ -86,5 +82,23 @@ public interface SystemErrReporter
    */
   public int getNbWarnings() ;
   
-  public String formatDelayedErrors() ;
+  /**
+   * Return the message of the delayed errors.
+   * 
+   * @return the message of the delayed errors
+   */
+  public List<String> getDelayedErrors() ;
+  
+  /**
+   * Return the message of the delayed warnings.
+   * 
+   * @return the message of the delayed warnings
+   */
+  public List<String> getDelayedWarnings() ;
+  
+  /**
+   * Clear the delayed errors and warnings.
+   * 
+   */
+  public void clearErrorsAndWarnings() ;
 }

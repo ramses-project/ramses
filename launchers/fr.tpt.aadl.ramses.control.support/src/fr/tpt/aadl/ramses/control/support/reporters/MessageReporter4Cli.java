@@ -22,16 +22,14 @@
 package fr.tpt.aadl.ramses.control.support.reporters ;
 
 import java.io.File ;
+import java.io.PrintStream ;
 
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.parsesupport.LocationReference ;
 import org.osate.utils.Aadl2Utils ;
 
-
-public abstract class AbstractMessageReporter implements MessageReporter
+public class MessageReporter4Cli implements MessageReporter
 {
-  abstract protected void printMessage(String msg, MessageStatus status) ;
-
   @Override
   public void reportMessage(MessageStatus status,
                             String filename,
@@ -54,10 +52,7 @@ public abstract class AbstractMessageReporter implements MessageReporter
   public void reportMessage(MessageStatus status,
                             String message)
   {
-    StringBuilder sb = new StringBuilder(status.toString()) ;
-    sb.append(' ') ;
-    sb.append(message) ;
-    printMessage(sb.toString(), status) ;
+    printMessage(message, status) ;
   }
 
   @Override
@@ -70,9 +65,9 @@ public abstract class AbstractMessageReporter implements MessageReporter
     String filename = locref.getFilename() ;
     if (filename==null)
     {
-    	System.err.println(where + " -> " + message);
-    	System.err.flush();
-    	return;
+      System.err.println(where + " -> " + message);
+      System.err.flush();
+      return;
     }
 
     if(filename.contains("null"))
@@ -91,5 +86,41 @@ public abstract class AbstractMessageReporter implements MessageReporter
     sb.append(": ") ;
     sb.append(message) ;
     printMessage(sb.toString(), status) ;
+  }
+  
+  protected void printMessage(String msg, MessageStatus status)
+  {
+    this.getStream(status).println(msg) ;
+  }
+  
+  protected PrintStream getStream(MessageStatus status)
+  {
+    PrintStream result ;
+    
+    switch(status)
+    {
+      case INTERNAL_FATAL_ERROR :
+      case INTERNAL_ERROR :   
+      case INTERNAL_WARNING :
+      case AADL_ERROR:
+      case AADL_WARNING:
+      {
+        result = System.err ; break ;
+      }
+     
+      case INFO:
+      default :
+      {
+        result = System.out ; break ;
+      }
+    }
+    
+    return result ;
+  }
+
+  @Override
+  public void reportMessage(MessageStatus status, String msg, Throwable e)
+  {
+    this.printMessage(msg, status);
   }
 }
