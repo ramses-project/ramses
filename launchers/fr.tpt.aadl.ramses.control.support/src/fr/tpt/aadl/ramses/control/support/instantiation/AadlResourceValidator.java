@@ -51,8 +51,10 @@ public class AadlResourceValidator {
 	      case Diagnostic.ERROR :
 	        for(Diagnostic d : diagnostic.getChildren())
 	        {
-	          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.error(null,
-	                                                              d.getMessage());
+	          System.err.println("Model has warnings: " + d.getMessage()) ;
+	          
+//	          ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER.error(null,
+//	                                                              d.getMessage());
 	        }
             break ;
           case Diagnostic.WARNING :
