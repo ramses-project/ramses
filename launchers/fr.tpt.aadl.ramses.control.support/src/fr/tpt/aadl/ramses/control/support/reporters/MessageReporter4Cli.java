@@ -62,25 +62,29 @@ public class MessageReporter4Cli implements MessageReporter
                             Element where,
                             String message)
   {
-    LocationReference locref = Aadl2Utils.getLocationReference(where) ; 
-    
-    String filename = locref.getFilename() ;
-
-    if(filename.contains("null"))
-    {
-      filename.replace("null", where.eResource().getURI().toString()) ;
-    }
-
-    File file = new File(filename) ;
-    filename = file.getName() ;
-    int line = locref.getLine() ;
-    
     StringBuilder sb = new StringBuilder() ;
     sb.append(message) ;
-    sb.append(" in ") ;
-    sb.append(filename) ;
-    sb.append(" at line ") ;
-    sb.append(line) ;
+    
+    LocationReference locref = Aadl2Utils.getLocationReference(where) ; 
+    String filename = locref.getFilename() ;
+
+    if (filename != null)
+    {
+      if(filename.contains("null"))
+      {
+        filename.replace("null", where.eResource().getURI().toString()) ;
+      }
+
+      File file = new File(filename) ;
+      filename = file.getName() ;
+      int line = locref.getLine() ;
+
+      sb.append(" in ") ;
+      sb.append(filename) ;
+      sb.append(" at line ") ;
+      sb.append(line) ;
+    }
+
     printMessage(sb.toString(), status) ;
   }
   
