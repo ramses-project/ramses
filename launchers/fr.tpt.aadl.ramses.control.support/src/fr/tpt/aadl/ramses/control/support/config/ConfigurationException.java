@@ -37,11 +37,11 @@ public class ConfigurationException extends Exception
   @Override
   public String getMessage()
   {
-    String msg = "configuration failed: " ;
+    String msg = "configuration has failed" ;
     
     if(false == (status.msg == null || status.msg.isEmpty()))
     {
-      msg += status.msg + " (" + status.cardinal + ')' ;
+      msg += ": " + status.msg ;
     }
     else
     {

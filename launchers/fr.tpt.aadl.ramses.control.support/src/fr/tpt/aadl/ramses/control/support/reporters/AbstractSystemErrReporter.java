@@ -42,27 +42,29 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
     {
       sb.append(initialMsg) ;
       sb.append(" (") ;
-      
-      if(! ( ex.getMessage() == null ||
-             ex.getMessage().isEmpty() ||
-             "null".equals(ex.getMessage())
-           )
-        )
-      {
-        sb.append(ex.getMessage()) ;
-      }
-      else
-      {
-        sb.append(ex.getClass().getSimpleName()) ;
-      }
+      formatException(sb, ex);
       sb.append(')') ;
+    }
+    else
+    {
+      formatException(sb, ex);
+    }
+
+    return sb.toString() ;
+  }
+  
+  private void formatException(StringBuilder sb, Throwable ex)
+  {
+    if(!(ex.getMessage() == null ||
+         ex.getMessage().isEmpty() ||
+         "null".equals(ex.getMessage())))
+    {
+      sb.append(ex.getMessage()) ;
     }
     else
     {
       sb.append(ex.getClass().getSimpleName()) ;
     }
-
-    return sb.toString() ;
   }
   
   protected String formatFatalMsg(String initialMsg)
