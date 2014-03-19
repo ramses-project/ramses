@@ -104,7 +104,7 @@ rule m_Thread_Output_PeriodicDelayed_Port_LowET
 		),
 		CurrentDeadlineWrite:AADLBA!DataSubcomponent
 		(
-			name<-fi.getComponentInstance().name+'_'+fi.name+'_CDWTable',
+			name<-fi.getComponentInstance().name+'_'+fi.name+'_CDWTable_'+cnxRef.destination.connectionEnd.getContainingClassifier().name+'_'+cnxRef.destination.connectionEnd.name,
 			dataSubcomponentType <- indexArrayDataType
 		),
 		CDWInit: AADLBA!ListValue

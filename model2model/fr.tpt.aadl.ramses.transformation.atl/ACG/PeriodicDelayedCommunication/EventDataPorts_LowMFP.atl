@@ -237,7 +237,7 @@ unique lazy rule createThreadID
 		)
 	to
 		thrdIDSub: AADLBA!DataSubcomponent (
-			name <- 'ID',
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_'+consumer.getComponentInstance().name+'_'+consumer.name+'_ID',
 			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES'),
 			ownedPropertyAssociation <- Sequence{
 				thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', ID)
@@ -283,7 +283,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		---------------------------------------------------------------------------
 		PeriodicDelayedContext_Access: AADLBA!DataAccess
 		(
-			name <- fi.name+'_Output_Periodic_Delayed_ContextAccess',
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_Output_Periodic_Delayed_ContextAccess_'+cnxRef.destination.connectionEnd.getContainingClassifier().name+'_'+cnxRef.destination.connectionEnd.name,
 			dataFeatureClassifier <- thisModule.createContextDataImpl(consumerPort), 
 			kind<-#requires
 		),
@@ -302,7 +302,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		),
 		PeriodicDelayedContext_Connection: AADLBA!AccessConnection
 		(
-			name<-cnxRef.uniqueName()+'_'+fi.name+'_to_periodic_Delayed_Context',
+			name<-fi.getComponentInstance().name+'_'+fi.name+'_'+cnxRef.destination.connectionEnd.getContainingClassifier().name+'_'+cnxRef.destination.connectionEnd.name+'_to_periodic_Delayed_Context',
 			accessCategory<-#data,
 			source<-connected_PeriodicDelayedContext_Access,
 			destination<-connected_PeriodicDelayedContext_Subcomponent
@@ -383,7 +383,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 	to
 		PeriodicDelayedContext_EntryPointAccess: AADLBA!DataAccess
 		(
-			name <- fi.name+'Out_Periodic_Delayed_ContextAccess',
+			name <- cnxRef.destination.connectionEnd.getContainingClassifier().name+'_'+cnxRef.destination.connectionEnd.name+'_Out_Periodic_Delayed_ContextAccess_'+fi.getComponentInstance().name+'_'+fi.name,
 			dataFeatureClassifier <- thisModule.createContextDataImpl(consumerPort), 
 			kind<-#requires
 		),
@@ -398,7 +398,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		PeriodicDelayedContext_EntryPointConnection: AADLBA!AccessConnection
 		(
-			name<-cnxRef.uniqueName()+'_'+fi.name+'_to_periodic_Delayed_Context',
+			name<-fi.getComponentInstance().name+'_'+fi.name+'_'+cnxRef.destination.connectionEnd.getContainingClassifier().name+'_'+cnxRef.destination.connectionEnd.name+'_to_periodic_Delayed_Context',
 			accessCategory<-#data,
 			source<-connected_PeriodicDelayedContext_Access,
 			destination<-connected_PeriodicDelayedContext_Subcomponent
@@ -637,7 +637,7 @@ rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_L
 		------------------------------------------------------------
 		
 		PeriodicDelayedContext_Access:AADLBA!DataAccess(
-			name <- fi.name+'_Input_Periodic_Delayed_ContextAccess', 
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_Input_Periodic_Delayed_ContextAccess', 
 			kind<-#requires
 		),
 		
@@ -656,7 +656,7 @@ rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_L
 		),
 		PeriodicDelayedContext_Connection: AADLBA!AccessConnection
 		(
-			name<-fi.name+'_to_periodic_Delayed_Context',
+			name<-fi.getComponentInstance().name+'_'+fi.name+'_to_periodic_Delayed_Context',
 			accessCategory<-#data,
 			source<-connected_periodic_Delayed_ContextAccess,
 			destination<-connected_periodic_Delayed_ContextData
@@ -737,7 +737,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	)
   to
   	PeriodicDelayedContext_EntryPointAccess:AADLBA!DataAccess(
-		name <- fi.name+'_Periodic_Delayed_ContextAccess',
+		name <- fi.getComponentInstance().name+'_'+fi.name+'_Periodic_Delayed_ContextAccess',
 		dataFeatureClassifier <- thisModule.createContextDataImpl(fi), 
 		kind<-#requires
 	),
@@ -752,7 +752,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	),
 	PeriodicDelayedContext_EntryPointConnection: AADLBA!AccessConnection
 	(
-		name<-fi.name+'_to_periodic_Delayed_Context',
+		name<-fi.getComponentInstance().name+'_'+fi.name+'_to_periodic_Delayed_Context',
 		accessCategory<-#data,
 		source<-connected_PeriodicDelayedContext_Access,
 		destination<-connected_PeriodicDelayedContext_Subcomponent

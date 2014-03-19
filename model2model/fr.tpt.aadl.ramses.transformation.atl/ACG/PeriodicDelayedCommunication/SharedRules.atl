@@ -282,7 +282,7 @@ rule m_Thread_Output_PeriodicDelayed_Port
 															CurrentDeadlineWriteTable->size().toString())}
 		),
 		CDWSize: AADLBA!DataSubcomponent (
-		    name<-fi.name+'_CDWSize',
+		    name<-fi.getComponentInstance().name+'_'+fi.name+'_CDWSize_'+cnxRef.destination.connectionEnd.getContainingClassifier().name+'_'+cnxRef.destination.connectionEnd.name,
 			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
 			ownedPropertyAssociation <- Sequence {
 												thisModule.CreatePropertyAssociation(

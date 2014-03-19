@@ -599,6 +599,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     }
     catch(DimensionException e)
     {
+      // This is an internal error, to be logged and displayed
       String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the type of \'" +
                                object + '\'', e) ;
       _LOGGER.error(errMsg);
@@ -1039,8 +1040,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         if(dst instanceof DataPrototype)
         {
           boolean bounded = false ;
-          Classifier cl = (Classifier) _owner ;
-          for(PrototypeBinding pb : cl.getOwnedPrototypeBindings())
+          for(PrototypeBinding pb : dc.getOwnedPrototypeBindings())
           {
             if(pb.getFormal().equals(dst))
             {

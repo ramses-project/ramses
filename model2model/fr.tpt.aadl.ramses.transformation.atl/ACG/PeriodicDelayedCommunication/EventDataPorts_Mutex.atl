@@ -114,6 +114,15 @@ helper def : collectInitializationEntryPoint(c: AADLI!ComponentInstance): AADLBA
   endif
 ;
 
+-- @extends m_Thread_With_Output_PeriodicDelayed_Port,m_Thread_With_Input_PeriodicDelayed_Port
+rule m_Thread_With_Input_and_Output_PeriodicDelayed_Port
+{
+	from
+		c: AADLI!ComponentInstance
+	to
+		sub: AADLBA!ThreadSubcomponent
+}
+
 -- @extends m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 rule m_Thread_With_Output_PeriodicDelayed_Port
 {
