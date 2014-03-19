@@ -24,10 +24,10 @@ package fr.tpt.aadl.ramses.control.support.config;
 import java.io.File ;
 import java.io.FileNotFoundException ;
 
-import org.apache.log4j.FileAppender ;
 import org.apache.log4j.Level ;
 import org.apache.log4j.Logger ;
 import org.apache.log4j.PatternLayout ;
+import org.apache.log4j.RollingFileAppender ;
 import org.osate.utils.FileUtils ;
 
 import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
@@ -391,13 +391,15 @@ public class RamsesConfiguration
       rootLogger.setLevel(lvl);
       
       // Configure Log4j.
-      FileAppender fa = new FileAppender() ;
+      RollingFileAppender ra = new RollingFileAppender() ;
       PatternLayout layout = new PatternLayout(layoutPattern) ;
-      fa.setLayout(layout);
-      fa.setFile(logFile.toString());
-      fa.setEncoding("UTF-8");
-      fa.activateOptions();
-      rootLogger.addAppender(fa);
+      ra.setLayout(layout);
+      ra.setFile(logFile.toString());
+      ra.setEncoding("UTF-8");
+      ra.activateOptions();
+      ra.setMaxBackupIndex(10);
+      ra.setMaxFileSize("1024KB");
+      rootLogger.addAppender(ra);
       
       _LOGGER.info("logger is set to " + lvl.toString());
     }
