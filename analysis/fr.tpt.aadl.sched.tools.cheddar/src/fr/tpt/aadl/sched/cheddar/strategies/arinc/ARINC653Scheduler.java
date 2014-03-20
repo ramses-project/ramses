@@ -1,17 +1,41 @@
-package fr.tpt.aadl.sched.cheddar.strategies.arinc ;
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+ 
+ package fr.tpt.aadl.sched.cheddar.strategies.arinc ;
 
 import java.io.BufferedWriter ;
 import java.io.File ;
 import java.io.FileWriter ;
 import java.io.IOException ;
 
+import org.apache.log4j.Logger ;
+
 import fr.tpt.aadl.launch.PluginActivator ;
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarModel ;
 import fr.tpt.aadl.sched.cheddar.model.SchedulerPipeline ;
 
 public class ARINC653Scheduler implements SchedulerPipeline
 {
-
   private static String FLAG_NUMBER_OF_SLOTS = "<<number_of_slots>>" ;
   private static String FLAG_NUMBER_OF_PARTITIONS = "<<number_of_partitions>>" ;
 
@@ -29,6 +53,8 @@ public class ARINC653Scheduler implements SchedulerPipeline
   private int partitions = 0 ;
 
   protected CheddarModel model = null ;
+  
+  private static Logger _LOGGER = Logger.getLogger(ARINC653Scheduler.class) ;
 
   public ARINC653Scheduler()
   {
@@ -38,7 +64,9 @@ public class ARINC653Scheduler implements SchedulerPipeline
     }
     catch(Exception e)
     {
-      System.err.println("[AutomatonCompletion] " + e.getLocalizedMessage()) ;
+      String msg = RamsesException.formatRethrowMessage("[AutomatonCompletion]", e);
+      _LOGGER.error(msg, e) ;
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
       error = true ;
     }
   }

@@ -1,19 +1,35 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.launch ;
 
 import java.io.File ;
-import java.io.FileNotFoundException ;
 import java.util.Map ;
 
-import javax.naming.OperationNotSupportedException ;
-
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.osate.aadl2.Element ;
 import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.instance.SystemOperationMode ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
-import org.osate.ui.actions.AbstractInstanceOrDeclarativeModelReadOnlyAction ;
 
+import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
@@ -47,6 +63,9 @@ extends
                                       SystemInstance root,
                                       SystemOperationMode som)
   */
+  
+  private static Logger _LOGGER = Logger.getLogger(CheddarBackgroundExecution.class) ;
+  
   @Override
   public void performAnalysis(SystemInstance systemInstance,
                               File outputDir,
@@ -64,6 +83,7 @@ extends
     {
       cheddar.exportAndSimule() ;
 
+      //TODO implement analysis report.
       if(cheddar.isSchedulable())
       {
         System.out
@@ -76,15 +96,11 @@ extends
         System.err.flush() ;
       }
     }
-    catch(FileNotFoundException e1)
-    {
-      System.err
-            .println("Simulation aborted (no generated file) : bad xml model") ;
-      e1.printStackTrace() ;
-    }
     catch(Exception e2)
     {
-      e2.printStackTrace() ;
+      String msg = "Simulation aborted (no generated file) : bad xml model"; 
+      _LOGGER.fatal(msg, e2);
+      throw new AnalysisException(msg, e2) ;
     }
     return;
   }
@@ -92,24 +108,32 @@ extends
   @Override
   public String getRegistryName()
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "getRegistryName is not supported";
+    _LOGGER.fatal(msg) ;
+    throw new UnsupportedOperationException(msg) ;
   }
 
   @Override
   public String getPluginName()
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "getPluginName is not supported";
+    _LOGGER.fatal(msg) ;
+    throw new UnsupportedOperationException(msg) ;
   }
 
   @Override
   public String getPluginId()
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "getPluginId is not supported";
+    _LOGGER.fatal(msg) ;
+    throw new UnsupportedOperationException(msg) ;
   }
 
   @Override
   public void setParameters(Map<String, Object> parameters)
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "setParameters is not supported";
+    _LOGGER.fatal(msg) ;
+    throw new UnsupportedOperationException(msg) ;
   }
 }

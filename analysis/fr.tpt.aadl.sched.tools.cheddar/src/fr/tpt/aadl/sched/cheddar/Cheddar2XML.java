@@ -1,7 +1,30 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.sched.cheddar ;
 
 import java.io.File ;
+import java.io.IOException ;
 
+import org.apache.log4j.Logger ;
 import org.jdom.Attribute ;
 import org.jdom.Document ;
 import org.jdom.Element ;
@@ -18,6 +41,7 @@ import fr.tpt.aadl.sched.cheddar.model.ResourceUse ;
 
 public class Cheddar2XML
 {
+  private static Logger _LOGGER = Logger.getLogger(Cheddar2XML.class) ;
 
   public Document generateXML(CheddarModel model,
                               File outputPath)
@@ -30,14 +54,7 @@ public class Cheddar2XML
     final Element resources = new Element("resources") ;
     String header = "" ;
 
-    try
-    {
-      header = PluginActivator.getInstance().getCheddarHeader() ;
-    }
-    catch(Exception e1)
-    {
-      e1.printStackTrace() ;
-    }
+    header = PluginActivator.getInstance().getCheddarHeader() ;
 
     root.addContent(processors) ;
     root.addContent(addrSpaces) ;
@@ -95,8 +112,17 @@ public class Cheddar2XML
       System.err.println("Network connection is not currently handled") ;
     }
 
-    p.saveSchedulerAs(AUTOMATON_PATH) ;
-    return e ;
+    try
+    {
+      p.saveSchedulerAs(AUTOMATON_PATH) ;
+      return e ;
+    }
+    catch(IOException ex)
+    {
+      String msg = "cannot save scheduler" ;
+      _LOGGER.fatal(msg, ex);
+      throw new RuntimeException(msg, ex) ;
+    }
   }
 
   private Element createAddressSpaceNode(CheddarAddressSpace a)

@@ -4,7 +4,6 @@ import org.osate.aadl2.Element ;
 
 public abstract class CheddarElement
 {
-
   /** Element name. */
   private String name = null ;
 
@@ -18,8 +17,7 @@ public abstract class CheddarElement
    * Create a CheddarElement
    * @param aadlElement associated AADL element
    */
-  public CheddarElement(
-                        Element aadlElement)
+  public CheddarElement(Element aadlElement)
   {
     this.aadlElement = aadlElement ;
   }
@@ -48,5 +46,4 @@ public abstract class CheddarElement
   {
     return model ;
   }
-
 }

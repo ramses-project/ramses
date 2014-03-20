@@ -1,7 +1,27 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.launch ;
 
 import java.io.File ;
-import java.io.IOException ;
 import java.util.Map ;
 
 import org.apache.log4j.Logger ;
@@ -9,7 +29,6 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
@@ -53,47 +72,39 @@ public class LaunchCheddarUI implements Analyzer
   {
     CheddarToolchain cheddar = new CheddarToolchain(systemInstance, outputDir,
                                                     errManager) ;
-
-    try
-    {
-      cheddar.createCheddarModel() ;
-      cheddar.exportAndSimule(true) ;
-    }
-    catch(IOException e)
-    {
-      String errMsg = "Simulation aborted (no generated file) : bad xml model" ;
-      _LOGGER.fatal(errMsg, e) ;
-      throw new RuntimeException(errMsg, e) ;
-    }
-    catch(Exception e2)
-    {
-      String errMsg = RamsesException.formatRethrowMessage("Simulation aborted (no generated file) : bad xml model", e2) ;
-      _LOGGER.fatal(errMsg, e2) ;
-      throw new AnalysisException(errMsg, e2) ;
-    }
+    cheddar.createCheddarModel() ;
+    cheddar.exportAndSimule(true) ;
   }
   
   @Override
   public String getRegistryName()
   {
-    throw new UnsupportedOperationException() ;
+    String errMsg = "getRegistryName is not supported" ;
+    _LOGGER.fatal(errMsg) ;
+    throw new UnsupportedOperationException(errMsg) ;
   }
 
   @Override
   public String getPluginName()
   {
-    throw new UnsupportedOperationException() ;
+    String errMsg = "getPluginName is not supported" ;
+    _LOGGER.fatal(errMsg) ;
+    throw new UnsupportedOperationException(errMsg) ;
   }
 
   @Override
   public String getPluginId()
   {
-    throw new UnsupportedOperationException() ;
+    String errMsg = "getPluginId is not supported" ;
+    _LOGGER.fatal(errMsg) ;
+    throw new UnsupportedOperationException(errMsg) ;
   }
 
   @Override
   public void setParameters(Map<String, Object> parameters)
   {
-    throw new UnsupportedOperationException() ;
+    String errMsg = "setParameters is not supported" ;
+    _LOGGER.fatal(errMsg) ;
+    throw new UnsupportedOperationException(errMsg) ;
   }
 }

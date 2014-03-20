@@ -1,4 +1,25 @@
-package fr.tpt.aadl.sched.cheddar.strategies ;
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+ 
+ package fr.tpt.aadl.sched.cheddar.strategies ;
 
 import java.util.ArrayList ;
 import java.util.Collections ;
@@ -20,7 +41,6 @@ import fr.tpt.aadl.sched.cheddar.model.CheddarElement ;
 
 public abstract class CheddarModelConversionPart<E extends CheddarElement>
 {
-
   private static HashMap<ComponentCategory, String> aadlTypeToSectionName ;
   private static HashMap<ComponentCategory, String> aadlTypeToInstanceName ;
 
@@ -182,16 +202,12 @@ public abstract class CheddarModelConversionPart<E extends CheddarElement>
 
   protected final long getInfoIntegerProperty(ComponentInstance process,
                                               String aadlPropertyName,
-                                              int defaultValue)
+                                              long defaultValue)
   {
-    long value = defaultValue ;
-
-    try
+    Long value = PropertyUtils.getIntValue(process, aadlPropertyName) ;
+    if(value == null)
     {
-      value = PropertyUtils.getIntValue(process, aadlPropertyName) ;
-    }
-    catch(Exception e)
-    {
+      value = defaultValue ;
     }
 
     return value ;

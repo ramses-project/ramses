@@ -1,10 +1,30 @@
-package fr.tpt.aadl.sched.cheddar.strategies ;
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+ 
+ package fr.tpt.aadl.sched.cheddar.strategies ;
 
 import java.util.List ;
 
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.ListValue ;
-import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.InstanceObject ;
 import org.osate.aadl2.instance.InstanceReferenceValue ;
@@ -20,8 +40,7 @@ public class ProcessSection extends
                            CheddarModelConversionPart<CheddarAddressSpace>
 {
 
-  public ProcessSection(
-                        CheddarContext sections)
+  public ProcessSection(CheddarContext sections)
   {
     super(ComponentCategory.PROCESS, sections) ;
   }
@@ -73,18 +92,16 @@ public class ProcessSection extends
 
   protected ComponentInstance getProcessBind(ComponentInstance process)
   {
-    try
+    ListValue lv = (ListValue) PropertyUtils.
+        getPropertyValue("Actual_Processor_Binding", process) ;
+    if(lv != null)
     {
-      ListValue lv = (ListValue) PropertyUtils.
-            getPropertyValue("Actual_Processor_Binding", process) ;
-            
       InstanceReferenceValue ref = (InstanceReferenceValue) lv.getOwnedListElements().get(0) ;
       InstanceObject owner = ref.getReferencedInstanceObject() ;
       return (ComponentInstance) owner ;
     }
-    catch(Exception e)
+    else
     {
-      e.printStackTrace() ;
       return null ;
     }
   }

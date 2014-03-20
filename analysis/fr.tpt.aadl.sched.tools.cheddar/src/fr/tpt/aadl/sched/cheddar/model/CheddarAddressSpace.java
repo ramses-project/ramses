@@ -8,7 +8,6 @@ import org.osate.aadl2.Element ;
 
 public class CheddarAddressSpace extends CheddarElement
 {
-
   private CheddarProcessor owner ;
 
   private List<CheddarResource> resources = new ArrayList<CheddarResource>() ;
@@ -23,8 +22,7 @@ public class CheddarAddressSpace extends CheddarElement
 
   private int partition_index = -1 ;
 
-  public CheddarAddressSpace(
-                             Element aadlElement)
+  public CheddarAddressSpace(Element aadlElement)
   {
     super(aadlElement) ;
   }

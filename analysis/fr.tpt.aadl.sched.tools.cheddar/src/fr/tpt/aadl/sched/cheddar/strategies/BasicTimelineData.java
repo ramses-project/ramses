@@ -1,4 +1,25 @@
-package fr.tpt.aadl.sched.cheddar.strategies ;
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+ 
+ package fr.tpt.aadl.sched.cheddar.strategies ;
 
 import java.util.ArrayList ;
 import java.util.HashMap ;
@@ -16,7 +37,6 @@ import fr.tpt.aadl.sched.cheddar.model.CheddarTask ;
  */
 public class BasicTimelineData extends TimelineData
 {
-
   /** Defines which task is activated on each tick. */
   private HashMap<Integer, TaskActivation> tickToTaskActivation =
         new HashMap<Integer, TaskActivation>() ;
@@ -27,8 +47,7 @@ public class BasicTimelineData extends TimelineData
 
   private int totalRunning = 0 ;
 
-  public BasicTimelineData(
-                           CheddarProcessor cpu)
+  public BasicTimelineData(CheddarProcessor cpu)
   {
     super(cpu) ;
   }
@@ -192,7 +211,6 @@ public class BasicTimelineData extends TimelineData
 
   public static class Factory implements TimelineData.Factory
   {
-
     private static Factory instance ;
 
     public static synchronized Factory getInstance()
@@ -214,6 +232,5 @@ public class BasicTimelineData extends TimelineData
     {
       return new BasicTimelineData(cpu) ;
     }
-
   }
 }

@@ -1,23 +1,47 @@
-package fr.tpt.aadl.sched.cheddar ;
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+ 
+ package fr.tpt.aadl.sched.cheddar ;
 
 import java.io.File ;
+import java.io.IOException ;
 import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 
+import javax.xml.parsers.ParserConfigurationException ;
+
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.xml.sax.SAXException ;
 
-import fr.tpt.aadl.ramses.control.support.reporters.MessageReporter ;
 import fr.tpt.aadl.sched.cheddar.events.SimulationData ;
 import fr.tpt.aadl.sched.cheddar.events.TaskActivation ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarModel ;
 
 public class CheddarToolchain
 {
-
   private final SystemInstance root ;
   private final AnalysisErrorReporterManager errManager ;
 
@@ -29,6 +53,8 @@ public class CheddarToolchain
   private File _outputDir ;
 
   private final String prefix ;
+  
+  private static Logger _LOGGER = Logger.getLogger(CheddarToolchain.class) ;
 
   public CheddarToolchain(String prefix, SystemInstance root,
                           File outputDir,
@@ -78,26 +104,22 @@ public class CheddarToolchain
   }
 
   public void exportAndSimule()
-        throws Exception
   {
     exportAndSimule(1f) ;
   }
 
   public void exportAndSimule(boolean withUI)
-        throws Exception
   {
     exportAndSimule(1f, withUI) ;
   }
 
   public long exportAndSimule(float scaling)
-        throws Exception
   {
     return exportAndSimule(scaling, false) ;
   }
 
   public long exportAndSimule(float scaling,
                               boolean withUI)
-        throws Exception
   {
     /** Step 1 Export. */
     if(exporter == null)
@@ -112,7 +134,6 @@ public class CheddarToolchain
   }
 
   public long createExportAndSimule()
-        throws Exception
   {
     return createExportAndSimule(1f) ;
   }
@@ -122,7 +143,6 @@ public class CheddarToolchain
    * @param scaling time scaling (default 1f).
    */
   public long createExportAndSimule(float scaling)
-        throws Exception
   {
     /** Step 1 Generate Cheddar model and then XML */
     createCheddarModel(scaling) ;
@@ -133,8 +153,8 @@ public class CheddarToolchain
     return simulator.execute(false) ;*/
   }
 
-  public SimulationData getSimulationData()
-        throws Exception
+  public SimulationData getSimulationData() throws ParserConfigurationException,
+                                                   SAXException, IOException
   {
     if(simulation == null)
     {
@@ -144,8 +164,8 @@ public class CheddarToolchain
     return simulation ;
   }
 
-  private void extractSimulation()
-        throws Exception
+  private void extractSimulation() throws ParserConfigurationException,
+                                          SAXException, IOException
   {
     if(exporter == null)
     {
@@ -160,8 +180,8 @@ public class CheddarToolchain
     simulation = importer.getSimulation() ;
   }
 
-  public boolean isSchedulable()
-        throws Exception
+  public boolean isSchedulable() throws ParserConfigurationException,
+                                        SAXException, IOException
   {
     if(simulation == null)
     {
@@ -174,7 +194,7 @@ public class CheddarToolchain
 
     if(CheddarOptions.CHEDDAR_DEBUG)
     {
-      System.out.println("\n") ;
+      _LOGGER.debug("\n") ;
     }
 
     boolean hasMissed = false ;
@@ -194,7 +214,7 @@ public class CheddarToolchain
 
         if(CheddarOptions.CHEDDAR_DEBUG)
         {
-          System.out.println(msg) ;
+          _LOGGER.debug(msg) ;
         }
 
         errManager.error(task, msg) ;
@@ -204,5 +224,4 @@ public class CheddarToolchain
 
     return !hasMissed ;
   }
-
 }

@@ -1,4 +1,25 @@
-package fr.tpt.aadl.sched.cheddar.strategies.arinc ;
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+ 
+ package fr.tpt.aadl.sched.cheddar.strategies.arinc ;
 
 import org.osate.aadl2.ContainmentPathElement ;
 import org.osate.aadl2.IntegerLiteral ;
@@ -15,9 +36,7 @@ import fr.tpt.aadl.sched.cheddar.strategies.ProcessorSection ;
 
 public class ARINC653ProcessorSection extends ProcessorSection
 {
-
-  public ARINC653ProcessorSection(
-                                  CheddarContext sections)
+  public ARINC653ProcessorSection(CheddarContext sections)
   {
     super(sections) ;
   }
@@ -55,16 +74,15 @@ public class ARINC653ProcessorSection extends ProcessorSection
 
   protected int getSlotsCount(ComponentInstance proc)
   {
-    try
+    PropertyExpression expr =
+        PropertyUtils.getPropertyValue("Partition_Slots", proc) ;
+    if(expr != null)
     {
-      PropertyExpression expr =
-            PropertyUtils.getPropertyValue("Partition_Slots", proc) ;
       ListValue list = (ListValue) expr ;
       return list.getOwnedListElements().size() ;
     }
-    catch(Exception e)
+    else
     {
-      e.printStackTrace() ;
       return 0 ;
     }
   }
@@ -72,18 +90,17 @@ public class ARINC653ProcessorSection extends ProcessorSection
   protected int getSlotDuration(ComponentInstance proc,
                                 int slot)
   {
-    try
+    PropertyExpression expr =
+        PropertyUtils.getPropertyValue("Partition_Slots", proc) ;
+    if(expr != null)
     {
-      PropertyExpression expr =
-            PropertyUtils.getPropertyValue("Partition_Slots", proc) ;
+      
       ListValue list = (ListValue) expr ;
       PropertyExpression value = list.getOwnedListElements().get(slot) ;
       IntegerLiteral duration = (IntegerLiteral) value ;
       return (int) duration.getValue() ;
     }
-    catch(Exception e)
     {
-      e.printStackTrace() ;
       return 0 ;
     }
   }
@@ -91,10 +108,10 @@ public class ARINC653ProcessorSection extends ProcessorSection
   protected int getPartitionAtSlot(ComponentInstance proc,
                                    int slot)
   {
-    try
+    PropertyExpression expr =
+        PropertyUtils.getPropertyValue("Slots_Allocation", proc) ;
+    if(expr != null)
     {
-      PropertyExpression expr =
-            PropertyUtils.getPropertyValue("Slots_Allocation", proc) ;
       ListValue list = (ListValue) expr ;
       PropertyExpression value = list.getOwnedListElements().get(slot) ;
       ReferenceValue ref = (ReferenceValue) value ;
@@ -103,9 +120,8 @@ public class ARINC653ProcessorSection extends ProcessorSection
             (VirtualProcessorSubcomponent) el.getNamedElement() ;
       return getPartitionIndex(proc, VPsub) ;
     }
-    catch(Exception e)
+    else
     {
-      e.printStackTrace() ;
       return -1 ;
     }
   }

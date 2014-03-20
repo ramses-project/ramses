@@ -1,4 +1,25 @@
-package fr.tpt.aadl.sched.cheddar ;
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+ 
+ package fr.tpt.aadl.sched.cheddar ;
 
 import java.io.BufferedReader ;
 import java.io.IOException ;
@@ -7,9 +28,11 @@ import java.io.InputStreamReader ;
 
 import javax.xml.parsers.DocumentBuilder ;
 import javax.xml.parsers.DocumentBuilderFactory ;
+import javax.xml.parsers.ParserConfigurationException ;
 
 import org.apache.log4j.Logger ;
 import org.w3c.dom.Document ;
+import org.xml.sax.SAXException ;
 
 import fr.tpt.aadl.sched.cheddar.model.CheddarModel ;
 
@@ -34,8 +57,7 @@ public class CheddarSimulator
     this.outputXMLPath = inputXMLPath.replace(".xml", "_sim.xml") ;
   }
 
-  public CheddarSimulator(
-                          AADL2Cheddar aadl2Cheddar)
+  public CheddarSimulator(AADL2Cheddar aadl2Cheddar)
   {
     this(aadl2Cheddar.getCheddarModel(), aadl2Cheddar.getCheddarXMLPath().toString()) ;
   }
@@ -46,7 +68,6 @@ public class CheddarSimulator
    * @return real scheduling simulation duration in milliseconds.
    */
   public long execute(boolean withUI)
-        throws Exception
   {
     if(withUI)
     {
@@ -72,9 +93,9 @@ public class CheddarSimulator
 
     if(CheddarOptions.CHEDDAR_DEBUG)
     {
-      System.out.println("------- Scheduling simulation -------") ;
-      System.out.println("Simulation Period : " + simulationPeriod) ;
-      System.out.println("Simulation Execution ..." + cmd) ;
+      _LOGGER.debug("------- Scheduling simulation -------") ;
+      _LOGGER.debug("Simulation Period : " + simulationPeriod) ;
+      _LOGGER.debug("Simulation Execution ..." + cmd) ;
     }
 
     long simulationStartDate = System.currentTimeMillis() ;
@@ -99,9 +120,11 @@ public class CheddarSimulator
 
       p.waitFor() ;
     }
-    catch(Exception e)
+    catch(Exception e) // IOException and InterruptedException
     {
-      System.err.println("simulation error: could not execute = " + cmd ) ;
+      String msg = "simulation error: could not execute = \'" + cmd  + '\'';
+      _LOGGER.fatal(msg, e);
+      throw new RuntimeException(msg, e) ;
     }
 
     executed = true ;
@@ -114,8 +137,8 @@ public class CheddarSimulator
     return lastSimulationDuration ;
   }
 
-  public Document getSimulationXML()
-        throws Exception
+  public Document getSimulationXML() throws ParserConfigurationException,
+                                            SAXException, IOException
   {
     if(!executed)
     {
@@ -131,8 +154,7 @@ public class CheddarSimulator
   {
     private final String cmd ;
 
-    private CheddarUIHandler(
-                             String cmd)
+    private CheddarUIHandler(String cmd)
     {
       this.cmd = cmd ;
     }
@@ -150,9 +172,11 @@ public class CheddarSimulator
         //t.join();
         //t2.join();
       }
-      catch(Exception e)
+      catch(IOException e)
       {
-        e.printStackTrace() ;
+        String msg = "simulation error: could not execute = \'" + cmd  + '\'';
+        _LOGGER.fatal(msg, e);
+        throw new RuntimeException(msg, e) ;
       }
     }
   }
@@ -162,8 +186,7 @@ public class CheddarSimulator
 
     private final BufferedReader reader ;
 
-    private CheddarReader(
-                          InputStream is)
+    private CheddarReader(InputStream is)
     {
       this.reader = new BufferedReader(new InputStreamReader(is)) ;
     }
@@ -181,7 +204,7 @@ public class CheddarSimulator
           // the configuration don't show the outputs. Otherwise, the process never stop.
           if(CheddarOptions.CHEDDAR_DEBUG)
           {
-            System.out.println(line) ;
+            _LOGGER.debug(line) ;
           }
         }
       }
