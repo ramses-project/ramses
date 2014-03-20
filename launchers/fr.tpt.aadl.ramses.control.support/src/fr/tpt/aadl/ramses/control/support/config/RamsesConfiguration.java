@@ -398,7 +398,7 @@ public class RamsesConfiguration
       ra.setEncoding("UTF-8");
       ra.activateOptions();
       ra.setMaxBackupIndex(10);
-      ra.setMaxFileSize("1024KB");
+      ra.setMaxFileSize("5000KB");
       rootLogger.addAppender(ra);
       
       _LOGGER.info("logger is set to " + lvl.toString());
