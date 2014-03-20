@@ -63,7 +63,6 @@ import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
@@ -166,12 +165,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     		  blackboardInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+p.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
       else
       {
-    	  try
-
+    	  String value = PropertyUtils.getStringValue(p.getDataFeatureClassifier(),
+    	                                              "Source_Name") ;
+    	  if(value != null)
     	  {
-    		  blackboardInfo.dataType=PropertyUtils.getStringValue(p.getDataFeatureClassifier(), "Source_Name") ;
+    		  blackboardInfo.dataType=value ;
     	  }
-    	  catch(Exception e)
+    	  else
     	  {
     		  blackboardInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(p.getDataFeatureClassifier().getQualifiedName()) ;
     	  }
@@ -308,11 +308,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
       else
       {
-        try
+        String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
+                                                    "Source_Name") ;
+        if(value != null)
         {
-          queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+          queueInfo.dataType=value ;
         }
-        catch(Exception e)
+        else
         {
     	  queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
         }
@@ -338,11 +340,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
       else
       {
-        try
+        String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
+                                                    "Source_Name") ;
+        if(value != null)
         {
-          queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+          queueInfo.dataType=value ;
         }
-        catch(Exception e)
+        else
         {
           queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
         }
@@ -375,28 +379,30 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     // XXX temporary. Until ATL transformation modifications.
     //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
     
-    try
+    if(info.type == null)
     {
-      if(info.type == null)
+      String value = PropertyUtils.getEnumValue(port, "Queue_Processing_Protocol") ;
+      if(value != null)
       {
-        info.type = PropertyUtils.getEnumValue(port, "Queue_Processing_Protocol") ;
+        info.type = value ;
+      }
+      else
+      {
+        result = false ;
       }
     }
-    catch (Exception e)
-    {
-      result = false ;
-    }  
     
-    try
+    if(info.size == -1)
     {
-      if(info.size == -1)
+      Long value = PropertyUtils.getIntValue(port, "Queue_Size") ;
+      if(value != null)
       {
-        info.size = PropertyUtils.getIntValue(port, "Queue_Size") ;
+        info.size = value ;
       }
-    }
-    catch (Exception e)
-    {
-      result = false ;
+      else
+      {
+        result = false ;
+      }
     }
     
     return result ;
@@ -419,11 +425,13 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
       }
       else
       {
-    	  try
+    	  String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
+    	                                              "Source_Name") ;
+    	  if(value != null)
     	  {
-    		  sampleInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+    		  sampleInfo.dataType=value ;
     	  }
-    	  catch(Exception e)
+    	  else
     	  {
     		  sampleInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
     	  }
@@ -446,25 +454,25 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     // XXX temporary. Until ATL transformation modifications.
     //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
     
-    try
+    if(info.refresh == -1)
     {
-      if(info.refresh == -1)
+      Long value = PropertyUtils.getIntValue(port,
+                                             "Sampling_Refresh_Period") ;
+      if(value != null)
       {
-        info.refresh = PropertyUtils.getIntValue(port,
-                                         "Sampling_Refresh_Period") ;
+        info.refresh = value ;
+      }
+      else
+      {
+        String msg =  "set default Sampling_Refresh_Period value for sampling port \'" +
+                      port.getQualifiedName() + "\'" ;
+        _LOGGER.warn(msg);
+        ServiceProvider.SYS_ERR_REP.warning(msg, true);
+
+        info.refresh = 10l;
+        //TODO: restore and resolve issue with pingpong-ba result = false ;
       }
     }
-    catch (Exception e)
-    {
-      String errMsg =  RamsesException.formatRethrowMessage("sampling port " +
-                         port.getQualifiedName() + " should have property" +
-                         " Sampling_Refresh_Period", e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-      
-      info.refresh = 10;
-      //TODO: restore and resolve issue with pingpong-ba result = false ;
-    }  
     
     return result ;
   }
@@ -782,29 +790,25 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     String deadline = null ;
     String timeCapacity = null ;
 
-    try
+    Long value = PropertyUtils.getIntValue(thread, "Period") ;
+    if(value != null)
     {
-      long value = PropertyUtils.getIntValue(thread, "Period") ;
       period = Long.toString(value) ;
-    }
-    catch(Exception e)
-    {
-      period = null ;
-    }
-
-    // If period is not set, don't generate.
-    if(period != null)
-    {
       mainImplCode.addOutput("  tattr.PERIOD = ") ;
       mainImplCode.addOutputNewline(period + ';') ;
     }
-
-    try
+    else
     {
-      long value = PropertyUtils.getIntValue(thread, "Deadline") ;
+      // If period is not set, don't generate.
+      period = null ;
+    }
+    
+    value = PropertyUtils.getIntValue(thread, "Deadline") ;
+    if(value != null)
+    {
       deadline = Long.toString(value) ;
     }
-    catch(Exception e)
+    else
     {
       // If deadline is not set, use period instead.
       deadline = period ;
@@ -817,44 +821,36 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       mainImplCode.addOutputNewline(deadline + ';') ;
     }
 
-    try
+    NumberValue nbValue =
+        PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
+    if(nbValue != null)
     {
-    	NumberValue value =
-				PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
-		Double d = value.getScaledValue("ms");
-		timeCapacity = Integer.toString(d.intValue()) ;
-    }
-    catch(Exception e)
-    {
-      timeCapacity = null ;
-    }
-
-    // If compute execution time is not set, don't generate.
-    if(timeCapacity != null)
-    {
+      Double d = nbValue.getScaledValue("ms");
+      timeCapacity = Integer.toString(d.intValue()) ;
       mainImplCode.addOutput("  tattr.TIME_CAPACITY = ") ;
       mainImplCode.addOutputNewline(timeCapacity + ';') ;
+    }
+    else
+    {
+      // If compute execution time is not set, don't generate.
+      timeCapacity = null ;
     }
     
     String priority;
     
-    try
+    value = PropertyUtils.getIntValue(thread, "Priority") ;
+    if(value != null)
     {
-      float value =
-            PropertyUtils.getIntValue(thread, "Priority") ;
-      priority = Integer.toString((int) value) ;
-    }
-    catch(Exception e)
-    {
-      priority = null ;
-    }
-
-    // If priority is not set, don't generate.
-    if(priority != null)
-    {
+      priority = Long.toString(value) ;
       mainImplCode.addOutput("  tattr.BASE_PRIORITY = ") ;
       mainImplCode.addOutputNewline(priority + ';') ;
     }
+    else
+    {
+      // If priority is not set, don't generate.
+      priority = null ;
+    }
+   
     mainImplCode
     	  .addOutputNewline("  strcpy(tattr.NAME, \""+thread.getName()+"\");");
     mainImplCode
@@ -866,7 +862,6 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     	  .addOutput("  START (arinc_threads[") ;
     mainImplCode.addOutput(Integer.toString(threadIndex)) ;
     mainImplCode.addOutputNewline("], &(ret));") ;
-    
   }
   
   private void genBlackboardMainImpl(UnparseText mainImplCode,
@@ -953,15 +948,15 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     // Thread declarations.
     for(ThreadSubcomponent thread : lthreads)
     {
-      boolean foundHM;
-      try {
-		foundHM = PropertyUtils.getBooleanValue(thread, "Error_Handling");
-      } catch (Exception e) {
-		foundHM = false;
+      Boolean foundHM = PropertyUtils.getBooleanValue(thread, "Error_Handling") ;
+      if(foundHM == null)
+      {
+        foundHM = false ;
       }
+      
       if(foundHM)
       {
-        genThreadErrorHandlerImpl(thread, mainImplCode);
+        genThreadErrorHandlerImpl(thread, mainImplCode) ;
       }
       else
       {
@@ -1066,8 +1061,6 @@ private void findCommunicationMechanism(ProcessImplementation process,
   		break;
     }
     mainHeaderCode.addOutputNewline(guard) ;
-    
-    
     
     /**** #DEFINE ****/
 
@@ -1231,18 +1224,18 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     deploymentImplCode.addOutputNewline("#include <types.h>") ;
     deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
     boolean processorLevelErrors = false;
-    List<String> errorIdList=null;
-    List<String> errorActionList=null;
-    try
+    List<String> errorIdList=PropertyUtils.getStringListValue(processor, "HM_Errors");
+    List<String> errorActionList=PropertyUtils.getStringListValue(processor, "HM_Module_Recovery_Actions");
+    
+    if(errorIdList != null && errorActionList != null)
     {
-      errorIdList = PropertyUtils.getStringListValue(processor, "HM_Errors");
-      errorActionList = PropertyUtils.getStringListValue(processor, "HM_Module_Recovery_Actions");
       processorLevelErrors=true;
     }
-    catch(Exception e)
+    else
     {
       // do nothing
     }
+    
     if(processorLevelErrors)
     {
       deploymentImplCode.addOutputNewline("void pok_kernel_error");
@@ -1261,18 +1254,15 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     boolean partitionLevelErrors=false;
     for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
     {
-      try
+      errorIdList = PropertyUtils.getStringListValue(vps, "HM_Errors");
+      if(errorIdList != null)
       {
-        errorIdList = PropertyUtils.getStringListValue(vps, "HM_Errors");
+        
         partitionLevelErrors=true;
         break;
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =  RamsesException.formatRethrowMessage("cannot fecth the hm errors for \'" +
-                                                              vps + '\'', e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         // do nothting
       }
     }
@@ -1292,27 +1282,24 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       deploymentImplCode.incrementIndent();
   	  for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
       {
-  		try
-  		{
-  		  errorIdList = PropertyUtils.getStringListValue(vps, "HM_Errors");
-          errorActionList = PropertyUtils.getStringListValue(vps, "HM_Partition_Recovery_Actions");
+  	    errorIdList = PropertyUtils.getStringListValue(vps, "HM_Errors");
+        errorActionList = PropertyUtils.getStringListValue(vps, "HM_Partition_Recovery_Actions");
+  	    if(errorIdList != null && errorActionList != null)
+    		{
           deploymentImplCode.addOutputNewline("case "+Integer.toString(partitionId)+":");
-  		  deploymentImplCode.incrementIndent();
-  		  generateErrorIdSelection(vps, errorIdList, errorActionList, deploymentImplCode);
-  		}
-  		catch(Exception e)
-  		{
-  		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the hm errors or the partition recovery actions for \'" +
-  		                                vps.getName() + '\'', e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+    		  deploymentImplCode.incrementIndent();
+    		  generateErrorIdSelection(vps, errorIdList, errorActionList, deploymentImplCode);
+  	  	}
+  	    else
+  		  {
   		  // do nothing
-  		}
+    		}
   		
-  		deploymentImplCode.decrementIndent();
-  		deploymentImplCode.addOutputNewline("break;");
-  		partitionId++;
+    		deploymentImplCode.decrementIndent();
+  	  	deploymentImplCode.addOutputNewline("break;");
+  		  partitionId++;
       }
+  	  
       deploymentImplCode.addOutputNewline("}");
       deploymentImplCode.decrementIndent();
       deploymentImplCode.addOutputNewline("}");
@@ -1487,18 +1474,16 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     // Try to fetch POK properties: Additional_Features.
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      try
+      additionalFeatures = PropertyUtils.getStringListValue(vps,
+                                                            "Additional_Features") ;
+      if(additionalFeatures != null)
       {
-        additionalFeatures =
-              PropertyUtils.getStringListValue(vps, "Additional_Features") ;
-
         for(String s : additionalFeatures)
         {
           if(s.equalsIgnoreCase("console"))
           {
             // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
-            deploymentHeaderCode
-                  .addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
+            deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
             _processorProp.consoleFound = true ;
             break ;
           }
@@ -1522,12 +1507,12 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
           }
         }
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the additionnal features for \'"+
-                                  vps.getName() + '\'', e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        String errMsg = "cannot fetch the Additional_Features for \'" +
+                                                        vps.getName() + '\'' ;
+        _LOGGER.error(errMsg) ;
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
         // Nothing to do
       }
     }
@@ -1579,10 +1564,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     }
     for(ThreadSubcomponent th : bindedThreads)
     {
-      String dispatchProtocol ;
-      try
+      String dispatchProtocol = PropertyUtils.getEnumValue(th, "Dispatch_Protocol") ;
+      if(dispatchProtocol != null)
       {
-        dispatchProtocol = PropertyUtils.getEnumValue(th, "Dispatch_Protocol") ;
         if(dispatchProtocol.equalsIgnoreCase("sporadic"))
         {
           deploymentHeaderCode
@@ -1590,10 +1574,10 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
           break ;
         }
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the dispatch protocol for \'"+
-                                    th.getName() + '\'', e) ;
+        String errMsg =  "cannot fetch the Dispatch_Protocol for \'"+
+                                    th.getName() + '\'' ;
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
@@ -1625,22 +1609,21 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      try
+      boolean foundRR = false ;
+
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      if(requiredScheduler != null)
       {
-        boolean foundRR = false ;
-
-        String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
-
         if(requiredScheduler.equalsIgnoreCase("RR") && foundRR == false)
         {
           foundRR = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
         }
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =  RamsesException.formatRethrowMessage("scheduler is not provided for \'" +
-                             vps.getName() + '\'', e) ;
+        String errMsg = "scheduler is not provided for \'" +
+                             vps.getName() + '\'' ;
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
@@ -1652,10 +1635,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      try
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      if(requiredScheduler != null)
       {
-        String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
-
         if(requiredScheduler.equalsIgnoreCase("RR"))
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
@@ -1666,9 +1648,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
           deploymentHeaderCode.addOutput(",") ;
         }
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the scheduler" + vps.getName(), e) ;
+        String errMsg =  "cannot fetch the scheduler for \'" + vps.getName() + '\'';
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
@@ -1752,30 +1734,30 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 
     for(ProcessSubcomponent p : bindedProcess)
     {
-      try
+      Long value = PropertyUtils.getIntValue(p, "Needed_Memory_Size") ;
+      if(value != null)
       {
-        memorySizePerPartition.add(PropertyUtils
-              .getIntValue(p, "Needed_Memory_Size")) ;
+        memorySizePerPartition.add(value) ;
       }
-      catch(Exception e)
+      else
       {
-        String warnMsg =  RamsesException.formatRethrowMessage("cannot fetch the size of the memory needed for "+
-                                                              p.getName() + ". try to fetch the partition memory", e) ;
+        String warnMsg =  "cannot fetch Needed_Memory_Siz for \'"+
+                          p.getName() + "\'. try to fetch the partition memory";
         _LOGGER.warn(warnMsg);
         ServiceProvider.SYS_ERR_REP.warning(warnMsg, true);
         
         MemorySubcomponent bindedMemory =
               (MemorySubcomponent) GeneratorUtils
                     .getDeloymentMemorySubcomponent(p) ;
-        try
+        value = PropertyUtils.getIntValue(bindedMemory, "Byte_Count") ;
+        if(value != null)
         {
-          memorySizePerPartition.add(PropertyUtils.getIntValue(bindedMemory,
-                                                               "Byte_Count")) ;
+          memorySizePerPartition.add(value) ;
         }
-        catch(Exception ee)
+        else
         {
-          String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the partition memory for \'"+
-                                          bindedMemory.getName() + '\'', ee) ;
+          String errMsg = "cannot fetch the partition memory (Byte_Count) for \'"+
+                                                  bindedMemory.getName() + '\'';
           _LOGGER.error(errMsg);
           ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
@@ -1796,10 +1778,12 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
     }
 
     deploymentHeaderCode.addOutputNewline("}") ;
-    try
+    
+    List<Long> slotPerPartition =
+        PropertyUtils.getIntListValue(processor, "Partition_Slots") ;
+    
+    if(slotPerPartition != null)
     {
-      List<Long> slotPerPartition =
-            PropertyUtils.getIntListValue(processor, "Partition_Slots") ;
       // POK_CONFIG_SCHEDULING_SLOTS extracted from POK::Paritions_Slots => (500 ms);
       deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
       idx = 0 ;
@@ -1820,81 +1804,88 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
                   Integer.toString(slotPerPartition.size())) ;
 
     }
-    catch(Exception e)
+    else
     {
-      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the partition slots for \'"+
-                                        processor.getName() + '\'', e) ;
+      String errMsg =  "cannot fetch Partition_Slots for \'"+
+                                        processor.getName() + '\'' ;
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
     
     List<Subcomponent> slotsAllocation =
           PropertyUtils.getSubcomponentList(processor, "Slots_Allocation") ;
-    deploymentHeaderCode
-          .addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
-
-    for(Subcomponent sAllocation : slotsAllocation)
+    if(! slotsAllocation.isEmpty())
     {
-      int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
-      deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
+      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
 
-      if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
+      for(Subcomponent sAllocation : slotsAllocation)
       {
-        deploymentHeaderCode.addOutput(",") ;
-      }
-    }
+        int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
+        deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
 
-    deploymentHeaderCode.addOutputNewline("}") ;
-    
-    try
-    {
-      Long majorFrame =
-            PropertyUtils.getIntValue(processor, "Module_Major_Frame") ;
-      deploymentHeaderCode
-            .addOutputNewline("#define POK_CONFIG_SCHEDULING_MAJOR_FRAME " +
-                  Long.toString(majorFrame)) ;
+        if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
+        {
+          deploymentHeaderCode.addOutput(",") ;
+        }
+      }
+
+      deploymentHeaderCode.addOutputNewline("}") ;
     }
-    catch(Exception e)
+    else
     {
-      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the module major frame for \'"+
-                                     processor.getName() + '\'', e) ;
+      String errMsg = "cannot fetch Slots_Allocation for \'" +
+                          processor.getName() + '\'' ;
+      _LOGGER.error(errMsg) ;
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+    }
+    
+    Long majorFrame =
+        PropertyUtils.getIntValue(processor, "Module_Major_Frame") ;
+    if(majorFrame != null)
+    {
+      deploymentHeaderCode
+      .addOutputNewline("#define POK_CONFIG_SCHEDULING_MAJOR_FRAME " +
+            Long.toString(majorFrame)) ;
+    }
+    else
+    {
+      String errMsg = "cannot fetch Module_Major_Frame for \'" +
+                                     processor.getName() + '\'' ;
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
     
-    try
+    String portsFlushTime = PropertyUtils.getEnumValue(processor, "Ports_Flush_Time");
+    if(portsFlushTime != null)
     {
-    	String portsFlushTime = PropertyUtils.getEnumValue(processor, "Ports_Flush_Time");
-    	if (portsFlushTime.equalsIgnoreCase("Minor_Frame_Switch"))
-    	{
-    		try
-    	    {
-    	    	long minorFrame = PropertyUtils.getIntValue(processor, "Module_Minor_Frame");
-    	    	deploymentHeaderCode
-    	    			.addOutputNewline("#define POK_FLUSH_PERIOD " + 
-    	    					Long.toString(minorFrame)) ;
-    	    }
-    	    catch(Exception e)
-    	    {
-    	      String errMsg =  RamsesException.formatRethrowMessage("Ports_Flush_Time was set to Minor_Frame_Switch for "
-                  +processor.getName()
-                  +", but property Module_Minor_Frame.", e) ;
+      if (portsFlushTime.equalsIgnoreCase("Minor_Frame_Switch"))
+      {
+        Long minorFrame = PropertyUtils.getIntValue(processor, "Module_Minor_Frame");
+        if(minorFrame != null)
+        {
+          deploymentHeaderCode
+          .addOutputNewline("#define POK_FLUSH_PERIOD " + 
+              Long.toString(minorFrame)) ;
+        }
+        else
+        {
+          String errMsg =  "Ports_Flush_Time was set to Minor_Frame_Switch for \'"
+                  +processor.getName()+"\', but cannot fetch Module_Minor_Frame" ;
             _LOGGER.error(errMsg);
             ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-    	    }
-    	}
-    	else if (portsFlushTime.equalsIgnoreCase("Partition_Slot_Switch"))
-    		deploymentHeaderCode
-    			.addOutputNewline("#define POK_NEEDS_FLUSH_ON_WINDOWS") ;
+        }
+      }
+      else if (portsFlushTime.equalsIgnoreCase("Partition_Slot_Switch"))
+        deploymentHeaderCode
+          .addOutputNewline("#define POK_NEEDS_FLUSH_ON_WINDOWS") ;
     }
-    catch(Exception e)
+    else
     {
-      String warnMsg = RamsesException.formatRethrowMessage("Ports_Flush_Time was not set on "+processor.getName()
-          +", default flush policy will be used.", e) ;
+      String warnMsg = "Ports_Flush_Time was not set on \'"+processor.getName()
+          +"\', default flush policy will be used" ;
       _LOGGER.warn(warnMsg);
       ServiceProvider.SYS_ERR_REP.warning(warnMsg, true);
     }
-
 
     for(ProcessSubcomponent ps : bindedProcess)
     {
@@ -1903,18 +1894,25 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 
       for(ThreadSubcomponent ts : processImplementation.getOwnedThreadSubcomponents())
       {
-        try
+        Long partitionStack =
+            PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
+      
+        if(partitionStack != null)
         {
-          long partitionStack =
-                PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
           _processorProp.requiredStackSize += partitionStack ;
-          _processorProp.requiredStackSizePerPartition.put(processImplementation, partitionStack) ;
+          _processorProp.requiredStackSizePerPartition.put(processImplementation,
+                                                           partitionStack) ;
         }
-        catch(Exception e)
+        else
         {
           _processorProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
-          _processorProp.requiredStackSizePerPartition
-                .put(processImplementation, DEFAULT_REQUIRED_STACK_SIZE) ;
+          _processorProp.requiredStackSizePerPartition.put(processImplementation,
+                                                           DEFAULT_REQUIRED_STACK_SIZE) ;
+          
+          String warnMsg = "Set default required stack size for \'"+processImplementation.getName()
+              +"\', default flush policy will be used" ;
+          _LOGGER.warn(warnMsg);
+          ServiceProvider.SYS_ERR_REP.warning(warnMsg, true);
         }
       }
     }
@@ -1934,36 +1932,27 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 
     
     boolean needErrorHandler=false,needPartitionErrorHandler=false,needKernelErrorHandler = false;
-    try
+    
+    if(PropertyUtils.getStringListValue(processor, "HM_Errors") != null)
     {
-      PropertyUtils.getStringListValue(processor, "HM_Errors");
       needErrorHandler = true;
       needKernelErrorHandler = true;
     }
-    catch(Exception e)
+    else
     {
-      String errMsg =  RamsesException.formatRethrowMessage("cannot fetch hm errors for \'"+
-                               processor.getName() + '\'', e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       //do nothing
     }
     
     ProcessorImplementation pi = (ProcessorImplementation) processor.getSubcomponentType();
     for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
     {
-      try
+      if(PropertyUtils.getStringListValue(vps, "HM_Errors") != null)
       {
-        PropertyUtils.getStringListValue(vps, "HM_Errors");
         needErrorHandler = true;
         needPartitionErrorHandler = true;
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch hm errors for \'"+
-              vps.getName() + '\'', e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         //do nothing
       }
     }
@@ -1976,21 +1965,13 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
             (ProcessImplementation) ps.getSubcomponentType() ;
       for(ThreadSubcomponent ts : procImpl.getOwnedThreadSubcomponents())
       {
-        try
+        if(PropertyUtils.getStringListValue(ts, "HM_Errors") != null)
         {
-          PropertyUtils.getStringListValue(ts, "HM_Errors") ;
           needErrorHandler = true ;
           break ;
         }
-        catch(Exception e)
+        else
         {
-          String errMsg =
-                RamsesException
-                      .formatRethrowMessage("cannot fetch hm errors for \'" +
-                                                  ts.getName() + '\'', e) ;
-          _LOGGER.error(errMsg) ;
-          ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
-
           //do nothing
         }
       }
@@ -2019,7 +2000,9 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
 @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
   }
 
   public TargetProperties process(SystemImplementation si,

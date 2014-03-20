@@ -34,6 +34,7 @@ import org.osate.aadl2.DataType ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.utils.AADLFileFilter ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
@@ -54,7 +55,7 @@ public class PredefinedPackagesManager
     _instantiator = instantiator ;
   }
   
-  public void parsePredefinedPackages()
+  public void parsePredefinedPackages() throws ParseException
   {
     if(resources.isEmpty()==false)
       return;

@@ -86,7 +86,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
       }
       else
       {
-        throw new NoSuchElementException() ;
+        String msg = "iteration over bound" ;
+        _LOGGER.fatal(msg);
+        throw new NoSuchElementException(msg) ;
       }
       
       _count++ ;
@@ -97,7 +99,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     @Override
     public void remove()
     {
-      throw new UnsupportedOperationException() ;
+      String msg = "remove not supported" ;
+      _LOGGER.fatal(msg);
+      throw new UnsupportedOperationException(msg) ;
     }
   }
   

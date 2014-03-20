@@ -21,50 +21,49 @@
 
 package fr.tpt.aadl.ramses.generation.pok.ada;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.File ;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.List ;
+import java.util.Map ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
-import org.eclipse.emf.common.util.EList;
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.ConnectedElement;
-import org.osate.aadl2.DataPort;
-import org.osate.aadl2.DataSubcomponent;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.EventDataPort;
-import org.osate.aadl2.MemorySubcomponent;
-import org.osate.aadl2.NumberValue;
-import org.osate.aadl2.Port;
-import org.osate.aadl2.ProcessImplementation;
-import org.osate.aadl2.ProcessSubcomponent;
-import org.osate.aadl2.ProcessorSubcomponent;
-import org.osate.aadl2.Subcomponent;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.ThreadImplementation;
-import org.osate.aadl2.ThreadSubcomponent;
-import org.osate.aadl2.VirtualProcessorSubcomponent;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.ConnectionReference;
-import org.osate.aadl2.instance.FeatureCategory;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.modelsupport.UnparseText;
+import org.eclipse.emf.common.util.EList ;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.ConnectedElement ;
+import org.osate.aadl2.DataPort ;
+import org.osate.aadl2.DataSubcomponent ;
+import org.osate.aadl2.DirectionType ;
+import org.osate.aadl2.EventDataPort ;
+import org.osate.aadl2.MemorySubcomponent ;
+import org.osate.aadl2.NumberValue ;
+import org.osate.aadl2.Port ;
+import org.osate.aadl2.ProcessImplementation ;
+import org.osate.aadl2.ProcessSubcomponent ;
+import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.Subcomponent ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.ThreadImplementation ;
+import org.osate.aadl2.ThreadSubcomponent ;
+import org.osate.aadl2.VirtualProcessorSubcomponent ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.ConnectionInstance ;
+import org.osate.aadl2.instance.ConnectionReference ;
+import org.osate.aadl2.instance.FeatureCategory ;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
-import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser;
-import fr.tpt.aadl.ramses.control.support.generator.GenerationException;
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
+import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
+import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
+import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.utils.FileUtils ;
-import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA;
-import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC;
+import fr.tpt.aadl.ramses.generation.ada.GenerationUtilsADA ;
+import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
 import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
 
@@ -159,17 +158,20 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		if(fi.getCategory() == FeatureCategory.DATA_PORT)
 		{
 			DataPort p  = (DataPort) fi.getFeature() ;
-			try
+			
+			String value = PropertyUtils.getStringValue(p.getDataFeatureClassifier(),
+			                                            "Source_Name") ;
+			if(value != null)
 			{
-				blackboardInfo.dataType=PropertyUtils.getStringValue(p.getDataFeatureClassifier(), "Source_Name") ;
+			  blackboardInfo.dataType= value ;
 			}
-			catch(Exception e)
+			else
 			{
-				blackboardInfo.dataType = GenerationUtilsADA.getGenerationADAIdentifier(p.getDataFeatureClassifier().getQualifiedName()) ;
+			  blackboardInfo.dataType = GenerationUtilsADA.getGenerationADAIdentifier(
+			                        p.getDataFeatureClassifier().getQualifiedName()) ;
 			}
 		}
 		pp.blackboardInfo.add(blackboardInfo);
-
 	}
 
 	//TODO : be refactored with generic interfaces.
@@ -186,13 +188,15 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
 		{
 			EventDataPort port  = (EventDataPort) fi.getFeature() ;
-			try
+			String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
+			                                            "Source_Name") ;
+			if(value != null)
 			{
-				queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+			  queueInfo.dataType=value ;
 			}
-			catch(Exception e)
+			else
 			{
-				queueInfo.dataType = GenerationUtilsADA.getGenerationADAIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+			  queueInfo.dataType = GenerationUtilsADA.getGenerationADAIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
 			}
 		}
 
@@ -214,13 +218,15 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
 		{
 			EventDataPort port  = (EventDataPort) fi.getFeature() ;
-			try
+			String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
+			                                            "Source_Name") ;
+			if(value != null)
 			{
-				queueInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+			  queueInfo.dataType= value ;
 			}
-			catch(Exception e)
+			else
 			{
-				queueInfo.dataType = GenerationUtilsADA.getGenerationADAIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
+			  queueInfo.dataType = GenerationUtilsADA.getGenerationADAIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
 			}
 		}
 
@@ -272,30 +278,32 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		// XXX temporary. Until ATL transformation modifications.
 		//  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
 
-		try
-		{
-			if(info.type == null)
-			{
-				info.type = PropertyUtils.getEnumValue(port, "Queue_Processing_Protocol") ;
-			}
-		}
-		catch (Exception e)
-		{
-			result = false ;
-		}  
-
-		try
-		{
-			if(info.size == -1)
-			{
-				info.size = PropertyUtils.getIntValue(port, "Queue_Size") ;
-			}
-		}
-		catch (Exception e)
-		{
-			result = false ;
-		}
-
+		if(info.type == null)
+    {
+      String value = PropertyUtils.getEnumValue(port, "Queue_Processing_Protocol") ;
+      if(value != null)
+      {
+        info.type = value ;
+      }
+      else
+      {
+        result = false ;
+      }
+    }
+		
+		if(info.size == -1)
+    {
+		  Long value = PropertyUtils.getIntValue(port, "Queue_Size") ;
+      if(value != null)
+      {
+        info.size = value.intValue() ;
+      }
+      else
+      {
+        result = false ;
+      }
+    }
+		
 		return result ;
 	}
 
@@ -310,11 +318,13 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		if(fi.getCategory() == FeatureCategory.DATA_PORT)
 		{
 			DataPort port  = (DataPort) fi.getFeature() ;
-			try
+			String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
+			                                            "Source_Name") ;
+			if(value != null)
 			{
-				sampleInfo.dataType=PropertyUtils.getStringValue(port.getDataFeatureClassifier(), "Source_Name") ;
+			  sampleInfo.dataType=value ;
 			}
-			catch(Exception e)
+			else
 			{
 				sampleInfo.dataType = GenerationUtilsADA.getGenerationADAIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
 			}
@@ -336,23 +346,23 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		// XXX temporary. Until ATL transformation modifications.
 		//  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
 
-		try
-		{
-			if(info.refresh == -1)
-			{
-				info.refresh = PropertyUtils.getIntValue(port,
-						"Sampling_Refresh_Period") ;
-			}
-		}
-		catch (Exception e)
-		{
-		  String errMsg =  RamsesException.formatRethrowMessage("sampling port "+port.getQualifiedName()+" should have property" +
-		                                                        " Sampling_Refresh_Period", e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-			result = false ;
-		}  
-
+		if(info.refresh == -1)
+    {
+      Long value = PropertyUtils.getIntValue(port, "Sampling_Refresh_Period") ;
+      if(value != null)
+      {
+        info.refresh = value ;
+      }
+      else
+      {
+        String errMsg =  "sampling port \'"+port.getQualifiedName()+"\' should have property" +
+            " Sampling_Refresh_Period" ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        result = false ;
+      }
+    }
+		
 		return result ;
 	}
 
@@ -812,63 +822,51 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 		String period = null ;
 		String timeCapacity = null ;
 
-		try
+		Long  value = PropertyUtils.getIntValue(thread, "Period") ;
+		if(value != null)
 		{
-			long value = PropertyUtils.getIntValue(thread, "Period") ;
-			period = Long.toString(value) ;
+		  period = Long.toString(value) ;
+		  mainImplCode.addOutput("  tattr.Period := ") ;
+      mainImplCode.addOutputNewline(period + ';') ;
 		}
-		catch(Exception e)
+		else
 		{
-			period = null ;
+		  period = null ;
+		  // If period is not set, don't generate.
 		}
-
-		// If period is not set, don't generate.
-		if(period != null)
-		{
-			mainImplCode.addOutput("  tattr.Period := ") ;
-			mainImplCode.addOutputNewline(period + ';') ;
-		}
+		
 		mainImplCode.addOutput("  tattr.Deadline := ") ;
 		mainImplCode.addOutputNewline("Hard" + ';') ;
 
-		try
+		NumberValue nbValue =
+        PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
+		if(nbValue != null)
 		{
-			NumberValue value =
-					PropertyUtils.getMaxRangeValue(thread, "Compute_Execution_Time") ;
-			Double d = value.getScaledValue("ms");
-			timeCapacity = Integer.toString(d.intValue()) ;
+		  Double d = nbValue.getScaledValue("ms");
+      timeCapacity = Integer.toString(d.intValue()) ;
+      mainImplCode.addOutput("  tattr.Time_Capacity := ") ;
+      mainImplCode.addOutputNewline(timeCapacity + ';') ;
 		}
-		catch(Exception e)
+		else
 		{
+		  // If compute execution time is not set, don't generate.
 			timeCapacity = null ;
 		}
-
-		// If compute execution time is not set, don't generate.
-		if(timeCapacity != null)
+		
+		String priority = null ;
+		value = PropertyUtils.getIntValue(thread, "Priority") ;
+		if(value != null)
 		{
-			mainImplCode.addOutput("  tattr.Time_Capacity := ") ;
-			mainImplCode.addOutputNewline(timeCapacity + ';') ;
+		  priority = Long.toString(value) ;
+		  mainImplCode.addOutput("  tattr.Base_Priority := ") ;
+      mainImplCode.addOutputNewline(priority + ';') ;
 		}
-
-		String priority;
-
-		try
-		{
-			float value =
-					PropertyUtils.getIntValue(thread, "Priority") ;
-			priority = Integer.toString((int) value) ;
-		}
-		catch(Exception e)
+		else
 		{
 			priority = null ;
+			// If priority is not set, don't generate.
 		}
 
-		// If priority is not set, don't generate.
-		if(priority != null)
-		{
-			mainImplCode.addOutput("  tattr.Base_Priority := ") ;
-			mainImplCode.addOutputNewline(priority + ';') ;
-		}
 		mainImplCode.incrementIndent();
 		mainImplCode
 		.addOutputNewline("tattr.Name := \""+thread.getName()+"\";");
@@ -1197,18 +1195,16 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     // Try to fetch POK properties: Additional_Features.
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      try
+      additionalFeatures =
+          PropertyUtils.getStringListValue(vps, "Additional_Features") ;
+      if(additionalFeatures != null)
       {
-        additionalFeatures =
-              PropertyUtils.getStringListValue(vps, "Additional_Features") ;
-
         for(String s : additionalFeatures)
         {
           if(s.equalsIgnoreCase("console"))
           {
             // POK_NEEDS_CONSOLE has to be in both kernel's deployment.h
-            deploymentHeaderCode
-                  .addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
+            deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_CONSOLE 1") ;
             _processorProp.consoleFound = true ;
             break ;
           }
@@ -1232,12 +1228,10 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
           }
         }
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =
-              RamsesException
-                    .formatRethrowMessage("cannot fecth additional features for \'" +
-                                                vps.getName() + '\'', e) ;
+        String errMsg = "cannot fecth Additional_Features for \'" +
+                                                vps.getName() + '\'' ;
         _LOGGER.error(errMsg) ;
         ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
       }
@@ -1316,24 +1310,20 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      try
+      boolean foundRR = false ;
+
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      if(requiredScheduler != null)
       {
-        boolean foundRR = false ;
-
-        String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
-
         if(requiredScheduler.equalsIgnoreCase("RR") && foundRR == false)
         {
           foundRR = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
         }
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =
-              RamsesException
-                    .formatRethrowMessage("scheduler is not provided for \'" +
-                                                vps.getName() + '\'', e) ;
+        String errMsg = "scheduler is not provided for \'" + vps.getName() + '\'' ;
         _LOGGER.error(errMsg) ;
         ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
       }
@@ -1345,10 +1335,9 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      try
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      if(requiredScheduler != null)
       {
-        String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
-
         if(requiredScheduler.equalsIgnoreCase("RR"))
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
@@ -1359,12 +1348,10 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
           deploymentHeaderCode.addOutput(",") ;
         }
       }
-      catch(Exception e)
+      else
       {
-        String errMsg =
-              RamsesException
-                    .formatRethrowMessage("cannot fecth the scheduler for \'" +
-                                                vps.getName() + '\'', e) ;
+        String errMsg = "cannot fetch the scheduler for \'" +
+                                                vps.getName() + '\'' ;
         _LOGGER.error(errMsg) ;
         ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
       }
@@ -1442,38 +1429,32 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
     for(ProcessSubcomponent p : bindedProcess)
     {
-      try
+      Long mem = PropertyUtils.getIntValue(p, "Needed_Memory_Size") ;
+      if(mem != null)
       {
-        memorySizePerPartition.add(PropertyUtils
-              .getIntValue(p, "Needed_Memory_Size")) ;
+        memorySizePerPartition.add(mem) ;
       }
-      catch(Exception e)
+      else
       {
-        String warnMsg =
-              RamsesException
-                    .formatRethrowMessage("cannot fetch the size of the memory needed for " +
+        String warnMsg = "cannot fetch Needed_Memory_Size for \'" +
                                                 p.getName() +
-                                                ". try to fetch the partition memory",
-                                          e) ;
+                                                "\'. try to fetch the partition memory" ;
         _LOGGER.warn(warnMsg) ;
         ServiceProvider.SYS_ERR_REP.warning(warnMsg, true) ;
 
         MemorySubcomponent bindedMemory =
               (MemorySubcomponent) GeneratorUtils
                     .getDeloymentMemorySubcomponent(p) ;
-
-        try
+        
+        mem = PropertyUtils.getIntValue(bindedMemory, "Byte_Count") ;
+        if(mem != null)
         {
-          memorySizePerPartition.add(PropertyUtils.getIntValue(bindedMemory,
-                                                               "Byte_Count")) ;
+          memorySizePerPartition.add(mem) ;
         }
-        catch(Exception ee)
+        else
         {
-          String errMsg =
-                RamsesException
-                      .formatRethrowMessage("cannot fetch the partition memory for \'" +
-                                                  bindedMemory.getName() + '\'',
-                                            ee) ;
+          String errMsg = "cannot fetch the partition memory (Byte_Count) for \'" +
+                                                  bindedMemory.getName() + '\'' ;
           _LOGGER.error(errMsg) ;
           ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
         }
@@ -1494,10 +1475,11 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     }
 
     deploymentHeaderCode.addOutputNewline("}") ;
-    try
+    
+    List<Long> slotPerPartition =
+        PropertyUtils.getIntListValue(processor, "Partition_Slots") ;
+    if(slotPerPartition != null)
     {
-      List<Long> slotPerPartition =
-            PropertyUtils.getIntListValue(processor, "Partition_Slots") ;
       // POK_CONFIG_SCHEDULING_SLOTS extracted from POK::Paritions_Slots => (500 ms);
       deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
       idx = 0 ;
@@ -1517,22 +1499,19 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
             .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
                   Integer.toString(slotPerPartition.size())) ;
     }
-    catch(Exception e)
+    else
     {
-      String errMsg =
-            RamsesException
-                  .formatRethrowMessage("cannot fetch the partition slots for \'" +
-                                              processor.getName() + '\'', e) ;
+      String errMsg = "cannot fetch the partition slots for \'" +
+                                              processor.getName() + '\'' ;
       _LOGGER.error(errMsg) ;
       ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
     }
 
-    try
+    List<Subcomponent> slotsAllocation = PropertyUtils.getSubcomponentList(processor,
+                                                           "Slots_Allocation") ;
+    if(! slotsAllocation.isEmpty())
     {
-      List<Subcomponent> slotsAllocation =
-            PropertyUtils.getSubcomponentList(processor, "Slots_Allocation") ;
-      deploymentHeaderCode
-            .addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
+      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
 
       for(Subcomponent sAllocation : slotsAllocation)
       {
@@ -1547,68 +1526,60 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
       deploymentHeaderCode.addOutputNewline("}") ;
     }
-    catch(Exception e)
+    else
     {
-      String errMsg =
-            RamsesException
-                  .formatRethrowMessage("cannot fetch the slots allocation for \'" +
-                                              processor.getName() + '\'', e) ;
+      String errMsg = "cannot fetch the Slots_Allocation for \'" +
+                                              processor.getName() + '\'' ;
       _LOGGER.error(errMsg) ;
       ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
     }
-
-    try
+    
+    Long majorFrame =
+        PropertyUtils.getIntValue(processor, "Module_Major_Frame") ;
+    
+    if(majorFrame != null)
     {
-      Long majorFrame =
-            PropertyUtils.getIntValue(processor, "Module_Major_Frame") ;
       deploymentHeaderCode
             .addOutputNewline("#define POK_CONFIG_SCHEDULING_MAJOR_FRAME " +
                   Long.toString(majorFrame)) ;
     }
-    catch(Exception e)
+    else
     {
-      String errMsg =
-            RamsesException
-                  .formatRethrowMessage("cannot fetch the module major frame for \'" +
-                                              processor.getName() + '\'', e) ;
+      String errMsg = "cannot fetch the module major frame for \'" +
+                                              processor.getName() + '\'' ;
       _LOGGER.error(errMsg) ;
       ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
     }
 
-    try
+    String portsFlushTime = PropertyUtils.getEnumValue(processor,
+                                                       "Ports_Flush_Time") ;
+    if(portsFlushTime != null)
     {
-      String portsFlushTime =
-            PropertyUtils.getEnumValue(processor, "Ports_Flush_Time") ;
       if(portsFlushTime.equalsIgnoreCase("Minor_Frame_Switch"))
       {
-        try
+        Long minorFrame = PropertyUtils.getIntValue(processor,
+                                                    "Module_Minor_Frame") ;
+        if(minorFrame != null)
         {
-          long minorFrame =
-                PropertyUtils.getIntValue(processor, "Module_Minor_Frame") ;
           deploymentHeaderCode.addOutputNewline("#define POK_FLUSH_PERIOD " +
-                Long.toString(minorFrame)) ;
+                                                Long.toString(minorFrame)) ;
         }
-        catch(Exception e)
+        else
         {
-          String errMsg =
-                RamsesException
-                      .formatRethrowMessage("Ports_Flush_Time was set to Minor_Frame_Switch for " +
-                                                  processor.getName() +
-                                                  ", but property Module_Minor_Frame",
-                                            e) ;
+          String errMsg = "Ports_Flush_Time was set to Minor_Frame_Switch for \'" +
+                             processor.getName() + "\', but property Module_Minor_Frame" ;
           _LOGGER.error(errMsg) ;
           ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
         }
       }
       else if(portsFlushTime.equalsIgnoreCase("Partition_Slot_Switch"))
-        deploymentHeaderCode
-              .addOutputNewline("#define POK_NEEDS_FLUSH_ON_WINDOWS") ;
+        deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_FLUSH_ON_WINDOWS") ;
     }
-    catch(Exception e)
+    else
     {
       String warnMsg =
-            "Ports_Flush_Time was not set on " + processor.getName() +
-                  ", default flush policy will be used" ;
+            "Ports_Flush_Time was not set on \'" + processor.getName() +
+                  "\', default flush policy will be used" ;
       _LOGGER.warn(warnMsg) ;
       ServiceProvider.SYS_ERR_REP.warning(warnMsg, true) ;
     }
@@ -1620,14 +1591,14 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
       for(ThreadSubcomponent ts : pi.getOwnedThreadSubcomponents())
       {
-        try
+        Long partitionStack =
+            PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
+        if(partitionStack != null)
         {
-          long partitionStack =
-                PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
           _processorProp.requiredStackSize += partitionStack ;
           _processorProp.requiredStackSizePerPartition.put(pi, partitionStack) ;
         }
-        catch(Exception e)
+        else
         {
           _processorProp.requiredStackSize += DEFAULT_REQUIRED_STACK_SIZE ;
           _processorProp.requiredStackSizePerPartition
@@ -1658,9 +1629,11 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
 	@Override
 	  public void setParameters(Map<Enum<?>, Object> parameters)
-	  {
-	    throw new UnsupportedOperationException() ;
-	  }
+    {
+      String msg = "setParameters not supported" ;
+      _LOGGER.fatal(msg) ;
+      throw new UnsupportedOperationException(msg) ;
+    }
 
 	  public TargetProperties process(SystemImplementation si,
 	                                  File runtimePath,
@@ -1745,9 +1718,12 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
                   PropertyUtils
                         .getComponentInstanceList(processInstance,
                                                   "Actual_Processor_Binding") ;
-            int partitionIndex =
+            if(bindedVP != null)
+            {
+              int partitionIndex =
                   bindedVPS.indexOf(bindedVP.get(0).getSubcomponent()) ;
-            routingHeaderCode.addOutput(Integer.toString(partitionIndex)) ;
+              routingHeaderCode.addOutput(Integer.toString(partitionIndex)) ;
+            }
           }
           routingHeaderCode.addOutput(",") ;
         }

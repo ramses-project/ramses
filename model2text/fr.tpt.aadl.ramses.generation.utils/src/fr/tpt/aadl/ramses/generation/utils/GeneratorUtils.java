@@ -130,7 +130,7 @@ public class GeneratorUtils
       catch(DimensionException ex)
       {
         String errMsg = "fail to fetch the initial value of " +  e.getName();
-        _LOGGER.error(errMsg);
+        _LOGGER.error(errMsg, ex);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
     }
@@ -161,6 +161,7 @@ public class GeneratorUtils
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     	return null;
     }
+    
     for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
           .getOwnedValues())
     {
@@ -288,27 +289,30 @@ public class GeneratorUtils
           PropertyUtils.findProperty("Actual_Memory_Binding",
                                      aProcessSubcomponent) ;
 
-    for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation
-          .getOwnedValues())
+    if(aPropertyAssociation != null)
     {
-      if(aModalPropertyValue.getOwnedValue() instanceof ListValue)
+      for(ModalPropertyValue aModalPropertyValue : aPropertyAssociation.
+                                                               getOwnedValues())
       {
-        ListValue list = (ListValue) aModalPropertyValue.getOwnedValue() ;
-
-        for(PropertyExpression pe : list.getOwnedListElements())
+        if(aModalPropertyValue.getOwnedValue() instanceof ListValue)
         {
-          if(pe instanceof ReferenceValue)
-          {
-            ReferenceValue rv = (ReferenceValue) pe ;
-            NamedElement anElement =
-                  rv.getContainmentPathElements()
-                        .get(rv.getContainmentPathElements().size() - 1)
-                        .getNamedElement() ;
+          ListValue list = (ListValue) aModalPropertyValue.getOwnedValue() ;
 
-            if(anElement instanceof MemorySubcomponent)
+          for(PropertyExpression pe : list.getOwnedListElements())
+          {
+            if(pe instanceof ReferenceValue)
             {
-              MemorySubcomponent ms = (MemorySubcomponent) anElement ;
-              return ms ;
+              ReferenceValue rv = (ReferenceValue) pe ;
+              NamedElement anElement =
+                                       rv.getContainmentPathElements()
+                                         .get(rv.getContainmentPathElements()
+                                                .size() - 1).getNamedElement() ;
+
+              if(anElement instanceof MemorySubcomponent)
+              {
+                MemorySubcomponent ms = (MemorySubcomponent) anElement ;
+                return ms ;
+              }
             }
           }
         }

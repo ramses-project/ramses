@@ -81,7 +81,7 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 		{
 		  String errMsg = "workflow file does not exist: " + testExist.getAbsolutePath() ;
 	    _LOGGER.fatal(errMsg) ;
-			throw new FileNotFoundException();
+			throw new FileNotFoundException(errMsg);
 		}
 
 		if (getResourceSet().getURIConverter().exists(workflow_uri, null)) {
@@ -149,52 +149,68 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	/**
 	 * @see WorkflowPilot#getAnalysisName()
 	 */
-	public String getAnalysisName() {
-		if (currentWorkflowElement instanceof Analysis) {
-			return ((Analysis) currentWorkflowElement).getMethod();
-		} else {
-			System.err
-					.println("You cannot ask for an analysis name if the current state is not an analysis.");
-			return null;
-		}
-	}
+  public String getAnalysisName()
+  {
+    if(currentWorkflowElement instanceof Analysis)
+    {
+      return ((Analysis) currentWorkflowElement).getMethod() ;
+    }
+    else
+    {
+      String msg = "You cannot ask for an analysis name if the current state is not an analysis." ;
+      _LOGGER.error(msg);
+      return null ;
+    }
+  }
 
 	/**
 	 * @see WorkflowPilot#getAnalysisMode()
 	 */
-	public String getAnalysisMode() {
-		if (currentWorkflowElement instanceof Analysis) {
-			return ((Analysis) currentWorkflowElement).getMode();
-		} else {
-			System.err
-					.println("You cannot ask for an analysis mode if the current state is not an analysis.");
-			return null;
-		}
+	public String getAnalysisMode()
+	{
+    if(currentWorkflowElement instanceof Analysis)
+    {
+      return ((Analysis) currentWorkflowElement).getMode() ;
+    }
+    else
+    {
+      String msg = "You cannot ask for an analysis mode if the current state is not an analysis." ; 
+      _LOGGER.error(msg);
+      return null ;
+    }
 	}
 
 	/**
 	 * @see WorkflowPilot#getTransformationFileNameList()
 	 */
-	public List<String> getTransformationFileNameList() {
-		if (currentWorkflowElement instanceof Transformation) {
-			fr.tpt.aadl.ramses.control.workflow.List list = ((Transformation) currentWorkflowElement).getList();
+  public List<String> getTransformationFileNameList()
+  {
+    if(currentWorkflowElement instanceof Transformation)
+    {
+      fr.tpt.aadl.ramses.control.workflow.List list =
+                           ((Transformation) currentWorkflowElement).getList() ;
 
-			List<fr.tpt.aadl.ramses.control.workflow.File> listFileTags = list.getFile();
-			Iterator<fr.tpt.aadl.ramses.control.workflow.File> listFileTagsIt = listFileTags.iterator();
+      List<fr.tpt.aadl.ramses.control.workflow.File> listFileTags =
+                                                                list.getFile() ;
+      Iterator<fr.tpt.aadl.ramses.control.workflow.File> listFileTagsIt =
+                                                       listFileTags.iterator() ;
 
-			List<String> listFileNames = new ArrayList<String>();
+      List<String> listFileNames = new ArrayList<String>() ;
 
-			while (listFileTagsIt.hasNext()) {
-				listFileNames.add(listFileTagsIt.next().getPath());
-			}
+      while(listFileTagsIt.hasNext())
+      {
+        listFileNames.add(listFileTagsIt.next().getPath()) ;
+      }
 
-			return listFileNames;
-		} else {
-			System.err
-					.println("You cannot ask for an asm file if the current state is not a transformation.");
-			return null;
-		}
-	}
+      return listFileNames ;
+    }
+    else
+    {
+      String msg = "You cannot ask for an asm file if the current state is not a transformation." ;
+      _LOGGER.error(msg);
+      return null ;
+    }
+  }
 
 	/**
 	 * @see WorkflowPilot#setAnalysisResult(boolean)

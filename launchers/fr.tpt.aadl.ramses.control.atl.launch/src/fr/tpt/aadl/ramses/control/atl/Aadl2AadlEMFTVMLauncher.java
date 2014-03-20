@@ -89,6 +89,7 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			catch(Exception ex)
 			{
 			  String msg = "fail to extract AADL resources" ;
+			  _LOGGER.fatal(msg, ex);
 	      throw new TransformationException(msg, ex) ;
 			}
 		}
@@ -157,10 +158,10 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 		  }
 		  catch (IOException e)
 		  {
-		    String errMsg =  RamsesException.formatRethrowMessage("cannot erase the previous output resource \'" +
-		                                                          uri.toString() + '\'', e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+		    String errMsg =  "cannot erase the previous output resource \'" +
+		                                                          uri.toString() + '\'' ;
+		    _LOGGER.error(errMsg, e);
+		    throw new RuntimeException(errMsg, e);
 		  }
 		  outputResource = rs.createResource(uri);
 		}

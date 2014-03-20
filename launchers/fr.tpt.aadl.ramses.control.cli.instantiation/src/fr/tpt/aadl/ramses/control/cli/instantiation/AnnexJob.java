@@ -36,6 +36,7 @@ import org.osate.aadl2.modelsupport.errorreporting.ParseErrorReporter ;
 import org.osate.annexsupport.AnnexParser ;
 import org.osate.annexsupport.AnnexResolver ;
 
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import antlr.RecognitionException ;
 
@@ -80,7 +81,7 @@ public class AnnexJob
     _errManager = analysisErrManager ;
   }
 
-  public boolean parse()
+  public boolean parse() throws ParseException
   {
     boolean result = false ;
     AnnexSubclause as ;
@@ -127,8 +128,9 @@ public class AnnexJob
       }
       catch(RecognitionException e)
       {
-        e.printStackTrace() ;
-        result = false ;
+        String msg = "parsing has failed" ;
+        _LOGGER.fatal(msg, e);
+        throw new ParseException(msg, e) ;
       }
     }
 

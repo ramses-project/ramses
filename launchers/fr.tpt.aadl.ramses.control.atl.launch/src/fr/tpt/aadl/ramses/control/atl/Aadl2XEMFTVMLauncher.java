@@ -108,8 +108,11 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 				URI fileURI = URI.createFileURI(module +".emftvm");
 				moduleRes.getContents().get(0).eResource().setURI(fileURI);
 				return (Module) moduleRes.getContents().get(0);
-			} catch (IOException e) {
-				throw new ModuleNotFoundException(e);
+			} catch (IOException e)
+			{
+				String msg = "cannot resolve module \'" + module + '\'' ;
+				_LOGGER.fatal(msg, e);
+			  throw new ModuleNotFoundException(msg, e);
 			}
 		}
 	};

@@ -27,6 +27,7 @@ import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.osate.ba.wizards.AadlBaExamplesWizard ;
 import org.osate.utils.Aadl2Utils ;
 
@@ -34,6 +35,8 @@ import fr.tpt.aadl.ramses.control.osate.Activator ;
 
 public class RamsesExamplesWizard extends AadlBaExamplesWizard
 {
+  private static Logger _LOGGER = Logger.getLogger(RamsesExamplesWizard.class) ;
+  
   public RamsesExamplesWizard ()
   {
     super();
@@ -108,7 +111,9 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
       }
       else
       {
-        throw new Exception('\'' + examplesPath + "\' is not directory") ;
+        String msg = '\'' + examplesPath + "\' is not directory" ;
+        _LOGGER.fatal(msg);
+        throw new Exception(msg) ;
       }
     }
   }

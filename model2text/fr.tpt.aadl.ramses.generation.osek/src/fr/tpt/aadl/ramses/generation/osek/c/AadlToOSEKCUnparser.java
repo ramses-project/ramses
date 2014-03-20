@@ -24,7 +24,6 @@ import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
@@ -62,13 +61,13 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	/**
 	 * Compilation config
 	 */
-	private final static String compilationFile = "compilation.properties";
+//	private final static String compilationFile = "compilation.properties";
 
 	/**
 	 * OSEK
 	 */
-	private final static String C_OSEK_RUNTIME = "osek_runtime.c";
-	private final static String H_OSEK_RUNTIME = "osek_runtime.h";
+//	private final static String C_OSEK_RUNTIME = "osek_runtime.c";
+//	private final static String H_OSEK_RUNTIME = "osek_runtime.h";
 
 	/**
 	 * Variable OIL
@@ -99,7 +98,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	 * Thread
 	 */
 	private final static int THREAD_ACTIVATION = 1;
-	private final static int THREAD_STACKSIZE = 512;
+	private final static long THREAD_STACKSIZE = 512l;
 	
 	/**
 	 * OIL AST
@@ -162,73 +161,81 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	/**
 	 * Method call on subprogram implementation
 	 */
-	public void process(SubprogramType elt, File generatedFilePath) {
-
-//		Os os = oil.getCpu().getOs();
-
-		if (_startupHook.getReferences().contains(elt.getName())) {
-			try
-			{
-				Subprogram subprogram = new Subprogram();
-				subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name"));
-				subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport"));
-				_startupHook.addSubrogram(subprogram);
-	
-			} catch (Exception e)
-			{
-			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch source name or nxt port", e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-			}
-		} else if (_shutdownHook.getReferences().contains(elt.getName())) {
-	
-			try
-			{
-				Subprogram subprogram = new Subprogram();
-				subprogram.setName(PropertyUtils.getStringValue(elt, "Source_Name"));
-				subprogram.addParameter(PropertyUtils.getStringValue(elt, "nxtport"));
-				_shutdownHook.addSubrogram(subprogram);
-			}
-			catch (Exception e)
-			{
-			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch source name or nxt port for \'"+ elt.getName() + '\'', e) ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-			}
-		}
-	}
+	public void process(SubprogramType elt, File generatedFilePath)
+  {
+    //		Os os = oil.getCpu().getOs();
+	  
+	  String name = PropertyUtils.getStringValue(elt, "Source_Name") ;
+    String port = PropertyUtils.getStringValue(elt, "nxtport") ;
+    if(name == null || port == null)
+    {
+      String what = "";
+      if(name == null)
+      {
+        what = "Source_Name";
+      }
+      
+      if(port == null)
+      {
+        what += " nxtport" ;
+      }
+      
+      String errMsg = "cannot fetch " + what + " for \'" + elt.getName() + '\'';
+      _LOGGER.error(errMsg) ;
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+      return ;
+    }
+    else
+    {
+      Subprogram subprogram = new Subprogram() ;
+      subprogram.setName(name) ;
+      subprogram.addParameter(port) ;
+      
+      if(_startupHook.getReferences().contains(elt.getName()))
+      {
+        _startupHook.addSubrogram(subprogram) ;
+      }
+      else if(_shutdownHook.getReferences().contains(elt.getName()))
+      {
+        _shutdownHook.addSubrogram(subprogram) ;
+      }
+    }
+  }
 
 	private void genDevice(SystemImplementation si) {
 
 		Os os = oil.getCpu().getOs();
 
-		for (DeviceSubcomponent device : si.getOwnedDeviceSubcomponents()) {
-			
-			try {
-				Classifier classifier = PropertyUtils.getClassifierValue(device, "Initialize_Entrypoint");
+		for (DeviceSubcomponent device : si.getOwnedDeviceSubcomponents())
+		{
+		  Classifier classifier = PropertyUtils.getClassifierValue(device, "Initialize_Entrypoint");
+		  if(classifier != null)
+			{
 				/*
 				 * If one thread/device contains Initialize_Entrypoint STARTUPHOOK = true
 				 */
 				os.setStartupHook(true);
 				_startupHook.addReference(classifier.getName());
-			} catch (Exception e)
+			}
+		  else
 			{
-			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch initialize entry point for \'" + device + '\'', e) ;
+			  String errMsg =  "cannot fetch initialize entry point for \'" + device + '\'';
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
 
-			try {
-				Classifier classifier = PropertyUtils.getClassifierValue(device, "Finalize_Entrypoint");
+		  classifier = PropertyUtils.getClassifierValue(device, "Finalize_Entrypoint");
+			if(classifier != null)
+		  {
 				/*
 				 * If one thread/device contains Finalize_Entrypoint SHUTDOWNHOOK = true
 				 */
 				os.setShutdownHook(true);
 				_shutdownHook.addReference(classifier.getName());
 			}
-			catch (Exception e)
+			else
 			{
-			  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch finalize entry point for \'" + device.getName() + '\'', e) ;
+			  String errMsg =  "cannot fetch finalize entry point for \'" + device.getName() + '\'' ;
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 			}
@@ -286,23 +293,30 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 
 		  EList<Subcomponent> subcmpts = processImpl.getAllSubcomponents();
 
-		  for (Subcomponent s : subcmpts) {
-		    if (s instanceof DataSubcomponent) {
-		      String value;
-		      try {
-		        value = PropertyUtils.getEnumValue(s, "Concurrency_Control_Protocol");
-		        if (value.equals("Priority_Ceiling")) {
-		          os.setStatus(Status.EXTENDED);
-		          break;
-		        }
-		      } catch (Exception e)
-		      {
-		        String errMsg =  RamsesException.formatRethrowMessage("cannot fetch concurrencey control protocol for \'" + s.getName() + '\'', e) ;
-		        _LOGGER.error(errMsg);
-		        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-		      }
-		    }
-		  }
+      for(Subcomponent s : subcmpts)
+      {
+        if(s instanceof DataSubcomponent)
+        {
+          String value = PropertyUtils.getEnumValue(s,
+                                                    "Concurrency_Control_Protocol") ;
+          if(value != null)
+          {
+            if(value.equals("Priority_Ceiling"))
+            {
+              os.setStatus(Status.EXTENDED) ;
+              break ;
+            }
+          }
+          else
+          {
+            String errMsg = "cannot fetch Concurrency_Control_Protocol for \'" +
+                                                                     s.getName() +
+                                                                     '\'' ;
+            _LOGGER.error(errMsg) ;
+            ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+          }
+        }
+      }
 		}
 
 		cpu.setName(ps.getName());
@@ -374,29 +388,49 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	private void genCounters(SystemImplementation si) {
 
 		Counter counter = oil.getCpu().getCounter();
-		String source = "";
-		int maxValue = -1;
-		int ticksPerBase= -1;
-		int minCycle= -1;
+		String source = PropertyUtils.getStringValue(si, "SystemCounter_Source");
+		Long maxValue = PropertyUtils.getIntValue(si, "SystemCounter_MaxAllowedValue");
+		Long ticksPerBase= PropertyUtils.getIntValue(si, "SystemCounter_TicksPerBase");
+		Long minCycle= PropertyUtils.getIntValue(si, "SystemCounter_MinCycle");
 
-		try {
-			source = PropertyUtils.getStringValue(si, "SystemCounter_Source");
-			maxValue = (int) PropertyUtils.getIntValue(si, "SystemCounter_MaxAllowedValue");
-			ticksPerBase = (int) PropertyUtils.getIntValue(si, "SystemCounter_TicksPerBase");
-			minCycle = (int) PropertyUtils.getIntValue(si, "SystemCounter_MinCycle");
-
-		} catch (Exception e)
+		if(source == null || maxValue == null || ticksPerBase == null ||
+		   minCycle == null)
 		{
-		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch system counter values for \'" + si.getName() + '\'', e) ;
+		  String what = "";
+		  
+		  if(source == null)
+		  {
+		    what = "SystemCounter_Source" ;
+		  }
+		  
+		  if(maxValue == null)
+		  {
+		    what += " SystemCounter_MaxAllowedValue";
+		    maxValue = -1l ;
+		  }
+		  
+		  if(ticksPerBase == null)
+		  {
+		    what += " SystemCounter_TicksPerBase" ;
+		    ticksPerBase = -1l ;
+		  }
+		  
+		  if(minCycle == null)
+		  {
+		    what += " SystemCounter_MinCycle" ;
+		    minCycle = -1l ;
+		  }
+		  
+		  String errMsg =  "cannot fetch " + what + " for \'" + si.getName() + '\'';
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
-
-		counter.setName(COUNTER_NAME);
-		counter.setSource(source);
-		counter.setMaxAllowedValue(maxValue);
-		counter.setTicksPerBase(ticksPerBase);
-		counter.setMinCycle(minCycle);
+		
+    counter.setName(COUNTER_NAME) ;
+    counter.setSource(source) ;
+    counter.setMaxAllowedValue(maxValue.intValue()) ;
+    counter.setTicksPerBase(ticksPerBase.intValue()) ;
+    counter.setMinCycle(minCycle.intValue()) ;
 	}
 	
 	
@@ -436,46 +470,49 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		/* Begin task */
 
 		Task task = new Task();
-		int priority = -1;
 		Schedule schedule;
-		int stackSize;
-
-		try {
-			priority = (int) PropertyUtils.getIntValue(thread, "Priority");
-		} catch (Exception e)
+		
+		Long priority = PropertyUtils.getIntValue(thread, "Priority");
+		if(priority == null)
 		{
-		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch priority for \'" + thread.getName() + '\'', e) ;
+		  String errMsg =  "cannot fetch Priority for \'" + thread.getName() + '\'';
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      priority = -1l ;
 		}
 
-		try {
-			boolean scheduler = PropertyUtils.getBooleanValue(ps, "Preemptive_Scheduler");
-			if (scheduler)
-				schedule = Schedule.FULL;
-			else
-				schedule = Schedule.NON;
-		} catch (Exception exception) {
-			schedule = Schedule.FULL;
-		}
-
-		stackSize = THREAD_STACKSIZE;
-
-		try {
-			stackSize = (int) PropertyUtils.getIntValue(thread, "Source_Stack_Size");
-		} catch (Exception e)
+		Boolean scheduler = PropertyUtils.getBooleanValue(ps,"Preemptive_Scheduler") ;
+		if(scheduler == null)
 		{
-		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch source stack size for \'" + thread.getName() + '\'', e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+		  schedule = Schedule.FULL ;
+		  String msg =  "set the default scheduler value for \'" + thread.getName() + '\'' ;
+      _LOGGER.warn(msg);
+      ServiceProvider.SYS_ERR_REP.warning(msg, true);
+		}
+		else
+		{
+		  if(scheduler)
+        schedule = Schedule.FULL ;
+      else
+        schedule = Schedule.NON ;
+		}
+		
+		Long stackSize = PropertyUtils.getIntValue(thread, "Source_Stack_Size");
+		
+		if(stackSize == null)
+		{
+		  stackSize = THREAD_STACKSIZE;
+		  String msg =  "set the default Source_Stack_Size value for \'" + thread.getName() + '\'' ;
+      _LOGGER.warn(msg);
+      ServiceProvider.SYS_ERR_REP.warning(msg, true);
 		}
 
 		task.setName(thread.getName());
-		task.setPriority(priority);
+		task.setPriority(priority.intValue());
 		task.setActivation(THREAD_ACTIVATION);
 
 		task.setSchedule(schedule);
-		task.setStacksize(stackSize);
+		task.setStacksize(stackSize.intValue());
 
 
 		ThreadImplementation ti = (ThreadImplementation) thread.getSubcomponentType();
@@ -498,43 +535,44 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 		/*
 		 * Generate alarme associated to periodic tasks
 		 */
-		try
-		{
-			String dispatchProtocol = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol");
+		String dispatchProtocol = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol");
 
-			if (dispatchProtocol.equals("Periodic")) {
+    if ("Periodic".equals(dispatchProtocol)) {
 
-				/* Begin Alarm */
+      /* Begin Alarm */
 
-				int period = (int) PropertyUtils.getIntValue(thread, "Period");
-				int alarmTime=0;
-				try{
-					alarmTime = 1;
-				} catch(Exception exc)
-				{
-				}
-				Alarm alarm = new Alarm(counter, task, cpu);
+      Long period = PropertyUtils.getIntValue(thread, "Period");
+      if(period == null)
+      {
+        String errMsg =  "cannot fetch Period for \'" + thread.getName() + '\'';
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        period = -1l ;
+      }
+      
+      
+      int alarmTime=0;
+      try{
+        alarmTime = 1;
+      } catch(Exception exc)
+      {
+      }
+      Alarm alarm = new Alarm(counter, task, cpu);
 
-				alarm.setName("wakeUp" + thread.getName());
-				alarm.setAction(Action.ACTIVATETASK);
-				alarm.setAutostart(true);
-				alarm.setAlarmTime(alarmTime);
-				alarm.setCycleTime(period);
+      alarm.setName("wakeUp" + thread.getName());
+      alarm.setAction(Action.ACTIVATETASK);
+      alarm.setAutostart(true);
+      alarm.setAlarmTime(alarmTime);
+      alarm.setCycleTime(period.intValue());
 
-				task.setAutostart(false);
+      task.setAutostart(false);
 
-				cpu.addPeriodicTask(new PeriodicTask(task, alarm));
-				/* End Alarm */
-			} else {
-				task.setAutostart(true);
-				cpu.addTask(task);
-			}
-		} catch (Exception e)
-		{
-		  String errMsg =  RamsesException.formatRethrowMessage("cannot fetch dispatch values for \'" + thread.getName() + '\'', e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-		}
+      cpu.addPeriodicTask(new PeriodicTask(task, alarm));
+      /* End Alarm */
+    } else {
+      task.setAutostart(true);
+      cpu.addTask(task);
+    }	  
 	}
 
 	/**
@@ -704,7 +742,9 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
                       File outputDir,
                       IProgressMonitor monitor)
 			throws GenerationException {
-		throw new UnsupportedOperationException() ;
+	  String msg = "process not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
 	}
 
 	@Override
@@ -783,7 +823,10 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
 	}
 	
 	@Override
-	public void setParameters(Map<Enum<?>, Object> parameters) {
-		// TODO Do NOT Use
+	public void setParameters(Map<Enum<?>, Object> parameters)
+	{
+	  String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
 	}
 }

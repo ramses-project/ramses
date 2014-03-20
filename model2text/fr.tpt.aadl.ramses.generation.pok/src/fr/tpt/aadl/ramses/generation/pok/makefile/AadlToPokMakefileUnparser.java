@@ -187,24 +187,22 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
       @Override
       public String caseProcessorSubcomponent(ProcessorSubcomponent object)
       {
-        try
+        String archiName = PropertyUtils.getEnumValue(object, "Architecture") ;
+        if(archiName != null)
         {
-          String archiName = PropertyUtils.getEnumValue(object, "Architecture") ;
           unparserContent.addOutputNewline("export ARCH=" + archiName) ;
         }
-        catch(Exception e)
+        else
         {
-          String errMsg =  RamsesException.formatRethrowMessage(
-                 "Property Architecture from property set POK, not found for" +
-                 " process subcomponent " + object.getName(), e) ;
+          String errMsg =  "Property Architecture from property set POK, not found for " +
+                 " process subcomponent \'" + object.getName() + '\'' ;
           _LOGGER.error(errMsg);
           ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
 
-        try
+        String bspName = PropertyUtils.getEnumValue(object, "BSP") ;
+        if(bspName != null)
         {
-          String bspName = PropertyUtils.getEnumValue(object, "BSP") ;
-
           if(bspName.equalsIgnoreCase("x86_qemu"))
           {
             bspName = "x86-qemu" ;
@@ -212,10 +210,10 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
 
           unparserContent.addOutputNewline("export BSP=" + bspName) ;
         }
-        catch(Exception e)
+        else
         {
           String errMsg = "Property BSP from property set POK, not found for" +
-                          " process subcomponent " + object.getName() ;
+                          " process subcomponent \'" + object.getName() + '\'';
           _LOGGER.error(errMsg);
           ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
@@ -359,7 +357,9 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
   }
   
   @Override

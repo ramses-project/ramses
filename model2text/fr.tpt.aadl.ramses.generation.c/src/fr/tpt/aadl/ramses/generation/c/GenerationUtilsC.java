@@ -32,7 +32,6 @@ import org.osate.aadl2.Parameter ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 public class GenerationUtilsC
@@ -130,6 +129,7 @@ public class GenerationUtilsC
     if(object.length() > 74) // 80 - 6 length of /*_ x 2
     {
       String errorMsg = "title more than 78 characters" ;
+      _LOGGER.fatal(errorMsg);
       throw new UnsupportedOperationException(errorMsg) ;
     }
   }
@@ -142,30 +142,25 @@ public class GenerationUtilsC
   
   public static boolean isReturnParameter(Parameter p)
   {
-	  boolean isReturnParam=false;
-	  try
-	  {
-		  isReturnParam =
-			PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
-	  }
-	  catch (Exception e)
-	  {
-	    String errMsg =  RamsesException.formatRethrowMessage("cannot fetch return parameter for \'"+
-	                    p.getName() + '\'', e) ;
+    Boolean isReturnParam = PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
+    if(isReturnParam == null)
+    {
+      isReturnParam=false;
+      String errMsg =  "cannot fetch Return_Parameter for \'" +  p.getName() + '\'' ;
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);  
-	    
-		  // DO NOT COMIT.
-//	    Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
-//		BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
-//		isReturnParam = bl.getValue();
-	  }
+
+      // DO NOT COMIT.
+      //Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
+      //BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
+      //isReturnParam = bl.getValue();
+    }
+    
 	  return isReturnParam;
   }
   
-  public static String
-      resolveExistingCodeDependencies(NamedElement object,
-                                      Set<String> additionalHeaders)
+  public static String resolveExistingCodeDependencies(NamedElement object,
+                                                       Set<String> additionalHeaders)
   {
     try
     {

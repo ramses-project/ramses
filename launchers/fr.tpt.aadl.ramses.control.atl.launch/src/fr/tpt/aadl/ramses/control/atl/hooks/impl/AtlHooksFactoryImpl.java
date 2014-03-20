@@ -23,6 +23,7 @@ package fr.tpt.aadl.ramses.control.atl.hooks.impl;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.* ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -37,6 +38,8 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
  */
 public class AtlHooksFactoryImpl extends EFactoryImpl implements AtlHooksFactory
 {
+  private static Logger _LOGGER = Logger.getLogger(AtlHooksFactoryImpl.class) ;
+  
   /**
 	 * Creates the default factory implementation.
 	 * <!-- begin-user-doc -->
@@ -79,7 +82,11 @@ public class AtlHooksFactoryImpl extends EFactoryImpl implements AtlHooksFactory
 		switch (eClass.getClassifierID()) {
 			case AtlHooksPackage.HOOK_ACCESS: return createHookAccess();
 			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+			{
+				String msg = "The class '" + eClass.getName() + "' is not a valid classifier";
+				_LOGGER.fatal(msg) ;
+				throw new IllegalArgumentException(msg);
+			}
 		}
 	}
 

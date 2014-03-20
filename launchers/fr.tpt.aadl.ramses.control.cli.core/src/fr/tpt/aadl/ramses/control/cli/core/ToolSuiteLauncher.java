@@ -144,7 +144,7 @@ public class ToolSuiteLauncher
     }
   }
 
-  List<Resource> performParse(List<File> aadlFile)
+  List<Resource> performParse(List<File> aadlFile) throws ParseException
   {
     List<Resource> result = _instantiator.parse(aadlFile) ;
     return result ;
@@ -168,7 +168,8 @@ public class ToolSuiteLauncher
                                      	 Map<String, Object> parameters)
                                                       throws AnalysisException,
                                                              GenerationException,
-                                                         TransformationException
+                                                         TransformationException,
+                                                         ParseException
   {
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
@@ -203,7 +204,8 @@ public class ToolSuiteLauncher
                               Map<String, Object> parameters)
                                                       throws AnalysisException,
                                                             GenerationException,
-                                                      TransformationException
+                                                      TransformationException,
+                                                      ParseException
   {
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
@@ -235,7 +237,8 @@ public class ToolSuiteLauncher
                        String systemToInstantiate,
                        RamsesConfiguration config,
                        Map<String, Object> parameters)
-                                                        throws AnalysisException
+                                                        throws AnalysisException,
+                                                        ParseException
   {
     _monitor.subTask("Parse AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModelFiles) ;

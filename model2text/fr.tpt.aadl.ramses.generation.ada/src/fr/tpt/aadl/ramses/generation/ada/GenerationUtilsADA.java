@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.generation.ada;
 import java.util.List ;
 import java.util.Set ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.BooleanLiteral ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
@@ -37,6 +38,7 @@ import org.osate.xtext.aadl2.properties.util.GetProperties ;
 public class GenerationUtilsADA
 {
 	public final static String THREAD_SUFFIX = "_Job" ;
+	private static Logger _LOGGER = Logger.getLogger(GenerationUtilsADA.class) ;
 	  
 	  // Give file name, in upper case or not and with or without extension.
 	  public static String generateHeaderInclusionGuard(String fileName)
@@ -201,6 +203,7 @@ public class GenerationUtilsADA
 	    if(object.length() > 74) // 80 - 6 length of /*_ x 2
 	    {
 	      String errorMsg = "title more than 78 characters" ;
+	      _LOGGER.fatal(errorMsg) ;
 	      throw new UnsupportedOperationException(errorMsg) ;
 	    }
 	  }
@@ -218,15 +221,21 @@ public class GenerationUtilsADA
 	  
 	  public static boolean isReturnParameter(Parameter p)
 	  {
-		  boolean isReturnParam=false;
-		  try {
-			isReturnParam =
-					  PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
-		  } catch (Exception e) {
-		    Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
-			BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
-			isReturnParam = bl.getValue();
-		  }
+	    Boolean isReturnParam = PropertyUtils.getBooleanValue(p, "Return_Parameter") ;
+	    if(isReturnParam == null)
+	    {
+	      Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
+	      if(prop != null)
+	      {
+	        BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
+	        isReturnParam = bl.getValue();
+	      }
+	      else
+	      {
+	        isReturnParam = false; // Is it right ?
+	      }
+	    }
+	    
 		  return isReturnParam;
 	  }
 	  
@@ -235,8 +244,17 @@ public class GenerationUtilsADA
 	  {
 		  NamedElement ne = object ;
 		  String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+		  if(sourceName == null)
+		  {
+		    return null ;
+		  }
 		  List<String> sourceText =
 				  PropertyUtils.getStringListValue(ne, "Source_Text") ;
+		  if(sourceText == null)
+		  {
+		    return null ;
+		  }
+		  
 		  for(String s : sourceText)
 		  {
 			  if(s.endsWith(".ads"))

@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.analysis.impl;
 import fr.tpt.aadl.ramses.analysis.*;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -37,7 +38,10 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
  * @generated
  */
 public class AnalysisResultFactoryImpl extends EFactoryImpl implements AnalysisResultFactory {
-	/**
+	
+  private static Logger _LOGGER = Logger.getLogger(AnalysisResultFactoryImpl.class) ;
+  
+  /**
 	 * Creates the default factory implementation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -78,7 +82,12 @@ public class AnalysisResultFactoryImpl extends EFactoryImpl implements AnalysisR
 			case AnalysisResultPackage.QUALITATIVE_ANALYSIS_RESULT: return createQualitativeAnalysisResult();
 			case AnalysisResultPackage.ANALYSIS_SOURCE: return createAnalysisSource();
 			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+			{
+			  String msg = "The class '" + eClass.getName() + "' is not a valid classifier" ;
+			  _LOGGER.fatal(msg) ;
+			  throw new IllegalArgumentException(msg);
+			}
+				
 		}
 	}
 

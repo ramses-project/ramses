@@ -117,7 +117,7 @@ public class BehaviorAction2EG
       {
         String msg = RamsesException.formatRethrowMessage("cannot do action to EG",
                                                           e) ;
-        _LOGGER.error(e) ;
+        _LOGGER.error("", e) ;
         ServiceProvider.SYS_ERR_REP.error(msg, true);
         actionNode = new EGNode (name + "_<error>");
       }
@@ -159,8 +159,10 @@ public class BehaviorAction2EG
       }
       else
       {
-        throw new UnsupportedOperationException('\'' +
-                    action.getClass().getSimpleName() + "\' is not supported");
+        String msg = '\'' +
+            action.getClass().getSimpleName() + "\' is not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg);
       }
     }
     else if (action instanceof CondStatement)
@@ -195,14 +197,18 @@ public class BehaviorAction2EG
       }
       else
       {
-        throw new UnsupportedOperationException('\'' +
-                     action.getClass().getSimpleName() + "\' is not supported");
+        String msg = '\'' +
+            action.getClass().getSimpleName() + "\' is not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg);
       }
     }
     else
     {
-      throw new UnsupportedOperationException('\'' +
-                     action.getClass().getSimpleName() + "\' is not supported");
+      String msg = '\'' +
+          action.getClass().getSimpleName() + "\' is not supported" ;
+      _LOGGER.fatal(msg);
+      throw new UnsupportedOperationException(msg);
     }
   }
   
@@ -320,7 +326,7 @@ public class BehaviorAction2EG
     catch(UnsupportedOperationException e)
     {
       String msg = RamsesException.formatRethrowMessage("unsupported operation", e);
-      _LOGGER.error(e);
+      _LOGGER.error("", e);
       ServiceProvider.SYS_ERR_REP.error(msg, true);
     }
     

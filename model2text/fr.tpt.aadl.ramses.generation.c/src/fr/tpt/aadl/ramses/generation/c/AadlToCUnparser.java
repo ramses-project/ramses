@@ -602,7 +602,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       // This is an internal error, to be logged and displayed
       String errMsg =  RamsesException.formatRethrowMessage("cannot fetch the type of \'" +
                                object + '\'', e) ;
-      _LOGGER.error(errMsg);
+      _LOGGER.error(errMsg, e);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
 
@@ -1020,7 +1020,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         {
           String errMsg =  RamsesException.formatRethrowMessage("cannot resolve dependencies for \'"+
                           object + '\'', e) ;
-          _LOGGER.error(errMsg);
+          _LOGGER.error(errMsg, e);
           ServiceProvider.SYS_ERR_REP.error(errMsg, true); ;
         }
 
@@ -1475,7 +1475,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           if(f instanceof Parameter)
           {
             Parameter p = (Parameter) f ;
-            String paramUsage = Aadl2Utils.getParameter_Usage(p) ;
+            String paramUsage = Aadl2Utils.getParameterUsage(p) ;
             if(p == returnParameter)
               continue ;
             if(first == false)
@@ -1652,7 +1652,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     						  continue;
     					  if(first==false)
     						  _currentImplUnparser.addOutput(", ") ;
-    					  String paramUsage = Aadl2Utils.getParameter_Usage(p);
+    					  String paramUsage = Aadl2Utils.getParameterUsage(p);
     					  if(Aadl2Utils.isInOutParameter(p) ||
     							  Aadl2Utils.isOutParameter(p)
     							  || paramUsage.equalsIgnoreCase("by_reference"))
@@ -1723,23 +1723,26 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       {
         PropertyAssociation pa = PropertyUtils.getPropertyAssociation(object,
                                            "Compute_Entrypoint_Call_Sequence") ;
-        ReferenceValue rv = (ReferenceValue) pa.getOwnedValues().get(0)
-                                               .getOwnedValue() ;
-        _currentBehaviorCallSequence =
-                                       (SubprogramCallSequence) rv.getContainmentPathElements()
-                                                                  .get(0)
-                                                                  .getNamedElement() ;
-
-        pa = PropertyUtils.getPropertyAssociation(object,
-                                        "Initialize_Entrypoint_Call_Sequence") ;
+        
         if(pa != null)
         {
-          rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue() ;
-          _initBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements()
-                                                                 .get(0)
-                                                                 .getNamedElement() ;
+          ReferenceValue rv = (ReferenceValue) pa.getOwnedValues().get(0)
+                                                 .getOwnedValue() ;
+          _currentBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements()
+                                                                    .get(0)
+                                                                    .getNamedElement() ;
+          pa = PropertyUtils.getPropertyAssociation(object,
+                                                    "Initialize_Entrypoint_Call_Sequence") ;
+          if(pa != null)
+          {
+            rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue() ;
+            _initBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements()
+                                                                   .get(0)
+                                                                   .getNamedElement() ;
+          }
+          process(object.getComponentImplementation()) ;
         }
-        process(object.getComponentImplementation()) ;
+        
         return null ;
       }
 
@@ -1831,6 +1834,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
   }
 }

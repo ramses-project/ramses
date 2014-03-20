@@ -220,7 +220,7 @@ public class WhileLoopUtil
 				return -1;
 			}
 		}
-		catch (Exception e)
+		catch (NumberFormatException e)
 		{
 			return -1;
 		}

@@ -40,6 +40,7 @@ import org.osate.aadl2.PropertySet ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.utils.AADLFileFilter ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
@@ -66,7 +67,7 @@ public class PredefinedPropertiesManager
       expectedPropertySet.add(names[i]) ; // Added by Arnaud
   }
   
-  public Map<String, Resource> parsePredefinedPropertySets()
+  public Map<String, Resource> parsePredefinedPropertySets() throws ParseException
   {
     File propertyDir = new File(RamsesConfiguration.getPredefinedResourceDir() + File.separator + Names.AADL_PREDEFINED_PROPERTIES_DIR_NAME) ;
     FilenameFilter filter = new AADLFileFilter() ;

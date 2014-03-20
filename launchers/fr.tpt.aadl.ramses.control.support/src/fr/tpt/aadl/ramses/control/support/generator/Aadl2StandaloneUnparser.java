@@ -2999,6 +2999,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
         catch(final CoreException e)
         {
           String msg = "cannot delete error markers" ;
+          _LOGGER.fatal(msg, e);
           throw new GenerationException(msg, e) ;
         }
       }

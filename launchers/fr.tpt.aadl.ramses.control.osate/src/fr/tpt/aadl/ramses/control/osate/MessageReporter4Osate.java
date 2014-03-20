@@ -1,5 +1,6 @@
 package fr.tpt.aadl.ramses.control.osate;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IStatus ;
 import org.eclipse.core.runtime.Status ;
 import org.eclipse.ui.statushandlers.StatusManager ;
@@ -11,6 +12,8 @@ import fr.tpt.aadl.ramses.control.support.reporters.MessageStatus ;
 public class MessageReporter4Osate implements MessageReporter
 {
   private static StatusManager _MANAGER = StatusManager.getManager() ;
+  
+  private static Logger _LOGGER = Logger.getLogger(MessageReporter4Osate.class) ;
   
   private void openFatalErrorDialog(String msg, Throwable e)
   {
@@ -53,13 +56,17 @@ public class MessageReporter4Osate implements MessageReporter
   public void reportMessage(MessageStatus status, String filename, int line,
                             String message)
   {
-    throw new UnsupportedOperationException("use OSATE's parsing or analysis reporter") ;
+    String msg = "use OSATE's parsing or analysis reporter";
+    _LOGGER.fatal(msg) ;
+    throw new UnsupportedOperationException(msg) ;
   }
 
   @Override
   public void reportMessage(MessageStatus status, Element where, String message)
   {
-    throw new UnsupportedOperationException("use OSATE's parsing or analysis reporter") ;
+    String msg = "use OSATE's parsing or analysis reporter";
+    _LOGGER.fatal(msg) ;
+    throw new UnsupportedOperationException(msg) ;
   }
 
   @Override
@@ -91,7 +98,9 @@ public class MessageReporter4Osate implements MessageReporter
       case AADL_ERROR:
       case AADL_WARNING:
       {
-        throw new UnsupportedOperationException("use OSATE's parsing or analysis reporter") ;
+        msg = "use OSATE's parsing or analysis reporter";
+        _LOGGER.fatal(msg) ;
+        throw new UnsupportedOperationException(msg) ;
       }
      
       case INFO :

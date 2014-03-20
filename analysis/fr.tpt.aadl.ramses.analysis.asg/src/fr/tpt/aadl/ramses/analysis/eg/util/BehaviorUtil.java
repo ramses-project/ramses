@@ -81,18 +81,17 @@ public class BehaviorUtil {
 		}
 		else
 		{
-			double wcet;
-			try 
-			{
-			  IntegerLiteral value = (IntegerLiteral) PropertyUtils.getMaxRangeValue(e, WCET_PROPERTY);
-			  wcet = getScaledValue (value, "ms");
-				//wcet = (int) PropertyUtils.getMaxRangeValue(e, WCET_PROPERTY).getScaledValue();
-			} 
-			catch (Exception e1) 
+		  IntegerLiteral value = (IntegerLiteral) PropertyUtils.getMaxRangeValue(e, WCET_PROPERTY);
+      if(value != null)
+      {
+        double wcet = getScaledValue (value, "ms");
+        //wcet = (int) PropertyUtils.getMaxRangeValue(e, WCET_PROPERTY).getScaledValue();
+        return new DoubleRange(wcet, wcet);
+      }
+      else
 			{
 				return null;
 			}
-			return new DoubleRange(wcet, wcet);
 		}
 	}
 	
@@ -106,8 +105,10 @@ public class BehaviorUtil {
     }
     else
     {
-      throw new UnsupportedOperationException('\'' + spg.getClass().getSimpleName() +
-                                              "\' is not supported");
+      String msg = '\'' + spg.getClass().getSimpleName() +
+          "\' is not supported" ; 
+      _LOGGER.fatal(msg);
+      throw new UnsupportedOperationException(msg);
     }
 	}
 	
@@ -130,8 +131,10 @@ public class BehaviorUtil {
 	      }
 	      else
 	      {
-	        throw new UnsupportedOperationException('\'' + called.getClass().getSimpleName() +
-              "\' is not supported");
+	        String msg = '\'' + called.getClass().getSimpleName() +
+              "\' is not supported" ; 
+	        _LOGGER.fatal(msg);
+	        throw new UnsupportedOperationException(msg);
 	      }
 	    }
 	    else if(e instanceof Classifier)
@@ -288,8 +291,10 @@ public class BehaviorUtil {
     }
     else
     {
-      throw new UnsupportedOperationException ('\'' +
-                     values.getClass().getSimpleName() + "\' is not supported");
+      String msg = '\'' +
+          values.getClass().getSimpleName() + "\' is not supported" ; 
+      _LOGGER.fatal(msg);
+      throw new UnsupportedOperationException (msg);
     }
   }
 	
@@ -317,8 +322,10 @@ public class BehaviorUtil {
     }
     else
     {
-      throw new UnsupportedOperationException ('\'' +
-                         iv.getClass().getSimpleName() + "\' is not supported");
+      String msg = '\'' +
+          iv.getClass().getSimpleName() + "\' is not supported" ; 
+      _LOGGER.fatal(msg);
+      throw new UnsupportedOperationException (msg);
     }
   }
 	

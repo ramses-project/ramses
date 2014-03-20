@@ -129,8 +129,13 @@ public class EventDataPortCommunicationDimensioning extends AbstractPeriodicDela
 		for(FeatureInstance writerFeatureInstance:this.writerFeatureInstances)
 		{
 			if(!this.writerFeatureInstances.contains(writerFeatureInstance))
-				throw new DimensioningException("ERROR: "+writerFeatureInstance.getComponentInstancePath()
-						+"\n is not connected to: "+this.readerReceivingTaskInstance.getComponentInstancePath());
+			{
+			  String msg = writerFeatureInstance.getComponentInstancePath() +
+	          "is not connected to: "+ this.readerReceivingTaskInstance.getComponentInstancePath() ;
+			  _LOGGER.fatal(msg);
+			  throw new DimensioningException(msg);
+			}
+						
 			ComponentInstance writerTaskInstance = (ComponentInstance) writerFeatureInstance.eContainer();
 			for(int iteration=0;iteration<this.CDWSize.get(writerFeatureInstance);iteration++)
 			{

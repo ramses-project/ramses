@@ -22,6 +22,7 @@
 package fr.tpt.aadl.sched.aadlinspector.output;
 
 import java.util.HashMap ;
+import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
@@ -140,10 +141,14 @@ public class AnalysisResult
 		}
 		else if(ci.getCategory() == ComponentCategory.PROCESS)
 		{
-			ComponentInstance bindedCPU = PropertyUtils.getComponentInstanceList(ci,
-	        		"Actual_Processor_Binding").get(0) ;
-			String prefix = getAIQualifiedName(bindedCPU);
-			result = prefix+"."+result;
+		  List<ComponentInstance> lci = PropertyUtils.getComponentInstanceList(ci,
+          "Actual_Processor_Binding") ;
+		  if(lci != null)
+		  {
+		    ComponentInstance bindedCPU = lci.get(0) ;
+	      String prefix = getAIQualifiedName(bindedCPU);
+	      result = prefix+"."+result;
+		  }
 		}
 		else if(ci.getCategory() == ComponentCategory.THREAD)
 		{

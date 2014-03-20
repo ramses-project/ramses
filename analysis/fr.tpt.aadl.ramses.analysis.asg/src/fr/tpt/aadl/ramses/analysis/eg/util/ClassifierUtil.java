@@ -181,19 +181,20 @@ public class ClassifierUtil {
 	}
 	
 	/*
-	public static long getSourceDataSize(DataClassifier dataClassifier)
+	public static Long getSourceDataSize(DataClassifier dataClassifier)
   {
     if (dataClassifier == null)
     {
       return 0l;
     }
     
-    try
-    {
-      return PropertyUtils.getIntValue(dataClassifier,
+    Long value = PropertyUtils.getIntValue(dataClassifier,
           "Source_Data_Size");
+    if(value != null
+    {
+      return value ;
     }
-    catch (Exception e)
+    else
     {
       DataClassifier baseType = null;
       try

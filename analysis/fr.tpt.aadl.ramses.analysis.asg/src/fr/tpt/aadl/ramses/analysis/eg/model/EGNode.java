@@ -106,7 +106,7 @@ public final class EGNode {
 	    {
 	      String msg = RamsesException.formatRethrowMessage("cannot parse integer",
 	                                                        e);
-	      _LOGGER.error(msg);
+	      _LOGGER.error(msg, e);
 	      ServiceProvider.SYS_ERR_REP.error(msg, true);
 	    }
 	  }

@@ -292,7 +292,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     // TODO: find mapping for REM operator
     if(operator.equals(MultiplyingOperator.REM))
     {
-      throw new UnsupportedOperationException() ;
+      String msg = "rem operator unparsing not supported" ;
+      _LOGGER.fatal(msg);
+      throw new UnsupportedOperationException(msg) ;
     }
 
     return operator.getLiteral() ;
@@ -429,8 +431,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
         String sourceName ;
         try
         {
-          sourceName =
-                       PropertyUtils.getStringValue(object.getDataClassifier(),
+          sourceName = PropertyUtils.getStringValue(object.getDataClassifier(),
                                                     "Source_Name") ;
           List<String> sourceText = PropertyUtils.getStringListValue(
                                                      object.getDataClassifier(),
@@ -450,6 +451,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
                                                           .getQualifiedName()) ;
           coreElementsToBeUnparsed.add(object.getDataClassifier()) ;
         }
+        
         _cFileContent.addOutput(sourceName) ;
         _cFileContent.addOutput(" " + object.getName()) ;
         caseArrayDimensions(object.getArrayDimensions()) ;
@@ -486,12 +488,12 @@ public class AadlBaToCUnparser extends AadlBaUnparser
     	NamedElement component = object.getComponent();
     	if(component!=null)
     	{
-    		try
-    	    {
-    	      PropertyUtils.getStringValue(component, "Source_Name") ;
-    	      _cFileContent.addOutput(object.getEnumLiteral().getValue());
-    	    }
-    		catch(Exception e)
+    	  String value = PropertyUtils.getStringValue(component, "Source_Name") ;
+        if(value != null)
+        {
+          _cFileContent.addOutput(object.getEnumLiteral().getValue());
+        }
+        else
     		{
     			_cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(component.getQualifiedName())+"_"+object.getEnumLiteral().getValue());
     		}
@@ -660,22 +662,30 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseDispatchCondition(DispatchCondition object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseDispatchCondition unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String caseDispatchTriggerConditionStop(DispatchTriggerConditionStop object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseDispatchTriggerConditionStop unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String caseDispatchTriggerLogicalExpression(DispatchTriggerLogicalExpression object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseDispatchTriggerLogicalExpression unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String caseDispatchConjunction(DispatchConjunction object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseDispatchConjunction unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String caseBehaviorActionBlock(BehaviorActionBlock object)
@@ -684,7 +694,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         if(object.getTimeout() != null)
         {
-          throw new UnsupportedOperationException() ;
+          String msg = "caseBehaviorActionBlock unparsing not supported" ;
+          _LOGGER.fatal(msg);
+          throw new UnsupportedOperationException(msg) ;
         }
 
         return DONE ;
@@ -698,7 +710,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
       public String caseBehaviorActionSet(BehaviorActionSet object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseBehaviorActionSet unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       /**
@@ -814,7 +828,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           {
             String errMsg =  RamsesException.formatRethrowMessage("while fetching type for \'"+
                 object.getIteratedValues() + '\'' , e) ;
-            _LOGGER.error(errMsg);
+            _LOGGER.error(errMsg, e);
             ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
           }
 
@@ -919,7 +933,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseIntegerRange(IntegerRange object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseIntegerRange unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       /**
@@ -927,7 +943,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseTimedAction(TimedAction object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseTimedAction unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       /**
@@ -940,7 +958,9 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         if(object instanceof Any)
         {
-          throw new UnsupportedOperationException() ;
+          String msg = "caseAssignmentAction unparsing not supported" ;
+          _LOGGER.fatal(msg);
+          throw new UnsupportedOperationException(msg) ;
         }
         else
         {
@@ -954,7 +974,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       public boolean manageParameterDirection(Parameter formal, ParameterLabel actual)
       {
     	  boolean remainingParenthesis = false;
-    	  String usageP = Aadl2Utils.getParameter_Usage(formal);
+    	  String usageP = Aadl2Utils.getParameterUsage(formal);
           if(Aadl2Utils.isInOutParameter(formal) ||
           		Aadl2Utils.isOutParameter(formal) ||
           		usageP.equalsIgnoreCase("by_reference"))
@@ -962,7 +982,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
             if(actual instanceof ParameterHolder)
             {
           	  ParameterHolder ph = (ParameterHolder) actual;
-          	  String usage = Aadl2Utils.getParameter_Usage(ph.getParameter());
+          	  String usage = Aadl2Utils.getParameterUsage(ph.getParameter());
           	  // in out passed to in
           	  if(!Aadl2Utils.isOutParameter(ph.getParameter()) &&
           		!Aadl2Utils.isInOutParameter(ph.getParameter())
@@ -1014,7 +1034,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           	if(actual instanceof ParameterHolder)
             {
           	  ParameterHolder ph = (ParameterHolder) actual;
-          	  String usagePH = Aadl2Utils.getParameter_Usage(ph.getElement());
+          	  String usagePH = Aadl2Utils.getParameterUsage(ph.getElement());
           	  // in to inout
           	  if(Aadl2Utils.isOutParameter(ph.getParameter()) ||
               	Aadl2Utils.isInOutParameter(ph.getParameter()) ||
@@ -1341,7 +1361,7 @@ public class AadlBaToCUnparser extends AadlBaUnparser
           Parameter p = (Parameter) elt ;
           if(false == (object.eContainer() instanceof SubprogramCallAction))
           {
-            String usageP = Aadl2Utils.getParameter_Usage(p) ;
+            String usageP = Aadl2Utils.getParameterUsage(p) ;
             if(Aadl2Utils.isInOutParameter(p) || Aadl2Utils.isOutParameter(p) ||
                usageP.equalsIgnoreCase("by_reference"))
             {
@@ -1388,27 +1408,37 @@ public class AadlBaToCUnparser extends AadlBaUnparser
       
       public String casePortSendAction(PortSendAction object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "casePortSendAction unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String casePortFreezeAction(PortFreezeAction object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "casePortFreezeAction unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String casePortDequeueAction(PortDequeueAction object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "casePortDequeueAction unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String caseLockAction(LockAction object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseLockAction unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String caseUnlockAction(UnlockAction object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseUnlockAction unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       /**
@@ -1416,22 +1446,30 @@ public class AadlBaToCUnparser extends AadlBaUnparser
        */
       public String caseBehaviorTime(BehaviorTime object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "caseBehaviorTime unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String casePortDequeueValue(PortDequeueValue object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "casePortDequeueValue unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String casePortCountValue(PortCountValue object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "casePortCountValue unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       public String casePortFreshValue(PortFreshValue object)
       {
-        throw new UnsupportedOperationException() ;
+        String msg = "casePortFreshValue unparsing not supported" ;
+        _LOGGER.fatal(msg);
+        throw new UnsupportedOperationException(msg) ;
       }
 
       /**

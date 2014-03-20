@@ -68,14 +68,14 @@ public class EGContext {
 	public void pushCurrentSubprogram(SubprogramCallAction sc)
 	{
 	  SubprogramCallContext ctxt = SubprogramCallContext.create(sc);
-	  //System.out.println("Push " + ctxt.getElement().getName());
+	  //_LOGGER.trace("Push " + ctxt.getElement().getName());
 		currentSubprograms.push(ctxt);
 	}
 	
 	public SubprogramCallContext popCurrentSubprogram()
 	{
 		SubprogramCallContext ctxt = currentSubprograms.pop();
-		//System.out.println("Pop " + ctxt.getElement().getName());
+		//_LOGGER.trace("Pop " + ctxt.getElement().getName());
 		return ctxt;
 	}
 	

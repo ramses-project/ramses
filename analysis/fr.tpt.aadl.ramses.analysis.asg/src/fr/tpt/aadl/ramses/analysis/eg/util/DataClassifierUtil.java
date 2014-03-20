@@ -63,7 +63,7 @@ public class DataClassifierUtil
     }
     catch(Exception e1)
     {
-      THANK YOU FOR LOGGING
+      THANK YOU FOR LOGGING !
       //System.err.println("getDimension(): " + e1.getMessage());
     }
     return dim;
@@ -72,9 +72,11 @@ public class DataClassifierUtil
   private static DataClassifier getBaseType (NamedElement e)
   {
     DataClassifier dc = null;
-    try
+    
+    PropertyAssociation pa = PropertyUtils.findProperty("Base_Type", e);
+    
+    if(pa != null)
     {
-      PropertyAssociation pa = PropertyUtils.findProperty("Base_Type", e);
       ModalPropertyValue mpv = pa.getOwnedValues().get(0);
       PropertyExpression pex = mpv.getOwnedValue();
       if (pex != null && pex instanceof ListValue)
@@ -91,10 +93,9 @@ public class DataClassifierUtil
         }
       }
     }
-    catch(Exception e1)
+    else
     {
-      String msg = RamsesException.formatRethrowMessage("cannot find Base_Type for \'" +
-                     e.getName() + '\'',e1) ;
+      String msg = "cannot find Base_Type for \'" + e.getName() + '\'' ;
       _LOGGER.warn(msg) ;
       ServiceProvider.SYS_ERR_REP.warning(msg, true);
     }
@@ -102,34 +103,24 @@ public class DataClassifierUtil
     return dc;
   }
   
-  private static int getSourceDataSizeInOctetsImpl(NamedElement e)
+  private static long getSourceDataSizeInOctetsImpl(NamedElement e)
   {
-    long size = 0l;
-    try 
+    Long size = PropertyUtils.getIntValue(e, "Source_Data_Size");
+    
+    if(size == null)
     {
-      size = PropertyUtils.getIntValue(e, "Source_Data_Size");
-    } 
-    catch (Exception e1) 
-    {
-      String msg = RamsesException.formatRethrowMessage("cannot find Source_Data_Size for \'" +
-          e.getName() + '\'',e1) ;
-      _LOGGER.warn(msg) ;
-      ServiceProvider.SYS_ERR_REP.warning(msg, true);
+      size = 0l ;
     }
-    return (int) size;
+
+    return size;
   }
   
   private static String getDataRepresentationImpl(NamedElement e)
   {
-    String rep = null;
-    try
+    String rep = PropertyUtils.getEnumValue(e, "Data_Representation");
+    if(rep == null)
     {
-      rep = PropertyUtils.getEnumValue(e, "Data_Representation");
-    }
-    catch(Exception e1)
-    {
-      String msg = RamsesException.formatRethrowMessage("cannot find Data_Representation for \'" +
-          e.getName() + '\'',e1) ;
+      String msg = "cannot find Data_Representation for \'" + e.getName() + '\'' ;
       _LOGGER.warn(msg) ;
       ServiceProvider.SYS_ERR_REP.warning(msg, true);
     }

@@ -256,20 +256,15 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
                                  (ThreadImplementation) thread.getComponentImplementation() ;
 
     mainImplCode.incrementIndent() ;
-    String Dispatch = null ;
-
-    try
+    String dispatch = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol") ;
+    if(dispatch == null)
     {
-      Dispatch = PropertyUtils.getEnumValue(thread, "Dispatch_Protocol") ;
-    }
-    catch(Exception exception)
-    {
-      String errMsg = "cannot fetch dispatch protocol for \'" + thread + '\'' ;
+      String errMsg = "cannot fetch Dispatch_Protocol for \'" + thread + '\'' ;
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
     }
     
-    if(Dispatch.equals("Sporadic"))
+    if("Sporadic".equals(dispatch))
     {
       nbSporadic++ ;
       portTypeThreads.add(GenerationUtilsADA.getGenerationADAIdentifier(procImpl.getFullName()) +
@@ -308,18 +303,10 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 
     String period = null ;
 
-    try
+    Long value = PropertyUtils.getIntValue(thread, "Period") ;
+    if(value != null)
     {
-      long value = PropertyUtils.getIntValue(thread, "Period") ;
       period = Long.toString(value) ;
-    }
-    catch(Exception e)
-    {
-      period = null ;
-    }
-
-    if(period != null)
-    {
       mainImplCode.addOutput("Task_Period => Ada.Real_Time.Milliseconds ") ;
       mainImplCode.addOutputNewline("(" + period + ")" + ',') ;
     }
@@ -327,24 +314,16 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
     mainImplCode.addOutput("Task_Deadline => Ada.Real_Time.Milliseconds ") ;
     mainImplCode.addOutputNewline("(" + period + ")" + ',') ;
 
-    String priority ;
+    String priority = null ;
 
-    try
+    value = PropertyUtils.getIntValue(thread, "Priority") ;
+    if(value != null)
     {
-      float value = PropertyUtils.getIntValue(thread, "Priority") ;
-      priority = Integer.toString((int) value) ;
-    }
-    catch(Exception e)
-    {
-      priority = null ;
-    }
-
-    if(priority != null)
-    {
+      priority = Long.toString(value) ;
       mainImplCode.addOutput("Task_Priority => ") ;
       mainImplCode.addOutputNewline("(" + priority + ")" + ',') ;
     }
-
+    
     mainImplCode.addOutputNewline("Task_Stack_Size => 10000,") ;
     mainImplCode.addOutputNewline("Job => " +
                                   GenerationUtilsADA.getGenerationADAIdentifier(timpl.getQualifiedName()) +
@@ -898,7 +877,9 @@ public class AadlToConfAdaRavenscarUnparser implements AadlTargetUnparser
 	@Override
 	  public void setParameters(Map<Enum<?>, Object> parameters)
 	  {
-	    throw new UnsupportedOperationException() ;
+	  String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
 	  }
 
 	  public TargetProperties process(SystemImplementation si,

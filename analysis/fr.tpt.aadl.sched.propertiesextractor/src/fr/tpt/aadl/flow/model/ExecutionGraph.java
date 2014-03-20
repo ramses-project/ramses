@@ -35,7 +35,7 @@ public class ExecutionGraph
   private RTAction reducedSteadyState = null ;
   private ExecutionGraphRegistry registry ;
 
-  private int priority = -1 ;
+  private long priority = -1 ;
 
   private float startTime = -1 ;
   private float WCET = -1 ;
@@ -45,7 +45,7 @@ public class ExecutionGraph
     return iterationGraph.getElement() ;
   }
 
-  public final int getPriority()
+  public final long getPriority()
   {
     return priority ;
   }
@@ -139,16 +139,15 @@ public class ExecutionGraph
     priority = computePriority() ;
   }
 
-  private int computePriority()
+  private Long computePriority()
   {
-    try
+    Long result = PropertyUtils.getIntValue(getTask(), "Priority") ; 
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(getTask(), "Priority") ;
+      result = 0l ;
     }
-    catch(Exception e)
-    {
-      return 0 ;
-    }
+    
+    return result ;
   }
 
   void setRegistry(ExecutionGraphRegistry registry)

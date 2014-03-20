@@ -38,12 +38,12 @@ public class ComputationUtil
 
   public static RTActionType getSubprogramActionType(NamedElement e)
   {
-    /*String synchroKind = "NotSyncFunction";
-    try
+    /*String synchroKind = PropertyUtils.getEnumValue(e, "Synchronization_Function");
+    if (synchroKing == null)
     {
-      synchroKind = PropertyUtils.getEnumValue(e, "Synchronization_Function");
+      synchroKind = "NotSyncFunction";
     }
-    catch (Exception ex){}
+    
     
     if (synchroKind.equals("GetResource"))
       return RTActionType.WaitResource;
@@ -71,18 +71,18 @@ public class ComputationUtil
     }
   }
 
-  public static int getElementMaxDuration(NamedElement e,
+  public static double getElementMaxDuration(NamedElement e,
                                           ExecutionAnalyzer a)
   {
-    Double d = 0.0 ;
+    Double d = 0d ;
 
-    try
+    NumberValue nv = PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
+    if(nv != null)
     {
-      NumberValue nv = PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
       d = nv.getScaledValue(AadlUtil.getPrecision(e)) ;
       return d.intValue();
     }
-    catch(Exception ex)
+    else
     {
       if(e instanceof SubprogramSubcomponent)
       {
@@ -100,21 +100,22 @@ public class ComputationUtil
       }
     }
 
-    return d.intValue() ;
+    return d ;
   }
 
-  public static int getElementMinDuration(NamedElement e,
+  public static double getElementMinDuration(NamedElement e,
                                           ExecutionAnalyzer a)
   {
-    Double d = 0.0 ;
+    Double d = 0d ;
 
-    try
+    NumberValue nv = PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
+    if(nv != null)
     {
-      NumberValue nv = PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
+      
       d = nv.getScaledValue(AadlUtil.getPrecision(e)) ;
       return d.intValue();
     }
-    catch(Exception ex)
+    else
     {
       if(e instanceof SubprogramSubcomponent)
       {
@@ -132,7 +133,7 @@ public class ComputationUtil
       }
     }
 
-    return d.intValue() ;
+    return d ;
   }
 
   /*

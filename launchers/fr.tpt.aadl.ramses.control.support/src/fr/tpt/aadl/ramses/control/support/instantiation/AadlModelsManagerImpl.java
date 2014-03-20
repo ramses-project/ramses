@@ -127,7 +127,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
     //	    try {
     //	    	resource.save(options);
     //	    } catch (IOException e) {
-    //	    	e.printStackTrace();
+    //	    	e.printStackTrace(); LOOG ME !
     //	    }
 
     //		  Serializer serializer = injector.getInstance(Serializer.class);

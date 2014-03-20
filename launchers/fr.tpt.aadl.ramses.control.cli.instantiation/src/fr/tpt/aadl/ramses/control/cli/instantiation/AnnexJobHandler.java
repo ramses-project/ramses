@@ -24,6 +24,8 @@ package fr.tpt.aadl.ramses.control.cli.instantiation ;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
+
 public class AnnexJobHandler
 {
   private List<AnnexJob> _jobList = new ArrayList<AnnexJob>() ;
@@ -33,7 +35,7 @@ public class AnnexJobHandler
     _jobList.add(job) ;
   }
 
-  public boolean parseAllAnnexes()
+  public boolean parseAllAnnexes() throws ParseException
   {
     boolean result = true ;
 

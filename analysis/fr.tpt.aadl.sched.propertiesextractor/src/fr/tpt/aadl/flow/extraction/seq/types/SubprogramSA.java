@@ -74,10 +74,10 @@ public class SubprogramSA extends CallSequenceAnalyzer
               new RTAction(IDGenerator.getNewIdForName(spg.getName()), type,
                     lastAction.getElement()) ;
         compute
-              .setMinExecutionTime(ComputationUtil.getElementMinDuration(spg,
+              .setMinExecutionTime((float) ComputationUtil.getElementMinDuration(spg,
                                                                          this)) ;
         compute
-              .setMaxExecutionTime(ComputationUtil.getElementMaxDuration(spg,
+              .setMaxExecutionTime((float) ComputationUtil.getElementMaxDuration(spg,
                                                                          this)) ;
         lastAction.addNext(compute) ;
         lastAction = compute ;

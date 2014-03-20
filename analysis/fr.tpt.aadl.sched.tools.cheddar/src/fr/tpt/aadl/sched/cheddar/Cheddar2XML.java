@@ -30,6 +30,7 @@ import org.jdom.Document ;
 import org.jdom.Element ;
 
 import fr.tpt.aadl.launch.PluginActivator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.util.workspace.XMLUtil ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarAddressSpace ;
 import fr.tpt.aadl.sched.cheddar.model.CheddarElement ;
@@ -109,7 +110,9 @@ public class Cheddar2XML
     }
     else
     {
-      System.err.println("Network connection is not currently handled") ;
+      String msg = "Network connection is not currently handled" ;
+      _LOGGER.error(msg);
+      ServiceProvider.SYS_ERR_REP.error(msg, true);
     }
 
     try

@@ -163,9 +163,9 @@ public class WorkspaceFilePrinter extends PrintStream
     }
     catch(final CoreException e)
     {
-      String errMsg =  RamsesException.formatRethrowMessage("cannot close the workspace file printer stream", e) ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      String errMsg = "cannot close the workspace file printer stream" ;
+      _LOGGER.error(errMsg, e);
+      throw new RuntimeException (errMsg, e) ;
     }
   }
 }

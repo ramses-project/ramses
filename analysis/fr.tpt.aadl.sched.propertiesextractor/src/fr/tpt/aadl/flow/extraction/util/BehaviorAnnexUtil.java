@@ -96,7 +96,7 @@ public class BehaviorAnnexUtil
     
         return acc.getName();
       }
-      catch (Exception e){THINK YOU FOR LOGGIN e.printStackTrace();}
+      catch (Exception e){THANK YOU FOR LOGGIN e.printStackTrace();}
     }*/
     return null ;
   }

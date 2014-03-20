@@ -73,7 +73,7 @@ public class CheddarSimulator
     {
       String cmd = CheddarOptions.CHEDDAR_TOOL_NAME + " " + inputXMLPath ;
       //cmd = "/usr/bin/nautilus";
-      System.out.println(cmd) ;
+      _LOGGER.trace(cmd) ;
       CheddarUIHandler h = new CheddarUIHandler(cmd) ;
       h.start() ;
       return 0l ;

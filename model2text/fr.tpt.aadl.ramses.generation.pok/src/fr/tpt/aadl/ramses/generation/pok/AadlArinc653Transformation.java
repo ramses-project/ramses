@@ -23,6 +23,8 @@ package fr.tpt.aadl.ramses.generation.pok ;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger ;
+
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
@@ -30,9 +32,13 @@ import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManag
 public class AadlArinc653Transformation extends
                                        AadlToTargetSpecificAadl
 {
+  private static Logger _LOGGER = Logger.getLogger(AadlArinc653Transformation.class);
+  
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
+    String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
     throw new UnsupportedOperationException() ;
   }
 

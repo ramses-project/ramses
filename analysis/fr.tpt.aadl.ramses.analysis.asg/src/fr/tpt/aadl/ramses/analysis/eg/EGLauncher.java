@@ -23,6 +23,7 @@ package fr.tpt.aadl.ramses.analysis.eg;
 
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.CalledSubprogram ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.NamedElement ;
@@ -46,6 +47,8 @@ public class EGLauncher {
 	private EGModels models = new EGModels();
 	
 	private static EGLauncher instance = null;
+	
+	private static Logger _LOGGER = Logger.getLogger(EGLauncher.class) ;
 	
 	public EGLauncher(SystemInstance root)
 	{
@@ -127,8 +130,10 @@ public class EGLauncher {
 	        }
 	        else // subprogram prototype ?
 	        {
-	          throw new UnsupportedOperationException("unsupported type \'" +
-	            called.getClass().getSimpleName() + '\'');
+	          String msg = "unsupported type \'" +
+	              called.getClass().getSimpleName() + '\'' ;
+	          _LOGGER.fatal(msg) ;
+	          throw new UnsupportedOperationException(msg);
 	        }
 	      }
 	      else if (sequence.size() > 1)

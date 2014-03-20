@@ -68,7 +68,7 @@ public class WCETAnalysis extends AbstractAnalyzer
     }
     catch(Exception e)
     {
-      e.printStackTrace() ;
+      e.printStackTrace() ; LOGG ME !
     }
     return;
   }

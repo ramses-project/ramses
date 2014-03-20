@@ -58,13 +58,13 @@ public class AadlUtil
   public static ComponentInstance getHighestPeriodTask(ComponentInstance process)
   {
     ComponentInstance result = null ;
-    int period = -1 ;
+    long period =-1l ;
 
     for(ComponentInstance c : process.getComponentInstances())
     {
       if(c.getCategory() == ComponentCategory.THREAD)
       {
-        int period2 = getInfoTaskPeriod(c) ;
+        long period2 = getInfoTaskPeriod(c) ;
 
         if(period2 > period)
         {
@@ -84,27 +84,22 @@ public class AadlUtil
 
   public static ComponentInstance getInfoProcessCPU(ComponentInstance process)
   {
-    try
-    {
-      PropertyExpression val =
-            PropertyUtils.getPropertyValue("Actual_Processor_Binding", process) ;
+    PropertyExpression val =
+        PropertyUtils.getPropertyValue("Actual_Processor_Binding", process) ;
 
+    if(val != null)
+    {
       if(val instanceof ComponentInstance)
       {
         return (ComponentInstance) val ;
       }
       else if(val instanceof InstanceReferenceValue)
       {
-        return (ComponentInstance) (((InstanceReferenceValue) val)
-              .getReferencedInstanceObject()) ;
+        return (ComponentInstance) (((InstanceReferenceValue) val).getReferencedInstanceObject()) ;
       }
+    }
 
-      return null ;
-    }
-    catch(Exception e)
-    {
-      return null ;
-    }
+    return null ;
   }
 
   public static ComponentInstance getInfoProcessGlobalCPU(ComponentInstance process)
@@ -122,13 +117,13 @@ public class AadlUtil
   public static double getInfoMaxDuration(NamedElement e,
                                           String unit)
   {
-    try
+    NumberValue nv =
+        PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
+    if(nv != null)
     {
-      NumberValue nv =
-            PropertyUtils.getMaxRangeValue(e, "Compute_Execution_Time") ;
       return nv.getScaledValue(unit) ;
     }
-    catch(Exception ex)
+    else
     {
       return 0f ;
     }
@@ -137,126 +132,126 @@ public class AadlUtil
   public static double getInfoMinDuration(NamedElement e,
                                           String unit)
   {
-    try
+    NumberValue nv =
+        PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
+    if(nv != null)
     {
-      NumberValue nv =
-            PropertyUtils.getMinRangeValue(e, "Compute_Execution_Time") ;
       return nv.getScaledValue(unit) ;
     }
-    catch(Exception ex)
+    else
     {
       return getInfoMaxDuration(e, unit) ;
     }
   }
 
-  public static int getInfoTaskDeadline(ComponentInstance task)
+  public static Long getInfoTaskDeadline(ComponentInstance task)
   {
-    try
+    Long result = PropertyUtils.getIntValue(task, "Deadline") ;
+    
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(task, "Deadline") ;
+      result = getInfoTaskPeriod(task) ;
     }
-    catch(Exception e)
-    {
-      return getInfoTaskPeriod(task) ;
-    }
+    
+    return result ;
   }
 
   public static DispatchProtocol getInfoTaskDispatch(ComponentInstance task)
   {
-    try
+    String value = PropertyUtils.getEnumValue(task, "Dispatch_Protocol") ;
+    if(value != null)
     {
-      String value = PropertyUtils.getEnumValue(task, "Dispatch_Protocol") ;
       return DispatchProtocol.valueOf(value) ;
     }
-    catch(Exception e)
+    else
     {
       return DispatchProtocol.Unknown ;
     }
   }
 
-  public static int getInfoTaskJitter(ComponentInstance task)
+  public static Long getInfoTaskJitter(ComponentInstance task)
   {
-    try
+    Long result = PropertyUtils.getIntValue(task, "Jitter") ;
+    
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(task, "Jitter") ;
+      result = new Long(0l) ;
     }
-    catch(Exception e)
-    {
-      return 0 ;
-    }
+    
+    return result ;
   }
 
-  public static int getInfoTaskPeriod(ComponentInstance task)
+  public static Long getInfoTaskPeriod(ComponentInstance task)
   {
-    try
+    Long result = PropertyUtils.getIntValue(task, "Period") ;
+    
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(task, "Period") ;
+      result = new Long(0l) ;
     }
-    catch(Exception e)
-    {
-      return 0 ;
-    }
+    
+    return result ;
   }
 
-  public static int getInfoTaskPriority(ComponentInstance task)
+  public static Long getInfoTaskPriority(ComponentInstance task)
   {
-    try
+    Long result = PropertyUtils.getIntValue(task, "Priority") ;
+    
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(task, "Priority") ;
+      result = new Long(0l) ;
     }
-    catch(Exception e)
-    {
-      return 0 ;
-    }
+    
+    return result ;
   }
 
-  public static int getInfoTaskMemorySize(ComponentInstance task)
+  public static Long getInfoTaskMemorySize(ComponentInstance task)
   {
-    try
+    Long result = PropertyUtils.getIntValue(task, "Source_Code_Size") ;
+    
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(task, "Source_Code_Size") ;
+      result = new Long(0l) ;
     }
-    catch(Exception e)
-    {
-      return 0 ;
-    }
+    
+    return result ;
   }
 
-  public static int getInfoTaskStackSize(ComponentInstance task)
+  public static Long getInfoTaskStackSize(ComponentInstance task)
   {
-    try
+    Long result = PropertyUtils.getIntValue(task, "Source_Stack_Size") ;
+    
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(task, "Source_Stack_Size") ;
+      result = new Long(0l) ;
     }
-    catch(Exception e)
-    {
-      return 0 ;
-    }
+    
+    return result ;
   }
 
   public static long getInfoPortCriticality(FeatureInstance port)
   {
-    try
+    Long result = PropertyUtils.getIntValue(port, "Criticality") ;
+    
+    if(result == null)
     {
-      return (int) PropertyUtils.getIntValue(port, "Criticality") ;
+      result = new Long(0l) ;
     }
-    catch(Exception e)
-    {
-      return 0 ;
-    }
+    
+    return result ;
   }
 
   public static double getThreadContextSwitchFor(ComponentInstance processor,
                                                  String unit)
   {
-    try
+    NumberValue nv =
+        PropertyUtils.getMaxRangeValue(processor,
+                                       "Thread_Swap_Execution_Time") ;
+    if(nv != null)
     {
-      NumberValue nv =
-            PropertyUtils.getMaxRangeValue(processor,
-                                           "Thread_Swap_Execution_Time") ;
       return nv.getScaledValue(unit) ;
     }
-    catch(Exception e)
+    else
     {
       return 0f ;
     }
@@ -265,14 +260,14 @@ public class AadlUtil
   public static double getProcessContextSwitchFor(ComponentInstance processor,
                                                   String unit)
   {
-    try
+    NumberValue nv =
+        PropertyUtils.getMaxRangeValue(processor,
+                                       "Process_Swap_Execution_Time") ;
+    if(nv != null)
     {
-      NumberValue nv =
-            PropertyUtils.getMaxRangeValue(processor,
-                                           "Process_Swap_Execution_Time") ;
       return nv.getScaledValue(unit) ;
     }
-    catch(Exception e)
+    else
     {
       return 0f ;
     }
@@ -281,15 +276,15 @@ public class AadlUtil
   public static double getSchedulerQuantum(ComponentInstance processor,
                                            String unit)
   {
-    try
+    NumberValue nv =
+        PropertyUtils.getMaxRangeValue(processor, "Scheduler_Quantum") ;
+    if(nv != null)
     {
-      NumberValue nv =
-            PropertyUtils.getMaxRangeValue(processor, "Scheduler_Quantum") ;
       return nv.getScaledValue(unit) ;
     }
-    catch(Exception e)
+    else
     {
-      return -1 ;
+      return -1d ;
     }
   }
 

@@ -46,6 +46,7 @@ import com.google.inject.Injector ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlResourceValidator ;
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 
@@ -123,13 +124,13 @@ public class StandAloneInstantiator extends AadlModelsManagerImpl
     return null ;
   }
 
-  public List<Resource> parse(List<File> aadlFiles)
+  public List<Resource> parse(List<File> aadlFiles) throws ParseException
   {
     return this.parse(aadlFiles, true) ;
   }
 
   public List<Resource> parse(List<File> aadlFiles,
-                              boolean loadOption)
+                              boolean loadOption) throws ParseException
   {
     List<Resource> result = new ArrayList<Resource>() ;
     boolean existParsingErrors = false ;

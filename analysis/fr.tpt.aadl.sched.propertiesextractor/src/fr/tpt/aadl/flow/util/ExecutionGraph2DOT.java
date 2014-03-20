@@ -62,7 +62,7 @@ public class ExecutionGraph2DOT implements ExecutionGraphVisitor
 
   public void visit(ExecutionGraph a)
   {
-    int priority = a.getPriority() ;
+    long priority = a.getPriority() ;
     final RTAction INIT_GLOBAL = a.getInitGraph() ;
     final RTAction ITER_GLOBAL = a.getIterationGraph() ;
     final RTAction STEADY = a.getSteadyState() ;
@@ -87,7 +87,7 @@ public class ExecutionGraph2DOT implements ExecutionGraphVisitor
 
   private void saveFlowModelAsPng(RTAction flow,
                                   String outputPath,
-                                  int priority)
+                                  long priority)
   {
     try
     {
@@ -115,7 +115,7 @@ public class ExecutionGraph2DOT implements ExecutionGraphVisitor
       writer.close() ;
       String outputImage = outputPath.replace(".dot", ".png") ;
       String cmd = "dot " + outputPath + " -Tpng -o " + outputImage ;
-      //System.out.println(cmd);
+      //_LOGGER.trace(cmd);
       Process cmdP = Runtime.getRuntime().exec(cmd) ;
       cmdP.waitFor() ;
 

@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.generation.adaravenscar.makefile ;
 import java.io.File ;
 import java.util.Map ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.ProcessSubcomponent ;
@@ -44,6 +45,8 @@ public class AadlToAdaRavenscarMakefileUnparser extends
                                               "/Ada_runtime/PeriodicDelayed_runtime/" ;
   private final static String RUNTIME_INCL_DIR = "/libpok/ada" ;
   private UnparseText unparserContent ;
+  
+  private static Logger _LOGGER = Logger.getLogger(AadlToAdaRavenscarMakefileUnparser.class) ;
 
   /*
   private UnparseText kernelMakefileContent ;
@@ -133,7 +136,9 @@ public class AadlToAdaRavenscarMakefileUnparser extends
                       File outputDir, File[] includeDirs,
                       IProgressMonitor monitor) throws GenerationException
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "process not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
   }
 
   @Override
@@ -149,7 +154,9 @@ public class AadlToAdaRavenscarMakefileUnparser extends
   @Override
   public void setParameters(Map<Enum<?>, Object> parameters)
   {
-    throw new UnsupportedOperationException() ;
+    String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
   }
 
   @Override

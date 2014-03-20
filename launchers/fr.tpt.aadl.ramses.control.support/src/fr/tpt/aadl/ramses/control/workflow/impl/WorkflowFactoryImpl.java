@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.workflow.impl;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EClass ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.EPackage ;
@@ -50,7 +51,10 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
  * @generated
  */
 public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory {
-	/**
+	
+  private static Logger _LOGGER = Logger.getLogger(WorkflowFactoryImpl.class) ;
+  
+  /**
    * Creates the default factory implementation.
    * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -104,7 +108,11 @@ public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory
       case WorkflowPackage.UNPARSE: return createUnparse();
       case WorkflowPackage.LOOP: return createLoop();
       default:
-        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+      {
+        String msg = "The class '" + eClass.getName() + "' is not a valid classifier" ;
+        _LOGGER.fatal(msg) ;
+        throw new IllegalArgumentException(msg);
+      }
     }
   }
 

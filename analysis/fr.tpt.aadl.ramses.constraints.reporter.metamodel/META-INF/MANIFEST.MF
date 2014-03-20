@@ -9,7 +9,8 @@ Bundle-Localization: plugin
 Bundle-Activator: fr.tpt.aadl.ramses.constraints.reporter.metamodel.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.emf.ecore;visibility:=reexport
+ org.eclipse.emf.ecore;visibility:=reexport,
+ org.apache.log4j
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.constraintsreporter,

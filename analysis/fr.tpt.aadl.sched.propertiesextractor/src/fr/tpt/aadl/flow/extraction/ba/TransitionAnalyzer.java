@@ -334,7 +334,7 @@ public class TransitionAnalyzer extends BAElementAnalyzer
         FeatureInstance fi = (FeatureInstance) co.getSource();
         if (fi.getFeature() == portType)
         {
-          System.out.println("ploup");
+          _LOGGER.trace("ploup");
         }
       }
     }

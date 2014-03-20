@@ -130,7 +130,7 @@ public class EG2DOT extends EGExport
 	    writer.close();
 	    String outputImage = outputPath.replace(".dot", ".svg");
 	    String cmd = layout.name() + " " + outputPath + " -Tsvg -o " + outputImage;
-	    // System.out.println(cmd);
+	    // _LOGGER.trace(cmd);
 	    Process cmdP = Runtime.getRuntime().exec(cmd);
 	    cmdP.waitFor();
 

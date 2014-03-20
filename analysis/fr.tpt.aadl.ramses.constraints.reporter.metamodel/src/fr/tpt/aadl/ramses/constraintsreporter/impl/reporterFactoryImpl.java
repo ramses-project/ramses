@@ -5,12 +5,11 @@ package fr.tpt.aadl.ramses.constraintsreporter.impl;
 import fr.tpt.aadl.ramses.constraintsreporter.reporterFactory;
 import fr.tpt.aadl.ramses.constraintsreporter.reporterPackage;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
-
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
 /**
@@ -20,7 +19,10 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
  * @generated
  */
 public class reporterFactoryImpl extends EFactoryImpl implements reporterFactory {
-	/**
+	
+  private static Logger _LOGGER = Logger.getLogger(reporterFactoryImpl.class) ;
+  
+  /**
 	 * Creates the default factory implementation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -59,7 +61,11 @@ public class reporterFactoryImpl extends EFactoryImpl implements reporterFactory
 		switch (eClass.getClassifierID()) {
 			case reporterPackage.ERROR: return createError();
 			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+			{
+			  String msg = "The class '" + eClass.getName() + "' is not a valid classifier" ;
+			  _LOGGER.fatal(msg);
+			  throw new IllegalArgumentException(msg);
+			}
 		}
 	}
 

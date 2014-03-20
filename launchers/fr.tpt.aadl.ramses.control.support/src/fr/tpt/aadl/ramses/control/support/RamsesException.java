@@ -62,7 +62,10 @@ public abstract class RamsesException extends Exception
     {
       initialMessage += " (" + ex.getMessage() + ')' ;
     }
-      
+    else if (ex!= null)
+    {
+      initialMessage += " (" + ex.getClass().getSimpleName() + ')' ;
+    }
     return initialMessage ;
   }
 }

@@ -139,7 +139,7 @@ public class BA2EG
       else
       {
         rootNode.setBlockEnd(transNodes.getBlockEnd());
-        /*System.out.println("Ignore transition to main loop state " 
+        /*_LOGGER.trace("Ignore transition to main loop state " 
             + mainLoopState.getName());*/
       }
     }

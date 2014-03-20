@@ -207,7 +207,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		{
 		  String errMsg =  RamsesException.formatRethrowMessage("cannot get current period on read table for \'"+
 		port + '\'', e) ;
-      _LOGGER.error(errMsg);
+      _LOGGER.error(errMsg, e);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return CPRTable;
@@ -233,7 +233,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		} catch (DimensioningException e) {
 		  String errMsg =  RamsesException.formatRethrowMessage("cannot get the hyper period for \'"+
 		port + '\'', e) ;
-      _LOGGER.error(errMsg);
+      _LOGGER.error(errMsg, e);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return hyperperiod;
@@ -265,7 +265,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		} catch (DimensioningException e) {
 		  String errMsg =  RamsesException.formatRethrowMessage("cannot get current dead line for \'"+
 		      port + '\'', e) ;
-		        _LOGGER.error(errMsg);
+		        _LOGGER.error(errMsg, e);
 		        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return CDWTable;
@@ -287,7 +287,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		} catch (DimensioningException e) {
 		  String errMsg =  RamsesException.formatRethrowMessage("cannot get the buffer size for \'"+
 		      destinationFeatureInstance + '\'', e) ;
-		        _LOGGER.error(errMsg);
+		        _LOGGER.error(errMsg, e);
 		        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		}
 		return 0;

@@ -60,20 +60,19 @@ public class ThreadSA extends CallSequenceAnalyzer
   {
     SubprogramClassifier sc = null ;
 
-    try
+    Classifier c =
+        PropertyUtils.getClassifierValue(comp, "Initialize_Entrypoint") ;
+    if(c != null)
     {
-      Classifier c =
-            PropertyUtils.getClassifierValue(comp, "Initialize_Entrypoint") ;
-
       if(c instanceof SubprogramClassifier)
       {
         sc = (SubprogramClassifier) c ;
       }
     }
-    catch(Exception e)
+    else
     {
-      String msg = RamsesException.formatRethrowMessage("cannot find Initialize_Entrypoint for \'"+
-                     comp.getName() + '\'', e) ;
+      String msg = "cannot find Initialize_Entrypoint for \'"+
+                     comp.getName() + '\'' ;
       _LOGGER.warn(msg) ;
       ServiceProvider.SYS_ERR_REP.warning(msg, true);
     }
@@ -85,7 +84,7 @@ public class ThreadSA extends CallSequenceAnalyzer
     else
     {
       RTAction init = new RTAction(sc.getName(), RTActionType.Compute, comp) ;
-      int computationTime = ComputationUtil.getElementMaxDuration(sc, this) ;
+      float computationTime = (float) ComputationUtil.getElementMaxDuration(sc, this) ;
       init.setMaxExecutionTime(computationTime) ;
       return init ;
     }

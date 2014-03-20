@@ -198,6 +198,7 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
     catch(Exception e)
     {
       String errMsg = "while generating Trampoline make file or compiling code" ;
+      _LOGGER.fatal(errMsg, e) ;
       throw new GenerationException(errMsg, e) ;
     }
   }
@@ -212,7 +213,9 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
 	                    File[] includeDirs,
 	                    IProgressMonitor monitor)
 	                          throws GenerationException {
-		throw new UnsupportedOperationException () ;
+	  String msg = "process not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
 	}
 
 	@Override
@@ -221,13 +224,17 @@ public class AadlToTrampolineOSEKMakefileUnparser extends AbstractAadlToCMakefil
                       File outputDir,
                       File[] includeDirs,
                       IProgressMonitor monitor) throws GenerationException {
-	  throw new UnsupportedOperationException () ;
+	  String msg = "process not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
 	}
 
 	@Override
 	public void setParameters(Map<Enum<?>, Object> parameters)
 	{
-	  throw new UnsupportedOperationException () ;
+	  String msg = "setParameters not supported" ;
+    _LOGGER.fatal(msg);
+    throw new UnsupportedOperationException(msg) ;
 	}
 
   @Override

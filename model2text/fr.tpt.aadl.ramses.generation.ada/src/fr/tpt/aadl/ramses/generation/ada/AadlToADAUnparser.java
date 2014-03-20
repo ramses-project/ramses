@@ -676,7 +676,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 {
 		   String errMsg = RamsesException.formatRethrowMessage("cannot fetch the type holder for \'" +
 		           object + '\'', e) ;
-	     _LOGGER.error(errMsg);
+	     _LOGGER.error(errMsg, e);
 	     ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 		 }
 
@@ -1543,62 +1543,73 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 try {
 					 resolveExistingCodeDependencies(object, null, _subprogramHeaderCode);
 					 addExternalCSubprograms(object, _subprogramHeaderCode);
-				 } catch (Exception e1) {
+				 } catch (Exception e1)
+				 {
 					 caseSubprogramClassifier((SubprogramClassifier) object);
 
 					 processBehavioredType(object) ;
 
-					 Set<String> l = getAdditionalHeaderSet(_subprogramHeaderCode);
-			         _subprogramImplCode.decrementIndent();
-			         _subprogramImplCode.addOutput("end ");
-			          try
-						 {
-							 String sourceName = PropertyUtils.getStringValue(object, "Source_Name") ;
-							 _subprogramImplCode.addOutput(sourceName);
-						 }
-						 catch(Exception e)
-						 {
-							 _subprogramImplCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
-						 }
-			          _subprogramImplCode.addOutputNewline(";");
+					 getAdditionalHeaderSet(_subprogramHeaderCode);
+			     _subprogramImplCode.decrementIndent();
+			     _subprogramImplCode.addOutput("end ");
+			     
+			     String sourceName = PropertyUtils.getStringValue(object, "Source_Name") ;
+			     if(sourceName != null)
+  				 {
+	  				 _subprogramImplCode.addOutput(sourceName);
+  				 }
+			     else
+					 {
+						 _subprogramImplCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
+					 }
+			     _subprogramImplCode.addOutputNewline(";");
 				 }
 				 return DONE;
 			 }
 			 
 			 void addExternalCSubprograms(SubprogramClassifier object, AadlToADASwitchProcess _subprogramHeaderCode)
 			 {
-				 try
-				  {
-					  NamedElement ne = object ;
-					  String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
-					  List<String> sourceText =
-							  PropertyUtils.getStringListValue(ne, "Source_Text") ;
-					  for(String s : sourceText)
-					  {
-						  if(s.endsWith(".ads"))
-						  {
-							  return;
-						  }
-					  }
-					  for(String s : sourceText)
-					  {
-						  if(s.endsWith(".h") && object instanceof SubprogramClassifier)
-						  {
-							  _additionalHeaders.get(_subprogramHeaderCode).add("Interfaces.C");
-							  addSubprogramDeclaration(object);
-							  _subprogramHeaderCode.addOutputNewline("pragma Import (C, "+sourceName+","+"\""+sourceName+"\");");
-							  return;
-						  }
-					  }
-				  }
-				 catch (Exception e)
-				 {
-				   String errMsg =  RamsesException.formatRethrowMessage(
-				            "cannot fetch source name or source text for \'" + object + '\''
-				            , e) ;
-		        _LOGGER.error(errMsg);
-		        ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
-				 }
+			   NamedElement ne = object ;
+         String sourceName = PropertyUtils.getStringValue(ne, "Source_Name") ;
+         if(sourceName != null)
+         {
+           List<String> sourceText =
+               PropertyUtils.getStringListValue(ne, "Source_Text") ;
+           if(sourceText != null)
+           {
+             for(String s : sourceText)
+             {
+               if(s.endsWith(".ads"))
+               {
+                 return;
+               }
+             }
+             for(String s : sourceText)
+             {
+               if(s.endsWith(".h") && object instanceof SubprogramClassifier)
+               {
+                 _additionalHeaders.get(_subprogramHeaderCode).add("Interfaces.C");
+                 addSubprogramDeclaration(object);
+                 _subprogramHeaderCode.addOutputNewline("pragma Import (C, "+sourceName+","+"\""+sourceName+"\");");
+                 return;
+               }
+             }
+           }
+           else
+           {
+             String errMsg = "cannot fetch Source_Text for \'" + object.getName() +
+                             '\'' ;
+             _LOGGER.error(errMsg);
+             ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
+           }
+         }
+         else
+         {
+           String errMsg =  "cannot fetch Source_Name for \'" + object.getName() +
+                             '\'' ;
+           _LOGGER.error(errMsg);
+           ServiceProvider.SYS_ERR_REP.error(errMsg, true); 
+         }
 			 }
 			 
 				 
@@ -1608,7 +1619,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 //					    getStringValue(object, "Source_Name") ;
 //				} catch (Exception e) {
 //					// TODO Auto-generated catch block
-//					e.printStackTrace();
+//					e.printStackTrace(); LOGG ME !
 //				}
 //				
 //		          	if(!srcName.equals(""))	
@@ -1770,17 +1781,18 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 {
 					 _subprogramHeaderCode.addOutput("function ");
 				 }
-				 try
+				 
+				 String sourceName = PropertyUtils.getStringValue(object, "Source_Name") ;
+				 if(sourceName != null)
 				 {
-					 String sourceName = PropertyUtils.getStringValue(object, "Source_Name") ;
-					 _subprogramHeaderCode.addOutput(sourceName);
+				   _subprogramHeaderCode.addOutput(sourceName);
 				 }
-				 catch(Exception e)
+				 else
 				 {
 				     _subprogramHeaderCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
 				 }
 
-	 	         _subprogramHeaderCode.addOutput("(");
+	 	     _subprogramHeaderCode.addOutput("(");
 				 boolean first = true;
 
 				 // Fetches data subcomponent names.
@@ -1894,16 +1906,18 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 }
 
 				 _subprogramImplCode.decrementIndent();   
-				 try
+				 
+				 String sourceName = PropertyUtils.getStringValue(object, "Source_Name") ;
+				 if(sourceName != null)
 				 {
-					 String sourceName = PropertyUtils.getStringValue(object, "Source_Name") ;
 					 _subprogramImplCode.addOutput(sourceName);
 				 }
-				 catch(Exception e)
+				 else
 				 {
 					 _subprogramImplCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName()));
 				 }
-       	         _subprogramImplCode.addOutput("(");
+       	 
+				 _subprogramImplCode.addOutput("(");
 			    		        
 				 boolean first = true;
 
@@ -2036,17 +2050,17 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
           }
 
           processBehavioredImplementation(object) ;
-          Set<String> l = getAdditionalHeaderSet(_subprogramHeaderCode) ;
+          getAdditionalHeaderSet(_subprogramHeaderCode) ;
           _subprogramImplCode.decrementIndent() ;
           _subprogramImplCode.addOutput("end ") ;
-          try
+          
+          String sourceName = PropertyUtils.getStringValue(object,
+                                                           "Source_Name") ;
+          if(sourceName != null)
           {
-            String sourceName =
-                                PropertyUtils.getStringValue(object,
-                                                             "Source_Name") ;
             _subprogramImplCode.addOutput(sourceName) ;
           }
-          catch(Exception e)
+          else
           {
             _subprogramImplCode.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(object.getQualifiedName())) ;
           }
@@ -2111,7 +2125,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 					 try {
 						 resolveExistingCodeDependencies(sct, _currentImplUnparser, _currentHeaderUnparser);
-		    			  System.out.println("sma");
+		    			  _LOGGER.trace("sma");
 
 					 } catch (Exception e1) {
 						 _currentImplUnparser.addOutput(GenerationUtilsADA.getGenerationADAIdentifier(sct.getQualifiedName()));
@@ -2187,49 +2201,56 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 }
 
 			 @Override
-			 public String caseThreadSubcomponent(ThreadSubcomponent object)
-			 {
-				    try
-				    {
-				      long value = PropertyUtils.getIntValue(object, "Period") ;
-				      period = Long.toString(value) ;
-				    }
-				    catch(Exception e)
-				    {
-				      period = null ;
-				    }
+      public String caseThreadSubcomponent(ThreadSubcomponent object)
+      {
+        Long value = PropertyUtils.getIntValue(object, "Period") ;
+        if(value != null)
+        {
+          period = Long.toString(value) ;
+        }
+        else
+        {
+          period = null ;
+        }
 
-				    try
-				    {
-				      long value = PropertyUtils.getIntValue(object, "Deadline") ;
-				      deadline = Long.toString(value) ;
-				    }
-				    catch(Exception e)
-				    {
-				      // If deadline is not set, use period instead.
-				      deadline = period ;
-				    }
+        value = PropertyUtils.getIntValue(object, "Deadline") ;
+        if(value != null)
+        {
+          deadline = Long.toString(value) ;
+        }
+        else
+        {  
+          // If deadline is not set, use period instead.
+          deadline = period ;
+        }
+       
+        value = PropertyUtils.getIntValue(object, "Priority") ;
+        if(value != null)
+        {
+          priority = Long.toString(value) ;
+        }
+        else
+        {  
+          String msg = "cannot find priority for \'" +
+              object.getName() + '\'' ;
+          _LOGGER.fatal(msg);
+          throw new PropertyNotFound(msg) ;
+        }
+        
+        dispatchProtocol =
+            PropertyUtils.getEnumValue(object,
+                                       "Dispatch_Protocol") ;
+        if(dispatchProtocol == null)
+        {
+          String msg = "cannot find dispatch protocol for \'"+
+              object.getName() + '\'' ;
+          _LOGGER.fatal(msg);
+          throw new PropertyNotFound(msg) ;
+        }
 
-				    try
-				    {
-				      long value = PropertyUtils.getIntValue(object, "Priority") ;
-				      priority = Long.toString(value) ;
-				    }
-				    catch(Exception e)
-				    {
-				      // If deadline is not set, use period instead.
-				      deadline = period ;
-				    }
-
-				    try {
-						dispatchProtocol = PropertyUtils.getEnumValue(object, "Dispatch_Protocol");
-					} catch (Exception exception) {
-						throw new PropertyNotFound(exception);
-					}
-				    
-				 process(object.getComponentImplementation()) ;
-				 return null ;
-			 }
+        process(object.getComponentImplementation()) ;
+        return null ;
+      }
 
 			 @Override
 			 public String caseThreadType(ThreadType object)
@@ -2327,6 +2348,8 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 	 @Override
 	 public void setParameters(Map<Enum<?>, Object> parameters)
 	 {
-		 throw new UnsupportedOperationException() ;
+	   String msg = "setParameters not supported" ;
+     _LOGGER.fatal(msg);
+	   throw new UnsupportedOperationException(msg) ;
 	 }
 }

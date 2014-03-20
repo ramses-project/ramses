@@ -108,17 +108,21 @@ public class SystemProperties {
 		{
 			case THREAD: return getIOTimeThread(c, property);
 			case PROCESS: return getIOTimeProcess(c, property);
-			default: try {
-				return getIOTimeImpl(c,property);
-			} 
-			catch (Exception e) 
+			default:
 			{
-				String msg = RamsesException.formatRethrowMessage("cannot getIOTime for\'"+
-			  c.getName() + '\'', e) ;
-				_LOGGER.warn(msg) ;
-				ServiceProvider.SYS_ERR_REP.warning(msg, true) ;
-				return new IOTime();
-			}
+				IOTime result =  getIOTimeImpl(c,property);
+				if(result != null)
+				{
+				  return result ;
+				}
+				else
+				{
+				  String msg = "cannot getIOTime for\'"+ c.getName() + '\'' ;
+			    _LOGGER.warn(msg) ;
+			    ServiceProvider.SYS_ERR_REP.warning(msg, true) ;
+			    return new IOTime();
+				}
+			} 
 		}
 	}
 	
@@ -130,88 +134,95 @@ public class SystemProperties {
 	/** Find property on Processor and Memory bound to the Process */
 	private static IOTime getIOTimeProcess(ComponentInstance process, String property)
 	{
-		try
-		{
-			PropertyExpression pex = PropertyUtils.getPropertyValue(
-					"Actual_Processor_Binding", process);
-			ListValue lv = (ListValue) pex;
-			PropertyExpression pe = lv.getOwnedListElements().get(0);
-			if (pe instanceof InstanceReferenceValue)
-			{
-				InstanceReferenceValue irv = (InstanceReferenceValue) pe;
-				ComponentInstance cpu = (ComponentInstance) irv
-						.getReferencedInstanceObject();
-				while (cpu.getCategory()==ComponentCategory.VIRTUAL_PROCESSOR)
-				{
-					cpu = (ComponentInstance) cpu.eContainer();
-				}
-				return getIOTimeImpl(cpu, property);
-			}
-		}
-		catch (Exception e){}
-		
-		try
-		{
-		  PropertyExpression pex = PropertyUtils.getPropertyValue(
-					"Actual_Memory_Binding", process);
-			ListValue lv = (ListValue) pex;
-      PropertyExpression pe = lv.getOwnedListElements().get(0);
-			
-			if (pe instanceof InstanceReferenceValue)
-			{
-				InstanceReferenceValue irv = (InstanceReferenceValue) pe;
-				ComponentInstance mem = (ComponentInstance) irv
-						.getReferencedInstanceObject();
-				
-				IOTime t = getIOTimeImpl(mem, property);
-				if (t.isNull() && mem!=null)
-				{
-					if (mem.eContainer() instanceof ComponentInstance)
-					{
-						ComponentInstance owner = (ComponentInstance) mem.eContainer();
-						if (owner.getCategory()==ComponentCategory.MEMORY)
-						{
-							mem = owner;
-							t = getIOTimeImpl(mem, property);
-						}
-					}
-				}
-				return t;
-			}
-		}
-		catch (Exception e)
-		{
-		  String msg = RamsesException.formatRethrowMessage("cannot get actual memory binding for \'" + process.getName() +
-		      '\'', e) ;
-		  _LOGGER.warn(msg) ;
-		  ServiceProvider.SYS_ERR_REP.warning(msg, true);
-		}
-		
-		return new IOTime();
+    PropertyExpression pex = PropertyUtils.getPropertyValue("Actual_Processor_Binding",
+                                                            process) ;
+    if(pex != null)
+    {
+      ListValue lv = (ListValue) pex ;
+      PropertyExpression pe = lv.getOwnedListElements().get(0) ;
+      if(pe instanceof InstanceReferenceValue)
+      {
+        InstanceReferenceValue irv = (InstanceReferenceValue) pe ;
+        ComponentInstance cpu =
+                                (ComponentInstance) irv.getReferencedInstanceObject() ;
+        while(cpu.getCategory() == ComponentCategory.VIRTUAL_PROCESSOR)
+        {
+          cpu = (ComponentInstance) cpu.eContainer() ;
+        }
+        return getIOTimeImpl(cpu, property) ;
+      }
+    }
+    else
+    {
+      pex = PropertyUtils.getPropertyValue("Actual_Memory_Binding", process) ;
+      if(pex != null)
+      {
+        ListValue lv = (ListValue) pex ;
+        PropertyExpression pe = lv.getOwnedListElements().get(0) ;
+
+        if(pe instanceof InstanceReferenceValue)
+        {
+          InstanceReferenceValue irv = (InstanceReferenceValue) pe ;
+          ComponentInstance mem =
+                                  (ComponentInstance) irv.getReferencedInstanceObject() ;
+
+          IOTime t = getIOTimeImpl(mem, property) ;
+          if(t.isNull() && mem != null)
+          {
+            if(mem.eContainer() instanceof ComponentInstance)
+            {
+              ComponentInstance owner = (ComponentInstance) mem.eContainer() ;
+              if(owner.getCategory() == ComponentCategory.MEMORY)
+              {
+                mem = owner ;
+                t = getIOTimeImpl(mem, property) ;
+              }
+            }
+          }
+          return t ;
+        }
+      }
+      else
+      {
+        String msg = "cannot get actual memory binding for \'" + process.getName() +
+                                                              '\'' ;
+        _LOGGER.warn(msg) ;
+        ServiceProvider.SYS_ERR_REP.warning(msg, true) ;
+      }
+    }
+    
+    return new IOTime();
 	}
 	
-	private static IOTime getIOTimeImpl (ComponentInstance cpuOrMemory, String property) throws Exception
+	private static IOTime getIOTimeImpl (ComponentInstance cpuOrMemory, String property)
 	{
 		RecordValue rv = PropertyUtils.getRecordValue(cpuOrMemory, property);
 		
-		double fixed = 0d;
-		double perByte = 0d;
-		
-		for(BasicPropertyAssociation value : rv.getOwnedFieldValues())
+		if(rv != null)
 		{
-			String propertyName = value.getProperty().getName();
-			if (propertyName.equalsIgnoreCase("Fixed"))
-			{
-				IntegerLiteral v = (IntegerLiteral) value.getOwnedValue();
-				fixed = BehaviorUtil.getScaledValue(v,"ms");
-			}
-			else if (propertyName.equalsIgnoreCase("PerByte"))
-			{
-			  IntegerLiteral v = (IntegerLiteral) value.getOwnedValue();
-				perByte = BehaviorUtil.getScaledValue(v,"ms");
-			}
+		  double fixed = 0d;
+	    double perByte = 0d;
+	    
+	    for(BasicPropertyAssociation value : rv.getOwnedFieldValues())
+	    {
+	      String propertyName = value.getProperty().getName();
+	      if (propertyName.equalsIgnoreCase("Fixed"))
+	      {
+	        IntegerLiteral v = (IntegerLiteral) value.getOwnedValue();
+	        fixed = BehaviorUtil.getScaledValue(v,"ms");
+	      }
+	      else if (propertyName.equalsIgnoreCase("PerByte"))
+	      {
+	        IntegerLiteral v = (IntegerLiteral) value.getOwnedValue();
+	        perByte = BehaviorUtil.getScaledValue(v,"ms");
+	      }
+	    }
+	    
+	    return new IOTime(fixed,perByte);
 		}
-		
-		return new IOTime(fixed,perByte);
+		else
+		{
+		  return null ;
+		}
 	}
 }
