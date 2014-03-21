@@ -55,6 +55,8 @@ public class RamsesConfiguration
   private static File _AADL_PACKAGE_DIR ;
   private static File _AADL_PROPERTYSET_DIR ;
   
+  public static boolean _IS_LOGGER_ON = false ;
+  
   private static Logger _LOGGER = Logger.getLogger(RamsesConfiguration.class) ;
   
   public static ConfigStatus setRamsesResourceDir(String path)
@@ -402,11 +404,13 @@ public class RamsesConfiguration
       rootLogger.addAppender(ra);
       
       _LOGGER.info("logger is set to " + lvl.toString());
+      _IS_LOGGER_ON = true ;
     }
     else
     {
       _LOGGER.info("logger is switch off") ;
-      Logger.getRootLogger().setLevel(Level.OFF); ;
+      Logger.getRootLogger().setLevel(Level.OFF);
+      _IS_LOGGER_ON = false ;
     }
   }
 }

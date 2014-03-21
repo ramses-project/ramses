@@ -25,6 +25,8 @@ import java.util.Collections ;
 import java.util.LinkedList ;
 import java.util.List ;
 
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+
 public abstract class AbstractSystemErrReporter implements SystemErrReporter
 {
   protected LinkedList<String> _delayedErrors = new LinkedList<String>() ;
@@ -36,7 +38,16 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   protected String formatFatalMsg(String initialMsg, Throwable ex)
   {
     StringBuilder sb = new StringBuilder() ;
-    sb.append("Abort on fatal error (see log file for more information): ");
+    sb.append("Abort on fatal error ");
+    
+    if(RamsesConfiguration._IS_LOGGER_ON)
+    {
+      sb.append("(see log file for more information):") ;
+    }
+    else
+    {
+      sb.append("(for more information, turn on the loggin system):") ;
+    }
     
     if(! (initialMsg == null || initialMsg.isEmpty()))
     {
