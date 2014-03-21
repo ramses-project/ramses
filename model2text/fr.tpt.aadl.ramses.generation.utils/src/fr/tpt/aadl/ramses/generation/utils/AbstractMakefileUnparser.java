@@ -14,6 +14,7 @@ import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.Element ;
@@ -403,6 +404,19 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     result.addAll(tmp) ;
   }
 
+  private File getDirectory(Element e)
+  {
+	String path="";
+	URI dirURI = e.eResource().getURI();
+	if(dirURI.isFile())
+	  path = dirURI.toFileString();
+	else
+	  path = dirURI.toString();
+	int index = path.lastIndexOf(File.separator);
+	path = path.substring(0, index+1);
+	return new File(path);
+  }
+  
   protected boolean getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
                                                Set<File> result)
   {
@@ -431,13 +445,26 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
             StringLiteral sl = (StringLiteral) aPE ;
             String value = sl.getValue() ;
             boolean found = false ;
+            
+            File dir = getDirectory(aPropertyAssociation);
+            
+            File foundFile =
+                    new File(dir + File.separator + value) ;
+            
+            if(foundFile.exists())
+            {
+              tmp.add(foundFile) ;
+              _includeDirManager.addCommonDependency(dir);
+              found = true ;
+              continue;
+            }
             File includeDir = null ;
             Iterator<File> it = new IncludeDirIterator() ;
             while(it.hasNext())
             {
               includeDir = it.next() ;
               
-              File foundFile =
+              foundFile =
                     new File(includeDir.getAbsoluteFile() + File.separator + value) ;
               if(foundFile.exists())
               {
@@ -462,12 +489,23 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
               StringLiteral sl = (StringLiteral) pe ;
               String value = sl.getValue() ;
               boolean found = false ;
+              File dir = getDirectory(aPropertyAssociation);
+              File foundFile =
+                      new File(dir + File.separator + value) ;
+              
+              if(foundFile.exists())
+              {
+                tmp.add(foundFile) ;
+                found = true ;
+                _includeDirManager.addCommonDependency(dir);
+                continue;
+              }
               File includeDir = null ;
               Iterator<File> it = new IncludeDirIterator() ;
               while(it.hasNext())
               {
                 includeDir = it.next() ;
-                File foundFile =
+                foundFile =
                       new File(includeDir.getAbsolutePath() + File.separator + value) ;
                 if(foundFile.exists())
                 {

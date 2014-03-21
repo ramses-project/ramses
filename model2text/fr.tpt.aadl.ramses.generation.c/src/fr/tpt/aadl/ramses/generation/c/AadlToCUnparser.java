@@ -1796,7 +1796,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           resolveExistingCodeDependencies(object.getDataFeatureClassifier(),
                                _currentImplUnparser, _currentHeaderUnparser);
         }
-        catch(Exception e)
+        catch(GenerationException e)
         {
           _currentImplUnparser.addOutput(GenerationUtilsC
                 .getGenerationCIdentifier(object.getDataFeatureClassifier()

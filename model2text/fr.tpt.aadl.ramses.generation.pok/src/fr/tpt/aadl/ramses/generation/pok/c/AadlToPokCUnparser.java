@@ -1741,7 +1741,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       }
       else
       {
-        String warnMsg =  "cannot fetch Needed_Memory_Siz for \'"+
+        String warnMsg =  "cannot fetch Needed_Memory_Size for \'"+
                           p.getName() + "\'. try to fetch the partition memory";
         _LOGGER.warn(warnMsg);
         ServiceProvider.SYS_ERR_REP.warning(warnMsg, true);

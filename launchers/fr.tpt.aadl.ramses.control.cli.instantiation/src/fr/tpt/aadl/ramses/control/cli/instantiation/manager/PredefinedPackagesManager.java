@@ -46,7 +46,7 @@ public class PredefinedPackagesManager
   private static String[] names =
   {"base_types", "aadl_runtime", "RAVENSCAR_runtime", "OJR_runtime",
    "ARINC653_runtime", "OSEK_runtime", "PeriodicDelayed_runtime",
-   "PeriodicDelayedMutex_runtime"} ;
+   "PeriodicDelayedMutex_runtime", "RAMSES_processors"} ;
   
   private static HashMap<String, Resource> resources = new HashMap<String, Resource>() ;
   

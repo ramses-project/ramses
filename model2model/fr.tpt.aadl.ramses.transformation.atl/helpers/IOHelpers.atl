@@ -182,7 +182,7 @@ helper context AADLI!FeatureInstance def: isPeriodicDelayedPort(): Boolean =
 		self.isPeriodicThreadPort() and
 		self.dstConnectionInstance->forAll(e|e.source.isPeriodicThreadPort()) and
 		(self.isDelayedPort() or self.isTimeBasedInputPort())  and
-		self.getDequeueProtocol() = 'AllItems'.toLower()
+		(self.getDequeueProtocol() = 'AllItems'.toLower())
 	endif
 ;
 
