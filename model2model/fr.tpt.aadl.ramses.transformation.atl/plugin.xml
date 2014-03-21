@@ -53,5 +53,10 @@
             id="fr.tpt.aadl.propetries.generation.aadlcontribution"
             name="Generation-Properties">
       </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/package/RAMSES_processors.aadl2"
+            id="fr.tpt.aadl.packages.ramses_processors.aadlcontribution"
+            name="RAMSES_processors">
+      </aadlcontribution>
    </extension>
 </plugin>
