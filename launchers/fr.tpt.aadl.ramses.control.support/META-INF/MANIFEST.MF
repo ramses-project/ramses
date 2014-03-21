@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: fr.tpt.aadl.ramses.control.support
+Bundle-Name: AADL-RAMSES-ControlSupport
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.support;singleton:=true
-Bundle-Version: 0.5.0
-Bundle-Vendor: TPT
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: TELECOM ParisTech
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.tpt.aadl.ramses.control.support,

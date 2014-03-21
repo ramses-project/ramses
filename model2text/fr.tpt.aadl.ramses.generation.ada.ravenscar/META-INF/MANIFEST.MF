@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: AdaRavenscar
+Bundle-Name: AADL-RAMSES-Ada-Ravenscar
 Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.ada.ravenscar
-Bundle-Version: 0.5.0
+Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.emf.ecore,
@@ -18,12 +18,12 @@ Require-Bundle: org.eclipse.ui,
  org.osate.utils;bundle-version="0.9.5",
  org.osate.ba;bundle-version="0.9.5",
  org.apache.log4j,
- fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
- fr.tpt.aadl.ramses.control.atl.launch;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.control.atl.launch,
  fr.tpt.aadl.ramses.generation.utils,
- fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.generation.target.specific;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.generation.ada;bundle-version="0.5.0"
+ fr.tpt.aadl.ramses.util.properties,
+ fr.tpt.aadl.ramses.generation.target.specific,
+ fr.tpt.aadl.ramses.generation.ada
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: TELECOM Paristech

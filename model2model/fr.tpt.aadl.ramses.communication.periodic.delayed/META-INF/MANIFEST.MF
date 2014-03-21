@@ -1,13 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: CommunicationDimensioning
+Bundle-Name: AADL-RAMSES-CommunicationDimensioning
 Bundle-SymbolicName: fr.tpt.aadl.ramses.communication.periodic.delayed;singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
  org.apache.log4j,
- fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.util.math;bundle-version="0.0.1"
+ fr.tpt.aadl.ramses.util.properties,
+ fr.tpt.aadl.ramses.util.math
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.communication.dimensioning,
  fr.tpt.aadl.ramses.communication.periodic.delayed
+Bundle-Vendor: TELECOM ParisTech

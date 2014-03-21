@@ -1,5 +1,5 @@
 Bundle-SymbolicName: fr.tpt.aadl.ramses.util.properties;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Name: AADL-Ramses-Util-Properties
 Bundle-Vendor: TELECOM ParisTech
 Eclipse-AutoStart: true

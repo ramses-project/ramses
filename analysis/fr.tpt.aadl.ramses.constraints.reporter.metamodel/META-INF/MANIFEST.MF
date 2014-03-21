@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %pluginName
+Bundle-Name: AADL-RAMSES-ConstraintsReporter
 Bundle-SymbolicName: fr.tpt.aadl.ramses.constraints.reporter.metamodel;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
-Bundle-Vendor: %providerName
+Bundle-Vendor: TELECOM ParisTech
 Bundle-Localization: plugin
 Bundle-Activator: fr.tpt.aadl.ramses.constraints.reporter.metamodel.Activator
 Require-Bundle: org.eclipse.ui,

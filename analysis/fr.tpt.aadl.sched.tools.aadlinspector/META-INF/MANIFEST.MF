@@ -1,7 +1,7 @@
 Bundle-Vendor: TELECOM ParisTech
 Bundle-SymbolicName: fr.tpt.aadl.sched.tools.aadlinspector;singleton:=true
-Bundle-Version: 1.0.0
-Bundle-Name: AADLInspector-Interface
+Bundle-Version: 1.0.0.qualifier
+Bundle-Name: AADL-RAMSES-Inspector-Interface
 Export-Package: fr.tpt.aadl.launch,
  fr.tpt.aadl.sched.aadlinspector,
  fr.tpt.aadl.sched.aadlinspector.output
@@ -12,7 +12,7 @@ Require-Bundle: org.osate.aadl2,
  org.osate.ui;bundle-version="1.0.0",
  org.osate.utils,
  org.apache.log4j;bundle-version="1.2.15",
- fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
- fr.tpt.aadl.ramses.analysis.result;bundle-version="0.0.1",
- fr.tpt.aadl.ramses.util.properties;bundle-version="1.0.0"
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.analysis.result,
+ fr.tpt.aadl.ramses.util.properties
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

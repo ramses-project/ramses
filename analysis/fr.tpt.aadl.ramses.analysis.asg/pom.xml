@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>ramses</groupId>
 	<artifactId>fr.tpt.aadl.ramses.analysis.asg</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
 	<dependencies>
@@ -23,7 +23,7 @@
 	<dependency>
 	    <groupId>ramses</groupId>
 	    <artifactId>fr.tpt.aadl.ramses.util.properties</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.0.0-SNAPSHOT</version>
 	</dependency>
 	</dependencies>
 </project>

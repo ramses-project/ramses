@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Atl
+Bundle-Name: AADL-RAMSES-ATL
 Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.atl;singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: TELECOM-ParisTech

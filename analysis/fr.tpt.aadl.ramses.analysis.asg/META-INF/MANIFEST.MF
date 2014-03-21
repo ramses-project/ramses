@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: EGAnalysis
+Bundle-Name: AADL-RAMSES-EGAnalysis
 Bundle-SymbolicName: fr.tpt.aadl.ramses.analysis.asg;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: fr.tpt.aadl.ramses.analysis.eg.Activator
 Bundle-Vendor: TELECOM ParisTech
 Require-Bundle: org.eclipse.ui,

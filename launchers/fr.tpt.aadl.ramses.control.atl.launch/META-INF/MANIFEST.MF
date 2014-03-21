@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %pluginName
+Bundle-Name: AADL-RAMSES-Control-ATL
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.atl.launch;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
-Bundle-Vendor: %providerName
+Bundle-Vendor: TELECOM ParisTech
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.control.atl,
@@ -29,8 +29,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.osate.workspace,
  org.objectweb.asm;bundle-version="3.3.1",
  org.apache.log4j,
- fr.tpt.aadl.ramses.control.support;bundle-version="0.5.0",
- fr.tpt.aadl.ramses.constraints.reporter.metamodel;bundle-version="1.0.0",
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.constraints.reporter.metamodel,
  fr.tpt.aadl.ramses.communication.periodic.delayed,
  fr.tpt.aadl.ramses.util.properties
 Bundle-ActivationPolicy: lazy

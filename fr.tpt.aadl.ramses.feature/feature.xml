@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="fr.tpt.aadl.ramses.feature"
-      label="RamsesFeature"
-      version="0.5.0"
-      provider-name="TELECOM-ParisTech">
+      label="AADL-RAMSES-Feature"
+      version="1.0.0.qualifier"
+      provider-name="TELECOM ParisTech">
 
    <description url="http://aadl.telecom-paristech.fr/">
       RAMSES (Refinement of AADL Models for Synthesis of Embedded Systems) is a model transformation and code generation tool that produces C code for ARINC653-compliant operating systems and OSEK-compliant operating systems.
@@ -27,7 +27,6 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.osate.aadl2" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.ramses.util.properties" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.osate.ui"/>
@@ -35,7 +34,6 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.osate.annexsupport"/>
       <import plugin="org.osate.xtext.aadl2.properties"/>
       <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="fr.tpt.aadl.ramses.generation.c" version="0.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.osate.aadl2.modelsupport" version="1.0.0" match="greaterOrEqual"/>
@@ -45,12 +43,8 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.eclipse.xtext" version="2.1.1" match="greaterOrEqual"/>
       <import plugin="org.osate.aadl2.instantiation"/>
       <import plugin="org.osate.xtext.aadl2"/>
-      <import plugin="fr.tpt.aadl.ramses.control.support" version="0.5.0" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.ramses.generation.target.specific" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.sched.wcetanalysis" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="fr.tpt.aadl.ramses.analysis.result" version="0.0.1" match="greaterOrEqual"/>
       <import plugin="org.osate.pluginsupport"/>
       <import plugin="org.eclipse.ui.workbench" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
@@ -177,13 +171,6 @@ You should have received a copy of the Eclipse Public License along with this pr
          unpack="false"/>
 
    <plugin
-         id="fr.tpt.aadl.sched.wcetanalysis"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.m2m.atl.emftvm"
          download-size="0"
          install-size="0"
@@ -240,35 +227,28 @@ You should have received a copy of the Eclipse Public License along with this pr
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.cdt"
+         id="fr.tpt.aadl.ramses.analysis.asg"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.cdt.ui"
+         id="fr.tpt.aadl.ramses.constraints.reporter.metamodel"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.cdt.core"
+         id="fr.tpt.aadl.sched.tools.cheddar"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.cdt.make.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.cdt.make.ui"
+         id="fr.tpt.aadl.sched.wcetanalysis.results"
          download-size="0"
          install-size="0"
          version="0.0.0"

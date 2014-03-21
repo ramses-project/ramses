@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Math
+Bundle-Name: AADL-RAMSES-Util-Math
 Bundle-SymbolicName: fr.tpt.aadl.ramses.util.math;singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 1.0.0.qualifier
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.util.math
+Bundle-Vendor: TELECOM ParisTech
