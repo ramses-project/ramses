@@ -171,6 +171,13 @@ public class ToolSuiteLauncherCommand
             // No use because RAMSES CLI does not delayed error reporting.
           }
         }
+        else
+        {
+          String msg = "unrecognized options (please do \'--help\')" ;
+          _logger.fatal(msg);
+          ServiceProvider.SYS_ERR_REP.fatal(msg);
+          System.exit(-1);
+        }
       }
     }
     catch(Exception ex)
