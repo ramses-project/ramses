@@ -1446,14 +1446,15 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
               (MemorySubcomponent) GeneratorUtils
                     .getDeloymentMemorySubcomponent(p) ;
         
-        mem = PropertyUtils.getIntValue(bindedMemory, "Byte_Count") ;
+        
+        mem = PropertyUtils.getIntValue(bindedMemory, "Memory_Size") ;
         if(mem != null)
         {
           memorySizePerPartition.add(mem) ;
         }
         else
         {
-          String errMsg = "cannot fetch the partition memory (Byte_Count) for \'" +
+          String errMsg = "cannot fetch the partition memory (Memory_Size) for \'" +
                                                   bindedMemory.getName() + '\'' ;
           _LOGGER.error(errMsg) ;
           ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;

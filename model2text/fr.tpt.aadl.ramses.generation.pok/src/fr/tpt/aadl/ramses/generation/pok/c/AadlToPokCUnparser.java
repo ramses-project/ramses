@@ -1749,14 +1749,14 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
         MemorySubcomponent bindedMemory =
               (MemorySubcomponent) GeneratorUtils
                     .getDeloymentMemorySubcomponent(p) ;
-        value = PropertyUtils.getIntValue(bindedMemory, "Byte_Count") ;
+        value = PropertyUtils.getIntValue(bindedMemory, "Memory_Size") ;
         if(value != null)
         {
           memorySizePerPartition.add(value) ;
         }
         else
         {
-          String errMsg = "cannot fetch the partition memory (Byte_Count) for \'"+
+          String errMsg = "cannot fetch the partition memory (Memory_Size) for \'"+
                                                   bindedMemory.getName() + '\'';
           _LOGGER.error(errMsg);
           ServiceProvider.SYS_ERR_REP.error(errMsg, true);

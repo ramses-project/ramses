@@ -52,7 +52,8 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
   private UnparseText unparserContent ;
   private UnparseText kernelMakefileContent ;
   private List<ProcessSubcomponent> bindedProcess ;
-  private final static String RUNTIME_INCL_DIR = "/libpok/include" ;
+  private final static String C_RUNTIME_INCL_DIR = "/libpok/include" ;
+  private final static String ADA_RUNTIME_INCL_DIR = "/libpok/ada" ;
   public final static String POK_RUNTIME_VAR_ENV = "POK_PATH" ;
   
   private static Logger _LOGGER = Logger.getLogger(AadlToPokMakefileUnparser.class) ;
@@ -65,8 +66,10 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
   @Override
   protected void handleDirs(File runtimePath, File[] includeDirs)
   {
-    File pokCFile = new File(runtimePath + RUNTIME_INCL_DIR);
+    File pokCFile = new File(runtimePath + C_RUNTIME_INCL_DIR);
+    File pokAdaFile = new File(runtimePath + ADA_RUNTIME_INCL_DIR);
     _includeDirManager.addCommonDependency(pokCFile);
+    _includeDirManager.addCommonDependency(pokAdaFile);
     super.handleDirs(runtimePath, includeDirs);
   }
   

@@ -25,12 +25,15 @@ import java.util.List ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
+import org.osate.aadl2.BooleanLiteral;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Parameter ;
+import org.osate.aadl2.Property;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.utils.PropertyUtils ;
+import org.osate.xtext.aadl2.properties.util.GetProperties;
 
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
@@ -146,17 +149,13 @@ public class GenerationUtilsC
     if(isReturnParam == null)
     {
       isReturnParam=false;
-      String errMsg =  "cannot fetch Return_Parameter for \'" +  p.getName() + '\'' ;
-      _LOGGER.error(errMsg);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);  
-
-      // DO NOT COMIT.
-      //Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
-      //BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
-      //isReturnParam = bl.getValue();
+      
+      Property prop = GetProperties.lookupPropertyDefinition(p, "Generation_Properties", "Return_Parameter") ;
+      BooleanLiteral bl = (BooleanLiteral) prop.getDefaultValue() ;
+      isReturnParam = bl.getValue();
     }
     
-	  return isReturnParam;
+	return isReturnParam;
   }
   
   public static String resolveExistingCodeDependencies(NamedElement object,
