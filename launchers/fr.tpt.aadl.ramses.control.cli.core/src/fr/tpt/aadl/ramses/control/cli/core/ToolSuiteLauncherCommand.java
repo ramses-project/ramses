@@ -759,6 +759,10 @@ public class ToolSuiteLauncherCommand
     if(count != 111)
     {
       String folder = EnvUtils.getExternalVariable(Names.RAMSES_RESOURCES_VAR) ;
+      if(folder == null || folder.isEmpty())
+      {
+        folder = Names.DEFAULT_RAMSES_RESOUCE_DIR ;
+      }
       
       status = RamsesConfiguration.setRamsesResourceDir(folder) ;
       if(status == ConfigStatus.SET)
