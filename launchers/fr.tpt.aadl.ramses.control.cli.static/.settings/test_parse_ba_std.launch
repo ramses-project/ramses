@@ -10,7 +10,7 @@
 <mapEntry key="RAMSES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--parse -m aadlBaTestTypes.aadl,aadlBaTestPropertySet.aadl,aadlBaTestSubprogram.aadl,aadlBaTest001.aadl,aadlBaTest002.aadl,aadlBaTest003.aadl,aadlBaTest004.aadl,aadlBaTest005.aadl,sr_D4_6.aadl,sr_D3_18.aadl,lr_D6_L8.aadl,lr_D6_L3_L4.aadl,lr_D6_L2_nr_D6_N1.aadl,lr_D4_L1_L2.aadl,lr_D3_L6_L7_L8.aadl,lr_D3_L5.aadl,lr_D3_L3_L4.aadl,lr_D3_L1_L2.aadl,cr_D3_C4.aadl,multiModalPingPong.aadl2 -i ../../../aadlba/org.osate.ba/examples/covering_syntaxe,../../../aadlba/org.osate.ba/examples/covering_semantic,../../../aadlba/org.osate.ba/examples/toy_examples,../../model2model/fr.tpt.aadl.ramses.transformation.atl/aadl_resources/package -l trace -o /tmp/parse-output"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="--parse -m ba_example_007.aadl -i ../../../aadlba/org.osate.ba/examples/standard_examples  -o /tmp/parse-output -l trace"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&#10;-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl&#10;-Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
 </launchConfiguration>

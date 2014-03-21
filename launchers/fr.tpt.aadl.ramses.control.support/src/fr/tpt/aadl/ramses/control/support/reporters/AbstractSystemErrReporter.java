@@ -40,13 +40,13 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
     StringBuilder sb = new StringBuilder() ;
     sb.append("Abort on fatal error ");
     
-    if(RamsesConfiguration._IS_LOGGER_ON)
+    if(RamsesConfiguration.IS_LOGGER_ON)
     {
-      sb.append("(see log file for more information):") ;
+      sb.append("(see log file for more information): ") ;
     }
     else
     {
-      sb.append("(for more information, turn on the loggin system):") ;
+      sb.append("(for more information, turn on the loggin system): ") ;
     }
     
     if(! (initialMsg == null || initialMsg.isEmpty()))
@@ -80,8 +80,23 @@ public abstract class AbstractSystemErrReporter implements SystemErrReporter
   
   protected String formatFatalMsg(String initialMsg)
   {
-    return "<Fatal Error> Abort on fatal error (see log file for more information): " +
-            initialMsg ;
+    StringBuilder sb = new StringBuilder("<Fatal Error> Abort on fatal error ") ;
+    if(RamsesConfiguration.IS_LOGGER_ON)
+    {
+      sb.append("(see log file for more information)") ;
+    }
+    else
+    {
+      sb.append("(for more information, turn on the loggin system)") ;
+    }
+    
+    if(! (initialMsg == null || initialMsg.isEmpty()))
+    {
+      sb.append(": ") ;
+      sb.append(initialMsg) ;
+    }
+    
+    return sb.toString() ;
   }
   
   protected String formatErrorMsg(String initialMsg)
