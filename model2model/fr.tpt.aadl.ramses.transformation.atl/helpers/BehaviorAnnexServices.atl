@@ -61,17 +61,23 @@ helper context AADLBA!BehaviorElement def: isPartOfBehaviorAnnexOf(c: AADLI!Comp
 
 helper context AADLI!FeatureInstance def: isDirectlyUsedInFresh() : Boolean =
 	let as: AADLBA!DefaultAnnexSubclause = self.eContainer().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name='behavior_specification') in
-	if(not as.oclIsUndefined()) then
-		let ba: AADLBA!BehaviorAnnex = as.parsedAnnexSubclause in 
-		if(not ba.oclIsUndefined()) then
-			ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
-			(ba,
+	if(as.oclIsKindOf(AADLBA!BehaviorAnnex)) then
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
+			(as,
 			self.feature)
+	else
+		if(not as.oclIsUndefined()) then
+			let ba: AADLBA!BehaviorAnnex = as.parsedAnnexSubclause in 
+			if(not ba.oclIsUndefined()) then
+				ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().isUsedInFreshClause
+				(ba,
+				self.feature)
+			else
+				false
+			endif
 		else
 			false
 		endif
-	else
-		false
 	endif
 ;
 
