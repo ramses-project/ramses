@@ -46,7 +46,6 @@ import org.osate.aadl2.instance.InstanceReferenceValue ;
 import org.osate.utils.PropertyUtils ;
 import org.osate.xtext.aadl2.properties.util.GetProperties ;
 
-import fr.tpt.aadl.ramses.control.cli.instantiation.manager.PredefinedPropertiesManager ;
 
 public class AadlUtil
 {
@@ -397,34 +396,22 @@ public class AadlUtil
   public static String getPrecision(NamedElement ne)
   {
     String precision = "" ;
-    if(Platform.isRunning())
+    Property prop = null ;
+    try
     {
-      Property prop = null ;
-      try
-      {
-        prop =
-              GetProperties.lookupPropertyDefinition(ne, "AADL_Project",
-                                                     "Timing_Precision") ;
-      }
-      catch(Exception e)
-      {
-        return "ms" ;
-      }
+      prop =
+    	GetProperties.lookupPropertyDefinition(ne, "AADL_Project",
+    					"Timing_Precision") ;
+    }
+    catch(Exception e)
+    {
+      return "ms" ;
+    }
 
-      if(prop == null)
-        return "ms" ;
-      UnitLiteral sl = (UnitLiteral) prop.getDefaultValue() ;
-      precision = sl.getName() ;
-    }
-    else
-    {
-      PropertyConstant prop =
-            PredefinedPropertiesManager
-                  .getPropertyConstantDefinition("AADL_Project",
-                                                 "Timing_Precision") ;
-      NamedValue sl = (NamedValue) prop.getConstantValue() ;
-      precision = ((UnitLiteral) sl.getNamedValue()).getName() ;
-    }
+    if(prop == null)
+    	return "ms" ;
+    UnitLiteral sl = (UnitLiteral) prop.getDefaultValue() ;
+    precision = sl.getName() ;
     return precision ;
   }
 }
