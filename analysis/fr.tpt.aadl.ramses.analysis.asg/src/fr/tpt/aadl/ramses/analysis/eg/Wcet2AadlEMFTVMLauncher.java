@@ -37,14 +37,7 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		super(modelInstantiator, predefinedResourcesManager) ;
 	  EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, ReducedbaPackage.eINSTANCE) ;
 		wcetModel = model;
-		this.initTransformation();
-	}
-
-	@Override
-	protected void initTransformation()
-	{
-		// register reducedBa
-		super.initTransformation();
+		initTransformation();
 	}
 	
 	@Override

@@ -26,24 +26,19 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.io.IOException ;
+import java.io.IOException;
 
-import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EPackage ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
-import org.eclipse.m2m.atl.emftvm.Metamodel ;
+import org.apache.log4j.Logger;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 
-import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
 
 
 public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 {
-	
-	private String ERROR_REPORTER_URI = "http://fr.tpt.aadl.ramses.constraints.vilation.reporter";
 	
 	private static Logger _LOGGER = Logger.getLogger(Aadl2ConstraintValidationEMFTVMLauncher.class) ;
 	
@@ -59,12 +54,6 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 			                                        String resourceSuffix)
 	{
 		ResourceSet rs = inputResource.getResourceSet();
-		
-		// Load metamodels
-		// Load aadl instance metamodel 
-		Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		aadlInstanceMetaModel.setResource(rs.getResource(URI.createURI(ERROR_REPORTER_URI), true));
-		env.registerMetaModel("CV", aadlInstanceMetaModel);
 		
 		String aadlFileName = inputResource.getURI().path();
 		if(aadlFileName.startsWith("file:"))
@@ -95,14 +84,6 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 		return outputResource;
 	}
 	
-	@Override
-	protected void initTransformation()
-	{
-		EPackage.Registry.INSTANCE.put(ERROR_REPORTER_URI, 
-				fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE);
-		super.initTransformation();
-	}
-
 	@Override
 	protected void registerDefaultTransformationModules() {
 		// No default module here.

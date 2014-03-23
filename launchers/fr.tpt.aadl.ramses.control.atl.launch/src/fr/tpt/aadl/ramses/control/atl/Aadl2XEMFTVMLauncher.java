@@ -26,46 +26,37 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.io.File ;
-import java.io.IOException ;
-import java.io.InputStream ;
-import java.net.URL ;
-import java.util.ArrayList ;
-import java.util.Collections ;
-import java.util.Iterator ;
-import java.util.List ;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.EPackage ;
-import org.eclipse.emf.ecore.EcorePackage ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
-import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl ;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
-import org.eclipse.m2m.atl.emftvm.ExecEnv ;
-import org.eclipse.m2m.atl.emftvm.Metamodel ;
-import org.eclipse.m2m.atl.emftvm.Model ;
-import org.eclipse.m2m.atl.emftvm.Module ;
-import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl ;
-import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl ;
-import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException ;
-import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
-import org.eclipse.m2m.atl.emftvm.util.TimingData ;
-import org.osate.aadl2.AadlPackage ;
-import org.osate.aadl2.PropertySet ;
-import org.osate.aadl2.instance.InstancePackage ;
-import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl ;
-import org.osate.ba.aadlba.AadlBaPackage ;
+import org.apache.log4j.Logger;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
+import org.eclipse.m2m.atl.emftvm.ExecEnv;
+import org.eclipse.m2m.atl.emftvm.Model;
+import org.eclipse.m2m.atl.emftvm.Module;
+import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl;
+import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException;
+import org.eclipse.m2m.atl.emftvm.util.ModuleResolver;
+import org.eclipse.m2m.atl.emftvm.util.TimingData;
+import org.osate.aadl2.AadlPackage;
+import org.osate.aadl2.PropertySet;
 
-import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
-import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
-import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
-import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory;
+import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
 
 
 public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
@@ -74,15 +65,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
   
 	protected PredefinedAadlModelManager _predefinedResourcesManager ;
 
-	protected ExecEnv env = EmftvmFactory.eINSTANCE.createExecEnv();
-
-	protected static final String AADLBA_MM_URI =
-			org.osate.ba.aadlba.AadlBaPackage.eNS_URI ;
-	protected static final String AADL2_MM_URI =
-			org.osate.aadl2.Aadl2Package.eNS_URI ;
-	protected static final String AADLI_MM_URI =
-			org.osate.aadl2.instance.InstancePackage.eNS_URI ;
-	protected static final String ATLHOOKS_MM_URI = AtlHooksPackage.eNS_URI ;
+	protected ExecEnv env;
 
 	protected String outputPackageName = "";
 	
@@ -122,7 +105,8 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
   {
     _modelInstantiator = modelInstantiator ;
     _predefinedResourcesManager = predefinedResourcesManager ;
-    this.initTransformation() ;
+    initTransformation() ;
+    env = pool.getExecEnv();
   }
 	
 	public String getOutputPackageName() {
@@ -131,25 +115,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 
 	public void setOutputPackageName(String outputPackageName) {
 		this.outputPackageName = outputPackageName;
-	}
-
-	protected void initTransformation()
-	{
-		EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
-				org.osate.aadl2.Aadl2Package.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(ATLHOOKS_MM_URI, AtlHooksPackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(AADLBA_MM_URI, AadlBaPackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(AADLI_MM_URI, InstancePackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put("http://www.eclipse.org/emf/2002/Ecore",
-				EcorePackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(org.eclipse.m2m.atl.emftvm.EmftvmPackage.eNS_URI,
-				org.eclipse.m2m.atl.emftvm.EmftvmPackage.eINSTANCE) ;
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-		.put("aaxl2", new InstanceResourceFactoryImpl()) ;
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-		.put("ecore", new EcoreResourceFactoryImpl()) ;
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-		.put("emftvm", new EMFTVMResourceFactoryImpl()) ;
 	}
 
 	public Resource doTransformation(List<File> transformationFileList,
@@ -199,13 +164,11 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		return outModel.getResource();		
 	}
-
+	
 	
 	protected abstract Resource initTransformationOutput(Resource inputResource,
-                                                       String outputDirPathName,
-                                                       String resourceSuffix);
-	
-	
+			String outputDirPathName, String resourceSuffix);
+
 	protected void registerPredefinedResourcesInLauncher(ExecEnv env,
 	                                                     List<Resource> predefinedAadlModels)
 	{
@@ -226,23 +189,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	protected void initTransformationInputs(List<File> transformationFileList,
 			                                    Resource inputResource)
 	{
-    ResourceSet rs = inputResource.getResourceSet();
-
-    // Load metamodels
-    // Load aadl instance metamodel 
-    Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-    aadlInstanceMetaModel.setResource(rs.getResource(URI.createURI(AADLI_MM_URI), true));
-    env.registerMetaModel("AADLI", aadlInstanceMetaModel);
-
-    // Load aadl+BA metamodel
-    Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-    aadlBaMetaModel.setResource(rs.getResource(URI.createURI(AADLBA_MM_URI), true));
-    env.registerMetaModel("AADLBA", aadlBaMetaModel);
-
-    // Load atlHooks metamodel
-    Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-    atlHoolsMetaModel.setResource(rs.getResource(URI.createURI(ATLHOOKS_MM_URI), true));
-    env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
 
     // Load models
     Model inModel = EmftvmFactory.eINSTANCE.createModel();
