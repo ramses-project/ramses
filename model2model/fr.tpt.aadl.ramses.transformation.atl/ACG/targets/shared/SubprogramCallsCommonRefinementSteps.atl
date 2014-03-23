@@ -265,7 +265,11 @@ rule m_ThreadEntrypoint {
 											thisModule.collectComputeEntryPointActionBlocks(c)
 										endif
 									),
-			variables   <- c.subcomponent.classifier.getBA().variables
+			variables   <- if(not c.subcomponent.classifier.getBA().oclIsUndefined()) then
+								c.subcomponent.classifier.getBA().variables
+							else
+								Sequence{}
+							endif
 							->union(
 								thisModule.collectBehaviorVariable(c)
 							)
