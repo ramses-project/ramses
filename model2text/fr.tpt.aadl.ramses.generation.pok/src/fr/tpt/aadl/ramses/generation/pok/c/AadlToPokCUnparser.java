@@ -36,6 +36,7 @@ import org.osate.aadl2.BooleanLiteral ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.DataPort ;
 import org.osate.aadl2.DataSubcomponent ;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.EventDataPort ;
 import org.osate.aadl2.MemorySubcomponent ;
@@ -283,8 +284,17 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       if(as.getName().equalsIgnoreCase("behavior_specification"))
       {
-        ba = (BehaviorAnnex) as ;
-        break ;
+    	if(as instanceof BehaviorAnnex)
+        {
+    	  ba = (BehaviorAnnex) as ;
+    	  break ;
+        }
+    	else if(as instanceof DefaultAnnexSubclause)
+    	{
+    	  DefaultAnnexSubclause das = (DefaultAnnexSubclause) as ;
+    	  ba = (BehaviorAnnex) das.getParsedAnnexSubclause();
+    	  break;
+    	}
       }
     }
     return ba ;

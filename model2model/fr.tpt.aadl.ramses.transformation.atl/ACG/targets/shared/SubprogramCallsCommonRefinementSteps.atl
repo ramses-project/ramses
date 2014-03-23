@@ -90,17 +90,11 @@ helper def: collectComputeEntryPointTransitions(c: AADLI!ComponentInstance): Seq
 
 
 helper def: collectBAEntryPointTransitions(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorTransition) =
-	c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
-	->collect(
-		ba | thisModule.resolveMatchedTupleIfExists(Sequence{c, ba}, 'computeEntryPointTransition')
-	)
+	Sequence{thisModule.resolveMatchedTupleIfExists(Sequence{c, c.subcomponent.classifier.getBA()}, 'computeEntryPointTransition')}
 ;
 
 helper def: collectBAEntryPointActionBlocks(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorActionBlock) =
-	c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
-	->collect(
-		ba | thisModule.resolveMatchedTupleIfExists(Sequence{c, ba}, 'computeEntryPointActionBlock')
-	)
+	Sequence{thisModule.resolveMatchedTupleIfExists(Sequence{c, c.subcomponent.classifier.getBA()}, 'computeEntryPointActionBlock')}
 ;
 
 helper def: collectComputeEntryPointActionBlocks(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorActionBlock) =
@@ -162,13 +156,9 @@ rule m_ThreadEntrypoint {
 											)
 										)
 									)
-									->union
+									->append
 									(
-										impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
-										->collect
-										(
-											ba | thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'currentStateAccess')
-										)
+										thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA()},'currentStateAccess')
 									)
 									->union
 									(
@@ -275,8 +265,7 @@ rule m_ThreadEntrypoint {
 											thisModule.collectComputeEntryPointActionBlocks(c)
 										endif
 									),
-			variables   <- c.subcomponent.classifier.ownedAnnexSubclause->select(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
-							->collect( ba | ba.variables)
+			variables   <- c.subcomponent.classifier.getBA().variables
 							->union(
 								thisModule.collectBehaviorVariable(c)
 							)

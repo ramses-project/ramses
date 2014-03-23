@@ -254,13 +254,9 @@ rule m_create_Thread_BA
 			ownedRealization <- thisModule.Realization(typeImg),
 			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
 			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data)
-												->union
+												->append
 												(
-													impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
-													->collect
-													(
-														ba | thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'currentState')
-													)
+													thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA()},'currentState')
 												)
 												->union
 												(
@@ -321,17 +317,14 @@ rule m_create_Thread_BA
 												->union(
 													c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
 													->collect(fi|
-														impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
-														->collect(ba |
 															if(fi.isInputFeature()) then
-																thisModule.resolveMatchedTupleIfExists(Sequence{fi,ba}, 'f_connection')
+																thisModule.resolveMatchedTupleIfExists(Sequence{fi,impl.getBA()}, 'f_connection')
 															else
 																fi.srcConnectionInstance->collect( cnxInst |
-																	thisModule.resolveMatchedTupleIfExists(Sequence{fi,ba,cnxInst.connectionReference->first().connection}, 'f_connection')
+																	thisModule.resolveMatchedTupleIfExists(Sequence{fi,impl.getBA(),cnxInst.connectionReference->first().connection}, 'f_connection')
 																)
 															endif
 														)
-													)
 												)
 												->flatten()
 												->union(impl.ownedSubprogramCallSequence
@@ -353,16 +346,12 @@ rule m_create_Thread_BA
 													c.featureInstance->select(e | e.feature.oclIsKindOf(AADLBA!DataAccess))
 													->collect
 													(
-														fi | impl.ownedAnnexSubclause->collect(e| thisModule.createAccessConnectionFromBA(fi, e))
+														fi | thisModule.createAccessConnectionFromBA(fi, impl.getBA())
 													)
 												)
-												->union
+												->append
 												(
-													impl.ownedAnnexSubclause->select(annex | annex.oclIsTypeOf(AADLBA!BehaviorAnnex))
-													->collect
-													(
-														ba | thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'accessConnection_CURRENT_STATE')
-													)
+													thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA()},'accessConnection_CURRENT_STATE')
 												)
 												->union
 												(
@@ -428,10 +417,14 @@ unique lazy rule createAccessConnectionFromBA
 	from
 		fi: AADLI!FeatureInstance,
 		ba: AADLBA!BehaviorAnnex
+	using
+	{
+		annexSubclause: AADLBA!AnnexSubclause = fi.getComponentInstance().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name = 'behavior_specification');
+	}
 	to
 		accessCnx: AADLBA!AccessConnection
 		(
-			name <- fi.name+'_BA_cnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(ba).toString(),
+			name <- fi.name+'_BA_cnx_'+fi.eContainer().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(annexSubclause).toString(),
 			source <- accessCnx_Source,
 			destination <- accessCnx_Destination,
 			accessCategory <- #data

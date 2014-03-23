@@ -41,7 +41,7 @@ abstract rule m_Port_BehaviorAnnex
 			and
 			fi.isThreadPort()
 			and
-			fi.getComponentInstance().subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e=behavior)
+			(fi.getComponentInstance().subcomponent.subcomponentType.getBA()=behavior)
 			and not fi.isPeriodicDelayedPort()
 		)
 }
@@ -159,12 +159,16 @@ rule m_Input_Port_BehaviorAnnex
 		(
 			fi.isInputFeature()
 		)
+	using
+	{
+		annexSubclause: AADLBA!AnnexSubclause = fi.getComponentInstance().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name = 'behavior_specification');
+	}
 	to
 		f_connection: AADLBA!AccessConnection
 		(
 			source <- sourceCE,
 			destination <- destinationCE,
-			name <- fi.name+'_accessCnx_'+fi.getComponentInstance().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString(),
+			name <- fi.name+'_accessCnx_'+fi.getComponentInstance().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(annexSubclause).toString(),
 			accessCategory <- #data
 		),
 		sourceCE: AADLBA!ConnectedElement
@@ -193,12 +197,16 @@ rule m_Output_Port_BehaviorAnnex
 			and
 			fi.srcConnectionInstance->exists(e|e.connectionReference->exists(cnx| cnx.connection = cnxRef))
 		)
+	using
+	{
+		annexSubclause: AADLBA!AnnexSubclause = fi.getComponentInstance().subcomponent.classifier.ownedAnnexSubclause->any(e|e.name = 'behavior_specification');
+	}
 	to
 		f_connection: AADLBA!AccessConnection
 		(
 			source <- sourceCE,
 			destination <- destinationCE,
-			name <- cnxRef.uniqueName()+'_'+fi.name+'_accessCnx_'+fi.getComponentInstance().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString(),
+			name <- cnxRef.uniqueName()+'_'+fi.name+'_accessCnx_'+fi.getComponentInstance().subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(annexSubclause).toString(),
 			accessCategory <- #data
 		),
 		sourceCE: AADLBA!ConnectedElement
@@ -215,6 +223,18 @@ rule m_Output_Port_BehaviorAnnex
 	}
 }
 
+helper context AADLI!SubcomponentType def : getBA() : AADLBA!BehaviorAnnex = 
+	let as: AADLI!AnnexSubclause = self.ownedAnnexSubclause->any(e | e.name='behavior_specification') in
+	if(as.oclIsKindOf(AADLBA!BehaviorAnnex)) then
+		as
+	else 
+		if(not as.oclIsUndefined()) then
+			as.parsedAnnexSubclause
+		else
+			OclUndefined
+		endif
+	endif
+;
 
 -- @extends m_ThreadBehavior
 rule m_Compute_EntryPoint_from_BA {
@@ -226,7 +246,7 @@ rule m_Compute_EntryPoint_from_BA {
 		and
 		behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
 	  	and
-	  	c.subcomponent.classifier.ownedAnnexSubclause->exists(e| e=behavior)
+	  	c.subcomponent.classifier.getBA() = behavior
 	  	and
 		c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
 		and
@@ -235,7 +255,8 @@ rule m_Compute_EntryPoint_from_BA {
  using
  {
     impl: AADLI!Thread = c.subcomponent.subcomponentType;
- 	implBA: AADLBA!BehaviorAnnex = c.subcomponent.subcomponentType.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex));
+ 	implBA: AADLBA!BehaviorAnnex = c.subcomponent.subcomponentType.getBA();
+	annexSubclause: AADLBA!AnnexSubclause = c.subcomponent.classifier.ownedAnnexSubclause->any(e|e.name = 'behavior_specification');
 	stateTypeID: String = c.uniqueName().concat('_currentState');
  }
  to 
@@ -303,7 +324,7 @@ rule m_Compute_EntryPoint_from_BA {
 	),
 	computeEntryPointTransition: AADLBA!BehaviorTransition
 	(
-		name <- behavior.name+'_'+c.subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(behavior).toString()
+		name <- behavior.name+'_'+c.subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(annexSubclause).toString()
 	),
 	computeEntryPointActions: AADLBA!BehaviorActionSequence
 	(
@@ -424,7 +445,7 @@ rule m_BehaviorActionsFromThread
 	(
 		c.category = #thread
 		and
-		c.subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e = src_transition.eContainer())
+		c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
 	)
   using
   {
@@ -587,7 +608,7 @@ rule m_BehaviorActionsFromThread_Periodic
 		(
 			c.isPeriodicThread()
 			and
-			c.subcomponent.subcomponentType.ownedAnnexSubclause->exists(e| e = src_transition.eContainer())
+			c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
 			and
 			src_transition.destinationState.complete=true
 		)

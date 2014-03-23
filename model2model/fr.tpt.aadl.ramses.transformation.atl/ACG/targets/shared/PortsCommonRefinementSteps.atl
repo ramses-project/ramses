@@ -356,7 +356,7 @@ helper def: assignPortVariableType(fi: AADLI!FeatureInstance, fresh_data_impl_wr
 ;
 
 helper context AADLI!FeatureInstance def: getBehaviorAnnex():  AADLBA!BehaviorAnnex = 
-	self.getComponentInstance().subcomponent.classifier.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+	self.getComponentInstance().subcomponent.classifier.getBA()
 ;
 
 helper context AADLI!ComponentInstance def: needsToMapBehaviorAnnex(): Boolean =
@@ -364,7 +364,7 @@ helper context AADLI!ComponentInstance def: needsToMapBehaviorAnnex(): Boolean =
 ;
 
 helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
-	self.ownedAnnexSubclause->exists(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex))
+	self.ownedAnnexSubclause->exists(e| e.name = 'behavior_specification')
 	and
 	self.getPropertyAssociation('Source_Name').oclIsUndefined()
 	and

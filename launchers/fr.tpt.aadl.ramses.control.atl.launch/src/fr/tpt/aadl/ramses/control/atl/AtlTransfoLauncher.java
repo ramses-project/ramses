@@ -123,6 +123,7 @@ public abstract class AtlTransfoLauncher
 		constraintValidationMetamodel.setResource(
 				fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE.eResource());
 		AtlTransfoLauncher.pool.registerMetaModel("CV", constraintValidationMetamodel);
+		
   }
   
   protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher,

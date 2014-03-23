@@ -22,8 +22,9 @@
 package fr.tpt.aadl.ramses.generation.c.annex.behavior ;
 
 import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.ba.AadlBaUnParserAction ;
-import org.osate.ba.aadlba.BehaviorElement ;
+import org.osate.ba.aadlba.BehaviorAnnex;
 
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 
@@ -44,7 +45,15 @@ public class AadlBaToCUnparserAction extends AadlBaUnParserAction implements
   @Override
   public String unparseAnnexSubclause(AnnexSubclause subclause, String indent)
   {
-    return _unparser.process((BehaviorElement) subclause) ;
+	BehaviorAnnex ba = null;
+	if(subclause instanceof BehaviorAnnex)
+	  ba = (BehaviorAnnex) subclause;
+	else
+	{
+	  DefaultAnnexSubclause das = (DefaultAnnexSubclause)subclause;
+	  ba = (BehaviorAnnex) das.getParsedAnnexSubclause();
+	}
+	return _unparser.process(ba) ;
   }
 
   public AadlBaToCUnparser getUnparser()
