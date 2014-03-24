@@ -50,6 +50,20 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
     public RamsesExamplesWizardPage(String pageId)
     {
       super(pageId) ;
+      
+      File rootExamplePath ;
+      try
+      {
+        rootExamplePath = Aadl2Utils.getPluginFile(Activator.PLUGIN_ID,
+                                                          _EXAMPLE_ROOT_PATH) ;
+        String[][] items = new String[][]{{"arinc653", "common-components"}} ;
+        
+        super.setSelectedItems(items, rootExamplePath);
+      }
+      catch(Exception e)
+      {
+        reportError("examples not found",e) ;
+      }
     }
 
     @Override
@@ -58,7 +72,6 @@ public class RamsesExamplesWizard extends AadlBaExamplesWizard
     {
       File rootPath = Aadl2Utils.getPluginFile(Activator.PLUGIN_ID,
                                                examplesPath) ;
-      
       if (rootPath.isDirectory())
       {
         Map<String, List<Integer>> result = new HashMap<String, List<Integer>>();

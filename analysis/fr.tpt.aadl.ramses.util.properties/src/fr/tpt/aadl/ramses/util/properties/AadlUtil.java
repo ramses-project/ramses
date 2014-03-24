@@ -26,15 +26,12 @@ import java.util.ArrayList ;
 import java.util.Collections ;
 import java.util.List ;
 
-import org.eclipse.core.runtime.Platform ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.NamedValue ;
 import org.osate.aadl2.NumberValue ;
 import org.osate.aadl2.Property ;
-import org.osate.aadl2.PropertyConstant ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.Subprogram ;
 import org.osate.aadl2.SubprogramCall ;
