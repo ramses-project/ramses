@@ -59,6 +59,7 @@ import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DataSubcomponentType ;
 import org.osate.aadl2.DataType ;
 import org.osate.aadl2.DefaultAnnexLibrary ;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.EnumerationLiteral ;
 import org.osate.aadl2.Feature ;
@@ -1408,6 +1409,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           if(as instanceof BehaviorAnnex)
           {
             return (BehaviorAnnex) as ;
+          }
+          else
+          {
+        	DefaultAnnexSubclause das = (DefaultAnnexSubclause) as;
+        	AnnexSubclause potentialBa = das.getParsedAnnexSubclause();
+        	if(potentialBa instanceof BehaviorAnnex)
+        	  return (BehaviorAnnex) potentialBa; 
           }
         }
         if(object.getExtended() != null)
