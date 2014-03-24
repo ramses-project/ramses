@@ -155,7 +155,9 @@ public class DataClassifierUtil
         if (cc instanceof ComponentType)
         {
           ComponentType ct = (ComponentType) cc;
-          size = getSourceDataSizeInOctets (ct.getExtended());
+          ComponentType extended = (ComponentType) cc.getExtended();
+          if(extended!=null)
+            size = getSourceDataSizeInOctets (extended);
         }
       }
     }
@@ -190,7 +192,9 @@ public class DataClassifierUtil
         if (cc instanceof ComponentType)
         {
           ComponentType ct = (ComponentType) cc;
-          rep = getDataRepresentationImpl (ct.getExtended());
+          ComponentType extended = ct.getExtended();
+          if(extended!=null)
+        	rep = getDataRepresentationImpl (ct.getExtended());
         }
       }
     }

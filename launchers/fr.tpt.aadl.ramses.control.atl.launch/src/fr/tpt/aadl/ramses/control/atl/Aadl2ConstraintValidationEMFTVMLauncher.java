@@ -53,7 +53,6 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 			                                        String outputDirPathName,
 			                                        String resourceSuffix)
 	{
-		ResourceSet rs = inputResource.getResourceSet();
 		
 		String aadlFileName = inputResource.getURI().path();
 		if(aadlFileName.startsWith("file:"))

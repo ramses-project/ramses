@@ -47,16 +47,14 @@ public class AADLInspectorLauncher
 	
 	private final static String ENV_VAR = "AADLINSPECTOR_PATH";
 	
-	private final static String PATH = getPath();
-	private static String BIN_PATH;
-	private static String OUTPUT_FILE_PATH;
-	private static String extension = "";
+	private final String PATH = getPath();
+	private String BIN_PATH;
+	private String OUTPUT_FILE_PATH;
+	private String extension = "";
 	
-	private static Logger _LOGGER = Logger.getLogger(AADLInspectorLauncher.class) ;
+	private Logger _LOGGER = Logger.getLogger(AADLInspectorLauncher.class) ;
 	
-	private AADLInspectorLauncher() {}
-	
-	private static String getPath()
+	private String getPath()
 	{
 		String aIPath = System.getProperty(ENV_VAR);
 		if (aIPath == null)
@@ -73,7 +71,7 @@ public class AADLInspectorLauncher
 		return "";
 	}
 	
-	private static AnalysisResult launchAnalysis(String[] aadlModelsPath, 
+	private AnalysisResult launchAnalysis(String[] aadlModelsPath, 
 			                                         File outputDir,
 			                                         String mode,
 			                                         SystemInstance model)
@@ -172,7 +170,7 @@ public class AADLInspectorLauncher
     }
 	}
 	
-	public static AnalysisResult launchAnalysis(SystemInstance root,
+	public AnalysisResult launchAnalysis(SystemInstance root,
 	                                            File outputDir,
 	                                            String mode)
 	                                                throws AnalysisException
@@ -206,7 +204,7 @@ public class AADLInspectorLauncher
 		return launchAnalysis(modelList, outputDir, mode, root);
 	}
 	
-	private static void loadResourcePaths(PublicPackageSection pps, List<String> pathList)
+	private void loadResourcePaths(PublicPackageSection pps, List<String> pathList)
 	{
 		final List<ModelUnit> imports = pps.getImportedUnits();
 		for(ModelUnit u : imports)

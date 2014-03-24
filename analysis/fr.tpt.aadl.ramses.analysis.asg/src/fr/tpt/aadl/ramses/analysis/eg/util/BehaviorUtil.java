@@ -32,6 +32,7 @@ import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.CalledSubprogram ;
 import org.osate.aadl2.Classifier ;
+import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.IntegerLiteral ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.RangeValue ;
@@ -148,6 +149,11 @@ public class BehaviorUtil {
 	            if(annex instanceof BehaviorAnnex)
 	            {
 	              return (BehaviorAnnex) annex ;
+	            }
+	            else if(annex instanceof DefaultAnnexSubclause)
+	            {
+	              DefaultAnnexSubclause das = (DefaultAnnexSubclause) annex;
+	              return (BehaviorAnnex) das.getParsedAnnexSubclause();
 	            }
 	          }
 	    	  

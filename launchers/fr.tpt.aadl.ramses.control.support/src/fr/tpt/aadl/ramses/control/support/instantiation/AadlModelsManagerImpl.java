@@ -115,7 +115,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	 * @see AadlModelsManagerImpl#serialize(Resource, String)
 	 */
 	@Override
-	  public void serialize(Resource transfoResult,
+	public synchronized void serialize(Resource transfoResult,
 	                        String targetFileName)
   {
     // serialization code

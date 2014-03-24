@@ -2622,7 +2622,7 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    * @param obj
    *            Element
    */
-  private void unparse(Element obj)
+  synchronized private void unparse(Element obj)
   {
     process(obj) ;
   }

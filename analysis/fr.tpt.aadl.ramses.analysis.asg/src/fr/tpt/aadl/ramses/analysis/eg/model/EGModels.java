@@ -21,8 +21,10 @@
 
 package fr.tpt.aadl.ramses.analysis.eg.model;
 
+import java.util.ArrayList;
 import java.util.Collection ;
 import java.util.HashMap ;
+import java.util.List;
 import java.util.Map ;
 import java.util.Map.Entry ;
 import java.util.Set ;
@@ -77,16 +79,27 @@ public class EGModels {
 	  return clone;
 	}
 	
-	public void reduce()
+	
+	public Map<ComponentInstance, List<EGNode>> reduce()
 	{
-	  for(ComponentInstance c : threadToNode.keySet())
-    {
-	    _LOGGER.debug("Reduction for thread " + c.getName());
-	    EGNode n = threadToNode.get(c);
-	    n.merge();
-	    n.merge();
-	    n.getBlockEnd().addNext(new EGNode("thread_end"));
-    }
+		Map<ComponentInstance, List<EGNode>> res =
+				new HashMap<ComponentInstance, List<EGNode>>();
+		for(ComponentInstance c : threadToNode.keySet())
+		{
+			EGNode n = threadToNode.get(c);
+			n.merge();
+
+			List<EGNode> l = new ArrayList<EGNode>();
+			n.EG2SequenceList(l);
+			n.UpdateEndBlock(l);
+			for(EGNode iter : l)
+			{
+				iter.merge();
+				iter.getBlockEnd().addNext(new EGNode("thread_end"));
+			}
+			res.put(c, l);
+		}
+		return res;
 	}
 	
 	public double getWCETFromPropertyInMs (ComponentInstance thread)

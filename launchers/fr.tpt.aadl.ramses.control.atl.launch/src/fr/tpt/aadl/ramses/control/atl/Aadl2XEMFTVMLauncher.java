@@ -54,6 +54,7 @@ import org.osate.aadl2.PropertySet;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess;
+import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
@@ -67,6 +68,16 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 
 	protected ExecEnv env;
 
+	protected ResourceSet rs = new ResourceSetImpl();
+	private HookAccessImpl atlHook;
+ 	
+	public HookAccessImpl getAtlHook()
+	{
+	  return atlHook;
+	}
+
+	
+	
 	protected String outputPackageName = "";
 	
 	protected abstract void registerDefaultTransformationModules();
@@ -105,8 +116,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
   {
     _modelInstantiator = modelInstantiator ;
     _predefinedResourcesManager = predefinedResourcesManager ;
-    initTransformation() ;
-    env = pool.getExecEnv();
+    
+    env = EmftvmFactory.eINSTANCE.createExecEnv();
+    initTransformation(env) ;
   }
 	
 	public String getOutputPackageName() {
@@ -141,6 +153,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		td.finishLoading();
 		env.run(td);
 		td.finish();
+		//pool.returnExecEnv(env);
 
 		// Save the resulting model
 		if(System.getProperty("DEBUG")!=null)
@@ -223,7 +236,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
             "/ATLHook.atlhooks") ;
     ResourceSet set = new ResourceSetImpl() ;
     Resource hookResource = set.createResource(fileURI) ;
-    HookAccess atlHook = AtlHooksFactory.eINSTANCE.createHookAccess() ;
+    atlHook = (HookAccessImpl) AtlHooksFactory.eINSTANCE.createHookAccess() ;
     atlHook.setOutputPackageName(outputPackageName);
     hookResource.getContents().add(atlHook) ;
     

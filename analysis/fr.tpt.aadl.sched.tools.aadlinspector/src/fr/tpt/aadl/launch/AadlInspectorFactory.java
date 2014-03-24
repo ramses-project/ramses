@@ -32,6 +32,6 @@ public class AadlInspectorFactory implements AnalyzerFactory
   public Analyzer createAnalyzer(AadlModelInstantiatior modelInstantiatior,
                                  PredefinedAadlModelManager predefinedAadlModels)
   {
-    return new AADLInspectorSchedulingAnalysis() ;
+    return new AADLInspectorSchedulingAnalysis(modelInstantiatior, predefinedAadlModels) ;
   }
 }

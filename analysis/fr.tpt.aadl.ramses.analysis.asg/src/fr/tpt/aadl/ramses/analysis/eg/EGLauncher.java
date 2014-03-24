@@ -32,6 +32,7 @@ import org.osate.aadl2.SubprogramClassifier ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.ramses.analysis.eg.ba.BA2EG ;
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
@@ -40,19 +41,20 @@ import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.analysis.eg.seq.CallSequence2EG ;
 import fr.tpt.aadl.ramses.analysis.eg.util.BehaviorUtil ;
 import fr.tpt.aadl.ramses.analysis.eg.util.DoubleRange ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
 
 public class EGLauncher {
 
-	private final SystemInstance root;
+	private final ComponentInstance cpu;
 	private EGModels models = new EGModels();
 	
 	private static EGLauncher instance = null;
 	
 	private static Logger _LOGGER = Logger.getLogger(EGLauncher.class) ;
 	
-	public EGLauncher(SystemInstance root)
+	public EGLauncher(ComponentInstance cpu)
 	{
-		this.root = root;
+		this.cpu = cpu;
 		instance = this;
 	}
 	
@@ -63,18 +65,43 @@ public class EGLauncher {
 	
 	/**
 	 * Launch execution graph analysis for all thread components in the model.
+	 * @throws AnalysisException 
 	 */
-	public EGModels launch()
+	public EGModels launch() throws AnalysisException
 	{
 		models = new EGModels();
-		for(ComponentInstance c : root.getAllComponentInstances())
+		for(ComponentInstance c : cpu.getSystemInstance().getAllComponentInstances())
 		{
 			if (c.getCategory() == ComponentCategory.THREAD)
 			{
-				doThreadAnalysis(c);
+				List<ComponentInstance> bindedExecUnitList =
+		                PropertyUtils
+		                      .getComponentInstanceList(c,
+		                                                "Actual_Processor_Binding") ;
+				if(bindedExecUnitList.size()==1)
+				{
+					ComponentInstance exec = bindedExecUnitList.get(0);
+					if(isContainedBy(cpu, exec))
+						doThreadAnalysis(c);
+				}
+				else
+					throw new AnalysisException("Thread instance "+c.getName()+
+							" is deployed on several execution units (processor or " +
+							"virtual processo components)");
+				
 			}
 		}
 		return models;
+	}
+	
+	private boolean isContainedBy(ComponentInstance container, ComponentInstance content) {
+		if(container.equals(content))
+			return true;
+		else
+			if(container==null || content.eContainer() instanceof SystemInstance)
+				return false;
+			else
+				return isContainedBy(container, (ComponentInstance) content.eContainer());
 	}
 	
 	public EGModels lastLaunchResults()
@@ -148,11 +175,14 @@ public class EGLauncher {
 	  double bcet = 0;
 	  double wcet = 0;
 	  DoubleRange range = BehaviorUtil.getComputeExecutionTimeInMs(entry);
-    bcet = range.getMin();
-    wcet = range.getMax();
+	  if(range!=null)
+	  {
+	    bcet = range.getMin();
+        wcet = range.getMax();
+	  }
 	  
 	  EGNode nCompute = new EGNode ("No_Behavior_Call_" + entry.getName());
-    nCompute.setBCET(bcet);
+      nCompute.setBCET(bcet);
 	  nCompute.setWCET(wcet);
     return nCompute;
 	}

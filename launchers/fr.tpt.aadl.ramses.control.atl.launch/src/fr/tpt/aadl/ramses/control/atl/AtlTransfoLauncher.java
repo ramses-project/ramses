@@ -33,6 +33,7 @@ import org.eclipse.m2m.atl.core.emf.EMFModel ;
 import org.eclipse.m2m.atl.core.emf.EMFModelFactory ;
 import org.eclipse.m2m.atl.core.emf.EMFReferenceModel ;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
+import org.eclipse.m2m.atl.emftvm.ExecEnv;
 import org.eclipse.m2m.atl.emftvm.Metamodel;
 import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl;
 import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
@@ -44,6 +45,7 @@ import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
 import org.osate.ba.aadlba.AadlBaPackage;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage;
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
 
 /**
  * This abstract class specifies the methods and resources of an ATL
@@ -55,7 +57,7 @@ public abstract class AtlTransfoLauncher
    * injector is an object for injecting objects to the ATL runtime. 
    */
   protected static final EMFInjector injector = new EMFInjector() ;
-  protected static final ExecEnvPool pool =  new ExecEnvPool();
+  //protected static final ExecEnvPool pool =  new ExecEnvPool();
 
   // Load the input file resource
   private static final EMFModelFactory factory = new EMFModelFactory() ;
@@ -69,16 +71,18 @@ public abstract class AtlTransfoLauncher
 			org.osate.aadl2.instance.InstancePackage.eNS_URI ;
   private static final String ATLHOOKS_MM_URI = AtlHooksPackage.eNS_URI ;
 	
+  private static final String REDUCEDBA_MM_URI = ReducedbaPackage.eNS_URI ;
+  
   private static final String ERROR_REPORTER_URI = 
 			"http://fr.tpt.aadl.ramses.constraints.vilation.reporter";
   
   private static boolean initialized=false;
   
-  public static void initTransformation()
+  public static void initTransformation(ExecEnv env)
   {
-	  if(initialized)
-		  return;
-	  initialized = true;
+//	  if(initialized)
+//		  return;
+//	  initialized = true;
 	  EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
 				org.osate.aadl2.Aadl2Package.eINSTANCE) ;
 		EPackage.Registry.INSTANCE.put(ATLHOOKS_MM_URI, AtlHooksPackage.eINSTANCE) ;
@@ -95,22 +99,25 @@ public abstract class AtlTransfoLauncher
 		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
 		.put("emftvm", new EMFTVMResourceFactoryImpl()) ;
 		
+		EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, 
+				fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE) ;
+		
 		
 		// Load metamodels
 	    // Load aadl instance metamodel 
 	    Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
 	    aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
-	    AtlTransfoLauncher.pool.registerMetaModel("AADLI", aadlInstanceMetaModel);
+	    env.registerMetaModel("AADLI", aadlInstanceMetaModel);
 
 	    // Load aadl+BA metamodel
 	    Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
 	    aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
-	    AtlTransfoLauncher.pool.registerMetaModel("AADLBA", aadlBaMetaModel);
+	    env.registerMetaModel("AADLBA", aadlBaMetaModel);
 
 	    // Load atlHooks metamodel
 	    Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
 	    atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
-	    AtlTransfoLauncher.pool.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
+	    env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
 
 		
 		
@@ -122,7 +129,12 @@ public abstract class AtlTransfoLauncher
 		Metamodel constraintValidationMetamodel = EmftvmFactory.eINSTANCE.createMetamodel();
 		constraintValidationMetamodel.setResource(
 				fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE.eResource());
-		AtlTransfoLauncher.pool.registerMetaModel("CV", constraintValidationMetamodel);
+		env.registerMetaModel("CV", constraintValidationMetamodel);
+		
+		Metamodel reducedBAMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		reducedBAMetaModel.setResource(
+				fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE.eResource());
+		env.registerMetaModel("REDUCEDBA", reducedBAMetaModel);
 		
   }
   

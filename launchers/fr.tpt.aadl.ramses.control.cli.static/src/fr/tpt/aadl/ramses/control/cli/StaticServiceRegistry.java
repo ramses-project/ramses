@@ -93,7 +93,9 @@ public class StaticServiceRegistry extends AbstractServiceRegistry implements Se
     _analyzers.put(EGAnalyzer.PLUGIN_NAME, new EGAnalyzer(modelInstantiatior,
                                                               predefinedAadlModels));
     
-    _analyzers.put(AADLInspectorSchedulingAnalysis.PLUGIN_NAME, new AADLInspectorSchedulingAnalysis());
+    _analyzers.put(AADLInspectorSchedulingAnalysis.PLUGIN_NAME, new AADLInspectorSchedulingAnalysis(modelInstantiatior,
+    		            predefinedAadlModels));
+    
     
     GeneratorFactory pokGeneratorFactory = new PokGeneratorFactory();
     GeneratorFactory oSEKGeneratorFactory =new OSEKGeneratorFactory();

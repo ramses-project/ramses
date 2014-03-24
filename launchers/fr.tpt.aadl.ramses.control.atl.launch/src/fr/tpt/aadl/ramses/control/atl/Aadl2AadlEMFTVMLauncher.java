@@ -133,7 +133,6 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			                                        String outputDirPathName,
 			                                        String resourceSuffix)
 	{
-		ResourceSet rs = inputResource.getResourceSet();
 		
 		String aadlGeneratedFileName = inputResource.getURI().path();
 		if(aadlGeneratedFileName.startsWith("file:"))

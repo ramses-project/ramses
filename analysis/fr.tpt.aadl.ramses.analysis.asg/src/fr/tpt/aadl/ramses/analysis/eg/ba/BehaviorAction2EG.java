@@ -79,6 +79,7 @@ import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
 import fr.tpt.aadl.ramses.analysis.eg.context.SubprogramCallContext ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNodeKind ;
+import fr.tpt.aadl.ramses.analysis.eg.model.IOTime;
 import fr.tpt.aadl.ramses.analysis.eg.model.SystemProperties ;
 import fr.tpt.aadl.ramses.analysis.eg.util.BehaviorUtil ;
 import fr.tpt.aadl.ramses.analysis.eg.util.ClassifierUtil ;
@@ -362,7 +363,10 @@ public class BehaviorAction2EG
       final int defOctets = (int) ClassifierUtil.getFeatureSizeInOctets(sct, indexParam);
       final int octets = Math.max(valueOctets, defOctets);
       
-      double loadTime = sp.getAssignTimeInMs(thread).getTime(octets);
+      double loadTime = 0;
+      IOTime assignTime = sp.getAssignTimeInMs(thread);
+      if(assignTime!=null)
+    	  loadTime = assignTime.getTime(octets);
       
       String actionName = (copyParam ? "Assign_and_copy_" : "Assign_");
       
@@ -375,8 +379,14 @@ public class BehaviorAction2EG
       
       if (copyParam)
       {
-        double readTime = sp.getReadTimeInMs(thread).getTime(octets);
-        double writeTime = sp.getWriteTimeInMs(thread).getTime(octets);
+    	double readTime=0, writeTime=0;
+    	IOTime readIOTime = sp.getReadTimeInMs(thread);
+        if(readIOTime!=null)
+    	  readTime = readIOTime.getTime(octets);
+        
+        IOTime writeIOTime = sp.getWriteTimeInMs(thread); 
+        if(writeIOTime!=null)
+        	writeTime = writeIOTime.getTime(octets);
         
         if (!isInput)
         {

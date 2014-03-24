@@ -166,6 +166,10 @@ public class ClassifierUtil {
 			Parameter p = (Parameter) t;
 			return getDataClassifier(p.getDataFeatureClassifier());
 		}
+		else if (t instanceof DataClassifier)
+		{
+			return (DataClassifier) t;
+		}
 		else
 		{
 			return null;

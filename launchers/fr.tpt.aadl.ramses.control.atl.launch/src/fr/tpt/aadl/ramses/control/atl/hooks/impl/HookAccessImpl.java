@@ -47,6 +47,7 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.aadl2.instance.ConnectionInstance;
 import org.osate.aadl2.instance.InstanceObject;
+import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.parsesupport.LocationReference;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorElement ;
@@ -55,6 +56,7 @@ import org.osate.ba.aadlba.BehaviorTransition ;
 import org.osate.ba.utils.AadlBaLocationReference ;
 import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.Aadl2Utils ;
+import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
 import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning;
@@ -62,6 +64,7 @@ import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
 import fr.tpt.aadl.ramses.control.atl.hooks.utils.ComparablePortByCriticality ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
 
@@ -425,5 +428,53 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  _LOGGER.trace("\t"+o.toString()+": "+ msg);
 	return o;
   }
+  
+  private List<ComponentInstance> cpuToIgnore;
+    
+  public List<ComponentInstance> getCpuToIgnore()
+  {
+    return cpuToIgnore;
+  }
+   
+  public void resetCpuToIgnore(List<ComponentInstance> cpuList)
+  {
+    cpuToIgnore = cpuList;
+  }
+  
+  public boolean deployedOnIgnoredCpu(ComponentInstance c) throws AnalysisException
+  {
+    if(c instanceof SystemInstance)
+      return false;
+    if(c.getContainingComponentImpl()==null)
+      return false; // workaround bug in osate
+    List<ComponentInstance> execUnit =
+    		PropertyUtils
+    		.getComponentInstanceList(c,
+    				"Actual_Processor_Binding") ;
+    if(execUnit.size()==1)
+    {
+      ComponentInstance exec = execUnit.get(0);
+      if(isContainedBy(cpuToIgnore, exec))
+    	return true;
+    }
+    else
+      throw new AnalysisException("Thread instance "+c.getName()+
+    		  " is deployed on several execution units (processor or " +
+    		  "virtual processo components)");
+    return false;
+  }
+
+  private boolean isContainedBy(List<ComponentInstance> cpuToIgnore,
+		  ComponentInstance execUnit) 
+  {
+	if(cpuToIgnore.contains(execUnit))
+	  return true;
+	else
+	  if(execUnit.eContainer()==null || execUnit.eContainer() instanceof SystemInstance)
+		return false;
+	  else
+		return isContainedBy(cpuToIgnore, (ComponentInstance) execUnit.eContainer());
+  }
+
   
 } //HookAccessImpl

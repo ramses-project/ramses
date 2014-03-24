@@ -552,7 +552,9 @@ public class ValueExpressionUtil {
 		public double getLoadTimeInMs(ComponentInstance thread)
 		{
 			IOTime io = props.getAssignTimeInMs(thread);
-			return io.getTime(getSizeInOctets(thread));
+			if(io!=null)
+				return io.getTime(getSizeInOctets(thread));
+			return 0;
 		}
 	}
 	
@@ -582,12 +584,18 @@ public class ValueExpressionUtil {
 		public double getReadTimeInMs(ComponentInstance thread)
 		{
 			IOTime io = props.getReadTimeInMs(thread);
-			return io.getTime(getSizeInOctets(thread));
+			if(io!=null)
+			  return io.getTime(getSizeInOctets(thread));
+			else
+			  return 0;
 		}
 		public double getWriteTimeInMs(ComponentInstance thread)
 		{
 			IOTime io = props.getWriteTimeInMs(thread);
-			return io.getTime(getSizeInOctets(thread));
+			if(io!=null)
+				return io.getTime(getSizeInOctets(thread));
+			else
+				return 0;
 		}
 		
 		public static DataToken mergeFields (List<ExpressionToken> tokens, 

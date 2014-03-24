@@ -31,10 +31,26 @@ helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : 
 									)->collectSelfPropertyAssociationImg()
 ;
 
+
+
+-- @extends m_Component_Instance
+rule m_Component_Instance_Ignored {
+	from
+		c : AADLI!ComponentInstance 
+		(
+		  thisModule.theHOOK.deployedOnIgnoredCpu(c)
+		)
+}
+
+
 -- @extends m_Component_Instance
 rule m_Process_Instance {
 	from
-		c : AADLI!ComponentInstance (c.category = #process)
+		c : AADLI!ComponentInstance (
+			c.category = #process
+			and
+			not thisModule.theHOOK.deployedOnIgnoredCpu(c)
+		)
 	using
 	{
  		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
@@ -277,6 +293,8 @@ rule m_AddReducedBA
 			t.category = #thread
 			and
 			reducedBA.thread = t
+			and
+			not thisModule.theHOOK.deployedOnIgnoredCpu(t)
 		)
 	to
 		ba: AADLBA!BehaviorAnnex

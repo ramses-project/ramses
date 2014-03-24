@@ -92,25 +92,7 @@ public final class EGNode {
 	}
 	
 	private void setName(String name)
-	{
-	  int indexSep = name.lastIndexOf("_");
-	  if (indexSep != -1)
-	  {
-	    String suffix = name.substring(indexSep+1);
-	    try 
-	    { 
-	      Integer.parseInt(suffix);
-	      name = name.substring(0,indexSep);
-	    } 
-	    catch (NumberFormatException e)
-	    {
-	      String msg = RamsesException.formatRethrowMessage("cannot parse integer",
-	                                                        e);
-	      _LOGGER.error(msg, e);
-	      ServiceProvider.SYS_ERR_REP.error(msg, true);
-	    }
-	  }
-	  
+	{ 
 		this.name = name + "_" + instanceIndex;
 	}
 	
@@ -246,19 +228,46 @@ public final class EGNode {
 		}
 	}
 	
+	private boolean areMergable(List<EGNode> nextNodes) 
+	{
+		for(EGNode n: nextNodes)
+		{
+			EGNode iter = n;
+			while(iter.nextNodes.isEmpty()==false)
+			{
+				if(iter.kind.equals(EGNodeKind.CriticalSectionEnd))
+					return false;
+				if(iter.nextNodes.size()>1)
+				{
+					if(!areMergable(iter.nextNodes))
+						return false;
+					else
+						iter = iter.nextNodes.get(0).blockEnd;
+				}
+				else
+					iter = iter.nextNodes.get(0);
+			}
+		}
+		return true;
+	}
+
+
 	public boolean merge()
 	{
-	  boolean merged = false;
-	  
-	  if (nextNodes.size()>1)
+		boolean merged = false;
+
+		if (nextNodes.size()>1)
 		{
-			merged = mergeBranches();
+			if(areMergable(nextNodes))
+				merged = mergeBranches();
+			else
+				return false;
 		}
-	  if (nextNodes.isEmpty())
-    {
-      return merged;
-    }
-		
+		if (nextNodes.isEmpty())
+		{
+			return merged;
+		}
+
 	  EGNode next = nextNodes.get(0);
 		
 		if (this.isMergeable() && next.isMergeable())
@@ -294,4 +303,75 @@ public final class EGNode {
 	{
 	  return kind.isMergeable() && nextNodes.size()<2;
 	}
+	
+	public void EG2SequenceList(List<EGNode> l) {
+	  EGNode n = this;
+	  EGNode n2 = new EGNode(this);
+	  if(l.isEmpty())
+	    l.add(n2);
+	  else
+	  {
+		EGNode last = getLast(l.get(l.size()-1));
+		last.nextNodes.add(n2);
+	  }
+	  if(n.nextNodes.size()==1
+		&& n.nextNodes.get(0)!=n)
+	  {
+		n.nextNodes.get(0).EG2SequenceList(l);
+	  }
+	  if(n.nextNodes.size()>1)
+	  {
+		EGNode head = l.get(l.size()-1);
+	    EGNode savHead = EGNodeUtil.clone(head);
+	    for(EGNode nIter: n.nextNodes)
+	    {
+	      EGNode cloneHead = EGNodeUtil.clone(savHead);
+	      if(n.nextNodes.get(0).equals(nIter))
+	    	nIter.EG2SequenceList(l);
+	      else
+	      {
+	    	l.add(cloneHead);
+	    	nIter.EG2SequenceList(l);
+	      }
+	    }
+	  }
+	}
+
+	private EGNode getLast(EGNode egNode) {
+	  EGNode iter = egNode;
+	  while(!iter.nextNodes.isEmpty()
+			&& iter.nextNodes.get(0)!=iter)
+	  {
+		iter = iter.nextNodes.get(0);
+	  }
+	  return iter;
+	}
+
+	public void UpdateEndBlock(List<EGNode> l) {
+	  for(EGNode iter: l)
+	  {
+		EGNode last = getLast(iter);
+		last.setBlockEnd(last);
+		iter.setBlockEnd(last);
+		while(iter.nextNodes.get(0)!=last)
+		{
+		  iter = iter.nextNodes.get(0);
+		  iter.setBlockEnd(last);
+		}
+
+	  }
+	}
+
+	public boolean hasCapacity() {
+	  EGNode iter = this;
+	  while(!iter.nextNodes.isEmpty()
+			  && iter.nextNodes.get(0)!=iter)
+	  {
+		if(iter.wcet>0)
+		  return true;
+		iter = iter.nextNodes.get(0);
+	  }
+	  return false;
+	}
+	
 }

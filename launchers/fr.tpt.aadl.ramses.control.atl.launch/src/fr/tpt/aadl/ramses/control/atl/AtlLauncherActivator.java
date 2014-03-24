@@ -9,7 +9,7 @@ public class AtlLauncherActivator implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		System.out.println("Init ATL Launcher: start bundle");
-		AtlTransfoLauncher.initTransformation();
+		//AtlTransfoLauncher.initTransformation(env);
 	}
 
 	@Override
