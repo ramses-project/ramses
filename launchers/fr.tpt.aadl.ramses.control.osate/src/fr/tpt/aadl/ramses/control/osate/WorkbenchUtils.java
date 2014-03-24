@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IStatus ;
 import org.eclipse.core.runtime.MultiStatus ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.core.runtime.Status ;
+import org.eclipse.jface.dialogs.ErrorDialog ;
 import org.eclipse.jface.viewers.ISelection ;
 import org.eclipse.jface.viewers.IStructuredSelection ;
 import org.eclipse.swt.SWT ;
@@ -43,7 +44,6 @@ import org.eclipse.ui.IWorkbench ;
 import org.eclipse.ui.IWorkbenchPage ;
 import org.eclipse.ui.IWorkbenchWindow ;
 import org.eclipse.ui.PlatformUI ;
-import org.eclipse.ui.statushandlers.StatusManager ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 import org.osate.aadl2.modelsupport.errorreporting.MarkerAnalysisErrorReporter ;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
@@ -194,9 +194,9 @@ public class WorkbenchUtils
   public static void showGenerationReport()
   {
     SystemErrReporter errRep = ServiceProvider.SYS_ERR_REP  ;
-    StringBuffer sb = new StringBuffer() ;
-    IStatus status ;
-    int style = StatusManager.BLOCK ;
+    final StringBuffer sb = new StringBuffer() ;
+    final IStatus status ;
+//    int style = StatusManager.BLOCK ;
     int code = IStatus.INFO ;
     sb.append("Code generation was successfully done") ;
    
@@ -235,7 +235,7 @@ public class WorkbenchUtils
       }
        
       status = tmp ;
-      style |= StatusManager.LOG ; 
+//      style |= StatusManager.LOG ; 
       
       errRep.clearErrorsAndWarnings();
     }
@@ -244,6 +244,12 @@ public class WorkbenchUtils
       status = new Status(code, Activator.PLUGIN_ID, sb.toString()) ;
     }
     
-    StatusManager.getManager().handle(status, style);
+    // Eclipse bug on the window title (display "problem occured").
+//    StatusManager.getManager().handle(status, style);
+    Display.getDefault().syncExec(new Runnable() {
+      public void run() {
+        ErrorDialog.openError(null, "final report", null, status) ;
+      }
+   });
   }
 }
