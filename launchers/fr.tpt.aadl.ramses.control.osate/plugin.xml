@@ -4,9 +4,10 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            name="RAMSES Build"
             class="fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage"
-            id="fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage">
+            icon="icons/RAMSES.gif"
+            id="fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage"
+            name="RAMSES Configuration">
          <enabledWhen>
             <instanceof
                   value="org.eclipse.core.resources.IProject">
@@ -16,6 +17,12 @@
 	           name="nature"
 	           value="org.osate.core.aadlnature">
 	     </filter>
+      </page>
+      <page
+            category="fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage"
+            class="fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage"
+            id="fr.tpt.aadl.ramses.control.osate.ramses.log"
+            name="Logging configuration">
       </page>
    </extension>
 

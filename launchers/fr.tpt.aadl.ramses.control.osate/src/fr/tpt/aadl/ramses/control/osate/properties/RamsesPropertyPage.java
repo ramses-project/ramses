@@ -86,7 +86,7 @@ public class RamsesPropertyPage extends PropertyPage {
   private Button target;
   private Text runtimePathText;
   private Label selectedPathLabel;
-  
+  private RamsesConfiguration _config;
   private IProject _project ;
   
   private static Logger _LOGGER = Logger.getLogger(RamsesPropertyPage.class) ;
@@ -98,18 +98,14 @@ public class RamsesPropertyPage extends PropertyPage {
     super();
   }
 
-  private RamsesConfiguration loadConfig()
+  private void loadConfig()
   {
     try
     {
       _project = (IProject) getElement() ;
-      
-      return fetchProperties(_project) ;
-    }
-    catch (ConfigurationException ee)
-    {
-      // Missing configuration or first time configuration.
-      return new RamsesConfiguration() ;
+      if(_config==null)
+    	_config =  new RamsesConfiguration() ;
+      fetchProperties(_project, _config) ;
     }
     catch(Exception e)
     {
@@ -240,14 +236,14 @@ public class RamsesPropertyPage extends PropertyPage {
     data.grabExcessHorizontalSpace = true;
     composite.setLayoutData(data);
 
-    RamsesConfiguration config = loadConfig() ; 
+    loadConfig() ; 
     
     addInformationSection(composite);
     addSeparator(composite);
     addSeparator(composite);
-    addOutputDirectorySection(composite, config);
+    addOutputDirectorySection(composite, _config);
     addSeparator(composite);
-    addTargetSection(composite, config);
+    addTargetSection(composite, _config);
     
     return composite;
   }
@@ -502,7 +498,7 @@ public class RamsesPropertyPage extends PropertyPage {
     ServiceProvider.SYS_ERR_REP.error(msg.toString(), false);
   }
   
-  private static String fetchPropertiesValue(IProject project,
+  public static String fetchPropertiesValue(IProject project,
                                              String property) throws
                                                            CoreException
   {
@@ -512,11 +508,10 @@ public class RamsesPropertyPage extends PropertyPage {
     return value ;
   }
   
-  public static RamsesConfiguration fetchProperties(IProject project) throws
+  public static void fetchProperties(IProject project, RamsesConfiguration result) throws
                                                                    CoreException,
                                                                    ConfigurationException
   {
-    RamsesConfiguration result = new RamsesConfiguration() ;
     ConfigStatus status ;
     
     status = result.setOutputDir(fetchPropertiesValue(project, OUTPUT_DIR)) ;
@@ -537,7 +532,6 @@ public class RamsesPropertyPage extends PropertyPage {
       throw new ConfigurationException(status) ;
     }
     
-    return result ;
   }
   
   // Return false if user has canceled.

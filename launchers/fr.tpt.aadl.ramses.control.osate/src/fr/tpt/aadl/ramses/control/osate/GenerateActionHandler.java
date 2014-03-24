@@ -57,6 +57,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
@@ -83,7 +84,7 @@ public class GenerateActionHandler extends AbstractHandler {
   
   // Call init method to setup these attributes.
   private boolean _isOutline = false ;
-  private RamsesConfiguration _config = null ;
+  private RamsesConfiguration _config = new RamsesConfiguration() ;
   private IProject _currentProject = null ;
   private ExecutionEvent _event = null ;
   
@@ -101,14 +102,16 @@ public class GenerateActionHandler extends AbstractHandler {
       // Fetch RAMSES configuration.
       try
       {
-        _config = RamsesPropertyPage.fetchProperties(_currentProject) ;
+        RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
+        LoggingConfigPage.fetchLoggingProperties(_currentProject);
       }
       catch (ConfigurationException ee)
       {
         if(RamsesPropertyPage.openPropertyDialog(_currentProject))
         {
           // Reload configuration.
-          _config = RamsesPropertyPage.fetchProperties(_currentProject) ;
+          RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
+          LoggingConfigPage.fetchLoggingProperties(_currentProject);
         }
         else // User has canceled.
         {
