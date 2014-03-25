@@ -62,12 +62,13 @@ public class Activator extends AbstractUIPlugin {
 	// Print a session logging header.
     getLog().log(new Status(IStatus.OK, "Starting RAMSES plugin suite ...",
                             "RAMSES starting ...")); ;
-    /*** hard set logging level ***/
-    // TODO let the user choose the logging level: implement a gui ???
-    // DEBUG level is set to DEBUG.
+    
+    // Set the level to FATAL for the plugin activation. Later, RAMSES will
+    // will set the level to the user configuration.
     String lvl = "FATAL" ;
-    RamsesConfiguration.setupLogging(lvl, Platform.getLogFileLocation().toFile());
-                            
+    RamsesConfiguration.setupLogging(lvl, 
+                                     Platform.getLogFileLocation().toFile(),
+                                     false);
 	  try
 		{
 		  super.start(context);

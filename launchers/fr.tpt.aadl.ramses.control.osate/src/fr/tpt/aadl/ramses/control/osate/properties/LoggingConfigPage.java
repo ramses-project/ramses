@@ -1,22 +1,25 @@
 package fr.tpt.aadl.ramses.control.osate.properties;
 
-import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.dialogs.PropertyPage;
+import java.io.File ;
 
-import fr.tpt.aadl.ramses.control.support.config.ConfigurationException;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
+import org.apache.log4j.Logger ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.runtime.CoreException ;
+import org.eclipse.core.runtime.Platform ;
+import org.eclipse.core.runtime.QualifiedName ;
+import org.eclipse.jface.preference.PreferencePage ;
+import org.eclipse.swt.SWT ;
+import org.eclipse.swt.layout.GridData ;
+import org.eclipse.swt.layout.GridLayout ;
+import org.eclipse.swt.widgets.Button ;
+import org.eclipse.swt.widgets.Composite ;
+import org.eclipse.swt.widgets.Control ;
+import org.eclipse.swt.widgets.Label ;
+import org.eclipse.ui.dialogs.PropertyPage ;
+
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class LoggingConfigPage extends PropertyPage {
 
@@ -87,23 +90,22 @@ public class LoggingConfigPage extends PropertyPage {
 		int i=-1;
 		if(value == null || value.isEmpty())
 		  value = DEFAULT_LOGGING_LEVEL;
-		else
-		{
-		  if(value.equalsIgnoreCase("TRACE"))
-			  i=0;
-		  else if(value.equalsIgnoreCase("DEBUG"))
-			  i=1;
-		  else if(value.equalsIgnoreCase("INFO"))
-			  i=2;
-		  else if(value.equalsIgnoreCase("WARNING"))
-			  i=3;
-		  else if(value.equalsIgnoreCase("ERROR"))
-			  i=4;
-		  else if(value.equalsIgnoreCase("FATAL"))
-			  i=5;
-		  else if(value.equalsIgnoreCase("OFF"))
-			  i=6;
-		}
+		
+		if(value.equalsIgnoreCase("TRACE"))
+      i=0;
+    else if(value.equalsIgnoreCase("DEBUG"))
+      i=1;
+    else if(value.equalsIgnoreCase("INFO"))
+      i=2;
+    else if(value.equalsIgnoreCase("WARNING"))
+      i=3;
+    else if(value.equalsIgnoreCase("ERROR"))
+      i=4;
+    else if(value.equalsIgnoreCase("FATAL"))
+      i=5;
+    else if(value.equalsIgnoreCase("OFF"))
+      i=6;
+		
 		radioButtons[i].setSelection(true);
 	}
 	
@@ -194,8 +196,11 @@ public class LoggingConfigPage extends PropertyPage {
 		  String lvl = RamsesPropertyPage.fetchPropertiesValue(project,LOGGING_LEVEL);
 		  if(lvl == null || lvl.isEmpty())
 			  lvl = DEFAULT_LOGGING_LEVEL;
-		  RamsesConfiguration.setupLogging(
-				  lvl,
-				  Platform.getLogFileLocation().toFile());
+		  
+		  File osateLogFile = Platform.getLogFileLocation().toFile() ;
+	    File dir = osateLogFile.getParentFile() ;
+	    File ramsesLogFile = new File(dir + File.separator + Names.LOGGING_FILENAME) ;
+		  
+		  RamsesConfiguration.setupLogging(lvl, ramsesLogFile, true);
       }
 }

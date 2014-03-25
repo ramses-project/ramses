@@ -103,7 +103,6 @@ public class GenerateActionHandler extends AbstractHandler {
       try
       {
         RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
-        LoggingConfigPage.fetchLoggingProperties(_currentProject);
       }
       catch (ConfigurationException ee)
       {
@@ -111,12 +110,17 @@ public class GenerateActionHandler extends AbstractHandler {
         {
           // Reload configuration.
           RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
-          LoggingConfigPage.fetchLoggingProperties(_currentProject);
         }
         else // User has canceled.
         {
           return null ;
         }
+      }
+      finally
+      {
+        // Only call once because it creates a log file.
+        LoggingConfigPage.fetchLoggingProperties(_currentProject);
+        _config.log() ;
       }
     }
     catch (Exception e) // Configuration and CoreException caught.

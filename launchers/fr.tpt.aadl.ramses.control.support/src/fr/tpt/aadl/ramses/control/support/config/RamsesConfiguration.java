@@ -24,10 +24,10 @@ package fr.tpt.aadl.ramses.control.support.config;
 import java.io.File ;
 import java.io.FileNotFoundException ;
 
+import org.apache.log4j.FileAppender ;
 import org.apache.log4j.Level ;
 import org.apache.log4j.Logger ;
 import org.apache.log4j.PatternLayout ;
-import org.apache.log4j.RollingFileAppender ;
 import org.osate.utils.FileUtils ;
 
 import fr.tpt.aadl.ramses.control.support.generator.AbstractAadlToAadl ;
@@ -327,19 +327,19 @@ public class RamsesConfiguration
   }
   
   /**
-   * Setup RAMSES logging system with the default log file : ./.ramses-log.
+   * Setup RAMSES logging system with the default log file : ./.ramses-log-date.
    * 
    * @see#setupLogging(String,File)
    * 
    * 
    * @param loggingLevel
    */
-  public static void setupLogging(String loggingLevel)
+  public static void setupLogging(String loggingLevel, boolean oneLogPerRun)
   {
     String currentDirectory = System.getProperty("user.dir") ;
     File logFile = new File(currentDirectory + File.separator + Names. 
                                                              LOGGING_FILENAME) ;
-    setupLogging(loggingLevel, logFile);
+    setupLogging(loggingLevel, logFile, oneLogPerRun);
   }
   
   
@@ -360,9 +360,10 @@ public class RamsesConfiguration
    * 
    * @param loggingLevel logging level
    * @param logFile the log file
+   * @param oneLogPerRun create a log file per run (maximum 10 files are kept)
    */
-  public static void setupLogging(String loggingLevel,
-                                  File logFile)
+  public static void setupLogging(String loggingLevel, File logFile,
+                                  boolean oneLogPerRun)
   {
     if(! (loggingLevel == null || loggingLevel.isEmpty() || logFile == null))
     {
@@ -393,15 +394,26 @@ public class RamsesConfiguration
       rootLogger.setLevel(lvl);
       
       // Configure Log4j.
-      RollingFileAppender ra = new RollingFileAppender() ;
+      FileAppender fa ;
+      
+      if(oneLogPerRun)
+      {
+        RunAppender ra = new RunAppender() ;
+        fa = ra ;
+        ra.setMaxBackupIndex(10);
+      }
+      else
+      {
+        fa = new FileAppender() ;
+      }
+      
       PatternLayout layout = new PatternLayout(layoutPattern) ;
-      ra.setLayout(layout);
-      ra.setFile(logFile.toString());
-      ra.setEncoding("UTF-8");
-      ra.activateOptions();
-      ra.setMaxBackupIndex(10);
-      ra.setMaxFileSize("5000KB");
-      rootLogger.addAppender(ra);
+      fa.setLayout(layout);
+      fa.setFile(logFile.toString());
+      fa.setEncoding("UTF-8");
+      fa.activateOptions();
+      
+      rootLogger.addAppender(fa);
       
       _LOGGER.info("logger is set to " + lvl.toString());
       IS_LOGGER_ON = true ;
@@ -412,5 +424,15 @@ public class RamsesConfiguration
       Logger.getRootLogger().setLevel(Level.OFF);
       IS_LOGGER_ON = false ;
     }
+  }
+
+  public void log()
+  {
+    _LOGGER.info("RAMSES resource directory is \'" + _RAMSES_RESOURCE_DIR + '\'') ;
+    _LOGGER.info("ATL resource directory is \'" + _ATL_RESOURCE_DIR + '\'') ;
+    _LOGGER.info("AADL resource directory is \'" + _AADL_PACKAGE_DIR + '\'') ;
+    _LOGGER.info("output directory is \'" + _outputDir + '\'') ;
+    _LOGGER.info("generation target is \'" + _targetId + '\'') ;
+    _LOGGER.info("runtime path is \'" + _runtimePath + '\'') ;
   }
 }

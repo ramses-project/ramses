@@ -386,7 +386,7 @@ public class ToolSuiteLauncherCommand
                                                    throws ConfigurationException 
   {
     String loggingOption = options.getString(LOGGING_OPTION_ID) ;
-    RamsesConfiguration.setupLogging(loggingOption) ;
+    RamsesConfiguration.setupLogging(loggingOption, true) ;
     String sessionHeader = createSessionHeader(args) ; 
     _logger.info(sessionHeader);
     

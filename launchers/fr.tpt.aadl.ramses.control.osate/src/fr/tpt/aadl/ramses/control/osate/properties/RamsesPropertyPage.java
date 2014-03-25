@@ -107,6 +107,11 @@ public class RamsesPropertyPage extends PropertyPage {
     	_config =  new RamsesConfiguration() ;
       fetchProperties(_project, _config) ;
     }
+    catch(ConfigurationException ee)
+    {
+      // Missing configuration or first time configuration.
+      _config = new RamsesConfiguration() ;
+    }
     catch(Exception e)
     {
       String msg = "cannot load RAMSES configuration" ;
