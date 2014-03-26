@@ -56,13 +56,17 @@ helper context AADLI!Element def: getContainerInstance(): AADLI!InstanceObject =
 	endif
 ;
 
+helper context AADLI!Property def: getAbsoluteName() : String = 
+	self.eContainer().getName()+'::'+self.name
+;
+
 rule m_PropertyAssociationAppliesToSelf { 
     from 
     	p : AADLI!PropertyAssociation in IN
 		(p.collectInstanceReferenceValue()->isEmpty())
     to
     	p2 : AADLBA!PropertyAssociation (
-    		property <- thisModule.getProperty(p.property.name),  
+    		property <- thisModule.getProperty(p.property.getAbsoluteName()),  
     		appliesTo <- p.appliesTo,
     		inBinding <- p.inBinding,
     		append <- p.append,
@@ -82,7 +86,7 @@ rule m_PropertyAssociationAppliesToParent {
 	}
     to
     	p2 : AADLBA!PropertyAssociation (
-    		property <- thisModule.getProperty(p.property.name),  
+    		property <- thisModule.getProperty(p.property.getAbsoluteName()),  
     		appliesTo <- Sequence{cne},
     		inBinding <- p.inBinding,
     		append <- p.append,

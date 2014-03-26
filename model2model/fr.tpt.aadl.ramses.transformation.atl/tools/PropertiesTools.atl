@@ -76,8 +76,17 @@ helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String)
 
 
 helper def : getProperty(propertyName : String) : AADLBA!Property =
-	AADLBA!PropertySet->allInstances()->collect(ps|ps.ownedProperty)
-						->flatten()->any(p|p.name.toLower()=propertyName.toLower())
+	if(propertyName.contains('::')) then
+		let index: Integer = propertyName.indexOf('::') in
+		let psName: String = propertyName.substring(1,index-1) in
+		let propName: String = propertyName.substring(index+2, propertyName.size()) in
+			AADLBA!PropertySet->allInstances()->select(ps| ps.name.toLower() = psName.toLower())
+											->collect(ps|ps.ownedProperty)
+											->flatten()->any(p|p.name.toLower()=propName.toLower())
+	else
+		AADLBA!PropertySet->allInstances()->collect(ps|ps.ownedProperty)
+					->flatten()->any(p|p.name.toLower()=propertyName.toLower())
+	endif
 ;
 
 helper context AADLBA!NamedElement def : getPropertyIntValue(
