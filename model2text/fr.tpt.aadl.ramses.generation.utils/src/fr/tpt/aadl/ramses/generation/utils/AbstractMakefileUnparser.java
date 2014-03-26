@@ -574,7 +574,10 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     {
       case Command.CANCEL:
       {
-        throw new OperationCanceledException() ;
+        logProcessTraces(process) ;
+        String msg = '\'' + cmd.getLabel() + "\' was canceled" ;
+        _LOGGER.trace(msg) ;
+        throw new OperationCanceledException(msg) ;
       }
       case Command.ERROR:
       {
@@ -605,18 +608,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
       }
       case Command.OK:
       {
-        InputStream is ;
-        is = process.getInputStream() ;
-        BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
-
-        String line = null ;
-        while((line = in.readLine()) != null)
-        {
-          _LOGGER.trace(line);
-        }
-        String msg = "Generated code was successfully built.\n" ;
+        logProcessTraces(process) ;
+        String msg = '\'' + cmd.getLabel() + "\' was successfully done" ;
         _LOGGER.info(msg);
-        
         break ;
       }
       default:
@@ -625,6 +619,20 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
+    }
+  }
+  
+  private static void logProcessTraces(Process process)
+                                                              throws IOException
+  {
+    InputStream is ;
+    is = process.getInputStream() ;
+    BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
+
+    String line = null ;
+    while((line = in.readLine()) != null)
+    {
+      _LOGGER.trace(line);
     }
   }
   
@@ -655,14 +663,23 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             return monitor.isCanceled() ;
           }
-          
+
+          @Override
+          public String getLabel()
+          {
+            return "make clean" ;
+          }
         } ;
 
         // Blocking.
         waitProcess(cmd, makeCleanProcess) ;
         
         if(monitor.isCanceled())
-          throw new OperationCanceledException() ;
+        {
+          String msg = "compilation has been canceled after make clean" ;
+          _LOGGER.trace(msg);
+          throw new OperationCanceledException(msg) ;
+        }
         
         final Process makeProcess =
             runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
@@ -682,6 +699,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           public boolean isCanceled()
           {
             return monitor.isCanceled() ;
+          }
+          
+          @Override
+          public String getLabel()
+          {
+            return "make all" ;
           }
         } ;
         

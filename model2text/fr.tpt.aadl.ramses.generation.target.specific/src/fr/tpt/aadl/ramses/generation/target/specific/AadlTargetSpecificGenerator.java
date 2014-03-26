@@ -161,7 +161,11 @@ public class AadlTargetSpecificGenerator implements Generator
     }
     
     if(monitor.isCanceled())
-      throw new OperationCanceledException() ;
+    {
+      String msg = "generation has been canceled after validation" ;
+      _LOGGER.trace(msg);
+      throw new OperationCanceledException(msg) ;
+    }
     
     if(_targetTrans != null)
     {
@@ -172,7 +176,11 @@ public class AadlTargetSpecificGenerator implements Generator
      r = inputResource;
     
     if(monitor.isCanceled())
-      throw new OperationCanceledException() ;
+    {
+      String msg = "generation has been canceled after transformation" ;
+      _LOGGER.trace(msg);
+      throw new OperationCanceledException(msg) ;
+    }
     
     _codeGen.generate(r, runtimeDir, outputDir, includeDirs, monitor) ;
   }
@@ -194,7 +202,11 @@ public class AadlTargetSpecificGenerator implements Generator
                                                   systemInstance.getName() +
                                                   ".ares") ;
     if(monitor.isCanceled())
-      throw new OperationCanceledException() ;
+    {
+      String msg = "generation has been canceled after analysis result" ;
+      _LOGGER.trace(msg);
+      throw new OperationCanceledException(msg) ;
+    }
 
     Resource r = systemInstance.eResource() ;
     if(_modelValidator != null)
@@ -218,7 +230,11 @@ public class AadlTargetSpecificGenerator implements Generator
     }
 
     if(monitor.isCanceled())
-      throw new OperationCanceledException() ;
+    {
+      String msg = "generation has been canceled after validation" ;
+      _LOGGER.trace(msg);
+      throw new OperationCanceledException(msg) ;
+    }
 
     SystemInstance currentInstance = systemInstance ;
     String rootModelId = xmlPilot.getInputModelId() ;
@@ -236,9 +252,6 @@ public class AadlTargetSpecificGenerator implements Generator
     
     while(xmlPilot.hasNextOperation())
     {
-      if(monitor.isCanceled())
-        throw new OperationCanceledException() ;
-      
       String operation = xmlPilot.getNextOperation() ;
       
       if(operation == null)
@@ -280,7 +293,15 @@ public class AadlTargetSpecificGenerator implements Generator
         _LOGGER.error(msg) ;
         ServiceProvider.SYS_ERR_REP.error(msg, true) ;
       }
-
+      
+      if(monitor.isCanceled())
+      {
+        String msg = "generation has been canceled after xml operation \'" +
+                     operation + '\'';
+        _LOGGER.trace(msg);
+        throw new OperationCanceledException(msg) ;
+      }
+      
       xmlPilot.goForward() ;
     }
   }

@@ -70,6 +70,7 @@ import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
 
 public class GenerateActionHandler extends AbstractHandler {
@@ -215,9 +216,6 @@ public class GenerateActionHandler extends AbstractHandler {
     
     instantiator.setProgressMonitor(monitor);
     
-    if(monitor.isCanceled())
-      throw new OperationCanceledException() ;
-    
     // For the executed command from outline menu,the system implementation 
     // root has to be instantiated prior to the code generation.
     if(_isOutline)
@@ -229,12 +227,20 @@ public class GenerateActionHandler extends AbstractHandler {
     // implementation has already been instantiated.
     
     if(monitor.isCanceled())
-      throw new OperationCanceledException() ;
+    {
+      String msg = "generation has been canceled after instantiation" ;
+      _LOGGER.trace(msg);
+      throw new OperationCanceledException(msg) ;
+    }
     
     generate(_currentProject, _sysInst, _config, monitor);
     
     if(monitor.isCanceled())
-      throw new OperationCanceledException() ;
+    {
+      String msg = "generation has been canceled after code generation" ;
+      _LOGGER.trace(msg);
+      throw new OperationCanceledException(msg) ;
+    }
     
     WorkbenchUtils.showGenerationReport() ;
   }
@@ -273,6 +279,24 @@ public class GenerateActionHandler extends AbstractHandler {
               }
               catch(OperationCanceledException e)
               {
+                StringBuilder sb = new StringBuilder() ;
+                sb.append(Names.NEW_LINE) ;
+                sb.append(Names.NEW_LINE) ;
+                sb.append("********************************************************************************") ;
+                sb.append(Names.NEW_LINE) ;
+                if(! (e.getMessage() == null || e.getMessage().isEmpty()))
+                {
+                  sb.append(e.getMessage()) ;
+                }
+                else
+                {
+                  sb.append("User has canceled") ;
+                }
+                sb.append(Names.NEW_LINE) ;
+                sb.append("********************************************************************************") ;
+                
+                _LOGGER.info(sb.toString());
+                
                 this.setLabel(_CANCEL_STATUS);
               }
               catch(Exception e)

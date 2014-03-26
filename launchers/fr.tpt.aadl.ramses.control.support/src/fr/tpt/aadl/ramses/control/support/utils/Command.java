@@ -11,4 +11,6 @@ public interface Command
   public int runBlockingCommand() throws Exception ;
   
   public boolean isCanceled() ;
+  
+  public String getLabel() ;
 }
