@@ -128,7 +128,7 @@ public class AadlToAdaRavenscarMakefileUnparser extends
   {
     super.process(system, runtimePath, outputDir, includeDirs, monitor) ;
     //generateMakefile((NamedElement) system, generatedFilePath) ;
-    executeMake(outputDir, runtimePath) ;
+    executeMake(outputDir, runtimePath, monitor) ;
   }
 
   @Override

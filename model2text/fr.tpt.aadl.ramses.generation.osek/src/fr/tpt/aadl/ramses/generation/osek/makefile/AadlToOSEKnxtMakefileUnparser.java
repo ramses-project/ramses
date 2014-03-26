@@ -223,7 +223,7 @@ public class AadlToOSEKnxtMakefileUnparser  extends AbstractAadlToCMakefileUnpar
   {
 	  super.process(system, runtimeDir, outputDir, includeDirs, monitor);
 	  generateMakefile((NamedElement) system, outputDir) ;
-		super.executeMake(outputDir, runtimeDir);
+		super.executeMake(outputDir, runtimeDir, monitor);
 	}
 
 	@Override

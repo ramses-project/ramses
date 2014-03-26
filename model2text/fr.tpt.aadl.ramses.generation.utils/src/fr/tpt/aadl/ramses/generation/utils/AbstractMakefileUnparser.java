@@ -14,6 +14,7 @@ import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.AnnexSubclause ;
@@ -45,7 +46,9 @@ import org.osate.ba.aadlba.SubprogramCallAction ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetBuilderGenerator ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.utils.Command ;
 import fr.tpt.aadl.ramses.control.support.utils.DependencyManager ;
+import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 
 public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
                                                implements TargetBuilderGenerator
@@ -560,60 +563,127 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     }
   }
   
-  public static void executeMake(File generatedFilePath, File runtimePath)
+  private static void waitProcess(Command cmd, Process process)
+                                                    throws InterruptedException,
+                                                                     IOException
   {
-    Runtime runtime = Runtime.getRuntime() ;
+    WaitMonitor waitMonitor = new WaitMonitor(cmd) ; 
+    waitMonitor.start();
+    int exitCode = waitMonitor.waitAndCheck(1000) ;
+    switch(exitCode)
+    {
+      case Command.CANCEL:
+      {
+        throw new OperationCanceledException() ;
+      }
+      case Command.ERROR:
+      {
+        String errMsg = "while compiling generated code: " ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+
+        InputStream is ;
+        is = process.getInputStream() ;
+        BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
+
+        String line = null ;
+        while((line = in.readLine()) != null)
+        {
+          _LOGGER.error(line);
+          ServiceProvider.SYS_ERR_REP.error(line, true);
+        }
+        is = process.getErrorStream() ;
+        in = new BufferedReader(new InputStreamReader(is)) ;
+        line = null ;
+        while((line = in.readLine()) != null)
+        {
+          _LOGGER.error(line);
+          ServiceProvider.SYS_ERR_REP.error(line, true);
+        }
+        
+        break ;
+      }
+      case Command.OK:
+      {
+        InputStream is ;
+        is = process.getInputStream() ;
+        BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
+
+        String line = null ;
+        while((line = in.readLine()) != null)
+        {
+          _LOGGER.trace(line);
+        }
+        String msg = "Generated code was successfully built.\n" ;
+        _LOGGER.info(msg);
+        
+        break ;
+      }
+      default:
+      {
+        String errMsg = "unknown exit code" ;
+        _LOGGER.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      }
+    }
+  }
+  
+  public static void executeMake(final File generatedFilePath, final File runtimePath,
+                                 final IProgressMonitor monitor)
+  {
     if(runtimePath != null && runtimePath.exists())
     {
       try
       {
-        Process makeCleanProcess =
-              runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
-                    " clean") ;
-        makeCleanProcess.waitFor() ;
-        Process makeProcess =
-              runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
-                    " all") ;
-        makeProcess.waitFor() ;
-        if(makeProcess.exitValue() != 0)
+        final Runtime runtime = Runtime.getRuntime() ;
+        final Process makeCleanProcess =
+            runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
+                " clean") ;
+        
+        Command cmd = new Command()
         {
-          String errMsg = "while compiling generated code: " ;
-          _LOGGER.error(errMsg);
-          ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-
-          InputStream is ;
-          is = makeProcess.getInputStream() ;
-          BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
-
-          String line = null ;
-          while((line = in.readLine()) != null)
+          @Override
+          public int runBlockingCommand() throws Exception
           {
-            _LOGGER.error(line);
-            ServiceProvider.SYS_ERR_REP.error(line, true);
+            int tmp = makeCleanProcess.waitFor() ;
+            
+            return (tmp == 0) ? Command.OK : Command.ERROR ;
           }
-          is = makeProcess.getErrorStream() ;
-          in = new BufferedReader(new InputStreamReader(is)) ;
-          line = null ;
-          while((line = in.readLine()) != null)
+
+          @Override
+          public boolean isCanceled()
           {
-            _LOGGER.error(line);
-            ServiceProvider.SYS_ERR_REP.error(line, true);
+            return monitor.isCanceled() ;
           }
-        }
-        else
+          
+        } ;
+
+        // Blocking.
+        waitProcess(cmd, makeCleanProcess) ;
+        
+        final Process makeProcess =
+            runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
+                         " all") ;
+        
+        cmd = new Command()
         {
-          InputStream is ;
-          is = makeProcess.getInputStream() ;
-          BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
-
-          String line = null ;
-          while((line = in.readLine()) != null)
+          @Override
+          public int runBlockingCommand() throws Exception
           {
-            _LOGGER.trace(line);
+            int tmp = makeProcess.waitFor() ;
+            
+            return (tmp == 0) ? Command.OK : Command.ERROR ;
           }
-          String msg = "Generated code was successfully built.\n" ;
-          _LOGGER.info(msg);
-        }
+
+          @Override
+          public boolean isCanceled()
+          {
+            return monitor.isCanceled() ;
+          }
+        } ;
+        
+        // Blocking.
+        waitProcess(cmd, makeProcess) ;
       }
       catch(IOException ex)
       {
