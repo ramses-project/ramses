@@ -172,7 +172,7 @@ subprogram Store_Received_Message
 features 
    Thread_Interface : in parameter Thread_Interface_Type;
    From             : in parameter Entity_Type;
-   Time_Stamp       : in parameter Time_Stamp; 
+   Time_Stamp       : in parameter Timestamp; 
 properties
    programming_properties::source_name => "Store_Received_Message";
    programming_properties::source_text => ("polyorb-hi-ada/polyorb_hi-thread_interrogators.ads");
@@ -285,7 +285,7 @@ prototypes
 features
   this : requires data access Global_Queue.Impl;
   Port_Type : requires data access data_type;
-  Time_Stamp : in parameter Time_Stamp;
+  Time_Stamp : in parameter Timestamp;
 properties
    programming_properties::source_name => "Store_In";
    programming_properties::source_text => ("polyorb-hi-ada/polyorb_hi-thread_interrogators.adb");
@@ -297,7 +297,7 @@ prototypes
 features
   this : requires data access Global_Queue.Impl;
   Port_Type : requires data access data_type;
-  Time_Stamp : in parameter Time_Stamp;
+  Time_Stamp : in parameter Timestamp;
 properties
    programming_properties::source_name => "Store_Out";
    programming_properties::source_text => ("polyorb-hi-ada/polyorb_hi-thread_interrogators.adb");
