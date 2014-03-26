@@ -572,13 +572,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     int exitCode = waitMonitor.waitAndCheck(500) ;
     switch(exitCode)
     {
+      // Process is not terminated but the user has canceled it.
       case Command.CANCEL:
       {
-        process.destroy();
+        process.destroy(); // We have to destroy the process as it is still running. 
         String msg = '\'' + cmd.getLabel() + "\' was canceled" ;
         _LOGGER.trace(msg) ;
         throw new OperationCanceledException(msg) ;
       }
+      
+      // Process has terminated without been canceled but with an error (exit code != 0).
       case Command.ERROR:
       {
         String errMsg = "while compiling generated code: " ;
@@ -606,6 +609,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         
         break ;
       }
+      
+      // Process is terminated and was not canceled.
       case Command.OK:
       {
         logProcessTraces(process) ;
