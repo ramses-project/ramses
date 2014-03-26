@@ -661,6 +661,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         // Blocking.
         waitProcess(cmd, makeCleanProcess) ;
         
+        if(monitor.isCanceled())
+          throw new OperationCanceledException() ;
+        
         final Process makeProcess =
             runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
                          " all") ;
