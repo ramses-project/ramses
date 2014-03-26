@@ -116,7 +116,6 @@ public class AadlTargetSpecificCodeGenerator
     generatedCodeDirectory.mkdir() ;
 
     monitor.subTask("Code generation ..."); 
-//  RamsesConfiguration.waitUnitOfTime(1);
     
     for(SystemImplementation sys: systemImplementationList)
     {

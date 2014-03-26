@@ -51,9 +51,8 @@ public class ProgressMonitorWrapper extends AbstractProgressMonitor
   @Override
   public void done()
   {
-    if(_isNotCanceled)
+    if(false == _monitor.isCanceled())
     {
-      _isNotCanceled = false ; // According to the IProgressMonitor definition.
       _monitor.done();
       String msg = super.formatDone(_mainTask) ;
       _logger.info(msg) ;
@@ -69,17 +68,16 @@ public class ProgressMonitorWrapper extends AbstractProgressMonitor
   @Override
   public boolean isCanceled()
   {
-    return false == _isNotCanceled ;
+    return _monitor.isCanceled() ;
   }
 
   @Override
   public void setCanceled(boolean value)
   {
-    if(_isNotCanceled)
+    if(false == _monitor.isCanceled())
     {
       if(value)
       {
-        _isNotCanceled = false ;
         _monitor.setCanceled(true);
         String msg = super.formatCanceled(_mainTask) ;
         _logger.info(msg) ;
@@ -98,7 +96,7 @@ public class ProgressMonitorWrapper extends AbstractProgressMonitor
   @Override
   public void subTask(String name)
   {
-    if(_isNotCanceled)
+    if(false == _monitor.isCanceled())
     {
       _monitor.subTask(name) ;
       String msg = super.formatSubTask(name) ;
@@ -109,7 +107,7 @@ public class ProgressMonitorWrapper extends AbstractProgressMonitor
   @Override
   public void worked(int work)
   {
-    if(_isNotCanceled)
+    if(false == _monitor.isCanceled())
     {
       _monitor.worked(work);
       String msg = super.formatWorked(work, _totalWork) ;

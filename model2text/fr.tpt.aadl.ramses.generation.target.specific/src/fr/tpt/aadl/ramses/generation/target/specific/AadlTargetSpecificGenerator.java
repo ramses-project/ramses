@@ -28,6 +28,7 @@ import java.util.Map ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -137,7 +138,6 @@ public class AadlTargetSpecificGenerator implements Generator
                        IProgressMonitor monitor) throws GenerationException,
                                                         TransformationException
   {
-	
     Resource inputResource = systemInstance.eResource() ;
     Resource r;
     if(_modelValidator != null)
@@ -148,25 +148,31 @@ public class AadlTargetSpecificGenerator implements Generator
     	{
     	  for(EObject err : r.getContents())
     	  {
-    		if(err instanceof fr.tpt.aadl.ramses.constraintsreporter.Error)
-    		{
-    		  fr.tpt.aadl.ramses.constraintsreporter.Error constraintError =
-    						(fr.tpt.aadl.ramses.constraintsreporter.Error) err;
-    		  errManager.error((Element) constraintError.getObject(), 
-    						constraintError.getMessage());
-    		}
-    	  }
-    	  return;
+          if(err instanceof fr.tpt.aadl.ramses.constraintsreporter.Error)
+          {
+            fr.tpt.aadl.ramses.constraintsreporter.Error constraintError =
+                            (fr.tpt.aadl.ramses.constraintsreporter.Error) err ;
+            errManager.error((Element) constraintError.getObject(),
+                             constraintError.getMessage()) ;
+          }
+        }
+        return ;
     	}
     }
+    
+    if(monitor.isCanceled())
+      throw new OperationCanceledException() ;
+    
     if(_targetTrans != null)
     {
       monitor.subTask("Model transformation (refinement) ..."); 
-//      RamsesConfiguration.waitUnitOfTime(1);
       r = _targetTrans.transform(inputResource, outputDir, monitor);
     }
     else
      r = inputResource;
+    
+    if(monitor.isCanceled())
+      throw new OperationCanceledException() ;
     
     _codeGen.generate(r, runtimeDir, outputDir, includeDirs, monitor) ;
   }
@@ -182,84 +188,100 @@ public class AadlTargetSpecificGenerator implements Generator
                                                                 TransformationException,
                                                                 AnalysisException
   {
-	if(_analysisResults==null)
-	  _analysisResults = AnalysisUtils.createNewAnalysisArtifact(outputDir.getAbsolutePath()+systemInstance.getName()+".ares");
-	
-	Resource r = systemInstance.eResource() ;
-	if(_modelValidator != null)
+    if(_analysisResults == null)
+      _analysisResults = AnalysisUtils.createNewAnalysisArtifact(
+                                                  outputDir.getAbsolutePath() +
+                                                  systemInstance.getName() +
+                                                  ".ares") ;
+    if(monitor.isCanceled())
+      throw new OperationCanceledException() ;
+
+    Resource r = systemInstance.eResource() ;
+    if(_modelValidator != null)
     {
-      monitor.subTask("Model validation: check compatibility for refinement.");
-      Resource errRes = _modelValidator.validate(r, errManager, monitor);
-      if(false==errRes.getContents().isEmpty())
+      monitor.subTask("Model validation: check compatibility for refinement.") ;
+      Resource errRes = _modelValidator.validate(r, errManager, monitor) ;
+      if(false == errRes.getContents().isEmpty())
       {
-    	for(EObject err : errRes.getContents())
-    	{
-    	  if(err instanceof fr.tpt.aadl.ramses.constraintsreporter.Error)
-    	  {
-    		fr.tpt.aadl.ramses.constraintsreporter.Error constraintError =
-    						(fr.tpt.aadl.ramses.constraintsreporter.Error) err;
-    		errManager.error((Element) constraintError.getObject(), 
-    						constraintError.getMessage());
-    	  }
-    	}
-    	return;
+        for(EObject err : errRes.getContents())
+        {
+          if(err instanceof fr.tpt.aadl.ramses.constraintsreporter.Error)
+          {
+            fr.tpt.aadl.ramses.constraintsreporter.Error constraintError =
+                                                                           (fr.tpt.aadl.ramses.constraintsreporter.Error) err ;
+            errManager.error((Element) constraintError.getObject(),
+                             constraintError.getMessage()) ;
+          }
+        }
+        return ;
       }
     }
-    SystemInstance currentInstance = systemInstance;
-    String rootModelId = xmlPilot.getInputModelId();
-    if(rootModelId!=null && !rootModelId.isEmpty())
-    	modelsMap.put(rootModelId, r);
-    
-   systemToInstantiate = xmlPilot.getOutputModelId()+".impl";
-    PublicPackageSection pps = (PublicPackageSection) systemInstance.getSystemImplementation().getOwner();
-    AadlPackage p = (AadlPackage) pps.getOwner();
-    final String initialPackageName = p.getName();
-    
-    int transfoCounter = 0;
+
+    if(monitor.isCanceled())
+      throw new OperationCanceledException() ;
+
+    SystemInstance currentInstance = systemInstance ;
+    String rootModelId = xmlPilot.getInputModelId() ;
+    if(rootModelId != null && !rootModelId.isEmpty())
+      modelsMap.put(rootModelId, r) ;
+
+    systemToInstantiate = xmlPilot.getOutputModelId() + ".impl" ;
+    PublicPackageSection pps = (PublicPackageSection) systemInstance.
+                                                      getSystemImplementation().
+                                                      getOwner() ;
+    AadlPackage p = (AadlPackage) pps.getOwner() ;
+    final String initialPackageName = p.getName() ;
+
+    int transfoCounter = 0 ;
     
     while(xmlPilot.hasNextOperation())
     {
-      String operation = xmlPilot.getNextOperation();
+      if(monitor.isCanceled())
+        throw new OperationCanceledException() ;
+      
+      String operation = xmlPilot.getNextOperation() ;
+      
       if(operation == null)
-    	  return;
+        return ;
+      
       if(operation.equals("analysis"))
       {
-        doAnalysis(xmlPilot, outputDir, monitor, errManager);
+        doAnalysis(xmlPilot, outputDir, monitor, errManager) ;
       }
       else if(operation.equals("transformation"))
       {
-    	  currentInstance = doTransformation(xmlPilot, outputDir);
-    	  r = currentInstance.eResource();
+        currentInstance = doTransformation(xmlPilot, outputDir) ;
+        r = currentInstance.eResource() ;
       }
       else if(operation.equals("unparse"))
-      {  
-    	  String pkgName = initialPackageName + "_" + transfoCounter;
-    	  
-    	  doUnparse(currentInstance.eResource(), currentImplResource, 
-    	            outputDir, pkgName, monitor);
-    	  
-    	  transfoCounter++;
+      {
+        String pkgName = initialPackageName + "_" + transfoCounter ;
+
+        doUnparse(currentInstance.eResource(), currentImplResource, outputDir,
+                  pkgName, monitor) ;
+
+        transfoCounter++ ;
       }
       else if(operation.equals("errorstate"))
       {
-        doErrorState();
+        doErrorState() ;
       }
       else if(operation.equals("generation"))
       {
-        doGeneration(runtimeDir, outputDir, includeDirs, r, monitor);
+        doGeneration(runtimeDir, outputDir, includeDirs, r, monitor) ;
       }
       else if(operation.equals("loop"))
       {
-        doLoop(xmlPilot.getLoop(),errManager, xmlPilot, outputDir, monitor);
+        doLoop(xmlPilot.getLoop(), errManager, xmlPilot, outputDir, monitor) ;
       }
       else
       {
         String msg = "undefined workflow operation: " + operation ;
-        _LOGGER.error(msg);
-        ServiceProvider.SYS_ERR_REP.error(msg, true);
+        _LOGGER.error(msg) ;
+        ServiceProvider.SYS_ERR_REP.error(msg, true) ;
       }
 
-      xmlPilot.goForward();
+      xmlPilot.goForward() ;
     }
   }
 

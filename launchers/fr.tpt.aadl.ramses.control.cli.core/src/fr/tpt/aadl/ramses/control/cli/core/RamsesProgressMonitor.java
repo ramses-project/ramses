@@ -30,7 +30,7 @@ import fr.tpt.aadl.ramses.control.support.reporters.AbstractProgressMonitor ;
 public class RamsesProgressMonitor extends AbstractProgressMonitor
 {
   protected PrintStream _output ;
-  
+  protected boolean _isNotCanceled = true ;
   private Logger _logger = Logger.getLogger(RamsesProgressMonitor.class) ;
   
   public RamsesProgressMonitor(PrintStream stdOutput)

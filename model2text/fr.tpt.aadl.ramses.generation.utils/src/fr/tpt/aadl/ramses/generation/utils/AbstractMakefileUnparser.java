@@ -540,8 +540,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     return isSourceTextPA ;
   }
   
-  public static void saveMakefile(UnparseText text,
-                                  File makeFileDir)
+  public static void saveMakefile(UnparseText text, File makeFileDir)
   {
     try
     {
@@ -561,8 +560,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
     }
   }
   
-  public static void executeMake(File generatedFilePath,
-                                 File runtimePath)
+  public static void executeMake(File generatedFilePath, File runtimePath)
   {
     Runtime runtime = Runtime.getRuntime() ;
     if(runtimePath != null && runtimePath.exists())

@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.IStatus ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
+import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.core.runtime.Status ;
 import org.eclipse.core.runtime.jobs.Job ;
 import org.eclipse.emf.ecore.EObject ;
@@ -81,6 +82,10 @@ public class GenerateActionHandler extends AbstractHandler {
                          "fr.tpt.aadl.ramses.control.osate.outline.generation" ;
 //  private static final String MENU_OR_BUTTON_COMMAND_ID = 
 //                        "fr.tpt.aadl.ramses.control.osate.instance.generation" ;
+  
+  private static final String _OK_STATUS = "OK" ;
+  private static final String _CANCEL_STATUS = "CANCEL" ;
+  private static final String _ABORT_STATUS = "FATAL" ;
   
   // Call init method to setup these attributes.
   private boolean _isOutline = false ;
@@ -210,6 +215,9 @@ public class GenerateActionHandler extends AbstractHandler {
     
     instantiator.setProgressMonitor(monitor);
     
+    if(monitor.isCanceled())
+      throw new OperationCanceledException() ;
+    
     // For the executed command from outline menu,the system implementation 
     // root has to be instantiated prior to the code generation.
     if(_isOutline)
@@ -220,7 +228,13 @@ public class GenerateActionHandler extends AbstractHandler {
     // For executed command from the button or the RAMSES menu,system
     // implementation has already been instantiated.
     
+    if(monitor.isCanceled())
+      throw new OperationCanceledException() ;
+    
     generate(_currentProject, _sysInst, _config, monitor);
+    
+    if(monitor.isCanceled())
+      throw new OperationCanceledException() ;
     
     WorkbenchUtils.showGenerationReport() ;
   }
@@ -254,14 +268,19 @@ public class GenerateActionHandler extends AbstractHandler {
                 WorkbenchUtils.saveEditor(editor);
                 
                 jobCore(monitorWrapper) ;
-                this.setLabel("OK") ;
+                
+                this.setLabel(_OK_STATUS) ;
+              }
+              catch(OperationCanceledException e)
+              {
+                this.setLabel(_CANCEL_STATUS);
               }
               catch(Exception e)
               {
                 _LOGGER.fatal("", e) ;
                 // Don't report error to the user.
                 // Eclipse will open an error dialog thanks to the status.
-                this.setLabel("FATAL") ;
+                this.setLabel(_ABORT_STATUS) ;
                 this.exceptionCaught = e ;
               }
             }
@@ -269,7 +288,7 @@ public class GenerateActionHandler extends AbstractHandler {
 
           ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
                                                                          null) ;
-          if("FATAL".equals(cmd.getLabel()))
+          if(_ABORT_STATUS.equals(cmd.getLabel()))
           {
             result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                                 "FATAL ERROR", cmd.exceptionCaught) ;
@@ -277,13 +296,9 @@ public class GenerateActionHandler extends AbstractHandler {
           else
           {
             // Don't show error if any exception has been raised: escape side effects.
-            if("OK".equals(cmd.getLabel()))
+            if(_OK_STATUS.equals(cmd.getLabel()))
             {
               result = Status.OK_STATUS ;
-              if(ServiceProvider.SYS_ERR_REP.hasDelayedErrors())
-              {
-                // TODO SOMETHING !
-              }
             }
             else
             {
