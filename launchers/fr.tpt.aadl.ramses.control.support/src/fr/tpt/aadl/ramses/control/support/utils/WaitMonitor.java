@@ -45,21 +45,36 @@ public class WaitMonitor extends Thread
     while(hasToContinue)
     {
       beforeWaiting = System.currentTimeMillis() ;
+      System.out.println(beforeWaiting) ;
+      
       synchronized(_action)
       {
         _action.wait(period) ;
       }
       currentTime = System.currentTimeMillis() ;
+      System.out.println(currentTime) ;
+      
+      // operation has finished before timeout.
       if(beforeWaiting + period > currentTime)
       {
         hasToContinue = false ;
+        System.out.println("finished before timeout") ;
       }
       else
       {
+        // Operation has been canceled.
         if(_action.isCanceled())
         {
           hasToContinue = false ;
           _exitCode = Command.CANCEL ;
+          System.out.println("is canceled") ;
+        }
+        else 
+        {
+          // Operation is not complete and has not been canceled.
+          System.out.println("continue") ;
+          continue ;
+          
         }
       }
     }

@@ -569,12 +569,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
   {
     WaitMonitor waitMonitor = new WaitMonitor(cmd) ; 
     waitMonitor.start();
-    int exitCode = waitMonitor.waitAndCheck(1000) ;
+    int exitCode = waitMonitor.waitAndCheck(500) ;
     switch(exitCode)
     {
       case Command.CANCEL:
       {
-        logProcessTraces(process) ;
+        process.destroy();
         String msg = '\'' + cmd.getLabel() + "\' was canceled" ;
         _LOGGER.trace(msg) ;
         throw new OperationCanceledException(msg) ;
