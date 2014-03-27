@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
@@ -31,6 +32,9 @@ import fr.tpt.aadl.ramses.analysis.eg.model.EGModels;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.utils.Command ;
+import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
@@ -101,7 +105,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	public List<EGNode> performAnalysis(ComponentInstance cpu,
 			File outputDir,
 			AnalysisErrorReporterManager errorReporter,
-			IProgressMonitor monitor
+			final IProgressMonitor monitor
 			)
 					throws AnalysisException
 					{
@@ -149,27 +153,102 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		// If one is not schedulable, exhibit this one
 		// otherwise exhibit one that maximizes CPU usage
 		
-		int iter=1;
+		int iter=0;
+		final Thread[] aadlInspectorThreads = new Thread[size] ;
+		
+		final AADLInspectorSchedulingAnalysis app = this ;
+		
 		for(List<EGNode> egNodeList: res)
 		{
-			monitor.subTask("Execution of AADLInspector "+iter+"/"+size);
 			File tmpDir = new File(outputDir.getAbsolutePath()+"/wcet_"+iter);
 			if(!tmpDir.exists())
 				tmpDir.mkdir();
 			// Execute analysis in several threads
-			Thread t = new Thread(new AADLInspectorAnalysisThread(this, egNodeList, tmpDir, cpu, "wcet_"+iter, "automatic"));
-			t.start();
+			aadlInspectorThreads[iter] = new AADLInspectorAnalysisThread(app, egNodeList, tmpDir, cpu, "wcet_"+iter, "automatic");
 			iter++;
 		}
 		
-		try {
-			synchronized (this) {
-				wait();
-			}
-		}catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		Command cmd = new Command()
+		{
+      @Override
+      public int run() throws Exception
+      {
+        for(Thread t : aadlInspectorThreads)
+        {
+          t.start();
+        }
+        
+        // Wait all the thread end.
+        synchronized (app) {wait();}
+        
+        return Command.OK ;
+      }
+
+      @Override
+      public boolean isCanceled()
+      {
+        return monitor.isCanceled() ;
+      }
+
+      @Override
+      public String getLabel()
+      {
+        return null ;
+      }
+		} ;
+		
+		int exitStatus ;
+		WaitMonitor wm = new WaitMonitor(cmd) ;
+		wm.start();
+		try
+    {
+      exitStatus = wm.waitAndCheck(500) ;
+    }
+    catch(InterruptedException e)
+    {
+      killThreads(aadlInspectorThreads) ;
+      String msg = "AADL inspector monitoring has been interrupted" ;
+      _logger.fatal(msg, e);
+      throw new RuntimeException(msg, e) ;
+    }
+		
+		switch(exitStatus)
+		{
+		  case Command.FATAL:
+		  {
+		    Exception e = wm.getCaughtException() ;
+		    String msg = "AADL Inspector has failed" ;
+		    _logger.fatal(msg, e);
+		    throw new RuntimeException(msg, e);
+		  }
+		  
+		  case Command.ERROR:
+		  {
+		    // TODO
+		  }
+		  
+		  case Command.CANCEL:
+		  {
+		    killThreads(aadlInspectorThreads) ;
+        String msg = "AADL Inspector has been canceled" ;
+        _logger.trace(msg) ;
+        throw new OperationCanceledException(msg) ;
+      }
+		  
+		  case Command.OK:
+		  {
+		    String msg = "AADL Inspector process done" ;
+		    _logger.trace(msg);
+		  }
+		  
+		  default:
+		  {
+        String errMsg = "unknown exit code" ;
+        _logger.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+      }
 		}
+		
 		int i=0;
 		String outputModelId="";
 		List<EGNode> resultingEGNodeList =  new ArrayList<EGNode>();
@@ -209,7 +288,14 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 					}
 	
-	public void performAnalysis(SystemInstance root,
+	private void killThreads(Thread[] aadlInspectorThreads)
+  {
+    for(Thread t : aadlInspectorThreads)
+      t.stop();
+  }
+
+
+  public void performAnalysis(SystemInstance root,
 			File outputDir,
 			AnalysisErrorReporterManager errorReporter,
 			IProgressMonitor monitor
@@ -303,7 +389,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		return null;
 	}
 	
-	static class AADLInspectorAnalysisThread implements Runnable
+	static class AADLInspectorAnalysisThread extends Thread
     {
 		private List<EGNode> egNodeList;
 		private File outputDir;

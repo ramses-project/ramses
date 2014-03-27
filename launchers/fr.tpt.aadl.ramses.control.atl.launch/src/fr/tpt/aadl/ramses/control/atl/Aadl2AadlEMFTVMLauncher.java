@@ -29,7 +29,6 @@ import java.util.List ;
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.m2m.atl.emftvm.ExecEnv ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
 import org.osate.aadl2.util.Aadl2Util ;

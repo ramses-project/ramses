@@ -53,7 +53,6 @@ import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PropertySet;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory;
-import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess;
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
@@ -76,8 +75,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	  return atlHook;
 	}
 
-	
-	
 	protected String outputPackageName = "";
 	
 	protected abstract void registerDefaultTransformationModules();
