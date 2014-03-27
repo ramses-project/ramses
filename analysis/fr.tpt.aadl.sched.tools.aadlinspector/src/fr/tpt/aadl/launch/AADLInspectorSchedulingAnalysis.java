@@ -474,6 +474,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 							" failed.";
 					initiator._monitor.subTask(message);
 					initiator._logger.trace(message);
+					evaluateIfFinished();
 				}
 			}
 
@@ -483,16 +484,20 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 						" done.";
 				initiator._monitor.subTask(message);
 				initiator._logger.trace(message);
-				if(initiator.cpt==initiator.size)
-					synchronized (initiator) {
-					initiator.notify();
-					initiator.cpt=0;
-					}
+				evaluateIfFinished();
 			}
 			
 			
 			return;
         }
+		void evaluateIfFinished()
+		{
+		  if(initiator.cpt==initiator.size)
+			synchronized (initiator) {
+			  initiator.notify();
+			  initiator.cpt=0;
+			}
+		}
  
     }
 }
