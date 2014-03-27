@@ -610,6 +610,14 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         break ;
       }
       
+      case Command.FATAL:
+      {
+        Exception e = waitMonitor.getCaughtException() ;
+        String msg = "compiling has failed" ;
+        _LOGGER.fatal(msg, e);
+        throw new RuntimeException(msg, e) ;
+      }
+      
       // Process is terminated and was not canceled.
       case Command.OK:
       {
