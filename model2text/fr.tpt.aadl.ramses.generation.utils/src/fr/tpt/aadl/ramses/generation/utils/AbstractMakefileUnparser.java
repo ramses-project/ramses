@@ -656,7 +656,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         Command cmd = new Command()
         {
           @Override
-          public int runBlockingCommand() throws Exception
+          public int run() throws Exception
           {
             int tmp = makeCleanProcess.waitFor() ;
             
@@ -693,7 +693,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         cmd = new Command()
         {
           @Override
-          public int runBlockingCommand() throws Exception
+          public int run() throws Exception
           {
             int tmp = makeProcess.waitFor() ;
             
