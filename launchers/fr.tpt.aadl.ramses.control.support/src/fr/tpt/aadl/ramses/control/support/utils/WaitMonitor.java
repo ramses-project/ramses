@@ -21,6 +21,8 @@
 
 package fr.tpt.aadl.ramses.control.support.utils;
 
+import org.eclipse.core.runtime.OperationCanceledException ;
+
 public class WaitMonitor extends Thread
 {
   private Command _action ; 
@@ -40,6 +42,11 @@ public class WaitMonitor extends Thread
     try
     {
       _exitCode = _action.run();
+    }
+    catch(OperationCanceledException e)
+    {
+      // It means that _action.run() detected that user has canceled.
+      _exitCode = Command.CANCEL ;
     }
     catch(Exception e)
     {
