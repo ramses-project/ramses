@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.ModalPropertyValue ;
@@ -30,6 +31,7 @@ import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.Subprogram ;
 import org.osate.aadl2.SubprogramCall ;
 import org.osate.aadl2.SubprogramCallSequence ;
+import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramSubcomponent ;
 import org.osate.aadl2.SubprogramSubcomponentType ;
@@ -39,6 +41,8 @@ import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.aadl2.modelsupport.modeltraversal.AadlProcessingSwitch ;
+import org.osate.annexsupport.AnnexUtil;
+import org.osate.ba.aadlba.AadlBaPackage;
 import org.osate.ba.aadlba.BehaviorActionBlock ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.SubprogramCallAction ;
@@ -303,7 +307,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
       if(aSubprogram instanceof SubprogramType)
       {
         SubprogramType aSubprogramType = (SubprogramType) aSubprogram ;
-        for(AnnexSubclause annex : aSubprogramType.getAllAnnexSubclauses())
+        for(AnnexSubclause annex : AnnexUtil.
+        		getAllAnnexSubclauses((Classifier)aSubprogramType, AadlBaPackage.eINSTANCE.getBehaviorAnnex()))
         {
           if(annex instanceof BehaviorAnnex)
           {
@@ -331,8 +336,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         SubprogramImplementation aSubprogramImplementation =
               (SubprogramImplementation) aSubprogram ;
 
-        for(AnnexSubclause annex : aSubprogramImplementation
-              .getAllAnnexSubclauses())
+        for(AnnexSubclause annex : AnnexUtil.
+        		getAllAnnexSubclauses((Classifier)aSubprogramImplementation, AadlBaPackage.eINSTANCE.getBehaviorAnnex()))
         {
           if(annex instanceof BehaviorAnnex)
           {

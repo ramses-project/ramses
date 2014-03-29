@@ -56,6 +56,8 @@ import org.osate.aadl2.ThreadClassifier ;
 import org.osate.aadl2.modelsupport.AadlConstants ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.aadl2.modelsupport.util.AadlUtil ;
+import org.osate.annexsupport.AnnexUtil;
+import org.osate.ba.aadlba.AadlBaPackage;
 import org.osate.ba.aadlba.Any ;
 import org.osate.ba.aadlba.AssignmentAction ;
 import org.osate.ba.aadlba.BehaviorActionBlock ;
@@ -1331,7 +1333,7 @@ public class AadlBaToADAUnparser extends AadlBaUnparser
                                             AadlToADAUnparser.getAadlToADAUnparser() ;
         if(false == aadlADAUnparser.additionalUnparsing.contains(sct))
           aadlADAUnparser.additionalUnparsing.add(sct) ;
-        for(AnnexSubclause as : ((SubprogramClassifier) sct).getAllAnnexSubclauses())
+        for(AnnexSubclause as : AnnexUtil.getAllAnnexSubclauses((SubprogramClassifier) sct, AadlBaPackage.eINSTANCE.getBehaviorAnnex()))
         {
           if(as instanceof BehaviorAnnex)
           {
