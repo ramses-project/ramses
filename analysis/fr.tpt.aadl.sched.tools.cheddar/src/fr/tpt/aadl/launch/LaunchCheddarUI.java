@@ -22,6 +22,7 @@
 package fr.tpt.aadl.launch ;
 
 import java.io.File ;
+import java.util.List;
 import java.util.Map ;
 
 import org.apache.log4j.Logger ;
@@ -107,4 +108,10 @@ public class LaunchCheddarUI implements Analyzer
     _LOGGER.fatal(errMsg) ;
     throw new UnsupportedOperationException(errMsg) ;
   }
+
+@Override
+public List<String> getTransformationModuleList() {
+	// TODO Auto-generated method stub
+	return null;
+}
 }

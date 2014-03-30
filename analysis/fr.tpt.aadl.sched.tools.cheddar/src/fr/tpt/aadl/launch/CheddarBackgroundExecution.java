@@ -22,6 +22,7 @@
 package fr.tpt.aadl.launch ;
 
 import java.io.File ;
+import java.util.List;
 import java.util.Map ;
 
 import org.apache.log4j.Logger ;
@@ -136,4 +137,10 @@ extends
     _LOGGER.fatal(msg) ;
     throw new UnsupportedOperationException(msg) ;
   }
+
+@Override
+public List<String> getTransformationModuleList() {
+	// TODO Auto-generated method stub
+	return null;
+}
 }

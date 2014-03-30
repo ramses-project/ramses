@@ -22,6 +22,7 @@
 package fr.tpt.aadl.launch ;
 
 import java.io.File ;
+import java.util.List;
 import java.util.Map ;
 
 import org.apache.log4j.Logger ;
@@ -127,4 +128,10 @@ public class WCETAnalysis extends AbstractAnalyzer
       throw new AnalysisException(msg, e) ;
     }
   }
+
+@Override
+public List<String> getTransformationModuleList() {
+	// TODO Auto-generated method stub
+	return null;
+}
 }
