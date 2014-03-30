@@ -202,12 +202,7 @@ public class GenerateActionHandler extends AbstractHandler {
     return result ;
   }
   
-  private void jobCore(IProgressMonitor monitor) throws ConfigurationException,
-                                                        AnalysisException,
-                                                        GenerationException,
-                                                        TransformationException,
-                                                        FileNotFoundException,
-                                                        CoreException
+  private void jobCore(IProgressMonitor monitor) throws Exception
   {
     monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
     
@@ -381,7 +376,8 @@ public class GenerateActionHandler extends AbstractHandler {
     tmp.toArray(includeDirs) ;
     
     if(workflow==null)
-      generator.generate(sinst, 
+      generator.generate(sinst,
+    		  			 config.getTargetId(),
                          config.getRuntimePath(),
                          config.getOutputDir(),
                          includeDirs,

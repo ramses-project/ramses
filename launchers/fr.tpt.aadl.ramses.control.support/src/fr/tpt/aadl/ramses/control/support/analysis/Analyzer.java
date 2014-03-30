@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.control.support.analysis ;
 
 import java.io.File ;
+import java.util.List;
 import java.util.Map ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
@@ -41,4 +42,6 @@ public interface Analyzer extends NamedPlugin
                                                 throws AnalysisException ;
 
   public void setParameters(Map<String, Object> parameters) ;
+
+  public List<String> getTransformationModuleList();
 }

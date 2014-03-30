@@ -70,60 +70,28 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 				Aadl2Util.setUseTunedEqualsMethods (false);
 			}
 
-			File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
-			if(outputModelDir.exists()==false)
-				outputModelDir.mkdir();
-			
-			String outputFilePath=outputModelDir.getAbsolutePath()+File.separator+aadlGeneratedFileName;
-			File outputFile = new File(outputFilePath);
-
-			_modelInstantiator.serialize(transfoResult, outputFilePath);
-			try
-			{
-			  return AadlToTargetSpecificAadl.extractAadlResource(inputResource,
-			                                                      outputFile);
-			}
-			catch(Exception ex)
-			{
-			  String msg = "fail to extract AADL resources" ;
-			  _LOGGER.fatal(msg, ex);
-	      throw new TransformationException(msg, ex) ;
-			}
+			return setOutputResult(inputResource, aadlGeneratedFileName, outputDir, transfoResult);
 		}
 
-	protected void registerDefaultTransformationModules()
-	{
-		env.loadModule(_moduleResolver, RamsesConfiguration.getAtlResourceDir().getAbsolutePath()+"/Uninstanciate");
-		registerDefaultTransformationsEMFTVM(env, _moduleResolver);
-	}
-	
-	private void registerDefaultTransformationsEMFTVM(ExecEnv env,
-			                                              ModuleResolver mr)
-	{
-		List<String> fileName = new ArrayList<String>() ;
-		fileName.add("/helpers/IOHelpers") ;
-		fileName.add("/helpers/AADLCopyHelpers") ;
-		fileName.add("/helpers/AADLICopyHelpers") ;
-		fileName.add("/helpers/BehaviorAnnexServices") ;
-		fileName.add("/tools/PropertiesTools") ;
-		fileName.add("/tools/PackagesTools") ;
-		fileName.add("/tools/FeaturesTools") ;
-		fileName.add("/uninstanciate/Features") ;
-		fileName.add("/uninstanciate/Implementations") ;
-		fileName.add("/uninstanciate/Properties") ;
-		fileName.add("/uninstanciate/Types") ;
-		fileName.add("/uninstanciate/Connections") ;
-		fileName.add("/helpers/Services") ;
-		fileName.add("/tools/BehaviorAnnexTools") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
-		fileName.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
-		fileName.add("/BehaviorAnnexCopy/copyElementHolders") ;
+	private Resource setOutputResult(Resource inputResource, String aadlGeneratedFileName, File outputDir, Resource transfoResult) throws TransformationException {
+		File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
+		if(outputModelDir.exists()==false)
+			outputModelDir.mkdir();
 		
-		for(String s : fileName)
+		String outputFilePath=outputModelDir.getAbsolutePath()+File.separator+aadlGeneratedFileName;
+		File outputFile = new File(outputFilePath);
+
+		_modelInstantiator.serialize(transfoResult, outputFilePath);
+		try
 		{
-			env.loadModule(mr, RamsesConfiguration.getAtlResourceDir().getAbsolutePath()+s);
+		  return AadlToTargetSpecificAadl.extractAadlResource(inputResource,
+		                                                      outputFile);
+		}
+		catch(Exception ex)
+		{
+		  String msg = "fail to extract AADL resources" ;
+		  _LOGGER.fatal(msg, ex);
+      throw new TransformationException(msg, ex) ;
 		}
 	}
 
@@ -163,5 +131,26 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 		}
 		
 		return outputResource;
+	}
+
+	public Resource generationEntryPoint(Resource inputResource,
+			String targetId, File outputDir) throws TransformationException {
+		String aadlGeneratedFileName = inputResource.getURI().lastSegment();
+		aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
+				".aaxl2", "_extended.aadl2");
+
+		Aadl2Util.setUseTunedEqualsMethods (false);
+		Resource transfoResult;
+		try
+		{
+			transfoResult = this.doTransformation(targetId,
+				inputResource, aadlGeneratedFileName, "_extended");
+		}
+		finally
+		{
+			Aadl2Util.setUseTunedEqualsMethods (false);
+		}
+
+		return setOutputResult(inputResource, aadlGeneratedFileName, outputDir, transfoResult);
 	}
 }

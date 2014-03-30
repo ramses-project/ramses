@@ -15,10 +15,10 @@
   <eClassifiers xsi:type="ecore:EClass" name="Transformation" eSuperTypes="#//WorkflowElement #//AnalysisElement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="element" lowerBound="1"
         eType="#//AnalysisElement" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="list" lowerBound="1" eType="#//List"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="list" eType="#//List" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"
         eType="#//ModelIdentifier" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifier" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AnalysisElement" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Generation" eSuperTypes="#//WorkflowElement #//AnalysisElement"/>

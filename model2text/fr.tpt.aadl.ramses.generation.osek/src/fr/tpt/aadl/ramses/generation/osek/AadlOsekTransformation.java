@@ -1,5 +1,6 @@
 package fr.tpt.aadl.ramses.generation.osek;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger ;
@@ -16,21 +17,19 @@ public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
 	                              PredefinedAadlModelManager predefinedAadlModels,
 	                              String module)
 	{
-		super(modelInstantiator, predefinedAadlModels) ;
-	  _atlFileNames = new String[] 
-				{
-			"ACG/targets/shared/UninstanciateOverride",
- 			"ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
- 			"ACG/targets/shared/PortsCommonRefinementSteps",
- 			"ACG/targets/shared/DispatchCommonRefinementSteps",
- 			"ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
- 			"ACG/targets/osek/ExpandThreadsPorts", 
- 			"ACG/targets/osek/BlackboardCommunications",
- 			"ACG/targets/osek/BufferCommunications",
-			"ACG/targets/osek/ExpandThreadsDispatchProtocol",
-			"ACG/PeriodicDelayedCommunication/SharedRules",
-			module
-			};
+	  super(modelInstantiator, predefinedAadlModels) ;
+	  _atlFileNames = new ArrayList<String>();
+	  _atlFileNames.add("ACG/targets/shared/UninstanciateOverride");
+	  _atlFileNames.add("ACG/targets/shared/SubprogramCallsCommonRefinementSteps");
+	  _atlFileNames.add("ACG/targets/shared/PortsCommonRefinementSteps");
+	  _atlFileNames.add("ACG/targets/shared/DispatchCommonRefinementSteps");
+	  _atlFileNames.add("ACG/targets/shared/BehaviorAnnexCommonRefinementSteps");
+	  _atlFileNames.add("ACG/targets/osek/ExpandThreadsPorts");
+	  _atlFileNames.add("ACG/targets/osek/BlackboardCommunications");
+	  _atlFileNames.add("ACG/targets/osek/BufferCommunications");
+	  _atlFileNames.add("ACG/targets/osek/ExpandThreadsDispatchProtocol");
+	  _atlFileNames.add("ACG/PeriodicDelayedCommunication/SharedRules");
+	  _atlFileNames.add(module);
 	}
 
 	@Override
@@ -39,4 +38,5 @@ public class AadlOsekTransformation extends AadlToTargetSpecificAadl {
     _LOGGER.fatal(msg);
     throw new UnsupportedOperationException(msg) ;
 	}
+	
 }

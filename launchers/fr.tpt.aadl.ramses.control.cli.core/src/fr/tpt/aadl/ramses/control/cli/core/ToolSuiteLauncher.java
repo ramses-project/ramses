@@ -191,7 +191,7 @@ public class ToolSuiteLauncher
     
     generator.setParameters(parameters) ;
     
-    generator.generate(instance,config.getRuntimePath(), config.getOutputDir(), 
+    generator.generate(instance,config.getTargetId(), config.getRuntimePath(), config.getOutputDir(), 
                        includeDirs,
                        ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, _monitor) ;
   }

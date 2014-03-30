@@ -88,22 +88,31 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
   protected static AadlResourceValidator extractor;
    
   public Resource transform(Resource inputResource,
+		  					String targetId,
                             File outputDir,
                             IProgressMonitor monitor) throws TransformationException
   {
+	Aadl2AadlEMFTVMLauncher atlLauncher =
+			new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
+					_predefinedAadlModels) ;
+	atlLauncher.setOutputPackageName("refined_model") ;
+	AtlTransfoLauncher.initTransformation();
+	if(AtlTransfoLauncher.getRamsesExecEnv(targetId)!=null)
+		return atlLauncher.generationEntryPoint(inputResource,
+				targetId, outputDir) ;
     initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
 
     {
-      ArrayList<File> atlFiles = new ArrayList<File>(_atlFileNames.length) ;
+      ArrayList<File> atlFiles = new ArrayList<File>() ;
 
+      for(String fileName : AtlTransfoLauncher.getUninstanciateTransformationModuleList())
+      {
+    	atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
+      }
       for(String fileName : _atlFileNames)
       {
         atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
       }
-      Aadl2AadlEMFTVMLauncher atlLauncher =
-            new Aadl2AadlEMFTVMLauncher(_modelInstantiator,
-                  _predefinedAadlModels) ;
-      atlLauncher.setOutputPackageName("refined_model") ;
       return atlLauncher.generationEntryPoint(inputResource,
                                               atlFiles, outputDir) ;
     }
@@ -304,17 +313,34 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 
 abstract public void setParameters(Map<Enum<?>, Object> parameters);
  
+  
   public static void validate(ResourceSet rs)
   {
 	AadlResourceValidator.validate(rs);
   }
   
   public Resource transformWokflow(Resource inputResource,
+		  							String transformationId,
 		  							List<String> resourceFileNameList,
 		  							File outputDir,
 		  							String outputPackageName) throws TransformationException
   {
-    ArrayList<File> atlFiles = new ArrayList<File>() ;
+	Aadl2AadlEMFTVMLauncher atlLauncher =
+	        new Aadl2AadlEMFTVMLauncher(_modelInstantiator, _predefinedAadlModels) ;
+	atlLauncher.setOutputPackageName(outputPackageName) ;
+	  
+	AtlTransfoLauncher.initTransformation();
+	if(transformationId!=null && AtlTransfoLauncher.getRamsesExecEnv(transformationId)!=null)
+	  return atlLauncher.generationEntryPoint(inputResource,
+			  transformationId, outputDir) ;
+	
+	ArrayList<File> atlFiles = new ArrayList<File>() ;
+	for(String s : AtlTransfoLauncher.getUninstanciateTransformationModuleList())
+	{
+	  atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() +
+			  File.separator +
+			  s)) ;
+	}
     for(String resourceFileName : resourceFileNameList)
     {
       String resourcePath = resourceFileName ;
@@ -324,10 +350,6 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
                     resourceFileName ;
       atlFiles.add(new File(resourcePath)) ;
     }
-    
-    Aadl2AadlEMFTVMLauncher atlLauncher =
-          new Aadl2AadlEMFTVMLauncher(_modelInstantiator, _predefinedAadlModels) ;
-    atlLauncher.setOutputPackageName(outputPackageName) ;
 
     return atlLauncher.generationEntryPoint(inputResource, atlFiles, outputDir) ;
   }

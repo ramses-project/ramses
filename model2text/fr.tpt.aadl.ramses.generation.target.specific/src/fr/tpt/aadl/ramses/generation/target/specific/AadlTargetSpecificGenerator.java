@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.generation.target.specific;
 
 import java.io.File ;
+import java.util.ArrayList;
 import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
@@ -50,9 +51,11 @@ import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
+import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -131,6 +134,7 @@ public class AadlTargetSpecificGenerator implements Generator
 
   @Override
   public void generate(SystemInstance systemInstance,
+		  			   String targetId,
                        File runtimeDir,
                        File outputDir,
                        File[] includeDirs,
@@ -169,8 +173,8 @@ public class AadlTargetSpecificGenerator implements Generator
     
     if(_targetTrans != null)
     {
-      monitor.subTask("Model transformation (refinement) ..."); 
-      r = _targetTrans.transform(inputResource, outputDir, monitor);
+      monitor.subTask("Model transformation (refinement) ...");
+      r = _targetTrans.transform(inputResource, targetId, outputDir, monitor);
     }
     else
      r = inputResource;
@@ -259,16 +263,19 @@ public class AadlTargetSpecificGenerator implements Generator
       
       if(operation.equals("analysis"))
       {
+	    monitor.subTask("Model analysis: " + xmlPilot.getAnalysisName());
         doAnalysis(xmlPilot, outputDir, monitor, errManager) ;
       }
       else if(operation.equals("transformation"))
       {
+    	monitor.subTask("Model transformation " + ((xmlPilot.getTransformationName()!=null) ? xmlPilot.getTransformationName():""));
         currentInstance = doTransformation(xmlPilot, outputDir) ;
         r = currentInstance.eResource() ;
       }
       else if(operation.equals("unparse"))
       {
         String pkgName = initialPackageName + "_" + transfoCounter ;
+    	monitor.subTask("Unparse output model: " + pkgName);
 
         doUnparse(currentInstance.eResource(), currentImplResource, outputDir,
                   pkgName, monitor) ;
@@ -509,8 +516,8 @@ public class AadlTargetSpecificGenerator implements Generator
       loopIteration++;
       String msg = "Start loop iteration = " + loopIteration ;
       _LOGGER.trace(msg);
-      
-      doTransformation(moduleList,inputId,outputId,outputDir);
+      String transfoId = xmlPilot.getTransformationName();
+      doTransformation(transfoId, moduleList,inputId,outputId,outputDir);
       if (isValidLoopIteration(a,errManager,xmlPilot,outputDir,outputId,monitor))
       {
         break;
@@ -585,13 +592,16 @@ public class AadlTargetSpecificGenerator implements Generator
   private SystemInstance doTransformation(WorkflowPilot workflowPilot, File generatedDir)
 		                                                 throws GenerationException, AnalysisException, TransformationException
 	{
+	  String identifier = workflowPilot.getTransformationName();
     List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
     String inputModelId = workflowPilot.getInputModelId();
     String outputModelId = workflowPilot.getOutputModelId();
-    return doTransformation(resourceFileNameList,inputModelId,outputModelId,generatedDir);
+    return doTransformation(identifier, resourceFileNameList,inputModelId,outputModelId,generatedDir);
 	}
-		                                                 
-  private SystemInstance doTransformation(List<String> resourceFileNameList,
+  
+  
+  private SystemInstance doTransformation(String transformationId,
+		  								  List<String> resourceFileNameList,
                                           String inputModelId, String outputModelId, 
                                           File generatedDir) throws GenerationException,
                                                                     TransformationException
@@ -603,10 +613,12 @@ public class AadlTargetSpecificGenerator implements Generator
     _LOGGER.trace(msg);
     msg = "  Module list  : " + resourceFileNameList ;
     _LOGGER.trace(msg);
+    msg = "  Transfo id  : " + transformationId ;
+	_LOGGER.trace(msg);
     msg = "  Output model : " + outputModelId ;
     _LOGGER.trace(msg);
     
-    Resource result = _targetTrans.transformWokflow(r, resourceFileNameList, 
+    Resource result = _targetTrans.transformWokflow(r, transformationId, resourceFileNameList, 
                                                 generatedDir, outputModelId);
 
     PropertiesLinkingService pls = new PropertiesLinkingService ();
@@ -678,4 +690,12 @@ private void doErrorState()
   {
     return _codeGen.getRuntimePathEnvVar() ;
   }
+
+  @Override
+  public List<String> getTransformationModuleList() {
+	List<String> res = AtlTransfoLauncher.getUninstanciateTransformationModuleList(); 
+	res.addAll(_targetTrans.getTransformationModuleList());
+	return res;
+  }
+  
 }

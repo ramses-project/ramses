@@ -21,7 +21,10 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List ;
+import java.util.Map;
 
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.EPackage;
@@ -37,6 +40,7 @@ import org.eclipse.m2m.atl.emftvm.ExecEnv;
 import org.eclipse.m2m.atl.emftvm.Metamodel;
 import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl;
 import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
+import org.eclipse.m2m.atl.emftvm.util.ModuleResolverFactory;
 import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.PropertySet ;
@@ -45,6 +49,10 @@ import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
 import org.osate.ba.aadlba.AadlBaPackage;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
+import fr.tpt.aadl.ramses.control.support.generator.Generator;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
 
 /**
@@ -56,86 +64,135 @@ public abstract class AtlTransfoLauncher
   /**
    * injector is an object for injecting objects to the ATL runtime. 
    */
-  protected static final EMFInjector injector = new EMFInjector() ;
+  protected final EMFInjector injector = new EMFInjector() ;
   //protected static final ExecEnvPool pool =  new ExecEnvPool();
 
   // Load the input file resource
-  private static final EMFModelFactory factory = new EMFModelFactory() ;
-  protected static EMFReferenceModel aadlbaMetamodel ;
+  private final EMFModelFactory factory = new EMFModelFactory() ;
+  protected EMFReferenceModel aadlbaMetamodel ;
   
-  private static final String AADLBA_MM_URI =
+  private final static String AADLBA_MM_URI =
 			org.osate.ba.aadlba.AadlBaPackage.eNS_URI ;
-  private static final String AADL2_MM_URI =
+  private final static String AADL2_MM_URI =
 			org.osate.aadl2.Aadl2Package.eNS_URI ;
-  private static final String AADLI_MM_URI =
+  private final static String AADLI_MM_URI =
 			org.osate.aadl2.instance.InstancePackage.eNS_URI ;
-  private static final String ATLHOOKS_MM_URI = AtlHooksPackage.eNS_URI ;
+  private final static String ATLHOOKS_MM_URI = AtlHooksPackage.eNS_URI ;
 	
-  private static final String REDUCEDBA_MM_URI = ReducedbaPackage.eNS_URI ;
+  private final static String REDUCEDBA_MM_URI = ReducedbaPackage.eNS_URI ;
   
-  private static final String ERROR_REPORTER_URI = 
+  private final static String ERROR_REPORTER_URI = 
 			"http://fr.tpt.aadl.ramses.constraints.vilation.reporter";
   
   private static boolean initialized=false;
   
-  public static void initTransformation(ExecEnv env)
+  private static Map<String, ExecEnvPool> _ramsesExecEnvPoolMap = 
+		  new HashMap<String, ExecEnvPool>();
+  
+  public static ExecEnvPool getRamsesExecEnv(String target)
   {
-//	  if(initialized)
-//		  return;
-//	  initialized = true;
+	return _ramsesExecEnvPoolMap.get(target);
+  }
+  
+  public static void initTransformation()
+  {
+	  if(initialized)
+		  return;
+	  initialized = true;
+	  
 	  EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
 				org.osate.aadl2.Aadl2Package.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(ATLHOOKS_MM_URI, AtlHooksPackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(AADLBA_MM_URI, AadlBaPackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(AADLI_MM_URI, InstancePackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put("http://www.eclipse.org/emf/2002/Ecore",
-				EcorePackage.eINSTANCE) ;
-		EPackage.Registry.INSTANCE.put(org.eclipse.m2m.atl.emftvm.EmftvmPackage.eNS_URI,
-				org.eclipse.m2m.atl.emftvm.EmftvmPackage.eINSTANCE) ;
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-		.put("aaxl2", new InstanceResourceFactoryImpl()) ;
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-		.put("ecore", new EcoreResourceFactoryImpl()) ;
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-		.put("emftvm", new EMFTVMResourceFactoryImpl()) ;
-		
-		EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, 
-				fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE) ;
-		
-		
-		// Load metamodels
-	    // Load aadl instance metamodel 
-	    Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-	    aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
-	    env.registerMetaModel("AADLI", aadlInstanceMetaModel);
+	  EPackage.Registry.INSTANCE.put(ATLHOOKS_MM_URI, AtlHooksPackage.eINSTANCE) ;
+	  EPackage.Registry.INSTANCE.put(AADLBA_MM_URI, AadlBaPackage.eINSTANCE) ;
+	  EPackage.Registry.INSTANCE.put(AADLI_MM_URI, InstancePackage.eINSTANCE) ;
+	  EPackage.Registry.INSTANCE.put("http://www.eclipse.org/emf/2002/Ecore",
+			  EcorePackage.eINSTANCE) ;
+	  EPackage.Registry.INSTANCE.put(org.eclipse.m2m.atl.emftvm.EmftvmPackage.eNS_URI,
+			  org.eclipse.m2m.atl.emftvm.EmftvmPackage.eINSTANCE) ;
+	  Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+	  .put("aaxl2", new InstanceResourceFactoryImpl()) ;
+	  Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+	  .put("ecore", new EcoreResourceFactoryImpl()) ;
+	  Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+	  .put("emftvm", new EMFTVMResourceFactoryImpl()) ;
 
-	    // Load aadl+BA metamodel
-	    Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-	    aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
-	    env.registerMetaModel("AADLBA", aadlBaMetaModel);
+	  EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, 
+			  fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE) ;
 
-	    // Load atlHooks metamodel
-	    Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-	    atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
-	    env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
 
+	  
+	  ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
+	  for(String generatorName: sr.getAvailableGeneratorNames())
+	  {
+		Generator g = sr.getGenerator(generatorName);
+		List<String> moduleList = g.getTransformationModuleList();
+		ExecEnvPool pool = new ExecEnvPool();
+		loadMetaModels(pool);
+		ModuleResolverFactory mrf = new RamsesModuleResolverFactory();
+		pool.setModuleResolverFactory(mrf);
+		for(String moduleName: moduleList)
+		{
+		  pool.loadModule(moduleName);
+		}
+		_ramsesExecEnvPoolMap.put(generatorName, pool);
+	  }
+	  
+	  // init validators
+	  
+	  for(String analyzerName: sr.getAvailableAnalysisNames())
+	  {
+		Analyzer a = sr.getAnalyzer(analyzerName);
+		List<String> moduleList = a.getTransformationModuleList();
+		if(moduleList == null)
+		  continue;
+		ExecEnvPool pool = new ExecEnvPool();
+		loadMetaModels(pool);
+		ModuleResolverFactory mrf = new RamsesModuleResolverFactory();
+		pool.setModuleResolverFactory(mrf);
+		for(String moduleName: moduleList)
+		{
+		  pool.loadModule(moduleName);
+		}
+		_ramsesExecEnvPoolMap.put(analyzerName, pool);
+	  }
+	  
 		
-		
-		EPackage.Registry.INSTANCE.put(ERROR_REPORTER_URI, 
-				fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE);
-		
-		// Load metamodels
-		// Load aadl instance metamodel 
-		Metamodel constraintValidationMetamodel = EmftvmFactory.eINSTANCE.createMetamodel();
-		constraintValidationMetamodel.setResource(
-				fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE.eResource());
-		env.registerMetaModel("CV", constraintValidationMetamodel);
-		
-		Metamodel reducedBAMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		reducedBAMetaModel.setResource(
-				fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE.eResource());
-		env.registerMetaModel("REDUCEDBA", reducedBAMetaModel);
-		
+  }
+    
+  private static void loadMetaModels(ExecEnvPool pool)
+  {
+	  // Load metamodels
+	  // Load aadl instance metamodel 
+	  Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+	  aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
+	  pool.registerMetaModel("AADLI", aadlInstanceMetaModel);
+
+	  // Load aadl+BA metamodel
+	  Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+	  aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
+	  pool.registerMetaModel("AADLBA", aadlBaMetaModel);
+
+	  // Load atlHooks metamodel
+	  Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+	  atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
+	  pool.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
+
+
+
+	  EPackage.Registry.INSTANCE.put(ERROR_REPORTER_URI, 
+			  fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE);
+
+	  // Load metamodels
+	  // Load aadl instance metamodel 
+	  Metamodel constraintValidationMetamodel = EmftvmFactory.eINSTANCE.createMetamodel();
+	  constraintValidationMetamodel.setResource(
+			  fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE.eResource());
+	  pool.registerMetaModel("CV", constraintValidationMetamodel);
+
+	  Metamodel reducedBAMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+	  reducedBAMetaModel.setResource(
+			  fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE.eResource());
+	  pool.registerMetaModel("REDUCEDBA", reducedBAMetaModel);
   }
   
   protected void registerPredefinedResourcesInLauncher(EMFVMLauncher launcher,
@@ -153,5 +210,31 @@ public abstract class AtlTransfoLauncher
       injector.inject(rModel, r) ;
       launcher.addInModel(rModel, name.toUpperCase(), "AADLBA") ;
     }
+  }
+  
+  public static List<String> getUninstanciateTransformationModuleList()
+  {
+	List<String> fileNameList = new ArrayList<String>() ;
+	fileNameList.add("/helpers/IOHelpers") ;
+	fileNameList.add("/helpers/AADLCopyHelpers") ;
+	fileNameList.add("/helpers/AADLICopyHelpers") ;
+	fileNameList.add("/helpers/BehaviorAnnexServices") ;
+	fileNameList.add("/tools/PropertiesTools") ;
+	fileNameList.add("/tools/PackagesTools") ;
+	fileNameList.add("/tools/FeaturesTools") ;
+	fileNameList.add("/Uninstanciate");
+	fileNameList.add("/uninstanciate/Features") ;
+	fileNameList.add("/uninstanciate/Implementations") ;
+	fileNameList.add("/uninstanciate/Properties") ;
+	fileNameList.add("/uninstanciate/Types") ;
+	fileNameList.add("/uninstanciate/Connections") ;
+	fileNameList.add("/helpers/Services") ;
+	fileNameList.add("/tools/BehaviorAnnexTools") ;
+	fileNameList.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;
+	fileNameList.add("/BehaviorAnnexCopy/copyBehaviorCondition") ;
+	fileNameList.add("/BehaviorAnnexCopy/copyBehaviorSpecification") ;
+	fileNameList.add("/BehaviorAnnexCopy/copyBehaviorTime") ;
+	fileNameList.add("/BehaviorAnnexCopy/copyElementHolders") ;
+	return fileNameList;
   }
 }

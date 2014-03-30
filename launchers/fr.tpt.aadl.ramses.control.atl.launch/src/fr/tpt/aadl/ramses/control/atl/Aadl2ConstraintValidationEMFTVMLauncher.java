@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.m2m.atl.emftvm.ExecEnv;
 
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
@@ -83,8 +84,4 @@ public class Aadl2ConstraintValidationEMFTVMLauncher extends AadlModelValidator
 		return outputResource;
 	}
 	
-	@Override
-	protected void registerDefaultTransformationModules() {
-		// No default module here.
-	}
 }

@@ -34,12 +34,17 @@ public abstract class AbstractAadlToAadl implements AadlToAadl
 {
   protected static final Set<String> _resourcesDirNames = new HashSet<String>() ;
   
-  protected String[] _atlFileNames;
+  protected List<String> _atlFileNames;
+  
+  public List<String> getTransformationModuleList() {
+	return _atlFileNames;
+  }
+  
   protected List<File> _atlFiles;
   
   public void initAtlFileNameList(File resourceDir)
   {
-    _atlFiles = new ArrayList<File>(_atlFileNames.length);
+    _atlFiles = new ArrayList<File>();
     for (String fileName : _atlFileNames) {
       _atlFiles.add(new File(resourceDir.getAbsolutePath() +File.separator+ fileName));
     }

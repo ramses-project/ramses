@@ -141,4 +141,10 @@ public class EGAnalyzer extends AbstractAnalyzer
   {
     return PLUGIN_ID ;
   }
+
+  @Override
+  public List<String> getTransformationModuleList() {
+	// return null, no transformation performed in this analysis plugin
+	return null;
+  }
 }

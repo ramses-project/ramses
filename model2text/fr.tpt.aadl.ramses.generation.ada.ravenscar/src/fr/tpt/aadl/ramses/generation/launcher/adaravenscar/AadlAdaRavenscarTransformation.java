@@ -23,6 +23,8 @@
 
 package fr.tpt.aadl.ramses.generation.launcher.adaravenscar ;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger ;
@@ -48,18 +50,21 @@ public class AadlAdaRavenscarTransformation extends
 	                                        PredefinedAadlModelManager predefinedAadlModels,
 	                                        String module)
 	  {
-		  super(modelInstantiator, predefinedAadlModels) ;	
-	    _atlFileNames = new String[]
-		        {"ACG/targets/shared/UninstanciateOverride",
-		  		 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
-		  		 "ACG/targets/shared/PortsCommonRefinementSteps",
-		  		 "ACG/targets/shared/DispatchCommonRefinementSteps",
-		  		 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
-		  		 "ACG/targets/ravenscar/ExpandThreadsPorts",
-//		  		 "ACG/targets/ravenscar/RavenscarCommunications",
-		  		 "ACG/targets/ravenscar/ExpandThreadsDispatchProtocol",		  		 
-		  		 "ACG/PeriodicDelayedCommunication/SharedRules",
-		  		 module
-		        };
-		  }
+		super(modelInstantiator, predefinedAadlModels) ;	
+	    _atlFileNames = new ArrayList<String>();
+	    _atlFileNames.add("ACG/targets/shared/UninstanciateOverride");
+	    _atlFileNames.add("ACG/targets/shared/SubprogramCallsCommonRefinementSteps");
+	    _atlFileNames.add("ACG/targets/shared/PortsCommonRefinementSteps");
+	    _atlFileNames.add("ACG/targets/shared/DispatchCommonRefinementSteps");
+	    _atlFileNames.add("ACG/targets/shared/BehaviorAnnexCommonRefinementSteps");
+	    _atlFileNames.add("ACG/targets/ravenscar/ExpandThreadsPorts");
+	    _atlFileNames.add("ACG/targets/ravenscar/ExpandThreadsDispatchProtocol");		  		 
+	    _atlFileNames.add("ACG/PeriodicDelayedCommunication/SharedRules");
+	    _atlFileNames.add(module);
+	  }
+
+	@Override
+	public List<String> getTransformationModuleList() {
+	  return _atlFileNames;
+	}
 }

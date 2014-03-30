@@ -30,6 +30,7 @@ import fr.tpt.aadl.ramses.analysis.eg.EG2ResultModel;
 import fr.tpt.aadl.ramses.analysis.eg.EGAnalyzer;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGModels;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode;
+import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
@@ -360,9 +361,11 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		{
 			Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager, cpuList);
 			List<File> transformationFileList = new ArrayList<File>();
+			
+			for(String s: getTransformationModuleList())
+			  transformationFileList.add(new File(s));
+			
 			Aadl2Util.setUseTunedEqualsMethods (false);
-
-			transformationFileList.add(new File(RamsesConfiguration.getAtlResourceDir().getAbsolutePath()+"/WcetAnalysis/ReducedBA"));
 
 			launcher.setOutputPackageName(outputModelId);
 			File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+File.separator+outputModelIdentifier+".aadl2");
@@ -500,4 +503,18 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		}
  
     }
+
+	List<String> _ransformationModuleList = null;
+	
+	@Override
+	public List<String> getTransformationModuleList() 
+	{
+	  if(_ransformationModuleList == null)
+	  {
+		_ransformationModuleList = AtlTransfoLauncher.getUninstanciateTransformationModuleList();
+		_ransformationModuleList.add(
+		  "/WcetAnalysis/ReducedBA");
+	  }
+	  return _ransformationModuleList;
+	}
 }

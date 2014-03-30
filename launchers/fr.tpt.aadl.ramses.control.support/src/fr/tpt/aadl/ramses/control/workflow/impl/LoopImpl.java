@@ -7,37 +7,39 @@
  * 
  * Authors: see AUTHORS
  * 
- * This program is free software: you can redistribute it and/or modify 
- * it under the terms of the Eclipse Public License as published by Eclipse,
- * either version 1.0 of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Eclipse Public License for more details.
- * You should have received a copy of the Eclipse Public License
- * along with this program.  If not, see 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the Eclipse Public License as published by Eclipse, either
+ * version 1.0 of the License, or (at your option) any later version. This
+ * program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License for
+ * more details. You should have received a copy of the Eclipse Public License
+ * along with this program. If not, see
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
-
 package fr.tpt.aadl.ramses.control.workflow.impl;
 
-import java.util.Collection ;
+import fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis;
+import fr.tpt.aadl.ramses.control.workflow.AnalysisOption;
+import fr.tpt.aadl.ramses.control.workflow.List;
+import fr.tpt.aadl.ramses.control.workflow.Loop;
+import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
 
-import org.eclipse.emf.common.notify.Notification ;
-import org.eclipse.emf.common.notify.NotificationChain ;
-import org.eclipse.emf.common.util.EList ;
-import org.eclipse.emf.ecore.EClass ;
-import org.eclipse.emf.ecore.InternalEObject ;
-import org.eclipse.emf.ecore.impl.ENotificationImpl ;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList ;
-import org.eclipse.emf.ecore.util.InternalEList ;
+import java.util.Collection;
 
-import fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis ;
-import fr.tpt.aadl.ramses.control.workflow.AnalysisOption ;
-import fr.tpt.aadl.ramses.control.workflow.List ;
-import fr.tpt.aadl.ramses.control.workflow.Loop ;
-import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier ;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
+
+import org.eclipse.emf.common.util.EList;
+
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.InternalEObject;
+
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
+
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -66,7 +68,7 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList alternatives;
+	protected EList<List> alternatives;
 
 	/**
 	 * The cached value of the '{@link #getAnalysis() <em>Analysis</em>}' containment reference.
@@ -142,6 +144,7 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	protected EClass eStaticClass() {
 		return WorkflowPackage.Literals.LOOP;
 	}
@@ -151,9 +154,9 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList getAlternatives() {
+	public EList<List> getAlternatives() {
 		if (alternatives == null) {
-			alternatives = new EObjectContainmentEList(List.class, this, WorkflowPackage.LOOP__ALTERNATIVES);
+			alternatives = new EObjectContainmentEList<List>(List.class, this, WorkflowPackage.LOOP__ALTERNATIVES);
 		}
 		return alternatives;
 	}
@@ -356,10 +359,11 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case WorkflowPackage.LOOP__ALTERNATIVES:
-				return ((InternalEList)getAlternatives()).basicRemove(otherEnd, msgs);
+				return ((InternalEList<?>)getAlternatives()).basicRemove(otherEnd, msgs);
 			case WorkflowPackage.LOOP__ANALYSIS:
 				return basicSetAnalysis(null, msgs);
 			case WorkflowPackage.LOOP__OUTPUT_MODEL_IDENTIFIER:
@@ -377,6 +381,7 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case WorkflowPackage.LOOP__ALTERNATIVES:
@@ -384,7 +389,7 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 			case WorkflowPackage.LOOP__ANALYSIS:
 				return getAnalysis();
 			case WorkflowPackage.LOOP__INITIAL_ANALYSIS:
-				return isInitialAnalysis() ? Boolean.TRUE : Boolean.FALSE;
+				return isInitialAnalysis();
 			case WorkflowPackage.LOOP__OUTPUT_MODEL_IDENTIFIER:
 				return getOutputModelIdentifier();
 			case WorkflowPackage.LOOP__FOUND_OPTION:
@@ -400,17 +405,19 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case WorkflowPackage.LOOP__ALTERNATIVES:
 				getAlternatives().clear();
-				getAlternatives().addAll((Collection)newValue);
+				getAlternatives().addAll((Collection<? extends List>)newValue);
 				return;
 			case WorkflowPackage.LOOP__ANALYSIS:
 				setAnalysis((AbstractAnalysis)newValue);
 				return;
 			case WorkflowPackage.LOOP__INITIAL_ANALYSIS:
-				setInitialAnalysis(((Boolean)newValue).booleanValue());
+				setInitialAnalysis((Boolean)newValue);
 				return;
 			case WorkflowPackage.LOOP__OUTPUT_MODEL_IDENTIFIER:
 				setOutputModelIdentifier((ModelIdentifier)newValue);
@@ -430,6 +437,7 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case WorkflowPackage.LOOP__ALTERNATIVES:
@@ -459,6 +467,7 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case WorkflowPackage.LOOP__ALTERNATIVES:
@@ -482,6 +491,7 @@ public class LoopImpl extends WorkflowElementImpl implements Loop {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

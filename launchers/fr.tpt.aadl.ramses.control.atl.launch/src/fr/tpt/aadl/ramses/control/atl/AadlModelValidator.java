@@ -6,6 +6,8 @@ import java.util.List ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
+import org.eclipse.m2m.atl.emftvm.Metamodel;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
@@ -38,22 +40,26 @@ public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
 			                     AnalysisErrorReporterManager errManager,
 			                     IProgressMonitor monitor) throws TransformationException 
 	{
-		initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
+	  if(env == null)
+		env = EmftvmFactory.eINSTANCE.createExecEnv();  
+	  Metamodel constraintValidationMetamodel = EmftvmFactory.eINSTANCE.createMetamodel();
+	  constraintValidationMetamodel.setResource(
+			  fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE.eResource());
+	  env.registerMetaModel("CV", constraintValidationMetamodel);
+		  
+	  initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
     ArrayList<File> atlFiles = new ArrayList<File>(ATL_FILE_NAMES.length) ;
 
     for(String fileName : ATL_FILE_NAMES)
     {
       atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
     }
-    Aadl2ConstraintValidationEMFTVMLauncher atlLauncher =
-          new Aadl2ConstraintValidationEMFTVMLauncher(_modelInstantiator,
-                _predefinedResourcesManager) ;
     
     String errorReportingGeneratedFileName = inputResource.getURI().lastSegment();
     errorReportingGeneratedFileName = errorReportingGeneratedFileName.replaceFirst(
       ".aaxl2", ".xmi");
     
-    return atlLauncher.doTransformation(ATL_FILES, inputResource, 
+    return doTransformation(ATL_FILES, inputResource, 
                                         errorReportingGeneratedFileName, 
                                         "_Errors");
 	}

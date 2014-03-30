@@ -7,19 +7,21 @@
  * 
  * Authors: see AUTHORS
  * 
- * This program is free software: you can redistribute it and/or modify 
- * it under the terms of the Eclipse Public License as published by Eclipse,
- * either version 1.0 of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * Eclipse Public License for more details.
- * You should have received a copy of the Eclipse Public License
- * along with this program.  If not, see 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the Eclipse Public License as published by Eclipse, either
+ * version 1.0 of the License, or (at your option) any later version. This
+ * program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License for
+ * more details. You should have received a copy of the Eclipse Public License
+ * along with this program. If not, see
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
-
 package fr.tpt.aadl.ramses.control.workflow.impl;
+
+import fr.tpt.aadl.ramses.control.workflow.File;
+import fr.tpt.aadl.ramses.control.workflow.List;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
 
 import java.util.Collection;
 
@@ -34,11 +36,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
-
-import fr.tpt.aadl.ramses.control.workflow.File;
-import fr.tpt.aadl.ramses.control.workflow.List;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage;
-
 
 /**
  * <!-- begin-user-doc -->
@@ -62,7 +59,7 @@ public class ListImpl extends EObjectImpl implements List {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList file;
+	protected EList<File> file;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -78,6 +75,7 @@ public class ListImpl extends EObjectImpl implements List {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	protected EClass eStaticClass() {
 		return WorkflowPackage.Literals.LIST;
 	}
@@ -87,9 +85,9 @@ public class ListImpl extends EObjectImpl implements List {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList getFile() {
+	public EList<File> getFile() {
 		if (file == null) {
-			file = new EObjectContainmentEList(File.class, this, WorkflowPackage.LIST__FILE);
+			file = new EObjectContainmentEList<File>(File.class, this, WorkflowPackage.LIST__FILE);
 		}
 		return file;
 	}
@@ -99,10 +97,11 @@ public class ListImpl extends EObjectImpl implements List {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case WorkflowPackage.LIST__FILE:
-				return ((InternalEList)getFile()).basicRemove(otherEnd, msgs);
+				return ((InternalEList<?>)getFile()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -112,6 +111,7 @@ public class ListImpl extends EObjectImpl implements List {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case WorkflowPackage.LIST__FILE:
@@ -125,11 +125,13 @@ public class ListImpl extends EObjectImpl implements List {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case WorkflowPackage.LIST__FILE:
 				getFile().clear();
-				getFile().addAll((Collection)newValue);
+				getFile().addAll((Collection<? extends File>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -140,6 +142,7 @@ public class ListImpl extends EObjectImpl implements List {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case WorkflowPackage.LIST__FILE:
@@ -154,6 +157,7 @@ public class ListImpl extends EObjectImpl implements List {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case WorkflowPackage.LIST__FILE:

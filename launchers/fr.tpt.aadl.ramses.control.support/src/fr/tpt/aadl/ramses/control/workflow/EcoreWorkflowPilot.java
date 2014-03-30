@@ -382,4 +382,18 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
     else
       return null;
   }
+
+  @Override
+  public String getTransformationName() {
+    if(currentWorkflowElement instanceof Transformation)
+	{
+	  return ((Transformation) currentWorkflowElement).getIdentifier() ;
+	}
+    else
+    {
+      String msg = "You cannot ask for a transformation name if the current state is not a transformation." ;
+      _LOGGER.error(msg);
+      return null ;
+    }
+  }
 }

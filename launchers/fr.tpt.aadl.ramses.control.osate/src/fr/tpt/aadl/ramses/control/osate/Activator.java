@@ -29,6 +29,7 @@ import org.eclipse.jface.resource.ImageDescriptor ;
 import org.eclipse.ui.plugin.AbstractUIPlugin ;
 import org.osgi.framework.BundleContext ;
 
+import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelsManagerImpl ;
@@ -91,6 +92,8 @@ public class Activator extends AbstractUIPlugin {
 	    
 	    sr.init(instantiator, modelManager);
 	    ServiceProvider.setDefault(sr) ;
+	    
+		AtlTransfoLauncher.initTransformation();
 	    
 	    /**************************************************************************/
 		}

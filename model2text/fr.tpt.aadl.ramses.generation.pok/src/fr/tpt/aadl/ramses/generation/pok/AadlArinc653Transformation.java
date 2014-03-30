@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.generation.pok ;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger ;
@@ -47,22 +48,21 @@ public class AadlArinc653Transformation extends
                                     String module)
   {
     super(modelInstantiator, predefinedAadlModels) ;
-    _atlFileNames = new String[]
-        {"ACG/targets/shared/UninstanciateOverride",
-  		 "ACG/targets/shared/SubprogramCallsCommonRefinementSteps",
-  		 "ACG/targets/shared/PortsCommonRefinementSteps",
-  		 "ACG/targets/shared/DispatchCommonRefinementSteps",
-  		 "ACG/targets/shared/BehaviorAnnexCommonRefinementSteps",
-  		 "ACG/targets/arinc653/ExpandThreadsPorts",
-  		 "ACG/targets/arinc653/BlackboardCommunications",
-  		 "ACG/targets/arinc653/BufferCommunications",
-  		 "ACG/targets/arinc653/EventsCommunications",
-  		 "ACG/targets/arinc653/QueuingCommunications",
-  		 "ACG/targets/arinc653/SamplingCommunications",
-  		 "ACG/targets/arinc653/ExpandThreadsDispatchProtocol",
-  		 "ACG/targets/arinc653/HealthMonitoring",
-  		 "ACG/PeriodicDelayedCommunication/SharedRules",
-  		 module
-        };
+    _atlFileNames = new ArrayList<String>();
+    _atlFileNames.add("ACG/targets/shared/UninstanciateOverride");
+    _atlFileNames.add("ACG/targets/shared/SubprogramCallsCommonRefinementSteps");
+    _atlFileNames.add("ACG/targets/shared/PortsCommonRefinementSteps");
+    _atlFileNames.add("ACG/targets/shared/DispatchCommonRefinementSteps");
+    _atlFileNames.add("ACG/targets/shared/BehaviorAnnexCommonRefinementSteps");
+    _atlFileNames.add("ACG/targets/arinc653/ExpandThreadsPorts");
+    _atlFileNames.add("ACG/targets/arinc653/BlackboardCommunications");
+    _atlFileNames.add("ACG/targets/arinc653/BufferCommunications");
+    _atlFileNames.add("ACG/targets/arinc653/EventsCommunications");
+    _atlFileNames.add("ACG/targets/arinc653/QueuingCommunications");
+    _atlFileNames.add("ACG/targets/arinc653/SamplingCommunications");
+    _atlFileNames.add("ACG/targets/arinc653/ExpandThreadsDispatchProtocol");
+    _atlFileNames.add("ACG/targets/arinc653/HealthMonitoring");
+    _atlFileNames.add("ACG/PeriodicDelayedCommunication/SharedRules");
+    _atlFileNames.add(module);
   }
 }

@@ -33,8 +33,9 @@ public interface AadlToAadl
   public void initAtlFileNameList(File resourceFilePath);
 	
   public Resource transform(Resource inputResource,
-                            File outputDir,
-                            IProgressMonitor monitor) throws TransformationException;
+							 String targetId,
+							 File outputDir,
+							 IProgressMonitor monitor) throws TransformationException;
   
   public Resource unparse(Resource inputResource,
                           Resource expandedResult,

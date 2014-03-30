@@ -22,4 +22,5 @@ Require-Bundle: org.osate.aadl2,
  fr.tpt.aadl.sched.wcetanalysis.results;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.m2m.atl.core,
- org.eclipse.m2m.atl.emftvm
+ org.eclipse.m2m.atl.emftvm,
+ org.eclipse.m2m.atl.emftvm.util

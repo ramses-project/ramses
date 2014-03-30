@@ -43,16 +43,21 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
 import org.eclipse.m2m.atl.emftvm.ExecEnv;
+import org.eclipse.m2m.atl.emftvm.Metamodel;
 import org.eclipse.m2m.atl.emftvm.Model;
 import org.eclipse.m2m.atl.emftvm.Module;
 import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl;
+import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
 import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver;
 import org.eclipse.m2m.atl.emftvm.util.TimingData;
 import org.osate.aadl2.AadlPackage;
 import org.osate.aadl2.PropertySet;
+import org.osate.aadl2.instance.InstancePackage;
+import org.osate.ba.aadlba.AadlBaPackage;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory;
+import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage;
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
@@ -76,8 +81,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	}
 
 	protected String outputPackageName = "";
-	
-	protected abstract void registerDefaultTransformationModules();
 	
 	private static Logger _LOGGER = Logger.getLogger(Aadl2XEMFTVMLauncher.class) ;
 	
@@ -113,9 +116,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
   {
     _modelInstantiator = modelInstantiator ;
     _predefinedResourcesManager = predefinedResourcesManager ;
-    
-    env = EmftvmFactory.eINSTANCE.createExecEnv();
-    initTransformation(env) ;
   }
 	
 	public String getOutputPackageName() {
@@ -126,20 +126,23 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		this.outputPackageName = outputPackageName;
 	}
 
-	public Resource doTransformation(List<File> transformationFileList,
-	                                 Resource inputResource,
-			                             String outputDirPathName,
-			                             String resourceSuffix)
+	public Resource doTransformation(String transformationId,
+            Resource inputResource,
+                String outputDirPathName,
+                String resourceSuffix)
 	{
-		initTransformationInputs(transformationFileList, 
-				inputResource);
+		env = AtlTransfoLauncher.getRamsesExecEnv(transformationId).getExecEnv();
+		
+		initTransformationInputs(inputResource);
+		
+		return doTransformation(inputResource, outputDirPathName, resourceSuffix);
+	}
+	
+	private Resource doTransformation(Resource inputResource,
+			String outputDirPathName, String resourceSuffix) {
 		
 		Resource outputResource = initTransformationOutput(inputResource, 
 				outputDirPathName, resourceSuffix);
-		
-		registerDefaultTransformationModules(); // variable part of this template method.
-		
-		registerAdditionalTransformationsEMFTVM(transformationFileList, _moduleResolver);
 		
 		Model outModel = EmftvmFactory.eINSTANCE.createModel();
 		outModel.setResource(outputResource);
@@ -172,7 +175,41 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 			}
 		}
 		
-		return outModel.getResource();		
+		return outModel.getResource();
+	}
+
+	public Resource doTransformation(List<File> transformationFileList,
+	                                 Resource inputResource,
+			                             String outputDirPathName,
+			                             String resourceSuffix)
+	{
+		
+		
+		if(env == null)
+		  env = EmftvmFactory.eINSTANCE.createExecEnv();
+		
+		// Load metamodels
+		  // Load aadl instance metamodel 
+		  Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		  aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
+		  env.registerMetaModel("AADLI", aadlInstanceMetaModel);
+
+		  // Load aadl+BA metamodel
+		  Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		  aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
+		  env.registerMetaModel("AADLBA", aadlBaMetaModel);
+
+		  // Load atlHooks metamodel
+		  Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		  atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
+		  env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
+		  
+		
+		initTransformationInputs(inputResource);
+		
+		registerAdditionalTransformationsEMFTVM(transformationFileList, _moduleResolver);
+		
+		return doTransformation(inputResource, outputDirPathName, resourceSuffix);	
 	}
 	
 	
@@ -196,8 +233,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		}
 	}
 
-	protected void initTransformationInputs(List<File> transformationFileList,
-			                                    Resource inputResource)
+	protected void initTransformationInputs(Resource inputResource)
 	{
 
     // Load models

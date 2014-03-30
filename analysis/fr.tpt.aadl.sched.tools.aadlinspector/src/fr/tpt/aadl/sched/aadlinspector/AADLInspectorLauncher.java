@@ -67,6 +67,8 @@ public class AADLInspectorLauncher
 		
 		String msg = ENV_VAR + " environment variable should be initialized." ;
 		_LOGGER.error(msg) ;
+		// TODO : add configuration page
+		
 		ServiceProvider.SYS_ERR_REP.error(msg, true);
 		return "";
 	}

@@ -107,4 +107,6 @@ public interface WorkflowPilot {
    * Returns the current loop executed in the workflow
    */
   public AbstractLoop getLoop();
+  
+  public String getTransformationName();
 }
