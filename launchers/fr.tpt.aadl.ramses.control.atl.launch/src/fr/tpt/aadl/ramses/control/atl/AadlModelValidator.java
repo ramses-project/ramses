@@ -2,6 +2,7 @@ package fr.tpt.aadl.ramses.control.atl;
 
 import java.io.File ;
 import java.util.ArrayList ;
+import java.util.Collection;
 import java.util.List ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
@@ -23,12 +24,12 @@ public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
 		super(modelInstantiator, predefinedResourcesManager);
 	}
 
-	protected String[] ATL_FILE_NAMES;
+	protected List<String> ATL_FILE_NAMES;
     public List<File> ATL_FILES;
 	
   public void initAtlFileNameList(File resourceDir)
   {
-    ATL_FILES = new ArrayList<File>(ATL_FILE_NAMES.length) ;
+    ATL_FILES = new ArrayList<File>() ;
     for(String fileName : ATL_FILE_NAMES)
     {
       ATL_FILES.add(new File(resourceDir.getAbsolutePath() + File.separator +
@@ -37,30 +38,40 @@ public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
   }
 	
 	public Resource validate(Resource inputResource, 
-			                     AnalysisErrorReporterManager errManager,
+			                     String targetId, AnalysisErrorReporterManager errManager,
 			                     IProgressMonitor monitor) throws TransformationException 
 	{
-	  if(env == null)
-		env = EmftvmFactory.eINSTANCE.createExecEnv();  
-	  Metamodel constraintValidationMetamodel = EmftvmFactory.eINSTANCE.createMetamodel();
-	  constraintValidationMetamodel.setResource(
-			  fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE.eResource());
-	  env.registerMetaModel("CV", constraintValidationMetamodel);
-		  
-	  initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
-    ArrayList<File> atlFiles = new ArrayList<File>(ATL_FILE_NAMES.length) ;
+	  String errorReportingGeneratedFileName = inputResource.getURI().lastSegment();
+	  errorReportingGeneratedFileName = errorReportingGeneratedFileName.replaceFirst(
+	      ".aaxl2", ".xmi");
 
-    for(String fileName : ATL_FILE_NAMES)
-    {
-      atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
-    }
-    
-    String errorReportingGeneratedFileName = inputResource.getURI().lastSegment();
-    errorReportingGeneratedFileName = errorReportingGeneratedFileName.replaceFirst(
-      ".aaxl2", ".xmi");
-    
-    return doTransformation(ATL_FILES, inputResource, 
+	  if(targetId!=null && AtlTransfoLauncher.getRamsesExecEnv(targetId)!=null)
+	  {
+		env = AtlTransfoLauncher.getRamsesExecEnv(targetId).getExecEnv();
+		return doTransformation(targetId, inputResource, 
+										errorReportingGeneratedFileName, 
+                						"_Errors");
+	  }
+      if(env == null)
+		env = EmftvmFactory.eINSTANCE.createExecEnv();  
+      Metamodel constraintValidationMetamodel = EmftvmFactory.eINSTANCE.createMetamodel();
+      constraintValidationMetamodel.setResource(
+    		  fr.tpt.aadl.ramses.constraintsreporter.reporterPackage.eINSTANCE.eResource());
+      env.registerMetaModel("CV", constraintValidationMetamodel);
+	  initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
+      ArrayList<File> atlFiles = new ArrayList<File>() ;
+
+      for(String fileName : ATL_FILE_NAMES)
+      {
+        atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
+      }
+        
+      return doTransformation(ATL_FILES, inputResource, 
                                         errorReportingGeneratedFileName, 
                                         "_Errors");
+	}
+
+	public List<String> getTransformationModuleList() {
+		return ATL_FILE_NAMES;
 	}
 }

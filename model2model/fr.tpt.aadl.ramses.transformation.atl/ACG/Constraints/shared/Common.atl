@@ -38,6 +38,6 @@ abstract rule check_ComponentInstance
 
 helper context AADLI!NamedElement def : hasProperty(propertyName: String) : Boolean =
 	self.ownedPropertyAssociation->exists(
-				e | e.property.name = propertyName
+				e | e.property.name.toLower() = propertyName.toLower()
 				)
 ;

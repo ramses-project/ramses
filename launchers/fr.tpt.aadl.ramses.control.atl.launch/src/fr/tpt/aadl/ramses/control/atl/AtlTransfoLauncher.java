@@ -53,6 +53,7 @@ import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
 import fr.tpt.aadl.ramses.control.support.generator.Generator;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.utils.Names;
 import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
 
 /**
@@ -135,6 +136,18 @@ public abstract class AtlTransfoLauncher
 		  pool.loadModule(moduleName);
 		}
 		_ramsesExecEnvPoolMap.put(generatorName, pool);
+		
+		moduleList = g.getValidationModuleList();
+		pool = new ExecEnvPool();
+		loadMetaModels(pool);
+		mrf = new RamsesModuleResolverFactory();
+		pool.setModuleResolverFactory(mrf);
+		for(String moduleName: moduleList)
+		{
+		  pool.loadModule(moduleName);
+		}
+		_ramsesExecEnvPoolMap.put(generatorName+Names.VALIDATOR_SUFFIX, pool);
+		
 	  }
 	  
 	  // init validators

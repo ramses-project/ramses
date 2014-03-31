@@ -30,6 +30,6 @@ abstract rule check_VirtualProcessorInstance
 {
 	from
 	  obj: AADLI!ComponentInstance
-	  (obj.category.getName() = 'virtual processor')
+	  (obj.category.getName().toLower() = 'virtual processor')
 }
 

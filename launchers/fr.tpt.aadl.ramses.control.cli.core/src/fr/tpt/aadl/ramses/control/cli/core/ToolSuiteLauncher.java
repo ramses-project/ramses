@@ -227,7 +227,7 @@ public class ToolSuiteLauncher
 
     generator.setParameters(parameters) ;
     
-    generator.generateWorkflow(instance, xmlPilot, config.getRuntimePath(),
+    generator.generateWorkflow(instance, config.getTargetId(), xmlPilot, config.getRuntimePath(),
                                config.getOutputDir(), includeDirs,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor) ;

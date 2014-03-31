@@ -50,6 +50,7 @@ public interface Generator extends NamedPlugin
   // TODO: doc me !
   // runtimePath can be null.
   public void generateWorkflow(SystemInstance systemInstance,
+		  					   String targetId,
                                WorkflowPilot xmlPilot,
                                File runtimeDir,
                                File outputDir,
@@ -65,6 +66,9 @@ public interface Generator extends NamedPlugin
   public String getRuntimePathEnvVar() ;
   
   public List<String> getTransformationModuleList();
+
+  public List<String> getValidationModuleList();
   
   public void setParameters(Map<String, Object> parameters) ;
+
 }

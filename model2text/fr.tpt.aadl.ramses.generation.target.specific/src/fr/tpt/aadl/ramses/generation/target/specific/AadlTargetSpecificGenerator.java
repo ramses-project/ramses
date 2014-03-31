@@ -64,6 +64,7 @@ import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelsManagerImpl ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.utils.Names;
 import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 
@@ -147,7 +148,7 @@ public class AadlTargetSpecificGenerator implements Generator
     if(_modelValidator != null)
     {
     	monitor.subTask("Model validation: check compatibility for refinement.");
-    	r = _modelValidator.validate(inputResource, errManager, monitor);
+    	r = _modelValidator.validate(inputResource, targetId+Names.VALIDATOR_SUFFIX, errManager, monitor);
     	if(false==r.getContents().isEmpty())
     	{
     	  for(EObject err : r.getContents())
@@ -191,6 +192,7 @@ public class AadlTargetSpecificGenerator implements Generator
 
   @Override
   public void generateWorkflow(SystemInstance systemInstance,
+		  					   String targetId,
                                WorkflowPilot xmlPilot,
                                File runtimeDir,
                                File outputDir,
@@ -216,7 +218,7 @@ public class AadlTargetSpecificGenerator implements Generator
     if(_modelValidator != null)
     {
       monitor.subTask("Model validation: check compatibility for refinement.") ;
-      Resource errRes = _modelValidator.validate(r, errManager, monitor) ;
+      Resource errRes = _modelValidator.validate(r, targetId+Names.VALIDATOR_SUFFIX, errManager, monitor) ;
       if(false == errRes.getContents().isEmpty())
       {
         for(EObject err : errRes.getContents())
@@ -695,6 +697,13 @@ private void doErrorState()
   public List<String> getTransformationModuleList() {
 	List<String> res = AtlTransfoLauncher.getUninstanciateTransformationModuleList(); 
 	res.addAll(_targetTrans.getTransformationModuleList());
+	return res;
+  }
+  
+  @Override
+  public List<String> getValidationModuleList() {
+	List<String> res = new ArrayList<String>(); 
+	res.addAll(_modelValidator.getTransformationModuleList());
 	return res;
   }
   

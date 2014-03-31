@@ -387,6 +387,7 @@ public class GenerateActionHandler extends AbstractHandler {
     {
       EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
       generator.generateWorkflow(sinst,
+    		  					 config.getTargetId(),
                                  xmlPilot,
                                  config.getRuntimePath(),
                                  config.getOutputDir(),

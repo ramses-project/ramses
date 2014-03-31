@@ -1,5 +1,7 @@
 package fr.tpt.aadl.ramses.generation.pok;
 
+import java.util.ArrayList;
+
 import fr.tpt.aadl.ramses.control.atl.Aadl2ConstraintValidationEMFTVMLauncher ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
@@ -10,18 +12,17 @@ public class AadlArinc653Validation extends Aadl2ConstraintValidationEMFTVMLaunc
 			                          PredefinedAadlModelManager predefinedResourcesManager)
   {
 		super(modelInstantiator, predefinedResourcesManager);
-		ATL_FILE_NAMES = new String[]
-		        {"helpers/Services",
-				"tools/PropertiesTools",
-		        "ACG/Constraints/shared/Common",
-				"ACG/Constraints/shared/ThreadInstances",
-				"ACG/Constraints/shared/ProcessInstances",
-				"ACG/Constraints/shared/ProcessorInstances",
-				"ACG/Constraints/shared/VirtualProcessorInstances",
-				"ACG/Constraints/shared/FeatureInstances",
-				"ACG/Constraints/shared/Subprograms",
-				"ACG/Constraints/arinc653/InterPartitionCommunications",
-				"ACG/Constraints/arinc653/ArincProperties"
-		        };
+		ATL_FILE_NAMES = new ArrayList<String>();
+		ATL_FILE_NAMES.add("helpers/Services");
+		ATL_FILE_NAMES.add("tools/PropertiesTools");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/Common");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/ThreadInstances");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessInstances");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessorInstances");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/VirtualProcessorInstances");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/FeatureInstances");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/Subprograms");
+		ATL_FILE_NAMES.add("ACG/Constraints/arinc653/InterPartitionCommunications");
+		ATL_FILE_NAMES.add("ACG/Constraints/arinc653/ArincProperties");
 	}
 }

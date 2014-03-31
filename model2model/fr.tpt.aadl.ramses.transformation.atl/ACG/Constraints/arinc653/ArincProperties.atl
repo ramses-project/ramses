@@ -162,7 +162,7 @@ rule check_HasPeriod
 	from
 	 	obj:AADLI!ComponentInstance,
 		p: AADLI!Property
-		(p.name='Period' and not obj.hasProperty('Period'))
+		(p.eContainer().name='ARINC653' and p.name='Period' and not obj.hasProperty('Period'))
 	to
 		err: CV!Error
 		(message <- 'In ARINC653, each virtual processor must'+ 
