@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.support.utils;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 
 public class WaitMonitor extends Thread
@@ -30,6 +31,8 @@ public class WaitMonitor extends Thread
   private Exception _caughtException = null ;
   
   private int _exitCode = Command.UNSET;
+  
+  private static Logger _LOGGER = Logger.getLogger(WaitMonitor.class) ; 
   
   public WaitMonitor(Command action)
   {
@@ -50,6 +53,7 @@ public class WaitMonitor extends Thread
     }
     catch(Exception e)
     {
+      _LOGGER.fatal("command has failed", e);
       _caughtException = e ;
       _exitCode = Command.FATAL ;
     }

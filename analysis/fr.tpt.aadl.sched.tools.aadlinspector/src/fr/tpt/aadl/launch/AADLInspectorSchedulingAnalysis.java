@@ -180,7 +180,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
         }
         
         // Wait all the thread end.
-        synchronized (app) {wait();}
+        synchronized (app) {app.wait();}
         
         return Command.OK ;
       }
@@ -220,6 +220,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		    Exception e = wm.getCaughtException() ;
 		    String msg = "AADL Inspector has failed" ;
 		    _logger.fatal(msg, e);
+		    killThreads(aadlInspectorThreads) ;
 		    throw new RuntimeException(msg, e);
 		  }
 		  
@@ -397,7 +398,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		private List<EGNode> egNodeList;
 		private File outputDir;
 		private SystemInstance root;
-		private AADLInspectorSchedulingAnalysis initiator;
+		private final AADLInspectorSchedulingAnalysis initiator;
 		private String outputModelId;
 		private String mode;
 		private List<ComponentInstance> cpuToIgnore = new ArrayList<ComponentInstance>();
@@ -423,7 +424,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			}
 		}
 
-		public AADLInspectorAnalysisThread(AADLInspectorSchedulingAnalysis aadlInspectorSchedulingAnalysis, List<EGNode> egNodeList,
+		public AADLInspectorAnalysisThread(final AADLInspectorSchedulingAnalysis aadlInspectorSchedulingAnalysis, List<EGNode> egNodeList,
 				File outputDir, SystemInstance root, String outputModelId, String mode) {
         	this.initiator = aadlInspectorSchedulingAnalysis;
 			this.egNodeList = egNodeList;
@@ -464,7 +465,6 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 						initiator.addAnalysisResult(ci, ufr, egNodeList);
 					}
 				}
-				
 			} 
 			catch (Exception e)
 			{
