@@ -48,6 +48,7 @@ import org.eclipse.emf.transaction.TransactionalCommandStack ;
 import org.eclipse.emf.transaction.TransactionalEditingDomain ;
 import org.eclipse.jface.viewers.ISelection ;
 import org.eclipse.jface.viewers.IStructuredSelection ;
+import org.eclipse.m2m.atl.emftvm.util.VMException ;
 import org.eclipse.ui.IEditorPart ;
 import org.eclipse.ui.handlers.HandlerUtil ;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode ;
@@ -58,7 +59,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
-import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage;
+import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage ;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigStatus ;
@@ -206,6 +207,13 @@ public class GenerateActionHandler extends AbstractHandler {
   {
     monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
     
+    if(monitor.isCanceled())
+    {
+      String msg = "generation has been canceled at the begining" ;
+      _LOGGER.trace(msg);
+      throw new OperationCanceledException(msg) ;
+    }
+    
     ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     AadlModelInstantiatior instantiator =sr.getModelInstantiatior() ;
     
@@ -274,34 +282,57 @@ public class GenerateActionHandler extends AbstractHandler {
               }
               catch(OperationCanceledException e)
               {
-                StringBuilder sb = new StringBuilder() ;
-                sb.append(Names.NEW_LINE) ;
-                sb.append(Names.NEW_LINE) ;
-                sb.append("********************************************************************************") ;
-                sb.append(Names.NEW_LINE) ;
-                if(! (e.getMessage() == null || e.getMessage().isEmpty()))
+                _LOGGER.info(cancelMsg(e));
+                this.setLabel(_CANCEL_STATUS);
+              }
+              catch(VMException e)
+              {
+                if(e.getCause() instanceof OperationCanceledException)
                 {
-                  sb.append(e.getMessage()) ;
+                  _LOGGER.info(cancelMsg((OperationCanceledException) e.getCause()));
+                  this.setLabel(_CANCEL_STATUS);
                 }
                 else
                 {
-                  sb.append("User has canceled") ;
+                  _LOGGER.fatal("", e) ;
+                  fatal(e) ;
                 }
-                sb.append(Names.NEW_LINE) ;
-                sb.append("********************************************************************************") ;
-                
-                _LOGGER.info(sb.toString());
-                
-                this.setLabel(_CANCEL_STATUS);
               }
               catch(Exception e)
               {
                 _LOGGER.fatal("", e) ;
-                // Don't report error to the user.
-                // Eclipse will open an error dialog thanks to the status.
-                this.setLabel(_ABORT_STATUS) ;
-                this.exceptionCaught = e ;
+                fatal(e) ;
               }
+            }
+
+            private void fatal(Exception e)
+            {
+              // Don't report error to the user.
+              // Eclipse will open an error dialog thanks to the status.
+              this.setLabel(_ABORT_STATUS) ;
+              this.exceptionCaught = e ;
+            }
+
+            private String cancelMsg(OperationCanceledException e)
+            {
+              StringBuilder sb = new StringBuilder() ;
+              sb.append(Names.NEW_LINE) ;
+              sb.append(Names.NEW_LINE) ;
+              sb.append("********************************************************************************") ;
+              sb.append(Names.NEW_LINE) ;
+              if(! (e.getMessage() == null || e.getMessage().isEmpty()))
+              {
+                sb.append(e.getMessage()) ;
+              }
+              else
+              {
+                sb.append("User has canceled") ;
+              }
+              sb.append(Names.NEW_LINE) ;
+              sb.append("********************************************************************************") ;
+              sb.append(Names.NEW_LINE) ;
+              
+              return sb.toString() ;
             }
           } ;
 

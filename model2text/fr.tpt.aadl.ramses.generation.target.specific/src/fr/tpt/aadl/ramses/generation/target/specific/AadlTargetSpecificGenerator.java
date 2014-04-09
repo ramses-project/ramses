@@ -55,7 +55,6 @@ import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -271,7 +270,7 @@ public class AadlTargetSpecificGenerator implements Generator
       else if(operation.equals("transformation"))
       {
     	monitor.subTask("Model transformation " + ((xmlPilot.getTransformationName()!=null) ? xmlPilot.getTransformationName():""));
-        currentInstance = doTransformation(xmlPilot, outputDir) ;
+        currentInstance = doTransformation(xmlPilot, outputDir, monitor) ;
         r = currentInstance.eResource() ;
       }
       else if(operation.equals("unparse"))
@@ -519,7 +518,7 @@ public class AadlTargetSpecificGenerator implements Generator
       String msg = "Start loop iteration = " + loopIteration ;
       _LOGGER.trace(msg);
       String transfoId = xmlPilot.getTransformationName();
-      doTransformation(transfoId, moduleList,inputId,outputId,outputDir);
+      doTransformation(transfoId, moduleList,inputId,outputId,outputDir, monitor);
       if (isValidLoopIteration(a,errManager,xmlPilot,outputDir,outputId,monitor))
       {
         break;
@@ -591,21 +590,22 @@ public class AadlTargetSpecificGenerator implements Generator
       return false;
   }
 
-  private SystemInstance doTransformation(WorkflowPilot workflowPilot, File generatedDir)
+  private SystemInstance doTransformation(WorkflowPilot workflowPilot, File generatedDir, IProgressMonitor monitor)
 		                                                 throws GenerationException, AnalysisException, TransformationException
 	{
 	  String identifier = workflowPilot.getTransformationName();
     List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
     String inputModelId = workflowPilot.getInputModelId();
     String outputModelId = workflowPilot.getOutputModelId();
-    return doTransformation(identifier, resourceFileNameList,inputModelId,outputModelId,generatedDir);
+    return doTransformation(identifier, resourceFileNameList,inputModelId,outputModelId,generatedDir, monitor);
 	}
   
   
   private SystemInstance doTransformation(String transformationId,
 		  								  List<String> resourceFileNameList,
                                           String inputModelId, String outputModelId, 
-                                          File generatedDir) throws GenerationException,
+                                          File generatedDir,
+                                          IProgressMonitor monitor) throws GenerationException,
                                                                     TransformationException
   {
     Resource r = modelsMap.get(inputModelId);
@@ -621,7 +621,7 @@ public class AadlTargetSpecificGenerator implements Generator
     _LOGGER.trace(msg);
     
     Resource result = _targetTrans.transformWokflow(r, transformationId, resourceFileNameList, 
-                                                generatedDir, outputModelId);
+                                                generatedDir, outputModelId, monitor);
 
     PropertiesLinkingService pls = new PropertiesLinkingService ();
     SystemImplementation si = (SystemImplementation) pls.

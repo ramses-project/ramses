@@ -27,6 +27,7 @@ import java.util.ArrayList ;
 import java.util.List ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.m2m.atl.emftvm.ExecEnv ;
@@ -51,7 +52,8 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 
 	public Resource generationEntryPoint(Resource inputResource,
 			                                 List<File> transformationFileList,
-			                                 File outputDir)
+			                                 File outputDir,
+			                                 IProgressMonitor monitor)
 			                                            throws TransformationException
 	{
 			String aadlGeneratedFileName = inputResource.getURI().lastSegment();
@@ -63,7 +65,7 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			try
 			{
 				transfoResult = this.doTransformation(transformationFileList,
-					inputResource, aadlGeneratedFileName, "_extended");
+					inputResource, aadlGeneratedFileName, "_extended", monitor);
 			}
 			finally
 			{
@@ -134,7 +136,7 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 	}
 
 	public Resource generationEntryPoint(Resource inputResource,
-			String targetId, File outputDir) throws TransformationException {
+			String targetId, File outputDir, IProgressMonitor monitor) throws TransformationException {
 		String aadlGeneratedFileName = inputResource.getURI().lastSegment();
 		aadlGeneratedFileName = aadlGeneratedFileName.replaceFirst(
 				".aaxl2", "_extended.aadl2");
@@ -144,7 +146,7 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 		try
 		{
 			transfoResult = this.doTransformation(targetId,
-				inputResource, aadlGeneratedFileName, "_extended");
+				inputResource, aadlGeneratedFileName, "_extended", monitor);
 		}
 		finally
 		{

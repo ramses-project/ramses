@@ -99,7 +99,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 	AtlTransfoLauncher.initTransformation();
 	if(AtlTransfoLauncher.getRamsesExecEnv(targetId)!=null)
 		return atlLauncher.generationEntryPoint(inputResource,
-				targetId, outputDir) ;
+				targetId, outputDir, monitor) ;
     initAtlFileNameList(RamsesConfiguration.getAtlResourceDir()) ;
 
     {
@@ -114,7 +114,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
         atlFiles.add(new File(RamsesConfiguration.getAtlResourceDir() + File.separator + fileName)) ;
       }
       return atlLauncher.generationEntryPoint(inputResource,
-                                              atlFiles, outputDir) ;
+                                              atlFiles, outputDir, monitor) ;
     }
   }
   
@@ -323,7 +323,8 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
 		  							String transformationId,
 		  							List<String> resourceFileNameList,
 		  							File outputDir,
-		  							String outputPackageName) throws TransformationException
+		  							String outputPackageName,
+		  							IProgressMonitor monitor) throws TransformationException
   {
 	Aadl2AadlEMFTVMLauncher atlLauncher =
 	        new Aadl2AadlEMFTVMLauncher(_modelInstantiator, _predefinedAadlModels) ;
@@ -332,7 +333,7 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
 	AtlTransfoLauncher.initTransformation();
 	if(transformationId!=null && AtlTransfoLauncher.getRamsesExecEnv(transformationId)!=null)
 	  return atlLauncher.generationEntryPoint(inputResource,
-			  transformationId, outputDir) ;
+			  transformationId, outputDir, monitor) ;
 	
 	ArrayList<File> atlFiles = new ArrayList<File>() ;
 	for(String s : AtlTransfoLauncher.getUninstanciateTransformationModuleList())
@@ -351,6 +352,6 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
       atlFiles.add(new File(resourcePath)) ;
     }
 
-    return atlLauncher.generationEntryPoint(inputResource, atlFiles, outputDir) ;
+    return atlLauncher.generationEntryPoint(inputResource, atlFiles, outputDir, monitor) ;
   }
 }

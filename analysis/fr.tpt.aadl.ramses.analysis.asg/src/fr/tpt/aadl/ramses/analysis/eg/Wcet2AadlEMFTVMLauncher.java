@@ -3,6 +3,7 @@ package fr.tpt.aadl.ramses.analysis.eg;
 import java.io.File ;
 import java.util.List ;
 
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EPackage ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -44,7 +45,8 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	public Resource doTransformation(List<File> transformationFileList,
 			                             Resource inputResource,
 			                             String outputDirPathName,
-			                             String resourceSuffix)
+			                             String resourceSuffix,
+			                             IProgressMonitor monitor)
 	{
 		ResourceSet rs = inputResource.getResourceSet();
 		
@@ -65,6 +67,6 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		env.registerInputModel("WCET", inModel);
 		
 		return super.doTransformation(transformationFileList, inputResource,
-				outputDirPathName, resourceSuffix);
+				outputDirPathName, resourceSuffix, monitor);
 	}
 }

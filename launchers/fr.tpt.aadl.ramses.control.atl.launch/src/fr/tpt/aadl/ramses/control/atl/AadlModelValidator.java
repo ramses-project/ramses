@@ -2,7 +2,6 @@ package fr.tpt.aadl.ramses.control.atl;
 
 import java.io.File ;
 import java.util.ArrayList ;
-import java.util.Collection;
 import java.util.List ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
@@ -50,7 +49,7 @@ public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
 		env = AtlTransfoLauncher.getRamsesExecEnv(targetId).getExecEnv();
 		return doTransformation(targetId, inputResource, 
 										errorReportingGeneratedFileName, 
-                						"_Errors");
+                						"_Errors", monitor);
 	  }
       if(env == null)
 		env = EmftvmFactory.eINSTANCE.createExecEnv();  
@@ -68,7 +67,7 @@ public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
         
       return doTransformation(ATL_FILES, inputResource, 
                                         errorReportingGeneratedFileName, 
-                                        "_Errors");
+                                        "_Errors", monitor);
 	}
 
 	public List<String> getTransformationModuleList() {

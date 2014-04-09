@@ -26,42 +26,45 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.io.File ;
+import java.io.IOException ;
+import java.io.InputStream ;
+import java.net.URL ;
+import java.util.ArrayList ;
+import java.util.Collections ;
+import java.util.Iterator ;
+import java.util.List ;
 
-import org.apache.log4j.Logger;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
-import org.eclipse.m2m.atl.emftvm.ExecEnv;
-import org.eclipse.m2m.atl.emftvm.Metamodel;
-import org.eclipse.m2m.atl.emftvm.Model;
-import org.eclipse.m2m.atl.emftvm.Module;
-import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl;
-import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
-import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException;
-import org.eclipse.m2m.atl.emftvm.util.ModuleResolver;
-import org.eclipse.m2m.atl.emftvm.util.TimingData;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.PropertySet;
-import org.osate.aadl2.instance.InstancePackage;
-import org.osate.ba.aadlba.AadlBaPackage;
+import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.OperationCanceledException ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
+import org.eclipse.m2m.atl.emftvm.ExecEnv ;
+import org.eclipse.m2m.atl.emftvm.Metamodel ;
+import org.eclipse.m2m.atl.emftvm.Model ;
+import org.eclipse.m2m.atl.emftvm.Module ;
+import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceImpl ;
+import org.eclipse.m2m.atl.emftvm.util.ModuleNotFoundException ;
+import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
+import org.eclipse.m2m.atl.emftvm.util.StackFrame ;
+import org.eclipse.m2m.atl.emftvm.util.TimingData ;
+import org.eclipse.m2m.atl.emftvm.util.VMMonitor ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.PropertySet ;
+import org.osate.aadl2.instance.InstancePackage ;
+import org.osate.ba.aadlba.AadlBaPackage ;
 
-import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory;
-import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage;
-import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
-import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
-import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
+import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksFactory ;
+import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
+import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 
 
 public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
@@ -129,17 +132,18 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	public Resource doTransformation(String transformationId,
             Resource inputResource,
                 String outputDirPathName,
-                String resourceSuffix)
+                String resourceSuffix,
+                IProgressMonitor monitor)
 	{
 		env = AtlTransfoLauncher.getRamsesExecEnv(transformationId).getExecEnv();
 		
 		initTransformationInputs(inputResource);
 		
-		return doTransformation(inputResource, outputDirPathName, resourceSuffix);
+		return doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
 	}
 	
 	private Resource doTransformation(Resource inputResource,
-			String outputDirPathName, String resourceSuffix) {
+			String outputDirPathName, String resourceSuffix, final IProgressMonitor monitor) {
 		
 		Resource outputResource = initTransformationOutput(inputResource, 
 				outputDirPathName, resourceSuffix);
@@ -151,6 +155,61 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		// Run transformation
 		TimingData td = new TimingData();
 		td.finishLoading();
+		
+		if(null == env.getMonitor())
+		{
+		  VMMonitor vmMonitor = new VMMonitor()
+	    {
+	      @Override
+	      public boolean isTerminated()
+	      {
+	        // TODO Auto-generated method stub
+	        return false ;
+	      }
+
+	      @Override
+	      public void enter(StackFrame frame)
+	      {
+	        // TODO Auto-generated method stub
+	        
+	      }
+
+	      @Override
+	      public void leave(StackFrame frame)
+	      {
+	        // TODO Auto-generated method stub
+	        
+	      }
+
+	      @Override
+	      public void step(StackFrame frame)
+	      {
+	        if(monitor.isCanceled())
+	        {
+	          String msg = "user has canceled during the analysis" ;
+	          _LOGGER.trace(msg) ;
+	          throw new OperationCanceledException(msg) ;
+	        }
+	      }
+
+	      @Override
+	      public void terminated()
+	      {
+	        // TODO Auto-generated method stub
+	        
+	      }
+
+	      @Override
+	      public void error(StackFrame frame, String msg, Exception e)
+	      {
+	        // TODO Auto-generated method stub
+	        
+	      }
+	    };
+	    
+	    env.setMonitor(vmMonitor);
+		}
+		
 		env.run(td);
 		td.finish();
 		//pool.returnExecEnv(env);
@@ -181,7 +240,8 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	public Resource doTransformation(List<File> transformationFileList,
 	                                 Resource inputResource,
 			                             String outputDirPathName,
-			                             String resourceSuffix)
+			                             String resourceSuffix,
+			                             IProgressMonitor monitor)
 	{
 		
 		
@@ -209,7 +269,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		registerAdditionalTransformationsEMFTVM(transformationFileList, _moduleResolver);
 		
-		return doTransformation(inputResource, outputDirPathName, resourceSuffix);	
+		return doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);	
 	}
 	
 	

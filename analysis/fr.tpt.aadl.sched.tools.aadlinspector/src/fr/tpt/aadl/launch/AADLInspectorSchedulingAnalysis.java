@@ -1,49 +1,70 @@
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 package fr.tpt.aadl.launch;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File ;
+import java.util.ArrayList ;
+import java.util.HashMap ;
+import java.util.LinkedHashSet ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.OperationCanceledException ;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.EcoreUtil2;
-import org.osate.aadl2.AadlPackage;
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
-import org.osate.aadl2.util.Aadl2Util;
-import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.m2m.atl.emftvm.util.VMException ;
+import org.eclipse.xtext.EcoreUtil2 ;
+import org.osate.aadl2.AadlPackage ;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.aadl2.util.Aadl2Util ;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Sets ;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
-import fr.tpt.aadl.ramses.analysis.eg.EG2ResultModel;
-import fr.tpt.aadl.ramses.analysis.eg.EGAnalyzer;
-import fr.tpt.aadl.ramses.analysis.eg.model.EGModels;
-import fr.tpt.aadl.ramses.analysis.eg.model.EGNode;
-import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
-import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
-import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
+import fr.tpt.aadl.ramses.analysis.eg.EG2ResultModel ;
+import fr.tpt.aadl.ramses.analysis.eg.EGAnalyzer ;
+import fr.tpt.aadl.ramses.analysis.eg.model.EGModels ;
+import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
+import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
+import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.utils.Command ;
 import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
-import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
-import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher;
-import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult;
-import fr.tpt.aadl.sched.aadlinspector.output.ResponseTimeResult;
-import fr.tpt.aadl.sched.aadlinspector.output.ResponseTimeResult.TaskResponseTimeResult;
-import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel;
+import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher ;
+import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult ;
+import fr.tpt.aadl.sched.aadlinspector.output.ResponseTimeResult ;
+import fr.tpt.aadl.sched.aadlinspector.output.ResponseTimeResult.TaskResponseTimeResult ;
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
 
 public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
@@ -241,6 +262,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		  {
 		    String msg = "AADL Inspector process done" ;
 		    _logger.trace(msg);
+		    break ;
 		  }
 		  
 		  default:
@@ -293,7 +315,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	private void killThreads(Thread[] aadlInspectorThreads)
   {
     for(Thread t : aadlInspectorThreads)
-      t.stop();
+      t.interrupt();
   }
 
 
@@ -354,43 +376,33 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	}
 	
 	private Resource produceAnalysisAADLModel(AnalysisModel m, File outputDir,
-			SystemInstance systemInstance,
-			String outputModelId,
-			List<ComponentInstance> cpuList)
+			                                      SystemInstance systemInstance,
+			                                      String outputModelId,
+			                                      List<ComponentInstance> cpuList,
+			                                      IProgressMonitor monitor)
 	{
-		try
-		{
-			Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager, cpuList);
-			List<File> transformationFileList = new ArrayList<File>();
-			
-			for(String s: getTransformationModuleList())
-			  transformationFileList.add(new File(s));
-			
-			Aadl2Util.setUseTunedEqualsMethods (false);
+	  Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager, cpuList);
+    List<File> transformationFileList = new ArrayList<File>();
+    
+    for(String s: getTransformationModuleList())
+      transformationFileList.add(new File(s));
+    
+    Aadl2Util.setUseTunedEqualsMethods (false);
 
-			launcher.setOutputPackageName(outputModelId);
-			File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+File.separator+outputModelIdentifier+".aadl2");
-			Resource rootResource = systemInstance.eResource();
-			Resource aadlModelWithWcet = launcher.doTransformation(transformationFileList, 
-					rootResource,
-					outputDir.getAbsolutePath(),
-					"_"+outputModelId);
+    launcher.setOutputPackageName(outputModelId);
+    File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+File.separator+outputModelIdentifier+".aadl2");
+    Resource rootResource = systemInstance.eResource();
+    Resource aadlModelWithWcet = launcher.doTransformation(transformationFileList, 
+        rootResource,
+        outputDir.getAbsolutePath(),
+        "_"+outputModelId,
+        monitor);
 
-			
-			aadlModelWithWcet.setURI(URI.createFileURI(aadlWithWcetFile.getAbsolutePath()));
-			_instantiator.serialize(aadlModelWithWcet, aadlWithWcetFile.getAbsolutePath());
-			return aadlModelWithWcet;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		finally
-		{
-			Aadl2Util.setUseTunedEqualsMethods (false);
-		}
-		return null;
+    
+    aadlModelWithWcet.setURI(URI.createFileURI(aadlWithWcetFile.getAbsolutePath()));
+    _instantiator.serialize(aadlModelWithWcet, aadlWithWcetFile.getAbsolutePath());
+    Aadl2Util.setUseTunedEqualsMethods (false);
+    return aadlModelWithWcet;
 	}
 	
 	static class AADLInspectorAnalysisThread extends Thread
@@ -404,6 +416,8 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		private List<ComponentInstance> cpuToIgnore = new ArrayList<ComponentInstance>();
 		
 		public AnalysisResult analysisResult;
+    
+    private static Logger _LOGGER = Logger.getLogger(AADLInspectorAnalysisThread.class) ;
 		
 		public AADLInspectorAnalysisThread(AADLInspectorSchedulingAnalysis aadlInspectorSchedulingAnalysis, List<EGNode> egNodeList,
 				File outputDir, ComponentInstance cpu, String outputModelId, String mode) {
@@ -434,66 +448,138 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			this.mode = mode;
 		}
 		
-		public void run()
+    public void run()
+    {
+      Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+      
+      EGModels models = new EGModels() ;
+      for(EGNode node : egNodeList)
+      {
+        models.put((ComponentInstance) node.getThread(), node) ;
+      }
+      try
+      {
+        EG2ResultModel eg2resultModel = new EG2ResultModel(models) ;
+        AnalysisModel result = eg2resultModel.getAnalysisModel() ;
+
+        if(initiator._monitor.isCanceled())
         {
-            EGModels models = new EGModels();
-			for(EGNode node: egNodeList)
-			{
-				models.put((ComponentInstance)node.getThread(), node);
-			}
-			try {
-				EG2ResultModel eg2resultModel = new EG2ResultModel(models);
-				AnalysisModel result = eg2resultModel.getAnalysisModel();
-				Resource aadlModel = initiator.produceAnalysisAADLModel(result, outputDir, root, outputModelId, cpuToIgnore);
-
-				PropertiesLinkingService pls = new PropertiesLinkingService ();
-				AadlPackage pkg = (AadlPackage) aadlModel.getContents().get(0);
-				SystemImplementation si = (SystemImplementation) pls.
-						findNamedElementInsideAadlPackage(outputModelId+".impl", 
-								pkg.getOwnedPublicSection());
-
-				SystemInstance sinst = initiator._instantiator.instantiate(si);
-
-			
-				AADLInspectorLauncher launcher = new AADLInspectorLauncher();
-				analysisResult = launcher.launchAnalysis(sinst, outputDir, mode);
-				for(ComponentInstance ci : EcoreUtil2.getAllContentsOfType(sinst, ComponentInstance.class))
-				{
-					if(ci.getCategory().equals(ComponentCategory.PROCESSOR))
-					{
-						ResponseTimeResult ufr = analysisResult.getResponseTimeResults("root."+ci.getName());
-						initiator.addAnalysisResult(ci, ufr, egNodeList);
-					}
-				}
-			} 
-			catch (Exception e)
-			{
-				System.err.println("Intermediate AADLInspector: " + e.getMessage());
-				e.printStackTrace();
-				synchronized (root) {
-					initiator.cpt++;
-					initiator.cpt_failed++;
-					String message = "INFO: "+initiator.cpt_failed+" execution(s) of AADLInspector schedulability" +
-							" failed.";
-					initiator._monitor.subTask(message);
-					initiator._logger.trace(message);
-					evaluateIfFinished();
-				}
-			}
-
-			synchronized (root) {
-				initiator.cpt++;
-				String message = "INFO: "+initiator.cpt+" execution(s) of AADLInspector schedulability" +
-						" done.";
-				initiator._monitor.subTask(message);
-				initiator._logger.trace(message);
-				evaluateIfFinished();
-			}
-			
-			
-			return;
+          String msg = "analysis has been canceled before analysis" ;
+          _LOGGER.trace(msg) ;
+          return ;
         }
-		void evaluateIfFinished()
+
+        Resource aadlModel =
+                             initiator.produceAnalysisAADLModel(result,
+                                                                outputDir,
+                                                                root,
+                                                                outputModelId,
+                                                                cpuToIgnore,
+                                                                initiator._monitor) ;
+
+        PropertiesLinkingService pls = new PropertiesLinkingService() ;
+        AadlPackage pkg = (AadlPackage) aadlModel.getContents().get(0) ;
+        SystemImplementation si =
+                                  (SystemImplementation) pls.findNamedElementInsideAadlPackage(outputModelId +
+                                                                                                   ".impl",
+                                                                                               pkg.getOwnedPublicSection()) ;
+        SystemInstance sinst = initiator._instantiator.instantiate(si) ;
+
+        AADLInspectorLauncher launcher = new AADLInspectorLauncher() ;
+        analysisResult =
+                         launcher.launchAnalysis(sinst, outputDir, mode,
+                                                 initiator._monitor) ;
+        if(initiator._monitor.isCanceled())
+        {
+          String msg = "analysis has been canceled after analysis" ;
+          _LOGGER.trace(msg) ;
+          return ;
+        }
+
+        for(ComponentInstance ci : EcoreUtil2.getAllContentsOfType(sinst,
+                                                                   ComponentInstance.class))
+        {
+          if(ci.getCategory().equals(ComponentCategory.PROCESSOR))
+          {
+            ResponseTimeResult ufr =
+                                     analysisResult.getResponseTimeResults("root." +
+                                                                           ci.getName()) ;
+            initiator.addAnalysisResult(ci, ufr, egNodeList) ;
+          }
+        }
+      }
+			catch(InterruptedException e)
+			{
+			  // Analysis has been canceled by the user. Stop the analysis.
+			  String msg = "Intermediate AADLInspector has been interrupted" ;
+        _LOGGER.trace(msg) ;
+			  return ;
+			}
+			catch(OperationCanceledException e)
+			{
+			  // Analysis has been canceled by the user. Stop the analysis.
+			  _LOGGER.trace(cancelMsg()) ;
+			  return ;
+			}
+			catch(VMException e)
+			{
+			  if(e.getCause() instanceof OperationCanceledException)
+			  {
+			    // Analysis has been canceled by the user. Stop the analysis.
+			    _LOGGER.trace(cancelMsg()) ;
+	        return ;
+			  }
+			  else
+			  {
+	        e.printStackTrace();
+	        _LOGGER.fatal(fatalMsg(), e);
+	        fatal() ;
+			  }
+			}
+      catch(Exception e)
+      {
+        e.printStackTrace() ;
+        _LOGGER.fatal(fatalMsg(), e) ;
+        fatal() ;
+      }
+
+      synchronized(root)
+      {
+        initiator.cpt++ ;
+        String message =
+                         initiator.cpt +
+                             " execution(s) of AADLInspector schedulability" +
+                             " done." ;
+        initiator._monitor.subTask(message) ;
+        _LOGGER.trace(message) ;
+        evaluateIfFinished() ;
+      }
+
+      return ;
+    }
+		
+		private String fatalMsg()
+    {
+		  return  initiator.cpt_failed +" execution(s) of AADLInspector schedulability" +
+          " failed.";
+    }
+
+    private void fatal()
+    {
+      synchronized (root)
+      {
+        initiator.cpt++;
+        initiator.cpt_failed++;
+        evaluateIfFinished();
+      }
+    }
+
+    private String cancelMsg()
+    {
+      return "Intermediate AADLInspector has been canceled" ;
+    }
+
+    void evaluateIfFinished()
 		{
 		  if(initiator.cpt==initiator.size)
 			synchronized (initiator) {

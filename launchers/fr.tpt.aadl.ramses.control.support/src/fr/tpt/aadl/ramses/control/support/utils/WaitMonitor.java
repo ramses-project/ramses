@@ -50,6 +50,13 @@ public class WaitMonitor extends Thread
     {
       // It means that _action.run() detected that user has canceled.
       _exitCode = Command.CANCEL ;
+      _LOGGER.trace("the command has been canceled. Return cancel exit code");
+    }
+    catch(InterruptedException e)
+    {
+      // It means that _action.run() detected that user has canceled.
+      _exitCode = Command.CANCEL ;
+      _LOGGER.trace("the command has been interrupted. Return cancel exit code");
     }
     catch(Exception e)
     {
@@ -76,7 +83,8 @@ public class WaitMonitor extends Thread
   
   /**
    * Wait until the command has finished or has been canceled or has crashed 
-   * on a fatal error. 
+   * on a fatal error. waitAndCheck will try to stop the command by raising an
+   * Interrupted Exception.
    * 
    * @param period time in milliseconds that cancellation is check 
    * @return command exit code
@@ -111,6 +119,7 @@ public class WaitMonitor extends Thread
         {
           hasToContinue = false ;
           _exitCode = Command.CANCEL ;
+          this.interrupt();
         }
         else 
         {

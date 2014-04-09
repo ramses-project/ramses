@@ -93,7 +93,7 @@ public class Activator extends AbstractUIPlugin {
 	    sr.init(instantiator, modelManager);
 	    ServiceProvider.setDefault(sr) ;
 	    
-		AtlTransfoLauncher.initTransformation();
+		  AtlTransfoLauncher.initTransformation();
 	    
 	    /**************************************************************************/
 		}

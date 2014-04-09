@@ -21,40 +21,39 @@
 
 package fr.tpt.aadl.ramses.control.atl ;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.ArrayList ;
+import java.util.HashMap ;
 import java.util.List ;
-import java.util.Map;
+import java.util.Map ;
 
 import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.EPackage ;
+import org.eclipse.emf.ecore.EcorePackage ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
+import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl ;
 import org.eclipse.m2m.atl.core.emf.EMFInjector ;
 import org.eclipse.m2m.atl.core.emf.EMFModel ;
 import org.eclipse.m2m.atl.core.emf.EMFModelFactory ;
 import org.eclipse.m2m.atl.core.emf.EMFReferenceModel ;
-import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
-import org.eclipse.m2m.atl.emftvm.ExecEnv;
-import org.eclipse.m2m.atl.emftvm.Metamodel;
-import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl;
-import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
-import org.eclipse.m2m.atl.emftvm.util.ModuleResolverFactory;
+import org.eclipse.m2m.atl.emftvm.EmftvmFactory ;
+import org.eclipse.m2m.atl.emftvm.Metamodel ;
+import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl ;
+import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool ;
+import org.eclipse.m2m.atl.emftvm.util.ModuleResolverFactory ;
 import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.PropertySet ;
-import org.osate.aadl2.instance.InstancePackage;
-import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl;
-import org.osate.ba.aadlba.AadlBaPackage;
+import org.osate.aadl2.instance.InstancePackage ;
+import org.osate.aadl2.instance.util.InstanceResourceFactoryImpl ;
+import org.osate.ba.aadlba.AadlBaPackage ;
 
-import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage;
-import fr.tpt.aadl.ramses.control.support.analysis.Analyzer;
-import fr.tpt.aadl.ramses.control.support.generator.Generator;
-import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
-import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
-import fr.tpt.aadl.ramses.control.support.utils.Names;
-import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage;
+import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
+import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
+import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage ;
 
 /**
  * This abstract class specifies the methods and resources of an ATL
@@ -92,84 +91,84 @@ public abstract class AtlTransfoLauncher
   
   public static ExecEnvPool getRamsesExecEnv(String target)
   {
-	return _ramsesExecEnvPoolMap.get(target);
+	  return _ramsesExecEnvPoolMap.get(target);
   }
   
   public static void initTransformation()
   {
-	  if(initialized)
-		  return;
-	  initialized = true;
-	  
-	  EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
-				org.osate.aadl2.Aadl2Package.eINSTANCE) ;
-	  EPackage.Registry.INSTANCE.put(ATLHOOKS_MM_URI, AtlHooksPackage.eINSTANCE) ;
-	  EPackage.Registry.INSTANCE.put(AADLBA_MM_URI, AadlBaPackage.eINSTANCE) ;
-	  EPackage.Registry.INSTANCE.put(AADLI_MM_URI, InstancePackage.eINSTANCE) ;
-	  EPackage.Registry.INSTANCE.put("http://www.eclipse.org/emf/2002/Ecore",
-			  EcorePackage.eINSTANCE) ;
-	  EPackage.Registry.INSTANCE.put(org.eclipse.m2m.atl.emftvm.EmftvmPackage.eNS_URI,
-			  org.eclipse.m2m.atl.emftvm.EmftvmPackage.eINSTANCE) ;
-	  Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-	  .put("aaxl2", new InstanceResourceFactoryImpl()) ;
-	  Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-	  .put("ecore", new EcoreResourceFactoryImpl()) ;
-	  Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
-	  .put("emftvm", new EMFTVMResourceFactoryImpl()) ;
+    if(initialized)
+      return ;
+    initialized = true ;
 
-	  EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI, 
-			  fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE) ;
+    EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
+                                   org.osate.aadl2.Aadl2Package.eINSTANCE) ;
+    EPackage.Registry.INSTANCE.put(ATLHOOKS_MM_URI, AtlHooksPackage.eINSTANCE) ;
+    EPackage.Registry.INSTANCE.put(AADLBA_MM_URI, AadlBaPackage.eINSTANCE) ;
+    EPackage.Registry.INSTANCE.put(AADLI_MM_URI, InstancePackage.eINSTANCE) ;
+    EPackage.Registry.INSTANCE.put("http://www.eclipse.org/emf/2002/Ecore",
+                                   EcorePackage.eINSTANCE) ;
+    EPackage.Registry.INSTANCE.put(org.eclipse.m2m.atl.emftvm.EmftvmPackage.eNS_URI,
+                                   org.eclipse.m2m.atl.emftvm.EmftvmPackage.eINSTANCE) ;
+    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+                                      .put("aaxl2",
+                                           new InstanceResourceFactoryImpl()) ;
+    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+                                      .put("ecore",
+                                           new EcoreResourceFactoryImpl()) ;
+    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+                                      .put("emftvm",
+                                           new EMFTVMResourceFactoryImpl()) ;
 
+    EPackage.Registry.INSTANCE.put(REDUCEDBA_MM_URI,
+                                   fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage.eINSTANCE) ;
 
-	  
-	  ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
-	  for(String generatorName: sr.getAvailableGeneratorNames())
-	  {
-		Generator g = sr.getGenerator(generatorName);
-		List<String> moduleList = g.getTransformationModuleList();
-		ExecEnvPool pool = new ExecEnvPool();
-		loadMetaModels(pool);
-		ModuleResolverFactory mrf = new RamsesModuleResolverFactory();
-		pool.setModuleResolverFactory(mrf);
-		for(String moduleName: moduleList)
-		{
-		  pool.loadModule(moduleName);
-		}
-		_ramsesExecEnvPoolMap.put(generatorName, pool);
-		
-		moduleList = g.getValidationModuleList();
-		pool = new ExecEnvPool();
-		loadMetaModels(pool);
-		mrf = new RamsesModuleResolverFactory();
-		pool.setModuleResolverFactory(mrf);
-		for(String moduleName: moduleList)
-		{
-		  pool.loadModule(moduleName);
-		}
-		_ramsesExecEnvPoolMap.put(generatorName+Names.VALIDATOR_SUFFIX, pool);
-		
-	  }
-	  
-	  // init validators
-	  
-	  for(String analyzerName: sr.getAvailableAnalysisNames())
-	  {
-		Analyzer a = sr.getAnalyzer(analyzerName);
-		List<String> moduleList = a.getTransformationModuleList();
-		if(moduleList == null)
-		  continue;
-		ExecEnvPool pool = new ExecEnvPool();
-		loadMetaModels(pool);
-		ModuleResolverFactory mrf = new RamsesModuleResolverFactory();
-		pool.setModuleResolverFactory(mrf);
-		for(String moduleName: moduleList)
-		{
-		  pool.loadModule(moduleName);
-		}
-		_ramsesExecEnvPoolMap.put(analyzerName, pool);
-	  }
-	  
-		
+    ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
+    for(String generatorName : sr.getAvailableGeneratorNames())
+    {
+      Generator g = sr.getGenerator(generatorName) ;
+      List<String> moduleList = g.getTransformationModuleList() ;
+      ExecEnvPool pool = new ExecEnvPool() ;
+      loadMetaModels(pool) ;
+      ModuleResolverFactory mrf = new RamsesModuleResolverFactory() ;
+      pool.setModuleResolverFactory(mrf) ;
+      for(String moduleName : moduleList)
+      {
+        pool.loadModule(moduleName) ;
+      }
+      _ramsesExecEnvPoolMap.put(generatorName, pool) ;
+
+      moduleList = g.getValidationModuleList() ;
+      pool = new ExecEnvPool() ;
+      loadMetaModels(pool) ;
+      mrf = new RamsesModuleResolverFactory() ;
+      pool.setModuleResolverFactory(mrf) ;
+      for(String moduleName : moduleList)
+      {
+        pool.loadModule(moduleName) ;
+      }
+      _ramsesExecEnvPoolMap.put(generatorName + Names.VALIDATOR_SUFFIX, pool) ;
+
+    }
+
+    // init validators
+
+    for(String analyzerName : sr.getAvailableAnalysisNames())
+    {
+      Analyzer a = sr.getAnalyzer(analyzerName) ;
+      List<String> moduleList = a.getTransformationModuleList() ;
+      if(moduleList == null)
+        continue ;
+      ExecEnvPool pool = new ExecEnvPool() ;
+      loadMetaModels(pool) ;
+      ModuleResolverFactory mrf = new RamsesModuleResolverFactory() ;
+      pool.setModuleResolverFactory(mrf) ;
+      for(String moduleName : moduleList)
+      {
+        pool.loadModule(moduleName) ;
+      }
+      _ramsesExecEnvPoolMap.put(analyzerName, pool) ;
+    }
+
   }
     
   private static void loadMetaModels(ExecEnvPool pool)

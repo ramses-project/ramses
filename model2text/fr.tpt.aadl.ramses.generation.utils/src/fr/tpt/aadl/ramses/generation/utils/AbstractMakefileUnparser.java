@@ -31,7 +31,6 @@ import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.Subprogram ;
 import org.osate.aadl2.SubprogramCall ;
 import org.osate.aadl2.SubprogramCallSequence ;
-import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramSubcomponent ;
 import org.osate.aadl2.SubprogramSubcomponentType ;

@@ -27,6 +27,8 @@ import java.util.ArrayList ;
 import java.util.List ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.core.runtime.Platform ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -76,8 +78,10 @@ public class AADLInspectorLauncher
 	private AnalysisResult launchAnalysis(String[] aadlModelsPath, 
 			                                         File outputDir,
 			                                         String mode,
-			                                         SystemInstance model)
-		                                               throws AnalysisException
+			                                         SystemInstance model,
+			                                         IProgressMonitor monitor)
+		                                               throws AnalysisException,
+		                                                      InterruptedException
 	{
 		if (PATH.isEmpty())
 		{
@@ -107,6 +111,14 @@ public class AADLInspectorLauncher
 		
 		final String command = BIN_PATH + "AADLInspector" + extension;
 		Process p ;
+		
+		if(monitor.isCanceled())
+		{
+		  String msg = "analysis has been canceled before launching the process" ;
+		  _LOGGER.trace(msg) ;
+		  throw new OperationCanceledException(msg) ;
+		}
+		
     try
     {
       p = Runtime.getRuntime().exec(new String[] {
@@ -131,16 +143,8 @@ public class AADLInspectorLauncher
 		_LOGGER.trace("AADL Inspector command: "+debugCommand) ;
 		
 		int exitValue = -1 ;
-    try
-    {
-      exitValue = p.waitFor() ;
-    }
-    catch(InterruptedException e)
-    {
-      String msg = "AADLInspector was interrupted" ;
-      _LOGGER.fatal(msg, e) ;
-      throw new RuntimeException(msg, e) ;
-    }
+    
+		exitValue = p.waitFor() ;
     
 		if (exitValue!=0)
 		{
@@ -159,6 +163,13 @@ public class AADLInspectorLauncher
 		  throw new RuntimeException(msg) ;
 		}
 		
+		if(monitor.isCanceled())
+    {
+      String msg = "analysis has been canceled before launching the process" ;
+      _LOGGER.trace(msg) ;
+      throw new OperationCanceledException(msg) ;
+    }
+		
 		/** If output format change, modify here the name of the class */
 		try
     {
@@ -174,8 +185,10 @@ public class AADLInspectorLauncher
 	
 	public AnalysisResult launchAnalysis(SystemInstance root,
 	                                            File outputDir,
-	                                            String mode)
-	                                                throws AnalysisException
+	                                            String mode,
+	                                            IProgressMonitor monitor)
+	                                                throws AnalysisException,
+	                                                       InterruptedException
 	{
 		String OS = (String) System.getProperties().get("os.name");
 		if(OS.equalsIgnoreCase("linux"))
@@ -203,7 +216,7 @@ public class AADLInspectorLauncher
 		loadResourcePaths(pps, paths);
 		String[] modelList = paths.toArray(new String[paths.size()]);
 		
-		return launchAnalysis(modelList, outputDir, mode, root);
+		return launchAnalysis(modelList, outputDir, mode, root, monitor);
 	}
 	
 	private void loadResourcePaths(PublicPackageSection pps, List<String> pathList)
