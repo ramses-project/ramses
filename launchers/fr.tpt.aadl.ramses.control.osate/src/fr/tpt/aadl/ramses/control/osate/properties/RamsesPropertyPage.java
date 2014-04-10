@@ -80,14 +80,14 @@ public class RamsesPropertyPage extends PropertyPage {
   private String DEFAULT_PATH;
   private String PROJECT_NAME;  
 
-  private static final int TEXT_FIELD_WIDTH = 43;
+  protected static final int TEXT_FIELD_WIDTH = 43;
 
-  private Text outputDirText;
+  protected Text outputDirText;
   private Button target;
   private Text runtimePathText;
   private Label selectedPathLabel;
   private RamsesConfiguration _config;
-  private IProject _project ;
+  protected IProject _project ;
   
   private static Logger _LOGGER = Logger.getLogger(RamsesPropertyPage.class) ;
   
@@ -128,7 +128,7 @@ public class RamsesPropertyPage extends PropertyPage {
     pathLabel.setText("This property page enable you to configure RAMSES code generator");
   }
 
-  private void addSeparator(Composite parent) {
+  protected void addSeparator(Composite parent) {
     Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
@@ -141,11 +141,12 @@ public class RamsesPropertyPage extends PropertyPage {
     return resource.getLocation().makeAbsolute().toOSString();
   }
   
-  private void addOutputDirectorySection(Composite parent,
-                                         RamsesConfiguration config)
+  protected void addOutputDirectorySection(Composite parent,
+                                         RamsesConfiguration config,
+                                         String labelMessage)
   {
     Label label = new Label(parent, SWT.BOLD);
-    label.setText("1 - Select output directory to generate code in");
+    label.setText("1 - "+labelMessage);
 
     Composite composite = createDefaultComposite(parent);
 
@@ -215,7 +216,7 @@ public class RamsesPropertyPage extends PropertyPage {
     }
   }
 
-  private Composite createDefaultComposite(Composite parent) {
+  protected Composite createDefaultComposite(Composite parent) {
     Composite composite = new Composite(parent, SWT.NULL);
     GridLayout layout = new GridLayout();
     layout.numColumns = 2;
@@ -246,7 +247,8 @@ public class RamsesPropertyPage extends PropertyPage {
     addInformationSection(composite);
     addSeparator(composite);
     addSeparator(composite);
-    addOutputDirectorySection(composite, _config);
+    addOutputDirectorySection(composite, _config,
+    		"Select output directory for generated code");
     addSeparator(composite);
     addTargetSection(composite, _config);
     
@@ -312,7 +314,6 @@ public class RamsesPropertyPage extends PropertyPage {
     arinc.addListener(SWT.Selection, listener);
     ojr.addListener(SWT.Selection, listener);
 
-    // Code added by achille
     Button pathButton = new Button(composite, SWT.PUSH);
     pathButton.setText("Choose the target platform path");
     pathButton.setAlignment(SWT.RIGHT);

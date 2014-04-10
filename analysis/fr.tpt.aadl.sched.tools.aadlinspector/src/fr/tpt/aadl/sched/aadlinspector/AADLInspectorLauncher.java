@@ -48,31 +48,36 @@ public class AADLInspectorLauncher
 	public final static String[] additionalPackages = {"types.aadl"};
 	
 	private final static String ENV_VAR = "AADLINSPECTOR_PATH";
+
+	private String PATH = "";
 	
-	private final String PATH = getPath();
+	
 	private String BIN_PATH;
 	private String OUTPUT_FILE_PATH;
 	private String extension = "";
 	
 	private Logger _LOGGER = Logger.getLogger(AADLInspectorLauncher.class) ;
 	
-	private String getPath()
+	
+	public AADLInspectorLauncher(String InstallDir)
 	{
+		if(InstallDir!=null)
+			PATH = InstallDir;
 		String aIPath = System.getProperty(ENV_VAR);
 		if (aIPath == null)
 			aIPath = System.getenv(ENV_VAR);
 		if(aIPath != null)
 		{
 		  aIPath = aIPath.endsWith(File.separator) ? aIPath : aIPath + File.separator;
-		  return aIPath;
+		  PATH = aIPath;
 		}
 		
-		String msg = ENV_VAR + " environment variable should be initialized." ;
-		_LOGGER.error(msg) ;
-		// TODO : add configuration page
-		
-		ServiceProvider.SYS_ERR_REP.error(msg, true);
-		return "";
+		if(PATH.isEmpty() || PATH==null)
+		{
+		  String msg = ENV_VAR + " install directory of AADL Inspector not found." ;
+		  _LOGGER.error(msg) ;
+		  ServiceProvider.SYS_ERR_REP.error(msg, true);
+		}
 	}
 	
 	private AnalysisResult launchAnalysis(String[] aadlModelsPath, 
@@ -158,9 +163,10 @@ public class AADLInspectorLauncher
 		{
 			String msg = "output file \'" + OUTPUT_FILE_PATH 
           + "\' is not found ! Maybe there is some elements in the AADL model that are not supported" +
-          " actually" ; 
-		  _LOGGER.fatal(msg) ;
-		  throw new RuntimeException(msg) ;
+          " yet." ; 
+		  _LOGGER.error(msg) ;
+		  ServiceProvider.SYS_ERR_REP.error(msg, true) ;
+		  return null;
 		}
 		
 		if(monitor.isCanceled())
@@ -177,9 +183,10 @@ public class AADLInspectorLauncher
     }
     catch(Exception e)
     {
-      String msg = "cannot fetch AADLInspector XML result" ;
-      _LOGGER.fatal(msg) ;
-      throw new AnalysisException(msg);
+      String msg = "Could fetch AADLInspector XML result, analysis probably failed" ;
+      _LOGGER.error(msg) ;
+      ServiceProvider.SYS_ERR_REP.error(msg, true) ;
+      return null;
     }
 	}
 	

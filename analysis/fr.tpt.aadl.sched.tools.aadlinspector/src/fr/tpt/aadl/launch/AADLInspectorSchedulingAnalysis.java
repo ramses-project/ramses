@@ -485,7 +485,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
                                                                                                pkg.getOwnedPublicSection()) ;
         SystemInstance sinst = initiator._instantiator.instantiate(si) ;
 
-        AADLInspectorLauncher launcher = new AADLInspectorLauncher() ;
+        AADLInspectorLauncher launcher = new AADLInspectorLauncher(null) ;
         analysisResult =
                          launcher.launchAnalysis(sinst, outputDir, mode,
                                                  initiator._monitor) ;
