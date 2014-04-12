@@ -122,7 +122,6 @@ public class DataClassifierUtil
     {
       String msg = "cannot find Data_Representation for \'" + e.getName() + '\'' ;
       _LOGGER.warn(msg) ;
-      ServiceProvider.SYS_ERR_REP.warning(msg, true);
     }
     return rep;
   }

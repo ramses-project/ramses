@@ -39,7 +39,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 	public static final String AI_INSTALL_DIR = "ai.install.dir";
 	private static final String DEFAULT_MODE = "automatic";
 	
-	private static String _PROPERTY_PAGE_ID = "fr.tpt.aadl.ramses.control.osate.properties.AADLInspectorPropertyPage";
+	private static String _PROPERTY_PAGE_ID = "fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage";
 	private AadlInspectorConfiguration _config;
 	private static Logger _LOGGER = Logger.getLogger(AadlInspectorPropertyPage.class) ;
   

@@ -312,7 +312,8 @@ public class ValueExpressionUtil {
     }
     else
     {
-      String msg = "DataSubcomponentHolder: cannot get tokens for \'" + dst +
+      String msg = "failed to produce execution graph:" +
+    		  	   " DataSubcomponentHolder: cannot get tokens for \'" + dst +
                    '\'' ;
       _LOGGER.error(msg) ;
       ServiceProvider.SYS_ERR_REP.error(msg, true);
@@ -335,7 +336,8 @@ public class ValueExpressionUtil {
         }
         else
         {
-          String msg = "DataSubcomponentHolder indice: cannot get tokens for " +
+          String msg = "failed to produce execution graph:" +
+        		       "DataSubcomponentHolder indice: cannot get tokens for " +
                        indice + '\'' ;
           _LOGGER.error(msg) ;
           ServiceProvider.SYS_ERR_REP.error(msg, true);

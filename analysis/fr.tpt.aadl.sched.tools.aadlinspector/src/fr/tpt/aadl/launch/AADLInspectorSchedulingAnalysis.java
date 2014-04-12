@@ -267,7 +267,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		  
 		  default:
 		  {
-        String errMsg = "unknown exit code" ;
+        String errMsg = "AADL Inspector error: unknown exit code" ;
         _logger.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
@@ -349,7 +349,8 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			synchronized (this) {
 				wait();
 			}
-			last.analysisResult.normalize(currentResult);
+			if(last.analysisResult!=null)
+				last.analysisResult.normalize(currentResult);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -484,7 +485,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
                                                                                                    ".impl",
                                                                                                pkg.getOwnedPublicSection()) ;
         SystemInstance sinst = initiator._instantiator.instantiate(si) ;
-
+        
         AADLInspectorLauncher launcher = new AADLInspectorLauncher(null) ;
         analysisResult =
                          launcher.launchAnalysis(sinst, outputDir, mode,

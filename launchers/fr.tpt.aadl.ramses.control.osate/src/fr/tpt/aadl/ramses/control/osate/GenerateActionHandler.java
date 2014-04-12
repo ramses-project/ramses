@@ -69,9 +69,6 @@ public class GenerateActionHandler extends RamsesActionHandler {
   // Call init method to setup these attributes.
   private RamsesConfiguration _config = new RamsesConfiguration() ;
   
-  private SystemImplementation _sysImpl = null ;
-  //OR (init will not initialize both)
-  private SystemInstance _sysInst = null ;
   
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException

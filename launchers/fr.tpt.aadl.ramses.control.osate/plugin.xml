@@ -26,7 +26,7 @@
       </page>
       <page
             class="fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage"
-            id="fr.tpt.aadl.ramses.control.osate.aadl.inspector"
+            id="fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage"
             icon="icons/Icon-inspector.jpg"
             name="AADL Inspector configuration">
             <enabledWhen>

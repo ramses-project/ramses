@@ -34,7 +34,7 @@ import fr.tpt.aadl.ramses.control.support.utils.Names;
 
 public abstract class RamsesActionHandler extends AbstractHandler {
 
-	protected boolean _isOutline = false;
+	protected static boolean _isOutline = false;
 	protected IProject _currentProject = null ;
 	protected ExecutionEvent _event = null ;
 

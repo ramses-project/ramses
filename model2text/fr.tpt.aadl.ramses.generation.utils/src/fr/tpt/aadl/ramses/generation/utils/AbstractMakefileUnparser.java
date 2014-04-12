@@ -599,8 +599,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         String line = null ;
         while((line = in.readLine()) != null)
         {
-          _LOGGER.error(line);
-          ServiceProvider.SYS_ERR_REP.error(line, true);
+          _LOGGER.trace(line);
         }
         is = process.getErrorStream() ;
         in = new BufferedReader(new InputStreamReader(is)) ;
@@ -608,7 +607,10 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         while((line = in.readLine()) != null)
         {
           _LOGGER.error(line);
-          ServiceProvider.SYS_ERR_REP.error(line, true);
+          if(line.contains("error")
+        		  || line.contains("Error")
+        		  || line.contains("ERROR"))
+        	  ServiceProvider.SYS_ERR_REP.error(line, true);
         }
         
         break ;

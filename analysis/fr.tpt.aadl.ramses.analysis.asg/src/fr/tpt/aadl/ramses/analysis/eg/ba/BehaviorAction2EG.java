@@ -116,8 +116,9 @@ public class BehaviorAction2EG
       }
       catch(UnsupportedOperationException e)
       {
-        String msg = RamsesException.formatRethrowMessage("cannot do action to EG",
-                                                          e) ;
+        String msg = RamsesException.formatRethrowMessage("failed to produce execution graph:" +
+        		" unsupported operation: ",
+        		 e) ;
         _LOGGER.error("", e) ;
         ServiceProvider.SYS_ERR_REP.error(msg, true);
         actionNode = new EGNode (name + "_<error>");
@@ -326,7 +327,8 @@ public class BehaviorAction2EG
     }
     catch(UnsupportedOperationException e)
     {
-      String msg = RamsesException.formatRethrowMessage("unsupported operation", e);
+      String msg = RamsesException.formatRethrowMessage("failed to produce execution graph:" +
+    		  " unsupported operation", e);
       _LOGGER.error("", e);
       ServiceProvider.SYS_ERR_REP.error(msg, true);
     }
@@ -427,7 +429,8 @@ public class BehaviorAction2EG
     }
     if (resourceIndex==-1)
     {
-      String msg = "Cannot find shared resource for SubprogramCallAction \'" +
+      String msg = "failed to produce execution graph:" +
+    		  " cannot find shared resource for SubprogramCallAction \'" +
           sc.getName() + '\'' ;
       _LOGGER.error(msg);
       ServiceProvider.SYS_ERR_REP.error(msg, true);
@@ -447,7 +450,8 @@ public class BehaviorAction2EG
     
     if (da==null)
     {
-      String msg = "Cannot find shared resource for SubprogramCallAction \'" +
+      String msg = "failed to produce execution graph:" +
+      		" cannot find shared resource for SubprogramCallAction \'" +
                    sc.getName() + '\'' ; 
       _LOGGER.error(msg);
       ServiceProvider.SYS_ERR_REP.error(msg, true);
@@ -669,8 +673,9 @@ public class BehaviorAction2EG
     }
     catch(UnsupportedOperationException e)
     {
-      String msg = RamsesException.formatRethrowMessage("cannot getForStatementRange",
-                                                        e);
+      String msg = RamsesException.formatRethrowMessage("failed to produce execution graph:" +
+    		  " cannot extract value bound for a ForStatement",
+    		  e);
       _LOGGER.error(msg);
       ServiceProvider.SYS_ERR_REP.error(msg, true);
       

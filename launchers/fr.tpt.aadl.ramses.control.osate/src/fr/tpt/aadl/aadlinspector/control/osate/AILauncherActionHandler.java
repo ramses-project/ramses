@@ -3,9 +3,13 @@ package fr.tpt.aadl.aadlinspector.control.osate;
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.osate.aadl2.instance.SystemInstance;
 
 import fr.tpt.aadl.ramses.control.osate.AadlInspectorConfiguration;
@@ -36,9 +40,22 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 	  try
 	  {
 		_JOB_NAME = "AADL Inspector launcher";
-		init(event, _OUTLINE_COMMAND_ID);
-		
-		try
+		if(event!=null)
+			init(event, _OUTLINE_COMMAND_ID);
+		else
+		{
+			if(_isOutline)
+		    {
+		      _currentProject = WorkbenchUtils.getProjectByActiveEditor() ;
+		    }
+		    else
+		    {
+		      ISelection s = HandlerUtil.getCurrentSelection(event) ;
+		      IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;
+		      _currentProject = node.getProject() ;
+		    }
+		}
+			try
 		{
 			AadlInspectorPropertyPage.fetchProperties(_currentProject, _config) ;
 		}
@@ -109,7 +126,7 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 	      throw new OperationCanceledException(msg) ;
 	    }
 	    
-	    analysis(_currentProject, _sysInst, _config, monitor);
+	    analysis(_sysInst, _config, monitor);
 	    
 	    if(monitor.isCanceled())
 	    {
@@ -122,7 +139,7 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 	  }
 
 
-	private void analysis(IProject project, SystemInstance sysInst,
+	private void analysis(SystemInstance sysInst,
 			AadlInspectorConfiguration config, IProgressMonitor monitor) throws AnalysisException, InterruptedException {
 		
 		AADLInspectorLauncher aiLauncher = new AADLInspectorLauncher(config.getInstallDir());
