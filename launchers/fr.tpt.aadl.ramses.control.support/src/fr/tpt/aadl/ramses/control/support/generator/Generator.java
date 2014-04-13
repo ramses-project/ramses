@@ -30,6 +30,7 @@ import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 
@@ -38,9 +39,7 @@ public interface Generator extends NamedPlugin
   //TODO: doc me !
   // runtimePath can be null.
   public void generate(SystemInstance systemInstance,
-                       String targetId,
-                       File runtimeDir,
-                       File outputDir,
+                       RamsesConfiguration config,
                        File[] includeDirs,
                        AnalysisErrorReporterManager errManager,
                        IProgressMonitor monitor) throws AnalysisException,
@@ -50,10 +49,8 @@ public interface Generator extends NamedPlugin
   // TODO: doc me !
   // runtimePath can be null.
   public void generateWorkflow(SystemInstance systemInstance,
-		  					   String targetId,
+                               RamsesConfiguration config,
                                WorkflowPilot xmlPilot,
-                               File runtimeDir,
-                               File outputDir,
                                File[] includeDirs,
                                AnalysisErrorReporterManager errManager,
                                IProgressMonitor monitor) throws AnalysisException,

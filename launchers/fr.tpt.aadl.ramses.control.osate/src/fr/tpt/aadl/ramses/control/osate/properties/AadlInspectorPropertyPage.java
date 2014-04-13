@@ -25,10 +25,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.osate.utils.FileUtils;
 
-import fr.tpt.aadl.ramses.control.osate.AadlInspectorConfiguration;
 import fr.tpt.aadl.ramses.control.osate.WorkbenchUtils;
 import fr.tpt.aadl.ramses.control.support.config.ConfigStatus;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 
 public class AadlInspectorPropertyPage extends RamsesPropertyPage {
@@ -40,7 +40,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 	private static final String DEFAULT_MODE = "automatic";
 	
 	private static String _PROPERTY_PAGE_ID = "fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage";
-	private AadlInspectorConfiguration _config;
+	private RamsesConfiguration _config;
 	private static Logger _LOGGER = Logger.getLogger(AadlInspectorPropertyPage.class) ;
   
 	private Label installDirLabel;
@@ -49,7 +49,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 	private String selectedMode;
 	
 	public static void fetchProperties(IProject project,
-			AadlInspectorConfiguration result) throws CoreException, ConfigurationException {
+			RamsesConfiguration result) throws CoreException, ConfigurationException {
 		
 		ConfigStatus status ;
 	    
@@ -65,7 +65,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 	      throw new ConfigurationException(status) ;
 	    }
 	    
-	    status = result.setInstallDir(fetchPropertiesValue(project, AI_INSTALL_DIR));
+	    status = result.setAadlInspectorInstallDir(fetchPropertiesValue(project, AI_INSTALL_DIR));
 	    if(status != ConfigStatus.SET)
 	    {
 	      throw new ConfigurationException(status) ;
@@ -141,7 +141,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 	}
 
 
-	private void addInstallDirSection(Composite composite, AadlInspectorConfiguration config)
+	private void addInstallDirSection(Composite composite, RamsesConfiguration config)
 	{
 	  Label targetInfo = new Label(composite, SWT.BOLD);
 	  targetInfo.setText("2 - Precise where AADL Inspector is installed");
@@ -159,8 +159,8 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 	  
 	  InstallDirText = new Text(composite, SWT.BOLD | SWT.SINGLE | SWT.BORDER);
 	  InstallDirText.setEditable(false) ;
-	  if (config.getInstallDir() != null)
-		  InstallDirText.setText(config.getInstallDir());
+	  if (config.getAadlInspectorInstallDir() != null)
+		  InstallDirText.setText(config.getAadlInspectorInstallDir());
 	  GridData grd = new GridData();
 	  grd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
 	  InstallDirText.setLayoutData(grd) ;
@@ -263,13 +263,13 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 		{
 			_project = (IProject) getElement() ;
 			if(_config==null)
-				_config =  new AadlInspectorConfiguration() ;
+				_config =  new RamsesConfiguration() ;
 			fetchProperties(_project, _config) ;
 		}
 		catch(ConfigurationException ee)
 		{
 			// Missing configuration or first time configuration.
-			_config = new AadlInspectorConfiguration() ;
+			_config = new RamsesConfiguration() ;
 		}
 		catch(Exception e)
 		{

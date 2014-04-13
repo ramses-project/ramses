@@ -122,8 +122,8 @@ public class ToolSuiteLauncher
   }
 
   private void performAnalysis(SystemInstance instance,
-                                Map<String, Object> parameters,
-                                File outputDir)
+                                RamsesConfiguration config,
+                                Map<String, Object> parameters)
                                                   throws AnalysisException
   {
     if(_analysisToPerform != null && _analysisToPerform.isEmpty() == false)
@@ -136,7 +136,7 @@ public class ToolSuiteLauncher
         // Set parameters to null in order to reset analyzer's parameters.
         analyzer.setParameters(parameters) ;
         analyzer.performAnalysis(instance,
-                                 outputDir,
+                                 config,
                                  ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor
                                ) ;
@@ -191,8 +191,7 @@ public class ToolSuiteLauncher
     
     generator.setParameters(parameters) ;
     
-    generator.generate(instance,config.getTargetId(), config.getRuntimePath(), config.getOutputDir(), 
-                       includeDirs,
+    generator.generate(instance, config, includeDirs,
                        ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, _monitor) ;
   }
 
@@ -227,8 +226,7 @@ public class ToolSuiteLauncher
 
     generator.setParameters(parameters) ;
     
-    generator.generateWorkflow(instance, config.getTargetId(), xmlPilot, config.getRuntimePath(),
-                               config.getOutputDir(), includeDirs,
+    generator.generateWorkflow(instance, config, xmlPilot, includeDirs,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor) ;
   }
@@ -254,7 +252,7 @@ public class ToolSuiteLauncher
       ServiceProvider.SYS_ERR_REP.fatal(msg);
       System.exit(-1);
     }
-    this.performAnalysis(instance, parameters, config.getOutputDir()) ;
+    this.performAnalysis(instance, config, parameters) ;
   }
 
   void unparse(List<Resource> resources, RamsesConfiguration config) throws IOException 

@@ -32,6 +32,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
 
 public class LaunchCheddarUI implements Analyzer
@@ -66,12 +67,12 @@ public class LaunchCheddarUI implements Analyzer
   
   @Override
   public void performAnalysis(SystemInstance systemInstance,
-                            File outputDir,
+                            RamsesConfiguration config,
                             AnalysisErrorReporterManager errManager,
                             IProgressMonitor monitor)
       throws AnalysisException
   {
-    CheddarToolchain cheddar = new CheddarToolchain(systemInstance, outputDir,
+    CheddarToolchain cheddar = new CheddarToolchain(systemInstance, config.getOutputDir(),
                                                     errManager) ;
     cheddar.createCheddarModel() ;
     cheddar.exportAndSimule(true) ;

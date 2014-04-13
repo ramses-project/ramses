@@ -55,6 +55,7 @@ import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -134,14 +135,16 @@ public class AadlTargetSpecificGenerator implements Generator
 
   @Override
   public void generate(SystemInstance systemInstance,
-		  			   String targetId,
-                       File runtimeDir,
-                       File outputDir,
-                       File[] includeDirs,
+		  			   RamsesConfiguration config,
+		  			   File[] includeDirs,
                        AnalysisErrorReporterManager errManager,
                        IProgressMonitor monitor) throws GenerationException,
                                                         TransformationException
   {
+	String targetId = config.getTargetId();
+	File outputDir = config.getOutputDir();
+	File runtimeDir = config.getRuntimePath(); 
+	
     Resource inputResource = systemInstance.eResource() ;
     Resource r;
     if(_modelValidator != null)
@@ -191,16 +194,18 @@ public class AadlTargetSpecificGenerator implements Generator
 
   @Override
   public void generateWorkflow(SystemInstance systemInstance,
-		  					   String targetId,
+		  					   RamsesConfiguration config,
                                WorkflowPilot xmlPilot,
-                               File runtimeDir,
-                               File outputDir,
                                File[] includeDirs,
                                AnalysisErrorReporterManager errManager,
                                IProgressMonitor monitor) throws GenerationException,
                                                                 TransformationException,
                                                                 AnalysisException
   {
+	String targetId = config.getTargetId();
+	File outputDir = config.getOutputDir();
+	File runtimeDir = config.getRuntimePath(); 
+
     if(_analysisResults == null)
       _analysisResults = AnalysisUtils.createNewAnalysisArtifact(
                                                   outputDir.getAbsolutePath() +
@@ -265,12 +270,12 @@ public class AadlTargetSpecificGenerator implements Generator
       if(operation.equals("analysis"))
       {
 	    monitor.subTask("Model analysis: " + xmlPilot.getAnalysisName());
-        doAnalysis(xmlPilot, outputDir, monitor, errManager) ;
+        doAnalysis(xmlPilot, config, monitor, errManager) ;
       }
       else if(operation.equals("transformation"))
       {
     	monitor.subTask("Model transformation " + ((xmlPilot.getTransformationName()!=null) ? xmlPilot.getTransformationName():""));
-        currentInstance = doTransformation(xmlPilot, outputDir, monitor) ;
+        currentInstance = doTransformation(xmlPilot, config, monitor) ;
         r = currentInstance.eResource() ;
       }
       else if(operation.equals("unparse"))
@@ -293,7 +298,7 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       else if(operation.equals("loop"))
       {
-        doLoop(xmlPilot.getLoop(), errManager, xmlPilot, outputDir, monitor) ;
+        doLoop(xmlPilot.getLoop(), errManager, xmlPilot, config, monitor) ;
       }
       else
       {
@@ -314,7 +319,7 @@ public class AadlTargetSpecificGenerator implements Generator
     }
   }
 
-  private void doAnalysis(WorkflowPilot workflowPilot, File outputDir,
+  private void doAnalysis(WorkflowPilot workflowPilot, RamsesConfiguration config,
                           IProgressMonitor monitor,
                           AnalysisErrorReporterManager errManager) throws AnalysisException
   {
@@ -323,7 +328,7 @@ public class AadlTargetSpecificGenerator implements Generator
     String analysisModelInputIdentifier = workflowPilot.getInputModelId();
     String analysisModelOutputIdentifier = workflowPilot.getOutputModelId();
     doAnalysis(analysisName,analysisMode,analysisModelInputIdentifier,
-               analysisModelOutputIdentifier, errManager,workflowPilot,outputDir,monitor);
+               analysisModelOutputIdentifier, errManager,workflowPilot,config,monitor);
   }
   
   private void doAnalysis(String analysisName, String analysisMode,
@@ -331,7 +336,7 @@ public class AadlTargetSpecificGenerator implements Generator
                           String analysisModelOutputIdentifier,
                           AnalysisErrorReporterManager errManager,
                           WorkflowPilot workflowPilot,
-                          File outputDir,
+                          RamsesConfiguration config,
                           IProgressMonitor monitor) throws AnalysisException
   {
     _modelInstantiator = new AadlModelsManagerImpl(errManager) ;
@@ -391,7 +396,7 @@ public class AadlTargetSpecificGenerator implements Generator
     {
 
       a.setParameters(analysisParam) ;
-      a.performAnalysis(currentInstance, outputDir, errManager, monitor) ;
+      a.performAnalysis(currentInstance, config, errManager, monitor) ;
       a.setParameters(analysisParam) ;
       Resource result = (Resource) analysisParam.get("OutputResource") ;
       if(result != null)
@@ -502,7 +507,7 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private void doLoop(AbstractLoop l,AnalysisErrorReporterManager errManager,
-                      WorkflowPilot xmlPilot, File outputDir,
+                      WorkflowPilot xmlPilot, RamsesConfiguration config,
                       IProgressMonitor monitor) throws AnalysisException,
                                                        TransformationException,
                                                        GenerationException
@@ -518,8 +523,8 @@ public class AadlTargetSpecificGenerator implements Generator
       String msg = "Start loop iteration = " + loopIteration ;
       _LOGGER.trace(msg);
       String transfoId = xmlPilot.getTransformationName();
-      doTransformation(transfoId, moduleList,inputId,outputId,outputDir, monitor);
-      if (isValidLoopIteration(a,errManager,xmlPilot,outputDir,outputId,monitor))
+      doTransformation(transfoId, moduleList,inputId,outputId,config, monitor);
+      if (isValidLoopIteration(a,errManager,xmlPilot,config,outputId,monitor))
       {
         break;
       }
@@ -527,7 +532,7 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private boolean isValidLoopIteration (AbstractLoop.AbstractAnalysis a, AnalysisErrorReporterManager errManager,
-                                        WorkflowPilot xmlPilot, File outputDir,
+                                        WorkflowPilot xmlPilot, RamsesConfiguration config,
                                         String outputId, IProgressMonitor monitor) throws AnalysisException
   {
      if (loopValidIteration >= 0)
@@ -538,14 +543,14 @@ public class AadlTargetSpecificGenerator implements Generator
      else
      {
        /** Check iteration validity by specified analysis */
-       return doLoopAnalysis(a,errManager,xmlPilot,outputDir,monitor,outputId,outputId);
+       return doLoopAnalysis(a,errManager,xmlPilot,config,monitor,outputId,outputId);
      }
   }
   
   private boolean doLoopAnalysis(AbstractLoop.AbstractAnalysis a,
                               AnalysisErrorReporterManager errManager,
                               WorkflowPilot xmlPilot,
-                              File outputDir,
+                              RamsesConfiguration config,
                               IProgressMonitor monitor,
                               String inputId,
                               String outputId) throws AnalysisException
@@ -558,7 +563,7 @@ public class AadlTargetSpecificGenerator implements Generator
        inputId = (inputIdSpecific == null) ? inputId : inputIdSpecific;
        outputId = (outputIdSpecific == null) ? outputId : outputIdSpecific;
        doAnalysis(aa.getMethod(),aa.getMode(),inputId,outputId,errManager,
-                  xmlPilot,outputDir,monitor);
+                  xmlPilot,config,monitor);
       
        return xmlPilot.getAnalysisResult();
     }
@@ -567,7 +572,7 @@ public class AadlTargetSpecificGenerator implements Generator
       AbstractLoop.Conjunction c = (AbstractLoop.Conjunction) a;
       for(AbstractLoop.AbstractAnalysis aa : c.getSequence())
       { 
-         if (! doLoopAnalysis(aa,errManager,xmlPilot,outputDir,monitor,inputId,outputId))
+         if (! doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,outputId))
          {
            return false;
          }
@@ -579,7 +584,7 @@ public class AadlTargetSpecificGenerator implements Generator
       AbstractLoop.Disjunction d = (AbstractLoop.Disjunction) a;
       for(AbstractLoop.AbstractAnalysis aa : d.getSequence())
       {
-         if (doLoopAnalysis(aa,errManager,xmlPilot,outputDir,monitor,inputId,outputId))
+         if (doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,outputId))
          {
            return true;
          }
@@ -590,21 +595,21 @@ public class AadlTargetSpecificGenerator implements Generator
       return false;
   }
 
-  private SystemInstance doTransformation(WorkflowPilot workflowPilot, File generatedDir, IProgressMonitor monitor)
+  private SystemInstance doTransformation(WorkflowPilot workflowPilot, RamsesConfiguration config, IProgressMonitor monitor)
 		                                                 throws GenerationException, AnalysisException, TransformationException
 	{
 	  String identifier = workflowPilot.getTransformationName();
     List<String> resourceFileNameList = workflowPilot.getTransformationFileNameList();
     String inputModelId = workflowPilot.getInputModelId();
     String outputModelId = workflowPilot.getOutputModelId();
-    return doTransformation(identifier, resourceFileNameList,inputModelId,outputModelId,generatedDir, monitor);
+    return doTransformation(identifier, resourceFileNameList,inputModelId,outputModelId,config, monitor);
 	}
   
   
   private SystemInstance doTransformation(String transformationId,
 		  								  List<String> resourceFileNameList,
                                           String inputModelId, String outputModelId, 
-                                          File generatedDir,
+                                          RamsesConfiguration config,
                                           IProgressMonitor monitor) throws GenerationException,
                                                                     TransformationException
   {
@@ -621,7 +626,7 @@ public class AadlTargetSpecificGenerator implements Generator
     _LOGGER.trace(msg);
     
     Resource result = _targetTrans.transformWokflow(r, transformationId, resourceFileNameList, 
-                                                generatedDir, outputModelId, monitor);
+                                                config.getOutputDir(), outputModelId, monitor);
 
     PropertiesLinkingService pls = new PropertiesLinkingService ();
     SystemImplementation si = (SystemImplementation) pls.

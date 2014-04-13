@@ -435,4 +435,66 @@ public class RamsesConfiguration
     _LOGGER.info("generation target is \'" + _targetId + '\'') ;
     _LOGGER.info("runtime path is \'" + _runtimePath + '\'') ;
   }
+  
+  
+  private String _mode;
+  private String _AadlInspectrorInstallDir;
+
+  public ConfigStatus setAadlInspectorInstallDir(String installDir) {
+	  ConfigStatus isValid = isValidInstallDir(installDir);
+	  if(isValid == ConfigStatus.SET)
+	  {
+		  _AadlInspectrorInstallDir = installDir;
+		  if(false==_AadlInspectrorInstallDir.endsWith("/"))
+			  _AadlInspectrorInstallDir+="/";
+	  }
+	  return isValid;
+  }
+
+  public ConfigStatus isValidInstallDir(String installDir)
+  {
+	  if(! (installDir == null || installDir.isEmpty()))
+	  {
+		  File outputDir = new File(installDir) ;
+		  if(! outputDir.exists())
+		  {
+			  ConfigStatus.NOT_VALID.msg = "AADL inspector installation directory " +
+					  "is invalid (does not exist)" ;
+			  return ConfigStatus.NOT_VALID ;
+		  }
+		  String bianryFilesDir = installDir;
+		  if(false==bianryFilesDir.endsWith("/"))
+			  bianryFilesDir+="/";
+		  bianryFilesDir += "bin.common/";
+
+		  File testAIInstalled = new File(bianryFilesDir);
+		  if(false==testAIInstalled.exists())
+		  {
+			  ConfigStatus.NOT_VALID.msg = "AADL inspector installation directory " +
+					  "is invalid (binary files not found)" ;
+			  return ConfigStatus.NOT_VALID ;
+		  }
+		  return ConfigStatus.SET;
+	  }
+	  else
+	  {
+		  ConfigStatus.NOT_VALID.msg = "AADL inspector install directory is not set" ;
+		  return ConfigStatus.NOT_VALID ;
+	  }
+  }
+
+  public String getAadlInspectorInstallDir() {
+	  return _AadlInspectrorInstallDir;
+  }
+
+  public ConfigStatus setMode(String mode)
+  {
+	  _mode = mode;
+	  return ConfigStatus.SET;
+  }
+
+  public String getMode() {
+	  return _mode;
+  }
+
 }

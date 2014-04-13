@@ -43,6 +43,7 @@ import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 
+import fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage;
 import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
@@ -100,6 +101,31 @@ public class GenerateActionHandler extends RamsesActionHandler {
         // Only call once because it creates a log file.
         LoggingConfigPage.fetchLoggingProperties(_currentProject);
         _config.log() ;
+      }
+      
+      Resource r;
+      if(_sysImpl!=null)
+    	  r = _sysImpl.eResource();
+      else
+    	  r = _sysInst.eResource();
+      if(getWorkflow(r)!=null)
+      {
+    	  try
+          {
+    		  AadlInspectorPropertyPage.fetchProperties(_currentProject, _config) ;
+          }
+    	  catch (ConfigurationException ee)
+          {
+            if(AadlInspectorPropertyPage.openPropertyDialog(_currentProject))
+            {
+              // Reload configuration.
+              AadlInspectorPropertyPage.fetchProperties(_currentProject, _config) ;
+            }
+            else // User has canceled.
+            {
+              return null ;
+            }
+          }
       }
     }
     catch (Exception e) // Configuration and CoreException caught.
@@ -178,13 +204,8 @@ public class GenerateActionHandler extends RamsesActionHandler {
     
     SystemImplementation sysImpl = sinst.getSystemImplementation() ;
     
-    IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
     
-    // look for a workflow file
-    Resource r = sysImpl.eResource();
-    String s = r.getURI().segment(1);
-    File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
-    String workflow = GenerateActionUtils.findWorkflow(rootDir);
+    String workflow = getWorkflow(sysImpl.eResource());
     
     AnalysisErrorReporterManager errReporter = 
                                  ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
@@ -197,20 +218,16 @@ public class GenerateActionHandler extends RamsesActionHandler {
     
     if(workflow==null)
       generator.generate(sinst,
-    		  			 config.getTargetId(),
-                         config.getRuntimePath(),
-                         config.getOutputDir(),
-                         includeDirs,
+    		  			 config,
+    		  			 includeDirs,
                          errReporter,
                          monitor) ;
     else
     {
       EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
       generator.generateWorkflow(sinst,
-    		  					 config.getTargetId(),
+    		  					 config,
                                  xmlPilot,
-                                 config.getRuntimePath(),
-                                 config.getOutputDir(),
                                  includeDirs,
                                  errReporter,
                                  monitor);
@@ -218,6 +235,15 @@ public class GenerateActionHandler extends RamsesActionHandler {
     
     ResourcesPlugin.getWorkspace().getRoot().
     refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); 
+  }
+
+  private String getWorkflow(Resource r) {
+	  IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	  // look for a workflow file
+	  String s = r.getURI().segment(1);
+	  File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
+	  String workflow = GenerateActionUtils.findWorkflow(rootDir);
+	  return workflow;
   }
 }
 

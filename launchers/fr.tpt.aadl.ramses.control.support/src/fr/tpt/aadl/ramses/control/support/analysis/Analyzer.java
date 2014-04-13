@@ -21,21 +21,21 @@
 
 package fr.tpt.aadl.ramses.control.support.analysis ;
 
-import java.io.File ;
 import java.util.List;
-import java.util.Map ;
+import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor ;
-import org.osate.aadl2.instance.SystemInstance ;
-import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager;
 
-import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.plugins.NamedPlugin;
 
 public interface Analyzer extends NamedPlugin
 {
   
   public void performAnalysis(SystemInstance systemInstance,
-                              File outputDir,
+                              RamsesConfiguration config,
                               AnalysisErrorReporterManager errManager,
                               IProgressMonitor monitor
                               )

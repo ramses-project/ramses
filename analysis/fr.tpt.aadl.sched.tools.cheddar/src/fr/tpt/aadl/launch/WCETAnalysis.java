@@ -32,6 +32,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.sched.cheddar.CheddarOptions ;
 import fr.tpt.aadl.sched.cheddar.CheddarToolchain ;
 
@@ -109,13 +110,13 @@ public class WCETAnalysis extends AbstractAnalyzer
 
   @Override
   public void performAnalysis(SystemInstance root,
-                              File outputDir,
+                              RamsesConfiguration config,
                               AnalysisErrorReporterManager errManager,
                               IProgressMonitor monitor)
                                                         throws AnalysisException
   {
     CheddarOptions.CHEDDAR_DEBUG = true ;
-    CheddarToolchain cheddar = new CheddarToolchain(root, outputDir, errManager) ;
+    CheddarToolchain cheddar = new CheddarToolchain(root, config.getOutputDir(), errManager) ;
     cheddar.createExportAndSimule() ;
     try
     {

@@ -12,13 +12,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.osate.aadl2.instance.SystemInstance;
 
-import fr.tpt.aadl.ramses.control.osate.AadlInspectorConfiguration;
 import fr.tpt.aadl.ramses.control.osate.RamsesActionHandler;
 import fr.tpt.aadl.ramses.control.osate.WorkbenchUtils;
 import fr.tpt.aadl.ramses.control.osate.properties.AadlInspectorPropertyPage;
 import fr.tpt.aadl.ramses.control.osate.properties.LoggingConfigPage;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
@@ -32,7 +32,7 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 	private static final String _OUTLINE_COMMAND_ID = 
             "fr.tpt.aadl.ramses.control.osate.inspector.launch.outline" ;
 	
-	private AadlInspectorConfiguration _config = new AadlInspectorConfiguration() ;
+	private RamsesConfiguration _config = new RamsesConfiguration() ;
 	
 	
 	@Override
@@ -140,9 +140,9 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 
 
 	private void analysis(SystemInstance sysInst,
-			AadlInspectorConfiguration config, IProgressMonitor monitor) throws AnalysisException, InterruptedException {
+			RamsesConfiguration config, IProgressMonitor monitor) throws AnalysisException, InterruptedException {
 		
-		AADLInspectorLauncher aiLauncher = new AADLInspectorLauncher(config.getInstallDir());
+		AADLInspectorLauncher aiLauncher = new AADLInspectorLauncher(config.getAadlInspectorInstallDir());
 		
 		aiLauncher.launchAnalysis(sysInst, config.getOutputDir(), config.getMode(), monitor);
 	    

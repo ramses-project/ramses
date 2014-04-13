@@ -55,6 +55,7 @@ import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
@@ -109,6 +110,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	public int size;
 	private Map<ResponseTimeResult, List<EGNode>> analysisResult = new HashMap<ResponseTimeResult, List<EGNode>>();
 	private IProgressMonitor _monitor;
+	private RamsesConfiguration _config;
 
 	@Override
 	public void setParameters(Map<String, Object> parameters) 
@@ -125,14 +127,14 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	}
 
 	public List<EGNode> performAnalysis(ComponentInstance cpu,
-			File outputDir,
+			RamsesConfiguration config,
 			AnalysisErrorReporterManager errorReporter,
 			final IProgressMonitor monitor
 			)
 					throws AnalysisException
 					{
 		
-		
+		this._config = config;
 		this._monitor = monitor;
 		
 		/* XXX: test avec plusieurs cpu
@@ -182,7 +184,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 		for(List<EGNode> egNodeList: res)
 		{
-			File tmpDir = new File(outputDir.getAbsolutePath()+"/wcet_"+iter);
+			File tmpDir = new File(config.getOutputDir().getAbsolutePath()+"/wcet_"+iter);
 			if(!tmpDir.exists())
 				tmpDir.mkdir();
 			// Execute analysis in several threads
@@ -320,7 +322,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
 
   public void performAnalysis(SystemInstance root,
-			File outputDir,
+			RamsesConfiguration config,
 			AnalysisErrorReporterManager errorReporter,
 			IProgressMonitor monitor
 			)
@@ -333,13 +335,13 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		{
 			if(ci.getCategory().equals(ComponentCategory.PROCESSOR))
 			{
-				resultingEGNodeList.addAll(this.performAnalysis(ci, outputDir, errorReporter, monitor));
+				resultingEGNodeList.addAll(this.performAnalysis(ci, config, errorReporter, monitor));
 			}
 		}
 		
 		
 		this.size=1;
-		File resultDir = new File(outputDir.getAbsolutePath()+"/"+outputModelIdentifier);
+		File resultDir = new File(config.getOutputDir().getAbsolutePath()+"/"+outputModelIdentifier);
 		if(!resultDir.exists())
 			resultDir.mkdir();
 		AADLInspectorAnalysisThread last = new AADLInspectorAnalysisThread(this, resultingEGNodeList, resultDir, root, outputModelIdentifier, mode);
@@ -486,7 +488,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
                                                                                                pkg.getOwnedPublicSection()) ;
         SystemInstance sinst = initiator._instantiator.instantiate(si) ;
         
-        AADLInspectorLauncher launcher = new AADLInspectorLauncher(null) ;
+        AADLInspectorLauncher launcher = new AADLInspectorLauncher(initiator._config.getAadlInspectorInstallDir()) ;
         analysisResult =
                          launcher.launchAnalysis(sinst, outputDir, mode,
                                                  initiator._monitor) ;
