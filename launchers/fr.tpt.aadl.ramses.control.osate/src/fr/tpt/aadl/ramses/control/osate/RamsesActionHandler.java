@@ -26,7 +26,6 @@ import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 
-import fr.tpt.aadl.aadlinspector.control.osate.AILauncherActionHandler;
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.control.support.config.ConfigStatus;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException;
@@ -50,7 +49,6 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	protected SystemImplementation _sysImpl = null ;
 	//OR (init will not initialize both)
 	protected SystemInstance _sysInst = null ;
-	
 	
 	protected abstract void jobCore(IProgressMonitor monitor) throws Exception;
 	
