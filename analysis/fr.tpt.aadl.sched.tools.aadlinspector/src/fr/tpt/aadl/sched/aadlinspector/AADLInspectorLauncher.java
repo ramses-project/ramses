@@ -149,7 +149,17 @@ public class AADLInspectorLauncher
 		
 		int exitValue = -1 ;
     
-		exitValue = p.waitFor() ;
+		try 
+		{
+		  exitValue = p.waitFor() ;
+		}
+		catch(InterruptedException e)
+		{
+		  _LOGGER.trace("AADLInspector thread " + Thread.currentThread().getId() +
+                    " has been interrupted. The current process is destroyed");
+		  p.destroy();
+		  throw e ;
+		}
     
 		if (exitValue!=0)
 		{
