@@ -47,9 +47,12 @@ public abstract class AadlModelValidator extends Aadl2XEMFTVMLauncher {
 	  if(targetId!=null && AtlTransfoLauncher.getRamsesExecEnv(targetId)!=null)
 	  {
 		env = AtlTransfoLauncher.getRamsesExecEnv(targetId).getExecEnv();
-		return doTransformation(targetId, inputResource, 
+		Resource res = doTransformation(targetId, inputResource, 
 										errorReportingGeneratedFileName, 
                 						"_Errors", monitor);
+		
+		AtlTransfoLauncher.getRamsesExecEnv(targetId).returnExecEnv(env);
+		return res;
 	  }
       if(env == null)
 		env = EmftvmFactory.eINSTANCE.createExecEnv();  

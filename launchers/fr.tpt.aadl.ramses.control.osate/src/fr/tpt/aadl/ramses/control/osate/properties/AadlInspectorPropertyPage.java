@@ -53,7 +53,7 @@ public class AadlInspectorPropertyPage extends RamsesPropertyPage {
 		
 		ConfigStatus status ;
 	    
-	    status = result.setOutputDir(fetchPropertiesValue(project, OUTPUT_DIR)) ;
+	    status = result.setAadlInspectorOutputDir(fetchPropertiesValue(project, OUTPUT_DIR)) ;
 	    if(status != ConfigStatus.SET)
 	    {
 	      throw new ConfigurationException(status) ;

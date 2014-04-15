@@ -139,10 +139,15 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		initTransformationInputs(inputResource);
 		
-		return doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
+		Resource res = doTransformation(inputResource, outputDirPathName, resourceSuffix, monitor);
+		
+		AtlTransfoLauncher.getRamsesExecEnv(transformationId).returnExecEnv(env);
+		
+		return res;
+
 	}
 	
-	private Resource doTransformation(Resource inputResource,
+	protected Resource doTransformation(Resource inputResource,
 			String outputDirPathName, String resourceSuffix, final IProgressMonitor monitor) {
 		
 		Resource outputResource = initTransformationOutput(inputResource, 
@@ -212,8 +217,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		env.run(td);
 		td.finish();
-		//pool.returnExecEnv(env);
-
+		
 		// Save the resulting model
 		if(System.getProperty("DEBUG")!=null)
 		{

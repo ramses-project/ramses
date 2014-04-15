@@ -171,7 +171,7 @@ public class RamsesConfiguration
     }
   }
   
-  public ConfigStatus setOutputDir(String path)
+  public ConfigStatus setRamsesOutputDir(String path)
   {
     if(! (path == null || path.isEmpty()))
     {
@@ -496,5 +496,6 @@ public class RamsesConfiguration
   public String getMode() {
 	  return _mode;
   }
+
 
 }

@@ -61,6 +61,12 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	 */
 	@Override
 	public SystemInstance instantiate(SystemImplementation si) {
+	  if(si == null)
+	  {
+		String errMsg =  "cannot delete the previous AADL resource set" ;
+        _LOGGER.fatal(errMsg);
+        throw new RuntimeException(errMsg) ;
+	  }
 	  URI instanceURI =
 	       OsateResourceUtil.getInstanceModelURI(si) ;
 	  
@@ -85,7 +91,14 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 
 	  SystemInstance instance = _instantiateModel.createSystemInstanceInt(si,
 	                                                    aadlResource) ;
-		    
+	  
+	  if(instance == null)
+	  {
+		  String errMsg = "Model instantiation failed";
+		  _LOGGER.fatal(errMsg);
+		  throw new RuntimeException(errMsg);
+	  }
+	  
 	  return instance;
     }
 

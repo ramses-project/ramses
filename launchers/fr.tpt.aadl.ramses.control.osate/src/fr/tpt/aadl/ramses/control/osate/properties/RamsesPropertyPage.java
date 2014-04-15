@@ -520,7 +520,7 @@ public class RamsesPropertyPage extends PropertyPage {
   {
     ConfigStatus status ;
     
-    status = result.setOutputDir(fetchPropertiesValue(project, OUTPUT_DIR)) ;
+    status = result.setRamsesOutputDir(fetchPropertiesValue(project, OUTPUT_DIR)) ;
     if(status != ConfigStatus.SET)
     {
       throw new ConfigurationException(status) ;

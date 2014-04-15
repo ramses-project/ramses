@@ -34,6 +34,8 @@ import org.eclipse.m2m.atl.emftvm.ExecEnv ;
 import org.eclipse.m2m.atl.emftvm.util.ModuleResolver ;
 import org.osate.aadl2.util.Aadl2Util ;
 
+import com.google.common.util.concurrent.Monitor;
+
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
@@ -72,10 +74,10 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 				Aadl2Util.setUseTunedEqualsMethods (false);
 			}
 
-			return setOutputResult(inputResource, aadlGeneratedFileName, outputDir, transfoResult);
+			return setOutputResult(inputResource, aadlGeneratedFileName, outputDir, transfoResult, monitor);
 		}
 
-	private Resource setOutputResult(Resource inputResource, String aadlGeneratedFileName, File outputDir, Resource transfoResult) throws TransformationException {
+	private Resource setOutputResult(Resource inputResource, String aadlGeneratedFileName, File outputDir, Resource transfoResult, IProgressMonitor monitor) throws TransformationException {
 		File outputModelDir =  new File(outputDir.getAbsolutePath()+"/refined-models");
 		if(outputModelDir.exists()==false)
 			outputModelDir.mkdir();
@@ -87,7 +89,9 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 		try
 		{
 		  return AadlToTargetSpecificAadl.extractAadlResource(inputResource,
-		                                                      outputFile);
+		                                                      outputFile,
+		                                                      monitor
+		                                                      );
 		}
 		catch(Exception ex)
 		{
@@ -153,6 +157,6 @@ public class Aadl2AadlEMFTVMLauncher extends Aadl2XEMFTVMLauncher
 			Aadl2Util.setUseTunedEqualsMethods (false);
 		}
 
-		return setOutputResult(inputResource, aadlGeneratedFileName, outputDir, transfoResult);
+		return setOutputResult(inputResource, aadlGeneratedFileName, outputDir, transfoResult, monitor);
 	}
 }

@@ -35,7 +35,9 @@ import java.util.concurrent.TimeUnit ;
 import java.util.concurrent.TimeoutException ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.Path ;
 import org.eclipse.core.runtime.Platform ;
@@ -136,17 +138,18 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 
 	  try
 	  {
-		  return extractAadlResource(inputResource, outputFile);
+		  return extractAadlResource(inputResource, outputFile, monitor);
 	  }
 	  catch (Exception ex)
 	  {
-	    String msg = "fail to extract AADL resources" ;
+	    String msg = "failed to extract AADL resources" ;
         throw new GenerationException(msg, ex) ;
 	  }
   }
 
   public static Resource extractAadlResource(Resource inputResource,
-                                             File outputFile)
+                                             File outputFile, 
+                                             IProgressMonitor monitor)
                                         throws IOException, RecognitionException
   {
     URI uri ;
@@ -159,10 +162,11 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       int outputPathHeaderIndex = workspaceLocation.length() ;
       String outputAbsolutePath = outputFile.getAbsolutePath().toString() ;
       String outputPlatformRelativePath = "" ;
+      String projectName=null;
       if(outputPathHeaderIndex > 0)
       {
         String inputURI = inputResource.getURI().toString() ;
-        String projectName =
+        projectName =
               inputURI.substring(inputURI.indexOf("resource") + 9) ;
         projectName = projectName.substring(0, projectName.indexOf('/')) ;
         outputPathHeaderIndex = outputAbsolutePath.indexOf(projectName) ;
@@ -176,7 +180,14 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
 
       ResourceSet rs = OsateResourceUtil.getResourceSet() ;
       xtextResource = rs.getResource(uri, true) ;
-
+      IResource folderToUpdate = ResourcesPlugin.getWorkspace().getRoot().findMember(projectName);
+      try {
+		folderToUpdate.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+	  } catch (CoreException e) {
+		String errMsg = "could not refresh output directory" ;
+        _LOGGER.fatal(errMsg, e) ;
+        throw new RuntimeException(errMsg, e) ;
+	  }
     }
     else
     {

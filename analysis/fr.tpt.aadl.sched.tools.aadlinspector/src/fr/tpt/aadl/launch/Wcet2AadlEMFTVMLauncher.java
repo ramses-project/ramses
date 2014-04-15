@@ -59,9 +59,7 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		this.cpuList = cpuList;
 	}
 	
-	@Override
-	public Resource doTransformation(List<File> transformationFileList,
-			Resource inputResource, String outputDirPathName,
+	public Resource doTransformation(Resource inputResource, String outputDirPathName,
 			String resourceSuffix,
 			IProgressMonitor monitor)
 			{
@@ -85,8 +83,12 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		super.initTransformationInputs(inputResource);
 		
 		getAtlHook().resetCpuToIgnore(cpuList);
-		return super.doTransformation(transformationFileList, inputResource,
+		Resource res = super.doTransformation(inputResource,
 				outputDirPathName, resourceSuffix, monitor);
+		
+		pool.returnExecEnv(env);
+		
+		return res;
 	}
 	
 }

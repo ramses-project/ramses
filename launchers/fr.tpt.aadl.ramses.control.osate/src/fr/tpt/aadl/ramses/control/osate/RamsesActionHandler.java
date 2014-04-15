@@ -141,6 +141,7 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	                IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
 	                WorkbenchUtils.saveEditor(editor);
 	                
+	                
 	                jobCore(monitorWrapper) ;
 	                
 	                this.setLabel(_OK_STATUS) ;

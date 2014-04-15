@@ -317,6 +317,9 @@ public class AadlTargetSpecificGenerator implements Generator
       
       xmlPilot.goForward() ;
     }
+    
+    this.modelsMap.clear();
+    
   }
 
   private void doAnalysis(WorkflowPilot workflowPilot, RamsesConfiguration config,

@@ -42,7 +42,7 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 	}
 	
 	@Override
-	public Resource doTransformation(List<File> transformationFileList,
+	public Resource doTransformation(String transformationId,
 			                             Resource inputResource,
 			                             String outputDirPathName,
 			                             String resourceSuffix,
@@ -66,7 +66,7 @@ public class Wcet2AadlEMFTVMLauncher extends Aadl2AadlEMFTVMLauncher{
 		inModel.setResource(wcetResource);
 		env.registerInputModel("WCET", inModel);
 		
-		return super.doTransformation(transformationFileList, inputResource,
+		return super.doTransformation(transformationId, inputResource,
 				outputDirPathName, resourceSuffix, monitor);
 	}
 }

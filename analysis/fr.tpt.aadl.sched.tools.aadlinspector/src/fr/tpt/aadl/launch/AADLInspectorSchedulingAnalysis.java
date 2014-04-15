@@ -385,18 +385,17 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			                                      IProgressMonitor monitor)
 	{
 	  Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager, cpuList);
-    List<File> transformationFileList = new ArrayList<File>();
-    
-    for(String s: getTransformationModuleList())
-      transformationFileList.add(new File(s));
+//    List<File> transformationFileList = new ArrayList<File>();
+//    
+//    for(String s: getTransformationModuleList())
+//      transformationFileList.add(new File(s));
     
     Aadl2Util.setUseTunedEqualsMethods (false);
 
     launcher.setOutputPackageName(outputModelId);
     File aadlWithWcetFile = new File(outputDir.getAbsolutePath()+File.separator+outputModelIdentifier+".aadl2");
     Resource rootResource = systemInstance.eResource();
-    Resource aadlModelWithWcet = launcher.doTransformation(transformationFileList, 
-        rootResource,
+    Resource aadlModelWithWcet = launcher.doTransformation(rootResource,
         outputDir.getAbsolutePath(),
         "_"+outputModelId,
         monitor);

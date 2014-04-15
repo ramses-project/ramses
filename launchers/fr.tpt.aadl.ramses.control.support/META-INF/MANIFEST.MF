@@ -46,5 +46,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Eclipse-LazyStart: true
 Bundle-ClassPath: lib/jdom-2.0.2.jar,
  .
+Import-Package: org.eclipse.emf.transaction
 
 
