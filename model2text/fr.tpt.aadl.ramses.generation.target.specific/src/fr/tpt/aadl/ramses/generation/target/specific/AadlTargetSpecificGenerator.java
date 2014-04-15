@@ -142,7 +142,7 @@ public class AadlTargetSpecificGenerator implements Generator
                                                         TransformationException
   {
 	String targetId = config.getTargetId();
-	File outputDir = config.getOutputDir();
+	File outputDir = config.getRamsesOutputDir();
 	File runtimeDir = config.getRuntimePath(); 
 	
     Resource inputResource = systemInstance.eResource() ;
@@ -203,7 +203,7 @@ public class AadlTargetSpecificGenerator implements Generator
                                                                 AnalysisException
   {
 	String targetId = config.getTargetId();
-	File outputDir = config.getOutputDir();
+	File outputDir = config.getRamsesOutputDir();
 	File runtimeDir = config.getRuntimePath(); 
 
     if(_analysisResults == null)
@@ -629,7 +629,7 @@ public class AadlTargetSpecificGenerator implements Generator
     _LOGGER.trace(msg);
     
     Resource result = _targetTrans.transformWokflow(r, transformationId, resourceFileNameList, 
-                                                config.getOutputDir(), outputModelId, monitor);
+                                                config.getRamsesOutputDir(), outputModelId, monitor);
 
     PropertiesLinkingService pls = new PropertiesLinkingService ();
     SystemImplementation si = (SystemImplementation) pls.

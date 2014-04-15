@@ -72,7 +72,7 @@ public class LaunchCheddarUI implements Analyzer
                             IProgressMonitor monitor)
       throws AnalysisException
   {
-    CheddarToolchain cheddar = new CheddarToolchain(systemInstance, config.getOutputDir(),
+    CheddarToolchain cheddar = new CheddarToolchain(systemInstance, config.getAadlInspectorOutputDir(),
                                                     errManager) ;
     cheddar.createCheddarModel() ;
     cheddar.exportAndSimule(true) ;

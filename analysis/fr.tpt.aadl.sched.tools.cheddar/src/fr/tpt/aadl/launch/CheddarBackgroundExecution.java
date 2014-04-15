@@ -77,7 +77,7 @@ extends
         throws AnalysisException
   {
     CheddarToolchain cheddar = new CheddarToolchain(systemInstance,
-                                                    config.getOutputDir(),
+                                                    config.getAadlInspectorOutputDir(),
                                                     errManager) ;
     cheddar.createCheddarModel() ;
 

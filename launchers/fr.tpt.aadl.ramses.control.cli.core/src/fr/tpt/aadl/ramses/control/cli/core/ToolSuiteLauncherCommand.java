@@ -449,7 +449,7 @@ public class ToolSuiteLauncherCommand
     if(hasToUnparse)
     {
       RamsesConfiguration ramsesConfig = new RamsesConfiguration() ;
-      ConfigStatus status = ramsesConfig.setOutputDir(unparse_file_path) ;
+      ConfigStatus status = ramsesConfig.setRamsesOutputDir(unparse_file_path) ;
       
       if(status == ConfigStatus.SET)
       {
@@ -481,7 +481,7 @@ public class ToolSuiteLauncherCommand
           options.getString(OUTPUT_DIR_OPTION_ID) ;
     
     
-    ConfigStatus status = config.setOutputDir(output_path) ;
+    ConfigStatus status = config.setRamsesOutputDir(output_path) ;
     if(status != ConfigStatus.SET)
     {
       _logger.fatal(status.msg);

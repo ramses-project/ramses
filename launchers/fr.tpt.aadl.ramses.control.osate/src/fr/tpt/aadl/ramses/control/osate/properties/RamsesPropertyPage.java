@@ -165,10 +165,10 @@ public class RamsesPropertyPage extends PropertyPage {
     DEFAULT_PATH = getDefaultOutputDir((IResource) getElement());
     PROJECT_NAME = (((IResource) getElement()).getName()) ;
 
-    if (config.getOutputDir() == null)
+    if (config.getRamsesOutputDir() == null)
         outputDirText.setText(DEFAULT_PATH);
       else
-        outputDirText.setText(config.getOutputDir().getAbsolutePath());
+        outputDirText.setText(config.getRamsesOutputDir().getAbsolutePath());
     
     // Move the cursor to the end.
     outputDirText.setSelection(outputDirText.getText().length()) ;

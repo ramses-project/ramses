@@ -143,7 +143,7 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 		
 		AADLInspectorLauncher aiLauncher = new AADLInspectorLauncher(config.getAadlInspectorInstallDir());
 		
-		aiLauncher.launchAnalysis(sysInst, config.getOutputDir(), config.getMode(), monitor);
+		aiLauncher.launchAnalysis(sysInst, config.getAadlInspectorOutputDir(), config.getMode(), monitor);
 	    
 	}
 	

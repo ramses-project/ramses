@@ -267,7 +267,7 @@ public class ToolSuiteLauncher
     {
       fileName = r.getURI().toFileString() ;
       fileName = fileName.substring(fileName.lastIndexOf(File.separator)) ;
-      outputFile = new File(config.getOutputDir() + fileName);
+      outputFile = new File(config.getRamsesOutputDir() + fileName);
       
       if(outputFile.exists())
       {

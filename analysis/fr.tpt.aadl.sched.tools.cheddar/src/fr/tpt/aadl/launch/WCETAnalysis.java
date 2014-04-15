@@ -116,7 +116,7 @@ public class WCETAnalysis extends AbstractAnalyzer
                                                         throws AnalysisException
   {
     CheddarOptions.CHEDDAR_DEBUG = true ;
-    CheddarToolchain cheddar = new CheddarToolchain(root, config.getOutputDir(), errManager) ;
+    CheddarToolchain cheddar = new CheddarToolchain(root, config.getAadlInspectorOutputDir(), errManager) ;
     cheddar.createExportAndSimule() ;
     try
     {

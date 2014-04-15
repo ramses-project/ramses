@@ -41,7 +41,8 @@ import fr.tpt.aadl.ramses.control.support.utils.Names ;
 public class RamsesConfiguration
 {
   // Directory where generated files are produced.
-  private  File _outputDir;
+  private  File _ramsesOutputDir;
+  private  File _aadlInspectorOutputDir;
   
   // Path to the platform runtime.
   private File _runtimePath = null ;
@@ -85,11 +86,16 @@ public class RamsesConfiguration
     }
   }
   
-  public File getOutputDir()
+  public File getRamsesOutputDir()
   {
-    return _outputDir ;
+    return _ramsesOutputDir ;
   }
 
+  public File getAadlInspectorOutputDir()
+  {
+    return _aadlInspectorOutputDir ;
+  }
+  
   public File getRuntimePath()
   {
     return _runtimePath ;
@@ -171,6 +177,41 @@ public class RamsesConfiguration
     }
   }
   
+  public ConfigStatus setAadlInspectorOutputDir(String path) {
+	  if(! (path == null || path.isEmpty()))
+	    {
+	      File outputDir = new File(path) ;
+	      
+	      if(! outputDir.exists())
+	      {
+	        try
+	        {
+	          if(! outputDir.mkdirs())
+	          {
+	            ConfigStatus.NOT_VALID.msg = "can't create the output directory at this location :" +  "\'" + path + "\'";
+	            return ConfigStatus.NOT_VALID ;
+	          }
+	        }
+	        catch(Exception e)
+	        {
+	          ConfigStatus.NOT_VALID.msg = "can't create the output directory at this location :" +  "\'" + path + "\'. Because:\n\n\t" +
+	          e.getMessage() ;
+	          return ConfigStatus.NOT_VALID ;
+	        }
+	      }
+	      
+	      _aadlInspectorOutputDir = outputDir ;
+	      ConfigStatus.SET.msg = "set output directory to \'" + path + "\'" ;
+	      _LOGGER.info(ConfigStatus.SET.msg);
+	      return ConfigStatus.SET ;
+	    }
+	    else
+	    {
+	      ConfigStatus.NOT_VALID.msg = "output directory is not configured" ;
+	      return ConfigStatus.NOT_VALID ;
+	    }
+  }
+  
   public ConfigStatus setRamsesOutputDir(String path)
   {
     if(! (path == null || path.isEmpty()))
@@ -195,7 +236,7 @@ public class RamsesConfiguration
         }
       }
       
-      _outputDir = outputDir ;
+      _ramsesOutputDir = outputDir ;
       ConfigStatus.SET.msg = "set output directory to \'" + path + "\'" ;
       _LOGGER.info(ConfigStatus.SET.msg);
       return ConfigStatus.SET ;
@@ -431,7 +472,7 @@ public class RamsesConfiguration
     _LOGGER.info("RAMSES resource directory is \'" + _RAMSES_RESOURCE_DIR + '\'') ;
     _LOGGER.info("ATL resource directory is \'" + _ATL_RESOURCE_DIR + '\'') ;
     _LOGGER.info("AADL resource directory is \'" + _AADL_PACKAGE_DIR + '\'') ;
-    _LOGGER.info("output directory is \'" + _outputDir + '\'') ;
+    _LOGGER.info("output directory is \'" + _ramsesOutputDir + '\'') ;
     _LOGGER.info("generation target is \'" + _targetId + '\'') ;
     _LOGGER.info("runtime path is \'" + _runtimePath + '\'') ;
   }
