@@ -161,6 +161,7 @@ public class AadlTargetSpecificGenerator implements Generator
                             (fr.tpt.aadl.ramses.constraintsreporter.Error) err ;
             errManager.error((Element) constraintError.getObject(),
                              constraintError.getMessage()) ;
+            ServiceProvider.SYS_ERR_REP.error(constraintError.getMessage(), true) ;
           }
         }
         return ;
@@ -233,6 +234,7 @@ public class AadlTargetSpecificGenerator implements Generator
                                                                            (fr.tpt.aadl.ramses.constraintsreporter.Error) err ;
             errManager.error((Element) constraintError.getObject(),
                              constraintError.getMessage()) ;
+            ServiceProvider.SYS_ERR_REP.error(constraintError.getMessage(), true) ;
           }
         }
         return ;

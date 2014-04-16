@@ -403,6 +403,10 @@ rule m_ThreadEntrypoint {
 		( 
 			actions <- c.collectDispatchActions()
 		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'DATA_MODEL', 'Data_Model');
+	}
 }
 
 helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AADLBA!BehaviorAction) = 
@@ -1648,6 +1652,10 @@ rule m_Parameter_to_Parameter_Connection
 			name <- paramCnx.uniqueName()+'_localVariable',
 			dataSubcomponentType <- paramCnx.source.connectionEnd.dataFeatureClassifier
 		)
+	do
+	{
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), paramCnx.source.connectionEnd.dataFeatureClassifier);
+	}
 }
 
 lazy rule Parameter_to_Parameter_Connection

@@ -41,7 +41,6 @@ helper def : collectPeriodicDelayed_LocalVariables_LowET(c: AADLI!ComponentInsta
 	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort())
 		->collect(fi|
 			fi.srcConnectionInstance->collect(cnxInst|
-				-- @ requires EventDataPorts_LowET.m_Thread_Output_PeriodicDelayed_Port_LowET(fi, cnxInst.connectionReference->first().connection) ==> produce a helper and a helper call that does the if(INCLUSION and not EXCLUSION) then resolveTemp else OclUndefined
 				thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxInst.connectionReference->first().connection}, 'CurrentDeadlineWrite')
 			)
 		)

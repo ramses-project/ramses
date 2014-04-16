@@ -25,3 +25,16 @@
 module PokProperties;
 create OUT : CV 	from 		IN : AADLI;
 
+
+--@extends check_VirtualProcessorInstance
+rule check_HasScheduler
+{
+	from
+	 	obj:AADLI!ComponentInstance,
+		p: AADLI!Property
+		(p.eContainer().name='POK' and p.name='Scheduler' and not obj.hasProperty('Scheduler'))
+	to
+		err: CV!Error
+		(message <- 'For code generation towards POK, each virtual processor must'+ 
+			'have a property value for POK::Scheduler' )
+}

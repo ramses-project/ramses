@@ -223,16 +223,25 @@ rule m_Thread_DataOrEventDataPort_Input_Instance
 		and fi.isInputFeature()
 		and fi.isThreadPort()
 		)
+	using
+	{
+		dataClass : AADLBA!DataSubcomponentType =
+									if(not fi.isUsedInFresh()) then	
+										fi.feature.dataFeatureClassifier
+									else
+										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
+									endif;
+	}
   	to
   		localVariable: AADLBA!DataSubcomponent
 		(
 			name <- fi.name+'_localVariable',
-			dataSubcomponentType <- if(not fi.isUsedInFresh()) then	
-										fi.feature.dataFeatureClassifier
-									else
-										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
-									endif
+			dataSubcomponentType <- dataClass
 		)
+	do
+	{
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), dataClass);
+	}
 }
 
 -- @extends m_Thread_Input_Port_Instance
@@ -264,6 +273,15 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
 			and
 			fi.isOutputFeature()
 		)
+	using
+	{
+		dataClass : AADLBA!DataSubcomponentType =
+									if(not fi.isUsedInFresh()) then	
+										fi.feature.dataFeatureClassifier
+									else
+										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
+									endif;
+	}
   	to
   		localVariable: AADLBA!DataSubcomponent
 		(
@@ -274,6 +292,10 @@ rule m_Thread_DataOrEventDataPort_Output_Instance
 										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
 									endif
 		)
+	do
+	{
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), dataClass);
+	}
 }
 
 -- @extends m_Thread_Port_Instance
