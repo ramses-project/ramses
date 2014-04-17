@@ -1,0 +1,4 @@
+#include "deployment.h"
+test_buffer_delayed_refined_model__ComponentInstanceArrayDataType_the_receiver_p_in writer_instances_the_receiver_p_in = {{2000,2000}};
+test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl the_receiver_p_in_globalVariable;
+periodic_delayed_context_t context_the_receiver_p_in = {1000,1,3,2000,writer_instances_the_receiver_p_in};

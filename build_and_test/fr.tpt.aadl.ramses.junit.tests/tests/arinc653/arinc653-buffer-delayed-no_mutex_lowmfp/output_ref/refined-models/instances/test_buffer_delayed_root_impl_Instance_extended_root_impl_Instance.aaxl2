@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="ASCII"?>
+<instance:SystemInstance xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance" name="root_impl_Instance" category="system" systemImplementation="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4">
+  <componentInstance name="the_mem" category="memory" subcomponent="aadl2:MemorySubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedMemorySubcomponent.0">
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.11">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:IntegerLiteral" value="80000"/>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance name="the_proc" category="process" subcomponent="aadl2:ProcessSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedProcessSubcomponent.0">
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.2/@componentInstance.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance name="the_receiver_p_globalVariable" dstConnectionInstance="#//@componentInstance.1/@connectionInstance.0 #//@componentInstance.1/@connectionInstance.2" category="data" subcomponent="aadl2:DataSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedDataSubcomponent.0">
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.0">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:ClassifierValue" classifier="aadl2:DataType file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/base_types.aadl2#//@ownedPublicSection/@ownedClassifier.3"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.5">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:IntegerLiteral" value="10"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance name="context_the_receiver_p" dstConnectionInstance="#//@componentInstance.1/@connectionInstance.1 #//@componentInstance.1/@connectionInstance.3" category="data" subcomponent="aadl2:DataSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedDataSubcomponent.1">
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.9">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="{200,1,2,1000,writer_instances_the_receiver_p}"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.8"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:StringLiteral" value="periodic_delayed_context_t"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <componentInstance name="reader_task_period" category="data" subcomponent="aadl2:DataSubcomponent file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/PeriodicDelayed_runtime.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedDataSubcomponent.0">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="2"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance name="writer_count" category="data" subcomponent="aadl2:DataSubcomponent file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/PeriodicDelayed_runtime.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedDataSubcomponent.1">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="2"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance name="buffer_size" category="data" subcomponent="aadl2:DataSubcomponent file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/PeriodicDelayed_runtime.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedDataSubcomponent.2">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="2"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance name="hyperperiod" category="data" subcomponent="aadl2:DataSubcomponent file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/PeriodicDelayed_runtime.aadl2#//@ownedPublicSection/@ownedClassifier.10/@ownedDataSubcomponent.3">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="2"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.6"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.12/@ownedPropertyType/@ownedLiteral.1"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <index>0</index>
+      </componentInstance>
+      <componentInstance name="writer_instances" category="data" subcomponent="aadl2:DataSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.25/@ownedDataSubcomponent.0">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.0">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:ClassifierValue" classifier="aadl2:DataImplementation file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/PeriodicDelayed_runtime.aadl2#//@ownedPublicSection/@ownedClassifier.7"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="1"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <index>0</index>
+      </componentInstance>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance name="writer_instances_the_receiver_p" category="data" subcomponent="aadl2:DataSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedDataSubcomponent.2">
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.9">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:StringLiteral" value="{{1000,1000}}"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.0">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:ClassifierValue" classifier="aadl2:DataImplementation file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/PeriodicDelayed_runtime.aadl2#//@ownedPublicSection/@ownedClassifier.7"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.5">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:IntegerLiteral" value="1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance name="the_sender" category="thread" subcomponent="aadl2:ThreadSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedThreadSubcomponent.0">
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.2/@componentInstance.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ReferenceValue">
+            <containmentPathElement namedElement="aadl2:Property ../test_buffer_delayed_root_impl_Instance_extended.aadl2#xtextLink_::0.5.9.3.41.0.4.0.7.0.6.2.0::3::/0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.3">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:RangeValue">
+            <minimum xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+            <maximum xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3" value="1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3" value="1000"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" value="5"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="40000"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.10">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="40000"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.7">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="40"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance name="cnx_generated_id_0_p" srcConnectionInstance="#//@componentInstance.1/@connectionInstance.0" category="dataAccess" direction="in out" feature="aadl2:DataAccess ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.18/@ownedDataAccess.0">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.0">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:ClassifierValue" classifier="aadl2:DataType file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/base_types.aadl2#//@ownedPublicSection/@ownedClassifier.3"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="10"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+      </featureInstance>
+      <featureInstance name="p_Periodic_Delayed_ContextAccess" srcConnectionInstance="#//@componentInstance.1/@connectionInstance.1" category="dataAccess" direction="in out" feature="aadl2:DataAccess ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.18/@ownedDataAccess.1">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.8"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:StringLiteral" value="periodic_delayed_context_t"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+      </featureInstance>
+      <index>0</index>
+    </componentInstance>
+    <componentInstance name="the_receiver" category="thread" subcomponent="aadl2:ThreadSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedThreadSubcomponent.1">
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.2">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.2/@componentInstance.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.4">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ReferenceValue">
+            <containmentPathElement namedElement="aadl2:Property ../test_buffer_delayed_root_impl_Instance_extended.aadl2#xtextLink_::0.5.9.3.41.1.4.0.7.0.6.2.0::3::/0"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.0">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.3">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:RangeValue">
+            <minimum xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+            <maximum xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3" value="1"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3" value="200"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Thread_Properties.aadl2#//@ownedProperty.3">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" value="10"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="40000"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.10">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="40000"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.7">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1" value="40"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <featureInstance name="p" srcConnectionInstance="#//@componentInstance.1/@connectionInstance.2" category="dataAccess" direction="in out" feature="aadl2:DataAccess ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.23/@ownedDataAccess.0">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.0"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.0">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:ClassifierValue" classifier="aadl2:DataType file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/package/base_types.aadl2#//@ownedPublicSection/@ownedClassifier.3"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:IntegerLiteral" value="10"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+      </featureInstance>
+      <featureInstance name="p_Periodic_Delayed_ContextAccess" srcConnectionInstance="#//@componentInstance.1/@connectionInstance.3" category="dataAccess" direction="in out" feature="aadl2:DataAccess ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.23/@ownedDataAccess.1">
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.5">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="#//@componentInstance.0"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/data_model.aadl2#//@ownedProperty.4/@ownedPropertyType/@ownedLiteral.8"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.19">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:StringLiteral" value="periodic_delayed_context_t"/>
+          </ownedValue>
+        </ownedPropertyAssociation>
+        <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Programming_Properties.aadl2#//@ownedProperty.20">
+          <ownedValue>
+            <ownedValue xsi:type="aadl2:ListValue">
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.h"/>
+              <ownedListElement xsi:type="aadl2:StringLiteral" value="PeriodicDelayed_runtime.c"/>
+            </ownedValue>
+          </ownedValue>
+        </ownedPropertyAssociation>
+      </featureInstance>
+      <index>0</index>
+    </componentInstance>
+    <connectionInstance name="the_sender.cnx_generated_id_0_p -> the_receiver_p_globalVariable" complete="true" kind="accessConnection" destination="#//@componentInstance.1/@componentInstance.0" source="#//@componentInstance.1/@componentInstance.3/@featureInstance.0">
+      <connectionReference context="#//@componentInstance.1" connection="aadl2:AccessConnection ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedAccessConnection.0" source="#//@componentInstance.1/@componentInstance.3/@featureInstance.0" destination="#//@componentInstance.1/@componentInstance.0"/>
+    </connectionInstance>
+    <connectionInstance name="the_sender.p_Periodic_Delayed_ContextAccess -> context_the_receiver_p" complete="true" kind="accessConnection" destination="#//@componentInstance.1/@componentInstance.1" source="#//@componentInstance.1/@componentInstance.3/@featureInstance.1">
+      <connectionReference context="#//@componentInstance.1" connection="aadl2:AccessConnection ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedAccessConnection.2" source="#//@componentInstance.1/@componentInstance.3/@featureInstance.1" destination="#//@componentInstance.1/@componentInstance.1"/>
+    </connectionInstance>
+    <connectionInstance name="the_receiver.p -> the_receiver_p_globalVariable" complete="true" kind="accessConnection" destination="#//@componentInstance.1/@componentInstance.0" source="#//@componentInstance.1/@componentInstance.4/@featureInstance.0">
+      <connectionReference context="#//@componentInstance.1" connection="aadl2:AccessConnection ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedAccessConnection.1" source="#//@componentInstance.1/@componentInstance.4/@featureInstance.0" destination="#//@componentInstance.1/@componentInstance.0"/>
+    </connectionInstance>
+    <connectionInstance name="the_receiver.p_Periodic_Delayed_ContextAccess -> context_the_receiver_p" complete="true" kind="accessConnection" destination="#//@componentInstance.1/@componentInstance.1" source="#//@componentInstance.1/@componentInstance.4/@featureInstance.1">
+      <connectionReference context="#//@componentInstance.1" connection="aadl2:AccessConnection ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.3/@ownedAccessConnection.3" source="#//@componentInstance.1/@componentInstance.4/@featureInstance.1" destination="#//@componentInstance.1/@componentInstance.1"/>
+    </connectionInstance>
+    <index>0</index>
+  </componentInstance>
+  <componentInstance name="the_cpu" category="processor" subcomponent="aadl2:ProcessorSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedProcessorSubcomponent.0">
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.6">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3" value="1000"/>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.7">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.0/@ownedLiteral.5"/>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.8">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="aadl2:IntegerLiteral" unit="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3" value="1000"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.9">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="aadl2:ReferenceValue">
+            <containmentPathElement namedElement="aadl2:VirtualProcessorSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedVirtualProcessorSubcomponent.0"/>
+          </ownedListElement>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.13">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.4/@ownedLiteral.0"/>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.12">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.3/@ownedLiteral.0"/>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25">
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.7"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <componentInstance name="the_part" category="virtual processor" subcomponent="aadl2:VirtualProcessorSubcomponent ../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedVirtualProcessorSubcomponent.0">
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.7">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.0/@ownedLiteral.3"/>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Deployment_Properties.aadl2#//@ownedProperty.25">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.7"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <ownedPropertyAssociation property="file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedProperty.21">
+        <ownedValue>
+          <ownedValue xsi:type="aadl2:ListValue">
+            <ownedListElement xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.5/@ownedLiteral.2"/>
+            <ownedListElement xsi:type="aadl2:NamedValue" namedValue="aadl2:EnumerationLiteral file:/data/hudson/jobs/RAMSES-Test/workspace/junit_tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.5/@ownedLiteral.6"/>
+          </ownedValue>
+        </ownedValue>
+      </ownedPropertyAssociation>
+      <index>0</index>
+    </componentInstance>
+    <index>0</index>
+  </componentInstance>
+  <systemOperationMode name="No Modes"/>
+</instance:SystemInstance>

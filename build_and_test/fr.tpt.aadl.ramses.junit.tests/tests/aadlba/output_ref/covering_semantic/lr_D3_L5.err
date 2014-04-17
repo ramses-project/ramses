@@ -1,0 +1,2 @@
+<Analysis Error> Only transition out of complete states may have dispatch condition : Behavior Annex D.3.(L6) legality rule failed. in lr_D3_L5.aadl at line 42
+<Analysis Error> Subprogram components must not contain a dispatch condition in any of its transitions: Behavior Annex D.3.(L5) legality rule failed. in lr_D3_L5.aadl at line 42

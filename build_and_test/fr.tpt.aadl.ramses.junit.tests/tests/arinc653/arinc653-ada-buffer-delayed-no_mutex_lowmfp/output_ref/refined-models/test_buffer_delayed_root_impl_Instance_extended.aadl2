@@ -1,0 +1,263 @@
+package test_buffer_delayed_refined
+public
+with Base_Types,Data_Model,POK,test_buffer_delayed,PeriodicDelayed_runtime,arinc653_runtime;
+  processor implementation cpu.impl
+    subcomponents
+      the_part: virtual processor part.impl {
+        POK::Scheduler => RR;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+  end cpu.impl;
+  
+  virtual processor implementation part.impl
+  end part.impl;
+  
+  memory implementation mem.impl
+  end mem.impl;
+  
+  process implementation proc.impl
+    subcomponents
+      the_receiver_p_globalVariable: data BufferArrayType_the_receiver_p;
+      context_the_receiver_p: data periodic_delayed_context_t.impl_the_proc_the_receiver_p {
+        Data_Model::Initial_Value => ("(200,1,2,1000,writer_instances_the_receiver_p)");
+        };
+      writer_instances_the_receiver_p: data ComponentInstanceArrayDataType_the_receiver_p {
+        Data_Model::Initial_Value => ("(0 => (1000,1000))");
+        };
+      the_sender: thread the_proc_the_sender.impl {
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 5;
+        Source_Data_Size => 40000 Bytes;
+        Source_Stack_Size => 40000 Bytes;
+        Source_Code_Size => 40 Bytes;
+        };
+      the_receiver: thread the_proc_the_receiver.impl {
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 200 ms;
+        Priority => 10;
+        Source_Data_Size => 40000 Bytes;
+        Source_Stack_Size => 40000 Bytes;
+        Source_Code_Size => 40 Bytes;
+        };
+    connections
+      cnx_generated_id_0_p_to_globalVariable: data access the_sender.cnx_generated_id_0_p -> the_receiver_p_globalVariable;
+      Id_instance_to_the_receiver_p: data access the_receiver.p -> the_receiver_p_globalVariable;
+      cnx_generated_id_0_p_to_periodic_Delayed_Context: data access the_sender.p_Periodic_Delayed_ContextAccess -> context_the_receiver_p;
+      p_to_periodic_Delayed_Context: data access the_receiver.p_Periodic_Delayed_ContextAccess -> context_the_receiver_p;
+  end proc.impl;
+  
+  system implementation root.impl
+    subcomponents
+      the_mem: memory mem.impl {
+        Byte_Count => 80000;
+        };
+      the_proc: process proc.impl;
+      the_cpu: processor cpu.impl {
+        POK::Module_Major_Frame => 1000 ms;
+        POK::Scheduler => STATIC;
+        POK::Partition_Slots => (1000 ms);
+        POK::Slots_Allocation => (reference(the_part));
+        POK::Architecture => x86;
+        POK::BSP => x86_qemu;
+        Scheduling_Protocol => (Posix_1003_Highest_Priority_First_Protocol);
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
+      Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
+  end root.impl;
+  
+  processor cpu
+  end cpu;
+  
+  virtual processor part
+  end part;
+  
+  memory mem
+  end mem;
+  
+  process proc
+  end proc;
+  
+  system root
+  end root;
+  
+  subprogram Put_Value_LowFP_the_proc_the_sender_p
+    extends PeriodicDelayed_runtime::Put_Value_LowFP
+    (value_type => data test_buffer_delayed::Integer,context_prototype => data periodic_delayed_context_t.impl_the_proc_the_receiver_p)
+    features
+      value: refined to in parameter test_buffer_delayed::Integer;
+      buffer: refined to requires data access BufferArrayType_the_receiver_p;
+  end Put_Value_LowFP_the_proc_the_sender_p;
+  
+  data BufferArrayType_the_receiver_p
+    extends PeriodicDelayed_runtime::ArrayDataType
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(Base_Types::Integer_16));
+      Data_Model::Dimension => (10);
+  end BufferArrayType_the_receiver_p;
+  
+  subprogram Receive_Input_LowFP_the_proc_the_receiver_p
+    extends PeriodicDelayed_runtime::Receive_Input_LowFP
+    (context_prototype => data periodic_delayed_context_t.impl_the_proc_the_receiver_p)
+  end Receive_Input_LowFP_the_proc_the_receiver_p;
+  
+  subprogram Next_Value_the_proc_the_receiver_p
+    extends PeriodicDelayed_runtime::Next_Value
+    (output_type => data test_buffer_delayed::Integer)
+    features
+      buffer: refined to requires data access BufferArrayType_the_receiver_p;
+      output: refined to requires data access test_buffer_delayed::Integer;
+  end Next_Value_the_proc_the_receiver_p;
+  
+  subprogram the_proc_the_sender_entrypoint
+    features
+      cnx_generated_id_0_p: requires data access BufferArrayType_the_receiver_p;
+      p_Periodic_Delayed_ContextAccess: requires data access periodic_delayed_context_t.impl_the_proc_the_receiver_p;
+  end the_proc_the_sender_entrypoint;
+  
+  subprogram implementation the_proc_the_sender_entrypoint.impl
+    subcomponents
+      the_proc_the_sender_runtime_call_ret: data arinc653_runtime::Return_Code_Type;
+      p_localVariable: data test_buffer_delayed::Integer;
+      the_proc_the_sender_IterationCounter: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("0");
+        };
+      p_CDWSize: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("2");
+        };
+      ID: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("0");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_buffer_delayed_refined::the_proc_the_sender_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_sender_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {test_buffer_delayed::sender_spg ! (p_localVariable) ;
+Put_Value_LowFP_the_proc_the_sender_p ! (ID, the_proc_the_sender_IterationCounter, p_CDWSize, p_localVariable, p_Periodic_Delayed_ContextAccess, cnx_generated_id_0_p) ;
+PeriodicDelayed_runtime::Send_Output ! (the_proc_the_sender_IterationCounter, p_CDWSize)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_sender_behaviorIdentifier_enum#default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_init_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_sender_runtime_call_ret)} ;
+**};
+  end the_proc_the_sender_entrypoint.impl;
+  
+  data the_proc_the_sender_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior");
+  end the_proc_the_sender_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_the_sender.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_the_sender_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_accessCnx_call: data access cnx_generated_id_0_p -> call_entrypoint.cnx_generated_id_0_p;
+      cnx_generated_id_0_p_to_periodic_Delayed_Context: data access call_entrypoint.p_Periodic_Delayed_ContextAccess -> p_Periodic_Delayed_ContextAccess;
+  end the_proc_the_sender.impl;
+  
+  thread the_proc_the_sender
+    features
+      cnx_generated_id_0_p: requires data access BufferArrayType_the_receiver_p;
+      p_Periodic_Delayed_ContextAccess: requires data access periodic_delayed_context_t.impl_the_proc_the_receiver_p;
+  end the_proc_the_sender;
+  
+  subprogram the_proc_the_receiver_entrypoint
+    features
+      p: requires data access BufferArrayType_the_receiver_p;
+      p_Periodic_Delayed_ContextAccess: requires data access periodic_delayed_context_t.impl_the_proc_the_receiver_p;
+  end the_proc_the_receiver_entrypoint;
+  
+  subprogram implementation the_proc_the_receiver_entrypoint.impl
+    subcomponents
+      the_proc_the_receiver_runtime_call_ret: data arinc653_runtime::Return_Code_Type;
+      p_localVariable: data test_buffer_delayed::Integer;
+      the_proc_the_receiver_IterationCounter: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("0");
+        };
+      p_CPRSize: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("10");
+        };
+      p_lastIndex: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("-1");
+        };
+      p_readIndex: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("-1");
+        };
+      the_receiver_p_BufferSize: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("2");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_buffer_delayed_refined::the_proc_the_receiver_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_receiver_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Input_LowFP_the_proc_the_receiver_p ! (the_proc_the_receiver_IterationCounter, p_CPRSize, p_Periodic_Delayed_ContextAccess, p_readIndex, p_lastIndex) ;
+Next_Value_the_proc_the_receiver_p ! (p_readIndex, p_lastIndex, p, p_localVariable, the_receiver_p_BufferSize) ;
+test_buffer_delayed::receiver_spg ! (p_localVariable)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_receiver_behaviorIdentifier_enum#default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_init_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_receiver_runtime_call_ret)} ;
+**};
+  end the_proc_the_receiver_entrypoint.impl;
+  
+  data the_proc_the_receiver_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("p", "default_behavior");
+  end the_proc_the_receiver_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_the_receiver.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_the_receiver_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_accessCnx_call: data access p -> call_entrypoint.p;
+      p_to_periodic_Delayed_Context: data access call_entrypoint.p_Periodic_Delayed_ContextAccess -> p_Periodic_Delayed_ContextAccess;
+  end the_proc_the_receiver.impl;
+  
+  thread the_proc_the_receiver
+    features
+      p: requires data access BufferArrayType_the_receiver_p;
+      p_Periodic_Delayed_ContextAccess: requires data access periodic_delayed_context_t.impl_the_proc_the_receiver_p;
+  end the_proc_the_receiver;
+  
+  data periodic_delayed_context_t
+    extends PeriodicDelayed_runtime::periodic_delayed_context_t
+  end periodic_delayed_context_t;
+  
+  data implementation periodic_delayed_context_t.impl_the_proc_the_receiver_p
+    extends PeriodicDelayed_runtime::periodic_delayed_context_t.impl
+    subcomponents
+      writer_instances: refined to data ComponentInstanceArrayDataType_the_receiver_p;
+  end periodic_delayed_context_t.impl_the_proc_the_receiver_p;
+  
+  data ComponentInstanceArrayDataType_the_receiver_p
+    extends PeriodicDelayed_runtime::ComponentInstanceArrayDataType
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(PeriodicDelayed_runtime::component_instance_t.impl));
+      Data_Model::Dimension => (1);
+  end ComponentInstanceArrayDataType_the_receiver_p;
+end test_buffer_delayed_refined;

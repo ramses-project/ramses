@@ -1,0 +1,65 @@
+#include "arinc653/sampling.h"
+#include "pingpong.h"
+#include "subprograms.h"
+PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_State_t S2_inst_a2_inst_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_init_state;
+void PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl(SAMPLING_PORT_ID_TYPE *  C2_mode, SAMPLING_PORT_ID_TYPE *  C2_PingIn, SAMPLING_PORT_ID_TYPE *  C2_PongIn, SAMPLING_PORT_ID_TYPE *  C2_ping_implicit_cnx_C2_PingOut, SAMPLING_PORT_ID_TYPE *  C2_pong_implicit_cnx_C2_PongOut, SAMPLING_PORT_ID_TYPE *  C2_error_implicit_cnx_C2_badSequenceNumber, SEQ *  call_seq_seqNb_entrypoint)
+{
+  RETURN_CODE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_S2_inst_a2_inst_runtime_call_ret;
+  ROLE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_localVariable;
+  MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_Length = sizeof(ROLE);
+  PingPongMessage PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_localVariable;
+  MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_Length = sizeof(PingPongMessage);
+  PingPongMessage PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_localVariable;
+  MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_Length = sizeof(PingPongMessage);
+  PingPongMessage PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingOut_localVariable;
+  MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingOut_Length = sizeof(PingPongMessage);
+  PingPongMessage PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongOut_localVariable;
+  MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongOut_Length = sizeof(PingPongMessage);
+  PingPong__Exception PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_badSequenceNumber_localVariable;
+  MESSAGE_SIZE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_badSequenceNumber_Length = sizeof(PingPong__Exception);
+  RETURN_CODE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_ErrorCode = 0;
+  RETURN_CODE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_ErrorCode = 0;
+  RETURN_CODE_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_ErrorCode = 0;
+  VALIDITY_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_Validity;
+  VALIDITY_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_Validity;
+  VALIDITY_TYPE PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_Validity;
+  PingPong_refined_model__S2_inst_a2_inst_behaviorIdentifier_enum whichPortActivated = PingPong_refined_model__S2_inst_a2_inst_behaviorIdentifier_enum_default_behavior;
+while(1)
+{
+  switch(S2_inst_a2_inst_entrypoint_impl_current_state)
+  {
+    case PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_init_state:
+    // Transition id: which_behavior_default_mode
+    if(1) // no execution condition
+    {
+      S2_inst_a2_inst_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_exec_state;
+      whichPortActivated = PingPong_refined_model__S2_inst_a2_inst_behaviorIdentifier_enum_default_behavior;
+      break;
+    }
+    case PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_wait_dispatch_state:
+    // Transition id: dispatch_transition
+    if(1) // no execution condition
+    {
+      S2_inst_a2_inst_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_exec_state;
+      PERIODIC_WAIT (&PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_S2_inst_a2_inst_runtime_call_ret);
+      break;
+    }
+    case PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_exec_state:
+    // Transition id: call_seq -- Priority 0
+    if(whichPortActivated == PingPong_refined_model__S2_inst_a2_inst_behaviorIdentifier_enum_default_behavior)
+    {
+      S2_inst_a2_inst_entrypoint_impl_current_state = PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_BA_entrypoint_wait_dispatch_state;
+      READ_SAMPLING_MESSAGE ((*C2_mode), &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_Length, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_Validity, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_ErrorCode);
+      READ_SAMPLING_MESSAGE ((*C2_PingIn), &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_Length, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_Validity, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_ErrorCode);
+      READ_SAMPLING_MESSAGE ((*C2_PongIn), &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_Length, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_Validity, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_ErrorCode);
+      if (PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_ErrorCode == 0 && PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_ErrorCode == 0 && PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_ErrorCode == 0) {
+      mode (call_seq_seqNb_entrypoint, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingIn_localVariable, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingOut_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongIn_localVariable, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongOut_localVariable, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_badSequenceNumber_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_mode_localVariable);
+      }
+      WRITE_SAMPLING_MESSAGE ((*C2_ping_implicit_cnx_C2_PingOut), &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingOut_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PingOut_Length, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_S2_inst_a2_inst_runtime_call_ret);
+      WRITE_SAMPLING_MESSAGE ((*C2_pong_implicit_cnx_C2_PongOut), &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongOut_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_PongOut_Length, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_S2_inst_a2_inst_runtime_call_ret);
+      WRITE_SAMPLING_MESSAGE ((*C2_error_implicit_cnx_C2_badSequenceNumber), &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_badSequenceNumber_localVariable, PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_C2_badSequenceNumber_Length, &PingPong_refined_model__S2_inst_a2_inst_entrypoint_impl_S2_inst_a2_inst_runtime_call_ret);
+      break;
+    }
+  }
+}
+}

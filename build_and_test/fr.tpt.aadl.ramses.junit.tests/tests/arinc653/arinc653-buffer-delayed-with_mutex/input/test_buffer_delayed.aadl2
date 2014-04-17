@@ -1,0 +1,64 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright ¬© 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+package test_buffer_delayed
+public
+
+with Base_Types;
+with Data_Model;
+with POK;
+with ARINC653;
+with common_pkg;
+
+  system root
+  end root;
+
+  system implementation root.impl
+  subcomponents
+    the_cpu: processor cpu.impl;
+    the_proc: process proc.impl;
+    the_mem: memory common_pkg::mem.impl;
+  properties
+    Actual_Processor_Binding => (reference (the_cpu.the_part)) applies to the_proc;
+    Actual_Memory_Binding => (reference (the_mem)) applies to the_proc;
+  end root.impl;
+
+  processor cpu extends common_pkg::cpu
+  end cpu;
+
+  processor implementation cpu.impl extends common_pkg::cpu.single_partition
+  properties
+    ARINC653::Module_Major_Frame => 1000 ms;
+    ARINC653::Partition_Slots => (1000 ms);
+  end cpu.impl;
+
+  process proc
+  end proc;
+
+  process implementation proc.impl
+  subcomponents
+    the_sender: thread common_pkg::eventdata_sender.impl;
+    the_receiver: thread common_pkg::eventdata_receiver.impl{Dequeue_Protocol => AllItems applies to p_in;};
+  connections
+    cnx: port the_sender.p_out -> the_receiver.p_in { Timing => Delayed; };
+  end proc.impl;
+
+end test_buffer_delayed;

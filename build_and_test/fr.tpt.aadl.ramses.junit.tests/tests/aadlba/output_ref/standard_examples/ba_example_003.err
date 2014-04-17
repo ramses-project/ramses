@@ -1,0 +1,2 @@
+<Analysis Error> The dispatch relative timeout and catch statement must be declared in only one transition: Behavior Annex D.4.(L1) legality rule failed. in ba_example_003.aadl at line 33
+<Analysis Error> The dispatch relative timeout and catch statement must be declared in only one transition: Behavior Annex D.4.(L1) legality rule failed. in ba_example_003.aadl at line 54

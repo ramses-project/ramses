@@ -1,0 +1,27 @@
+package exemple_lr_D3_L6_L7_L8
+public
+with Base_Types;
+  thread th
+  end th;
+  
+  thread implementation th.good
+    annex behavior_specification {**
+      states
+  uniqueState : initial complete final state ;
+transitions
+  uniqueState -[on dispatch]-> uniqueState ;
+**};
+  end th.good;
+  
+  thread implementation th.error
+    annex behavior_specification {**
+      states
+  compState : initial complete state ;
+  exeState : state ;
+  finalState : final state ;
+transitions
+  compState -[]-> finalState ;
+  finalState -[on dispatch]-> finalState ;
+**};
+  end th.error;
+end exemple_lr_D3_L6_L7_L8;

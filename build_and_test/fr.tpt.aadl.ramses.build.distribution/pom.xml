@@ -1,0 +1,62 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ramses</groupId>
+  <artifactId>fr.tpt.aadl.ramses.build.distribution</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <parent>
+    <groupId>ramses</groupId>
+    <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <type>jar</type>
+      <classifier>exe</classifier>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osate</groupId>
+      <artifactId>org.osate.aadl2</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+       
+  </dependencies>
+
+  <build>
+    <plugins>
+      
+      <plugin>  
+        <groupId>org.apache.maven.plugins</groupId>  
+        <artifactId>maven-assembly-plugin</artifactId>  
+        <configuration>  
+          <descriptors>  
+            <descriptor>src_assembly.xml</descriptor>
+            <descriptor>bin_assembly.xml</descriptor>
+          </descriptors>
+          <finalName>ramses-1.0.0-SNAPSHOT_${maven.build.timestamp}</finalName>
+          <appendAssemblyId>true</appendAssemblyId>
+        </configuration>  
+        <executions>
+          <execution>  
+            <id>make-assembly</id>  
+            <phase>package</phase>  
+            <goals>  
+              <goal>single</goal>  
+            </goals>  
+          </execution>  
+        </executions>  
+      </plugin> 
+            
+    </plugins>
+  </build>
+
+</project>
