@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.transformation.atl.launch/src"
+    editDirectory="/fr.tpt.aadl.ramses.transformation.atl.edit/src" editorDirectory="/fr.tpt.aadl.ramses.transformation.atl.editor/src"
+    modelPluginID="fr.tpt.aadl.ramses.transformation.atl.launch" modelName="hooks"
+    editPluginClass="fr.tpt.aadl.ramses.transformation.atl.provider.AtlHooksEditPlugin"
+    editorPluginClass="fr.tpt.aadl.ramses.transformation.atl.presentation.AtlHooksEditorPlugin"
+    testSuiteClass="fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooks.tests.AtlHooksAllTests"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0" copyrightFields="false"
+    editPluginID="fr.tpt.aadl.ramses.transformation.atl.edit" editorPluginID="fr.tpt.aadl.atl.transformation.editor"
+    usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../fr.tpt.aadl.annex.behavior/model/aadlba.genmodel#//aadlba ../../org.osate.aadl2/model/instance.genmodel#//instance">
+  <foreignModel>ATLHooks.ecore</foreignModel>
+  <genPackages prefix="AtlHooks" basePackage="fr.tpt.aadl.ramses.transformation.atl"
+      resource="XML" disposableProviderFactory="true" ecorePackage="ATLHooks.ecore#/">
+    <genClasses ecoreClass="ATLHooks.ecore#//HookAccess">
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/orderFeatures">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/orderFeatures/cpt"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/copyLocationReference">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/copyLocationReference/target"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/copyLocationReference/source"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/addTransformationBackTrace">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/addTransformationBackTrace/targetDeclarative"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/addTransformationBackTrace/sourceInstance"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc/state"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/putTransitionWhereSrc/transition"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getCurrentPerionReadTable">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getCurrentPerionReadTable/port"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getCurrentDeadlineWriteTable">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getCurrentDeadlineWriteTable/port"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getCurrentDeadlineWriteTable/destinationPort"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getBufferSize">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getBufferSize/destinationFeatureInstance"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/setInDirection">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/setInDirection/feature"/>
+      </genOperations>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

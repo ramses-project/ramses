@@ -1,0 +1,195 @@
+package Minimal_Runtime_Types
+public
+with Data_Model,Base_Types;
+  data Date
+  end Date;
+  
+  data Byte
+    properties
+      Source_Data_Size => 1 Bytes;
+  end Byte;
+  
+  data Buffer
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(Byte));
+      Data_Model::Dimension => (0);
+  end Buffer;
+  
+  data implementation Buffer.impl
+    subcomponents
+      Length: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("0");
+        };
+  end Buffer.impl;
+  
+  feature group Link_Access
+    features
+      Next: provides data access Pending_Event_Link.impl;
+      Previous: provides data access Pending_Event_Link.impl;
+    inverse of
+  end Link_Access;
+  
+  data Pending_Event_Link
+    features
+      Cpt_Access: feature group Link_Access;
+  end Pending_Event_Link;
+  
+  data implementation Pending_Event_Link.impl
+    subcomponents
+      Port_Id: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("-1");
+        };
+      Timestamp: data Date {
+        Data_Model::Initial_Value => ("0");
+        };
+      Is_Connected: data Base_Types::Boolean {
+        Data_Model::Initial_Value => ("FALSE");
+        };
+  end Pending_Event_Link.impl;
+  
+  data Item
+  end Item;
+  
+  data implementation Item.impl
+    prototypes
+       
+      ;
+    subcomponents
+      Payload: data ;
+      Link: data Pending_Event_Link.impl;
+  end Item.impl;
+  
+  data Pending_Event_Chain
+  end Pending_Event_Chain;
+  
+  data implementation Pending_Event_Chain.impl
+    subcomponents
+      First: data Pending_Event_Link.impl;
+      Last: data Pending_Event_Link.impl;
+  end Pending_Event_Chain.impl;
+  
+  data Item_Array
+    prototypes
+      Item.impl 
+      ;
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(Item.impl));
+      Data_Model::Dimension => (0);
+  end Item_Array;
+  
+  data Queue
+  end Queue;
+  
+  data implementation Queue.impl
+    prototypes
+      Item_Array 
+      ;
+      Item.impl 
+      ;
+    subcomponents
+      Array: data ;
+      Last_Value: data ;
+      First: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("0");
+        };
+      Last: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("0");
+        };
+      Is_Empty: data Base_Types::Boolean {
+        Data_Model::Initial_Value => ("FALSE");
+        };
+      Length: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("0");
+        };
+  end Queue.impl;
+  
+  data Event_Port_Variable
+  end Event_Port_Variable;
+  
+  data implementation Event_Port_Variable.impl
+    prototypes
+      Queue.impl 
+      ;
+    subcomponents
+      Id: data Base_Types::Unsigned_8 {
+        Data_Model::Initial_Value => ("0");
+        };
+      Queue: data ;
+      Dequeuable_Items: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("0");
+        };
+      Readable_Items: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("1");
+        };
+      Is_Updated: data Base_Types::Boolean[2] {
+        Data_Model::Initial_Value => ("FALSE");
+        };
+  end Event_Port_Variable.impl;
+  
+  data Data_Port_Item_Array
+    extends Item_Array
+    properties
+      Data_Model::Dimension => (2);
+  end Data_Port_Item_Array;
+  
+  data Data_Port_Variable
+  end Data_Port_Variable;
+  
+  data implementation Data_Port_Variable.impl
+    prototypes
+      Data_Port_Item_Array 
+      ;
+    subcomponents
+      Id: data Base_Types::Unsigned_8 {
+        Data_Model::Initial_Value => ("0");
+        };
+      Array: data ;
+      Snapshot_Index: data Base_Types::Unsigned_8 {
+        Data_Model::Initial_Value => ("0");
+        };
+      Stream_Index: data Base_Types::Unsigned_8 {
+        Data_Model::Initial_Value => ("1");
+        };
+      Is_Fresh: data Base_Types::Boolean {
+        Data_Model::Initial_Value => ("FALSE");
+        };
+  end Data_Port_Variable.impl;
+  
+  data Generic_List
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Dimension => (0);
+  end Generic_List;
+  
+  data implementation Generic_List.impl
+    subcomponents
+      Nb_Items: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("0");
+        };
+      Length: data Base_Types::Natural {
+        Data_Model::Initial_Value => ("0");
+        };
+  end Generic_List.impl;
+  
+  data Natural_List
+    extends Generic_List
+  end Natural_List;
+  
+  data implementation Natural_List.impl
+    extends Generic_List.impl
+    properties
+      Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
+  end Natural_List.impl;
+  
+  data Pending_Event_Chain_List
+    extends Generic_List
+  end Pending_Event_Chain_List;
+  
+  data implementation Pending_Event_Chain_List.impl
+    extends Generic_List.impl
+    properties
+      Data_Model::Base_Type => (classifier(Pending_Event_Chain.impl));
+  end Pending_Event_Chain_List.impl;
+end Minimal_Runtime_Types;

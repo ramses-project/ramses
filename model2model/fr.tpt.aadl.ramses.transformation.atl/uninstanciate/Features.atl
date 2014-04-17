@@ -1,0 +1,254 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+
+module Features;
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI;
+
+
+-------------------------------------------------------------------------------------
+---  RULES FOR KINDS OF FEATURES
+-------------------------------------------------------------------------------------
+
+--rule Feature (f: AADLI!Feature, featureImg : AADLBA!Feature) {
+--	do
+--	{
+--		if (f.oclIsKindOf(AADLI!DataPort)) { featureImg <- thisModule.DataPort(f); }
+--		else if(f.oclIsKindOf(AADLI!EventDataPort)) { featureImg <- thisModule.EventDataPort(f); }
+--		else if(f.oclIsKindOf(AADLI!EventPort)) { featureImg <- thisModule.EventPort(f); }
+--		else if(f.oclIsKindOf(AADLI!DataAccess)) { featureImg <- thisModule.DataAccess(f); }
+--		else if(f.oclIsKindOf(AADLI!Parameter)) { featureImg <- thisModule.Parameter(f); }
+--		featureImg;
+--	}
+--}
+
+--lazy abstract rule Port {
+--	from
+--		f : AADLI!Port
+--	to
+--		f2 : AADLBA!Port
+--}
+--
+--lazy rule DataPort extends Port {
+--	from
+--		f : AADLI!DataPort
+--	to
+--		f2 : AADLBA!DataPort
+--		(
+--			name <- f.name.debug('  copy data port'),
+--			direction <- f.direction,
+--			dataFeatureClassifier <- f.dataFeatureClassifier.mapDataClassifier(),
+--			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+--		)
+--	do
+--	{
+--		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().copyLocationReference(f2, f);
+--		f2;
+--	}
+--}
+--
+--lazy rule EventDataPort extends Port {
+--	from
+--		f : AADLI!EventDataPort
+--	to
+--		f2 : AADLBA!EventDataPort
+--		(
+--			name <- f.name.debug('  copy event data port'),
+--			direction <- f.direction,
+--			dataFeatureClassifier <- f.mapDataClassifier(),
+--			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+--		)
+--	do
+--	{
+--		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().copyLocationReference(f2, f);
+--		f2;
+--	}
+--}
+--
+--lazy rule EventPort extends Port{
+--	from
+--		f : AADLI!EventPort
+--	to
+--		f2 : AADLBA!EventPort
+--		(
+--			name <- f.name.debug('  copy event port'),
+--			direction <- f.direction,
+--			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+--		)
+--	do
+--	{
+--		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().copyLocationReference(f2, f);
+--		f2;
+--	}
+--}
+
+abstract rule m_Feature_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+	to
+		f: AADLBA!Feature
+		(
+			name <- fi.feature.debug('  copy feature instance').name--,
+			--ownedPropertyAssociation <- fi.collectSelfPropertyAssociationImg()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+-- @extends m_Feature_Instance
+rule m_DataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataPort)
+	to
+		f: AADLBA!DataPort
+		(
+			direction <- fi.feature.direction,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+		)
+}
+
+-- @extends m_Feature_Instance
+rule m_EventPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventPort)
+	to
+		f: AADLBA!EventPort
+		(
+			direction <- fi.feature.direction
+		)
+}
+
+-- @extends m_Feature_Instance
+rule m_EventDataPort_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventDataPort)
+	to
+		f: AADLBA!EventDataPort
+		(
+			direction <- fi.feature.direction,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+		)
+}
+
+-- @extends m_Feature_Instance
+rule m_DataAccess_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataAccess)
+	to
+		f: AADLBA!DataAccess
+		(
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+			kind <- fi.feature.kind
+		)
+}
+
+-- @extends m_Feature_Instance
+rule m_SubprogramAccess_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#subprogramAccess)
+	using
+	{
+			c : AADLI!ComponentInstance = fi.getComponentInstance();
+	}
+	to
+		f: AADLBA!SubprogramAccess
+		(
+			subprogramFeatureClassifier <- fi.feature.subprogramFeatureClassifier,
+			kind <- fi.feature.kind
+		)
+}
+
+-- @extends m_Feature_Instance
+rule m_Parameter_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#parameter)
+	to
+		f: AADLBA!Parameter
+		(
+			direction <- fi.feature.direction,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+		)
+}
+
+
+unique lazy abstract rule Feature {
+	from
+		f : AADLI!Feature
+	to
+		f2 : AADLBA!Feature
+		(
+			name <- f.name.debug('  copy feature')
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().copyLocationReference(f2, f);
+		f2;
+	}
+}
+
+-- @extends Feature
+unique lazy rule Parameter {
+	from
+		f : AADLI!Parameter
+	to
+		f2 : AADLBA!Parameter
+		(
+			direction <- f.direction,
+			dataFeatureClassifier <- f.dataFeatureClassifier,
+			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		f2;
+	}
+}
+
+-- @extends Feature
+lazy rule DataAccess {
+	from
+		f : AADLI!DataAccess
+	to
+		f2 : AADLBA!DataAccess
+		(
+			dataFeatureClassifier <- f.dataFeatureClassifier,
+			kind <- f.kind,
+			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		f2;
+	}
+}

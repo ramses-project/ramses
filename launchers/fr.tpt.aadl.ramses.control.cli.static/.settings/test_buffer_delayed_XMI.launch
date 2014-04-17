@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/fr.tpt.aadl.ramses.control.cli.static/src/fr/tpt/aadl/ramses/control/cli/ToolSuiteLauncher.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="RAMSES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
+</mapAttribute>
+<mapAttribute key="org.eclipse.debug.core.preferred_launchers">
+<mapEntry key="[debug]" value="org.eclipse.jdt.launching.localJavaApplication"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m common-components/common-pkg.aadl2,arinc653-buffer-delayed-no_mutex/input/test_buffer_delayed.aadl2  -g pok -s root.impl -o ../../build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/arinc653-buffer-delayed-no_mutex/output/ -i ../../build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/ --workflow ../../build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/arinc653-buffer-delayed-no_mutex/input/Workflow.xmi -r /usr/share/pok -l trace"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DDEBUG&#10;-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&#10;-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl&#10;-Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
+</launchConfiguration>

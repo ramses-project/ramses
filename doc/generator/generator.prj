@@ -1,0 +1,839 @@
+format 74
+"generator"
+  revision 4
+  modified_by 2 "seb"
+
+
+  
+  // class settings
+  default_attribute_visibility private default_relation_visibility private default_operation_visibility public
+  //class diagram settings
+  draw_all_relations yes hide_attributes no hide_operations no hide_getset_operations no show_members_full_definition no show_members_visibility no show_members_stereotype no show_members_context no show_members_multiplicity no show_members_initialization no show_attribute_modifiers no member_max_width 127 show_parameter_dir yes show_parameter_name yes package_name_in_tab no class_drawing_mode natural drawing_language uml show_context_mode no auto_label_position yes show_relation_modifiers no show_relation_visibility no show_infonote no shadow yes show_stereotype_properties no
+  //use case diagram settings
+  package_name_in_tab no show_context no auto_label_position yes draw_all_relations yes class_drawing_mode actor shadow yes show_stereotype_properties no
+  //sequence diagram settings
+  show_full_operations_definition no write_horizontally yes class_drawing_mode natural drawing_language uml draw_all_relations yes shadow yes show_stereotype_properties no show_class_context_mode no show_msg_context_mode no
+  //collaboration diagram settings
+  show_full_operations_definition no show_hierarchical_rank no write_horizontally yes drawing_language uml package_name_in_tab no show_context no show_msg_context no draw_all_relations yes shadow yes show_stereotype_properties no
+  //object diagram settings
+   write_horizontally yes package_name_in_tab no show_context no auto_label_position yes draw_all_relations yes shadow yes show_stereotype_properties no
+  //component diagram settings
+  package_name_in_tab no show_context no auto_label_position yes draw_all_relations yes shadow yes
+  draw_component_as_icon no show_component_req_prov no show_component_rea no show_stereotype_properties no
+  //deployment diagram settings
+  package_name_in_tab no show_context no write_horizontally yes auto_label_position yes draw_all_relations yes shadow yes
+  draw_component_as_icon no show_component_req_prov no show_component_rea no show_stereotype_properties no
+  //state diagram settings
+  package_name_in_tab no show_context no auto_label_position yes write_trans_label_horizontally yes show_trans_definition no draw_all_relations yes shadow yes
+  show_activities yes region_horizontally yes drawing_language uml show_stereotype_properties no
+  //activity diagram settings
+  package_name_in_tab no show_context no show_opaque_action_definition no auto_label_position yes write_flow_label_horizontally no draw_all_relations yes shadow yes
+  show_infonote yes drawing_language uml show_stereotype_properties no
+  
+  class_color yellow duration_color transparent continuation_color gray note_color blue fragment_color transparent subject_color transparent usecase_color yellow package_color transparent component_color green artifact_color green deploymentnode_color gray state_color yellow stateaction_color transparent activity_color transparent activityregion_color transparent activitypartition_color transparent activityaction_color transparent parameterpin_color white 
+  font_size 10
+  diagram_format A4
+
+  mark_for_import
+  
+  classview 128002 "execution_flow"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 128002 "pok_diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition yes show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode class drawing_language java show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    class 128002 "AadlTargetSpecificCodeGenerator"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      classrelation 129794 // <aggregation>
+	relation 129794 o---
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129794 // <aggregation>
+	  b role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129922 // <aggregation>
+      end
+
+      classrelation 130434 // <aggregation>
+	relation 130178 o---
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 130434 // <aggregation>
+	  b role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 130562 // <aggregation>
+      end
+
+      classrelation 138754 // <aggregation>
+	relation 138242 o---
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 138754 // <aggregation>
+	  b role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 138882 // <aggregation>
+      end
+
+      operation 135170 "generate"
+	public explicit_return_type ""
+	nparams 2
+	  param in name "inputResource" explicit_type "Resource"
+	  param in name "generatedFilePath" explicit_type "File"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      classrelation 139394 // <aggregation>
+	relation_ref 138626 // <aggregation>
+      end
+
+      operation 142978 "setParameters"
+	public explicit_return_type ""
+	nparams 1
+	  param in name "parameters" explicit_type "Map<Enum, Object>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 128258 "AadlGenericUnparser"
+      visibility package stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      classrelation 129922 // <aggregation>
+	relation_ref 129794 // <aggregation>
+      end
+
+      operation 135298 "process"
+	public explicit_return_type ""
+	nparams 2
+	  param in name "element" explicit_type "Element"
+	  param in name "generatedFilePath" explicit_type "File"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 142850 "setParameters"
+	public explicit_return_type ""
+	nparams 1
+	  param in name "parameters" explicit_type "Map<Enum, Object>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 128386 "TargetProperties"
+      visibility package stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+    end
+
+    class 128770 "TargetBuilderGenerator"
+      visibility package stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      operation 128514 "process"
+	public explicit_return_type ""
+	nparams 2
+	  param in name "sys" explicit_type "SystemImplementation"
+	  param in name "generatedFilePath" explicit_type "File"
+	nexceptions 1
+	  explicit_exception "Exception"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      classrelation 130946 // <unidirectional association>
+	relation 130562 --->
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 130946 // <unidirectional association>
+	  b parent class_ref 128386 // TargetProperties
+      end
+
+      classrelation 138882 // <aggregation>
+	relation_ref 138242 // <aggregation>
+      end
+
+      operation 143362 "process"
+	public explicit_return_type ""
+	nparams 2
+	  param in name "processor" explicit_type "ProcessorSubcomponent"
+	  param in name "generatedFilePath" explicit_type "File"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 143490 "process"
+	public explicit_return_type ""
+	nparams 2
+	  param in name "process" explicit_type "ProcessSubcomponent"
+	  param in name "generatedFilePath" explicit_type "File"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 143618 "setParameters"
+	public explicit_return_type ""
+	nparams 1
+	  param in name "parameters" explicit_type "Map<Enum, Object>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 128898 "AadlToPokCUnparser"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128258 // <realization>
+	relation 128258 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128258 // <realization>
+	  b parent class_ref 129026 // AadlTargetUnparser
+      end
+
+      classrelation 129666 // <unidirectional association>
+	relation 129666 --->
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129666 // <unidirectional association>
+	  b parent class_ref 129154 // RoutingProperties
+      end
+    end
+
+    class 129026 "AadlTargetUnparser"
+      visibility package stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      operation 128642 "process"
+	public explicit_return_type ""
+	nparams 3
+	  param in name "process" explicit_type "ProcessSubcomponent"
+	  param in name "generatedFilePath" explicit_type "File"
+	  param in name "tarProp" type class_ref 128386 // TargetProperties
+	nexceptions 1
+	  explicit_exception "GenerationException"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      classrelation 130562 // <aggregation>
+	relation_ref 130178 // <aggregation>
+      end
+
+      classrelation 130818 // <unidirectional association>
+	relation 130434 --->
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 130818 // <unidirectional association>
+	  b parent class_ref 128386 // TargetProperties
+      end
+
+      operation 135426 "process"
+	public explicit_return_type ""
+	nparams 3
+	  param in name "processor" explicit_type "ProcessorSubcomponent"
+	  param in name "generatedFilePath" explicit_type "File"
+	  param in name "tarProp" type class_ref 128386 // TargetProperties
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 143106 "process"
+	public return_type class_ref 128386 // TargetProperties
+	nparams 2
+	  param in name "sys" explicit_type "SystemImplementation"
+	  param in name "generatedFilePath" explicit_type "File"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 143234 "setParameters"
+	public explicit_return_type ""
+	nparams 1
+	  param in name "parameters" explicit_type "Map<Enum, Object>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 129154 "RoutingProperties"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128386 // <realization>
+	relation 128386 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128386 // <realization>
+	  b parent class_ref 128386 // TargetProperties
+      end
+
+      classrelation 147202 // <composition>
+	relation 146178 *---
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 147202 // <composition>
+	  b role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 147330 // <composition>
+      end
+    end
+
+    class 129410 "AadlToPokMakefileUnparser"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128898 // <realization>
+	relation 128898 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128898 // <realization>
+	  b parent class_ref 128770 // TargetBuilderGenerator
+      end
+
+    end
+
+    class 129538 "AadlToCUnparser"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 129154 // <realization>
+	relation 129154 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129154 // <realization>
+	  b parent class_ref 128258 // AadlGenericUnparser
+      end
+    end
+
+    classdiagram 128130 "code_generator_diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition yes show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode class drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A0
+    end
+
+    class 129666 "AadlToAdaUnparser"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 131074 // <realization>
+	relation 130690 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131074 // <realization>
+	  b parent class_ref 128258 // AadlGenericUnparser
+      end
+    end
+
+    class 129922 "OsekProperties"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 131330 // <realization>
+	relation 130946 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131330 // <realization>
+	  b parent class_ref 128386 // TargetProperties
+      end
+    end
+
+    class 130050 "AadlToOsekMakefileUnparser"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 131458 // <realization>
+	relation 131074 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131458 // <realization>
+	  b parent class_ref 128770 // TargetBuilderGenerator
+      end
+    end
+
+    class 130434 "AadlToOsekAdaUnparser"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 131970 // <realization>
+	relation 131586 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131970 // <realization>
+	  b parent class_ref 129026 // AadlTargetUnparser
+      end
+    end
+
+    class 130562 "AadlToOsekCUnparser"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 131842 // <realization>
+	relation 131458 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131842 // <realization>
+	  b parent class_ref 129026 // AadlTargetUnparser
+      end
+    end
+
+    classdiagram 134658 "generator_diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition yes show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode class drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A0
+    end
+
+    class 137090 "AadlTargetSpecificGenerator"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      classrelation 139266 // <aggregation>
+	relation 138626 o---
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 139266 // <aggregation>
+	  b role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 139394 // <aggregation>
+      end
+
+      classrelation 139522 // <aggregation>
+	relation 138754 o---
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 139522 // <aggregation>
+	  b role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 139650 // <aggregation>
+      end
+
+      classrelation 140162 // <realization>
+	relation 139266 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 140162 // <realization>
+	  b parent class_ref 137602 // Generator
+      end
+    end
+
+    class 137218 "AadlArinc653Transformation"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 139138 // <realization>
+	relation 138498 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 139138 // <realization>
+	  b parent class_ref 137346 // AadlTargetSpecificTransformation
+      end
+
+      classrelation 139778 // <unidirectional association>
+	relation 138882 --->
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 139778 // <unidirectional association>
+	  b parent class_ref 137474 // ATLTransfoLauncher
+      end
+    end
+
+    class 137346 "AadlTargetSpecificTransformation"
+      visibility package stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      operation 135554 "transform"
+	public explicit_return_type "Resource"
+	nparams 3
+	  param in name "inputResource" explicit_type "Resource"
+	  param in name "standardPropertysets" explicit_type "Map<String, Resource>"
+	  param in name "generatedFilePath" explicit_type "File"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      classrelation 139650 // <aggregation>
+	relation_ref 138754 // <aggregation>
+      end
+    end
+
+    class 137474 "ATLTransfoLauncher"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+    end
+
+    class 137602 "Generator"
+      visibility package stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      operation 135682 "generate"
+	public explicit_return_type ""
+	nparams 3
+	  param in name "instance" explicit_type "SystemInstance"
+	  param in name "standardPropertysets" explicit_type "Map<String, Resource>"
+	  param in name "generatedFilePath" explicit_type "File"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 136194 "setParameters"
+	public explicit_return_type ""
+	nparams 1
+	  param in name "parameters" explicit_type "Map<Enum, Object>"
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 144386 "ProcessorProperties"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 147330 // <composition>
+	relation_ref 146178 // <composition>
+      end
+    end
+
+    class 144514 "PokGeneratorFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 147458 // <dependency>
+	relation 146306 -_->
+	  a default
+	    classrelation_ref 147458 // <dependency>
+	  b parent class_ref 129538 // AadlToCUnparser
+      end
+
+      classrelation 147586 // <dependency>
+	relation 146434 -_->
+	  a default
+	    classrelation_ref 147586 // <dependency>
+	  b parent class_ref 128898 // AadlToPokCUnparser
+      end
+
+      classrelation 147714 // <dependency>
+	relation 146562 -_->
+	  a default
+	    classrelation_ref 147714 // <dependency>
+	  b parent class_ref 129154 // RoutingProperties
+      end
+
+      classrelation 147842 // <dependency>
+	relation 146690 -_->
+	  a default
+	    classrelation_ref 147842 // <dependency>
+	  b parent class_ref 129410 // AadlToPokMakefileUnparser
+      end
+    end
+
+    class 144642 "ToolSuiteLauncher"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 147970 // <unidirectional association>
+	relation 146818 --->
+	  a role_name "" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 147970 // <unidirectional association>
+	  b parent class_ref 137602 // Generator
+      end
+    end
+  end
+end

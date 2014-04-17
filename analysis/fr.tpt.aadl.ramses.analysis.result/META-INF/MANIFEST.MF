@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL-RAMSES-AnalysisResult
+Bundle-SymbolicName: fr.tpt.aadl.ramses.analysis.result;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: .
+Bundle-Vendor: TELECOM ParisTech
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf.ecore;visibility:=reexport,
+ org.eclipse.emf.ecore.xmi,
+ org.junit,
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.control.support
+Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
+Export-Package: fr.tpt.aadl.ramses.analysis,
+ fr.tpt.aadl.ramses.analysis.impl,
+ fr.tpt.aadl.ramses.analysis.util,
+ fr.tpt.ramses.analysis
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

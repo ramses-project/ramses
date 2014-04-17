@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="analysis" nsURI="http://fr.tpt.aadl.ramses.analysis/Analysis/1.0"
+    nsPrefix="ares">
+  <eClassifiers xsi:type="ecore:EClass" name="AnalysisArtifact">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="results" upperBound="-1"
+        eType="#//AnalysisResult" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AnalysisResult" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultUUId" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nfpId" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" lowerBound="1"
+        eType="#//AnalysisSource"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="QuantitativeAnalysisResult" eSuperTypes="#//AnalysisResult">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="margin" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="QualitativeAnalysisResult" eSuperTypes="#//AnalysisResult">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="validated" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AnalysisSource">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="iterationId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="scope" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="methodName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+</ecore:EPackage>

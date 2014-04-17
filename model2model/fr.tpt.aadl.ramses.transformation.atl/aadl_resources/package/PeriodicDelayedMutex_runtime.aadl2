@@ -1,0 +1,234 @@
+package PeriodicDelayedMutex_runtime
+public
+
+with Base_Types,Data_Model,Generation_Properties;
+
+  data ReturnCodeType
+    properties
+	  Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("Ok","EmptyQueue", "FullQueue");
+      Data_Model::Initial_Value => ("Ok");
+  end ReturnCodeType;
+
+---------------------------------------------------------------
+-- Linked list types
+---------------------------------------------------------------
+
+data MsgPrototype
+properties
+  Data_Model::Data_Representation => Struct;
+end MsgPrototype;
+
+data implementation MsgPrototype.impl
+prototypes
+  t_data: data;
+subcomponents
+  MsgValue       : data t_data;
+  Timestamp      : data Base_Types::Integer_16;
+  PriorityValue  : data Base_Types::Integer_16;
+  Consumed       : data Base_Types::Boolean 
+                   { 
+              	     Data_Model::Initial_Value => ("TRUE");
+                   };       
+  Next          : data Base_Types::Integer_16;
+end MsgPrototype.impl;
+
+-- Linked list structure
+
+data BufferPrototype
+properties
+  Data_Model::Data_Representation => Array;
+  Data_Model::Base_Type => (classifier(MsgPrototype.impl));
+end BufferPrototype; -- to be refined with Dimension property
+
+data SharedStructure
+properties
+  Data_Model::Data_Representation => Struct;
+end SharedStructure;
+
+data implementation SharedStructure.impl
+prototypes
+  t_buffer: data BufferPrototype;
+subcomponents
+  buffer: data t_buffer;
+  first_write: data Base_Types::Integer;
+end SharedStructure.impl;
+
+subprogram Init_Prototype
+prototypes
+  t_buffer: data SharedStructure.impl;
+features
+  BufferAccess : requires data access  t_buffer;
+  Size : requires data access Base_Types::Integer_16 {Access_Right=>read_only;};
+annex behavior_specification {**
+  variables
+    j : Base_Types::Integer_16;
+  states
+    s : initial final state;
+  transitions
+    t: s-[]->s {
+     BufferAccess.first_write :=-1; -- buffer empty
+     while (j < Size)
+     {
+        BufferAccess.buffer[j].Next := -2; -- empty slot 
+        j := j + 1
+     }
+    };
+**};
+end Init_Prototype;
+
+
+---------------------------------------------------------------
+-- Runtime Services
+---------------------------------------------------------------
+
+subprogram Put_Value
+prototypes
+  t_data: data;
+  t_buffer: data SharedStructure.impl;
+features
+  BufferAccess      : requires data access  t_buffer; -- to be refined with concrete type
+  DataValue         : requires data access  t_data;
+  CurrentDeadline   : in parameter           Base_Types::Integer_16;
+  PriorityValue     : in parameter           Base_Types::Integer_16;
+  Size              : in parameter           Base_Types::Integer_16;
+end Put_Value;
+
+subprogram implementation Put_Value.impl
+subcomponents
+  previous_j    : data Base_Types::Integer_16
+                  { Data_Model::Initial_Value => ("0"); };
+  j             : data Base_Types::Integer_16
+                  { Data_Model::Initial_Value => ("0"); };
+  empty_slot    : data Base_Types::Integer_16
+                  { Data_Model::Initial_Value => ("0"); };
+annex behavior_specification {**
+  variables
+    isHigherPrio: Base_Types::Boolean;
+    date: Base_Types::Integer_16;
+  states
+    s: initial final state;
+  transitions
+    t: s -[]-> s
+    {
+     
+	 while (empty_slot < size and BufferAccess.buffer[empty_slot].Next != -2)
+     {
+        empty_slot := empty_slot + 1
+     };
+     
+     BufferAccess.buffer[empty_slot].MsgValue := DataValue;
+     BufferAccess.buffer[empty_slot].PriorityValue := PriorityValue;
+     BufferAccess.buffer[empty_slot].TimeStamp := CurrentDeadline;
+ 
+     j := BufferAccess.first_write;
+ 	 isHigherPrio := (BufferAccess.buffer[j].TimeStamp < BufferAccess.buffer[empty_slot].TimeStamp)
+ 	 					or (BufferAccess.buffer[j].TimeStamp = BufferAccess.buffer[empty_slot].TimeStamp and BufferAccess.buffer[j].PriorityValue < BufferAccess.buffer[empty_slot].PriorityValue)
+ 	 					;
+     while (j >= 0 and isHigherPrio=true)
+     {
+	   isHigherPrio := (BufferAccess.buffer[j].TimeStamp < BufferAccess.buffer[empty_slot].TimeStamp)
+ 	 					or (BufferAccess.buffer[j].TimeStamp = BufferAccess.buffer[empty_slot].TimeStamp and BufferAccess.buffer[j].PriorityValue < BufferAccess.buffer[empty_slot].PriorityValue)
+ 	 					;
+            previous_j := j;
+       j := BufferAccess.buffer[j].Next
+     };
+    
+     if (j = BufferAccess.first_write)
+       BufferAccess.first_write := empty_slot
+     else
+       BufferAccess.buffer[previous_j].Next := empty_slot
+     end if;
+     BufferAccess.buffer[empty_slot].Next := j 
+    };
+**};
+end Put_Value.impl;
+
+subprogram Receive_Input
+prototypes
+  t_buffer: data SharedStructure.impl;
+features
+  BufferAccess       : requires data access  t_buffer; -- to be refined with concrete type
+  PeriodValue        : in parameter           Base_Types::Integer_16;
+  CurrentPeriod      : in parameter           Base_Types::Integer_16;
+end Receive_Input;
+
+subprogram implementation Receive_Input.impl
+subcomponents
+	j : data Base_Types::Integer_16;
+    temp : data Base_Types::Integer_16;
+annex behavior_specification {**
+  states
+    s: initial final state;
+  transitions
+    t: s-[]->s 
+    {
+     j:=BufferAccess.first_write;
+     while (j != -1 and (BufferAccess.buffer[j].Timestamp <= CurrentPeriod-PeriodValue))
+     {
+        BufferAccess.first_write := BufferAccess.buffer[j].Next;
+        BufferAccess.buffer[j].Next := -2; -- free slot
+        j := BufferAccess.first_write
+     }
+    };
+**};
+end Receive_Input.impl;
+
+
+subprogram Next_Value
+prototypes
+  t_data: data;
+  t_buffer: data SharedStructure.impl;
+features
+  BufferAccess       : requires data access t_buffer; -- to be refined with concrete type
+  DataValue          : out parameter          t_data;
+  CurrentPeriod      : in parameter           Base_Types::Integer_16;
+  BufferState        : out parameter          ReturnCodeType;
+end Next_Value;
+
+subprogram implementation Next_Value.impl
+subcomponents
+  tmp: data Base_Types::Integer_16;
+  j: data Base_Types::Integer_16;
+annex behavior_specification {**
+  states
+    s: initial final state;
+  transitions
+    t: s -[]-> s
+    {
+     if (BufferAccess.first_write != -1)
+       BufferState := ReturnCodeType#Ok;
+       if (BufferAccess.buffer[BufferAccess.first_write].TimeStamp <= CurrentPeriod)
+         DataValue := BufferAccess.buffer[BufferAccess.first_write].MsgValue;
+         tmp := BufferAccess.first_write;
+         BufferAccess.first_write := BufferAccess.buffer[BufferAccess.first_write].Next;
+         BufferAccess.buffer[tmp].Next := -2 -- free slot
+       else
+         BufferState := ReturnCodeType#EmptyQueue
+       end if
+     else
+       BufferState := ReturnCodeType#EmptyQueue
+     end if
+    };
+**};
+end Next_Value.impl;
+
+subprogram Send_Output
+features 
+  PeriodValue     : in parameter Base_Types::Integer_16;
+  DeadlineValue   : in parameter Base_Types::Integer_16;
+  CurrentPeriod   : in out parameter Base_Types::Integer_16;
+  CurrentDeadline : in out parameter Base_Types::Integer_16;
+annex behavior_specification {**
+  states
+    s : initial final state;
+  transitions
+    t : s-[]->s
+    {
+      CurrentPeriod := CurrentPeriod + PeriodValue;
+      CurrentDeadline := CurrentPeriod + DeadlineValue
+    };
+**};
+end Send_Output;
+
+end PeriodicDelayedMutex_runtime;

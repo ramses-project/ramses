@@ -1,0 +1,70 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+
+module PackagesTools;
+
+create 
+	OUT 				   : AADLBA
+from 
+	IN 					   : AADLI,
+	BASE_TYPES			   : AADLBA,
+	AADL_RUNTIME		   : AADLBA,
+	DATA_MODEL			   : AADLBA,
+	SCHEDULER_CONSTANTS	   : AADLBA,
+	SCHEDULER_REALIZATIONS : AADLBA,
+	SCHEDULER_RUNTIME	   : AADLBA;
+
+
+rule addImportedUnit(packageImg: AADLBA!PackageSection,	model: String,	importedPackage:String) {
+	using
+	{
+		unit: AADLBA!ModelUnit = AADLBA!ModelUnit->allInstancesFrom(model)->any(e|e.name = importedPackage);
+		isNotYetImported: Boolean =  AADLBA!ModelUnit->allInstancesFrom('OUT')->any(e|e.name = importedPackage).oclIsUndefined();
+	}
+	do
+	{
+		if(isNotYetImported)
+		{
+			thisModule.allImportedUnits <- thisModule.allImportedUnits->including(unit);
+		}
+	}
+}
+
+rule addImportedUnitFromInputModel(packageImg: AADLBA!PackageSection, elt: AADLBA!NamedElement)
+{
+	using
+	{
+		src_package : AADLI!AadlPackage = elt.getContainingPackage();
+	}
+	do
+	{
+		if(not src_package.oclIsUndefined() and not packageImg.importedUnit->exists(e|e.name = src_package.name))
+		{
+			if(not src_package.equals(packageImg))
+			{
+				thisModule.allImportedUnits <- thisModule.allImportedUnits->including(src_package);
+			}
+		}
+	}
+}

@@ -1,0 +1,106 @@
+package POSIX_runtime
+public
+
+with minimal_runtime_dispatch;
+with Minimal_Runtime_Sync;
+with Data_Model;
+
+data mutex
+properties
+  Source_Name => "pthread_mutex_t";
+  Source_Text => ("pthread.h", "libpthread.a"); 
+end mutex;
+
+subprogram lock
+features
+  m: in parameter mutex;
+properties
+  Source_Name => "pthread_mutex_lock";
+  Source_Text => ("pthread.h", "libpthread.a"); 
+end lock;
+
+subprogram unlock
+features
+  m: in parameter mutex;
+properties
+  Source_Name => "pthread_mutex_unlock";
+  Source_Text => ("pthread.h", "libpthread.a"); 
+end unlock;
+
+data cond
+properties
+  Source_Name => "pthread_cond_t";
+  Source_Text => ("pthread.h", "libpthread.a"); 
+end cond;
+
+subprogram cond_wait
+properties
+  Source_Name => "pthread_cond_wait";
+  Source_Text => ("pthread.h", "libpthread.a"); 
+end cond_wait;
+
+subprogram cond_timedwait
+properties
+  Source_Name => "pthread_cond_timedwait";
+  Source_Text => ("pthread.h", "libpthread.a"); 
+end cond_timedwait;
+
+subprogram cond_signal
+properties
+  Source_Name => "pthread_cond_signal";
+  Source_Text => ("pthread.h", "libpthread.a"); 
+end cond_signal;
+
+data periodic_config
+properties
+  Data_Model::Data_Representation => Struct;
+  Source_Name => "periodic_config";
+  Source_Text => ("POSIX_runtime.h", "POSIX_runtime.c"); 
+end periodic_config;
+
+subprogram setup_periodic_timer
+features
+  config: in parameter periodic_config;
+properties
+  Source_Name => "setup_periodic_timer";
+  Source_Text => ("POSIX_runtime.h", "POSIX_runtime.c"); 
+end setup_periodic_timer;
+
+subprogram wait_period
+features
+  timer: in parameter periodic_config;
+properties
+  Source_Name => "wait_period";
+  Source_Text => ("POSIX_runtime.h", "POSIX_runtime.c"); 
+end wait_period;
+
+data periodic_thread_config_t
+properties
+  Data_Model::Data_Representation => Struct;
+  Source_Name => "periodic_thread_config_t";
+  Source_Text => ("POSIX_runtime.h", "POSIX_runtime.c"); 
+end periodic_thread_config_t;
+
+subprogram init_periodic_config
+features
+  config: in parameter periodic_thread_config_t;
+properties
+  Source_Name => "init_periodic_config";
+  Source_Text => ("POSIX_runtime.h", "POSIX_runtime.c"); 
+end init_periodic_config;
+
+subprogram wait_next_period
+features
+  timer: in parameter periodic_thread_config_t;
+properties
+  Source_Name => "wait_next_period";
+  Source_Text => ("POSIX_runtime.h", "POSIX_runtime.c"); 
+end wait_next_period;
+
+--subprogram refined_periodic_wait 
+--extends minimal_runtime_dispatch::Periodic_Dispatch
+--	(Wait_Next_Period => subprogram wait_next_period,
+--	Date_Type => data periodic_thread_config_t)
+--end refined_periodic_wait;
+
+end POSIX_runtime;

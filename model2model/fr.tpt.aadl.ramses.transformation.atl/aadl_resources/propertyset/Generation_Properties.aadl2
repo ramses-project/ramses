@@ -1,0 +1,11 @@
+property set Generation_Properties is
+
+  Parameter_Usage: enumeration (By_Value,By_Reference) applies to (data access, parameter);
+
+  Return_Parameter: aadlboolean => false applies to (parameter);
+
+  Constant_Value: list of aadlstring applies to (subprogram, subprogram access);
+
+  Constant_Value_Parameters: list of aadlstring applies to (subprogram, subprogram access); 
+
+end Generation_Properties;

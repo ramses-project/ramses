@@ -1,0 +1,81 @@
+format 74
+
+classcanvas 129026 class_ref 128898 // AadlToPokCUnparser
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 131.255 365.083 2000
+end
+classcanvas 129538 class_ref 129154 // RoutingProperties
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 381.522 365.552 2000
+end
+classcanvas 130306 class_ref 129410 // AadlToPokMakefileUnparser
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 610.378 220.341 2000
+end
+classcanvas 130690 class_ref 129538 // AadlToCUnparser
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 135.966 290.714 2000
+end
+note 131586 "C code generation based on POK specific rules."
+  xyzwh 136.613 456.992 2000 135 76
+note 131842 "C code generation based on target independant rules."
+  xyzwh 97.2855 168.806 2000 195 59
+note 133378 "POK properties extracted from AADL-- tree."
+  xyzwh 347.638 462.989 2000 191 53
+note 134018 "POK makefile generator."
+  xyzwh 619.382 129.248 2000 167 37
+classcanvas 134786 class_ref 144386 // ProcessorProperties
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 617.208 365.474 2000
+end
+note 135170 "POK processors properties."
+  xyzwh 626.768 457.092 2000 123 58
+classcanvas 135426 class_ref 144514 // PokGeneratorFactory
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 373.272 218.412 2000
+end
+note 136066 "Build a POK generator instance."
+  xyzwh 333.598 119.581 2000 222 37
+relationcanvas 132354 relation_ref 129666 // <unidirectional association>
+  from ref 129026 z 2001 to ref 129538
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 135042 relation_ref 146178 // <composition>
+  from ref 129538 z 2001 to ref 134786
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 135554 relation_ref 146306 // <dependency>
+  from ref 135426 z 2001 to ref 130690
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 135682 relation_ref 146434 // <dependency>
+  from ref 135426 z 2001 to ref 129026
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 135810 relation_ref 146562 // <dependency>
+  from ref 135426 z 2001 to ref 129538
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 135938 relation_ref 146690 // <dependency>
+  from ref 135426 z 2001 to ref 130306
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+line 131714 -_-_
+  from ref 131586 z 2001 to ref 129026
+line 131970 -_-_
+  from ref 131842 z 2001 to ref 130690
+line 133506 -_-_
+  from ref 129538 z 2001 to ref 133378
+line 134146 -_-_
+  from ref 134018 z 2001 to ref 130306
+line 135298 -_-_
+  from ref 135170 z 2001 to ref 134786
+line 136194 -_-_
+  from ref 136066 z 2001 to ref 135426
+end

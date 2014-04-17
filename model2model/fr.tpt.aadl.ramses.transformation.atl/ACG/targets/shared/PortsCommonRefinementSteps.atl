@@ -1,0 +1,594 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module PortsCommonRefinementSteps;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									ARINC653_RUNTIME: AADLBA;
+
+------------------------------------------------------------
+--- Beginning of refactoring
+------------------------------------------------------------
+
+helper context AADLI!ConnectionInstanceEnd def:getGlobalVariableImg(): AADLBA!DataSubcomponent =
+	thisModule.resolveMatchedSingleIfExists(self,'globalVariable')
+;
+
+helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!DataSubcomponent =
+	thisModule.resolveMatchedSingleIfExists(self, 'localVariable')
+;
+
+abstract rule m_Not_PeriodicDelayed_Port
+{
+	from
+		fi: AADLI!FeatureInstance
+		(not fi.isPeriodicDelayedPort())
+}
+
+-- @extends m_Feature_Instance
+rule m_Thread_Port_Instance
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isThreadPort())
+	to
+		f: AADLBA!DataAccess
+		(
+			name <- fi.feature.name,
+			kind <- #requires
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- fi.feature.name,
+			kind <- #requires
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(f, fi);
+	}
+}
+
+-- @extends m_Thread_Port_Instance
+rule m_Thread_Output_Port_Instance
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.isOutputFeature()
+			and
+			fi.srcConnectionInstance->exists(e| e.connectionReference->exists(f|f.connection = cnxRef))
+		)
+	to
+		f: AADLBA!DataAccess
+		(
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name --connection data access (left side) in thread implementation
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name --connection data access (right side) in thread implementation
+		),
+		accessConnection: AADLBA!AccessConnection
+		(
+			name <- cnxRef.uniqueName()+'_'+cnxRef.destination.connectionEnd.name+'_to_globalVariable',
+			source<-connectedSubcomponent,
+			accessCategory<-#data,
+			destination<-connectedAccess
+		),
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-fi.srcConnectionInstance->any(e| e.connectionReference->exists(f|f.connection = cnxRef)).connectionReference->any(e|e.source=fi).destination.getGlobalVariableImg()
+		),
+		connectedAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-f
+		)
+	do
+	{
+		connectedAccess.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'sub'));
+	}
+}
+
+rule m_Process_Output_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isProcessPort()
+			and
+			fi.isOutputFeature()
+		)
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(name <- fi.getComponentInstance().name+'_'+fi.name+'_globalVariable')
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+	}
+}
+
+-- @extends m_Thread_Port_Instance
+rule m_Thread_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isInputFeature()
+		)
+	to
+		f:AADLBA!DataAccess,
+		connectedSubcomponent: AADLBA!ConnectedElement,
+		accessConnection: AADLBA!AccessConnection
+		(
+			name <- 'Id_instance_to_'+fi.getComponentInstance().name+'_'+fi.name,
+			source<-connectedSubcomponent,
+			accessCategory<-#data,
+			destination<-connectedAccess
+		),
+		connectedAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-f
+		)
+	do
+	{
+		connectedAccess.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'sub'));
+	}
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_InterProcess_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			not fi.isIntraProcessFeatureInstance()
+		)
+	to
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-fi.dstConnectionInstance->first().connectionReference->last().source.getGlobalVariableImg()
+		)
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_IntraProcess_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isIntraProcessFeatureInstance()
+		)
+	to
+		globalVariable: AADLBA!DataSubcomponent
+		(name <- fi.getComponentInstance().name+'_'+fi.name+'_globalVariable'), -- process subcomponents Task + _ + Port P + global variable 
+		connectedSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-fi.getGlobalVariableImg()
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+	}
+}
+
+rule m_Process_Input_Port_Instance
+{
+	from
+		fi:AADLI!FeatureInstance
+		(
+			fi.isInputFeature()
+			and
+			fi.isProcessPort()
+		)
+	to
+		globalVariable:AADLBA!DataSubcomponent
+		(name <- fi.getComponentInstance().name+'_'+fi.name+'globalVariable')
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+	}
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_DataOrEventDataPort_Input_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataOrEventDataPort()
+		and fi.isInputFeature()
+		and fi.isThreadPort()
+		)
+	using
+	{
+		dataClass : AADLBA!DataSubcomponentType =
+									if(not fi.isUsedInFresh()) then	
+										fi.feature.dataFeatureClassifier
+									else
+										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
+									endif;
+	}
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+		(
+			name <- fi.name+'_localVariable',
+			dataSubcomponentType <- dataClass
+		)
+	do
+	{
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), dataClass);
+	}
+}
+
+-- @extends m_Thread_Input_Port_Instance
+rule m_Thread_EventPort_Input_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort()
+		and fi.isInputFeature()
+		and fi.isThreadPort()
+		)
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+		(
+			name <- fi.name+'_localVariable',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
+		)
+}
+
+-- @extends m_Thread_Port_Instance
+rule m_Thread_DataOrEventDataPort_Output_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(
+			fi.isDataOrEventDataPort()
+			and
+			fi.isThreadPort()
+			and
+			fi.isOutputFeature()
+		)
+	using
+	{
+		dataClass : AADLBA!DataSubcomponentType =
+									if(not fi.isUsedInFresh()) then	
+										fi.feature.dataFeatureClassifier
+									else
+										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
+									endif;
+	}
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+		(
+			name <- fi.name+'_localVariable',
+			dataSubcomponentType <- if(not fi.isUsedInFresh()) then	
+										fi.feature.dataFeatureClassifier
+									else
+										thisModule.createFreshnessDataStructure(fi.feature.dataFeatureClassifier)
+									endif
+		)
+	do
+	{
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), dataClass);
+	}
+}
+
+-- @extends m_Thread_Port_Instance
+rule m_Thread_EventPort_Output_Instance
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(
+			fi.isEventPort()
+			and
+			fi.isThreadPort()
+			and
+			fi.isOutputFeature()
+		)
+  	to
+  		localVariable: AADLBA!DataSubcomponent
+		(
+			name <- fi.name+'_localVariable',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
+		)
+}
+
+unique lazy rule createFreshnessDataStructure
+{
+	from
+		payload: AADLI!DataClassifier
+	to
+		fresh_data_type_wrapper:AADLBA!DataType
+		(
+			name<-payload.getFreshnessType(),
+			ownedPropertyAssociation <- Sequence
+			{
+				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
+					'Struct'.asEnumeration('DATA_MODEL').asNamedValue())
+			}
+		),
+		fresh_data_impl_wrapper:AADLBA!DataImplementation
+		(
+			name<-payload.getFreshnessType()+thisModule.impl_suffix,
+			ownedDataSubcomponent<-Sequence{struct_functional_data_subcomponent,struct_freshness_data_subcomponent}
+		),
+		struct_freshness_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name<-'fresh_ba',
+			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES')
+		),
+		struct_functional_data_subcomponent: AADLBA!DataSubcomponent
+		(
+			name <- 'pvalue',
+			dataSubcomponentType <- payload
+		)
+	do
+	{
+		fresh_data_impl_wrapper;
+	}
+}
+
+------------------------------------------------------------
+--- End of refactoring
+------------------------------------------------------------
+
+helper def: freshness_suffix : String = '_freshness_t';
+helper def: impl_suffix : String = '.impl';
+helper context AADLI!DataClassifier def: getFreshnessType() : String =
+	self.name+thisModule.freshness_suffix
+;
+-------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------
+----	ADDED MATCHED RULES
+-------------------------------------------------------------------------------------------
+
+
+helper def: assignPortVariableType(fi: AADLI!FeatureInstance, fresh_data_impl_wrapper: AADLBA!DataSubcomponentType): AADLBA!DataSubcomponentType =
+	if(fi.isUsedInFresh()) then
+ 		fresh_data_impl_wrapper
+	else 		
+		fi.feature.dataFeatureClassifier
+	endif
+;
+
+helper context AADLI!FeatureInstance def: getBehaviorAnnex():  AADLBA!BehaviorAnnex = 
+	self.getComponentInstance().subcomponent.classifier.getBA()
+;
+
+helper context AADLI!ComponentInstance def: needsToMapBehaviorAnnex(): Boolean =
+	self.subcomponent.subcomponentType.needsToMapBehaviorAnnex()
+;
+
+helper context AADLBA!Classifier def: needsToMapBehaviorAnnex(): Boolean =
+	self.ownedAnnexSubclause->exists(e| e.name = 'behavior_specification')
+	and
+	self.getPropertyAssociation('Source_Name').oclIsUndefined()
+	and
+	self.getPropertyAssociation('Source_Text').oclIsUndefined()
+;
+
+-- @extends m_Feature_Instance
+rule m_EventPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#eventPort 
+									and fi.getComponentInstance().category = #thread
+									and not fi.isPeriodicDelayedPort()
+									and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			)
+	do
+	{
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+-- @extends m_Feature_Instance
+rule m_EventDataPort_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance(fi.category=#eventDataPort 
+								and fi.getComponentInstance().category=#thread
+								and not fi.isPeriodicDelayedPort()
+								and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex())
+	using
+	{
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
+		implImg: AADLI!ComponentImplementation = OclUndefined;
+	}
+	to
+		-- target data access must be called 'f' to be retreived with resolveTemp 
+		f: AADLBA!DataAccess
+			(
+				name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+				kind <- #requires
+			),
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-fi.feature.name+'_MsgAddr',
+			dataSubcomponentType<-fi.feature.dataFeatureClassifier
+		),
+		f_entrypoint: AADLBA!DataAccess
+		(
+			name <- fi.name+thisModule.dataAccessSuffix()+fi.direction,
+			kind <- #requires
+		),
+		actualParam: AADLBA!Parameter
+	do
+	{
+		f_entrypoint.dataFeatureClassifier <- f.dataFeatureClassifier;
+	}
+}
+
+-- @extends m_DataAccess_Instance
+rule m_DataAccess_Instance_with_BA
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#dataAccess
+			 and fi.getComponentInstance().category=#thread
+			 and fi.getComponentInstance().subcomponent.classifier.needsToMapBehaviorAnnex()
+		)
+	using
+	{
+		c: AADLI!ComponentInstance = fi.getComponentInstance();
+		implImg: AADLI!ComponentImplementation = OclUndefined; 
+		processImplImg: AADLI!ProcessImplementation = OclUndefined;
+	}
+	to
+		f_entrypoint: AADLBA!DataAccess
+			(
+				name <- fi.name,
+				kind <- #requires,
+				dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+				ownedPropertyAssociation <- fi.feature.mapOwnedPropertyAssociationList()
+			)
+	do
+	{
+		thisModule.addImportedUnitFromInputModel(thisModule.public(), fi.feature);
+	}
+}
+
+helper def: getErrorCodeInitValue() : String =
+	thisModule.toStringLiteral('0')
+;
+
+unique lazy rule CreateReturnSubcomponentFromPort
+{
+	from
+		port : AADLI!FeatureInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.getErrorCodeInitValue();
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-port.feature.name+'_ErrorCode',
+			dataSubcomponentType<-thisModule.getRuntimeReturnType(),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
+		dataSubcomponent;
+	}
+}
+
+unique lazy rule CreateLengthDataSubcomponent
+{
+	from
+		port : AADLI!FeatureInstance
+	using
+	{
+		typeId: String = port.getLengthInitialValue();
+		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression(thisModule.getSizeOfType(typeId));
+	}
+	to
+		lv: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{initValuePE}
+		),
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-port.feature.name+'_Length',
+			dataSubcomponentType<-thisModule.getRuntimeSizeType,
+			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
+		
+		dataSubcomponent;
+	}
+}
+
+helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
+	let ba: AADLBA!BehaviorAnnex = self.getBehaviorAnnex() in
+	let p: AADLI!FeatureInstance = self.getDirectlyUsedInFresh() in
+	if(not p.oclIsUndefined()) then
+		let package_name: String = p.getComponentInstance().subcomponent.classifier.getNamespace().getOwner().name in
+		if(p.getComponentInstance().eContainer() = self.getComponentInstance().eContainer()) then
+			package_name+thisModule.getPackageSuffix().concat('::'+p.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		else
+			package_name+thisModule.getPackageSuffix().concat('::'+self.feature.dataFeatureClassifier.getFreshnessType()+thisModule.impl_suffix).getProgrammationLanguageIdentifier()
+		endif
+	else
+		if(self.isEventPort()) then
+			'Integer_16'.asClassifier('BASE_TYPES').getProgrammationLanguageIdentifier()
+		else 
+			self.feature.dataFeatureClassifier.getProgrammationLanguageIdentifier()
+		endif
+	endif
+;
+
+unique lazy rule createResolvedSpg
+{
+	from
+		classifier: AADLI!DataClassifier,
+		spg: AADLBA!SubprogramType
+	using
+	{
+		param: AADLBA!Parameter = spg.ownedParameter->any(e|e.name = 'MESSAGE_ADDR');
+	}
+	to
+		spg_ResolvedType: AADLBA!SubprogramType
+		(
+			name <- spg.name+'_'+thisModule.getProgrammationLanguageIdentifier(classifier.name),
+			ownedExtension <- extendedMessageType,
+			ownedParameter <- Sequence{actualParam}
+		),
+		extendedMessageType: AADLBA!TypeExtension
+		(
+			extended<-spg
+		),
+		actualParam : AADLBA!Parameter
+		(
+			refined <- param,
+			direction <- param.direction,
+			dataFeatureClassifier <- classifier
+		)
+	do
+	{
+		spg_ResolvedType;
+	}
+}

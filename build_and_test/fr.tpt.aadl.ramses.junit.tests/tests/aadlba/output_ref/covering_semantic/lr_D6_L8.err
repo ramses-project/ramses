@@ -1,0 +1,1 @@
+<Analysis Error> In timed actions, the value of  the first parameter must be lesser than the second one: Behavior Annex D.6.(L8) legality rule failed. in lr_D6_L8.aadl at line 65

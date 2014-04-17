@@ -1,0 +1,209 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+
+module Types;
+
+-- TODO
+--  ClassifierValue property kind
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI;
+
+
+helper context AADLI!ComponentType def : defaultEventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.ownedEventPort->collect(e|thisModule.EventPort(e))
+;
+
+helper context AADLI!ProcessorType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!VirtualProcessorType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!ProcessType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+helper context AADLI!ThreadType def : eventPortsMapping() : Sequence (AADLBA!EventPortType) =
+	self.defaultEventPortsMapping()
+;
+
+abstract rule m_Component_Type {
+  from
+  	type : AADLI!ComponentType
+  to
+    typeImg : AADLBA!ComponentType
+	(
+ 		name <- type.name
+ 	)
+}
+
+-- @extends m_Component_Type
+rule m_Bus_Type {
+ from
+ 	type : AADLI!BusType
+ to
+ 	typeImg : AADLBA!BusType
+}
+
+-- @extends m_Component_Type
+rule m_VirtualBus_Type {
+ from
+ 	type : AADLI!VirtualBusType
+ to
+ 	typeImg : AADLBA!VirtualBusType
+}
+
+-- @extends m_Component_Type
+rule m_Device_Type {
+ from
+ 	type : AADLI!DeviceType
+ to
+ 	typeImg : AADLBA!DeviceType (
+		ownedEventDataPort <- type.ownedEventDataPort,
+	 	ownedDataPort <- type.ownedDataPort,
+	 	ownedEventPort <- type.ownedEventPort
+ 	)
+}
+
+-- @extends m_Component_Type
+rule m_Processor_Type {
+  from 
+    type : AADLI!ProcessorType 
+  to 
+    typeImg : AADLBA!ProcessorType (
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))
+  )
+}
+
+-- @extends m_Component_Type
+rule m_VirtualProcessor_Type {
+ from 
+    type : AADLI!VirtualProcessorType 
+ to 
+    typeImg : AADLBA!VirtualProcessorType (
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))
+	)
+}
+
+-- @extends m_Component_Type
+rule m_Memory_Type {
+  from 
+ 	type : AADLI!MemoryType
+  to 
+  	typeImg : AADLBA!MemoryType
+}
+
+-- @extends m_Component_Type
+rule m_Process_Type {
+ from
+ 	type : AADLI!ProcessType
+ to 
+ 	typeImg : AADLBA!ProcessType (
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+	)
+}
+
+-- @extends m_Component_Type
+rule m_ThreadGroup_Type {
+ from 
+ 	type : AADLI!ThreadGroupType
+ to 
+ 	typeImg : AADLBA!ThreadGroupType (
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+	)
+}
+
+-- @extends m_Component_Type
+rule m_Thread_Type {
+ from 
+ 	type : AADLI!ThreadType
+ to 
+ 	typeImg : AADLBA!ThreadType (
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+ 	)
+}
+
+-- @extends m_Component_Type
+rule m_Subprogram_Type {
+ from 
+ 	type : AADLI!SubprogramType 
+ to 
+ 	typeImg : AADLBA!SubprogramType (
+		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
+		ownedDataAccess <- type.ownedDataAccess->collect(p|thisModule.DataAccess(p)),
+		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+	)
+}
+
+-- @extends m_Component_Type
+rule m_System_Type {
+ from 
+ 	type : AADLI!SystemType 
+ to 
+ 	typeImg : AADLBA!SystemType (
+ 		name <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
+				type.name
+				else
+				thisModule.theHOOK.getOutputPackageName()
+				endif,
+		ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
+		ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
+		ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
+		ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
+		ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess')),
+		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+	)
+}
+
+-- @extends m_Component_Type
+rule m_Data_Type {
+ from 
+   type : AADLI!DataType 
+ to 
+   typeImg : AADLBA!DataType 
+   (
+	 ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+   )
+}

@@ -1,0 +1,39 @@
+<Syntax Error> missing behavior variable separator ',' in aadlBaTest006.aadl at line 33
+<Syntax Error> missing behavior variable separator ',' in aadlBaTest006.aadl at line 35
+<Syntax Error> unterminated behavior variable (missing ending ';') in aadlBaTest006.aadl at line 38
+<Syntax Error> unterminated behavior variable (missing ending ';') in aadlBaTest006.aadl at line 40
+<Syntax Error> missing behavior state separator ',' in aadlBaTest006.aadl at line 44
+<Syntax Error> missing behavior state separator ',' in aadlBaTest006.aadl at line 46
+<Syntax Error> unterminated behavior state (missing ending ';') in aadlBaTest006.aadl at line 49
+<Syntax Error> unterminated behavior state (missing ending ';') in aadlBaTest006.aadl at line 51
+<Syntax Error> missing frozen port separator ',' in aadlBaTest006.aadl at line 57
+<Syntax Error> missing frozen port separator ',' in aadlBaTest006.aadl at line 59
+<Syntax Error> unterminated behavior transition (missing ending ';') in aadlBaTest006.aadl at line 63
+<Syntax Error> missing behavior state source separator ',' in aadlBaTest006.aadl at line 66
+<Syntax Error> missing behavior state source separator ',' in aadlBaTest006.aadl at line 68
+<Syntax Error> extraneous input ';', delete it in aadlBaTest006.aadl at line 71
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 76
+<Syntax Error> missing behavior action sequence separator ';' in aadlBaTest006.aadl at line 80
+<Syntax Error> extraneous input ';', delete it in aadlBaTest006.aadl at line 81
+<Syntax Error> missing behavior action sequence separator ';' in aadlBaTest006.aadl at line 74
+<Syntax Error> mismatched input 'elif' expecting ''elsif'' in aadlBaTest006.aadl at line 90
+<Syntax Error> unbalanced {} in aadlBaTest006.aadl at line 97
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 94
+<Syntax Error> mismatched input 'endif' expecting 'end if' in aadlBaTest006.aadl at line 102
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 86
+<Syntax Error> missing behavior action sequence separator ';' in aadlBaTest006.aadl at line 84
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 104
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 106
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 115
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 118
+<Syntax Error> missing behavior action sequence separator ';' in aadlBaTest006.aadl at line 116
+<Syntax Error> missing subprogram parameter separator ',' in aadlBaTest006.aadl at line 120
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 123
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 126
+<Syntax Error> missing subprogram parameter separator ',' in aadlBaTest006.aadl at line 127
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 131
+<Syntax Error> mismatched input '==' expecting '=' in aadlBaTest006.aadl at line 134
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 136
+<Syntax Error> mismatched input '=' expecting ':=' in aadlBaTest006.aadl at line 138
+<Syntax Error> extraneous input ';', delete it in aadlBaTest006.aadl at line 138
+<Internal Warning> t has parsing errors. Its annexes have not been resolved.

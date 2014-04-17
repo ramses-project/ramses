@@ -1,0 +1,266 @@
+package MultiModalPingPong
+public
+with Data_Model,Base_Types;
+  data components_number
+    properties
+      Data_Model::Data_Representation => Integer;
+  end components_number;
+  
+  data sequence_number
+    properties
+      Data_Model::Data_Representation => Integer;
+  end sequence_number;
+  
+  data component_id
+    properties
+      Data_Model::Data_Representation => Integer;
+  end component_id;
+  
+  data message_type
+    properties
+      Data_Model::Data_Representation => String;
+      Data_Model::Enumerators => ("PING", "PONG");
+  end message_type;
+  
+  data payload
+    properties
+      Data_Model::Data_Representation => Struct;
+  end payload;
+  
+  data implementation payload.impl
+    subcomponents
+      t: data message_type;
+      r: data component_id;
+      s: data sequence_number;
+  end payload.impl;
+  
+  data role_switch
+    properties
+      Data_Model::Data_Representation => String;
+      Data_Model::Enumerators => ("to_ping", "to_pong", "to_disconnect");
+  end role_switch;
+  
+  data mode_switch_cmd
+    properties
+      Data_Model::Data_Representation => Struct;
+      Data_Model::Base_Type => (classifier(role_switch), classifier(component_id));
+      Data_Model::Element_Names => ("to_role", "c_id");
+  end mode_switch_cmd;
+  
+  data implementation mode_switch_cmd.impl
+    subcomponents
+      to_role: data role_switch;
+      c_id: data component_id;
+  end mode_switch_cmd.impl;
+  
+  data ping_result
+    properties
+      Data_Model::Data_Representation => String;
+      Data_Model::Enumerators => ("failure", "success");
+  end ping_result;
+  
+  thread Cping_t
+    features
+      result: out data port ping_result;
+      emit: out event data port payload.impl;
+      receive: in event data port payload.impl;
+    properties
+      Dispatch_Protocol => Timed;
+      Period => 100 ms;
+  end Cping_t;
+  
+  thread implementation Cping_t.impl
+    subcomponents
+      the_ping_msg: data payload.impl;
+      received_msg: data payload.impl;
+      recipient_array: data component_id[122];
+      message_array: data sequence_number[122];
+      my_id: data component_id;
+      counter: data Base_Types::Integer;
+    annex behavior_specification {**
+      states
+  standby : initial complete final state ;
+  busy : complete state ;
+  validation : state ;
+transitions
+  busy -[on dispatch]-> busy {result := failure} ;
+  standby -[on dispatch]-> busy {for (i : component_id in recipient_array)
+  {
+    the_ping_msg.t := PING ;
+the_ping_msg.r := i ;
+set_muid ! (the_ping_msg.s) ;
+message_array[i] := the_ping_msg.s ;
+emit ! (the_ping_msg)
+  }
+  } ;
+  standby -[on dispatch receive]-> standby {receive ?} ;
+  busy -[on dispatch receive]-> validation {receive ? (received_msg)} ;
+  validation -[received_msg.t = PONG and received_msg.s = message_array[received_msg.r]]-> standby {result := success ;
+counter := counter + 1} ;
+  validation -[received_msg.t != PONG or received_msg.s != message_array[received_msg.r]]-> busy ;
+  busy -[on dispatch timeout 80 ms]-> standby {result := failure} ;
+**};
+  end Cping_t.impl;
+  
+  subprogram set_muid
+    features
+      uid: out parameter sequence_number;
+  end set_muid;
+  
+  thread Cpong_t
+    features
+      emit: out event data port payload.impl;
+      receive: in event data port payload.impl;
+    properties
+      Dispatch_Protocol => Sporadic;
+  end Cpong_t;
+  
+  thread implementation Cpong_t.impl
+    subcomponents
+      received_ping: data payload.impl;
+    annex behavior_specification {**
+      states
+  available : initial complete final state ;
+transitions
+  available -[on dispatch receive]-> available {receive ? (received_ping) ;
+received_ping.t := PONG ;
+emit ! (received_ping)} ;
+**};
+  end Cpong_t.impl;
+  
+  process ping_or_pong
+    features
+      result: out data port ping_result;
+      emit: out event data port payload.impl;
+      receive: in event data port payload.impl;
+      to_ping: in event port ;
+      to_pong: in event port ;
+  end ping_or_pong;
+  
+  process implementation ping_or_pong.impl
+    subcomponents
+      the_ping: thread Cping_t.impl in modes (ping_m: mode ;
+      );
+      the_pong: thread Cpong_t.impl in modes (pong_m: mode ;
+      );
+    connections
+      cnx1: port the_ping.emit -> emit in modes (ping_m: mode ;
+      );
+      cnx2: port receive -> the_ping.receive in modes (ping_m: mode ;
+      );
+      cnx3: port the_pong.emit -> emit in modes (pong_m: mode ;
+      );
+      cnx4: port receive -> the_pong.receive in modes (pong_m: mode ;
+      );
+      cnx5: port the_ping.result -> result in modes (ping_m: mode ;
+      );
+  end ping_or_pong.impl;
+  
+  system global_sys
+    features
+      mode_switch_p: in event data port mode_switch_cmd;
+  end global_sys;
+  
+  system implementation global_sys.impl
+    subcomponents
+      the_components: process ping_or_pong.impl[123];
+      the_controller: process controller_process.impl;
+    connections
+      cnx1: port the_components.emit -> the_components.receive {
+        Connection_Pattern => ((One_To_All));
+        };
+      cnx3: port mode_switch_p -> the_controller.mode_switch_p;
+  end global_sys.impl;
+  
+  process controller_process
+    features
+      mode_switch_p: in event data port mode_switch_cmd;
+  end controller_process;
+  
+  process implementation controller_process.impl
+    subcomponents
+      the_components: data components_array.impl;
+      the_controller: thread controller_thread.impl;
+    connections
+      cnx2: data access the_components -> the_controller.components;
+      cnx: port mode_switch_p -> the_controller.mode_switch_p;
+  end controller_process.impl;
+  
+  thread controller_thread
+    features
+      mode_switch_p: in event data port mode_switch_cmd.impl;
+      to_ping: out event port [123];
+      to_pong: out event port [123];
+      components: requires data access components_array.impl;
+    properties
+      Dispatch_Protocol => Sporadic;
+  end controller_thread;
+  
+  thread implementation controller_thread.impl
+    subcomponents
+      mode_switch: subprogram controller_subprogram.impl;
+      last_cmd: data mode_switch_cmd.impl;
+      result: data Base_Types::Integer;
+    annex behavior_specification {**
+      states
+  idle : initial complete state ;
+  exec : state ;
+  close : final state ;
+transitions
+  exec -[last_cmd.to_role = to_ping]-> idle {for (i : Integer in 0 .. result)
+  {
+     !
+  }
+   ;
+last_cmd.to_role := } ;
+  idle -[on dispatch mode_switch_p]-> idle {mode_switch_p ? (last_cmd) ;
+mode_switch ! (last_cmd.to_role, last_cmd.c_id, result, components)} ;
+**};
+  end controller_thread.impl;
+  
+  subprogram controller_subprogram
+    features
+      dest_mode: in parameter role_switch;
+      c_id: in parameter component_id;
+      result: out parameter Base_Types::Integer;
+      components: requires data access components_array.impl;
+  end controller_subprogram;
+  
+  subprogram implementation controller_subprogram.impl
+    annex behavior_specification {**
+      states
+  s_ini : initial state ;
+  s_fini : final state ;
+transitions
+  s_ini -[dest_mode = to_disconnect and components.c[c_id].role = pong]-> s_fini {result := 2 ;
+components.c[c_id].role := not_connected} ;
+  s_ini -[dest_mode = to_disconnect and components.c[c_id].role = ping]-> s_fini {result := 2 ;
+components.c[c_id].role := not_connected} ;
+  s_ini -[dest_mode = to_ping and components.c[c_id].role = not_connected]-> s_fini {result := 1 ;
+components.c[c_id].role := ping} ;
+  s_ini -[dest_mode = to_pong and components.c[c_id].role = not_connected]-> s_fini {result := 1 ;
+components.c[c_id].role := pong} ;
+**};
+  end controller_subprogram.impl;
+  
+  data c_id_and_role
+    properties
+      Data_Model::Data_Representation => Struct;
+  end c_id_and_role;
+  
+  data implementation c_id_and_role.impl
+    subcomponents
+      c_id: data component_id;
+      role: data Base_Types::String;
+  end c_id_and_role.impl;
+  
+  data components_array
+    properties
+      Data_Model::Data_Representation => Array;
+  end components_array;
+  
+  data implementation components_array.impl
+    subcomponents
+      c: data c_id_and_role.impl[123];
+  end components_array.impl;
+end MultiModalPingPong;

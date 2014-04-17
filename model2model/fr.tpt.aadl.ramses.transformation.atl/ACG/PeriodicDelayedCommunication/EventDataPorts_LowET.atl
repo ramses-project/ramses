@@ -1,0 +1,412 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module EventDataPorts_LowET;
+create OUT : AADLBA from IN : AADLI;
+
+helper def : Put_Value_Name     : String = 'Put_Value';
+helper def : Send_Output_Name   : String = 'Send_Output';
+helper def : Receive_Input_Name : String = 'Receive_Input';
+helper def : Next_Value_Name    : String = 'Next_Value';
+
+
+helper def : collectPeriodicDelayed_LocalVariables_LowET(c: AADLI!ComponentInstance, behavior: AADLI!Element): Sequence(AADLBA!DataAccess) =
+	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort() and e.isInputFeature())
+	->collect(fi|
+		thisModule.resolveMatchedSingleIfExists(fi, 'CurrentPeriodReadTable')
+	)
+	->union
+	(
+	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort())
+		->collect(fi|
+			fi.srcConnectionInstance->collect(cnxInst|
+				thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxInst.connectionReference->first().connection}, 'CurrentDeadlineWrite')
+			)
+		)
+	)
+;
+
+-- @extends m_Thread_Output_PeriodicDelayed_Port
+rule m_Thread_Output_PeriodicDelayed_Port_LowET
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+	using
+	{
+		CurrentDeadlineWriteTable: Sequence(Integer) = thisModule.getCurrentDeadlineWriteTable(fi, fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef).destination);
+		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		Array_Prototype : AADLBA!DataClassifier = 'ArrayDataType'.asDataType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		indexArrayDataType: AADLBA!DataType
+		(
+			name <- 'IndexArrayType_'+fi.getComponentInstance().name+'_'+fi.name,
+			ownedPropertyAssociation <- Sequence {
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Data_Representation',
+													'DATA_MODEL',
+													'Array'.asEnumeration('DATA_MODEL').asNamedValue()
+												),
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Base_Type',
+													'DATA_MODEL',
+													thisModule.CreateListValueFromClassifier(
+														'Integer_16'.asClassifier('BASE_TYPES')
+													)
+												),
+
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Dimension',
+													'DATA_MODEL',
+													thisModule.CreateListValueFromInteger(
+														CurrentDeadlineWriteTable->size())
+												),
+												
+												thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													CDWInit
+												)
+									   },
+			ownedExtension <- indexArrayDataTypeExtension
+		),
+		indexArrayDataTypeExtension: AADLBA!TypeExtension
+		(
+			extended <- Array_Prototype
+		),
+		CurrentDeadlineWrite:AADLBA!DataSubcomponent
+		(
+			name<-fi.getComponentInstance().name+'_'+fi.name+'_CDWTable_'+cnxRef.destination.connectionEnd.getContainingClassifier().name+'_'+cnxRef.destination.connectionEnd.name,
+			dataSubcomponentType <- indexArrayDataType
+		),
+		CDWInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+															thisModule.concatToString(CurrentDeadlineWriteTable))}
+		),
+		
+		--- CDW parameter
+		CDWParam: AADLBA!Parameter
+		(
+			name <- 'CDW',
+			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'CDW'),
+			dataFeatureClassifier <- indexArrayDataType
+		)
+}
+
+-- @extends m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance,m_Thread_Output_PeriodicDelayed_Port_LowET
+rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET
+{
+  	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+	using
+	{
+		Put_Value_PrototypeSpg: AADLBA!SubprogramType = thisModule.Put_Value_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
+		producerPort: AADLI!FeatureInstance = cnxInst.source;
+	}
+	to
+		-----------------------
+		--- Put_Value
+		-----------------------
+		extendedPutValueSpg: AADLBA!TypeExtension
+		(
+			extended<-Put_Value_PrototypeSpg
+		),
+		putValueOutputPrototypeBinding: AADLBA!ComponentPrototypeBinding
+		(
+			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'value_type'),
+			actual <- Sequence{thisModule.CreateDataComponentPrototypeActual(producerPort.feature.dataFeatureClassifier)}
+		),
+		putValueValueParam: AADLBA!Parameter
+		(
+			name <- 'pvalue',
+			refined <- Put_Value_PrototypeSpg.ownedParameter->any(e|e.name = 'pvalue'),
+			dataFeatureClassifier <-  producerPort.feature.dataFeatureClassifier
+		),
+		BufferAccess: AADLBA!DataAccess
+		(
+			name <- 'buffer',
+			refined <- Put_Value_PrototypeSpg.ownedDataAccess->any(e|e.name = 'buffer'),
+			dataFeatureClassifier <- thisModule.resolveMatchedSingleIfExists(cnxInst.destination, 'bufferArrayImpl'),
+			kind<-#requires
+		),
+		putValueSpg: AADLBA!SubprogramType
+		(
+			name <- Put_Value_PrototypeSpg.name+'_'+thisModule.getProgrammationLanguageIdentifier(producerPort.getComponentInstancePath()),
+			ownedExtension <- extendedPutValueSpg,
+			ownedPrototypeBinding <- Sequence{putValueOutputPrototypeBinding},
+			ownedParameter <- Sequence{putValueValueParam}, -- CDWParam
+			ownedDataAccess <- Sequence{BufferAccess}
+		)
+	do
+	{
+		-- next is a workaround
+		thisModule.theHOOK.setDirection(putValueValueParam, 'in');
+	}
+}
+
+-- @extends m_PeriodicDelayed_Port,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_LowET
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection,
+		cnxRef: AADLI!PortConnection
+		(
+			fi.srcConnectionInstance->exists(e|e.connectionReference->first().connection = cnxRef)
+		)
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram<-putValueSpgHolder,		
+			parameterLabels <- Sequence{iterationCounter_DataSubcomponent_Holder, 
+										CDWTable_Holder, 
+										CDWSize_DataSubcomponent_Holder, 
+										currentValue_DataSubcomponent_Holder, 
+										buffer_ThreadAccess_Holder}
+		),
+		putValueSpgHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'putValueSpg')
+		),
+		
+		--- connect CDWSize
+		CDWTable_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'CurrentDeadlineWrite')
+		),
+		--- connect CDWSize
+		CDWSize_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'CDWSize')
+		),
+		--- connect IterationCounter
+		iterationCounter_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.createIterationCounter(fi.getComponentInstance())
+		),
+		--- connect value
+		currentValue_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveMatchedSingleIfExists(fi, 'localVariable')
+		),
+		--- connect buffer
+		buffer_ThreadAccess_Holder: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'f_entrypoint')
+		)
+}
+
+-- @extends m_Input_Port_ComputeEntrypointCallSequence,m_PeriodicDelayed_Port
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_LowET
+{
+  from
+  	fi: AADLI!FeatureInstance,
+	behavior: AADLI!SubprogramCallSequence
+	(
+		(behavior.isComputeEntryPointOf(fi.getComponentInstance())
+		and
+		fi.isInputFeature()
+		and
+		(fi.isEventPort() or fi.isEventDataPort()))
+	)
+  using
+  {
+	portAbsoluteName: String = thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath());
+  }
+  to
+  
+	f_connection: AADLBA!AccessConnection,		
+	callReceiveInputs: AADLBA!SubprogramCallAction
+	(
+		subprogram<-receiveInputsHolder,
+		parameterLabels <- Sequence{iterationCounter_DataSubcomponent_Holder,
+									CPR_DataSubcomponent_Holder,
+									CPRSize_DataSubcomponent_Holder,
+									readIndex_DataSubcomponent_Holder,
+									lastIndex_DataSubcomponent_Holder,
+									bufferSize_DataSubcomponent_Holder,
+									ErrorCode_Holder
+		}
+	),
+	receiveInputsHolder: AADLBA!CalledSubprogramHolder
+	(
+		element <- thisModule.resolveMatchedSingleIfExists(fi, 'receiveInputSpg')
+	),
+	
+	--- connect cprSize
+	CPRSize_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveMatchedSingleIfExists(fi, 'CPRSize')
+	),
+	
+	--- connect cprSize
+	CPR_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveMatchedSingleIfExists(fi, 'CurrentPeriodReadTable')
+	),
+	
+	--- connect IterationCounter
+	iterationCounter_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.createIterationCounter(fi.getComponentInstance())
+	),
+	
+	--- connect firstIndex
+	readIndex_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveMatchedSingleIfExists(fi, 'readIndex')
+	),
+	
+	--- connect lastIndex
+	lastIndex_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveMatchedSingleIfExists(fi, 'lastIndex')
+	),
+	
+	--- connect bufferSize
+	bufferSize_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element<-thisModule.resolveMatchedSingleIfExists(fi, 'bufferSizeSubcomponent')
+	),
+	
+	ErrorCode_Holder: AADLBA!DataSubcomponentHolder
+	(
+		element <- thisModule.CreateReturnSubcomponentFromPort(fi)
+	)
+}
+
+-- @extends m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput_LowET
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		cnxRef: AADLI!PortConnection
+}
+
+-- @extends m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance,m_Input_PeriodicDelayed_Port_LowET
+rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowET
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort()
+		and
+		fi.isIntraProcessFeatureInstance())
+	using
+	{
+		Receive_Input_PrototypeSpg: AADLBA!SubprogramType = thisModule.Receive_Input_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		-----------------------
+		--- Receive_Input
+		-----------------------
+		extendedReceiveInputSpg: AADLBA!TypeExtension
+		(
+			extended<-Receive_Input_PrototypeSpg
+		),
+		receiveInputSpg: AADLBA!SubprogramType
+		(
+			name <- Receive_Input_PrototypeSpg.name+'_lowet_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
+			ownedExtension <- extendedReceiveInputSpg,
+			ownedParameter <- Sequence{}
+		)
+}
+
+
+-- @extends m_Input_PeriodicDelayed_Port_No_Mutex
+rule m_Input_PeriodicDelayed_Port_LowET
+{
+  	from
+		fi: AADLI!FeatureInstance
+	using
+	{
+		CurrentPerionReadTable: Sequence(Integer) = thisModule.getCurrentPerionReadTable(fi);
+	}
+	to
+		CPRInit: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+															thisModule.concatToString(CurrentPerionReadTable))}
+		),
+		indexArrayDataType: AADLBA!DataType
+		(
+			name <- 'IndexArrayType_'+fi.getComponentInstance().name+'_'+fi.name,
+			ownedPropertyAssociation <- Sequence {
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Data_Representation',
+													'DATA_MODEL',
+													'Array'.asEnumeration('DATA_MODEL').asNamedValue()
+												),
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Base_Type',
+													'DATA_MODEL',
+													thisModule.CreateListValueFromClassifier(
+														'Integer_16'.asClassifier('BASE_TYPES')
+													)
+												),
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Dimension',
+													'DATA_MODEL',
+													thisModule.CreateListValueFromInteger(
+														CurrentPerionReadTable->size())
+												),
+												
+												thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													CPRInit)
+									   }
+		),
+		CurrentPeriodReadTable:AADLBA!DataSubcomponent (
+		    name<-fi.name+'_CPRTable',
+			dataSubcomponentType <- indexArrayDataType
+		)
+}
+
+-- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue
+rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_LowET
+{
+  from
+  	fi: AADLI!FeatureInstance,
+	behavior: AADLI!SubprogramCallSequence,
+	paramCnx: AADLI!ParameterConnection
+  to
+  	call: AADLBA!SubprogramCallAction
+}

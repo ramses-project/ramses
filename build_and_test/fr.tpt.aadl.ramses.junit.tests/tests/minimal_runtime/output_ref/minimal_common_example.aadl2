@@ -1,0 +1,249 @@
+package Minimal_Common_Example
+public
+with Timing_Properties,Data_Model,Base_Types,Minimal_Runtime_Dispatch,Minimal_Runtime_Port,Minimal_Runtime_Types;
+  data Ports_Type
+  end Ports_Type;
+  
+  data implementation Ports_Type.impl
+    subcomponents
+      P1_Portvariable: data P1_Port_Variable.impl;
+      P2_Portvariable: data P2_Port_Variable.impl;
+  end Ports_Type.impl;
+  
+  subprogram Wrapper_Freeze
+    extends Minimal_Runtime_Dispatch::Wrapper_Freeze
+    (Ports_Type => data Ports_Type.impl)
+    annex behavior_specification {**
+      states
+  init_state : initial state ;
+  final_state : final state ;
+transitions
+  init_state -[true]-> final_state {if (Minimal_Runtime_Dispatch::Port_Id = Minimal_Runtime_Dispatch::Ports.P1_Portvariable.Id) P1_Freeze ! (Minimal_Runtime_Dispatch::Ports.P1_Portvariable, Minimal_Runtime_Dispatch::Mutex) else P2_Freeze ! (Minimal_Runtime_Dispatch::Ports.P2_Portvariable, Minimal_Runtime_Dispatch::Mutex) end if
+  } ;
+**};
+  end Wrapper_Freeze;
+  
+  subprogram P1_Payload_Copy
+    extends Minimal_Runtime_Port::Basic_Payload_Copy
+    (Port_Type => data Base_Types::Integer)
+  end P1_Payload_Copy;
+  
+  data P1_Item
+    extends Minimal_Runtime_Types::Item
+  end P1_Item;
+  
+  data implementation P1_Item.impl
+    extends Minimal_Runtime_Types::Item.impl
+    (Port_Type => data Base_Types::Integer)
+  end P1_Item.impl;
+  
+  data P1_Item_Array
+    extends Minimal_Runtime_Types::Item_Array
+    properties
+      Data_Model::Base_Type => (classifier(P1_Item.impl));
+      Data_Model::Dimension => (100);
+  end P1_Item_Array;
+  
+  data P1_Queue
+    extends Minimal_Runtime_Types::Queue
+  end P1_Queue;
+  
+  data implementation P1_Queue.impl
+    extends Minimal_Runtime_Types::Queue.impl
+    (Item_Array_Type => data P1_Item_Array,Item_Type => data P1_Item.impl)
+  end P1_Queue.impl;
+  
+  data P1_Port_Variable
+    extends Minimal_Runtime_Types::Event_Port_Variable
+  end P1_Port_Variable;
+  
+  data implementation P1_Port_Variable.impl
+    extends Minimal_Runtime_Types::Event_Port_Variable.impl
+    (Queue_Type => data P1_Queue.impl)
+  end P1_Port_Variable.impl;
+  
+  subprogram P1_Dequeue
+    extends Minimal_Runtime_Port::Dequeue
+    (Queue_Type => data P1_Queue.impl,Payload_Copy => subprogram P1_Payload_Copy)
+  end P1_Dequeue;
+  
+  subprogram P1_Read_In
+    extends Minimal_Runtime_Port::Read_In
+    (Queue_Type => data P1_Queue.impl,Item_Type => data P1_Item.impl)
+  end P1_Read_In;
+  
+  subprogram P1_Write_In
+    extends Minimal_Runtime_Port::Write_In
+    (Queue_type => data P1_Queue.impl,Item_Type => data P1_Item.impl,Overflow_Handling_Protocol => subprogram P1_Drop_Oldest_Protocol)
+  end P1_Write_In;
+  
+  subprogram P1_Drop_Oldest_Protocol
+    extends Minimal_Runtime_Port::Drop_Oldest_Protocol
+    (Queue_type => data P1_Queue.impl,Item_Type => data P1_Item.impl)
+  end P1_Drop_Oldest_Protocol;
+  
+  subprogram P1_Discard_Events
+    extends Minimal_Runtime_Port::Event_Port_Discard_Events
+    (Port_Variable_Type => data P1_Port_Variable.impl,Dequeue => subprogram P1_Dequeue)
+  end P1_Discard_Events;
+  
+  subprogram P1_Get_Queue_Count
+    extends Minimal_Runtime_Port::Event_Port_Get_Count
+    (Port_Variable_Type => data P1_Port_Variable.impl)
+  end P1_Get_Queue_Count;
+  
+  subprogram P1_Updated_Queue
+    extends Minimal_Runtime_Port::Event_Port_Updated
+    (Port_Variable_Type => data P1_Port_Variable.impl)
+  end P1_Updated_Queue;
+  
+  subprogram P1_Get_Queue_Value
+    extends Minimal_Runtime_Port::Event_Port_Get_Value
+  end P1_Get_Queue_Value;
+  
+  subprogram implementation P1_Get_Queue_Value.impl
+    extends Minimal_Runtime_Port::Event_Port_Get_Value.impl
+    (Port_Variable_Type => data P1_Port_Variable.impl,Item_Type => data P1_Item.impl,Read_In => subprogram P1_Read_In,Port_Type => data Base_Types::Integer,Payload_Copy => subprogram P1_Payload_Copy)
+  end P1_Get_Queue_Value.impl;
+  
+  subprogram P1_Event_Port_Send_Output
+    extends Minimal_Runtime_Port::Event_Port_Send_Output
+    (Queue_Type => data P1_Queue.impl,Enqueue => subprogram P1_Enqueue)
+  end P1_Event_Port_Send_Output;
+  
+  subprogram P1_Next_Value
+    extends Minimal_Runtime_Port::Next_Value
+    (Port_Type => data Base_Types::Integer,Port_Variable_Type => data P1_Port_Variable.impl,Dequeue => subprogram P1_Dequeue,Get_Value => subprogram P1_Get_Queue_Value)
+  end P1_Next_Value;
+  
+  subprogram P1_Freeze
+    extends Minimal_Runtime_Port::Event_Port_Freeze
+    (Port_Variable_Type => data P1_Port_Variable.impl)
+  end P1_Freeze;
+  
+  subprogram P1_Put_Value
+    extends Minimal_Runtime_Port::Event_Port_Put_Value
+  end P1_Put_Value;
+  
+  subprogram implementation P1_Put_Value.impl
+    extends Minimal_Runtime_Port::Event_Port_Put_Value.impl
+    (Queue_type => data P1_Queue.impl,Item_Type => data P1_Item.impl,Port_Type => data Base_Types::Integer,Payload_Copy => subprogram P1_Payload_Copy,Write_In => subprogram P1_Write_In)
+  end P1_Put_Value.impl;
+  
+  subprogram P1_Enqueue
+    extends Minimal_Runtime_Port::Enqueue
+    (Queue_Type => data P1_Queue.impl)
+  end P1_Enqueue;
+  
+  subprogram P2_Payload_Copy
+    extends Minimal_Runtime_Port::Basic_Payload_Copy
+    (Port_Type => data Base_Types::Integer)
+  end P2_Payload_Copy;
+  
+  data P2_Item
+    extends Minimal_Runtime_Types::Item
+  end P2_Item;
+  
+  data implementation P2_Item.impl
+    extends Minimal_Runtime_Types::Item.impl
+    (Port_Type => data Base_Types::Integer)
+  end P2_Item.impl;
+  
+  data P2_Item_Array
+    extends Minimal_Runtime_Types::Item_Array
+    properties
+      Data_Model::Base_Type => (classifier(P2_Item.impl));
+      Data_Model::Dimension => (100);
+  end P2_Item_Array;
+  
+  data P2_Queue
+    extends Minimal_Runtime_Types::Queue
+  end P2_Queue;
+  
+  data implementation P2_Queue.impl
+    extends Minimal_Runtime_Types::Queue.impl
+    (Item_Array_Type => data P2_Item_Array,Item_Type => data P2_Item.impl)
+  end P2_Queue.impl;
+  
+  data P2_Port_Variable
+    extends Minimal_Runtime_Types::Event_Port_Variable
+  end P2_Port_Variable;
+  
+  data implementation P2_Port_Variable.impl
+    extends Minimal_Runtime_Types::Event_Port_Variable.impl
+    (Queue_Type => data P2_Queue.impl)
+  end P2_Port_Variable.impl;
+  
+  subprogram P2_Dequeue
+    extends Minimal_Runtime_Port::Dequeue
+    (Queue_Type => data P2_Queue.impl,Payload_Copy => subprogram P2_Payload_Copy)
+  end P2_Dequeue;
+  
+  subprogram P2_Read_In
+    extends Minimal_Runtime_Port::Read_In
+    (Queue_Type => data P2_Queue.impl,Item_Type => data P2_Item.impl)
+  end P2_Read_In;
+  
+  subprogram P2_Write_In
+    extends Minimal_Runtime_Port::Write_In
+    (Queue_type => data P2_Queue.impl,Item_Type => data P2_Item.impl,Overflow_Handling_Protocol => subprogram P2_Drop_Oldest_Protocol)
+  end P2_Write_In;
+  
+  subprogram P2_Discard_Events
+    extends Minimal_Runtime_Port::Event_Port_Discard_Events
+    (Port_Variable_Type => data P2_Port_Variable.impl,Dequeue => subprogram P2_Dequeue)
+  end P2_Discard_Events;
+  
+  subprogram P2_Get_Queue_Count
+    extends Minimal_Runtime_Port::Event_Port_Get_Count
+    (Port_Variable_Type => data P2_Port_Variable.impl)
+  end P2_Get_Queue_Count;
+  
+  subprogram P2_Updated_Queue
+    extends Minimal_Runtime_Port::Event_Port_Updated
+    (Port_Variable_Type => data P2_Port_Variable.impl)
+  end P2_Updated_Queue;
+  
+  subprogram P2_Get_Queue_Value
+    extends Minimal_Runtime_Port::Event_Port_Get_Value
+  end P2_Get_Queue_Value;
+  
+  subprogram implementation P2_Get_Queue_Value.impl
+    extends Minimal_Runtime_Port::Event_Port_Get_Value.impl
+    (Port_Variable_Type => data P2_Port_Variable.impl,Item_Type => data P2_Item.impl,Read_In => subprogram P2_Read_In,Port_Type => data Base_Types::Integer,Payload_Copy => subprogram P2_Payload_Copy)
+  end P2_Get_Queue_Value.impl;
+  
+  subprogram P2_Event_Port_Send_Output
+    extends Minimal_Runtime_Port::Event_Port_Send_Output
+    (Queue_Type => data P2_Queue.impl,Enqueue => subprogram P2_Enqueue)
+  end P2_Event_Port_Send_Output;
+  
+  subprogram P2_Next_Value
+    extends Minimal_Runtime_Port::Next_Value
+    (Port_Type => data Base_Types::Integer,Port_Variable_Type => data P2_Port_Variable.impl,Dequeue => subprogram P2_Dequeue,Get_Value => subprogram P2_Get_Queue_Value)
+  end P2_Next_Value;
+  
+  subprogram P2_Freeze
+    extends Minimal_Runtime_Port::Event_Port_Freeze
+    (Port_Variable_Type => data P2_Port_Variable.impl)
+  end P2_Freeze;
+  
+  subprogram P2_Drop_Oldest_Protocol
+    extends Minimal_Runtime_Port::Drop_Oldest_Protocol
+    (Queue_type => data P2_Queue.impl,Item_Type => data P2_Item.impl)
+  end P2_Drop_Oldest_Protocol;
+  
+  subprogram P2_Put_Value
+    extends Minimal_Runtime_Port::Event_Port_Put_Value
+  end P2_Put_Value;
+  
+  subprogram implementation P2_Put_Value.impl
+    extends Minimal_Runtime_Port::Event_Port_Put_Value.impl
+    (Queue_type => data P2_Queue.impl,Item_Type => data P2_Item.impl,Port_Type => data Base_Types::Integer,Payload_Copy => subprogram P2_Payload_Copy,Write_In => subprogram P2_Write_In)
+  end P2_Put_Value.impl;
+  
+  subprogram P2_Enqueue
+    extends Minimal_Runtime_Port::Enqueue
+    (Queue_Type => data P2_Queue.impl)
+  end P2_Enqueue;
+end Minimal_Common_Example;

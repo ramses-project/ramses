@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL-RAMSES-Generation
+Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.utils;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Export-Package: fr.tpt.aadl.ramses.generation.utils
+Require-Bundle: org.osate.utils;bundle-version="0.9.5",
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.osate.annexsupport;bundle-version="1.0.0",
+ org.osate.aadl2.modelsupport,
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.control.atl.launch
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: TELECOM ParisTech

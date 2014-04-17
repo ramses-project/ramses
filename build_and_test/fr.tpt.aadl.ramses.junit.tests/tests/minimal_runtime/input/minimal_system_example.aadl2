@@ -1,0 +1,127 @@
+package Minimal_System_Example
+
+public
+
+with Timing_Properties, Data_Model, Base_Types, Minimal_Example, Minimal_Aperiodic_Example,
+      Minimal_Periodic_Example, Minimal_Common_Example, Minimal_Runtime_Types ;
+
+
+system Minimal_Transmitters_Receiver extends Minimal_Example::Transmitters_Receiver
+end Minimal_Transmitters_Receiver ;
+
+
+system implementation Minimal_Transmitters_Receiver.impl extends Minimal_Example::Transmitters_Receiver.impl
+
+   subcomponents
+   
+   U_Process : refined to process Minimal_Unique_Process.impl ;
+
+end Minimal_Transmitters_Receiver.impl ;
+
+
+process Minimal_Unique_Process extends Minimal_Example::Unique_Process
+end Minimal_Unique_Process ;
+
+
+process implementation Minimal_Unique_Process.impl
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Mutex_Type : data ;
+
+
+   subcomponents
+   
+   Transmitter1 : thread Minimal_Periodic_Example::Transmitter1_Thread.impl ;
+   Transmitter2 : thread Minimal_Periodic_Example::Transmitter2_Thread.impl ;
+   Receiver     : thread Minimal_Aperiodic_Example::Receiver_Thread.impl    ;
+   
+   Ports : data Minimal_Common_Example::Ports_Type.impl ;
+   DispatchPorts : data Minimal_Runtime_Types::Natural_List.impl {Data_Model::Dimension => (2) ;} ;
+   UpdatedPort : data Minimal_Runtime_Types::Natural_List.impl {Data_Model::Dimension => (2);} ;
+   DispatchedPort : data Minimal_Runtime_Types::Natural_List.impl {Data_Model::Dimension => (2);} ;
+   Monitor : data Monitor_Type ;
+   Mutex : data Mutex_Type ;
+   Pending_Event_Chain : data Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+ 
+   -- Behavior Annex standard does not support subcomponents other than data subcomponent to be a
+   -- data reference member. Unusually, connections are used instead of assignment actions in the behavior clause.
+   -- Unfortunately, connection name resolution does not work (plus NullPointerException). 
+   connections
+   
+   cnx01 : data access Ports -> Receiver.Ports ;
+   cnx02 : data access Monitor -> Receiver.Monitor ;
+   cnx03 : data access Mutex -> Receiver.Mutex;
+   cnx04 : data access Pending_Event_Chain -> Receiver.Pending_Event_Chain ;
+   cnx05 : data access DispatchPorts -> Receiver.DispatchPorts ;
+   cnx06 : data access UpdatedPort -> Receiver.UpdatedPort ;
+   cnx07 : data access DispatchedPort -> Receiver.DispatchedPort ;
+   
+   -- cnx08 : data access Ports.P1_Portvariable -> Transmitter1.P1_Portvariable ;
+   cnx09 : data access Monitor -> Transmitter1.P1_Monitor ;
+   cnx10 : data access Mutex -> Transmitter1.P1_Mutex ;
+   cnx11 : data access Pending_Event_Chain -> Transmitter1.P1_Pending_Event_Chain ; 
+   
+   -- cnx12 : data access Ports.P2_Portvariable -> Transmitter2.P2_Portvariable ;
+   cnx13 : data access Monitor -> Transmitter2.P2_Monitor ;
+   cnx14 : data access Mutex -> Transmitter2.P2_Mutex ;
+   cnx15 : data access Pending_Event_Chain -> Transmitter2.P2_Pending_Event_Chain ;
+   
+   -- Initializations.
+   annex behavior_specification
+   {**
+      variables
+      
+      index : Base_Types::Integer ;
+      
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         -- threads initializations.
+         
+         -- Will be initialized at generation time. Don't forget to convert time unit !
+         -- Transmitter1.Period 
+         -- Transmitter2.Period
+         
+         Ports.P1_Portvariable.Id := 1 ;
+         
+         index := 0 ;
+         
+         while(index < Ports.P1_Portvariable.Queue.Length)
+         {
+            Ports.P1_Portvariable.Queue.Array[index].Payload := 0 ;
+            Ports.P1_Portvariable.Queue.Array[index].Link.Port_Id := Ports.P1_Portvariable.Id ;
+            index := index + 1
+         } ;
+         
+         index := 0 ;
+         
+         Ports.P2_Portvariable.Id := 2 ;
+         
+         while(index < Ports.P2_Portvariable.Queue.Length)
+         {
+            Ports.P2_Portvariable.Queue.Array[index].Payload := 0 ;
+            Ports.P2_Portvariable.Queue.Array[index].Link.Port_Id := Ports.P2_Portvariable.Id ;
+            index := index + 1
+         } ;
+
+         DispatchPorts[0] := Ports.P1_Portvariable.Id ;
+         DispatchPorts[1] := Ports.P2_Portvariable.Id ;
+         DispatchPorts.Nb_Items := 2 ;
+         DispatchPorts.Length := 2 ;
+         UpdatedPort.Length := 2 ;
+         DispatchedPort.Length := 2       
+      } ; 
+   **} ;
+
+end Minimal_Unique_Process.impl ;
+
+
+end Minimal_System_Example ;

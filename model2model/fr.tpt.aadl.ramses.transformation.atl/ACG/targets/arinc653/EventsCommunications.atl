@@ -1,0 +1,175 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module EventsCommunications;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									ARINC653_RUNTIME: AADLBA;
+
+
+--------------------------------------------
+---                EVENT                 ---
+--------------------------------------------
+
+-- @extends m_Not_PeriodicDelayed_Port
+rule m_EventSubprogramCall
+{
+	from
+		fi: AADLI!FeatureInstance,
+		callSequence: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection
+		(
+			false -- NOT CLEAR YET WHEN TO USE ARINC653/EVENT; PROBABLY FOR SPORADIC/APERIODIC/TIMED/HYBRID TASKS?
+			
+--			fi.isEventPort()
+--			and
+--			callSequence.isComputeEntryPointOf(fi.getComponentInstance())
+--			and
+--			fi.isIntraProcessFeatureInstance()
+		)
+	using
+	{
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		EVENT_ID: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
+	}
+	to
+		call: AADLBA!SubprogramCallAction,
+		connected_EVENT_ID_Access: AADLBA!ConnectedElement,
+		connected_EVENT_ID: AADLBA!ConnectedElement
+		(
+			connectionEnd<-EVENT_ID.debug('Id Subcomponent Connection End')
+		),
+		accessIDConnection: AADLBA!AccessConnection
+		(
+			name<-fi.name+'_to_ID_'+paramCnx.name,
+			accessCategory<-#data,
+			source<-connected_EVENT_ID_Access,
+			destination<-connected_EVENT_ID
+		),
+		
+		connectedParam_RETURN_CODE: AADLBA!ConnectedElement,
+		connectedSubcomponent_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-RETURN_CODE.debug('ReturnCode Subcomponent Connection End')
+		),
+		paramConnection_RETURN_CODE: AADLBA!ParameterConnection
+		(
+			name<-fi.name+'_to_ReturnCode',
+			source<-connectedParam_RETURN_CODE,
+			destination<-connectedSubcomponent_RETURN_CODE
+		)
+		
+	do
+	{
+		connectedParam_RETURN_CODE.setContext(call);
+		connected_EVENT_ID_Access.setContext(call);
+	}
+}
+
+
+-- @extends m_EventSubprogramCall,m_Input_EventPort_ComputeEntrypointCallSequence
+rule m_Input_Event_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		callSequence: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection
+	using
+	{
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		spg: AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			name<-thisModule.callPrefix()+spg.name+'_'+fi.name+'_'+paramCnx.name,
+			calledSubprogram<-resolvedSpg
+		),
+		connectedSubcomponent_TIME_OUT: AADLBA!ConnectedElement
+		(
+			connectionEnd<-TIME_OUT.debug('TimeOut Subcomponent Connection End')
+		),
+		paramConnection_TIME_OUT: AADLBA!ParameterConnection
+		(
+			name<-fi.name+'_to_TimeOut',
+			source<-connectedParam_TIME_OUT,
+			destination<-connectedSubcomponent_TIME_OUT
+		),
+		connected_QUEUING_ID_Access: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedDataAccess->first().debug('Id Data Access Connection End')
+		),
+		connectedParam_TIME_OUT: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='TIME_OUT').debug('TimeOut Parameter Connection End')
+		),
+		connectedParam_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='RETURN_CODE').debug('ReturnCode Parameter Connection End')
+		)
+	do
+	{
+		connectedParam_TIME_OUT.setContext(call);
+	}
+}
+
+-- @extends m_EventSubprogramCall,m_Output_Port_ComputeEntrypointCallSequence
+rule m_Output_Event_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		callSequence: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection,
+		cnxRef: AADLI!ConnectionReference		
+		(
+			fi.srcConnectionInstance->exists(e|e.connectionReference->first() = cnxRef)
+		)
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Set_Event'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			name<-thisModule.callPrefix()+spg.name+'_'+fi.name+'_'+paramCnx.name,
+			calledSubprogram<-resolvedSpg
+		),
+		connected_EVENT_ID_Access: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedDataAccess->first().debug('Id Data Access Connection End')
+		),
+		connectedParam_RETURN_CODE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-spg.ownedParameter->any(e|e.name='RETURN_CODE').debug('ReturnCode Parameter Connection End')
+		)
+}
+

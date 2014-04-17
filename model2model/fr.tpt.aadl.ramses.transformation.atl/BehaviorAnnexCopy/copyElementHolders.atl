@@ -1,0 +1,110 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @atlcompiler emftvm
+
+module CopyElementHolders;
+create OUT : AADLBA 	from 	IN : AADLBA,
+								HOOKS: ATLHOOKS;
+
+abstract rule m_ElementHolder
+{
+	from
+		src_Holder: AADLBA!ElementHolder
+		(src_Holder.isThreadBehaviorElement())
+	to
+		target_Holder: AADLBA!ElementHolder
+		(
+			element<-src_Holder.element	
+		)
+}
+
+-- @extends m_ElementHolder
+rule m_SubprogramAccessHolder
+{
+	from
+		src_Holder: AADLBA!SubprogramAccessHolder
+	to
+		target_Holder: AADLBA!SubprogramAccessHolder
+}
+
+-- @extends m_ElementHolder
+rule m_EventPortHolder
+{
+	from
+		src_Holder: AADLBA!EventPortHolder
+	to
+		target_Holder: AADLBA!EventPortHolder
+}
+
+-- @extends m_ElementHolder
+rule m_EventDataPortHolder
+{
+	from
+		src_Holder:AADLBA!EventDataPortHolder
+	to
+		target_Holder: AADLBA!EventDataPortHolder
+}
+
+-- @extends m_ElementHolder
+rule m_DataPortHolder
+{
+	from
+		src_Holder:AADLBA!DataPortHolder
+	to
+		target_Holder: AADLBA!DataPortHolder
+}
+
+-- @extends m_ElementHolder
+rule m_CalledSubprogramHolder
+{
+	from
+		src_Holder:AADLBA!CalledSubprogramHolder
+	to
+		target_Holder:AADLBA!CalledSubprogramHolder
+}
+
+-- @extends m_ElementHolder
+rule m_DataAccessHolder
+{
+	from
+		src_Holder:AADLBA!DataAccessHolder
+	to
+		target_Holder:AADLBA!DataAccessHolder
+}
+
+-- @extends m_ElementHolder
+rule m_BehaviorVariableHolder
+{
+	from
+		src_Holder: AADLBA!BehaviorVariableHolder
+	to
+		target_Holder: AADLBA!BehaviorVariableHolder
+}
+
+-- @extends m_ElementHolder
+rule m_PortFreshValue
+{
+	from
+		src_Holder: AADLBA!PortFreshValue
+	to
+		target_Holder: AADLBA!PortFreshValue
+}

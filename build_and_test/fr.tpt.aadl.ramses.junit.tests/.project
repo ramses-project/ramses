@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>fr.tpt.aadl.ramses.junit.tests</name>
+	<comment>NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+	<projects>
+		<project>fr.tpt.aadl.ramses.control.support</project>
+		<project>fr.tpt.aadl.annex.behavior</project>
+		<project>fr.tpt.aadl.ramses.control.core</project>
+		<project>fr.tpt.aadl.ramses.control.cli.core</project>
+		<project>fr.tpt.aadl.ramses.control.cli.osgi</project>
+		<project>fr.tpt.aadl.ramses.generation.c</project>
+		<project>fr.tpt.aadl.ramses.generation.osek</project>
+		<project>fr.tpt.aadl.ramses.generation.pok</project>
+		<project>fr.tpt.aadl.sched.tools.cheddar</project>
+		<project>fr.tpt.aadl.ramses.control.cli.static</project>
+		<project>org.osate.aadl2.modelsupport</project>
+		<project>org.osate.aadl2</project>
+		<project>org.osate.annexsupport</project>
+		<project>org.osate.ui</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+</projectDescription>
