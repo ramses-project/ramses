@@ -1,7 +1,0 @@
-property set Generation_Properties is
-
-  Is_Generated: aadlboolean => true applies to (Classifier);
-  
-  Parameter_Usage: enumeration (By_Value,By_Reference) applies to (data access);
-
-end Generation_Properties;

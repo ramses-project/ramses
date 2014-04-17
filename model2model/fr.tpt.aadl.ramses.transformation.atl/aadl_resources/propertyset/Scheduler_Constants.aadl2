@@ -1,5 +1,0 @@
-property set Scheduler_Constants is
-
-	QUANTUM_VALUE : constant aadlinteger => 5; 
-
-end Scheduler_Constants;
