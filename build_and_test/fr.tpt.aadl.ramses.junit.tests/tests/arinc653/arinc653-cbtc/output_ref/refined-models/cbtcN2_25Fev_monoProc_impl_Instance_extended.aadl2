@@ -1,6 +1,6 @@
 package cbtc_refined_model
 public
-with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,arinc653_runtime,cbtc,PeriodicDelayed_runtime;
+with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thread_Properties,Programming_Properties,Deployment_Properties,ARINC653,COAL,POK,Generation_Properties,cbtc_refined_model,cbtc,arinc653_runtime,PeriodicDelayed_runtime;
   process implementation train.impl
     subcomponents
       TrainPpu_trainTraction_tractionIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
