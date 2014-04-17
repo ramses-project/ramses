@@ -10,7 +10,7 @@
 <mapEntry key="RAMSES_DIR" value="${project_loc:/fr.tpt.aadl.ramses.transformation.atl}"/>
 </mapAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="fr.tpt.aadl.ramses.control.cli.ToolSuiteLauncher"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m ../../../build_and_test/junit_tests/tests/arinc653/arinc653-pingpong/input/ping-pong_v0.4_next.aadl -g pok -s PingPong_Communication_System.impl -o results/arinc653-pingpong-tpt -r /usr/share/pok -l trace"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-m ../../build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/arinc653-pingpong/input/ping-pong_v0.4_next.aadl -g pok -s PingPong_Communication_System.impl -o results/arinc653-pingpong-tpt -r /usr/share/pok -l trace"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fr.tpt.aadl.ramses.control.cli.static"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl&#10;-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl&#10;-Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/>
 </launchConfiguration>
