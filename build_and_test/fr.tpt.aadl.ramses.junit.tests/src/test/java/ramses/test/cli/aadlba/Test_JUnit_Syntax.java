@@ -6,7 +6,7 @@ import org.junit.Test ;
 
 import ramses.test.util.BaExamplesScenario ;
 
-public class Test_JUnit_Syntaxe extends BaExamplesScenario
+public class Test_JUnit_Syntax extends BaExamplesScenario
 {
   @Test
   public void Test_JUnit_Syntaxe_exec()
@@ -20,11 +20,11 @@ public class Test_JUnit_Syntaxe extends BaExamplesScenario
                                  "aadlBaTest006.aadl"//, "aadlBaTest005.aadl"
                                } ;
     
-    _include = "tests/aadlba/input/covering_syntaxe" ;
+    _include = "tests/aadlba/input/covering_syntax" ;
 
-    _refDir = "tests/aadlba/output_ref/covering_syntaxe" ;
+    _refDir = "tests/aadlba/output_ref/covering_syntax" ;
     
-    _outputDir = new File ("tests/aadlba/output/covering_syntaxe") ;
+    _outputDir = new File ("tests/aadlba/output/covering_syntax") ;
     
     super.exec() ;
   }
