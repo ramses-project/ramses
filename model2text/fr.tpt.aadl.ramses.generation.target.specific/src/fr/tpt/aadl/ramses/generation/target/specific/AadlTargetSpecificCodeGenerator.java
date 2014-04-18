@@ -135,11 +135,9 @@ public class AadlTargetSpecificCodeGenerator
         File processorFileDir =
               new File(generatedFileDir + File.separator + ps.getName()) ;
         processorFileDir.mkdir() ;
-        if(_targetBuilderGen != null)
-          _targetBuilderGen.process(ps, runtimePath,
-                                    processorFileDir, includeDirs, monitor);
 
         File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
+        kernelFileDir.mkdir();
         if(_targetUnparser != null)
           _targetUnparser.process(ps, tarProp, runtimePath,
                                   kernelFileDir, monitor);
@@ -161,7 +159,11 @@ public class AadlTargetSpecificCodeGenerator
             _targetBuilderGen.process(process, runtimePath,
                                       processDirectory, includeDirs, monitor) ;
         }
-
+        
+        if(_targetBuilderGen != null)
+          _targetBuilderGen.process(ps, runtimePath,
+                                    processorFileDir, includeDirs, monitor);
+        
         // This line is at the end because it will launch the build of the generated code;
         // Thus it is better is the code has been generated...
         if(_targetBuilderGen!= null)

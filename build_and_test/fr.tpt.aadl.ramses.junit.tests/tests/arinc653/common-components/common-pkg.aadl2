@@ -28,25 +28,33 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   --------------------------------------------------
   
   processor cpu extends RAMSES_processors::cpu_x86
+  modes
+    Module_Init: initial mode {ARINC653::State_Information=>[Identifier=>1;Description=>"Module Init";];};
+    System_Function_Execution: mode {ARINC653::State_Information=>[Identifier=>1;Description=>"Module Init";];};
+    Process_Execution: mode {ARINC653::State_Information=>[Identifier=>1;Description=>"Process Execution";];};
+  properties
+    POK::Scheduler => static;
+    ARINC653::HM_Error_ID_Levels => ([ErrorIdentifier => 1; Description=>"Configuration Error";	ErrorLevel=>Module_Level;],
+    				     			 [ErrorIdentifier => 2; Description=>"Module Configuration Error";	ErrorLevel=>Module_Level;]) in modes (Module_Init),
+                                    ([ErrorIdentifier => 5; Description=>"Segmentation violation";	ErrorLevel=>Module_Level;],
+    				     			 [ErrorIdentifier => 6; Description=>"Time duration exceeded";	ErrorLevel=>Module_Level;]) in modes (System_Function_Execution);
   end cpu;
 
   processor implementation cpu.single_partition
   subcomponents
-    the_part:  virtual processor part;
+    the_part:  virtual processor part in modes (Process_Execution => Process_Exec);
   properties
     ARINC653::Module_Major_Frame => 2000 ms;
-    POK::Scheduler => static;
     ARINC653::Partition_Slots => (2000 ms);
     ARINC653::Slots_Allocation => (reference (the_part));
   end cpu.single_partition;
 
   processor implementation cpu.two_partitions
   subcomponents
-    the_part1:  virtual processor part;
-    the_part2:  virtual processor part;
+    the_part1:  virtual processor part in modes (Process_Execution => Process_Exec);
+    the_part2:  virtual processor part in modes (Process_Execution => Process_Exec);
   properties
     ARINC653::Module_Major_Frame => 4000 ms;
-    POK::Scheduler => static;
     ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
     ARINC653::Slots_Allocation => (reference (the_part1), reference (the_part1), reference (the_part2));
     POK::Ports_Flush_Time => Partition_Slot_Switch;
@@ -57,13 +65,16 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   --------------------------------------------------
 
   virtual processor part
+  requires modes
+	Process_Exec: mode;
   properties
-    ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
-    ARINC653::HM_Partition_Recovery_Actions => (Partition_Stop, Warm_Restart);
-    ARINC653::EntryPoint => "Initial";
-    ARINC653::Partition_Identifier => "1";
+    Activate_Entrypoint_Source_Text => "Initial";
+    ARINC653::Partition_Identifier => 1;
     POK::Additional_Features => (libc_stdio, console);
     POK::Scheduler => RR;
+    ARINC653::HM_Error_ID_Actions => ([ErrorIdentifier => 5; Description=>"Segmentation Error"; Action=>"IDLE";],
+    				     	     	  [ErrorIdentifier => 6; Description=>"Time Duration Exceeded"; Action=>"IGNORE";]) 
+									     in modes (Process_Exec);
   end part;
   
 
@@ -77,7 +88,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   memory implementation mem.impl
   properties
     Memory_Size => 200000 bytes;
-    ARINC653::Access_Type => (read, write);
+    Memory_Protocol => read_write;
     ARINC653::Memory_Type => (Data_Memory);
   end mem.impl;
 
@@ -91,7 +102,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   memory part_mem
   properties
     Memory_Size => 80000 bytes;
-    ARINC653::Access_Type => (read,write);
+    Memory_Protocol => read_write;
     ARINC653::Memory_Type => (Data_Memory);
   end part_mem;
   
@@ -111,8 +122,8 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
-    ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
-    ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
+	ARINC653::HM_Error_ID_Actions => ([ErrorIdentifier => 5; Description=>"Numeric Error"; Action=>"Process_Restart";],
+    				     	     	  [ErrorIdentifier => 6; Description=>"Time Duration Exceeded"; Action=>"Warm_Restart";]);
   end data_sender;
 
   thread implementation data_sender.impl
@@ -135,8 +146,8 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Source_Data_Size => 40000 bytes;
     Source_Stack_Size => 40000 bytes;
     Source_Code_Size => 40 bytes;
-    ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
-    ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
+	ARINC653::HM_Error_ID_Actions => ([ErrorIdentifier => 5; Description=>"Numeric Error"; Action=>"Process_Restart";],
+    				     	     	  [ErrorIdentifier => 6; Description=>"Time Duration Exceeded"; Action=>"Warm_Restart";]);
   end data_receiver;
 
   thread implementation data_receiver.impl

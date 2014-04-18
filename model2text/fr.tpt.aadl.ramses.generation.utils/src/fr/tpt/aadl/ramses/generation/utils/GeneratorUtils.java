@@ -283,8 +283,9 @@ public class GeneratorUtils
     }
   }
   
-  public static Subcomponent getDeloymentMemorySubcomponent(ProcessSubcomponent aProcessSubcomponent)
+  public static NamedElement getDeloymentMemorySubcomponent(NamedElement aProcessSubcomponent)
   {
+    // aProcessSubcomponent could be a of class ComponentInstance as well
     PropertyAssociation aPropertyAssociation =
           PropertyUtils.findProperty("Actual_Memory_Binding",
                                      aProcessSubcomponent) ;
@@ -308,11 +309,7 @@ public class GeneratorUtils
                                          .get(rv.getContainmentPathElements()
                                                 .size() - 1).getNamedElement() ;
 
-              if(anElement instanceof MemorySubcomponent)
-              {
-                MemorySubcomponent ms = (MemorySubcomponent) anElement ;
-                return ms ;
-              }
+              return anElement;
             }
           }
         }

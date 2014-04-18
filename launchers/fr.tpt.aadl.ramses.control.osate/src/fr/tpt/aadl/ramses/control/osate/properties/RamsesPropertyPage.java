@@ -271,6 +271,10 @@ public class RamsesPropertyPage extends PropertyPage {
     ojr.setText("Java - OJR");
     ojr.setData(_OJR_PLATFORM);
 
+    Button arincIntegrity = new Button(composite, SWT.RADIO);
+    arincIntegrity.setText("ARINC653 - Integrity");
+    arincIntegrity.setData("integrity");
+    
     Button osek = new Button(composite, SWT.RADIO);
     osek.setText("OSEX/NXT - nxtOSEK (http://lejos-osek.sourceforge.net/)");
     osek.setData(OSEKGeneratorFactory.OSEK_GENERATOR_NAME);
@@ -313,7 +317,8 @@ public class RamsesPropertyPage extends PropertyPage {
     osek.addListener(SWT.Selection, listener);
     arinc.addListener(SWT.Selection, listener);
     ojr.addListener(SWT.Selection, listener);
-
+    arincIntegrity.addListener(SWT.Selection, listener);
+    
     Button pathButton = new Button(composite, SWT.PUSH);
     pathButton.setText("Choose the target platform path");
     pathButton.setAlignment(SWT.RIGHT);
