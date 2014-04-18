@@ -1,2 +1,0 @@
-<Analysis Error> The same port variable must not be assigned to in different actions of an action set: Behavior Annex D.6.(L4) legality rules failed. in lr_D6_L3_L4.aadl at line 196
-<Analysis Error> The same port variable must not be assigned to in different actions of an action set: Behavior Annex D.6.(L4) legality rules failed. in lr_D6_L3_L4.aadl at line 166

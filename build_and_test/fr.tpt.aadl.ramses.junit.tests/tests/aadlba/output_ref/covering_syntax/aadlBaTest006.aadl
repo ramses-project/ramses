@@ -1,8 +1,0 @@
-package ParseTest
-public
-with Base_Types;
-  thread t
-    annex behavior_specification {**
-      NOT AN BEHAVIOR ELEMENT**};
-  end t;
-end ParseTest;

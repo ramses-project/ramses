@@ -1,3 +1,0 @@
-<Analysis Error> Transitions out of complete states must have dispatch condition : Behavior Annex D.3.(L7) legality rule failed. in lr_D3_L6_L7_L8.aadl at line 58
-<Analysis Error> Only transition out of complete states may have dispatch condition : Behavior Annex D.3.(L6) legality rule failed. in lr_D3_L6_L7_L8.aadl at line 63
-<Analysis Error> Transitions out of final states are not allowed : Behavior Annex D.3.(L8) legality rule failed. in lr_D3_L6_L7_L8.aadl at line 63

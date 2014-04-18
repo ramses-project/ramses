@@ -1,2 +1,0 @@
-#include "deployment.h"
-test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl the_receiver_p_in_globalVariable;

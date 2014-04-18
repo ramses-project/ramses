@@ -1,1 +1,0 @@
-<Analysis Error> Transitions out of complete states must have dispatch condition : Behavior Annex D.3.(L7) legality rule failed. in sr_D3_18.aadl at line 67
