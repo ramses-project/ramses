@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="AADL-RAMSES&#xA;&#xA;Copyright © 2014 TELECOM ParisTech and CNRS&#xA;&#xA;TELECOM ParisTech/LTCI&#xA;&#xA;Authors: see AUTHORS&#xA;&#xA;This program is free software: you can redistribute it and/or modify it under&#xA;the terms of the Eclipse Public License as published by Eclipse, either&#xA;version 1.0 of the License, or (at your option) any later version. This&#xA;program is distributed in the hope that it will be useful, but WITHOUT ANY&#xA;WARRANTY; without even the implied warranty of MERCHANTABILITY or&#xA;FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License for&#xA;more details. You should have received a copy of the Eclipse Public License&#xA;along with this program. If not, see&#xA;http://www.eclipse.org/org/documents/epl-v10.php"
+    modelDirectory="/fr.tpt.aadl.ramses.constraints.reporter.metamodel/src" editDirectory=""
+    editorDirectory="" modelPluginID="fr.tpt.aadl.ramses.constraints.reporter.metamodel"
+    modelName="ConstraintsViolationReporter" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    testsDirectory="" importerID="org.eclipse.emf.importer.ecore" complianceLevel="7.0"
+    copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <foreignModel>ConstraintsViolationReporter.ecore</foreignModel>
+  <genPackages prefix="reporter" basePackage="fr.tpt.aadl.ramses" disposableProviderFactory="true"
+      ecorePackage="ConstraintsViolationReporter.ecore#/">
+    <genClasses ecoreClass="ConstraintsViolationReporter.ecore#//Error">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ConstraintsViolationReporter.ecore#//Error/message"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ConstraintsViolationReporter.ecore#//Error/object"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

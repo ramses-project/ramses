@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL-RAMSES-JUnitTests
+Bundle-SymbolicName: fr.tpt.aadl.ramses.junit.tests;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: .
+Bundle-Activator: ramses.test.cli.App
+Bundle-Vendor: TELECOM ParisTech
+Export-Package: com.saxman.textdiff,
+ ramses.test.cli,
+ ramses.test.cli.aadlba,
+ ramses.test.cli.arinc653,
+ ramses.test.util
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit;bundle-version="4.8.2",
+ org.osate.utils,
+ fr.tpt.aadl.ramses.control.support

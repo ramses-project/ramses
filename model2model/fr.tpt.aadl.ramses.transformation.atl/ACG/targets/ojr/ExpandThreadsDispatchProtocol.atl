@@ -1,0 +1,95 @@
+
+-- nsURI AADLBA=http:///AADLBA
+-- @atlcompiler emftvm
+
+module ExpandThreadsDispatchProtocol;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									OJR_RUNTIME: AADLBA;
+
+helper context AADLI!FeatureInstance def: isLastFeatureInstance() : Boolean =
+	let c: AADLI!ComponentInstance = self.eContainer() in
+	c.featureInstance->last() = self
+;
+
+helper def: getLoadedAADLRuntime: String =
+	'OJR_RUNTIME'
+;
+
+helper def: getRuntimeName: String =
+	'ojr_runtime'
+;
+
+helper def: getWaitPeriodSubprogram : AADLBA!SubprogramType = 'Periodic_Wait'.asSubprogramType('OJR_RUNTIME');
+
+helper def: getWaitEventSubprogram : AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('OJR_RUNTIME');
+
+rule expandThreadDispatchProtocolInBA(inst: AADLI!ComponentInstance,
+									  spg: AADLBA!SubprogramImplementation,
+									  actionSequence: AADLBA!BehaviorActionSequence) 
+{
+ do{
+ 	if(inst.isPeriodicThread())
+ 	{
+ 		actionSequence.actions <- actionSequence.actions->including(thisModule.getPeriodicWaitCallAction(spg));
+ 	}
+ 	if(inst.isSporadicThread())
+ 	{
+ 		actionSequence.actions <- actionSequence.actions->including(thisModule.getSporadicWaitCallAction(spg));
+ 	}
+ 	if(inst.isAperiodicThread())
+ 	{
+ 		thisModule.getAperiodicWaitCallAction(spg);
+ 	}
+ }
+}
+
+lazy rule getPeriodicWaitCallAction
+{
+	from
+		spgImg: AADLBA!SubprogramImplementation
+	using
+	{
+		spg : AADLBA!SubprogramType = 'Periodic_Wait'.asSubprogramType('OJR_RUNTIME');
+ 	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		)
+	do
+	{
+		call;
+	}
+}
+
+lazy rule getSporadicWaitCallAction
+{
+	from
+		spgImg: AADLBA!SubprogramImplementation
+	using
+	{
+		spg : AADLBA!SubprogramType = 'Wait_Event'.asSubprogramType('OJR_RUNTIME');
+ 	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		)
+	do
+	{
+		call;
+	}
+}

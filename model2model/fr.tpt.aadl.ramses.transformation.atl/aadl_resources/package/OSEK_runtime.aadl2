@@ -1,0 +1,266 @@
+package OSEK_runtime
+public
+
+with Generation_Properties, Base_Types;
+
+-- Task management
+data StatusType
+properties
+  Programming_Properties::Source_Name => "StatusType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end StatusType;
+
+data TaskType
+properties
+  Programming_Properties::Source_Name => "TaskType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end TaskType;
+
+data TaskRefType
+properties
+  Programming_Properties::Source_Name => "TaskRefType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end TaskRefType;
+
+data TaskStateType
+properties
+  Programming_Properties::Source_Name => "TaskStateType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end TaskStateType;
+
+data TaskStateRefType
+properties
+  Programming_Properties::Source_Name => "TaskStateRefType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end TaskStateRefType;
+
+subprogram ActivateTask
+features
+  TASK_ID: in parameter TaskType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "ActivateTask";
+  Programming_Properties::Source_Text => ("kernel.h");
+end ActivateTask;
+
+subprogram TerminateTask
+properties
+  Programming_Properties::Source_Name => "TerminateTask";
+  Programming_properties::Source_Text => ("kernel.h");
+  Compute_Execution_Time => 2 ms .. 3 ms; 
+end TerminateTask;
+
+-- TODO: ChainTask
+-- TODO: Schedule
+-- TODO: GetTaskID
+-- TODO: GetTaskState
+
+
+-- Resource management
+data ResourceType
+properties
+  Programming_Properties::Source_Name => "ResourceType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end ResourceType;
+
+subprogram GetResource
+features
+  RES_ID: in parameter ResourceType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "GetResource";
+  Programming_Properties::Source_Text => ("kernel.h");
+end GetResource;
+
+subprogram ReleaseResource
+features
+  RES_ID: in parameter ResourceType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "ReleaseResource";
+  Programming_Properties::Source_Text => ("kernel.h");
+end ReleaseResource;
+
+-- Event control
+data EventMaskType
+properties
+  Programming_Properties::Source_Name => "EventMaskType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end EventMaskType;
+
+data EventMaskRefType
+properties
+  Programming_Properties::Source_Name => "EventMaskRefType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end EventMaskRefType;
+
+subprogram SetEvent
+features
+  TASK_ID: in parameter TaskType;
+  MASK: in parameter EventMaskType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "SetEvent";
+  Programming_Properties::Source_Text => ("kernel.h");
+end SetEvent;
+
+subprogram ClearEvent
+features
+  MASK: in parameter EventMaskType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "ClearEvent";
+  Programming_Properties::Source_Text => ("kernel.h");
+end ClearEvent;
+
+subprogram GetEvent
+features
+  TASK_ID: in parameter TaskType;
+  EVENT_REF: out parameter EventMaskRefType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "GetEvent";
+  Programming_Properties::Source_Text => ("kernel.h");
+end GetEvent;
+
+subprogram WaitEvent
+features
+  MASK: in parameter EventMaskType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "WaitEvent";
+  Programming_Properties::Source_Text => ("kernel.h");
+end WaitEvent;
+
+-- Operating system
+data AppModeType
+properties
+  Programming_Properties::Source_Name => "AppModeType";
+  Programming_Properties::Source_Text => ("kernel.h");
+end AppModeType;
+
+-- TODO: GetActiveApplicationMode
+subprogram StartOS
+features
+  APP_MODE: in parameter AppModeType;
+  STATUS: out parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "StartOS";
+  Programming_Properties::Source_Text => ("kernel.h");
+end StartOS;
+
+subprogram ShutdownOS
+features
+  STATUS: in parameter StatusType;
+properties
+  Programming_Properties::Source_Name => "ShutdownOS";
+  Programming_Properties::Source_Text => ("kernel.h");
+end ShutdownOS;
+
+-- Hooks
+-- Les hooks sont initialement vides, ils sont transformés en
+-- une séquence d'appels contenant l'ensemble des fonctions
+-- qui sont définies dans les propriétés Initialize_Entrypoint
+-- (StartupHook) ou Finilize_Entrypoint (ShutdownHook)
+subprogram StartupHook
+end StartupHook;
+
+subprogram ShutdownHook
+end ShutdownHook;
+-- TODO: Alarms
+-- TODO: Interrupt handling
+
+-- Ports management
+
+data PortQueueType
+properties
+  Programming_Properties::Source_Name => "port_queue_t";
+  Programming_Properties::Source_Text => ("osek_runtime.h");
+end PortQueueType;
+
+data ThreadQueueType
+properties
+  Programming_Properties::Source_Name => "thread_queue_t";
+  Programming_Properties::Source_Text => ("osek_runtime.h");
+end ThreadQueueType;
+
+data DataPortType
+properties
+  Programming_Properties::Source_Name => "data_port_t";
+  Programming_Properties::Source_Text => ("osek_runtime.h");
+end DataPortType;
+
+subprogram SendOutput
+prototypes
+  MESSAGE_TYPE: data;
+features
+  dest_global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  dest_port_id: in parameter Base_Types::Integer;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "SendOutput_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
+end SendOutput;
+
+subprogram NextValue
+prototypes
+  MESSAGE_TYPE: data;
+features
+  global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  port_id: in parameter Base_Types::Integer;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "NextValue_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
+end NextValue;
+
+subprogram GetValue
+prototypes
+  MESSAGE_TYPE: data;
+features
+  global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  port_id: in parameter Base_Types::Integer;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "GetValue_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
+end GetValue;
+
+subprogram ReceiveInputs
+features
+  global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  port_id: in parameter Base_Types::Integer;
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "ReceiveInputs_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
+end ReceiveInputs;
+
+subprogram PutValueDataPort
+prototypes
+  MESSAGE_TYPE: data;
+features
+  DATA_PORT_ID: in parameter DataPortType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  MESSAGE_ADDR: in out parameter MESSAGE_TYPE;
+  STATUS: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "PutValueDataPort_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
+end PutValueDataPort;
+
+subprogram GetValueDataPort
+prototypes
+  MESSAGE_TYPE: data;
+features
+  DATA_PORT_ID: in out parameter DataPortType;
+  MESSAGE_ADDR: in parameter MESSAGE_TYPE {Generation_Properties::Parameter_Usage=>By_Reference;};
+  STATUS: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "GetValueDataPort_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");
+end GetValueDataPort;
+
+end OSEK_runtime;

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL-RAMSES-CLI-OSGi
+Bundle-SymbolicName: fr.tpt.aadl.ramses.control.cli.osgi;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.osate.annexsupport;bundle-version="1.0.0",
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.control.cli.core
+Bundle-Vendor: TELECOM ParisTech

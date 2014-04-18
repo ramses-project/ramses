@@ -1,0 +1,143 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- nsURI AADLBA=http:///AADLBA
+-- @atlcompiler emftvm
+
+
+module DispatchCommonRefinementSteps;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS;
+
+
+helper def: collectSporadicGlobalVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
+helper def: collectSporadicThreadVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
+helper def: collectSporadicGlobalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+	
+helper def: collectSporadicGlobalVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+	Sequence{}
+;
+	
+helper def: collectSporadicBehaviorActions (c: AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorAction) =
+	Sequence{}
+;
+
+helper def: collectSporadicThreadVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
+	Sequence{}
+;
+
+
+helper def: collectSporadicThreadVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
+	Sequence{}
+;
+
+
+-- @extends m_ThreadEntrypoint
+rule m_PeriodicThread
+{
+	from
+		c: AADLI!ComponentInstance
+		(c.isPeriodicThread())
+	using
+	{
+		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
+	}
+	to
+		initState: AADLBA!BehaviorState,
+		callSeqState: AADLBA!BehaviorState,
+		returnData: AADLBA!DataSubcomponent,
+		waitDispatchCall: AADLBA!SubprogramCallAction
+		(
+			subprogram<-dispatchHolder,
+			parameterLabels <- Sequence{RETURN_DATA_Holder}
+		),
+		dispatchHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		RETURN_DATA_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element<-returnData
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
+	}
+}
+
+-- @extends m_ThreadEntrypoint
+rule m_SporadicThread
+{
+	from
+		c: AADLI!ComponentInstance
+    	(
+    		c.isSporadicThread()
+		)
+	using
+	{
+		spg_event : AADLBA!SubprogramType = thisModule.getWaitEventSubprogram;
+	}
+	to
+		sub: AADLBA!ThreadSubcomponent,
+		waitDispatchCall: AADLBA!SubprogramCallAction
+		(
+			subprogram<-dispatchHolder
+		),
+		dispatchHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg_event
+		),
+		f: AADLBA!DataAccess
+		(
+   			name <- c.name+thisModule.dataAccessSuffix()+'_GlobalQueue',
+			dataFeatureClassifier <- thisModule.getRuntimeEventType(),
+			kind <- #requires
+		),
+		GlobalQueueDataType: AADLBA!DataType
+		(
+			name <- 'Global_Queue_'+c.uniqueName(),
+			ownedExtension  <- extendedQueueType,
+			ownedDataAccess <- c.featureInstance->collect(fi|thisModule.resolveMatchedSingleIfExists(fi, 'queueFieldAccess'))
+		),
+		extendedQueueType: AADLBA!TypeExtension
+		(
+			extended<-thisModule.getRuntimeEventType()
+		),
+    	GlobalQueueDataImpl: AADLBA!DataImplementation
+		(
+			name <- 'Global_Queue_'+c.uniqueName()+'.impl',
+			ownedDataSubcomponent <- c.featureInstance->collect(fi|thisModule.resolveMatchedSingleIfExists(fi, 'queueSubcomponent')),
+			ownedAccessConnection <- c.featureInstance->collect(fi|thisModule.resolveMatchedSingleIfExists(fi,'f_connection'))
+		)
+		
+}
+

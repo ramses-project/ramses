@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<rwf:Workflow xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rwf="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0">
+  <element xsi:type="rwf:Transformation">
+    <element xsi:type="rwf:Generation"/>
+    <list>
+      <file path="test1.asm"/>
+      <file path="test2.asm"/>
+      <file path="test3.asm"/>
+    </list>
+  </element>
+</rwf:Workflow>

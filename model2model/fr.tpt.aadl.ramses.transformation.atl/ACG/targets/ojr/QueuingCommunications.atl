@@ -1,0 +1,168 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module QueuingCommunications;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									ARINC653_RUNTIME: AADLBA;
+
+
+
+--------------------------------------------
+---               QUEUING                ---
+--------------------------------------------
+
+-- @extends m_Not_PeriodicDelayed_Port
+abstract rule m_QueueingSubprogramCall
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection
+		(
+			fi.isEventOrEventDataPort()
+			and
+			behavior.isComputeEntryPointOf(fi.eContainer())
+			and
+			not fi.isIntraProcessFeatureInstance()
+		)
+}
+
+-- @extends m_QueueingSubprogramCall,m_Input_EventDataPort_ComputeEntrypointCallSequence,m_Parameter_to_PortInstance_Connection
+rule m_Input_Queuing_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Receive_Queuing_Message'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		QUEUE_ID: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{
+				QEUEING_HOLDER,
+				TIME_OUT_HOLDER,
+				MESSAGE_ADDR_HOLDER,
+				LENGTH_HOLDER,
+				RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		QEUEING_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-QUEUE_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+
+-- @extends m_QueueingSubprogramCall,m_Output_EventOrEventDataPort_ComputeEntrypointCallSequence
+rule m_Output_Queuing_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection,
+		cnxRef: AADLI!PortConnection		
+		(
+			fi.srcConnectionInstance->exists(e|e.connectionReference->first().connection = cnxRef)
+		)
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Send_Queuing_Message'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponent(fi);
+		QUEUE_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.eContainer(), 'returnData');
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{
+				QEUEING_HOLDER,
+				MESSAGE_ADDR_HOLDER,
+				LENGTH_HOLDER,
+				TIME_OUT_HOLDER,
+				RETURN_CODE_HOLDER
+			}
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		QEUEING_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-QUEUE_ID
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIME_OUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+

@@ -1,0 +1,217 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module BlackboardCommunications;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS,
+
+									ARINC653_RUNTIME: AADLBA;
+
+
+--------------------------------------------
+---              BLACKBOARD              ---
+--------------------------------------------
+
+-- @extends m_Not_PeriodicDelayed_Port
+abstract rule m_BlackBoard
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!Element
+		(
+			fi.isDataPort()
+			and
+			fi.isIntraProcessFeatureInstance()
+			and
+			(
+				behavior.oclIsKindOf(AADLBA!SubprogramCallSequence)
+				or
+				behavior.oclIsKindOf(AADLBA!BehaviorAnnex)
+			)
+		)
+	to
+		call: AADLBA!BehaviorAction
+}
+
+-- @extends m_BlackBoard
+abstract rule m_Input_BlackBoard
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!Element
+	using
+	{
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
+		spg: AADLBA!SubprogramType = 'Read_Blackboard'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,TIMEOUT_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		TIMEOUT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- TIME_OUT
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+}
+
+-- @extends m_Input_BlackBoard,m_Input_DataPort_ComputeEntrypointCallSequence
+rule m_Input_BlackBoard_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence
+		(
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
+		)
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
+	}
+	to
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+
+-- @extends m_Input_BlackBoard,m_Input_Port_BehaviorAnnex
+rule m_Input_BlackBoard_BehaviorAnnex
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLBA!AnnexSubclause
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
+	}
+	to
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+
+-- @extends m_BlackBoard
+abstract rule m_Output_BlackBoard
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!Element,
+		cnxRef: AADLI!PortConnection
+	using
+	{
+		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
+		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		spg: AADLBA!SubprogramType = 'Display_Blackboard'.asSubprogramType('ARINC653_RUNTIME');
+		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
+	}
+	to
+		call: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{BLACKBOARD_ID_HOLDER,MESSAGE_ADDR_HOLDER,LENGTH_HOLDER,RETURN_CODE_HOLDER} 
+		),
+		callHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- resolvedSpg
+		),
+		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint')
+		),
+		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- MESSAGE_ADDR
+		),
+		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- LENGTH
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+}
+
+-- @extends m_Output_BlackBoard,m_Output_DataPort_ComputeEntrypointCallSequence
+rule m_Output_BlackBoard_ComputeEntrypointCallSequence
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		cnxRef: AADLI!PortConnection
+		(
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
+		)
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
+	}
+	to
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}
+
+-- @extends m_Output_BlackBoard,m_Output_Port_BehaviorAnnex
+rule m_Output_BlackBoard_BehaviorAnnex
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLBA!AnnexSubclause,
+		cnxRef: AADLI!PortConnection
+	using
+	{
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
+	}
+	to
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+}

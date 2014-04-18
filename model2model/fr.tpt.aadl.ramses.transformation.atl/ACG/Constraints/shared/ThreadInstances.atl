@@ -1,0 +1,81 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http://aadl.info/AADL/2.0/instance
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module ThreadInstances;
+create OUT : CV 	from 		IN : AADLI;
+
+-- @extends check_ComponentInstance
+abstract rule check_ThreadInstance
+{
+	from
+	  obj: AADLI!ComponentInstance
+	  (obj.category = #thread)
+}
+
+-- @extends check_ThreadInstance
+rule check_HasBehavior
+{
+	from
+	  obj: AADLI!ComponentInstance
+	  (
+	  	not obj.hasBehavior()
+	  )
+	to
+	err: CV!Error
+	(message <- 'Thread subcomponent ' + obj.subcomponent.name + ' has no behavior (BA or Compute_Entrypoint_CallSequence)')
+}
+
+
+
+helper context AADLI!ComponentInstance def: hasBehavior() : Boolean =
+	self.hasBehaviorAnnex()
+	or
+	self.hasCallSequence()
+;
+
+helper context AADLI!ComponentInstance def: hasBehaviorAnnex() : Boolean =
+	self.subcomponent.classifier.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
+;
+
+helper context AADLI!ComponentInstance def: hasCallSequence() : Boolean =
+	self.hasProperty('Compute_Entrypoint_Call_Sequence')
+;
+
+-- @extends check_ThreadInstance
+rule check_HasPeriodIfNeeded
+{
+	from
+	  obj: AADLI!ComponentInstance
+	  (
+	  	(obj.isPeriodicThread() or obj.isSporadicThread() or obj.isHybridThread() or obj.isTimedThread())
+		and
+		not obj.hasProperty('Period')
+	  )
+	to
+	  err: CV!Error
+	  (
+		message <- 'With this dispatch protocol, thread must have a period value'
+	  )
+}

@@ -1,0 +1,252 @@
+package PeriodicDelayed_runtime
+public
+
+with Base_Types, Data_Model, Generation_Properties;
+
+  data ReturnCodeType
+    properties
+	  Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("Ok","EmptyQueue", "FullQueue");
+      Data_Model::Initial_Value => ("Ok");
+  end ReturnCodeType;
+
+  data ArrayDataType
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(Base_Types::Integer_16));
+  end ArrayDataType;
+
+  subprogram Receive_Input
+    features
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      CPR: in parameter ArrayDataType;
+      CPRSize: in parameter Base_Types::Integer_16;
+      first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      bufferSize: in parameter Base_Types::Integer_16;
+      ReturnCode: out parameter ReturnCodeType ;
+    properties
+        Compute_Execution_Time => 0 ms .. 1 ms;
+     annex behavior_specification {**
+       variables
+       	 next : Base_Types::Integer_16;
+       states
+         s: initial final state;
+       transitions
+       t2: s -[]-> s 
+       {
+         next := (iteration_counter+1) mod CPRSize;
+         if(CPR[next] != CPR[iteration_counter])
+           first := CPR[iteration_counter];
+           last  := CPR[next]
+         else
+           first := -1;
+	       last  := -1
+         end if;
+         iteration_counter := (iteration_counter+1) mod CPRSize
+       };
+   **};
+   end Receive_Input;
+
+  subprogram Next_Value
+    prototypes
+      output_type: data;
+    features
+      first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      last: requires data access Base_Types::Integer_16 {Access_Right=>read_only;};
+      buffer: requires data access ArrayDataType {Access_Right=>read_only;};
+      output: requires data access output_type {Access_Right=>write_only;};
+      bufferSize: in parameter Base_Types::Integer_16;
+      ReturnCode: out parameter ReturnCodeType ;
+    properties
+      Compute_Execution_Time => 0 ms .. 1 ms;
+    annex behavior_specification {**
+      states
+    	s: initial final state;
+      transitions
+        t: s -[]-> s
+        {
+		  if(first>=0)
+            output := buffer[first];
+            if(first!=last)
+        	  first := (first+1) mod bufferSize;
+        	  ReturnCode:=ReturnCodeType#Ok
+        	else
+        	  ReturnCode:=ReturnCodeType#EmptyQueue
+            end if
+          else
+            ReturnCode:=ReturnCodeType#EmptyQueue
+          end if
+        };
+    **};
+  end Next_Value;
+
+  subprogram Put_Value
+    prototypes
+      value_type: data;
+    features
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      CDW: in parameter ArrayDataType;
+      CDWSize: in parameter Base_Types::Integer_16;
+      pvalue: in parameter value_type;
+      buffer: requires data access ArrayDataType {Access_Right=>write_only;};
+    properties
+      Compute_Execution_Time => 0 ms .. 1 ms;
+    annex behavior_specification {**
+      states
+        s: initial final state;
+      transitions
+        t: s -[]-> s
+        {
+          buffer[CDW[iteration_counter]] := pvalue
+        };
+    **};
+  end Put_Value;
+  
+  subprogram Send_Output
+  features
+    iteration_counter: in out parameter Base_Types::Integer_16;
+    CDWSize: in parameter Base_Types::Integer_16;
+  properties
+      Compute_Execution_Time => 0 ms .. 1 ms;
+  annex behavior_specification {**
+  	states
+  	  s: initial final state;
+  	transitions
+  	  t: s -[]-> s
+  	  {
+  	    iteration_counter := (iteration_counter+1) mod CDWSize
+  	  };
+  **};
+  end Send_Output;
+  
+  
+  ------------------------------------------------------------------------
+  --                 LOW MEMORY FOOTPRINT VERSION
+  ------------------------------------------------------------------------
+  
+  data component_instance_t
+    properties
+      Data_Model::Data_Representation => Struct;
+      Source_Name => "component_instance_t";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c", "periodicdelayed_runtime.ads"); 
+  end component_instance_t;
+  
+  data implementation component_instance_t.impl
+    subcomponents
+      period: data base_types::Unsigned_16;
+      deadline: data base_types::Unsigned_16;
+  end component_instance_t.impl;
+  
+  data ComponentInstanceArrayDataType
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(component_instance_t.impl));
+  end ComponentInstanceArrayDataType;
+  
+  data periodic_delayed_context_t
+    properties
+      Data_Model::Data_Representation => Struct;
+      Source_Name => "periodic_delayed_context_t";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+  end periodic_delayed_context_t;
+  
+  data implementation periodic_delayed_context_t.impl
+    subcomponents
+      reader_task_period: data base_types::Unsigned_16;
+      writer_count: data base_types::Unsigned_16;
+      buffer_size: data base_types::Unsigned_16; 
+      hyperperiod: data base_types::Unsigned_16;
+      writer_instances: data ComponentInstanceArrayDataType;
+  end periodic_delayed_context_t.impl;
+  
+  subprogram Compute_CPR
+    prototypes
+  	  context_prototype : data;
+    features
+      iteration_counter : in parameter Base_Types::Integer_16;
+      periodic_delayed_context : in parameter context_prototype	{
+    					Generation_Properties::Parameter_Usage => By_Reference;
+  						};
+      CPR : out parameter Base_Types::Integer_16;
+    properties
+      Source_Name => "Compute_CPR";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+  end Compute_CPR;
+  
+  subprogram Compute_PPR
+  	prototypes
+      context_prototype : data;
+    features
+      PPR : out parameter Base_Types::Integer_16;
+      CPR : in parameter Base_Types::Integer_16;
+      periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
+    properties
+      Source_Name => "Compute_PPR";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+  end Compute_PPR;
+  
+  subprogram Compute_CDW
+    prototypes
+  	  context_prototype : data;
+    features
+      taskID: in parameter Base_Types::Integer_16;
+      iteration_counter : in parameter Base_Types::Integer_16;
+      periodic_delayed_context : in parameter context_prototype	{
+    					Generation_Properties::Parameter_Usage => By_Reference;
+  						};
+      CDW : out parameter Base_Types::Integer_16;
+    properties
+      Source_Name => "Compute_CDW";
+      Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+  end Compute_CDW;
+
+  subprogram Receive_Input_LowFP
+    prototypes
+      context_prototype : data;
+    features
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      CPRSize: in parameter Base_Types::Integer_16;
+      periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
+      first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
+      ReturnCode: out parameter ReturnCodeType ;
+    annex behavior_specification {**
+      states
+        s: initial final state;
+      transitions
+       t: s -[]-> s 
+       {
+		 Compute_CPR!(iteration_counter, periodic_delayed_context, first);
+         iteration_counter := (iteration_counter+1) mod CPRSize;
+         Compute_CPR!(iteration_counter, periodic_delayed_context, last)
+       };
+    **};
+  end Receive_Input_LowFP;
+
+  subprogram Put_Value_LowFP
+    prototypes
+      value_type: data;
+      context_prototype: data;
+    features
+      taskID: in parameter Base_Types::Integer_16;
+      iteration_counter: in out parameter Base_Types::Integer_16;
+      CDWSize: in parameter Base_Types::Integer_16;
+      pvalue: in parameter value_type;
+      periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
+      buffer: requires data access ArrayDataType {Access_Right=>write_only;};
+    annex behavior_specification {**
+      variables
+        CDWIndex : Base_Types::Integer_16;
+      states
+        s: initial final state;
+      transitions
+        t: s -[]-> s
+        {
+          Compute_CDW!(taskID, iteration_counter, periodic_delayed_context, CDWIndex);
+          buffer[CDWIndex] := pvalue
+        };
+    **};
+  end Put_Value_LowFP;
+
+end PeriodicDelayed_runtime;

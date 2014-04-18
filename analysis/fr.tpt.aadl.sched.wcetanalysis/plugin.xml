@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="fr.tpt.aadl.ramses.control.support.analyzer">
+      <analyzer
+            analysisName="WCET"
+            class="fr.tpt.aadl.sched.wcetanalysis.WcetFactory"
+            id="fr.tpt.aadl.analysis.wcet">
+      </analyzer>
+   </extension>
+
+</plugin>

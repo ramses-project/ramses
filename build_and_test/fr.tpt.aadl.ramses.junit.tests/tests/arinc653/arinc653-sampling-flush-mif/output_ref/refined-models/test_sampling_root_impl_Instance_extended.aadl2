@@ -1,0 +1,320 @@
+package test_sampling_refined_model
+public
+with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime;
+  processor implementation cpu.single_partition
+  end cpu.single_partition;
+  
+  processor implementation cpu.two_partitions
+    subcomponents
+      the_part1: virtual processor part {
+        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
+        POK::Scheduler => RR;
+        ARINC653::HM_Partition_Recovery_Actions => (Partition_Stop, Warm_Restart);
+        ARINC653::Entrypoint => "Initial";
+        ARINC653::Partition_Identifier => "1";
+        POK::Additional_Features => (libc_stdio, console);
+        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        };
+      the_part2: virtual processor part {
+        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
+        POK::Scheduler => RR;
+        ARINC653::HM_Partition_Recovery_Actions => (Partition_Stop, Warm_Restart);
+        ARINC653::Entrypoint => "Initial";
+        ARINC653::Partition_Identifier => "1";
+        POK::Additional_Features => (libc_stdio, console);
+        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        };
+  end cpu.two_partitions;
+  
+  memory implementation mem.impl
+  end mem.impl;
+  
+  memory implementation mem.two_partitions
+    subcomponents
+      part1_mem: memory part_mem {
+        Memory_Size => 80000 Bytes;
+        ARINC653::Access_Type => (read, write);
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      part2_mem: memory part_mem {
+        Memory_Size => 80000 Bytes;
+        ARINC653::Access_Type => (read, write);
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+  end mem.two_partitions;
+  
+  system implementation refined_model.impl
+    subcomponents
+      the_mem: memory mem.two_partitions;
+      the_proc1: process proc1.impl;
+      the_proc2: process proc2.impl;
+      the_cpu: processor cpu.two_partitions {
+        ARINC653::Module_Major_Frame => 4000 ms;
+        POK::Scheduler => STATIC;
+        ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
+        ARINC653::Slots_Allocation => (reference(the_part1), reference(the_part1), reference(the_part2));
+        POK::Ports_Flush_Time => Partition_Slot_Switch;
+        POK::Architecture => x86;
+        POK::BSP => x86_qemu;
+        Scheduling_Protocol => (ARINC653);
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1;
+      Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1;
+      Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2;
+      Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2;
+      Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1.the_sender;
+      Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2.the_receiver;
+  end refined_model.impl;
+  
+  processor cpu_x86
+  end cpu_x86;
+  
+  processor cpu
+  end cpu;
+  
+  virtual processor part
+  end part;
+  
+  memory mem
+  end mem;
+  
+  memory part_mem
+  end part_mem;
+  
+  process proc1
+  end proc1;
+  
+  process proc2
+  end proc2;
+  
+  system refined_model
+  end refined_model;
+  
+  process implementation proc1.impl
+    subcomponents
+      the_proc1_p_out_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      the_sender: thread the_proc1_the_sender.impl {
+        Source_Data_Size => 40000 Bytes;
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Source_Stack_Size => 40000 Bytes;
+        Source_Code_Size => 40 Bytes;
+        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
+        ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      error_handling_th: thread the_proc1_error_handler_th.impl {
+        Compute_Entrypoint_Call_Sequence => reference(the_proc1_error_handler_cs);
+        Dispatch_Protocol => Aperiodic;
+        ARINC653::Error_Handling => true;
+        };
+    connections
+      cnx_p_out_to_globalVariable: data access the_proc1_p_out_globalVariable -> the_sender.cnx_p_out;
+  end proc1.impl;
+  
+  thread the_proc1_error_handler_th
+  end the_proc1_error_handler_th;
+  
+  thread implementation the_proc1_error_handler_th.impl
+    calls
+      the_proc1_error_handler_cs:  {
+        the_proc1_error_handler_call: subprogram the_proc1_error_handler_spg;
+        } 
+      ;
+  end the_proc1_error_handler_th.impl;
+  
+  subprogram the_proc1_error_handler_spg
+    annex behavior_specification {**
+      variables
+  error_status : arinc653_runtime::Error_Status_Type.impl ;
+  error_code : arinc653_runtime::Return_Code_Type ;
+states
+  error_recovery_state : initial final state ;
+  switch_error_state : state ;
+transitions
+  action_Numeric_Error : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#NUMERIC_ERROR]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Start ! (error_status.FAILED_PROCESS_ID, error_code) ;
+arinc653_runtime::a_Stop ! (error_status.FAILED_PROCESS_ID, error_code) end if
+  } ;
+  action_Illegal_Request : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#ILLEGAL_REQUEST]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Set_Partition_Mode ! (arinc653_runtime::OPERATING_MODE_TYPE#WARM_START, error_code) end if
+  } ;
+  get_error_transition : error_recovery_state -[]-> switch_error_state {arinc653_runtime::Stop_Self ! ;
+arinc653_runtime::Get_Error_Status ! (error_status, error_code)} ;
+**};
+  end the_proc1_error_handler_spg;
+  
+  process implementation proc2.impl
+    subcomponents
+      the_proc2_p_inglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      the_receiver: thread the_proc2_the_receiver.impl {
+        Source_Data_Size => 40000 Bytes;
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Source_Stack_Size => 40000 Bytes;
+        Source_Code_Size => 40 Bytes;
+        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
+        ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      error_handling_th: thread the_proc2_error_handler_th.impl {
+        Compute_Entrypoint_Call_Sequence => reference(the_proc2_error_handler_cs);
+        Dispatch_Protocol => Aperiodic;
+        ARINC653::Error_Handling => true;
+        };
+    connections
+      Id_instance_to_the_receiver_p_in: data access the_proc2_p_inglobalVariable -> the_receiver.p_in;
+  end proc2.impl;
+  
+  thread the_proc2_error_handler_th
+  end the_proc2_error_handler_th;
+  
+  thread implementation the_proc2_error_handler_th.impl
+    calls
+      the_proc2_error_handler_cs:  {
+        the_proc2_error_handler_call: subprogram the_proc2_error_handler_spg;
+        } 
+      ;
+  end the_proc2_error_handler_th.impl;
+  
+  subprogram the_proc2_error_handler_spg
+    annex behavior_specification {**
+      variables
+  error_status : arinc653_runtime::Error_Status_Type.impl ;
+  error_code : arinc653_runtime::Return_Code_Type ;
+states
+  error_recovery_state : initial final state ;
+  switch_error_state : state ;
+transitions
+  action_Numeric_Error : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#NUMERIC_ERROR]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Start ! (error_status.FAILED_PROCESS_ID, error_code) ;
+arinc653_runtime::a_Stop ! (error_status.FAILED_PROCESS_ID, error_code) end if
+  } ;
+  action_Illegal_Request : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#ILLEGAL_REQUEST]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Set_Partition_Mode ! (arinc653_runtime::OPERATING_MODE_TYPE#WARM_START, error_code) end if
+  } ;
+  get_error_transition : error_recovery_state -[]-> switch_error_state {arinc653_runtime::Stop_Self ! ;
+arinc653_runtime::Get_Error_Status ! (error_status, error_code)} ;
+**};
+  end the_proc2_error_handler_spg;
+  
+  subprogram the_proc1_the_sender_entrypoint
+    features
+      cnx_p_out: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+  end the_proc1_the_sender_entrypoint;
+  
+  subprogram implementation the_proc1_the_sender_entrypoint.impl
+    subcomponents
+      the_proc1_the_sender_runtime_call_ret: data arinc653_runtime::Return_Code_Type;
+      p_out_localVariable: data common_pkg::Integer;
+      p_out_Length: data arinc653_runtime::Message_Size_Type {
+        Data_Model::Initial_Value => ("sizeof(common_pkg__Integer)");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_sampling_refined_model::the_proc1_the_sender_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc1_the_sender_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
+Write_Sampling_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, the_proc1_the_sender_runtime_call_ret)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc1_the_sender_behaviorIdentifier_enum#default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc1_the_sender_runtime_call_ret)} ;
+**};
+  end the_proc1_the_sender_entrypoint.impl;
+  
+  data the_proc1_the_sender_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior");
+      Data_Model::Initial_Value => ("test_sampling_refined_model__the_proc1_the_sender_behaviorIdentifier_enum_default_behavior");
+  end the_proc1_the_sender_behaviorIdentifier_enum;
+  
+  thread implementation the_proc1_the_sender.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc1_the_sender_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_out_accessCnx_call: data access cnx_p_out -> call_entrypoint.cnx_p_out;
+  end the_proc1_the_sender.impl;
+  
+  thread the_proc1_the_sender
+    features
+      cnx_p_out: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+  end the_proc1_the_sender;
+  
+  subprogram the_proc2_the_receiver_entrypoint
+    features
+      p_in: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+  end the_proc2_the_receiver_entrypoint;
+  
+  subprogram implementation the_proc2_the_receiver_entrypoint.impl
+    subcomponents
+      the_proc2_the_receiver_runtime_call_ret: data arinc653_runtime::Return_Code_Type;
+      p_in_localVariable: data common_pkg::Integer;
+      p_in_Length: data arinc653_runtime::Message_Size_Type {
+        Data_Model::Initial_Value => ("sizeof(common_pkg__Integer)");
+        };
+      p_in_ErrorCode: data arinc653_runtime::Return_Code_Type {
+        Data_Model::Initial_Value => ("0");
+        };
+      p_in_Validity: data arinc653_runtime::Validity_Type;
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_sampling_refined_model::the_proc2_the_receiver_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc2_the_receiver_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_Integer ! (p_in, p_in_localVariable, p_in_Length, p_in_Validity, p_in_ErrorCode) ;
+if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
+  } ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc2_the_receiver_behaviorIdentifier_enum#default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc2_the_receiver_runtime_call_ret)} ;
+**};
+  end the_proc2_the_receiver_entrypoint.impl;
+  
+  data the_proc2_the_receiver_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior", "p_in");
+      Data_Model::Initial_Value => ("test_sampling_refined_model__the_proc2_the_receiver_behaviorIdentifier_enum_default_behavior");
+  end the_proc2_the_receiver_behaviorIdentifier_enum;
+  
+  thread implementation the_proc2_the_receiver.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc2_the_receiver_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_in_accessCnx_call: data access p_in -> call_entrypoint.p_in;
+  end the_proc2_the_receiver.impl;
+  
+  thread the_proc2_the_receiver
+    features
+      p_in: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+  end the_proc2_the_receiver;
+  
+  subprogram Read_Sampling_Message_Integer
+    extends arinc653_runtime::Read_Sampling_Message
+    features
+      MESSAGE_ADDR: refined to out parameter common_pkg::Integer;
+  end Read_Sampling_Message_Integer;
+  
+  subprogram Write_Sampling_Message_Integer
+    extends arinc653_runtime::Write_Sampling_Message
+    features
+      MESSAGE_ADDR: refined to in out parameter common_pkg::Integer;
+  end Write_Sampling_Message_Integer;
+end test_sampling_refined_model;

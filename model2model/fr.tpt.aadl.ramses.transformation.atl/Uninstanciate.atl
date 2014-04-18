@@ -1,0 +1,241 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+
+module Uninstanciate;
+
+create 
+	OUT 			: AADLBA
+from 
+	IN 				: AADLI,
+	HOOKS			: ATLHOOKS;
+
+
+rule Comment {
+	from
+		c : AADLI!Comment
+	to
+		c2 : AADLBA!Comment(body <- c.body, ownedComment <- c.ownedComment)
+}
+
+
+-------------------------------------------------------------------------------------
+---  RULES FOR KINDS OF COMPONENT INSTANCES
+-------------------------------------------------------------------------------------
+
+helper def: allImportedUnits : Sequence(AADLBA!ModelUnit) = Sequence{};
+helper def: getPackageSuffix() : String = '_'+thisModule.theHOOK.getOutputPackageName();
+
+rule m_RootSystem_Instance {
+	from
+		c : AADLI!SystemInstance (c.category = #system and c.eContainer().oclIsUndefined())
+	using
+	{
+		src_package : AADLI!AadlPackage = c.systemImplementation.getNamespace().getOwner();
+	}
+	to
+		section : AADLBA!PublicPackageSection (
+			ownedClassifier <- AADLI!Classifier.allInstancesFrom('OUT')
+		),
+		pkg : AADLBA!AadlPackage (
+			name <- src_package.name+thisModule.getPackageSuffix(),
+			ownedPublicSection <- section
+		)
+	do
+	{
+		thisModule.allImportedUnits <- thisModule.allImportedUnits->including(src_package.ownedPublicSection.importedUnit);
+		if(AADLBA!SystemImplementation.allInstancesFrom('OUT')->contains(c.systemImplementation.resolve()))
+			c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveMatchedSingleIfExists(p, 'p2')));
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
+	}
+}
+
+endpoint rule addImportedPackages()
+{
+	do
+	{
+		thisModule.public().importedUnit <- thisModule.allImportedUnits->flatten()->asSet()->asSequence();
+	}
+}
+
+rule m_System_Instance {
+	from
+		c : AADLI!SystemInstance (c.category = #system and not c.eContainer().oclIsUndefined())
+	to
+		sub : AADLBA!SystemSubcomponent
+		(
+			systemSubcomponentType <- c.subcomponent.subcomponentType
+		)
+	do
+	{
+		c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg();
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
+	}
+}
+
+helper context AADLI!ComponentInstance def: getInstanceReferenceValue() : Sequence(AADLI!PropertyAssociation) =
+	self.componentInstance->collect(
+		e | e.ownedPropertyAssociation->select(
+			f | not f.collectInstanceReferenceValue()->isEmpty()
+			and 
+			not f.collectInstanceReferenceValue()->select(
+				g| not g.referencedInstanceObject.isContainedIn(self)
+			)->isEmpty()
+		)
+	)->union(
+		self.componentInstance->collect(
+			e|e.getInstanceReferenceValue()
+		)
+	)
+	->flatten()
+;
+
+
+helper context AADLI!InstanceObject def: isContainedIn(container : AADLI!InstanceObject) : Boolean = 
+	if(container.oclIsTypeOf(AADLI!ComponentInstance)) then
+		container.componentInstance->union(container.featureInstance)->includes(self)
+	else
+		false
+	endif
+;
+
+abstract rule m_Component_Instance {
+	from
+		c : AADLI!ComponentInstance
+	to
+		sub: AADLBA!Subcomponent(
+				name <- c.name.debug('subcomponent created'),
+				ownedPropertyAssociation  <- c.collectSelfPropertyAssociationImg()
+			)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+	}
+}
+
+-- @extends m_Component_Instance
+rule m_Memory_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #memory)
+	to
+		sub : AADLBA!MemorySubcomponent
+		(
+			memorySubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_Bus_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #bus)
+	to
+		sub : AADLBA!BusSubcomponent
+		(
+			busSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_Device_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #device)
+	to
+		sub : AADLBA!DeviceSubcomponent
+		(
+			deviceSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_Processor_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #processor)
+	to
+		sub : AADLBA!ProcessorSubcomponent
+		(
+			processorSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_VirtualProcessor_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category.getName() = 'virtual processor')
+	to
+		sub : AADLBA!VirtualProcessorSubcomponent
+		(
+			virtualProcessorSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_Thread_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #thread)
+	to 
+		sub : AADLBA!ThreadSubcomponent
+		(
+			threadSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_Subprogram_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #subprogram)
+	to 
+		sub : AADLBA!SubprogramSubcomponent
+		(
+			subprogramSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_Process_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #process)
+	to 
+		sub : AADLBA!ProcessSubcomponent
+		(
+			processSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+-- @extends m_Component_Instance
+rule m_Data_Instance {
+	from
+		c : AADLI!ComponentInstance (c.category = #data)
+	to
+		sub : AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- c.subcomponent.subcomponentType
+		)
+}
+
+helper def : getContainingImplementation(cnx: AADLI!Connection) : AADLBA!ComponentImplementation =
+	if(thisModule.resolveMatchedSingleIfExists(cnx.context, 'sub').oclIsUndefined()) then
+		thisModule.resolveMatchedSingleIfExists(cnx.context, 'impl').debug('Retreived System Implementation')
+	else
+		thisModule.resolveMatchedSingleIfExists(cnx.context, 'sub').subcomponentType.debug('Retreived Component Implementation')
+	endif
+;

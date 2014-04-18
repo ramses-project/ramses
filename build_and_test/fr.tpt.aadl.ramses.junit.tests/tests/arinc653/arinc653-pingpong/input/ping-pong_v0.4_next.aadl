@@ -1,0 +1,414 @@
+package PingPong
+public
+
+with ARINC653;
+with POK;
+with Base_Types, Data_Model;
+
+  data PingPongMessage
+    properties
+      Data_Model::Data_Representation => Struct;
+      Data_Model::Element_Names => ("m_type", "m_sender", "m_seqNb");
+      Data_Model::Base_Type => (classifier(TYPE_aadlKeywords), classifier(ID), classifier(SEQ));
+      source_name => "PingPongMessage";
+      source_language => (C);
+      source_text => ("pingpong.h");
+  end PingPongMessage;
+  
+  data TICK
+    properties
+      Data_Model::Data_Representation => Integer;
+      source_name => "TICK";
+      source_language => (C);
+      source_text => ("pingpong.h");
+  end TICK;
+  
+  data SEQ
+    properties
+      Data_Model::Data_Representation => Integer;
+      source_name => "SEQ";
+      source_language => (C);
+      source_text => ("pingpong.h");
+end SEQ;
+  
+  data Size_Units
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("kb");
+  end Size_Units;
+  
+  data Time_Units
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("ms");
+  end Time_Units;
+  
+  data ROLE
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("PING", "PONG", "UNCONNECTED");
+      source_name => "ROLE";
+      source_language => (C);
+      source_text => ("pingpong.h");
+  end ROLE;
+  
+  data ID
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("Cping", "Cpong");
+      source_name => "ID";
+      source_language => (C);
+      source_text => ("pingpong.h");
+  end ID;
+  
+  data TYPE_aadlKeywords
+    properties
+      Data_Model::Data_Representation => String;
+      Data_Model::Enumerators => ("PING", "PONG");
+      source_name => "TYPE";
+      source_language => (C);
+      source_text => ("pingpong.h");
+  end TYPE_aadlKeywords;
+  
+  data version
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(Base_Types::Integer));
+      Data_Model::Dimension => (10);
+  end version;
+      
+  data receivers
+    properties
+      Data_Model::Data_Representation => Array;
+      Data_Model::Base_Type => (classifier(ID));
+      Data_Model::Dimension => (2);
+  end receivers;
+  
+  data Exception
+    properties
+      Data_Model::Data_Representation => Integer;
+  end Exception;
+   
+  system PingPong_Communication_System
+  end PingPong_Communication_System;
+  
+  system implementation PingPong_Communication_System.impl
+    subcomponents
+      node1_main_memory_inst: memory node1_main_memory.impl;
+      S1_inst: process S1.impl;
+      S2_inst: process S2.impl;
+      node_1_inst: processor node_1.impl;
+    connections
+      mode_proc_cnx: port S1_inst.Mon_mode_C2 -> S2_inst.C2_mode;
+      C1_ping_proc_cnx: port S1_inst.C1_PingOut -> S2_inst.C2_PingIn;
+      C1_pong_proc_cnx: port S1_inst.C1_PongOut -> S2_inst.C2_PongIn;
+      C2_ping_proc_cnx: port S2_inst.C2_PingOut -> S1_inst.C1_PingIn;
+      C2_pong_proc_cnx: port S2_inst.C2_PongOut -> S1_inst.C1_PongIn;
+      C2_error_proc_cnx: port S2_inst.C2_badSequenceNumber -> S1_inst.Mon_error_C2;
+    properties
+      Actual_Processor_Binding => (reference (node_1_inst.VP_S1_inst)) applies to S1_inst;
+      Actual_Processor_Binding => (reference (node_1_inst.VP_S2_inst)) applies to S2_inst;
+  end PingPong_Communication_System.impl;
+  
+  processor node_1
+    properties
+      POK::Architecture => x86;
+      POK::BSP => x86_qemu;
+  end node_1;
+  
+  processor implementation node_1.impl
+    subcomponents
+      VP_S1_inst: virtual processor VP_S1.impl;
+      VP_S2_inst: virtual processor VP_S2.impl;
+    properties
+      ARINC653::Module_Major_Frame => 2000 ms;
+      ARINC653::Partition_Slots => (1000 ms, 1000 ms);
+      ARINC653::Slots_Allocation => (reference (VP_S1_inst), reference (VP_S2_inst));
+  end node_1.impl;
+  
+  memory node1_main_memory
+  end node1_main_memory;
+  
+  memory implementation node1_main_memory.impl
+  end node1_main_memory.impl;
+  
+  virtual processor VP_S1
+    properties
+      POK::Additional_Features => (console);
+  end VP_S1;
+  
+  virtual processor VP_S2
+    properties
+      POK::Additional_Features => (console);
+  end VP_S2;
+  
+  virtual processor implementation VP_S1.impl
+    properties
+      POK::Scheduler => RR;
+  end VP_S1.impl;
+  
+  virtual processor implementation VP_S2.impl
+    properties
+      POK::Scheduler => RR;
+  end VP_S2.impl;
+  
+  process S1
+    features
+      Mon_mode_C2: out data port ROLE{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PingOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PongOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PingIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      C1_PongIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      Mon_error_C2: in data port Exception{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+  end S1;
+  
+  process S2
+    features
+      C2_mode: in data port ROLE{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      C2_PingIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      C2_PongIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10000 ms;};
+      C2_PingOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C2_PongOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C2_badSequenceNumber: out data port Exception{ARINC653::Sampling_Refresh_Period => 10 ms;};
+  end S2;
+  
+  process implementation S1.impl
+    subcomponents
+      a1_inst: thread a1.impl;
+      state_baKeywords: data TYPE_aadlKeywords;
+    connections
+      C2_ping_implicit_cnx: port C1_PingIn -> a1_inst.C1_PingIn;
+      C2_pong_implicit_cnx: port C1_PongIn -> a1_inst.C1_PongIn;
+      C2_error_implicit_cnx: port Mon_error_C2 -> a1_inst.Mon_error_C2;
+      mode_implicit_cnx: port a1_inst.Mon_mode_C2 -> Mon_mode_C2;
+      C1_ping_implicit_cnx: port a1_inst.C1_PingOut -> C1_PingOut;
+      C1_pong_implicit_cnx: port a1_inst.C1_PongOut -> C1_PongOut;
+  properties
+    POK::Needed_Memory_Size => 200 kbyte;
+  end S1.impl;
+  
+  process implementation S2.impl
+    subcomponents
+      a2_inst: thread a2.impl;
+    connections
+      mode_implicit_cnx: port C2_mode -> a2_inst.C2_mode;
+      C1_ping_implicit_cnx: port C2_PingIn -> a2_inst.C2_PingIn;
+      C1_pong_implicit_cnx: port C2_PongIn -> a2_inst.C2_PongIn;
+      C2_ping_implicit_cnx: port a2_inst.C2_PingOut -> C2_PingOut;
+      C2_pong_implicit_cnx: port a2_inst.C2_PongOut -> C2_PongOut;
+      C2_error_implicit_cnx: port a2_inst.C2_badSequenceNumber -> C2_badSequenceNumber;
+  properties
+    POK::Needed_Memory_Size => 200 kbyte;
+  end S2.impl;
+  
+  thread a1
+    features
+      Mon_mode_C2: out data port ROLE {ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PingOut: out data port PingPongMessage {ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PongOut: out data port PingPongMessage {ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PingIn: in data port PingPongMessage {ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C1_PongIn: in data port PingPongMessage {ARINC653::Sampling_Refresh_Period => 10 ms;};
+      Mon_error_C2: in data port Exception {ARINC653::Sampling_Refresh_Period => 10 ms;};
+    properties
+      Dispatch_Protocol => Periodic;
+      Source_Stack_Size => 100 KByte;
+      Priority => 1;
+      Period => 2000 ms;
+  end a1;
+  
+  thread implementation a1.impl
+    subcomponents
+      state_baKeywords: data TYPE_aadlKeywords;
+      seqNb: data SEQ {
+        Data_Model::Initial_Value => ("0");
+        };
+    calls
+      call_seq : 
+      { 
+        call_Monitor_activate : subprogram Monitor_activate;
+        call_C1_mode : subprogram IPingOrPong_mode;
+      };
+    connections
+      cnx1: parameter call_Monitor_activate.mode_C2 -> Mon_mode_C2;
+      cnx2: parameter call_C1_mode.PingOut -> C1_PingOut;
+      cnx3: parameter call_C1_mode.PongOut -> C1_PongOut;
+      cnx4: parameter C1_PingIn -> call_C1_mode.PingIn;
+      cnx5: parameter C1_PongIn -> call_C1_mode.PongIn;
+      cnx6: parameter Mon_error_C2 -> call_Monitor_activate.error_C2;
+      cnx7: parameter call_C1_mode.badSequenceNumber -> call_Monitor_activate.error_C1;
+      cnx8: data access call_Monitor_activate.state_baKeywords -> state_baKeywords;
+      cnx9: parameter call_Monitor_activate.mode_C1 -> call_C1_mode.mode_aadlkeywords;
+      cnxx11: data access call_C1_mode.seqNb -> seqNb;
+    properties
+      Compute_Entrypoint_Call_Sequence => reference (call_seq);
+  end a1.impl;
+  
+  thread a2
+    features
+      C2_mode: in data port ROLE{
+      ARINC653::Sampling_Refresh_Period => 10 ms;
+      Data_Model::Initial_Value => ("0");
+      };
+      C2_PingIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C2_PongIn: in data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C2_PingOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C2_PongOut: out data port PingPongMessage{ARINC653::Sampling_Refresh_Period => 10 ms;};
+      C2_badSequenceNumber: out data port Exception{ARINC653::Sampling_Refresh_Period => 10 ms;};
+    properties
+      Dispatch_Protocol => Periodic;
+      Source_Stack_Size => 100 KByte;
+      Priority => 2;
+      Period => 2000 ms;
+  end a2;
+
+  thread implementation a2.impl
+    subcomponents
+      seqNb: data SEQ {
+        Data_Model::Initial_Value => ("0");
+        };
+    calls
+      call_seq : 
+      { 
+        call_C2_mode : subprogram IPingOrPong_mode;
+      };
+    connections
+      cnx1: parameter C2_mode -> call_C2_mode.mode_aadlkeywords;
+      cnx2: parameter C2_PingIn -> call_C2_mode.PingIn;
+      cnx3: parameter C2_PongIn -> call_C2_mode.PongIn;
+      cnx4: parameter call_C2_mode.PingOut -> C2_PingOut;
+      cnx5: parameter call_C2_mode.PongOut -> C2_PongOut;
+      cnx6: parameter call_C2_mode.badSequenceNumber -> C2_badSequenceNumber;
+      cnx7: data access call_C2_mode.seqNb -> seqNb;
+    properties
+      Compute_Entrypoint_Call_Sequence => reference (call_seq);
+  end a2.impl;
+
+  subprogram IPingOrPong_mode
+    features
+--      PingIn_fresh: requires data access Base_Types::Boolean;
+      seqNb: requires data access SEQ;
+      PingIn: in parameter PingPongMessage;
+      PingOut: out parameter PingPongMessage;
+      PongIn: in parameter PingPongMessage;
+      PongOut: out parameter PingPongMessage;
+      badSequenceNumber: out parameter Exception;
+      mode_aadlKeywords: in parameter ROLE;
+    properties
+      source_name => "mode";
+      source_language => (C);
+      source_text => ("pingpong.h","pingpong.c");
+  end IPingOrPong_mode;
+
+  subprogram IPingOrPong_storePong
+    features
+      PongIn: in parameter PingPongMessage;
+      replyPong: out parameter PingPongMessage;
+    properties
+     source_name => "storePong";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end IPingOrPong_storePong;
+  
+  subprogram IPingOrPong_ping
+    features
+      replyPong: in parameter PingPongMessage;
+      PingOut: out parameter PingPongMessage;
+      badSequenceNumber: out parameter Exception;
+      seqNb_in: requires data access SEQ;
+      seqNb_out: requires data access SEQ;
+    properties
+     source_name => "ping";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end IPingOrPong_ping;
+  
+  subprogram IPingOrPong_noPong
+    features
+      PongOut: out parameter PingPongMessage;
+    properties
+     source_name => "noPong";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end IPingOrPong_noPong;
+  
+  subprogram IPingOrPong_pong
+    features
+      PingIn: in parameter PingPongMessage;
+      PongOut: out parameter PingPongMessage;
+    properties
+     source_name => "pong";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end IPingOrPong_pong;
+  
+  subprogram IPingOrPong_noPing
+    features
+      PingOut: out parameter PingPongMessage;
+      badSequenceNumber: out parameter Exception;
+      seqNb_out: requires data access SEQ;
+    properties
+     source_name => "noPing";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end IPingOrPong_noPing;
+  
+  subprogram IPingOrPong_noPingPong
+    features
+      PingOut: out parameter PingPongMessage;
+      PongOut: out parameter PingPongMessage;
+      badSequenceNumber: out parameter Exception;
+      seqNb_out: requires data access SEQ;
+    properties
+     source_name => "noPingPong";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end IPingOrPong_noPingPong;
+  
+  subprogram Monitor_storeErrorC1
+    features
+      error_C1: in parameter Exception;
+      errorC1: out parameter Exception;
+    properties
+     source_name => "storeError";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end Monitor_storeErrorC1;
+
+  subprogram Monitor_activate
+    features
+      state_baKeywords: requires data access TYPE_aadlKeywords;
+      error_C1: in parameter Exception;
+      error_C2: in parameter Exception;
+      mode_C1: out parameter ROLE;
+      mode_C2: out parameter ROLE;
+    properties
+      source_name => "activate";
+      source_language => (C);
+      source_text => ("pingpong.h","pingpong.c");
+  end Monitor_activate;
+
+  
+  subprogram Monitor_storeErrorC2
+    features
+      error_C2: in parameter Exception;
+      errorC2: out parameter Exception;
+    properties
+     source_name => "storeError";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end Monitor_storeErrorC2;
+  
+  subprogram Monitor_changeState
+    features
+      errorC1: in parameter Exception;
+      errorC2: in parameter Exception;
+      mode_C1: out parameter ROLE;
+      mode_C2: out parameter ROLE;
+      state_in: requires data access TYPE_aadlKeywords;
+      state_out: requires data access TYPE_aadlKeywords;
+    properties
+     source_name => "changeState";
+     source_language => (C);
+     source_text => ("pingpong.h","pingpong.c");
+  end Monitor_changeState;
+end PingPong;

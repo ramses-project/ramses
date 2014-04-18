@@ -1,0 +1,40 @@
+AADL-RAMSES
+ 
+Copyright © 2012 TELECOM ParisTech and CNRS
+
+TELECOM ParisTech/LTCI
+
+Authors: see AUTHORS
+
+This program is free software: you can redistribute it and/or modify 
+it under the terms of the Eclipse Public License as published by Eclipse,
+either version 1.0 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Eclipse Public License for more details.
+You should have received a copy of the Eclipse Public License
+along with this program.  If not, see 
+http://www.eclipse.org/org/documents/epl-v10.php
+
+Different configurations of transformations:
+
+	No superimposition
+	
+test Uninstanciate.atl
+-m test/test1.aadl2 -s node.impl -o test/result/ -i test/ -d ../../model2model/fr.tpt.aadl.transformation.atl/
+
+	Superimposition
+
+test Uninstanciate.atl superimposed with ExpandThreadsPorts.atl
+-m test/test1.aadl2 -s node.impl -t ExpandThreadsPorts.asm -o test/result/ -i test/ -d ../../model2model/fr.tpt.aadl.transformation.atl/
+
+	Refining mode without superimposition
+
+test Uninstanciate.atl refined with ChangeThreadsDispatchProtocol.atl
+-m test/test1.aadl2 -s node.impl -o test/result/ -i test/ -p ChangeThreadsDispatchProtocol.asm -d ${workspace_loc}/fr.tpt.aadl.transformation.atl/
+
+	Refining mode with superimposition
+	
+test Uninstanciate.atl superimposed with ExpandThreadsPorts.atl refined with ChangeThreadsDispatchProtocol.atl
+-m test/test1.aadl2 -s node.impl -o test/result/ -i test/ -t ExpandThreadsPorts.asm -p ChangeThreadsDispatchProtocol.asm -d ${workspace_loc}/fr.tpt.aadl.transformation.atl/

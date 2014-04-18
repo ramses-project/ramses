@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="fr.tpt.aadl.ramses.feature"
+      label="AADL-RAMSES-Feature"
+      version="1.0.0.qualifier"
+      provider-name="TELECOM ParisTech">
+
+   <description url="http://aadl.telecom-paristech.fr/">
+      RAMSES (Refinement of AADL Models for Synthesis of Embedded Systems) is a model transformation and code generation tool that produces C code for ARINC653-compliant operating systems and OSEK-compliant operating systems.
+   </description>
+
+   <copyright url="http://aadl.telecom-paristech.fr/">
+      AADL-RAMSES Copyright © 2011 TELECOM ParisTech and CNRS TELECOM ParisTech/LTCI
+   </copyright>
+
+   <license url="http://www.eclipse.org/org/documents/epl-v10.ph">
+      This program is free software: you can redistribute it and/or modify  it under the terms of the Eclipse Public License as published by Eclipse, either version 1.0 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Eclipse Public License for more details.
+You should have received a copy of the Eclipse Public License along with this program. If not, see http://www.eclipse.org/org/documents/epl-v10.ph
+   </license>
+
+   <url>
+      <discovery label="TELECOM ParisTech AADL corner" url="http://aadl.telecom-paristech.fr/"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.osate.aadl2" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.osate.ui"/>
+      <import plugin="org.osate.aadl2.modelsupport"/>
+      <import plugin="org.osate.annexsupport"/>
+      <import plugin="org.osate.xtext.aadl2.properties"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.aadl2.modelsupport" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.annexsupport" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.m2m.atl.core" version="3.2.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext" version="2.1.1" match="greaterOrEqual"/>
+      <import plugin="org.osate.aadl2.instantiation"/>
+      <import plugin="org.osate.xtext.aadl2"/>
+      <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.7.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.pluginsupport"/>
+      <import plugin="org.eclipse.ui.workbench" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore.xmi"/>
+      <import plugin="org.eclipse.m2m.atl.engine.emfvm" version="3.2.1" match="greaterOrEqual"/>
+      <import plugin="org.osate.pluginsupport" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.workspace"/>
+      <import plugin="org.objectweb.asm" version="3.3.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.m2m.atl.core.emf"/>
+      <import plugin="org.eclipse.core.runtime" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.common" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.6.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.xtext.aadl2.properties" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.jdom" version="1.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore.xmi" version="2.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.m2m.atl.emftvm.trace"/>
+      <import plugin="org.eclipse.m2m.atl.common" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.validation" version="1.4.0" match="greaterOrEqual"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.osate.xtext.aadl2" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.aadl2.instantiation" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.ui.shared"/>
+      <import plugin="org.osate.xtext.aadl2.properties.ui"/>
+      <import plugin="org.osate.ba" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.osate.utils" version="1.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.communication.periodic.delayed"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.osate"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.support"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.c"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.osek"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.pok"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.target.specific"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.atl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.util.math"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.engine.emfvm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.util.properties"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.jdom"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.common"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.emftvm"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.analysis.result"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.sched.tools.aadlinspector"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.emftvm.trace"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.ada"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.ada.ravenscar"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.atl.launch"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.utils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.analysis.asg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.constraints.reporter.metamodel"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.sched.wcetanalysis.results"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.m2m.atl.engine.emfvm.launch"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.cdt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.cdt.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.cdt.make.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.cdt.make.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.cdt.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

@@ -1,0 +1,233 @@
+-- TODO Have to specify Monitor_Type.
+
+package Minimal_Periodic_Example
+
+public
+
+with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Sync,
+      Minimal_Runtime_Dispatch, Minimal_Common_Example, Minimal_Example,
+      Minimal_Runtime_Types ;
+
+
+---------------------------- Transmitter 1 ----------------------------
+
+subprogram Transmitter1_Thread_Routine
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Mutex_Type : data ;
+   
+   features
+   
+   P1_Portvariable : requires data access Minimal_Common_Example::P1_Port_Variable.impl ;
+   P1_Monitor : requires data access Monitor_Type ;
+   P1_Mutex : requires data access Mutex_Type ;
+   P1_Pending_Event_Chain : requires data access Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+   Period : in parameter Minimal_Runtime_Types::Date ;
+   Is_Alive : requires data access Base_Types::Boolean ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   
+   annex behavior_specification
+   {**
+      variables
+      
+      next_dispatch : Minimal_Runtime_Types::Date ;
+      port_count : Base_Types::Integer ;
+      
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         while(Is_Alive)
+         {
+            Minimal_Example::Transmitter1_Compute_Subprog ! (port_count) ;
+            
+            Minimal_Common_Example::P1_Put_Value.impl ! (P1_Portvariable.Queue,
+                                                         port_count,
+                                                         P1_Mutex) ;
+            
+            Minimal_Common_Example::P1_Event_Port_Send_Output ! (P1_Portvariable.Queue,
+                                                                 P1_Monitor,
+                                                                 P1_Pending_Event_Chain,
+                                                                 P1_Mutex) ;
+            
+            Minimal_Runtime_Sync::Wait_Next_Period ! (Period)
+         }
+      } ; 
+   **} ;
+
+end Transmitter1_Thread_Routine ;
+
+
+thread Transmitter1_Thread
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Mutex_Type : data ;
+   
+   features
+   
+   P1_Portvariable : requires data access Minimal_Common_Example::P1_Port_Variable.impl ;
+   P1_Monitor : requires data access Monitor_Type ;
+   P1_Mutex : requires data access Mutex_Type ;
+   P1_Pending_Event_Chain : requires data access Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   Dispatch_Protocol => Periodic ;
+   Period => 100 ms ;
+   Synchronized_Component => FALSE ;
+   
+end Transmitter1_Thread ;
+
+
+thread implementation Transmitter1_Thread.impl
+
+   subcomponents
+   
+   Is_Alive : data Base_Types::Boolean {Data_Model::Initial_Value => ("TRUE");} ;
+   
+   annex behavior_specification
+   {**
+      states
+      
+      init_state : initial state ;
+      final_state : complete final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         Minimal_Example::Transmitter1_Init_Subprog ! ;
+         Transmitter1_Thread_Routine ! (P1_Portvariable, P1_Monitor, P1_Mutex,
+                                        P1_Pending_Event_Chain, Period, Is_Alive) ;
+         Minimal_Example::Transmitter1_Finalization_Subprog !
+      } ; 
+   **} ;
+
+end Transmitter1_Thread.impl ;
+
+
+---------------------------- Transmitter 2 ----------------------------
+
+
+subprogram Transmitter2_Thread_Routine
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Mutex_Type : data ;
+   
+   features
+   
+   P2_Portvariable : requires data access Minimal_Common_Example::P2_Port_Variable.impl ;
+   P2_Monitor : requires data access Monitor_Type ;
+   P2_Mutex : requires data access Mutex_Type ;
+   P2_Pending_Event_Chain : requires data access Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+   Period : in parameter Minimal_Runtime_Types::Date ;
+   Is_Alive : requires data access Base_Types::Boolean ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   
+   annex behavior_specification
+   {**
+      variables
+      
+      next_dispatch : Minimal_Runtime_Types::Date ;
+      port_count : Base_Types::Integer ;
+      
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         while(Is_Alive)
+         {
+            Minimal_Example::Transmitter2_Compute_Subprog ! (port_count) ;
+            
+            Minimal_Common_Example::P2_Put_Value.impl ! (P2_Portvariable.Queue,
+                                                         port_count,
+                                                         P2_Mutex) ;
+            
+            Minimal_Common_Example::P2_Event_Port_Send_Output ! (P2_Portvariable.Queue,
+                                                                 P2_Monitor,
+                                                                 P2_Pending_Event_Chain,
+                                                                 P2_Mutex) ;
+            
+            Minimal_Runtime_Sync::Wait_Next_Period ! (Period)
+         }
+      } ; 
+   **} ;
+
+end Transmitter2_Thread_Routine ;
+
+
+thread Transmitter2_Thread
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Mutex_Type : data ;
+   
+   features
+   
+   P2_Portvariable : requires data access Minimal_Common_Example::P2_Port_Variable.impl ;
+   P2_Monitor : requires data access Monitor_Type ;
+   P2_Mutex : requires data access Mutex_Type ;
+   P2_Pending_Event_Chain : requires data access Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   Dispatch_Protocol => Periodic ;
+   Period => 150 ms ;
+   Synchronized_Component => FALSE ;
+   
+end Transmitter2_Thread ;
+
+
+thread implementation Transmitter2_Thread.impl
+
+   subcomponents
+   
+   Is_Alive : data Base_Types::Boolean {Data_Model::Initial_Value => ("TRUE");} ;
+   
+   annex behavior_specification
+   {**
+      states
+      
+      init_state : initial state ;
+      final_state : complete final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         Minimal_Example::Transmitter2_Init_Subprog ! ;
+         Transmitter2_Thread_Routine ! (P2_Portvariable, P2_Monitor, P2_Mutex,
+                                        P2_Pending_Event_Chain, Period, Is_Alive) ;
+         Minimal_Example::Transmitter2_Finalization_Subprog !
+      } ; 
+   **} ;
+
+end Transmitter2_Thread.impl ;
+
+
+end Minimal_Periodic_Example ;

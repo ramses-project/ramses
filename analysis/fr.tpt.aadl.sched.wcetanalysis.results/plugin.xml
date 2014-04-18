@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ <copyright>
+ </copyright>
+
+ $Id$
+-->
+
+<plugin>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated ReducedBA -->
+      <package
+            uri="http://fr.tpt.aadl.sched.wcetanalysis.result.reducedba/1.0"
+            class="fr.tpt.aadl.sched.wcetanalysis.result.reducedba.ReducedbaPackage"
+            genModel="model/ReducedBA.genmodel"/>
+   </extension>
+
+</plugin>

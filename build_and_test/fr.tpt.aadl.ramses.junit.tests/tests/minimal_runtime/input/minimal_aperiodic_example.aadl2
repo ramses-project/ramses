@@ -1,0 +1,212 @@
+-- TODO Have to specify Monitor_Type.
+
+package Minimal_Aperiodic_Example
+
+public
+
+with Timing_Properties, Data_Model, Base_Types, Minimal_Runtime_Dispatch,
+     Minimal_Common_Example, Minimal_Example, Minimal_Runtime_Types ;
+
+
+-- on dispatch P1 OR P2
+subprogram P1_P2_DispatchConditionFunction extends Minimal_Runtime_Dispatch::Dispatch_Condition_Function
+
+   annex behavior_specification
+   {**
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         Is_Dispatched := FALSE ;
+         
+         for(i : Base_Types::Unsigned_8 in DispatchedPort)
+         {
+            for(j : Base_Types::Unsigned_8 in DispatchPorts)
+            {
+               if (i = j)
+                  Is_Dispatched := TRUE
+               end if
+            }
+         }
+      } ; 
+   **} ;
+
+end P1_P2_DispatchConditionFunction ;
+
+-- Have to specify Monitor_Type, Wait_For_Signal, Mutex_Type., Set and Unset ICCP.
+subprogram P1_P2_Await_Dispatch extends Minimal_Runtime_Dispatch::Await_Dispatch
+(Ports_Type => data Minimal_Common_Example::Ports_Type.impl,
+ Dispatch_Condition_Function => subprogram P1_P2_DispatchConditionFunction,
+ Wrapper_Freeze => subprogram Minimal_Common_Example::Wrapper_Freeze
+)
+end P1_P2_Await_Dispatch ;
+
+
+subprogram Receiver_Thread_Routine
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Mutex_Type : data ;
+      
+   features
+   
+   Ports : requires data access Minimal_Common_Example::Ports_Type.impl ;
+   Monitor : requires data access Monitor_Type ;
+   Mutex : requires data access Mutex_Type ;
+   Pending_Event_Chain : requires data access Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+   DispatchPorts : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   UpdatedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   DispatchedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   Is_Alive : requires data access Base_Types::Boolean ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   
+   annex behavior_specification
+   {**
+      variables
+      
+      payload : Base_Types::Integer ;
+      has_no_value : Base_Types::Boolean ;
+      
+      states
+      
+      init_state : initial state ;
+      final_state : final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         has_no_value := FALSE ;
+         
+         while(Is_Alive)
+         {
+            P1_P2_Await_Dispatch ! (Ports,
+                                    Monitor,
+                                    Mutex,
+                                    Pending_Event_Chain,
+                                    DispatchPorts,
+                                    UpdatedPort,
+                                    DispatchedPort) ;
+                                    
+            if(DispatchedPort.Nb_Items = 1)
+            {
+               if(DispatchedPort[0] = Ports.P1_Portvariable.Id)
+               {
+                  Minimal_Common_Example::P1_Next_Value ! (Ports.P1_Portvariable,
+                                                           payload,
+                                                           Pending_Event_Chain,
+                                                           Mutex,
+                                                           has_no_value) ;
+                
+                  while(NOT has_no_value) -- depending on the number of item to be dequeued.
+                  {
+                     Minimal_Example::Receiver_Compute_Subprog ! (payload) ;
+                     Minimal_Common_Example::P1_Next_Value ! (Ports.P1_Portvariable,
+                                                              payload,
+                                                              Pending_Event_Chain,
+                                                              Mutex,
+                                                              has_no_value)
+                  }
+               
+                  -- Decomment only if there is some events left in the queue.
+                  -- Minimal_Common_Example::P1_Discard_Events ! (Ports.P1_Portvariable,
+                  --                                              Pending_Event_Chain,
+                  --                                              Mutex)
+               }
+               else
+               { 
+                  Minimal_Common_Example::P2_Next_Value ! (Ports.P2_Portvariable,
+                                                           payload,
+                                                           Pending_Event_Chain,
+                                                           Mutex,
+                                                           has_no_value) ;
+               
+                  while(NOT has_no_value) -- depending on the number of item to be dequeued.
+                  {
+                     Minimal_Example::Receiver_Compute_Subprog ! (payload) ;
+                     Minimal_Common_Example::P2_Next_Value ! (Ports.P2_Portvariable,
+                                                              payload,
+                                                              Pending_Event_Chain,
+                                                              Mutex,
+                                                              has_no_value)
+                  }
+               
+                  -- Decomment only if there is some events left in the queue.
+                  -- Minimal_Common_Example::P2_Discard_Events ! (Ports.P2_Portvariable,
+                  --                                              Pending_Event_Chain,
+                  -- 
+               }
+               end if
+           }
+           -- else i don't know ...
+           end if
+         }
+       } ;
+   **} ;
+
+end Receiver_Thread_Routine ;
+
+
+thread Receiver_Thread
+
+   prototypes
+   
+   Monitor_Type : data ;
+   Mutex_Type : data ;
+      
+   features
+   
+   Ports : requires data access Minimal_Common_Example::Ports_Type.impl ;
+   Monitor : requires data access Monitor_Type ;
+   Mutex : requires data access Mutex_Type ;
+   Pending_Event_Chain : requires data access Minimal_Runtime_Types::Pending_Event_Chain.impl ;
+   DispatchPorts : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   UpdatedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   DispatchedPort : requires data access Minimal_Runtime_Types::Natural_List.impl ;
+   
+   properties
+   
+   Prototype_Substitution_Rule => Type_Extension ;
+   Dispatch_Protocol => Aperiodic ;
+   Synchronized_Component => FALSE ;
+   
+end Receiver_Thread ;
+
+
+thread implementation Receiver_Thread.impl
+
+   subcomponents
+   
+   Is_Alive : data Base_Types::Boolean {Data_Model::Initial_Value => ("TRUE");} ;
+   
+   annex behavior_specification
+   {**
+      states
+      
+      init_state : initial state ;
+      final_state : complete final state ;
+      
+      transitions
+      
+      init_state -[TRUE]-> final_state
+      {
+         Minimal_Example::Receiver_Init_Subprog ! ;
+         Receiver_Thread_Routine ! (Ports, Monitor, Mutex, Pending_Event_Chain, DispatchPorts,
+                                    UpdatedPort, DispatchedPort, Is_Alive) ;
+         Minimal_Example::Receiver_Finalization_Subprog !
+      } ; 
+   **} ;
+   
+end Receiver_Thread.impl ;
+
+
+end Minimal_Aperiodic_Example ;

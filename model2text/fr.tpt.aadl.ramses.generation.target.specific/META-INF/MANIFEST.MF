@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AADL-RAMSES-Generation
+Bundle-SymbolicName: fr.tpt.aadl.ramses.generation.target.specific;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.emf.ecore;bundle-version="2.7.0",
+ org.eclipse.m2m.atl.core,
+ org.eclipse.xtext;bundle-version="2.1.1",
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.osate.utils;bundle-version="0.9.5",
+ org.osate.aadl2.modelsupport;bundle-version="1.0.0",
+ org.osate.xtext.aadl2.properties.ui;bundle-version="1.0.0",
+ org.osate.xtext.aadl2.properties,
+ org.osate.ba;bundle-version="0.9.5",
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.generation.utils,
+ fr.tpt.aadl.ramses.analysis.result,
+ fr.tpt.aadl.ramses.util.properties,
+ fr.tpt.aadl.ramses.control.atl.launch,
+ fr.tpt.aadl.ramses.constraints.reporter.metamodel;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: fr.tpt.aadl.ramses.generation.target.specific
+Bundle-Vendor: TELECOM Paristech

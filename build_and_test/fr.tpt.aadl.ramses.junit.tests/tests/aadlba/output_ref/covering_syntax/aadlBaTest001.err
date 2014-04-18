@@ -1,0 +1,3 @@
+<Analysis Error> NamesResolutionTest::thread1.impl can't have more than one initial state : a5, a6 : Behavior Annex D.3.(L3) legality rule failed. in aadlBaTest001.aadl at line 129
+<Analysis Error> The completion relative timeout condition and catch statement must be declared in only one transition: Behavior Annex D.4.(L2) legality rule failed. in aadlBaTest001.aadl at line 187
+<Analysis Error> The completion relative timeout condition and catch statement must be declared in only one transition: Behavior Annex D.4.(L2) legality rule failed. in aadlBaTest001.aadl at line 188

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ASCII"?>
+<rwf:Workflow xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rwf="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0" xsi:schemaLocation="http://fr.tpt.aadl.ramses.control.workflow/Ramses/1.0 ../../../../fr.tpt.aadl.ramses.control.support/model/RamsesWorkflow.ecore">
+  <element xsi:type="rwf:Transformation">
+    <!--
+    <element xsi:type="rwf:Analysis" method="WCET" mode="automatic">
+      <yesOption>
+        <element xsi:type="rwf:Generation"/>
+      </yesOption>
+    </element>
+    -->
+    <element xsi:type="rwf:Analysis" method="AADLInspector" mode="automatic">
+      <yesOption><element xsi:type="Generation"/></yesOption>
+      <noOption><element xsi:type="ErrorState" type="scheduling"/></noOption>
+    </element>
+    <list>
+      <file path="targets/shared/BehaviorAnnexCommonRefinementSteps.asm"/>
+      <file path="targets/shared/DispatchCommonRefinementSteps.asm"/>
+      <file path="targets/shared/PortsCommonRefinementSteps.asm"/>
+      <file path="targets/shared/SubprogramCallsCommonRefinementSteps.asm"/>
+      <file path="PeriodicDelayedCommunication/EventDataPorts.asm"/>
+    </list>
+  </element>
+</rwf:Workflow>
