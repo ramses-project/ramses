@@ -233,6 +233,18 @@
 
     <dependency>
       <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.arinc653.xml</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.generation.integrity</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.math</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
