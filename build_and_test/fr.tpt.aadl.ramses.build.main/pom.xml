@@ -9,7 +9,7 @@
   <properties>
     <tycho-version>0.17.0</tycho-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-     <platform-version-name>juno</platform-version-name>
+     <platform-version-name>kepler</platform-version-name>
     <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
     <xtext-site>http://download.itemis.com/updates/releases</xtext-site>
     <swtbot-site>http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site</swtbot-site>
