@@ -1593,7 +1593,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
       for(ThreadSubcomponent ts : pi.getOwnedThreadSubcomponents())
       {
         Long partitionStack =
-            PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
+            PropertyUtils.getIntValue(ts, "Stack_Size") ;
         if(partitionStack != null)
         {
           _processorProp.requiredStackSize += partitionStack ;

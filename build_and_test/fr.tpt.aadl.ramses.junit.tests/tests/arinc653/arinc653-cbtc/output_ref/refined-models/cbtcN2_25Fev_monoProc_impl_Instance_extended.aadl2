@@ -20,39 +20,39 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       train_inst_trainPpu_inst_trainDataOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       train_inst_trainPpu_inst_trainDataInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       TrainPpu_odometerAcquisition: thread train_inst_TrainPpu_odometerAcquisition.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 1;
         Period => 300 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       TrainPpu_trainTraction: thread train_inst_TrainPpu_trainTraction.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 1;
         Period => 300 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       VobcTrainPositionEstimation_vobcTrainPositionEstimation: thread train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 2;
         Period => 300 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       TrainSpeedAccelCompute_trainSpeedAccelCompute: thread train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 2;
         Period => 300 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
     connections
@@ -87,39 +87,39 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       railway_inst_TrainSimu_inst_trainDataInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       railway_inst_TrainSimu_inst_trainDataOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       TrainPositionsCorrelation_trainPositionsCorrelation: thread railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 3;
         Period => 600 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       ViuTrainPositionEstimation_viuTrainPositionEstimation: thread railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 1;
         Period => 600 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       TrainSimu_trainSimulation: thread railway_inst_TrainSimu_trainSimulation.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 1;
         Period => 600 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       TrainSimu_delayed_trainDataIn: thread railway_inst_TrainSimu_delayed_trainDataIn.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 1;
         Period => 600 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
     connections
@@ -180,13 +180,13 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         ARINC653::Access_Type => (write, read, execute);
         };
       train_inst: process train.impl {
-        Source_Data_Size => 200 KByte;
-        Source_Code_Size => 200 KByte;
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
         ARINC653::Partition_Stack => 5000;
         };
       railway_inst: process railway.impl {
-        Source_Data_Size => 200 KByte;
-        Source_Code_Size => 200 KByte;
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
         ARINC653::Partition_Stack => 5000;
         };
       root_inst: processor root.impl {

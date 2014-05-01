@@ -211,7 +211,7 @@ end SEQ;
       Mon_error_C2: in data port Exception {ARINC653::Sampling_Refresh_Period => 10 ms;};
     properties
       Dispatch_Protocol => Periodic;
-      Source_Stack_Size => 100 KByte;
+      Stack_Size => 100 KByte;
       Priority => 1;
       Period => 2000 ms;
   end a1;
@@ -256,7 +256,7 @@ end SEQ;
       C2_badSequenceNumber: out data port Exception{ARINC653::Sampling_Refresh_Period => 10 ms;};
     properties
       Dispatch_Protocol => Periodic;
-      Source_Stack_Size => 100 KByte;
+      Stack_Size => 100 KByte;
       Priority => 2;
       Period => 2000 ms;
   end a2;

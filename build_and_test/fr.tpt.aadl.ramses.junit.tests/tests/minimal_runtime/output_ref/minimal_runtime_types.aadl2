@@ -6,7 +6,7 @@ with Data_Model,Base_Types;
   
   data Byte
     properties
-      Source_Data_Size => 1 Bytes;
+      Data_Size => 1 Bytes;
   end Byte;
   
   data Buffer

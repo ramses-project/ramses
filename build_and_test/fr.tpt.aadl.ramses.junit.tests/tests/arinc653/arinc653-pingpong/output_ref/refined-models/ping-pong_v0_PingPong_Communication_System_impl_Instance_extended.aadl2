@@ -18,7 +18,7 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       S1_inst_Mon_error_C2globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       a1_inst: thread S1_inst_a1_inst.impl {
         Dispatch_Protocol => Periodic;
-        Source_Stack_Size => 100 KByte;
+        Stack_Size => 100 KByte;
         Priority => 1;
         Period => 2000 ms;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
@@ -42,7 +42,7 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       S2_inst_C2_badSequenceNumber_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       a2_inst: thread S2_inst_a2_inst.impl {
         Dispatch_Protocol => Periodic;
-        Source_Stack_Size => 100 KByte;
+        Stack_Size => 100 KByte;
         Priority => 2;
         Period => 2000 ms;
         Compute_Entrypoint_Call_Sequence => reference(main_call);

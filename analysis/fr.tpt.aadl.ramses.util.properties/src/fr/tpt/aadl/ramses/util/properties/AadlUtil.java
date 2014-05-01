@@ -203,7 +203,7 @@ public class AadlUtil
 
   public static Long getInfoTaskMemorySize(ComponentInstance task)
   {
-    Long result = PropertyUtils.getIntValue(task, "Source_Code_Size") ;
+    Long result = PropertyUtils.getIntValue(task, "Code_Size") ;
     
     if(result == null)
     {
@@ -215,7 +215,7 @@ public class AadlUtil
 
   public static Long getInfoTaskStackSize(ComponentInstance task)
   {
-    Long result = PropertyUtils.getIntValue(task, "Source_Stack_Size") ;
+    Long result = PropertyUtils.getIntValue(task, "Stack_Size") ;
     
     if(result == null)
     {

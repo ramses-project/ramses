@@ -1905,7 +1905,7 @@ private void genDeploymentImpl(ProcessorSubcomponent processor,
       for(ThreadSubcomponent ts : processImplementation.getOwnedThreadSubcomponents())
       {
         Long partitionStack =
-            PropertyUtils.getIntValue(ts, "Source_Stack_Size") ;
+            PropertyUtils.getIntValue(ts, "Stack_Size") ;
       
         if(partitionStack != null)
         {

@@ -97,13 +97,13 @@ with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
     subcomponents
       the_proc1_p_out_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       the_sender: thread the_proc1_the_sender.impl {
-        Source_Data_Size => 40000 Bytes;
+        Data_Size => 40000 Bytes;
         Dispatch_Protocol => Periodic;
         Compute_Execution_Time => 0 ms .. 1 ms;
         Period => 2000 ms;
         Priority => 5;
-        Source_Stack_Size => 40000 Bytes;
-        Source_Code_Size => 40 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
         ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
         ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
         Compute_Entrypoint_Call_Sequence => reference(main_call);
@@ -151,13 +151,13 @@ arinc653_runtime::Get_Error_Status ! (error_status, error_code)} ;
     subcomponents
       the_proc2_p_inglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       the_receiver: thread the_proc2_the_receiver.impl {
-        Source_Data_Size => 40000 Bytes;
+        Data_Size => 40000 Bytes;
         Dispatch_Protocol => Periodic;
         Compute_Execution_Time => 0 ms .. 1 ms;
         Period => 1000 ms;
         Priority => 10;
-        Source_Stack_Size => 40000 Bytes;
-        Source_Code_Size => 40 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
         ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
         ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
         Compute_Entrypoint_Call_Sequence => reference(main_call);

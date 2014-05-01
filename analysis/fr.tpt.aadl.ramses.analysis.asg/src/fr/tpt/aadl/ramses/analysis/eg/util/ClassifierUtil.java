@@ -193,7 +193,7 @@ public class ClassifierUtil {
     }
     
     Long value = PropertyUtils.getIntValue(dataClassifier,
-          "Source_Data_Size");
+          "Data_Size");
     if(value != null
     {
       return value ;

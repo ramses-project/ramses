@@ -225,8 +225,8 @@ END System_aadlKeywords;
 
 PROCESS IMPLEMENTATION System_aadlKeywords.impl
 PROPERTIES
-  Source_Data_Size => 200KByte;
-  Source_Code_Size => 200KByte;
+  Data_Size => 200KByte;
+  Code_Size => 200KByte;
   ARINC653::Partition_Stack => 5000;
 END System_aadlKeywords.impl;
 
@@ -255,33 +255,33 @@ CONNECTIONS
   PortCnx8 : PORT TrainSpeedAccelCompute_trainSpeedAccelCompute.trainPositionForMauOut -> TrainSpeedAccelCompute_inst_trainPositionForMauOut;
   PortCnx9 : PORT TrainPpu_trainTraction.trainDataOut -> trainPpu_inst_trainDataOut;
 PROPERTIES
-  Source_Data_Size => 200KByte;
-  Source_Code_Size => 200KByte;
+  Data_Size => 200KByte;
+  Code_Size => 200KByte;
   ARINC653::Partition_Stack => 5000;
   Dispatch_Protocol => Periodic APPLIES TO TrainPpu_odometerAcquisition;
   Priority => 1 APPLIES TO TrainPpu_odometerAcquisition;
   Period => 300ms APPLIES TO TrainPpu_odometerAcquisition;
-  Source_Data_Size => 40KByte APPLIES TO TrainPpu_odometerAcquisition;
-  Source_Stack_Size => 40KByte APPLIES TO TrainPpu_odometerAcquisition;
-  Source_Code_Size => 40KByte APPLIES TO TrainPpu_odometerAcquisition;
+  Data_Size => 40KByte APPLIES TO TrainPpu_odometerAcquisition;
+  Stack_Size => 40KByte APPLIES TO TrainPpu_odometerAcquisition;
+  Code_Size => 40KByte APPLIES TO TrainPpu_odometerAcquisition;
   Dispatch_Protocol => Periodic APPLIES TO TrainPpu_trainTraction;
   Priority => 1 APPLIES TO TrainPpu_trainTraction;
   Period => 300ms APPLIES TO TrainPpu_trainTraction;
-  Source_Data_Size => 40KByte APPLIES TO TrainPpu_trainTraction;
-  Source_Stack_Size => 40KByte APPLIES TO TrainPpu_trainTraction;
-  Source_Code_Size => 40KByte APPLIES TO TrainPpu_trainTraction;
+  Data_Size => 40KByte APPLIES TO TrainPpu_trainTraction;
+  Stack_Size => 40KByte APPLIES TO TrainPpu_trainTraction;
+  Code_Size => 40KByte APPLIES TO TrainPpu_trainTraction;
   Dispatch_Protocol => Periodic APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
   Priority => 2 APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
   Period => 300ms APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
-  Source_Data_Size => 40KByte APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
-  Source_Stack_Size => 40KByte APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
-  Source_Code_Size => 40KByte APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Data_Size => 40KByte APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Stack_Size => 40KByte APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
+  Code_Size => 40KByte APPLIES TO VobcTrainPositionEstimation_vobcTrainPositionEstimation;
   Dispatch_Protocol => Periodic APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
   Priority => 2 APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
   Period => 300ms APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
-  Source_Data_Size => 40KByte APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
-  Source_Stack_Size => 40KByte APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
-  Source_Code_Size => 40KByte APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Data_Size => 40KByte APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Stack_Size => 40KByte APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
+  Code_Size => 40KByte APPLIES TO TrainSpeedAccelCompute_trainSpeedAccelCompute;
 END train.impl;
 
 PROCESS railway
@@ -307,33 +307,33 @@ CONNECTIONS
   PortCnx6 : PORT TrainSimu_trainSimulation.trainDataOut -> TrainSimu_inst_trainDataOut;
   PortCnx7 : PORT TrainPositionsCorrelation_trainPositionsCorrelation.eoAForVobcOut -> EoaSending_inst_eoaForVobcOut;
 PROPERTIES
-  Source_Data_Size => 200KByte;
-  Source_Code_Size => 200KByte;
+  Data_Size => 200KByte;
+  Code_Size => 200KByte;
   ARINC653::Partition_Stack => 5000;
   Dispatch_Protocol => Periodic APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
   Priority => 3 APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
   Period => 600ms APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
-  Source_Data_Size => 40KByte APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
-  Source_Stack_Size => 40KByte APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
-  Source_Code_Size => 40KByte APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Data_Size => 40KByte APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Stack_Size => 40KByte APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
+  Code_Size => 40KByte APPLIES TO TrainPositionsCorrelation_trainPositionsCorrelation;
   Dispatch_Protocol => Periodic APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
   Priority => 1 APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
   Period => 600ms APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
-  Source_Data_Size => 40KByte APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
-  Source_Stack_Size => 40KByte APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
-  Source_Code_Size => 40KByte APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Data_Size => 40KByte APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Stack_Size => 40KByte APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
+  Code_Size => 40KByte APPLIES TO ViuTrainPositionEstimation_viuTrainPositionEstimation;
   Dispatch_Protocol => Periodic APPLIES TO TrainSimu_trainSimulation;
   Priority => 1 APPLIES TO TrainSimu_trainSimulation;
   Period => 600ms APPLIES TO TrainSimu_trainSimulation;
-  Source_Data_Size => 40KByte APPLIES TO TrainSimu_trainSimulation;
-  Source_Stack_Size => 40KByte APPLIES TO TrainSimu_trainSimulation;
-  Source_Code_Size => 40KByte APPLIES TO TrainSimu_trainSimulation;
+  Data_Size => 40KByte APPLIES TO TrainSimu_trainSimulation;
+  Stack_Size => 40KByte APPLIES TO TrainSimu_trainSimulation;
+  Code_Size => 40KByte APPLIES TO TrainSimu_trainSimulation;
   Dispatch_Protocol => Periodic APPLIES TO TrainSimu_delayed_trainDataIn;
   Priority => 1 APPLIES TO TrainSimu_delayed_trainDataIn;
   Period => 600ms APPLIES TO TrainSimu_delayed_trainDataIn;
-  Source_Data_Size => 40KByte APPLIES TO TrainSimu_delayed_trainDataIn;
-  Source_Stack_Size => 40KByte APPLIES TO TrainSimu_delayed_trainDataIn;
-  Source_Code_Size => 40KByte APPLIES TO TrainSimu_delayed_trainDataIn;
+  Data_Size => 40KByte APPLIES TO TrainSimu_delayed_trainDataIn;
+  Stack_Size => 40KByte APPLIES TO TrainSimu_delayed_trainDataIn;
+  Code_Size => 40KByte APPLIES TO TrainSimu_delayed_trainDataIn;
 END railway.impl;
 
 SUBPROGRAM TrainPpu_odometerAcquisition

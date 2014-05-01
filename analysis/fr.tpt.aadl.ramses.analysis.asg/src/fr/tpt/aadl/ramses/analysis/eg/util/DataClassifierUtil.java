@@ -105,7 +105,7 @@ public class DataClassifierUtil
   
   private static long getSourceDataSizeInOctetsImpl(NamedElement e)
   {
-    Long size = PropertyUtils.getIntValue(e, "Source_Data_Size");
+    Long size = PropertyUtils.getIntValue(e, "Data_Size");
     
     if(size == null)
     {

@@ -41,48 +41,48 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       S1_inst_C1_PongInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       S1_inst_Mon_error_C2globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       Monitor_changeState: thread S1_inst_Monitor_changeState.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 2;
         Period => 30 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       Monitor_delayed_error_C2: thread S1_inst_Monitor_delayed_error_C2.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 2;
         Period => 30 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       IPingOrPong_Cping_ping: thread S1_inst_IPingOrPong_Cping_ping.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 3;
         Period => 40 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       IPingOrPong_Cping_delayed_PongIn: thread S1_inst_IPingOrPong_Cping_delayed_PongIn.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 3;
         Period => 40 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       IPingOrPong_Cpong_pong: thread S1_inst_IPingOrPong_Cpong_pong.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 3;
         Period => 40 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
     connections
@@ -129,30 +129,30 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       S2_inst_C2_PongOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       S2_inst_C2_badSequenceNumber_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       IPingOrPong_Cping_ping: thread S2_inst_IPingOrPong_Cping_ping.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 3;
         Period => 40 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       IPingOrPong_Cping_delayed_PongIn: thread S2_inst_IPingOrPong_Cping_delayed_PongIn.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 3;
         Period => 40 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       IPingOrPong_Cpong_pong: thread S2_inst_IPingOrPong_Cpong_pong.impl {
-        Source_Data_Size => 40 KByte;
-        Source_Code_Size => 40 KByte;
+        Data_Size => 40 KByte;
+        Code_Size => 40 KByte;
         Dispatch_Protocol => Periodic;
         Priority => 3;
         Period => 40 ms;
-        Source_Stack_Size => 40 KByte;
+        Stack_Size => 40 KByte;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
     connections
@@ -232,13 +232,13 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         ARINC653::Access_Type => (write, read, execute);
         };
       S1_inst: process S1.impl {
-        Source_Data_Size => 200 KByte;
-        Source_Code_Size => 200 KByte;
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
         ARINC653::Partition_Stack => 5000;
         };
       S2_inst: process S2.impl {
-        Source_Data_Size => 200 KByte;
-        Source_Code_Size => 200 KByte;
+        Data_Size => 200 KByte;
+        Code_Size => 200 KByte;
         ARINC653::Partition_Stack => 5000;
         };
       root_inst: processor root.impl {
