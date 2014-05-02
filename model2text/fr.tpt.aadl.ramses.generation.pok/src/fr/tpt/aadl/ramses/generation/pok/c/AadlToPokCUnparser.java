@@ -1244,19 +1244,44 @@ private void findCommunicationMechanism(ProcessImplementation process,
     deploymentImplCode.addOutputNewline("#include <types.h>") ;
     deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
     
-    deploymentImplCode.addOutputNewline("void pok_kernel_error");
-    deploymentImplCode.incrementIndent();
-    deploymentImplCode.incrementIndent();
-    deploymentImplCode.addOutputNewline("(uint32_t error)");
-    deploymentImplCode.decrementIndent();
-    deploymentImplCode.decrementIndent();
-    deploymentImplCode.addOutputNewline("{");
-    deploymentImplCode.incrementIndent();
-    generateErrorIdSelection(processor, deploymentImplCode, null);
-    deploymentImplCode.decrementIndent();
-    deploymentImplCode.addOutputNewline("}");
+    String propertyName = "HM_Error_ID_Levels";
+    PropertyAssociation pa = PropertyUtils.findProperty(propertyName, processor);
+    
+    if(pa!=null)
+    {
+      deploymentImplCode.addOutputNewline("void pok_kernel_error");
+      deploymentImplCode.incrementIndent();
+      deploymentImplCode.incrementIndent();
+      deploymentImplCode.addOutputNewline("(uint32_t error)");
+      deploymentImplCode.decrementIndent();
+      deploymentImplCode.decrementIndent();
+      deploymentImplCode.addOutputNewline("{");
+      deploymentImplCode.incrementIndent();
+      generateErrorIdSelection(processor, deploymentImplCode, null);
+      deploymentImplCode.decrementIndent();
+      deploymentImplCode.addOutputNewline("}");
+    }
+    boolean partitionLevelErrors = false;
+    
     
     ProcessorImplementation pi = (ProcessorImplementation) processor.getSubcomponentType();
+    
+    propertyName = "HM_Error_ID_Actions";
+    
+    
+    for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
+    {
+      pa = PropertyUtils.findProperty(propertyName, vps);
+      if(pa!=null)
+      {
+        partitionLevelErrors = true;
+        break;
+      }
+    }
+    
+    if(partitionLevelErrors==false)
+      return;
+    
     partitionId=0;
     deploymentImplCode.addOutputNewline("void pok_partition_error");
     deploymentImplCode.incrementIndent();
