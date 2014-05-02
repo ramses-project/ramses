@@ -24,10 +24,10 @@ public class SystemProperties implements TargetProperties {
 	public SystemProperties() {
 		super();
 		partitions = new HashMap<String,Partition>();
-		processToPorts=new HashMap<>();
-		partitionToQueuingPorts=new HashMap<>();
-		partitionMemories=new HashMap<>();
-		factories=new HashMap();
+		processToPorts=new HashMap<String, List<FeatureInstance>>();
+		partitionToQueuingPorts=new HashMap<String,List<QueuingPort>>();
+		partitionMemories=new HashMap<String, PartitionMemory>();
+		factories=new HashMap<Class,ModelFactory>();
 	}
 
 	public Module getModule() {

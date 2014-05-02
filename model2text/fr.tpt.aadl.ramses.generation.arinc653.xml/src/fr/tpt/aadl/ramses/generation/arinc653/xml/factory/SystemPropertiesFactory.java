@@ -36,10 +36,11 @@ public class SystemPropertiesFactory extends ModelFactory<SystemProperties> {
 			throw new IllegalArgumentException("SystemPropertiesFactory needs a SystemInstance");
 		SystemProperties props =new SystemProperties();
 		try {
-			HashMap<String, String> vpToProcess= new HashMap<>();
-			HashMap<String, String> processToPart= new HashMap<>();
-			HashMap<String, Port> ports= new HashMap<>();
-			HashMap<String, List<FeatureInstance>> processToPorts=new HashMap<>();
+			HashMap<String, String> vpToProcess= new HashMap<String, String>();
+			HashMap<String, String> processToPart= new HashMap<String, String>();
+			HashMap<String, Port> ports= new HashMap<String, Port>();
+			HashMap<String, List<FeatureInstance>> processToPorts =
+			    new HashMap<String, List<FeatureInstance>>();
 			SystemInstance system = (SystemInstance) element;
 			for(ComponentInstance process : system.getComponentInstances())
 			{
@@ -68,7 +69,7 @@ public class SystemPropertiesFactory extends ModelFactory<SystemProperties> {
 
 	private HashMap<String, String> getProcessBindings(ComponentInstance process)
 	{
-		HashMap<String, String> processToVp=new HashMap<>();
+		HashMap<String, String> processToVp=new HashMap<String, String>();
 		PropertyAssociation deploymentPropertyAssociation=null;
 		for(PropertyAssociation pa : process.getOwnedPropertyAssociations())
 		{
