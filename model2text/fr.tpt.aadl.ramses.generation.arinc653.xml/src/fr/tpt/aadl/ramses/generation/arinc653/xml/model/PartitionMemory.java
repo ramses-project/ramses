@@ -23,7 +23,7 @@ public class PartitionMemory {
 	
 	public PartitionMemory() {
 		super();
-		memoryRequirements=new ArrayList<>();
+		memoryRequirements=new ArrayList<MemoryRequirements>();
 	}
 
 	public Integer getPartitionIdentifier() {

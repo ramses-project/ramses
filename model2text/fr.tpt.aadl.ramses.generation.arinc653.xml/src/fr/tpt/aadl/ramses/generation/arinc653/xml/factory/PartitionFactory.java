@@ -51,8 +51,8 @@ public class PartitionFactory extends ModelFactory<Partition> {
 				partitionName = element.getName();
 			partition.setPartitionName(partitionName);
 			partition.setSystemPartition(getPropValDefault(element, "System_Partition", boolean.class, false));
-			ArrayList<QueuingPort> queuingPorts=new ArrayList<>();
-			ArrayList<SamplingPort> samplingPorts=new ArrayList<>();
+			ArrayList<QueuingPort> queuingPorts=new ArrayList<QueuingPort>();
+			ArrayList<SamplingPort> samplingPorts=new ArrayList<SamplingPort>();
 			String boundProc=props.getPartitionToProcess().get(element.getName());
 			for(FeatureInstance fi: props.getProcessToPorts().get(boundProc))
 			{

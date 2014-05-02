@@ -38,7 +38,7 @@ public class Partition {
 	
 	public Partition() {
 		super();
-		this.queuingPorts=new ArrayList<>();
+		this.queuingPorts=new ArrayList<QueuingPort>();
 	}
 
 	public Partition(Integer partitionIdentifier, String partitionName,
@@ -50,7 +50,7 @@ public class Partition {
 		this.criticality = criticality;
 		this.systemPartition = systemPartition;
 		this.entryPoint = entryPoint;
-		this.queuingPorts=new ArrayList<>();
+		this.queuingPorts=new ArrayList<QueuingPort>();
 	}
 
 	public int getPartitionIdentifier() {
