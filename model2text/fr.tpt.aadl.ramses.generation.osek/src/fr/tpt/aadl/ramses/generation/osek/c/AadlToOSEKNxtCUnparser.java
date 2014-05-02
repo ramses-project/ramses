@@ -392,7 +392,7 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 
 		Task task = new Task();
 		Schedule schedule;
-		Long stackSize = PropertyUtils.getIntValue(thread, "Source_Stack_Size");
+		Long stackSize = PropertyUtils.getIntValue(thread, "Stack_Size");
 		Long priority = PropertyUtils.getIntValue(thread, "Priority");
 		
 		if(priority == null)

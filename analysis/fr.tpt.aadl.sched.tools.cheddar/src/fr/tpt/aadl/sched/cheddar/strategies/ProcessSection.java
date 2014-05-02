@@ -114,28 +114,28 @@ public class ProcessSection extends
   protected int getInfoProcessMemorySize(ComponentInstance process,
                                          int defaultValue)
   {
-    return (int) getInfoIntegerProperty(process, "Source_Code_Size",
+    return (int) getInfoIntegerProperty(process, "Code_Size",
                                         defaultValue) ;
   }
 
   protected int getInfoProcessStackSize(ComponentInstance process,
                                         int defaultValue)
   {
-    return (int) getInfoIntegerProperty(process, "Source_Stack_Size",
+    return (int) getInfoIntegerProperty(process, "Stack_Size",
                                         defaultValue) ;
   }
 
   protected int getInfoProcessDataSize(ComponentInstance process,
                                        int defaultValue)
   {
-    return (int) getInfoIntegerProperty(process, "Source_Data_Size",
+    return (int) getInfoIntegerProperty(process, "Data_Size",
                                         defaultValue) ;
   }
 
   protected int getInfoProcessHeapSize(ComponentInstance process,
                                        int defaultValue)
   {
-    return (int) getInfoIntegerProperty(process, "Source_Heap_Size",
+    return (int) getInfoIntegerProperty(process, "Heap_Size",
                                         defaultValue) ;
   }
 

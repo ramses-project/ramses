@@ -9,9 +9,9 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         Compute_Execution_Time => 0 ms .. 1 ms;
         Period => 2000 ms;
         Priority => 5;
-        Source_Data_Size => 40000 Bytes;
-        Source_Stack_Size => 40000 Bytes;
-        Source_Code_Size => 40 Bytes;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
       the_receiver: thread the_proc_the_receiver.impl {
@@ -19,9 +19,9 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         Compute_Execution_Time => 0 ms .. 1 ms;
         Period => 1000 ms;
         Priority => 10;
-        Source_Data_Size => 40000 Bytes;
-        Source_Stack_Size => 40000 Bytes;
-        Source_Code_Size => 40 Bytes;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
     connections

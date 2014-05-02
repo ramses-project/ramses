@@ -497,7 +497,7 @@ public class AadlToOSEKCUnparser implements AadlTargetUnparser {
         schedule = Schedule.NON ;
 		}
 		
-		Long stackSize = PropertyUtils.getIntValue(thread, "Source_Stack_Size");
+		Long stackSize = PropertyUtils.getIntValue(thread, "Stack_Size");
 		
 		if(stackSize == null)
 		{

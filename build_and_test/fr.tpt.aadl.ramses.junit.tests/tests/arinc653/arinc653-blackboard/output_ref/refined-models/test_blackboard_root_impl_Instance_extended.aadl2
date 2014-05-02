@@ -80,9 +80,9 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,PeriodicDelayed_runtim
         Compute_Execution_Time => 0 ms .. 1 ms;
         Period => 2000 ms;
         Priority => 5;
-        Source_Data_Size => 40000 Bytes;
-        Source_Stack_Size => 40000 Bytes;
-        Source_Code_Size => 40 Bytes;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
         ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
         ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
         Compute_Entrypoint_Call_Sequence => reference(main_call);
@@ -92,9 +92,9 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,PeriodicDelayed_runtim
         Compute_Execution_Time => 0 ms .. 1 ms;
         Period => 1000 ms;
         Priority => 10;
-        Source_Data_Size => 40000 Bytes;
-        Source_Stack_Size => 40000 Bytes;
-        Source_Code_Size => 40 Bytes;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
         ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
         ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
         Compute_Entrypoint_Call_Sequence => reference(main_call);

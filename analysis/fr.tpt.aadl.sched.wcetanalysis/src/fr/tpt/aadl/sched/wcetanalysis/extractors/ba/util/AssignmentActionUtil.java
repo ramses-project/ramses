@@ -117,7 +117,7 @@ public class AssignmentActionUtil
 		try
 		{
 			return PropertyUtils.getIntValue(dataClassifier,
-					"Source_Data_Size");
+					"Data_Size");
 		}
 		catch (Exception e)
 		{

@@ -28,33 +28,38 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   --------------------------------------------------
   
   processor cpu extends RAMSES_processors::cpu_x86
-  modes
-    Module_Init: initial mode {ARINC653::State_Information=>[Identifier=>1;Description=>"Module Init";];};
-    System_Function_Execution: mode {ARINC653::State_Information=>[Identifier=>1;Description=>"Module Init";];};
-    Process_Execution: mode {ARINC653::State_Information=>[Identifier=>1;Description=>"Process Execution";];};
   properties
-    POK::Scheduler => static;
-    ARINC653::HM_Error_ID_Levels => ([ErrorIdentifier => 1; Description=>"Configuration Error";	ErrorLevel=>Module_Level;],
-    				     			 [ErrorIdentifier => 2; Description=>"Module Configuration Error";	ErrorLevel=>Module_Level;]) in modes (Module_Init),
-                                    ([ErrorIdentifier => 5; Description=>"Segmentation violation";	ErrorLevel=>Module_Level;],
-    				     			 [ErrorIdentifier => 6; Description=>"Time duration exceeded";	ErrorLevel=>Module_Level;]) in modes (System_Function_Execution);
+    ARINC653::HM_Error_ID_Levels => (
+    	[ErrorIdentifier => 1; Description => "Numeric error"; ErrorLevel=>Module_Level;ErrorCode=>Numeric_Error;],
+    	[ErrorIdentifier => 2; Description => "Illegal request"; ErrorLevel=>Module_Level;ErrorCode=>Illegal_Request;],
+    	[ErrorIdentifier => 3; Description => "Numeric error"; ErrorLevel=>Partition_Level;ErrorCode=>Numeric_Error;],
+    	[ErrorIdentifier => 4; Description => "Illegal request"; ErrorLevel=>Partition_Level;ErrorCode=>Illegal_Request;],
+    	[ErrorIdentifier => 5; Description => "Numeric error"; ErrorLevel=>Process_Level;ErrorCode=>Numeric_Error;],
+    	[ErrorIdentifier => 6; Description => "Illegal request"; ErrorLevel=>Process_Level;ErrorCode=>Illegal_Request;]
+    );
+    ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 1; Description => "Restart partition"; Action => "Stop";],
+    	[ErrorIdentifier => 2; Description => "Warm partition restart"; Action => "Reset";]
+    );
   end cpu;
 
   processor implementation cpu.single_partition
   subcomponents
-    the_part:  virtual processor part in modes (Process_Execution => Process_Exec);
+    the_part:  virtual processor part;
   properties
     ARINC653::Module_Major_Frame => 2000 ms;
+    POK::Scheduler => static;
     ARINC653::Partition_Slots => (2000 ms);
     ARINC653::Slots_Allocation => (reference (the_part));
   end cpu.single_partition;
 
   processor implementation cpu.two_partitions
   subcomponents
-    the_part1:  virtual processor part in modes (Process_Execution => Process_Exec);
-    the_part2:  virtual processor part in modes (Process_Execution => Process_Exec);
+    the_part1:  virtual processor part;
+    the_part2:  virtual processor part;
   properties
     ARINC653::Module_Major_Frame => 4000 ms;
+    POK::Scheduler => static;
     ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
     ARINC653::Slots_Allocation => (reference (the_part1), reference (the_part1), reference (the_part2));
     POK::Ports_Flush_Time => Partition_Slot_Switch;
@@ -65,16 +70,14 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   --------------------------------------------------
 
   virtual processor part
-  requires modes
-	Process_Exec: mode;
   properties
-    Activate_Entrypoint_Source_Text => "Initial";
     ARINC653::Partition_Identifier => 1;
     POK::Additional_Features => (libc_stdio, console);
     POK::Scheduler => RR;
-    ARINC653::HM_Error_ID_Actions => ([ErrorIdentifier => 5; Description=>"Segmentation Error"; Action=>"IDLE";],
-    				     	     	  [ErrorIdentifier => 6; Description=>"Time Duration Exceeded"; Action=>"IGNORE";]) 
-									     in modes (Process_Exec);
+    ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 3; Description => "Restart process"; Action => "Cold_Restart";],
+    	[ErrorIdentifier => 4; Description => "Warm partition restart"; Action => "Warm_Restart";]
+    );
   end part;
   
 
@@ -119,11 +122,13 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 2000 Ms;
     Priority => 5;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
-	ARINC653::HM_Error_ID_Actions => ([ErrorIdentifier => 5; Description=>"Numeric Error"; Action=>"Process_Restart";],
-    				     	     	  [ErrorIdentifier => 6; Description=>"Time Duration Exceeded"; Action=>"Warm_Restart";]);
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
+    ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 5; Description => "Restart process"; Action => "Process_Restart";],
+    	[ErrorIdentifier => 6; Description => "Warm partition restart"; Action => "Warm_Restart";]
+    );
   end data_sender;
 
   thread implementation data_sender.impl
@@ -143,11 +148,13 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
     Priority => 10;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
-	ARINC653::HM_Error_ID_Actions => ([ErrorIdentifier => 5; Description=>"Numeric Error"; Action=>"Process_Restart";],
-    				     	     	  [ErrorIdentifier => 6; Description=>"Time Duration Exceeded"; Action=>"Warm_Restart";]);
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
+    ARINC653::HM_Error_ID_Actions => (
+    	[ErrorIdentifier => 3; Description => "Restart process"; Action => "Process_Restart";],
+    	[ErrorIdentifier => 4; Description => "Warm partition restart"; Action => "Warm_Restart";]
+    );
   end data_receiver;
 
   thread implementation data_receiver.impl
@@ -167,9 +174,9 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 2000 Ms;
     Priority => 5;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
   end eventdata_sender;
 
   thread implementation eventdata_sender.impl
@@ -189,9 +196,9 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
     Priority => 10;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
   end eventdata_receiver;
 
   thread implementation eventdata_receiver.impl
@@ -212,9 +219,9 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
     Priority => 5;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
   end event_sender;
 
   thread implementation event_sender.impl
@@ -233,9 +240,9 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Dispatch_Protocol => Periodic;
     Period => 200 Ms;
     Priority => 10;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
   end event_receiver;
 
   thread implementation event_receiver.impl
@@ -253,9 +260,9 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 500 Ms;
     Priority => 20;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
   end periodic;
   
   thread implementation periodic.impl
@@ -273,9 +280,9 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     Compute_Execution_Time => 0 ms .. 1 ms;
     Period => 1000 Ms;
     Priority => 15;
-    Source_Data_Size => 40000 bytes;
-    Source_Stack_Size => 40000 bytes;
-    Source_Code_Size => 40 bytes;
+    Data_Size => 40000 bytes;
+    Stack_Size => 40000 bytes;
+    Code_Size => 40 bytes;
   end sporadic_receiver;
 
   thread implementation sporadic_receiver.impl
@@ -348,7 +355,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   data Integer
   properties
     Data_Model::Data_Representation => integer;
-    Source_Data_Size => 4 Bytes;
+    Data_Size => 4 Bytes;
   end Integer;
 
 end common_pkg;

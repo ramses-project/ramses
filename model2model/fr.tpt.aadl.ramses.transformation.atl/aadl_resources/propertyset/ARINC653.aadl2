@@ -1,4 +1,4 @@
-property set ARINC653 is
+property set ARINC653 is 
 
 --The Partition_Slots property specifies time slot duration for each partition scheduled.
 Partition_Slots : list of Time applies to ( processor, virtual processor, system);
@@ -70,14 +70,14 @@ Error_Handling : reference (thread) applies to (virtual processor);
 Error_Level_Type: type enumeration (Module_Level,Partition_Level,Process_Level);
 
 --
--- The HM_Error_ID_Level_Type indicates where each error is supposed
--- to be raised (which layer) and associate an error identifier.
+--  The HM_Error_ID_Level_Type indicates where each error is supposed
+--  to be raised (which layer) and associate an error identifier.
 --
 HM_Error_ID_Level_Type: type record (
-ErrorIdentifier : aadlinteger;
-Description : aadlstring;
-ErrorLevel : ARINC653::Error_Level_Type;
-ErrorCode : ARINC653::Supported_Error_Code;
+	ErrorIdentifier : aadlinteger;
+	Description     : aadlstring;
+	ErrorLevel      : ARINC653::Error_Level_Type;
+	ErrorCode       : ARINC653::Supported_Error_Code;
 );
 
 --
@@ -92,10 +92,10 @@ HM_Error_ID_Levels : list of ARINC653::HM_Error_ID_Level_Type applies to (proces
 --
 
 HM_Error_ID_Action_Type: type record (
-ErrorIdentifier : aadlinteger;
-Description : aadlstring;
-Action : aadlstring;
-);
+	ErrorIdentifier  : aadlinteger;
+	Description      : aadlstring;
+	Action           : aadlstring;
+); 
 
 --
 -- The HM_Error_ID_Actions specifies the error recovery handler
@@ -110,11 +110,11 @@ HM_Error_ID_Actions : list of ARINC653::HM_Error_ID_Action_Type applies to (proc
 --
 
 State_Information_Type : type record (
-Identifier : aadlinteger;
-Description : aadlstring;
+	Identifier  : aadlinteger;
+	Description : aadlstring;
 );
 
--- Association of a ARINC653 state information to the AADL mode.
+--  Association of a ARINC653 state information to the AADL mode.
 State_Information: ARINC653::State_Information_Type applies to (mode);
 
 --
