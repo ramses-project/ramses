@@ -33,10 +33,16 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
     subcomponents
       the_part: virtual processor part {
         POK::Scheduler => RR;
-        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
-        ARINC653::HM_Partition_Recovery_Actions => (Partition_Stop, Warm_Restart);
-        ARINC653::Entrypoint => "Initial";
-        ARINC653::Partition_Identifier => "1";
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
         Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
@@ -55,7 +61,7 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
     subcomponents
       the_mem: memory mem.impl {
         Memory_Size => 200000 Bytes;
-        ARINC653::Access_Type => (read, write);
+        Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
         };
       the_proc: process proc.impl;
@@ -64,6 +70,46 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         POK::Scheduler => STATIC;
         ARINC653::Partition_Slots => (2000 ms);
         ARINC653::Slots_Allocation => (reference(the_part));
+        ARINC653::HM_Error_ID_Levels => ([
+          ErrorIdentifier=> 1;
+          Description=> "Numeric error";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Illegal request";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 3;
+          Description=> "Numeric error";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Illegal request";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 5;
+          Description=> "Numeric error";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 6;
+          Description=> "Illegal request";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Illegal_Request;
+        ]);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 1;
+          Description=> "Restart partition";
+          Action=> "Stop";
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Warm partition restart";
+          Action=> "Reset";
+        ]);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
         Scheduling_Protocol => (ARINC653);

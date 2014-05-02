@@ -13,14 +13,3 @@ void* test_sampling_refined_model__the_proc2_the_receiver_impl_Job()
   }
   return 0;
 }
-void test_sampling_refined_model__the_proc2_error_handler_th_impl_Init()
-{
-}
-
-void* test_sampling_refined_model__the_proc2_error_handler_th_impl_Job()
-{
-  while (1) {
-    test_sampling_refined_model__the_proc2_error_handler_spg ();
-  }
-  return 0;
-}

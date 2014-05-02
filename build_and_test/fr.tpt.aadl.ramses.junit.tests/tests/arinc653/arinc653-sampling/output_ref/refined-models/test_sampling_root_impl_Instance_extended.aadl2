@@ -1,26 +1,90 @@
 package test_sampling_refined_model
 public
 with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime;
+  process implementation proc1.impl
+    subcomponents
+      the_proc1_p_out_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      the_sender: thread the_proc1_the_sender.impl {
+        Data_Size => 40000 Bytes;
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 5;
+          Description=> "Restart process";
+          Action=> "Process_Restart";
+        ], [
+          ErrorIdentifier=> 6;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      cnx_p_out_to_globalVariable: data access the_proc1_p_out_globalVariable -> the_sender.cnx_p_out;
+  end proc1.impl;
+  
+  process implementation proc2.impl
+    subcomponents
+      the_proc2_p_inglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
+      the_receiver: thread the_proc2_the_receiver.impl {
+        Data_Size => 40000 Bytes;
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Process_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+    connections
+      Id_instance_to_the_receiver_p_in: data access the_proc2_p_inglobalVariable -> the_receiver.p_in;
+  end proc2.impl;
+  
   processor implementation cpu.single_partition
   end cpu.single_partition;
   
   processor implementation cpu.two_partitions
     subcomponents
       the_part1: virtual processor part {
-        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
         POK::Scheduler => RR;
-        ARINC653::HM_Partition_Recovery_Actions => (Partition_Stop, Warm_Restart);
-        ARINC653::Entrypoint => "Initial";
-        ARINC653::Partition_Identifier => "1";
+        ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
         Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
       the_part2: virtual processor part {
-        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
         POK::Scheduler => RR;
-        ARINC653::HM_Partition_Recovery_Actions => (Partition_Stop, Warm_Restart);
-        ARINC653::Entrypoint => "Initial";
-        ARINC653::Partition_Identifier => "1";
+        ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
         Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
@@ -33,12 +97,12 @@ with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
     subcomponents
       part1_mem: memory part_mem {
         Memory_Size => 80000 Bytes;
-        ARINC653::Access_Type => (read, write);
+        Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
         };
       part2_mem: memory part_mem {
         Memory_Size => 80000 Bytes;
-        ARINC653::Access_Type => (read, write);
+        Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
         };
   end mem.two_partitions;
@@ -49,11 +113,51 @@ with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
       the_proc1: process proc1.impl;
       the_proc2: process proc2.impl;
       the_cpu: processor cpu.two_partitions {
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 1;
+          Description=> "Restart partition";
+          Action=> "Stop";
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Warm partition restart";
+          Action=> "Reset";
+        ]);
         ARINC653::Module_Major_Frame => 4000 ms;
         POK::Scheduler => STATIC;
         ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
         ARINC653::Slots_Allocation => (reference(the_part1), reference(the_part1), reference(the_part2));
         POK::Ports_Flush_Time => Partition_Slot_Switch;
+        ARINC653::HM_Error_ID_Levels => ([
+          ErrorIdentifier=> 1;
+          Description=> "Numeric error";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Illegal request";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 3;
+          Description=> "Numeric error";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Illegal request";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 5;
+          Description=> "Numeric error";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 6;
+          Description=> "Illegal request";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Illegal_Request;
+        ]);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
         Scheduling_Protocol => (ARINC653);
@@ -92,114 +196,6 @@ with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   
   system refined_model
   end refined_model;
-  
-  process implementation proc1.impl
-    subcomponents
-      the_proc1_p_out_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      the_sender: thread the_proc1_the_sender.impl {
-        Data_Size => 40000 Bytes;
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 2000 ms;
-        Priority => 5;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
-        ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-      error_handling_th: thread the_proc1_error_handler_th.impl {
-        Compute_Entrypoint_Call_Sequence => reference(the_proc1_error_handler_cs);
-        Dispatch_Protocol => Aperiodic;
-        ARINC653::Error_Handling => true;
-        };
-    connections
-      cnx_p_out_to_globalVariable: data access the_proc1_p_out_globalVariable -> the_sender.cnx_p_out;
-  end proc1.impl;
-  
-  thread the_proc1_error_handler_th
-  end the_proc1_error_handler_th;
-  
-  thread implementation the_proc1_error_handler_th.impl
-    calls
-      the_proc1_error_handler_cs:  {
-        the_proc1_error_handler_call: subprogram the_proc1_error_handler_spg;
-        } 
-      ;
-  end the_proc1_error_handler_th.impl;
-  
-  subprogram the_proc1_error_handler_spg
-    annex behavior_specification {**
-      variables
-  error_status : arinc653_runtime::Error_Status_Type.impl ;
-  error_code : arinc653_runtime::Return_Code_Type ;
-states
-  error_recovery_state : initial final state ;
-  switch_error_state : state ;
-transitions
-  action_Numeric_Error : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#NUMERIC_ERROR]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Start ! (error_status.FAILED_PROCESS_ID, error_code) ;
-arinc653_runtime::a_Stop ! (error_status.FAILED_PROCESS_ID, error_code) end if
-  } ;
-  action_Illegal_Request : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#ILLEGAL_REQUEST]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Set_Partition_Mode ! (arinc653_runtime::OPERATING_MODE_TYPE#WARM_START, error_code) end if
-  } ;
-  get_error_transition : error_recovery_state -[]-> switch_error_state {arinc653_runtime::Stop_Self ! ;
-arinc653_runtime::Get_Error_Status ! (error_status, error_code)} ;
-**};
-  end the_proc1_error_handler_spg;
-  
-  process implementation proc2.impl
-    subcomponents
-      the_proc2_p_inglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
-      the_receiver: thread the_proc2_the_receiver.impl {
-        Data_Size => 40000 Bytes;
-        Dispatch_Protocol => Periodic;
-        Compute_Execution_Time => 0 ms .. 1 ms;
-        Period => 1000 ms;
-        Priority => 10;
-        Stack_Size => 40000 Bytes;
-        Code_Size => 40 Bytes;
-        ARINC653::HM_Errors => (Numeric_Error, Illegal_Request);
-        ARINC653::HM_Process_Recovery_Actions => (Process_Restart, Warm_Restart);
-        Compute_Entrypoint_Call_Sequence => reference(main_call);
-        };
-      error_handling_th: thread the_proc2_error_handler_th.impl {
-        Compute_Entrypoint_Call_Sequence => reference(the_proc2_error_handler_cs);
-        Dispatch_Protocol => Aperiodic;
-        ARINC653::Error_Handling => true;
-        };
-    connections
-      Id_instance_to_the_receiver_p_in: data access the_proc2_p_inglobalVariable -> the_receiver.p_in;
-  end proc2.impl;
-  
-  thread the_proc2_error_handler_th
-  end the_proc2_error_handler_th;
-  
-  thread implementation the_proc2_error_handler_th.impl
-    calls
-      the_proc2_error_handler_cs:  {
-        the_proc2_error_handler_call: subprogram the_proc2_error_handler_spg;
-        } 
-      ;
-  end the_proc2_error_handler_th.impl;
-  
-  subprogram the_proc2_error_handler_spg
-    annex behavior_specification {**
-      variables
-  error_status : arinc653_runtime::Error_Status_Type.impl ;
-  error_code : arinc653_runtime::Return_Code_Type ;
-states
-  error_recovery_state : initial final state ;
-  switch_error_state : state ;
-transitions
-  action_Numeric_Error : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#NUMERIC_ERROR]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Start ! (error_status.FAILED_PROCESS_ID, error_code) ;
-arinc653_runtime::a_Stop ! (error_status.FAILED_PROCESS_ID, error_code) end if
-  } ;
-  action_Illegal_Request : switch_error_state -[error_status.ERROR_CODE = arinc653_runtime::Error_Code_Type#ILLEGAL_REQUEST]-> error_recovery_state {if (error_status.FAILED_PROCESS_ID = 1) arinc653_runtime::Set_Partition_Mode ! (arinc653_runtime::OPERATING_MODE_TYPE#WARM_START, error_code) end if
-  } ;
-  get_error_transition : error_recovery_state -[]-> switch_error_state {arinc653_runtime::Stop_Self ! ;
-arinc653_runtime::Get_Error_Status ! (error_status, error_code)} ;
-**};
-  end the_proc2_error_handler_spg;
   
   subprogram the_proc1_the_sender_entrypoint
     features

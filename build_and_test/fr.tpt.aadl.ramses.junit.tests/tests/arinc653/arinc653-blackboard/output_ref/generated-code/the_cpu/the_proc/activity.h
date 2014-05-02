@@ -6,8 +6,6 @@ void*  test_blackboard_refined_model__the_proc_the_sender_impl_Job();
 
 void*  test_blackboard_refined_model__the_proc_the_receiver_impl_Job();
 
-void*  test_blackboard_refined_model__the_proc_error_handler_th_impl_Job();
-
 
 #endif
 

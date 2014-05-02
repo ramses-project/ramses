@@ -174,20 +174,18 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor implementation root.impl
     subcomponents
       VP_S1_inst: virtual processor VP_S1.impl {
-        ARINC653::Partition_Identifier => "1";
+        ARINC653::Partition_Identifier => 1;
         ARINC653::Partition_Name => "S1";
         ARINC653::System_Partition => false;
-        ARINC653::Criticality => LEVEL_A;
         ARINC653::System_Overhead_Time => 10 ms;
         POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
         Scheduling_Protocol => (Rate_Monotonic_Protocol);
         };
       VP_S2_inst: virtual processor VP_S2.impl {
-        ARINC653::Partition_Identifier => "2";
+        ARINC653::Partition_Identifier => 2;
         ARINC653::Partition_Name => "S2";
         ARINC653::System_Partition => false;
-        ARINC653::Criticality => LEVEL_C;
         ARINC653::System_Overhead_Time => 10 ms;
         POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
@@ -216,30 +214,28 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Memory_Size => 250000 Bytes;
         Base_Address => 8704;
         Word_Size => 10000 Bytes;
+        Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
-        ARINC653::Access_Type => (write, read, execute);
         };
       S1_memory_inst: memory S1_memory.impl {
         Base_Address => 12800;
         Word_Size => 10000 Bytes;
+        Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory, Code_Memory);
-        ARINC653::Access_Type => (write, read, execute);
         };
       S2_memory_inst: memory S2_memory.impl {
         Base_Address => 16896;
         Word_Size => 10000 Bytes;
+        Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory, Code_Memory);
-        ARINC653::Access_Type => (write, read, execute);
         };
       S1_inst: process S1.impl {
         Data_Size => 200 KByte;
         Code_Size => 200 KByte;
-        ARINC653::Partition_Stack => 5000;
         };
       S2_inst: process S2.impl {
         Data_Size => 200 KByte;
         Code_Size => 200 KByte;
-        ARINC653::Partition_Stack => 5000;
         };
       root_inst: processor root.impl {
         Thread_Swap_Execution_Time => 5 ms .. 10 ms;

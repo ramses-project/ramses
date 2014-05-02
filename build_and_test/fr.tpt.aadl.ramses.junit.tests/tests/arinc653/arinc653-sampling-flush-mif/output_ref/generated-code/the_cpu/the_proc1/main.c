@@ -17,7 +17,6 @@ SAMPLING_PORT_ID_TYPE the_proc1_p_out_globalVariable;
 int main ()
 {
 test_sampling_refined_model__the_proc1_the_sender_impl_Init();
-test_sampling_refined_model__the_proc1_error_handler_th_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_SAMPLING_PORT ("the_proc1_p_out",
@@ -31,8 +30,6 @@ test_sampling_refined_model__the_proc1_error_handler_th_impl_Init();
   strcpy(tattr.NAME, "the_sender");
   CREATE_PROCESS (&(tattr), &(arinc_threads[1]), &(ret));
   START (arinc_threads[1], &(ret));
-  tattr.ENTRY_POINT = test_sampling_refined_model__the_proc1_error_handler_th_impl_Job;
-  CREATE_ERROR_HANDLER (tattr.ENTRY_POINT,8192,&(ret));
   SET_PARTITION_MODE (NORMAL, &(ret));
   return (0);
 }
