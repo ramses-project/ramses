@@ -67,19 +67,14 @@ public class MemoryRequirementsFactory extends ModelFactory<MemoryRequirements> 
 			  List<String> memoryTypes = PropertyUtils.getStringListValue(mem, "Memory_Type");
 			  if(memoryTypes.size()==1)
 			  {
-				  //Supported_Memory_Type : type enumeration (Data_Memory, Code_Memory, IO_Memory);
-				  switch (memoryTypes.get(0).toLowerCase()) {
-				case "data_memory":
-					mr.setType("DATA");
-					break;
-				case "code_memory":
-					mr.setType("CODE");
-					break;
-				case "io_memory":
-					mr.setType("INPUT_OUTPUT");
-				default:
-					break;
-				}
+			    //Supported_Memory_Type : type enumeration (Data_Memory, Code_Memory, IO_Memory);
+			    String tmpMemoryType = memoryTypes.get(0).toLowerCase();
+			    if(tmpMemoryType.equals("data_memory"))
+			        mr.setType("DATA");
+			    else if(tmpMemoryType.equals("code_memory"))
+			        mr.setType("CODE");
+			    else if(tmpMemoryType.equals("io_memory"))
+			      mr.setType("INPUT_OUTPUT");
 			  }
 				 
 			  
