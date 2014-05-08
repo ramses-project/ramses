@@ -128,8 +128,8 @@ PROPERTIES
   memory_size => 250000 bytes;
   Base_Address => 16#2200#;
   Word_Size => 10000Bytes;
+  Memory_Protocol => read_write;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory,IO_Memory);
-  ARINC653::Access_Type => (write,read,execute);
 END root_main_memory;
 
 MEMORY IMPLEMENTATION root_main_memory.impl
@@ -139,8 +139,8 @@ MEMORY S1_memory
 PROPERTIES
   Base_Address => 16#3200#;
   Word_Size => 10000Bytes;
+  Memory_Protocol => read_write;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory);
-  ARINC653::Access_Type => (write,read,execute);
 END S1_memory;
 
 MEMORY IMPLEMENTATION S1_memory.impl
@@ -150,8 +150,8 @@ MEMORY S2_memory
 PROPERTIES
   Base_Address => 16#4200#;
   Word_Size => 10000Bytes;
+  Memory_Protocol => read_write;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory);
-  ARINC653::Access_Type => (write,read,execute);
 END S2_memory;
 
 MEMORY IMPLEMENTATION S2_memory.impl
@@ -162,10 +162,9 @@ END VP_S1;
 
 VIRTUAL PROCESSOR IMPLEMENTATION VP_S1.impl
 PROPERTIES
-  ARINC653::Partition_Identifier => "1";
+  ARINC653::Partition_Identifier => 1;
   ARINC653::Partition_Name => "S1";
   ARINC653::System_Partition => FALSE;
-  ARINC653::Criticality => LEVEL_A;
   ARINC653::System_Overhead_Time => 10ms;
   POK::Scheduler => RR;
   POK::Additional_Features => (libc_stdio,console);
@@ -176,10 +175,9 @@ END VP_S2;
 
 VIRTUAL PROCESSOR IMPLEMENTATION VP_S2.impl
 PROPERTIES
-  ARINC653::Partition_Identifier => "2";
+  ARINC653::Partition_Identifier => 2;
   ARINC653::Partition_Name => "S2";
   ARINC653::System_Partition => FALSE;
-  ARINC653::Criticality => LEVEL_C;
   ARINC653::System_Overhead_Time => 10ms;
   POK::Scheduler => RR;
   POK::Additional_Features => (libc_stdio,console);
@@ -225,7 +223,6 @@ CONNECTIONS
 PROPERTIES
   Data_Size => 200KByte;
   Code_Size => 200KByte;
-  ARINC653::Partition_Stack => 5000;
   Dispatch_Protocol => Periodic APPLIES TO Monitor_changeState;
   Priority => 2 APPLIES TO Monitor_changeState;
   Period => 30ms APPLIES TO Monitor_changeState;
@@ -290,7 +287,6 @@ CONNECTIONS
 PROPERTIES
   Data_Size => 200KByte;
   Code_Size => 200KByte;
-  ARINC653::Partition_Stack => 5000;
   Dispatch_Protocol => Periodic APPLIES TO IPingOrPong_Cping_ping;
   Priority => 3 APPLIES TO IPingOrPong_Cping_ping;
   Period => 40ms APPLIES TO IPingOrPong_Cping_ping;
