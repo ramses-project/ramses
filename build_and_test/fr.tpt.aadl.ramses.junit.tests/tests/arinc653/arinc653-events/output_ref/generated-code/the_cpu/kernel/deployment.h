@@ -26,7 +26,9 @@
 #define POK_CONFIG_STACKS_SIZE 80000
 #define POK_CONFIG_NB_BUSES 0
 #define POK_NEEDS_ERROR_HANDLING 1
+#define POK_USE_GENERATED_KERNEL_ERROR_HANDLER 1
 #define POK_USE_GENERATED_PARTITION_ERROR_HANDLER 1
 #include "core/partition.h"
 #include "core/error.h"
+#include "core/kernel.h"
 #endif

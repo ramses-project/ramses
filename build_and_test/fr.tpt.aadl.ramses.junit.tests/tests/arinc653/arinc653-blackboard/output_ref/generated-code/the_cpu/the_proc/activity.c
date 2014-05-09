@@ -25,14 +25,3 @@ void* test_blackboard_refined_model__the_proc_the_receiver_impl_Job()
   }
   return 0;
 }
-void test_blackboard_refined_model__the_proc_error_handler_th_impl_Init()
-{
-}
-
-void* test_blackboard_refined_model__the_proc_error_handler_th_impl_Job()
-{
-  while (1) {
-    test_blackboard_refined_model__the_proc_error_handler_spg ();
-  }
-  return 0;
-}

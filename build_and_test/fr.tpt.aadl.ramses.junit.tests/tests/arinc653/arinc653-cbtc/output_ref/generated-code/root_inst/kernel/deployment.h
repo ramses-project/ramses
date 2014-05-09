@@ -34,4 +34,5 @@
 #define POK_USE_GENERATED_KERNEL_ERROR_HANDLER 1
 #include "core/partition.h"
 #include "core/error.h"
+#include "core/kernel.h"
 #endif
