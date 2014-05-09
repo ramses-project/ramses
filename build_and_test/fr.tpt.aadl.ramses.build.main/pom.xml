@@ -18,6 +18,8 @@
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.core</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.osgi</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support</module>
+    <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.edit</module>
+    <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.editor</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.osate</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.static</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.atl.launch</module>
@@ -32,6 +34,9 @@
     <module>../../model2text/fr.tpt.aadl.ramses.generation.target.specific</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.utils</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.atl</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.edit</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.editor</module>
     <module>../../model2model/fr.tpt.aadl.ramses.communication.periodic.delayed</module>
     <module>../../model2model/fr.tpt.aadl.ramses.util.math</module>
     <module>../../analysis/fr.tpt.aadl.ramses.util.properties</module>

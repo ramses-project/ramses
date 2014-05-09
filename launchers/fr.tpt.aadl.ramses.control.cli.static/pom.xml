@@ -86,6 +86,12 @@
     </dependency>
 
     <dependency>
+      <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.trc</artifactId>
+      <version>1.0.0.qualifier</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.eclipse.core</groupId>
       <artifactId>runtime</artifactId>
       <version>3.7.0.v20110110</version>
