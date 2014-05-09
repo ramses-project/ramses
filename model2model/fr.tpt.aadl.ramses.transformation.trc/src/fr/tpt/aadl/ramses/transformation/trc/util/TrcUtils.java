@@ -241,7 +241,7 @@ public class TrcUtils {
 						List<Module> lhs = result.subList(0, toIndex-1);
 						lhs.add(lastInserted);
 						List<Module> rhs = result.subList(toIndex, result.size());
-						result = new ArrayList<>();
+						result = new ArrayList<Module>();
 						lhs.addAll(rhs);
 						result.addAll(lhs);
 					}
@@ -280,11 +280,11 @@ public class TrcUtils {
 					}
 					else
 						lhs = result.subList(0, result.indexOf(lastInserted));
-					ArrayList local = new ArrayList<>();
+					ArrayList<Module> local = new ArrayList<Module>();
 					local.addAll(result);
 					List<Module> rhs = local.subList(result.indexOf(lastInserted), result.size());
 					lhs.add(Mj);
-					result = new ArrayList<>();
+					result = new ArrayList<Module>();
 					result.addAll(lhs);
 					result.addAll(rhs);
 				}
@@ -297,7 +297,7 @@ public class TrcUtils {
 	public static List<List<RuleApplicationTulpe>> getInclusionDependencies(List<EObject> eObjList, String appliedRule)
 	{
 		TrcSpecification spec = getTrcSpecification();
-		List<List<RuleApplicationTulpe>> result = new ArrayList<>();
+		List<List<RuleApplicationTulpe>> result = new ArrayList<List<RuleApplicationTulpe>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencies().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
@@ -371,7 +371,7 @@ public class TrcUtils {
 				}
 				else
 				{
-					List<RuleApplicationTulpe> disjuncResult = new ArrayList<>();
+					List<RuleApplicationTulpe> disjuncResult = new ArrayList<RuleApplicationTulpe>();
 					disjuncResult.addAll(currentDependencyList);
 					getPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result);
 					result.add(disjuncResult);
@@ -382,7 +382,7 @@ public class TrcUtils {
 	
 	private static List<EObject> getReferenceList(EObject eObj, List<String> referenceNameList) throws Exception
 	{
-		List<EObject> result= new ArrayList<>();
+		List<EObject> result= new ArrayList<EObject>();
 		for(String fieldName:referenceNameList)
 		{
 			if(fieldName.equals("self"))
@@ -395,7 +395,7 @@ public class TrcUtils {
 	
 	private static List<EObject> getReferenceList(List<EObject> eObjList, String referenceName) throws Exception
 	{
-		List<EObject> result= new ArrayList<>();
+		List<EObject> result= new ArrayList<EObject>();
 		for(EObject eObj: eObjList)
 		{
 		final EClass type = eObj.eClass();
@@ -404,7 +404,6 @@ public class TrcUtils {
 			int firstParenthesisIdx = referenceName.indexOf("(");
 			int lastParenthesisIdx = referenceName.lastIndexOf(")");
 			String operationName = referenceName.substring(0, firstParenthesisIdx);
-			List arguments = new ArrayList();
 			String argumentListName = referenceName.substring(firstParenthesisIdx+1, lastParenthesisIdx);
 			argumentListName = argumentListName.replaceAll(" ", "");
 			String[] argumentArray = argumentListName.split("\\s*,\\s*");
@@ -425,7 +424,7 @@ public class TrcUtils {
 					Object o = cl.getMethods()[i].invoke(eObj);
 					if(o instanceof List)
 					{
-						result.addAll((List)o);
+						result.addAll((List<EObject>)o);
 					}
 					else
 						result.add((EObject) o);
@@ -460,7 +459,7 @@ public class TrcUtils {
 	public static List<List<RuleApplicationTulpe>> getExlcusionDependencies(List<EObject> candidateObjects,
 			String appliedRule) {
 		TrcSpecification trcSpecification = getTrcSpecification();
-		List<List<RuleApplicationTulpe>> exclusionDependencyList = new ArrayList<>();
+		List<List<RuleApplicationTulpe>> exclusionDependencyList = new ArrayList<List<RuleApplicationTulpe>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) trcSpecification.getDependencies().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
