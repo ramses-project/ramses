@@ -20,7 +20,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
-import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationTulpe;
 import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency;
 import fr.tpt.aadl.ramses.transformation.trc.Module;
 import fr.tpt.aadl.ramses.transformation.trc.RuleDependency;
