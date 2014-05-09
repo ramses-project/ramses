@@ -30,5 +30,6 @@ package fr.tpt.aadl.ramses.control.workflow;
  * @model
  * @generated
  */
-public interface Conjunction extends AnalysisSequence {
+public interface Conjunction extends AnalysisSequence
+{
 } // Conjunction

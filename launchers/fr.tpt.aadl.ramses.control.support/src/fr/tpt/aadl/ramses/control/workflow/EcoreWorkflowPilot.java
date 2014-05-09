@@ -318,7 +318,6 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
     if (currentWorkflowElement instanceof Loop)
     {
       Loop l = (Loop) currentWorkflowElement;
-      boolean initialAnalysis = l.isInitialAnalysis();
       String inputModelIdentifier = l.getInputModelIdentifier().getId();
       String outputModelIdentifier = l.getOutputModelIdentifier().getId();
       
@@ -327,18 +326,21 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
       
       /** Convert module lists */
       List<List<String>> moduleLists = new ArrayList<List<String>>();
-      for(fr.tpt.aadl.ramses.control.workflow.List moduleList : l.getAlternatives())
+      for(fr.tpt.aadl.ramses.transformation.trc.Transformation 
+          transfo : 
+            l.getAlternatives())
       {
         List<String> moduleListStr = new ArrayList<String>();
-        for(fr.tpt.aadl.ramses.control.workflow.File f : moduleList.getFile())
+        for(fr.tpt.aadl.ramses.transformation.trc.Module m : transfo.getModules().getModules())
         {
-          moduleListStr.add(f.getPath());
+          moduleListStr.add(m.getPath());
         }
         moduleLists.add(moduleListStr);
       }
       
-      return new AbstractLoop(initialAnalysis,aa,moduleLists,
-          inputModelIdentifier,outputModelIdentifier);
+      return new AbstractLoop(aa,moduleLists,
+          inputModelIdentifier,outputModelIdentifier,
+          l.getResolutionMethod());
     }
     return null;
   }

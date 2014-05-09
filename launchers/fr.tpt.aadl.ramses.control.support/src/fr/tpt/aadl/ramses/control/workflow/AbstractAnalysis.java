@@ -38,57 +38,58 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  * @generated
  */
-public interface AbstractAnalysis extends EObject {
-	/**
-	 * Returns the value of the '<em><b>Yes Option</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Yes Option</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Yes Option</em>' containment reference.
-	 * @see #setYesOption(AnalysisOption)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAbstractAnalysis_YesOption()
-	 * @model containment="true"
-	 * @generated
-	 */
-	AnalysisOption getYesOption();
+public interface AbstractAnalysis extends EObject
+{
+  /**
+   * Returns the value of the '<em><b>Yes Option</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Yes Option</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Yes Option</em>' containment reference.
+   * @see #setYesOption(AnalysisOption)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAbstractAnalysis_YesOption()
+   * @model containment="true"
+   * @generated
+   */
+  AnalysisOption getYesOption();
 
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis#getYesOption <em>Yes Option</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Yes Option</em>' containment reference.
-	 * @see #getYesOption()
-	 * @generated
-	 */
-	void setYesOption(AnalysisOption value);
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis#getYesOption <em>Yes Option</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Yes Option</em>' containment reference.
+   * @see #getYesOption()
+   * @generated
+   */
+  void setYesOption(AnalysisOption value);
 
-	/**
-	 * Returns the value of the '<em><b>No Option</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>No Option</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>No Option</em>' containment reference.
-	 * @see #setNoOption(AnalysisOption)
-	 * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAbstractAnalysis_NoOption()
-	 * @model containment="true"
-	 * @generated
-	 */
-	AnalysisOption getNoOption();
+  /**
+   * Returns the value of the '<em><b>No Option</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>No Option</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>No Option</em>' containment reference.
+   * @see #setNoOption(AnalysisOption)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getAbstractAnalysis_NoOption()
+   * @model containment="true"
+   * @generated
+   */
+  AnalysisOption getNoOption();
 
-	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis#getNoOption <em>No Option</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>No Option</em>' containment reference.
-	 * @see #getNoOption()
-	 * @generated
-	 */
-	void setNoOption(AnalysisOption value);
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.AbstractAnalysis#getNoOption <em>No Option</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>No Option</em>' containment reference.
+   * @see #getNoOption()
+   * @generated
+   */
+  void setNoOption(AnalysisOption value);
 
 } // AbstractAnalysis

@@ -1,9 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: AADL-RAMSES-ControlSupport
+Bundle-Name: %pluginName
 Bundle-SymbolicName: fr.tpt.aadl.ramses.control.support;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: TELECOM ParisTech
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.tpt.aadl.ramses.control.support,
@@ -42,7 +43,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
  org.osate.aadl2.instantiation;bundle-version="1.0.0",
  org.osate.utils,
- org.apache.log4j
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.transformation.trc
 Eclipse-LazyStart: true
 Bundle-ClassPath: lib/jdom-2.0.2.jar,
  .

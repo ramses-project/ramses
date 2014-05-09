@@ -33,24 +33,27 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public class GenerationImpl extends WorkflowElementImpl implements Generation {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected GenerationImpl() {
-		super();
-	}
+public class GenerationImpl extends WorkflowElementImpl implements Generation
+{
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected GenerationImpl()
+  {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.GENERATION;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return WorkflowPackage.Literals.GENERATION;
+  }
 
 } //GenerationImpl

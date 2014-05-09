@@ -30,5 +30,6 @@ package fr.tpt.aadl.ramses.control.workflow;
  * @model
  * @generated
  */
-public interface Disjunction extends AnalysisSequence {
+public interface Disjunction extends AnalysisSequence
+{
 } // Disjunction

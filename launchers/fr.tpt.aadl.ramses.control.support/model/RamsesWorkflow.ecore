@@ -65,15 +65,22 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Loop" eSuperTypes="#//WorkflowElement #//AnalysisElement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="alternatives" lowerBound="2"
-        upperBound="-1" eType="#//List" containment="true"/>
+        upperBound="-1" eType="ecore:EClass ../../fr.tpt.aadl.ramses.transformation.trc/model/TRC.ecore#//Transformation"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="analysis" lowerBound="1"
         eType="#//AbstractAnalysis" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="initialAnalysis" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputModelIdentifier"
         eType="#//ModelIdentifier" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="foundOption" lowerBound="1"
         eType="#//AnalysisOption" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="notFoundOption" lowerBound="1"
         eType="#//AnalysisOption" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="resolutionMethod" eType="#//ResolutionMethod"
+        defaultValueLiteral="TryEach"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ResolutionMethod">
+    <eLiterals name="TryEach" literal="TryEach"/>
+    <eLiterals name="ManualMerge" value="1" literal="ManualMerge"/>
+    <eLiterals name="SensitivityMerge" value="2" literal="SensitivityMerge"/>
+    <eLiterals name="GeneticMerge" value="3"/>
   </eClassifiers>
 </ecore:EPackage>

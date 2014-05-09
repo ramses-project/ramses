@@ -26,25 +26,26 @@ import java.util.List;
 
 public class AbstractLoop {
 
-	private final boolean hasInitialAnalysis;
-	private final AbstractAnalysis analysis;
+
+  private final AbstractAnalysis analysis;
 	private final List<List<String>> moduleLists;
 	private final String inputModelIdentifier;
 	private final String outputModelIdentifier;
+	private final ResolutionMethod method;
 	
-	public AbstractLoop(boolean initialAnalysis, AbstractAnalysis analysis,
+	
+	public AbstractLoop(AbstractAnalysis analysis,
 			List<List<String>> moduleLists, String inputModelIdentifier,
-			String outputModelIdentifier)
+			String outputModelIdentifier,
+			ResolutionMethod method)
 	{
-		this.hasInitialAnalysis = initialAnalysis;
 		this.analysis = analysis;
 		this.moduleLists = moduleLists;
 		this.inputModelIdentifier = inputModelIdentifier;
 		this.outputModelIdentifier = outputModelIdentifier;
+		this.method = method;
 	}
-	public boolean hasInitialAnalysis() {
-		return hasInitialAnalysis;
-	}
+	
 	public String getInputModelIdentifier() {
 		return inputModelIdentifier;
 	}
@@ -57,7 +58,11 @@ public class AbstractLoop {
 	public List<List<String>> getModuleLists() {
 		return moduleLists;
 	}
-
+	public ResolutionMethod getMethod()
+	{
+	  return method;
+	}
+	
 	public static abstract class AbstractAnalysis {}
 	public static class Analysis extends AbstractAnalysis
 	{

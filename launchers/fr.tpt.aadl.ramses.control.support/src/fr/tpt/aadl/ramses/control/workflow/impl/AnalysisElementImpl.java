@@ -35,24 +35,27 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *
  * @generated
  */
-public abstract class AnalysisElementImpl extends EObjectImpl implements AnalysisElement {
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected AnalysisElementImpl() {
-		super();
-	}
+public abstract class AnalysisElementImpl extends EObjectImpl implements AnalysisElement
+{
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected AnalysisElementImpl()
+  {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return WorkflowPackage.Literals.ANALYSIS_ELEMENT;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return WorkflowPackage.Literals.ANALYSIS_ELEMENT;
+  }
 
 } //AnalysisElementImpl

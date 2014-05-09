@@ -22,6 +22,7 @@ package fr.tpt.aadl.ramses.control.workflow.impl;
 import fr.tpt.aadl.ramses.control.workflow.*;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 
@@ -35,210 +36,289 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
  * <!-- end-user-doc -->
  * @generated
  */
-public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory {
-	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public static WorkflowFactory init() {
-		try {
-			WorkflowFactory theWorkflowFactory = (WorkflowFactory)EPackage.Registry.INSTANCE.getEFactory(WorkflowPackage.eNS_URI);
-			if (theWorkflowFactory != null) {
-				return theWorkflowFactory;
-			}
-		}
-		catch (Exception exception) {
-			EcorePlugin.INSTANCE.log(exception);
-		}
-		return new WorkflowFactoryImpl();
-	}
+public class WorkflowFactoryImpl extends EFactoryImpl implements WorkflowFactory
+{
+  /**
+   * Creates the default factory implementation.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public static WorkflowFactory init()
+  {
+    try
+    {
+      WorkflowFactory theWorkflowFactory = (WorkflowFactory)EPackage.Registry.INSTANCE.getEFactory(WorkflowPackage.eNS_URI);
+      if (theWorkflowFactory != null)
+      {
+        return theWorkflowFactory;
+      }
+    }
+    catch (Exception exception)
+    {
+      EcorePlugin.INSTANCE.log(exception);
+    }
+    return new WorkflowFactoryImpl();
+  }
 
-	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public WorkflowFactoryImpl() {
-		super();
-	}
+  /**
+   * Creates an instance of the factory.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public WorkflowFactoryImpl()
+  {
+    super();
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public EObject create(EClass eClass) {
-		switch (eClass.getClassifierID()) {
-			case WorkflowPackage.WORKFLOW: return createWorkflow();
-			case WorkflowPackage.TRANSFORMATION: return createTransformation();
-			case WorkflowPackage.GENERATION: return createGeneration();
-			case WorkflowPackage.CONJUNCTION: return createConjunction();
-			case WorkflowPackage.DISJUNCTION: return createDisjunction();
-			case WorkflowPackage.ANALYSIS: return createAnalysis();
-			case WorkflowPackage.ERROR_STATE: return createErrorState();
-			case WorkflowPackage.LIST: return createList();
-			case WorkflowPackage.FILE: return createFile();
-			case WorkflowPackage.ANALYSIS_OPTION: return createAnalysisOption();
-			case WorkflowPackage.MODEL_IDENTIFIER: return createModelIdentifier();
-			case WorkflowPackage.UNPARSE: return createUnparse();
-			case WorkflowPackage.LOOP: return createLoop();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
-		}
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EObject create(EClass eClass)
+  {
+    switch (eClass.getClassifierID())
+    {
+      case WorkflowPackage.WORKFLOW: return createWorkflow();
+      case WorkflowPackage.TRANSFORMATION: return createTransformation();
+      case WorkflowPackage.GENERATION: return createGeneration();
+      case WorkflowPackage.CONJUNCTION: return createConjunction();
+      case WorkflowPackage.DISJUNCTION: return createDisjunction();
+      case WorkflowPackage.ANALYSIS: return createAnalysis();
+      case WorkflowPackage.ERROR_STATE: return createErrorState();
+      case WorkflowPackage.LIST: return createList();
+      case WorkflowPackage.FILE: return createFile();
+      case WorkflowPackage.ANALYSIS_OPTION: return createAnalysisOption();
+      case WorkflowPackage.MODEL_IDENTIFIER: return createModelIdentifier();
+      case WorkflowPackage.UNPARSE: return createUnparse();
+      case WorkflowPackage.LOOP: return createLoop();
+      default:
+        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+    }
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Workflow createWorkflow() {
-		WorkflowImpl workflow = new WorkflowImpl();
-		return workflow;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public Object createFromString(EDataType eDataType, String initialValue)
+  {
+    switch (eDataType.getClassifierID())
+    {
+      case WorkflowPackage.RESOLUTION_METHOD:
+        return createResolutionMethodFromString(eDataType, initialValue);
+      default:
+        throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+    }
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Transformation createTransformation() {
-		TransformationImpl transformation = new TransformationImpl();
-		return transformation;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public String convertToString(EDataType eDataType, Object instanceValue)
+  {
+    switch (eDataType.getClassifierID())
+    {
+      case WorkflowPackage.RESOLUTION_METHOD:
+        return convertResolutionMethodToString(eDataType, instanceValue);
+      default:
+        throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+    }
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Generation createGeneration() {
-		GenerationImpl generation = new GenerationImpl();
-		return generation;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Workflow createWorkflow()
+  {
+    WorkflowImpl workflow = new WorkflowImpl();
+    return workflow;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Conjunction createConjunction() {
-		ConjunctionImpl conjunction = new ConjunctionImpl();
-		return conjunction;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Transformation createTransformation()
+  {
+    TransformationImpl transformation = new TransformationImpl();
+    return transformation;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Disjunction createDisjunction() {
-		DisjunctionImpl disjunction = new DisjunctionImpl();
-		return disjunction;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Generation createGeneration()
+  {
+    GenerationImpl generation = new GenerationImpl();
+    return generation;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Analysis createAnalysis() {
-		AnalysisImpl analysis = new AnalysisImpl();
-		return analysis;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Conjunction createConjunction()
+  {
+    ConjunctionImpl conjunction = new ConjunctionImpl();
+    return conjunction;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ErrorState createErrorState() {
-		ErrorStateImpl errorState = new ErrorStateImpl();
-		return errorState;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Disjunction createDisjunction()
+  {
+    DisjunctionImpl disjunction = new DisjunctionImpl();
+    return disjunction;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List createList() {
-		ListImpl list = new ListImpl();
-		return list;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Analysis createAnalysis()
+  {
+    AnalysisImpl analysis = new AnalysisImpl();
+    return analysis;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public File createFile() {
-		FileImpl file = new FileImpl();
-		return file;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ErrorState createErrorState()
+  {
+    ErrorStateImpl errorState = new ErrorStateImpl();
+    return errorState;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public AnalysisOption createAnalysisOption() {
-		AnalysisOptionImpl analysisOption = new AnalysisOptionImpl();
-		return analysisOption;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public List createList()
+  {
+    ListImpl list = new ListImpl();
+    return list;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ModelIdentifier createModelIdentifier() {
-		ModelIdentifierImpl modelIdentifier = new ModelIdentifierImpl();
-		return modelIdentifier;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public File createFile()
+  {
+    FileImpl file = new FileImpl();
+    return file;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Unparse createUnparse() {
-		UnparseImpl unparse = new UnparseImpl();
-		return unparse;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public AnalysisOption createAnalysisOption()
+  {
+    AnalysisOptionImpl analysisOption = new AnalysisOptionImpl();
+    return analysisOption;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Loop createLoop() {
-		LoopImpl loop = new LoopImpl();
-		return loop;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ModelIdentifier createModelIdentifier()
+  {
+    ModelIdentifierImpl modelIdentifier = new ModelIdentifierImpl();
+    return modelIdentifier;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public WorkflowPackage getWorkflowPackage() {
-		return (WorkflowPackage)getEPackage();
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Unparse createUnparse()
+  {
+    UnparseImpl unparse = new UnparseImpl();
+    return unparse;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @deprecated
-	 * @generated
-	 */
-	@Deprecated
-	public static WorkflowPackage getPackage() {
-		return WorkflowPackage.eINSTANCE;
-	}
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public Loop createLoop()
+  {
+    LoopImpl loop = new LoopImpl();
+    return loop;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ResolutionMethod createResolutionMethodFromString(EDataType eDataType, String initialValue)
+  {
+    ResolutionMethod result = ResolutionMethod.get(initialValue);
+    if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+    return result;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public String convertResolutionMethodToString(EDataType eDataType, Object instanceValue)
+  {
+    return instanceValue == null ? null : instanceValue.toString();
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public WorkflowPackage getWorkflowPackage()
+  {
+    return (WorkflowPackage)getEPackage();
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @deprecated
+   * @generated
+   */
+  @Deprecated
+  public static WorkflowPackage getPackage()
+  {
+    return WorkflowPackage.eINSTANCE;
+  }
 
 } //WorkflowFactoryImpl

@@ -31,5 +31,6 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  * @generated
  */
-public interface AnalysisElement extends EObject {
+public interface AnalysisElement extends EObject
+{
 } // AnalysisElement
