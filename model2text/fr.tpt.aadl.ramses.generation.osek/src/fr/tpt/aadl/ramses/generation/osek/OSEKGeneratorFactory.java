@@ -72,7 +72,8 @@ public class OSEKGeneratorFactory implements GeneratorFactory {
 	    AadlTargetSpecificGenerator result = 
 	                  new AadlTargetSpecificGenerator(targetTrans, tarSpecCodeGen,
 	                		  						  modelInstantiator,
-	                                                  targetVal) ;
+	                		  						  targetVal,
+	                		  						  predefinedAadlModels) ;
 	    result.setRegistryName(OSEK_GENERATOR_NAME);
 
 	    return result;

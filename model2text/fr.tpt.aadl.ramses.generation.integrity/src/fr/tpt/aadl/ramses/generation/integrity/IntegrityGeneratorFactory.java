@@ -65,7 +65,9 @@ public class IntegrityGeneratorFactory implements GeneratorFactory
     AadlTargetSpecificGenerator result = 
                   new AadlTargetSpecificGenerator(targetTrans, 
                 		  tarSpecCodeGen,
-                		  instantiator, targetVal) ;
+                		  instantiator,
+                		  targetVal,
+                		  predefinedAadlModels) ;
     
     result.setRegistryName(INTEGRITY_GENERATOR_NAME) ;
     
