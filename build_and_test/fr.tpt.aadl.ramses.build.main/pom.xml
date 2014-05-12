@@ -34,11 +34,16 @@
     <module>../../model2text/fr.tpt.aadl.ramses.generation.target.specific</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.utils</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.atl</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.tip</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.edit</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.editor</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection.sensitivity</module>
     <module>../../model2model/fr.tpt.aadl.ramses.communication.periodic.delayed</module>
     <module>../../model2model/fr.tpt.aadl.ramses.util.math</module>
+    <module>../../model2model/fr.tpt.atl.hots</module>
+    <module>../../model2model/fr.tpt.atl.utils</module>
     <module>../../analysis/fr.tpt.aadl.ramses.util.properties</module>
     <module>../../analysis/fr.tpt.aadl.sched.propertiesextractor</module>
     <module>../../analysis/fr.tpt.aadl.sched.tools.cheddar</module>
@@ -47,6 +52,7 @@
     <module>../../analysis/fr.tpt.aadl.sched.wcetanalysis.results</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.result</module>
     <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
+    <module>../../requirements/fr.tpt.rdal.utils</module>
     <module>../fr.tpt.aadl.ramses.build.feature</module>
     <module>../fr.tpt.aadl.ramses.build.distribution</module>
     <module>../../../update-site</module>
