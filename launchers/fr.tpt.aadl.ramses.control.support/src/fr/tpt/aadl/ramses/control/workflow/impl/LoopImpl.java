@@ -56,6 +56,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.LoopImpl#getFoundOption <em>Found Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.LoopImpl#getNotFoundOption <em>Not Found Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.LoopImpl#getResolutionMethod <em>Resolution Method</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.LoopImpl#getMaxNbIteration <em>Max Nb Iteration</em>}</li>
  * </ul>
  * </p>
  *
@@ -132,6 +133,26 @@ public class LoopImpl extends WorkflowElementImpl implements Loop
    * @ordered
    */
   protected ResolutionMethod resolutionMethod = RESOLUTION_METHOD_EDEFAULT;
+
+  /**
+   * The default value of the '{@link #getMaxNbIteration() <em>Max Nb Iteration</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getMaxNbIteration()
+   * @generated
+   * @ordered
+   */
+  protected static final int MAX_NB_ITERATION_EDEFAULT = 0;
+
+  /**
+   * The cached value of the '{@link #getMaxNbIteration() <em>Max Nb Iteration</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getMaxNbIteration()
+   * @generated
+   * @ordered
+   */
+  protected int maxNbIteration = MAX_NB_ITERATION_EDEFAULT;
 
   /**
    * <!-- begin-user-doc -->
@@ -388,6 +409,29 @@ public class LoopImpl extends WorkflowElementImpl implements Loop
    * <!-- end-user-doc -->
    * @generated
    */
+  public int getMaxNbIteration()
+  {
+    return maxNbIteration;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public void setMaxNbIteration(int newMaxNbIteration)
+  {
+    int oldMaxNbIteration = maxNbIteration;
+    maxNbIteration = newMaxNbIteration;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.LOOP__MAX_NB_ITERATION, oldMaxNbIteration, maxNbIteration));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
@@ -427,6 +471,8 @@ public class LoopImpl extends WorkflowElementImpl implements Loop
         return getNotFoundOption();
       case WorkflowPackage.LOOP__RESOLUTION_METHOD:
         return getResolutionMethod();
+      case WorkflowPackage.LOOP__MAX_NB_ITERATION:
+        return getMaxNbIteration();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -461,6 +507,9 @@ public class LoopImpl extends WorkflowElementImpl implements Loop
       case WorkflowPackage.LOOP__RESOLUTION_METHOD:
         setResolutionMethod((ResolutionMethod)newValue);
         return;
+      case WorkflowPackage.LOOP__MAX_NB_ITERATION:
+        setMaxNbIteration((Integer)newValue);
+        return;
     }
     super.eSet(featureID, newValue);
   }
@@ -493,6 +542,9 @@ public class LoopImpl extends WorkflowElementImpl implements Loop
       case WorkflowPackage.LOOP__RESOLUTION_METHOD:
         setResolutionMethod(RESOLUTION_METHOD_EDEFAULT);
         return;
+      case WorkflowPackage.LOOP__MAX_NB_ITERATION:
+        setMaxNbIteration(MAX_NB_ITERATION_EDEFAULT);
+        return;
     }
     super.eUnset(featureID);
   }
@@ -519,6 +571,8 @@ public class LoopImpl extends WorkflowElementImpl implements Loop
         return notFoundOption != null;
       case WorkflowPackage.LOOP__RESOLUTION_METHOD:
         return resolutionMethod != RESOLUTION_METHOD_EDEFAULT;
+      case WorkflowPackage.LOOP__MAX_NB_ITERATION:
+        return maxNbIteration != MAX_NB_ITERATION_EDEFAULT;
     }
     return super.eIsSet(featureID);
   }
@@ -536,6 +590,8 @@ public class LoopImpl extends WorkflowElementImpl implements Loop
     StringBuffer result = new StringBuffer(super.toString());
     result.append(" (resolutionMethod: ");
     result.append(resolutionMethod);
+    result.append(", maxNbIteration: ");
+    result.append(maxNbIteration);
     result.append(')');
     return result.toString();
   }

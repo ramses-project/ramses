@@ -59,4 +59,6 @@ public class Names
   public static final String LOGGING_FILENAME = ".ramses-log" ;
 
   public static final String VALIDATOR_SUFFIX = "-validator";
+
+  public static final String RAMSES_PROPERTIES = "RAMSES_PROPERTIES" ;
 }

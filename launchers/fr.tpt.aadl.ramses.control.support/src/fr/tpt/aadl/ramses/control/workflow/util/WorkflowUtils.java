@@ -30,6 +30,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
+import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier ;
 import fr.tpt.aadl.ramses.control.workflow.Workflow ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowElement ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory ;
@@ -82,11 +83,11 @@ public class WorkflowUtils {
 	 * @param workflowElement
 	 * 			  root element of the created workflow.
 	 */
-	public static void createNewWorkflow(String workflowPath, WorkflowElement workflowElement) {
+	public static void createNewWorkflow(String workflowPath, WorkflowElement workflowElement, ModelIdentifier inputModelIdentifier) {
 
 		Workflow workflow = WorkflowFactory.eINSTANCE.createWorkflow();
-
 		workflow.setElement(workflowElement);
+		workflow.setInputModelIdentifier(inputModelIdentifier);
 		
 		URI wf_uri = URI.createFileURI(workflowPath);
 

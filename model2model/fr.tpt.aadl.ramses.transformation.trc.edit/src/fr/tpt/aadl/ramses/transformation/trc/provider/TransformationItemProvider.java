@@ -64,6 +64,7 @@ public class TransformationItemProvider
     {
       super.getPropertyDescriptors(object);
 
+      addModulesPropertyDescriptor(object);
       addRuleNamePropertyDescriptor(object);
       addNamePropertyDescriptor(object);
     }
@@ -71,6 +72,29 @@ public class TransformationItemProvider
   }
 
 	/**
+   * This adds a property descriptor for the Modules feature.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected void addModulesPropertyDescriptor(Object object)
+  {
+    itemPropertyDescriptors.add
+      (createItemPropertyDescriptor
+        (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+         getResourceLocator(),
+         getString("_UI_Transformation_modules_feature"),
+         getString("_UI_PropertyDescriptor_description", "_UI_Transformation_modules_feature", "_UI_Transformation_type"),
+         TrcPackage.Literals.TRANSFORMATION__MODULES,
+         true,
+         false,
+         true,
+         null,
+         null,
+         null));
+  }
+
+  /**
    * This adds a property descriptor for the Rule Name feature.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -130,7 +154,6 @@ public class TransformationItemProvider
     {
       super.getChildrenFeatures(object);
       childrenFeatures.add(TrcPackage.Literals.TRANSFORMATION__IMPACTS);
-      childrenFeatures.add(TrcPackage.Literals.TRANSFORMATION__MODULES);
     }
     return childrenFeatures;
   }
@@ -186,12 +209,12 @@ public class TransformationItemProvider
 
     switch (notification.getFeatureID(Transformation.class))
     {
+      case TrcPackage.TRANSFORMATION__MODULES:
       case TrcPackage.TRANSFORMATION__RULE_NAME:
       case TrcPackage.TRANSFORMATION__NAME:
         fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
         return;
       case TrcPackage.TRANSFORMATION__IMPACTS:
-      case TrcPackage.TRANSFORMATION__MODULES:
         fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
         return;
     }
@@ -213,11 +236,6 @@ public class TransformationItemProvider
       (createChildParameter
         (TrcPackage.Literals.TRANSFORMATION__IMPACTS,
          TrcFactory.eINSTANCE.createTransformationImpact()));
-
-    newChildDescriptors.add
-      (createChildParameter
-        (TrcPackage.Literals.TRANSFORMATION__MODULES,
-         TrcFactory.eINSTANCE.createModuleList()));
   }
 
 	/**

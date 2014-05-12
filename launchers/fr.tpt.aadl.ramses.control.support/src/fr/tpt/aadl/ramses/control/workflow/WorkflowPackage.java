@@ -103,13 +103,22 @@ public interface WorkflowPackage extends EPackage
   int WORKFLOW__INPUT_MODEL_IDENTIFIER = 1;
 
   /**
+   * The feature id for the '<em><b>Requirements Root</b></em>' reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int WORKFLOW__REQUIREMENTS_ROOT = 2;
+
+  /**
    * The number of structural features of the '<em>Workflow</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int WORKFLOW_FEATURE_COUNT = 2;
+  int WORKFLOW_FEATURE_COUNT = 3;
 
   /**
    * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowElementImpl <em>Element</em>}' class.
@@ -758,13 +767,22 @@ public interface WorkflowPackage extends EPackage
   int LOOP__RESOLUTION_METHOD = WORKFLOW_ELEMENT_FEATURE_COUNT + 5;
 
   /**
+   * The feature id for the '<em><b>Max Nb Iteration</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int LOOP__MAX_NB_ITERATION = WORKFLOW_ELEMENT_FEATURE_COUNT + 6;
+
+  /**
    * The number of structural features of the '<em>Loop</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int LOOP_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 6;
+  int LOOP_FEATURE_COUNT = WORKFLOW_ELEMENT_FEATURE_COUNT + 7;
 
   /**
    * The meta object id for the '{@link fr.tpt.aadl.ramses.control.workflow.ResolutionMethod <em>Resolution Method</em>}' enum.
@@ -808,6 +826,17 @@ public interface WorkflowPackage extends EPackage
    * @generated
    */
   EReference getWorkflow_InputModelIdentifier();
+
+  /**
+   * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.control.workflow.Workflow#getRequirementsRoot <em>Requirements Root</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the reference '<em>Requirements Root</em>'.
+   * @see fr.tpt.aadl.ramses.control.workflow.Workflow#getRequirementsRoot()
+   * @see #getWorkflow()
+   * @generated
+   */
+  EReference getWorkflow_RequirementsRoot();
 
   /**
    * Returns the meta object for class '{@link fr.tpt.aadl.ramses.control.workflow.WorkflowElement <em>Element</em>}'.
@@ -1234,6 +1263,17 @@ public interface WorkflowPackage extends EPackage
   EAttribute getLoop_ResolutionMethod();
 
   /**
+   * Returns the meta object for the attribute '{@link fr.tpt.aadl.ramses.control.workflow.Loop#getMaxNbIteration <em>Max Nb Iteration</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Max Nb Iteration</em>'.
+   * @see fr.tpt.aadl.ramses.control.workflow.Loop#getMaxNbIteration()
+   * @see #getLoop()
+   * @generated
+   */
+  EAttribute getLoop_MaxNbIteration();
+
+  /**
    * Returns the meta object for enum '{@link fr.tpt.aadl.ramses.control.workflow.ResolutionMethod <em>Resolution Method</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -1291,6 +1331,14 @@ public interface WorkflowPackage extends EPackage
      * @generated
      */
     EReference WORKFLOW__INPUT_MODEL_IDENTIFIER = eINSTANCE.getWorkflow_InputModelIdentifier();
+
+    /**
+     * The meta object literal for the '<em><b>Requirements Root</b></em>' reference feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EReference WORKFLOW__REQUIREMENTS_ROOT = eINSTANCE.getWorkflow_RequirementsRoot();
 
     /**
      * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowElementImpl <em>Element</em>}' class.
@@ -1643,6 +1691,14 @@ public interface WorkflowPackage extends EPackage
      * @generated
      */
     EAttribute LOOP__RESOLUTION_METHOD = eINSTANCE.getLoop_ResolutionMethod();
+
+    /**
+     * The meta object literal for the '<em><b>Max Nb Iteration</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute LOOP__MAX_NB_ITERATION = eINSTANCE.getLoop_MaxNbIteration();
 
     /**
      * The meta object literal for the '{@link fr.tpt.aadl.ramses.control.workflow.ResolutionMethod <em>Resolution Method</em>}' enum.

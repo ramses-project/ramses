@@ -51,6 +51,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	private boolean analysisResult;
 	
 	private String sourceModelId;
+
+  private Workflow workflowRootObject ;
 	
 	private static Logger _LOGGER = Logger.getLogger(EcoreWorkflowPilot.class) ;
 
@@ -86,7 +88,7 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 
 		if (getResourceSet().getURIConverter().exists(workflow_uri, null)) {
 			resource = getResourceSet().getResource(workflow_uri, true);
-			Workflow workflowRootObject = (Workflow) resource.getContents()
+			workflowRootObject = (Workflow) resource.getContents()
 					.get(0);
 			
 			sourceModelId = workflowRootObject.getInputModelIdentifier().getId();
@@ -324,23 +326,10 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
       /** Convert analysis */
       AbstractLoop.AbstractAnalysis aa = convertAnalysis(l.getAnalysis());
       
-      /** Convert module lists */
-      List<List<String>> moduleLists = new ArrayList<List<String>>();
-      for(fr.tpt.aadl.ramses.transformation.trc.Transformation 
-          transfo : 
-            l.getAlternatives())
-      {
-        List<String> moduleListStr = new ArrayList<String>();
-        for(fr.tpt.aadl.ramses.transformation.trc.Module m : transfo.getModules().getModules())
-        {
-          moduleListStr.add(m.getPath());
-        }
-        moduleLists.add(moduleListStr);
-      }
-      
-      return new AbstractLoop(aa,moduleLists,
+      return new AbstractLoop(aa,l.getAlternatives(),
           inputModelIdentifier,outputModelIdentifier,
-          l.getResolutionMethod());
+          l.getResolutionMethod(),
+          l.getMaxNbIteration());
     }
     return null;
   }
@@ -388,14 +377,20 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
   @Override
   public String getTransformationName() {
     if(currentWorkflowElement instanceof Transformation)
-	{
-	  return ((Transformation) currentWorkflowElement).getIdentifier() ;
-	}
+    {
+      return ((Transformation) currentWorkflowElement).getIdentifier() ;
+    }
     else
     {
       String msg = "You cannot ask for a transformation name if the current state is not a transformation." ;
       _LOGGER.error(msg);
       return null ;
     }
+  }
+
+  @Override
+  public Workflow getWokflowRoot()
+  {
+    return workflowRootObject;
   }
 }

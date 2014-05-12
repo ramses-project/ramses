@@ -30,69 +30,11 @@ public class TrcParser {
 		if (resourceSet.getURIConverter().exists(p_uri, null)) {
 			resource = resourceSet.getResource(p_uri, true);
 			TrcSpecification result = (TrcSpecification) resource.getContents().get(0);
-			TrcUtils.setTrcSpecification(result);
 			return result;	
 		} else {
 			System.out.println("TRC of specified path ("+trcPath+") does not exit.");
 		}
 		
-		return null;
-	}
-	
-	
-	public static Transformation getTransformationById(String transformationId){
-		TrcSpecification specification = TrcUtils.getTrcSpecification();
-		Iterator transformationsIt = specification.getTransformations().getTransformations().iterator();
-		while (transformationsIt.hasNext()){
-			Transformation transformation = (Transformation)transformationsIt.next();
-			for(Module module: (List<Module>)transformation.getModules())
-			{
-				String moduleName = module.getName().replaceFirst(".atl", "");
-				moduleName = moduleName.substring(moduleName.lastIndexOf('/')+1);
-				if(transformation.getRuleName()==null || 
-						transformation.getRuleName().isEmpty())
-				{
-					if(transformationId.contains("."))
-					{
-						if(transformationId.substring(0, transformationId.lastIndexOf('.')).equals(moduleName))
-							return transformation;
-					}
-					else
-						if(transformationId.equals(moduleName))
-							return transformation;
-				}
-				else
-				{
-					for(String ruleName:(List<String>)transformation.getRuleName())
-					{
-						String qualifiedTransformationName = moduleName+"."+ruleName;
-						//System.out.println("Transformation qualified name: "+qualifiedTransformationName);
-
-						if (qualifiedTransformationName.equals(transformationId)){
-							return transformation;
-						}
-					}
-				}
-			}
-		}
-		
-		System.out.println("WARNING: in TRC, no value provided for rule:\n\t "+transformationId);
-		
-		
-		return null;
-	}
-	
-	
-	public static Transformation getTransformationByName(TrcSpecification specification, String transformationName){
-		Iterator transformationsIt = specification.getTransformations().getTransformations().iterator();
-		while (transformationsIt.hasNext()){
-			Transformation transformation = (Transformation)transformationsIt.next();
-			for(String ruleName:(List<String>)transformation.getRuleName())
-			{
-				if (ruleName.equals(transformationName))
-					return transformation;
-			}
-		}
 		return null;
 	}
 	

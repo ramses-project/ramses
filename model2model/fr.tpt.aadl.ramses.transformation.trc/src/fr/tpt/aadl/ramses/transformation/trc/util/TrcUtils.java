@@ -34,7 +34,6 @@ import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
 
 public class TrcUtils {
 
-	private static ResourceSet resourceSet;
 	private static Resource resource;
 	private static TrcSpecification trcSpecification;
 
@@ -84,12 +83,12 @@ public class TrcUtils {
 		{
 			Module m = TrcFactory.eINSTANCE.createModule();
 			m.setPath(path);
-			t.getModules().getModules().add(m);
+			t.getModules().add(m);
 		}
 		t.getRuleName().add(transformationName);
 		boolean toBeAdded = true;
 		
-		EList<Transformation> existingTransformationsList = specification.getTransformations().getTransformations();
+		EList<Transformation> existingTransformationsList = specification.getTransformationList().getTransformations();
 		Iterator<Transformation> existingTransformationsIt = existingTransformationsList.iterator();
 		while(existingTransformationsIt.hasNext()){
 			Transformation tObj = existingTransformationsIt.next();
@@ -106,7 +105,7 @@ public class TrcUtils {
 		}
 		
 		if (toBeAdded){
-			specification.getTransformations().getTransformations().add(t);
+			specification.getTransformationList().getTransformations().add(t);
 			saveTrc(getResource(trcPath, resourceSet), specification);			
 		}
 	}
@@ -132,7 +131,7 @@ public class TrcUtils {
 		impact.setQualityAttributeName(qualityAttribute);
 		impact.setImpactValue(impactValue);
 		
-		Transformation t = TrcParser.getTransformationById(transformationId);
+		Transformation t = getTransformationById(specification, transformationId);
 		t.getImpacts().add(impact);
 		
 		saveTrc(getResource(trcPath, resourceSet), specification);
@@ -151,7 +150,7 @@ public class TrcUtils {
 	                                                      Map qualityImpactMap){
 
 		TrcSpecification specification = TrcParser.parse(trcPath,resourceSet);
-		Transformation t = TrcParser.getTransformationById(transformationId);
+		Transformation t = getTransformationById(specification, transformationId);
 		t.getImpacts().clear();
 		
 	    Iterator it = qualityImpactMap.entrySet().iterator();
@@ -207,24 +206,80 @@ public class TrcUtils {
 	}
 
 	
+	public static Transformation getTransformationById(TrcSpecification specification,
+                                                     String transformationId){
+    Iterator transformationsIt = specification.getTransformationList().getTransformations().iterator();
+    while (transformationsIt.hasNext()){
+      Transformation transformation = (Transformation)transformationsIt.next();
+      for(Module module: (List<Module>)transformation.getModules())
+      {
+        String moduleName = module.getName().replaceFirst(".atl", "");
+        moduleName = moduleName.substring(moduleName.lastIndexOf('/')+1);
+        if(transformation.getRuleName()==null || 
+            transformation.getRuleName().isEmpty())
+        {
+          if(transformationId.contains("."))
+          {
+            if(transformationId.substring(0, transformationId.lastIndexOf('.')).equals(moduleName))
+              return transformation;
+          }
+          else
+            if(transformationId.equals(moduleName))
+              return transformation;
+        }
+        else
+        {
+          for(String ruleName:(List<String>)transformation.getRuleName())
+          {
+            String qualifiedTransformationName = moduleName+"."+ruleName;
+            //System.out.println("Transformation qualified name: "+qualifiedTransformationName);
+
+            if (qualifiedTransformationName.equals(transformationId)){
+              return transformation;
+            }
+          }
+        }
+      }
+    }
+    
+    System.out.println("WARNING: in TRC, no value provided for rule:\n\t "+transformationId);
+    
+    
+    return null;
+  }
+  
+  
+  public static Transformation getTransformationByName(TrcSpecification specification, String transformationName){
+    Iterator transformationsIt = specification.getTransformationList().getTransformations().iterator();
+    while (transformationsIt.hasNext()){
+      Transformation transformation = (Transformation)transformationsIt.next();
+      for(String ruleName:(List<String>)transformation.getRuleName())
+      {
+        if (ruleName.equals(transformationName))
+          return transformation;
+      }
+    }
+    return null;
+  }
+	
 	public static List<Module> buildDependencyList(List<Transformation> inputTransformationList)
 	{
 		ArrayList<Module> result = new ArrayList<Module>();
 		Transformation T0 = inputTransformationList.get(0);
-		result.addAll(T0.getModules().getModules());
+		result.addAll(T0.getModules());
 		for(int i=1;i<inputTransformationList.size();i++)
 		{
 			Transformation Ti = inputTransformationList.get(i);
 			Module lastInserted=null; // lastInserted
-			for(int j=Ti.getModules().getModules().size()-1;j>=0;j--)
+			for(int j=Ti.getModules().size()-1;j>=0;j--)
 			{
-				Module Mj=(Module)Ti.getModules().getModules().get(j);
+				Module Mj=(Module)Ti.getModules().get(j);
 				if(result.contains(Mj))
 					continue;
 				else if(lastInserted==null)
 				{
 					lastInserted = Mj;
-					if(j==Ti.getModules().getModules().size()-1)
+					if(j==Ti.getModules().size()-1)
 					{
 						result.add(lastInserted);
 					}
@@ -237,7 +292,7 @@ public class TrcUtils {
 					}
 					else
 					{
-						int toIndex = result.indexOf(Ti.getModules().getModules().get(j+1));
+						int toIndex = result.indexOf(Ti.getModules().get(j+1));
 						List<Module> lhs = result.subList(0, toIndex-1);
 						lhs.add(lastInserted);
 						List<Module> rhs = result.subList(toIndex, result.size());
@@ -294,11 +349,12 @@ public class TrcUtils {
 	}
 	
 	// return list of possible rule according to dependencies of an appliedRule on an EObject
-	public static List<List<RuleApplicationTulpe>> getInclusionDependencies(List<EObject> eObjList, String appliedRule)
+	public static List<List<RuleApplicationTulpe>> getInclusionDependencies(TrcSpecification spec,
+	                                                                        List<EObject> eObjList,
+	                                                                        String appliedRule)
 	{
-		TrcSpecification spec = getTrcSpecification();
 		List<List<RuleApplicationTulpe>> result = new ArrayList<List<RuleApplicationTulpe>>();
-		for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencies().getTransformationDependencies())
+		for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
 				continue;
@@ -456,11 +512,11 @@ public class TrcUtils {
 		return result;
 	}
 
-	public static List<List<RuleApplicationTulpe>> getExlcusionDependencies(List<EObject> candidateObjects,
-			String appliedRule) {
-		TrcSpecification trcSpecification = getTrcSpecification();
+	public static List<List<RuleApplicationTulpe>> getExlcusionDependencies(TrcSpecification trcSpecification,
+	                                                                        List<EObject> candidateObjects,
+	                                                                        String appliedRule) {
 		List<List<RuleApplicationTulpe>> exclusionDependencyList = new ArrayList<List<RuleApplicationTulpe>>();
-		for(TransformationDependency dep: (List<TransformationDependency>) trcSpecification.getDependencies().getTransformationDependencies())
+		for(TransformationDependency dep: (List<TransformationDependency>) trcSpecification.getDependencyList().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
 				continue;
@@ -472,13 +528,5 @@ public class TrcUtils {
 			}
 		}
 		return exclusionDependencyList;
-	}
-
-	public static TrcSpecification getTrcSpecification() {
-		return trcSpecification;
-	}
-	
-	public static void setTrcSpecification(TrcSpecification trcParam) {
-		trcSpecification = trcParam;
 	}
 }

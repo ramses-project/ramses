@@ -109,4 +109,6 @@ public interface WorkflowPilot {
   public AbstractLoop getLoop();
   
   public String getTransformationName();
+
+  public Workflow getWokflowRoot() ;
 }

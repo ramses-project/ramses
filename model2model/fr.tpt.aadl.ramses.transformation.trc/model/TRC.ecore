@@ -3,10 +3,12 @@
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="trc" nsURI="http://fr.tpt.aadl.ramses.transformation/TRC/1.0"
     nsPrefix="trc">
   <eClassifiers xsi:type="ecore:EClass" name="TrcSpecification">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="transformations" lowerBound="1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="transformationList" lowerBound="1"
         eType="#//TransformationList" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="dependencies" lowerBound="1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependencyList" lowerBound="1"
         eType="#//TransformationDependencyList" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="moduleList" lowerBound="1"
+        eType="#//ModuleList" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TransformationImpact" eSuperTypes="#//TransformationElement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="impactValue" lowerBound="1"
@@ -23,7 +25,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="impacts" upperBound="-1"
         eType="#//TransformationImpact" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="modules" lowerBound="1"
-        eType="#//ModuleList" containment="true"/>
+        upperBound="-1" eType="#//Module"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="ruleName" upperBound="-1"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>

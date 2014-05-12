@@ -28,22 +28,25 @@ public class AbstractLoop {
 
 
   private final AbstractAnalysis analysis;
-	private final List<List<String>> moduleLists;
+	private final List<fr.tpt.aadl.ramses.transformation.trc.Transformation> transformations;
 	private final String inputModelIdentifier;
 	private final String outputModelIdentifier;
 	private final ResolutionMethod method;
-	
+	private final int iterationNb;
 	
 	public AbstractLoop(AbstractAnalysis analysis,
-			List<List<String>> moduleLists, String inputModelIdentifier,
-			String outputModelIdentifier,
-			ResolutionMethod method)
+	                    List<fr.tpt.aadl.ramses.transformation.trc.Transformation> moduleLists,
+	                    String inputModelIdentifier,
+	                    String outputModelIdentifier,
+	                    ResolutionMethod method,
+	                    int iterationNb)
 	{
 		this.analysis = analysis;
-		this.moduleLists = moduleLists;
+		this.transformations = moduleLists;
 		this.inputModelIdentifier = inputModelIdentifier;
 		this.outputModelIdentifier = outputModelIdentifier;
 		this.method = method;
+		this.iterationNb = iterationNb;
 	}
 	
 	public String getInputModelIdentifier() {
@@ -55,12 +58,16 @@ public class AbstractLoop {
 	public AbstractAnalysis getAnalysis() {
 		return analysis;
 	}
-	public List<List<String>> getModuleLists() {
-		return moduleLists;
+	public List<fr.tpt.aadl.ramses.transformation.trc.Transformation> getTransformations() {
+		return transformations;
 	}
 	public ResolutionMethod getMethod()
 	{
 	  return method;
+	}
+	public int getIterationNb()
+	{
+	  return iterationNb;
 	}
 	
 	public static abstract class AbstractAnalysis {}

@@ -63,28 +63,28 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	public SystemInstance instantiate(SystemImplementation si) {
 	  if(si == null)
 	  {
-		String errMsg =  "cannot delete the previous AADL resource set" ;
-        _LOGGER.fatal(errMsg);
-        throw new RuntimeException(errMsg) ;
+	    String errMsg =  "could not find system implementation in generated package" ;
+	    _LOGGER.fatal(errMsg);
+	    throw new RuntimeException(errMsg) ;
 	  }
 	  URI instanceURI =
-	       OsateResourceUtil.getInstanceModelURI(si) ;
-	  
+	      OsateResourceUtil.getInstanceModelURI(si) ;
+
 	  Resource aadlResource = aadlResourceSet.getResource(instanceURI,
 	                                                      false) ;
-    if(aadlResource != null)
-    {
-      try
-      {
-        aadlResource.delete(null) ;
-      }
-      catch(IOException e)
-      {
-        String errMsg =  "cannot delete the previous AADL resource set" ;
-        _LOGGER.fatal(errMsg, e);
-        throw new RuntimeException(errMsg, e) ;
-      }
-    }
+	  if(aadlResource != null)
+	  {
+	    try
+	    {
+	      aadlResource.delete(null) ;
+	    }
+	    catch(IOException e)
+	    {
+	      String errMsg =  "cannot delete the previous AADL resource set" ;
+	      _LOGGER.fatal(errMsg, e);
+	      throw new RuntimeException(errMsg, e) ;
+	    }
+	  }
     
 	  aadlResource = aadlResourceSet
               .createResource(instanceURI) ;

@@ -218,7 +218,7 @@ public class TrcPackageImpl extends EPackageImpl implements TrcPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getTrcSpecification_Transformations()
+  public EReference getTrcSpecification_TransformationList()
   {
     return (EReference)trcSpecificationEClass.getEStructuralFeatures().get(0);
   }
@@ -228,9 +228,19 @@ public class TrcPackageImpl extends EPackageImpl implements TrcPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getTrcSpecification_Dependencies()
+  public EReference getTrcSpecification_DependencyList()
   {
     return (EReference)trcSpecificationEClass.getEStructuralFeatures().get(1);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EReference getTrcSpecification_ModuleList()
+  {
+    return (EReference)trcSpecificationEClass.getEStructuralFeatures().get(2);
   }
 
   /**
@@ -624,8 +634,9 @@ public class TrcPackageImpl extends EPackageImpl implements TrcPackage
 
     // Create classes and their features
     trcSpecificationEClass = createEClass(TRC_SPECIFICATION);
-    createEReference(trcSpecificationEClass, TRC_SPECIFICATION__TRANSFORMATIONS);
-    createEReference(trcSpecificationEClass, TRC_SPECIFICATION__DEPENDENCIES);
+    createEReference(trcSpecificationEClass, TRC_SPECIFICATION__TRANSFORMATION_LIST);
+    createEReference(trcSpecificationEClass, TRC_SPECIFICATION__DEPENDENCY_LIST);
+    createEReference(trcSpecificationEClass, TRC_SPECIFICATION__MODULE_LIST);
 
     transformationImpactEClass = createEClass(TRANSFORMATION_IMPACT);
     createEAttribute(transformationImpactEClass, TRANSFORMATION_IMPACT__IMPACT_VALUE);
@@ -715,8 +726,9 @@ public class TrcPackageImpl extends EPackageImpl implements TrcPackage
 
     // Initialize classes and features; add operations and parameters
     initEClass(trcSpecificationEClass, TrcSpecification.class, "TrcSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getTrcSpecification_Transformations(), this.getTransformationList(), null, "transformations", null, 1, 1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getTrcSpecification_Dependencies(), this.getTransformationDependencyList(), null, "dependencies", null, 1, 1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getTrcSpecification_TransformationList(), this.getTransformationList(), null, "transformationList", null, 1, 1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getTrcSpecification_DependencyList(), this.getTransformationDependencyList(), null, "dependencyList", null, 1, 1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getTrcSpecification_ModuleList(), this.getModuleList(), null, "moduleList", null, 1, 1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(transformationImpactEClass, TransformationImpact.class, "TransformationImpact", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEAttribute(getTransformationImpact_ImpactValue(), ecorePackage.getEInt(), "impactValue", null, 1, 1, TransformationImpact.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -729,7 +741,7 @@ public class TrcPackageImpl extends EPackageImpl implements TrcPackage
 
     initEClass(transformationEClass, Transformation.class, "Transformation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getTransformation_Impacts(), this.getTransformationImpact(), null, "impacts", null, 0, -1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getTransformation_Modules(), this.getModuleList(), null, "modules", null, 1, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getTransformation_Modules(), this.getModule(), null, "modules", null, 1, -1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getTransformation_RuleName(), ecorePackage.getEString(), "ruleName", null, 0, -1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getTransformation_Name(), ecorePackage.getEString(), "name", null, 1, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

@@ -28,6 +28,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
@@ -42,6 +43,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <ul>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl#getElement <em>Element</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.impl.WorkflowImpl#getRequirementsRoot <em>Requirements Root</em>}</li>
  * </ul>
  * </p>
  *
@@ -68,6 +70,16 @@ public class WorkflowImpl extends EObjectImpl implements Workflow
    * @ordered
    */
   protected ModelIdentifier inputModelIdentifier;
+
+  /**
+   * The cached value of the '{@link #getRequirementsRoot() <em>Requirements Root</em>}' reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getRequirementsRoot()
+   * @generated
+   * @ordered
+   */
+  protected EObject requirementsRoot;
 
   /**
    * <!-- begin-user-doc -->
@@ -191,6 +203,49 @@ public class WorkflowImpl extends EObjectImpl implements Workflow
    * <!-- end-user-doc -->
    * @generated
    */
+  public EObject getRequirementsRoot()
+  {
+    if (requirementsRoot != null && requirementsRoot.eIsProxy())
+    {
+      InternalEObject oldRequirementsRoot = (InternalEObject)requirementsRoot;
+      requirementsRoot = eResolveProxy(oldRequirementsRoot);
+      if (requirementsRoot != oldRequirementsRoot)
+      {
+        if (eNotificationRequired())
+          eNotify(new ENotificationImpl(this, Notification.RESOLVE, WorkflowPackage.WORKFLOW__REQUIREMENTS_ROOT, oldRequirementsRoot, requirementsRoot));
+      }
+    }
+    return requirementsRoot;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public EObject basicGetRequirementsRoot()
+  {
+    return requirementsRoot;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public void setRequirementsRoot(EObject newRequirementsRoot)
+  {
+    EObject oldRequirementsRoot = requirementsRoot;
+    requirementsRoot = newRequirementsRoot;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, WorkflowPackage.WORKFLOW__REQUIREMENTS_ROOT, oldRequirementsRoot, requirementsRoot));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
@@ -218,6 +273,9 @@ public class WorkflowImpl extends EObjectImpl implements Workflow
         return getElement();
       case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
         return getInputModelIdentifier();
+      case WorkflowPackage.WORKFLOW__REQUIREMENTS_ROOT:
+        if (resolve) return getRequirementsRoot();
+        return basicGetRequirementsRoot();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -237,6 +295,9 @@ public class WorkflowImpl extends EObjectImpl implements Workflow
         return;
       case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
         setInputModelIdentifier((ModelIdentifier)newValue);
+        return;
+      case WorkflowPackage.WORKFLOW__REQUIREMENTS_ROOT:
+        setRequirementsRoot((EObject)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -258,6 +319,9 @@ public class WorkflowImpl extends EObjectImpl implements Workflow
       case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
         setInputModelIdentifier((ModelIdentifier)null);
         return;
+      case WorkflowPackage.WORKFLOW__REQUIREMENTS_ROOT:
+        setRequirementsRoot((EObject)null);
+        return;
     }
     super.eUnset(featureID);
   }
@@ -276,6 +340,8 @@ public class WorkflowImpl extends EObjectImpl implements Workflow
         return element != null;
       case WorkflowPackage.WORKFLOW__INPUT_MODEL_IDENTIFIER:
         return inputModelIdentifier != null;
+      case WorkflowPackage.WORKFLOW__REQUIREMENTS_ROOT:
+        return requirementsRoot != null;
     }
     return super.eIsSet(featureID);
   }

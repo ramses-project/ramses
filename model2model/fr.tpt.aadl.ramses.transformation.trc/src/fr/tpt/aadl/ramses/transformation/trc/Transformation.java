@@ -44,30 +44,20 @@ public interface Transformation extends EObject
   EList<TransformationImpact> getImpacts();
 
   /**
-   * Returns the value of the '<em><b>Modules</b></em>' containment reference.
+   * Returns the value of the '<em><b>Modules</b></em>' reference list.
+   * The list contents are of type {@link fr.tpt.aadl.ramses.transformation.trc.Module}.
    * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Modules</em>' containment reference list isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Modules</em>' containment reference.
-   * @see #setModules(ModuleList)
+   * @return the value of the '<em>Modules</em>' reference list.
    * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTransformation_Modules()
-   * @model containment="true" required="true"
+   * @model required="true"
    * @generated
    */
-  ModuleList getModules();
-
-  /**
-   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.trc.Transformation#getModules <em>Modules</em>}' containment reference.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Modules</em>' containment reference.
-   * @see #getModules()
-   * @generated
-   */
-  void setModules(ModuleList value);
+  EList<Module> getModules();
 
   /**
    * Returns the value of the '<em><b>Rule Name</b></em>' attribute list.

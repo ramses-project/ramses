@@ -284,6 +284,16 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
    * <!-- end-user-doc -->
    * @generated
    */
+  public EReference getWorkflow_RequirementsRoot()
+  {
+    return (EReference)workflowEClass.getEStructuralFeatures().get(2);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   public EClass getWorkflowElement()
   {
     return workflowElementEClass;
@@ -684,6 +694,16 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
    * <!-- end-user-doc -->
    * @generated
    */
+  public EAttribute getLoop_MaxNbIteration()
+  {
+    return (EAttribute)loopEClass.getEStructuralFeatures().get(6);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   public EEnum getResolutionMethod()
   {
     return resolutionMethodEEnum;
@@ -722,6 +742,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
     workflowEClass = createEClass(WORKFLOW);
     createEReference(workflowEClass, WORKFLOW__ELEMENT);
     createEReference(workflowEClass, WORKFLOW__INPUT_MODEL_IDENTIFIER);
+    createEReference(workflowEClass, WORKFLOW__REQUIREMENTS_ROOT);
 
     workflowElementEClass = createEClass(WORKFLOW_ELEMENT);
     createEReference(workflowElementEClass, WORKFLOW_ELEMENT__INPUT_MODEL_IDENTIFIER);
@@ -778,6 +799,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
     createEReference(loopEClass, LOOP__FOUND_OPTION);
     createEReference(loopEClass, LOOP__NOT_FOUND_OPTION);
     createEAttribute(loopEClass, LOOP__RESOLUTION_METHOD);
+    createEAttribute(loopEClass, LOOP__MAX_NB_ITERATION);
 
     // Create enums
     resolutionMethodEEnum = createEEnum(RESOLUTION_METHOD);
@@ -834,7 +856,8 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
     // Initialize classes and features; add operations and parameters
     initEClass(workflowEClass, Workflow.class, "Workflow", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getWorkflow_Element(), this.getWorkflowElement(), null, "element", null, 1, 1, Workflow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getWorkflow_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 0, 1, Workflow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getWorkflow_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 1, 1, Workflow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getWorkflow_RequirementsRoot(), ecorePackage.getEObject(), null, "requirementsRoot", null, 0, 1, Workflow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(workflowElementEClass, WorkflowElement.class, "WorkflowElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getWorkflowElement_InputModelIdentifier(), this.getModelIdentifier(), null, "inputModelIdentifier", null, 1, 1, WorkflowElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -891,6 +914,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
     initEReference(getLoop_FoundOption(), this.getAnalysisOption(), null, "foundOption", null, 1, 1, Loop.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getLoop_NotFoundOption(), this.getAnalysisOption(), null, "notFoundOption", null, 1, 1, Loop.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getLoop_ResolutionMethod(), this.getResolutionMethod(), "resolutionMethod", "TryEach", 0, 1, Loop.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getLoop_MaxNbIteration(), ecorePackage.getEInt(), "maxNbIteration", null, 0, 1, Loop.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     // Initialize enums and add enum literals
     initEEnum(resolutionMethodEEnum, ResolutionMethod.class, "ResolutionMethod");

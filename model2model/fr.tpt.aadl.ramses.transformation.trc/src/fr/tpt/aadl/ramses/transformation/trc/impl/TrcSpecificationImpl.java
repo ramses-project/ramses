@@ -34,8 +34,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.impl.TrcSpecificationImpl#getTransformations <em>Transformations</em>}</li>
- *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.impl.TrcSpecificationImpl#getDependencies <em>Dependencies</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.impl.TrcSpecificationImpl#getTransformationList <em>Transformation List</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.impl.TrcSpecificationImpl#getDependencyList <em>Dependency List</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.impl.TrcSpecificationImpl#getModuleList <em>Module List</em>}</li>
  * </ul>
  * </p>
  *
@@ -44,24 +45,34 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecification
 {
   /**
-   * The cached value of the '{@link #getTransformations() <em>Transformations</em>}' containment reference.
+   * The cached value of the '{@link #getTransformationList() <em>Transformation List</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getTransformations()
+   * @see #getTransformationList()
    * @generated
    * @ordered
    */
-  protected TransformationList transformations;
+  protected TransformationList transformationList;
 
   /**
-   * The cached value of the '{@link #getDependencies() <em>Dependencies</em>}' containment reference.
+   * The cached value of the '{@link #getDependencyList() <em>Dependency List</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getDependencies()
+   * @see #getDependencyList()
    * @generated
    * @ordered
    */
-  protected TransformationDependencyList dependencies;
+  protected TransformationDependencyList dependencyList;
+
+  /**
+   * The cached value of the '{@link #getModuleList() <em>Module List</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getModuleList()
+   * @generated
+   * @ordered
+   */
+  protected ModuleList moduleList;
 
   /**
    * <!-- begin-user-doc -->
@@ -89,9 +100,9 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
    * <!-- end-user-doc -->
    * @generated
    */
-  public TransformationList getTransformations()
+  public TransformationList getTransformationList()
   {
-    return transformations;
+    return transformationList;
   }
 
   /**
@@ -99,13 +110,13 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
    * <!-- end-user-doc -->
    * @generated
    */
-  public NotificationChain basicSetTransformations(TransformationList newTransformations, NotificationChain msgs)
+  public NotificationChain basicSetTransformationList(TransformationList newTransformationList, NotificationChain msgs)
   {
-    TransformationList oldTransformations = transformations;
-    transformations = newTransformations;
+    TransformationList oldTransformationList = transformationList;
+    transformationList = newTransformationList;
     if (eNotificationRequired())
     {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS, oldTransformations, newTransformations);
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, oldTransformationList, newTransformationList);
       if (msgs == null) msgs = notification; else msgs.add(notification);
     }
     return msgs;
@@ -116,20 +127,20 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
    * <!-- end-user-doc -->
    * @generated
    */
-  public void setTransformations(TransformationList newTransformations)
+  public void setTransformationList(TransformationList newTransformationList)
   {
-    if (newTransformations != transformations)
+    if (newTransformationList != transformationList)
     {
       NotificationChain msgs = null;
-      if (transformations != null)
-        msgs = ((InternalEObject)transformations).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS, null, msgs);
-      if (newTransformations != null)
-        msgs = ((InternalEObject)newTransformations).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS, null, msgs);
-      msgs = basicSetTransformations(newTransformations, msgs);
+      if (transformationList != null)
+        msgs = ((InternalEObject)transformationList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, null, msgs);
+      if (newTransformationList != null)
+        msgs = ((InternalEObject)newTransformationList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, null, msgs);
+      msgs = basicSetTransformationList(newTransformationList, msgs);
       if (msgs != null) msgs.dispatch();
     }
     else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS, newTransformations, newTransformations));
+      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, newTransformationList, newTransformationList));
   }
 
   /**
@@ -137,9 +148,9 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
    * <!-- end-user-doc -->
    * @generated
    */
-  public TransformationDependencyList getDependencies()
+  public TransformationDependencyList getDependencyList()
   {
-    return dependencies;
+    return dependencyList;
   }
 
   /**
@@ -147,13 +158,13 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
    * <!-- end-user-doc -->
    * @generated
    */
-  public NotificationChain basicSetDependencies(TransformationDependencyList newDependencies, NotificationChain msgs)
+  public NotificationChain basicSetDependencyList(TransformationDependencyList newDependencyList, NotificationChain msgs)
   {
-    TransformationDependencyList oldDependencies = dependencies;
-    dependencies = newDependencies;
+    TransformationDependencyList oldDependencyList = dependencyList;
+    dependencyList = newDependencyList;
     if (eNotificationRequired())
     {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCIES, oldDependencies, newDependencies);
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, oldDependencyList, newDependencyList);
       if (msgs == null) msgs = notification; else msgs.add(notification);
     }
     return msgs;
@@ -164,20 +175,68 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
    * <!-- end-user-doc -->
    * @generated
    */
-  public void setDependencies(TransformationDependencyList newDependencies)
+  public void setDependencyList(TransformationDependencyList newDependencyList)
   {
-    if (newDependencies != dependencies)
+    if (newDependencyList != dependencyList)
     {
       NotificationChain msgs = null;
-      if (dependencies != null)
-        msgs = ((InternalEObject)dependencies).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCIES, null, msgs);
-      if (newDependencies != null)
-        msgs = ((InternalEObject)newDependencies).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCIES, null, msgs);
-      msgs = basicSetDependencies(newDependencies, msgs);
+      if (dependencyList != null)
+        msgs = ((InternalEObject)dependencyList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, null, msgs);
+      if (newDependencyList != null)
+        msgs = ((InternalEObject)newDependencyList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, null, msgs);
+      msgs = basicSetDependencyList(newDependencyList, msgs);
       if (msgs != null) msgs.dispatch();
     }
     else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCIES, newDependencies, newDependencies));
+      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, newDependencyList, newDependencyList));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public ModuleList getModuleList()
+  {
+    return moduleList;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetModuleList(ModuleList newModuleList, NotificationChain msgs)
+  {
+    ModuleList oldModuleList = moduleList;
+    moduleList = newModuleList;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__MODULE_LIST, oldModuleList, newModuleList);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public void setModuleList(ModuleList newModuleList)
+  {
+    if (newModuleList != moduleList)
+    {
+      NotificationChain msgs = null;
+      if (moduleList != null)
+        msgs = ((InternalEObject)moduleList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__MODULE_LIST, null, msgs);
+      if (newModuleList != null)
+        msgs = ((InternalEObject)newModuleList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__MODULE_LIST, null, msgs);
+      msgs = basicSetModuleList(newModuleList, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__MODULE_LIST, newModuleList, newModuleList));
   }
 
   /**
@@ -190,10 +249,12 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
   {
     switch (featureID)
     {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS:
-        return basicSetTransformations(null, msgs);
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCIES:
-        return basicSetDependencies(null, msgs);
+      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+        return basicSetTransformationList(null, msgs);
+      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+        return basicSetDependencyList(null, msgs);
+      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+        return basicSetModuleList(null, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
   }
@@ -208,10 +269,12 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
   {
     switch (featureID)
     {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS:
-        return getTransformations();
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCIES:
-        return getDependencies();
+      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+        return getTransformationList();
+      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+        return getDependencyList();
+      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+        return getModuleList();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -227,11 +290,14 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
   {
     switch (featureID)
     {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS:
-        setTransformations((TransformationList)newValue);
+      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+        setTransformationList((TransformationList)newValue);
         return;
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCIES:
-        setDependencies((TransformationDependencyList)newValue);
+      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+        setDependencyList((TransformationDependencyList)newValue);
+        return;
+      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+        setModuleList((ModuleList)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -247,11 +313,14 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
   {
     switch (featureID)
     {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS:
-        setTransformations((TransformationList)null);
+      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+        setTransformationList((TransformationList)null);
         return;
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCIES:
-        setDependencies((TransformationDependencyList)null);
+      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+        setDependencyList((TransformationDependencyList)null);
+        return;
+      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+        setModuleList((ModuleList)null);
         return;
     }
     super.eUnset(featureID);
@@ -267,10 +336,12 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
   {
     switch (featureID)
     {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS:
-        return transformations != null;
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCIES:
-        return dependencies != null;
+      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+        return transformationList != null;
+      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+        return dependencyList != null;
+      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+        return moduleList != null;
     }
     return super.eIsSet(featureID);
   }

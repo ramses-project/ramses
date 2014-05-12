@@ -55,14 +55,14 @@ public class TransformationImpl extends EObjectImpl implements Transformation
   protected EList<TransformationImpact> impacts;
 
   /**
-   * The cached value of the '{@link #getModules() <em>Modules</em>}' containment reference.
+   * The cached value of the '{@link #getModules() <em>Modules</em>}' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @see #getModules()
    * @generated
    * @ordered
    */
-  protected ModuleList modules;
+  protected EList<Module> modules;
 
   /**
    * The cached value of the '{@link #getRuleName() <em>Rule Name</em>}' attribute list.
@@ -134,47 +134,13 @@ public class TransformationImpl extends EObjectImpl implements Transformation
    * <!-- end-user-doc -->
    * @generated
    */
-  public ModuleList getModules()
+  public EList<Module> getModules()
   {
+    if (modules == null)
+    {
+      modules = new EObjectResolvingEList<Module>(Module.class, this, TrcPackage.TRANSFORMATION__MODULES);
+    }
     return modules;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public NotificationChain basicSetModules(ModuleList newModules, NotificationChain msgs)
-  {
-    ModuleList oldModules = modules;
-    modules = newModules;
-    if (eNotificationRequired())
-    {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION__MODULES, oldModules, newModules);
-      if (msgs == null) msgs = notification; else msgs.add(notification);
-    }
-    return msgs;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public void setModules(ModuleList newModules)
-  {
-    if (newModules != modules)
-    {
-      NotificationChain msgs = null;
-      if (modules != null)
-        msgs = ((InternalEObject)modules).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRANSFORMATION__MODULES, null, msgs);
-      if (newModules != null)
-        msgs = ((InternalEObject)newModules).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRANSFORMATION__MODULES, null, msgs);
-      msgs = basicSetModules(newModules, msgs);
-      if (msgs != null) msgs.dispatch();
-    }
-    else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION__MODULES, newModules, newModules));
   }
 
   /**
@@ -226,8 +192,6 @@ public class TransformationImpl extends EObjectImpl implements Transformation
     {
       case TrcPackage.TRANSFORMATION__IMPACTS:
         return ((InternalEList<?>)getImpacts()).basicRemove(otherEnd, msgs);
-      case TrcPackage.TRANSFORMATION__MODULES:
-        return basicSetModules(null, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
   }
@@ -270,7 +234,8 @@ public class TransformationImpl extends EObjectImpl implements Transformation
         getImpacts().addAll((Collection<? extends TransformationImpact>)newValue);
         return;
       case TrcPackage.TRANSFORMATION__MODULES:
-        setModules((ModuleList)newValue);
+        getModules().clear();
+        getModules().addAll((Collection<? extends Module>)newValue);
         return;
       case TrcPackage.TRANSFORMATION__RULE_NAME:
         getRuleName().clear();
@@ -297,7 +262,7 @@ public class TransformationImpl extends EObjectImpl implements Transformation
         getImpacts().clear();
         return;
       case TrcPackage.TRANSFORMATION__MODULES:
-        setModules((ModuleList)null);
+        getModules().clear();
         return;
       case TrcPackage.TRANSFORMATION__RULE_NAME:
         getRuleName().clear();
@@ -322,7 +287,7 @@ public class TransformationImpl extends EObjectImpl implements Transformation
       case TrcPackage.TRANSFORMATION__IMPACTS:
         return impacts != null && !impacts.isEmpty();
       case TrcPackage.TRANSFORMATION__MODULES:
-        return modules != null;
+        return modules != null && !modules.isEmpty();
       case TrcPackage.TRANSFORMATION__RULE_NAME:
         return ruleName != null && !ruleName.isEmpty();
       case TrcPackage.TRANSFORMATION__NAME:

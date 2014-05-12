@@ -67,22 +67,31 @@ public interface TrcPackage extends EPackage
   int TRC_SPECIFICATION = 0;
 
   /**
-   * The feature id for the '<em><b>Transformations</b></em>' containment reference.
+   * The feature id for the '<em><b>Transformation List</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int TRC_SPECIFICATION__TRANSFORMATIONS = 0;
+  int TRC_SPECIFICATION__TRANSFORMATION_LIST = 0;
 
   /**
-   * The feature id for the '<em><b>Dependencies</b></em>' containment reference.
+   * The feature id for the '<em><b>Dependency List</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int TRC_SPECIFICATION__DEPENDENCIES = 1;
+  int TRC_SPECIFICATION__DEPENDENCY_LIST = 1;
+
+  /**
+   * The feature id for the '<em><b>Module List</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int TRC_SPECIFICATION__MODULE_LIST = 2;
 
   /**
    * The number of structural features of the '<em>Specification</em>' class.
@@ -91,7 +100,7 @@ public interface TrcPackage extends EPackage
    * @generated
    * @ordered
    */
-  int TRC_SPECIFICATION_FEATURE_COUNT = 2;
+  int TRC_SPECIFICATION_FEATURE_COUNT = 3;
 
   /**
    * The meta object id for the '{@link fr.tpt.aadl.ramses.transformation.trc.impl.TransformationImpl <em>Transformation</em>}' class.
@@ -215,7 +224,7 @@ public interface TrcPackage extends EPackage
   int TRANSFORMATION__IMPACTS = 0;
 
   /**
-   * The feature id for the '<em><b>Modules</b></em>' containment reference.
+   * The feature id for the '<em><b>Modules</b></em>' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
@@ -588,26 +597,37 @@ public interface TrcPackage extends EPackage
   EClass getTrcSpecification();
 
   /**
-   * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformations <em>Transformations</em>}'.
+   * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformationList <em>Transformation List</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Transformations</em>'.
-   * @see fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformations()
+   * @return the meta object for the containment reference '<em>Transformation List</em>'.
+   * @see fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformationList()
    * @see #getTrcSpecification()
    * @generated
    */
-  EReference getTrcSpecification_Transformations();
+  EReference getTrcSpecification_TransformationList();
 
   /**
-   * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencies <em>Dependencies</em>}'.
+   * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencyList <em>Dependency List</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Dependencies</em>'.
-   * @see fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencies()
+   * @return the meta object for the containment reference '<em>Dependency List</em>'.
+   * @see fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencyList()
    * @see #getTrcSpecification()
    * @generated
    */
-  EReference getTrcSpecification_Dependencies();
+  EReference getTrcSpecification_DependencyList();
+
+  /**
+   * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getModuleList <em>Module List</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the containment reference '<em>Module List</em>'.
+   * @see fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getModuleList()
+   * @see #getTrcSpecification()
+   * @generated
+   */
+  EReference getTrcSpecification_ModuleList();
 
   /**
    * Returns the meta object for class '{@link fr.tpt.aadl.ramses.transformation.trc.Transformation <em>Transformation</em>}'.
@@ -631,10 +651,10 @@ public interface TrcPackage extends EPackage
   EReference getTransformation_Impacts();
 
   /**
-   * Returns the meta object for the containment reference '{@link fr.tpt.aadl.ramses.transformation.trc.Transformation#getModules <em>Modules</em>}'.
+   * Returns the meta object for the reference list '{@link fr.tpt.aadl.ramses.transformation.trc.Transformation#getModules <em>Modules</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the containment reference '<em>Modules</em>'.
+   * @return the meta object for the reference list '<em>Modules</em>'.
    * @see fr.tpt.aadl.ramses.transformation.trc.Transformation#getModules()
    * @see #getTransformation()
    * @generated
@@ -1025,20 +1045,28 @@ public interface TrcPackage extends EPackage
     EClass TRC_SPECIFICATION = eINSTANCE.getTrcSpecification();
 
     /**
-     * The meta object literal for the '<em><b>Transformations</b></em>' containment reference feature.
+     * The meta object literal for the '<em><b>Transformation List</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EReference TRC_SPECIFICATION__TRANSFORMATIONS = eINSTANCE.getTrcSpecification_Transformations();
+    EReference TRC_SPECIFICATION__TRANSFORMATION_LIST = eINSTANCE.getTrcSpecification_TransformationList();
 
     /**
-     * The meta object literal for the '<em><b>Dependencies</b></em>' containment reference feature.
+     * The meta object literal for the '<em><b>Dependency List</b></em>' containment reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EReference TRC_SPECIFICATION__DEPENDENCIES = eINSTANCE.getTrcSpecification_Dependencies();
+    EReference TRC_SPECIFICATION__DEPENDENCY_LIST = eINSTANCE.getTrcSpecification_DependencyList();
+
+    /**
+     * The meta object literal for the '<em><b>Module List</b></em>' containment reference feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EReference TRC_SPECIFICATION__MODULE_LIST = eINSTANCE.getTrcSpecification_ModuleList();
 
     /**
      * The meta object literal for the '{@link fr.tpt.aadl.ramses.transformation.trc.impl.TransformationImpl <em>Transformation</em>}' class.
@@ -1059,7 +1087,7 @@ public interface TrcPackage extends EPackage
     EReference TRANSFORMATION__IMPACTS = eINSTANCE.getTransformation_Impacts();
 
     /**
-     * The meta object literal for the '<em><b>Modules</b></em>' containment reference feature.
+     * The meta object literal for the '<em><b>Modules</b></em>' reference list feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated

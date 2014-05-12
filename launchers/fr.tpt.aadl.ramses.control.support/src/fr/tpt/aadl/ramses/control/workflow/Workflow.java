@@ -31,6 +31,7 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Workflow#getElement <em>Element</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Workflow#getInputModelIdentifier <em>Input Model Identifier</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Workflow#getRequirementsRoot <em>Requirements Root</em>}</li>
  * </ul>
  * </p>
  *
@@ -77,7 +78,7 @@ public interface Workflow extends EObject
    * @return the value of the '<em>Input Model Identifier</em>' containment reference.
    * @see #setInputModelIdentifier(ModelIdentifier)
    * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getWorkflow_InputModelIdentifier()
-   * @model containment="true"
+   * @model containment="true" required="true"
    * @generated
    */
   ModelIdentifier getInputModelIdentifier();
@@ -91,5 +92,31 @@ public interface Workflow extends EObject
    * @generated
    */
   void setInputModelIdentifier(ModelIdentifier value);
+
+  /**
+   * Returns the value of the '<em><b>Requirements Root</b></em>' reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Requirements Root</em>' reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Requirements Root</em>' reference.
+   * @see #setRequirementsRoot(EObject)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getWorkflow_RequirementsRoot()
+   * @model
+   * @generated
+   */
+  EObject getRequirementsRoot();
+
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Workflow#getRequirementsRoot <em>Requirements Root</em>}' reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Requirements Root</em>' reference.
+   * @see #getRequirementsRoot()
+   * @generated
+   */
+  void setRequirementsRoot(EObject value);
 
 } // Workflow

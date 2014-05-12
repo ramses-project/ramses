@@ -82,8 +82,9 @@ public class TrcSpecificationItemProvider
     if (childrenFeatures == null)
     {
       super.getChildrenFeatures(object);
-      childrenFeatures.add(TrcPackage.Literals.TRC_SPECIFICATION__TRANSFORMATIONS);
-      childrenFeatures.add(TrcPackage.Literals.TRC_SPECIFICATION__DEPENDENCIES);
+      childrenFeatures.add(TrcPackage.Literals.TRC_SPECIFICATION__TRANSFORMATION_LIST);
+      childrenFeatures.add(TrcPackage.Literals.TRC_SPECIFICATION__DEPENDENCY_LIST);
+      childrenFeatures.add(TrcPackage.Literals.TRC_SPECIFICATION__MODULE_LIST);
     }
     return childrenFeatures;
   }
@@ -137,8 +138,9 @@ public class TrcSpecificationItemProvider
 
     switch (notification.getFeatureID(TrcSpecification.class))
     {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATIONS:
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCIES:
+      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
         fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
         return;
     }
@@ -158,13 +160,18 @@ public class TrcSpecificationItemProvider
 
     newChildDescriptors.add
       (createChildParameter
-        (TrcPackage.Literals.TRC_SPECIFICATION__TRANSFORMATIONS,
+        (TrcPackage.Literals.TRC_SPECIFICATION__TRANSFORMATION_LIST,
          TrcFactory.eINSTANCE.createTransformationList()));
 
     newChildDescriptors.add
       (createChildParameter
-        (TrcPackage.Literals.TRC_SPECIFICATION__DEPENDENCIES,
+        (TrcPackage.Literals.TRC_SPECIFICATION__DEPENDENCY_LIST,
          TrcFactory.eINSTANCE.createTransformationDependencyList()));
+
+    newChildDescriptors.add
+      (createChildParameter
+        (TrcPackage.Literals.TRC_SPECIFICATION__MODULE_LIST,
+         TrcFactory.eINSTANCE.createModuleList()));
   }
 
 	/**

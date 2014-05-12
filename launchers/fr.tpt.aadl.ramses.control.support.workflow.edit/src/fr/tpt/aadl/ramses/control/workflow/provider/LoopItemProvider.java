@@ -82,6 +82,7 @@ public class LoopItemProvider
 
       addAlternativesPropertyDescriptor(object);
       addResolutionMethodPropertyDescriptor(object);
+      addMaxNbIterationPropertyDescriptor(object);
     }
     return itemPropertyDescriptors;
   }
@@ -128,6 +129,29 @@ public class LoopItemProvider
          false,
          false,
          ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+         null,
+         null));
+  }
+
+  /**
+   * This adds a property descriptor for the Max Nb Iteration feature.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  protected void addMaxNbIterationPropertyDescriptor(Object object)
+  {
+    itemPropertyDescriptors.add
+      (createItemPropertyDescriptor
+        (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+         getResourceLocator(),
+         getString("_UI_Loop_maxNbIteration_feature"),
+         getString("_UI_PropertyDescriptor_description", "_UI_Loop_maxNbIteration_feature", "_UI_Loop_type"),
+         WorkflowPackage.Literals.LOOP__MAX_NB_ITERATION,
+         true,
+         false,
+         false,
+         ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
          null,
          null));
   }
@@ -211,6 +235,7 @@ public class LoopItemProvider
     switch (notification.getFeatureID(Loop.class))
     {
       case WorkflowPackage.LOOP__RESOLUTION_METHOD:
+      case WorkflowPackage.LOOP__MAX_NB_ITERATION:
         fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
         return;
       case WorkflowPackage.LOOP__ANALYSIS:

@@ -36,6 +36,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Loop#getFoundOption <em>Found Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Loop#getNotFoundOption <em>Not Found Option</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Loop#getResolutionMethod <em>Resolution Method</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.control.workflow.Loop#getMaxNbIteration <em>Max Nb Iteration</em>}</li>
  * </ul>
  * </p>
  *
@@ -194,5 +195,31 @@ public interface Loop extends WorkflowElement, AnalysisElement
    * @generated
    */
   void setResolutionMethod(ResolutionMethod value);
+
+  /**
+   * Returns the value of the '<em><b>Max Nb Iteration</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Max Nb Iteration</em>' attribute isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Max Nb Iteration</em>' attribute.
+   * @see #setMaxNbIteration(int)
+   * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getLoop_MaxNbIteration()
+   * @model
+   * @generated
+   */
+  int getMaxNbIteration();
+
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.control.workflow.Loop#getMaxNbIteration <em>Max Nb Iteration</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Max Nb Iteration</em>' attribute.
+   * @see #getMaxNbIteration()
+   * @generated
+   */
+  void setMaxNbIteration(int value);
 
 } // Loop

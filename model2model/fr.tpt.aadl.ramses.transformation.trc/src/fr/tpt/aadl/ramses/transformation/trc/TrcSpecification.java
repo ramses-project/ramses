@@ -14,8 +14,9 @@ import org.eclipse.emf.ecore.EObject;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformations <em>Transformations</em>}</li>
- *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencies <em>Dependencies</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformationList <em>Transformation List</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencyList <em>Dependency List</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getModuleList <em>Module List</em>}</li>
  * </ul>
  * </p>
  *
@@ -26,55 +27,81 @@ import org.eclipse.emf.ecore.EObject;
 public interface TrcSpecification extends EObject
 {
   /**
-   * Returns the value of the '<em><b>Transformations</b></em>' containment reference.
+   * Returns the value of the '<em><b>Transformation List</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <p>
-   * If the meaning of the '<em>Transformations</em>' containment reference isn't clear,
+   * If the meaning of the '<em>Transformation List</em>' containment reference isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Transformations</em>' containment reference.
-   * @see #setTransformations(TransformationList)
-   * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTrcSpecification_Transformations()
+   * @return the value of the '<em>Transformation List</em>' containment reference.
+   * @see #setTransformationList(TransformationList)
+   * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTrcSpecification_TransformationList()
    * @model containment="true" required="true"
    * @generated
    */
-  TransformationList getTransformations();
+  TransformationList getTransformationList();
 
   /**
-   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformations <em>Transformations</em>}' containment reference.
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getTransformationList <em>Transformation List</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Transformations</em>' containment reference.
-   * @see #getTransformations()
+   * @param value the new value of the '<em>Transformation List</em>' containment reference.
+   * @see #getTransformationList()
    * @generated
    */
-  void setTransformations(TransformationList value);
+  void setTransformationList(TransformationList value);
 
   /**
-   * Returns the value of the '<em><b>Dependencies</b></em>' containment reference.
+   * Returns the value of the '<em><b>Dependency List</b></em>' containment reference.
    * <!-- begin-user-doc -->
    * <p>
-   * If the meaning of the '<em>Dependencies</em>' reference isn't clear,
+   * If the meaning of the '<em>Dependency List</em>' containment reference isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Dependencies</em>' containment reference.
-   * @see #setDependencies(TransformationDependencyList)
-   * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTrcSpecification_Dependencies()
+   * @return the value of the '<em>Dependency List</em>' containment reference.
+   * @see #setDependencyList(TransformationDependencyList)
+   * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTrcSpecification_DependencyList()
    * @model containment="true" required="true"
    * @generated
    */
-  TransformationDependencyList getDependencies();
+  TransformationDependencyList getDependencyList();
 
   /**
-   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencies <em>Dependencies</em>}' containment reference.
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getDependencyList <em>Dependency List</em>}' containment reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Dependencies</em>' containment reference.
-   * @see #getDependencies()
+   * @param value the new value of the '<em>Dependency List</em>' containment reference.
+   * @see #getDependencyList()
    * @generated
    */
-  void setDependencies(TransformationDependencyList value);
+  void setDependencyList(TransformationDependencyList value);
+
+  /**
+   * Returns the value of the '<em><b>Module List</b></em>' containment reference.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Module List</em>' containment reference isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Module List</em>' containment reference.
+   * @see #setModuleList(ModuleList)
+   * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTrcSpecification_ModuleList()
+   * @model containment="true" required="true"
+   * @generated
+   */
+  ModuleList getModuleList();
+
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification#getModuleList <em>Module List</em>}' containment reference.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Module List</em>' containment reference.
+   * @see #getModuleList()
+   * @generated
+   */
+  void setModuleList(ModuleList value);
 
 } // TrcSpecification
