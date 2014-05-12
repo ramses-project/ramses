@@ -468,6 +468,26 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		)
 }
 
+unique lazy rule createContextDataType
+{
+	from
+		d: AADLI!DataType
+	to
+		PeriodicDelayedContext_Type: AADLBA!DataType
+		(
+			name <- d.name,
+			ownedExtension <- extensionPeriodicDelayedContextType
+		),
+		extensionPeriodicDelayedContextType: AADLBA!TypeExtension
+		(
+			extended<-d
+		)
+	do
+	{
+		PeriodicDelayedContext_Type;
+	}
+}
+
 unique lazy rule createContextDataImpl
 {
 	from
@@ -475,6 +495,7 @@ unique lazy rule createContextDataImpl
 	using
 	{
 		Periodic_Delayed_Context_Prototype_Type: AADLBA!DataType = thisModule.Periodic_Delayed_Context_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
+		PeriodicDelayedContext_Type: AADLBA!DataType = thisModule.createContextDataType(Periodic_Delayed_Context_Prototype_Type);
 		Periodic_Delayed_Context_Prototype_Impl: AADLBA!DataImplementation = thisModule.Periodic_Delayed_Context_Impl_Name.asDataType('PERIODICDELAYED_RUNTIME');
 		Component_Instance_Array_Type: AADLBA!DataType = thisModule.Component_Instance_Array_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
 		Component_Instance_Type: AADLBA!DataImplementation = thisModule.Component_Instance_Type_Name.asDataType('PERIODICDELAYED_RUNTIME');
@@ -484,11 +505,7 @@ unique lazy rule createContextDataImpl
 		--- Define PeriodicDelayedContext data type
 		------------------------------------------------------------
 		
-		PeriodicDelayedContext_Type: AADLBA!DataType
-		(
-			name <- Periodic_Delayed_Context_Prototype_Type.name,
-			ownedExtension <- extensionPeriodicDelayedContextType
-		),
+		
 		PeriodicDelayedContext_Impl: AADLBA!DataImplementation
 		(
 			name <- Periodic_Delayed_Context_Prototype_Impl.name+'_'+thisModule.getProgrammationLanguageIdentifier(fi.getComponentInstancePath()),
@@ -539,10 +556,6 @@ unique lazy rule createContextDataImpl
 		extensionPeriodicDelayedContext: AADLBA!ImplementationExtension
 		(
 			extended<-Periodic_Delayed_Context_Prototype_Impl
-		),
-		extensionPeriodicDelayedContextType: AADLBA!TypeExtension
-		(
-			extended<-Periodic_Delayed_Context_Prototype_Type
 		)
 	do
 	{

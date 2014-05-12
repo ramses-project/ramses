@@ -953,7 +953,7 @@ rule m_ComputeEntrypointCallSequence {
 		computeEntryPointActions: AADLBA!BehaviorActionSequence
 	do
 	{
-		computeEntryPointActions.actions <- thisModule.populateComputeEntryPointActions(c, behavior);
+		computeEntryPointActions.actions <- thisModule.populateComputeEntryPointActions(c, behavior)->excluding(OclUndefined);
 	}
 }
 
@@ -1159,7 +1159,7 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 			}
 		}
 		for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isDataPort()))
-		{
+		{	
 			for(cnxInst in source.srcConnectionInstance)
 			{
 				intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataPutValueCalls(source, behavior, cnxInst));

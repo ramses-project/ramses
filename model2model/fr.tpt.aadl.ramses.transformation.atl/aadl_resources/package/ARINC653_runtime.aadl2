@@ -497,20 +497,31 @@ subprogram Write_Sampling_Message
 prototypes
   MESSAGE_TYPE: data;
 features
-  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
+  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;};
   MESSAGE_ADDR:  in out parameter MESSAGE_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
 properties
   Programming_Properties::Source_Name => "WRITE_SAMPLING_MESSAGE";
   Programming_Properties::Source_Text => ("arinc653/sampling.h", "arinc653/apex-sampling.ads");
+annex behavior_specification {**
+	states
+		s:initial final state;
+	transitions
+		t: s-[]->s{
+			computation(4 us .. 5 us);
+			SAMPLING_PORT_ID!<;
+			computation(1ms..2ms);
+			SAMPLING_PORT_ID!>
+		};
+**};
 end Write_Sampling_Message;
 
 subprogram Read_Sampling_Message
 prototypes
   MESSAGE_TYPE: data;
 features
-  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;};
+  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;};
   MESSAGE_ADDR: out parameter MESSAGE_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   VALIDITY: out parameter VALIDITY_TYPE;
@@ -518,6 +529,17 @@ features
 properties
   Programming_Properties::Source_Name => "READ_SAMPLING_MESSAGE";
   Programming_Properties::Source_Text => ("arinc653/sampling.h", "arinc653/apex-sampling.ads");
+annex behavior_specification {**
+	states
+		s:initial final state;
+	transitions
+		t: s-[]->s{
+			computation(4 us .. 5 us);
+			SAMPLING_PORT_ID!<;
+			computation(1ms..2ms);
+			SAMPLING_PORT_ID!>
+		};
+**};
 end Read_Sampling_Message;
 
 subprogram Get_Sampling_Port_Id
@@ -590,7 +612,7 @@ subprogram Display_Blackboard
 prototypes
   MESSAGE_TYPE: data;
 features
-   BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE {Access_Right=>read_only;};
+   BLACKBOARD_ID: requires data access BLACKBOARD_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;};
    MESSAGE_ADDR: in out parameter MESSAGE_TYPE ;
    LENGTH: in parameter MESSAGE_SIZE_TYPE ;
    RETURN_CODE: out parameter RETURN_CODE_TYPE ;

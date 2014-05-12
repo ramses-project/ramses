@@ -50,8 +50,9 @@ helper def : SharedStruct_Prototype : AADLBA!DataClassifier = 'SharedStructure'
 -----------------------------------------------------------------------------------------------------
 
 helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
-  if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
-	thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence')
+  let result: AADLBA!SubprogramCallSequence = thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence') in
+  if(not result.oclIsUndefined() and not result.ownedSubprogramCall->isEmpty()) then
+	result
   else
   	OclUndefined
   endif
@@ -107,7 +108,8 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c: AADLI!Compone
 ;
 
 helper def : collectInitializationEntryPoint(c: AADLI!ComponentInstance): AADLBA!PropertyAssociation =
-  if(c.featureInstance->exists(e|e.isInputFeature() and e.isPeriodicDelayedPort())) then
+  let result: AADLBA!SubprogramCallSequence = thisModule.resolveMatchedSingleIfExists(c, 'initCallSequence') in
+  if(not result.oclIsUndefined() and not result.ownedSubprogramCall->isEmpty()) then
 	thisModule.resolveMatchedSingleIfExists(c, 'pa')
   else
   	OclUndefined
@@ -185,6 +187,7 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 			name <- 'initLikedList',
 			ownedSubprogramCall <- c.featureInstance->select(e|e.isInputFeature())
 										->collect(e|thisModule.resolveMatchedSingleIfExists(e,'callInit'))
+										->excluding(OclUndefined)
 		)
 	do
 	{

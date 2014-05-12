@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Selection
+Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.selection
+Bundle-Version: 1.0.0.qualifier
+Export-Package: fr.tpt.aadl.ramses.transformation.selection
+Import-Package: org.eclipse.emf.ecore
+Require-Bundle: fr.tpt.aadl.ramses.transformation.tip,
+ fr.tpt.aadl.ramses.transformation.trc
