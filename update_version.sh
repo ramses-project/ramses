@@ -2,6 +2,27 @@
 
 <?php
 
+/**
+ * AADL-RAMSES
+ * 
+ * Copyright © 2014 TELECOM ParisTech and CNRS
+ * 
+ * TELECOM ParisTech/LTCI
+ * 
+ * Authors: see AUTHORS
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the Eclipse Public License as published by Eclipse,
+ * either version 1.0 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Eclipse Public License for more details.
+ * You should have received a copy of the Eclipse Public License
+ * along with this program.  If not, see 
+ * http://www.eclipse.org/org/documents/epl-v10.php
+ */
+
 ################################# NAMING #######################################
 
 $root=dirname(__FILE__) ;
@@ -29,14 +50,19 @@ $version_file_path=$root . '/build_and_test/fr.tpt.aadl.ramses.build.main/versio
 
 if(count($argv) != 2)
 {
-  print('Wrong version number. Version number has to be quoted !' . PHP_EOL);
+  print('Unexpected or missing version number. Remember: version number has to be quoted !' . PHP_EOL);
   print("example: '1.0.0'" . PHP_EOL);
-  print("Don't put 'qualifier' or 'SNAPSHOT' at the end of the version number. It will be automaticaly added" . PHP_EOL);
   print('abort' . PHP_EOL);
   exit(-1);
 }
 
-print('Proceed with the version number: ' . $argv[1] . PHP_EOL) ;
+print("Don't put 'qualifier' or 'SNAPSHOT' at the end of the version number. It will be automaticaly added" . PHP_EOL);
+print('Proceed with the version number: ' . $argv[1] . ' (y/n) ?' . PHP_EOL) ;
+if(confirm() == False)
+{
+  print('abort' . PHP_EOL);
+  exit(0) ;
+}
 
 // Update the RAMSES version number for maven build settings.
 $settings_version=$argv[1] . $settings_qualifier ;
@@ -63,11 +89,7 @@ updateVersionFile($version_file_path, $argv[1]) ;
 // Update repository.
 print('Every files are updated, proceed GIT commit (y/n) ?' . PHP_EOL);
 
-$answer=readStdin() ;
-$answer=str_replace(PHP_EOL, '', $answer);
-
-if(strcasecmp($answer,'y') == 0 or
-   strcasecmp($answer,'yes') == 0)
+if(confirm() == True)
 {
   callGIT($log);
   print ('*** UPDATE DONE ***' . PHP_EOL);
@@ -80,6 +102,22 @@ else
 exit(0) ;
 
 ################################## FUNCTIONS ###################################
+
+function confirm()
+{
+  $answer=readStdin() ;
+  $answer=str_replace(PHP_EOL, '', $answer);
+
+  if(strcasecmp($answer,'y') == 0 or
+     strcasecmp($answer,'yes') == 0)
+  {
+    return True ;
+  }
+  else
+  {
+    return False ;
+  }
+}
 
 function updateMavenSettings($version)
 {
