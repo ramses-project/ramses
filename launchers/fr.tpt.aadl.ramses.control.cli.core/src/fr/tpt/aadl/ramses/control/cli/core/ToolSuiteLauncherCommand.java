@@ -567,7 +567,7 @@ public class ToolSuiteLauncherCommand
     
     if(isWorkflow)
     {
-      mainTaskName += " (workflow XML)" ;
+      mainTaskName += " (workflow)" ;
     }
     
     _monitor.beginTask(mainTaskName, IProgressMonitor.UNKNOWN);

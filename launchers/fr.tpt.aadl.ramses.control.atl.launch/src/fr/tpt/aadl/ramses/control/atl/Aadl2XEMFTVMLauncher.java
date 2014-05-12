@@ -77,6 +77,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 
 	protected ResourceSet rs = new ResourceSetImpl();
 	private HookAccessImpl atlHook;
+ 	private List<Module> moduleList = new ArrayList<Module>();
  	
 	public HookAccessImpl getAtlHook()
 	{
@@ -130,10 +131,10 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	}
 
 	public Resource doTransformation(String transformationId,
-            Resource inputResource,
-                String outputDirPathName,
-                String resourceSuffix,
-                IProgressMonitor monitor)
+	                                 Resource inputResource,
+	                                 String outputDirPathName,
+	                                 String resourceSuffix,
+	                                 IProgressMonitor monitor)
 	{
 		env = AtlTransfoLauncher.getRamsesExecEnv(transformationId).getExecEnv();
 		
@@ -359,7 +360,13 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		
 		for(File f : transformationFileList)
 		{
-		  env.loadModule(mr, f.getAbsolutePath());
+		  moduleList.add(env.loadModule(mr, f.getAbsolutePath()));
 		}
 	}
+
+  public List<Module> getModuleList()
+  {
+    return moduleList;
+  }
+  
 }

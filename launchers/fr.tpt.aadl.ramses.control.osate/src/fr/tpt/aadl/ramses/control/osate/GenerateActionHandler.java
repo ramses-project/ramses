@@ -23,6 +23,8 @@ package fr.tpt.aadl.ramses.control.osate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap ;
+import java.util.Map ;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -55,6 +57,7 @@ import fr.tpt.aadl.ramses.control.support.generator.TransformationException;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot;
 
 public class GenerateActionHandler extends RamsesActionHandler {
@@ -108,7 +111,7 @@ public class GenerateActionHandler extends RamsesActionHandler {
     	  r = _sysImpl.eResource();
       else
     	  r = _sysInst.eResource();
-      if(getWorkflow(r)!=null)
+      if(getConfigFile(r, "workflow")!=null)
       {
     	  try
           {
@@ -205,7 +208,7 @@ public class GenerateActionHandler extends RamsesActionHandler {
     SystemImplementation sysImpl = sinst.getSystemImplementation() ;
     
     
-    String workflow = getWorkflow(sysImpl.eResource());
+    String workflow = getConfigFile(sysImpl.eResource(), "workflow");
     
     AnalysisErrorReporterManager errReporter = 
                                  ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER ;
@@ -215,6 +218,11 @@ public class GenerateActionHandler extends RamsesActionHandler {
     Set<File> tmp = WorkbenchUtils.getIncludeDirs(currentProject) ;
     File[] includeDirs = new File[tmp.size()] ;
     tmp.toArray(includeDirs) ;
+    
+    String properties = getConfigFile(sysImpl.eResource(), "properties");
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put(Names.RAMSES_PROPERTIES, properties);
+    generator.setParameters(parameters);
     
     if(workflow==null)
       generator.generate(sinst,
@@ -237,12 +245,12 @@ public class GenerateActionHandler extends RamsesActionHandler {
     refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor()); 
   }
 
-  private String getWorkflow(Resource r) {
+  private String getConfigFile(Resource r, String extension) {
 	  IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 	  // look for a workflow file
 	  String s = r.getURI().segment(1);
 	  File rootDir = new File(workspaceRoot.getProject(s).getLocationURI());
-	  String workflow = GenerateActionUtils.findWorkflow(rootDir);
+	  String workflow = GenerateActionUtils.findConfigFile(rootDir, extension);
 	  return workflow;
   }
 }

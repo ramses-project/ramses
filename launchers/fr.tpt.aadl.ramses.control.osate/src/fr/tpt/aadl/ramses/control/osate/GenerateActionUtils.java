@@ -25,7 +25,7 @@ import java.io.File;
 
 public class GenerateActionUtils {
 
-	public static String findWorkflow(File rootDirectory)
+	public static String findConfigFile(File rootDirectory, String extension )
 	{
 		File[] list = rootDirectory.listFiles();
 
@@ -33,14 +33,14 @@ public class GenerateActionUtils {
 
 		for ( File f : list ) {
 			if ( f.isDirectory() ) {
-				String result = findWorkflow( f );
+				String result = findConfigFile( f, extension );
 				if(result == null)
 					continue;
 				else
 					return result;
 			}
 			else {
-				if(f.getPath().endsWith(".workflow"))
+				if(f.getPath().endsWith("."+extension))
 					return f.getAbsolutePath(); 
 			}
 		}
