@@ -184,7 +184,12 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 		for(List<EGNode> egNodeList: res)
 		{
-			File tmpDir = new File(config.getAadlInspectorOutputDir().getAbsolutePath()+"/wcet_"+iter);
+		  String outputPath;
+		  if(config.getAadlInspectorOutputDir()!=null)
+		    outputPath = config.getAadlInspectorOutputDir().getAbsolutePath();
+		  else
+		    outputPath = config.getRamsesOutputDir().getAbsolutePath();
+			File tmpDir = new File(outputPath+"/wcet_"+iter);
 			if(!tmpDir.exists())
 				tmpDir.mkdir();
 			// Execute analysis in several threads
@@ -341,7 +346,12 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 		
 		this.size=1;
-		File resultDir = new File(config.getAadlInspectorOutputDir().getAbsolutePath()+"/"+outputModelIdentifier);
+		String resultPath;
+    if(config.getAadlInspectorOutputDir()!=null)
+      resultPath = config.getAadlInspectorOutputDir().getAbsolutePath();
+    else
+      resultPath = config.getRamsesOutputDir().getAbsolutePath();
+		File resultDir = new File(resultPath+"/"+outputModelIdentifier);
 		if(!resultDir.exists())
 			resultDir.mkdir();
 		AADLInspectorAnalysisThread last = new AADLInspectorAnalysisThread(this, resultingEGNodeList, resultDir, root, outputModelIdentifier, mode);
