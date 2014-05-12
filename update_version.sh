@@ -28,7 +28,7 @@ print('Proceed with the version number: ' . $argv[1] . PHP_EOL) ;
 
 
 // update the RAMSES version number for maven build settings.
-//updateMavenSettings();
+updateMavenSettings();
 
 $manifest_files=rsearch($root, "/$manifest_file_name/") ;
 
@@ -37,7 +37,7 @@ $new_directive=$manifest_directive . $argv[1];
 
 foreach($manifest_files as $file)
 {
-//  replace($file, $directive_pattern, $new_directive);
+  replace($file, $directive_pattern, $new_directive);
 }
 
 print('Every files are updated, proceed GIT commit (y/n) ?' . PHP_EOL);
