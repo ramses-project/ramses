@@ -22,10 +22,15 @@
 package fr.tpt.aadl.ramses.generation.target.specific;
 
 import java.io.File ;
+import java.io.FileInputStream ;
+import java.io.IOException ;
+import java.io.InputStream ;
 import java.util.ArrayList;
 import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
+import java.util.Properties ;
+import java.util.concurrent.TimeUnit ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
@@ -33,6 +38,7 @@ import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -46,6 +52,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
+import fr.openpeople.rdal2.model.rdal.Specification ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
@@ -55,6 +62,7 @@ import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.generator.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
@@ -62,11 +70,19 @@ import fr.tpt.aadl.ramses.control.support.generator.Generator ;
 import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelsManagerImpl ;
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.support.utils.Names;
 import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
+import fr.tpt.aadl.ramses.control.workflow.ResolutionMethod ;
+import fr.tpt.aadl.ramses.control.workflow.Transformation ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
+import fr.tpt.aadl.ramses.transformation.launcher.ArchitectureRefinementProcessLauncher ;
+import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
+import fr.tpt.aadl.ramses.transformation.selection.sensitivity.SensitivityBasedSelection ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -89,6 +105,10 @@ public class AadlTargetSpecificGenerator implements Generator
 
   private AadlModelValidator _modelValidator;
   
+  private PredefinedAadlModelManager _predefinedResourceManager;
+  
+  private Map<String, Object> additionalParameters;
+  
   /** Loop debug  (loopValidIteration must be negative to disable debug) **/
   private static int loopValidIteration = -1;
   private int loopIteration = -1;
@@ -100,12 +120,14 @@ public class AadlTargetSpecificGenerator implements Generator
   public AadlTargetSpecificGenerator(AadlToTargetSpecificAadl targetTrans,
                                      AadlTargetSpecificCodeGenerator codeGen,
                                      AadlModelInstantiatior modelInstantiator,
-                                     AadlModelValidator modelValidator)
+                                     AadlModelValidator modelValidator,
+                                     PredefinedAadlModelManager predefinedResourceManager)
   {
     _targetTrans = targetTrans ;
     _codeGen = codeGen ;
     _modelInstantiator = modelInstantiator ;
     _modelValidator = modelValidator;
+    _predefinedResourceManager = predefinedResourceManager;
   }
   
   public void setRegistryName(String registryName)
@@ -141,9 +163,9 @@ public class AadlTargetSpecificGenerator implements Generator
                        IProgressMonitor monitor) throws GenerationException,
                                                         TransformationException
   {
-	String targetId = config.getTargetId();
-	File outputDir = config.getRamsesOutputDir();
-	File runtimeDir = config.getRuntimePath(); 
+    String targetId = config.getTargetId();
+    File outputDir = config.getRamsesOutputDir();
+    File runtimeDir = config.getRuntimePath(); 
 	
     Resource inputResource = systemInstance.eResource() ;
     Resource r;
@@ -203,9 +225,14 @@ public class AadlTargetSpecificGenerator implements Generator
                                                                 TransformationException,
                                                                 AnalysisException
   {
-	String targetId = config.getTargetId();
-	File outputDir = config.getRamsesOutputDir();
-	File runtimeDir = config.getRuntimePath(); 
+    
+    long startTime = System.nanoTime();
+    
+    currentImplResource = systemInstance.eResource();
+    
+    String targetId = config.getTargetId();
+    File outputDir = config.getRamsesOutputDir();
+    File runtimeDir = config.getRuntimePath(); 
 
     if(_analysisResults == null)
       _analysisResults = AnalysisUtils.createNewAnalysisArtifact(
@@ -300,7 +327,21 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       else if(operation.equals("loop"))
       {
-        doLoop(xmlPilot.getLoop(), errManager, xmlPilot, config, monitor) ;
+          try
+          {
+            doLoop(xmlPilot.getLoop(), errManager, xmlPilot, config, monitor) ;
+          }
+          catch(ParseException e)
+          {
+            StackTraceElement[] message = e.getStackTrace();
+            _LOGGER.fatal(message);
+          }
+          catch(ConfigurationException e)
+          {
+            StackTraceElement[] message = e.getStackTrace();
+            _LOGGER.fatal(message);
+          }
+        
       }
       else
       {
@@ -319,6 +360,20 @@ public class AadlTargetSpecificGenerator implements Generator
       
       xmlPilot.goForward() ;
     }
+    
+    
+    long duration = System.nanoTime() - startTime;
+    
+    long elapsedTimeMinutes = TimeUnit.MINUTES.convert(duration, TimeUnit.NANOSECONDS);
+    
+    long diffSeconds = TimeUnit.SECONDS.convert(elapsedTimeMinutes, TimeUnit.MINUTES);
+    long elapsedTimeSeconds = TimeUnit.SECONDS.convert(duration, TimeUnit.NANOSECONDS);
+    
+    long timeMinuteSeconds = elapsedTimeSeconds - diffSeconds;
+    
+    _LOGGER.trace("\n\n\t\t Elapsed time = " + elapsedTimeMinutes + " minutes, " +
+        +timeMinuteSeconds+" seconds," +
+        " (" + duration+" nanoseconds)\n\n");
     
     this.modelsMap.clear();
     
@@ -512,18 +567,111 @@ public class AadlTargetSpecificGenerator implements Generator
   }
   
   private void doLoop(AbstractLoop l,AnalysisErrorReporterManager errManager,
-                      WorkflowPilot xmlPilot, RamsesConfiguration config,
+                      WorkflowPilot workflowPilot, RamsesConfiguration config,
                       IProgressMonitor monitor) throws AnalysisException,
                                                        TransformationException,
-                                                       GenerationException
+                                                       GenerationException, ParseException, ConfigurationException
+  {
+    if(l.getIterationNb()>0)
+      loopValidIteration = l.getIterationNb();
+    
+    if(l.getMethod().equals(ResolutionMethod.TRY_EACH))
+    {
+      doLoopTryEach(l, errManager,
+                    workflowPilot, config,
+                    monitor);
+    }
+    else if(l.getMethod().equals(ResolutionMethod.MANUAL_MERGE))
+    {
+      doLoopManualMerge(l, errManager,
+                        workflowPilot, config,
+                        monitor);
+    }
+    else if(l.getMethod().equals(ResolutionMethod.SENSITIVITY_MERGE))
+    {
+      doLoopSensitivityMerge(l, errManager,
+                             workflowPilot, config,
+                             monitor);
+    }
+    else if(l.getMethod().equals(ResolutionMethod.GENETIC_MERGE))
+    {
+      doLoopGeneticMerge(l, errManager,
+                         workflowPilot, config,
+                         monitor);
+    }
+    
+    
+  }
+  
+  private void doLoopGeneticMerge(AbstractLoop l,
+                                  AnalysisErrorReporterManager errManager,
+                                  WorkflowPilot workflowPilot,
+                                  RamsesConfiguration config,
+                                  IProgressMonitor monitor)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  private void doLoopSensitivityMerge(AbstractLoop l,
+                                      AnalysisErrorReporterManager errManager,
+                                      WorkflowPilot workflowPilot,
+                                      RamsesConfiguration config,
+                                      IProgressMonitor monitor) throws ParseException, ConfigurationException
+  {
+    String propertyFile = (String) additionalParameters.get(Names.RAMSES_PROPERTIES);
+    
+    Properties p = new Properties();
+    try {
+      InputStream in = new FileInputStream(propertyFile);
+      p.load(in);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
+    Specification rdal = (Specification) workflowPilot.getWokflowRoot().getRequirementsRoot();
+    SensitivityBasedSelection selectionMethod = new SensitivityBasedSelection(trc, rdal);
+    ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
+        (trc,
+         this.currentImplResource.getResourceSet(),
+         config,
+         selectionMethod,
+         p,
+         l.getTransformations(),
+         this._modelInstantiator,
+         this._predefinedResourceManager
+         );
+    SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
+    mergeLauncher.launch(sinst, workflowPilot.getOutputModelId()+"_iter_"+this.loopIteration, l.getIterationNb());
+  }
+
+  private void doLoopManualMerge(AbstractLoop l,
+                                 AnalysisErrorReporterManager errManager,
+                                 WorkflowPilot xmlPilot,
+                                 RamsesConfiguration config,
+                                 IProgressMonitor monitor)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  private void doLoopTryEach(AbstractLoop l,
+                             AnalysisErrorReporterManager errManager,
+                             WorkflowPilot xmlPilot,
+                             RamsesConfiguration config,
+                             IProgressMonitor monitor) throws AnalysisException, GenerationException, TransformationException
   {
     AbstractLoop.AbstractAnalysis a = l.getAnalysis();
     final String inputId = l.getInputModelIdentifier();
     final String outputId = l.getOutputModelIdentifier();
-    
     loopIteration = -1;
-    for(List<String> moduleList : l.getModuleLists())
+    for(fr.tpt.aadl.ramses.transformation.trc.Transformation 
+        transfo : l.getTransformations())
     {
+      List<String> moduleList = new ArrayList<String>();
+      for(fr.tpt.aadl.ramses.transformation.trc.Module m : transfo.getModules())
+        moduleList.add(m.getPath());
+      
       loopIteration++;
       String msg = "Start loop iteration = " + loopIteration ;
       _LOGGER.trace(msg);
@@ -535,7 +683,7 @@ public class AadlTargetSpecificGenerator implements Generator
       }
     }
   }
-  
+
   private boolean isValidLoopIteration (AbstractLoop.AbstractAnalysis a, AnalysisErrorReporterManager errManager,
                                         WorkflowPilot xmlPilot, RamsesConfiguration config,
                                         String outputId, IProgressMonitor monitor) throws AnalysisException
@@ -688,7 +836,7 @@ private void doErrorState()
   @Override
   public void setParameters(Map<String, Object> parameters)
   {
-    // AadlTargetSpecificGenerator does not take any parameters: nothing to do.
+    additionalParameters = parameters;
   }
 
   @Override
