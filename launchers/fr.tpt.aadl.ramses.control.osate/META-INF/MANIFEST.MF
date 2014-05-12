@@ -18,7 +18,7 @@ Require-Bundle: org.eclipse.ui.ide,
  org.osate.annexsupport,
  org.osate.xtext.aadl2.properties,
  org.osate.utils,
- org.osate.ba;bundle-version="0.9.5",
+ org.osate.ba,
  org.apache.log4j,
  fr.tpt.aadl.ramses.control.support,
  fr.tpt.aadl.ramses.generation.c,
@@ -26,7 +26,7 @@ Require-Bundle: org.eclipse.ui.ide,
  fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.osek,
  org.eclipse.m2m.atl.emftvm,
- fr.tpt.aadl.sched.tools.aadlinspector;bundle-version="1.0.0"
+ fr.tpt.aadl.sched.tools.aadlinspector
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: TELECOM ParisTech

@@ -1,8 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>ramses</groupId>
   <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>${ramses-version}</version>
   <packaging>jar</packaging>
 
   <repositories>
@@ -82,7 +83,7 @@
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.support</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
@@ -100,25 +101,25 @@
 	<dependency>
  	  <groupId>ramses</groupId>
 	  <artifactId>fr.tpt.aadl.ramses.constraints.reporter.metamodel</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
+	  <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.c</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.ada</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.ada.ravenscar</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
@@ -148,173 +149,173 @@
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.cli.instantiation</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.atl.launch</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.utils</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
       <artifactId>PropertiesExtractor</artifactId>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.properties</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.analysis.asg</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.wcetanalysis.results</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.tools.aadlinspector</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
       <artifactId>fr.tpt.aadl.ramses.analysis.result</artifactId>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.cli.core</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
    
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.tools.cheddar</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.target.specific</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.osek</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.pok</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.math</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.communication.periodic.delayed</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${ramses-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.core</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.aadl2.instantiation</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.annexsupport</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.ui</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.workspace</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.aadl2.modelsupport</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.aadl2</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.xtext.aadl2.properties.ui</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.xtext.aadl2.properties</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.xtext.aadl2</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
     
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.ba</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
     
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.utils</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
     </dependency>
 
     <dependency>

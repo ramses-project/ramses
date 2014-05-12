@@ -19,13 +19,13 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.xtext,
  org.eclipse.m2m.atl.emftvm,
  org.eclipse.m2m.atl.engine.emfvm;bundle-version="3.2.1",
- org.osate.aadl2.modelsupport;bundle-version="1.0.0";visibility:=reexport,
+ org.osate.aadl2.modelsupport;visibility:=reexport,
  org.osate.annexsupport,
  org.osate.aadl2;visibility:=reexport,
- org.osate.utils;bundle-version="0.9.5",
+ org.osate.utils,
  org.osate.xtext.aadl2.properties,
- org.osate.ba;bundle-version="0.9.5";visibility:=reexport,
- org.osate.pluginsupport;bundle-version="1.0.0",
+ org.osate.ba;visibility:=reexport,
+ org.osate.pluginsupport,
  org.osate.workspace,
  org.objectweb.asm;bundle-version="3.3.1",
  org.apache.log4j,
@@ -33,7 +33,7 @@ Require-Bundle: org.eclipse.core.runtime,
  fr.tpt.aadl.ramses.constraints.reporter.metamodel,
  fr.tpt.aadl.ramses.communication.periodic.delayed,
  fr.tpt.aadl.ramses.util.properties,
- fr.tpt.aadl.sched.wcetanalysis.results;bundle-version="1.0.0"
+ fr.tpt.aadl.sched.wcetanalysis.results
 Bundle-Activator: fr.tpt.aadl.ramses.control.atl.AtlLauncherActivator
 Bundle-ActivationPolicy: lazy
 

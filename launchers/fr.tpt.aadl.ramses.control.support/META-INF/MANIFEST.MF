@@ -35,12 +35,12 @@ Export-Package: fr.tpt.aadl.ramses.control.support,
  org.jdom2.xpath.util
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport,
- org.osate.aadl2;bundle-version="1.0.0",
- org.osate.aadl2.modelsupport;bundle-version="1.0.0",
- org.osate.ui;bundle-version="1.0.0",
- org.osate.annexsupport;bundle-version="1.0.0",
- org.osate.xtext.aadl2.properties;bundle-version="1.0.0",
- org.osate.aadl2.instantiation;bundle-version="1.0.0",
+ org.osate.aadl2,
+ org.osate.aadl2.modelsupport,
+ org.osate.ui,
+ org.osate.annexsupport,
+ org.osate.xtext.aadl2.properties,
+ org.osate.aadl2.instantiation,
  org.osate.utils,
  org.apache.log4j
 Eclipse-LazyStart: true

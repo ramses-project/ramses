@@ -4,13 +4,13 @@
  	<parent>
     <groupId>ramses</groupId>
     <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${ramses-version}</version>
     <relativePath>../../build_and_test/fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
   </parent>
  
   <groupId>ramses</groupId>
   <artifactId>fr.tpt.aadl.ramses.communication.periodic.delayed</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>${ramses-version}</version>
   <packaging>eclipse-plugin</packaging>
   
 </project>
