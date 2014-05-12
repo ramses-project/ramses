@@ -97,6 +97,7 @@ PROPERTIES
   Source_Language => (C);
   Source_Name => "TrainData";
   Source_Text => ("business-code/cbtc_module.h");
+  Data_Size => 2 bytes;
 END TrainData;
 
 DATA TrainPositionOffset
@@ -161,17 +162,20 @@ END root;
 
 PROCESSOR IMPLEMENTATION root.impl
 SUBCOMPONENTS
-  VP_train_inst : VIRTUAL PROCESSOR VP_train.impl;
-  VP_railway_inst : VIRTUAL PROCESSOR VP_railway.impl;
+  VP_train_inst : VIRTUAL PROCESSOR VP_train.impl
+  {Scheduling_Protocol => (Rate_Monotonic_Protocol);};
+  VP_railway_inst : VIRTUAL PROCESSOR VP_railway.impl
+ {Scheduling_Protocol => (Rate_Monotonic_Protocol);};
 END root.impl;
 
 MEMORY root_main_memory
 PROPERTIES
-  Memory_Size => 250000 Bytes;
+  Byte_Count => 250000;
   Base_Address => 16#2200#;
   Word_Size => 10000Bytes;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory,IO_Memory);
-  Memory_Protocol => read_write;
+--  Write_Time => [Fixed => 5 ns .. 5 ns; PerByte =>  5 ns .. 5 ns; ];
+--  Read_Time => [Fixed => 5 ns .. 5 ns; PerByte =>  5 ns .. 5 ns; ];
 END root_main_memory;
 
 MEMORY IMPLEMENTATION root_main_memory.impl
@@ -186,7 +190,7 @@ PROPERTIES
   ARINC653::Partition_Name => "System";
   ARINC653::System_Partition => TRUE;
   ARINC653::System_Overhead_Time => 10ms;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Rate_Monotonic_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_System_aadlKeywords.impl;
 
@@ -195,12 +199,11 @@ END VP_train;
 
 VIRTUAL PROCESSOR IMPLEMENTATION VP_train.impl
 PROPERTIES
-  ARINC653::Partition_Identifier => 1;
+  ARINC653::Partition_Identifier => 2;
   ARINC653::Partition_Name => "train";
   ARINC653::System_Partition => FALSE;
   ARINC653::System_Overhead_Time => 10ms;
--- EB: scheduler = RR
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Rate_Monotonic_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_train.impl;
 
@@ -213,7 +216,7 @@ PROPERTIES
   ARINC653::Partition_Name => "railway";
   ARINC653::System_Partition => FALSE;
   ARINC653::System_Overhead_Time => 10ms;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Rate_Monotonic_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_railway.impl;
 
@@ -342,6 +345,7 @@ PROPERTIES
   Source_Name => "TrainPpu_odometerAcquisition";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.h","business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.c", "business-code/VobcProcessing.c", "business-code/Tools.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END TrainPpu_odometerAcquisition;
 
 SUBPROGRAM TrainPpu_trainTraction
@@ -362,6 +366,7 @@ PROPERTIES
   Source_Name => "TrainPpu_trainTraction";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.h","business-code/cbtc_trainPpu_subsystem_Implementations_TrainPpu_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END TrainPpu_trainTraction;
 
 SUBPROGRAM TrackPpu_cdvAcquisition
@@ -376,6 +381,7 @@ PROPERTIES
   Source_Name => "TrackPpu_cdvAcquisition";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_trainPpu_subsystem_Implementations_TrackPpu_impl.h","business-code/cbtc_trainPpu_subsystem_Implementations_TrackPpu_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END TrackPpu_cdvAcquisition;
 
 SUBPROGRAM WheelAngleAcquisition_wheelAngleAcquisition
@@ -390,6 +396,7 @@ PROPERTIES
   Source_Name => "WheelAngleAcquisition_wheelAngleAcquisition";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.h","business-code/cbtc_vobc_subsystem_Implementations_WheelAngleAcquisition_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END WheelAngleAcquisition_wheelAngleAcquisition;
 
 SUBPROGRAM VobcTrainPositionEstimation_vobcTrainPositionEstimation
@@ -407,6 +414,7 @@ PROPERTIES
   Source_Name => "VobcTrainPositionEstimation_vobcTrainPositionEstimation";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.h","business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionEstimation_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END VobcTrainPositionEstimation_vobcTrainPositionEstimation;
 
 SUBPROGRAM VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset
@@ -440,6 +448,7 @@ PROPERTIES
   Source_Name => "VobcTrainPositionSending_vobcTrainPositionSending";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionSending_impl.h","business-code/cbtc_vobc_subsystem_Implementations_VobcTrainPositionSending_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END VobcTrainPositionSending_vobcTrainPositionSending;
 
 SUBPROGRAM TrainSpeedAccelCompute_trainSpeedAccelCompute
@@ -460,6 +469,7 @@ PROPERTIES
   Source_Name => "TrainSpeedAccelCompute_trainSpeedAccelCompute";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_TrainSpeedAccelCompute_impl.h","business-code/cbtc_vobc_subsystem_Implementations_TrainSpeedAccelCompute_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END TrainSpeedAccelCompute_trainSpeedAccelCompute;
 
 SUBPROGRAM AccelerationSending_accelerationSending
@@ -474,6 +484,7 @@ PROPERTIES
   Source_Name => "AccelerationSending_accelerationSending";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_vobc_subsystem_Implementations_AccelerationSending_impl.h","business-code/cbtc_vobc_subsystem_Implementations_AccelerationSending_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END AccelerationSending_accelerationSending;
 
 SUBPROGRAM TrainPositionsCorrelation_trainPositionsCorrelation
@@ -491,6 +502,7 @@ PROPERTIES
   Source_Name => "TrainPositionsCorrelation_trainPositionsCorrelation";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_mau_subsystem_Implementations_TrainPositionsCorrelation_impl.h","business-code/cbtc_mau_subsystem_Implementations_TrainPositionsCorrelation_impl.c", "business-code/Tools.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END TrainPositionsCorrelation_trainPositionsCorrelation;
 
 SUBPROGRAM TrainPositionsCorrelation_store_trainPositionMauOut
@@ -524,6 +536,7 @@ PROPERTIES
   Source_Name => "EndOfAuthorityComputation_endOfAuthorityComputation";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_mau_subsystem_Implementations_EndOfAuthorityComputation_impl.h","business-code/cbtc_mau_subsystem_Implementations_EndOfAuthorityComputation_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END EndOfAuthorityComputation_endOfAuthorityComputation;
 
 SUBPROGRAM EoaSending_eoaSending
@@ -538,6 +551,7 @@ PROPERTIES
   Source_Name => "EoaSending_eoaSending";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.h","business-code/cbtc_mau_subsystem_Implementations_EoaSending_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END EoaSending_eoaSending;
 
 SUBPROGRAM TrackAcquisition_trackAcquisition
@@ -552,6 +566,7 @@ PROPERTIES
   Source_Name => "TrackAcquisition_trackAcquisition";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.h","business-code/cbtc_viu_subsystem_Implementations_TrackAcquisition_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END TrackAcquisition_trackAcquisition;
 
 SUBPROGRAM ViuTrainPositionEstimation_viuTrainPositionEstimation
@@ -566,6 +581,7 @@ PROPERTIES
   Source_Name => "ViuTrainPositionEstimation_viuTrainPositionEstimation";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionEstimation_impl.h","business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionEstimation_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END ViuTrainPositionEstimation_viuTrainPositionEstimation;
 
 SUBPROGRAM ViuTrainPositionSending_viuTrainPositionSending
@@ -580,6 +596,7 @@ PROPERTIES
   Source_Name => "ViuTrainPositionSending_viuTrainPositionSending";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionSending_impl.h","business-code/cbtc_viu_subsystem_Implementations_ViuTrainPositionSending_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END ViuTrainPositionSending_viuTrainPositionSending;
 
 SUBPROGRAM TrainSimu_trainSimulation
@@ -594,6 +611,7 @@ PROPERTIES
   Source_Name => "TrainSimu_trainSimulation";
   Source_Language => (C);
   Source_Text => ("business-code/cbtc_cbtc_subsystem_Implementations_TrainSimu_impl.h","business-code/cbtc_cbtc_subsystem_Implementations_TrainSimu_impl.c");
+  Compute_Execution_Time => 5 ms .. 10 ms;
 END TrainSimu_trainSimulation;
 
 SUBPROGRAM TrainSimu_delayed_trainDataIn
@@ -604,6 +622,8 @@ FEATURES
   delayed_trainDataIn : OUT PARAMETER TrainData {
     Generation_Properties::Parameter_Usage => By_Reference;
   };
+properties
+  Compute_Execution_Time => 5 ms .. 10 ms;
 ANNEX behavior_specification {**
   STATES
     s : INITIAL FINAL STATE;
@@ -612,7 +632,6 @@ ANNEX behavior_specification {**
     delayed_trainDataIn := trainDataIn
   };
 **};
-
 END TrainSimu_delayed_trainDataIn;
 
 THREAD TrainPpu_odometerAcquisition_Thread
@@ -625,6 +644,8 @@ THREAD IMPLEMENTATION TrainPpu_odometerAcquisition_Thread.impl
 SUBCOMPONENTS
   TrainPpu_odometerAcquisition : SUBPROGRAM TrainPpu_odometerAcquisition;
   WheelAngleAcquisition_wheelAngleAcquisition : SUBPROGRAM WheelAngleAcquisition_wheelAngleAcquisition;
+properties
+  compute_execution_time => 10 ms .. 20 ms;
 ANNEX behavior_specification {**
   VARIABLES
     odometerOut : OdometerData;
@@ -640,7 +661,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END TrainPpu_odometerAcquisition_Thread.impl;
 
 THREAD TrainPpu_trainTraction_Thread
@@ -654,6 +674,8 @@ END TrainPpu_trainTraction_Thread;
 THREAD IMPLEMENTATION TrainPpu_trainTraction_Thread.impl
 SUBCOMPONENTS
   TrainPpu_trainTraction : SUBPROGRAM TrainPpu_trainTraction;
+properties
+  compute_execution_time => 5 ms .. 10 ms;
 ANNEX behavior_specification {**
   STATES
     switch : INITIAL COMPLETE STATE;
@@ -664,7 +686,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END TrainPpu_trainTraction_Thread.impl;
 
 THREAD VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread
@@ -679,6 +700,8 @@ SUBCOMPONENTS
   VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset : SUBPROGRAM VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset;
   VobcTrainPositionEstimation_vobcTrainPositionEstimation : SUBPROGRAM VobcTrainPositionEstimation_vobcTrainPositionEstimation;
   VobcTrainPositionSending_vobcTrainPositionSending : SUBPROGRAM VobcTrainPositionSending_vobcTrainPositionSending;
+properties
+  compute_execution_time => 15 ms .. 30 ms;
 ANNEX behavior_specification {**
   VARIABLES
     delayed_additionalTrainPositionOffset : TrainPositionOffset;
@@ -696,7 +719,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END VobcTrainPositionEstimation_vobcTrainPositionEstimation_Thread.impl;
 
 THREAD TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread
@@ -711,6 +733,8 @@ THREAD IMPLEMENTATION TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread.impl
 SUBCOMPONENTS
   TrainSpeedAccelCompute_trainSpeedAccelCompute : SUBPROGRAM TrainSpeedAccelCompute_trainSpeedAccelCompute;
   AccelerationSending_accelerationSending : SUBPROGRAM AccelerationSending_accelerationSending;
+properties
+  compute_execution_time => 10 ms .. 20 ms;
 ANNEX behavior_specification {**
   VARIABLES
     trainAccelOut : TractionData;
@@ -726,7 +750,6 @@ ANNEX behavior_specification {**
     END IF
   };
 **};
-
 END TrainSpeedAccelCompute_trainSpeedAccelCompute_Thread.impl;
 
 THREAD TrainPositionsCorrelation_trainPositionsCorrelation_Thread
@@ -742,6 +765,8 @@ SUBCOMPONENTS
   TrainPositionsCorrelation_store_trainPositionMauOut : SUBPROGRAM TrainPositionsCorrelation_store_trainPositionMauOut;
   EndOfAuthorityComputation_endOfAuthorityComputation : SUBPROGRAM EndOfAuthorityComputation_endOfAuthorityComputation;
   EoaSending_eoaSending : SUBPROGRAM EoaSending_eoaSending;
+properties
+  compute_execution_time => 20 ms .. 40 ms;
 ANNEX behavior_specification {**
   VARIABLES
     delayed_trainPositionMauOut : TrainPosition;
@@ -776,6 +801,8 @@ THREAD IMPLEMENTATION ViuTrainPositionEstimation_viuTrainPositionEstimation_Thre
 SUBCOMPONENTS
   ViuTrainPositionEstimation_viuTrainPositionEstimation : SUBPROGRAM ViuTrainPositionEstimation_viuTrainPositionEstimation;
   ViuTrainPositionSending_viuTrainPositionSending : SUBPROGRAM ViuTrainPositionSending_viuTrainPositionSending;
+properties
+  compute_execution_time => 10 ms .. 20 ms;
 ANNEX behavior_specification {**
   VARIABLES
     trainPositionOut : ViuData;
@@ -806,6 +833,8 @@ SUBCOMPONENTS
   TrainSimu_trainSimulation : SUBPROGRAM TrainSimu_trainSimulation;
   TrackPpu_cdvAcquisition : SUBPROGRAM TrackPpu_cdvAcquisition;
   TrackAcquisition_trackAcquisition : SUBPROGRAM TrackAcquisition_trackAcquisition;
+properties
+  compute_execution_time => 15 ms .. 30 ms;
 ANNEX behavior_specification {**
   VARIABLES
     trainDataIn : TrainData;
@@ -834,6 +863,8 @@ END TrainSimu_delayed_trainDataIn_Thread;
 THREAD IMPLEMENTATION TrainSimu_delayed_trainDataIn_Thread.impl
 SUBCOMPONENTS
   TrainSimu_delayed_trainDataIn : SUBPROGRAM TrainSimu_delayed_trainDataIn;
+properties
+  compute_execution_time => 5 ms .. 10 ms;
 ANNEX behavior_specification {**
   STATES
     switch : INITIAL COMPLETE STATE;

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Utils
+Bundle-SymbolicName: fr.tpt.rdal.utils
+Bundle-Version: 1.0.0.qualifier
+Export-Package: fr.tpt.rdal.parser
+Require-Bundle: org.eclipse.emf.ecore,
+ org.eclipse.emf.ecore.xmi,
+ org.eclipse.xtext;bundle-version="2.3.1",
+ org.osate.aadl2;bundle-version="1.0.0",
+ org.osate.xtext.aadl2;bundle-version="1.0.0",
+ fr.openpeople.rdal2.model;bundle-version="1.0.0"
