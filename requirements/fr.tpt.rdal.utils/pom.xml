@@ -9,7 +9,7 @@
  
   <groupId>ramses</groupId>
   <artifactId>fr.tpt.rdal.utils</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>${project.parent.version}</version>
   <packaging>eclipse-plugin</packaging>
 
   <dependencies>

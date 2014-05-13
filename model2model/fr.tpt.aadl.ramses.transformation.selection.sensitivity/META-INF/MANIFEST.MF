@@ -11,7 +11,7 @@ Export-Package: fr,
  fr.tpt.aadl.ramses.transformation.selection,
  fr.tpt.aadl.ramses.transformation.selection.sensitivity,
  fr.tpt.aadl.ramses.transformation.selection.utils
-Require-Bundle: fr.tpt.aadl.ramses.transformation.selection;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.transformation.tip;bundle-version="1.0.0",
- fr.tpt.rdal.utils;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.transformation.trc;bundle-version="1.0.0"
+Require-Bundle: fr.tpt.aadl.ramses.transformation.selection,
+ fr.tpt.aadl.ramses.transformation.tip,
+ fr.tpt.rdal.utils,
+ fr.tpt.aadl.ramses.transformation.trc

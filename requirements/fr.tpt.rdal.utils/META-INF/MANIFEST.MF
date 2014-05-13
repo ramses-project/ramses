@@ -10,7 +10,7 @@ Export-Package: fr.openpeople.rdal2.model.rdal,
 Require-Bundle: org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.xmi,
  org.eclipse.xtext;bundle-version="2.3.1",
- org.osate.aadl2;bundle-version="1.0.0",
- org.osate.xtext.aadl2;bundle-version="1.0.0"
+ org.osate.aadl2,
+ org.osate.xtext.aadl2
 Bundle-ClassPath: lib/fr.openpeople.rdal2.model_1.0.0.201312131039.jar,
  .
