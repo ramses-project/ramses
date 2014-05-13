@@ -34,6 +34,7 @@
     <module>../../model2text/fr.tpt.aadl.ramses.generation.target.specific</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.utils</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.atl</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.merge.launcher</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.tip</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.edit</module>
