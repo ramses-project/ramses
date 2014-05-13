@@ -21,7 +21,6 @@
 
 package fr.tpt.aadl.launch;
 
-import java.io.File ;
 import java.util.List ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;

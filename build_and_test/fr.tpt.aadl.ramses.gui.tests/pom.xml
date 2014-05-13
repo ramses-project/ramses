@@ -5,7 +5,7 @@
   <artifactId>q7tests</artifactId>
   <!-- Set group id based on application under test name -->
   <groupId>ramses-gui</groupId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <!-- Q7 Maven Plugin provides this packaging type -->
   <packaging>q7test</packaging>
 

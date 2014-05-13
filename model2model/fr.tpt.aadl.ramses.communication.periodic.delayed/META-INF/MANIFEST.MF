@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: AADL-RAMSES-CommunicationDimensioning
 Bundle-SymbolicName: fr.tpt.aadl.ramses.communication.periodic.delayed;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.osate.aadl2;bundle-version="1.0.0",
+Require-Bundle: org.osate.aadl2,
  org.apache.log4j,
  fr.tpt.aadl.ramses.util.properties,
  fr.tpt.aadl.ramses.util.math

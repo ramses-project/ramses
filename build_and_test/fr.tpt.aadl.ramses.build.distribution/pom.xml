@@ -1,9 +1,4 @@
 <project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>ramses</groupId>
-  <artifactId>fr.tpt.aadl.ramses.build.distribution</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0.0-SNAPSHOT</version>
 
   <parent>
     <groupId>ramses</groupId>
@@ -12,11 +7,17 @@
     <relativePath>../fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
   </parent>
 
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ramses</groupId>
+  <artifactId>fr.tpt.aadl.ramses.build.distribution</artifactId>
+  <packaging>pom</packaging>
+  <version>${project.parent.version}</version>
+
   <dependencies>
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
       <type>jar</type>
       <classifier>exe</classifier>
       <scope>compile</scope>
@@ -25,7 +26,7 @@
     <dependency>
       <groupId>org.osate</groupId>
       <artifactId>org.osate.aadl2</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${osate-version}</version>
       <scope>runtime</scope>
     </dependency>
        
@@ -42,7 +43,7 @@
             <descriptor>src_assembly.xml</descriptor>
             <descriptor>bin_assembly.xml</descriptor>
           </descriptors>
-          <finalName>ramses-1.0.0-SNAPSHOT_${maven.build.timestamp}</finalName>
+          <finalName>ramses-${project.parent.version}_${maven.build.timestamp}</finalName>
           <appendAssemblyId>true</appendAssemblyId>
         </configuration>  
         <executions>
