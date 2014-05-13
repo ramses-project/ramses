@@ -14,5 +14,4 @@ Export-Package: fr,
 Require-Bundle: fr.tpt.aadl.ramses.transformation.selection;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.transformation.tip;bundle-version="1.0.0",
  fr.tpt.rdal.utils;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.transformation.trc;bundle-version="1.0.0",
- fr.openpeople.rdal2.model;bundle-version="1.0.0"
+ fr.tpt.aadl.ramses.transformation.trc;bundle-version="1.0.0"

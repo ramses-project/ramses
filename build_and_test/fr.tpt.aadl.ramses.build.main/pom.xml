@@ -65,12 +65,6 @@
       <artifactId>maven-eclipse-plugin</artifactId>
       <version>2.9</version>	
     </dependency>
-    
-    <dependency>
-    	<groupId>fr.openpeople</groupId>
-		<artifactId>rdal2.model</artifactId>
-		<version>1.0.0.201304191724</version>
-	</dependency>
   </dependencies>
 
   <repositories>
