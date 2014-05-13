@@ -1,40 +1,25 @@
 package fr.tpt.rdal.parser;
 
-import java.io.IOException ;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.ArrayList ;
+import java.util.Collections ;
+import java.util.Comparator ;
+import java.util.Iterator ;
+import java.util.List ;
 
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.ecore.xmi.XMLResource;
-import org.eclipse.emf.ecore.xmi.impl.URIHandlerImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.eclipse.xtext.resource.XtextResourceSet;
-import org.osate.aadl2.Aadl2Package;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.instance.InstancePackage;
-import org.osate.xtext.aadl2.Aadl2StandaloneSetup;
+import org.eclipse.emf.common.util.TreeIterator ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.util.EcoreUtil ;
+import org.osate.aadl2.NamedElement ;
 
-import fr.labsticc.framework.constraints.model.constraints.ConstraintsPackage;
-import fr.labsticc.framework.settings.model.settings.SettingsPackage;
-import fr.openpeople.rdal2.model.rdal.DesignElementReference;
-import fr.openpeople.rdal2.model.rdal.AbstractGoal;
-import fr.openpeople.rdal2.model.rdal.GoalsPackage;
-import fr.openpeople.rdal2.model.rdal.PrioritizedSatDesignElementRef;
-import fr.openpeople.rdal2.model.rdal.QualityObjective;
-import fr.openpeople.rdal2.model.rdal.RdalOrgPackage;
-import fr.openpeople.rdal2.model.rdal.RdalPackage;
-import fr.openpeople.rdal2.model.rdal.ReferencedDesignElements;
-import fr.openpeople.rdal2.model.rdal.Sensitivity;
-import fr.openpeople.rdal2.model.rdal.Specification;
+import fr.openpeople.rdal2.model.rdal.AbstractGoal ;
+import fr.openpeople.rdal2.model.rdal.DesignElementReference ;
+import fr.openpeople.rdal2.model.rdal.GoalsPackage ;
+import fr.openpeople.rdal2.model.rdal.PrioritizedSatDesignElementRef ;
+import fr.openpeople.rdal2.model.rdal.QualityObjective ;
+import fr.openpeople.rdal2.model.rdal.RdalOrgPackage ;
+import fr.openpeople.rdal2.model.rdal.ReferencedDesignElements ;
+import fr.openpeople.rdal2.model.rdal.Sensitivity ;
+import fr.openpeople.rdal2.model.rdal.Specification ;
 
 public class RdalParser {
 
