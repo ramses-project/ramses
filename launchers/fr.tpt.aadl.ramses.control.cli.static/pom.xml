@@ -97,7 +97,43 @@
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.transformation.trc</artifactId>
-      <version>1.0.0.qualifier</version>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.selection</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.selection.sensitivity</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+	<dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.tip</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    
+    <dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.atl.utils</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+	<dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.rdal.utils</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+	
+	<dependency>
+	  <groupId>ramses</groupId>
+      <artifactId>fr.tpt.aadl.ramses.transformation.merge.launcher</artifactId>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
