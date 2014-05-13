@@ -104,9 +104,14 @@ public class AtlConverter {
 			saveFile( sourceStream, codeFileName);
 
 		}
-		catch ( ATLCoreException | CoreException e ) {
+		catch ( ATLCoreException e) {
 			e.printStackTrace();
 		}
+    catch(CoreException e)
+    {
+      e.printStackTrace();
+    }
+		
 
 		return true;
 	}
