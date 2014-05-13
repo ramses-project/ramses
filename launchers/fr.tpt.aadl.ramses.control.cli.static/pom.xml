@@ -1,9 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+  <parent>
+    <groupId>ramses</groupId>
+    <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../build_and_test/fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
+  </parent>
+  
   <modelVersion>4.0.0</modelVersion>
   <groupId>ramses</groupId>
   <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
-  <version>${ramses-version}</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <repositories>
@@ -83,7 +90,7 @@
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.support</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
@@ -101,25 +108,25 @@
 	<dependency>
  	  <groupId>ramses</groupId>
 	  <artifactId>fr.tpt.aadl.ramses.constraints.reporter.metamodel</artifactId>
-	  <version>${ramses-version}</version>
+	  <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.c</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.ada</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.ada.ravenscar</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
@@ -149,99 +156,99 @@
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.cli.instantiation</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.atl.launch</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.utils</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
       <artifactId>PropertiesExtractor</artifactId>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.properties</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.analysis.asg</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.wcetanalysis.results</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.tools.aadlinspector</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
       <artifactId>fr.tpt.aadl.ramses.analysis.result</artifactId>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.cli.core</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
    
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.sched.tools.cheddar</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.target.specific</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.osek</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.generation.pok</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.util.math</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.communication.periodic.delayed</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>

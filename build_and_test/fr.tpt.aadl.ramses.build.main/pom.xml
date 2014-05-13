@@ -7,12 +7,13 @@
      <platform-version-name>kepler</platform-version-name>
     <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
     <xtext-site>http://download.itemis.com/updates/releases</xtext-site>
+    <osate-version>1.0.0-SNAPSHOT</osate-version>
   </properties>
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>ramses</groupId>
   <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
-  <version>${ramses-version}</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>

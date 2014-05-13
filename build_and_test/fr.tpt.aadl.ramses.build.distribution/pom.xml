@@ -1,22 +1,23 @@
 <project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>ramses</groupId>
-  <artifactId>fr.tpt.aadl.ramses.build.distribution</artifactId>
-  <packaging>pom</packaging>
-  <version>${ramses-version}</version>
 
   <parent>
     <groupId>ramses</groupId>
     <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
-    <version>${ramses-version}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
   </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ramses</groupId>
+  <artifactId>fr.tpt.aadl.ramses.build.distribution</artifactId>
+  <packaging>pom</packaging>
+  <version>${project.parent.version}</version>
 
   <dependencies>
     <dependency>
       <groupId>ramses</groupId>
       <artifactId>fr.tpt.aadl.ramses.control.cli.static</artifactId>
-      <version>${ramses-version}</version>
+      <version>${project.parent.version}</version>
       <type>jar</type>
       <classifier>exe</classifier>
       <scope>compile</scope>
@@ -42,7 +43,7 @@
             <descriptor>src_assembly.xml</descriptor>
             <descriptor>bin_assembly.xml</descriptor>
           </descriptors>
-          <finalName>ramses-${ramses-version}_${maven.build.timestamp}</finalName>
+          <finalName>ramses-${project.parent.version}_${maven.build.timestamp}</finalName>
           <appendAssemblyId>true</appendAssemblyId>
         </configuration>  
         <executions>

@@ -7,13 +7,13 @@
 	<parent>
     <groupId>ramses</groupId>
     <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
-    <version>${ramses-version}</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../../build_and_test/fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
   </parent>
   
 	<groupId>ramses</groupId>
 	<artifactId>fr.tpt.aadl.ramses.generation.ada</artifactId>
-	<version>${ramses-version}</version>
+	<version>${project.parent.version}</version>
 	<packaging>eclipse-plugin</packaging>
 	
 </project>
