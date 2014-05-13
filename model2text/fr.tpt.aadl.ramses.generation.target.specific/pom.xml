@@ -16,4 +16,12 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 	
+	<dependencies>
+      <dependency>
+        <groupId>fr.openpeople</groupId>
+        <artifactId>rdal2.model</artifactId>
+        <version>1.0.0.201304191724</version>
+      </dependency>
+    </dependencies>
+	
 </project>
