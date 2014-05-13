@@ -27,9 +27,10 @@
 
 $root=dirname(__FILE__) ;
 
-$settings_file_path=$root . '/build_and_test/fr.tpt.aadl.ramses.build.main/settings.xml' ;
-$settings_qualifier='-SNAPSHOT';
-$ramses_node='ramses-version';
+$pom_file_name='pom.xml' ;
+$pom_qualifier='-SNAPSHOT';
+$build_pom_file_path=$root . '/build_and_test/fr.tpt.aadl.ramses.build.main/' . $pom_file_name ;
+
 
 $manifest_file_name='MANIFEST.MF';
 $manifest_directive='Bundle-Version: ' ;
@@ -64,9 +65,24 @@ if(confirm() == False)
   exit(0) ;
 }
 
-// Update the RAMSES version number for maven build settings.
-$settings_version=$argv[1] . $settings_qualifier ;
-updateMavenSettings($settings_version);
+// Update the RAMSES version number for maven build.
+$pom_version=$argv[1] . $pom_qualifier ;
+
+// Update the ramses.build.main pom.xml.
+updateBuildPom($build_pom_file_path, $pom_version);
+
+// Backup ramses.build.main pom.xml.
+$build_pom_content=file_get_contents($build_pom_file_path);
+
+// Update all pom.xml including ramses.build.main pom.xml (yes dump treatment).
+$pom_files=rsearch($root, "/$pom_file_name/");
+foreach($pom_files as $file)
+{
+  updatePom($file, $pom_version);
+}
+
+// Revert ramses.build.main pom.xml.
+file_put_contents($build_pom_file_path, $build_pom_content);
 
 // Update manifest files.
 $manifest_files=rsearch($root, "/$manifest_file_name/") ;
@@ -75,10 +91,10 @@ $new_directive=$manifest_directive . $argv[1] . $manifest_qualifier ;
 
 foreach($manifest_files as $file)
 {
-  replace($file, $directive_pattern, $new_directive);
+  updateManifest($file, $directive_pattern, $new_directive);
 }
 
-// Update the RAMSES features (Eclipse update site).
+// Update the RAMSES update site).
 $feature_version=$argv[1] . $feature_qualifier ;
 updateRamsesFeature($feature_file_path, $feature_version);
 updateSite($update_site_file_path, $feature_version, $url_root);
@@ -119,12 +135,20 @@ function confirm()
   }
 }
 
-function updateMavenSettings($version)
+function updatePom($file, $version)
 {
-  $settings=simplexml_load_file($GLOBALS['settings_file_path']) ;
-  $settings->profiles->profile->properties->$GLOBALS['ramses_node']=$version;
-  $settings->asXML($GLOBALS['settings_file_path']);
-  print($GLOBALS['settings_file_path'] . ' has been modifed' . PHP_EOL);
+  $pom=simplexml_load_file($file) ;
+  $pom->parent->version=$version;
+  $pom->asXML($file);
+  print($file . ' has been modifed' . PHP_EOL);
+}
+
+function updateBuildPom($file, $version)
+{
+  $pom=simplexml_load_file($file) ;
+  $pom->version=$version;
+  $pom->asXML($file);
+  print($file . ' has been modifed' . PHP_EOL);
 }
 
 function updateSite($file, $version, $url_root)
@@ -157,7 +181,7 @@ function rsearch($folder, $pattern)
   return $fileList;
 }
 
-function replace($file, $pattern, $value)
+function updateManifest($file, $pattern, $value)
 {
   $file_content=file_get_contents($file);
   $file_content=preg_replace($pattern, $value, $file_content) ;
@@ -190,17 +214,23 @@ function readStdin()
 
 ############################## INFORMATIONS ####################################
 //-----------------------------------------------------------------------------
-// settings.xml
+// pom.xml
 /*
-  <profiles>
-    <profile>  
-      <id>common</id>
-      <properties>
-        <ramses-version>1.0.0-SNAPSHOT</ramses-version>
-        <osate-version>2.0.0-SNAPSHOT</osate-version>
-      </properties>
-    </profile>
-  </profiles>
+	<parent>
+    <groupId>ramses</groupId>
+    <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../build_and_test/fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
+  </parent>
+*/
+//-----------------------------------------------------------------------------
+// ramses.build.main pom.xml
+/*
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ramses</groupId>
+  <artifactId>fr.tpt.aadl.ramses.build.main</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
 */
 //-----------------------------------------------------------------------------
 // MANIFEST.MF
