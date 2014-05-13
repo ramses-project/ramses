@@ -141,7 +141,7 @@ public class ArchitectureRefinementProcessLauncher {
 
     AtlTip2AtlLauncher hotLauncher = new AtlTip2AtlLauncher("Atl2DedicatedAtl4Aadl2Aadl", 
                                                             resourceSet);
-    List<String> treatedFiles = new ArrayList<>();
+    List<String> treatedFiles = new ArrayList<String>();
     Iterator<ElementTransformation> tuplesToApplyIt = tuplesToApply.iterator();
 
     

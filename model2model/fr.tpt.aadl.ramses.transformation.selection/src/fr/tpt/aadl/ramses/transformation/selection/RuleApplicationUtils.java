@@ -13,7 +13,7 @@ import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils;
 
 public class RuleApplicationUtils {
 
-    static Map<String, List> rulesInheritenceMap = new HashMap<>();
+    static Map<String, List> rulesInheritenceMap = new HashMap<String, List>();
 	
 	public static Map<String, List> getRulesInheritenceMap() {
 		return rulesInheritenceMap;

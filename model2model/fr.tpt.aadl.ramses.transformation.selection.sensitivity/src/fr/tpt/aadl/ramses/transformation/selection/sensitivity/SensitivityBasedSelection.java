@@ -45,7 +45,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 		// execute the selection algorithm for this object (key)
 		// retrieve dependency objects
 				
-		List<List<RuleApplicationTulpe>> exclusionDependencies = new ArrayList<>();
+		List<List<RuleApplicationTulpe>> exclusionDependencies = new ArrayList<List<RuleApplicationTulpe>>();
 		// add this object (and dependencies)
 		List<List<EObject>> treatedObjects = new ArrayList<List<EObject>>();
 		while (patternMatchingIt.hasNext()) 
@@ -56,7 +56,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			List<String> transformationsToApply = null; 
 			if(candidateTransformationList.size()>1)
 			{
-				List<String> newCandidateTransformationList = new ArrayList<>();
+				List<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
 				for(List<RuleApplicationTulpe> toExcludeList: exclusionDependencies)
 				{
