@@ -38,7 +38,7 @@ $manifest_qualifier='.qualifier';
 
 $feature_file_path=$root . '/build_and_test/fr.tpt.aadl.ramses.build.feature/feature.xml';
 $feature_qualifier=$manifest_qualifier ;
-$update_site_file_path=$root . '/../update-site/site.xml';
+$update_site_file_path=$root . '/build_and_test/fr.tpt.aadl.ramses.build.update.site/site.xml';
 $url_root='features/fr.tpt.aadl.ramses.feature_';
 
 $log='* all:' . PHP_EOL . '  - Update version number.' ;
