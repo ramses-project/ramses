@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://aadl.telecom-paristech.fr/">
+      TELECOM ParisTech AADL corner.
+   </description>
+   <feature url="features/fr.tpt.aadl.ramses.feature_1.0.0.qualifier.jar" id="fr.tpt.aadl.ramses.feature" version="1.0.0.qualifier">
+      <category name="ramses_category"/>
+   </feature>
+   <category-def name="ramses_category" label="AADL-RAMSES">
+      <description>
+         RAMSES (Refinement of AADL Models for Synthesis of Embedded Systems) is a model transformation and code generation tool that produces C code for ARINC653-compliant operating systems and OSEK-compliant operating systems.
+      </description>
+   </category-def>
+</site>
