@@ -10,7 +10,7 @@
     <relativePath>../fr.tpt.aadl.ramses.build.main/pom.xml</relativePath>
   </parent>
   <groupId>ramses</groupId>
-  <artifactId>fr.tpt.aadl.update-site</artifactId>
+  <artifactId>fr.tpt.aadl.ramses.build.update.site</artifactId>
   <version>${project.parent.version}</version>
   <packaging>eclipse-update-site</packaging>
 </project>

@@ -44,7 +44,7 @@
     <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
     <module>../fr.tpt.aadl.ramses.build.feature</module>
     <module>../fr.tpt.aadl.ramses.build.distribution</module>
-    <module>../../../update-site</module>
+    <module>../fr.tpt.aadl.ramses.build.update.site</module>
   </modules>
 
   <dependencies> 
