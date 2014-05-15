@@ -197,7 +197,7 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 		globalVariable:AADLBA!DataSubcomponent
 		(
 			dataSubcomponentType <- 'Blackboard_Id_Type'.asDataType('ARINC653_RUNTIME'),
-			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Concurrency_Control_Protocol','THREAD_PROPERTIES', thisModule.CreateEnumValuePropertyExpression('PRIORITY_CEILING_PROTOCOL'))}
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Concurrency_Control_Protocol','THREAD_PROPERTIES', thisModule.CreateEnumValuePropertyExpression('Priority_Ceiling'))}
 		)
 }
 
