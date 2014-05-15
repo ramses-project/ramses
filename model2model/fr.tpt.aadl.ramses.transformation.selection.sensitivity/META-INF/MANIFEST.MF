@@ -3,13 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Sensitivity
 Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.selection.sensitivity
 Bundle-Version: 1.0.0.qualifier
-Export-Package: fr,
- fr.tpt,
- fr.tpt.aadl,
- fr.tpt.aadl.ramses,
- fr.tpt.aadl.ramses.transformation,
- fr.tpt.aadl.ramses.transformation.selection,
- fr.tpt.aadl.ramses.transformation.selection.sensitivity,
+Export-Package: fr.tpt.aadl.ramses.transformation.selection.sensitivity,
  fr.tpt.aadl.ramses.transformation.selection.utils
 Require-Bundle: fr.tpt.aadl.ramses.transformation.selection,
  fr.tpt.aadl.ramses.transformation.tip,
