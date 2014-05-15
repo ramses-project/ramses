@@ -142,7 +142,7 @@ public class AADLInspectorLauncher
 		
 		String debugCommand = command+" -a "+modelList+ 
 				" --plugin "+ "schedulability.cheddarSimTest"+ 
-				//" --result "+ OUTPUT_FILE_PATH+
+				" --result "+ OUTPUT_FILE_PATH+
 				" --show "+ modeOption;
 		
 		_LOGGER.trace("AADL Inspector command: "+debugCommand) ;

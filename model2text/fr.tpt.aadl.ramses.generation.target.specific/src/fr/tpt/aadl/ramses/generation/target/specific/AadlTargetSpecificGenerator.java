@@ -52,6 +52,7 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
+import fr.openpeople.rdal2.model.rdal.RdalPackage ;
 import fr.openpeople.rdal2.model.rdal.Specification ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
@@ -82,6 +83,7 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 import fr.tpt.aadl.ramses.transformation.launcher.ArchitectureRefinementProcessLauncher ;
 import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
 import fr.tpt.aadl.ramses.transformation.selection.sensitivity.SensitivityBasedSelection ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcPackage ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 
 
@@ -628,6 +630,10 @@ public class AadlTargetSpecificGenerator implements Generator
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
+    currentImplResource.getResourceSet().getPackageRegistry().put("http://www.open-people.fr/rdal2", RdalPackage.eINSTANCE);
+
+    
     TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
     Specification rdal = (Specification) workflowPilot.getWokflowRoot().getRequirementsRoot();
     SensitivityBasedSelection selectionMethod = new SensitivityBasedSelection(trc, rdal);

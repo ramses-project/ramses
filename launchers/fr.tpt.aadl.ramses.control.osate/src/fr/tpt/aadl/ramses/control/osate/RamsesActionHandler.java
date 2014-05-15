@@ -139,7 +139,8 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	                                                                      monitor) ;
 	                // Make sure that this xtext editor is saved.
 	                IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
-	                WorkbenchUtils.saveEditor(editor);
+	                if(editor!=null)
+	                  WorkbenchUtils.saveEditor(editor);
 	                
 	                
 	                jobCore(monitorWrapper) ;
