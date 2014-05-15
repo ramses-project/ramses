@@ -315,10 +315,10 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		(
 			extended<-Put_Value_PrototypeSpg
 		),
-		putValueOutputPrototypeBinding: AADLBA!ComponentPrototypeBinding
+		putValueOutputPrototypeBinding: AADLBA!FeaturePrototypeBinding
 		(
 			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'value_type'),
-			actual <- Sequence{thisModule.CreateDataComponentPrototypeActual(producerPort.feature.dataFeatureClassifier)}
+			actual <- putValueOutputActual
 		),
 		putValueValueParam: AADLBA!Parameter
 		(
@@ -341,13 +341,17 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 			ownedParameter <- Sequence{putValueValueParam}, -- CDWParam
 			ownedDataAccess <- Sequence{BufferAccess}
 		),
+		putValueOutputActual: AADLBA!AccessSpecification
+		(
+			category<-#data
+		),
 		
-		putValueContextPrototypeBinding: AADLBA!ComponentPrototypeBinding
+		putValueContextPrototypeBinding: AADLBA!FeaturePrototypeBinding
 		(
 			formal <- Put_Value_PrototypeSpg.ownedPrototype->any(e|e.name = 'context_prototype'),
-			actual <- Sequence{putValueContextActual}
+			actual <- putValueContextActual
 		),
-		putValueContextActual: AADLBA!ComponentPrototypeActual
+		putValueContextActual: AADLBA!AccessSpecification
 		(
 			category<-#data
 		),
@@ -359,7 +363,8 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 	{
 		-- next is a workaround
 		thisModule.theHOOK.setDirection(putValueValueParam, 'in');
-		putValueContextActual.setSubcomponentType(thisModule.resolveLazySingleIfExists(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
+		putValueOutputActual.setClassifier(fi.feature.dataFeatureClassifier);
+		putValueContextActual.setClassifier(thisModule.resolveLazySingleIfExists(consumerPort, 'createContextDataImpl', 'PeriodicDelayedContext_Impl'));
 	}
 }
 
@@ -671,18 +676,18 @@ rule m_Thread_IntraProcess_Input_EventOrEventDataPort_PeriodicDelayed_Instance_L
 			ownedPrototypeBinding <- Sequence{receiveInputContextPrototypeBinding},
 			ownedParameter <- Sequence{}
 		),
-		receiveInputContextPrototypeBinding: AADLBA!ComponentPrototypeBinding
+		receiveInputContextPrototypeBinding: AADLBA!FeaturePrototypeBinding
 		(
 			formal <- Receive_Input_PrototypeSpg.ownedPrototype->any(e|e.name = 'context_prototype'),
-			actual <- Sequence{receiveInputContextActual}
+			actual <- receiveInputContextActual
 		),
-		receiveInputContextActual: AADLBA!ComponentPrototypeActual
+		receiveInputContextActual: AADLBA!AccessSpecification
 		(
 			category<-#data
 		)
 	do
 	{
-		receiveInputContextActual.setSubcomponentType(thisModule.createContextDataImpl(fi));
+		receiveInputContextActual.setClassifier(thisModule.createContextDataImpl(fi));
 		PeriodicDelayedContext_Access.setDataFeatureClassifier(thisModule.createContextDataImpl(fi));
 	}
 }
