@@ -5,7 +5,7 @@
       <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.12"/>
       <ownedValue>
         <ownedValue xsi:type="aadl2:IntegerLiteral" value="200000">
-          <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+          <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
         </ownedValue>
       </ownedValue>
     </ownedPropertyAssociation>
@@ -190,10 +190,10 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:RangeValue">
             <minimum xsi:type="aadl2:IntegerLiteral">
-              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
             </minimum>
             <maximum xsi:type="aadl2:IntegerLiteral" value="1">
-              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
             </maximum>
           </ownedValue>
         </ownedValue>
@@ -202,7 +202,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="2000">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -216,7 +216,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="40000">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -224,7 +224,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.10"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="40000">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -232,7 +232,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.7"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="40">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -332,10 +332,10 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:RangeValue">
             <minimum xsi:type="aadl2:IntegerLiteral">
-              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
             </minimum>
             <maximum xsi:type="aadl2:IntegerLiteral" value="1">
-              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
             </maximum>
           </ownedValue>
         </ownedValue>
@@ -344,7 +344,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Timing_Properties.aadl2#//@ownedProperty.18"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="1000">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -358,7 +358,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="40000">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -366,7 +366,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.10"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="40000">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -374,7 +374,7 @@
         <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.7"/>
         <ownedValue>
           <ownedValue xsi:type="aadl2:IntegerLiteral" value="40">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
           </ownedValue>
         </ownedValue>
       </ownedPropertyAssociation>
@@ -464,7 +464,7 @@
           <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/Memory_Properties.aadl2#//@ownedProperty.8"/>
           <ownedValue>
             <ownedValue xsi:type="aadl2:IntegerLiteral" value="2">
-              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.13/@ownedLiteral.1"/>
+              <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.11/@ownedLiteral.1"/>
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
@@ -526,7 +526,7 @@
       <property href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.2"/>
       <ownedValue>
         <ownedValue xsi:type="aadl2:IntegerLiteral" value="1000">
-          <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+          <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
         </ownedValue>
       </ownedValue>
     </ownedPropertyAssociation>
@@ -535,7 +535,7 @@
       <ownedValue>
         <ownedValue xsi:type="aadl2:ListValue">
           <ownedListElement xsi:type="aadl2:IntegerLiteral" value="1000">
-            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.14/@ownedLiteral.3"/>
+            <unit href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.12/@ownedLiteral.3"/>
           </ownedListElement>
         </ownedValue>
       </ownedValue>
@@ -755,7 +755,7 @@
       <ownedValue>
         <ownedValue xsi:type="aadl2:ListValue">
           <ownedListElement xsi:type="aadl2:NamedValue">
-            <namedValue xsi:type="aadl2:EnumerationLiteral" href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.6"/>
+            <namedValue xsi:type="aadl2:EnumerationLiteral" href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.9"/>
           </ownedListElement>
         </ownedValue>
       </ownedValue>
@@ -809,7 +809,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ListValue">
             <ownedListElement xsi:type="aadl2:NamedValue">
-              <namedValue xsi:type="aadl2:EnumerationLiteral" href="file:/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/../ramses-SNAPSHOT-bin/aadl_resources/propertyset/AADL_Project.aadl2#//@ownedPropertyType.7/@ownedLiteral.2"/>
+              <namedValue xsi:type="aadl2:Property" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#xtextLink_::0.5.9.3.48.0.4.4.7.0.6.2.0::2::/0"/>
             </ownedListElement>
           </ownedValue>
         </ownedValue>

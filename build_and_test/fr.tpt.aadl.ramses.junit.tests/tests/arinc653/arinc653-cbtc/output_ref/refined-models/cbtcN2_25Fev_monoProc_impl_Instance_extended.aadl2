@@ -4,16 +4,16 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   process implementation train.impl
     subcomponents
       TrainPpu_trainTraction_tractionIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       VobcTrainPositionEstimation_vobcTrainPositionEstimation_additionalTrainPositionOffset_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       VobcTrainPositionEstimation_vobcTrainPositionEstimation_wheelAngleIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       TrainSpeedAccelCompute_trainSpeedAccelCompute_trainPositionIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       train_inst_TrainSpeedAccelCompute_inst_eoaInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       train_inst_TrainSpeedAccelCompute_inst_trainPositionForMauOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
@@ -74,13 +74,13 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   process implementation railway.impl
     subcomponents
       TrainPositionsCorrelation_trainPositionsCorrelation_trainPositionViuForMauIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       ViuTrainPositionEstimation_viuTrainPositionEstimation_trackIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       TrainSimu_trainSimulation_delayed_trainDataIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       railway_inst_EoaSending_inst_eoaForVobcOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       railway_inst_TrainPositionsCorrelation_inst_trainPositionVobcForMauInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
