@@ -362,25 +362,88 @@ public class TrcUtils {
 			result.add(localDependencyList);
 			for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 			{
-				getPossibleDependencies(req, eObjList, localDependencyList, result);
+				getRestrictedPossibleDependencies(req, eObjList, localDependencyList, result, false);
 			}
 		}
 		return result;
 	}
 	
+	//return list of possible rule according to dependencies of an appliedRule on an EObject
+	public static List<List<TaggedRuleApplicationTulpe>> getNormalizedDependencies(TrcSpecification spec,
+	                                                                         List<EObject> eObjList,
+	                                                                         String appliedRule)
+	                                                                         {
+	  List<List<TaggedRuleApplicationTulpe>> result = new ArrayList<List<TaggedRuleApplicationTulpe>>();
+	  for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
+	  {
+	    if(false==dep.getAppliedRule().equals(appliedRule))
+	      continue;
+	    List<TaggedRuleApplicationTulpe> localDependencyList = new ArrayList<TaggedRuleApplicationTulpe>();
+	    result.add(localDependencyList);
+	    for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
+	    {
+	      getPossibleDependencies(req, eObjList, localDependencyList, result);
+	    }
+	  }
+	  return result;
+	                                                                         }
+
 	private static void getPossibleDependencies(AbstractRuleDependency ar, 
-			  List<EObject> eObjList, 
-			  List<RuleApplicationTulpe> currentDependencyList,
-			  List<List<RuleApplicationTulpe>> result)
-	{
-		getPossibleDependencies(ar, 
-				  eObjList, 
-				  currentDependencyList,
-				  result,
-				  false);
-	}
+	                                           List<EObject> eObjList, 
+	                                           List<TaggedRuleApplicationTulpe> currentDependencyList,
+	                                           List<List<TaggedRuleApplicationTulpe>> result)
+  {
+	  // Here, we have to organize dependencies according to a disjunctive normal form.
+	  if(ar instanceof RuleDependency)
+	  {
+	    RuleDependency rd = (RuleDependency) ar;
+	    try
+	    {
+	      TaggedRuleApplicationTulpe dep = new TaggedRuleApplicationTulpe();
+	      List<EObject> depObjList = new ArrayList<EObject>();
+	      for(EObject eObj: eObjList)
+	      {
+	        List<EObject> depObj = getReferenceList(eObj,rd.getFieldNames());
+	        depObjList.addAll(depObj);
+	      }
+	      currentDependencyList.add(dep);
+	      dep.setPatternMatchedElement(depObjList);
+	      dep.setTransformationRuleName(rd.getRequiredRule());
+	      dep.setExclusion(rd.isIsExclusion());
+	    }
+	    catch(Exception e)
+	    {
+	      e.printStackTrace();
+	      System.exit(-1);
+	    }
+	  }
+	  else if(ar instanceof RuleDependencyConjunction)
+	  {
+	    for(AbstractRuleDependency conjunctedAr:((RuleDependencyConjunction) ar).getRequiredTransformations())
+	    {
+	      getPossibleDependencies(conjunctedAr, eObjList, currentDependencyList, result);
+	    }
+	  }
+	  else if(ar instanceof RuleDependencyDisjunction)
+	  {
+	    for(AbstractRuleDependency disjunctedAr:((RuleDependencyDisjunction) ar).getRequiredTransformations())
+	    {
+	      if(disjunctedAr.equals(((RuleDependencyDisjunction) ar).getRequiredTransformations().get(0)))
+	      {
+	        getPossibleDependencies(disjunctedAr, eObjList, currentDependencyList, result);
+	      }
+	      else
+	      {
+	        List<TaggedRuleApplicationTulpe> disjuncResult = new ArrayList<TaggedRuleApplicationTulpe>();
+	        disjuncResult.addAll(currentDependencyList);
+	        getPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result);
+	        result.add(disjuncResult);
+	      }
+	    }
+	  }
+  }
 	
-	private static void getPossibleDependencies(AbstractRuleDependency ar, 
+	private static void getRestrictedPossibleDependencies(AbstractRuleDependency ar, 
 												  List<EObject> eObjList, 
 												  List<RuleApplicationTulpe> currentDependencyList,
 												  List<List<RuleApplicationTulpe>> result,
@@ -390,6 +453,8 @@ public class TrcUtils {
 		if(ar instanceof RuleDependency)
 		{
 			RuleDependency rd = (RuleDependency) ar;
+			if(rd.isIsExclusion()!=isExclusion)
+			  return;
 			try
 			{
 				RuleApplicationTulpe dep = new RuleApplicationTulpe();
@@ -414,7 +479,7 @@ public class TrcUtils {
 		{
 			for(AbstractRuleDependency conjunctedAr:((RuleDependencyConjunction) ar).getRequiredTransformations())
 			{
-				getPossibleDependencies(conjunctedAr, eObjList, currentDependencyList, result);
+			  getRestrictedPossibleDependencies(conjunctedAr, eObjList, currentDependencyList, result, isExclusion);
 			}
 		}
 		else if(ar instanceof RuleDependencyDisjunction)
@@ -423,13 +488,13 @@ public class TrcUtils {
 			{
 				if(disjunctedAr.equals(((RuleDependencyDisjunction) ar).getRequiredTransformations().get(0)))
 				{
-					getPossibleDependencies(disjunctedAr, eObjList, currentDependencyList, result);
+				  getRestrictedPossibleDependencies(disjunctedAr, eObjList, currentDependencyList, result, isExclusion);
 				}
 				else
 				{
 					List<RuleApplicationTulpe> disjuncResult = new ArrayList<RuleApplicationTulpe>();
 					disjuncResult.addAll(currentDependencyList);
-					getPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result);
+					getRestrictedPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result, isExclusion);
 					result.add(disjuncResult);
 				}
 			}
@@ -524,7 +589,7 @@ public class TrcUtils {
 			exclusionDependencyList.add(localDependencyList);
 			for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 			{
-				getPossibleDependencies(req, candidateObjects, localDependencyList, exclusionDependencyList, true);
+				getRestrictedPossibleDependencies(req, candidateObjects, localDependencyList, exclusionDependencyList, true);
 			}
 		}
 		return exclusionDependencyList;

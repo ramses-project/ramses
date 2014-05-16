@@ -6,24 +6,24 @@ import org.eclipse.emf.ecore.EObject;
 
 public class RuleApplicationTulpe {
 
-	List<EObject> patternMatchedElementList;
+	private List<EObject> _patternMatchedElementList;
+	private String  _transformationRuleName;
 	
-	public List<EObject> getPatternMatchedElement() {
-		return patternMatchedElementList;
+	
+  public List<EObject> getPatternMatchedElement() {
+		return _patternMatchedElementList;
 	}
 	
 	public void setPatternMatchedElement(List<EObject> patternMatchedElement) {
-		this.patternMatchedElementList = patternMatchedElement;
+		this._patternMatchedElementList = patternMatchedElement;
 	}
 	
-	String  transformationRuleName;
-	
 	public String getTransformationRuleName() {
-		return transformationRuleName;
+		return _transformationRuleName;
 	}
 	
 	public void setTransformationRuleName(String transformationRuleName) {
-		this.transformationRuleName = transformationRuleName;
+		this._transformationRuleName = transformationRuleName;
 	}
-	
+  
 }

@@ -611,7 +611,8 @@ public class AadlTargetSpecificGenerator implements Generator
                                   RamsesConfiguration config,
                                   IProgressMonitor monitor)
   {
-    // TODO Auto-generated method stub
+    TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
+    
     
   }
 
@@ -657,7 +658,8 @@ public class AadlTargetSpecificGenerator implements Generator
                                  RamsesConfiguration config,
                                  IProgressMonitor monitor)
   {
-    // TODO Auto-generated method stub
+    TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
+    
     
   }
 
