@@ -25,7 +25,7 @@ import java.io.File ;
 import java.io.FileInputStream ;
 import java.io.IOException ;
 import java.io.InputStream ;
-import java.util.ArrayList;
+import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
@@ -38,11 +38,10 @@ import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.SWT ;
+import org.eclipse.swt.widgets.MessageBox ;
+import org.eclipse.swt.widgets.Shell ;
+import org.eclipse.ui.PlatformUI ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.PublicPackageSection ;
@@ -59,12 +58,12 @@ import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
-import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher;
+import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.analysis.Analyzer ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.Aadl2StandaloneUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
@@ -75,15 +74,13 @@ import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
-import fr.tpt.aadl.ramses.control.support.utils.Names;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
 import fr.tpt.aadl.ramses.control.workflow.ResolutionMethod ;
-import fr.tpt.aadl.ramses.control.workflow.Transformation ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 import fr.tpt.aadl.ramses.transformation.launcher.ArchitectureRefinementProcessLauncher ;
-import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
+import fr.tpt.aadl.ramses.transformation.selection.manual.ManualSelection ;
 import fr.tpt.aadl.ramses.transformation.selection.sensitivity.SensitivityBasedSelection ;
-import fr.tpt.aadl.ramses.transformation.trc.TrcPackage ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 
 
@@ -654,12 +651,35 @@ public class AadlTargetSpecificGenerator implements Generator
 
   private void doLoopManualMerge(AbstractLoop l,
                                  AnalysisErrorReporterManager errManager,
-                                 WorkflowPilot xmlPilot,
+                                 WorkflowPilot workflowPilot,
                                  RamsesConfiguration config,
-                                 IProgressMonitor monitor)
+                                 IProgressMonitor monitor) throws ParseException, ConfigurationException
   {
     TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
     
+    String propertyFile = (String) additionalParameters.get(Names.RAMSES_PROPERTIES);
+
+    Properties p = new Properties();
+    try {
+      InputStream in = new FileInputStream(propertyFile);
+      p.load(in);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    
+    ManualSelection selectionMethod = new ManualSelection(trc);
+    ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
+        (trc,
+         this.currentImplResource.getResourceSet(),
+         config,
+         selectionMethod,
+         p,
+         l.getTransformations(),
+         this._modelInstantiator,
+         this._predefinedResourceManager
+         );
+    SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
+    mergeLauncher.launch(sinst, workflowPilot.getOutputModelId()+"_iter_"+this.loopIteration, l.getIterationNb());
     
   }
 
