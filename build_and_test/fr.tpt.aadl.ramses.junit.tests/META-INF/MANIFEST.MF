@@ -14,5 +14,9 @@ Export-Package: com.saxman.textdiff,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit;bundle-version="4.8.2",
+ org.eclipse.emf.ecore,
+ org.osate.aadl2,
  org.osate.utils,
- fr.tpt.aadl.ramses.control.support
+ fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.control.cli.core,
+ fr.tpt.aadl.ramses.control.cli.instantiation

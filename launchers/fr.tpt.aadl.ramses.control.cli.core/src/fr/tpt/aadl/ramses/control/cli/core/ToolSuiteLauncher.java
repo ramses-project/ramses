@@ -66,7 +66,7 @@ public class ToolSuiteLauncher
   
   private static Logger _LOGGER = Logger.getLogger(ToolSuiteLauncher.class) ;
   
-  ToolSuiteLauncher(IProgressMonitor monitor,
+  public ToolSuiteLauncher(IProgressMonitor monitor,
                     StandAloneInstantiator instantiator,
                     PredefinedAadlModelManager modelManager)
   {
@@ -144,7 +144,7 @@ public class ToolSuiteLauncher
     }
   }
 
-  List<Resource> performParse(List<File> aadlFile) throws ParseException
+  public List<Resource> performParse(List<File> aadlFile) throws ParseException
   {
     List<Resource> result = _instantiator.parse(aadlFile) ;
     return result ;
@@ -155,7 +155,7 @@ public class ToolSuiteLauncher
    * and registers them in the OSATE resource set.
    * @throws ParseException 
    */
-  void parsePredefinedRessources() throws ParseException
+  public void parsePredefinedRessources() throws ParseException
   {
     _monitor.subTask("Parse predefined AADL models");
     _modelManager.parsePredefinedAadlModels();

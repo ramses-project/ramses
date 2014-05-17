@@ -10,7 +10,8 @@ import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
 import java.util.concurrent.TimeoutException ;
 
-import junit.framework.Assert ;
+import org.junit.Assert ;
+
 import fr.tpt.aadl.ramses.control.support.reporters.StdProcessTraceDisplay ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
 

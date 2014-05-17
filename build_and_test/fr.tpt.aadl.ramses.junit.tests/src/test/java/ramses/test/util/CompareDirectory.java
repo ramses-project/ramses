@@ -46,9 +46,9 @@ public class CompareDirectory {
   /**
    * 
    * @return
-   * @throws Exception 
+   * @throws IOException
    */
-  public boolean evaluate() throws Exception {
+  public boolean evaluate() throws IOException {
 	boolean noDiff = true;
     ArrayList<SimpleFile> sListGen = new ArrayList<SimpleFile>();
     for (File f : listGen) {

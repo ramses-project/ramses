@@ -5,8 +5,7 @@ import static org.junit.Assert.fail ;
 import java.io.File ;
 import java.io.IOException ;
 
-import junit.framework.Assert ;
-
+import org.junit.Assert ;
 import org.osate.utils.FileUtils ;
 
 import com.saxman.textdiff.Report ;
