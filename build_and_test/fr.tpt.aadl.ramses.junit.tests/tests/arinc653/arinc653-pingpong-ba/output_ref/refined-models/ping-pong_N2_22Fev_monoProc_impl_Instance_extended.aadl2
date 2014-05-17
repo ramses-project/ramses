@@ -17,22 +17,22 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Data_Model::Base_Type => (classifier(COAL::integer));
         };
       Monitor_changeState_error_C1_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       Monitor_changeState_delayed_error_C2_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       IPingOrPong_Cping_ping_delayed_PongIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       IPingOrPong_Cping_ping_mode_aadlKeywords_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       IPingOrPong_Cping_delayed_PongIn_mode_aadlKeywords_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       IPingOrPong_Cpong_pong_mode_aadlKeywords_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       S1_inst_Mon_mode_C2_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       S1_inst_C1_PingOut_globalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
@@ -120,7 +120,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Data_Model::Base_Type => (classifier(COAL::integer));
         };
       IPingOrPong_Cping_ping_delayed_PongIn_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       S2_inst_C2_modeglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;
       S2_inst_C2_PingInglobalVariable: data arinc653_runtime::Sampling_Port_Id_Type;

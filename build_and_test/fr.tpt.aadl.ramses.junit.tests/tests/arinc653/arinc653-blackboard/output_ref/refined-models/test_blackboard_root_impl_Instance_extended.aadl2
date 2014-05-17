@@ -4,7 +4,7 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,PeriodicDelayed_runtim
   process implementation proc.impl
     subcomponents
       the_receiver_p_in_globalVariable: data arinc653_runtime::Blackboard_Id_Type {
-        Concurrency_Control_Protocol => PRIORITY_CEILING_PROTOCOL;
+        Concurrency_Control_Protocol => Priority_Ceiling;
         };
       the_sender: thread the_proc_the_sender.impl {
         Dispatch_Protocol => Periodic;
