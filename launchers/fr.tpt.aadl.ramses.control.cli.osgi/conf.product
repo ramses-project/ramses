@@ -7,14 +7,13 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog</programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.5 -XX:MaxPermSize=256m -Xms40m -Xmx512m -Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl
--Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
--Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl</vmArgs>
+      <programArgs>–nosplash -os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl}</programArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts -XX:MaxPermSize=256m -Xms40m -Xmx512m -Xdock:icon=../Resources/Eclipse.icns -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
    <windowImages/>
+
 
    <launcher name="osate2-cli">
       <solaris/>
@@ -38,6 +37,7 @@
       <plugin id="fr.tpt.aadl.ramses.control.atl.launch"/>
       <plugin id="fr.tpt.aadl.ramses.control.cli.core"/>
       <plugin id="fr.tpt.aadl.ramses.control.cli.instantiation"/>
+      <plugin id="fr.tpt.aadl.ramses.control.cli.osgi"/>
       <plugin id="fr.tpt.aadl.ramses.control.support"/>
       <plugin id="fr.tpt.aadl.ramses.control.support.workflow.edit"/>
       <plugin id="fr.tpt.aadl.ramses.control.support.workflow.editor"/>
@@ -217,6 +217,13 @@
       <plugin id="org.w3c.dom.smil"/>
       <plugin id="org.w3c.dom.svg"/>
    </plugins>
+
+   <features>
+      <feature id="org.osate.core.feature" version="2.0.0.qualifier"/>
+      <feature id="org.osate.utils.feature" version="1.0.0.qualifier"/>
+      <feature id="org.osate.ba.feature" version="1.0.0.qualifier"/>
+      <feature id="fr.tpt.aadl.ramses.feature" version="1.0.0.qualifier"/>
+   </features>
 
 
 </product>
