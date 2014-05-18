@@ -19,6 +19,7 @@
   <modules>
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.core</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.osgi</module>
+    <module>../../launchers/fr.tpt.aadl.ramses.control.cli.osgi.product</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.edit</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.editor</module>
