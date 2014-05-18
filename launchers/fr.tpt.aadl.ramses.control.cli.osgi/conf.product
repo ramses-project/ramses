@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="model transformation osgi" uid="model.transformation.osgi" id="fr.tpt.aadl.model.transformation.osgi.product" application="fr.tpt.aadl.model.transformation.osgi.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
+<product name="model transformation osgi" uid="model.transformation.osgi" id="fr.tpt.aadl.model.transformation.osgi.product" application="fr.tpt.aadl.ramses.control.cli.osgi.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -26,29 +26,60 @@
    </vm>
 
    <plugins>
-      <plugin id="com.google.collect"/>
+      <plugin id="PropertiesExtractor"/>
+      <plugin id="com.google.guava"/>
       <plugin id="com.google.inject"/>
       <plugin id="com.ibm.icu"/>
-      <plugin id="fr.tpt.aadl.annex.behavior"/>
-      <plugin id="fr.tpt.aadl.atl.transformation"/>
-      <plugin id="fr.tpt.aadl.generation.makefile"/>
-      <plugin id="fr.tpt.aadl.instantiation"/>
-      <plugin id="fr.tpt.aadl.model.transformation.osgi"/>
-      <plugin id="fr.tpt.aadl.toolsuite.cli"/>
-      <plugin id="fr.tpt.aadl.toolsuite.core"/>
-      <plugin id="fr.tpt.aadl.toolsuite.support"/>
+      <plugin id="fr.tpt.aadl.ramses.analysis.asg"/>
+      <plugin id="fr.tpt.aadl.ramses.analysis.result"/>
+      <plugin id="fr.tpt.aadl.ramses.communication.periodic.delayed"/>
+      <plugin id="fr.tpt.aadl.ramses.constraints.reporter.metamodel"/>
+      <plugin id="fr.tpt.aadl.ramses.control.atl.launch"/>
+      <plugin id="fr.tpt.aadl.ramses.control.cli.core"/>
+      <plugin id="fr.tpt.aadl.ramses.control.cli.instantiation"/>
+      <plugin id="fr.tpt.aadl.ramses.control.cli.osgi"/>
+      <plugin id="fr.tpt.aadl.ramses.control.cli.static"/>
+      <plugin id="fr.tpt.aadl.ramses.control.support"/>
+      <plugin id="fr.tpt.aadl.ramses.control.support.workflow.edit"/>
+      <plugin id="fr.tpt.aadl.ramses.control.support.workflow.editor"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.ada"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.ada.ravenscar"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.arinc653.xml"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.c"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.integrity"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.osek"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.pok"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.target.specific"/>
+      <plugin id="fr.tpt.aadl.ramses.generation.utils"/>
+      <plugin id="fr.tpt.aadl.ramses.junit.tests"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.atl"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.merge.launcher"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.selection"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.selection.manual"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.selection.sensitivity"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.tip"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.trc"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.trc.edit"/>
+      <plugin id="fr.tpt.aadl.ramses.transformation.trc.editor"/>
+      <plugin id="fr.tpt.aadl.ramses.util.math"/>
+      <plugin id="fr.tpt.aadl.ramses.util.properties"/>
+      <plugin id="fr.tpt.aadl.sched.tools.aadlinspector"/>
+      <plugin id="fr.tpt.aadl.sched.tools.cheddar"/>
+      <plugin id="fr.tpt.aadl.sched.wcetanalysis.results"/>
+      <plugin id="fr.tpt.atl.hots"/>
+      <plugin id="fr.tpt.atl.utils"/>
+      <plugin id="fr.tpt.rdal.utils"/>
+      <plugin id="javax.annotation"/>
+      <plugin id="javax.inject"/>
+      <plugin id="javax.xml"/>
       <plugin id="lpg.runtime.java"/>
       <plugin id="org.antlr.runtime"/>
-      <plugin id="org.aopalliance"/>
-      <plugin id="org.apache.ant"/>
+      <plugin id="org.apache.batik.css"/>
+      <plugin id="org.apache.batik.util"/>
+      <plugin id="org.apache.batik.util.gui"/>
       <plugin id="org.apache.commons.lang"/>
       <plugin id="org.apache.commons.logging"/>
       <plugin id="org.apache.log4j"/>
-      <plugin id="org.eclipse.acceleo.common"/>
-      <plugin id="org.eclipse.acceleo.engine"/>
-      <plugin id="org.eclipse.acceleo.model"/>
-      <plugin id="org.eclipse.acceleo.parser"/>
-      <plugin id="org.eclipse.acceleo.profiler"/>
       <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>
@@ -58,23 +89,41 @@
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
-      <plugin id="org.eclipse.core.net"/>
-      <plugin id="org.eclipse.core.net.linux.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.resources"/>
       <plugin id="org.eclipse.core.runtime"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
       <plugin id="org.eclipse.core.variables"/>
       <plugin id="org.eclipse.debug.core"/>
-      <plugin id="org.eclipse.debug.ui"/>
+      <plugin id="org.eclipse.e4.core.commands"/>
+      <plugin id="org.eclipse.e4.core.contexts"/>
+      <plugin id="org.eclipse.e4.core.di"/>
+      <plugin id="org.eclipse.e4.core.di.extensions"/>
+      <plugin id="org.eclipse.e4.core.services"/>
+      <plugin id="org.eclipse.e4.ui.bindings"/>
+      <plugin id="org.eclipse.e4.ui.css.core"/>
+      <plugin id="org.eclipse.e4.ui.css.swt"/>
+      <plugin id="org.eclipse.e4.ui.css.swt.theme"/>
+      <plugin id="org.eclipse.e4.ui.di"/>
+      <plugin id="org.eclipse.e4.ui.model.workbench"/>
+      <plugin id="org.eclipse.e4.ui.services"/>
+      <plugin id="org.eclipse.e4.ui.widgets"/>
+      <plugin id="org.eclipse.e4.ui.workbench"/>
+      <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true"/>
+      <plugin id="org.eclipse.e4.ui.workbench.swt"/>
+      <plugin id="org.eclipse.e4.ui.workbench3"/>
+      <plugin id="org.eclipse.emf"/>
+      <plugin id="org.eclipse.emf.cdo.ecore.retrofit" fragment="true"/>
       <plugin id="org.eclipse.emf.codegen"/>
+      <plugin id="org.eclipse.emf.codegen.ecore"/>
       <plugin id="org.eclipse.emf.common"/>
       <plugin id="org.eclipse.emf.common.ui"/>
       <plugin id="org.eclipse.emf.ecore"/>
       <plugin id="org.eclipse.emf.ecore.change"/>
       <plugin id="org.eclipse.emf.ecore.edit"/>
-      <plugin id="org.eclipse.emf.ecore.editor"/>
       <plugin id="org.eclipse.emf.ecore.xmi"/>
       <plugin id="org.eclipse.emf.edit"/>
       <plugin id="org.eclipse.emf.edit.ui"/>
@@ -82,7 +131,10 @@
       <plugin id="org.eclipse.emf.transaction"/>
       <plugin id="org.eclipse.emf.validation"/>
       <plugin id="org.eclipse.equinox.app"/>
+      <plugin id="org.eclipse.equinox.bidi"/>
       <plugin id="org.eclipse.equinox.common"/>
+      <plugin id="org.eclipse.equinox.ds"/>
+      <plugin id="org.eclipse.equinox.event"/>
       <plugin id="org.eclipse.equinox.p2.core"/>
       <plugin id="org.eclipse.equinox.p2.engine"/>
       <plugin id="org.eclipse.equinox.p2.metadata"/>
@@ -91,6 +143,8 @@
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.registry"/>
       <plugin id="org.eclipse.equinox.security"/>
+      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
+      <plugin id="org.eclipse.equinox.util"/>
       <plugin id="org.eclipse.help"/>
       <plugin id="org.eclipse.jdt.compiler.apt" fragment="true"/>
       <plugin id="org.eclipse.jdt.compiler.tool" fragment="true"/>
@@ -100,56 +154,70 @@
       <plugin id="org.eclipse.jface"/>
       <plugin id="org.eclipse.jface.databinding"/>
       <plugin id="org.eclipse.jface.text"/>
+      <plugin id="org.eclipse.m2m.atl"/>
       <plugin id="org.eclipse.m2m.atl.adt"/>
-      <plugin id="org.eclipse.m2m.atl.adt.ui"/>
       <plugin id="org.eclipse.m2m.atl.common"/>
       <plugin id="org.eclipse.m2m.atl.core"/>
       <plugin id="org.eclipse.m2m.atl.core.emf"/>
-      <plugin id="org.eclipse.m2m.atl.core.ui"/>
       <plugin id="org.eclipse.m2m.atl.debug.core"/>
       <plugin id="org.eclipse.m2m.atl.dsls"/>
+      <plugin id="org.eclipse.m2m.atl.emftvm"/>
+      <plugin id="org.eclipse.m2m.atl.emftvm.compiler"/>
+      <plugin id="org.eclipse.m2m.atl.emftvm.trace"/>
       <plugin id="org.eclipse.m2m.atl.engine"/>
       <plugin id="org.eclipse.m2m.atl.engine.emfvm"/>
       <plugin id="org.eclipse.m2m.atl.engine.emfvm.launch"/>
       <plugin id="org.eclipse.ocl"/>
+      <plugin id="org.eclipse.ocl.common"/>
       <plugin id="org.eclipse.ocl.ecore"/>
       <plugin id="org.eclipse.osgi"/>
+      <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
+      <plugin id="org.eclipse.swt.cocoa.macosx.x86_64" fragment="true"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.console"/>
       <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
       <plugin id="org.eclipse.ui.views"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
+      <plugin id="org.eclipse.uml2.codegen.ecore"/>
       <plugin id="org.eclipse.uml2.common"/>
       <plugin id="org.eclipse.uml2.common.edit"/>
+      <plugin id="org.eclipse.uml2.types"/>
       <plugin id="org.eclipse.uml2.uml"/>
       <plugin id="org.eclipse.uml2.uml.edit"/>
-      <plugin id="org.eclipse.update.configurator"/>
-      <plugin id="org.eclipse.update.core"/>
       <plugin id="org.eclipse.xtext"/>
       <plugin id="org.eclipse.xtext.builder"/>
       <plugin id="org.eclipse.xtext.logging" fragment="true"/>
       <plugin id="org.eclipse.xtext.ui"/>
       <plugin id="org.eclipse.xtext.ui.shared"/>
       <plugin id="org.eclipse.xtext.util"/>
+      <plugin id="org.eclipse.xtext.xbase.lib"/>
+      <plugin id="org.hamcrest.core"/>
+      <plugin id="org.jdom"/>
+      <plugin id="org.junit"/>
+      <plugin id="org.objectweb.asm"/>
       <plugin id="org.osate.aadl2"/>
       <plugin id="org.osate.aadl2.edit"/>
       <plugin id="org.osate.aadl2.instantiation"/>
       <plugin id="org.osate.aadl2.modelsupport"/>
       <plugin id="org.osate.annexsupport"/>
+      <plugin id="org.osate.ba"/>
       <plugin id="org.osate.contribution.sei"/>
       <plugin id="org.osate.core"/>
       <plugin id="org.osate.pluginsupport"/>
       <plugin id="org.osate.ui"/>
+      <plugin id="org.osate.utils"/>
       <plugin id="org.osate.workspace"/>
       <plugin id="org.osate.xtext.aadl2"/>
       <plugin id="org.osate.xtext.aadl2.properties"/>
       <plugin id="org.osate.xtext.aadl2.properties.ui"/>
+      <plugin id="org.w3c.css.sac"/>
+      <plugin id="org.w3c.dom.events"/>
+      <plugin id="org.w3c.dom.smil"/>
+      <plugin id="org.w3c.dom.svg"/>
    </plugins>
 
 
