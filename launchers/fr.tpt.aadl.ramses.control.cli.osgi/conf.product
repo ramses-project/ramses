@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="osate2 cli osgi" uid="osate2-cli" id="fr.tpt.aadl.model.transformation.osgi.product" application="fr.tpt.aadl.ramses.control.cli.osgi.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
+<product name="osate2 cli osgi" uid="osate2-cli" id="fr.tpt.aadl.ramses.control.cli.osgi.product" application="fr.tpt.aadl.ramses.control.cli.osgi.application" version="1.0.0.qualifier" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
+      <programArgs>-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -consoleLog</programArgs>
       <vmArgs>-Dosgi.requiredJavaVersion=1.5 -XX:MaxPermSize=256m -Xms40m -Xmx512m -Djavax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl
 -Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
 -Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl</vmArgs>
@@ -15,7 +16,7 @@
 
    <windowImages/>
 
-   <launcher name="model_transformation">
+   <launcher name="osate2-cli">
       <solaris/>
       <win useIco="false">
          <bmp/>
