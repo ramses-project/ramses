@@ -9,7 +9,7 @@
 
    <launcherArgs>
       <programArgs>-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl}</programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts -XX:MaxPermSize=256m -Xms40m -Xmx512m -Xdock:icon=../Resources/Eclipse.icns -XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XstartOnFirstThread -XX:MaxPermSize=256m -Xms40m -Xmx512m</vmArgs>
    </launcherArgs>
 
    <windowImages/>
