@@ -40,7 +40,6 @@
       <plugin id="fr.tpt.aadl.ramses.control.cli.core"/>
       <plugin id="fr.tpt.aadl.ramses.control.cli.instantiation"/>
       <plugin id="fr.tpt.aadl.ramses.control.cli.osgi"/>
-      <plugin id="fr.tpt.aadl.ramses.control.cli.static"/>
       <plugin id="fr.tpt.aadl.ramses.control.osate"/>
       <plugin id="fr.tpt.aadl.ramses.control.support"/>
       <plugin id="fr.tpt.aadl.ramses.control.support.workflow.edit"/>
@@ -54,7 +53,6 @@
       <plugin id="fr.tpt.aadl.ramses.generation.pok"/>
       <plugin id="fr.tpt.aadl.ramses.generation.target.specific"/>
       <plugin id="fr.tpt.aadl.ramses.generation.utils"/>
-      <plugin id="fr.tpt.aadl.ramses.junit.tests"/>
       <plugin id="fr.tpt.aadl.ramses.transformation.atl"/>
       <plugin id="fr.tpt.aadl.ramses.transformation.merge.launcher"/>
       <plugin id="fr.tpt.aadl.ramses.transformation.selection"/>
