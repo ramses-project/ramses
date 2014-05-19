@@ -36,10 +36,10 @@ http://www.eclipse.org/org/documents/epl-v10.php
          point="org.eclipse.core.runtime.products">
       <product
             application="fr.tpt.aadl.ramses.control.cli.osgi.application"
-            name="osate2 cli osgi">
+            name="osate2-cli">
          <property
                name="appName"
-               value="osate2 cli osgi">
+               value="osate2-cli">
          </property>
       </product>
    </extension>
