@@ -65,7 +65,6 @@ public class PatternMatchingForTrcHotLauncher {
 			
 		  // execute the HOT for pattern matching for each transformation
       // included in the TRC iterate on available transformations
-			@SuppressWarnings("unchecked")
 			Iterator<Module> modulesIt = moduleList.iterator();
 			while (modulesIt.hasNext()) {
 				Module moduleObject = modulesIt.next();

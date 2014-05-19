@@ -15,6 +15,7 @@ import java.util.Map.Entry ;
 import java.util.Properties ;
 
 import org.eclipse.core.runtime.NullProgressMonitor ;
+import org.eclipse.core.runtime.Platform ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -228,6 +229,7 @@ public class ArchitectureRefinementProcessLauncher {
     }
 
     config.setRamsesOutputDir(outputDir.getAbsolutePath());
+    
     
     // First, execute the HOT that produces pattern matching results
     PatternMatchingForTrcHotLauncher pmHotLauncher = new PatternMatchingForTrcHotLauncher(transformations,

@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.swt.SWT ;
 import org.eclipse.swt.widgets.MessageBox ;
 import org.eclipse.swt.widgets.Shell ;
@@ -81,7 +82,10 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 import fr.tpt.aadl.ramses.transformation.launcher.ArchitectureRefinementProcessLauncher ;
 import fr.tpt.aadl.ramses.transformation.selection.manual.ManualSelection ;
 import fr.tpt.aadl.ramses.transformation.selection.sensitivity.SensitivityBasedSelection ;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
+import fr.tpt.rdal.parser.RdalParser ;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -629,10 +633,23 @@ public class AadlTargetSpecificGenerator implements Generator
       e.printStackTrace();
     }
     
-    currentImplResource.getResourceSet().getPackageRegistry().put("http://www.open-people.fr/rdal2", RdalPackage.eINSTANCE);
-
+    ResourceSet rs = currentImplResource.getResourceSet();
     
-    TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
+    String trcPath = p.getProperty("ArchitectureRefinementLauncher.trc");
+    if(trcPath!=null)
+      TrcParser.parse(trcPath, rs);
+    
+    String rdalPath = p.getProperty("ArchitectureRefinementLauncher.rdal");
+    if(trcPath!=null)
+    {
+      RdalParser.parse(rdalPath, rs);
+      rs.getPackageRegistry().put("http://www.open-people.fr/rdal2", RdalPackage.eINSTANCE);
+    }
+        
+    List<Transformation> list = l.getTransformations();
+    Resource r = list.get(0).eResource();
+    TrcSpecification trc = (TrcSpecification) r.getContents().get(0);
+    
     Specification rdal = (Specification) workflowPilot.getWokflowRoot().getRequirementsRoot();
     SensitivityBasedSelection selectionMethod = new SensitivityBasedSelection(trc, rdal);
     ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
