@@ -26,6 +26,62 @@
           <includeAllDependencies>true</includeAllDependencies>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <!-- here the phase you need -->
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/osate2-cli</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <!-- here the phase you need -->
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/repository</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
+                  <includes>
+                    <include>**/*.emftvm</include>
+                    <include>**/*.aadl</include>
+                    <include>**/*.aadl2</include>
+                    <include>**/*.c</include>
+                    <include>**/*.h</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-director-plugin</artifactId>
