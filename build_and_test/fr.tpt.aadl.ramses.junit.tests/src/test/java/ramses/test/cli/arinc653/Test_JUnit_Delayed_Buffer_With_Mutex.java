@@ -13,7 +13,7 @@ public class Test_JUnit_Delayed_Buffer_With_Mutex extends POKScenario {
 	}
 
 	@Test
-	public void  JUnit_delayed_buffer_no_mutex_exec(){
+	public void  JUnit_delayed_buffer_with_mutex_exec(){
 		input = "common-components/common-pkg.aadl2,arinc653-buffer-delayed-with_mutex/input/test_buffer_delayed.aadl2";
 		includeList = "tests/arinc653/";
 		ramses_dir = System.getProperty("RAMSES_DIR");
