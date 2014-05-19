@@ -7,9 +7,16 @@ import java.util.Iterator ;
 import java.util.List ;
 
 import org.eclipse.emf.common.util.TreeIterator ;
+import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.util.EcoreUtil ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.InstanceObject ;
 
 import fr.openpeople.rdal2.model.rdal.AbstractGoal ;
 import fr.openpeople.rdal2.model.rdal.DesignElementReference ;
@@ -17,12 +24,35 @@ import fr.openpeople.rdal2.model.rdal.GoalsPackage ;
 import fr.openpeople.rdal2.model.rdal.PrioritizedSatDesignElementRef ;
 import fr.openpeople.rdal2.model.rdal.QualityObjective ;
 import fr.openpeople.rdal2.model.rdal.RdalOrgPackage ;
+import fr.openpeople.rdal2.model.rdal.RdalPackage ;
 import fr.openpeople.rdal2.model.rdal.ReferencedDesignElements ;
 import fr.openpeople.rdal2.model.rdal.Sensitivity ;
 import fr.openpeople.rdal2.model.rdal.Specification ;
 
 public class RdalParser {
 
+  
+  public static Specification parse(String rdalPath, 
+                                       ResourceSet resourceSet){
+    
+    final Resource resource;
+    
+    URI p_uri = URI.createFileURI(rdalPath);
+    
+    resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("rdal", new XMIResourceFactoryImpl());
+    resourceSet.getPackageRegistry().put(RdalPackage.eNS_URI, RdalPackage.eINSTANCE);
+    
+    if (resourceSet.getURIConverter().exists(p_uri, null)) {
+      resource = resourceSet.getResource(p_uri, true);
+      Specification result = (Specification) resource.getContents().get(0);
+      return result;  
+    } else {
+      System.out.println("RDAL of specified path ("+rdalPath+") does not exit.");
+    }
+    
+    return null;
+  }
+  
 //	private Specification rdalRootObject;
 //	public static Specification parse(String rdalPath){
 //		final Resource resource;
@@ -203,7 +233,8 @@ public class RdalParser {
 						if(object instanceof NamedElement)
 						{
 							NamedElement ne = (NamedElement) object;
-							if(designElement.equals(ne) || isContainedIn(ne, (NamedElement) designElement))
+							if(designElement.equals(ne) || isContainedIn(ne, (NamedElement) designElement)
+							    || isInstanceOf(designElement, ne))
 							{
 								sensitivitiesResultList.add(cs);
 							}
@@ -231,7 +262,30 @@ public class RdalParser {
 		return result;
 	}
 	
-	private static boolean isContainedIn(NamedElement container,
+	private static boolean isInstanceOf(EObject designElement, NamedElement neInRdal)
+  {
+    if(designElement instanceof InstanceObject)
+    {
+      InstanceObject io = (InstanceObject) designElement;
+      if(io instanceof ComponentInstance)
+      {
+        ComponentInstance ci = (ComponentInstance) io;
+        return ci.getSubcomponent().equals(designElement) 
+            || ci.getSubcomponent().getSubcomponentType().equals(designElement);
+      }
+      else if(io instanceof FeatureInstance)
+      {
+        FeatureInstance fi = (FeatureInstance) io;
+        return fi.getFeature().equals(designElement);
+      }
+      return false;
+    }
+    return false ;
+  }
+
+	
+	
+  private static boolean isContainedIn(NamedElement container,
 			NamedElement designeElement) {
 		if(designeElement.eContainer() == null)
 			return false;
