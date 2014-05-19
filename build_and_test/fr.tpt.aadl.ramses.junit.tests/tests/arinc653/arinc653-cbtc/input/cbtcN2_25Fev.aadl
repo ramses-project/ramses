@@ -163,9 +163,9 @@ END root;
 PROCESSOR IMPLEMENTATION root.impl
 SUBCOMPONENTS
   VP_train_inst : VIRTUAL PROCESSOR VP_train.impl
-  {Scheduling_Protocol => (Rate_Monotonic_Protocol);};
+  {Scheduling_Protocol => (RMS);};
   VP_railway_inst : VIRTUAL PROCESSOR VP_railway.impl
- {Scheduling_Protocol => (Rate_Monotonic_Protocol);};
+ {Scheduling_Protocol => (RMS);};
 END root.impl;
 
 MEMORY root_main_memory
@@ -190,7 +190,7 @@ PROPERTIES
   ARINC653::Partition_Name => "System";
   ARINC653::System_Partition => TRUE;
   ARINC653::System_Overhead_Time => 10ms;
-  Scheduling_Protocol => (Rate_Monotonic_Protocol);
+  Scheduling_Protocol => (RMS);
   POK::Additional_Features => (libc_stdio,console);
 END VP_System_aadlKeywords.impl;
 
@@ -203,7 +203,7 @@ PROPERTIES
   ARINC653::Partition_Name => "train";
   ARINC653::System_Partition => FALSE;
   ARINC653::System_Overhead_Time => 10ms;
-  Scheduling_Protocol => (Rate_Monotonic_Protocol);
+  Scheduling_Protocol => (RMS);
   POK::Additional_Features => (libc_stdio,console);
 END VP_train.impl;
 
@@ -216,7 +216,7 @@ PROPERTIES
   ARINC653::Partition_Name => "railway";
   ARINC653::System_Partition => FALSE;
   ARINC653::System_Overhead_Time => 10ms;
-  Scheduling_Protocol => (Rate_Monotonic_Protocol);
+  Scheduling_Protocol => (RMS);
   POK::Additional_Features => (libc_stdio,console);
 END VP_railway.impl;
 
