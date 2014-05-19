@@ -5,6 +5,9 @@ import static org.junit.Assert.fail ;
 import java.io.File ;
 import java.io.IOException ;
 import java.util.Calendar ;
+import java.util.Iterator ;
+import java.util.Map ;
+import java.util.Map.Entry ;
 import java.util.concurrent.Callable ;
 import java.util.concurrent.FutureTask ;
 import java.util.concurrent.TimeUnit ;
@@ -28,11 +31,42 @@ public abstract class Scenario
   protected String aadlInspectorPath="";
   protected String target="";
   protected String includeList="";
+  protected Map<String, Object> parameters;
   
   private Process ramsesProcess;
   
-  abstract Process executeGeneratedCode() throws Exception;
-  abstract void init();
+  protected abstract Process executeGeneratedCode() throws Exception;
+  
+  protected abstract void init();
+  
+  protected abstract void initAdditionalParameters();
+  
+  protected void setupCommandLineArgsPrefix(StringBuilder args)
+  {
+    args.append("java") ;
+
+    args.append(" -DDEBUG") ;
+
+    if(ramses_dir != null)
+    {
+      args.append(" -D") ;
+      args.append(Names.RAMSES_RESOURCES_VAR) ;
+      args.append('=') ;
+      args.append(ramses_dir) ;
+    }
+
+    args.append(" -DAADLINSPECTOR_PATH=") ;
+    args.append(aadlInspectorPath) ;
+
+    args.append(" -jar ") ;
+
+    if(ramses_dir != null)
+    {
+      args.append(ramses_dir) ;
+    }
+
+    args.append("ramses-exe.jar") ;
+  }
   
   protected void exec()
   {
@@ -69,29 +103,7 @@ public abstract class Scenario
       {
         StringBuilder args = new StringBuilder() ;
 
-        args.append("java") ;
-
-        args.append(" -DDEBUG") ;
-
-        if(ramses_dir != null)
-        {
-          args.append(" -D") ;
-          args.append(Names.RAMSES_RESOURCES_VAR) ;
-          args.append('=') ;
-          args.append(ramses_dir) ;
-        }
-
-        args.append(" -DAADLINSPECTOR_PATH=") ;
-        args.append(aadlInspectorPath) ;
-
-        args.append(" -jar ") ;
-
-        if(ramses_dir != null)
-        {
-          args.append(ramses_dir) ;
-        }
-
-        args.append("ramses-exe.jar") ;
+        this.setupCommandLineArgsPrefix(args);
 
         args.append(" -l trace") ;
 
@@ -121,6 +133,20 @@ public abstract class Scenario
           args.append(workflowPath) ;
         }
 
+        if(parameters!=null)
+        {
+          args.append(" --parameters ") ;
+          Iterator<Entry<String, Object>> it = parameters.entrySet().iterator();
+          while (it.hasNext()) {
+              Entry<String, Object> pairs = it.next();
+              args.append(pairs.getKey());
+              args.append("=");
+              args.append(pairs.getValue());
+              if(it.hasNext())
+                args.append(",");
+          }
+        }
+        
         Runtime runtime = Runtime.getRuntime() ;
         // Launch code generation
         String line = args.toString() ;
