@@ -58,7 +58,7 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         ]);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end cpu.impl;
   
@@ -318,10 +318,6 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
       the_receiver_p_in_Input_Periodic_Delayed_ContextAccess: requires data access periodic_delayed_context_t.impl_the_proc_the_receiver_p_in;
   end the_proc_the_receiver;
   
-  data periodic_delayed_context_t
-    extends PeriodicDelayed_runtime::periodic_delayed_context_t
-  end periodic_delayed_context_t;
-  
   data implementation periodic_delayed_context_t.impl_the_proc_the_receiver_p_in
     extends PeriodicDelayed_runtime::periodic_delayed_context_t.impl
     subcomponents
@@ -335,4 +331,8 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
       Data_Model::Base_Type => (classifier(PeriodicDelayed_runtime::component_instance_t.impl));
       Data_Model::Dimension => (1);
   end ComponentInstanceArrayDataType_the_receiver_p_in;
+  
+  data periodic_delayed_context_t
+    extends PeriodicDelayed_runtime::periodic_delayed_context_t
+  end periodic_delayed_context_t;
 end test_buffer_delayed_refined_model;

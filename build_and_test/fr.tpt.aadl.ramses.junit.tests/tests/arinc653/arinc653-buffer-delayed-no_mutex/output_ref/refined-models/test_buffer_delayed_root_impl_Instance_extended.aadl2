@@ -50,7 +50,7 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         ]);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end cpu.impl;
   

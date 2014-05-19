@@ -64,7 +64,7 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,PeriodicDelayed_runtim
         POK::Scheduler => RR;
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end cpu.single_partition;
   
