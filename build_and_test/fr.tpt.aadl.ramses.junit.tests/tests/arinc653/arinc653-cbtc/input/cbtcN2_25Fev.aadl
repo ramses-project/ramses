@@ -170,7 +170,7 @@ END root.impl;
 
 MEMORY root_main_memory
 PROPERTIES
-  Byte_Count => 250000;
+  Memory_Size => 250000 Bytes;
   Base_Address => 16#2200#;
   Word_Size => 10000Bytes;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory,IO_Memory);

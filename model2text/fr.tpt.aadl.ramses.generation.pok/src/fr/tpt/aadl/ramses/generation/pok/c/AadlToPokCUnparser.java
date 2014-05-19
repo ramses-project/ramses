@@ -1739,10 +1739,10 @@ private void findCommunicationMechanism(ProcessImplementation process,
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RR"))
+        if(requiredScheduler.equalsIgnoreCase("RMS"))
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
         }
