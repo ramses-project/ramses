@@ -12,7 +12,7 @@ public abstract class OSGIScenario extends Scenario
       args.append(ramses_dir) ;
     }
     
-    args.append("osate2-cli.app/Contents/MacOS/osate2-cli") ;
+    args.append("osate2-cli") ;
   }
 
   
