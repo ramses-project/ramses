@@ -71,7 +71,7 @@ with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         POK::Scheduler => RR;
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
       the_part2: virtual processor part {
         ARINC653::HM_Error_ID_Actions => ([
@@ -86,7 +86,7 @@ with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         POK::Scheduler => RR;
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end cpu.two_partitions;
   

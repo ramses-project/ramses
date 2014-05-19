@@ -138,22 +138,22 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor implementation root.impl
     subcomponents
       VP_train_inst: virtual processor VP_train.impl {
-        ARINC653::Partition_Identifier => 1;
+        POK::Scheduler => RR;
+        ARINC653::Partition_Identifier => 2;
         ARINC653::Partition_Name => "train";
         ARINC653::System_Partition => false;
         ARINC653::System_Overhead_Time => 10 ms;
-        POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
       VP_railway_inst: virtual processor VP_railway.impl {
+        POK::Scheduler => RR;
         ARINC653::Partition_Identifier => 3;
         ARINC653::Partition_Name => "railway";
         ARINC653::System_Partition => false;
         ARINC653::System_Overhead_Time => 10 ms;
-        POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end root.impl;
   
@@ -176,7 +176,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Base_Address => 8704;
         Word_Size => 10000 Bytes;
         ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
-        Memory_Protocol => read_write;
         };
       train_inst: process train.impl {
         Data_Size => 200 KByte;

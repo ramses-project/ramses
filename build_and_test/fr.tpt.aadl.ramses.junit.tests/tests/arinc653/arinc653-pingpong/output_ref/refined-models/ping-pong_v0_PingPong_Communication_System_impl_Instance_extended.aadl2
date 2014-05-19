@@ -61,12 +61,12 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       VP_S1_inst: virtual processor VP_S1.impl {
         POK::Scheduler => RR;
         POK::Additional_Features => (console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
       VP_S2_inst: virtual processor VP_S2.impl {
         POK::Scheduler => RR;
         POK::Additional_Features => (console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end node_1.impl;
   

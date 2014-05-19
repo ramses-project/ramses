@@ -180,7 +180,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         ARINC653::System_Overhead_Time => 10 ms;
         POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
       VP_S2_inst: virtual processor VP_S2.impl {
         ARINC653::Partition_Identifier => 2;
@@ -189,7 +189,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         ARINC653::System_Overhead_Time => 10 ms;
         POK::Scheduler => RR;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end root.impl;
   
