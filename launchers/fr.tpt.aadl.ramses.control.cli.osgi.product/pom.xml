@@ -63,7 +63,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/repository</outputDirectory>
+              <outputDirectory>${basedir}/target/products/osate2-cli/linux/gtk/x86_64/osate2-cli/</outputDirectory>
               <resources>
                 <resource>
                   <directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
