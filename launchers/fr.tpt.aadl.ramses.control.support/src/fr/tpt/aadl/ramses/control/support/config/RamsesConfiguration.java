@@ -401,7 +401,7 @@ public class RamsesConfiguration
    * 
    * @param loggingLevel logging level
    * @param logFile the log file
-   * @param oneLogPerRun create a log file per run (maximum 10 files are kept)
+   * @param oneLogPerRun create a log file per run (maximum 25 files are kept)
    */
   public static void setupLogging(String loggingLevel, File logFile,
                                   boolean oneLogPerRun)
@@ -441,7 +441,7 @@ public class RamsesConfiguration
       {
         RunAppender ra = new RunAppender() ;
         fa = ra ;
-        ra.setMaxBackupIndex(10);
+        ra.setMaxBackupIndex(25);
       }
       else
       {
