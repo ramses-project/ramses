@@ -19,7 +19,6 @@
   <modules>
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.core</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.osgi</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.cli.osgi.product</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.edit</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.editor</module>
@@ -61,6 +60,7 @@
     <module>../fr.tpt.aadl.ramses.build.feature</module>
     <module>../fr.tpt.aadl.ramses.build.distribution</module>
     <module>../fr.tpt.aadl.ramses.build.update.site</module>
+    <module>../fr.tpt.aadl.ramses.control.cli.osgi.product</module>
   </modules>
 
   <dependencies> 
