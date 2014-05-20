@@ -33,6 +33,7 @@ import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.Platform ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.osate.utils.Aadl2Utils ;
 
@@ -768,9 +769,21 @@ public class ToolSuiteLauncherCommand
       String folder = EnvUtils.getExternalVariable(Names.RAMSES_RESOURCES_VAR) ;
       if(folder == null || folder.isEmpty())
       {
-        folder = Names.DEFAULT_RAMSES_RESOUCE_DIR ;
+        try
+        {
+          if(Platform.isRunning())
+            folder = Aadl2Utils.getAbsolutePluginPath(Names.
+                                                      ATL_TRANSFORMATION_PLUGIN_ID).toString() ;
+        }
+        catch(Exception e)
+        {
+          ConfigStatus.NOT_FOUND.msg = e.getMessage() ;
+          throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
+        }
+        
+        if(folder == null || folder.isEmpty())
+          folder = Names.DEFAULT_RAMSES_RESOUCE_DIR ;
       }
-      
       status = RamsesConfiguration.setRamsesResourceDir(folder) ;
       if(status == ConfigStatus.SET)
       {
