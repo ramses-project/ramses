@@ -16,80 +16,6 @@
   <version>${project.parent.version}</version>
   <packaging>eclipse-repository</packaging>
   
-  <profiles>
-  <profile>
-    <id>WinProfile64</id>
-    <activation>
-      <os>
-        <family>windows</family>
-        <arch>x86_64</arch>
-      </os>
-    </activation>
-    <properties>
-      <osate2.cli.directory>win32/win32/x86_64/osate2-cli/</osate2.cli.directory>
-    </properties>
-  </profile>
-  <profile>
-    <id>WinProfile32</id>
-    <activation>
-      <os>
-        <family>windows</family>
-        <arch>x86_64</arch>
-      </os>
-    </activation>
-    <properties>
-      <osate2.cli.directory>win32/win32/x86/osate2-cli/</osate2.cli.directory>
-    </properties>
-  </profile>
-  <profile>
-    <id>UnixProfile32</id>
-    <activation>
-      <os>
-        <family>unix</family>
-        <arch>x86</arch>
-      </os>
-    </activation>
-    <properties>
-      <osate2.cli.directory>linux/gtk/x86/</osate2.cli.directory>
-    </properties>
-  </profile>
-  <profile>
-    <id>UnixProfile64</id>
-    <activation>
-      <os>
-        <family>unix</family>
-        <arch>x86_64</arch>
-      </os>
-    </activation>
-    <properties>
-      <osate2.cli.directory>linux/gtk/x86_64/</osate2.cli.directory>
-    </properties>
-  </profile>
-  <profile>
-    <id>MacProfile32</id>
-    <activation>
-      <os>
-        <family>macosx</family>
-        <arch>x86</arch>
-      </os>
-    </activation>
-    <properties>
-      <osate2.cli.directory>macosx/cocoa/x86/</osate2.cli.directory>
-    </properties>
-  </profile>
-  <profile>
-    <id>MacProfile64</id>
-    <activation>
-      <os>
-        <family>macosx</family>
-        <arch>x86_64</arch>
-      </os>
-    </activation>
-    <properties>
-      <osate2.cli.directory>macosx/cocoa/x86_64/</osate2.cli.directory>
-    </properties>
-  </profile>
-</profiles>
   
   <build>
     <plugins>
@@ -103,78 +29,32 @@
       </plugin>
       
       <plugin>
-   		<groupId>org.eclipse.tycho</groupId>
-   		<artifactId>tycho-packaging-plugin</artifactId>
-   		<version>${tycho-version}</version>
-   		<additionalFileSets>
- 		<fileSet>
-  			<directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
-  			<includes>
-   				<include>**/*.emftvm</include>
-                <include>**/*.aadl</include>
-                <include>**/*.aadl2</include>
-                <include>**/*.c</include>
-                <include>**/*.h</include>
- 			 </includes>
- 		</fileSet>     
-		</additionalFileSets>
-   	  </plugin>
-      
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <!-- here the phase you need -->
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/osate2-cli/${osate2.cli.directory}</outputDirectory>
-              <resources>          
-                <resource>
-                  <directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
-                  <filtering>true</filtering>
-                </resource>
-              </resources>              
-            </configuration>            
-          </execution>
-        </executions>
-      </plugin>
-      
-      
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <!-- here the phase you need -->
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/products/osate2-cli/linux/gtk/x86_64/osate2-cli/</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
-                  <includes>
-                    <include>**/*.emftvm</include>
-                    <include>**/*.aadl</include>
-                    <include>**/*.aadl2</include>
-                    <include>**/*.c</include>
-                    <include>**/*.h</include>
-                  </includes>
-                  <filtering>true</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+ 		<groupId>org.eclipse.tycho</groupId>
+		<artifactId>tycho-source-plugin</artifactId>
+		<version>${tycho-version}</version>
+		<configuration>
+			<additionalFileSets>
+				<fileSet>
+					<directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
+  					<includes>
+   						<include>**/*.emftvm</include>
+		                <include>**/*.aadl</include>
+		                <include>**/*.aadl2</include>
+		                <include>**/*.c</include>
+		                <include>**/*.h</include>
+		 			 </includes>
+				</fileSet>
+			</additionalFileSets>
+		</configuration>
+		<executions>
+			<execution>
+				<id>plugin-source</id>
+				<goals>
+					<goal>plugin-source</goal>
+				</goals>
+			</execution>
+		</executions>
+	  </plugin>
       
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
