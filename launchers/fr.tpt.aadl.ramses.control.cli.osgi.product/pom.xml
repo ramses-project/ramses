@@ -23,7 +23,6 @@
       <os>
         <family>windows</family>
       </os>
-      <ws>win32</ws>
       <arch>x86_64</arch>
     </activation>
     <properties>
@@ -36,7 +35,6 @@
       <os>
         <family>windows</family>
       </os>
-      <ws>win32</ws>
       <arch>x86_64</arch>
     </activation>
     <properties>
@@ -49,7 +47,6 @@
       <os>
         <family>unix</family>
       </os>
-      <ws>gtk</ws>
       <arch>x86</arch>
     </activation>
     <properties>
@@ -62,7 +59,6 @@
       <os>
         <family>unix</family>
       </os>
-      <ws>gtk</ws>
       <arch>x86_64</arch>
     </activation>
     <properties>
@@ -75,7 +71,6 @@
       <os>
         <family>macosx</family>
       </os>
-      <ws>cocoa</ws>
       <arch>x86</arch>
     </activation>
     <properties>
@@ -88,7 +83,6 @@
       <os>
         <family>macosx</family>
       </os>
-      <ws>cocoa</ws>
       <arch>x86_64</arch>
     </activation>
     <properties>
