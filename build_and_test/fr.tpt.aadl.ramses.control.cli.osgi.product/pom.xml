@@ -103,6 +103,24 @@
       </plugin>
       
       <plugin>
+   		<groupId>org.eclipse.tycho</groupId>
+   		<artifactId>tycho-packaging-plugin</artifactId>
+   		<version>${tycho-version}</version>
+   		<additionalFileSets>
+ 		<fileSet>
+  			<directory>../../model2model/fr.tpt.aadl.ramses.transformation.atl</directory>
+  			<includes>
+   				<include>**/*.emftvm</include>
+                <include>**/*.aadl</include>
+                <include>**/*.aadl2</include>
+                <include>**/*.c</include>
+                <include>**/*.h</include>
+ 			 </includes>
+ 		</fileSet>     
+		</additionalFileSets>
+   	  </plugin>
+      
+      <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <version>2.6</version>
         <executions>
