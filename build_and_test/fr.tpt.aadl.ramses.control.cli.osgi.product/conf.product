@@ -3,17 +3,15 @@
 
 <product name="osate2-cli" uid="osate2-cli" id="fr.tpt.aadl.ramses.control.cli.osgi.product" application="fr.tpt.aadl.ramses.control.cli.osgi.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
 
-
-   <configIni>
+   <configIni use="">
    </configIni>
 
    <launcherArgs>
       <programArgs>-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl}</programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XstartOnFirstThread -XX:MaxPermSize=256m -Xms40m -Xmx512m</vmArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms40m -Xmx512m</vmArgs>
    </launcherArgs>
 
    <windowImages/>
-
 
    <launcher name="osate2-cli">
       <solaris/>
@@ -22,10 +20,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="PropertiesExtractor"/>
