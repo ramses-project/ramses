@@ -53,7 +53,7 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
 import fr.openpeople.rdal2.model.rdal.RdalPackage ;
-import fr.openpeople.rdal2.model.rdal.Specification ;
+import fr.openpeople.rdal2.model.rdal.impl.SpecificationImpl ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
@@ -649,8 +649,7 @@ public class AadlTargetSpecificGenerator implements Generator
     List<Transformation> list = l.getTransformations();
     Resource r = list.get(0).eResource();
     TrcSpecification trc = (TrcSpecification) r.getContents().get(0);
-    
-    Specification rdal = (Specification) workflowPilot.getWokflowRoot().getRequirementsRoot();
+    SpecificationImpl rdal = (SpecificationImpl) workflowPilot.getWokflowRoot().getRequirementsRoot();
     SensitivityBasedSelection selectionMethod = new SensitivityBasedSelection(trc, rdal);
     ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
         (trc,
