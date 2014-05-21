@@ -622,7 +622,7 @@ public class AadlTargetSpecificGenerator implements Generator
                                       RamsesConfiguration config,
                                       IProgressMonitor monitor) throws ParseException, ConfigurationException
   {
-    String propertyFile = (String) additionalParameters.get(Names.RAMSES_PROPERTIES);
+    String propertyFile = (String) config.getParameters().get(Names.RAMSES_PROPERTIES);
     
     Properties p = new Properties();
     try {
@@ -675,7 +675,7 @@ public class AadlTargetSpecificGenerator implements Generator
   {
     TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
     
-    String propertyFile = (String) additionalParameters.get(Names.RAMSES_PROPERTIES);
+    String propertyFile = (String) config.getParameters().get(Names.RAMSES_PROPERTIES);
 
     Properties p = new Properties();
     try {
