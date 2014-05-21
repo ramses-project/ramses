@@ -219,26 +219,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		env.run(td);
 		td.finish();
 		
-		// Save the resulting model
-		if(RamsesConfiguration.IS_DEBUG_MODE)
-		{
-			if(outModel.getResource() == null ||
-					! outModel.getResource().getContents().isEmpty())
-			{
-				outModel.getResource().setURI(outputResource.getURI());
-				try
-				{
-				  outModel.getResource().save(null);
-				}
-				catch(IOException ex)
-				{
-				  String errMsg = "cannot save the output AADL model" ;
-	        _LOGGER.fatal(errMsg, ex);
-	        throw new RuntimeException(errMsg, ex);
-				}
-			}
-		}
-		
 		return outModel.getResource();
 	}
 

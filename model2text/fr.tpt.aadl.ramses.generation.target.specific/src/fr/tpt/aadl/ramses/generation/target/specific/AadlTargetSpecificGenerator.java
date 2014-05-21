@@ -110,7 +110,6 @@ public class AadlTargetSpecificGenerator implements Generator
   
   private PredefinedAadlModelManager _predefinedResourceManager;
   
-  private Map<String, Object> additionalParameters;
   
   /** Loop debug  (loopValidIteration must be negative to disable debug) **/
   private static int loopValidIteration = -1;
@@ -880,11 +879,6 @@ private void doErrorState()
   ServiceProvider.SYS_ERR_REP.error(msg, true);
 }
 
-  @Override
-  public void setParameters(Map<String, Object> parameters)
-  {
-    additionalParameters = parameters;
-  }
 
   @Override
   public boolean runtimePathChecker(File runtimePath)

@@ -222,7 +222,7 @@ public class GenerateActionHandler extends RamsesActionHandler {
     String properties = getConfigFile(sysImpl.eResource(), "properties");
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put(Names.RAMSES_PROPERTIES, properties);
-    generator.setParameters(parameters);
+    config.setParameters(parameters);
     
     if(workflow==null)
       generator.generate(sinst,

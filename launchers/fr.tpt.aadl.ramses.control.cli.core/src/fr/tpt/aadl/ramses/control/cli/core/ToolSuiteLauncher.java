@@ -164,8 +164,7 @@ public class ToolSuiteLauncher
   void launchDefaultGenerationProcess (List<File> mainModels,
                                      	 String systemToInstantiate,
                                      	 RamsesConfiguration config,
-                                     	 File[] includeDirs,
-                                     	 Map<String, Object> parameters)
+                                     	 File[] includeDirs)
                                                       throws AnalysisException,
                                                              GenerationException,
                                                          TransformationException,
@@ -189,8 +188,6 @@ public class ToolSuiteLauncher
       System.exit(-1);
     }
     
-    generator.setParameters(parameters) ;
-    
     generator.generate(instance, config, includeDirs,
                        ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, _monitor) ;
   }
@@ -199,8 +196,7 @@ public class ToolSuiteLauncher
                               String systemToInstantiate,
                               RamsesConfiguration config,
                               File[] includeDirs,
-                              WorkflowPilot xmlPilot,
-                              Map<String, Object> parameters)
+                              WorkflowPilot xmlPilot)
                                                       throws AnalysisException,
                                                             GenerationException,
                                                       TransformationException,
@@ -224,8 +220,6 @@ public class ToolSuiteLauncher
       System.exit(-1);
     }
 
-    generator.setParameters(parameters) ;
-    
     generator.generateWorkflow(instance, config, xmlPilot, includeDirs,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor) ;

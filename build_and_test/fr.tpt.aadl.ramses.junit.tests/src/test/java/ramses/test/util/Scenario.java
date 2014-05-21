@@ -5,6 +5,7 @@ import static org.junit.Assert.fail ;
 import java.io.File ;
 import java.io.IOException ;
 import java.util.Calendar ;
+import java.util.HashMap ;
 import java.util.Iterator ;
 import java.util.Map ;
 import java.util.Map.Entry ;
@@ -31,7 +32,7 @@ public abstract class Scenario
   protected String aadlInspectorPath="";
   protected String target="";
   protected String includeList="";
-  protected Map<String, Object> parameters;
+  protected Map<String, Object> parameters = new HashMap<String, Object>();
   
   private Process ramsesProcess;
   
@@ -45,8 +46,9 @@ public abstract class Scenario
   {
     args.append("java") ;
 
-    args.append(" -DDEBUG") ;
-
+    String debug = "true";
+    parameters.put("debug", debug);
+    
     if(ramses_dir != null)
     {
       args.append(" -D") ;

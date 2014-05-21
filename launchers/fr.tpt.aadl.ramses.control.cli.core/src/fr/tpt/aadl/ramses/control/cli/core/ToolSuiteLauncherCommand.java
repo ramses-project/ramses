@@ -564,7 +564,7 @@ public class ToolSuiteLauncherCommand
           options.getString(WORKFLOW_OPTION_ID) ;
       
     Map<String, Object> parameters = parametersHandler(options) ;
-    
+    config.setParameters(parameters);
     boolean isWorkflow = workflow_path != null ; 
     
     String mainTaskName = "Generate code for " + targetName ;
@@ -590,8 +590,7 @@ public class ToolSuiteLauncherCommand
                                         _systemToInstantiate,
                                         config,
                                         inclDirs,
-                                        xmlPilot,
-                                        parameters) ;
+                                        xmlPilot) ;
       }
       catch (FileNotFoundException ex)
       {
@@ -606,8 +605,7 @@ public class ToolSuiteLauncherCommand
       _launcher.launchDefaultGenerationProcess(_mainModelFiles,
                                                _systemToInstantiate,
                                                config,
-                                               inclDirs,
-                                               parameters) ;
+                                               inclDirs) ;
     }
     
     _monitor.done();

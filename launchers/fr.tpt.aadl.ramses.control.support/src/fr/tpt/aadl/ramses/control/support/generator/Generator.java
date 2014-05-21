@@ -23,7 +23,6 @@ package fr.tpt.aadl.ramses.control.support.generator ;
 
 import java.io.File ;
 import java.util.List;
-import java.util.Map ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -65,7 +64,5 @@ public interface Generator extends NamedPlugin
   public List<String> getTransformationModuleList();
 
   public List<String> getValidationModuleList();
-  
-  public void setParameters(Map<String, Object> parameters) ;
 
 }

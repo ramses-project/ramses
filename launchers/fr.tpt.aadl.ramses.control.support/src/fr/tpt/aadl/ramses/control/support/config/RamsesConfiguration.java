@@ -23,6 +23,8 @@ package fr.tpt.aadl.ramses.control.support.config;
 
 import java.io.File ;
 import java.io.FileNotFoundException ;
+import java.util.Map ;
+import java.util.Map.Entry ;
 
 import org.apache.log4j.FileAppender ;
 import org.apache.log4j.Level ;
@@ -60,7 +62,7 @@ public class RamsesConfiguration
   public static boolean IS_LOGGER_ON = false ;
   
   private static Logger _LOGGER = Logger.getLogger(RamsesConfiguration.class) ;
-  public static boolean IS_DEBUG_MODE = true;
+  public static boolean IS_DEBUG_MODE = false;
   
   public static ConfigStatus setRamsesResourceDir(String path)
   {
@@ -482,6 +484,7 @@ public class RamsesConfiguration
   
   private String _mode;
   private String _AadlInspectrorInstallDir;
+  private Map<String, Object> _parameters ;
 
   public ConfigStatus setAadlInspectorInstallDir(String installDir) {
 	  ConfigStatus isValid = isValidInstallDir(installDir);
@@ -540,5 +543,22 @@ public class RamsesConfiguration
 	  return _mode;
   }
 
+  public void setParameters(Map<String, Object> parameters)
+  {
+    _parameters = parameters;
+    for(Entry<String, Object> param: parameters.entrySet())
+    {
+      if(param.getKey().equalsIgnoreCase("DEBUG"))
+      {
+        String val = (String) param.getValue();
+        IS_DEBUG_MODE = val.equalsIgnoreCase("true");
+      }
+    }
+  }
+
+  public Map<String, Object> getParameters()
+  {
+    return _parameters;
+  }
 
 }
