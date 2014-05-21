@@ -75,7 +75,7 @@
     <repository>
       <id>emftvm</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/mmt/atl/updates/milestones/3.4/S201305211502/</url>
+      <url>http://download.eclipse.org/mmt/atl/updates/milestones/3.5/S201405200835/</url>
     </repository>
     <repository>
       <id>${platform-version-name}</id>
