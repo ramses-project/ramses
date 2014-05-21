@@ -74,6 +74,7 @@ import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
@@ -1641,7 +1642,7 @@ private void findCommunicationMechanism(ProcessImplementation process,
       deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1") ;
     }
 
-    if(System.getProperty("DEBUG")!=null)
+    if(RamsesConfiguration.IS_DEBUG_MODE)
     {
       deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_DEBUG 1") ;
     }

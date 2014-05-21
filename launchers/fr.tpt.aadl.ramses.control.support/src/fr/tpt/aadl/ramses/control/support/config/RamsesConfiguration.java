@@ -60,6 +60,7 @@ public class RamsesConfiguration
   public static boolean IS_LOGGER_ON = false ;
   
   private static Logger _LOGGER = Logger.getLogger(RamsesConfiguration.class) ;
+  public static boolean IS_DEBUG_MODE = true;
   
   public static ConfigStatus setRamsesResourceDir(String path)
   {

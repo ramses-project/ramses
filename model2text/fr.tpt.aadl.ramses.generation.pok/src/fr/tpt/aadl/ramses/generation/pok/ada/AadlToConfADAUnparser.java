@@ -57,6 +57,7 @@ import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
@@ -1256,8 +1257,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1") ;
     }
-
-    if(System.getProperty("DEBUG") != null)
+    
+    if(RamsesConfiguration.IS_DEBUG_MODE)
     {
       deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_DEBUG 1") ;
     }

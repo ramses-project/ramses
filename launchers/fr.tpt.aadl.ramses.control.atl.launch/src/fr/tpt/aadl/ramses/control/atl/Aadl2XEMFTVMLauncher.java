@@ -220,7 +220,7 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		td.finish();
 		
 		// Save the resulting model
-		if(System.getProperty("DEBUG")!=null)
+		if(RamsesConfiguration.IS_DEBUG_MODE)
 		{
 			if(outModel.getResource() == null ||
 					! outModel.getResource().getContents().isEmpty())
