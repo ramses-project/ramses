@@ -40,7 +40,7 @@ import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class RamsesConfiguration
 {
-  public static boolean USES_GUI;
+  
   // Directory where generated files are produced.
   private  File _ramsesOutputDir;
   private  File _aadlInspectorOutputDir;
@@ -60,11 +60,6 @@ public class RamsesConfiguration
   public static boolean IS_LOGGER_ON = false ;
   
   private static Logger _LOGGER = Logger.getLogger(RamsesConfiguration.class) ;
-  
-  public static void usesGraphicalInterface(boolean useGui)
-  {
-    USES_GUI = useGui;
-  }
   
   public static ConfigStatus setRamsesResourceDir(String path)
   {

@@ -155,7 +155,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
     URI uri ;
     SystemInstance si = (SystemInstance) inputResource.getContents().get(0) ;
     final Resource xtextResource ;
-    if(RamsesConfiguration.USES_GUI)
+    if(OsateResourceUtil.USES_GUI)
     {
       String workspaceLocation =
             ResourcesPlugin.getWorkspace().getRoot().getLocationURI().getPath() ;

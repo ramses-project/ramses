@@ -35,6 +35,7 @@ import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.Platform ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.utils.Aadl2Utils ;
 
 import com.martiansoftware.jsap.FlaggedOption ;
@@ -410,7 +411,8 @@ public class ToolSuiteLauncherCommand
     }
     
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
-    RamsesConfiguration.usesGraphicalInterface(false);
+    
+    OsateResourceUtil.USES_GUI=false;
     setRamsesResourceDir(_includeDirs) ;
     
     _monitor = new RamsesProgressMonitor(System.out) ;

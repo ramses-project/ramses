@@ -630,6 +630,9 @@ public class AadlTargetSpecificGenerator implements Generator
       InputStream in = new FileInputStream(propertyFile);
       p.load(in);
     } catch (IOException e) {
+      String message = "could not open property file "
+          + propertyFile;
+      _LOGGER.error(message);
       e.printStackTrace();
     }
     
