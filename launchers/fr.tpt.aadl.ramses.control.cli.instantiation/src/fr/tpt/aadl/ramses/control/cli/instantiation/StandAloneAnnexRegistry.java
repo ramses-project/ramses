@@ -25,6 +25,7 @@ import java.util.HashMap ;
 
 import org.eclipse.core.runtime.IConfigurationElement ;
 import org.eclipse.core.runtime.Platform ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.annexsupport.AnnexProxy ;
 import org.osate.annexsupport.AnnexRegistry ;
 
@@ -36,7 +37,7 @@ public class StandAloneAnnexRegistry extends AnnexRegistry
   @Override
   protected void initialize(String extensionId) {
     if(Platform.isRunning()
-        && RamsesConfiguration.USES_GUI)
+        && OsateResourceUtil.USES_GUI)
       super.initialize(extensionId);
     else
     {
