@@ -410,6 +410,7 @@ public class ToolSuiteLauncherCommand
     }
     
     /*** Always set Ramses resouce dirs before initialize Service Registry, instantiator and AADL models manager !!! ***/
+    RamsesConfiguration.usesGraphicalInterface(false);
     setRamsesResourceDir(_includeDirs) ;
     
     _monitor = new RamsesProgressMonitor(System.out) ;

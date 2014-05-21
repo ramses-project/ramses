@@ -169,7 +169,7 @@ public class WorkbenchUtils
       ConfigStatus.NOT_FOUND.msg = e.getMessage() ;
       throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
     }
-    
+    RamsesConfiguration.usesGraphicalInterface(true);
     RamsesConfiguration.setRamsesResourceDir(ramsesDirPath) ;
     RamsesConfiguration.setAtlResourceDir(ramsesDirPath) ;
     RamsesConfiguration.setPredefinedResourceDir(ramsesDirPath + File.separator + Names.AADL_RESOURCE_DIRECTORY_NAME) ;
