@@ -12,7 +12,6 @@ import com.saxman.textdiff.Report ;
 import com.saxman.textdiff.TextDiff ;
 
 import fr.tpt.aadl.ramses.control.support.reporters.StdProcessTraceDisplay ;
-import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public abstract class BaScenario
 {
