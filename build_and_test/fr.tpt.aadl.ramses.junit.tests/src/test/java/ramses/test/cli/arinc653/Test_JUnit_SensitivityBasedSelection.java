@@ -2,8 +2,6 @@ package ramses.test.cli.arinc653;
 
 import static org.junit.Assert.fail ;
 
-import java.util.HashMap ;
-
 import org.junit.Test ;
 
 import ramses.test.util.OSGIPOKScenario ;
@@ -39,7 +37,6 @@ public class Test_JUnit_SensitivityBasedSelection extends OSGIPOKScenario
   protected void initAdditionalParameters()
   {
     String propertyFilePath = "tests/arinc653/arinc653-selection-sensitivity/input/ArchitectureRefinementLauncher.properties";
-    parameters = new HashMap<String, Object>();
     parameters.put(Names.RAMSES_PROPERTIES, propertyFilePath);
   }
   

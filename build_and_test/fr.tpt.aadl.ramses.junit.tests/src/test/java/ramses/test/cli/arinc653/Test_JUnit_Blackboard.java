@@ -4,7 +4,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ramses.test.util.OSGIPOKScenario ;
-import ramses.test.util.POKScenario;
 
 public class Test_JUnit_Blackboard extends OSGIPOKScenario {	
 

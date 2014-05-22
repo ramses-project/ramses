@@ -73,6 +73,7 @@ public abstract class Scenario
   protected void exec()
   {
     init() ;
+    initAdditionalParameters();
     this.cleanOutputDirectory(new File(output)) ;
     Process executeProcess = null ;
     try
