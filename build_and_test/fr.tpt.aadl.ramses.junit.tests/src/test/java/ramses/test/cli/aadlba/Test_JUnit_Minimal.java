@@ -11,6 +11,11 @@ public class Test_JUnit_Minimal extends BaProjectScenario
   @Test
   public void Test_JUnit_Minimal_exec()
   {
+    _packages = "minimal_runtime_types.aadl2," +
+                "minimal_runtime_sync.aadl2," +
+                "minimal_runtime_port.aadl2," +
+                "minimal_runtime_transport.aadl2," +
+                "minimal_runtime_dispatch.aadl2" ;
     
     _include = "tests/minimal_runtime/input" ;
     
