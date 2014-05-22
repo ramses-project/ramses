@@ -3,9 +3,9 @@ package ramses.test.cli.arinc653;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ramses.test.util.POKScenario;
+import ramses.test.util.OSGIPOKScenario ;
 
-public class Test_JUnit_PingPong_Ba extends POKScenario {
+public class Test_JUnit_PingPong_Ba extends OSGIPOKScenario {
 
 
 	@BeforeClass
@@ -22,4 +22,11 @@ public class Test_JUnit_PingPong_Ba extends POKScenario {
 		system_impl = "monoProc.impl";
 		this.exec();
 	}
+
+  @Override
+  protected void initAdditionalParameters()
+  {
+    // TODO Auto-generated method stub
+    
+  }
 }
