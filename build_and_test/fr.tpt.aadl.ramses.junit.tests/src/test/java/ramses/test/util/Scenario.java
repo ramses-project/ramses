@@ -137,7 +137,7 @@ public abstract class Scenario
 
         if(parameters!=null)
         {
-          args.append(" --parameters ") ;
+          args.append(" --parameter ") ;
           Iterator<Entry<String, Object>> it = parameters.entrySet().iterator();
           while (it.hasNext()) {
               Entry<String, Object> pairs = it.next();
