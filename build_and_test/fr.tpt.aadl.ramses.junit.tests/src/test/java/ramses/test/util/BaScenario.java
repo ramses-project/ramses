@@ -27,7 +27,7 @@ public abstract class BaScenario
   protected StringBuffer _args ;
   
   protected final static String _RAMSES_DIR ;
-  protected final static String _RAMSES_FILE_NAME = "ramses-exe.jar" ;
+  protected final static String _RAMSES_FILE_NAME = "osate2-cli" ;
   protected final static String _ERR_EXTENSION_FILE = ".err" ;
   protected final static char _SEPARATOR = ',' ;
   
@@ -40,25 +40,12 @@ public abstract class BaScenario
   {
     _args = new StringBuffer() ;
     
-    _args.append("java") ;
-    
-    _args.append(" -DDEBUG ") ;
-    
-    if(_RAMSES_DIR != null)
-    {
-      _args.append("-D") ;
-      _args.append(Names.RAMSES_RESOURCES_VAR) ;
-      _args.append('=') ;
-      _args.append(_RAMSES_DIR) ;
-    }
-    
-    _args.append(" -jar ") ;
     
     if(_RAMSES_DIR != null)
     {
       _args.append(_RAMSES_DIR) ;
     }
-
+    
     _args.append(_RAMSES_FILE_NAME) ;
     
     _args.append(" -l trace") ;
