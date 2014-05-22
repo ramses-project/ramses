@@ -27,8 +27,6 @@ public class Test_JUnit_Minimal extends BaProjectScenario
 
     _projectName = "minimal_example" ;
     
-    _include += _SEPARATOR + _RAMSES_DIR + "aadl_resources/package" ;
-
     _refDir = "tests/minimal_runtime/output_ref" ;
     
     _outputDir = new File ("tests/minimal_runtime/output") ;
