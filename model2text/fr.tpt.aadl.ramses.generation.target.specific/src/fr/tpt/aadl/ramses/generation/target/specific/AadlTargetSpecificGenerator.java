@@ -53,6 +53,7 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
 import fr.openpeople.rdal2.model.rdal.RdalPackage ;
+import fr.openpeople.rdal2.model.rdal.Specification ;
 import fr.openpeople.rdal2.model.rdal.impl.SpecificationImpl ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
@@ -85,7 +86,6 @@ import fr.tpt.aadl.ramses.transformation.selection.sensitivity.SensitivityBasedS
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
-import fr.tpt.rdal.parser.RdalParser ;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -642,16 +642,17 @@ public class AadlTargetSpecificGenerator implements Generator
       TrcParser.parse(trcPath, rs);
     
     String rdalPath = p.getProperty("ArchitectureRefinementLauncher.rdal");
-    if(trcPath!=null)
-    {
-      RdalParser.parse(rdalPath, rs);
-      rs.getPackageRegistry().put("http://www.open-people.fr/rdal2", RdalPackage.eINSTANCE);
-    }
+//    if(trcPath!=null)
+//    {
+//      RdalParser.parse(rdalPath, rs);
+//      rs.getPackageRegistry().put("http://www.open-people.fr/rdal2", RdalPackage.eINSTANCE);
+//    }
         
     List<Transformation> list = l.getTransformations();
     Resource r = list.get(0).eResource();
     TrcSpecification trc = (TrcSpecification) r.getContents().get(0);
-    SpecificationImpl rdal = (SpecificationImpl) workflowPilot.getWokflowRoot().getRequirementsRoot();
+    EObject obj = workflowPilot.getWokflowRoot().getRequirementsRoot();
+    SpecificationImpl rdal = (SpecificationImpl) obj;
     SensitivityBasedSelection selectionMethod = new SensitivityBasedSelection(trc, rdal);
     ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
         (trc,

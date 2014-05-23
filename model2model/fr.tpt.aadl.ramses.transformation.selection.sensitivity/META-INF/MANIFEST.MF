@@ -8,4 +8,5 @@ Export-Package: fr.tpt.aadl.ramses.transformation.selection.sensitivity,
 Require-Bundle: fr.tpt.aadl.ramses.transformation.selection,
  fr.tpt.aadl.ramses.transformation.tip,
  fr.tpt.rdal.utils,
- fr.tpt.aadl.ramses.transformation.trc
+ fr.tpt.aadl.ramses.transformation.trc,
+ fr.openpeople.rdal2.model

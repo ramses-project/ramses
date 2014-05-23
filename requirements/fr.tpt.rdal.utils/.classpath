@@ -6,10 +6,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/fr.labsticc.framework.constraints.model_2.1.0.201312131039.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/fr.openpeople.rdal2.model_1.0.0.201312131039.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/fr.labsticc.framework.settings.model_1.0.0.201312131039.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
