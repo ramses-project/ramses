@@ -39,5 +39,8 @@
     <eOperations name="getHyperperiod" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
       <eParameters name="port" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//FeatureInstance"/>
     </eOperations>
+    <eOperations name="getTimingPrecision" lowerBound="1" eType="ecore:EDataType ../../org.osate.aadl2/model/aadl2.ecore#//String">
+      <eParameters name="namedElement" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//NamedElement"/>
+    </eOperations>
   </eClassifiers>
 </ecore:EPackage>
