@@ -39,6 +39,8 @@ public class SensitivityBasedSelection implements ITransformationSelection {
   public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply)
 	{
 		
+    _LOGGER.trace("Selection started: "+ patternMatchingMap.keySet().size() +"decisions to take");
+    
 		// for each key from the pattern matching map, execute the transformation selection algorithm
 		Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
 			    
@@ -57,7 +59,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			List<EObject> candidateObjects = tuple.getKey();
 			List<String> transformationsToApply = null; 
 			if(candidateTransformationList.size()>1)
-			{
+			{ 
 				List<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
 				for(List<RuleApplicationTulpe> toExcludeList: exclusionDependencies)
@@ -79,6 +81,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 					{
 						// execute the best allocation selection algorithm
 						transformationsToApply = selectBestTransformation(newTuple);
+						_LOGGER.trace("Selected "+transformationsToApply);
 						break;
 					}
 					else if(((List<String>)newTuple.getValue()).size()==1)
@@ -111,6 +114,8 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 				transformationsToApply = candidateTransformationList;
 			}
 			exclusionDependencies.addAll(TrcUtils.getExlcusionDependencies(trc,candidateObjects, transformationsToApply.get(0)));
+			
+			
 			
 			List<List<RuleApplicationTulpe>> inclusionDependencies = TrcUtils.getInclusionDependencies(trc,candidateObjects, transformationsToApply.get(0));
 			if(inclusionDependencies.size()==0)
@@ -147,29 +152,30 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 		// second, select transformation for other elements
 		while (patternMatchingIt.hasNext()) 
 		{
-			Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
-		    if(treatedObjects.contains(tuple.getKey()))
-		       	continue;
-		    if(tuple.getValue().size()<=1)
-		       	continue;
-		    System.out.println(tuple.getKey() + " = " + tuple.getValue());
-			        
-			        
-		    //execute the best allocations selection algorithm        		
-		    List<String> transformationsToApply = selectBestTransformation(tuple);
-		    if(transformationsToApply.size()==1)
-			{
-				if(TipUtils.alreadyReferenced((List<EObject>) tuple.getKey(), tuplesToApply))
-				  continue;
-				RuleApplicationUtils.setTransformationToApply(tuple, transformationsToApply.get(0), tuplesToApply);
-			}
-			else
-			{
-				System.out.println("WARNING: Did not manage to select a transformation rule for :");
-				for(EObject ne: tuple.getKey())
-					System.out.println("\t "+ne);
-			}
-			patternMatchingIt.remove(); // avoids a ConcurrentModificationException
+		  Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
+		  if(treatedObjects.contains(tuple.getKey()))
+		    continue;
+		  if(tuple.getValue().size()<=1)
+		    continue;
+		  _LOGGER.trace(tuple.getKey() + " = " + tuple.getValue());
+
+
+		  //execute the best allocations selection algorithm        		
+		  List<String> transformationsToApply = selectBestTransformation(tuple);
+		  if(transformationsToApply.size()==1)
+		  {
+		    if(TipUtils.alreadyReferenced((List<EObject>) tuple.getKey(), tuplesToApply))
+		      continue;
+		    RuleApplicationUtils.setTransformationToApply(tuple, transformationsToApply.get(0), tuplesToApply);
+		  }
+		  else
+		  {
+		    String message = "Did not manage to select a transformation rule for :"; 
+		    for(EObject ne: tuple.getKey())
+		      message+=ne;
+		    _LOGGER.warn(message);
+		  }
+		  patternMatchingIt.remove(); // avoids a ConcurrentModificationException
 		}		
 		
 	}
