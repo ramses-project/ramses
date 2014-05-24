@@ -39,7 +39,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
   public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply)
 	{
 		
-    _LOGGER.trace("Selection started: "+ patternMatchingMap.keySet().size() +"decisions to take");
+    _LOGGER.trace("Selection started: "+ patternMatchingMap.keySet().size() +" decisions to take");
     
 		// for each key from the pattern matching map, execute the transformation selection algorithm
 		Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
@@ -113,11 +113,13 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			{
 				transformationsToApply = candidateTransformationList;
 			}
+			_LOGGER.trace("Get dependencies to exclude");
 			exclusionDependencies.addAll(TrcUtils.getExlcusionDependencies(trc,candidateObjects, transformationsToApply.get(0)));
+			_LOGGER.trace("Dependencies to exclude: "+exclusionDependencies.size());
 			
-			
-			
+			_LOGGER.trace("Get dependencies to include");
 			List<List<RuleApplicationTulpe>> inclusionDependencies = TrcUtils.getInclusionDependencies(trc,candidateObjects, transformationsToApply.get(0));
+			_LOGGER.trace("Dependencies to include: "+inclusionDependencies.size());
 			if(inclusionDependencies.size()==0)
 				continue;
 			// possibleDependencies is returned under a disjunctive normal form
@@ -147,7 +149,9 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			}
 					
 		}
-			
+		
+		_LOGGER.trace("Selection with propagation finished");
+		
 		patternMatchingIt = patternMatchingMap.entrySet().iterator();
 		// second, select transformation for other elements
 		while (patternMatchingIt.hasNext()) 

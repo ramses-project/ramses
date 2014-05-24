@@ -300,7 +300,9 @@ public class ArchitectureRefinementProcessLauncher {
 
     //create candidate tuples of possible transformations -> execute the AADL to pattern matching (all the files with ending "_2pml.atl")
     List<Transformation> transfoList = trcSpec.getTransformationList().getTransformations();
-	
+    
+    _LOGGER.trace("Start identification step (trace all pattern matching)");
+    
     for(Transformation transfo : transfoList)
     {
       PatternMatchingTransformationLauncher pmtl = new PatternMatchingTransformationLauncher(this.modelInstantiator,
@@ -319,7 +321,6 @@ public class ArchitectureRefinementProcessLauncher {
       AtlTransfoLauncher.initTransformation();
       pmtl.setResourceSet(resourceSet);
       
-      _LOGGER.trace("Start identification step (trace all pattern matching)");
       pmtl.doTransformation(emftvmFiles, 
                             sinst.eResource(),  
                             getOutputDir(),
