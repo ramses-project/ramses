@@ -343,6 +343,11 @@ public class AadlTargetSpecificGenerator implements Generator
             StackTraceElement[] message = e.getStackTrace();
             _LOGGER.fatal(message);
           }
+          catch(IOException e)
+          {
+            StackTraceElement[] message = e.getStackTrace();
+            _LOGGER.fatal(message);
+          }
         
       }
       else
@@ -572,7 +577,7 @@ public class AadlTargetSpecificGenerator implements Generator
                       WorkflowPilot workflowPilot, RamsesConfiguration config,
                       IProgressMonitor monitor) throws AnalysisException,
                                                        TransformationException,
-                                                       GenerationException, ParseException, ConfigurationException
+                                                       GenerationException, ParseException, ConfigurationException, IOException
   {
     if(l.getIterationNb()>0)
       loopValidIteration = l.getIterationNb();
@@ -620,7 +625,7 @@ public class AadlTargetSpecificGenerator implements Generator
                                       AnalysisErrorReporterManager errManager,
                                       WorkflowPilot workflowPilot,
                                       RamsesConfiguration config,
-                                      IProgressMonitor monitor) throws ParseException, ConfigurationException
+                                      IProgressMonitor monitor) throws ParseException, ConfigurationException, AnalysisException, TransformationException, IOException
   {
     String propertyFile = (String) config.getParameters().get(Names.RAMSES_PROPERTIES);
     
@@ -672,7 +677,7 @@ public class AadlTargetSpecificGenerator implements Generator
                                  AnalysisErrorReporterManager errManager,
                                  WorkflowPilot workflowPilot,
                                  RamsesConfiguration config,
-                                 IProgressMonitor monitor) throws ParseException, ConfigurationException
+                                 IProgressMonitor monitor) throws ParseException, ConfigurationException, AnalysisException, TransformationException, IOException
   {
     TrcSpecification trc = (TrcSpecification) l.getTransformations().get(0).eResource().getContents().get(0);
     

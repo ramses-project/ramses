@@ -6,6 +6,7 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Map.Entry ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EObject ;
 
 import fr.openpeople.rdal2.model.rdal.Specification ;
@@ -23,6 +24,7 @@ import fr.tpt.rdal.parser.RdalParser ;
 
 public class SensitivityBasedSelection implements ITransformationSelection {
 
+  private static Logger _LOGGER = Logger.getLogger(SensitivityBasedSelection.class) ;
   
   private TrcSpecification trc;
   private Specification rdal ;
@@ -34,7 +36,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
     this.rdal = rdalSpecification;
   }
   
-  public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply) throws Exception
+  public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply)
 	{
 		
 		// for each key from the pattern matching map, execute the transformation selection algorithm
@@ -97,9 +99,13 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 						transformationsToApply = (List<String>)tuple;
 				}
 				if(transformationsToApply == null)
-					throw new Exception("Could not find transformation to apply after considering exclusions for" +
-							tuple.getValue());
+				{
+				  String message = "Could not find transformation " +
+				      "to apply after considering exclusions for" +
+              tuple.getValue();
+				  _LOGGER.fatal(message);
 				}
+			}
 			else
 			{
 				transformationsToApply = candidateTransformationList;

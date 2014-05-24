@@ -9,4 +9,5 @@ Require-Bundle: fr.tpt.aadl.ramses.transformation.selection,
  fr.tpt.aadl.ramses.transformation.tip,
  fr.tpt.rdal.utils,
  fr.tpt.aadl.ramses.transformation.trc,
- fr.openpeople.rdal2.model
+ fr.openpeople.rdal2.model,
+ org.apache.log4j

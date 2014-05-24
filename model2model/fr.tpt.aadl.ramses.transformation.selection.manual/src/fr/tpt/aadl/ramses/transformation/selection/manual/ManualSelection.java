@@ -25,8 +25,7 @@ public class ManualSelection implements ITransformationSelection
 
   @Override
   public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap,
-                                    ArrayList<ElementTransformation> tuplesToApply) 
-                                        throws Exception
+                                    ArrayList<ElementTransformation> tuplesToApply)
   {
     String message = "In manual selection branch";
     _LOGGER.trace(message);
