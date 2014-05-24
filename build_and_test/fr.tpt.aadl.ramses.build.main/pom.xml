@@ -79,6 +79,7 @@
     </repository>
     <repository>
       <id>rdal</id>
+      <layout>p2</layout>
       <url>http://aadl.telecom-paristech.fr/download/rdal-update-site/</url>
     </repository>
     <repository>
