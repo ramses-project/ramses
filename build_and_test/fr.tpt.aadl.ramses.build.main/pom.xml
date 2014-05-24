@@ -4,7 +4,7 @@
   <properties>
     <tycho-version>0.20.0</tycho-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-     <platform-version-name>kepler</platform-version-name>
+    <platform-version-name>kepler</platform-version-name>
     <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
     <xtext-site>http://download.itemis.com/updates/releases</xtext-site>
     <osate-version>1.0.0-SNAPSHOT</osate-version>
@@ -76,6 +76,10 @@
       <id>emftvm</id>
       <layout>p2</layout>
       <url>http://download.eclipse.org/mmt/atl/updates/milestones/3.5/S201405200835/</url>
+    </repository>
+    <repository>
+      <id>rdal</id>
+      <url>http://aadl.telecom-paristech.fr/download/rdal-update-site/</url>
     </repository>
     <repository>
       <id>${platform-version-name}</id>
