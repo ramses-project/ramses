@@ -23,6 +23,7 @@ Require-Bundle: org.eclipse.m2m.atl.engine,
  org.eclipse.m2m.atl.emftvm.compiler;bundle-version="3.4.0",
  org.osate.aadl2,
  fr.tpt.aadl.ramses.transformation.tip,
- org.osate.ba
+ org.osate.ba,
+ org.apache.log4j
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy

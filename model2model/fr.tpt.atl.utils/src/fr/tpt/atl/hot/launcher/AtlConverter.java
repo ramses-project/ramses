@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
@@ -29,6 +30,9 @@ import org.eclipse.m2m.atl.engine.parser.AtlParser;
 
 public class AtlConverter {
 
+  private static Logger _LOGGER = Logger.getLogger(AtlConverter.class) ;
+  
+  
 	static String atlFileName;
 	
 /*	public static IModel convertToModel2(String file) throws ATLCoreException,
@@ -47,6 +51,8 @@ public class AtlConverter {
 		final EObject[] models;
 		try {
 
+		  String message = "Convert ATL file to ATXL: " + file;
+		  _LOGGER.trace(message);
 			models = AtlParser.getDefault().parseWithProblems(
 					new ByteArrayInputStream(getByteArrayFromFile(file)));
 
