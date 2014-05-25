@@ -196,7 +196,7 @@ public class RdalParser {
         }
       }
     }
-    _LOGGER.trace("Sensitivitiy list contains "+sensitivitiesResultList
+    _LOGGER.trace("Sensitivitiy list contains "+sensitivitiesResultList.size()
                   +" elements");
     Collections.sort(sensitivitiesResultList, new Comparator<ComparableSensitivity>(){
       @Override

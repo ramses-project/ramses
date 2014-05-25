@@ -150,7 +150,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 					
 		}
 		
-		_LOGGER.trace("Selection with propagation finished");
+		_LOGGER.trace("Selection with dependency propagation finished");
 		
 		patternMatchingIt = patternMatchingMap.entrySet().iterator();
 		// second, select transformation for other elements
