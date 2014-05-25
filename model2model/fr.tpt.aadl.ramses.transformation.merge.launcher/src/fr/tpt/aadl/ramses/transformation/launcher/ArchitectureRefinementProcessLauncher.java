@@ -3,6 +3,8 @@ package fr.tpt.aadl.ramses.transformation.launcher;
 import java.io.File ;
 import java.io.FilenameFilter ;
 import java.io.IOException ;
+import java.io.PrintWriter ;
+import java.io.StringWriter ;
 import java.util.ArrayList ;
 import java.util.Arrays ;
 import java.util.HashMap ;
@@ -404,8 +406,10 @@ public class ArchitectureRefinementProcessLauncher {
     try {
       this.generateDedicatedAtlForTip(sinst.eResource(),tuplesToApply, getOutputDir()+getTipId());
     } catch (ATLCoreException e) {
-      StackTraceElement[] message = e.getStackTrace();
-      _LOGGER.fatal(message);
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      e.printStackTrace(pw);
+      _LOGGER.fatal(sw.toString());
     }
 
     _LOGGER.trace("Finished specialization HOT");
@@ -503,9 +507,11 @@ public class ArchitectureRefinementProcessLauncher {
 
       generator.generateWorkflow(sinst, config, workflowPilot, null, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, monitor);
 
-    } catch (GenerationException e1) {
-      StackTraceElement[] message = e1.getStackTrace();
-      _LOGGER.fatal(message);
+    } catch (GenerationException e) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      e.printStackTrace(pw);
+      _LOGGER.fatal(sw.toString());
     }
 
 

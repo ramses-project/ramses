@@ -25,6 +25,8 @@ import java.io.File ;
 import java.io.FileInputStream ;
 import java.io.IOException ;
 import java.io.InputStream ;
+import java.io.PrintWriter ;
+import java.io.StringWriter ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.List ;
@@ -336,18 +338,24 @@ public class AadlTargetSpecificGenerator implements Generator
           }
           catch(ParseException e)
           {
-            StackTraceElement[] message = e.getStackTrace();
-            _LOGGER.fatal(message);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            _LOGGER.fatal(sw.toString());
           }
           catch(ConfigurationException e)
           {
-            StackTraceElement[] message = e.getStackTrace();
-            _LOGGER.fatal(message);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            _LOGGER.fatal(sw.toString());
           }
           catch(IOException e)
           {
-            StackTraceElement[] message = e.getStackTrace();
-            _LOGGER.fatal(message);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            _LOGGER.fatal(sw.toString());
           }
         
       }
