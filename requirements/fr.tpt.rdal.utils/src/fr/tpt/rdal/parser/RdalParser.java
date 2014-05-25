@@ -164,7 +164,17 @@ public class RdalParser {
 		
 		for(EObject obj: designElementList)
 		{
-			sensitivitiesResultList.addAll(getSensitivitiesForDesignElement(rdalSpecificationObj, obj));
+		  if(obj instanceof NamedElement)
+		  {
+		    NamedElement ne = (NamedElement) obj;
+		    _LOGGER.trace("Search sensitivity for "+ne.getName());
+		  }
+		  List<String> sensitivities = getSensitivitiesForDesignElement(rdalSpecificationObj, obj);
+		  String message = "Found sensitivities: ";
+		  for(String s: sensitivities)
+		    message+=s+" ";
+			sensitivitiesResultList.addAll(sensitivities);
+			
 		}
 		
 		if(designElementList.size() >0 && sensitivitiesResultList.size()>1)
@@ -218,15 +228,19 @@ public class RdalParser {
 		List<ComparableSensitivity> sensitivitiesResultList = new ArrayList<ComparableSensitivity>();
 		
 		List<GoalsPackage> packagesList = getGoalsPackages(rdalSpecificationObj);
+		_LOGGER.trace("Search in "+packagesList.size()+" goal packages");
 		Iterator<GoalsPackage> pakagesIt = packagesList.iterator();
 		while(pakagesIt.hasNext()){
 			GoalsPackage goalPackageObject = pakagesIt.next();
 			List<AbstractGoal> goalsList = getGoalsForPackage(goalPackageObject);
+			_LOGGER.trace("Search in "+goalsList.size()+" goals");
 			Iterator<AbstractGoal> goalsIt = goalsList.iterator();
 			while(goalsIt.hasNext()){
 				AbstractGoal goalObject = goalsIt.next();
 				if (goalObject instanceof QualityObjective){
 					Sensitivity sensitivityObject = getSensitivityForQualityGoal((QualityObjective)goalObject);
+					if(sensitivityObject == null)
+					  _LOGGER.error("Sensitivity not found");
 					List<EObject> objectsList = new ArrayList<EObject>();
 					long priority = getDesignElementsForSensitivity(sensitivityObject, objectsList);
 					ComparableSensitivity cs = new ComparableSensitivity(sensitivityObject, priority);
