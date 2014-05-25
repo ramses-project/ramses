@@ -35,6 +35,7 @@ public abstract class Scenario
   protected Map<String, Object> parameters = new HashMap<String, Object>();
   
   private Process ramsesProcess;
+  protected long codeGenerationTimeout = 5 ;
   
   protected abstract Process executeGeneratedCode() throws Exception;
   
@@ -156,7 +157,7 @@ public abstract class Scenario
         System.out.println(line) ;
         ramsesProcess = runtime.exec(line) ;
         new Thread(ft).start() ;
-        ft.get(300, TimeUnit.SECONDS) ;
+        ft.get(codeGenerationTimeout, TimeUnit.MINUTES) ;
         displayProcessMessages(ramsesProcess, 1) ;
       }
       catch(TimeoutException ee)

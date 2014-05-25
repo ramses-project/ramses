@@ -12,6 +12,7 @@ public class Test_JUnit_SensitivityBasedSelection extends OSGIPOKScenario
   
   @Test
   public void  JUnit_sensitivity_selection_exec(){
+    codeGenerationTimeout = 10;
     input = "tests/arinc653/arinc653-selection-sensitivity/input/test_buffer_delayed.aadl2";
     includeList = "tests/arinc653/";
     ramses_dir = System.getProperty("RAMSES_DIR");
