@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -41,7 +42,9 @@ import org.eclipse.m2m.atl.emftvm.compiler.EmftvmCompilerPlugin;
  * Entry point of the 'EModelCopy' transformation module.
  */
 public abstract class AtlHotTransfoLauncher {
-
+  
+  private static Logger _LOGGER = Logger.getLogger(AtlHotTransfoLauncher.class) ;
+  
 	/**
 	 * The property file. Stores module list, the metamodel and library
 	 * locations.
@@ -97,8 +100,11 @@ public abstract class AtlHotTransfoLauncher {
 
 	public void launchHot(String[] inputAtlPaths, String outputAtlPath)
 			throws IOException, ATLCoreException {
+	  _LOGGER.trace("HOT load models");
 		this.loadModels(inputAtlPaths); //-> produces model.atxl
+		_LOGGER.trace("HOT launch");
 		this.doHot(new NullProgressMonitor()); //-> transforms model.atxl to model_refined.atxl
+		_LOGGER.trace("Save atl file");
 		this.saveModels(outputAtlPath); // -> transforms model_refined.atxl to model_refined.atl
 		// workaround bug in the atl pretty printer: replace 
 		// to

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
@@ -30,6 +31,8 @@ import fr.tpt.aadl.ramses.transformation.tip.TipPackage;
 public class AtlTip2AtlLauncher extends AtlHotTransfoLauncher
 {
 
+  private static Logger _LOGGER = Logger.getLogger(AtlTip2AtlLauncher.class) ;
+  
 	/**
 	 * The IN2 model.
 	 * @generated
@@ -109,7 +112,7 @@ public class AtlTip2AtlLauncher extends AtlHotTransfoLauncher
 				try {
 					Thread.sleep(200);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					_LOGGER.error("convertion of atl to atxl file finished with timeout");
 				}
 			}
 		}
