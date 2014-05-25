@@ -60,6 +60,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			List<String> transformationsToApply = null; 
 			if(candidateTransformationList.size()>1)
 			{ 
+			  _LOGGER.trace("need to proceed to selection");
 				List<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
 				for(List<RuleApplicationTulpe> toExcludeList: exclusionDependencies)
@@ -81,12 +82,13 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 					{
 						// execute the best allocation selection algorithm
 						transformationsToApply = selectBestTransformation(newTuple);
-						_LOGGER.trace("Selected "+transformationsToApply);
+						_LOGGER.trace("Selected: "+transformationsToApply);
 						break;
 					}
 					else if(((List<String>)newTuple.getValue()).size()==1)
 					{
 						transformationsToApply = (List<String>)newTuple.getValue();
+						_LOGGER.trace("Selected unique option remaining: "+transformationsToApply);
 						break;
 					}
 					else

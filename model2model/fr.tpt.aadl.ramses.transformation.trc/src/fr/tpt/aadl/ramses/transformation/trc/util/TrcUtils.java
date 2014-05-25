@@ -361,6 +361,7 @@ public class TrcUtils {
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
 				continue;
+			_LOGGER.trace("Search dependency for "+appliedRule);
 			List<RuleApplicationTulpe> localDependencyList = new ArrayList<RuleApplicationTulpe>();
 			result.add(localDependencyList);
 			for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
@@ -368,6 +369,8 @@ public class TrcUtils {
 				getRestrictedPossibleDependencies(req, eObjList, localDependencyList, result, false);
 			}
 		}
+		if(result.isEmpty())
+		  _LOGGER.trace("No dependency found for "+appliedRule);
 		return result;
 	}
 	
