@@ -1,11 +1,13 @@
 package fr.tpt.rdal.parser;
 
+import java.io.File ;
 import java.util.ArrayList ;
 import java.util.Collections ;
 import java.util.Comparator ;
 import java.util.Iterator ;
 import java.util.List ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.TreeIterator ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
@@ -31,13 +33,14 @@ import fr.openpeople.rdal2.model.rdal.Specification ;
 
 public class RdalParser {
 
+  private static Logger _LOGGER = Logger.getLogger(RdalParser.class) ;
   
   public static Specification parse(String rdalPath, 
                                        ResourceSet resourceSet){
     
     final Resource resource;
     
-    URI p_uri = URI.createFileURI(rdalPath);
+    URI p_uri = URI.createURI(rdalPath);
     
     resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("rdal", new XMIResourceFactoryImpl());
     resourceSet.getPackageRegistry().put(RdalPackage.eNS_URI, RdalPackage.eINSTANCE);
@@ -47,7 +50,7 @@ public class RdalParser {
       Specification result = (Specification) resource.getContents().get(0);
       return result;  
     } else {
-      System.out.println("RDAL of specified path ("+rdalPath+") does not exit.");
+      _LOGGER.error("RDAL of specified path ("+rdalPath+") does not exit.");
     }
     
     return null;

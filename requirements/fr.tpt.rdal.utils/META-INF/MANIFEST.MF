@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Export-Package: fr.tpt.rdal.parser
 Require-Bundle: org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.xmi,
+ org.apache.log4j;bundle-version="1.2.15",
  org.eclipse.xtext;bundle-version="2.3.1",
  org.osate.aadl2,
  org.osate.xtext.aadl2,

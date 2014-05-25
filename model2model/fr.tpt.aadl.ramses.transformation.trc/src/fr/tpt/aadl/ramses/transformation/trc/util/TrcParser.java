@@ -1,8 +1,10 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
+import java.io.File ;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -16,13 +18,14 @@ import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
 
 public class TrcParser {
 
-	
+  private static Logger _LOGGER = Logger.getLogger(TrcParser.class) ;
+  
 	public static TrcSpecification parse(String trcPath, 
 	                                     ResourceSet resourceSet){
 		
 		final Resource resource;
 		
-		URI p_uri = URI.createFileURI(trcPath);
+		URI p_uri = URI.createURI(trcPath);
 		
 		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("trc", new XMIResourceFactoryImpl());
 		resourceSet.getPackageRegistry().put(TrcPackage.eNS_URI, TrcPackage.eINSTANCE);
@@ -32,7 +35,7 @@ public class TrcParser {
 			TrcSpecification result = (TrcSpecification) resource.getContents().get(0);
 			return result;	
 		} else {
-			System.out.println("TRC of specified path ("+trcPath+") does not exit.");
+		  _LOGGER.error("TRC of specified path ("+trcPath+") does not exit.");
 		}
 		
 		return null;
