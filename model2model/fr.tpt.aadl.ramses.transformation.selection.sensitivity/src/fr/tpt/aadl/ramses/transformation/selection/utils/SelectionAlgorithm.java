@@ -6,8 +6,10 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EObject;
 
+import fr.tpt.aadl.ramses.transformation.selection.sensitivity.SensitivityBasedSelection ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipParser;
 import fr.tpt.aadl.ramses.transformation.tip.TipSpecification;
 import fr.tpt.aadl.ramses.transformation.trc.Module;
@@ -18,7 +20,8 @@ import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class SelectionAlgorithm {
 		
-
+  private static Logger _LOGGER = Logger.getLogger(SelectionAlgorithm.class) ;
+  
 	/*	*//**
 	 * Returns a list of transformation's identifiers of transformation rules that can applay to element of type Elem 
 	 *
@@ -106,15 +109,16 @@ public class SelectionAlgorithm {
 		// create List of available transformations from Strings
 		List<Transformation> transformationsAvailable = new ArrayList<Transformation>();
 		Iterator<String> availableTransformationIdsIt = availableTransformationsIdList.iterator();
-		while (availableTransformationIdsIt.hasNext()){
+		_LOGGER.trace("Search best allocation among "+availableTransformationsIdList.size());
+    while (availableTransformationIdsIt.hasNext()){
 			Transformation tr = TrcUtils.getTransformationById(trcSpec, availableTransformationIdsIt.next().toString());
 			if(tr!=null)
 				transformationsAvailable.add(tr);
 		}
-	
+    _LOGGER.trace("Found "+availableTransformationsIdList.size()+"equivalent transformations in TRC");
+    
 		// for each possible transformation create a list of values for the sensitivities it is 
 		List<OrderedQualityImpact> transSensList = getTransformationOrderBySensitivities(transformationsAvailable, sensitivities);
-		
 		Collections.sort(transSensList, new Comparator<OrderedQualityImpact>(){
 			public int compare(OrderedQualityImpact arg0, OrderedQualityImpact arg1) {
 				for (int i=0; i< arg0.sensitivityValuesList.size(); i++){
@@ -126,6 +130,8 @@ public class SelectionAlgorithm {
 			}
 		});
 
+		_LOGGER.trace("Ordered quality attributes " + transSensList.size());
+		
 		List<String> results = new ArrayList<String>();
 		
 		for (Iterator<OrderedQualityImpact> transSensIt = transSensList.iterator(); transSensIt.hasNext();){
@@ -148,7 +154,7 @@ public class SelectionAlgorithm {
 			}
 
 		}
-		
+		_LOGGER.error("Did not find transformation");
 		return results;
 	}
 
