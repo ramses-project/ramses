@@ -11,7 +11,8 @@ Export-Package: fr.tpt.aadl.ramses.transformation.trc,
  fr.tpt.aadl.ramses.transformation.trc.util
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport,
- org.eclipse.emf.ecore.xmi;bundle-version="2.9.1"
+ org.eclipse.emf.ecore.xmi;bundle-version="2.9.1",
+ org.apache.log4j
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

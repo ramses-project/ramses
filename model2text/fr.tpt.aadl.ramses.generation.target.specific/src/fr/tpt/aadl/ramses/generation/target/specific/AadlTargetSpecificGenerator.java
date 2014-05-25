@@ -86,6 +86,7 @@ import fr.tpt.aadl.ramses.transformation.selection.sensitivity.SensitivityBasedS
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
+import fr.tpt.rdal.parser.RdalParser ;
 
 
 public class AadlTargetSpecificGenerator implements Generator
@@ -647,11 +648,8 @@ public class AadlTargetSpecificGenerator implements Generator
       TrcParser.parse(trcPath, rs);
     
     String rdalPath = p.getProperty("ArchitectureRefinementLauncher.rdal");
-//    if(trcPath!=null)
-//    {
-//      RdalParser.parse(rdalPath, rs);
-//      rs.getPackageRegistry().put("http://www.open-people.fr/rdal2", RdalPackage.eINSTANCE);
-//    }
+    if(trcPath!=null)
+      RdalParser.parse(rdalPath, rs);
         
     List<Transformation> list = l.getTransformations();
     Resource r = list.get(0).eResource();

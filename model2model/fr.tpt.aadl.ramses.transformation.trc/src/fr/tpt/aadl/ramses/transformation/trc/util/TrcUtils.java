@@ -9,11 +9,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -37,6 +38,8 @@ public class TrcUtils {
 	private static Resource resource;
 	private static TrcSpecification trcSpecification;
 
+	private static Logger _LOGGER = Logger.getLogger(TrcUtils.class) ;
+  
 	
 	/**
 	 * Creates a new TRC artifact of a specified path and version 
@@ -450,7 +453,8 @@ public class TrcUtils {
 												  boolean isExclusion)
 	{
 		// Here, we have to organize dependencies according to a disjunctive normal form.
-		if(ar instanceof RuleDependency)
+		_LOGGER.trace("Start retreive dependencies under disjunctive normal form");
+	  if(ar instanceof RuleDependency)
 		{
 			RuleDependency rd = (RuleDependency) ar;
 			if(rd.isIsExclusion()!=isExclusion)
@@ -467,7 +471,7 @@ public class TrcUtils {
 				currentDependencyList.add(dep);
 				dep.setPatternMatchedElement(depObjList);
 				dep.setTransformationRuleName(rd.getRequiredRule());
-
+				_LOGGER.trace("Retreived dependency to "+rd.getRequiredRule());
 			}
 			catch(Exception e)
 			{
@@ -499,6 +503,7 @@ public class TrcUtils {
 				}
 			}
 		}
+	  _LOGGER.trace("Finished retreive dependencies under disjunctive normal form");
 	}
 	
 	private static List<EObject> getReferenceList(EObject eObj, List<String> referenceNameList) throws Exception
