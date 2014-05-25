@@ -163,20 +163,20 @@ public abstract class Scenario
       catch(TimeoutException ee)
       {
         displayProcessMessages(ramsesProcess, 1, "exited on timeout") ;
-        fail() ;
         if(ramsesProcess != null)
         {
           ramsesProcess.destroy() ;
         }
+        fail() ;
       }
       catch(Exception e)
       {
         e.printStackTrace() ;
-        fail() ;
         if(ramsesProcess != null)
         {
           ramsesProcess.destroy() ;
         }
+        fail() ;
         System.exit(-1) ;
       }
       

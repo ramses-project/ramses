@@ -60,7 +60,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			List<String> transformationsToApply = null; 
 			if(candidateTransformationList.size()>1)
 			{ 
-			  _LOGGER.trace("need to proceed to selection");
+			  _LOGGER.trace("need to proceed to selection, exclusions nb="+exclusionDependencies.size());
 				ArrayList<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
 				for(List<RuleApplicationTulpe> toExcludeList: exclusionDependencies)
@@ -96,10 +96,8 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 				}
 				if(exclusionDependencies.isEmpty())
 				{
-					if(tuple.getValue().size()>1)
-						transformationsToApply = selectBestTransformation(tuple);
-					else
-						transformationsToApply = (List<String>)tuple.getValue();
+				  _LOGGER.trace("Without exclusion to consider, start selection");
+				  transformationsToApply = selectBestTransformation(tuple);
 				}
 				if(transformationsToApply == null)
 				{
@@ -116,13 +114,12 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			
 			_LOGGER.trace("Selected: "+transformationsToApply.get(0));
 			
-			_LOGGER.trace("Get dependencies to exclude");
 			exclusionDependencies.addAll(TrcUtils.getExlcusionDependencies(trc,candidateObjects, transformationsToApply.get(0)));
 			_LOGGER.trace("Dependencies to exclude: "+exclusionDependencies.size());
 			
-			_LOGGER.trace("Get dependencies to include");
 			List<List<RuleApplicationTulpe>> inclusionDependencies = TrcUtils.getInclusionDependencies(trc,candidateObjects, transformationsToApply.get(0));
 			_LOGGER.trace("Dependencies to include: "+inclusionDependencies.size());
+			
 			if(inclusionDependencies.size()==0)
 				continue;
 			// possibleDependencies is returned under a disjunctive normal form
@@ -202,6 +199,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 		// get the sensitivities for a given element
 		List<String> sensitivities = RdalParser.getSensitivitiesForDesignElement(rdal, tuple.getKey());
 
+		_LOGGER.trace("Start selection with "+sensitivities.size()+" sensitivities"); 
 		if (TipUtils.getCurrentIteration()>1) {//if the iteration is not the first one 
 			// get ignored transformations from the TIP
 			ArrayList<String> ignoredTransformations = TipParser.getElementTransformationsHistory(tuple.getKey());
