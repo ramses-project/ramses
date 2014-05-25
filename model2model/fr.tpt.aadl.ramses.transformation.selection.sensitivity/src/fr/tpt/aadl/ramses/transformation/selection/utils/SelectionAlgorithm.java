@@ -115,7 +115,7 @@ public class SelectionAlgorithm {
 			if(tr!=null)
 				transformationsAvailable.add(tr);
 		}
-    _LOGGER.trace("Found "+availableTransformationsIdList.size()+"equivalent transformations in TRC");
+    _LOGGER.trace("Found "+availableTransformationsIdList.size()+" equivalent transformations in TRC");
     
 		// for each possible transformation create a list of values for the sensitivities it is 
 		List<OrderedQualityImpact> transSensList = getTransformationOrderBySensitivities(transformationsAvailable, sensitivities);

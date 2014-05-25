@@ -61,7 +61,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			if(candidateTransformationList.size()>1)
 			{ 
 			  _LOGGER.trace("need to proceed to selection");
-				List<String> newCandidateTransformationList = new ArrayList<String>();
+				ArrayList<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
 				for(List<RuleApplicationTulpe> toExcludeList: exclusionDependencies)
 				{
@@ -77,18 +77,16 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 							}
 						}
 					}
-					TupleEntry newTuple = new TupleEntry(tuple.getKey(), newCandidateTransformationList);
+					TupleEntry<List<EObject>, ArrayList<String>> newTuple = new TupleEntry<List<EObject>, ArrayList<String>>(tuple.getKey(), newCandidateTransformationList);
 					if(((List<String>)newTuple.getValue()).size()>1)
 					{
 						// execute the best allocation selection algorithm
 						transformationsToApply = selectBestTransformation(newTuple);
-						_LOGGER.trace("Selected: "+transformationsToApply);
 						break;
 					}
 					else if(((List<String>)newTuple.getValue()).size()==1)
 					{
 						transformationsToApply = (List<String>)newTuple.getValue();
-						_LOGGER.trace("Selected unique option remaining: "+transformationsToApply);
 						break;
 					}
 					else
@@ -101,7 +99,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 					if(tuple.getValue().size()>1)
 						transformationsToApply = selectBestTransformation(tuple);
 					else
-						transformationsToApply = (List<String>)tuple;
+						transformationsToApply = (List<String>)tuple.getValue();
 				}
 				if(transformationsToApply == null)
 				{
@@ -115,6 +113,9 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			{
 				transformationsToApply = candidateTransformationList;
 			}
+			
+			_LOGGER.trace("Selected: "+transformationsToApply.get(0));
+			
 			_LOGGER.trace("Get dependencies to exclude");
 			exclusionDependencies.addAll(TrcUtils.getExlcusionDependencies(trc,candidateObjects, transformationsToApply.get(0)));
 			_LOGGER.trace("Dependencies to exclude: "+exclusionDependencies.size());
