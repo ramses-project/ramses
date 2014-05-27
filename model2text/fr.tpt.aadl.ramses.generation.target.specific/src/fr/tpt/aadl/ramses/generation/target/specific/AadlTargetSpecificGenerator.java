@@ -317,7 +317,7 @@ public class AadlTargetSpecificGenerator implements Generator
       else if(operation.equals("unparse"))
       {
         String pkgName = initialPackageName + "_" + transfoCounter ;
-    	monitor.subTask("Unparse output model: " + pkgName);
+        monitor.subTask("Unparse output model: " + pkgName);
 
         doUnparse(currentInstance.eResource(), currentImplResource, outputDir,
                   pkgName, monitor) ;
@@ -686,8 +686,15 @@ public class AadlTargetSpecificGenerator implements Generator
          this._predefinedResourceManager
          );
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
-    Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
-    modelsMap.put(workflowPilot.getOutputModelId(), result);
+    loopIteration=0;
+    boolean loopAnalysis = false;
+    while(!loopAnalysis)
+    {
+      loopIteration++;
+      Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
+      modelsMap.put(workflowPilot.getOutputModelId(), result);
+      loopAnalysis = isValidLoopIteration(l.getAnalysis(), errManager, workflowPilot, config, workflowPilot.getOutputModelId(), monitor);
+    }
   }
 
   private void doLoopManualMerge(AbstractLoop l,
@@ -726,14 +733,14 @@ public class AadlTargetSpecificGenerator implements Generator
 
   private void doLoopTryEach(AbstractLoop l,
                              AnalysisErrorReporterManager errManager,
-                             WorkflowPilot xmlPilot,
+                             WorkflowPilot workflowPilot,
                              RamsesConfiguration config,
                              IProgressMonitor monitor) throws AnalysisException, GenerationException, TransformationException
   {
     AbstractLoop.AbstractAnalysis a = l.getAnalysis();
     final String inputId = l.getInputModelIdentifier();
     final String outputId = l.getOutputModelIdentifier();
-    loopIteration = -1;
+    loopIteration = 0;
     for(fr.tpt.aadl.ramses.transformation.trc.Transformation 
         transfo : l.getTransformations())
     {
@@ -744,9 +751,9 @@ public class AadlTargetSpecificGenerator implements Generator
       loopIteration++;
       String msg = "Start loop iteration = " + loopIteration ;
       _LOGGER.trace(msg);
-      String transfoId = xmlPilot.getTransformationName();
+      String transfoId = workflowPilot.getTransformationName();
       doTransformation(transfoId, moduleList,inputId,outputId,config, monitor);
-      if (isValidLoopIteration(a,errManager,xmlPilot,config,outputId,monitor))
+      if (isValidLoopIteration(a,errManager,workflowPilot,config,outputId,monitor))
       {
         break;
       }
@@ -757,16 +764,18 @@ public class AadlTargetSpecificGenerator implements Generator
                                         WorkflowPilot xmlPilot, RamsesConfiguration config,
                                         String outputId, IProgressMonitor monitor) throws AnalysisException
   {
-     if (loopValidIteration >= 0)
-     {
-       /** Debug mode (valid iteration is fixed by the user) */
-       return loopIteration == loopValidIteration;
-     }
-     else
-     {
-       /** Check iteration validity by specified analysis */
-       return doLoopAnalysis(a,errManager,xmlPilot,config,monitor,outputId+"_iter_"+loopIteration,outputId+"_iter_analysis_"+loopIteration);
-     }
+    boolean result = doLoopAnalysis(a,errManager,xmlPilot,config,monitor,outputId+"_iter_"+loopIteration,outputId+"_iter_analysis_"+loopIteration);
+    xmlPilot.setAnalysisResult(result);
+    if (loopValidIteration >= 0 && !result)
+    {
+      /** Debug mode (valid iteration is fixed by the user) */
+      return loopIteration == loopValidIteration;
+    }
+    else
+    {
+      /** Check iteration validity by specified analysis */
+      return result;
+    }
   }
   
   private boolean doLoopAnalysis(AbstractLoop.AbstractAnalysis a,
@@ -814,7 +823,7 @@ public class AadlTargetSpecificGenerator implements Generator
       return false;
     }
     else
-      return true;
+      return false;
   }
 
   private SystemInstance doTransformation(WorkflowPilot workflowPilot, RamsesConfiguration config, IProgressMonitor monitor)
@@ -843,24 +852,24 @@ public class AadlTargetSpecificGenerator implements Generator
     msg = "  Module list  : " + resourceFileNameList ;
     _LOGGER.trace(msg);
     msg = "  Transfo id  : " + transformationId ;
-	_LOGGER.trace(msg);
+    _LOGGER.trace(msg);
     msg = "  Output model : " + outputModelId ;
     _LOGGER.trace(msg);
-    
+
     Resource result = _targetTrans.transformWokflow(r, transformationId, resourceFileNameList, 
-                                                config.getRamsesOutputDir(), outputModelId, monitor);
+                                                    config.getRamsesOutputDir(), outputModelId, monitor);
 
     PropertiesLinkingService pls = new PropertiesLinkingService ();
     SystemImplementation si = (SystemImplementation) pls.
         findNamedElementInsideAadlPackage(systemToInstantiate, 
-            ((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
-    
+                                          ((AadlPackage) result.getContents().get(0)).getOwnedPublicSection());
+
     SystemInstance sinst = _modelInstantiator.instantiate(si);
     if(outputModelId!=null && !outputModelId.isEmpty())
       this.modelsMap.put(outputModelId, sinst.eResource());
-    
+
     currentImplResource = sinst.eResource();
-    
+
     return sinst;
   }
   
@@ -895,12 +904,12 @@ public class AadlTargetSpecificGenerator implements Generator
 	  _codeGen.generate(r, runtimePath, outputDir, includeDirs, monitor) ;
   }
 
-private void doErrorState()
-{
-  String msg = "XML piloting achieved in errorstate" ;
-  _LOGGER.error(msg);
-  ServiceProvider.SYS_ERR_REP.error(msg, true);
-}
+  private void doErrorState()
+  {
+    String msg = "workflow pilote reached in errorstate" ;
+    _LOGGER.error(msg);
+    ServiceProvider.SYS_ERR_REP.error(msg, true);
+  }
 
 
   @Override

@@ -494,13 +494,13 @@
     <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.emftvm</artifactId>
-      <version>3.4.0</version>
+      <version>3.5.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.eclipse.m2m</groupId>
       <artifactId>atl.emftvm.trace</artifactId>
-      <version>3.4.0</version>
+      <version>3.5.0</version>
     </dependency>
 
     <dependency>

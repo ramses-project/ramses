@@ -143,7 +143,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 				return "unparse";
 			} else if (currentWorkflowElement instanceof Loop) {
 			  return "loop";
-			}
+			} else if (currentWorkflowElement instanceof ErrorState)
+			  return "errorstate";
 		}
 		return null;
 	}
