@@ -79,6 +79,7 @@ public class ArchitectureRefinementProcessLauncher {
   private List<Transformation> transformations;
   private TrcSpecification trcSpec;
 
+  
   private final File outputPathSave ;
   
   public ArchitectureRefinementProcessLauncher(TrcSpecification trcSpec,
@@ -215,6 +216,7 @@ public class ArchitectureRefinementProcessLauncher {
    * This method executes the architecture refinement process
    * INPUT: AADL candidate architecture model, RDAL specification, TRC artifact
    * OUTPUT: AADL architecture model is obtained from the workflow execution
+   * @return Resource obtained after merge and execution of the transformation
    * @throws ParseException 
    * @throws ConfigurationException 
    * @throws TransformationException 
@@ -223,8 +225,8 @@ public class ArchitectureRefinementProcessLauncher {
    * @throws IOException 
    * 
    */		
-  public void launch(SystemInstance systemInstance,
-                     String outputResourceSuffix,
+  public Resource launch(SystemInstance systemInstance,
+                     String outputResourceID,
                      int nbIterations) 
                          throws ParseException, ConfigurationException, AnalysisException, TransformationException, IOException
   {
@@ -248,18 +250,17 @@ public class ArchitectureRefinementProcessLauncher {
     _LOGGER.trace(message);
     
     try {
-      for(int i=0; i<nbIterations; i++)
-      {
         TipUtils.setCurrentIteration(TipUtils.getCurrentIteration()+1);
-        message = "Start iteration "+(i+1);
+        message = "Start production of " + outputResourceID;
         _LOGGER.trace(message);
-        this.runArchitectureRefinementIteration(trcSpec,
-                                                systemInstance, 
-                                                config,
-                                                outputResourceSuffix);
-        message = "Finish iteration "+(i+1);
+        Resource r = this.runArchitectureRefinementIteration(trcSpec,
+                                                             systemInstance, 
+                                                             config,
+                                                             outputResourceID);
+        
+        message = "Finish production of " + outputResourceID;
         config.setRamsesOutputDir(outputPathSave.getAbsolutePath());
-      }
+        return r;
     }
     finally
     {
@@ -277,16 +278,17 @@ public class ArchitectureRefinementProcessLauncher {
    * This method executes an iteration of architecture refinement process
    * INPUT: AADL candidate architecture model, RDAL specification, TRC artifact
    * OUTPUT: AADL architecture model is obtained from the workflow execution
+   * @return 
    * @throws IOException 
    * @throws TransformationException 
    * @throws AnalysisException 
    * @throws Exception 
    * 
    */	
-  public void runArchitectureRefinementIteration(TrcSpecification trcSpec,
+  private Resource runArchitectureRefinementIteration(TrcSpecification trcSpec,
                                                  SystemInstance sinst,
                                                  RamsesConfiguration config,
-                                                 String outputResourceSuffix) throws IOException, AnalysisException, TransformationException
+                                                 String outputResourceID) throws IOException, AnalysisException, TransformationException
   {
 
     TipUtils.addIteration(TipUtils.getTipSpecification(),
@@ -326,7 +328,7 @@ public class ArchitectureRefinementProcessLauncher {
       pmtl.doTransformation(emftvmFiles, 
                             sinst.eResource(),  
                             getOutputDir(),
-                            outputResourceSuffix, 
+                            outputResourceID, 
                             monitor);
     }
 
@@ -430,16 +432,10 @@ public class ArchitectureRefinementProcessLauncher {
     //generate ramses workflow from TIP
     String workflowPath = getOutputDir()+"workflow"+
         TipParser.getLastIterationId()+".xmi";
-    //        fr.tpt.aadl.ramses.control.workflow.Transformation parentTransfo = null;
-    //        fr.tpt.aadl.ramses.control.workflow.Transformation rootTransfo = null;
-    //        for(int k=0;k<transfoList.size();k++)
-    //		{
-    //Transformation Ti = transfoList.get(k);
-    //			fr.tpt.aadl.ramses.control.workflow.Transformation t = WorkflowFactory.eINSTANCE.createTransformation();
     fr.tpt.aadl.ramses.control.workflow.Transformation rootTransfo = WorkflowFactory.eINSTANCE.createTransformation();
     
     ModelIdentifier outputMi = WorkflowFactory.eINSTANCE.createModelIdentifier();
-    outputMi.setId("applied_"+TipParser.getLastIterationId());
+    outputMi.setId(outputResourceID);
     rootTransfo.setOutputModelIdentifier(outputMi);
     
     ModelIdentifier inputMi = WorkflowFactory.eINSTANCE.createModelIdentifier();
@@ -447,8 +443,8 @@ public class ArchitectureRefinementProcessLauncher {
     rootTransfo.setInputModelIdentifier(inputMi);
     
     fr.tpt.aadl.ramses.control.workflow.List l = WorkflowFactory.eINSTANCE.createList();
-    //			t.setList(l);
     rootTransfo.setList(l);
+    
     // retreive module dependencies for current transformation.
     List<Module> completeModuleList = TrcUtils.buildDependencyList(transfoList);
     // add dependencies in the workflow model.
@@ -497,28 +493,25 @@ public class ArchitectureRefinementProcessLauncher {
 
     _LOGGER.trace("Launch specialized transformation");
     
-    // execute ramses workflow transformation -> running java from command line, 
-    // example: -m test/simple-component2/model.aadl  -g pok -s s.i -o test/simple-component2/gen -i test/ --xml test/simple-component2/comp.xml
+    // execute ramses workflow transformation 
     WorkflowPilot workflowPilot = new EcoreWorkflowPilot(workflowPath);
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
 
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     try {
 
-      generator.generateWorkflow(sinst, config, workflowPilot, null, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, monitor);
-
+      Map<String, Resource> res = generator.generateWorkflow(sinst, config, workflowPilot, null, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, monitor);
+      return res.get(outputResourceID);
     } catch (GenerationException e) {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       e.printStackTrace(pw);
       _LOGGER.fatal(sw.toString());
     }
+    return null ;
 
 
   }
-
-
-
 
 
   //--------------------------------------------------------------------

@@ -223,6 +223,7 @@ public class ToolSuiteLauncher
     generator.generateWorkflow(instance, config, xmlPilot, includeDirs,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor) ;
+    generator.cleanUp();
   }
   
   void performAnalysis(List<File> mainModelFiles,

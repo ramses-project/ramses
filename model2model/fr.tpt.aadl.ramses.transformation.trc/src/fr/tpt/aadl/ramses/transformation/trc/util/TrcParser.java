@@ -1,20 +1,18 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
-import java.io.File ;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Iterator ;
+import java.util.List ;
 
 import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
-import fr.tpt.aadl.ramses.transformation.trc.Module;
-import fr.tpt.aadl.ramses.transformation.trc.Transformation;
-import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact;
-import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
-import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcPackage ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 
 public class TrcParser {
 

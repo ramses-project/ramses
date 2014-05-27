@@ -234,11 +234,12 @@ public class GenerateActionHandler extends RamsesActionHandler {
     {
       EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
       generator.generateWorkflow(sinst,
-    		  					 config,
+                                 config,
                                  xmlPilot,
                                  includeDirs,
                                  errReporter,
                                  monitor);
+      generator.cleanUp();
     }
     
     ResourcesPlugin.getWorkspace().getRoot().

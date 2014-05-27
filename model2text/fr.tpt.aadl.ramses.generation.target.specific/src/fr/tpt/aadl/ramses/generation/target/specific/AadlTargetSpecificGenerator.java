@@ -117,6 +117,7 @@ public class AadlTargetSpecificGenerator implements Generator
   /** Loop debug  (loopValidIteration must be negative to disable debug) **/
   private static int loopValidIteration = -1;
   private int loopIteration = -1;
+
   /****************/
   
 
@@ -221,14 +222,15 @@ public class AadlTargetSpecificGenerator implements Generator
   }
 
   @Override
-  public void generateWorkflow(SystemInstance systemInstance,
-		  					   RamsesConfiguration config,
-                               WorkflowPilot xmlPilot,
-                               File[] includeDirs,
-                               AnalysisErrorReporterManager errManager,
-                               IProgressMonitor monitor) throws GenerationException,
-                                                                TransformationException,
-                                                                AnalysisException
+  public Map<String, Resource> generateWorkflow(SystemInstance systemInstance,
+                                                RamsesConfiguration config,
+                                                WorkflowPilot xmlPilot,
+                                                File[] includeDirs,
+                                                AnalysisErrorReporterManager errManager,
+                                                IProgressMonitor monitor) 
+                                                    throws GenerationException,
+                                                    TransformationException,
+                                                    AnalysisException
   {
     
     long startTime = System.nanoTime();
@@ -269,7 +271,7 @@ public class AadlTargetSpecificGenerator implements Generator
             ServiceProvider.SYS_ERR_REP.error(constraintError.getMessage(), true) ;
           }
         }
-        return ;
+        return null;
       }
     }
 
@@ -299,16 +301,16 @@ public class AadlTargetSpecificGenerator implements Generator
       String operation = xmlPilot.getNextOperation() ;
       
       if(operation == null)
-        return ;
+        return modelsMap;
       
       if(operation.equals("analysis"))
       {
-	    monitor.subTask("Model analysis: " + xmlPilot.getAnalysisName());
+        monitor.subTask("Model analysis: " + xmlPilot.getAnalysisName());
         doAnalysis(xmlPilot, config, monitor, errManager) ;
       }
       else if(operation.equals("transformation"))
       {
-    	monitor.subTask("Model transformation " + ((xmlPilot.getTransformationName()!=null) ? xmlPilot.getTransformationName():""));
+        monitor.subTask("Model transformation " + ((xmlPilot.getTransformationName()!=null) ? xmlPilot.getTransformationName():""));
         currentInstance = doTransformation(xmlPilot, config, monitor) ;
         r = currentInstance.eResource() ;
       }
@@ -375,6 +377,7 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       
       xmlPilot.goForward() ;
+      
     }
     
     
@@ -391,10 +394,15 @@ public class AadlTargetSpecificGenerator implements Generator
         +timeMinuteSeconds+" seconds," +
         " (" + duration+" nanoseconds)\n\n");
     
-    this.modelsMap.clear();
-    
+    return modelsMap ;
   }
 
+  @Override
+  public void cleanUp()
+  {
+    modelsMap.clear();
+  }
+  
   private void doAnalysis(WorkflowPilot workflowPilot, RamsesConfiguration config,
                           IProgressMonitor monitor,
                           AnalysisErrorReporterManager errManager) throws AnalysisException
@@ -417,7 +425,9 @@ public class AadlTargetSpecificGenerator implements Generator
   {
     _modelInstantiator = new AadlModelsManagerImpl(errManager) ;
 
-    Resource inputResource = modelsMap.get(analysisModelInputIdentifier) ;
+    String qualifiedAnalysisModelInputIdentifier = analysisModelInputIdentifier;
+    
+    Resource inputResource = modelsMap.get(qualifiedAnalysisModelInputIdentifier) ;
     SystemInstance currentInstance ;
     PropertiesLinkingService pls = new PropertiesLinkingService() ;
     if(inputResource.getContents().get(0) instanceof AadlPackage)
@@ -676,7 +686,8 @@ public class AadlTargetSpecificGenerator implements Generator
          this._predefinedResourceManager
          );
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
-    mergeLauncher.launch(sinst, workflowPilot.getOutputModelId()+"_iter_"+this.loopIteration, l.getIterationNb());
+    Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
+    modelsMap.put(workflowPilot.getOutputModelId(), result);
   }
 
   private void doLoopManualMerge(AbstractLoop l,
@@ -709,8 +720,8 @@ public class AadlTargetSpecificGenerator implements Generator
          this._predefinedResourceManager
          );
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
-    mergeLauncher.launch(sinst, workflowPilot.getOutputModelId()+"_iter_"+this.loopIteration, l.getIterationNb());
-    
+    Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
+    modelsMap.put(workflowPilot.getOutputModelId(), result);    
   }
 
   private void doLoopTryEach(AbstractLoop l,
@@ -754,7 +765,7 @@ public class AadlTargetSpecificGenerator implements Generator
      else
      {
        /** Check iteration validity by specified analysis */
-       return doLoopAnalysis(a,errManager,xmlPilot,config,monitor,outputId,outputId);
+       return doLoopAnalysis(a,errManager,xmlPilot,config,monitor,outputId+"_iter_"+loopIteration,outputId+"_iter_analysis_"+loopIteration);
      }
   }
   
@@ -803,7 +814,7 @@ public class AadlTargetSpecificGenerator implements Generator
       return false;
     }
     else
-      return false;
+      return true;
   }
 
   private SystemInstance doTransformation(WorkflowPilot workflowPilot, RamsesConfiguration config, IProgressMonitor monitor)
