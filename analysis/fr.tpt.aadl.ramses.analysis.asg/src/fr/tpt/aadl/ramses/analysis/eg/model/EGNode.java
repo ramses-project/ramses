@@ -350,26 +350,30 @@ public final class EGNode {
 	public void UpdateEndBlock(List<EGNode> l) {
 	  for(EGNode iter: l)
 	  {
-		EGNode last = getLast(iter);
-		last.setBlockEnd(last);
-		iter.setBlockEnd(last);
-		while(iter.nextNodes.get(0)!=last)
-		{
-		  iter = iter.nextNodes.get(0);
-		  iter.setBlockEnd(last);
-		}
+	    EGNode last = getLast(iter);
+	    last.setBlockEnd(last);
+	    iter.setBlockEnd(last);
+	    if(iter.nextNodes.size()==0)
+	      continue;
+	    while(iter.nextNodes.get(0)!=last)
+	    {
+	      iter = iter.nextNodes.get(0);
+	      iter.setBlockEnd(last);
+	    }
 
 	  }
 	}
 
 	public boolean hasCapacity() {
 	  EGNode iter = this;
+	  if(iter.wcet>0)
+      return true;
 	  while(!iter.nextNodes.isEmpty()
 			  && iter.nextNodes.get(0)!=iter)
 	  {
-		if(iter.wcet>0)
-		  return true;
-		iter = iter.nextNodes.get(0);
+	    if(iter.wcet>0)
+	      return true;
+	    iter = iter.nextNodes.get(0);
 	  }
 	  return false;
 	}
