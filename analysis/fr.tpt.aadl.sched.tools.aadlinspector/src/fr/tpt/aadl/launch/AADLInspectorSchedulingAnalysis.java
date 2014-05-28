@@ -132,7 +132,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			final IProgressMonitor monitor
 			)
 					throws AnalysisException
-					{
+	{
 		
 		this._config = config;
 		this._monitor = monitor;
@@ -171,6 +171,10 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
 		if(size==0)
 		{
+		  message = "At least one task has no worst case execution time defined in the " +
+		      "analysis model";
+		  _logger.error(message);
+		  ServiceProvider.SYS_ERR_REP.error(message, false);
 			return null;
 		}
 		// Launch analysis for each configuration
@@ -311,13 +315,21 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 				}
 				i++;
 			}
-			resultingEGNodeList.addAll(tmp);
+			if(tmp!=null)
+			  resultingEGNodeList.addAll(tmp);
+			else
+			{
+			  String errMsg = "AADL Inspector error: results show a schedulable" +
+			      " task set, tasks have execution time, but the sum of tasks response time is null" ;
+        _logger.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+			}
 		}
 		
 		return resultingEGNodeList;
 		
 		
-					}
+	}
 	
 	private void killThreads(Thread[] aadlInspectorThreads)
   {
@@ -327,12 +339,12 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
 
   public void performAnalysis(SystemInstance root,
-			RamsesConfiguration config,
-			AnalysisErrorReporterManager errorReporter,
-			IProgressMonitor monitor
-			)
-					throws AnalysisException
-					{
+                              RamsesConfiguration config,
+                              AnalysisErrorReporterManager errorReporter,
+                              IProgressMonitor monitor
+      )
+          throws AnalysisException
+  {
 		
 		List<ComponentInstance> cpuList = new  ArrayList<ComponentInstance>();
 		List<EGNode> resultingEGNodeList = new ArrayList<EGNode>();
@@ -340,7 +352,11 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		{
 			if(ci.getCategory().equals(ComponentCategory.PROCESSOR))
 			{
-				resultingEGNodeList.addAll(this.performAnalysis(ci, config, errorReporter, monitor));
+			  List<EGNode> executionGraphNodeList = this.performAnalysis(ci, config, errorReporter, monitor);
+				if(executionGraphNodeList!=null)
+				  resultingEGNodeList.addAll(executionGraphNodeList);
+				else
+				  return;
 			}
 		}
 		
@@ -369,7 +385,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		}
 		
 		return;
-					}
+	}
 
 
 	synchronized private void addAnalysisResult(ComponentInstance ci, ResponseTimeResult rtr, List<EGNode> nodes)
