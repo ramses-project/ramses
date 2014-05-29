@@ -35,56 +35,56 @@ import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
  */
 public interface AnalysisResultFactory extends EFactory {
 	/**
-	 * The singleton instance of the factory.
-	 * <!-- begin-user-doc -->
+   * The singleton instance of the factory.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	AnalysisResultFactory eINSTANCE = fr.tpt.aadl.ramses.analysis.impl.AnalysisResultFactoryImpl.init();
 
 	/**
-	 * Returns a new object of class '<em>Analysis Artifact</em>'.
-	 * <!-- begin-user-doc -->
+   * Returns a new object of class '<em>Analysis Artifact</em>'.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Analysis Artifact</em>'.
-	 * @generated
-	 */
+   * @return a new object of class '<em>Analysis Artifact</em>'.
+   * @generated
+   */
 	AnalysisArtifact createAnalysisArtifact();
 
 	/**
-	 * Returns a new object of class '<em>Quantitative Analysis Result</em>'.
-	 * <!-- begin-user-doc -->
+   * Returns a new object of class '<em>Quantitative Analysis Result</em>'.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Quantitative Analysis Result</em>'.
-	 * @generated
-	 */
+   * @return a new object of class '<em>Quantitative Analysis Result</em>'.
+   * @generated
+   */
 	QuantitativeAnalysisResult createQuantitativeAnalysisResult();
 
 	/**
-	 * Returns a new object of class '<em>Qualitative Analysis Result</em>'.
-	 * <!-- begin-user-doc -->
+   * Returns a new object of class '<em>Qualitative Analysis Result</em>'.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Qualitative Analysis Result</em>'.
-	 * @generated
-	 */
+   * @return a new object of class '<em>Qualitative Analysis Result</em>'.
+   * @generated
+   */
 	QualitativeAnalysisResult createQualitativeAnalysisResult();
 
 	/**
-	 * Returns a new object of class '<em>Analysis Source</em>'.
-	 * <!-- begin-user-doc -->
+   * Returns a new object of class '<em>Analysis Source</em>'.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Analysis Source</em>'.
-	 * @generated
-	 */
+   * @return a new object of class '<em>Analysis Source</em>'.
+   * @generated
+   */
 	AnalysisSource createAnalysisSource();
 
 	/**
-	 * Returns the package supported by this factory.
-	 * <!-- begin-user-doc -->
+   * Returns the package supported by this factory.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the package supported by this factory.
-	 * @generated
-	 */
+   * @return the package supported by this factory.
+   * @generated
+   */
 	AnalysisResultPackage getAnalysisResultPackage();
 
 } //AnalysisResultFactory

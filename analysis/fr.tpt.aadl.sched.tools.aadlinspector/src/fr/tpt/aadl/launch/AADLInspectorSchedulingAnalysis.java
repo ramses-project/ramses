@@ -22,6 +22,7 @@
 package fr.tpt.aadl.launch;
 
 import java.io.File ;
+import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.LinkedHashSet ;
@@ -34,6 +35,7 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.m2m.atl.emftvm.util.VMException ;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.osate.aadl2.AadlPackage ;
@@ -54,6 +56,7 @@ import fr.tpt.aadl.ramses.analysis.eg.model.EGModels ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
@@ -287,6 +290,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		int i=0;
 		String outputModelId="";
 		List<EGNode> resultingEGNodeList =  new ArrayList<EGNode>();
+		
 		for(ComponentInstance ci: responseTimeResultList.keySet())
 		{
 			List<EGNode> tmp=null;
@@ -306,7 +310,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 				}
 				for(TaskResponseTimeResult rt :ufr.getResponseTimes().values())
 					responseTimeSum += rt.worst;
-				if(responseTimeSum>maxResponseTime && schedulable)
+				if(responseTimeSum>=maxResponseTime && schedulable)
 				{
 					tmp = new ArrayList<EGNode>();
 					tmp.addAll(this.analysisResult.get(ufr));
@@ -377,13 +381,25 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			synchronized (this) {
 				wait();
 			}
-			if(last.analysisResult!=null)
-				last.analysisResult.normalize(currentResult);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		try
+    {
+		  URI uri = URI.createFileURI(resultDir.getAbsolutePath()+"/"+outputModelIdentifier+".ares");
+		  ResourceSet rs = root.eResource().getResourceSet();
+		  Resource resResource = rs.getResource(uri, false);
+		  if(resResource==null)
+		    resResource = rs.createResource(uri);
+		  resResource.getContents().add(currentResult);
+		  resResource.save(null);
+    }
+    catch(IOException e)
+    {
+      String message = "Could not save analysis results normalized for ramses";
+      _logger.fatal(message);
+    }
 		return;
 	}
 
@@ -411,11 +427,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			                                      IProgressMonitor monitor)
 	{
 	  Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager, cpuList);
-//    List<File> transformationFileList = new ArrayList<File>();
-//    
-//    for(String s: getTransformationModuleList())
-//      transformationFileList.add(new File(s));
-    
+
     Aadl2Util.setUseTunedEqualsMethods (false);
 
     launcher.setOutputPackageName(outputModelId);
@@ -449,13 +461,13 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 		public AADLInspectorAnalysisThread(AADLInspectorSchedulingAnalysis aadlInspectorSchedulingAnalysis, List<EGNode> egNodeList,
 				File outputDir, ComponentInstance cpu, String outputModelId, String mode) {
-        	this.initiator = aadlInspectorSchedulingAnalysis;
+      
+		  this.initiator = aadlInspectorSchedulingAnalysis;
 			this.egNodeList = egNodeList;
 			this.outputDir = outputDir;
 			this.root = cpu.getSystemInstance();
 			this.outputModelId = outputModelId;
 			this.mode = mode;
-			
 			for(ComponentInstance ci : EcoreUtil2.getAllContentsOfType(root, ComponentInstance.class))
 			{
 				if(ci.getCategory().equals(ComponentCategory.PROCESSOR)
@@ -534,6 +546,10 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
                                                                            ci.getName()) ;
             initiator.addAnalysisResult(ci, ufr, egNodeList) ;
           }
+        }
+        synchronized (this.initiator.currentResult)
+        {
+          analysisResult.normalize(this.initiator.currentResult);
         }
       }
 			catch(InterruptedException e)

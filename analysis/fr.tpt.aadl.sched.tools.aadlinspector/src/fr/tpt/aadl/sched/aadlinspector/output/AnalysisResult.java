@@ -90,40 +90,83 @@ public class AnalysisResult
 	
 	public void normalize(AnalysisArtifact aaResults)
 	{
-		AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
-		
-		QualitativeAnalysisResult schedulable = f.createQualitativeAnalysisResult();
-		AnalysisSource schedulable_s = f.createAnalysisSource();
-		schedulable_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
-		
-		schedulable.setValidated(isSchedulable());
-		schedulable.setSource(schedulable_s);
-		
-		aaResults.getResults().add(schedulable);
-		
-		for(String cpuName : responseTimeResults.keySet())
-		{
-			ResponseTimeResult rtrs = getResponseTimeResults(cpuName);
-			Map<String,TaskResponseTimeResult> rtr = rtrs.getResponseTimes();
-			for(String taskName : rtr.keySet())
-			{
-				double deadline = getDeadline(cpuName, taskName);
-				double wcrt = rtr.get(taskName).worst;
-				double margin = (deadline - wcrt)/deadline;
-				
-				AnalysisSource responseMargin_s = f.createAnalysisSource();
-				responseMargin_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
-				responseMargin_s.setScope(taskName);
-				
-				QuantitativeAnalysisResult responseMargin = f.createQuantitativeAnalysisResult();
-				responseMargin.setMargin((float) margin);
-				responseMargin.setSource(responseMargin_s);
-				
-				aaResults.getResults().add(responseMargin);
-			}
-		}
-		
+	  QualitativeAnalysisResult schedulable=null;
+	  for(Object obj: aaResults.getResults())
+	  {
+	    fr.tpt.aadl.ramses.analysis.AnalysisResult ar  = 
+	        (fr.tpt.aadl.ramses.analysis.AnalysisResult) obj;
+	    if(ar instanceof QualitativeAnalysisResult)
+	    {
+	      QualitativeAnalysisResult qar = (QualitativeAnalysisResult) ar;
+	      if(qar.getSource().getMethodName().equals(AADLInspectorSchedulingAnalysis.PLUGIN_NAME))
+	      {
+	        schedulable = qar;
+	        if(!isSchedulable())    
+	          schedulable.setValidated(false);
+	      }
+	    }
+	  }
+	  AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
+	  if(schedulable==null)
+	  {
+	    schedulable = f.createQualitativeAnalysisResult();
+	    AnalysisSource schedulable_s = f.createAnalysisSource();
+	    schedulable_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
+	    schedulable.setValidated(isSchedulable());
+	    schedulable.setSource(schedulable_s);
+	    aaResults.getResults().add(schedulable);
+	  }
+	  
+	  
+	  for(String cpuName : responseTimeResults.keySet())
+    {
+      ResponseTimeResult rtrs = getResponseTimeResults(cpuName);
+      Map<String,TaskResponseTimeResult> rtr = rtrs.getResponseTimes();
+      for(String taskName : rtr.keySet())
+      {
+        QuantitativeAnalysisResult responseMargin=null;
+        
+        double deadline = getDeadline(cpuName, taskName);
+        double wcrt = rtr.get(taskName).worst;
+        double margin = 100*(deadline - wcrt)/deadline;
+        
+        for(Object obj: aaResults.getResults())
+        {
+          fr.tpt.aadl.ramses.analysis.AnalysisResult ar  = 
+              (fr.tpt.aadl.ramses.analysis.AnalysisResult) obj;
+          if(ar instanceof QuantitativeAnalysisResult)
+          {
+            QuantitativeAnalysisResult qar = (QuantitativeAnalysisResult) ar;
+            if(qar.getSource().getMethodName().equals(AADLInspectorSchedulingAnalysis.PLUGIN_NAME)
+                && qar.getSource().getScope().equals(taskName))
+            {
+              responseMargin = qar;
+              if(margin<responseMargin.getMargin())
+              {
+                responseMargin.setMargin((float) margin);
+                responseMargin.setValue((float) wcrt);
+              }
+            }
+          }
+        }
+        if(responseMargin==null)
+        {
+          AnalysisSource responseMargin_s = f.createAnalysisSource();
+          responseMargin_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
+          responseMargin_s.setScope(taskName);
+          
+          responseMargin = f.createQuantitativeAnalysisResult();
+          responseMargin.setMargin((float) margin);
+          responseMargin.setLimit((float) deadline);
+          responseMargin.setValue((float) wcrt);
+          responseMargin.setSource(responseMargin_s);
+          
+          aaResults.getResults().add(responseMargin);
+        }
+      }
+    }
 	}
+	
 	
 	private String getAIQualifiedName(ComponentInstance ci)
 	{

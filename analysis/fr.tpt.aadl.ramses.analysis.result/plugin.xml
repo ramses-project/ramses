@@ -17,4 +17,12 @@
             genModel="model/AnalysisResult.genmodel"/>
    </extension>
 
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated AnalysisResult -->
+      <package
+            uri="http://fr.tpt.aadl.ramses.analysis/Analysis/1.0"
+            class="fr.tpt.aadl.ramses.analysis.AnalysisResultPackage"
+            genModel="model/AnalysisResult.genmodel"/>
+   </extension>
+
 </plugin>
