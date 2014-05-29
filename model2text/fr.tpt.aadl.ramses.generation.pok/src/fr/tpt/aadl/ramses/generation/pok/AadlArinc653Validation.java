@@ -20,9 +20,11 @@ public class AadlArinc653Validation extends Aadl2ConstraintValidationEMFTVMLaunc
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessInstances");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/ProcessorInstances");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/VirtualProcessorInstances");
+		ATL_FILE_NAMES.add("ACG/Constraints/shared/MemoryInstances");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/FeatureInstances");
 		ATL_FILE_NAMES.add("ACG/Constraints/shared/Subprograms");
 		ATL_FILE_NAMES.add("ACG/Constraints/arinc653/InterPartitionCommunications");
 		ATL_FILE_NAMES.add("ACG/Constraints/arinc653/ArincProperties");
+		ATL_FILE_NAMES.add("ACG/Constraints/pok/PokProperties");
 	}
 }
