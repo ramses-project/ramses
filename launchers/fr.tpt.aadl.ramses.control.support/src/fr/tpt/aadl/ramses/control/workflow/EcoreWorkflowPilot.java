@@ -289,6 +289,10 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 			Analysis a = (Analysis) currentWorkflowElement;
 			result = a.getInputModelIdentifier().getId();
 		}
+		if (currentWorkflowElement instanceof Generation) {
+		  Generation g = (Generation) currentWorkflowElement;
+      result = g.getInputModelIdentifier().getId();
+    }
 		return result;
 	}
 
