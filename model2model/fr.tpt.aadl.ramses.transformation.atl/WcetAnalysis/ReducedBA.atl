@@ -29,9 +29,17 @@ create OUT : AADLBA 	from 		IN: AADLI,
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
 	self.ownedPropertyAssociation->select(e | not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
 									)->collectSelfPropertyAssociationImg()
+									->append(self.isRootSystem())
+									->excluding(OclUndefined)
 ;
 
-
+helper context AADLI!InstanceObject def : isRootSystem() : AADLBA!PropertyAssociation = 
+	if (self.category = #system and self.eContainer().oclIsUndefined()) then
+		thisModule.CreatePropertyAssociation('Root_System', 'AI', thisModule.CreateStringLiteralPropertyExpression('selected')).debug(' !!!!!!!!! ')
+	else
+		OclUndefined
+	endif
+;
 
 -- @extends m_Component_Instance
 rule m_Component_Instance_Ignored {
@@ -160,35 +168,6 @@ rule m_System_Implementation {
 	)
 }
 
-
----- @extends m_RootSystem_Instance
---rule m_RootSystem_Instance_ReducedBA {
---	from
---		c : AADLI!SystemInstance
---	using
---	{
---		impl: AADLBA!SystemImplementation = c.systemImplementation;
---	}
---	to
---		section : AADLBA!PublicPackageSection,
---		pkg : AADLBA!AadlPackage,
---		implImg : AADLBA!SystemImplementation
---		(
---			name                              <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
---												 impl.name
---												 else
---												 thisModule.theHOOK.getOutputPackageName()+'.impl'
---												 endif,
---			ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory'),
---			ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor'),
---			ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device'),
---			ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
---			ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
---			ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
---			ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system'),
---			ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')
---		)
---}
 
 --@extends m_Component_Implementation
 rule m_Thread_Implementation {

@@ -65,7 +65,10 @@ rule m_RootSystem_Instance {
 	{
 		thisModule.allImportedUnits <- thisModule.allImportedUnits->including(src_package.ownedPublicSection.importedUnit);
 		if(AADLBA!SystemImplementation.allInstancesFrom('OUT')->contains(c.systemImplementation.resolve()))
-			c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveMatchedSingleIfExists(p, 'p2')));
+			c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()
+																		->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveMatchedSingleIfExists(p, 'p2')))
+																		->union(c.collectSelfPropertyAssociationImg())
+																		->excluding(OclUndefined);
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
 	}
 }
