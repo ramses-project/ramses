@@ -116,14 +116,14 @@ public class MemoryFootprintAnalysis
 
   private static long getMemorySize(NamedElement memory)
   {
-    return getPropertyBytesValue(memory, "Word_Count") ;
+    return getPropertyBytesValue(memory, "Memory_Size") ;
   }
 
   private static long getComponentOverhead(NamedElement e)
   {
-    final long Data_Size = getPropertyBytesValue(e, "Source_Data_Size") ;
-    final long Code_Size = getPropertyBytesValue(e, "Source_Code_Size") ;
-    final long Stack_Size = getPropertyBytesValue(e, "Source_Stack_Size") ;
+    final long Data_Size = getPropertyBytesValue(e, "Data_Size") ;
+    final long Code_Size = getPropertyBytesValue(e, "Code_Size") ;
+    final long Stack_Size = getPropertyBytesValue(e, "Stack_Size") ;
 
     return Data_Size + Code_Size + Stack_Size ;
   }
