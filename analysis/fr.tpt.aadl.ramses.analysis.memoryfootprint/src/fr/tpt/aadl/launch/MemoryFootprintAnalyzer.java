@@ -1,6 +1,6 @@
 package fr.tpt.aadl.launch;
 
-import java.io.File ;
+import java.util.List ;
 import java.util.Map ;
 
 import org.eclipse.core.runtime.IProgressMonitor ;
@@ -9,10 +9,11 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.memoryfootprint.MemoryFootprintAnalysis ;
-import fr.tpt.aadl.ramses.control.support.AadlModelInstantiatior ;
-import fr.tpt.aadl.ramses.control.support.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
+import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 
 
 public class MemoryFootprintAnalyzer extends AbstractAnalyzer
@@ -30,16 +31,6 @@ public class MemoryFootprintAnalyzer extends AbstractAnalyzer
   {
     this.modelInstantiator = modelInstantiator;
     this.predefinedAadlModels = predefinedAadlModels;
-  }
-
-  @Override
-  public void performAnalysis(SystemInstance systemInstance,
-                              File outputDir,
-                              AnalysisErrorReporterManager errManager,
-                              IProgressMonitor monitor)
-        throws AnalysisException
-  {
-    currentResult = MemoryFootprintAnalysis.doAnalysis(systemInstance);
   }
 
   private boolean first = true;
@@ -73,5 +64,22 @@ public class MemoryFootprintAnalyzer extends AbstractAnalyzer
   public String getPluginId()
   {
     return PLUGIN_ID ;
+  }
+
+  @Override
+  public void performAnalysis(SystemInstance systemInstance,
+                              RamsesConfiguration config,
+                              AnalysisErrorReporterManager errManager,
+                              IProgressMonitor monitor)
+                                                       throws AnalysisException
+  {
+    currentResult = MemoryFootprintAnalysis.doAnalysis(systemInstance);
+  }
+
+  @Override
+  public List<String> getTransformationModuleList()
+  {
+    // TODO Auto-generated method stub
+    return null ;
   }
 }
