@@ -3,7 +3,6 @@
 
 <product name="osate2-cli" uid="osate2-cli" id="fr.tpt.aadl.ramses.control.cli.osgi.product" application="fr.tpt.aadl.ramses.control.cli.osgi.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
 
-
    <configIni use="">
    </configIni>
 
@@ -21,10 +20,8 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="PropertiesExtractor"/>
@@ -53,6 +50,7 @@
       <plugin id="fr.openpeople.rdalte.osate"/>
       <plugin id="fr.openpeople.rdalte.service"/>
       <plugin id="fr.tpt.aadl.ramses.analysis.asg"/>
+      <plugin id="fr.tpt.aadl.ramses.analysis.memoryfootprint"/>
       <plugin id="fr.tpt.aadl.ramses.analysis.result"/>
       <plugin id="fr.tpt.aadl.ramses.communication.periodic.delayed"/>
       <plugin id="fr.tpt.aadl.ramses.constraints.reporter.metamodel"/>
