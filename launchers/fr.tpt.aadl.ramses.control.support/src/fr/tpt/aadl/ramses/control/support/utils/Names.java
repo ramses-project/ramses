@@ -61,4 +61,7 @@ public class Names
   public static final String VALIDATOR_SUFFIX = "-validator";
 
   public static final String RAMSES_PROPERTIES = "RAMSES_PROPERTIES" ;
+  
+  public final static String AI_PLUGIN_NAME = "AADLInspector-SchedulingAnalysis";
+  
 }

@@ -63,6 +63,7 @@ import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.utils.Command ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher ;
 import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult ;
@@ -72,9 +73,9 @@ import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
 
 public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
-	private final static String ANALYZER_NAME = "AADLInspector-SchedulingAnalysis";
-	public final static String PLUGIN_NAME = "AADLInspector-SchedulingAnalysis";
-	private final static String PLUGIN_ID = "AADLInspector-SchedulingAnalysis";
+	private final static String ANALYZER_NAME = Names.AI_PLUGIN_NAME;
+	public final static String PLUGIN_NAME = Names.AI_PLUGIN_NAME;
+	private final static String PLUGIN_ID = Names.AI_PLUGIN_NAME;
 	private AadlModelInstantiatior _instantiator ;
 	private PredefinedAadlModelManager _predefinedResourcesManager ;
 	private String outputModelIdentifier;

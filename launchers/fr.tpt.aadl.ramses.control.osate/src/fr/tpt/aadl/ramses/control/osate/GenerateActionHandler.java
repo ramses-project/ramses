@@ -38,6 +38,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.emf.common.util.TreeIterator ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -58,6 +61,7 @@ import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
+import fr.tpt.aadl.ramses.control.workflow.Analysis ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot;
 
 public class GenerateActionHandler extends RamsesActionHandler {
@@ -66,8 +70,6 @@ public class GenerateActionHandler extends RamsesActionHandler {
 
   private static final String _OUTLINE_COMMAND_ID = 
                          "fr.tpt.aadl.ramses.control.osate.outline.generation" ;
-//  private static final String MENU_OR_BUTTON_COMMAND_ID = 
-//                        "fr.tpt.aadl.ramses.control.osate.instance.generation" ;
   
 
   // Call init method to setup these attributes.
@@ -111,12 +113,29 @@ public class GenerateActionHandler extends RamsesActionHandler {
     	  r = _sysImpl.eResource();
       else
     	  r = _sysInst.eResource();
-      if(getConfigFile(r, "workflow")!=null)
+      String workflowFile = getConfigFile(r, "workflow");
+      if(workflowFile!=null)
       {
-    	  try
+        try
+        {
+          URI uri = URI.createPlatformResourceURI(workflowFile, false);
+          Resource workflow = r.getResourceSet().getResource(uri, false);
+          TreeIterator<EObject> iter = workflow.getAllContents();
+          boolean foundAI=false;
+          while(iter.hasNext()
+              && !foundAI)
           {
-    		  AadlInspectorPropertyPage.fetchProperties(_currentProject, _config) ;
+            EObject eObj = iter.next();
+            if(eObj instanceof Analysis)
+            {
+              Analysis a = (Analysis) eObj;
+              if(a.getMethod().equals(Names.AI_PLUGIN_NAME))
+                foundAI = true;
+            }
           }
+          if(foundAI)
+            AadlInspectorPropertyPage.fetchProperties(_currentProject, _config) ;
+        }
     	  catch (ConfigurationException ee)
           {
             if(AadlInspectorPropertyPage.openPropertyDialog(_currentProject))

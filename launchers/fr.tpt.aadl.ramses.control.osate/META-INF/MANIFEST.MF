@@ -26,7 +26,8 @@ Require-Bundle: org.eclipse.ui.ide,
  fr.tpt.aadl.ramses.generation.pok,
  fr.tpt.aadl.ramses.generation.osek,
  org.eclipse.m2m.atl.emftvm,
- fr.tpt.aadl.sched.tools.aadlinspector
+ fr.tpt.aadl.sched.tools.aadlinspector,
+ org.eclipse.emf.common
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: TELECOM ParisTech
