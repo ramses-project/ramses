@@ -179,7 +179,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
    */
   public void putTransitionWhereSrc(BehaviorState state, BehaviorTransition transition)
   {
-    AadlBaVisitors.putTransitionWhereSrc(state, transition);
+    AadlBaVisitors.putTransitionWhereSrc(state,transition);
   }
 
   
