@@ -48,9 +48,8 @@ abstract rule check_MemoryInstance
 rule check_MemoryInstance_HasSize
 {
 	from
-	  obj: AADLI!ComponentInstance,
-	  p: AADLI!Property
-	  (p.eContainer().name='Memory_Properties' and p.name='Memory_Size' and not obj.hasProperty('Memory_Size'))
+	  obj: AADLI!ComponentInstance
+	  (not obj.hasProperty('Memory_Size'))
 	to
 	  err: CV!Error
 		(message <- 'Memory_Size property must be set on memory components' )

@@ -72,7 +72,7 @@ rule check_MemoryBinding
 {
 	from
 		obj: AADLI!ComponentInstance
-		(not obj.hasProperty('Actual_Processor_Binding'))
+		(not obj.hasProperty('Actual_Memory_Binding'))
 	to
 		err: CV!Error
 		(message <- 'Process subcomponent '+obj.subcomponent.name + ' must be bound to a memory component' )
