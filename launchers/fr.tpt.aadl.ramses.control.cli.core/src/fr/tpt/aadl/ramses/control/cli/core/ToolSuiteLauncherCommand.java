@@ -832,7 +832,7 @@ public class ToolSuiteLauncherCommand
     sb.append("******************************************") ;
     sb.append(Names.NEW_LINE) ;
               
-    sb.append("CODE GENERATION HAS SUCCESSFULLY COMPLETED") ;
+    sb.append("RAMSES HAS COMPLETED ITS EXECUTION") ;
     sb.append(Names.NEW_LINE) ;
     
     
