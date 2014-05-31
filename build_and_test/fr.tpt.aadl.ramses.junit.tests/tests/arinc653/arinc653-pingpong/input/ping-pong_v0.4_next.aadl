@@ -108,6 +108,8 @@ end SEQ;
     properties
       Actual_Processor_Binding => (reference (node_1_inst.VP_S1_inst)) applies to S1_inst;
       Actual_Processor_Binding => (reference (node_1_inst.VP_S2_inst)) applies to S2_inst;
+      Actual_Memory_Binding => (reference (node1_main_memory_inst)) applies to S1_inst;
+      Actual_Memory_Binding => (reference (node1_main_memory_inst)) applies to S1_inst;
   end PingPong_Communication_System.impl;
   
   processor node_1
@@ -130,6 +132,8 @@ end SEQ;
   end node1_main_memory;
   
   memory implementation node1_main_memory.impl
+  	properties
+  	  Memory_Size => 20 kbyte;
   end node1_main_memory.impl;
   
   virtual processor VP_S1
@@ -183,8 +187,6 @@ end SEQ;
       mode_implicit_cnx: port a1_inst.Mon_mode_C2 -> Mon_mode_C2;
       C1_ping_implicit_cnx: port a1_inst.C1_PingOut -> C1_PingOut;
       C1_pong_implicit_cnx: port a1_inst.C1_PongOut -> C1_PongOut;
-  properties
-    POK::Needed_Memory_Size => 200 kbyte;
   end S1.impl;
   
   process implementation S2.impl
@@ -197,8 +199,6 @@ end SEQ;
       C2_ping_implicit_cnx: port a2_inst.C2_PingOut -> C2_PingOut;
       C2_pong_implicit_cnx: port a2_inst.C2_PongOut -> C2_PongOut;
       C2_error_implicit_cnx: port a2_inst.C2_badSequenceNumber -> C2_badSequenceNumber;
-  properties
-    POK::Needed_Memory_Size => 200 kbyte;
   end S2.impl;
   
   thread a1

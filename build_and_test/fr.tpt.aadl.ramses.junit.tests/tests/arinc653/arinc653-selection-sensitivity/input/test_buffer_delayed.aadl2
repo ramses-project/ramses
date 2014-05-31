@@ -91,7 +91,7 @@ with ARINC653;
 
   memory implementation mem.impl
   properties
-    Byte_Count => 160000;
+    Memory_Size => 160000 Bytes;
   end mem.impl;
 
   thread sender
