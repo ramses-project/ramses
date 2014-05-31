@@ -126,7 +126,7 @@ public class AnalysisResult
       {
         QuantitativeAnalysisResult responseMargin=null;
         
-        double deadline = getDeadline(cpuName, taskName);
+        double deadline = getDeadline(taskName);
         double wcrt = rtr.get(taskName).worst;
         double margin = 100*(deadline - wcrt)/deadline;
         
@@ -201,21 +201,9 @@ public class AnalysisResult
 		return result;
 	}
 	
-	private double getDeadline(String cpuName, String taskName)
+	private double getDeadline(String taskName)
 	{
-		ComponentInstance cpu = null;
 		ComponentInstance task = null;
-		
-		for(ComponentInstance c : model.getComponentInstances())
-		{
-			String qName = getAIQualifiedName(c);
-			if ((c.getCategory()==ComponentCategory.PROCESSOR)
-					&& (qName.equals(cpuName)))
-			{
-				cpu = c;
-				break;
-			}
-		}
 		
 		for(ComponentInstance c : model.getAllComponentInstances())
 		{

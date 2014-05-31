@@ -49,6 +49,7 @@ public class MemoryFootprintAnalysis
         r.setSource(source);
         r.setMargin((float) margin);
         a.getResults().add(r);
+        
       }
     }
     

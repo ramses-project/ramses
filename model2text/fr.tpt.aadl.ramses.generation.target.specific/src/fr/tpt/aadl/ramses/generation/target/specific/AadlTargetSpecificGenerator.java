@@ -54,8 +54,6 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
-import fr.openpeople.rdal2.model.rdal.RdalPackage ;
-import fr.openpeople.rdal2.model.rdal.Specification ;
 import fr.openpeople.rdal2.model.rdal.impl.SpecificationImpl ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
@@ -500,6 +498,26 @@ public class AadlTargetSpecificGenerator implements Generator
 
         SystemInstance sinst = _modelInstantiator.instantiate(si) ;
         modelsMap.put(analysisModelOutputIdentifier, sinst.eResource()) ;
+      }
+      
+      AnalysisArtifact aa = (AnalysisArtifact) analysisParam.get("AnalysisResult");
+      if(aa!=null)
+      {
+        try
+        {
+          URI uri = URI.createFileURI(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_resutls.ares");
+          ResourceSet rs = currentImplResource.getResourceSet();
+          Resource resResource = rs.getResource(uri, false);
+          if(resResource==null)
+            resResource = rs.createResource(uri);
+          resResource.getContents().add(aa);
+          resResource.save(null);
+        }
+        catch(IOException e)
+        {
+          String message = "Could not save analysis results normalized for ramses";
+          _LOGGER.fatal(message);
+        }
       }
     }
     

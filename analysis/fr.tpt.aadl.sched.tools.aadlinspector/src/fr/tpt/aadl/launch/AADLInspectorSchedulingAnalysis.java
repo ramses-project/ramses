@@ -22,7 +22,6 @@
 package fr.tpt.aadl.launch;
 
 import java.io.File ;
-import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.LinkedHashSet ;
@@ -35,7 +34,6 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.m2m.atl.emftvm.util.VMException ;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.osate.aadl2.AadlPackage ;
@@ -56,9 +54,8 @@ import fr.tpt.aadl.ramses.analysis.eg.model.EGModels ;
 import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
@@ -351,7 +348,6 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
           throws AnalysisException
   {
 		
-		List<ComponentInstance> cpuList = new  ArrayList<ComponentInstance>();
 		List<EGNode> resultingEGNodeList = new ArrayList<EGNode>();
 		for(ComponentInstance ci : EcoreUtil2.getAllContentsOfType(root, ComponentInstance.class))
 		{
@@ -386,21 +382,6 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		try
-    {
-		  URI uri = URI.createFileURI(resultDir.getAbsolutePath()+"/"+outputModelIdentifier+".ares");
-		  ResourceSet rs = root.eResource().getResourceSet();
-		  Resource resResource = rs.getResource(uri, false);
-		  if(resResource==null)
-		    resResource = rs.createResource(uri);
-		  resResource.getContents().add(currentResult);
-		  resResource.save(null);
-    }
-    catch(IOException e)
-    {
-      String message = "Could not save analysis results normalized for ramses";
-      _logger.fatal(message);
-    }
 		return;
 	}
 
