@@ -138,7 +138,8 @@ END root_main_memory.impl;
 MEMORY S1_memory
 PROPERTIES
   Base_Address => 16#3200#;
-  Word_Size => 10000Bytes;
+  Word_Size => 1Bytes;
+  Memory_Size => 10000Bytes;
   Memory_Protocol => read_write;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory);
 END S1_memory;
@@ -149,7 +150,8 @@ END S1_memory.impl;
 MEMORY S2_memory
 PROPERTIES
   Base_Address => 16#4200#;
-  Word_Size => 10000Bytes;
+  Word_Size => 1Bytes;
+  Memory_Size => 10000Bytes;
   Memory_Protocol => read_write;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory);
 END S2_memory;
