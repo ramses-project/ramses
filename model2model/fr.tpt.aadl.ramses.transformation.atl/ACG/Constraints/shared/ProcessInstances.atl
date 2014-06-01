@@ -23,7 +23,8 @@
 -- @atlcompiler emftvm
 
 module ProcessInstances;
-create OUT : CV 	from 		IN : AADLI;
+create OUT : CV 	from 		IN : AADLI,
+								DEPLOYMENT_PROPERTIES: AADLI;
 
 abstract rule check_ComponentInstance
 {
@@ -60,8 +61,9 @@ rule check_HasOneThreadSubcomponent
 rule check_ProcessorBinding
 {
 	from
-		obj: AADLI!ComponentInstance
-		(not obj.hasProperty('Actual_Processor_Binding'))
+		obj: AADLI!ComponentInstance,
+		p: AADLI!Property in DEPLOYMENT_PROPERTIES
+		(p.name= 'Actual_Processor_Binding' and not obj.hasProperty('Actual_Processor_Binding'))
 	to
 		err: CV!Error
 		(message <- 'Process subcomponent '+obj.subcomponent.name + ' must be bound to a virtual processor or processor' )
@@ -71,8 +73,9 @@ rule check_ProcessorBinding
 rule check_MemoryBinding
 {
 	from
-		obj: AADLI!ComponentInstance
-		(not obj.hasProperty('Actual_Memory_Binding'))
+		obj: AADLI!ComponentInstance,
+		p: AADLI!Property in DEPLOYMENT_PROPERTIES
+		(p.name= 'Actual_Memory_Binding' and not obj.hasProperty('Actual_Memory_Binding'))
 	to
 		err: CV!Error
 		(message <- 'Process subcomponent '+obj.subcomponent.name + ' must be bound to a memory component' )
