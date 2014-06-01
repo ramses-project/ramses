@@ -109,7 +109,9 @@ with POK,ARINC653,Data_Model,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   
   system implementation refined_model.impl
     subcomponents
-      the_mem: memory mem.two_partitions;
+      the_mem: memory mem.two_partitions {
+        Memory_Size => 200000 Bytes;
+        };
       the_proc1: process proc1.impl;
       the_proc2: process proc2.impl;
       the_cpu: processor cpu.two_partitions {

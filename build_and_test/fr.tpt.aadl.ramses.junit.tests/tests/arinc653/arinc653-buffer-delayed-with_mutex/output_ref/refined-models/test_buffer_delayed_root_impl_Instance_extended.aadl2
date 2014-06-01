@@ -67,9 +67,9 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
   system implementation refined_model.impl
     subcomponents
       the_mem: memory mem.impl {
-        Memory_Size => 200000 Bytes;
         Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
+        Memory_Size => 200000 Bytes;
         };
       the_proc: process proc.impl;
       the_cpu: processor cpu.impl {
