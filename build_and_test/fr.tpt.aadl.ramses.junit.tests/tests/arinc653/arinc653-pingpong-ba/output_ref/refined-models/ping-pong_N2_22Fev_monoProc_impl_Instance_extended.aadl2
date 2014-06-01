@@ -218,14 +218,16 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         ARINC653::Memory_Type => (Data_Memory, Code_Memory, IO_Memory);
         };
       S1_memory_inst: memory S1_memory.impl {
+        Memory_Size => 10000 Bytes;
         Base_Address => 12800;
-        Word_Size => 10000 Bytes;
+        Word_Size => 1 Bytes;
         Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory, Code_Memory);
         };
       S2_memory_inst: memory S2_memory.impl {
+        Memory_Size => 10000 Bytes;
         Base_Address => 16896;
-        Word_Size => 10000 Bytes;
+        Word_Size => 1 Bytes;
         Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory, Code_Memory);
         };

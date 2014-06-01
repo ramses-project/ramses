@@ -76,16 +76,26 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   end mem.impl;
   
   memory implementation mem.two_partitions
+    subcomponents
+      part1_mem: memory part_mem {
+        Memory_Size => 80000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      part2_mem: memory part_mem {
+        Memory_Size => 80000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
   end mem.two_partitions;
   
   system implementation refined_model.impl
     subcomponents
-      the_proc1: process proc1.impl {
-        POK::Needed_Memory_Size => 200 KByte;
+      the_mem: memory mem.two_partitions {
+        Memory_Size => 200000 Bytes;
         };
-      the_proc2: process proc2.impl {
-        POK::Needed_Memory_Size => 200 KByte;
-        };
+      the_proc1: process proc1.impl;
+      the_proc2: process proc2.impl;
       the_cpu: processor cpu.two_partitions {
         ARINC653::Module_Major_Frame => 4000 ms;
         POK::Scheduler => STATIC;
@@ -138,9 +148,13 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         };
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1;
+      Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2;
+      Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2;
       Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1.the_sender;
+      Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2.the_receiver;
   end refined_model.impl;
   
   processor cpu_x86

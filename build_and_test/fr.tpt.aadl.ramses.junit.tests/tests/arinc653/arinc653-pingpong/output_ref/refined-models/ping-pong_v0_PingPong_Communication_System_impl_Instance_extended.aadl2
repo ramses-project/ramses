@@ -81,13 +81,11 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
   
   system implementation refined_model.impl
     subcomponents
-      node1_main_memory_inst: memory node1_main_memory.impl;
-      S1_inst: process S1.impl {
-        POK::Needed_Memory_Size => 200 KByte;
+      node1_main_memory_inst: memory node1_main_memory.impl {
+        Memory_Size => 20 KByte;
         };
-      S2_inst: process S2.impl {
-        POK::Needed_Memory_Size => 200 KByte;
-        };
+      S1_inst: process S1.impl;
+      S2_inst: process S2.impl;
       node_1_inst: processor node_1.impl {
         ARINC653::Module_Major_Frame => 2000 ms;
         ARINC653::Partition_Slots => (1000 ms, 1000 ms);
@@ -98,9 +96,17 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
         };
     properties
       Actual_Processor_Binding => (reference(node_1_inst.VP_S1_inst)) applies to S1_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S2_inst)) applies to S2_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.state_baKeywords;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S1_inst)) applies to S1_inst.a1_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst.state_baKeywords;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst.seqNb;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S2_inst)) applies to S2_inst.a2_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst.a2_inst;
+      Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst.a2_inst.seqNb;
   end refined_model.impl;
   
   processor cpu_x86
