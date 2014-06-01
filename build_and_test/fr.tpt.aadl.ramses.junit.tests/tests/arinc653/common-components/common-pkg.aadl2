@@ -86,11 +86,12 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   --------------------------------------------------
 
   memory mem
+  properties
+    Memory_Size => 200000 bytes;
   end mem;
 
   memory implementation mem.impl
   properties
-    Memory_Size => 200000 bytes;
     Memory_Protocol => read_write;
     ARINC653::Memory_Type => (Data_Memory);
   end mem.impl;
