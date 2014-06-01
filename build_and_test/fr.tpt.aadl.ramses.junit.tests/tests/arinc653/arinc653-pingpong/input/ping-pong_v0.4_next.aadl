@@ -109,7 +109,7 @@ end SEQ;
       Actual_Processor_Binding => (reference (node_1_inst.VP_S1_inst)) applies to S1_inst;
       Actual_Processor_Binding => (reference (node_1_inst.VP_S2_inst)) applies to S2_inst;
       Actual_Memory_Binding => (reference (node1_main_memory_inst)) applies to S1_inst;
-      Actual_Memory_Binding => (reference (node1_main_memory_inst)) applies to S1_inst;
+      Actual_Memory_Binding => (reference (node1_main_memory_inst)) applies to S2_inst;
   end PingPong_Communication_System.impl;
   
   processor node_1
