@@ -188,6 +188,7 @@ public class AadlTargetSpecificGenerator implements Generator
             errManager.error((Element) constraintError.getObject(),
                              constraintError.getMessage()) ;
             ServiceProvider.SYS_ERR_REP.error(constraintError.getMessage(), true) ;
+            _LOGGER.error(constraintError.getMessage());
           }
         }
         return ;
@@ -267,6 +268,7 @@ public class AadlTargetSpecificGenerator implements Generator
             errManager.error((Element) constraintError.getObject(),
                              constraintError.getMessage()) ;
             ServiceProvider.SYS_ERR_REP.error(constraintError.getMessage(), true) ;
+            _LOGGER.error(constraintError.getMessage());
           }
         }
         return null;

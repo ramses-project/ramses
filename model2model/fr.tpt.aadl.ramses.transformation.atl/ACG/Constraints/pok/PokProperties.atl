@@ -30,9 +30,8 @@ create OUT : CV 	from 		IN : AADLI;
 rule check_HasScheduler
 {
 	from
-	 	obj:AADLI!ComponentInstance,
-		p: AADLI!Property
-		(p.eContainer().name='POK' and p.name='Scheduler' and not obj.hasProperty('Scheduler'))
+	 	obj:AADLI!ComponentInstance
+		(not obj.hasProperty('Scheduler'))
 	to
 		err: CV!Error
 		(message <- 'For code generation towards POK, each virtual processor must'+ 
