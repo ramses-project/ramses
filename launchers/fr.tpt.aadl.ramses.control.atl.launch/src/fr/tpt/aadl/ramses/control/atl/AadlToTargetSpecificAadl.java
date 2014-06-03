@@ -356,7 +356,7 @@ abstract public void setParameters(Map<Enum<?>, Object> parameters);
     for(String resourceFileName : resourceFileNameList)
     {
       String resourcePath = resourceFileName ;
-      if(false == resourceFileName.startsWith(File.separator))
+      if(false == new File(resourcePath).exists())
         resourcePath =
               RamsesConfiguration.getAtlResourceDir() + File.separator +
                     resourceFileName ;
