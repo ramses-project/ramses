@@ -24,9 +24,11 @@ import fr.openpeople.rdal2.model.rdal.DesignElementReference ;
 import fr.openpeople.rdal2.model.rdal.GoalsPackage ;
 import fr.openpeople.rdal2.model.rdal.PrioritizedSatDesignElementRef ;
 import fr.openpeople.rdal2.model.rdal.QualityObjective ;
+import fr.openpeople.rdal2.model.rdal.RdalFactory ;
 import fr.openpeople.rdal2.model.rdal.RdalOrgPackage ;
 import fr.openpeople.rdal2.model.rdal.RdalPackage ;
 import fr.openpeople.rdal2.model.rdal.ReferencedDesignElements ;
+import fr.openpeople.rdal2.model.rdal.SatisfiableDesignElementRef ;
 import fr.openpeople.rdal2.model.rdal.Sensitivity ;
 import fr.openpeople.rdal2.model.rdal.Specification ;
 
@@ -100,7 +102,7 @@ public class RdalParser {
         NamedElement ne = (NamedElement) obj;
         _LOGGER.trace("Search sensitivity for "+ne.getName());
       }
-      List<String> sensitivities = getSensitivitiesForDesignElement(rdalSpecificationObj, obj);
+      List<String> sensitivities = getSensitivitiesNameForDesignElement(rdalSpecificationObj, obj);
       String message = "Found sensitivities: ";
       for(String s: sensitivities)
         message+=s+" ";
@@ -155,7 +157,20 @@ public class RdalParser {
     return result;
   }
 
-  public static List<String> getSensitivitiesForDesignElement(Specification rdalSpecificationObj, 
+  private static List<String> getSensitivitiesNameForDesignElement(Specification rdalSpecificationObj, 
+                                                                   EObject designElement)
+  {
+    List<Sensitivity> sensitivitiesList = getSensitivitiesForDesignElement(rdalSpecificationObj, designElement);
+    List<String> result = new ArrayList<String>();
+    
+    for(Sensitivity s: sensitivitiesList)
+    {
+      result.add(s.getName());
+    }
+    return result;
+  }
+  
+  private static List<Sensitivity> getSensitivitiesForDesignElement(Specification rdalSpecificationObj, 
                                                               EObject designElement)
   {
 
@@ -211,10 +226,13 @@ public class RdalParser {
     }
         );
     _LOGGER.trace("Sensitivity list was sorted");
-    List<String> result = new ArrayList<String>();
+    
+    
+    
+    List<Sensitivity> result = new ArrayList<Sensitivity>();
     for(ComparableSensitivity s:sensitivitiesResultList)
       if(false == result.contains(s.getSensitivity().getName()))
-        result.add(s.getSensitivity().getName());
+        result.add(s.getSensitivity());
     return result;
   }
 
@@ -310,6 +328,85 @@ public class RdalParser {
       return false;
     }
     return false ;
+  }
+
+  public static void promoteSensitivity(Specification rdalSpecificationObj,
+                                        List<EObject> elementListToModify,
+                                        String currentQualityAttributeToImprove)
+  {
+    List<GoalsPackage> packagesList = getGoalsPackages(rdalSpecificationObj);
+    Iterator<GoalsPackage> pakagesIt = packagesList.iterator();
+    while(pakagesIt.hasNext()){
+      GoalsPackage goalPackageObject = pakagesIt.next();
+      List<AbstractGoal> goalsList = getGoalsForPackage(goalPackageObject);
+      Iterator<AbstractGoal> goalsIt = goalsList.iterator();
+      while(goalsIt.hasNext()){
+        AbstractGoal goalObject = goalsIt.next();
+        if (goalObject instanceof QualityObjective){
+          Sensitivity sensitivityObject = getSensitivityForQualityGoal((QualityObjective)goalObject);
+          if(sensitivityObject == null)
+            _LOGGER.error("Sensitivity not found");
+          if(false == sensitivityObject.getName().equals(currentQualityAttributeToImprove))
+            continue;
+          ReferencedDesignElements rde = sensitivityObject.getOwnedReferencedDesignElements();
+          List<DesignElementReference> toRemove = new ArrayList<DesignElementReference>();
+          for(DesignElementReference der: rde.getOwnedDesignElementRefs())
+          {
+            
+            for(EObject elementToModify: elementListToModify)
+            {
+              EObject ref = der.getDesignElement();
+              if(ref.equals(elementToModify))
+              {
+                if(der instanceof PrioritizedSatDesignElementRef)
+                {
+                  PrioritizedSatDesignElementRef psder = (PrioritizedSatDesignElementRef) der;
+                  long currentPriority = getSensitivityMaxPriority(rdalSpecificationObj,
+                                                                   ref);
+                  psder.setPriority(currentPriority+1);
+                }
+                else if(der instanceof SatisfiableDesignElementRef)
+                {
+                  toRemove.add(der);
+                  SatisfiableDesignElementRef sder = (SatisfiableDesignElementRef) der;
+                  PrioritizedSatDesignElementRef psder = RdalFactory.eINSTANCE.createPrioritizedSatDesignElementRef();
+                  long currentPriority = getSensitivityMaxPriority(rdalSpecificationObj,
+                                                                   ref);
+                  psder.setPriority(currentPriority+1);
+                  psder.setDescription(sder.getDescription());
+                  psder.setDesignElement(sder.getDesignElement());
+                  psder.setEvaluationResult(sder.getEvaluationResult());
+                  psder.setId(sder.getId());
+                  psder.setName(sder.getName());
+                }
+              }
+            }
+          }
+          // sensitivity was not found for this element 
+        }
+      }
+    }
+  }
+
+  private static long getSensitivityMaxPriority(Specification rdalSpecificationObj, EObject ref)
+  {
+    long prio = 0;
+    List<Sensitivity> sensitivities = getSensitivitiesForDesignElement(rdalSpecificationObj, ref);
+    for(Sensitivity sensitivityObject: sensitivities)
+    {
+      ReferencedDesignElements rde = sensitivityObject.getOwnedReferencedDesignElements();
+      for(DesignElementReference der: rde.getOwnedDesignElementRefs())
+      {
+        if(der instanceof PrioritizedSatDesignElementRef)
+        {
+          PrioritizedSatDesignElementRef psder = (PrioritizedSatDesignElementRef) der;
+          long currentPriority = psder.getPriority();
+          if(currentPriority>prio)
+            prio=currentPriority;
+        }
+      }
+    }
+    return prio;
   }
 
   

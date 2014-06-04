@@ -10,4 +10,5 @@ Require-Bundle: fr.tpt.aadl.ramses.transformation.selection,
  fr.tpt.rdal.utils,
  fr.tpt.aadl.ramses.transformation.trc,
  fr.openpeople.rdal2.model,
- org.apache.log4j
+ org.apache.log4j,
+ fr.tpt.aadl.ramses.analysis.result

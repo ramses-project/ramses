@@ -5,11 +5,14 @@ import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Map.Entry ;
+import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EObject ;
 
 import fr.openpeople.rdal2.model.rdal.Specification ;
+import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
 import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
 import fr.tpt.aadl.ramses.transformation.selection.TupleEntry ;
@@ -29,6 +32,9 @@ public class SensitivityBasedSelection implements ITransformationSelection {
   private TrcSpecification trc;
   private Specification rdal ;
   
+  private String currentQualityAttributeToImprove=null;
+  private int maxSensitivities=0;
+  
   public SensitivityBasedSelection(TrcSpecification trc,
                                    Specification rdalSpecification)
   {
@@ -36,7 +42,117 @@ public class SensitivityBasedSelection implements ITransformationSelection {
     this.rdal = rdalSpecification;
   }
   
-  public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply)
+  
+  
+    public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply)
+    {
+      if (TipUtils.getCurrentIteration()==1) {//if the iteration is not the first one
+        selectTransformationFirst(patternMatchingMap, tuplesToApply);
+      }
+      else
+      {
+        updateSensitivitiesWithAnalysisResults(patternMatchingMap);
+        // eliminate selected tuples from patternMatchingMap
+        selectTransformationFirst(patternMatchingMap, tuplesToApply);
+        // check if we reached a decision already tried
+        
+      }
+    }
+    
+    private void updateSensitivitiesWithAnalysisResults(Map<List<EObject>, ArrayList<String>> patternMatchingMap)
+    {
+      // get analysis results and check if it violates a requirement
+      Set<String> invalidatedAnalysisList = AnalysisUtils.getInvalidatedResults();
+
+      // if it does, we promote the sensitivity on one element to this requirement
+      if(false == invalidatedAnalysisList.isEmpty())
+      {
+        if(currentQualityAttributeToImprove==null
+            || !invalidatedAnalysisList.contains(currentQualityAttributeToImprove))
+          currentQualityAttributeToImprove=AnalysisUtils.getLeastSatisfiedQualityAttribute();
+        
+        // we search elements for which currentQualityAttributeToImprove is sensitivity of rank "level"
+        int level=1;
+        Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
+        List<EObject> elementToModify = null;
+        float worst = 1;
+        
+        List<String> transformationsWithUpdatedSensitivities=null;
+        Map.Entry<List<EObject>, ArrayList<String>> tupleWithUpdatedSensitivities=null;
+        
+        while (patternMatchingIt.hasNext()) 
+        {
+          Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>) patternMatchingIt.next();
+          List<String> sensitivities = RdalParser.getSensitivitiesForDesignElement(rdal, tuple.getKey());
+          float res = AnalysisUtils.getMarginFor(tuple.getKey(), currentQualityAttributeToImprove);
+          while(level<maxSensitivities)
+          {
+            if(sensitivities.size()>level &&
+                sensitivities.get(level).equals(currentQualityAttributeToImprove) && res<worst)
+            {
+              elementToModify = tuple.getKey();
+              // get ignored transformations from the TIP
+              ArrayList<String> ignoredTransformations = TipParser.getElementTransformationsHistory(tuple.getKey());
+
+              // select a transformation with updated sensitivities, and with ignored transformations in parameters
+              List<String> updatedSensitivities = promoteSensitivities(sensitivities, invalidatedAnalysisList);
+              transformationsWithUpdatedSensitivities = 
+                  SelectionAlgorithm.findBestAllocationsWithSensitivitiesNext(trc,
+                                                                              (ArrayList<String>) tuple.getValue(), 
+                                                                              updatedSensitivities, 
+                                                                              ignoredTransformations);
+              tupleWithUpdatedSensitivities=tuple;
+              level++;
+            }
+          }
+          if(elementToModify==null
+              && false==sensitivities.contains(currentQualityAttributeToImprove) && res<worst)
+            // we search elements for which currentQualityAttributeToImprove
+            // is not a sensitivity AND transformation previously executed is not
+            // the one we would select now.
+          {
+            // get ignored transformations from the TIP
+            ArrayList<String> appliedTransformations = TipParser.getElementTransformationsHistory(tuple.getKey());
+
+            // select a transformation with updated sensitivities, and with ignored transformations in parameters
+            List<String> updatedSensitivities = promoteSensitivities(sensitivities, invalidatedAnalysisList);
+            transformationsWithUpdatedSensitivities = 
+                SelectionAlgorithm.findBestAllocationsWithSensitivities(trc,
+                                                                            (ArrayList<String>) tuple.getValue(), 
+                                                                            updatedSensitivities);
+            if(false==transformationsWithUpdatedSensitivities.isEmpty()
+                && transformationsWithUpdatedSensitivities.get(0)!=appliedTransformations.get(0))
+            
+              elementToModify = tuple.getKey();
+            tupleWithUpdatedSensitivities=tuple;
+            
+          }
+        }
+        if(elementToModify==null)
+        {
+          String message = "No new candidate transformation found for elements with worst analysis results";
+          _LOGGER.error(message);
+        }
+        else
+        {
+          // We just need to update sensitivities in rdal model
+          RdalParser.promoteSensitivity(rdal,
+                                        elementToModify,
+                                        currentQualityAttributeToImprove);
+          
+        } 
+        
+      }
+      else
+      {
+        _LOGGER.error("Selection process is iterating but analysis results are ok...");
+        return;
+      }
+    }
+
+
+
+  private void selectTransformationFirst (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply)
 	{
 		
     _LOGGER.trace("Selection started: "+ patternMatchingMap.keySet().size() +" decisions to take");
@@ -59,7 +175,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 			List<EObject> candidateObjects = tuple.getKey();
 			List<String> transformationsToApply = null; 
 			if(candidateTransformationList.size()>1)
-			{ 
+			{
 			  _LOGGER.trace("need to proceed to selection, exclusions nb="+exclusionDependencies.size());
 				ArrayList<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
@@ -174,7 +290,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 		  }
 		  else
 		  {
-		    String message = "Did not manage to select a transformation rule for :"; 
+		    String message = "Did not manage to select a transformation Elements for :"; 
 		    for(EObject ne: tuple.getKey())
 		      message+=ne;
 		    _LOGGER.warn(message);
@@ -194,24 +310,39 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 		return true;
 	}
 	
+	private List<String> promoteSensitivities(List<String> existingSensitivities, Set<String> invalidatedAnalysisList)
+	{
+	  List<String> updatedSensitivities = new ArrayList<String>();
+    
+	  List<String> sensitivitiesCopy =  new ArrayList<String>();
+    sensitivitiesCopy.addAll(existingSensitivities);
+    for(String invalidatedAnalysis: invalidatedAnalysisList)
+    {
+      for(String s: existingSensitivities)
+      {
+        if(s.equalsIgnoreCase(invalidatedAnalysis))
+        {
+          updatedSensitivities.add(s);
+          sensitivitiesCopy.remove(s);
+        }
+      }
+      if(false == sensitivitiesCopy.isEmpty())
+        updatedSensitivities.addAll(sensitivitiesCopy);
+    }
+    return updatedSensitivities;
+	}
+	
 	private List<String> selectBestTransformation(Entry<List<EObject>, ArrayList<String>> tuple)
 	{
-		// get the sensitivities for a given element
-		List<String> sensitivities = RdalParser.getSensitivitiesForDesignElement(rdal, tuple.getKey());
+	  // get the sensitivities for a given element
+	  List<String> sensitivities = RdalParser.getSensitivitiesForDesignElement(rdal, tuple.getKey());
+	  if(sensitivities.size()>maxSensitivities)
+	    maxSensitivities=sensitivities.size();
+	  return SelectionAlgorithm.findBestAllocationsWithSensitivities(trc,(ArrayList<String>) tuple.getValue(), sensitivities);
 
-		_LOGGER.trace("Start selection with "+sensitivities.size()+" sensitivities"); 
-		if (TipUtils.getCurrentIteration()>1) {//if the iteration is not the first one 
-			// get ignored transformations from the TIP
-			ArrayList<String> ignoredTransformations = TipParser.getElementTransformationsHistory(tuple.getKey());
-
-			return SelectionAlgorithm.findBestAllocationsWithSensitivitiesNext(trc,(ArrayList<String>) tuple.getValue(), sensitivities, ignoredTransformations);
-		} else {//if it is the first iteration
-			return SelectionAlgorithm.findBestAllocationsWithSensitivities(trc,(ArrayList<String>) tuple.getValue(), sensitivities);	        	
-		}
 	}
 
-
-	private List<RuleApplicationTulpe> selectBestTransformation(
+  private List<RuleApplicationTulpe> selectBestTransformation(
 			List<List<RuleApplicationTulpe>> possibleDependencyList,
 			List<String> ignoredTransformations) {
 

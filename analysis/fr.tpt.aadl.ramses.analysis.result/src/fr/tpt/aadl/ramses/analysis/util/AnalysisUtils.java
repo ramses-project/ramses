@@ -22,13 +22,19 @@
 package fr.tpt.aadl.ramses.analysis.util;
 
 import java.io.IOException;
+import java.util.ArrayList ;
+import java.util.HashSet ;
+import java.util.List ;
+import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.osate.aadl2.NamedElement;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
@@ -184,4 +190,81 @@ public class AnalysisUtils {
 
 		return resource;
 	}
+
+	
+	/**
+	 * Return list of analysis identifiers for which analysis was not satisfactory 
+	 * @return list of analysis identifiers 
+	 */
+  public static Set<String> getInvalidatedResults()
+  {
+    Set<String> res = new HashSet<String>();
+    AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(0);
+    
+    for(Object o: aa.getResults())
+    {
+      if(o instanceof QuantitativeAnalysisResult)
+      {
+        QuantitativeAnalysisResult qar = (QuantitativeAnalysisResult) o;
+        if(qar.getMargin()<0)
+        {
+          String qaName = convertAnalysisMethodToQualityAttribute(qar.getSource().getMethodName());
+          res.add(qaName);
+        }
+      }
+    }
+    return res;
+  }
+
+  private static String convertAnalysisMethodToQualityAttribute(String analysisMethod)
+  {
+    // TODO: implement this...
+    if(analysisMethod.equals(""))
+      return analysisMethod;
+    else
+      return analysisMethod;
+  }
+  
+  public static String getLeastSatisfiedQualityAttribute()
+  {
+    String res = null;
+    AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(0);
+    float worst=0;
+    for(Object o: aa.getResults())
+    {
+      if(o instanceof QuantitativeAnalysisResult)
+      {
+        QuantitativeAnalysisResult qar = (QuantitativeAnalysisResult) o;
+        if(qar.getMargin()<worst)
+        {
+          worst = qar.getMargin();
+          res = qar.getSource().getMethodName();
+        }
+      }
+    }
+    return res;
+  }
+
+  public static float getMarginFor(List<EObject> elementList,
+                                   String currentQualityAttributeToImprove)
+  {
+    AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(0);
+    
+    for(EObject obj: elementList)
+    {
+      for(Object o: aa.getResults())
+      {
+        if(o instanceof QuantitativeAnalysisResult)
+        {
+          QuantitativeAnalysisResult qar = (QuantitativeAnalysisResult) o;
+          String qaName = convertAnalysisMethodToQualityAttribute(qar.getSource().getMethodName());
+          if(qaName.equals(currentQualityAttributeToImprove))
+          {
+            return qar.getMargin();
+          }
+        }
+      } 
+    }
+    return 2 ; // 2 is not a valid result (margin goes from -infinity to 1)
+  }
 }

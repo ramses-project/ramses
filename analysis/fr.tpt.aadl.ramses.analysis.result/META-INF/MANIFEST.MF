@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore.xmi,
  org.junit,
  org.apache.log4j,
+ org.osate.aadl2,
  fr.tpt.aadl.ramses.control.support,
  fr.tpt.aadl.ramses.analysis.result
 Eclipse-LazyStart: true
