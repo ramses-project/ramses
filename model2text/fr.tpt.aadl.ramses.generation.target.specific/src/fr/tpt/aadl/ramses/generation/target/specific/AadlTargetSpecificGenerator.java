@@ -54,9 +54,13 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
+import com.google.common.io.Files ;
+
 import fr.openpeople.rdal2.model.rdal.impl.SpecificationImpl ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
@@ -110,7 +114,9 @@ public class AadlTargetSpecificGenerator implements Generator
   private AadlModelValidator _modelValidator;
   
   private PredefinedAadlModelManager _predefinedResourceManager;
-  
+
+  private final AnalysisResultFactory analysisResultFactory = AnalysisResultFactory.eINSTANCE;
+  private final AnalysisArtifact analysisArtefact = analysisResultFactory.createAnalysisArtifact();
   
   /** Loop debug  (loopValidIteration must be negative to disable debug) **/
   private static int loopValidIteration = -1;
@@ -242,9 +248,11 @@ public class AadlTargetSpecificGenerator implements Generator
 
     if(_analysisResults == null)
       _analysisResults = AnalysisUtils.createNewAnalysisArtifact(
-                                                  outputDir.getAbsolutePath() +
-                                                  systemInstance.getName() +
-                                                  ".ares") ;
+                                                                 currentImplResource.getResourceSet(),
+                                                                 outputDir.getAbsolutePath() +
+                                                                 File.pathSeparator+
+                                                                 systemInstance.getName() +
+                                                                 ".ares") ;
     if(monitor.isCanceled())
     {
       String msg = "generation has been canceled after analysis result" ;
@@ -383,6 +391,22 @@ public class AadlTargetSpecificGenerator implements Generator
       
     }
     
+    // save analysis results
+    try
+    {
+      URI uri = URI.createFileURI(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares");
+      ResourceSet rs = currentImplResource.getResourceSet();
+      Resource resResource = rs.getResource(uri, false);
+      if(resResource==null)
+        resResource = rs.createResource(uri);
+      resResource.getContents().add(analysisArtefact);
+      resResource.save(null);
+    }
+    catch(IOException e)
+    {
+      String message = "Could not save analysis results normalized for ramses";
+      _LOGGER.fatal(message);
+    }
     
     long duration = System.nanoTime() - startTime;
     
@@ -505,21 +529,12 @@ public class AadlTargetSpecificGenerator implements Generator
       AnalysisArtifact aa = (AnalysisArtifact) analysisParam.get("AnalysisResult");
       if(aa!=null)
       {
-        try
+        List<AnalysisResult> analysis_results = new ArrayList<AnalysisResult>();
+        for(Object r: aa.getResults())
         {
-          URI uri = URI.createFileURI(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_resutls.ares");
-          ResourceSet rs = currentImplResource.getResourceSet();
-          Resource resResource = rs.getResource(uri, false);
-          if(resResource==null)
-            resResource = rs.createResource(uri);
-          resResource.getContents().add(aa);
-          resResource.save(null);
+          analysis_results.add((AnalysisResult) r);
         }
-        catch(IOException e)
-        {
-          String message = "Could not save analysis results normalized for ramses";
-          _LOGGER.fatal(message);
-        }
+        analysisArtefact.getResults().addAll(analysis_results);
       }
     }
     
@@ -561,7 +576,6 @@ public class AadlTargetSpecificGenerator implements Generator
         msg = ">> " + analysisName + " result set at " +
               result.isValidated() ;
         _LOGGER.trace(msg);
-        workflowPilot.setAnalysisResult(result.isValidated()) ;
       }
     }
     else if(analysisMode.equals("manual"))
@@ -719,6 +733,8 @@ public class AadlTargetSpecificGenerator implements Generator
     {
       loopIteration++;
       Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
+      if(result==null)
+        break;
       String modelIdSuffix = "_iter_"+loopIteration;
       modelsMap.put(workflowPilot.getOutputModelId()+modelIdSuffix, result);
       loopAnalysis = isValidLoopIteration(l.getAnalysis(), errManager, workflowPilot, config, workflowPilot.getOutputModelId(), modelIdSuffix, monitor);
@@ -935,7 +951,7 @@ public class AadlTargetSpecificGenerator implements Generator
 
   private void doErrorState()
   {
-    String msg = "workflow pilote reached in errorstate" ;
+    String msg = "workflow pilot reached in errorstate" ;
     _LOGGER.error(msg);
     ServiceProvider.SYS_ERR_REP.error(msg, true);
   }
