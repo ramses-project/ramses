@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.SystemImplementation ;
@@ -29,7 +28,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 
 	protected InstantiateModel _instantiateModel ;
         
-	private ResourceSet aadlResourceSet = new ResourceSetImpl();
+	
 //	protected AadlModelInstantiatior _modelInstantiator ;
 	protected IProgressMonitor _monitor = new NullProgressMonitor() ;
 	protected AnalysisErrorReporterManager _errManager ;
@@ -69,8 +68,8 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	  }
 	  URI instanceURI =
 	      OsateResourceUtil.getInstanceModelURI(si) ;
-
-	  Resource aadlResource = aadlResourceSet.getResource(instanceURI,
+	  ResourceSet rs = si.eResource().getResourceSet();
+	  Resource aadlResource = rs.getResource(instanceURI,
 	                                                      false) ;
 	  if(aadlResource != null)
 	  {
@@ -86,7 +85,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	    }
 	  }
     
-	  aadlResource = aadlResourceSet
+	  aadlResource = rs
               .createResource(instanceURI) ;
 
 	  SystemInstance instance = _instantiateModel.createSystemInstanceInt(si,
