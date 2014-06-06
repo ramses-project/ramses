@@ -21,35 +21,63 @@ public class MemoryFootprintAnalysis
 {
   private final static Logger _LOGGER = Logger.getLogger(MemoryFootprintAnalysis.class) ;
 
-  //Source_Data_Size + Source_Code_Size + Source_Stack_Size < Word_Count (memory)
-
   private MemoryFootprintAnalysis(){}
-  
+  private static SystemInstance root;
   private final static AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
-  
-  public static AnalysisArtifact doAnalysis(SystemInstance s)
+  private static int iterationCounter=0;
+  public static void doAnalysis(SystemInstance s, AnalysisArtifact currentResult )
   {
-    final AnalysisArtifact a = f.createAnalysisArtifact();
+    root=s;
     boolean analysisValid = true;
-    
+
+    final QualitativeAnalysisResult qar = f.createQualitativeAnalysisResult();
+    qar.setValidated(true);
+    AnalysisSource sourceQar = f.createAnalysisSource();
+    sourceQar.setMethodName(MemoryFootprintAnalyzer.PLUGIN_NAME);
+    sourceQar.setScope(s.getQualifiedName());
+    qar.setSource(sourceQar);
+    iterationCounter++;
     /** For each process create a result indicating memory overhead margin */
     for (ComponentInstance c : s.getAllComponentInstances())
     {
-      if (c.getCategory()==ComponentCategory.PROCESS)
+      double margin; 
+      // check Memory Component
+      if (c.getCategory()==ComponentCategory.MEMORY)
       {
-        final double margin = getProcessMargin (c);
-        
+        margin = getMemoryComponentMargin (c);
+      }
+      // check Process Component
+      else if (c.getCategory()==ComponentCategory.PROCESS)
+      {
+        margin = getProcessComponentMargin(c);
+      }
+      // check Thread components
+      else if (c.getCategory()==ComponentCategory.THREAD)
+      {
+        margin = getThreadComponentMargin(c);
+      }
+      else
+        margin=2; // impossible value as a result of analysis
+      
+      if(margin<2)
+      {                
         analysisValid &= (margin >= 0d);
-        
+        addQualitativeAnalysisResult(currentResult, c, analysisValid);
+
         AnalysisSource source = f.createAnalysisSource();
         source.setMethodName(MemoryFootprintAnalyzer.PLUGIN_NAME);
         source.setScope(c.getName());
+        source.setIterationId(iterationCounter);
         
         QuantitativeAnalysisResult r = f.createQuantitativeAnalysisResult();
         r.setSource(source);
         r.setMargin((float) margin);
-        a.getResults().add(r);
-        
+        currentResult.getResults().add(r);
+      }
+      if(margin<0
+          && qar.isValidated())
+      {
+        qar.setValidated(false);
       }
     }
     
@@ -61,74 +89,177 @@ public class MemoryFootprintAnalysis
     QualitativeAnalysisResult r = f.createQualitativeAnalysisResult();
     r.setSource(source);
     r.setValidated(analysisValid);
-    a.getResults().add(r);
+    currentResult.getResults().add(r);
     
-    return a;
   }
   
-  private static double getProcessMargin(ComponentInstance p)
+  private static void addQualitativeAnalysisResult(AnalysisArtifact a, ComponentInstance c, boolean valid)
   {
-    PropertyExpression pex = null;
-    try
+    final QualitativeAnalysisResult qar = f.createQualitativeAnalysisResult();
+    qar.setValidated(valid);
+    AnalysisSource sourceQar = f.createAnalysisSource();
+    sourceQar.setMethodName(MemoryFootprintAnalyzer.PLUGIN_NAME);
+    sourceQar.setScope(c.getQualifiedName());
+    qar.setSource(sourceQar);
+  }
+  
+  private static double getThreadComponentMargin(ComponentInstance threadComponent)
+  {
+    final long threadSize = getThreadSize(threadComponent);
+    final long consumption = getThreadSucomponentConsumption(threadComponent);
+    if(threadSize!=0)
+      return (threadSize-consumption)/threadSize;
+    return 2; // TODO
+  }
+  
+  private static long getThreadSucomponentConsumption(ComponentInstance threadComponent)
+  {
+    long consumption = 0 ;
+
+    for(ComponentInstance c : threadComponent.getAllComponentInstances())
     {
-      pex = PropertyUtils.getPropertyValue("Actual_Memory_Binding", p) ;
-    }
-    catch(Exception e)
-    {
-      _LOGGER.warn("No memory bound to process " + p.getName(), e);
-      return 0;
+      if(c.getCategory() == ComponentCategory.DATA)
+      {
+        consumption += DataSizeHelper.getOrComputeDataSize(c) ;
+      }
     }
     
-    ListValue lv = (ListValue) pex ;
-    PropertyExpression pe = lv.getOwnedListElements().get(0) ;
-
-    if(pe instanceof InstanceReferenceValue)
-    {
-      InstanceReferenceValue irv = (InstanceReferenceValue) pe ;
-      ComponentInstance mem = (ComponentInstance) irv.getReferencedInstanceObject() ;
-      
-      final long memSize = getMemorySize(mem);
-      return ((double) (memSize - getProcessOverhead (p))) / memSize;
-    }
-    else
-    {
-      return 0;
-    }
+    // TODO: add stack and heap of subprograms
+    
+    return consumption ;
   }
 
-  private static long getProcessOverhead(ComponentInstance p)
+  private static double getProcessComponentMargin(ComponentInstance processComponent)
   {
-    long overhead = 0 ;
+    final long procSize = getProcessSize(processComponent);
+    final long consumption=getProcessSubcomponentsConsumption(processComponent);
+    if(procSize!=0)
+      return (procSize-consumption)/procSize;
+    return 0;
+  }
+  
+  private static double getMemoryComponentMargin(ComponentInstance memoryComponent)
+  {
+    final long memSize = getMemorySize(memoryComponent);
+    long consumption=0;
+    // get Processes binded to memory component
+    for (ComponentInstance processComponent : root.getAllComponentInstances())
+    {
+      if (processComponent.getCategory()==ComponentCategory.PROCESS)
+      {
+        PropertyExpression pex = null;
+        try
+        {
+          pex = PropertyUtils.getPropertyValue("Actual_Memory_Binding", processComponent) ;
+        }
+        catch(Exception e)
+        {
+          _LOGGER.warn("No memory bound to process " + processComponent.getName(), e);
+          return 0;
+        }
+        
+        ListValue lv = (ListValue) pex ;
+        PropertyExpression pe = lv.getOwnedListElements().get(0) ;
+
+        if(pe instanceof InstanceReferenceValue)
+        {
+          InstanceReferenceValue irv = (InstanceReferenceValue) pe ;
+          ComponentInstance mem = (ComponentInstance) irv.getReferencedInstanceObject() ;
+          if(mem!=memoryComponent)
+            continue;
+          consumption+=getProcessMemoryUsage(processComponent);
+        }
+      }
+    }
+    if(memSize!=0)
+      return (memSize-consumption)/memSize;
+    return 0;
+  }
+
+  private static long getProcessSubcomponentsConsumption(ComponentInstance p)
+  {
+    long consumption = 0 ;
 
     for(ComponentInstance c : p.getAllComponentInstances())
     {
       if(c.getCategory() == ComponentCategory.THREAD)
       {
-        overhead += getComponentOverhead(c) ;
+        consumption += getThreadStaticSize(c) ;
       }
       else if(c.getCategory() == ComponentCategory.DATA)
       {
-        overhead += DataSizeHelper.getOrComputeDataSize(c) ;
+        consumption += DataSizeHelper.getOrComputeDataSize(c) ;
       }
     }
 
-    return overhead ;
+    return consumption ;
   }
 
-  private static long getMemorySize(NamedElement memory)
+  private static long getMemorySize(ComponentInstance memory)
   {
     return getPropertyBytesValue(memory, "Memory_Size") ;
   }
-
-  private static long getComponentOverhead(NamedElement e)
+  
+  private static long getProcessSize(ComponentInstance process)
   {
-    final long Data_Size = getPropertyBytesValue(e, "Data_Size") ;
-    final long Code_Size = getPropertyBytesValue(e, "Code_Size") ;
-    final long Stack_Size = getPropertyBytesValue(e, "Stack_Size") ;
-
-    return Data_Size + Code_Size + Stack_Size ;
+    return getComponentCodeMemory(process)
+        +getComponentDataMemory(process);
+  }
+  
+  private static long getProcessMemoryUsage(ComponentInstance e)
+  {
+    long memoryUsage = getComponentCodeMemory(e)
+        +getComponentDataMemory(e);
+    
+    for (ComponentInstance threadComponent : e.getAllComponentInstances())
+    {
+      if (threadComponent.getCategory()==ComponentCategory.THREAD)
+      {
+        memoryUsage+=getThreadDynamicSize(threadComponent);
+      }
+    }
+    
+    return memoryUsage;
   }
 
+  private static long getThreadSize(ComponentInstance e)
+  {
+    return getThreadStaticSize(e)
+        +getThreadDynamicSize(e);
+  }
+  
+  private static long getThreadStaticSize(ComponentInstance e)
+  {
+    return getComponentCodeMemory(e)
+        +getComponentDataMemory(e);
+  }
+  
+  private static long getThreadDynamicSize(NamedElement e)
+  {
+   return getComponentStackMemory(e)
+       +getComponentHeapMemory(e);
+  }
+  
+  private static long getComponentCodeMemory(NamedElement e)
+  {
+    return getPropertyBytesValue(e, "Code_Size") ;
+  }
+  
+  private static long getComponentDataMemory(NamedElement e)
+  {
+    return getPropertyBytesValue(e, "Data_Size") ;
+  }
+  
+  private static long getComponentStackMemory(NamedElement e)
+  {
+    return getPropertyBytesValue(e, "Stack_Size") ;
+  }
+
+  private static long getComponentHeapMemory(NamedElement e)
+  {
+    return getPropertyBytesValue(e, "Heap_Size") ;
+  }
+  
   private static long getPropertyBytesValue(NamedElement e,
                                             String property)
   {

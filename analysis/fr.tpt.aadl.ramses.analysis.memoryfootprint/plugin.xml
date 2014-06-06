@@ -4,7 +4,7 @@
    <extension
          point="fr.tpt.aadl.ramses.control.support.analyzer">
       <analyzer
-            analysisName="MemoryFootprint"
+            analysisName="RAMSES-MemoryFootprintAnalysis"
             class="fr.tpt.aadl.launch.MemoryFootprintAnalysisFactory"
             id="fr.tpt.aadl.sched.tools.memoryfootprint">
       </analyzer>

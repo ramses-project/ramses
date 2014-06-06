@@ -1,5 +1,8 @@
 package fr.tpt.aadl.ramses.analysis.memoryfootprint;
 
+import java.util.List ;
+
+import org.apache.log4j.Logger ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ClassifierValue ;
 import org.osate.aadl2.ComponentClassifier ;
@@ -20,10 +23,14 @@ import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.PrototypeBinding ;
 import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.SubcomponentType ;
+import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.utils.PropertyUtils ;
 
 public class DataSizeHelper
 {
+  
+  private final static Logger _LOGGER = Logger.getLogger(DataSizeHelper.class) ;
+
   private DataSizeHelper(){}
   
   private static DataClassifier getBaseType (NamedElement e)
@@ -58,13 +65,29 @@ public class DataSizeHelper
     long size = 0l;
     try 
     {
-      size = PropertyUtils.getIntValue(e, "Source_Data_Size");
+      size = PropertyUtils.getIntValue(e, "Data_Size");
     } 
     catch (Exception e1) 
     {
-      //System.err.println("getSourceDataSize(): " + e1.getMessage());
+      _LOGGER.warn("Data_Size property missing for "+e.getFullName());
     }
     return (int) size;
+  }
+  
+  private static int getSumOfDimensions(NamedElement e)
+  {
+    long nbOfElements = 0l;
+    try
+    {
+      List<String> dimensionsList = PropertyUtils.getStringListValue(e, "Dimension");
+      for(String dim: dimensionsList)
+        nbOfElements+=Long.valueOf(dim);
+    }
+    catch (Exception e1) 
+    {
+      _LOGGER.warn("Dimension property missing for "+e.getFullName());
+    }
+    return (int) nbOfElements;
   }
   
   private static String getDataRepresentationImpl(NamedElement e)
@@ -83,34 +106,42 @@ public class DataSizeHelper
   
   public static long getSourceDataSizeInOctets(NamedElement e)
   {
-    long size = getSourceDataSizeInOctetsImpl(e);
+    long size = 0;
+    ComponentClassifier cc = null;
+    if(e instanceof ComponentInstance)
+    {
+      ComponentInstance inst = (ComponentInstance) e;
+      cc = inst.getComponentClassifier();
+    }
+    if (e instanceof ComponentClassifier)
+    {
+      cc = (ComponentClassifier) e;
+    }
+    if(cc!=null)
+      size = getSourceDataSizeInOctetsImpl(cc);
     if (size == 0)
     {
-      if (e instanceof ComponentClassifier)
+      if (cc instanceof ComponentImplementation)
       {
-        ComponentClassifier cc = (ComponentClassifier) e;
-        if (cc instanceof ComponentImplementation)
+        ComponentImplementation ci = (ComponentImplementation) cc;
+        ComponentImplementation extended = ci.getExtended();
+
+        if (extended != null)
         {
-          ComponentImplementation ci = (ComponentImplementation) cc;
-          ComponentImplementation extended = ci.getExtended();
-          
-          if (extended != null)
+          size = getSourceDataSizeInOctets (extended);
+          if (size == 0)
           {
-            size = getSourceDataSizeInOctets (extended);
-            if (size == 0)
+            if (ci.getType() != null)
             {
-              if (ci.getType() != null)
-              {
-                cc = ci.getType();
-              }
+              cc = ci.getType();
             }
           }
         }
-        if (cc instanceof ComponentType)
-        {
-          ComponentType ct = (ComponentType) cc;
-          size = getSourceDataSizeInOctets (ct.getExtended());
-        }
+      }
+      if (cc instanceof ComponentType)
+      {
+        ComponentType ct = (ComponentType) cc;
+        size = getSourceDataSizeInOctets (ct.getExtended());
       }
     }
     return size;
@@ -179,7 +210,8 @@ public class DataSizeHelper
     {
       DataClassifier dc = getBaseType (e);
       long elementSize = getOrComputeDataSize (dc);
-      return elementSize;
+      long numberOfElements = getSumOfDimensions(e);
+      return numberOfElements*elementSize;
     }
     else
     {

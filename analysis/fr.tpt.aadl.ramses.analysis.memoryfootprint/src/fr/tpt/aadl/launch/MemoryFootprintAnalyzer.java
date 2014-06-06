@@ -14,14 +14,15 @@ import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 
 public class MemoryFootprintAnalyzer extends AbstractAnalyzer
 {
 
-  private static final String REGISTRY_NAME = "MemoryFootprint" ;
-  public final static String PLUGIN_NAME = "MemoryFootprint" ;
-  private final static String PLUGIN_ID = "MemoryFootprint" ;
+  private static final String REGISTRY_NAME = Names.MEMORY_ANALYSIS_PLUGIN_NAME ;
+  public final static String PLUGIN_NAME = Names.MEMORY_ANALYSIS_PLUGIN_NAME ;
+  private final static String PLUGIN_ID = Names.MEMORY_ANALYSIS_PLUGIN_NAME ;
 
   protected final AadlModelInstantiatior modelInstantiator;
   protected final PredefinedAadlModelManager predefinedAadlModels;
@@ -73,7 +74,7 @@ public class MemoryFootprintAnalyzer extends AbstractAnalyzer
                               IProgressMonitor monitor)
                                                        throws AnalysisException
   {
-    currentResult = MemoryFootprintAnalysis.doAnalysis(systemInstance);
+    MemoryFootprintAnalysis.doAnalysis(systemInstance, currentResult);
   }
 
   @Override
