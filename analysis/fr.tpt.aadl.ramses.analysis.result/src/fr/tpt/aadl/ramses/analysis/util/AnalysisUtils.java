@@ -21,32 +21,27 @@
 
 package fr.tpt.aadl.ramses.analysis.util;
 
-import java.io.IOException;
-import java.util.ArrayList ;
+import java.io.IOException ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.osate.aadl2.NamedElement;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
-import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory;
-import fr.tpt.aadl.ramses.analysis.AnalysisSource;
-import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult;
-import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage ;
+import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public class AnalysisUtils {
 
-	private static ResourceSet resourceSet;
 	private static Resource resource;
 	private static Logger _LOGGER = Logger.getLogger(AnalysisUtils.class) ;
 	
@@ -56,17 +51,17 @@ public class AnalysisUtils {
 	 * @param analysisPath   	String representing the artifact path
 	 * @return 
 	 */
-	public static Resource createNewAnalysisArtifact(String analysisPath){
+	public static Resource createNewAnalysisArtifact(ResourceSet resourceSet,
+	                                                 String analysisPath){
 		
 		AnalysisArtifact analysisSpec = AnalysisResultFactory.eINSTANCE.createAnalysisArtifact(); 
-		
 		URI analysis_uri = URI.createFileURI(analysisPath);
 
-		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
+		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
+		resourceSet.getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
 
-		if (!getResourceSet().getURIConverter().exists(analysis_uri, null)){
-			resource = getResourceSet().createResource(analysis_uri);
+		if (!resourceSet.getURIConverter().exists(analysis_uri, null)){
+			resource = resourceSet.createResource(analysis_uri);
 			resource.getContents().add(analysisSpec);
 			return resource;
 		} else
@@ -76,69 +71,6 @@ public class AnalysisUtils {
       ServiceProvider.SYS_ERR_REP.error(msg, true);
 		}
 		return null;
-	}
-	
-	/**
-	 * Adds quantitative analysis result to AnalysisArtifact of specified path 
-	 *
-	 * @param _analysisPath		String representing the artifact path
-	 * @param _scope			String representing the qualified name of the model element or model identifier
-	 * @param _iterationId		int representing the iteration number
-	 * @param _nfpId			String representing the non-functional property for which the analysis is done
-	 * @param _evalValue		float representing the evaluation value
-	 */
-	public static void addQuantitativeAnalysisResult(String _analysisPath, String _scope, int _iterationId, String _nfpId, float _evalValue){
-
-		AnalysisArtifact analysisSpec = AnalysisParser.parse(_analysisPath);
-
-		QuantitativeAnalysisResult resultObj = AnalysisResultFactory.eINSTANCE.createQuantitativeAnalysisResult();
-		if (_nfpId != null){
-			resultObj.setNfpId(_nfpId);
-		}
-		if (_scope != null){
-			AnalysisSource sourceObj = AnalysisResultFactory.eINSTANCE.createAnalysisSource();
-			sourceObj.setScope(_scope);
-			if (_iterationId > -1){
-				sourceObj.setIterationId(_iterationId);
-			}
-			resultObj.setSource(sourceObj);
-		}
-		resultObj.setMargin(_evalValue);
-		
-		analysisSpec.getResults().add(resultObj);
-					
-	}
-	
-
-	/**
-	 * Adds qualitative analysis result to AnalysisArtifact of specified path 
-	 *
-	 * @param _analysisPath		String representing the artifact path
-	 * @param _scope			String representing the qualified name of the model element or model identifier
-	 * @param _iterationId		int representing the iteration number
-	 * @param _nfpId			String representing the non-functional property for which the analysis is done
-	 * @param _evalValue		boolean representing the evaluation value
-	 */
-	public static void addQualitativeAnalysisResult(String _analysisPath, String _scope, int _iterationId, String _nfpId, boolean _evalValue){
-
-		AnalysisArtifact analysisSpec = AnalysisParser.parse(_analysisPath);
-
-		QualitativeAnalysisResult resultObj = AnalysisResultFactory.eINSTANCE.createQualitativeAnalysisResult();
-		if (_nfpId != null){
-			resultObj.setNfpId(_nfpId);
-		}
-		if (_scope != null){
-			AnalysisSource sourceObj = AnalysisResultFactory.eINSTANCE.createAnalysisSource();
-			sourceObj.setScope(_scope);
-			if (_iterationId > -1){
-				sourceObj.setIterationId(_iterationId);
-			}
-			resultObj.setSource(sourceObj);
-		}
-		resultObj.setValidated(_evalValue);
-		
-		analysisSpec.getResults().add(resultObj);
-					
 	}
 
 	/**
@@ -161,35 +93,6 @@ public class AnalysisUtils {
 		  throw new RuntimeException(msg, e) ;
 		}
 	}
-	
-	/**
-	 * Returns either existing ResourceSet object or a new one in case it was not already existing 
-	 *
-	 * @return       ResourceSet object 
-	 */
-	protected static ResourceSet getResourceSet() {
-		if (resourceSet == null) {
-			resourceSet = new ResourceSetImpl();
-		}
-		return resourceSet;
-	}
-	
-	/**
-	 * Returns a Resource object for a file of a given location 
-	 *
-	 * @param trcPath   String representing a element type
-	 * @return     		Resource object 
-	 */
-	protected static Resource getResource(String analysisPath){
-		URI p_uri = URI.createFileURI(analysisPath);
-
-		getResourceSet().getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
-		
-		resource = getResourceSet().getResource(p_uri, true);
-
-		return resource;
-	}
 
 	
 	/**
@@ -199,7 +102,7 @@ public class AnalysisUtils {
   public static Set<String> getInvalidatedResults()
   {
     Set<String> res = new HashSet<String>();
-    AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(0);
+    AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(resource.getContents().size()-1);
     
     for(Object o: aa.getResults())
     {
@@ -208,7 +111,7 @@ public class AnalysisUtils {
         QuantitativeAnalysisResult qar = (QuantitativeAnalysisResult) o;
         if(qar.getMargin()<0)
         {
-          String qaName = convertAnalysisMethodToQualityAttribute(qar.getSource().getMethodName());
+          String qaName = convertAnalysisMethodNameToSensitivityName(qar.getSource().getMethodName());
           res.add(qaName);
         }
       }
@@ -216,19 +119,19 @@ public class AnalysisUtils {
     return res;
   }
 
-  private static String convertAnalysisMethodToQualityAttribute(String analysisMethod)
+  private static String convertAnalysisMethodNameToSensitivityName(String analysisMethod)
   {
-    // TODO: implement this...
-    if(analysisMethod.equals(""))
-      return analysisMethod;
-    else
-      return analysisMethod;
+    if(analysisMethod.equals(Names.TIMING_ANALYSIS_PLUGIN_NAME))
+      return Names.TIMING_SENSITIVITY_NAME;
+    else if(analysisMethod.equals(Names.MEMORY_ANALYSIS_PLUGIN_NAME))
+      return Names.MEMORY_SENSITIVITY_NAME;
+    return null;
   }
   
   public static String getLeastSatisfiedQualityAttribute()
   {
     String res = null;
-    AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(0);
+    AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(resource.getContents().size()-1);
     float worst=0;
     for(Object o: aa.getResults())
     {
@@ -238,7 +141,7 @@ public class AnalysisUtils {
         if(qar.getMargin()<worst)
         {
           worst = qar.getMargin();
-          res = qar.getSource().getMethodName();
+          res = convertAnalysisMethodNameToSensitivityName(qar.getSource().getMethodName());
         }
       }
     }
@@ -257,7 +160,7 @@ public class AnalysisUtils {
         if(o instanceof QuantitativeAnalysisResult)
         {
           QuantitativeAnalysisResult qar = (QuantitativeAnalysisResult) o;
-          String qaName = convertAnalysisMethodToQualityAttribute(qar.getSource().getMethodName());
+          String qaName = convertAnalysisMethodNameToSensitivityName(qar.getSource().getMethodName());
           if(qaName.equals(currentQualityAttributeToImprove))
           {
             return qar.getMargin();
