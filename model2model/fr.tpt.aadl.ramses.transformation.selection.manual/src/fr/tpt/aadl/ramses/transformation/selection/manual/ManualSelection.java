@@ -33,4 +33,10 @@ public class ManualSelection implements ITransformationSelection
     ServiceProvider.SYS_ERR_REP.error("Not Implemented Yet", false);
     
   }
+
+  @Override
+  public boolean shouldSelectionContinue()
+  {
+    return true ;
+  }
 }

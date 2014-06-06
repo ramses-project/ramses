@@ -257,7 +257,8 @@ public class ArchitectureRefinementProcessLauncher {
                                                              systemInstance, 
                                                              config,
                                                              outputResourceID);
-        
+        if(r==null)
+          return r;
         message = "Finish production of " + outputResourceID;
         config.setRamsesOutputDir(outputPathSave.getAbsolutePath());
         return r;
@@ -361,6 +362,10 @@ public class ArchitectureRefinementProcessLauncher {
     // store the result of the selection: generate TIP
     TipUtils.addElementTransformationToLastIteration(getOutputDir()+getTipId(), resourceSet, TipUtils.getTipSpecification(), tuplesToApply);
 
+    if(false==this.transformationSelection.shouldSelectionContinue())
+      return null;
+    
+    
     _LOGGER.trace("Finished selection step");
 
     long finishTimeSelection = System.nanoTime();
@@ -483,7 +488,7 @@ public class ArchitectureRefinementProcessLauncher {
     }
 
     // create workflow and save the workflow file
-    WorkflowUtils.createNewWorkflow(workflowPath, rootTransfo, inputMi);
+    WorkflowUtils.createNewWorkflow(resourceSet,workflowPath, rootTransfo, inputMi);
 
     _LOGGER.trace("Finished specialization step");
     
@@ -494,7 +499,8 @@ public class ArchitectureRefinementProcessLauncher {
     _LOGGER.trace("Launch specialized transformation");
     
     // execute ramses workflow transformation 
-    WorkflowPilot workflowPilot = new EcoreWorkflowPilot(workflowPath);
+    WorkflowPilot workflowPilot = new EcoreWorkflowPilot(this.resourceSet,
+                                                         workflowPath);
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
 
     Generator generator = registry.getGenerator(config.getTargetId()) ;

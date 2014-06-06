@@ -118,8 +118,8 @@ public class GenerateActionHandler extends RamsesActionHandler {
       {
         try
         {
-          URI uri = URI.createPlatformResourceURI(workflowFile, false);
-          Resource workflow = r.getResourceSet().getResource(uri, false);
+          URI uri = URI.createFileURI(workflowFile);
+          Resource workflow = r.getResourceSet().getResource(uri, true);
           TreeIterator<EObject> iter = workflow.getAllContents();
           boolean foundAI=false;
           while(iter.hasNext()
@@ -129,7 +129,7 @@ public class GenerateActionHandler extends RamsesActionHandler {
             if(eObj instanceof Analysis)
             {
               Analysis a = (Analysis) eObj;
-              if(a.getMethod().equals(Names.AI_PLUGIN_NAME))
+              if(a.getMethod().equals(Names.TIMING_ANALYSIS_PLUGIN_NAME))
                 foundAI = true;
             }
           }
@@ -251,7 +251,8 @@ public class GenerateActionHandler extends RamsesActionHandler {
                          monitor) ;
     else
     {
-      EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflow);
+      EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(sinst.getSystemImplementation().eResource().getResourceSet(),
+                                                           workflow);
       generator.generateWorkflow(sinst,
                                  config,
                                  xmlPilot,

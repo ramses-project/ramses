@@ -22,6 +22,7 @@
 package fr.tpt.aadl.ramses.control.cli.core ;
 
 import java.io.File ;
+import java.io.FileNotFoundException ;
 import java.io.IOException ;
 import java.io.PrintStream ;
 import java.util.ArrayList ;
@@ -49,6 +50,7 @@ import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 
 /**
@@ -196,11 +198,11 @@ public class ToolSuiteLauncher
                               String systemToInstantiate,
                               RamsesConfiguration config,
                               File[] includeDirs,
-                              WorkflowPilot xmlPilot)
+                              String workflowFilePath)
                                                       throws AnalysisException,
-                                                            GenerationException,
+                                                      GenerationException,
                                                       TransformationException,
-                                                      ParseException
+                                                      ParseException, FileNotFoundException
   {
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
@@ -220,7 +222,10 @@ public class ToolSuiteLauncher
       System.exit(-1);
     }
 
-    generator.generateWorkflow(instance, config, xmlPilot, includeDirs,
+    EcoreWorkflowPilot workflowPilot = new EcoreWorkflowPilot(instance.getSystemImplementation().eResource().getResourceSet(),
+                                                         workflowFilePath);
+    
+    generator.generateWorkflow(instance, config, workflowPilot, includeDirs,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
                                _monitor) ;
     generator.cleanUp();

@@ -4,7 +4,9 @@ import java.util.ArrayList ;
 import java.util.Collections ;
 import java.util.Comparator ;
 import java.util.Iterator ;
+import java.util.LinkedHashSet ;
 import java.util.List ;
+import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.TreeIterator ;
@@ -18,6 +20,7 @@ import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.aadl2.instance.InstanceObject ;
+import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.openpeople.rdal2.model.rdal.AbstractGoal ;
 import fr.openpeople.rdal2.model.rdal.DesignElementReference ;
@@ -102,7 +105,7 @@ public class RdalParser {
         NamedElement ne = (NamedElement) obj;
         _LOGGER.trace("Search sensitivity for "+ne.getName());
       }
-      List<String> sensitivities = getSensitivitiesNameForDesignElement(rdalSpecificationObj, obj);
+      Set<String> sensitivities = getSensitivitiesNameForDesignElement(rdalSpecificationObj, obj);
       String message = "Found sensitivities: ";
       for(String s: sensitivities)
         message+=s+" ";
@@ -126,7 +129,10 @@ public class RdalParser {
       String message = "WARNING: no sensitivity found for the following components: ";
       for(EObject ne: designElementList)
       {
-        message+="\t"+((NamedElement) ne).getQualifiedName();
+        if(ne instanceof NamedElement)
+          message+="\t"+((NamedElement) ne).getQualifiedName();
+        else
+          message+="\tof type "+ ne.getClass().toString()+", not a NamedElement" ;
       }
       _LOGGER.warn(message);
     }
@@ -157,11 +163,11 @@ public class RdalParser {
     return result;
   }
 
-  private static List<String> getSensitivitiesNameForDesignElement(Specification rdalSpecificationObj, 
+  private static Set<String> getSensitivitiesNameForDesignElement(Specification rdalSpecificationObj, 
                                                                    EObject designElement)
   {
     List<Sensitivity> sensitivitiesList = getSensitivitiesForDesignElement(rdalSpecificationObj, designElement);
-    List<String> result = new ArrayList<String>();
+    Set<String> result = new LinkedHashSet<String>();
     
     for(Sensitivity s: sensitivitiesList)
     {
@@ -190,22 +196,35 @@ public class RdalParser {
           Sensitivity sensitivityObject = getSensitivityForQualityGoal((QualityObjective)goalObject);
           if(sensitivityObject == null)
             _LOGGER.error("Sensitivity not found");
-          List<EObject> objectsList = new ArrayList<EObject>();
-          long priority = getDesignElementsForSensitivity(sensitivityObject, objectsList);
-          ComparableSensitivity cs = new ComparableSensitivity(sensitivityObject, priority);
-          Iterator<EObject> objectsIt = objectsList.iterator();
-          while(objectsIt.hasNext()){
-            EObject object = objectsIt.next();
-            if(object instanceof NamedElement)
+          long priority;
+          ReferencedDesignElements referencedDesignElement = sensitivityObject.getOwnedReferencedDesignElements();
+          List<DesignElementReference> designElementReferencesList = referencedDesignElement.getOwnedDesignElementRefs();
+          Iterator<DesignElementReference> designElementReferencesIt = designElementReferencesList.iterator();
+          while(designElementReferencesIt.hasNext()){
+            DesignElementReference designElementReferenceObject = designElementReferencesIt.next();
+            if(designElementReferenceObject instanceof PrioritizedSatDesignElementRef)
             {
-              NamedElement ne = (NamedElement) object;
-              if(designElement.equals(ne) || isContainedIn(ne, (NamedElement) designElement)
-                  || isInstanceOf(designElement, ne))
+              PrioritizedSatDesignElementRef psder = (PrioritizedSatDesignElementRef) designElementReferenceObject;
+              try
               {
-                sensitivitiesResultList.add(cs);
+                priority = psder.getPriority();
               }
-              else
-                _LOGGER.warn("No sensitivitiy found for "+ne.getName());
+              catch(Exception e)
+              {
+                priority = -1;
+              }
+              EObject object = psder.getDesignElement();
+              if(object instanceof NamedElement
+                  && designElement instanceof NamedElement)
+              {
+                NamedElement ne = (NamedElement) object;
+                if(designElement.equals(ne) || isContainedIn(ne, (NamedElement) designElement)
+                    || isInstanceOf(designElement, ne))
+                {
+                  ComparableSensitivity cs = new ComparableSensitivity(sensitivityObject, priority);
+                  sensitivitiesResultList.add(cs);
+                }
+              }
             }
           }
         }
@@ -314,16 +333,21 @@ public class RdalParser {
     if(designElement instanceof InstanceObject)
     {
       InstanceObject io = (InstanceObject) designElement;
-      if(io instanceof ComponentInstance)
+      if(io instanceof SystemInstance)
+      {
+        SystemInstance si = (SystemInstance) io;
+        return si.getSystemImplementation().equals(neInRdal);
+      }
+      else if(io instanceof ComponentInstance)
       {
         ComponentInstance ci = (ComponentInstance) io;
         return ci.getSubcomponent().equals(designElement) 
-            || ci.getSubcomponent().getSubcomponentType().equals(designElement);
+            || ci.getSubcomponent().getSubcomponentType().equals(neInRdal);
       }
       else if(io instanceof FeatureInstance)
       {
         FeatureInstance fi = (FeatureInstance) io;
-        return fi.getFeature().equals(designElement);
+        return fi.getFeature().equals(neInRdal);
       }
       return false;
     }
@@ -348,11 +372,14 @@ public class RdalParser {
             _LOGGER.error("Sensitivity not found");
           if(false == sensitivityObject.getName().equals(currentQualityAttributeToImprove))
             continue;
+          boolean updated=false;
           ReferencedDesignElements rde = sensitivityObject.getOwnedReferencedDesignElements();
           List<DesignElementReference> toRemove = new ArrayList<DesignElementReference>();
-          for(DesignElementReference der: rde.getOwnedDesignElementRefs())
+          List<DesignElementReference> toAdd = new ArrayList<DesignElementReference>();
+          Iterator<DesignElementReference> iter = rde.getOwnedDesignElementRefs().iterator();
+          while(iter.hasNext())
           {
-            
+            DesignElementReference der=iter.next();
             for(EObject elementToModify: elementListToModify)
             {
               EObject ref = der.getDesignElement();
@@ -364,6 +391,7 @@ public class RdalParser {
                   long currentPriority = getSensitivityMaxPriority(rdalSpecificationObj,
                                                                    ref);
                   psder.setPriority(currentPriority+1);
+                  updated=true;
                 }
                 else if(der instanceof SatisfiableDesignElementRef)
                 {
@@ -378,11 +406,31 @@ public class RdalParser {
                   psder.setEvaluationResult(sder.getEvaluationResult());
                   psder.setId(sder.getId());
                   psder.setName(sder.getName());
+                  toAdd.add(psder);
+                  updated=true;
                 }
               }
             }
+            if(updated)
+              break;
           }
-          // sensitivity was not found for this element 
+          if(!updated)
+          {
+            for(EObject elementToModify: elementListToModify)
+            {
+              // sensitivity was not found for this element 
+              PrioritizedSatDesignElementRef psder = RdalFactory.eINSTANCE.createPrioritizedSatDesignElementRef();
+              long currentPriority = getSensitivityMaxPriority(rdalSpecificationObj,elementToModify);
+              psder.setPriority(currentPriority+1);
+              psder.setDescription("Automatically generated sensitivity to promote quality attribute: "
+                  +currentQualityAttributeToImprove);
+              psder.setDesignElement(elementToModify);
+              psder.setName(currentQualityAttributeToImprove);
+              toAdd.add(psder);
+            }
+          }
+          rde.getOwnedDesignElementRefs().removeAll(toRemove);
+          rde.getOwnedDesignElementRefs().addAll(toAdd);
         }
       }
     }
@@ -400,8 +448,8 @@ public class RdalParser {
         if(der instanceof PrioritizedSatDesignElementRef)
         {
           PrioritizedSatDesignElementRef psder = (PrioritizedSatDesignElementRef) der;
-          long currentPriority = psder.getPriority();
-          if(currentPriority>prio)
+          Long currentPriority = psder.getPriority();
+          if(currentPriority!=null && currentPriority>prio)
             prio=currentPriority;
         }
       }

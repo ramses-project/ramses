@@ -583,14 +583,12 @@ public class ToolSuiteLauncherCommand
       try
       {
         File workflowFile = org.osate.utils.FileUtils.stringToFile(workflow_path) ;
-        
-        EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(workflowFile.toString());
           
         _launcher.launchWorkflowProcess(_mainModelFiles,
                                         _systemToInstantiate,
                                         config,
                                         inclDirs,
-                                        xmlPilot) ;
+                                        workflowFile.toString()) ;
       }
       catch (FileNotFoundException ex)
       {

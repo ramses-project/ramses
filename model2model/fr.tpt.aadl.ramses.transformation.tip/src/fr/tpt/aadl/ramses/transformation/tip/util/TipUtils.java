@@ -26,6 +26,7 @@ public class TipUtils {
 	private static Resource resource;
 	private static int currentIteration;
 	private static TipSpecification tipSpecification;
+  private static List<String> experimentedDirectionList = new ArrayList<String>();
 	
 	public static TipSpecification createNewTIP(Resource r){
 		resource = r;
@@ -169,5 +170,55 @@ public class TipUtils {
 	public static void setTipSpecification(TipSpecification param) {
 		tipSpecification = param;
 	}
+
+	public static void addExperimentedDirection(String direction)
+	{
+	  experimentedDirectionList.add(direction);
+	}
+	
+  public static boolean isLastIterationDifferent(String direction)
+  {
+    if(false == experimentedDirectionList.contains(direction)
+        || currentIteration==1)
+      return true;
+    TipSpecification spec = (TipSpecification) resource.getContents().get(0);
+    Iteration lastIteration = (Iteration) spec.getIterations().get(spec.getIterations().size()-1);
+    for(Object o: spec.getIterations())
+    {
+      Iteration iter = (Iteration) o;
+      if(lastIteration==iter)
+      {
+        return true;
+      }
+      boolean res = areSameIterations(iter, lastIteration);
+      if(res)
+        return false;
+    }
+    return true;
+  }
+
+  private static boolean areSameIterations(Iteration iter,
+                                           Iteration lastIteration)
+  {
+    for(Object o: iter.getElements())
+    {
+      ElementTransformation et = (ElementTransformation) o;
+      for(Object last: lastIteration.getElements())
+      {
+        ElementTransformation lastEt = (ElementTransformation) last;
+        if(
+            !lastEt.getTransformationId().equals(et.getTransformationId())
+            && 
+            lastEt.getElementName().equals(et.getElementName())
+            &&
+            lastEt.isIsExclusion()==false
+            &&
+            et.isIsExclusion()==false
+            )
+          return false;
+      }
+    }
+    return true ;
+  }
 	
 }

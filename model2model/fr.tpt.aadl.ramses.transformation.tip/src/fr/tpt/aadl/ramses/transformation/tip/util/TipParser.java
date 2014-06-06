@@ -104,6 +104,8 @@ public class TipParser {
 							toContinue = false;
 							break;
 						}
+						else
+						  break;
 					}
 					if(!toContinue)
 						break;
