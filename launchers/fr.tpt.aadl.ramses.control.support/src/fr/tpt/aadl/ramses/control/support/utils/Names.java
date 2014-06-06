@@ -62,6 +62,12 @@ public class Names
 
   public static final String RAMSES_PROPERTIES = "RAMSES_PROPERTIES" ;
   
-  public final static String AI_PLUGIN_NAME = "AADLInspector-SchedulingAnalysis";
+  public final static String TIMING_ANALYSIS_PLUGIN_NAME = "AADLInspector-SchedulingAnalysis";
+  public final static String TIMING_SENSITIVITY_NAME = "TimingPerformance";
+  
+  public static final String MEMORY_ANALYSIS_PLUGIN_NAME = "RAMSES-MemoryFootprintAnalysis";
+  public final static String MEMORY_SENSITIVITY_NAME = "MemoryFootprint";
+  
+  public final static String MAINTENANCE_QA = "Maintenance";
   
 }

@@ -70,9 +70,9 @@ import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
 
 public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
-	private final static String ANALYZER_NAME = Names.AI_PLUGIN_NAME;
-	public final static String PLUGIN_NAME = Names.AI_PLUGIN_NAME;
-	private final static String PLUGIN_ID = Names.AI_PLUGIN_NAME;
+	private final static String ANALYZER_NAME = Names.TIMING_ANALYSIS_PLUGIN_NAME;
+	public final static String PLUGIN_NAME = Names.TIMING_ANALYSIS_PLUGIN_NAME;
+	private final static String PLUGIN_ID = Names.TIMING_ANALYSIS_PLUGIN_NAME;
 	private AadlModelInstantiatior _instantiator ;
 	private PredefinedAadlModelManager _predefinedResourcesManager ;
 	private String outputModelIdentifier;
