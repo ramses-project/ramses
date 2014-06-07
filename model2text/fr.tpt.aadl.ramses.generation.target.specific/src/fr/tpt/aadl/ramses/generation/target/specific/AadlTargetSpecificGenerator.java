@@ -391,23 +391,25 @@ public class AadlTargetSpecificGenerator implements Generator
       
     }
     
-    // save analysis results
-    try
+    if(false==analysisArtefact.getResults().isEmpty())
     {
-      URI uri = URI.createFileURI(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares");
-      ResourceSet rs = currentImplResource.getResourceSet();
-      Resource resResource = rs.getResource(uri, false);
-      if(resResource==null)
-        resResource = rs.createResource(uri);
-      resResource.getContents().add(analysisArtefact);
-      resResource.save(null);
+      // save analysis results
+      try
+      {
+        URI uri = URI.createFileURI(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares");
+        ResourceSet rs = currentImplResource.getResourceSet();
+        Resource resResource = rs.getResource(uri, false);
+        if(resResource==null)
+          resResource = rs.createResource(uri);
+        resResource.getContents().add(analysisArtefact);
+        resResource.save(null);
+      }
+      catch(IOException e)
+      {
+        String message = "Could not save analysis results normalized for ramses";
+        _LOGGER.fatal(message);
+      }
     }
-    catch(IOException e)
-    {
-      String message = "Could not save analysis results normalized for ramses";
-      _LOGGER.fatal(message);
-    }
-    
     long duration = System.nanoTime() - startTime;
     
     long elapsedTimeMinutes = TimeUnit.MINUTES.convert(duration, TimeUnit.NANOSECONDS);
