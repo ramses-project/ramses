@@ -152,31 +152,34 @@ public class DataSizeHelper
     String rep = getDataRepresentationImpl(e);
     if (rep == null)
     {
+      ComponentClassifier cc = null;
+      if(e instanceof ComponentInstance)
+        cc=((ComponentInstance)e).getComponentClassifier();
       if (e instanceof ComponentClassifier)
       {
-        ComponentClassifier cc = (ComponentClassifier) e;
-        if (cc instanceof ComponentImplementation)
+        cc = (ComponentClassifier) e;
+      }
+      if (cc instanceof ComponentImplementation)
+      {
+        ComponentImplementation ci = (ComponentImplementation) cc;
+        ComponentImplementation extended = ci.getExtended();
+
+        if (extended != null)
         {
-          ComponentImplementation ci = (ComponentImplementation) cc;
-          ComponentImplementation extended = ci.getExtended();
-          
-          if (extended != null)
+          rep = getDataRepresentation (extended);
+          if (rep == null)
           {
-            rep = getDataRepresentation (extended);
-            if (rep == null)
+            if (ci.getType() != null)
             {
-              if (ci.getType() != null)
-              {
-                cc = ci.getType();
-              }
+              cc = ci.getType();
             }
           }
         }
-        if (cc instanceof ComponentType)
-        {
-          ComponentType ct = (ComponentType) cc;
-          rep = getDataRepresentationImpl (ct.getExtended());
-        }
+      }
+      else if (cc instanceof ComponentType)
+      {
+        ComponentType ct = (ComponentType) cc;
+        rep = getDataRepresentationImpl (ct.getExtended());
       }
     }
     return rep;
