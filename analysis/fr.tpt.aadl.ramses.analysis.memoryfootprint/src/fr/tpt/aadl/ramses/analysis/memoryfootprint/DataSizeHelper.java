@@ -62,7 +62,7 @@ public class DataSizeHelper
   
   private static int getSourceDataSizeInOctetsImpl(NamedElement e)
   {
-    long size = 0l;
+    double size = 0l;
     try 
     {
       size = PropertyUtils.getIntValue(e, "Data_Size");
@@ -76,12 +76,12 @@ public class DataSizeHelper
   
   private static int getSumOfDimensions(NamedElement e)
   {
-    long nbOfElements = 0l;
+    double nbOfElements = 0l;
     try
     {
       List<String> dimensionsList = PropertyUtils.getStringListValue(e, "Dimension");
       for(String dim: dimensionsList)
-        nbOfElements+=Long.valueOf(dim);
+        nbOfElements+=Double.valueOf(dim);
     }
     catch (Exception e1) 
     {
@@ -104,9 +104,9 @@ public class DataSizeHelper
     return rep;
   }
   
-  public static long getSourceDataSizeInOctets(NamedElement e)
+  public static double getSourceDataSizeInOctets(NamedElement e)
   {
-    long size = 0;
+    double size = 0;
     ComponentClassifier cc = null;
     if(e instanceof ComponentInstance)
     {
@@ -182,7 +182,7 @@ public class DataSizeHelper
     return rep;
   }
   
-  private static long computeDataSize(NamedElement e)
+  private static double computeDataSize(NamedElement e)
   {
     
     String rep = getDataRepresentation(e);
@@ -193,7 +193,7 @@ public class DataSizeHelper
     else if ((rep.equalsIgnoreCase("Struct")) && (e instanceof DataImplementation))
     {
       DataImplementation di = (DataImplementation) e;
-      long size = 0;
+      double size = 0;
       for(Subcomponent sub : di.getAllSubcomponents())
       {
         if (sub instanceof DataSubcomponent)
@@ -209,8 +209,8 @@ public class DataSizeHelper
     else if (rep.equalsIgnoreCase("Array"))
     {
       DataClassifier dc = getBaseType (e);
-      long elementSize = getOrComputeDataSize (dc);
-      long numberOfElements = getSumOfDimensions(e);
+      double elementSize = getOrComputeDataSize (dc);
+      double numberOfElements = getSumOfDimensions(e);
       return numberOfElements*elementSize;
     }
     else
@@ -246,9 +246,9 @@ public class DataSizeHelper
     return null;
   }
   
-  public static long getOrComputeDataSize (NamedElement e)
+  public static double getOrComputeDataSize (NamedElement e)
   {
-    long size = getSourceDataSizeInOctets (e);
+    double size = getSourceDataSizeInOctets (e);
     if (size == 0)
     {
       size = computeDataSize (e);
