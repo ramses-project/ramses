@@ -172,6 +172,7 @@ with Base_Types, Data_Model, Generation_Properties;
     properties
       Source_Name => "Compute_CPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+      Stack_Size => 22 Bytes;
   end Compute_CPR;
   
   subprogram Compute_PPR
@@ -184,6 +185,7 @@ with Base_Types, Data_Model, Generation_Properties;
     properties
       Source_Name => "Compute_PPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+      Stack_Size => 22 Bytes;
   end Compute_PPR;
   
   subprogram Compute_CDW
@@ -199,6 +201,7 @@ with Base_Types, Data_Model, Generation_Properties;
     properties
       Source_Name => "Compute_CDW";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
+      Stack_Size => 26 Bytes;
   end Compute_CDW;
 
   subprogram Receive_Input_LowFP
