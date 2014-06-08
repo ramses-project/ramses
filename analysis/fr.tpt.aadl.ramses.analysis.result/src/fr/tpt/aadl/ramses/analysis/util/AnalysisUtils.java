@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
+import org.osate.aadl2.NamedElement ;
 
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage ;
@@ -148,26 +149,33 @@ public class AnalysisUtils {
     return res;
   }
 
-  public static float getMarginFor(List<EObject> elementList,
-                                   String currentQualityAttributeToImprove)
+  public static double getWorstMarginFor(List<EObject> elementList,
+                                         String currentQualityAttributeToImprove)
   {
     AnalysisArtifact aa = (AnalysisArtifact) resource.getContents().get(0);
-    
+    double current = 2; // 2 is not a valid result (margin goes from -infinity to 1)
     for(EObject obj: elementList)
     {
+      NamedElement ne;
+      if(obj instanceof NamedElement)
+        ne = (NamedElement) obj;
+      else
+        continue;
       for(Object o: aa.getResults())
       {
         if(o instanceof QuantitativeAnalysisResult)
         {
           QuantitativeAnalysisResult qar = (QuantitativeAnalysisResult) o;
           String qaName = convertAnalysisMethodNameToSensitivityName(qar.getSource().getMethodName());
-          if(qaName.equals(currentQualityAttributeToImprove))
+          if(qaName.equals(currentQualityAttributeToImprove)
+              && qar.getSource().getScope().equals(ne.getQualifiedName()))
           {
             return qar.getMargin();
           }
         }
       } 
     }
-    return 2 ; // 2 is not a valid result (margin goes from -infinity to 1)
+    return current ; 
   }
+
 }

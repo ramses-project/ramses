@@ -74,7 +74,8 @@ public class MemoryFootprintAnalyzer extends AbstractAnalyzer
                               IProgressMonitor monitor)
                                                        throws AnalysisException
   {
-    MemoryFootprintAnalysis.doAnalysis(systemInstance, currentResult);
+    MemoryFootprintAnalysis mfa = new MemoryFootprintAnalysis();
+    mfa.doAnalysis(systemInstance, currentResult);
   }
 
   @Override

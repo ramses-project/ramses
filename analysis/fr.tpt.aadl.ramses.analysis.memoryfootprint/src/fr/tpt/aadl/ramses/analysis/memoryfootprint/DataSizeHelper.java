@@ -79,8 +79,8 @@ public class DataSizeHelper
     double nbOfElements = 0l;
     try
     {
-      List<String> dimensionsList = PropertyUtils.getStringListValue(e, "Dimension");
-      for(String dim: dimensionsList)
+      List<Long> dimensionsList = getDimentions(e);
+      for(Long dim: dimensionsList)
         nbOfElements+=Double.valueOf(dim);
     }
     catch (Exception e1) 
@@ -90,6 +90,45 @@ public class DataSizeHelper
     return (int) nbOfElements;
   }
   
+  private static List<Long> getDimentions(NamedElement e)
+  {
+    List<Long> dimensionsList = PropertyUtils.getIntListValue(e, "Dimension");
+    if(dimensionsList==null)
+    {
+      if(e instanceof ComponentImplementation)
+      {
+        ComponentImplementation ci = (ComponentImplementation) e;
+        ComponentType ct = ci.getType();
+        dimensionsList = PropertyUtils.getIntListValue(ct, "Dimension");
+        ComponentImplementation parentImpl = ci.getExtended();
+        
+        
+        while(dimensionsList==null && parentImpl!=null)
+        {
+          dimensionsList = PropertyUtils.getIntListValue(parentImpl, "Dimension");
+          parentImpl = parentImpl.getExtended();
+        }
+        if(dimensionsList==null)
+          return getDimentions(ct);
+      }
+      else if(e instanceof ComponentType)
+      {
+        return getDimentions((ComponentType)e);
+      }
+    }
+    return dimensionsList;
+  }
+  private static List<Long> getDimentions(ComponentType e)
+  {
+    List<Long> dimensionsList=PropertyUtils.getIntListValue(e, "Dimension");
+    ComponentType parentType = e.getExtended();
+    while(dimensionsList==null && parentType!=null)
+    {
+      dimensionsList = PropertyUtils.getIntListValue(parentType, "Dimension");
+      parentType = parentType.getExtended();
+    }
+    return dimensionsList;
+  }
   private static String getDataRepresentationImpl(NamedElement e)
   {
     String rep = null;
