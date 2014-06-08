@@ -121,7 +121,7 @@ public class AadlTargetSpecificGenerator implements Generator
   /** Loop debug  (loopValidIteration must be negative to disable debug) **/
   private static int loopValidIteration = -1;
   private int loopIteration = -1;
-
+  private List<AnalysisResult> analysis_results = new ArrayList<AnalysisResult>();
   /****************/
   
 
@@ -388,7 +388,7 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       
       xmlPilot.goForward() ;
-      
+      analysisArtefact.getResults().addAll(analysis_results);
     }
     
     if(false==analysisArtefact.getResults().isEmpty())
@@ -531,12 +531,10 @@ public class AadlTargetSpecificGenerator implements Generator
       AnalysisArtifact aa = (AnalysisArtifact) analysisParam.get("AnalysisResult");
       if(aa!=null)
       {
-        List<AnalysisResult> analysis_results = new ArrayList<AnalysisResult>();
         for(Object r: aa.getResults())
         {
           analysis_results.add((AnalysisResult) r);
         }
-        analysisArtefact.getResults().addAll(analysis_results);
       }
     }
     
