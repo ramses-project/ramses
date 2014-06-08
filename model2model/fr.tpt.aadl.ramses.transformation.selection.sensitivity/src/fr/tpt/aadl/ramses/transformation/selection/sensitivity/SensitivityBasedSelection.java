@@ -101,7 +101,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
         int level=1;
         Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
         List<EObject> elementToModify = null;
-        float worst = 1;
+        double worst = 1;
         
         List<String> transformationsWithUpdatedSensitivities=null;
         
@@ -111,7 +111,7 @@ public class SensitivityBasedSelection implements ITransformationSelection {
           if(tuple.getValue().size()==1)
             continue;
           List<String> sensitivities = RdalParser.getSensitivitiesForDesignElement(rdal, tuple.getKey());
-          float res = AnalysisUtils.getMarginFor(tuple.getKey(), currentQualityAttributeToImprove);
+          double res = AnalysisUtils.getWorstMarginFor(tuple.getKey(), currentQualityAttributeToImprove);
           while(level<maxSensitivities)
           {
             if(sensitivities.size()>level &&
