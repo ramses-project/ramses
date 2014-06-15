@@ -424,8 +424,10 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  Boolean b = (Boolean) o;
 	  _LOGGER.trace("\t"+b.toString()+": "+ msg);
 	}
-	else
+	else if(o!=null)
 	  _LOGGER.trace("\t"+o.toString()+": "+ msg);
+	else
+	  _LOGGER.trace("\t NULL: "+ msg);
 	return o;
   }
   
