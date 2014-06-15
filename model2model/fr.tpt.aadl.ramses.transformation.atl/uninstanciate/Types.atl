@@ -33,6 +33,10 @@ from
 	IN 				: AADLI;
 
 
+helper context AADLI!ComponentType def: needsCopy(): Boolean =
+	true
+;
+
 helper context AADLI!ComponentType def : defaultEventPortsMapping() : Sequence (AADLBA!EventPortType) =
 	self.ownedEventPort->collect(e|thisModule.EventPort(e))
 ;
@@ -56,6 +60,7 @@ helper context AADLI!ThreadType def : eventPortsMapping() : Sequence (AADLBA!Eve
 abstract rule m_Component_Type {
   from
   	type : AADLI!ComponentType
+	(type.needsCopy())
   to
     typeImg : AADLBA!ComponentType
 	(
@@ -94,12 +99,13 @@ rule m_Device_Type {
 -- @extends m_Component_Type
 rule m_Processor_Type {
   from 
-    type : AADLI!ProcessorType 
+    type : AADLI!ProcessorType
   to 
     typeImg : AADLBA!ProcessorType (
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
-	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
-	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort'))->excluding(OclUndefined),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort'))->excluding(OclUndefined),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))->excluding(OclUndefined),
+	 ownedBusAccess <- type.ownedBusAccess->collect(e|e.getFeaturesInstances('busAccess'))->excluding(OclUndefined)
   )
 }
 
@@ -109,9 +115,9 @@ rule m_VirtualProcessor_Type {
     type : AADLI!VirtualProcessorType 
  to 
     typeImg : AADLBA!VirtualProcessorType (
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
-	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
-	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort'))->excluding(OclUndefined),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort'))->excluding(OclUndefined),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))->excluding(OclUndefined)
 	)
 }
 
@@ -129,11 +135,11 @@ rule m_Process_Type {
  	type : AADLI!ProcessType
  to 
  	typeImg : AADLBA!ProcessType (
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
-	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
-	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
-	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
-	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort'))->excluding(OclUndefined),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort'))->excluding(OclUndefined),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))->excluding(OclUndefined),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess'))->excluding(OclUndefined),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))->excluding(OclUndefined)
 	)
 }
 
@@ -143,11 +149,11 @@ rule m_ThreadGroup_Type {
  	type : AADLI!ThreadGroupType
  to 
  	typeImg : AADLBA!ThreadGroupType (
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
-	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
-	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
-	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
-	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort'))->excluding(OclUndefined),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort'))->excluding(OclUndefined),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))->excluding(OclUndefined),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess'))->excluding(OclUndefined),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))->excluding(OclUndefined)
 	)
 }
 
@@ -157,18 +163,18 @@ rule m_Thread_Type {
  	type : AADLI!ThreadType
  to 
  	typeImg : AADLBA!ThreadType (
-	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
-	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
-	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
-	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
-	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+	 ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort'))->excluding(OclUndefined),
+	 ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort'))->excluding(OclUndefined),
+	 ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))->excluding(OclUndefined),
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess'))->excluding(OclUndefined),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))->excluding(OclUndefined)
  	)
 }
 
 -- @extends m_Component_Type
 rule m_Subprogram_Type {
  from 
- 	type : AADLI!SubprogramType 
+ 	type : AADLI!SubprogramType
  to 
  	typeImg : AADLBA!SubprogramType (
 		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
@@ -180,7 +186,7 @@ rule m_Subprogram_Type {
 -- @extends m_Component_Type
 rule m_System_Type {
  from 
- 	type : AADLI!SystemType 
+ 	type : AADLI!SystemType
  to 
  	typeImg : AADLBA!SystemType (
  		name <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
@@ -188,11 +194,11 @@ rule m_System_Type {
 				else
 				thisModule.theHOOK.getOutputPackageName()
 				endif,
-		ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort')),
-		ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort')),
-		ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort')),
-		ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
-		ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess')),
+		ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort'))->excluding(OclUndefined),
+		ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort'))->excluding(OclUndefined),
+		ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))->excluding(OclUndefined),
+		ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess'))->excluding(OclUndefined),
+		ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))->excluding(OclUndefined),
 		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
 	)
 }
@@ -200,7 +206,7 @@ rule m_System_Type {
 -- @extends m_Component_Type
 rule m_Data_Type {
  from 
-   type : AADLI!DataType 
+   type : AADLI!DataType
  to 
    typeImg : AADLBA!DataType 
    (
