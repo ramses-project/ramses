@@ -21,7 +21,7 @@
 
 package common_pkg
 public
-with ARINC653,POK,RAMSES_processors,Data_Model;
+with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
 
   --------------------------------------------------
   --- PROCESSOR COMPONENTS
@@ -65,6 +65,23 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     POK::Ports_Flush_Time => Partition_Slot_Switch;
   end cpu.two_partitions;
 
+  processor connected_cpu extends cpu
+  features
+    bus_access: requires bus access RAMSES_buses::rtl8029;
+  end connected_cpu;
+
+  processor implementation connected_cpu.with_system_partition
+  subcomponents
+    the_part:  virtual processor part;
+    system_part:  virtual processor part;
+  properties
+    ARINC653::System_Partition => true applies to system_part;
+    ARINC653::Module_Major_Frame => 2000 ms;
+    POK::Scheduler => static;
+    ARINC653::Partition_Slots => (1000 ms, 1000 ms);
+    ARINC653::Slots_Allocation => (reference (the_part), reference (system_part));
+    POK::Ports_Flush_Time => Partition_Slot_Switch;
+  end connected_cpu.with_system_partition;
   --------------------------------------------------
   --- VIRTUAL PROCESSOR COMPONENTS
   --------------------------------------------------
@@ -74,6 +91,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     ARINC653::Partition_Identifier => 1;
     POK::Additional_Features => (libc_stdio, console);
     POK::Scheduler => RR;
+    Period => 1000 Ms;
     ARINC653::HM_Error_ID_Actions => (
     	[ErrorIdentifier => 3; Description => "Restart process"; Action => "Cold_Restart";],
     	[ErrorIdentifier => 4; Description => "Warm partition restart"; Action => "Warm_Restart";]
