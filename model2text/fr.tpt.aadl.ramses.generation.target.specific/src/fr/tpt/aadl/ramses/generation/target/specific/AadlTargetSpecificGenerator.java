@@ -245,10 +245,10 @@ public class AadlTargetSpecificGenerator implements Generator
     String targetId = config.getTargetId();
     File outputDir = config.getRamsesOutputDir();
     File runtimeDir = config.getRuntimePath(); 
-
+    ResourceSet resourceSet = currentImplResource.getResourceSet();
     if(_analysisResults == null)
       _analysisResults = AnalysisUtils.createNewAnalysisArtifact(
-                                                                 currentImplResource.getResourceSet(),
+                                                                 resourceSet,
                                                                  outputDir.getAbsolutePath() +
                                                                  File.pathSeparator+
                                                                  systemInstance.getName() +
@@ -904,6 +904,7 @@ public class AadlTargetSpecificGenerator implements Generator
     Resource result = _targetTrans.transformWokflow(r, transformationId, resourceFileNameList, 
                                                     config.getRamsesOutputDir(), outputModelId, monitor);
 
+    systemToInstantiate = outputModelId + ".impl" ;
     PropertiesLinkingService pls = new PropertiesLinkingService ();
     SystemImplementation si = (SystemImplementation) pls.
         findNamedElementInsideAadlPackage(systemToInstantiate, 
