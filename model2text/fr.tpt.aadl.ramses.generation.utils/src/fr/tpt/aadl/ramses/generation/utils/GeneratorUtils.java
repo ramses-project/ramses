@@ -38,7 +38,6 @@ import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.ListValue ;
-import org.osate.aadl2.MemorySubcomponent ;
 import org.osate.aadl2.ModalPropertyValue ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Parameter ;
@@ -68,7 +67,6 @@ public class GeneratorUtils
 {
   private static Logger _LOGGER = Logger.getLogger(GeneratorUtils.class) ;
   
-  @SuppressWarnings("unused")
   public static String getInitialValue(NamedElement e, String language)
   {
     StringBuilder initialization = new StringBuilder() ;
@@ -76,62 +74,35 @@ public class GeneratorUtils
     if(e instanceof Data)
     {
       Data d = (Data) e ;
-      TypeHolder dataTypeHolder ;
-
-      try
+      if(d instanceof DataSubcomponent)
       {
-        if(d instanceof DataSubcomponent)
+        DataSubcomponent ds = (DataSubcomponent) d ;
+        for(PropertyAssociation pa : ds.getOwnedPropertyAssociations())
         {
-          DataSubcomponent ds = (DataSubcomponent) d ;
+          Property p = pa.getProperty() ;
 
-          for(PropertyAssociation pa : ds.getOwnedPropertyAssociations())
+          // Sometime, properties don't have name.
+          if(p.getName() != null &&
+              p.getName()
+              .equalsIgnoreCase(DataModelProperties.INITIAL_VALUE))
           {
-            Property p = pa.getProperty() ;
-
-            // Sometime, properties don't have name.
-            if(p.getName() != null &&
-                  p.getName()
-                        .equalsIgnoreCase(DataModelProperties.INITIAL_VALUE))
-            {
-              setInitialization(ds, initialization, PropertyUtils
-                                      .getPropertyExpression(pa), language) ;
-              return initialization.toString() ;
-            }
+            setInitialization(ds, initialization, PropertyUtils
+                              .getPropertyExpression(pa), language) ;
+            return initialization.toString() ;
           }
-
-          return getInitialValue(ds.getClassifier(), language) ;
-        }
-        else if(d instanceof DataClassifier)
-        {
-          DataClassifier dc = (DataClassifier) d ;
-          
-          EList<PropertyExpression> initialValueProperty =
-                PropertyUtils
-                      .getPropertyExpression(dc,
-                                             DataModelProperties.INITIAL_VALUE) ;
-          setInitialization(dc, initialization, initialValueProperty, language) ;
-//          String ret = "";
-          
-//          if (language.equalsIgnoreCase("java"))
-//          {
-//        	if (AadlBaUtils.getDataRepresentation(dc) == DataRepresentation.ENUM)	
-//        	{
-//              	ret += dc.getQualifiedName() + "_";
-//
-//        	}  
-//          }
-          
-          return initialization.toString() ;
-//          return ret;
         }
 
-        dataTypeHolder = AadlBaUtils.getTypeHolder(d) ;
+        return getInitialValue(ds.getClassifier(), language) ;
       }
-      catch(DimensionException ex)
+      else if(d instanceof DataClassifier)
       {
-        String errMsg = "fail to fetch the initial value of " +  e.getName();
-        _LOGGER.error(errMsg, ex);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        DataClassifier dc = (DataClassifier) d ;
+        EList<PropertyExpression> initialValueProperty =
+            PropertyUtils
+            .getPropertyExpression(dc,
+                                   DataModelProperties.INITIAL_VALUE) ;
+        setInitialization(dc, initialization, initialValueProperty, language) ;
+        return initialization.toString() ;
       }
     }
     else if(e instanceof Port)
@@ -142,7 +113,6 @@ public class GeneratorUtils
     {
     
     }
-
     return initialization.toString() ;
   }
 
@@ -220,6 +190,28 @@ public class GeneratorUtils
                                         List<PropertyExpression> initialValues,
                                         String language)
   {
+    boolean isStringType = false;
+    DataClassifier dc;
+    if(obj instanceof DataSubcomponent)
+    {
+      DataSubcomponent ds = (DataSubcomponent) obj;
+      dc = (DataClassifier) ds.getDataSubcomponentType();
+    }
+    else
+      dc=(DataClassifier) obj;
+    
+    try
+    {
+      TypeHolder dataTypeHolder = AadlBaUtils.getTypeHolder(dc);
+      isStringType=dataTypeHolder.dataRep.equals(DataRepresentation.STRING);
+    }
+    catch(DimensionException ex)
+    {
+      String errMsg = "fail to fetch the initial value of " +  obj.getName();
+      _LOGGER.error(errMsg, ex);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+    }
+
     for(PropertyExpression pe : initialValues)
     {
       if(pe instanceof ListValue)
@@ -235,6 +227,9 @@ public class GeneratorUtils
             initialization.append(" = ") ;
         }
 
+        if(isStringType && false==initialization.toString().startsWith("\""))
+          initialization.append("\"");
+        
         if(initValueList.size() > 1)
         {
           if(language.equals("ada"))
@@ -275,10 +270,13 @@ public class GeneratorUtils
         if(initValueList.size() > 1)
         {
           if(language.equals("ada"))
-            initialization.append("{") ;
+            initialization.append(")") ;
           else
           	initialization.append("}") ;
         }
+        if(isStringType && false==initialization.toString().endsWith("\""))
+          initialization.append("\"");
+
       }
     }
   }
