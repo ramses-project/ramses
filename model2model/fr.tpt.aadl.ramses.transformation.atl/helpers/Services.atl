@@ -170,6 +170,19 @@ helper context AADLBA!SubprogramImplementation def: getOrderedFeature() : Sequen
 helper context AADLBA!ComponentImplementation def: getComponentType(): AADLBA!ComponentType = 
 	self.type;
 
+helper context AADLI!SubcomponentType def : getBA() : AADLBA!BehaviorAnnex = 
+	let as: AADLI!AnnexSubclause = self.ownedAnnexSubclause->any(e | e.name='behavior_specification') in
+	if(as.oclIsKindOf(AADLBA!BehaviorAnnex)) then
+		as
+	else 
+		if(not as.oclIsUndefined()) then
+			as.parsedAnnexSubclause
+		else
+			OclUndefined
+		endif
+	endif
+;
+
 helper context AADLBA!SubprogramSubcomponentType def: getSubprogramType() : AADLBA!SubprogramType = 
 	if(self.oclIsKindOf(AADLBA!SubprogramType)) then
 		self
@@ -250,6 +263,20 @@ helper context AADLI!ComponentInstance def : getProcess(): AADLI!ComponentInstan
 	endif
 ;
 
+
+helper context AADLI!InstanceObject def: getRemoteConnections():  Sequence(AADLI!ConnectionInstance) =
+	AADLI!ConnectionInstance.allInstancesFrom('IN')->select(f |
+    	self.isPartOf(f) and f.isRemoteConnection())
+;
+
+helper context AADLI!ConnectionInstance def: isRemoteConnection() : Boolean =
+	not self.isIntraProcessorConnection()
+;
+
+helper context AADLI!InstanceObject def: isIntraProcessorConnection() : Boolean =
+	self.source.getProcess().getProcessorBinding()->first()=self.destination.getProcess().getProcessorBinding()->first()
+;
+	
 helper context AADLI!NamedElement def: getPeriodValue(): Integer =
 	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('Period') in
 	if(mpv.oclIsUndefined()) then
@@ -322,6 +349,10 @@ helper context AADLI!ComponentInstance def: getPeriod() : Integer =
 	self.getModalPropertyValue('Period').ownedValue.value
 ;
 
+helper context AADLI!ComponentInstance def: getPeriodUnit(): AADLI!UnitLiteral =
+	self.getModalPropertyValue('Period').ownedValue.unit
+;
+	
 helper context AADLI!ComponentInstance def: getDeadline() : Integer = 
 	-- should call java code (PropertyUtils class) instead
 	if(self.getModalPropertyValue('Deadline').oclIsUndefined()) then
@@ -344,9 +375,25 @@ helper context AADLI!Connection def : uniqueName(): String =
 	endif
 ;
 
-helper context AADLI!ComponentInstance def : getProcessorBinding() : Sequence(AADLI!ComponentInstance) =
+helper context AADLI!ComponentInstance def : getActualProcessorBinding()  : Sequence(AADLI!ComponentInstance) =
 	self.ownedPropertyAssociation->any(e | e.property.name = 'Actual_Processor_Binding').ownedValue->first().ownedValue.ownedListElement
 	->collect(e|e.referencedInstanceObject)
+;
+	
+helper context AADLI!ComponentInstance def : getProcessorBinding() : Sequence(AADLI!ComponentInstance) =
+	self.getActualProcessorBinding()->collect(e|e.getProcessorContainer())
+;
+
+helper context AADLI!ComponentInstance def: getProcessorContainer() : AADLI!ComponentInstance =
+	if self.category=#processor then
+		self
+	else
+		if self.eContainer().oclIsUndefined() then
+			OclUndefined
+		else
+			self.eContainer().getProcessorContainer()
+		endif
+	endif
 ;
 
 helper context AADLI!FeatureInstance def: getInputMessagePortId(): Integer = 
@@ -387,10 +434,15 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 	Sequence{}
 ;
 
-helper def: collectPeriodicDelayed_ThreadVariables(c: AADLI!ComponentInstance, behavior: Sequence(AADLI!SubprogramCallSequence)): Sequence(AADLBA!DataSubcomponent)=
+helper def: collectPeriodicDelayed_ThreadVariables(c: AADLI!ComponentInstance): Sequence(AADLBA!DataSubcomponent)=
 	Sequence{}
 ;
 
 helper def: collectInitCallSequence(c: AADLI!ComponentInstance): AADLBA!SubprogramCallSequence =
-	OclUndefined
+	let mpv: AADLBA!ModalPropertyValue = c.getModalPropertyValue('Initialize_Entrypoint_Call_Sequence') in
+	if(mpv.oclIsUndefined()) then
+		OclUndefined
+	else
+		mpv.ownedValue.containmentPathElement->first().namedElement
+	endif
 ;
