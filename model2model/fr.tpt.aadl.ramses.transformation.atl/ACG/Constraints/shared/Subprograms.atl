@@ -55,6 +55,12 @@ helper context AADLI!SubprogramCall def: hasSourceCode(): Boolean =
 	self.hasBehaviorAnnex()
 	or
 	self.referenceSourceCode()
+	or
+		if(self.ownedExtension.oclIsUndefined()) then
+			false
+		else
+			self.ownedExtension.extended.hasSourceCode()
+		endif
 ;
 
 helper context AADLI!SubprogramCall def: referenceSourceCode() : Boolean =

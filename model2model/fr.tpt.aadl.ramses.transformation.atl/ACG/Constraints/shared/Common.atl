@@ -41,3 +41,9 @@ helper context AADLI!NamedElement def : hasProperty(propertyName: String) : Bool
 				e | e.property.name.toLower() = propertyName.toLower()
 				)
 ;
+
+helper context AADLI!NamedElement def : hasPropertyAssigned(p: AADLI!Property): Boolean =
+	self.ownedPropertyAssociation->exists(
+				e | e.property = p
+				)
+;
