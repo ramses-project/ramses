@@ -117,7 +117,7 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
             unparserContent.addOutput("\t$(MAKE) -C " + 
             		aProcessorSubcomponent.getName() + " run " +
             		"QEMU_MISC=\"-nographic -serial /dev/stdout > " +
-            		aProcessorSubcomponent.getName()+".trace\"") ;
+            		aProcessorSubcomponent.getName()+".trace\"\n") ;
           }
         
         return DONE ;
