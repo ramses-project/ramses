@@ -113,8 +113,8 @@ abstract rule m_Feature_Instance
 	to
 		f: AADLBA!Feature
 		(
-			name <- fi.feature.debug('  copy feature instance').name--,
-			--ownedPropertyAssociation <- fi.collectSelfPropertyAssociationImg()
+			name <- fi.feature.name,
+			ownedPropertyAssociation <- fi.collectSelfPropertyAssociationImg()
 		)
 	do
 	{
@@ -169,6 +169,19 @@ rule m_DataAccess_Instance
 		f: AADLBA!DataAccess
 		(
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+			kind <- fi.feature.kind
+		)
+}
+
+-- @extends m_Feature_Instance
+rule m_BusAccess_Instance
+{
+	from
+		fi: AADLI!FeatureInstance (fi.category=#busAccess)
+	to
+		f: AADLBA!BusAccess
+		(
+			busFeatureClassifier <- fi.feature.busFeatureClassifier,
 			kind <- fi.feature.kind
 		)
 }
