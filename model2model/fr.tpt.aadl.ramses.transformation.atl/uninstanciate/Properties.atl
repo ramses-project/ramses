@@ -596,7 +596,6 @@ lazy rule ModalPropertyValueRule {
 --			NamedValue
 --			StringLiteral
 
-
 helper context AADLI!ListValue def: PropertyExpression() : AADLBA!ListValue =
 	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression())
 						->select(e| not e.oclIsUndefined()) in 
@@ -649,24 +648,20 @@ lazy rule BooleanLiteral {
 	do { l2; }
 }
 
---helper context AADLI!ClassifierValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ClassifierValue =
---	if(referencesOnly)then
---		OclUndefined
---	else
---		thisModule.ClassifierValue(self)
---	endif
---;
---
---lazy rule ClassifierValue {
---	from
---		l : AADLI!ClassifierValue
---	to
---		l2 : AADLBA!ClassifierValue(classifier <- l.classifier.resolve())
---	do 
---	{
---		l2; 
---	}
---}
+helper context AADLI!ClassifierValue def: PropertyExpression() : AADLBA!ClassifierValue =
+	thisModule.ClassifierValue(self)
+;
+
+lazy rule ClassifierValue {
+	from
+		l : AADLI!ClassifierValue
+	to
+		l2 : AADLBA!ClassifierValue(classifier <- l.classifier)
+	do 
+	{
+		l2; 
+	}
+}
 
 
 --helper context AADLI!ComputedValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ComputedValue =
