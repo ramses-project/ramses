@@ -1,0 +1,458 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+-- TODO: Inout ports missing
+
+module rtl8029_driver;
+
+create OUT: AADLBA from IN: AADLI;
+
+helper def: RTL8029_DRIVER: String = 'rtl8029_driver';
+
+
+abstract rule m_Process_Port_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+	(fi.isProcessPort()
+		and
+	not fi.getRemoteConnections()->isEmpty()
+	)
+  to
+    f_mirror: AADLBA!Port
+	(name <- fi.name),
+	call_comm: AADLBA!SubprogramCall
+	(name <- fi.getProcess().name+'_'+fi.name+'_comCall')
+}
+
+unique lazy abstract rule a_createRemoteSendSubprogram
+{
+	from
+		fi: AADLI!FeatureInstance
+	using
+	{
+		createVirtualPortSpg: AADLBA!SubprogramType = 
+			'pok_port_virtual_create'.asSubprogramType('RTL8029_DRIVER');
+	}
+	to
+		spgType: AADLBA!SubprogramType,
+		createPokVirtualPort: AADLBA!SubprogramCall
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_createVirtualPort',
+			calledSubprogram <- createVirtualPortSpg
+		),
+		createVirtualPortCnx1: AADLBA!ParameterConnection
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_createVirtualPortCnx',
+			source <-sourceCE1,
+			destination <-destCE1
+		),
+		sourceCE1: AADLBA!ConnectedElement
+		(
+			connectionEnd <- createVirtualPortSpg.ownedParameter->first(),
+			context <- createPokVirtualPort
+		),
+		destCE1: AADLBA!ConnectedElement
+		(
+			connectionEnd <- portIdString
+		),
+		-- in parameter String: name of port in pok
+		portIdString: AADLBA!DataSubcomponent
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_createVirtualPortName',
+			dataSubcomponentType <- 'String'.asDataType('BASE_TYPES')
+		),
+		initName: AADLBA!DataSubcomponent
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_createVirtualPortName',
+			dataSubcomponentType <- 'String'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Initial_Value', 'DATA_MODEL', lvInit)}
+		),
+		lvInit: AADLBA!ListValue
+		(ownedListElement <- Sequence {stringInitValue}),
+		stringInitValue: AADLBA!StringLiteral
+		(
+			value <- fi.getProcess().name+'_'+fi.name
+		),
+		createVirtualPortCnx2: AADLBA!ParameterConnection
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_createVirtualPortCnx2',
+			source <-sourceCE2,
+			destination <-destCE2
+		),
+		sourceCE2: AADLBA!ConnectedElement
+		(
+			connectionEnd <- createVirtualPortSpg.ownedParameter->at(2),
+			context <- createPokVirtualPort
+		),
+		destCE2: AADLBA!ConnectedElement
+		(
+			connectionEnd <- portIdInt
+		),
+		-- int for id, add pok_property for init
+		portIdInt: AADLBA!DataSubcomponent
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_createVirtualPortId',
+			dataSubcomponentType <- 'Unsigned_8'.asDataType('BASE_TYPES')
+		),
+		-- int for length; add property legngth of (port ref)
+		-- change next step accordingly (to reuse this length data)
+		length: AADLBA!DataSubcomponent
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_length',
+			dataSubcomponentType <- 'Unsigned_32'.asDataType('BASE_TYPES')
+		),
+		rvDataSubcomponent: AADLBA!ReferenceValue
+		(containmentPathElement <- Sequence{cpeDataSubcomponent}),
+		cpeDataSubcomponent: AADLBA!ContainmentPathElement
+		(
+			namedElement <- length
+		),
+		cnx_comm1: AADLBA!ParameterConnection
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_comConnection',
+			source <- sourceCEComm1,
+			destination <- destCECommData
+		),
+		sourceCEComm1: AADLBA!ConnectedElement
+		(
+			connectionEnd <- fi
+		),
+		destCECommData: AADLBA!ConnectedElement
+		(
+   			context <- thisModule.resolveTemp(fi, 'call_comm')
+		),
+		cnx_comm2: AADLBA!ParameterConnection
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_comConnectionLength',
+			source <- sourceCEComm2,
+			destination <- destCECommLength
+		),
+		sourceCEComm2: AADLBA!ConnectedElement
+		(
+			connectionEnd <- length
+		),
+		destCECommLength: AADLBA!ConnectedElement
+		(
+   			context <- thisModule.resolveTemp(fi, 'call_comm')
+		),
+		cnx_comm3: AADLBA!ParameterConnection
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_comConnectionPortId',
+			source <- sourceCEComm3,
+			destination <- destCECommPortId
+		),
+		sourceCEComm3: AADLBA!ConnectedElement
+		(
+			connectionEnd <- portIdInt
+		),
+		destCECommPortId: AADLBA!ConnectedElement
+		(
+   			context <- thisModule.resolveTemp(fi, 'call_comm')
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'Base_Types'.toUpper(), 'Base_Types');
+		thisModule.addImportedUnit(thisModule.public(), 'RAMSES'.toUpper(), 'RAMSES');
+	}
+}
+
+-- @extends a_createRemoteSendSubprogram
+unique lazy rule createRemoteSendSubprogram
+{
+	from
+		fi: AADLI!FeatureInstance
+	using
+	{
+		writePrototypeSpg: AADLI!SubprogramType = 
+			'rtl8029_write'.asSubprogramType('RTL8029_DRIVER');
+	}
+	to
+		spgType: AADLBA!SubprogramType
+		( 
+			name <- fi.getProcess().name+'_'+fi.name+'_comSendSpg',
+			ownedExtension <- extendedWriteSpg,
+   			ownedPrototypeBinding <- Sequence {prototypeBinding},
+			ownedParameter <- Sequence{valueValueParam}
+		),
+		valueValueParam : AADLBA!Parameter (
+   			name <- 'input_data',
+   			refined <- writePrototypeSpg.ownedParameter->any(e |
+    			e.name = 'input_data'
+   			),
+   			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+			direction <- writePrototypeSpg.ownedParameter->any(e |
+    			e.name = 'input_data'
+   			).direction
+  		),
+		extendedWriteSpg : AADLBA!TypeExtension (
+  			extended <- writePrototypeSpg
+  		),
+		prototypeBinding : AADLBA!ComponentPrototypeBinding (
+  			formal <- writePrototypeSpg.ownedPrototype->any(e |
+    			e.name = 'data_type'
+   			),
+   			actual <- Sequence {thisModule.CreateDataComponentPrototypeActual(fi.feature.dataFeatureClassifier)}
+  		),
+		destCECommData: AADLBA!ConnectedElement
+		(
+			connectionEnd <- writePrototypeSpg.ownedParameter->at(2)
+		),
+		destCECommLength: AADLBA!ConnectedElement
+		(
+			connectionEnd <- writePrototypeSpg.ownedParameter->at(3)
+		),
+		destCECommPortId: AADLBA!ConnectedElement
+		(
+			connectionEnd <- writePrototypeSpg.ownedParameter->at(1)
+		)
+	do
+	{
+		spgType;
+	}
+}
+
+-- @extends a_createRemoteSendSubprogram
+unique lazy rule createRemoteReceiveSubprogram
+{
+	from
+		fi: AADLI!FeatureInstance
+	using
+	{
+		readPrototypeSpg: AADLI!SubprogramType = 
+			'rtl8029_read'.asSubprogramType('RTL8029_DRIVER');
+	}
+	to
+		spgType: AADLBA!SubprogramType
+		( 
+			name <- fi.getProcess().name+'_'+fi.name+'_comReceiveSpg',
+			ownedExtension <- extendedReadSpg,
+   			ownedPrototypeBinding <- Sequence {prototypeBinding},
+			ownedParameter <- Sequence{valueValueParam}
+		),
+		valueValueParam : AADLBA!Parameter (
+   			name <- 'input_data',
+   			refined <- readPrototypeSpg.ownedParameter->any(e |
+    			e.name = 'input_data'
+   			),
+   			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+			direction <- readPrototypeSpg.ownedParameter->any(e |
+    			e.name = 'input_data'
+   			).direction
+  		),
+		extendedReadSpg : AADLBA!TypeExtension (
+  			extended <- readPrototypeSpg
+  		),
+		prototypeBinding : AADLBA!ComponentPrototypeBinding (
+  			formal <- readPrototypeSpg.ownedPrototype->any(e |
+    			e.name = 'data_type'
+   			),
+   			actual <- Sequence {thisModule.CreateDataComponentPrototypeActual(fi.feature.dataFeatureClassifier)}
+  		),
+		destCECommData: AADLBA!ConnectedElement
+		(
+			connectionEnd <- readPrototypeSpg.ownedParameter->at(2)
+		),
+		destCECommLength: AADLBA!ConnectedElement
+		(
+			connectionEnd <- readPrototypeSpg.ownedParameter->at(3)
+		),
+		destCECommPortId: AADLBA!ConnectedElement
+		(
+			connectionEnd <- readPrototypeSpg.ownedParameter->at(1)
+		)
+	do
+	{
+		spgType;
+	}
+}
+
+-- @extends m_ConfigureSystemPartitionForCommunications
+rule m_ConfigureSystemPartitionForCommunications_rtl8029
+{
+	from
+		c: AADLI!ComponentInstance
+	using
+	{
+		featureInstanceList : Sequence(AADLI!FeatureInstance)
+			= c.getProcessorContainer().getRemotelyConnectedFeatures();
+	}
+	to
+		sub : AADLBA!VirtualProcessorSubcomponent,
+		comThreadSub: AADLBA!ThreadSubcomponent,
+		process_commImpl: AADLBA!ProcessImplementation
+		(
+			ownedThreadSubcomponent <- Sequence{comThreadSub,pollThreadSub}
+		),
+		pollThreadType: AADLBA!ThreadType
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_pollTask'
+		),
+		pollThreadImpl: AADLBA!ThreadImplementation
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_pollTask.impl',
+			ownedRealization <- thisModule.Realization(pollThreadType),
+			ownedSubprogramCallSequence <- Sequence{callSeq, callSeqInit}	
+		),
+		pollThreadSub: AADLBA!ThreadSubcomponent
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_comm',
+			threadSubcomponentType <- pollThreadImpl,
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Period', 'TIMING_PROPERTIES', pollPeriod),
+												thisModule.CreatePropertyAssociation ('Priority', 'THREAD_PROPERTIES', pollPrio),
+												thisModule.CreatePropertyAssociation ('Compute_Entrypoint_Call_Sequence', 'PROGRAMMING_PROPERTIES', rv),
+												thisModule.CreatePropertyAssociation ('Initialize_Entrypoint_Call_Sequence', 'PROGRAMMING_PROPERTIES', rvInit),
+												thisModule.CreatePropertyAssociation ('Dispatch_Protocol', 'THREAD_PROPERTIES', 'Periodic'.asEnumeration('AADL_PROJECT').asNamedValue())
+												}
+		),
+		rv: AADLBA!ReferenceValue
+		(containmentPathElement <- Sequence{cpe}),
+		cpe: AADLBA!ContainmentPathElement
+		(
+			namedElement <- callSeq
+		),
+		pollPrio: AADLBA!IntegerLiteral
+		(
+			value <- 10.longValue()
+		),
+		pollPeriod: AADLBA!IntegerLiteral
+		(
+			value <- c.getPeriod(),
+		 	unit <- thisModule.UnitLiteral(c.getPeriodUnit())
+		),
+		callSeq: AADLBA!SubprogramCallSequence
+		(
+			name <- c.name+'_pollCallSequence',
+			ownedSubprogramCall <- Sequence{call_poll}
+		),
+		call_poll: AADLBA!SubprogramCall
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_pollCall',
+			calledSubprogram <- 'rtl8029_polling'.asSubprogramType('RTL8029_DRIVER')
+		),
+		
+		rvInit: AADLBA!ReferenceValue
+		(containmentPathElement <- Sequence{cpeInit}),
+		cpeInit: AADLBA!ContainmentPathElement
+		(
+			namedElement <- callSeqInit
+		),
+		callSeqInit: AADLBA!SubprogramCallSequence
+	    (
+			name <- c.name+'_initPollCallSequence',
+			ownedSubprogramCall <- Sequence{call_init}
+		),
+		call_init: AADLBA!SubprogramCall
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_initCall',
+			calledSubprogram <- 'rtl8029_init'.asSubprogramType('RTL8029_DRIVER')
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), thisModule.RTL8029_DRIVER.toUpper(), thisModule.RTL8029_DRIVER);
+	}
+}
+
+-- @extends m_Processor_With_Remote_Connection
+rule m_Processor_With_Remote_Connection_rtl8029
+{
+  from
+    c: AADLI!ComponentInstance
+  using
+  {
+    featureInstanceList : Sequence(AADLI!FeatureInstance)
+		= c.getRemotelyConnectedFeatures();
+	virtualProcessorInstance: Sequence(AADLI!ComponentInstance)
+		= c.componentInstance->select(e|e.category.getName='virtual processor');
+  }
+  to
+    sub : AADLBA!ProcessorSubcomponent,
+    comThreadImpl: AADLBA!ThreadImplementation
+	(
+		ownedDataSubcomponent <- 	featureInstanceList->collect(e|Sequence{
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'portIdInt'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'initName'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'length'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'portIdInt'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'initName'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'length')
+															})->flatten()->excluding(OclUndefined),
+		ownedParameterConnection <-  featureInstanceList->collect(e|Sequence{
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'createVirtualPortCnx1'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'createVirtualPortCnx2'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'createVirtualPortCnx1'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'createVirtualPortCnx2'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'cnx_comm1'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'cnx_comm1'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'cnx_comm2'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'cnx_comm2'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteSendSubprogram', 'cnx_comm3'),
+															thisModule.resolveLazySingleIfExists(e,'createRemoteReceiveSubprogram', 'cnx_comm3')
+															})->flatten()->excluding(OclUndefined),
+		ownedSubprogramCallSequence <- Sequence{callSeq,callSeqInit},
+		ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Compute_Entrypoint_Call_Sequence', 'PROGRAMMING_PROPERTIES', rv),
+			thisModule.CreatePropertyAssociation ('Initialize_Entrypoint_Call_Sequence', 'PROGRAMMING_PROPERTIES', rvInit),
+			thisModule.CreatePropertyAssociation ('Dispatch_Protocol', 'THREAD_PROPERTIES', 'Periodic'.asEnumeration('AADL_PROJECT').asNamedValue())
+			}
+		->union(
+			featureInstanceList->collect(e|
+				let rv: AADLBA!ReferenceValue = thisModule.resolveLazySingleIfExists(e, 'createRemoteReceiveSubprogram', 'rvDataSubcomponent') in
+				if not rv.oclIsUndefined() then
+					thisModule.CreatePropertyAssociationAppliesTo ('length_data_subcomponent', 'RAMSES',rv, thisModule.createContainedNamedElement(thisModule.resolveTemp(e, 'f_mirror')))
+				else
+					OclUndefined
+				endif
+			)
+		)
+		->union(
+			featureInstanceList->collect(e|
+				let rv: AADLBA!ReferenceValue = thisModule.resolveLazySingleIfExists(e, 'createRemoteSendSubprogram', 'rvDataSubcomponent') in
+				if not rv.oclIsUndefined() then
+					thisModule.CreatePropertyAssociationAppliesTo ('length_data_subcomponent', 'RAMSES',rv, thisModule.createContainedNamedElement(thisModule.resolveTemp(e, 'f_mirror')))
+				else
+					OclUndefined
+				endif
+			)
+		)->excluding(OclUndefined)
+	),
+	callSeq: AADLBA!SubprogramCallSequence,
+	rv: AADLBA!ReferenceValue,
+	
+	callSeqInit: AADLBA!SubprogramCallSequence
+	(
+		name <- c.name+'_initCallSequence',
+		ownedSubprogramCall <- featureInstanceList
+									->collect(e| Sequence{thisModule.resolveLazySingleIfExists(e, 'createRemoteReceiveSubprogram', 'createPokVirtualPort'),
+										thisModule.resolveLazySingleIfExists(e, 'createRemoteSendSubprogram', 'createPokVirtualPort')
+										})
+									->flatten()
+									->excluding(OclUndefined)
+	),
+	rvInit: AADLBA!ReferenceValue
+	(containmentPathElement <- Sequence{cpeInit}),
+	cpeInit: AADLBA!ContainmentPathElement
+	(
+		namedElement <- callSeqInit
+	)
+}

@@ -1,0 +1,241 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+-- TODO: Inout ports missing
+
+module RemoteConnectionsCommonRefinementSteps;
+
+create OUT: AADLBA from IN: AADLI;
+
+
+helper context AADLI!ComponentInstance def: getRemotelyConnectedFeatures(): Sequence(AADLI!FeatureInstance) =
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(proc|
+			proc.category=#process and proc.getProcessorBinding()->includes(self))
+			->collect(p|p.featureInstance)->flatten()
+			->select(e|
+    			  not e.getRemoteConnections()->isEmpty()
+    			)
+;
+
+unique lazy abstract rule createRemoteSendSubprogram
+{
+	from
+		fi: AADLI!FeatureInstance
+}
+
+unique lazy abstract rule createRemoteReceiveSubprogram
+{
+	from
+		fi: AADLI!FeatureInstance
+}
+
+-- @extends m_Processor_Instance
+rule m_Processor_With_Remote_Connection
+{
+  from
+    c: AADLI!ComponentInstance
+    (
+		not c.getRemotelyConnectedFeatures()->isEmpty()
+	)
+  using
+  {
+    featureInstanceList : Sequence(AADLI!FeatureInstance)
+		= c.getRemotelyConnectedFeatures();
+  }
+  to
+    sub : AADLBA!ProcessorSubcomponent,
+    comThreadType: AADLBA!ThreadType
+	(
+		name <- c.name+'_communicationTask',
+		ownedDataPort <- featureInstanceList->select(e|e.isDataPort())
+							->collect(e|thisModule.resolveTemp(e, 'f_mirror')),
+		ownedEventDataPort <- featureInstanceList->select(e|e.isEventDataPort())
+							->collect(e|thisModule.resolveTemp(e, 'f_mirror')),
+		ownedEventPort <- featureInstanceList->select(e|e.isEventPort())
+							->collect(e|thisModule.resolveTemp(e, 'f_mirror'))
+	),
+	comThreadImpl: AADLBA!ThreadImplementation
+	(
+		name <- c.name+'_communicationTask.impl',
+		ownedRealization <- thisModule.Realization(comThreadType),
+		ownedSubprogramCallSequence <- Sequence{callSeq},
+		ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Compute_Entrypoint_Call_Sequence', 'PROGRAMMING_PROPERTIES', rv)}
+	),
+	rv: AADLBA!ReferenceValue
+	(containmentPathElement <- Sequence{cpe}),
+	cpe: AADLBA!ContainmentPathElement
+	(
+		namedElement <- callSeq
+	),
+	callSeq: AADLBA!SubprogramCallSequence
+	(
+		name <- c.name+'_communicationCallSequence',
+		ownedSubprogramCall <- featureInstanceList->collect(e|thisModule.resolveTemp(e, 'call_comm'))
+	)
+}
+
+abstract rule m_Process_Port_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+	(fi.isProcessPort()
+		and
+	not fi.getRemoteConnections()->isEmpty()
+	)
+  to
+    f_mirror: AADLBA!Port
+	(name <- fi.name),
+	param_comm: AADLBA!Parameter
+	(
+		name <- fi.getProcess().name+'_'+fi.name+'_comParam',
+		dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+	),
+	call_comm: AADLBA!SubprogramCall
+	(name <- fi.getProcess().name+'_'+fi.name+'_comCall')
+	do
+	{
+		if(fi.direction.getName()='out')
+			thisModule.theHOOK.setDirection(param_comm, 'in');
+		else if(fi.direction.getName()='in')
+			thisModule.theHOOK.setDirection(param_comm, 'out');
+			
+	}
+}
+
+-- @extends m_Process_Port_Remote_Connection,m_DataPort_Instance
+rule m_Process_DataPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!DataPort
+	(dataFeatureClassifier <- fi.feature.dataFeatureClassifier)
+}
+
+-- @extends m_Process_Port_Remote_Connection,m_EventDataPort_Instance
+rule m_Process_EventDataPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f:AADLBA!EventDataPort,
+    f_mirror: AADLBA!EventDataPort
+	(dataFeatureClassifier <- fi.feature.dataFeatureClassifier)
+}
+
+-- @extends m_Process_Port_Remote_Connection,m_EventPort_Instance
+rule m_Process_EventPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!EventPort
+}
+
+-- @extends m_Process_Port_Remote_Connection
+abstract rule m_Process_OutputPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+	(fi.isOutputFeature())
+  to
+    f_mirror: AADLBA!Port,
+	call_comm: AADLBA!SubprogramCall
+	(
+		calledSubprogram <- thisModule.createRemoteSendSubprogram(fi)
+	)
+  do
+  {
+  	thisModule.theHOOK.setDirection(f_mirror, 'in');
+  }
+}
+
+-- @extends m_Process_Port_Remote_Connection
+abstract rule m_Process_InputPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+	(fi.isInputFeature())
+  to
+    f_mirror: AADLBA!Port
+	(direction <- #out),
+	call_comm: AADLBA!SubprogramCall
+	(
+		calledSubprogram <- thisModule.createRemoteReceiveSubprogram(fi)
+	)
+}
+
+-- @extends m_Process_InputPort_Remote_Connection, m_Process_EventPort_Remote_Connection
+rule m_Process_InEventPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!EventPort
+}
+
+-- @extends m_Process_InputPort_Remote_Connection, m_Process_EventDataPort_Remote_Connection
+rule m_Process_InEventDataPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!EventDataPort
+}
+
+-- @extends m_Process_InputPort_Remote_Connection, m_Process_DataPort_Remote_Connection
+rule m_Process_InDataPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!DataPort
+}
+
+-- @extends m_Process_OutputPort_Remote_Connection, m_Process_EventPort_Remote_Connection
+rule m_Process_OutEventPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!EventPort
+}
+
+-- @extends m_Process_OutputPort_Remote_Connection, m_Process_EventDataPort_Remote_Connection
+rule m_Process_OutEventDataPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!EventDataPort
+}
+
+-- @extends m_Process_OutputPort_Remote_Connection, m_Process_DataPort_Remote_Connection
+rule m_Process_OutDataPort_Remote_Connection
+{
+  from
+    fi: AADLI!FeatureInstance
+  to
+    f_mirror: AADLBA!DataPort
+}

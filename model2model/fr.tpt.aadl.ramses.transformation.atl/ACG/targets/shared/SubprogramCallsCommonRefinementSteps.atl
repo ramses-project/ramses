@@ -199,7 +199,7 @@ rule m_ThreadEntrypoint {
 											thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent=e.destination.connectionEnd), behavior, e},'featureImg'))
 										)
 								)
-								->flatten()
+								->flatten()->excluding(OclUndefined)
 			
 		),
 		entryPointImplImg: AADLBA!SubprogramImplementation
@@ -1251,6 +1251,7 @@ lazy rule populateParameterLabels
 	 	impl: AADLI!ThreadImplementation = c.subcomponent.classifier;
 		intermediateParameterLabelList: Sequence(AADLBA!ElementHolder) = Sequence{};
 		orderedFeatures: Sequence(AADLBA!Feature) = Sequence{};
+		d: AADLBA!DataSubcomponent = OclUndefined;
 	}
 	do
 	{
@@ -1286,7 +1287,9 @@ lazy rule populateParameterLabels
 					}
 					else if(cnx.destination.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(e|cnx.destination.connectionEnd = e.subcomponent), behavior, cnx}, 'featureImg')));
+						d <- thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(e|cnx.destination.connectionEnd = e.subcomponent), behavior, cnx}, 'featureImg');
+						if(not d.oclIsUndefined())
+							intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(d));
 					}
 					else if(cnx.destination.connectionEnd.oclIsKindOf(AADLI!Port))
 					{
@@ -1301,7 +1304,9 @@ lazy rule populateParameterLabels
 					}
 					else if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!DataSubcomponent))
 					{
-						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(e|cnx.source.connectionEnd = e), behavior, cnx}, 'featureImg')));
+						d <- thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(e|cnx.source.connectionEnd = e.subcomponent), behavior, cnx}, 'featureImg');
+						if(not d.oclIsUndefined())
+							intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateParameterHolder(d));
 					}
 					else if(cnx.source.connectionEnd.oclIsKindOf(AADLI!Port))
 					{
@@ -1369,7 +1374,7 @@ rule m_ComponentSubprogramCall {
   do
   {
   	intermediateParameterLabelList <- thisModule.populateParameterLabels(subprogramCall, behavior, c);
-  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList;	
+  	subprogramCallAction.parameterLabels <- intermediateParameterLabelList->excluding(OclUndefined);
   }
 }
 
@@ -1975,42 +1980,7 @@ unique lazy rule createSubprogramCallSequence {
 		)
 }
 
-unique lazy rule mapComputeEntrypoint
-{
-	from
-		implImg : AADLBA!ComponentImplementation,
-		c : AADLI!ComponentInstance,
-		impl : AADLI!ComponentImplementation
-	using
-	{
-		callImg : AADLBA!SubprogramCall = OclUndefined;
-		fi: AADLI!FeatureInstance = c.featureInstance->any(e|e.name = impl.type.ownedEventPort->first().name);
-		calledSubprogram: AADLBA!SubprogramClassifier = OclUndefined;
-		referencedSubprogram: AADLI!Subprogram = impl.behaviorFromComputeEntryPoint();
-	}
-	to
-		seq: AADLBA!SubprogramCallSequence(
-			name <- 'callSeq_'+referencedSubprogram.name
-		),
-		call : AADLBA!SubprogramCall (
-			name <- 'call_'+referencedSubprogram.name,
-			calledSubprogram <- referencedSubprogram
-		)
-	do
-	{
-		
---		if(not impl.type.ownedEventPort->first().getModalPropertyValue('Compute_Entrypoint').oclIsUndefined())
---		{
---			thisModule.addNextValueSubprogramCall(seq, impl, implImg, fi);
---		}
---		seq.ownedSubprogramCall->add(call);
---		if (referencedSubprogram.oclIsKindOf(AADLI!SubprogramType))
---			call.calledSubprogram <- thisModule.Type(OclUndefined,referencedSubprogram);
---		else if(referencedSubprogram.oclIsKindOf(AADLI!SubprogramImplementation))
---			call.calledSubprogram <- thisModule.Implementation(OclUndefined,referencedSubprogram, thisModule.Type(OclUndefined,referencedSubprogram.getOwnedRealization().implemented));
---		seq;
-	}
-}
+
 
 --rule mapInputParameterConnection(s2 : AADLBA!SubprogramCallSequence,
 --								 impl : AADLI!ComponentImplementation,

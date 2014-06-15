@@ -29,6 +29,36 @@ create
 from 
 	IN 				: AADLI;
 
+helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
+	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemImplementation)
+;
+
+helper context AADLI!ComponentType def: needsCopy(): Boolean =
+	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemType)
+;
+
+helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
+	if self.source.isThreadPort() and not self.destination.context.oclIsUndefined() then
+		not self.destination.context.eContainer().isComputeEntryPointOf(self.source.eContainer())
+	else 
+		if(self.destination.isThreadPort() and not self.source.context.oclIsUndefined()) then
+			not self.source.context.eContainer().isComputeEntryPointOf(self.destination.eContainer())
+		else
+			false
+		endif
+	endif
+;
+
+helper context AADLI!ComponentType def : isInstanciated() : Boolean =
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
+		->exists(e| e.subcomponent.subcomponentType=self or if e.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation) then e.subcomponent.subcomponentType.type=self else false endif)
+;
+
+helper context AADLI!ComponentImplementation def: isInstanciated() : Boolean =
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
+		->exists(e| e.subcomponent.subcomponentType=self)
+;
+
 
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
 	self.ownedPropertyAssociation->select(e | not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
@@ -276,6 +306,14 @@ rule m_create_Thread_BA
 			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
 												e.source.oclIsKindOf(AADLI!Parameter) and e.destination.oclIsKindOf(AADLI!Parameter))
 												->collect(e| thisModule.ParameterConnection(e))
+												->union(
+													impl.ownedParameterConnection->select (e| e.source.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.source.context.eContainer().isComputeEntryPointOf(c))
+													->collect(e| thisModule.ParameterConnection(e))
+												)
+												->union(
+													impl.ownedParameterConnection->select (e| e.destination.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.destination.context.eContainer().isComputeEntryPointOf(c))
+													->collect(e| thisModule.ParameterConnection(e))
+												)
 												->union
 												(
 													impl.ownedParameterConnection->select (e|
@@ -284,7 +322,7 @@ rule m_create_Thread_BA
 													->collect(e|
 														impl.ownedSubprogramCallSequence
 														->collect(callSequence|
-															thisModule.resolveMatchedTupleIfExists(Sequence{c.subcomponent->any(e|e.subcomponent = e.source.connectionEnd), callSequence, e}, 'parameterConnection')
+															thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent = e.source.connectionEnd), callSequence, e}, 'parameterConnection')
 														)
 													)
 												)

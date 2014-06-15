@@ -33,11 +33,12 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BasicPropertyAssociation ;
+import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.BooleanLiteral ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.DataPort ;
 import org.osate.aadl2.DataSubcomponent ;
-import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.DefaultAnnexSubclause ;
 import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.EnumerationLiteral ;
 import org.osate.aadl2.EventDataPort ;
@@ -59,6 +60,11 @@ import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.Subcomponent ;
+import org.osate.aadl2.Subprogram ;
+import org.osate.aadl2.SubprogramCall ;
+import org.osate.aadl2.SubprogramCallSequence ;
+import org.osate.aadl2.SubprogramImplementation ;
+import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
@@ -1204,6 +1210,38 @@ private void findCommunicationMechanism(ProcessImplementation process,
     mainHeaderCode
           .addOutputNewline("#define POK_NEEDS_MIDDLEWARE 1") ;
     
+    // The macro POK_NEEDS_PORTS_VIRTUAL is used to include functions definition
+    // create and use virtual ports (for remote communications for instance)
+    for(ThreadSubcomponent th : bindedThreads)
+    {
+      if(th.getSubcomponentType() instanceof BehavioredImplementation)
+      {
+        BehavioredImplementation bi = (BehavioredImplementation) th.getSubcomponentType();
+        if(usesOperation(bi, "pok_port_virtual_create"))
+        {
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_PORTS_VIRTUAL");
+          break;
+        }
+      }
+    }
+    
+    for(ThreadSubcomponent th : bindedThreads)
+    {
+      if(th.getSubcomponentType() instanceof BehavioredImplementation)
+      {
+        BehavioredImplementation bi = (BehavioredImplementation) th.getSubcomponentType();
+        if(usesOperation(bi, "rtl8029_init"))
+        {
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_RTL8029");
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_PCI 1");
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_IO 1");
+          if(_processorProp.hwAdress!=null)
+            mainHeaderCode.addOutputNewline("#define POK_HW_ADDR \""+_processorProp.hwAdress+"\"");
+          break;
+        }
+      }
+    }
+    
     /**** "#INCLUDE ****/
     
     mainHeaderCode.addOutputNewline("");
@@ -1621,7 +1659,11 @@ private void findCommunicationMechanism(ProcessImplementation process,
         // Nothing to do
       }
     }
-
+    
+    String hwAddr = PropertyUtils.getStringValue(processor, "Address");
+    if(hwAddr!=null && false==hwAddr.isEmpty())
+      _processorProp.hwAdress = hwAddr;
+    
     // TODO: the integer ID in this macro must be set carefully to respect the
     // routing table defined in deployment.c files in the generated code for a
     // partition.
@@ -1687,12 +1729,13 @@ private void findCommunicationMechanism(ProcessImplementation process,
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
     }
-    //  The maccro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
+    
+    //  The macro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
     //  the kernel.It comprises the tasks for the partition and the main task of 
     //  each partition that initialize all ressources.
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_THREADS " +
           Integer.toString(2 + bindedProcess.size() + bindedThreads.size())) ;
-    //  The maccro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of 
+    //  The macro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of 
     //  threads in each partition we also add an additional process that 
     //  initialize all partition's entities (communication, threads, ...)
     deploymentHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_NTHREADS {") ;
@@ -2102,6 +2145,69 @@ private void findCommunicationMechanism(ProcessImplementation process,
     
   }                                            
 
+  private boolean usesOperation(BehavioredImplementation bi, 
+                                String subprogramName)
+  {
+    for(SubprogramCallSequence scs: bi.getOwnedSubprogramCallSequences())
+    {
+      for(SubprogramCall sc: scs.getOwnedSubprogramCalls())
+      {
+        Subprogram s = (Subprogram) sc.getCalledSubprogram();
+        if(s.getName().equals(subprogramName))
+        {
+          return true;
+        }
+        else if(s instanceof SubprogramType)
+        {
+          SubprogramType st = (SubprogramType) s;
+          if(extendsSubprogramType(st,subprogramName))
+            return true;
+        }
+        else if(s instanceof SubprogramImplementation)
+        {
+          SubprogramImplementation si = (SubprogramImplementation) s;
+          if(extendsSubprogramImpl(si,subprogramName))
+            return true;
+        }
+        if(s instanceof BehavioredImplementation)
+          usesOperation((BehavioredImplementation) s, subprogramName);
+      }
+    }
+    return false;
+  }
+
+  private boolean extendsSubprogramType(SubprogramType st, 
+                                   String subprogramName)
+  {
+    if(st.getOwnedExtension()!=null)
+    {
+      SubprogramType parent = (SubprogramType) st.getOwnedExtension().getExtended();
+      if(parent.getName().equals(subprogramName))
+      {
+        return true;
+      }
+      else
+        return extendsSubprogramType(parent, subprogramName);
+    }
+    return false;
+  }
+  
+  private boolean extendsSubprogramImpl(SubprogramImplementation si, 
+                                        String subprogramName)
+  {
+    if(si.getOwnedExtension()!=null)
+    {
+      SubprogramImplementation parent = (SubprogramImplementation) si.getOwnedExtension().getExtended();
+      if(parent.getName().equals(subprogramName))
+      {
+        return true;
+      }
+      else
+        return extendsSubprogramImpl(parent, subprogramName);
+    }
+    return false;
+  }
+  
   protected void genDeploymentHeaderEnd(UnparseText deploymentHeaderCode){}
 
 @Override

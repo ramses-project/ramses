@@ -223,19 +223,6 @@ rule m_Output_Port_BehaviorAnnex
 	}
 }
 
-helper context AADLI!SubcomponentType def : getBA() : AADLBA!BehaviorAnnex = 
-	let as: AADLI!AnnexSubclause = self.ownedAnnexSubclause->any(e | e.name='behavior_specification') in
-	if(as.oclIsKindOf(AADLBA!BehaviorAnnex)) then
-		as
-	else 
-		if(not as.oclIsUndefined()) then
-			as.parsedAnnexSubclause
-		else
-			OclUndefined
-		endif
-	endif
-;
-
 -- @extends m_ThreadBehavior
 rule m_Compute_EntryPoint_from_BA {
  from 

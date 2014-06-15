@@ -22,7 +22,6 @@
 -- @atlcompiler emftvm
 
 -- TODO: make iteration_counter a global variable
--- TODO: remove CPRTable and CDWTable from SharedRules
 
 module EventDataPorts_LowMFP;
 

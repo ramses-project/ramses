@@ -56,7 +56,8 @@ public class PredefinedPropertiesManager
    "Deployment_Properties", "Memory_Properties", "Modeling_Properties",
    "Programming_Properties", "Thread_Properties", "Timing_Properties",
    "Scheduler_Constants", "Generation_Properties", "pok_properties",
-   "oseknxt_properties", "osek_properties", "AI"} ;
+   "oseknxt_properties", "osek_properties", "RAMSES", "AI",
+   "Maintainability_Properties"} ;
   
   private StandAloneInstantiator _instanciator ;
   

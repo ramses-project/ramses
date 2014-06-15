@@ -101,7 +101,7 @@ rule m_Input_Buffer_ComputeEntrypointCallSequence
 		spg: AADLBA!SubprogramType = 'NextValue'.asSubprogramType('OSEK_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		LENGTH: AADLBA!DataSubcomponent = thisModule.GetOrCreateLengthDataSubcomponent(fi);
 		GLOBAL_Q: AADLBA!DataAccess = fi.getFeatureImg();
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
@@ -155,7 +155,7 @@ rule m_Output_Buffer_ComputeEntrypointCallSequence
 		spg: AADLBA!SubprogramType = 'SendOutput'.asSubprogramType('OSEK_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		LENGTH: AADLBA!DataSubcomponent = thisModule.GetOrCreateLengthDataSubcomponent(fi);
 		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 		dst: AADLI!FeatureInstance = fi.srcConnectionInstance->any(e|e.connectionReference->first().connection = cnxRef).destination;
@@ -205,7 +205,7 @@ rule m_OutputBuffer_EventPort
 		int: AADLBA!DataType = 'Integer_16'.asClassifier('BASE_TYPES');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(int, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		LENGTH: AADLBA!DataSubcomponent = thisModule.GetOrCreateLengthDataSubcomponent(fi);
 		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
@@ -253,7 +253,7 @@ rule m_BufferBehavior
 		int: AADLBA!DataType = 'Integer_16'.asClassifier('BASE_TYPES');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(int, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		LENGTH: AADLBA!DataSubcomponent = thisModule.GetOrCreateLengthDataSubcomponent(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		BUFFER_ID: AADLBA!DataAccess = fi.getFeatureImg();
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');

@@ -27,9 +27,7 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									AADL_RUNTIME: AADLBA,
 									DATA_MODEL: AADLBA,
 									PROGRAMMING_PROPERTIES: AADLBA,
-									HOOKS: ATLHOOKS,
-
-									ARINC653_RUNTIME: AADLBA;
+									HOOKS: ATLHOOKS;
 
 ------------------------------------------------------------
 --- Beginning of refactoring
@@ -514,10 +512,58 @@ unique lazy rule CreateReturnSubcomponentFromPort
 	}
 }
 
-unique lazy rule CreateLengthDataSubcomponent
+
+
+helper def: GetOrCreateLengthDataSubcomponentHolder(port: AADLI!FeatureInstance): AADLBA!DataSubcomponent =
+	if port.getModalPropertyValue('length_data_subcomponent').oclIsUndefined() then
+		thisModule.CreateLengthDataSubcomponentHolder(port)
+	else
+		thisModule.CreateLengthParameterHolder(port)
+	endif
+;
+
+unique lazy rule CreateLengthParameterHolder
 {
 	from
 		port : AADLI!FeatureInstance
+	using
+	{
+		lengthSubcomponent: AADLI!DataSubcomponent = port.getModalPropertyValue('length_data_subcomponent').ownedValue.referencedInstanceObject.subcomponent;
+		c: AADLI!ComponentInstance = port.getComponentInstance();
+		impl: AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+		callSequences: Sequence(AADLBA!SubprogramCallSequence) = impl.ownedSubprogramCallSequence->select(e|e.isComputeEntryPointOf(c));
+		param: AADLI!Parameter = impl.ownedParameterConnection
+								->select(e|e.source.connectionEnd=lengthSubcomponent)
+								->collect(e|
+									callSequences->collect(behavior |
+										thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent=e.source.connectionEnd), behavior, e},'featureImg'))
+									)
+								->union
+								(
+									impl.ownedParameterConnection
+									->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
+									->collect(e|
+										callSequences->collect(behavior |
+											thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent=e.destination.connectionEnd), behavior, e},'featureImg'))
+										)
+								)->flatten()->first();
+	}
+	to
+		paramHolder: AADLBA!ParameterHolder
+		(
+			element <- param
+		)
+	do
+	{
+		paramHolder;
+	}
+}
+
+unique lazy rule CreateLengthDataSubcomponentHolder
+{
+	from
+		port : AADLI!FeatureInstance
+		(port.getModalPropertyValue('length_data_subcomponent').oclIsUndefined())
 	using
 	{
 		typeId: String = port.getLengthInitialValue();
@@ -533,12 +579,16 @@ unique lazy rule CreateLengthDataSubcomponent
 			name<-port.feature.name+'_Length',
 			dataSubcomponentType<-thisModule.getRuntimeSizeType,
 			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
+		),
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- dataSubcomponent
 		)
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
 		
-		dataSubcomponent;
+		dataSubcomponentHolder;
 	}
 }
 

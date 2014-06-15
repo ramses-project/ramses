@@ -53,7 +53,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 			Sequence
 			{
 				fi.retreiveMessageAddress(),
-				thisModule.resolveLazySingleIfExists(fi, 'CreateLengthDataSubcomponent', 'dataSubcomponent')
+				thisModule.resolveLazySingleIfExists(fi, 'CreateLengthDataSubcomponentHolder', 'dataSubcomponent')
 			}
 		)
 	)

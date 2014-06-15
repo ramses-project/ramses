@@ -41,4 +41,6 @@ public class ProcessorProperties
   
   public Map<ProcessImplementation, PartitionProperties> partitionProperties = 
         new HashMap<ProcessImplementation, PartitionProperties>();
+
+  public String hwAdress ;
 }

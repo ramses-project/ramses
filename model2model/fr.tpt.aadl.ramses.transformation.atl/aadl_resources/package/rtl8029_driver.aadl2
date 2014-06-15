@@ -1,0 +1,57 @@
+package rtl8029_driver
+
+public
+
+with Base_Types,Generation_Properties;
+
+  subprogram pok_port_virtual_create
+  features
+    name: in parameter Base_Types::String;
+    id: out parameter Base_Types::Unsigned_8;
+  properties
+    source_name => "pok_port_virtual_create";
+    source_language => (C);
+    source_text => ("middleware/port.h");
+  end pok_port_virtual_create;
+  
+  subprogram rtl8029_init
+  properties
+    source_name => "rtl8029_init";
+    source_language => (C);
+    source_text => ("libpok/drivers/rtl8029.c", "libpok/drivers/rtl8029.h");
+  end rtl8029_init;
+
+  subprogram rtl8029_polling
+  properties
+    source_name => "rtl8029_polling";
+    source_language => (C);
+    source_text => ("libpok/drivers/rtl8029.c", "libpok/drivers/rtl8029.h");
+  end rtl8029_polling;
+  
+  subprogram rtl8029_read
+  prototypes
+    data_type: data;
+  features
+   	port_id: in parameter Base_Types::Unsigned_8; 
+   	input_data: out parameter data_type;
+   	len: in parameter Base_Types::Unsigned_32;
+  properties
+    source_name => "rtl8029_read";
+    source_language => (C);
+    source_text => ("libpok/drivers/rtl8029.c", "libpok/drivers/rtl8029.h");
+  end rtl8029_read;
+
+  subprogram rtl8029_write
+  prototypes
+    data_type: data;
+  features 
+   	port_id: in parameter Base_Types::Unsigned_8; 
+   	input_data: in parameter data_type {Generation_Properties::Parameter_Usage=>By_Reference;};
+   	len: in parameter Base_Types::Unsigned_32;
+  properties
+    source_name => "rtl8029_write";
+    source_language => (C);
+    source_text => ("libpok/drivers/rtl8029.c", "libpok/drivers/rtl8029.h");
+  end rtl8029_write;   
+   
+end rtl8029_driver;

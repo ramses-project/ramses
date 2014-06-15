@@ -1,0 +1,5 @@
+property set RAMSES is
+
+length_data_subcomponent: reference (data) applies to (port);
+
+end RAMSES; 
