@@ -35,7 +35,7 @@ helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : 
 
 helper context AADLI!InstanceObject def : isRootSystem() : AADLBA!PropertyAssociation = 
 	if (self.category = #system and self.eContainer().oclIsUndefined()) then
-		thisModule.CreatePropertyAssociation('Root_System', 'AI', thisModule.CreateStringLiteralPropertyExpression('selected')).debug(' !!!!!!!!! ')
+		thisModule.CreatePropertyAssociation('Root_System', 'AI', thisModule.CreateStringLiteralPropertyExpression('selected'))
 	else
 		OclUndefined
 	endif
@@ -82,6 +82,10 @@ rule m_Process_Instance {
 											else c.subcomponent.processSubcomponentType.type.name
 											endif
 		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'AI', 'AI');
+	}
 }
 
 rule m_Process_Type {
@@ -187,11 +191,11 @@ rule m_Thread_Implementation {
 -- @extends m_Component_Type
 rule m_Thread_Type {
  from 
- 	type : AADLI!ThreadType
+ 	type : AADLI!ThreadType  in IN
  to 
  	typeImg : AADLBA!ThreadType (
-	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess')),
-	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))
+	 ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess'))->excluding(OclUndefined),
+	 ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))->excluding(OclUndefined)
  	)
 }
 
