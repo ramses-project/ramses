@@ -126,8 +126,21 @@ helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : 
 helper context Sequence(AADLBA!PropertyAssociation) def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
 	self->select(e|(e.collectInstanceReferenceValue()->isEmpty()))
 								 ->union(self->select(e|not e.collectInstanceReferenceValue()->isEmpty() 
-								 											  and e.collectInstanceReferenceValue()->select(f| not f.referencedInstanceObject.isContainedIn(f.eContainer().eContainer().eContainer().eContainer()))->isEmpty())) -- econtainer() 4 times retreives container component instance; recursive helper would be better...
+								 											  and e.collectInstanceReferenceValue()->select(f| not f.oclIsKindOf(AADLI!FeatureInstance) and not f.referencedInstanceObject.isContainedIn(thisModule.getInstance(f)))->isEmpty()))
 													 ->collect ( p |  thisModule.resolveMatchedSingleIfExists(p, 'p2'))
+;
+
+helper def : getInstance(f: OclAny): AADLI!ComponentInstance =
+	if(f.oclIsUndefined()) then
+		OclUndefined
+	else
+		if(f.oclIsKindOf(AADLI!ComponentInstance)
+				or f.oclIsKindOf(AADLI!FeatureInstance))then
+			f
+		else
+			thisModule.getInstance(f.eContainer())
+		endif
+	endif
 ;
 
 helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(category : String) : Sequence(AADLI!ComponentInstance) =
@@ -145,9 +158,9 @@ helper context AADLI!Feature def : getFeaturesInstances(category : String) : AAD
 	let featureInstance : AADLI!FeatureInstance = AADLI!FeatureInstance->allInstancesFrom('IN')->any(f|f.feature=self)
 	in
 	if(not featureInstance.oclIsUndefined()) then
-		featureInstance
+		thisModule.resolveMatchedSingleIfExists(featureInstance, 'f')
 	else
-		OclUndefined
+		OclUndefined.debug( 'INSTANCE NOT FOUND '+self.eContainer().name+' '+self.name)
 	endif
 ;
 
