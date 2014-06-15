@@ -1,0 +1,78 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright ¬© 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+package test_network_rtl8029
+public
+with POK, Data_Model, ARINC653, common_pkg, RAMSES_buses;
+
+system root
+  end root;
+
+  system implementation root.impl
+  subcomponents
+    the_cpu1: processor common_pkg::connected_cpu.with_system_partition
+    {POK::Address=>"00:1F:C6:BF:74:06";};
+    the_proc1: process proc1.impl;
+    the_cpu2: processor common_pkg::connected_cpu.with_system_partition
+    {POK::Address=>"00:1E:A5:32:DE:32";};
+    the_proc2: process proc2.impl;
+    the_mem1: memory common_pkg::mem.two_partitions;
+    the_mem2: memory common_pkg::mem.two_partitions;
+    the_bus: bus RAMSES_buses::rtl8029;
+  connections
+    bus_to_cpu1: bus access the_cpu1.bus_access -> the_bus;
+    bus_to_cpu2: bus access the_cpu2.bus_access -> the_bus;
+    proc_cnx: port the_proc1.p_out -> the_proc2.p_in;
+  properties
+  	Actual_Processor_Binding => (reference (the_cpu1.the_part)) applies to the_proc1;
+    Actual_Processor_Binding => (reference (the_cpu2.the_part)) applies to the_proc2;
+    Actual_Memory_Binding => (reference (the_mem1.part1_mem)) applies to the_proc1;
+    Actual_Memory_Binding => (reference (the_mem2.part1_mem)) applies to the_proc2;
+    Actual_Connection_Binding => (reference(the_bus)) applies to proc_cnx;
+  end root.impl;
+
+  process proc1
+  features
+    p_out: out event data port common_pkg::Integer {	Queue_Size => 5; 
+    							          				Queue_Processing_Protocol => FIFO;};
+  end proc1;
+
+  process implementation proc1.impl
+  subcomponents
+    the_sender: thread common_pkg::eventdata_sender.impl;
+  connections
+    cnx: port the_sender.p_out -> p_out;
+  end proc1.impl;
+
+  process proc2
+  features
+    p_in: in event data port common_pkg::Integer{ Queue_Size => 10; 
+    							    				Queue_Processing_Protocol => FIFO;};
+  end proc2;
+
+  process implementation proc2.impl
+  subcomponents
+    the_receiver: thread common_pkg::eventdata_receiver.impl;
+  connections
+    cnx: port p_in -> the_receiver.p_in;
+  end proc2.impl;
+
+end test_network_rtl8029;
