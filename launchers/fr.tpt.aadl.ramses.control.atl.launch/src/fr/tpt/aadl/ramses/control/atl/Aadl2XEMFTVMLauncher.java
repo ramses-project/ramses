@@ -215,10 +215,15 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	    
 	    env.setMonitor(vmMonitor);
 		}
-		
-		env.run(td);
-		td.finish();
-		
+		try
+		{
+		  env.run(td);
+		  td.finish();
+		}
+		catch(Exception e)
+		{
+		  _LOGGER.fatal("EMFTVM transformation failed", e);
+		}
 		return outModel.getResource();
 	}
 
@@ -300,7 +305,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
           registeredReferences.add(r);
           Model referencedModel = EmftvmFactory.eINSTANCE.createModel();
           referencedModel.setResource(r);
-          env.registerInputModel(r.getURI().lastSegment(), referencedModel);
+          String id = r.getURI().lastSegment();
+          id = id.substring(0, id.lastIndexOf('.')).toUpperCase();
+          env.registerInputModel(id, referencedModel);
         }
       }
     }
