@@ -1,0 +1,561 @@
+---------------------------------------------------
+-- AADL2.1
+-- aadlrev2.3
+-- (c)Ellidiss Technologies
+-- 12Feb2013
+---------------------------------------------------
+
+PACKAGE PingPong
+PUBLIC
+
+WITH AADL_Project;
+WITH Data_Model;
+WITH Timing_Properties;
+WITH Memory_Properties;
+WITH Thread_Properties;
+WITH Programming_Properties;
+WITH Deployment_Properties;
+WITH ARINC653;
+WITH COAL;
+WITH POK;
+WITH Generation_Properties;
+DATA PingPongMessage
+PROPERTIES
+  Data_Model::Data_Representation => Struct;
+  Data_Model::Enumerators => ("m_type","m_sender","m_seqNb");
+  Data_Model::Element_Names => ("TYPE","ID","SEQ");
+  Source_Language => (C);
+  Source_Name => "PingPongMessage";
+  Source_Text => ("business-code/PingPong_module.h");
+END PingPongMessage;
+
+DATA SEQ
+PROPERTIES
+  Data_Model::Base_Type => (CLASSIFIER(COAL::integer));
+  Source_Language => (C);
+  Source_Name => "SEQ";
+  Source_Text => ("business-code/PingPong_module.h");
+END SEQ;
+
+DATA ROLE
+PROPERTIES
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("E_ROLE_CPING","E_ROLE_CPONG");
+  Source_Language => (C);
+  Source_Name => "ROLE";
+  Source_Text => ("business-code/PingPong_module.h");
+END ROLE;
+
+DATA TYPE_aadlKeywords
+PROPERTIES
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("E_TYPE_PING","E_TYPE_PONG");
+  Source_Language => (C);
+  Source_Name => "TYPE";
+  Source_Text => ("business-code/PingPong_module.h");
+END TYPE_aadlKeywords;
+
+DATA Exception
+PROPERTIES
+  Data_Model::Data_Representation => Enum;
+  Data_Model::Enumerators => ("E_EXCEPTION_NO_ERROR","E_EXCEPTION_BAD_SEQUENCE_NUMBER");
+  Source_Language => (C);
+  Source_Name => "Exception";
+  Source_Text => ("business-code/PingPong_module.h");
+END Exception;
+
+SYSTEM monoProc
+END monoProc;
+
+SYSTEM IMPLEMENTATION monoProc.impl
+SUBCOMPONENTS
+  root_main_memory_inst : MEMORY root_main_memory.impl;
+  S1_memory_inst : MEMORY S1_memory.impl;
+  S2_memory_inst : MEMORY S2_memory.impl;
+  S1_inst : PROCESS S1.impl;
+  S2_inst : PROCESS S2.impl;
+  root_inst : PROCESSOR root.impl {
+    Thread_Swap_Execution_Time => 5ms..10ms;
+    ARINC653::Module_Major_Frame => 1000ms;
+    ARINC653::Partition_Slots => (500ms,500ms);
+    ARINC653::Slots_Allocation => (REFERENCE(VP_S1_inst),REFERENCE(VP_S2_inst));
+    ARINC653::Module_Version => "1.0";
+    ARINC653::Module_Identifier => "ping-pong.root";
+    Process_Swap_Execution_Time => 5ms..10ms;
+    Scheduling_Protocol => (ARINC653);
+    POK::Module_Minor_Frame => 1ms;
+    POK::Ports_Flush_Time => Minor_Frame_Switch;
+    POK::Architecture => x86;
+    POK::BSP => x86_qemu;
+  };
+CONNECTIONS
+  C2_mode_proc_cnx : PORT S1_inst.Mon_mode_C2 -> S2_inst.C2_mode;
+  C1_ping_proc_cnx : PORT S1_inst.C1_PingOut -> S2_inst.C2_PingIn;
+  C1_pong_proc_cnx : PORT S1_inst.C1_PongOut -> S2_inst.C2_PongIn;
+  C2_ping_proc_cnx : PORT S2_inst.C2_PingOut -> S1_inst.C1_PingIn;
+  C2_pong_proc_cnx : PORT S2_inst.C2_PongOut -> S1_inst.C1_PongIn;
+  C2_error_proc_cnx : PORT S2_inst.C2_badSequenceNumber -> S1_inst.Mon_error_C2;
+PROPERTIES
+  Actual_Processor_Binding => (REFERENCE(root_inst.VP_S1_inst)) APPLIES TO S1_inst;
+  Actual_Processor_Binding => (REFERENCE(root_inst.VP_S2_inst)) APPLIES TO S2_inst;
+  Actual_Memory_Binding => (REFERENCE(root_main_memory_inst)) APPLIES TO S1_inst;
+  Actual_Memory_Binding => (REFERENCE(root_main_memory_inst)) APPLIES TO S2_inst;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S1_inst.Mon_mode_C2;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S1_inst.Mon_error_C2;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S1_inst.C1_PingOut;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S1_inst.C1_PongOut;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S1_inst.C1_PingIn;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S1_inst.C1_PongIn;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S2_inst.C2_mode;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S2_inst.C2_PingIn;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S2_inst.C2_PongIn;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S2_inst.C2_PingOut;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S2_inst.C2_PongOut;
+  ARINC653::Sampling_Refresh_Period => 10ms APPLIES TO S2_inst.C2_badSequenceNumber;
+END monoProc.impl;
+
+PROCESSOR root
+END root;
+
+PROCESSOR IMPLEMENTATION root.impl
+SUBCOMPONENTS
+  VP_S1_inst : VIRTUAL PROCESSOR VP_S1.impl;
+  VP_S2_inst : VIRTUAL PROCESSOR VP_S2.impl;
+END root.impl;
+
+MEMORY root_main_memory
+PROPERTIES
+  memory_size => 250000 bytes;
+  Base_Address => 16#2200#;
+  Word_Size => 10000Bytes;
+  Memory_Protocol => read_write;
+  ARINC653::Memory_Type => (Data_Memory,Code_Memory,IO_Memory);
+END root_main_memory;
+
+MEMORY IMPLEMENTATION root_main_memory.impl
+END root_main_memory.impl;
+
+MEMORY S1_memory
+PROPERTIES
+  Base_Address => 16#3200#;
+  Word_Size => 10000Bytes;
+  Memory_Protocol => read_write;
+  ARINC653::Memory_Type => (Data_Memory,Code_Memory);
+END S1_memory;
+
+MEMORY IMPLEMENTATION S1_memory.impl
+END S1_memory.impl;
+
+MEMORY S2_memory
+PROPERTIES
+  Base_Address => 16#4200#;
+  Word_Size => 10000Bytes;
+  Memory_Protocol => read_write;
+  ARINC653::Memory_Type => (Data_Memory,Code_Memory);
+END S2_memory;
+
+MEMORY IMPLEMENTATION S2_memory.impl
+END S2_memory.impl;
+
+VIRTUAL PROCESSOR VP_S1
+END VP_S1;
+
+VIRTUAL PROCESSOR IMPLEMENTATION VP_S1.impl
+PROPERTIES
+  ARINC653::Partition_Identifier => 1;
+  ARINC653::Partition_Name => "S1";
+  ARINC653::System_Partition => FALSE;
+  ARINC653::System_Overhead_Time => 10ms;
+  POK::Scheduler => RR;
+  POK::Additional_Features => (libc_stdio,console);
+END VP_S1.impl;
+
+VIRTUAL PROCESSOR VP_S2
+END VP_S2;
+
+VIRTUAL PROCESSOR IMPLEMENTATION VP_S2.impl
+PROPERTIES
+  ARINC653::Partition_Identifier => 2;
+  ARINC653::Partition_Name => "S2";
+  ARINC653::System_Partition => FALSE;
+  ARINC653::System_Overhead_Time => 10ms;
+  POK::Scheduler => RR;
+  POK::Additional_Features => (libc_stdio,console);
+END VP_S2.impl;
+
+PROCESS S1
+FEATURES
+  Mon_mode_C2 : OUT DATA PORT ROLE;
+  C1_PingOut : OUT DATA PORT PingPongMessage;
+  C1_PongOut : OUT DATA PORT PingPongMessage;
+  C1_PingIn : IN DATA PORT PingPongMessage;
+  C1_PongIn : IN DATA PORT PingPongMessage;
+  Mon_error_C2 : IN DATA PORT Exception;
+END S1;
+
+PROCESS IMPLEMENTATION S1.impl
+SUBCOMPONENTS
+  Monitor_changeState : THREAD Monitor_changeState_Thread.impl;
+  Monitor_delayed_error_C2 : THREAD Monitor_delayed_error_C2_Thread.impl;
+  IPingOrPong_Cping_ping : THREAD IPingOrPong_Cping_ping_Thread.impl;
+  IPingOrPong_Cping_delayed_PongIn : THREAD IPingOrPong_Cping_delayed_PongIn_Thread.impl;
+  IPingOrPong_Cpong_pong : THREAD IPingOrPong_Cpong_pong_Thread.impl;
+  State_baKeywords : DATA TYPE_aadlKeywords;
+  seqNb : DATA SEQ;
+CONNECTIONS
+  PortCnx1 : PORT Monitor_changeState.mode_C1 -> IPingOrPong_Cping_ping.mode_aadlKeywords;
+  PortCnx2 : PORT Monitor_changeState.mode_C1 -> IPingOrPong_Cping_delayed_PongIn.mode_aadlKeywords;
+  PortCnx3 : PORT Monitor_changeState.mode_C1 -> IPingOrPong_Cpong_pong.mode_aadlKeywords;
+  PortCnx4 : PORT IPingOrPong_Cping_ping.badSequenceNumber -> Monitor_changeState.error_C1;
+  PortCnx5 : PORT C1_PingIn -> IPingOrPong_Cpong_pong.PingIn;
+  PortCnx6 : PORT C1_PongIn -> IPingOrPong_Cping_delayed_PongIn.PongIn;
+  PortCnx7 : PORT Mon_error_C2 -> Monitor_delayed_error_C2.error_C2;
+  PortCnx8 : PORT Monitor_changeState.mode_C2 -> Mon_mode_C2;
+  PortCnx9 : PORT IPingOrPong_Cping_ping.PingOut -> C1_PingOut;
+  PortCnx10 : PORT IPingOrPong_Cpong_pong.PongOut -> C1_PongOut;
+  PortCnx11 : PORT Monitor_delayed_error_C2.delayed_error_C2 -> Monitor_changeState.delayed_error_C2;
+  PortCnx12 : PORT IPingOrPong_Cping_delayed_PongIn.delayed_PongIn -> IPingOrPong_Cping_ping.delayed_PongIn;
+  AccessCnx1 : DATA ACCESS State_baKeywords <-> Monitor_changeState.State_baKeywords;
+  AccessCnx2 : DATA ACCESS State_baKeywords <-> Monitor_delayed_error_C2.State_baKeywords;
+  AccessCnx3 : DATA ACCESS seqNb <-> IPingOrPong_Cping_ping.seqNb;
+  AccessCnx4 : DATA ACCESS seqNb <-> IPingOrPong_Cping_delayed_PongIn.seqNb;
+  AccessCnx5 : DATA ACCESS seqNb <-> IPingOrPong_Cpong_pong.seqNb;
+PROPERTIES
+  Data_Size => 200KByte;
+  Code_Size => 200KByte;
+  Dispatch_Protocol => Periodic APPLIES TO Monitor_changeState;
+  Priority => 2 APPLIES TO Monitor_changeState;
+  Period => 30ms APPLIES TO Monitor_changeState;
+  Data_Size => 40KByte APPLIES TO Monitor_changeState;
+  Stack_Size => 40KByte APPLIES TO Monitor_changeState;
+  Code_Size => 40KByte APPLIES TO Monitor_changeState;
+  Dispatch_Protocol => Periodic APPLIES TO Monitor_delayed_error_C2;
+  Priority => 2 APPLIES TO Monitor_delayed_error_C2;
+  Period => 30ms APPLIES TO Monitor_delayed_error_C2;
+  Data_Size => 40KByte APPLIES TO Monitor_delayed_error_C2;
+  Stack_Size => 40KByte APPLIES TO Monitor_delayed_error_C2;
+  Code_Size => 40KByte APPLIES TO Monitor_delayed_error_C2;
+  Dispatch_Protocol => Periodic APPLIES TO IPingOrPong_Cping_ping;
+  Priority => 3 APPLIES TO IPingOrPong_Cping_ping;
+  Period => 40ms APPLIES TO IPingOrPong_Cping_ping;
+  Data_Size => 40KByte APPLIES TO IPingOrPong_Cping_ping;
+  Stack_Size => 40KByte APPLIES TO IPingOrPong_Cping_ping;
+  Code_Size => 40KByte APPLIES TO IPingOrPong_Cping_ping;
+  Dispatch_Protocol => Periodic APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Priority => 3 APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Period => 40ms APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Data_Size => 40KByte APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Stack_Size => 40KByte APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Code_Size => 40KByte APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Dispatch_Protocol => Periodic APPLIES TO IPingOrPong_Cpong_pong;
+  Priority => 3 APPLIES TO IPingOrPong_Cpong_pong;
+  Period => 40ms APPLIES TO IPingOrPong_Cpong_pong;
+  Data_Size => 40KByte APPLIES TO IPingOrPong_Cpong_pong;
+  Stack_Size => 40KByte APPLIES TO IPingOrPong_Cpong_pong;
+  Code_Size => 40KByte APPLIES TO IPingOrPong_Cpong_pong;
+END S1.impl;
+
+PROCESS S2
+FEATURES
+  C2_mode : IN DATA PORT ROLE;
+  C2_PingIn : IN DATA PORT PingPongMessage;
+  C2_PongIn : IN DATA PORT PingPongMessage;
+  C2_PingOut : OUT DATA PORT PingPongMessage;
+  C2_PongOut : OUT DATA PORT PingPongMessage;
+  C2_badSequenceNumber : OUT DATA PORT Exception;
+END S2;
+
+PROCESS IMPLEMENTATION S2.impl
+SUBCOMPONENTS
+  IPingOrPong_Cping_ping : THREAD IPingOrPong_Cping_ping_Thread.impl;
+  IPingOrPong_Cping_delayed_PongIn : THREAD IPingOrPong_Cping_delayed_PongIn_Thread.impl;
+  IPingOrPong_Cpong_pong : THREAD IPingOrPong_Cpong_pong_Thread.impl;
+  seqNb : DATA SEQ;
+CONNECTIONS
+  PortCnx1 : PORT C2_mode -> IPingOrPong_Cping_ping.mode_aadlKeywords;
+  PortCnx2 : PORT C2_mode -> IPingOrPong_Cping_delayed_PongIn.mode_aadlKeywords;
+  PortCnx3 : PORT C2_mode -> IPingOrPong_Cpong_pong.mode_aadlKeywords;
+  PortCnx4 : PORT C2_PingIn -> IPingOrPong_Cpong_pong.PingIn;
+  PortCnx5 : PORT C2_PongIn -> IPingOrPong_Cping_delayed_PongIn.PongIn;
+  PortCnx6 : PORT IPingOrPong_Cping_ping.PingOut -> C2_PingOut;
+  PortCnx7 : PORT IPingOrPong_Cpong_pong.PongOut -> C2_PongOut;
+  PortCnx8 : PORT IPingOrPong_Cping_ping.badSequenceNumber -> C2_badSequenceNumber;
+  PortCnx9 : PORT IPingOrPong_Cping_delayed_PongIn.delayed_PongIn -> IPingOrPong_Cping_ping.delayed_PongIn;
+  AccessCnx1 : DATA ACCESS seqNb <-> IPingOrPong_Cping_ping.seqNb;
+  AccessCnx2 : DATA ACCESS seqNb <-> IPingOrPong_Cping_delayed_PongIn.seqNb;
+  AccessCnx3 : DATA ACCESS seqNb <-> IPingOrPong_Cpong_pong.seqNb;
+PROPERTIES
+  Data_Size => 200KByte;
+  Code_Size => 200KByte;
+  Dispatch_Protocol => Periodic APPLIES TO IPingOrPong_Cping_ping;
+  Priority => 3 APPLIES TO IPingOrPong_Cping_ping;
+  Period => 40ms APPLIES TO IPingOrPong_Cping_ping;
+  Data_Size => 40KByte APPLIES TO IPingOrPong_Cping_ping;
+  Stack_Size => 40KByte APPLIES TO IPingOrPong_Cping_ping;
+  Code_Size => 40KByte APPLIES TO IPingOrPong_Cping_ping;
+  Dispatch_Protocol => Periodic APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Priority => 3 APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Period => 40ms APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Data_Size => 40KByte APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Stack_Size => 40KByte APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Code_Size => 40KByte APPLIES TO IPingOrPong_Cping_delayed_PongIn;
+  Dispatch_Protocol => Periodic APPLIES TO IPingOrPong_Cpong_pong;
+  Priority => 3 APPLIES TO IPingOrPong_Cpong_pong;
+  Period => 40ms APPLIES TO IPingOrPong_Cpong_pong;
+  Data_Size => 40KByte APPLIES TO IPingOrPong_Cpong_pong;
+  Stack_Size => 40KByte APPLIES TO IPingOrPong_Cpong_pong;
+  Code_Size => 40KByte APPLIES TO IPingOrPong_Cpong_pong;
+END S2.impl;
+
+SUBPROGRAM IPingOrPong_Cping_ping
+FEATURES
+  delayed_PongIn : IN PARAMETER PingPongMessage {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  PingOut : OUT PARAMETER PingPongMessage {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  badSequenceNumber : OUT PARAMETER Exception {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  seqNb_in : REQUIRES DATA ACCESS SEQ;
+  seqNb_out : REQUIRES DATA ACCESS SEQ;
+PROPERTIES
+  Source_Name => "IPingOrPong_Cping_ping";
+  Source_Language => (C);
+  Source_Text => ("business-code/PingPong_Protocol_Implementations_IPingOrPong_impl.h","business-code/PingPong_Protocol_Implementations_IPingOrPong_impl.c");
+END IPingOrPong_Cping_ping;
+
+SUBPROGRAM IPingOrPong_Cping_delayed_PongIn
+FEATURES
+  PongIn : IN PARAMETER PingPongMessage {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_PongIn : OUT PARAMETER PingPongMessage {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+END IPingOrPong_Cping_delayed_PongIn;
+
+SUBPROGRAM IMPLEMENTATION IPingOrPong_Cping_delayed_PongIn.impl
+ANNEX behavior_specification {**
+  STATES
+    s : INITIAL FINAL STATE;
+  TRANSITIONS
+    t : s -[  ]-> s {
+    delayed_PongIn := PongIn
+  };
+**};
+
+END IPingOrPong_Cping_delayed_PongIn.impl;
+
+SUBPROGRAM IPingOrPong_Cpong_pong
+FEATURES
+  PingIn : IN PARAMETER PingPongMessage {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  PongOut : OUT PARAMETER PingPongMessage {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+PROPERTIES
+  Source_Name => "IPingOrPong_Cpong_pong";
+  Source_Language => (C);
+  Source_Text => ("business-code/PingPong_Protocol_Implementations_IPingOrPong_impl.h","business-code/PingPong_Protocol_Implementations_IPingOrPong_impl.c");
+END IPingOrPong_Cpong_pong;
+
+SUBPROGRAM Monitor_changeState
+FEATURES
+  delayed_error_C1 : IN PARAMETER Exception {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_error_C2 : IN PARAMETER Exception {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  mode_C1 : OUT PARAMETER ROLE {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  mode_C2 : OUT PARAMETER ROLE {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  State_in : REQUIRES DATA ACCESS TYPE_aadlKeywords;
+  State_out : REQUIRES DATA ACCESS TYPE_aadlKeywords;
+PROPERTIES
+  Source_Name => "Monitor_changeState";
+  Source_Language => (C);
+  Source_Text => ("business-code/PingPong_Protocol_Implementations_Monitor_impl.h","business-code/PingPong_Protocol_Implementations_Monitor_impl.c");
+END Monitor_changeState;
+
+SUBPROGRAM Monitor_delayed_error_C1
+FEATURES
+  error_C1 : IN PARAMETER Exception {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_error_C1 : OUT PARAMETER Exception {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+END Monitor_delayed_error_C1;
+
+SUBPROGRAM IMPLEMENTATION Monitor_delayed_error_C1.impl
+ANNEX behavior_specification {**
+  STATES
+    s : INITIAL FINAL STATE;
+  TRANSITIONS
+    t : s -[  ]-> s {
+    delayed_error_C1 := error_C1
+  };
+**};
+
+END Monitor_delayed_error_C1.impl;
+
+SUBPROGRAM Monitor_delayed_error_C2
+FEATURES
+  error_C2 : IN PARAMETER Exception {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+  delayed_error_C2 : OUT PARAMETER Exception {
+    Generation_Properties::Parameter_Usage => By_Reference;
+  };
+END Monitor_delayed_error_C2;
+
+SUBPROGRAM IMPLEMENTATION Monitor_delayed_error_C2.impl
+ANNEX behavior_specification {**
+  STATES
+    s : INITIAL FINAL STATE;
+  TRANSITIONS
+    t : s -[  ]-> s {
+    delayed_error_C2 := error_C2
+  };
+**};
+
+END Monitor_delayed_error_C2.impl;
+
+THREAD IPingOrPong_Cping_ping_Thread
+FEATURES
+  delayed_PongIn : IN DATA PORT PingPongMessage;
+  PingOut : OUT DATA PORT PingPongMessage;
+  badSequenceNumber : OUT DATA PORT Exception;
+  mode_aadlKeywords : IN DATA PORT ROLE;
+  seqNb : REQUIRES DATA ACCESS SEQ;
+END IPingOrPong_Cping_ping_Thread;
+
+THREAD IMPLEMENTATION IPingOrPong_Cping_ping_Thread.impl
+SUBCOMPONENTS
+  IPingOrPong_Cping_ping : SUBPROGRAM IPingOrPong_Cping_ping;
+CONNECTIONS
+  AccessCnx1 : DATA ACCESS seqNb -> IPingOrPong_Cping_ping.seqNb_in;
+  AccessCnx2 : DATA ACCESS seqNb -> IPingOrPong_Cping_ping.seqNb_out;
+ANNEX behavior_specification {**
+  STATES
+    switch : INITIAL COMPLETE STATE;
+  TRANSITIONS
+    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cping )
+    IPingOrPong_Cping_ping ! (delayed_PongIn,PingOut,badSequenceNumber,seqNb,seqNb)
+    END IF
+  };
+**};
+
+END IPingOrPong_Cping_ping_Thread.impl;
+
+THREAD IPingOrPong_Cping_delayed_PongIn_Thread
+FEATURES
+  PongIn : IN DATA PORT PingPongMessage;
+  delayed_PongIn : OUT DATA PORT PingPongMessage;
+  mode_aadlKeywords : IN DATA PORT ROLE;
+  seqNb : REQUIRES DATA ACCESS SEQ;
+END IPingOrPong_Cping_delayed_PongIn_Thread;
+
+THREAD IMPLEMENTATION IPingOrPong_Cping_delayed_PongIn_Thread.impl
+SUBCOMPONENTS
+  IPingOrPong_Cping_delayed_PongIn : SUBPROGRAM IPingOrPong_Cping_delayed_PongIn;
+ANNEX behavior_specification {**
+  STATES
+    switch : INITIAL COMPLETE STATE;
+  TRANSITIONS
+    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cping )
+    IPingOrPong_Cping_delayed_PongIn ! (PongIn,delayed_PongIn)
+    END IF
+  };
+**};
+
+END IPingOrPong_Cping_delayed_PongIn_Thread.impl;
+
+THREAD IPingOrPong_Cpong_pong_Thread
+FEATURES
+  PingIn : IN DATA PORT PingPongMessage;
+  PongOut : OUT DATA PORT PingPongMessage;
+  mode_aadlKeywords : IN DATA PORT ROLE;
+  seqNb : REQUIRES DATA ACCESS SEQ;
+END IPingOrPong_Cpong_pong_Thread;
+
+THREAD IMPLEMENTATION IPingOrPong_Cpong_pong_Thread.impl
+SUBCOMPONENTS
+  IPingOrPong_Cpong_pong : SUBPROGRAM IPingOrPong_Cpong_pong;
+ANNEX behavior_specification {**
+  STATES
+    switch : INITIAL COMPLETE STATE;
+  TRANSITIONS
+    unnamed_B2 : switch -[ ON DISPATCH ]-> switch {
+    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cpong )
+    IF ( PingIn'FRESH )
+    IPingOrPong_Cpong_pong ! (PingIn,PongOut)
+    END IF
+    END IF
+  };
+**};
+
+END IPingOrPong_Cpong_pong_Thread.impl;
+
+THREAD Monitor_changeState_Thread
+FEATURES
+  error_C1 : IN DATA PORT Exception;
+  delayed_error_C2 : IN DATA PORT Exception;
+  mode_C1 : OUT DATA PORT ROLE;
+  mode_C2 : OUT DATA PORT ROLE;
+  State_baKeywords : REQUIRES DATA ACCESS TYPE_aadlKeywords;
+END Monitor_changeState_Thread;
+
+THREAD IMPLEMENTATION Monitor_changeState_Thread.impl
+SUBCOMPONENTS
+  Monitor_delayed_error_C1 : SUBPROGRAM Monitor_delayed_error_C1;
+  Monitor_changeState : SUBPROGRAM Monitor_changeState;
+CONNECTIONS
+  AccessCnx1 : DATA ACCESS State_baKeywords -> Monitor_changeState.State_in;
+  AccessCnx2 : DATA ACCESS State_baKeywords -> Monitor_changeState.State_out;
+ANNEX behavior_specification {**
+  VARIABLES
+    delayed_error_C1 : Exception;
+  STATES
+    switch : INITIAL COMPLETE STATE;
+  TRANSITIONS
+    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+    Monitor_delayed_error_C1 ! (error_C1,delayed_error_C1);
+    Monitor_changeState ! (delayed_error_C1,delayed_error_C2,mode_C1,mode_C2,State_baKeywords,State_baKeywords)
+  };
+**};
+
+END Monitor_changeState_Thread.impl;
+
+THREAD Monitor_delayed_error_C2_Thread
+FEATURES
+  error_C2 : IN DATA PORT Exception;
+  delayed_error_C2 : OUT DATA PORT Exception;
+  State_baKeywords : REQUIRES DATA ACCESS TYPE_aadlKeywords;
+END Monitor_delayed_error_C2_Thread;
+
+THREAD IMPLEMENTATION Monitor_delayed_error_C2_Thread.impl
+SUBCOMPONENTS
+  Monitor_delayed_error_C2 : SUBPROGRAM Monitor_delayed_error_C2;
+ANNEX behavior_specification {**
+  STATES
+    switch : INITIAL COMPLETE STATE;
+  TRANSITIONS
+    unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
+    Monitor_delayed_error_C2 ! (error_C2,delayed_error_C2)
+  };
+**};
+
+END Monitor_delayed_error_C2_Thread.impl;
+
+END PingPong;
+

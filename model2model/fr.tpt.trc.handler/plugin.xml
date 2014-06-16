@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+     point="org.eclipse.core.expressions.definitions">
+     <definition
+       id="fr.tpt.trc.handler.generation.expression">
+       <with
+         variable="selection">
+         <and>
+           <iterate
+             ifEmpty="false"
+             operator="and">
+             <instanceof
+               value="org.eclipse.core.resources.IFile">
+             </instanceof>
+             <test
+               property="org.eclipse.core.resources.extension"
+               value="trc">
+             </test>
+           </iterate>
+           <count
+             value="1">
+           </count>
+         </and>
+       </with>
+     </definition>
+   </extension>
+   
+   <extension point="org.eclipse.ui.menus">
+    <menuContribution
+       locationURI="menu:org.eclipse.ui.main.menu">
+    <menu
+          id="ramses.menu"
+          label="RAMSES">
+       <command
+             commandId="fr.tpt.trc.handler.trc.update"
+             label="Update TRC modules"
+             style="push"
+             tooltip="Update TRC modules">
+       </command>
+    </menu>
+    </menuContribution>
+   </extension>
+   
+   <extension
+		point="org.eclipse.ui.handlers">
+		<handler 
+			class="fr.tpt.trc.handler.UpdateTrcModulesActionHandler"
+			commandId="fr.tpt.trc.handler.trc.update">
+     <enabledWhen>
+        <reference
+              definitionId="fr.tpt.trc.handler.generation.expression">
+        </reference>
+     </enabledWhen>
+		</handler>
+	</extension>
+	
+	 <extension
+		point="org.eclipse.ui.commands">
+        <command
+            description="Update TRC modules"
+        	id="fr.tpt.trc.handler.trc.update"
+        	name="Generate code">
+ 		</command>
+   </extension>
+	
+</plugin>

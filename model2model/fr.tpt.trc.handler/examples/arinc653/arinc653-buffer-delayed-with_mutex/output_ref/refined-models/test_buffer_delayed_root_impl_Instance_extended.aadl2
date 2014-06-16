@@ -1,0 +1,400 @@
+package test_buffer_delayed_refined_model
+public
+with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime,PeriodicDelayedMutex_runtime;
+  process implementation proc.impl
+    subcomponents
+      the_receiver_p_in_globalVariable: data SharedStructType_the_receiver_p_in.impl;
+      the_proc_the_receiver_p_in_sem: data arinc653_runtime::Semaphore_Id_Type;
+      the_sender: thread the_proc_the_sender.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        };
+      the_receiver: thread the_proc_the_receiver.impl {
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Data_Size => 40000 Bytes;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(main_call);
+        Initialize_Entrypoint_Call_Sequence => reference(initLikedList);
+        };
+    connections
+      cnx_p_in_to_globalVariable: data access the_receiver_p_in_globalVariable -> the_sender.cnx_p_out;
+      Id_instance_to_the_receiver_p_in: data access the_receiver_p_in_globalVariable -> the_receiver.p_in;
+      the_proc_the_sender_p_out_accessSemGlobalVariable: data access the_proc_the_receiver_p_in_sem -> the_sender.p_out_semAccess;
+      the_proc_the_receiver_p_in_accessSemGlobalVariable: data access the_proc_the_receiver_p_in_sem -> the_receiver.p_in_semAccess;
+  end proc.impl;
+  
+  processor implementation cpu.single_partition
+  end cpu.single_partition;
+  
+  processor implementation cpu.two_partitions
+  end cpu.two_partitions;
+  
+  processor implementation cpu.impl
+    subcomponents
+      the_part: virtual processor part {
+        POK::Scheduler => RR;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        };
+  end cpu.impl;
+  
+  memory implementation mem.impl
+  end mem.impl;
+  
+  memory implementation mem.two_partitions
+  end mem.two_partitions;
+  
+  system implementation refined_model.impl
+    subcomponents
+      the_mem: memory mem.impl {
+        Memory_Size => 200000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      the_proc: process proc.impl;
+      the_cpu: processor cpu.impl {
+        ARINC653::Module_Major_Frame => 1000 ms;
+        ARINC653::Partition_Slots => (1000 ms);
+        POK::Scheduler => STATIC;
+        ARINC653::Slots_Allocation => (reference(the_part));
+        ARINC653::HM_Error_ID_Levels => ([
+          ErrorIdentifier=> 1;
+          Description=> "Numeric error";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Illegal request";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 3;
+          Description=> "Numeric error";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Illegal request";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 5;
+          Description=> "Numeric error";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 6;
+          Description=> "Illegal request";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Illegal_Request;
+        ]);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 1;
+          Description=> "Restart partition";
+          Action=> "Stop";
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Warm partition restart";
+          Action=> "Reset";
+        ]);
+        POK::Architecture => x86;
+        POK::BSP => x86_qemu;
+        Scheduling_Protocol => (ARINC653);
+        };
+    properties
+      Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
+      Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
+  end refined_model.impl;
+  
+  processor cpu_x86
+  end cpu_x86;
+  
+  processor cpu
+  end cpu;
+  
+  processor cpu
+  end cpu;
+  
+  virtual processor part
+  end part;
+  
+  memory mem
+  end mem;
+  
+  memory part_mem
+  end part_mem;
+  
+  process proc
+  end proc;
+  
+  system refined_model
+  end refined_model;
+  
+  subprogram implementation Put_Value_the_sender_p_out.impl
+    extends PeriodicDelayedMutex_runtime::Put_Value.impl
+  end Put_Value_the_sender_p_out.impl;
+  
+  subprogram Put_Value_the_sender_p_out
+    extends PeriodicDelayedMutex_runtime::Put_Value
+    (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end Put_Value_the_sender_p_out;
+  
+  data SharedStructType_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::SharedStructure
+  end SharedStructType_the_receiver_p_in;
+  
+  data implementation SharedStructType_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::SharedStructure.impl
+    (t_buffer => data QueueType_the_receiver_p_in)
+    properties
+      Data_Model::Dimension => (6);
+  end SharedStructType_the_receiver_p_in.impl;
+  
+  data QueueType_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::BufferPrototype
+    properties
+      Data_Model::Base_Type => (classifier(Integer_Msg.impl));
+      Data_Model::Dimension => (10);
+  end QueueType_the_receiver_p_in;
+  
+  subprogram implementation Receive_Input_mutex_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Receive_Input.impl
+  end Receive_Input_mutex_the_receiver_p_in.impl;
+  
+  subprogram Receive_Input_mutex_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::Receive_Input
+    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end Receive_Input_mutex_the_receiver_p_in;
+  
+  subprogram implementation Next_Value_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Next_Value.impl
+  end Next_Value_the_receiver_p_in.impl;
+  
+  subprogram Next_Value_the_receiver_p_in
+    extends PeriodicDelayedMutex_runtime::Next_Value
+    (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end Next_Value_the_receiver_p_in;
+  
+  data bufferArrayImpl_the_receiver_p_in
+    extends PeriodicDelayed_runtime::ArrayDataType
+  end bufferArrayImpl_the_receiver_p_in;
+  
+  subprogram p_in_Init_Spg
+    extends PeriodicDelayedMutex_runtime::Init_Prototype
+    (t_buffer => data SharedStructType_the_receiver_p_in.impl)
+  end p_in_Init_Spg;
+  
+  subprogram the_proc_the_sender_entrypoint
+    features
+      cnx_p_out: requires data access SharedStructType_the_receiver_p_in.impl;
+      p_out_entrypointSemAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
+  end the_proc_the_sender_entrypoint;
+  
+  subprogram implementation the_proc_the_sender_entrypoint.impl
+    subcomponents
+      the_proc_the_sender_runtime_call_ret: data arinc653_runtime::Return_Code_Type;
+      p_out_localVariable: data common_pkg::Integer;
+      the_proc_the_sender_IterationCounter: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("0");
+        };
+      the_sender_p_out_CDWSize_eventdata_receiver_p_in: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("3");
+        };
+      CurrentDeadline: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("2000");
+        };
+      DeadlineValue: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("2000");
+        };
+      PeriodValue: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("2000");
+        };
+      CurrentPeriod: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("0");
+        };
+      MsgPriority: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("5");
+        };
+      p_out_semTimeOut: data arinc653_runtime::System_Time_Type {
+        Data_Model::Initial_Value => ("-1");
+        };
+      p_out_SemErrorCode: data arinc653_runtime::Return_Code_Type {
+        Data_Model::Initial_Value => ("0");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_buffer_delayed_refined_model::the_proc_the_sender_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_sender_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
+arinc653_runtime::Wait_Semaphore ! (p_out_entrypointSemAccess, p_out_semTimeOut, p_out_SemErrorCode) ;
+Put_Value_the_sender_p_out.impl ! (cnx_p_out, p_out_localVariable, CurrentDeadline, MsgPriority, 10) ;
+arinc653_runtime::Signal_Semaphore ! (p_out_entrypointSemAccess, p_out_SemErrorCode) ;
+PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, CurrentPeriod, CurrentDeadline)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_sender_behaviorIdentifier_enum#default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_sender_runtime_call_ret)} ;
+**};
+  end the_proc_the_sender_entrypoint.impl;
+  
+  data the_proc_the_sender_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior");
+      Data_Model::Initial_Value => ("test_buffer_delayed_refined_model__the_proc_the_sender_behaviorIdentifier_enum_default_behavior");
+  end the_proc_the_sender_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_the_sender.impl
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_the_sender_entrypoint.impl;
+        } 
+      ;
+    connections
+      p_out_accessCnx_call: data access cnx_p_out -> call_entrypoint.cnx_p_out;
+      p_out_accessSem: data access p_out_semAccess -> call_entrypoint.p_out_entrypointSemAccess;
+  end the_proc_the_sender.impl;
+  
+  thread the_proc_the_sender
+    features
+      cnx_p_out: requires data access SharedStructType_the_receiver_p_in.impl;
+      p_out_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
+  end the_proc_the_sender;
+  
+  subprogram the_proc_the_receiver_entrypoint
+    features
+      p_in: requires data access SharedStructType_the_receiver_p_in.impl;
+      p_in_entrypointSemAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
+  end the_proc_the_receiver_entrypoint;
+  
+  subprogram implementation the_proc_the_receiver_entrypoint.impl
+    subcomponents
+      the_proc_the_receiver_runtime_call_ret: data arinc653_runtime::Return_Code_Type;
+      p_in_ErrorCode: data arinc653_runtime::Return_Code_Type {
+        Data_Model::Initial_Value => ("0");
+        };
+      p_in_localVariable: data common_pkg::Integer;
+      the_proc_the_receiver_IterationCounter: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("0");
+        };
+      p_in_CPRSize: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("6");
+        };
+      p_in_lastIndex: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("-1");
+        };
+      p_in_readIndex: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("-1");
+        };
+      the_receiver_p_in_BufferSize: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("3");
+        };
+      CurrentDeadline: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("1000");
+        };
+      DeadlineValue: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("1000");
+        };
+      PeriodValue: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("1000");
+        };
+      CurrentPeriod: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("0");
+        };
+      p_in_semTimeOut: data arinc653_runtime::System_Time_Type {
+        Data_Model::Initial_Value => ("-1");
+        };
+      p_in_SemErrorCode: data arinc653_runtime::Return_Code_Type {
+        Data_Model::Initial_Value => ("0");
+        };
+    annex behavior_specification {**
+      variables
+  whichPortActivated : test_buffer_delayed_refined_model::the_proc_the_receiver_behaviorIdentifier_enum ;
+states
+  BA_entrypoint_init_state : initial state ;
+  BA_entrypoint_wait_dispatch_state : state ;
+  BA_entrypoint_exec_state : state ;
+  BA_entrypoint_final_state : final state ;
+transitions
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_receiver_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Input_mutex_the_receiver_p_in.impl ! (p_in, PeriodValue, CurrentPeriod) ;
+arinc653_runtime::Wait_Semaphore ! (p_in_entrypointSemAccess, p_in_semTimeOut, p_in_SemErrorCode) ;
+Next_Value_the_receiver_p_in.impl ! (p_in, p_in_localVariable, CurrentPeriod, p_in_ErrorCode) ;
+arinc653_runtime::Signal_Semaphore ! (p_in_entrypointSemAccess, p_in_SemErrorCode) ;
+if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
+   ;
+PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, CurrentPeriod, CurrentDeadline)} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_receiver_behaviorIdentifier_enum#default_behavior} ;
+  dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_receiver_runtime_call_ret)} ;
+**};
+  end the_proc_the_receiver_entrypoint.impl;
+  
+  data the_proc_the_receiver_behaviorIdentifier_enum
+    properties
+      Data_Model::Data_Representation => Enum;
+      Data_Model::Enumerators => ("default_behavior", "p_in");
+      Data_Model::Initial_Value => ("test_buffer_delayed_refined_model__the_proc_the_receiver_behaviorIdentifier_enum_default_behavior");
+  end the_proc_the_receiver_behaviorIdentifier_enum;
+  
+  thread implementation the_proc_the_receiver.impl
+    subcomponents
+      the_proc_the_receiver_p_in_BufferSize: data Base_Types::Integer_16 {
+        Data_Model::Initial_Value => ("10");
+        };
+    calls
+      main_call:  {
+        call_entrypoint: subprogram the_proc_the_receiver_entrypoint.impl;
+        } 
+      ;
+      initLikedList:  {
+        call_p_in_Init_Spg: subprogram p_in_Init_Spg;
+        } 
+      ;
+    connections
+      p_in_accessCnx_call: data access p_in -> call_entrypoint.p_in;
+      p_in_accessBuffer: data access p_in -> call_p_in_Init_Spg.BufferAccess;
+      p_in_accessSize: data access the_proc_the_receiver_p_in_BufferSize -> call_p_in_Init_Spg.Size;
+      p_in_accessSem: data access p_in_semAccess -> call_entrypoint.p_in_entrypointSemAccess;
+  end the_proc_the_receiver.impl;
+  
+  thread the_proc_the_receiver
+    features
+      p_in: requires data access SharedStructType_the_receiver_p_in.impl;
+      p_in_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
+  end the_proc_the_receiver;
+  
+  data implementation Integer_Msg.impl
+    extends PeriodicDelayedMutex_runtime::MsgPrototype.impl
+    (t_data => data common_pkg::Integer)
+  end Integer_Msg.impl;
+  
+  data Integer_Msg
+    extends PeriodicDelayedMutex_runtime::MsgPrototype
+  end Integer_Msg;
+end test_buffer_delayed_refined_model;
