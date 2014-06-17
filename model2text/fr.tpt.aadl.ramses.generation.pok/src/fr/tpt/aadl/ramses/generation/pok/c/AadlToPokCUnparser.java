@@ -939,14 +939,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
           .generateSectionTitle("MAIN")) ;
     mainImplCode.addOutputNewline("int main ()") ;
     mainImplCode.addOutputNewline("{") ;
-    for(ThreadSubcomponent ts:process.getOwnedThreadSubcomponents())
-    {
-      mainImplCode.addOutputNewline(
-    	GenerationUtilsC.getInitializationCall(
-    			(ThreadImplementation) ts.getClassifier()
-    			)
-      );
-    }
+    
     mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
     mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
     
@@ -1672,6 +1665,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
                 .getOwnedProcessorSubcomponents().indexOf(processor) ;
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_LOCAL_NODE " +
           Integer.toString(id)) ;
+    
+    String address = PropertyUtils.getStringValue(processor, "Address");
+    if(address!=null)
+    {
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PCI 1");
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_IO 1");
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PORTS_VIRTUAL 1");
+    }
     // POK_GENERATED_CODE 1 always true in our usage context
     deploymentHeaderCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
 

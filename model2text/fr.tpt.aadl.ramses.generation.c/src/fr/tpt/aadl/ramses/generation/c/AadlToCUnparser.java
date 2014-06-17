@@ -1270,28 +1270,6 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         GeneratorUtils.buildDataAccessMapping(object, _dataAccessMapping) ;
         process(object.getType()) ;
 
-        _currentImplUnparser.addOutput("void ") ;
-        _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
-        _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_INIT_SUFFIX +
-                                              "()") ;
-        _currentImplUnparser.addOutputNewline("{") ;
-        _currentImplUnparser.incrementIndent() ;
-
-        if(_initBehaviorCallSequence != null)
-        {
-          for(DataSubcomponent d : getAllDataSubcomponents(object))
-          {
-            if(isUsedInCallSequence(d, _initBehaviorCallSequence))
-              process(d) ;
-          }
-          process(_initBehaviorCallSequence) ;
-          _initBehaviorCallSequence = null ;
-        }
-
-        _activityImplCode.decrementIndent() ;
-        _activityImplCode.addOutputNewline("}") ;
-        _activityImplCode.addOutputNewline("") ;
-
         _currentImplUnparser.addOutput("void* ") ;
         _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName())) ;
         _currentImplUnparser.addOutputNewline(GenerationUtilsC.THREAD_SUFFIX +
@@ -1300,9 +1278,25 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _currentImplUnparser.incrementIndent() ;
         _owner = object ;
 
+        List<DataSubcomponent> processedDS = new ArrayList<DataSubcomponent>();
+        if(_initBehaviorCallSequence != null)
+        {
+          for(DataSubcomponent d : getAllDataSubcomponents(object))
+          {
+            if(isUsedInCallSequence(d, _initBehaviorCallSequence))
+            {
+              process(d) ;
+              processedDS.add(d);
+            }
+          }
+          process(_initBehaviorCallSequence) ;
+          _initBehaviorCallSequence = null ;
+        }
+        
         for(DataSubcomponent d : getAllDataSubcomponents(object))
         {
-          if(isUsedInCallSequence(d, _currentBehaviorCallSequence))
+          if(isUsedInCallSequence(d, _currentBehaviorCallSequence)
+              &&!processedDS.contains(d))
             process(d) ;
         }
 

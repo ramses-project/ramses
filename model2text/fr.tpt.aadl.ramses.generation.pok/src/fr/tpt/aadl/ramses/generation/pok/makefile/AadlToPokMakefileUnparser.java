@@ -56,6 +56,7 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
   public final static String POK_RUNTIME_VAR_ENV = "POK_PATH" ;
   
   private static Logger _LOGGER = Logger.getLogger(AadlToPokMakefileUnparser.class) ;
+  static boolean isFirstConnected=true;
   
   public AadlToPokMakefileUnparser()
   {
@@ -202,6 +203,18 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
           ServiceProvider.SYS_ERR_REP.error(errMsg, true);
         }
 
+        String address = PropertyUtils.getStringValue(object, "Address");
+        if(address!=null)
+        {
+          unparserContent.addOutputNewline("MAC_ADDR="+address);
+          String mode = "connect";
+          if(isFirstConnected)
+          {
+            mode="listen";
+            isFirstConnected=false;
+          }
+          unparserContent.addOutputNewline("QEMU_NETWORK_MODE="+mode);
+        }
         String bspName = PropertyUtils.getEnumValue(object, "BSP") ;
         if(bspName != null)
         {
