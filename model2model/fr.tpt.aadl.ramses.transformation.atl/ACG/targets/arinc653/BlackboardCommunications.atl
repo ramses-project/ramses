@@ -66,7 +66,7 @@ abstract rule m_Input_BlackBoard
 	using
 	{
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.GetOrCreateLengthDataSubcomponent(fi);
+		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
 		spg: AADLBA!SubprogramType = 'Read_Blackboard'.asSubprogramType('ARINC653_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
@@ -89,10 +89,6 @@ abstract rule m_Input_BlackBoard
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- MESSAGE_ADDR
-		),
-		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
-		(
-			element <- LENGTH
 		),
 		TIMEOUT_HOLDER: AADLBA!DataSubcomponentHolder
 		(
@@ -148,7 +144,7 @@ abstract rule m_Output_BlackBoard
 	using
 	{
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.GetOrCreateLengthDataSubcomponent(fi);
+		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
 		spg: AADLBA!SubprogramType = 'Display_Blackboard'.asSubprogramType('ARINC653_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 	}
@@ -169,10 +165,6 @@ abstract rule m_Output_BlackBoard
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- MESSAGE_ADDR
-		),
-		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
-		(
-			element <- LENGTH
 		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }
