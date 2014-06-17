@@ -191,10 +191,6 @@ rule m_OutputBuffer_EventPort
 		(
 			element <- TIME_OUT
 		),
-		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
-		(
-			element <- LENGTH
-		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- RETURN_CODE
@@ -303,7 +299,7 @@ rule m_BufferBehavior
 		call: AADLBA!SubprogramCallAction
 		(
 			subprogram <- callHolder,
-			parameterLabels <- Sequence{BUFFER_ID_HOLDER_RECEIVE,TIME_OUT_HOLDER_RECEIVE,MESSAGE_ADDR_HOLDER_RECEIVE,LENGTH_HOLDER_RECEIVE,RETURN_CODE_HOLDER_RECEIVE} 
+			parameterLabels <- Sequence{BUFFER_ID_HOLDER_RECEIVE,TIME_OUT_HOLDER_RECEIVE,MESSAGE_ADDR_HOLDER_RECEIVE,LENGTH_HOLDER,RETURN_CODE_HOLDER_RECEIVE} 
 		),
 		callHolder: AADLBA!CalledSubprogramHolder
 		(
@@ -316,10 +312,6 @@ rule m_BufferBehavior
 		MESSAGE_ADDR_HOLDER_RECEIVE: AADLBA!DataSubcomponentHolder
 		(
 			element <- MESSAGE_ADDR
-		),
-		LENGTH_HOLDER_RECEIVE: AADLBA!DataSubcomponentHolder
-		(
-			element <- LENGTH
 		),
 		TIME_OUT_HOLDER_RECEIVE: AADLBA!DataSubcomponentHolder
 		(
