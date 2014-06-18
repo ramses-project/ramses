@@ -120,8 +120,8 @@ end SEQ;
   
   processor implementation node_1.impl
     subcomponents
-      VP_S1_inst: virtual processor VP_S1.impl;
-      VP_S2_inst: virtual processor VP_S2.impl;
+      VP_S1_inst: virtual processor VP_S1.impl{Period => 1000 Ms;};
+      VP_S2_inst: virtual processor VP_S2.impl{Period => 1000 Ms;};
     properties
       ARINC653::Module_Major_Frame => 2000 ms;
       ARINC653::Partition_Slots => (1000 ms, 1000 ms);

@@ -163,9 +163,15 @@ END root;
 PROCESSOR IMPLEMENTATION root.impl
 SUBCOMPONENTS
   VP_train_inst : VIRTUAL PROCESSOR VP_train.impl
-  {POK::Scheduler => RR;};
+  {
+  	POK::Scheduler => RR;
+  	Period => 600 Ms;
+  };
   VP_railway_inst : VIRTUAL PROCESSOR VP_railway.impl
-  {POK::Scheduler => RR;};
+  {
+  	POK::Scheduler => RR;
+  	Period => 600 Ms;
+  };
 END root.impl;
 
 MEMORY root_main_memory
