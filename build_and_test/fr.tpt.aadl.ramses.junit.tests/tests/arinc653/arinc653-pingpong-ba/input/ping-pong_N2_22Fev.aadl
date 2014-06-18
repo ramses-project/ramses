@@ -119,8 +119,8 @@ END root;
 
 PROCESSOR IMPLEMENTATION root.impl
 SUBCOMPONENTS
-  VP_S1_inst : VIRTUAL PROCESSOR VP_S1.impl{Period=>1000 Ms};
-  VP_S2_inst : VIRTUAL PROCESSOR VP_S2.impl{Period=>1000 Ms};
+  VP_S1_inst : VIRTUAL PROCESSOR VP_S1.impl{Period=>1000 Ms;};
+  VP_S2_inst : VIRTUAL PROCESSOR VP_S2.impl{Period=>1000 Ms;};
 END root.impl;
 
 MEMORY root_main_memory
