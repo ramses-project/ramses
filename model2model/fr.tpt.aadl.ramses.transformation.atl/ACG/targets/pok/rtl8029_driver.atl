@@ -54,6 +54,9 @@ unique lazy abstract rule a_createRemoteSendSubprogram
 	{
 		createVirtualPortSpg: AADLBA!SubprogramType = 
 			'pok_port_virtual_create'.asSubprogramType('RTL8029_DRIVER');
+		typeId: String = fi.getLengthInitialValue();
+		initValuePE: AADLBA!PropertyExpression = 
+			thisModule.CreateStringLiteralPropertyExpression(thisModule.getSizeOfType(typeId));
 	}
 	to
 		spgType: AADLBA!SubprogramType,
@@ -93,7 +96,7 @@ unique lazy abstract rule a_createRemoteSendSubprogram
 		(ownedListElement <- Sequence {stringInitValue}),
 		stringInitValue: AADLBA!StringLiteral
 		(
-			value <- fi.getProcess().name+'_'+fi.name
+			value <- fi.getProcess().name+'_'+fi.name+'_virtual_port'
 		),
 		createVirtualPortCnx2: AADLBA!ParameterConnection
 		(
@@ -114,14 +117,19 @@ unique lazy abstract rule a_createRemoteSendSubprogram
 		portIdInt: AADLBA!DataSubcomponent
 		(
 			name <- fi.getProcess().name+'_'+fi.name+'_createVirtualPortId',
-			dataSubcomponentType <- 'Unsigned_8'.asDataType('BASE_TYPES')
+			dataSubcomponentType <- 'Pok_Port_Id_T'.asDataType('RTL8029_DRIVER')
 		),
 		-- int for length; add property legngth of (port ref)
 		-- change next step accordingly (to reuse this length data)
 		length: AADLBA!DataSubcomponent
 		(
 			name <- fi.getProcess().name+'_'+fi.name+'_length',
-			dataSubcomponentType <- 'Unsigned_32'.asDataType('BASE_TYPES')
+			dataSubcomponentType <- 'Unsigned_32'.asDataType('BASE_TYPES'),
+			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',initLv)}
+		),
+		initLv: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{initValuePE}
 		),
 		rvDataSubcomponent: AADLBA!ReferenceValue
 		(containmentPathElement <- Sequence{cpeDataSubcomponent}),
@@ -175,6 +183,7 @@ unique lazy abstract rule a_createRemoteSendSubprogram
 	{
 		thisModule.addImportedUnit(thisModule.public(), 'Base_Types'.toUpper(), 'Base_Types');
 		thisModule.addImportedUnit(thisModule.public(), 'RAMSES'.toUpper(), 'RAMSES');
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(portIdInt, fi);
 	}
 }
 

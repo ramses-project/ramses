@@ -4,10 +4,17 @@ public
 
 with Base_Types,Generation_Properties;
 
+  data Pok_Port_Id_T
+  properties
+    source_name => "pok_port_id_t";
+    source_language => (C);
+    source_text => ("types.h");
+  end Pok_Port_Id_T;
+  
   subprogram pok_port_virtual_create
   features
     name: in parameter Base_Types::String;
-    id: out parameter Base_Types::Unsigned_8;
+    id: out parameter Pok_Port_Id_T;
   properties
     source_name => "pok_port_virtual_create";
     source_language => (C);
@@ -32,7 +39,7 @@ with Base_Types,Generation_Properties;
   prototypes
     data_type: data;
   features
-   	port_id: in parameter Base_Types::Unsigned_8; 
+   	port_id: in parameter Pok_Port_Id_T; 
    	input_data: out parameter data_type;
    	len: in parameter Base_Types::Unsigned_32;
   properties
@@ -45,7 +52,7 @@ with Base_Types,Generation_Properties;
   prototypes
     data_type: data;
   features 
-   	port_id: in parameter Base_Types::Unsigned_8; 
+   	port_id: in parameter Pok_Port_Id_T; 
    	input_data: in parameter data_type {Generation_Properties::Parameter_Usage=>By_Reference;};
    	len: in parameter Base_Types::Unsigned_32;
   properties

@@ -26,6 +26,8 @@ public class PartitionProperties
   
   public boolean hasSample = false ;
   
+  public boolean hasVirtual = false ;
+  
   public Set<BlackBoardInfo> blackboardInfo = new LinkedHashSet<BlackBoardInfo>() ;
   
   public Set<String> eventNames = new LinkedHashSet<String>() ;
@@ -38,5 +40,8 @@ public class PartitionProperties
 
   public boolean hasSemaphore;
   
-  public Set<String> semaphoreNames = new LinkedHashSet<String>() ;
+  public Set<String> semaphoreNames = new LinkedHashSet<String>();
+
+  public Set<String> virtualNames = new LinkedHashSet<String>();
+
 }

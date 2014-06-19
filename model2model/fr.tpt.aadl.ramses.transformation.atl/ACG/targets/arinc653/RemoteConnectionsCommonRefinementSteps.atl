@@ -232,12 +232,18 @@ rule m_ConfigureSystemPartitionForCommunications
 		(
 			name <- c.name+'_comm',
 			threadSubcomponentType <- thisModule.resolveTemp(c.getProcessorContainer(),'comThreadImpl'),
-			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Period', 'TIMING_PROPERTIES', period)}
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Period', 'TIMING_PROPERTIES', period),
+											thisModule.CreatePropertyAssociation ('Priority', 'THREAD_PROPERTIES', prio)
+										}
 		),
 		period: AADLBA!IntegerLiteral
 		(
 			value <- c.getPeriod(),
 		 	unit <- thisModule.UnitLiteral(c.getPeriodUnit())
+		),
+		prio: AADLBA!IntegerLiteral
+		(
+			value <- 5.longValue()
 		),
 		process_commType: AADLBA!ProcessType
 		(
@@ -262,7 +268,16 @@ unique lazy rule mirrorEventDataPort
 		f: AADLBA!EventDataPort
 		(
 			name <- fi.eContainer().name+'_'+fi.name,
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Queue_Processing_Protocol', 'COMMUNICATION_PROPERTIES', 
+																		thisModule.CreateEnumValuePropertyExpression('FIFO')),
+												thisModule.CreatePropertyAssociation('Queue_Size', 'COMMUNICATION_PROPERTIES', 
+														size)				
+												}
+		),
+		size: AADLBA!IntegerLiteral
+		(
+			value <- fi.getModalPropertyValue('Queue_Size').ownedValue.value
 		)
 	do
 	{
@@ -304,7 +319,16 @@ unique lazy rule mirrorEventPort
 		f: AADLBA!EventPort
 		(
 			name <- fi.eContainer().name+'_'+fi.name,
-			dataFeatureClassifier <- 'Unsigned_8'.asDataType('Base_Types')
+			dataFeatureClassifier <- 'Unsigned_8'.asDataType('Base_Types'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Queue_Processing_Protocol', 'COMMUNICATION_PROPERTIES', 
+																		thisModule.CreateEnumValuePropertyExpression('FIFO')),
+												thisModule.CreatePropertyAssociation('Queue_Size', 'COMMUNICATION_PROPERTIES', 
+														size)				
+												}
+		),
+		size: AADLBA!IntegerLiteral
+		(
+			value <- fi.getModalPropertyValue('Queue_Size').ownedValue.value
 		)
 	do
 	{

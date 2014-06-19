@@ -1820,7 +1820,8 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       // compute list of ports for each partition deployed on "processor"
       String processName = deployedProcess.getSubcomponent().getName() ;
-      int nbPorts = routeProp.portPerProcess.get(deployedProcess).size() ;
+      int nbPorts = routeProp.portPerProcess.get(deployedProcess).size() 
+          + routeProp.virtualPortPerProcess.get(deployedProcess).size();
       routingImplCode.addOutput("uint8_t ") ;
       routingImplCode.addOutput(processName + "_partport[" +
             Integer.toString(nbPorts) + "] = {") ;
@@ -1828,6 +1829,12 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
       {
         routingImplCode.addOutput(AadlToPokADAUtils
               .getFeatureLocalIdentifier(fi)) ;
+        routingImplCode.addOutput(",") ;
+      }
+      for(FeatureInstance fi : routeProp.virtualPortPerProcess.get(deployedProcess))
+      {
+        routingImplCode.addOutput(AadlToPokADAUtils
+              .getFeatureLocalIdentifier(fi)+"_virtual_port") ;
         routingImplCode.addOutput(",") ;
       }
       routingImplCode.addOutputNewline("};") ;

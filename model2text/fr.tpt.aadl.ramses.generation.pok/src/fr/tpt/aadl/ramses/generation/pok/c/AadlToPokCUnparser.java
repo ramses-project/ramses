@@ -36,6 +36,7 @@ import org.osate.aadl2.BasicPropertyAssociation ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.BooleanLiteral ;
 import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.ConnectionKind ;
 import org.osate.aadl2.DataPort ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DefaultAnnexSubclause ;
@@ -73,6 +74,7 @@ import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
 import org.osate.aadl2.instance.FeatureCategory ;
 import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.InstanceReferenceValue ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
@@ -112,6 +114,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   public final static String SEMAPHORE_AADL_TYPE = 
 		  								  "arinc653_runtime::Semaphore_Id_Type" ;
+  
+  public final static String VIRTUAL_PORT_AADL_TYPE = 
+      "rtl8029_driver::Pok_Port_Id_T" ;
+
+  private static final String VIRTUAL_PORT_SUFFIX = "_virtual_port" ;
   
   private ProcessorProperties _processorProp;
   
@@ -1049,6 +1056,12 @@ private void findCommunicationMechanism(ProcessImplementation process,
         {
           pp.semaphoreNames.add(s.getName());
           pp.hasSemaphore = true;
+        }
+        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
+            .equalsIgnoreCase(VIRTUAL_PORT_AADL_TYPE))
+        {
+          pp.virtualNames.add(s.getName());
+          pp.hasVirtual = true;
         }
       }
     }
@@ -2244,16 +2257,29 @@ private void findCommunicationMechanism(ProcessImplementation process,
 		                                          RoutingProperties routeProp)
 	                                                    throws GenerationException
   {
-	List<FeatureInstance> localPorts = new ArrayList<FeatureInstance>();
-	if(routeProp.processPerProcessor.get(processor).isEmpty())
-		return localPorts;
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  localPorts.addAll(routeProp.portPerProcess.get(deployedProcess));
-	}
-	return localPorts;
+    List<FeatureInstance> localPorts = new ArrayList<FeatureInstance>();
+    if(routeProp.processPerProcessor.get(processor).isEmpty())
+      return localPorts;
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      localPorts.addAll(routeProp.portPerProcess.get(deployedProcess));
+    }
+    return localPorts;
   }
   
+  private List<FeatureInstance> getLocalVirtualPorts(ComponentInstance processor,
+                                              RoutingProperties routeProp)
+                                                      throws GenerationException
+  {
+    List<FeatureInstance> localPorts = new ArrayList<FeatureInstance>();
+    if(routeProp.processPerProcessor.get(processor).isEmpty())
+      return localPorts;
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      localPorts.addAll(routeProp.virtualPortPerProcess.get(deployedProcess));
+    }
+    return localPorts;
+  }
   private void genRoutingHeader(ComponentInstance processor,
                                 UnparseText routingHeaderCode,
                                 RoutingProperties routeProp)
@@ -2264,12 +2290,15 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	
 	if(routeProp.processPerProcessor.get(processor)!=null)
 	{
-	  int globalPortNb = routeProp.globalPort.size();
+	  int globalPortNb = routeProp.globalPort.size()
+	      +routeProp.globalVirtualPort.size();
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_GLOBAL_PORTS " +
 			  Integer.toString(globalPortNb));
 		
 	  List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
-	  int localPortNb = localPorts.size();
+	  List<FeatureInstance> localVirtualPorts = getLocalVirtualPorts(processor, routeProp);
+	  int localPortNb = localPorts.size()
+	      + localVirtualPorts.size();
 	  
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_PORTS " +
 			  Integer.toString(localPortNb));
@@ -2280,28 +2309,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	  Set<ComponentInstance> bindedPorcesses = routeProp.processPerProcessor.get(processor);
 	  
 	  if(!localPorts.isEmpty())
-      {
+    {
 	    routingHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_PORTS {");
-	    for(FeatureInstance fi: localPorts)
-	    {
-		  ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance();
-		  if(processInstance.getCategory() == ComponentCategory.PROCESS)
-		  {
-
-			int partitionIndex = 0;
-			for (Object entry:bindedPorcesses) {
-			  if (entry.equals(processInstance)) break;
-			  partitionIndex++;
-			}
-			
-			routingHeaderCode.addOutput(Integer.toString(partitionIndex));
-		  }
-		  routingHeaderCode.addOutput(",");
-	    }
+	    generateLocalPortsToPartitionsArray(localPorts, routingHeaderCode, bindedPorcesses);
+	    generateVirtualPortsToPartitionsArray(localVirtualPorts, routingHeaderCode, bindedPorcesses, routeProp);
 	    routingHeaderCode.addOutputNewline("}");
-      }
-	  
-	  
+    }
+
+
 	  routingHeaderCode.addOutputNewline("typedef enum") ;
 	  routingHeaderCode.addOutputNewline("{") ;
 	  routingHeaderCode.incrementIndent() ;
@@ -2309,10 +2324,10 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	  int idx=0;
 	  for(ComponentInstance node : routeProp.processors)
 	  {
-		routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(node)) ;
-		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-		routingHeaderCode.addOutputNewline(",") ;
-		idx++;
+	    routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(node)) ;
+	    routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+	    routingHeaderCode.addOutputNewline(",") ;
+	    idx++;
 	  }
 	  routingHeaderCode.decrementIndent() ;
 	  routingHeaderCode.addOutputNewline("} pok_node_identifier_t;") ;
@@ -2323,11 +2338,18 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	  routingHeaderCode.incrementIndent() ;
 	  for(FeatureInstance fi: localPorts)
 	  {
-		routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
-		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-		routingHeaderCode.addOutputNewline(",") ;
-		idx++;
+	    routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
+	    routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+	    routingHeaderCode.addOutputNewline(",") ;
+	    idx++;
 	  }
+	  for(FeatureInstance fi: localVirtualPorts)
+    {
+      routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX);
+      routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+      routingHeaderCode.addOutputNewline(",") ;
+      idx++;
+    }
 	  routingHeaderCode.addOutput("invalid_local_port");
 	  routingHeaderCode.addOutputNewline(" = "+Integer.toString(idx));
 	  routingHeaderCode.decrementIndent() ;
@@ -2344,6 +2366,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
 		  routingHeaderCode.addOutputNewline(",") ;
 		  idx++;
 	  }
+	  for(FeatureInstance fi: routeProp.globalVirtualPort)
+    {
+      routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi)
+                                  +VIRTUAL_PORT_SUFFIX);
+      routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+      routingHeaderCode.addOutputNewline(",") ;
+      idx++;
+    }
 	  routingHeaderCode.decrementIndent() ;
 	  routingHeaderCode.addOutputNewline("} pok_port_identifier_t;") ;
 
@@ -2367,168 +2397,323 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	routingHeaderCode.addOutputNewline("#endif");
   }
 
+  private
+      void
+      generateVirtualPortsToPartitionsArray(List<FeatureInstance> localVirtualPorts,
+                                            UnparseText routingHeaderCode,
+                                            Set<ComponentInstance> bindedPorcesses,
+                                            RoutingProperties routeProp)
+  {
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      ComponentInstance processInstance = routeProp.processVirtualPort.get(fi);
+      if(processInstance.getCategory() == ComponentCategory.PROCESS)
+      {
+
+        int partitionIndex = 0;
+        for (Object entry:bindedPorcesses) {
+          if (entry.equals(processInstance)) break;
+          partitionIndex++;
+        }
+
+        routingHeaderCode.addOutput(Integer.toString(partitionIndex));
+      }
+      routingHeaderCode.addOutput(",");
+    }
+  }
+
+  private void generateLocalPortsToPartitionsArray(List<FeatureInstance> localPorts,
+                                        UnparseText routingHeaderCode,
+                                        Set<ComponentInstance> bindedPorcesses)
+  {
+    for(FeatureInstance fi: localPorts)
+    {
+      ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance();
+      if(processInstance.getCategory() == ComponentCategory.PROCESS)
+      {
+
+        int partitionIndex = 0;
+        for (Object entry:bindedPorcesses) {
+          if (entry.equals(processInstance)) break;
+          partitionIndex++;
+        }
+
+        routingHeaderCode.addOutput(Integer.toString(partitionIndex));
+      }
+      routingHeaderCode.addOutput(",");
+    }
+  }
+
   private void genRoutingImpl(ComponentInstance processor,
                               UnparseText routingImplCode,
                               RoutingProperties routeProp)
                                                       throws GenerationException
   {
-	routingImplCode.addOutputNewline("#include \"routing.h\"") ;
-	routingImplCode.addOutputNewline("#include \"middleware/port.h\"") ;
-	routingImplCode.addOutputNewline("#include <types.h>") ;
-	
-	if(routeProp.processPerProcessor.get(processor)==null)
-	  return;
-	
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  // compute list of ports for each partition deployed on "processor"
-	  String processName = deployedProcess.getSubcomponent().getName();
-	  int nbPorts = routeProp.portPerProcess.get(deployedProcess).size();
-	  routingImplCode.addOutput("uint8_t ");
-	  routingImplCode.addOutput(processName+"_partport["+Integer.toString(nbPorts)
-	        +"] = {" );
-	  for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
-	  {
-		routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
-		routingImplCode.addOutput(",");
-	  }
-	  routingImplCode.addOutputNewline("};");
-	  
-	  // compute list of destination ports for each port of partitions deployed on "processor"
-	  for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
-	  {
-	    if(fi.getDirection().equals(DirectionType.OUT)
-	          || fi.getDirection().equals(DirectionType.IN_OUT))
-	    {
-	      List<FeatureInstance> destinations = RoutingProperties.getFeatureDestinations(fi);
-	      routingImplCode.addOutput("uint8_t ");
-	      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
-	                                "_deployment_destinations["+
-	                                Integer.toString(destinations.size())+"] = {");
-	      for(FeatureInstance dst:destinations)
-	      {
-	        routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(dst));
-	        routingImplCode.addOutput(",");
-	      }
-	      routingImplCode.addOutputNewline("};");	  
-	    }
-	  }
-	}
-	
-	List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
-	
-	routingImplCode.addOutput("uint8_t pok_global_ports_to_local_ports" +
-			"[POK_CONFIG_NB_GLOBAL_PORTS] = {");
-	for(FeatureInstance fi:routeProp.globalPort)
-	{
-	  if(localPorts.contains(fi))
-		routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
-	  else
-		routingImplCode.addOutput("invalid_local_port");
-	  
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_local_ports_to_global_ports" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi:localPorts)
-	{
-	  routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_nodes" +
-			"[POK_CONFIG_NB_GLOBAL_PORTS] = {");
-	for(FeatureInstance fi : routeProp.globalPort)
-	{
-	  ComponentInstance inst = routeProp.processorPort.get(fi);
-	  routingImplCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(inst));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_nb_ports_by_partition" +
-			"[POK_CONFIG_NB_PARTITIONS] = {");
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  int nbPort = routeProp.portPerProcess.get(deployedProcess).size();
-	  routingImplCode.addOutput(Integer.toString(nbPort));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t* pok_ports_by_partition" +
-			"[POK_CONFIG_NB_PARTITIONS] = {");
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  routingImplCode.addOutput(deployedProcess.getSubcomponent().getName()
-			  +"_partport");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("char* pok_ports_names" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  routingImplCode.addOutput("\""+
-	        AadlToPokCUtils.getFeatureLocalIdentifier(fi)
-			  +"\"");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_identifiers" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  routingImplCode.addOutput(""+
-	        AadlToPokCUtils.getFeatureLocalIdentifier(fi)
-			  +"");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_nb_destinations" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  int destNb = RoutingProperties.getFeatureDestinations(fi).size();
-	  routingImplCode.addOutput(Integer.toString(destNb));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t* pok_ports_destinations" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  int destNb = RoutingProperties.getFeatureDestinations(fi).size();
-	  if(destNb==0)
-		  routingImplCode.addOutput("NULL");
-	  else
-		  routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)
-				  +"_deployment_destinations");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_kind" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  if(fi.getCategory().equals(FeatureCategory.DATA_PORT))
-		  routingImplCode.addOutput("POK_PORT_KIND_SAMPLING");
-	  if(fi.getCategory().equals(FeatureCategory.EVENT_DATA_PORT)
-			  || fi.getCategory().equals(FeatureCategory.EVENT_PORT))
-		  routingImplCode.addOutput("POK_PORT_KIND_QUEUEING");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
+    routingImplCode.addOutputNewline("#include \"routing.h\"") ;
+    routingImplCode.addOutputNewline("#include \"middleware/port.h\"") ;
+    routingImplCode.addOutputNewline("#include <types.h>") ;
+
+    if(routeProp.processPerProcessor.get(processor)==null)
+      return;
+
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      // compute list of ports for each partition deployed on "processor"
+      String processName = deployedProcess.getSubcomponent().getName();
+      int nbPorts = routeProp.portPerProcess.get(deployedProcess).size()
+          + routeProp.virtualPortPerProcess.get(deployedProcess).size();
+      routingImplCode.addOutput("uint8_t ");
+      routingImplCode.addOutput(processName+"_partport["+Integer.toString(nbPorts)
+                                +"] = {" );
+      for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
+      {
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
+        routingImplCode.addOutput(",");
+      }
+      for(FeatureInstance fi : routeProp.virtualPortPerProcess.get(deployedProcess))
+      {
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX);
+        routingImplCode.addOutput(",");
+      }
+      routingImplCode.addOutputNewline("};");
+
+      // compute list of destination ports for each port of partitions deployed on "processor"
+      for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
+      {
+        generateDestinationInit(fi, routingImplCode);
+      }
+
+      for(FeatureInstance fi : routeProp.virtualPortPerProcess.get(deployedProcess))
+      {
+        generateDestinationInit(fi, routingImplCode, VIRTUAL_PORT_SUFFIX);
+      }
+    }
+
+    List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
+    List<FeatureInstance> localVirtualPorts = getLocalVirtualPorts(processor, routeProp);
+    routingImplCode.addOutput("uint8_t pok_global_ports_to_local_ports" +
+        "[POK_CONFIG_NB_GLOBAL_PORTS] = {");
+    for(FeatureInstance fi:routeProp.globalPort)
+    {
+      if(localPorts.contains(fi))
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
+      else
+        routingImplCode.addOutput("invalid_local_port");
+
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi:routeProp.globalVirtualPort)
+    {
+      if(localVirtualPorts.contains(fi))
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+                                  +VIRTUAL_PORT_SUFFIX);
+      else
+        routingImplCode.addOutput("invalid_local_port");
+
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_global_ports_to_bus" +
+        "[POK_CONFIG_NB_GLOBAL_PORTS] = {");
+    for(@SuppressWarnings("unused") FeatureInstance fi:routeProp.globalPort)
+    {
+      routingImplCode.addOutput("invalid_bus");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi:routeProp.globalVirtualPort)
+    {
+      Iterable<ConnectionInstance> cnxIter = fi.allEnclosingConnectionInstances();
+      for(ConnectionInstance connectionInstance : cnxIter)
+      {
+        if(false==connectionInstance.getKind().equals(org.osate.aadl2.instance.ConnectionKind.PORT_CONNECTION))
+          continue;
+        PropertyExpression pe = PropertyUtils.getPropertyValue("Actual_Connection_Binding", connectionInstance);
+        ListValue lvBus = (ListValue) pe;
+        InstanceReferenceValue irvBus = (InstanceReferenceValue) lvBus.getOwnedListElements().get(0);
+        ComponentInstance inst = (ComponentInstance) irvBus.getReferencedInstanceObject();
+        routingImplCode.addOutput(inst.getName());
+        routingImplCode.addOutput(",");
+        break;
+      }
+    }
+    routingImplCode.addOutputNewline("};");
+    
+    
+    routingImplCode.addOutput("uint8_t pok_local_ports_to_global_ports" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi:localPorts)
+    {
+      routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi));
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi:localVirtualPorts)
+    {
+      routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi)+
+                                VIRTUAL_PORT_SUFFIX);
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_nodes" +
+        "[POK_CONFIG_NB_GLOBAL_PORTS] = {");
+    for(FeatureInstance fi : routeProp.globalPort)
+    {
+      ComponentInstance inst = routeProp.processorPort.get(fi);
+      routingImplCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(inst));
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi : routeProp.globalVirtualPort)
+    {
+      ComponentInstance inst = routeProp.processorVirtualPort.get(fi);
+      routingImplCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(inst));
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_nb_ports_by_partition" +
+        "[POK_CONFIG_NB_PARTITIONS] = {");
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      int nbPort = routeProp.portPerProcess.get(deployedProcess).size();
+      int nbVirtualPort=routeProp.virtualPortPerProcess.get(deployedProcess).size();
+      routingImplCode.addOutput(Integer.toString(nbPort+nbVirtualPort));
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t* pok_ports_by_partition" +
+        "[POK_CONFIG_NB_PARTITIONS] = {");
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      routingImplCode.addOutput(deployedProcess.getSubcomponent().getName()
+                                +"_partport");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("char* pok_ports_names" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      routingImplCode.addOutput("\""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+          +"\"");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      routingImplCode.addOutput("\""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX
+          +"\"");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_identifiers" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      routingImplCode.addOutput(""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+          +"");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      routingImplCode.addOutput(""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX
+          +"");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_nb_destinations" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      routingImplCode.addOutput(Integer.toString(destNb));
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      routingImplCode.addOutput(Integer.toString(destNb));
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t* pok_ports_destinations" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      if(destNb==0)
+        routingImplCode.addOutput("NULL");
+      else
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+                                  +"_deployment_destinations");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      if(destNb==0)
+        routingImplCode.addOutput("NULL");
+      else
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX
+                                  +"_deployment_destinations");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_kind" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      if(fi.getCategory().equals(FeatureCategory.DATA_PORT))
+        routingImplCode.addOutput("POK_PORT_KIND_SAMPLING");
+      if(fi.getCategory().equals(FeatureCategory.EVENT_DATA_PORT)
+          || fi.getCategory().equals(FeatureCategory.EVENT_PORT))
+        routingImplCode.addOutput("POK_PORT_KIND_QUEUEING");
+      routingImplCode.addOutput(",");
+    }
+    for(@SuppressWarnings("unused") FeatureInstance fi: localVirtualPorts)
+    {
+      routingImplCode.addOutput("POK_PORT_KIND_VIRTUAL");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
   }
   
+  private void generateDestinationInit(FeatureInstance fi,
+                                       UnparseText routingImplCode,
+                                       String portSuffix)
+  {
+    if(fi.getDirection().equals(DirectionType.OUT)
+        || fi.getDirection().equals(DirectionType.IN_OUT))
+    {
+      List<FeatureInstance> destinations = RoutingProperties.getFeatureDestinations(fi);
+      routingImplCode.addOutput("uint8_t ");
+      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+portSuffix+
+                                "_deployment_destinations["+
+                                Integer.toString(destinations.size())+"] = {");
+      for(FeatureInstance dst:destinations)
+      {
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(dst)+portSuffix);
+        routingImplCode.addOutput(",");
+      }
+      routingImplCode.addOutputNewline("};");   
+    }
+  }
+
+  private void generateDestinationInit(FeatureInstance fi,
+                                       UnparseText routingImplCode)
+  {
+    generateDestinationInit(fi, routingImplCode, "");
+  }
+
   public static class BlackBoardInfo
   {
   	public String id = null ;
