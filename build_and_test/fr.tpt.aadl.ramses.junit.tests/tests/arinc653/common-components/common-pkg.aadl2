@@ -123,7 +123,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
 
   memory part_mem
   properties
-    Memory_Size => 80000 bytes;
+    Memory_Size => 150000 bytes;
     Memory_Protocol => read_write;
     ARINC653::Memory_Type => (Data_Memory);
   end part_mem;
