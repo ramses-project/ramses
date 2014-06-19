@@ -174,6 +174,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor implementation root.impl
     subcomponents
       VP_S1_inst: virtual processor VP_S1.impl {
+        Period => 1000 ms;
         ARINC653::Partition_Identifier => 1;
         ARINC653::Partition_Name => "S1";
         ARINC653::System_Partition => false;
@@ -183,6 +184,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Scheduling_Protocol => (RMS);
         };
       VP_S2_inst: virtual processor VP_S2.impl {
+        Period => 1000 ms;
         ARINC653::Partition_Identifier => 2;
         ARINC653::Partition_Name => "S2";
         ARINC653::System_Partition => false;
@@ -290,9 +292,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   
   processor root
   end root;
-  
-  processor cpu_x86
-  end cpu_x86;
   
   virtual processor VP_S1
   end VP_S1;
@@ -431,10 +430,10 @@ transitions
 Read_Blackboard_Exception ! (delayed_error_C2, delayed_error_C2_TimeOut, delayed_error_C2_localVariable, delayed_error_C2_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
 PingPong::Monitor_delayed_error_C1 ! (error_C1_localVariable, delayed_error_C1) ;
 PingPong::Monitor_changeState ! (delayed_error_C1, delayed_error_C2_localVariable, mode_C1_localVariable, mode_C2_localVariable, State_baKeywords, State_baKeywords) ;
-Display_Blackboard_ROLE ! (PortCnx1_mode_C1, mode_C1_localVariable, mode_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
-Display_Blackboard_ROLE ! (PortCnx2_mode_C1, mode_C1_localVariable, mode_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
+Display_Blackboard_ROLE ! (PortCnx1_mode_C1, mode_C1_localVariable, S1_inst_Monitor_changeState_runtime_call_ret) ;
+Display_Blackboard_ROLE ! (PortCnx2_mode_C1, mode_C1_localVariable, S1_inst_Monitor_changeState_runtime_call_ret) ;
 Display_Blackboard_ROLE ! (PortCnx3_mode_C1, mode_C1_localVariable, mode_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
-Write_Sampling_Message_ROLE ! (PortCnx8_mode_C2, mode_C2_localVariable, mode_C2_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
+Write_Sampling_Message_ROLE ! (PortCnx8_mode_C2, mode_C2_localVariable, S1_inst_Monitor_changeState_runtime_call_ret) ;
 arinc653_runtime::Periodic_Wait ! (S1_inst_Monitor_changeState_runtime_call_ret) ;
 Parent_BA_currentState_Access := S1_inst_Monitor_changeState_currentState#switch end if
   } ;
@@ -477,12 +476,36 @@ Parent_BA_currentState_Access := S1_inst_Monitor_changeState_currentState#switch
   
   thread S1_inst_Monitor_changeState
     features
-      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
-      error_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
-      delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
+      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_TYPE_PING", "E_TYPE_PONG");
+        Source_Language => (C);
+        Source_Name => "TYPE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      error_C1: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_EXCEPTION_NO_ERROR", "E_EXCEPTION_BAD_SEQUENCE_NUMBER");
+        Source_Language => (C);
+        Source_Name => "Exception";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_EXCEPTION_NO_ERROR", "E_EXCEPTION_BAD_SEQUENCE_NUMBER");
+        Source_Language => (C);
+        Source_Name => "Exception";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
       PortCnx1_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
       PortCnx2_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx3_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx3_mode_C1: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_ROLE_CPING", "E_ROLE_CPONG");
+        Source_Language => (C);
+        Source_Name => "ROLE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
       PortCnx8_mode_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
   end S1_inst_Monitor_changeState;
   
@@ -554,9 +577,27 @@ Parent_BA_currentState_Access := S1_inst_Monitor_delayed_error_C2_currentState#s
   
   thread S1_inst_Monitor_delayed_error_C2
     features
-      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords;
-      error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx11_delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type;
+      State_baKeywords: requires data access PingPong::TYPE_aadlKeywords {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_TYPE_PING", "E_TYPE_PONG");
+        Source_Language => (C);
+        Source_Name => "TYPE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_EXCEPTION_NO_ERROR", "E_EXCEPTION_BAD_SEQUENCE_NUMBER");
+        Source_Language => (C);
+        Source_Name => "Exception";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      PortCnx11_delayed_error_C2: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_EXCEPTION_NO_ERROR", "E_EXCEPTION_BAD_SEQUENCE_NUMBER");
+        Source_Language => (C);
+        Source_Name => "Exception";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
   end S1_inst_Monitor_delayed_error_C2;
   
   subprogram S1_inst_IPingOrPong_Cping_ping_entrypoint
@@ -616,7 +657,7 @@ if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPING) PingPong::IPi
    ;
 PingOut_freshnessIndicator_access := PingOut_freshnessIndicator_access + 1 ;
 PingOut_localVariable.fresh_ba := PingOut_freshnessIndicator_access ;
-Write_Sampling_Message_PingPongMessage ! (PortCnx9_PingOut, PingOut_localVariable, PingOut_Length, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
+Write_Sampling_Message_PingPongMessage ! (PortCnx9_PingOut, PingOut_localVariable, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
 Display_Blackboard_Exception ! (PortCnx4_badSequenceNumber, badSequenceNumber_localVariable, badSequenceNumber_Length, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
 arinc653_runtime::Periodic_Wait ! (S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
 Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cping_ping_currentState#switch end if
@@ -661,11 +702,35 @@ Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cping_ping_currentState#swi
   
   thread S1_inst_IPingOrPong_Cping_ping
     features
-      seqNb: requires data access PingPong::SEQ;
-      delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
+      seqNb: requires data access PingPong::SEQ {
+        Source_Language => (C);
+        Source_Name => "SEQ";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Base_Type => (classifier(COAL::integer));
+        };
+      delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
+      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_ROLE_CPING", "E_ROLE_CPONG");
+        Source_Language => (C);
+        Source_Name => "ROLE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
       PortCnx9_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx4_badSequenceNumber: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx4_badSequenceNumber: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_EXCEPTION_NO_ERROR", "E_EXCEPTION_BAD_SEQUENCE_NUMBER");
+        Source_Language => (C);
+        Source_Name => "Exception";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
   end S1_inst_IPingOrPong_Cping_ping;
   
   subprogram S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint
@@ -750,10 +815,35 @@ Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cping_delayed_PongIn_curren
   
   thread S1_inst_IPingOrPong_Cping_delayed_PongIn
     features
-      seqNb: requires data access PingPong::SEQ;
-      PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx12_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
+      seqNb: requires data access PingPong::SEQ {
+        Source_Language => (C);
+        Source_Name => "SEQ";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Base_Type => (classifier(COAL::integer));
+        };
+      PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
+      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_ROLE_CPING", "E_ROLE_CPONG");
+        Source_Language => (C);
+        Source_Name => "ROLE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      PortCnx12_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
   end S1_inst_IPingOrPong_Cping_delayed_PongIn;
   
   subprogram S1_inst_IPingOrPong_Cpong_pong_entrypoint
@@ -806,7 +896,7 @@ if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPONG) if ((PingIn_l
    end if
    ;
 PingIn_freshnessIndicator_access := PingIn_localVariable.fresh_ba ;
-Write_Sampling_Message_PingPongMessage ! (PortCnx10_PongOut, PongOut_localVariable, PongOut_Length, S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
+Write_Sampling_Message_PingPongMessage ! (PortCnx10_PongOut, PongOut_localVariable, S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
 arinc653_runtime::Periodic_Wait ! (S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
 Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cpong_pong_currentState#switch end if
   } ;
@@ -849,9 +939,27 @@ Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cpong_pong_currentState#swi
   
   thread S1_inst_IPingOrPong_Cpong_pong
     features
-      seqNb: requires data access PingPong::SEQ;
-      PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type;
+      seqNb: requires data access PingPong::SEQ {
+        Source_Language => (C);
+        Source_Name => "SEQ";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Base_Type => (classifier(COAL::integer));
+        };
+      PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
+      mode_aadlKeywords: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_ROLE_CPING", "E_ROLE_CPONG");
+        Source_Language => (C);
+        Source_Name => "ROLE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
       PortCnx10_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
   end S1_inst_IPingOrPong_Cpong_pong;
   
@@ -955,11 +1063,42 @@ Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cping_ping_currentState#swi
   
   thread S2_inst_IPingOrPong_Cping_ping
     features
-      seqNb: requires data access PingPong::SEQ;
-      delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx6_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx8_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      seqNb: requires data access PingPong::SEQ {
+        Source_Language => (C);
+        Source_Name => "SEQ";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Base_Type => (classifier(COAL::integer));
+        };
+      delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
+      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_ROLE_CPING", "E_ROLE_CPONG");
+        Source_Language => (C);
+        Source_Name => "ROLE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      PortCnx6_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
+      PortCnx8_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_EXCEPTION_NO_ERROR", "E_EXCEPTION_BAD_SEQUENCE_NUMBER");
+        Source_Language => (C);
+        Source_Name => "Exception";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
   end S2_inst_IPingOrPong_Cping_ping;
   
   subprogram S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint
@@ -1042,10 +1181,35 @@ Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cping_delayed_PongIn_curren
   
   thread S2_inst_IPingOrPong_Cping_delayed_PongIn
     features
-      seqNb: requires data access PingPong::SEQ;
-      PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx9_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type;
+      seqNb: requires data access PingPong::SEQ {
+        Source_Language => (C);
+        Source_Name => "SEQ";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Base_Type => (classifier(COAL::integer));
+        };
+      PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
+      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_ROLE_CPING", "E_ROLE_CPONG");
+        Source_Language => (C);
+        Source_Name => "ROLE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      PortCnx9_delayed_PongIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
   end S2_inst_IPingOrPong_Cping_delayed_PongIn;
   
   subprogram S2_inst_IPingOrPong_Cpong_pong_entrypoint
@@ -1139,10 +1303,35 @@ Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cpong_pong_currentState#swi
   
   thread S2_inst_IPingOrPong_Cpong_pong
     features
-      seqNb: requires data access PingPong::SEQ;
-      PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx7_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      seqNb: requires data access PingPong::SEQ {
+        Source_Language => (C);
+        Source_Name => "SEQ";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Base_Type => (classifier(COAL::integer));
+        };
+      PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
+      mode_aadlKeywords: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("E_ROLE_CPING", "E_ROLE_CPONG");
+        Source_Language => (C);
+        Source_Name => "ROLE";
+        Source_Text => ("business-code/PingPong_module.h");
+        };
+      PortCnx7_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("m_type", "m_sender", "m_seqNb");
+        Source_Language => (C);
+        Source_Name => "PingPongMessage";
+        Source_Text => ("business-code/PingPong_module.h");
+        Data_Model::Element_Names => ("TYPE", "ID", "SEQ");
+        };
   end S2_inst_IPingOrPong_Cpong_pong;
   
   data PingPongMessage_freshness_t

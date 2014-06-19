@@ -41,6 +41,7 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   processor implementation cpu.two_partitions
     subcomponents
       the_part1: virtual processor part {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
@@ -56,6 +57,7 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         Scheduling_Protocol => (RMS);
         };
       the_part2: virtual processor part {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
@@ -72,18 +74,21 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         };
   end cpu.two_partitions;
   
+  processor implementation connected_cpu.with_system_partition
+  end connected_cpu.with_system_partition;
+  
   memory implementation mem.impl
   end mem.impl;
   
   memory implementation mem.two_partitions
     subcomponents
       part1_mem: memory part_mem {
-        Memory_Size => 80000 Bytes;
+        Memory_Size => 150000 Bytes;
         Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
         };
       part2_mem: memory part_mem {
-        Memory_Size => 80000 Bytes;
+        Memory_Size => 150000 Bytes;
         Memory_Protocol => read_write;
         ARINC653::Memory_Type => (Data_Memory);
         };
@@ -157,9 +162,6 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
       Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2.the_receiver;
   end refined_model.impl;
   
-  processor cpu_x86
-  end cpu_x86;
-  
   processor cpu
   end cpu;
   
@@ -231,7 +233,10 @@ Send_Queuing_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_
   
   thread the_proc1_the_sender
     features
-      cnx_p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type;
+      cnx_p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type {
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
   end the_proc1_the_sender;
   
   subprogram the_proc2_the_receiver_entrypoint
@@ -288,7 +293,10 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   
   thread the_proc2_the_receiver
     features
-      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type;
+      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type {
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
   end the_proc2_the_receiver;
   
   subprogram Receive_Queuing_Message_Integer

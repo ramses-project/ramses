@@ -7,10 +7,6 @@ extern SAMPLING_PORT_ID_TYPE S2_inst_C2_PongInglobalVariable;
 extern SAMPLING_PORT_ID_TYPE S2_inst_C2_PingOut_globalVariable;
 extern SAMPLING_PORT_ID_TYPE S2_inst_C2_PongOut_globalVariable;
 extern SAMPLING_PORT_ID_TYPE S2_inst_C2_badSequenceNumber_globalVariable;
-void PingPong_refined_model__S2_inst_a2_inst_impl_Init()
-{
-}
-
 void* PingPong_refined_model__S2_inst_a2_inst_impl_Job()
 {
   SEQ PingPong_refined_model__S2_inst_a2_inst_impl_seqNb = 0;

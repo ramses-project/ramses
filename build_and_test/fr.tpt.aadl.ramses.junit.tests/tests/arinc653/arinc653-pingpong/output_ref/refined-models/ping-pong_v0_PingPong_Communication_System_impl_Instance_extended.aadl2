@@ -59,11 +59,13 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
   processor implementation node_1.impl
     subcomponents
       VP_S1_inst: virtual processor VP_S1.impl {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         POK::Additional_Features => (console);
         Scheduling_Protocol => (RMS);
         };
       VP_S2_inst: virtual processor VP_S2.impl {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         POK::Additional_Features => (console);
         Scheduling_Protocol => (RMS);
@@ -108,9 +110,6 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst.a2_inst;
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst.a2_inst.seqNb;
   end refined_model.impl;
-  
-  processor cpu_x86
-  end cpu_x86;
   
   processor node_1
   end node_1;
@@ -251,9 +250,28 @@ Write_Sampling_Message_PingPongMessage ! (C1_pong_implicit_cnx_C1_PongOut, C1_Po
   
   thread S1_inst_a1_inst
     features
-      C1_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C1_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      Mon_error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C1_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Struct;
+        Source_Name => "PingPongMessage";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        Data_Model::Element_Names => ("m_type", "m_sender", "m_seqNb");
+        Data_Model::Base_Type => (classifier(PingPong::TYPE_aadlKeywords));
+        };
+      C1_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Struct;
+        Source_Name => "PingPongMessage";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        Data_Model::Element_Names => ("m_type", "m_sender", "m_seqNb");
+        Data_Model::Base_Type => (classifier(PingPong::TYPE_aadlKeywords));
+        };
+      Mon_error_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Integer;
+        };
       mode_implicit_cnx_Mon_mode_C2: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C1_ping_implicit_cnx_C1_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
       C1_pong_implicit_cnx_C1_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
@@ -364,12 +382,55 @@ Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, 
   
   thread S2_inst_a2_inst
     features
-      C2_mode: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      C2_error_implicit_cnx_C2_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      C2_mode: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Enum;
+        Data_Model::Enumerators => ("PING", "PONG", "UNCONNECTED");
+        Source_Name => "ROLE";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        Data_Model::Initial_Value => ("0");
+        };
+      C2_PingIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Struct;
+        Source_Name => "PingPongMessage";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        Data_Model::Element_Names => ("m_type", "m_sender", "m_seqNb");
+        Data_Model::Base_Type => (classifier(PingPong::TYPE_aadlKeywords));
+        };
+      C2_PongIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Struct;
+        Source_Name => "PingPongMessage";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        Data_Model::Element_Names => ("m_type", "m_sender", "m_seqNb");
+        Data_Model::Base_Type => (classifier(PingPong::TYPE_aadlKeywords));
+        };
+      C2_ping_implicit_cnx_C2_PingOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Struct;
+        Source_Name => "PingPongMessage";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        Data_Model::Element_Names => ("m_type", "m_sender", "m_seqNb");
+        Data_Model::Base_Type => (classifier(PingPong::TYPE_aadlKeywords));
+        };
+      C2_pong_implicit_cnx_C2_PongOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Struct;
+        Source_Name => "PingPongMessage";
+        Source_Language => (C);
+        Source_Text => ("pingpong.h");
+        Data_Model::Element_Names => ("m_type", "m_sender", "m_seqNb");
+        Data_Model::Base_Type => (classifier(PingPong::TYPE_aadlKeywords));
+        };
+      C2_error_implicit_cnx_C2_badSequenceNumber: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        ARINC653::Sampling_Refresh_Period => 10 ms;
+        Data_Model::Data_Representation => Integer;
+        };
   end S2_inst_a2_inst;
   
   subprogram Read_Sampling_Message_PingPongMessage
