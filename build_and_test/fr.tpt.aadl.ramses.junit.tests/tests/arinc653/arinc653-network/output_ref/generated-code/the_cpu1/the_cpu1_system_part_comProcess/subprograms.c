@@ -38,8 +38,6 @@ while(1)
       if (test_network_rtl8029_remote_communications_refined_model__the_cpu1_system_part_comProcess_system_part_comm_entrypoint_impl_p_out_ErrorCode == 0) {
       rtl8029_write (*the_proc1_p_out_comConnectionPortId_port_id, &test_network_rtl8029_remote_communications_refined_model__the_cpu1_system_part_comProcess_system_part_comm_entrypoint_impl_p_out_localVariable, *the_proc1_p_out_comConnectionLength_len);
       }
-else
-{printf("WRONG RET:%d\n", test_network_rtl8029_remote_communications_refined_model__the_cpu1_system_part_comProcess_system_part_comm_entrypoint_impl_p_out_ErrorCode);}
       break;
     }
   }
