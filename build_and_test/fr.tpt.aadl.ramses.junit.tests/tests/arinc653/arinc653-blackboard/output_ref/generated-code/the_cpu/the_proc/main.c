@@ -17,8 +17,6 @@ BLACKBOARD_ID_TYPE the_receiver_p_in_globalVariable=0;
 
 int main ()
 {
-test_blackboard_refined_model__the_proc_the_sender_impl_Init();
-test_blackboard_refined_model__the_proc_the_receiver_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_BLACKBOARD ("the_receiver_p_in_globalVariable", sizeof (common_pkg__Integer), &(the_receiver_p_in_globalVariable), &(ret));

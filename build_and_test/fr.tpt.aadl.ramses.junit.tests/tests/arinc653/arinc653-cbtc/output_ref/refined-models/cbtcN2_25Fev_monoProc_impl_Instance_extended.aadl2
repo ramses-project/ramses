@@ -138,6 +138,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor implementation root.impl
     subcomponents
       VP_train_inst: virtual processor VP_train.impl {
+        Period => 600 ms;
         POK::Scheduler => RR;
         ARINC653::Partition_Identifier => 2;
         ARINC653::Partition_Name => "train";
@@ -147,6 +148,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Scheduling_Protocol => (RMS);
         };
       VP_railway_inst: virtual processor VP_railway.impl {
+        Period => 600 ms;
         POK::Scheduler => RR;
         ARINC653::Partition_Identifier => 3;
         ARINC653::Partition_Name => "railway";
@@ -253,12 +255,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   processor root
   end root;
   
-  processor cpu_x86
-  end cpu_x86;
-  
-  virtual processor VP_System_aadlKeywords
-  end VP_System_aadlKeywords;
-  
   virtual processor VP_train
   end VP_train;
   
@@ -267,9 +263,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
   
   memory root_main_memory
   end root_main_memory;
-  
-  process System_aadlKeywords
-  end System_aadlKeywords;
   
   process train
   end train;
@@ -429,8 +422,23 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_current
   
   thread train_inst_TrainPpu_odometerAcquisition
     features
-      trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx1_wheelAngleOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Size => 2 Bytes;
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("source_ident", "destination_ident", "computing_element", "msg_cycle", "direction", "acceleration", "limit_position", "maxi_speed", "speed", "distance_m", "distance_mm", "sim_ctrl_1", "sim_ctrl_2", "sim_ctrl_3", "sim_ctrl_4");
+        Data_Model::Element_Names => ("ulong", "long");
+        Source_Language => (C);
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx1_wheelAngleOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "wheel_angle", "speed");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "OdometerData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
   end train_inst_TrainPpu_odometerAcquisition;
   
   subprogram train_inst_TrainPpu_trainTraction_entrypoint
@@ -489,7 +497,7 @@ if ((tractionIn_localVariable.fresh_ba != tractionIn_freshnessIndicator_access) 
 tractionIn_freshnessIndicator_access := tractionIn_localVariable.fresh_ba ;
 trainDataIn_freshnessIndicator_access := trainDataIn_localVariable.fresh_ba ;
 Display_Blackboard_TrainPositionOffset ! (PortCnx2_additionalTrainPositionOffset, additionalTrainPositionOffset_localVariable, additionalTrainPositionOffset_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
-Write_Sampling_Message_TrainData ! (PortCnx9_trainDataOut, trainDataOut_localVariable, trainDataOut_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
+Write_Sampling_Message_TrainData ! (PortCnx9_trainDataOut, trainDataOut_localVariable, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
 arinc653_runtime::Periodic_Wait ! (train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
 Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#switch end if
   } ;
@@ -536,9 +544,29 @@ Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#
   
   thread train_inst_TrainPpu_trainTraction
     features
-      tractionIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx2_additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type;
+      tractionIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "msg_cycle", "acceleration", "limit_position", "maxi_speed", "direction");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "TractionData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Size => 2 Bytes;
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("source_ident", "destination_ident", "computing_element", "msg_cycle", "direction", "acceleration", "limit_position", "maxi_speed", "speed", "distance_m", "distance_mm", "sim_ctrl_1", "sim_ctrl_2", "sim_ctrl_3", "sim_ctrl_4");
+        Data_Model::Element_Names => ("ulong", "long");
+        Source_Language => (C);
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx2_additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Language => (C);
+        Source_Name => "TrainPositionOffset";
+        Source_Text => ("business-code/cbtc_module.h");
+        Data_Model::Base_Type => (classifier(COAL::long));
+        };
       PortCnx9_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
   end train_inst_TrainPpu_trainTraction;
   
@@ -653,9 +681,28 @@ Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrai
   
   thread train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation
     features
-      additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type;
-      wheelAngleIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx3_trainPositionOut_F: requires data access arinc653_runtime::Blackboard_Id_Type;
+      additionalTrainPositionOffset: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Source_Language => (C);
+        Source_Name => "TrainPositionOffset";
+        Source_Text => ("business-code/cbtc_module.h");
+        Data_Model::Base_Type => (classifier(COAL::long));
+        };
+      wheelAngleIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "wheel_angle", "speed");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "OdometerData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx3_trainPositionOut_F: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "train_position_m", "train_position_mm", "direction", "speed");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "VobcData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
   end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation;
   
   subprogram train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_entrypoint
@@ -723,7 +770,7 @@ trainPositionForMauOut_freshnessIndicator_access := trainPositionForMauOut_fresh
 trainPositionForMauOut_localVariable.fresh_ba := trainPositionForMauOut_freshnessIndicator_access ;
 tractionOut_freshnessIndicator_access := tractionOut_freshnessIndicator_access + 1 ;
 tractionOut_localVariable.fresh_ba := tractionOut_freshnessIndicator_access ;
-Write_Sampling_Message_VobcData ! (PortCnx8_trainPositionForMauOut, trainPositionForMauOut_localVariable, trainPositionForMauOut_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
+Write_Sampling_Message_VobcData ! (PortCnx8_trainPositionForMauOut, trainPositionForMauOut_localVariable, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 Display_Blackboard_TractionData ! (PortCnx4_tractionOut, tractionOut_localVariable, tractionOut_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 arinc653_runtime::Periodic_Wait ! (train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#switch end if
@@ -784,10 +831,31 @@ Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAcc
   
   thread train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute
     features
-      eoaIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      trainPositionIn: requires data access arinc653_runtime::Blackboard_Id_Type;
+      eoaIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "limit_position");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "EndOfAuthority";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      trainPositionIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "train_position_m", "train_position_mm", "direction", "speed");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "VobcData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
       PortCnx8_trainPositionForMauOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx4_tractionOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      PortCnx4_tractionOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "msg_cycle", "acceleration", "limit_position", "maxi_speed", "direction");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "TractionData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
   end train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute;
   
   subprogram railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint
@@ -914,9 +982,30 @@ Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPos
   
   thread railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation
     features
-      trainPositionVobcForMauIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      trainPositionViuForMauIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx7_eoaForVobcOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
+      trainPositionVobcForMauIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "train_position_m", "train_position_mm", "direction", "speed");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "VobcData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      trainPositionViuForMauIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "train_position", "direction");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "ViuData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx7_eoaForVobcOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "limit_position");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "EndOfAuthority";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
   end railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation;
   
   subprogram railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint
@@ -1014,8 +1103,22 @@ Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrai
   
   thread railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation
     features
-      trackIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx1_trainPositionForMauOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      trackIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "train_position");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "CdvData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx1_trainPositionForMauOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "train_position", "direction");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "ViuData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
   end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation;
   
   subprogram railway_inst_TrainSimu_trainSimulation_entrypoint
@@ -1128,9 +1231,32 @@ Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentS
   
   thread railway_inst_TrainSimu_trainSimulation
     features
-      delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type;
-      PortCnx6_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx3_trackOut: requires data access arinc653_runtime::Blackboard_Id_Type;
+      delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Size => 2 Bytes;
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("source_ident", "destination_ident", "computing_element", "msg_cycle", "direction", "acceleration", "limit_position", "maxi_speed", "speed", "distance_m", "distance_mm", "sim_ctrl_1", "sim_ctrl_2", "sim_ctrl_3", "sim_ctrl_4");
+        Data_Model::Element_Names => ("ulong", "long");
+        Source_Language => (C);
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx6_trainDataOut: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Size => 2 Bytes;
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("source_ident", "destination_ident", "computing_element", "msg_cycle", "direction", "acceleration", "limit_position", "maxi_speed", "speed", "distance_m", "distance_mm", "sim_ctrl_1", "sim_ctrl_2", "sim_ctrl_3", "sim_ctrl_4");
+        Data_Model::Element_Names => ("ulong", "long");
+        Source_Language => (C);
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx3_trackOut: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("ident", "train_position");
+        Data_Model::Element_Names => ("long");
+        Source_Language => (C);
+        Source_Name => "CdvData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
   end railway_inst_TrainSimu_trainSimulation;
   
   subprogram railway_inst_TrainSimu_delayed_trainDataIn_entrypoint
@@ -1199,8 +1325,24 @@ Parent_BA_currentState_Access := railway_inst_TrainSimu_delayed_trainDataIn_curr
   
   thread railway_inst_TrainSimu_delayed_trainDataIn
     features
-      trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type;
-      PortCnx2_delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type;
+      trainDataIn: requires data access arinc653_runtime::Sampling_Port_Id_Type {
+        Data_Size => 2 Bytes;
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("source_ident", "destination_ident", "computing_element", "msg_cycle", "direction", "acceleration", "limit_position", "maxi_speed", "speed", "distance_m", "distance_mm", "sim_ctrl_1", "sim_ctrl_2", "sim_ctrl_3", "sim_ctrl_4");
+        Data_Model::Element_Names => ("ulong", "long");
+        Source_Language => (C);
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
+      PortCnx2_delayed_trainDataIn: requires data access arinc653_runtime::Blackboard_Id_Type {
+        Data_Size => 2 Bytes;
+        Data_Model::Data_Representation => Struct;
+        Data_Model::Enumerators => ("source_ident", "destination_ident", "computing_element", "msg_cycle", "direction", "acceleration", "limit_position", "maxi_speed", "speed", "distance_m", "distance_mm", "sim_ctrl_1", "sim_ctrl_2", "sim_ctrl_3", "sim_ctrl_4");
+        Data_Model::Element_Names => ("ulong", "long");
+        Source_Language => (C);
+        Source_Name => "TrainData";
+        Source_Text => ("business-code/cbtc_module.h");
+        };
   end railway_inst_TrainSimu_delayed_trainDataIn;
   
   data TrainData_freshness_t

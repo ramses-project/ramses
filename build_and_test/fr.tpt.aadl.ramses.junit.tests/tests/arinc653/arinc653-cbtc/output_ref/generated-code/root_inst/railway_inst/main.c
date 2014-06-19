@@ -23,10 +23,6 @@ SAMPLING_PORT_ID_TYPE railway_inst_TrainSimu_inst_trainDataOut_globalVariable;
 
 int main ()
 {
-cbtc_refined_model__railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_impl_Init();
-cbtc_refined_model__railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_impl_Init();
-cbtc_refined_model__railway_inst_TrainSimu_trainSimulation_impl_Init();
-cbtc_refined_model__railway_inst_TrainSimu_delayed_trainDataIn_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_BLACKBOARD ("TrainPositionsCorrelation_trainPositionsCorrelation_trainPositionViuForMauIn_globalVariable", sizeof (cbtc_refined_model__ViuData_freshness_t_impl), &(TrainPositionsCorrelation_trainPositionsCorrelation_trainPositionViuForMauIn_globalVariable), &(ret));

@@ -15,8 +15,6 @@ PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];
 
 int main ()
 {
-test_buffer_delayed_refined_model__the_proc_the_sender_impl_Init();
-test_buffer_delayed_refined_model__the_proc_the_receiver_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   tattr.ENTRY_POINT = test_buffer_delayed_refined_model__the_proc_the_sender_impl_Job;
