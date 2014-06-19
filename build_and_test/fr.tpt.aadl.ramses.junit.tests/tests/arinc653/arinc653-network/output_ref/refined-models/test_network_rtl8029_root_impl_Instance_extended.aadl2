@@ -1,0 +1,459 @@
+package test_network_rtl8029_remote_communications
+public
+with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_driver;
+  processor implementation connected_cpu.with_system_partition
+    subcomponents
+      the_part: virtual processor part {
+        Period => 1000 ms;
+        POK::Scheduler => RR;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+      system_part: virtual processor part {
+        Period => 1000 ms;
+        ARINC653::System_Partition => true;
+        POK::Scheduler => RR;
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 3;
+          Description=> "Restart process";
+          Action=> "Cold_Restart";
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Warm partition restart";
+          Action=> "Warm_Restart";
+        ]);
+        ARINC653::Partition_Identifier => 1;
+        POK::Additional_Features => (libc_stdio, console);
+        };
+  end connected_cpu.with_system_partition;
+  
+  memory implementation mem.two_partitions
+    subcomponents
+      part1_mem: memory part_mem {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      part2_mem: memory part_mem {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+  end mem.two_partitions;
+  
+  process implementation proc1.impl
+    subcomponents
+      the_sender: thread eventdata_sender.impl {
+        Data_Size => 40000 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 2000 ms;
+        Priority => 5;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        };
+    connections
+      cnx: port the_sender.p_out -> p_out;
+  end proc1.impl;
+  
+  process implementation proc2.impl
+    subcomponents
+      the_receiver: thread eventdata_receiver.impl {
+        Data_Size => 40000 Bytes;
+        Compute_Entrypoint_Call_Sequence => reference(call);
+        Dispatch_Protocol => Periodic;
+        Compute_Execution_Time => 0 ms .. 1 ms;
+        Period => 1000 ms;
+        Priority => 10;
+        Stack_Size => 40000 Bytes;
+        Code_Size => 40 Bytes;
+        };
+    connections
+      cnx: port p_in -> the_receiver.p_in;
+  end proc2.impl;
+  
+  thread implementation eventdata_sender.impl
+    calls
+      call:  {
+        c: subprogram common_pkg::sender_spg;
+        } 
+      ;
+    connections
+      cnx: parameter c.result -> p_out;
+  end eventdata_sender.impl;
+  
+  thread implementation eventdata_receiver.impl
+    calls
+      call:  {
+        c: subprogram common_pkg::receiver_spg;
+        } 
+      ;
+    connections
+      cnx: parameter p_in -> c.input;
+  end eventdata_receiver.impl;
+  
+  bus rtl8029
+  end rtl8029;
+  
+  processor connected_cpu
+    features
+      bus_access: requires bus access rtl8029;
+  end connected_cpu;
+  
+  virtual processor part
+  end part;
+  
+  memory mem
+  end mem;
+  
+  memory part_mem
+  end part_mem;
+  
+  process proc1
+    features
+      p_out: out event data port common_pkg::Integer {
+        Queue_Size => 5;
+        Queue_Processing_Protocol => Fifo;
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
+  end proc1;
+  
+  process proc2
+    features
+      p_in: in event data port common_pkg::Integer {
+        Queue_Size => 10;
+        Queue_Processing_Protocol => Fifo;
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
+  end proc2;
+  
+  thread eventdata_sender
+    features
+      p_out: out event data port common_pkg::Integer {
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
+  end eventdata_sender;
+  
+  thread eventdata_receiver
+    features
+      p_in: in event data port common_pkg::Integer {
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
+  end eventdata_receiver;
+  
+  system remote_communications
+  end remote_communications;
+  
+  system implementation remote_communications.impl
+    subcomponents
+      the_bus: bus rtl8029;
+      the_mem1: memory mem.two_partitions {
+        Memory_Size => 200000 Bytes;
+        };
+      the_mem2: memory mem.two_partitions {
+        Memory_Size => 200000 Bytes;
+        };
+      the_cpu1_system_part_comProcess: process the_cpu1_system_part_comProcess.impl;
+      the_cpu2_system_part_comProcess: process the_cpu2_system_part_comProcess.impl;
+      the_proc1: process proc1.impl;
+      the_proc2: process proc2.impl;
+      the_cpu1: processor connected_cpu.with_system_partition {
+        POK::Address => "00:1F:C6:BF:74:06";
+        ARINC653::Module_Major_Frame => 2000 ms;
+        POK::Scheduler => STATIC;
+        ARINC653::Partition_Slots => (1000 ms, 1000 ms);
+        ARINC653::Slots_Allocation => (reference(the_part), reference(system_part));
+        POK::Ports_Flush_Time => Partition_Slot_Switch;
+        ARINC653::HM_Error_ID_Levels => ([
+          ErrorIdentifier=> 1;
+          Description=> "Numeric error";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Illegal request";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 3;
+          Description=> "Numeric error";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Illegal request";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 5;
+          Description=> "Numeric error";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 6;
+          Description=> "Illegal request";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Illegal_Request;
+        ]);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 1;
+          Description=> "Restart partition";
+          Action=> "Stop";
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Warm partition restart";
+          Action=> "Reset";
+        ]);
+        POK::Architecture => x86;
+        POK::BSP => x86_qemu;
+        };
+      the_cpu2: processor connected_cpu.with_system_partition {
+        POK::Address => "00:1E:A5:32:DE:32";
+        ARINC653::Module_Major_Frame => 2000 ms;
+        POK::Scheduler => STATIC;
+        ARINC653::Partition_Slots => (1000 ms, 1000 ms);
+        ARINC653::Slots_Allocation => (reference(the_part), reference(system_part));
+        POK::Ports_Flush_Time => Partition_Slot_Switch;
+        ARINC653::HM_Error_ID_Levels => ([
+          ErrorIdentifier=> 1;
+          Description=> "Numeric error";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Illegal request";
+          ErrorLevel=> Module_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 3;
+          Description=> "Numeric error";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 4;
+          Description=> "Illegal request";
+          ErrorLevel=> Partition_Level;
+          ErrorCode=> Illegal_Request;
+        ], [
+          ErrorIdentifier=> 5;
+          Description=> "Numeric error";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Numeric_Error;
+        ], [
+          ErrorIdentifier=> 6;
+          Description=> "Illegal request";
+          ErrorLevel=> Process_Level;
+          ErrorCode=> Illegal_Request;
+        ]);
+        ARINC653::HM_Error_ID_Actions => ([
+          ErrorIdentifier=> 1;
+          Description=> "Restart partition";
+          Action=> "Stop";
+        ], [
+          ErrorIdentifier=> 2;
+          Description=> "Warm partition restart";
+          Action=> "Reset";
+        ]);
+        POK::Architecture => x86;
+        POK::BSP => x86_qemu;
+        };
+    connections
+      bus_to_cpu1: bus access the_cpu1.bus_access -> the_bus;
+      bus_to_cpu2: bus access the_cpu2.bus_access -> the_bus;
+      the_proc1_p_out_ComProcessCnx: port the_proc1.p_out -> the_cpu1_system_part_comProcess.the_proc1_p_out;
+      the_proc2_p_in_ComProcessCnx: port the_cpu2_system_part_comProcess.the_proc2_p_in -> the_proc2.p_in;
+    properties
+      Actual_Processor_Binding => (reference(the_cpu1.the_part)) applies to the_proc1;
+      Actual_Memory_Binding => (reference(the_mem1.part1_mem)) applies to the_proc1;
+      Actual_Processor_Binding => (reference(the_cpu2.the_part)) applies to the_proc2;
+      Actual_Memory_Binding => (reference(the_mem2.part1_mem)) applies to the_proc2;
+      Actual_Processor_Binding => (reference(the_cpu1.the_part)) applies to the_proc1.the_sender;
+      Actual_Memory_Binding => (reference(the_mem1.part1_mem)) applies to the_proc1.the_sender;
+      Actual_Processor_Binding => (reference(the_cpu2.the_part)) applies to the_proc2.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem2.part1_mem)) applies to the_proc2.the_receiver;
+      Actual_Processor_Binding => (reference(the_cpu1.system_part)) applies to the_cpu1_system_part_comProcess;
+      Actual_Processor_Binding => (reference(the_cpu2.system_part)) applies to the_cpu2_system_part_comProcess;
+      Actual_Memory_Binding => (reference(the_mem1.part2_mem)) applies to the_cpu1_system_part_comProcess;
+      Actual_Memory_Binding => (reference(the_mem2.part2_mem)) applies to the_cpu2_system_part_comProcess;
+  end remote_communications.impl;
+  
+  process implementation the_cpu1_system_part_comProcess.impl
+    subcomponents
+      system_part_comm: thread the_cpu1_communicationTask.impl {
+        Period => 1000 ms;
+        Priority => 5;
+        };
+      the_cpu1_system_part_comm: thread the_cpu1_system_part_pollTask.impl {
+        Period => 1000 ms;
+        Priority => 10;
+        Compute_Entrypoint_Call_Sequence => reference(system_part_pollCallSequence);
+        Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
+        Dispatch_Protocol => Periodic;
+        };
+    connections
+      the_proc1_p_out_cnx: port the_proc1_p_out -> system_part_comm.p_out;
+  end the_cpu1_system_part_comProcess.impl;
+  
+  thread the_cpu1_system_part_pollTask
+  end the_cpu1_system_part_pollTask;
+  
+  thread implementation the_cpu1_system_part_pollTask.impl
+    calls
+      system_part_pollCallSequence:  {
+        the_cpu1_system_part_pollCall: subprogram rtl8029_driver::rtl8029_polling;
+        } 
+      ;
+      system_part_initPollCallSequence:  {
+        the_cpu1_system_part_initCall: subprogram rtl8029_driver::rtl8029_init;
+        } 
+      ;
+  end the_cpu1_system_part_pollTask.impl;
+  
+  process the_cpu1_system_part_comProcess
+    features
+      the_proc1_p_out: in event data port common_pkg::Integer {
+        Queue_Processing_Protocol => FIFO;
+        Queue_Size => 5;
+        };
+  end the_cpu1_system_part_comProcess;
+  
+  process implementation the_cpu2_system_part_comProcess.impl
+    subcomponents
+      system_part_comm: thread the_cpu2_communicationTask.impl {
+        Period => 1000 ms;
+        Priority => 5;
+        };
+      the_cpu2_system_part_comm: thread the_cpu2_system_part_pollTask.impl {
+        Period => 1000 ms;
+        Priority => 10;
+        Compute_Entrypoint_Call_Sequence => reference(system_part_pollCallSequence);
+        Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
+        Dispatch_Protocol => Periodic;
+        };
+    connections
+      the_proc2_p_in_cnx: port system_part_comm.p_in -> the_proc2_p_in;
+  end the_cpu2_system_part_comProcess.impl;
+  
+  thread the_cpu2_system_part_pollTask
+  end the_cpu2_system_part_pollTask;
+  
+  thread implementation the_cpu2_system_part_pollTask.impl
+    calls
+      system_part_pollCallSequence:  {
+        the_cpu2_system_part_pollCall: subprogram rtl8029_driver::rtl8029_polling;
+        } 
+      ;
+      system_part_initPollCallSequence:  {
+        the_cpu2_system_part_initCall: subprogram rtl8029_driver::rtl8029_init;
+        } 
+      ;
+  end the_cpu2_system_part_pollTask.impl;
+  
+  process the_cpu2_system_part_comProcess
+    features
+      the_proc2_p_in: out event data port common_pkg::Integer {
+        Queue_Processing_Protocol => FIFO;
+        Queue_Size => 10;
+        };
+  end the_cpu2_system_part_comProcess;
+  
+  thread implementation the_cpu1_communicationTask.impl
+    subcomponents
+      the_proc1_p_out_createVirtualPortId: data rtl8029_driver::Pok_Port_Id_T;
+      the_proc1_p_out_createVirtualPortName: data Base_Types::String {
+        Data_Model::Initial_Value => ("the_proc1_p_out_virtual_port");
+        };
+      the_proc1_p_out_length: data Base_Types::Unsigned_32 {
+        Data_Model::Initial_Value => ("sizeof(common_pkg__Integer)");
+        };
+    calls
+      the_cpu1_communicationCallSequence:  {
+        the_proc1_p_out_comCall: subprogram the_proc1_p_out_comSendSpg;
+        } 
+      ;
+      the_cpu1_initCallSequence:  {
+        the_proc1_p_out_createVirtualPort: subprogram rtl8029_driver::pok_port_virtual_create;
+        } 
+      ;
+    connections
+      the_proc1_p_out_createVirtualPortCnx: parameter the_proc1_p_out_createVirtualPort.name -> the_proc1_p_out_createVirtualPortName;
+      the_proc1_p_out_createVirtualPortCnx2: parameter the_proc1_p_out_createVirtualPort.id -> the_proc1_p_out_createVirtualPortId;
+      the_proc1_p_out_comConnection: parameter p_out -> the_proc1_p_out_comCall.input_data;
+      the_proc1_p_out_comConnectionLength: parameter the_proc1_p_out_length -> the_proc1_p_out_comCall.len;
+      the_proc1_p_out_comConnectionPortId: parameter the_proc1_p_out_createVirtualPortId -> the_proc1_p_out_comCall.port_id;
+    properties
+      Compute_Entrypoint_Call_Sequence => reference(the_cpu1_communicationCallSequence);
+      Initialize_Entrypoint_Call_Sequence => reference(the_cpu1_initCallSequence);
+      Dispatch_Protocol => Periodic;
+      RAMSES::length_data_subcomponent => reference(the_proc1_p_out_length) applies to p_out;
+  end the_cpu1_communicationTask.impl;
+  
+  thread the_cpu1_communicationTask
+    features
+      p_out: in event data port common_pkg::Integer;
+  end the_cpu1_communicationTask;
+  
+  thread implementation the_cpu2_communicationTask.impl
+    subcomponents
+      the_proc2_p_in_createVirtualPortId: data rtl8029_driver::Pok_Port_Id_T;
+      the_proc2_p_in_createVirtualPortName: data Base_Types::String {
+        Data_Model::Initial_Value => ("the_proc2_p_in_virtual_port");
+        };
+      the_proc2_p_in_length: data Base_Types::Unsigned_32 {
+        Data_Model::Initial_Value => ("sizeof(common_pkg__Integer)");
+        };
+    calls
+      the_cpu2_communicationCallSequence:  {
+        the_proc2_p_in_comCall: subprogram the_proc2_p_in_comReceiveSpg;
+        } 
+      ;
+      the_cpu2_initCallSequence:  {
+        the_proc2_p_in_createVirtualPort: subprogram rtl8029_driver::pok_port_virtual_create;
+        } 
+      ;
+    connections
+      the_proc2_p_in_createVirtualPortCnx: parameter the_proc2_p_in_createVirtualPort.name -> the_proc2_p_in_createVirtualPortName;
+      the_proc2_p_in_createVirtualPortCnx2: parameter the_proc2_p_in_createVirtualPort.id -> the_proc2_p_in_createVirtualPortId;
+      the_proc2_p_in_comConnection: parameter p_in -> the_proc2_p_in_comCall.input_data;
+      the_proc2_p_in_comConnectionLength: parameter the_proc2_p_in_length -> the_proc2_p_in_comCall.len;
+      the_proc2_p_in_comConnectionPortId: parameter the_proc2_p_in_createVirtualPortId -> the_proc2_p_in_comCall.port_id;
+    properties
+      Compute_Entrypoint_Call_Sequence => reference(the_cpu2_communicationCallSequence);
+      Initialize_Entrypoint_Call_Sequence => reference(the_cpu2_initCallSequence);
+      Dispatch_Protocol => Periodic;
+      RAMSES::length_data_subcomponent => reference(the_proc2_p_in_length) applies to p_in;
+  end the_cpu2_communicationTask.impl;
+  
+  thread the_cpu2_communicationTask
+    features
+      p_in: out event data port common_pkg::Integer;
+  end the_cpu2_communicationTask;
+  
+  subprogram the_proc2_p_in_comReceiveSpg
+    extends rtl8029_driver::rtl8029_read
+    (data_type => data common_pkg::Integer)
+    features
+      input_data: refined to out parameter common_pkg::Integer;
+  end the_proc2_p_in_comReceiveSpg;
+  
+  subprogram the_proc1_p_out_comSendSpg
+    extends rtl8029_driver::rtl8029_write
+    (data_type => data common_pkg::Integer)
+    features
+      input_data: refined to in parameter common_pkg::Integer;
+  end the_proc1_p_out_comSendSpg;
+end test_network_rtl8029_remote_communications;
