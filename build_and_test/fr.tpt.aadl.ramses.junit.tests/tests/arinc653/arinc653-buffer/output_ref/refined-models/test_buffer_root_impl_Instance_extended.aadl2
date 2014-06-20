@@ -32,6 +32,7 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   processor implementation cpu.single_partition
     subcomponents
       the_part: virtual processor part {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
@@ -50,6 +51,9 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   
   processor implementation cpu.two_partitions
   end cpu.two_partitions;
+  
+  processor implementation connected_cpu.with_system_partition
+  end connected_cpu.with_system_partition;
   
   memory implementation mem.impl
   end mem.impl;
@@ -123,9 +127,6 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;
   end refined_model.impl;
   
-  processor cpu_x86
-  end cpu_x86;
-  
   processor cpu
   end cpu;
   
@@ -134,9 +135,6 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   
   memory mem
   end mem;
-  
-  memory part_mem
-  end part_mem;
   
   process proc
   end proc;
@@ -194,7 +192,10 @@ Send_Buffer_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_out_TimeO
   
   thread the_proc_the_sender
     features
-      cnx_p_out: requires data access arinc653_runtime::Buffer_Id_Type;
+      cnx_p_out: requires data access arinc653_runtime::Buffer_Id_Type {
+        Data_Size => 4 Bytes;
+        Data_Model::Data_Representation => Integer;
+        };
   end the_proc_the_sender;
   
   subprogram the_proc_the_receiver_entrypoint
@@ -251,7 +252,10 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   
   thread the_proc_the_receiver
     features
-      p_in: requires data access arinc653_runtime::Buffer_Id_Type;
+      p_in: requires data access arinc653_runtime::Buffer_Id_Type {
+        Data_Size => 4 Bytes;
+        Data_Model::Data_Representation => Integer;
+        };
   end the_proc_the_receiver;
   
   subprogram Receive_Buffer_Integer

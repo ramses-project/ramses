@@ -33,15 +33,10 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       the_proc_the_receiver_p_in_accessSemGlobalVariable: data access the_proc_the_receiver_p_in_sem -> the_receiver.p_in_semAccess;
   end proc.impl;
   
-  processor implementation cpu.single_partition
-  end cpu.single_partition;
-  
-  processor implementation cpu.two_partitions
-  end cpu.two_partitions;
-  
   processor implementation cpu.impl
     subcomponents
       the_part: virtual processor part {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
@@ -57,6 +52,15 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         Scheduling_Protocol => (RMS);
         };
   end cpu.impl;
+  
+  processor implementation cpu.single_partition
+  end cpu.single_partition;
+  
+  processor implementation cpu.two_partitions
+  end cpu.two_partitions;
+  
+  processor implementation connected_cpu.with_system_partition
+  end connected_cpu.with_system_partition;
   
   memory implementation mem.impl
   end mem.impl;
@@ -130,12 +134,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
   end refined_model.impl;
   
-  processor cpu_x86
-  end cpu_x86;
-  
-  processor cpu
-  end cpu;
-  
   processor cpu
   end cpu;
   
@@ -144,9 +142,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
   
   memory mem
   end mem;
-  
-  memory part_mem
-  end part_mem;
   
   process proc
   end proc;
@@ -284,7 +279,10 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
   
   thread the_proc_the_sender
     features
-      cnx_p_out: requires data access SharedStructType_the_receiver_p_in.impl;
+      cnx_p_out: requires data access SharedStructType_the_receiver_p_in.impl {
+        Data_Size => 4 Bytes;
+        Data_Model::Data_Representation => Integer;
+        };
       p_out_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
   end the_proc_the_sender;
   
@@ -385,7 +383,11 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
   
   thread the_proc_the_receiver
     features
-      p_in: requires data access SharedStructType_the_receiver_p_in.impl;
+      p_in: requires data access SharedStructType_the_receiver_p_in.impl {
+        Dequeue_Protocol => AllItems;
+        Data_Size => 4 Bytes;
+        Data_Model::Data_Representation => Integer;
+        };
       p_in_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
   end the_proc_the_receiver;
   

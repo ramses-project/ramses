@@ -21,7 +21,6 @@ SAMPLING_PORT_ID_TYPE S2_inst_C2_badSequenceNumber_globalVariable;
 
 int main ()
 {
-PingPong_refined_model__S2_inst_a2_inst_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_SAMPLING_PORT ("S2_inst_C2_mode",

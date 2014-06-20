@@ -7,10 +7,6 @@ extern SAMPLING_PORT_ID_TYPE S1_inst_Mon_error_C2globalVariable;
 extern SAMPLING_PORT_ID_TYPE S1_inst_Mon_mode_C2_globalVariable;
 extern SAMPLING_PORT_ID_TYPE S1_inst_C1_PingOut_globalVariable;
 extern SAMPLING_PORT_ID_TYPE S1_inst_C1_PongOut_globalVariable;
-void PingPong_refined_model__S1_inst_a1_inst_impl_Init()
-{
-}
-
 void* PingPong_refined_model__S1_inst_a1_inst_impl_Job()
 {
   TYPE PingPong_refined_model__S1_inst_a1_inst_impl_state_baKeywords;

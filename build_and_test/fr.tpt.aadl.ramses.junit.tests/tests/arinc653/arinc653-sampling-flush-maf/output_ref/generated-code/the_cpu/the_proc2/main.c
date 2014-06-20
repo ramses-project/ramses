@@ -16,7 +16,6 @@ SAMPLING_PORT_ID_TYPE the_proc2_p_inglobalVariable;
 
 int main ()
 {
-test_sampling_refined_model__the_proc2_the_receiver_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_SAMPLING_PORT ("the_proc2_p_in",

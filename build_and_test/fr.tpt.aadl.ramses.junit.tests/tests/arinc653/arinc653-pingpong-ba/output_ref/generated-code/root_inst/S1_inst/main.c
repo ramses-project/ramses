@@ -28,11 +28,6 @@ SAMPLING_PORT_ID_TYPE S1_inst_Mon_error_C2globalVariable;
 
 int main ()
 {
-PingPong_refined_model__S1_inst_Monitor_changeState_impl_Init();
-PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_impl_Init();
-PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_impl_Init();
-PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_impl_Init();
-PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_BLACKBOARD ("Monitor_changeState_error_C1_globalVariable", sizeof (Exception), &(Monitor_changeState_error_C1_globalVariable), &(ret));
