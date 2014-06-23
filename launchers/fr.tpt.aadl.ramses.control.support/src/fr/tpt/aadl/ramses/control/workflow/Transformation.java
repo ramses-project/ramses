@@ -104,7 +104,7 @@ public interface Transformation extends WorkflowElement, AnalysisElement
    * @return the value of the '<em>Output Model Identifier</em>' containment reference.
    * @see #setOutputModelIdentifier(ModelIdentifier)
    * @see fr.tpt.aadl.ramses.control.workflow.WorkflowPackage#getTransformation_OutputModelIdentifier()
-   * @model containment="true"
+   * @model containment="true" required="true"
    * @generated
    */
   ModelIdentifier getOutputModelIdentifier();

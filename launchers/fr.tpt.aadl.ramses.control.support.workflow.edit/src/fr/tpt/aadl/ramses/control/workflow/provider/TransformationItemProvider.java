@@ -79,33 +79,9 @@ public class TransformationItemProvider
     {
       super.getPropertyDescriptors(object);
 
-      addOutputModelIdentifierPropertyDescriptor(object);
       addIdentifierPropertyDescriptor(object);
     }
     return itemPropertyDescriptors;
-  }
-
-  /**
-   * This adds a property descriptor for the Output Model Identifier feature.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  protected void addOutputModelIdentifierPropertyDescriptor(Object object)
-  {
-    itemPropertyDescriptors.add
-      (createItemPropertyDescriptor
-        (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-         getResourceLocator(),
-         getString("_UI_Transformation_outputModelIdentifier_feature"),
-         getString("_UI_PropertyDescriptor_description", "_UI_Transformation_outputModelIdentifier_feature", "_UI_Transformation_type"),
-         WorkflowPackage.Literals.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER,
-         true,
-         false,
-         true,
-         null,
-         null,
-         null));
   }
 
   /**
@@ -147,6 +123,7 @@ public class TransformationItemProvider
       super.getChildrenFeatures(object);
       childrenFeatures.add(WorkflowPackage.Literals.TRANSFORMATION__ELEMENT);
       childrenFeatures.add(WorkflowPackage.Literals.TRANSFORMATION__LIST);
+      childrenFeatures.add(WorkflowPackage.Literals.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER);
     }
     return childrenFeatures;
   }
@@ -211,6 +188,7 @@ public class TransformationItemProvider
         return;
       case WorkflowPackage.TRANSFORMATION__ELEMENT:
       case WorkflowPackage.TRANSFORMATION__LIST:
+      case WorkflowPackage.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER:
         fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
         return;
     }
@@ -263,6 +241,11 @@ public class TransformationItemProvider
       (createChildParameter
         (WorkflowPackage.Literals.TRANSFORMATION__LIST,
          WorkflowFactory.eINSTANCE.createList()));
+
+    newChildDescriptors.add
+      (createChildParameter
+        (WorkflowPackage.Literals.TRANSFORMATION__OUTPUT_MODEL_IDENTIFIER,
+         WorkflowFactory.eINSTANCE.createModelIdentifier()));
   }
 
 }
