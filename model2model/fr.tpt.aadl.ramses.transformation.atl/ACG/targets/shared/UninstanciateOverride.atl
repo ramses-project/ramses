@@ -76,6 +76,7 @@ helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : 
 abstract rule m_Component_Implementation {
  from
     impl : AADLI!ComponentImplementation
+	(impl.needsCopy())
  to
  	implImg : AADLBA!ComponentImplementation (
  		name             			<- impl.name,

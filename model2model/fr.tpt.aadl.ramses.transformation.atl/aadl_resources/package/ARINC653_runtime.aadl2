@@ -388,7 +388,7 @@ subprogram Send_Queuing_Message
 prototypes
   MESSAGE_TYPE: data;
 features
-  QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;};
+  QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => Maximum_Priority;};
   MESSAGE_ADDR: in out parameter MESSAGE_TYPE;
   LENGTH: in parameter MESSAGE_SIZE_TYPE;
   TIME_OUT: in parameter SYSTEM_TIME_TYPE;
@@ -402,7 +402,7 @@ subprogram Receive_Queuing_Message
 prototypes
   MESSAGE_TYPE: data;
 features
-  QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;};
+  QUEUING_PORT_ID: requires data access QUEUING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => Maximum_Priority;};
   TIME_OUT: in parameter SYSTEM_TIME_TYPE;
   MESSAGE_ADDR: out parameter MESSAGE_TYPE;
   LENGTH: out parameter MESSAGE_SIZE_TYPE;
@@ -497,7 +497,7 @@ subprogram Write_Sampling_Message
 prototypes
   MESSAGE_TYPE: data;
 features
-  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => Priority_Ceiling;};
+  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => Maximum_Priority;};
   MESSAGE_ADDR:  in out parameter MESSAGE_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   RETURN_CODE: out parameter RETURN_CODE_TYPE;
@@ -521,7 +521,7 @@ subprogram Read_Sampling_Message
 prototypes
   MESSAGE_TYPE: data;
 features
-  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => Priority_Ceiling;};
+  SAMPLING_PORT_ID: requires data access SAMPLING_PORT_ID_TYPE {Access_Right=>read_only;Concurrency_Control_Protocol => Maximum_Priority;};
   MESSAGE_ADDR: out parameter MESSAGE_TYPE;
   LENGTH:  in parameter MESSAGE_SIZE_TYPE;
   VALIDITY: out parameter VALIDITY_TYPE;
