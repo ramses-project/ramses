@@ -1,6 +1,8 @@
-package fr.tpt.trc.handler;
+package fr.tpt.atl.to.trc.handler;
 
-import java.util.List;
+import java.io.File;
+import java.util.Iterator;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.AbstractHandler;
@@ -8,196 +10,114 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.xtext.parsetree.reconstr.Serializer;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.utils.Aadl2Utils;
+
 import fr.tpt.aadl.ramses.control.support.utils.Names;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
+import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
+
+import org.trc.xtext.dsl.DslRuntimeModule;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 
 public class UpdateTrcModulesActionHandler extends AbstractHandler {
 
-	
+  protected static boolean _isOutline = false;
+  protected IProject _currentProject = null ;
+  public String trcFile = "";
+  int cpt =0;
 
-	protected static boolean _isOutline = false;
-	protected IProject _currentProject = null ;
-	protected ExecutionEvent _event = null ;
-
-	protected static String _JOB_NAME;
-//	
-//	private static final String _OK_STATUS = "OK" ;
-//	private static final String _CANCEL_STATUS = "CANCEL" ;
-//	private static final String _ABORT_STATUS = "FATAL" ;
-//	  
-	private static Logger _LOGGER = Logger.getLogger(UpdateTrcModulesActionHandler.class) ;
+  protected ExecutionEvent _event = null ;
+  private static final String COMMAND_ID = "fr.tpt.atl.to.trc.handler.trc.update";
+  protected static String _JOB_NAME;
+  private static Logger _LOGGER = Logger.getLogger(UpdateTrcModulesActionHandler.class) ;
 	
-	// Call init method to setup these attributes.
-	//protected _trc _modules = null ;
-	protected List<EObject> _trc = null;
-	protected List<EClass> _modules = null;
-
-	//OR (init will not initialize both)
-	//protected SystemInstance _sysInst = null ;
-	
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		try {
-			init(event, "TO CHANGE");
-		} catch (Exception e) {
-			_LOGGER.error("Error in update of TRC Modules");
-		}
-		return event;
-	}
-	
-	protected void init(ExecutionEvent event, String Command)
-			throws Exception
+  // Call init method to setup these attributes.
+		
+  @Override
+  public Object execute(ExecutionEvent event) throws ExecutionException 
+  {
+    try 
+    {
+	  init(event, COMMAND_ID);
+	} 
+    catch (Exception e) 
 	{
-		_event = event;
-		ISelection s = HandlerUtil.getCurrentSelection(event) ;
-		IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;
-//		IFile node = (IFile) ((IStructuredSelection) s).toList() ;
-		_currentProject = node.getProject() ;
-//		Resource resource = OsateResourceUtil.getResource((IResource) node) ;
-		
-		// Launch HOT ATL to Module list
-		// classe atlToX qui etend atltoatl et factoriser mon code
-		String atlDirPath = Aadl2Utils.getAbsolutePluginPath(Names.
-                ATL_TRANSFORMATION_PLUGIN_ID).toString() ;
-		
-		System.out.println("chemin : "+atlDirPath);
-		_LOGGER.info("OSATE project is \'" + _currentProject.getName() + '\'');
-		_LOGGER.info("system implementation to generate (button action) is \'" + _trc.get(0).toString() + '\''); // to modify
+	  _LOGGER.error("Error in update of TRC Modules");
 	}
+	  return event;
+  }
 	
-	
-//	  protected void doAction()
-//	  {
-//	    Job job = new Job(_JOB_NAME)
-//	    {
-//	      @Override
-//	      protected IStatus run(final IProgressMonitor monitor)
-//	      {
-//	        IStatus result = null ;
-//	        
-//	        try
-//	        {
-//	          final TransactionalEditingDomain domain = TransactionalEditingDomain.
-//	              Registry.INSTANCE.
-//	              getEditingDomain("org.osate.aadl2.ModelEditingDomain") ;
-//	          // We execute this command on the command stack because otherwise, we will
-//	          // not have write permissions on the editing domain.
-//	          RecordingCommandWithException cmd = new RecordingCommandWithException(domain)
-//	          {
-//	            protected void doExecute()
-//	            {
-//	              try
-//	              {
-//
-//	                // Make sure that this xtext editor is saved.
-//	                IEditorPart editor = HandlerUtil.getActiveEditor(_event) ;
-//	                if(editor!=null)
-//	                  WorkbenchUtils.saveEditor(editor);
-//	                
-//	                
-////	                jobCore(monitorWrapper) ;
-//	                
-//	                this.setLabel(_OK_STATUS) ;
-//	              }
-//	              catch(OperationCanceledException e)
-//	              {
-//	                _LOGGER.info(cancelMsg(e));
-//	                this.setLabel(_CANCEL_STATUS);
-//	              }
-//	              catch(VMException e)
-//	              {
-//	                if(e.getCause() instanceof OperationCanceledException)
-//	                {
-//	                  _LOGGER.info(cancelMsg((OperationCanceledException) e.getCause()));
-//	                  this.setLabel(_CANCEL_STATUS);
-//	                }
-//	                else
-//	                {
-//	                  _LOGGER.fatal("", e) ;
-//	                  fatal(e) ;
-//	                }
-//	              }
-//	              catch(Exception e)
-//	              {
-//	                _LOGGER.fatal("", e) ;
-//	                fatal(e) ;
-//	              }
-//	            }
-//
-//	            private void fatal(Exception e)
-//	            {
-//	              // Don't report error to the user.
-//	              // Eclipse will open an error dialog thanks to the status.
-//	              this.setLabel(_ABORT_STATUS) ;
-//	              this.exceptionCaught = e ;
-//	            }
-//
-//	            private String cancelMsg(OperationCanceledException e)
-//	            {
-//	              StringBuilder sb = new StringBuilder() ;
-//	              sb.append(Names.NEW_LINE) ;
-//	              sb.append(Names.NEW_LINE) ;
-//	              sb.append("********************************************************************************") ;
-//	              sb.append(Names.NEW_LINE) ;
-//	              if(! (e.getMessage() == null || e.getMessage().isEmpty()))
-//	              {
-//	                sb.append(e.getMessage()) ;
-//	              }
-//	              else
-//	              {
-//	                sb.append("User has canceled") ;
-//	              }
-//	              sb.append(Names.NEW_LINE) ;
-//	              sb.append("********************************************************************************") ;
-//	              sb.append(Names.NEW_LINE) ;
-//	              
-//	              return sb.toString() ;
-//	            }
-//	          } ;
-//
-//	          ((TransactionalCommandStack) domain.getCommandStack()).execute(cmd,
-//	                                                                         null) ;
-//	          if(_ABORT_STATUS.equals(cmd.getLabel()))
-//	          {
-//	            result = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-//	                                "FATAL ERROR", cmd.exceptionCaught) ;
-//	          }
-//	          else
-//	          {
-//	            // Don't show error if any exception has been raised: escape side effects.
-//	            if(_OK_STATUS.equals(cmd.getLabel()))
-//	            {
-//	              result = Status.OK_STATUS ;
-//	            }
-//	            else
-//	            {
-//	              result = Status.CANCEL_STATUS ;
-//	            }
-//	          }
-//	        }
-//	        catch(Exception e)
-//	        {
-//	          _LOGGER.fatal("", e);
-//	          result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "FATAL ERROR", e) ;
-//	        }
-//	        finally
-//	        {
-//	          HookAccessImpl.cleanupTransformationTrace() ;
-//	        }
-//	        
-//	        return result ;
-//	      }
-//	    };
-//	    
-//	    job.setUser(true);
-//	    job.schedule();
-//	  }
-}
+  protected void init(ExecutionEvent event, String Command)
+    throws Exception
+  {
+//    List<Module> moduleList = new ArrayList<Module>();
+//    List<String> alreadyAdded = new ArrayList<String>();
+    _event = event;
+	ISelection s = HandlerUtil.getCurrentSelection(event) ;
+	IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;		
+	_currentProject = node.getProject() ;
+	Resource resource = OsateResourceUtil.getResource((IResource) node) ;
 
-// TODO: make an independant class in support package since it is used (and copy/pasted) in two classes
+   	String atlDirPath = Aadl2Utils.getAbsolutePluginPath(Names.ATL_TRANSFORMATION_PLUGIN_ID).toString();
+   	_LOGGER.info("OSATE project is \'" + _currentProject.getName() + '\'');
+   	   	
+	//create hot launcher object
+	String[] AtlInputs = getFilesDirectory(atlDirPath);
+	
+//	for (int i=0; i<AtlInputs.length;i++)
+//	   	_LOGGER.info("Atl files is \'" + AtlInputs[i] + '\'');
+	
+	Atl2TrcLauncher hotLauncher = new Atl2TrcLauncher("Atl2Trc4Rule", resource.getResourceSet());
+	
+	Resource r = hotLauncher.launchHot(AtlInputs);
+	TrcSpecification newSpec = (TrcSpecification) r.getContents().get(0);
+	TrcSpecification oldSpec = (TrcSpecification) resource.getContents().get(0);
+	oldSpec.getModuleList().getModules().clear();
+	oldSpec.getModuleList().getModules().addAll(newSpec.getModuleList().getModules());
+
+	// Serialize xtext new trc module
+	Injector injector = Guice.createInjector(new  DslRuntimeModule());  
+	Serializer serializer = injector.getInstance(Serializer.class);  
+	String serializerr = serializer.serialize(newSpec);
+  }
+
+  private String[] getFilesDirectory(String path) 
+  {
+    Stack<File> stack = new Stack<File>();
+    Stack<String> AtlF = new Stack<String>();
+	stack.push(new File(path));
+	while(!stack.isEmpty()) 
+	{ 
+	  File pathOfCurrrentFileOrDir = stack.pop();
+	  if (pathOfCurrrentFileOrDir.isDirectory()) 
+	  {	
+	    for(File f : pathOfCurrrentFileOrDir.listFiles())
+		  stack.push(f);		  
+	  }
+	  else if (pathOfCurrrentFileOrDir.isFile()) 
+	  {
+	    if(pathOfCurrrentFileOrDir.getName().endsWith("atl"))
+	      AtlF.push(pathOfCurrrentFileOrDir.getPath());
+	  }
+	}
+	String AtlFiles[] = new String[AtlF.size()];
+	int nbfiles = 0;
+	while(!AtlF.isEmpty())
+	{
+	  AtlFiles[nbfiles] = AtlF.pop();
+	  nbfiles++;
+	}
+    return AtlFiles;
+  }
+
+}

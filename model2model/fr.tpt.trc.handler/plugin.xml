@@ -5,7 +5,7 @@
    <extension
      point="org.eclipse.core.expressions.definitions">
      <definition
-       id="fr.tpt.trc.handler.generation.expression">
+       id="fr.tpt.atl.to.trc.handler.generation.expression">
        <with
          variable="selection">
          <and>
@@ -17,7 +17,7 @@
              </instanceof>
              <test
                property="org.eclipse.core.resources.extension"
-               value="trc">
+               value="trcDsl">
              </test>
            </iterate>
            <count
@@ -35,7 +35,7 @@
           id="ramses.menu"
           label="RAMSES">
        <command
-             commandId="fr.tpt.trc.handler.trc.update"
+             commandId="fr.tpt.atl.to.trc.handler.trc.update"
              label="Update TRC modules"
              style="push"
              tooltip="Update TRC modules">
@@ -47,11 +47,11 @@
    <extension
 		point="org.eclipse.ui.handlers">
 		<handler 
-			class="fr.tpt.trc.handler.UpdateTrcModulesActionHandler"
-			commandId="fr.tpt.trc.handler.trc.update">
+			class="fr.tpt.atl.to.trc.handler.UpdateTrcModulesActionHandler"
+			commandId="fr.tpt.atl.to.trc.handler.trc.update">
      <enabledWhen>
         <reference
-              definitionId="fr.tpt.trc.handler.generation.expression">
+              definitionId="fr.tpt.atl.to.trc.handler.generation.expression">
         </reference>
      </enabledWhen>
 		</handler>
@@ -61,7 +61,7 @@
 		point="org.eclipse.ui.commands">
         <command
             description="Update TRC modules"
-        	id="fr.tpt.trc.handler.trc.update"
+        	id="fr.tpt.atl.to.trc.handler.trc.update"
         	name="Generate code">
  		</command>
    </extension>

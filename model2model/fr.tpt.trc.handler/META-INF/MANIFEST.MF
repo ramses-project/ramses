@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AADL-RAMSES-OSATE
-Bundle-SymbolicName: fr.tpt.trc.handler;singleton:=true
+Bundle-SymbolicName: fr.tpt.atl.to.trc;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: fr.tpt.trc.handler.Activator
+Bundle-Activator: fr.tpt.atl.to.trc.handler.Activator
 Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.ui.workbench.texteditor;bundle-version="3.8.0",
  org.eclipse.core.runtime,
@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.emf.ecore,
  org.eclipse.core.expressions,
  org.eclipse.emf.transaction,
+ fr.tpt.aadl.ramses.transformation.trc,
  org.osate.ui,
  org.osate.aadl2,
  org.osate.aadl2.modelsupport,
@@ -27,7 +28,13 @@ Require-Bundle: org.eclipse.ui.ide,
  fr.tpt.aadl.ramses.generation.osek,
  fr.tpt.atl.utils,
  org.eclipse.m2m.atl.emftvm,
- fr.tpt.aadl.sched.tools.aadlinspector
+ fr.tpt.aadl.sched.tools.aadlinspector,
+ org.eclipse.m2m.atl.core;bundle-version="3.4.0",
+ org.eclipse.m2m.atl.core.emf;bundle-version="3.4.0",
+ org.apache.commons.io;bundle-version="2.0.1",
+ org.trc.xtext.dsl;bundle-version="1.0.0",
+ org.eclipse.m2m.atl.engine.emfvm.launch;bundle-version="3.4.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: TELECOM ParisTech
+

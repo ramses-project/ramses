@@ -19,7 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.trc.handler;
+package fr.tpt.atl.to.trc.handler;
 
 import java.io.File;
 
