@@ -141,10 +141,8 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 	launcher.initialize(launcherOptions);
 	launcher.addInModel(inModel, "IN", "MM_ATL");
 	launcher.addOutModel(outModel, "OUT", "MM_TRC");
-	System.out.println("before the resource");
 	Resource r =  (Resource) launcher.launch("run", monitor, launcherOptions,
-			  (Object[]) getModulesList());
-	System.out.println("the resource : "+r.getURI().toString());
+			  (Object[]) getModulesList()); ///////// EXECUTION BLOCKED HERE
 	return r;
   }
   
