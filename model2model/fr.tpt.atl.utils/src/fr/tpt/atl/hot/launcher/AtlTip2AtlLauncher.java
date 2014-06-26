@@ -58,157 +58,157 @@ public class AtlTip2AtlLauncher extends AtlHotTransfoLauncher
 {
 
 
-/**
+	/**
 
-* The IN2 model.
+	 * The IN2 model.
 
-* @generated
+	 * @generated
 
-*/
+	 */
 
-protected IModel in2Model;
+	protected IModel in2Model;
 
-private IModel in3Model;
+	private IModel in3Model;
 
 
-private static final String AADLI_MM_URI =
+	private static final String AADLI_MM_URI =
 
-org.osate.aadl2.instance.InstancePackage.eNS_URI ;
+			org.osate.aadl2.instance.InstancePackage.eNS_URI ;
 
-private static final String AADLBA_MM_URI =
+	private static final String AADLBA_MM_URI =
 
-org.osate.ba.aadlba.AadlBaPackage.eNS_URI ;
+			org.osate.ba.aadlba.AadlBaPackage.eNS_URI ;
 
-private static final String AADL2_MM_URI =
+	private static final String AADL2_MM_URI =
 
-org.osate.aadl2.Aadl2Package.eNS_URI ;
+			org.osate.aadl2.Aadl2Package.eNS_URI ;
 
-private static final String TIP_MM_URI =
+	private static final String TIP_MM_URI =
 
-fr.tpt.aadl.ramses.transformation.tip.TipPackage.eNS_URI;
+			fr.tpt.aadl.ramses.transformation.tip.TipPackage.eNS_URI;
 
 
 
-public AtlTip2AtlLauncher(String hotTransformationName,
+	public AtlTip2AtlLauncher(String hotTransformationName,
 
-ResourceSet rs) throws IOException {
+			ResourceSet rs) throws IOException {
 
-super(hotTransformationName, rs);
+		super(hotTransformationName, rs);
 
 
-EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
+		EPackage.Registry.INSTANCE.put(AADL2_MM_URI,
 
-org.osate.aadl2.Aadl2Package.eINSTANCE) ;
+				org.osate.aadl2.Aadl2Package.eINSTANCE) ;
 
-Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put(
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put(
 
-"tip", new XMIResourceFactoryImpl());
+				"tip", new XMIResourceFactoryImpl());
 
-Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put(
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put(
 
-"atxl", new XMIResourceFactoryImpl());
+				"atxl", new XMIResourceFactoryImpl());
 
 
-EPackage.Registry.INSTANCE.put(AADLI_MM_URI, InstancePackage.eINSTANCE) ;
+		EPackage.Registry.INSTANCE.put(AADLI_MM_URI, InstancePackage.eINSTANCE) ;
 
-EPackage.Registry.INSTANCE.put(AADLBA_MM_URI, AadlBaPackage.eINSTANCE) ;
+		EPackage.Registry.INSTANCE.put(AADLBA_MM_URI, AadlBaPackage.eINSTANCE) ;
 
-EPackage.Registry.INSTANCE.put(TIP_MM_URI, TipPackage.eINSTANCE) ;
+		EPackage.Registry.INSTANCE.put(TIP_MM_URI, TipPackage.eINSTANCE) ;
 
 
-Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
 
-.put("aaxl2", new InstanceResourceFactoryImpl()) ;
+		.put("aaxl2", new InstanceResourceFactoryImpl()) ;
 
 
-}
+	}
 
 
 
-/**
+	/**
 
-* Load the input and input/output models, initialize output models.
+	 * Load the input and input/output models, initialize output models.
 
-*
+	 *
 
-* @param inModelPath
+	 * @param inModelPath
 
-* the IN model path
+	 * the IN model path
 
-* @throws ATLCoreException
+	 * @throws ATLCoreException
 
-* if a problem occurs while loading models
+	 * if a problem occurs while loading models
 
-* @throws IOException
+	 * @throws IOException
 
-* @generated
+	 * @generated
 
-*/
+	 */
 
-public void loadModels(String[] inModelPaths) throws ATLCoreException,
+	public void loadModels(String[] inModelPaths) throws ATLCoreException,
 
-IOException {
+	IOException {
 
 
-AtlConverter.convertToModel(inModelPaths[0], resourceSet);
+		AtlConverter.convertToModel(inModelPaths[0], resourceSet);
 
 
-ModelFactory factory = new EMFModelFactory();
+		ModelFactory factory = new EMFModelFactory();
 
 
-EMFInjector injector = new EMFInjector();
+		EMFInjector injector = new EMFInjector();
 
 
-IReferenceModel mm_atlMetamodel = factory.newReferenceModel();
+		IReferenceModel mm_atlMetamodel = factory.newReferenceModel();
 
-injector.inject(mm_atlMetamodel, getMetamodelUri("MM_ATL"));
+		injector.inject(mm_atlMetamodel, getMetamodelUri("MM_ATL"));
 
 
-IReferenceModel mm_tipMetamodel = factory.newReferenceModel();
+		IReferenceModel mm_tipMetamodel = factory.newReferenceModel();
 
-injector.inject(mm_tipMetamodel, getMetamodelUri("MM_TIP"));
+		injector.inject(mm_tipMetamodel, getMetamodelUri("MM_TIP"));
 
 
-IReferenceModel mm_AADLIMetamodel = factory.newReferenceModel();
+		IReferenceModel mm_AADLIMetamodel = factory.newReferenceModel();
 
-injector.inject(mm_AADLIMetamodel, getMetamodelUri("AADLI"));
+		injector.inject(mm_AADLIMetamodel, getMetamodelUri("AADLI"));
 
 
-this.inModel = factory.newModel(mm_atlMetamodel);
+		this.inModel = factory.newModel(mm_atlMetamodel);
 
 
-boolean modelExists = false;
+		boolean modelExists = false;
 
-String s = null;
+		String s = null;
 
-while (!modelExists) {
+		while (!modelExists) {
 
-s = new Path(inModelPaths[0]).removeFileExtension()
+			s = new Path(inModelPaths[0]).removeFileExtension()
 
-.addFileExtension("atxl").toString();
+					.addFileExtension("atxl").toString();
 
-if (new File(s).exists()) {
+			if (new File(s).exists()) {
 
-modelExists = true;
+				modelExists = true;
 
-} else {
+			} else {
 
-try {
+				try {
 
-Thread.sleep(200);
+					Thread.sleep(200);
 
-} catch (InterruptedException e) {
+				} catch (InterruptedException e) {
 
-e.printStackTrace();
+					e.printStackTrace();
 
-}
+				}
 
-}
+			}
 
-}
+		}
 
 
-/*String fileName = URI.createFileURI(inModelPaths[0]).toString();
+		/*String fileName = URI.createFileURI(inModelPaths[0]).toString();
 
 Path filePath = (Path) new Path(fileName).removeFileExtension()
 
@@ -225,14 +225,14 @@ atlResource=resourceSet.createResource(atxlURI);
 injector.inject(inModel, atlResource);*/
 
 
-String fileURI = URI.createFileURI(inModelPaths[0]).toString();
+		String fileURI = URI.createFileURI(inModelPaths[0]).toString();
 
-injector.inject(inModel, new Path(fileURI).removeFileExtension()
+		injector.inject(inModel, new Path(fileURI).removeFileExtension()
 
-.addFileExtension("atxl").toString());
+				.addFileExtension("atxl").toString());
 
 
-/*URI tipURI = URI.createFileURI(inModelPaths[1]);
+		/*URI tipURI = URI.createFileURI(inModelPaths[1]);
 
 Resource tipResource = resourceSet.getResource(tipURI, false);
 
@@ -240,14 +240,14 @@ this.in2Model = factory.newModel(mm_tipMetamodel);
 
 injector.inject(in2Model, tipResource);*/
 
-this.in2Model = factory.newModel(mm_tipMetamodel);
+		this.in2Model = factory.newModel(mm_tipMetamodel);
 
-fileURI = URI.createFileURI(inModelPaths[1]).toString();
+		fileURI = URI.createFileURI(inModelPaths[1]).toString();
 
-injector.inject(in2Model, fileURI);
+		injector.inject(in2Model, fileURI);
 
 
-/*URI instanceModelURI = URI.createFileURI(inModelPaths[2]);
+		/*URI instanceModelURI = URI.createFileURI(inModelPaths[2]);
 
 Resource instanceResource = resourceSet.getResource(instanceModelURI, false);
 
@@ -260,78 +260,78 @@ in3Model = factory.newModel(mm_AADLIMetamodel);
 injector.inject(in3Model, instanceResource);*/
 
 
-this.in3Model = factory.newModel(mm_AADLIMetamodel);
+		this.in3Model = factory.newModel(mm_AADLIMetamodel);
 
-fileURI = URI.createFileURI(inModelPaths[2]).toString();
+		fileURI = URI.createFileURI(inModelPaths[2]).toString();
 
-Map<String, Object> options = new HashMap<String, Object>();
+		Map<String, Object> options = new HashMap<String, Object>();
 
-options.put(EMFInjector.OPTION_LOAD_ON_DEMAND, false);
+		options.put(EMFInjector.OPTION_LOAD_ON_DEMAND, false);
 
-injector.inject(in3Model, fileURI, options);
-
-
-
-this.outModel = factory.newModel(mm_atlMetamodel);
-
-}
+		injector.inject(in3Model, fileURI, options);
 
 
 
+		this.outModel = factory.newModel(mm_atlMetamodel);
 
-/**
+	}
 
-* Transform the models.
 
-*
 
-* @param monitor
 
-* the progress monitor
+	/**
 
-* @throws ATLCoreException
+	 * Transform the models.
 
-* if an error occurs during models handling
+	 *
 
-* @throws IOException
+	 * @param monitor
 
-* if a module cannot be read
+	 * the progress monitor
 
-* @throws ATLExecutionException
+	 * @throws ATLCoreException
 
-* if an error occurs during the execution
+	 * if an error occurs during models handling
 
-*
+	 * @throws IOException
 
-* @generated
+	 * if a module cannot be read
 
-*/
+	 * @throws ATLExecutionException
 
-public Object doHot(IProgressMonitor monitor) throws ATLCoreException,
+	 * if an error occurs during the execution
 
-IOException, ATLExecutionException {
+	 *
 
-EMFVMLauncher launcher = new EMFVMLauncher();
+	 * @generated
 
-Map<String, Object> launcherOptions = getOptions();
+	 */
 
-launcherOptions.put("allowInterModelReferences", Boolean.TRUE);
+	public Object doHot(IProgressMonitor monitor) throws ATLCoreException,
 
-launcher.initialize(launcherOptions);
+	IOException, ATLExecutionException {
 
-launcher.addInModel(inModel, "IN", "MM_ATL");
+		EMFVMLauncher launcher = new EMFVMLauncher();
 
-launcher.addInModel(in2Model, "IN2", "MM_TIP");
+		Map<String, Object> launcherOptions = getOptions();
 
-launcher.addInModel(in3Model, "INSTANCE_MODEL", "AADLI");
+		launcherOptions.put("allowInterModelReferences", Boolean.TRUE);
 
-launcher.addOutModel(outModel, "OUT", "MM_ATL");
+		launcher.initialize(launcherOptions);
 
-return launcher.launch("run", monitor, launcherOptions,
+		launcher.addInModel(inModel, "IN", "MM_ATL");
 
-(Object[]) getModulesList());
+		launcher.addInModel(in2Model, "IN2", "MM_TIP");
 
-}
+		launcher.addInModel(in3Model, "INSTANCE_MODEL", "AADLI");
+
+		launcher.addOutModel(outModel, "OUT", "MM_ATL");
+
+		return launcher.launch("run", monitor, launcherOptions,
+
+				(Object[]) getModulesList());
+
+	}
 
 
 

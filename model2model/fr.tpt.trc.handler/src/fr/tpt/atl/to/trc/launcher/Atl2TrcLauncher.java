@@ -82,9 +82,10 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 
 	boolean modelExists = false;
 	String s = null;
-	while (!modelExists) {
+//	while (!modelExists) {
 		s = new Path(inModelPaths[0]).removeFileExtension()
 				.addFileExtension("atxl").toString();
+		System.out.println("valeur de s ;"+s);
 		if (new File(s).exists()) {
 			modelExists = true;
 		} else {
@@ -94,7 +95,7 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 				e.printStackTrace();
 			}
 		}
-	}
+//	}
     
 //    String[] s = new String[tableSize];
 ////   	  for(int i=0; i<tableSize; i++)
@@ -110,20 +111,11 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 	String fileURI = URI.createFileURI(inModelPaths[0]).toString();
 	injector.inject(inModel, new Path(fileURI).removeFileExtension()
 			.addFileExtension("atxl").toString());
-
-	/*URI tipURI = URI.createFileURI(inModelPaths[1]);
-	Resource tipResource = resourceSet.getResource(tipURI, false);
-	this.in2Model = factory.newModel(mm_tipMetamodel);
-	injector.inject(in2Model, tipResource);*/
-
-	/*URI instanceModelURI = URI.createFileURI(inModelPaths[2]);
-	Resource instanceResource = resourceSet.getResource(instanceModelURI, false);
-	if(instanceResource==null)
-		instanceResource = resourceSet.createResource(instanceModelURI);
-	in3Model = factory.newModel(mm_AADLIMetamodel);
-	injector.inject(in3Model, instanceResource);*/
+		
+	// atxl file
 	
-	this.outModel = factory.newModel(mm_atlMetamodel);
+	this.outModel = factory.newModel(mm_trcMetamodel);
+
 }
 
 
@@ -149,8 +141,11 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 	launcher.initialize(launcherOptions);
 	launcher.addInModel(inModel, "IN", "MM_ATL");
 	launcher.addOutModel(outModel, "OUT", "MM_TRC");
-	return (Resource) launcher.launch("run", monitor, launcherOptions,
+	System.out.println("before the resource");
+	Resource r =  (Resource) launcher.launch("run", monitor, launcherOptions,
 			  (Object[]) getModulesList());
+	System.out.println("the resource : "+r.getURI().toString());
+	return r;
   }
   
   @Override
