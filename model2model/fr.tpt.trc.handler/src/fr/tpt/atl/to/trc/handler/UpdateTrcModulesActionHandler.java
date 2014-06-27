@@ -11,6 +11,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -20,10 +21,12 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.utils.Aadl2Utils;
 
 import fr.tpt.aadl.ramses.control.support.utils.Names;
+import fr.tpt.aadl.ramses.transformation.trc.Module;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
 import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
 
 import org.trc.xtext.dsl.DslRuntimeModule;
+import org.trc.xtext.dsl.dsl.Modules;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -78,17 +81,30 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 //	   	_LOGGER.info("Atl files is \'" + AtlInputs[i] + '\'');
 	
 	Atl2TrcLauncher hotLauncher = new Atl2TrcLauncher("Atl2Trc4Rule", resource.getResourceSet());
+	String outputPath=_currentProject.getFullPath().toOSString()+"/out_tmp.xmi";
 	
-	Resource r = hotLauncher.launchHot(AtlInputs);
+	hotLauncher.launchHot(AtlInputs, outputPath);
+	
+	Resource r = resource.getResourceSet().getResource(URI.createURI(outputPath), true);
 	TrcSpecification newSpec = (TrcSpecification) r.getContents().get(0);
-	TrcSpecification oldSpec = (TrcSpecification) resource.getContents().get(0);
-	oldSpec.getModuleList().getModules().clear();
-	oldSpec.getModuleList().getModules().addAll(newSpec.getModuleList().getModules());
-
+	org.trc.xtext.dsl.dsl.TrcSpecification oldSpec = (org.trc.xtext.dsl.dsl.TrcSpecification) resource.getContents().get(0);
+	oldSpec.getModuleList().get(0).getModules().clear();
+	for(Module m: newSpec.getModuleList().getModules())
+	{
+		Modules newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModules();
+		newM.setName(m.getName());
+		newM.setPath(m.getPath());
+		oldSpec.getModuleList().get(0).getModules().add(newM);
+	}
+	r.delete(null);
 	// Serialize xtext new trc module
+	
+	
 	Injector injector = Guice.createInjector(new  DslRuntimeModule());  
 	Serializer serializer = injector.getInstance(Serializer.class);  
 	String serializerr = serializer.serialize(newSpec);
+	URI trcUri = resource.getURI(); /// chemin
+	
   }
 
   private String[] getFilesDirectory(String path) 

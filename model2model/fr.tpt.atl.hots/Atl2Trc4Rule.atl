@@ -20,7 +20,16 @@ rule Module {
     to t : MM_TRC!"trc::Module" (    		
     	name  <- s.name,
 		path  <- s.location,
-		rules <- s.elements -> collect(e | e.name))
+		rules <- s.elements -> collect(e | e.name)),
+
+	   t2 :MM_TRC!"TrcSpecification" 
+		(
+			moduleList <- t3
+		),
+	   t3 :MM_TRC!"ModuleList" 
+	   (
+	   		modules <- t
+	   )
 }
 
 

@@ -10,16 +10,15 @@
  *******************************************************************************/
 package fr.tpt.atl.to.trc.launcher;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.m2m.atl.common.ATLExecutionException;
@@ -34,15 +33,21 @@ import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
 import org.eclipse.m2m.atl.core.launch.ILauncher;
 import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
 import fr.tpt.atl.hot.launcher.Atl2XLauncher;
 import fr.tpt.atl.hot.launcher.AtlConverter;
 
 public class Atl2TrcLauncher extends Atl2XLauncher {
+
+private static final String TRC_MM_URI =
+  fr.tpt.aadl.ramses.transformation.trc.TrcPackage.eNS_URI;
 	
   public Atl2TrcLauncher(String transformation, ResourceSet rs)
     throws IOException
   {
     super(transformation, rs) ;
+    EPackage.Registry.INSTANCE.put(TRC_MM_URI, TrcPackage.eINSTANCE) ;
   }
   
   
@@ -58,12 +63,15 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 	 * @generated
 	 */
 
-  public void loadModels(String[] inModelPaths, int tableSize) throws ATLCoreException,
+  
+  @Override
+  public void loadModels(String[] inModelPaths) throws ATLCoreException,
   IOException 
   {
 //	for(int i=0; i<tableSize; i++)
 //	{
 	  AtlConverter.convertToModel(inModelPaths[0], resourceSet);
+	 
 //	}
 //	String rootAtl = "platform:/plugin/" + "fr.tpt.atl.utils/";
 
@@ -78,44 +86,14 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
     IReferenceModel mm_trcMetamodel = factory.newReferenceModel();
     injector.inject(mm_trcMetamodel, getMetamodelUri("MM_TRC"));
 
-    this.inModel = factory.newModel(mm_atlMetamodel);
-
-	boolean modelExists = false;
-	String s = null;
-//	while (!modelExists) {
-		s = new Path(inModelPaths[0]).removeFileExtension()
-				.addFileExtension("atxl").toString();
-		System.out.println("valeur de s ;"+s);
-		if (new File(s).exists()) {
-			modelExists = true;
-		} else {
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-//	}
-    
-//    String[] s = new String[tableSize];
-////   	  for(int i=0; i<tableSize; i++)
-////   	  {
-//   		s[0] = new Path(inModelPaths[0]).removeFileExtension().
-//   				  addFileExtension("atxl").toString();
-//
-//   		fileURI[0] = URI.createFileURI(inModelPaths[0]).toString();
-//   	    injector.inject(inModel, new Path(fileURI[0]).removeFileExtension()
-//   	    		.addFileExtension("atxl").toString());
-////    }
+    inModel = factory.newModel(mm_atlMetamodel);
 
 	String fileURI = URI.createFileURI(inModelPaths[0]).toString();
 	injector.inject(inModel, new Path(fileURI).removeFileExtension()
 			.addFileExtension("atxl").toString());
-		
 	// atxl file
 	
-	this.outModel = factory.newModel(mm_trcMetamodel);
-
+	outModel = factory.newModel(mm_trcMetamodel);
 }
 
 
@@ -124,6 +102,7 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 	 * 
 	 * @param monitor
 	 *            the progress monitor
+	 * @return 
 	 * @throws ATLCoreException
 	 *             if an error occurs during models handling
 	 * @throws IOException
@@ -133,7 +112,8 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 	 * 
 	 * @generated
 	 */
-  public Resource doHot(IProgressMonitor monitor) throws ATLCoreException,
+  @Override
+ public Object doHot(IProgressMonitor monitor) throws ATLCoreException,
     IOException, ATLExecutionException 
   {
     ILauncher launcher = new EMFVMLauncher();
@@ -141,9 +121,9 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 	launcher.initialize(launcherOptions);
 	launcher.addInModel(inModel, "IN", "MM_ATL");
 	launcher.addOutModel(outModel, "OUT", "MM_TRC");
-	Resource r =  (Resource) launcher.launch("run", monitor, launcherOptions,
-			  (Object[]) getModulesList()); ///////// EXECUTION BLOCKED HERE
-	return r;
+	return launcher.launch("run", monitor, launcherOptions,
+			  (Object[]) getModulesList());
+	
   }
   
   @Override
@@ -158,10 +138,11 @@ public class Atl2TrcLauncher extends Atl2XLauncher {
 		}
 	}
   
-  
-  public Resource launchHot(String[] atlInputs) throws ATLCoreException, IOException {
-	this.loadModels(atlInputs,atlInputs.length);
-	return this.doHot(new NullProgressMonitor());
-  }
-  
+  @Override
+  public void saveModels(String outFilePath) throws ATLCoreException {
+
+		// atxl file
+		IExtractor extractor = new EMFExtractor();
+		extractor.extract(outModel, outFilePath);
+	}
 }
