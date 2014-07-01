@@ -54,10 +54,13 @@ void nothing_received()
     printf("nothing received\n");
 }
 
-void send_event ()
+void send_event (__event_sender_spg_context * context)
 {
   if(counter<10 && counter>1)
+  {
     printf("send event\n");
+  }
+  __aadl_send_output (context->e, NULL);
 }
 
 void periodic()

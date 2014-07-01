@@ -250,7 +250,7 @@ unique lazy rule Parameter {
 }
 
 -- @extends Feature
-lazy rule DataAccess {
+unique lazy rule DataAccess {
 	from
 		f : AADLI!DataAccess
 	to
@@ -258,6 +258,39 @@ lazy rule DataAccess {
 		(
 			dataFeatureClassifier <- f.dataFeatureClassifier,
 			kind <- f.kind,
+			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		f2;
+	}
+}
+
+-- @extends Feature
+unique lazy rule EventPort {
+	from
+		f : AADLI!EventPort
+	to
+		f2 : AADLBA!EventPort
+		(
+			direction <- f.direction,
+			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
+		)
+	do
+	{
+		f2;
+	}
+}
+
+-- @extends Feature
+unique lazy rule EventDataPort {
+	from
+		f : AADLI!EventDataPort
+	to
+		f2 : AADLBA!EventDataPort
+		(
+			dataFeatureClassifier <- f.dataFeatureClassifier,
+			direction <- f.direction,
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
 	do

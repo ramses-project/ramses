@@ -201,6 +201,9 @@ helper context AADLBA!SubprogramType def: getSubprogramParameters() : Sequence(A
 helper context AADLBA!SubprogramImplementation def: getSubprogramParameters() : Sequence(AADLBA!Parameter) = 
 	self.type.ownedParameter;
 
+helper context AADLI!Feature def : isSubprogramPort() : Boolean =
+	self.eContainer().oclIsKindOf(AADLBA!Subprogram) and self.oclIsKindOf(AADLBA!Port)
+;
 
 helper context AADLI!Feature def : isThreadPort() : Boolean =
 	self.eContainer().oclIsKindOf(AADLBA!Thread) and self.oclIsKindOf(AADLBA!Port)
@@ -469,4 +472,23 @@ helper context AADLI!FeatureInstance def: getLengthInitialValue() : String =
 helper context AADLI!FeatureInstance def: getBehaviorAnnex() : AADLBA!BehaviorAnnex =
 	self.getComponentInstance().subcomponent.classifier.getBA()
 ;
-	
+
+helper context AADLI!SubprogramCall def: getSubprogramClassifier(): AADLBA!SubprogramClassifier = 
+	if(self.calledSubprogram.oclIsTypeOf(AADLBA!SubprogramAccess))then
+		self.calledSubprogram.subprogramFeatureClassifier
+	else
+		self.calledSubprogram
+	endif
+;
+
+helper context AADLI!SubprogramClassifier def: needsContext() : Boolean =
+	not self.getOrderedFeature()->select(e|e.oclIsKindOf(AADLI!Port))->isEmpty()
+;
+
+helper context AADLI!SubprogramClassifier def: getType() : AADLBA!SubprogramType =
+	if(self.oclIsKindOf(AADLBA!SubprogramImplementation)) then
+		self.type
+	else
+		self
+	endif
+;

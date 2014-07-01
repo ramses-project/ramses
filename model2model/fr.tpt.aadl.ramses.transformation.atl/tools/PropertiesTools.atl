@@ -172,6 +172,16 @@ rule CreateStringLiteralPropertyExpression (value : String) {
 	}
 }
 
+rule CreateClassifierValuePropertyExpression(value: AADLBA!Classifier)
+{
+	to
+		pr : AADLBA!ClassifierValue(classifier<-value)
+	do
+	{
+		pr;
+	}
+}
+
 rule CreateEnumValuePropertyExpression (value : String) {
 	to
 		pr : AADLBA!NamedValue(namedValue<-el),
@@ -237,6 +247,19 @@ rule CreateListValueFromListOfString(value: Sequence(String))
 		lv:AADLBA!ListValue
 		(
 			ownedListElement <- value->collect(e | thisModule.CreateStringLiteralPropertyExpression(e))
+		)
+	do
+	{
+		lv;
+	}
+}
+
+rule CreateListValueFromListOfClassifier(value: Sequence(AADLBA!Classifier))
+{
+	to
+		lv:AADLBA!ListValue
+		(
+			ownedListElement <- value->collect(e | thisModule.CreateClassifierValuePropertyExpression(e))
 		)
 	do
 	{

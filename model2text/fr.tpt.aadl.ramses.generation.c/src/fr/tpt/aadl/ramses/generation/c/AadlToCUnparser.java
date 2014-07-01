@@ -464,8 +464,13 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     	  }
     	}
       } else
-    	sourceNameDest.addOutput(GenerationUtilsC.getGenerationCIdentifier(dst
-    	  .getQualifiedName())) ;
+      {
+        String id = PropertyUtils.getStringValue(dst, "Source_Name");
+        if(id == null)
+          id = GenerationUtilsC.getGenerationCIdentifier(dst
+                                                         .getQualifiedName()) ;
+        sourceNameDest.addOutput(id);
+      }
     }
   }
   
@@ -590,8 +595,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   
   protected void getCTypeDeclarator(NamedElement object)
   {
-    String id =
-          GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
+    String id = PropertyUtils.getStringValue(object, "Source_Name");
+    if(id == null)
+      id = GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
     TypeHolder dataTypeHolder = null ;
 
     try
@@ -796,9 +802,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                 if(v instanceof ClassifierValue)
                 {
                   ClassifierValue cv = (ClassifierValue) v ;
-                  String type =
-                        GenerationUtilsC.getGenerationCIdentifier(cv
-                              .getClassifier().getQualifiedName()) ;
+                  String type = PropertyUtils.getStringValue(cv.getClassifier(), "Source_Name");
+                  if(type == null)
+                    type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
+                  
                   structDefinition.append("\t"+type +
                         " " +
                         stringifiedElementNames.get(lv.getOwnedListElements()
@@ -848,8 +855,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         			    	      process(dstActual);
         			    	      sourceName = GenerationUtilsC.resolveExistingCodeDependencies(dstActual, l);
         			    	      if(sourceName==null)
-        			    	    	  sourceName = GenerationUtilsC.getGenerationCIdentifier(dstActual.getQualifiedName());
-        			    	      break;
+        			    	      {
+        			    	        sourceName = PropertyUtils.getStringValue(dstActual, "Source_Name");
+        	                  if(sourceName == null)
+        	                    sourceName = GenerationUtilsC.getGenerationCIdentifier(dstActual.getQualifiedName());
+        			    	    	  break;
+        			    	      }
         			    	    }
         			    	  }
         			    	}
@@ -857,7 +868,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         				}
         				else
         				{
-        				  sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
+        				  sourceName = PropertyUtils.getStringValue(dst, "Source_Name");
+                  if(sourceName == null)
+                    sourceName = GenerationUtilsC.getGenerationCIdentifier(dst.getQualifiedName());
         				}
         			}
         			if(sourceName!=null)
@@ -912,7 +925,11 @@ public class AadlToCUnparser extends AadlProcessingSwitch
               if(v instanceof ClassifierValue)
               {
                 ClassifierValue cv = (ClassifierValue) v ;
-                String type =
+                
+                String type = PropertyUtils.getStringValue(cv
+                                                          .getClassifier(), "Source_Name");
+                if(type == null)
+                  type =
                       GenerationUtilsC.getGenerationCIdentifier(cv
                             .getClassifier().getQualifiedName()) ;
                 unionDeclaration.append("\t"+type +
@@ -1714,7 +1731,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       private void processConnectionEnd(ConnectionEnd ce)
       {
         if(ce instanceof DataSubcomponent)
+        {
           _currentImplUnparser.addOutput(GenerationUtilsC.getGenerationCIdentifier(ce.getQualifiedName())) ;
+        }
         else
         {
           _currentImplUnparser.addOutput(ce.getName()) ;
@@ -1800,9 +1819,12 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         }
         catch(GenerationException e)
         {
-          _currentImplUnparser.addOutput(GenerationUtilsC
+          String id = PropertyUtils.getStringValue(object.getDataFeatureClassifier(), "Source_Name");
+          if(id == null)
+            id = GenerationUtilsC
                 .getGenerationCIdentifier(object.getDataFeatureClassifier()
-                      .getQualifiedName())) ;
+                .getQualifiedName());
+          _currentImplUnparser.addOutput(id) ;
         }
         _currentImplUnparser.addOutput(" ") ;
         if(dataSubprogramName != null)

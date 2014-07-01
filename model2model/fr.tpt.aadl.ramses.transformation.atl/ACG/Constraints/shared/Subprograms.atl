@@ -52,21 +52,29 @@ rule check_HasSourceCode
 }
 
 helper context AADLI!SubprogramCall def: hasSourceCode(): Boolean =
-	self.hasBehaviorAnnex()
+	let called: AADLBA!CalledSubprogram = self.calledSubprogram in
+	let spg: AADLBA!SubprogramClassifier =
+		if called.oclIsKindOf(AADLBA!SubprogramClassifier) then
+		 called
+		else
+		 called.subprogramFeatureClassifier
+		endif
+	in
+	spg.hasBehaviorAnnex()
 	or
-	self.referenceSourceCode()
+	spg.referenceSourceCode()
 	or
-		if(self.ownedExtension.oclIsUndefined()) then
+		if(spg.ownedExtension.oclIsUndefined()) then
 			false
 		else
-			self.ownedExtension.extended.hasSourceCode()
+			spg.ownedExtension.extended.hasSourceCode()
 		endif
 ;
 
-helper context AADLI!SubprogramCall def: referenceSourceCode() : Boolean =
-	self.calledSubprogram.hasProperty('Source_Text') and self.calledSubprogram.hasProperty('Source_Name')
+helper context AADLI!SubprogramClassifier def: referenceSourceCode() : Boolean =
+	self.hasProperty('Source_Text') and self.hasProperty('Source_Name')
 ;
 
-helper context AADLI!SubprogramCall def: hasBehaviorAnnex() : Boolean =
-	self.calledSubprogram.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
+helper context AADLI!SubprogramClassifier def: hasBehaviorAnnex() : Boolean =
+	self.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
 ;

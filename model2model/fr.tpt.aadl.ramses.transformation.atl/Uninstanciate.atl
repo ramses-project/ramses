@@ -55,7 +55,7 @@ rule m_RootSystem_Instance {
 	}
 	to
 		section : AADLBA!PublicPackageSection (
-			ownedClassifier <- AADLI!Classifier.allInstancesFrom('OUT')
+			ownedClassifier <- AADLBA!Classifier.allInstancesFrom('OUT')
 		),
 		pkg : AADLBA!AadlPackage (
 			name <- src_package.name+thisModule.getPackageSuffix(),

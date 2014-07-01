@@ -850,6 +850,9 @@ public class AadlTargetSpecificGenerator implements Generator
       { 
          if (! doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix))
          {
+           Resource inputResource = modelsMap.get(inputId) ;
+           inputResource.unload();
+           modelsMap.remove(inputId);
            return false;
          }
       }

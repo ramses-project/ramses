@@ -41,6 +41,7 @@ helper context AADLI!FeatureInstance def : retreiveMessageAddress() : AADLBA!Dat
 	thisModule.resolveMatchedSingleIfExists(self, 'localVariable')
 ;
 
+
 abstract rule m_Not_PeriodicDelayed_Port
 {
 	from

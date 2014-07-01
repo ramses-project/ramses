@@ -230,6 +230,11 @@ rule m_ThreadEntrypoint {
 														Sequence{}
 													endif
 												)
+												->union(
+													impl.ownedSubprogramCallSequence->collect(
+														e | e.ownedSubprogramCall->collect(f| thisModule.createSubprogramCallContext(f, c))
+													)
+												)
 												->flatten()->excluding(OclUndefined)
 		),
 		returnData: AADLBA!DataSubcomponent
@@ -419,6 +424,88 @@ helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AA
 			->collect(fi|thisModule.createReceiveInputCall(fi))
 		)
 		->union(thisModule.collectTransitionChoiceActions(self))->excluding(OclUndefined)
+;
+	
+unique lazy rule createSubprogramCallContext
+{
+	from
+		sc: AADLI!SubprogramCall,
+		c: AADLI!ComponentInstance
+		(
+			sc.getSubprogramClassifier().needsContext()
+		)
+	using
+	{
+		spgClassifier: AADLI!SubprogramClassifier = sc.getSubprogramClassifier();
+		initValuePE: AADLBA!PropertyExpression = thisModule.CreateStringLiteralPropertyExpression(sc.getContextInitValue(c));
+	}
+	to
+		callContext: AADLBA!DataSubcomponent
+		(
+			name <- sc.name+'_context',
+			dataSubcomponentType <- thisModule.resolveTemp(spgClassifier.getType(), 'ctxt'),
+			ownedPropertyAssociation <- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
+			
+		),
+		lv: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{initValuePE}
+		)
+	do
+	{
+		callContext;
+	}
+}
+
+helper context AADLI!SubprogramCall def: getContextInitValue(c: AADLI!ComponentInstance) : String =
+	-- retreive connections
+	let impl: AADLI!ThreadImplementation = c.subcomponent.classifier in
+	let eventPortConnectionSequence: Sequence(AADLI!Connection) = self.getSubprogramClassifier().getType().ownedEventPort->
+																		collect(e | 
+																			impl.ownedConnection->select(f|f.destination.connectionEnd.oclIsKindOf(AADLI!EventPort)
+																			and f.source.context = self
+																			and f.source.connectionEnd = e)
+																		)->flatten() in
+--		
+--		impl.ownedConnection->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!EventPort)
+--															and e.source.context = self)
+--															->sortedBy(e | self.getSubprogramType().ownedEventPort->indexOf(
+--																e.source.connectionEnd)
+--															)
+--															in
+	let eventDataPortConnectionSequence: Sequence(AADLI!Connection) = self.getSubprogramClassifier().getType().ownedEventDataPort->
+																		collect(e | 
+																			impl.ownedConnection->select(f|f.destination.connectionEnd.oclIsKindOf(AADLI!EventDataPort)
+																			and f.source.context = self
+																			and f.source.connectionEnd = e)
+																		)->flatten() in
+																		
+		
+		
+		
+--		impl.ownedConnection->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!EventDataPort)
+--															and e.source.context = self)
+--															
+--															->sortedBy(e| self.getSubprogramType().ownedEventDataPort->indexOf(
+--																e.source.connectionEnd)
+--															)
+--															in
+	
+	-- retreive event ports connection end of thread
+	let eventPortSequence: Sequence(AADLI!EventPort) = eventPortConnectionSequence->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!EventPort))
+												->collect(e|e.destination.connectionEnd) in
+												
+	-- retreive event data ports connection end of thread
+	let eventDataPortSequence: Sequence(AADLI!EventPort) = eventDataPortConnectionSequence->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!EventDataPort))
+												->collect(e|e.destination.connectionEnd) in
+	
+	-- get port id of thread port
+	thisModule.concatToString(
+		eventPortSequence->collect(e| c.featureInstance->any(f|f.feature=e).getOutputPortId(c.getProcess()) )
+		->union(
+			eventDataPortSequence->collect(e| c.featureInstance->any(f|f.feature=e).getOutputPortId(c.getProcess()) )
+		)
+	)
 ;
 
 unique lazy rule createReceiveInputCall
@@ -899,20 +986,24 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, paramCnx, cnxInst));
 					}
 				}
-				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.source.context=call  and portCnxIter.destination.connectionEnd = fi.feature))
-				{
-					for(cnxInst in fi.srcConnectionInstance)
-					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, portCnx, cnxInst));
-					}
-				}
-				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.destination.context=call  and portCnxIter.source.connectionEnd = fi.feature))
-				{
-					for(cnxInst in fi.srcConnectionInstance)
-					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, portCnx, cnxInst));
-					}
-				}
+				
+				-- users have to send events in their own code or BA subclauses. The code is kept (commented) in case there is a need for it
+				-- in special cases
+				
+--				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.source.context=call  and portCnxIter.destination.connectionEnd = fi.feature))
+--				{
+--					for(cnxInst in fi.srcConnectionInstance)
+--					{
+--						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, portCnx, cnxInst));
+--					}
+--				}
+--				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.destination.context=call  and portCnxIter.source.connectionEnd = fi.feature))
+--				{
+--					for(cnxInst in fi.srcConnectionInstance)
+--					{
+--						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, portCnx, cnxInst));
+--					}
+--				}
 			}
 		}
 		if(fi.isOutputFeature() and fi.isDataPort())
@@ -1249,6 +1340,7 @@ lazy rule populateParameterLabels
 	using
 	{
 	 	impl: AADLI!ThreadImplementation = c.subcomponent.classifier;
+		spgClassifier: AADLI!SubprogramClassifier = OclUndefined;
 		intermediateParameterLabelList: Sequence(AADLBA!ElementHolder) = Sequence{};
 		orderedFeatures: Sequence(AADLBA!Feature) = Sequence{};
 		d: AADLBA!DataSubcomponent = OclUndefined;
@@ -1258,12 +1350,22 @@ lazy rule populateParameterLabels
 		thisModule.addImportedUnitFromInputModel(thisModule.public(), subprogramCall.calledSubprogram);
   		if(subprogramCall.calledSubprogram.oclIsKindOf(AADLI!SubprogramClassifier))
   		{
-  			orderedFeatures <- subprogramCall.calledSubprogram.getOrderedFeature();
+  			spgClassifier <- subprogramCall.calledSubprogram;
+  			orderedFeatures <- spgClassifier.getOrderedFeature();
   		}
 	  	else if(subprogramCall.calledSubprogram.oclIsTypeOf(AADLI!SubprogramAccess))
   		{
-  			orderedFeatures <- subprogramCall.calledSubprogram.subprogramFeatureClassifier.getOrderedFeature();
+	  		spgClassifier <- subprogramCall.calledSubprogram.subprogramFeatureClassifier;
+  			orderedFeatures <- spgClassifier.getOrderedFeature();
   		}
+	  	
+	  	for(sc in behavior.ownedSubprogramCall)
+	  	{
+	  		if(sc.getSubprogramClassifier().needsContext())
+	  		{
+	  			intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataSubcomponentHolder(thisModule.createSubprogramCallContext(sc,c)));
+	  		}
+	  	}
   		for(feature in orderedFeatures)
   		{
   			if(feature.oclIsTypeOf(AADLI!DataAccess))

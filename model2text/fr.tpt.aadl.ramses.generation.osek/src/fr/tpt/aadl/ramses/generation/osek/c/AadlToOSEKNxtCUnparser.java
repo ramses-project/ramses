@@ -124,95 +124,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
     _mainHCode = new UnparseText();
     _startupHook = new Hook();
     _shutdownHook = new Hook();
-		genDevice(si);
 
 		return new RoutingProperties();
-	}
-
-	/**
-	 * Method call on subprogram implementation
-	 */
-  public void process(SubprogramType elt,
-                      File generatedFilePath)
-  {
-    //		Os os = oil.getCpu().getOs();
-
-    String name = PropertyUtils.getStringValue(elt, "Source_Name") ;
-    String port = PropertyUtils.getStringValue(elt, "nxtport") ;
-    
-    if(name == null || port == null)
-    {
-      String what = "";
-      if(name == null)
-      {
-        what = "Source_Name";
-      }
-      
-      if(port == null)
-      {
-        what += " nxtport";
-      }
-      
-      String msg = "cannot fetch " + what + " for \'" + elt.getName() + '\'' ;
-      _LOGGER.error(msg);
-      ServiceProvider.SYS_ERR_REP.error(msg, true);
-      return ;
-    }
-    else
-    {
-      Subprogram subprogram = new Subprogram() ;
-      subprogram.setName(name) ;
-      subprogram.addParameter(port) ;
-      
-      if(_startupHook.getReferences().contains(elt.getName()))
-      {
-        _startupHook.addSubrogram(subprogram) ;
-      }
-      else if(_shutdownHook.getReferences().contains(elt.getName()))
-      {
-        _shutdownHook.addSubrogram(subprogram) ;
-      }
-    }
-  }
-
-	private void genDevice(SystemImplementation si) {
-
-		Os os = oil.getCpu().getOs();
-
-		for (DeviceSubcomponent device : si.getOwnedDeviceSubcomponents())
-		{
-		  Classifier classifier = PropertyUtils.getClassifierValue(device, "Initialize_Entrypoint");
-			if(classifier != null)
-			{
-				/*
-				 * If one thread/device contains Initialize_Entrypoint STARTUPHOOK = true
-				 */
-				os.setStartupHook(true);
-				_startupHook.addReference(classifier.getName());
-			}
-			else
-			{
-			  String errMsg = "cannot fetch initialize entrypoint for " + device ;
-		    _LOGGER.error(errMsg);
-		    ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-			}
-			
-			classifier = PropertyUtils.getClassifierValue(device, "Finalize_Entrypoint");
-			if(classifier != null)
-			{
-				/*
-				 * If one thread/device contains Finalize_Entrypoint SHUTDOWNHOOK = true
-				 */
-				os.setShutdownHook(true);
-				_shutdownHook.addReference(classifier.getName());
-			}
-			else
-			{
-			  String errMsg = "cannot fetch finalize entrypoint for " + device ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-			}
-		}
 	}
 
 	/**
@@ -448,18 +361,6 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
             task.addEvent(this.dataAccessMapping.get(da)) ;
         }
       }
-		}
-		for(SubprogramCallSequence scs: ti.getOwnedSubprogramCallSequences())
-		{
-		  for(SubprogramCall cs: scs.getOwnedSubprogramCalls())
-		  {
-		    if(cs instanceof SubprogramCall)
-		    {
-		      SubprogramCall sc = (SubprogramCall) cs;
-		      if(sc.getCalledSubprogram() instanceof SubprogramType)
-		        this.process((SubprogramType) sc.getCalledSubprogram(), _generatedCodeDirectory);
-		    }
-		  }
 		}
 		
 		/* End task */

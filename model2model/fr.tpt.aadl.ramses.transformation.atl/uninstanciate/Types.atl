@@ -175,10 +175,12 @@ rule m_Thread_Type {
 rule m_Subprogram_Type {
  from 
  	type : AADLI!SubprogramType
- to 
+ to
  	typeImg : AADLBA!SubprogramType (
 		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
 		ownedDataAccess <- type.ownedDataAccess->collect(p|thisModule.DataAccess(p)),
+		ownedEventPort <- type.ownedEventPort->collect(p|thisModule.EventPort(p)),
+		ownedEventDataPort <- type.ownedEventDataPort->collect(p|thisModule.EventDataPort(p)),
 		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
 	)
 }

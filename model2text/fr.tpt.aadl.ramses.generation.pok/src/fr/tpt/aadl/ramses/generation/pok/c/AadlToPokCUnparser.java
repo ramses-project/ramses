@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.generation.pok.c;
 import java.io.File ;
 import java.io.IOException ;
 import java.util.ArrayList ;
+import java.util.Collection ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
@@ -335,6 +336,22 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
     queueInfo.direction = p.getDirection() ;
     
+    queueInfo.portList = new ArrayList<FeatureInstance>();
+    queueInfo.portList.add(fi);
+    List<ConnectionInstance> allConnectionInstances = new ArrayList<ConnectionInstance>();
+    allConnectionInstances.addAll(fi.getSrcConnectionInstances());
+    allConnectionInstances.addAll(fi.getDstConnectionInstances());
+    for(ConnectionInstance ci: allConnectionInstances)
+    {
+      queueInfo.portList.add((FeatureInstance) ci.getSource());
+      queueInfo.portList.add((FeatureInstance) ci.getDestination());
+    }
+    
+    Long timeOut = PropertyUtils.getIntValue(fi, "Timeout");
+    if(timeOut==null)
+      timeOut=(long) 0;
+    queueInfo.timeOut = timeOut;
+    
     if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
     {
       EventDataPort port  = (EventDataPort) fi.getFeature() ;
@@ -366,7 +383,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     
     queueInfo.id = id;
     queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
-    
+    queueInfo.portList = new ArrayList<FeatureInstance>();
+    queueInfo.portList.add(fi);
+    List<ConnectionInstance> allConnectionInstances = new ArrayList<ConnectionInstance>();
+    allConnectionInstances.addAll(fi.getSrcConnectionInstances());
+    allConnectionInstances.addAll(fi.getDstConnectionInstances());
+    for(ConnectionInstance ci: allConnectionInstances)
+    {
+      queueInfo.portList.add((FeatureInstance) ci.getSource());
+      queueInfo.portList.add((FeatureInstance) ci.getDestination());
+    }
+    Long timeOut = PropertyUtils.getIntValue(fi, "Timeout");
+    if(timeOut==null)
+      timeOut=(long) 0;
+    queueInfo.timeOut = timeOut;
     if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
     {
       EventDataPort port  = (EventDataPort) fi.getFeature() ;
@@ -624,6 +654,10 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     // Generate main.c
     UnparseText mainImplCode = new UnparseText() ;
     genMainImpl(processImpl, mainImplCode, pp) ;
+    
+    ComponentInstance processInstance = (ComponentInstance) HookAccessImpl.getTransformationTrace(process);
+    
+    genSendOutputImpl(processInstance, mainImplCode, pp);
     
     try
     {
@@ -918,14 +952,96 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
           PartitionProperties pp)
   {
     // For each semaphore
-	for(String info : pp.semaphoreNames)
-	{
+    for(String info : pp.semaphoreNames)
+    {
       mainImplCode.addOutput("  CREATE_SEMAPHORE (\"") ;
       mainImplCode.addOutput(info) ;
       mainImplCode.addOutput("\", 1, 1, PRIORITY, &") ;
       mainImplCode.addOutput(info);
       mainImplCode.addOutputNewline(", &(ret));") ;
-	}
+    }
+  }
+  
+  private void genSendOutputImpl(ComponentInstance processInstance,
+                           UnparseText mainImplCode,
+                           PartitionProperties pp)
+  {
+    
+    List<FeatureInstance> featureInstances = new ArrayList<FeatureInstance>();
+    for(ComponentInstance ci: processInstance.getComponentInstances())
+    {
+      if(ci.getCategory().equals(ComponentCategory.THREAD))
+      {
+        for(FeatureInstance fi: ci.getFeatureInstances())
+        {
+          if(fi.getFeature() instanceof Port
+              && ((Port)fi.getFeature()).getDirection().equals(DirectionType.OUT))
+            featureInstances.add(fi);
+        }
+      }
+    }
+    
+    
+    mainImplCode.addOutputNewline(GenerationUtilsC
+                                  .generateSectionTitle("SEND OUTPUT")) ;
+    mainImplCode.addOutputNewline("void __aadl_send_output (unsigned int port_variable, void * value)") ;
+    mainImplCode.addOutputNewline("{") ;
+    mainImplCode.incrementIndent();
+    mainImplCode.addOutputNewline("RETURN_CODE_TYPE ret;");
+    mainImplCode.addOutputNewline("SYSTEM_TIME_TYPE time_out;");
+    mainImplCode.addOutputNewline("MESSAGE_SIZE_TYPE length;");
+    
+    mainImplCode.addOutputNewline("switch (port_variable) {");
+    mainImplCode.incrementIndent();
+    
+    mainImplCode.addOutputNewline("if(value==NULL)");
+    mainImplCode.addOutputNewline("{");
+    mainImplCode.incrementIndent();
+    mainImplCode.addOutputNewline("char i=0;");
+    mainImplCode.addOutputNewline("value = &i;");
+    mainImplCode.decrementIndent();
+    mainImplCode.addOutputNewline("}"); 
+    
+    int i = 0;
+    for(FeatureInstance fi: featureInstances)
+    {
+      mainImplCode.addOutputNewline("case "+ i +":");
+      mainImplCode.incrementIndent();
+      QueueInfo info=null;
+      for(QueueInfo bi: pp.bufferInfo)
+      {
+        if(bi.portList.contains(fi))
+        {
+          info=bi;
+          mainImplCode.addOutputNewline("time_out = "+info.timeOut+";");
+          mainImplCode.addOutputNewline("length = "+"sizeof( "+info.dataType+" );");
+          mainImplCode.addOutputNewline("SEND_BUFFER("+info.id+", value, length, time_out, &ret);");
+          
+        }
+      }
+      for(QueueInfo qi: pp.queueInfo)
+      {
+        if(qi.portList.contains(fi))
+        {
+          info=qi;
+          
+          mainImplCode.addOutputNewline("time_out = "+info.timeOut+";");
+          mainImplCode.addOutputNewline("length = "+"sizeof( "+info.dataType+" );");
+          mainImplCode.addOutputNewline("SEND_QUEUING_MESSAGE("+info.id+", value, length, time_out, &ret);");
+          
+        }
+      }
+            
+      mainImplCode.addOutputNewline("break;");
+      mainImplCode.decrementIndent();
+      i++;
+    }
+    
+    mainImplCode.decrementIndent();
+    mainImplCode.addOutputNewline("}") ;
+    mainImplCode.decrementIndent();
+    mainImplCode.addOutputNewline("}") ;
+    
   }
   
   private void genMainImpl(ProcessImplementation process,
@@ -2723,7 +2839,11 @@ private void findCommunicationMechanism(ProcessImplementation process,
   
   public static class QueueInfo
   {
-	public String id = null ;
+	public List<FeatureInstance> portList ;
+
+  public Long timeOut ;
+
+  public String id = null ;
     
 	public String uniqueId = null;
     
@@ -2734,6 +2854,7 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	public String dataType = null;
     
 	public DirectionType direction = null ;
+	
   }
   
   public static class SampleInfo
@@ -2751,15 +2872,18 @@ private void findCommunicationMechanism(ProcessImplementation process,
   
   public static class BufferInfo
   {
-	public String id = null ;
+    public List<FeatureInstance> portList ;
     
-	public String uniqueId = null;
-    
-	public long refresh = -1 ;
-    
-	public String dataType = null;
-    
-	public DirectionType direction = null ;
+    public String id = null ;
+
+    public String uniqueId = null;
+
+    public long refresh = -1 ;
+
+    public String dataType = null;
+
+    public DirectionType direction = null ;
+
   }
 }
 
