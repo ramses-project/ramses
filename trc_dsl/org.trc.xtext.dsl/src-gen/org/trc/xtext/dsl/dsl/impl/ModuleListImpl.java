@@ -17,8 +17,8 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.trc.xtext.dsl.dsl.DslPackage;
+import org.trc.xtext.dsl.dsl.Module;
 import org.trc.xtext.dsl.dsl.ModuleList;
-import org.trc.xtext.dsl.dsl.Modules;
 
 /**
  * <!-- begin-user-doc -->
@@ -43,7 +43,7 @@ public class ModuleListImpl extends MinimalEObjectImpl.Container implements Modu
    * @generated
    * @ordered
    */
-  protected EList<Modules> modules;
+  protected EList<Module> modules;
 
   /**
    * <!-- begin-user-doc -->
@@ -71,11 +71,11 @@ public class ModuleListImpl extends MinimalEObjectImpl.Container implements Modu
    * <!-- end-user-doc -->
    * @generated
    */
-  public EList<Modules> getModules()
+  public EList<Module> getModules()
   {
     if (modules == null)
     {
-      modules = new EObjectContainmentEList<Modules>(Modules.class, this, DslPackage.MODULE_LIST__MODULES);
+      modules = new EObjectContainmentEList<Module>(Module.class, this, DslPackage.MODULE_LIST__MODULES);
     }
     return modules;
   }
@@ -125,7 +125,7 @@ public class ModuleListImpl extends MinimalEObjectImpl.Container implements Modu
     {
       case DslPackage.MODULE_LIST__MODULES:
         getModules().clear();
-        getModules().addAll((Collection<? extends Modules>)newValue);
+        getModules().addAll((Collection<? extends Module>)newValue);
         return;
     }
     super.eSet(featureID, newValue);

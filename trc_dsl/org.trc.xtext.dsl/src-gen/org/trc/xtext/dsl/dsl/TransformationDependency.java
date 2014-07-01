@@ -54,30 +54,30 @@ public interface TransformationDependency extends EObject
   void setAppliedTransformation(Transformation value);
 
   /**
-   * Returns the value of the '<em><b>Applied Rule</b></em>' attribute.
+   * Returns the value of the '<em><b>Applied Rule</b></em>' reference.
    * <!-- begin-user-doc -->
    * <p>
-   * If the meaning of the '<em>Applied Rule</em>' attribute isn't clear,
+   * If the meaning of the '<em>Applied Rule</em>' reference isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Applied Rule</em>' attribute.
-   * @see #setAppliedRule(String)
+   * @return the value of the '<em>Applied Rule</em>' reference.
+   * @see #setAppliedRule(trcRule)
    * @see org.trc.xtext.dsl.dsl.DslPackage#getTransformationDependency_AppliedRule()
    * @model
    * @generated
    */
-  String getAppliedRule();
+  trcRule getAppliedRule();
 
   /**
-   * Sets the value of the '{@link org.trc.xtext.dsl.dsl.TransformationDependency#getAppliedRule <em>Applied Rule</em>}' attribute.
+   * Sets the value of the '{@link org.trc.xtext.dsl.dsl.TransformationDependency#getAppliedRule <em>Applied Rule</em>}' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Applied Rule</em>' attribute.
+   * @param value the new value of the '<em>Applied Rule</em>' reference.
    * @see #getAppliedRule()
    * @generated
    */
-  void setAppliedRule(String value);
+  void setAppliedRule(trcRule value);
 
   /**
    * Returns the value of the '<em><b>Fields</b></em>' attribute list.

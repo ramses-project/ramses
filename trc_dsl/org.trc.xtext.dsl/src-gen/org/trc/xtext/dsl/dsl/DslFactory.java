@@ -32,22 +32,13 @@ public interface DslFactory extends EFactory
   TrcSpecification createTrcSpecification();
 
   /**
-   * Returns a new object of class '<em>From</em>'.
+   * Returns a new object of class '<em>trc Rule</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return a new object of class '<em>From</em>'.
+   * @return a new object of class '<em>trc Rule</em>'.
    * @generated
    */
-  From createFrom();
-
-  /**
-   * Returns a new object of class '<em>Rules</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>Rules</em>'.
-   * @generated
-   */
-  Rules createRules();
+  trcRule createtrcRule();
 
   /**
    * Returns a new object of class '<em>Module List</em>'.
@@ -59,13 +50,13 @@ public interface DslFactory extends EFactory
   ModuleList createModuleList();
 
   /**
-   * Returns a new object of class '<em>Modules</em>'.
+   * Returns a new object of class '<em>Module</em>'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return a new object of class '<em>Modules</em>'.
+   * @return a new object of class '<em>Module</em>'.
    * @generated
    */
-  Modules createModules();
+  Module createModule();
 
   /**
    * Returns a new object of class '<em>Transformation List</em>'.
@@ -120,24 +111,6 @@ public interface DslFactory extends EFactory
    * @generated
    */
   AbstractRuleDependency createAbstractRuleDependency();
-
-  /**
-   * Returns a new object of class '<em>Rule Dependency Conjunction</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>Rule Dependency Conjunction</em>'.
-   * @generated
-   */
-  RuleDependencyConjunction createRuleDependencyConjunction();
-
-  /**
-   * Returns a new object of class '<em>Rule Dependency Disjunction</em>'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return a new object of class '<em>Rule Dependency Disjunction</em>'.
-   * @generated
-   */
-  RuleDependencyDisjunction createRuleDependencyDisjunction();
 
   /**
    * Returns a new object of class '<em>Rule Dependency</em>'.

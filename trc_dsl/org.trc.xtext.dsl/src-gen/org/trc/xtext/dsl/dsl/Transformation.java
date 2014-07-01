@@ -54,7 +54,7 @@ public interface Transformation extends EObject
 
   /**
    * Returns the value of the '<em><b>Modules</b></em>' reference list.
-   * The list contents are of type {@link org.trc.xtext.dsl.dsl.Modules}.
+   * The list contents are of type {@link org.trc.xtext.dsl.dsl.Module}.
    * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Modules</em>' reference list isn't clear,
@@ -66,7 +66,7 @@ public interface Transformation extends EObject
    * @model
    * @generated
    */
-  EList<Modules> getModules();
+  EList<Module> getModules();
 
   /**
    * Returns the value of the '<em><b>Impacts</b></em>' containment reference list.

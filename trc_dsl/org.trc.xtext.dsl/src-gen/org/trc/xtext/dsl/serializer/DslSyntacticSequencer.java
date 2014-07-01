@@ -20,14 +20,12 @@ public class DslSyntacticSequencer extends AbstractSyntacticSequencer {
 	protected DslGrammarAccess grammarAccess;
 	protected AbstractElementAlias match_RuleDependency___AndKeyword_0_2_0_or_OrKeyword_0_2_1__q;
 	protected AbstractElementAlias match_RuleDependency___AndKeyword_1_2_0_or_OrKeyword_1_2_1__q;
-	protected AbstractElementAlias match_TransformationDependency___AndKeyword_13_0_or_OrKeyword_13_1__q;
 	
 	@Inject
 	protected void init(IGrammarAccess access) {
 		grammarAccess = (DslGrammarAccess) access;
 		match_RuleDependency___AndKeyword_0_2_0_or_OrKeyword_0_2_1__q = new AlternativeAlias(false, true, new TokenAlias(false, false, grammarAccess.getRuleDependencyAccess().getAndKeyword_0_2_0()), new TokenAlias(false, false, grammarAccess.getRuleDependencyAccess().getOrKeyword_0_2_1()));
 		match_RuleDependency___AndKeyword_1_2_0_or_OrKeyword_1_2_1__q = new AlternativeAlias(false, true, new TokenAlias(false, false, grammarAccess.getRuleDependencyAccess().getAndKeyword_1_2_0()), new TokenAlias(false, false, grammarAccess.getRuleDependencyAccess().getOrKeyword_1_2_1()));
-		match_TransformationDependency___AndKeyword_13_0_or_OrKeyword_13_1__q = new AlternativeAlias(false, true, new TokenAlias(false, false, grammarAccess.getTransformationDependencyAccess().getAndKeyword_13_0()), new TokenAlias(false, false, grammarAccess.getTransformationDependencyAccess().getOrKeyword_13_1()));
 	}
 	
 	@Override
@@ -46,15 +44,13 @@ public class DslSyntacticSequencer extends AbstractSyntacticSequencer {
 				emit_RuleDependency___AndKeyword_0_2_0_or_OrKeyword_0_2_1__q(semanticObject, getLastNavigableState(), syntaxNodes);
 			else if(match_RuleDependency___AndKeyword_1_2_0_or_OrKeyword_1_2_1__q.equals(syntax))
 				emit_RuleDependency___AndKeyword_1_2_0_or_OrKeyword_1_2_1__q(semanticObject, getLastNavigableState(), syntaxNodes);
-			else if(match_TransformationDependency___AndKeyword_13_0_or_OrKeyword_13_1__q.equals(syntax))
-				emit_TransformationDependency___AndKeyword_13_0_or_OrKeyword_13_1__q(semanticObject, getLastNavigableState(), syntaxNodes);
 			else acceptNodes(getLastNavigableState(), syntaxNodes);
 		}
 	}
 
 	/**
 	 * Syntax:
-	 *     ('and' | 'or')?
+	 *     ('or' | 'and')?
 	 */
 	protected void emit_RuleDependency___AndKeyword_0_2_0_or_OrKeyword_0_2_1__q(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
 		acceptNodes(transition, nodes);
@@ -65,14 +61,6 @@ public class DslSyntacticSequencer extends AbstractSyntacticSequencer {
 	 *     ('and' | 'or')?
 	 */
 	protected void emit_RuleDependency___AndKeyword_1_2_0_or_OrKeyword_1_2_1__q(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
-		acceptNodes(transition, nodes);
-	}
-	
-	/**
-	 * Syntax:
-	 *     ('and' | 'or')?
-	 */
-	protected void emit_TransformationDependency___AndKeyword_13_0_or_OrKeyword_13_1__q(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
 		acceptNodes(transition, nodes);
 	}
 	

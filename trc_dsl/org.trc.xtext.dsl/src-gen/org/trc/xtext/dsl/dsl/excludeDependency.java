@@ -44,30 +44,20 @@ public interface excludeDependency extends EObject
   EList<Transformation> getRequiredTransformation();
 
   /**
-   * Returns the value of the '<em><b>Required Rule</b></em>' attribute.
+   * Returns the value of the '<em><b>Required Rule</b></em>' reference list.
+   * The list contents are of type {@link org.trc.xtext.dsl.dsl.trcRule}.
    * <!-- begin-user-doc -->
    * <p>
-   * If the meaning of the '<em>Required Rule</em>' attribute isn't clear,
+   * If the meaning of the '<em>Required Rule</em>' reference list isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Required Rule</em>' attribute.
-   * @see #setRequiredRule(String)
+   * @return the value of the '<em>Required Rule</em>' reference list.
    * @see org.trc.xtext.dsl.dsl.DslPackage#getexcludeDependency_RequiredRule()
    * @model
    * @generated
    */
-  String getRequiredRule();
-
-  /**
-   * Sets the value of the '{@link org.trc.xtext.dsl.dsl.excludeDependency#getRequiredRule <em>Required Rule</em>}' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Required Rule</em>' attribute.
-   * @see #getRequiredRule()
-   * @generated
-   */
-  void setRequiredRule(String value);
+  EList<trcRule> getRequiredRule();
 
   /**
    * Returns the value of the '<em><b>Fields</b></em>' attribute.

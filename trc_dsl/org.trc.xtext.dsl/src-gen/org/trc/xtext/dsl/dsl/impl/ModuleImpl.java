@@ -16,30 +16,27 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.trc.xtext.dsl.dsl.DslPackage;
 import org.trc.xtext.dsl.dsl.Module;
-import org.trc.xtext.dsl.dsl.Transformation;
-import org.trc.xtext.dsl.dsl.TransformationImpact;
+import org.trc.xtext.dsl.dsl.trcRule;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Transformation</b></em>'.
+ * An implementation of the model object '<em><b>Module</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.trc.xtext.dsl.dsl.impl.TransformationImpl#getName <em>Name</em>}</li>
- *   <li>{@link org.trc.xtext.dsl.dsl.impl.TransformationImpl#getModules <em>Modules</em>}</li>
- *   <li>{@link org.trc.xtext.dsl.dsl.impl.TransformationImpl#getImpacts <em>Impacts</em>}</li>
+ *   <li>{@link org.trc.xtext.dsl.dsl.impl.ModuleImpl#getName <em>Name</em>}</li>
+ *   <li>{@link org.trc.xtext.dsl.dsl.impl.ModuleImpl#getRules <em>Rules</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class TransformationImpl extends MinimalEObjectImpl.Container implements Transformation
+public class ModuleImpl extends MinimalEObjectImpl.Container implements Module
 {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -62,31 +59,21 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
   protected String name = NAME_EDEFAULT;
 
   /**
-   * The cached value of the '{@link #getModules() <em>Modules</em>}' reference list.
+   * The cached value of the '{@link #getRules() <em>Rules</em>}' containment reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getModules()
+   * @see #getRules()
    * @generated
    * @ordered
    */
-  protected EList<Module> modules;
-
-  /**
-   * The cached value of the '{@link #getImpacts() <em>Impacts</em>}' containment reference list.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #getImpacts()
-   * @generated
-   * @ordered
-   */
-  protected EList<TransformationImpact> impacts;
+  protected EList<trcRule> rules;
 
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    */
-  protected TransformationImpl()
+  protected ModuleImpl()
   {
     super();
   }
@@ -99,7 +86,7 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
   @Override
   protected EClass eStaticClass()
   {
-    return DslPackage.Literals.TRANSFORMATION;
+    return DslPackage.Literals.MODULE;
   }
 
   /**
@@ -122,7 +109,7 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
     String oldName = name;
     name = newName;
     if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, DslPackage.TRANSFORMATION__NAME, oldName, name));
+      eNotify(new ENotificationImpl(this, Notification.SET, DslPackage.MODULE__NAME, oldName, name));
   }
 
   /**
@@ -130,27 +117,13 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
    * <!-- end-user-doc -->
    * @generated
    */
-  public EList<Module> getModules()
+  public EList<trcRule> getRules()
   {
-    if (modules == null)
+    if (rules == null)
     {
-      modules = new EObjectResolvingEList<Module>(Module.class, this, DslPackage.TRANSFORMATION__MODULES);
+      rules = new EObjectContainmentEList<trcRule>(trcRule.class, this, DslPackage.MODULE__RULES);
     }
-    return modules;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EList<TransformationImpact> getImpacts()
-  {
-    if (impacts == null)
-    {
-      impacts = new EObjectContainmentEList<TransformationImpact>(TransformationImpact.class, this, DslPackage.TRANSFORMATION__IMPACTS);
-    }
-    return impacts;
+    return rules;
   }
 
   /**
@@ -163,8 +136,8 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
   {
     switch (featureID)
     {
-      case DslPackage.TRANSFORMATION__IMPACTS:
-        return ((InternalEList<?>)getImpacts()).basicRemove(otherEnd, msgs);
+      case DslPackage.MODULE__RULES:
+        return ((InternalEList<?>)getRules()).basicRemove(otherEnd, msgs);
     }
     return super.eInverseRemove(otherEnd, featureID, msgs);
   }
@@ -179,12 +152,10 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
   {
     switch (featureID)
     {
-      case DslPackage.TRANSFORMATION__NAME:
+      case DslPackage.MODULE__NAME:
         return getName();
-      case DslPackage.TRANSFORMATION__MODULES:
-        return getModules();
-      case DslPackage.TRANSFORMATION__IMPACTS:
-        return getImpacts();
+      case DslPackage.MODULE__RULES:
+        return getRules();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -200,16 +171,12 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
   {
     switch (featureID)
     {
-      case DslPackage.TRANSFORMATION__NAME:
+      case DslPackage.MODULE__NAME:
         setName((String)newValue);
         return;
-      case DslPackage.TRANSFORMATION__MODULES:
-        getModules().clear();
-        getModules().addAll((Collection<? extends Module>)newValue);
-        return;
-      case DslPackage.TRANSFORMATION__IMPACTS:
-        getImpacts().clear();
-        getImpacts().addAll((Collection<? extends TransformationImpact>)newValue);
+      case DslPackage.MODULE__RULES:
+        getRules().clear();
+        getRules().addAll((Collection<? extends trcRule>)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -225,14 +192,11 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
   {
     switch (featureID)
     {
-      case DslPackage.TRANSFORMATION__NAME:
+      case DslPackage.MODULE__NAME:
         setName(NAME_EDEFAULT);
         return;
-      case DslPackage.TRANSFORMATION__MODULES:
-        getModules().clear();
-        return;
-      case DslPackage.TRANSFORMATION__IMPACTS:
-        getImpacts().clear();
+      case DslPackage.MODULE__RULES:
+        getRules().clear();
         return;
     }
     super.eUnset(featureID);
@@ -248,12 +212,10 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
   {
     switch (featureID)
     {
-      case DslPackage.TRANSFORMATION__NAME:
+      case DslPackage.MODULE__NAME:
         return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-      case DslPackage.TRANSFORMATION__MODULES:
-        return modules != null && !modules.isEmpty();
-      case DslPackage.TRANSFORMATION__IMPACTS:
-        return impacts != null && !impacts.isEmpty();
+      case DslPackage.MODULE__RULES:
+        return rules != null && !rules.isEmpty();
     }
     return super.eIsSet(featureID);
   }
@@ -275,4 +237,4 @@ public class TransformationImpl extends MinimalEObjectImpl.Container implements 
     return result.toString();
   }
 
-} //TransformationImpl
+} //ModuleImpl

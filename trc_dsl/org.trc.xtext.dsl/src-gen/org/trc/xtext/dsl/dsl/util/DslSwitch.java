@@ -79,17 +79,10 @@ public class DslSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
-      case DslPackage.FROM:
+      case DslPackage.TRC_RULE:
       {
-        From from = (From)theEObject;
-        T result = caseFrom(from);
-        if (result == null) result = defaultCase(theEObject);
-        return result;
-      }
-      case DslPackage.RULES:
-      {
-        Rules rules = (Rules)theEObject;
-        T result = caseRules(rules);
+        trcRule trcRule = (trcRule)theEObject;
+        T result = casetrcRule(trcRule);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -100,10 +93,10 @@ public class DslSwitch<T> extends Switch<T>
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
-      case DslPackage.MODULES:
+      case DslPackage.MODULE:
       {
-        Modules modules = (Modules)theEObject;
-        T result = caseModules(modules);
+        Module module = (Module)theEObject;
+        T result = caseModule(module);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -146,20 +139,6 @@ public class DslSwitch<T> extends Switch<T>
       {
         AbstractRuleDependency abstractRuleDependency = (AbstractRuleDependency)theEObject;
         T result = caseAbstractRuleDependency(abstractRuleDependency);
-        if (result == null) result = defaultCase(theEObject);
-        return result;
-      }
-      case DslPackage.RULE_DEPENDENCY_CONJUNCTION:
-      {
-        RuleDependencyConjunction ruleDependencyConjunction = (RuleDependencyConjunction)theEObject;
-        T result = caseRuleDependencyConjunction(ruleDependencyConjunction);
-        if (result == null) result = defaultCase(theEObject);
-        return result;
-      }
-      case DslPackage.RULE_DEPENDENCY_DISJUNCTION:
-      {
-        RuleDependencyDisjunction ruleDependencyDisjunction = (RuleDependencyDisjunction)theEObject;
-        T result = caseRuleDependencyDisjunction(ruleDependencyDisjunction);
         if (result == null) result = defaultCase(theEObject);
         return result;
       }
@@ -206,33 +185,17 @@ public class DslSwitch<T> extends Switch<T>
   }
 
   /**
-   * Returns the result of interpreting the object as an instance of '<em>From</em>'.
+   * Returns the result of interpreting the object as an instance of '<em>trc Rule</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
    * returning a non-null result will terminate the switch.
    * <!-- end-user-doc -->
    * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>From</em>'.
+   * @return the result of interpreting the object as an instance of '<em>trc Rule</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
    * @generated
    */
-  public T caseFrom(From object)
-  {
-    return null;
-  }
-
-  /**
-   * Returns the result of interpreting the object as an instance of '<em>Rules</em>'.
-   * <!-- begin-user-doc -->
-   * This implementation returns null;
-   * returning a non-null result will terminate the switch.
-   * <!-- end-user-doc -->
-   * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Rules</em>'.
-   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-   * @generated
-   */
-  public T caseRules(Rules object)
+  public T casetrcRule(trcRule object)
   {
     return null;
   }
@@ -254,17 +217,17 @@ public class DslSwitch<T> extends Switch<T>
   }
 
   /**
-   * Returns the result of interpreting the object as an instance of '<em>Modules</em>'.
+   * Returns the result of interpreting the object as an instance of '<em>Module</em>'.
    * <!-- begin-user-doc -->
    * This implementation returns null;
    * returning a non-null result will terminate the switch.
    * <!-- end-user-doc -->
    * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Modules</em>'.
+   * @return the result of interpreting the object as an instance of '<em>Module</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
    * @generated
    */
-  public T caseModules(Modules object)
+  public T caseModule(Module object)
   {
     return null;
   }
@@ -361,38 +324,6 @@ public class DslSwitch<T> extends Switch<T>
    * @generated
    */
   public T caseAbstractRuleDependency(AbstractRuleDependency object)
-  {
-    return null;
-  }
-
-  /**
-   * Returns the result of interpreting the object as an instance of '<em>Rule Dependency Conjunction</em>'.
-   * <!-- begin-user-doc -->
-   * This implementation returns null;
-   * returning a non-null result will terminate the switch.
-   * <!-- end-user-doc -->
-   * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Rule Dependency Conjunction</em>'.
-   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-   * @generated
-   */
-  public T caseRuleDependencyConjunction(RuleDependencyConjunction object)
-  {
-    return null;
-  }
-
-  /**
-   * Returns the result of interpreting the object as an instance of '<em>Rule Dependency Disjunction</em>'.
-   * <!-- begin-user-doc -->
-   * This implementation returns null;
-   * returning a non-null result will terminate the switch.
-   * <!-- end-user-doc -->
-   * @param object the target of the switch.
-   * @return the result of interpreting the object as an instance of '<em>Rule Dependency Disjunction</em>'.
-   * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-   * @generated
-   */
-  public T caseRuleDependencyDisjunction(RuleDependencyDisjunction object)
   {
     return null;
   }

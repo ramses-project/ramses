@@ -14,7 +14,6 @@ import org.eclipse.emf.ecore.EObject;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.trc.xtext.dsl.dsl.TrcSpecification#getFroms <em>Froms</em>}</li>
  *   <li>{@link org.trc.xtext.dsl.dsl.TrcSpecification#getModuleList <em>Module List</em>}</li>
  *   <li>{@link org.trc.xtext.dsl.dsl.TrcSpecification#getTransformationList <em>Transformation List</em>}</li>
  *   <li>{@link org.trc.xtext.dsl.dsl.TrcSpecification#getDependencyList <em>Dependency List</em>}</li>
@@ -27,22 +26,6 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface TrcSpecification extends EObject
 {
-  /**
-   * Returns the value of the '<em><b>Froms</b></em>' containment reference list.
-   * The list contents are of type {@link org.trc.xtext.dsl.dsl.From}.
-   * <!-- begin-user-doc -->
-   * <p>
-   * If the meaning of the '<em>Froms</em>' containment reference list isn't clear,
-   * there really should be more of a description here...
-   * </p>
-   * <!-- end-user-doc -->
-   * @return the value of the '<em>Froms</em>' containment reference list.
-   * @see org.trc.xtext.dsl.dsl.DslPackage#getTrcSpecification_Froms()
-   * @model containment="true"
-   * @generated
-   */
-  EList<From> getFroms();
-
   /**
    * Returns the value of the '<em><b>Module List</b></em>' containment reference list.
    * The list contents are of type {@link org.trc.xtext.dsl.dsl.ModuleList}.

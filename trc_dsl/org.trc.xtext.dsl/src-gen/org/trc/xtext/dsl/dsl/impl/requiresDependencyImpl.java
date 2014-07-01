@@ -18,6 +18,7 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.trc.xtext.dsl.dsl.DslPackage;
 import org.trc.xtext.dsl.dsl.Transformation;
 import org.trc.xtext.dsl.dsl.requiresDependency;
+import org.trc.xtext.dsl.dsl.trcRule;
 
 /**
  * <!-- begin-user-doc -->
@@ -48,24 +49,14 @@ public class requiresDependencyImpl extends MinimalEObjectImpl.Container impleme
   protected EList<Transformation> requiredTransformation;
 
   /**
-   * The default value of the '{@link #getRequiredRule() <em>Required Rule</em>}' attribute.
+   * The cached value of the '{@link #getRequiredRule() <em>Required Rule</em>}' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @see #getRequiredRule()
    * @generated
    * @ordered
    */
-  protected static final String REQUIRED_RULE_EDEFAULT = null;
-
-  /**
-   * The cached value of the '{@link #getRequiredRule() <em>Required Rule</em>}' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #getRequiredRule()
-   * @generated
-   * @ordered
-   */
-  protected String requiredRule = REQUIRED_RULE_EDEFAULT;
+  protected EList<trcRule> requiredRule;
 
   /**
    * The default value of the '{@link #getFields() <em>Fields</em>}' attribute.
@@ -147,22 +138,13 @@ public class requiresDependencyImpl extends MinimalEObjectImpl.Container impleme
    * <!-- end-user-doc -->
    * @generated
    */
-  public String getRequiredRule()
+  public EList<trcRule> getRequiredRule()
   {
+    if (requiredRule == null)
+    {
+      requiredRule = new EObjectResolvingEList<trcRule>(trcRule.class, this, DslPackage.REQUIRES_DEPENDENCY__REQUIRED_RULE);
+    }
     return requiredRule;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public void setRequiredRule(String newRequiredRule)
-  {
-    String oldRequiredRule = requiredRule;
-    requiredRule = newRequiredRule;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, DslPackage.REQUIRES_DEPENDENCY__REQUIRED_RULE, oldRequiredRule, requiredRule));
   }
 
   /**
@@ -249,7 +231,8 @@ public class requiresDependencyImpl extends MinimalEObjectImpl.Container impleme
         getRequiredTransformation().addAll((Collection<? extends Transformation>)newValue);
         return;
       case DslPackage.REQUIRES_DEPENDENCY__REQUIRED_RULE:
-        setRequiredRule((String)newValue);
+        getRequiredRule().clear();
+        getRequiredRule().addAll((Collection<? extends trcRule>)newValue);
         return;
       case DslPackage.REQUIRES_DEPENDENCY__FIELDS:
         setFields((String)newValue);
@@ -275,7 +258,7 @@ public class requiresDependencyImpl extends MinimalEObjectImpl.Container impleme
         getRequiredTransformation().clear();
         return;
       case DslPackage.REQUIRES_DEPENDENCY__REQUIRED_RULE:
-        setRequiredRule(REQUIRED_RULE_EDEFAULT);
+        getRequiredRule().clear();
         return;
       case DslPackage.REQUIRES_DEPENDENCY__FIELDS:
         setFields(FIELDS_EDEFAULT);
@@ -300,7 +283,7 @@ public class requiresDependencyImpl extends MinimalEObjectImpl.Container impleme
       case DslPackage.REQUIRES_DEPENDENCY__REQUIRED_TRANSFORMATION:
         return requiredTransformation != null && !requiredTransformation.isEmpty();
       case DslPackage.REQUIRES_DEPENDENCY__REQUIRED_RULE:
-        return REQUIRED_RULE_EDEFAULT == null ? requiredRule != null : !REQUIRED_RULE_EDEFAULT.equals(requiredRule);
+        return requiredRule != null && !requiredRule.isEmpty();
       case DslPackage.REQUIRES_DEPENDENCY__FIELDS:
         return FIELDS_EDEFAULT == null ? fields != null : !FIELDS_EDEFAULT.equals(fields);
       case DslPackage.REQUIRES_DEPENDENCY__OCL_EXPRESSION:
@@ -320,9 +303,7 @@ public class requiresDependencyImpl extends MinimalEObjectImpl.Container impleme
     if (eIsProxy()) return super.toString();
 
     StringBuffer result = new StringBuffer(super.toString());
-    result.append(" (requiredRule: ");
-    result.append(requiredRule);
-    result.append(", fields: ");
+    result.append(" (fields: ");
     result.append(fields);
     result.append(", oclExpression: ");
     result.append(oclExpression);

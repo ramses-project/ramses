@@ -8,24 +8,19 @@
   <genPackages prefix="Dsl" basePackage="org.trc.xtext.dsl" disposableProviderFactory="true"
       fileExtensions="trcDsl" ecorePackage="Dsl.ecore#/">
     <genClasses ecoreClass="Dsl.ecore#//TrcSpecification">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//TrcSpecification/froms"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//TrcSpecification/moduleList"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//TrcSpecification/transformationList"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//TrcSpecification/dependencyList"/>
     </genClasses>
-    <genClasses ecoreClass="Dsl.ecore#//From">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//From/importURI"/>
-    </genClasses>
-    <genClasses ecoreClass="Dsl.ecore#//Rules">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Rules/name"/>
+    <genClasses ecoreClass="Dsl.ecore#//trcRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//trcRule/name"/>
     </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//ModuleList">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//ModuleList/modules"/>
     </genClasses>
-    <genClasses ecoreClass="Dsl.ecore#//Modules">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Modules/path"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Modules/name"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//Modules/ruleName"/>
+    <genClasses ecoreClass="Dsl.ecore#//Module">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//Module/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//Module/rules"/>
     </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//TransformationList">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//TransformationList/transformations"/>
@@ -45,30 +40,24 @@
     </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//TransformationDependency">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Dsl.ecore#//TransformationDependency/appliedTransformation"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//TransformationDependency/appliedRule"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Dsl.ecore#//TransformationDependency/appliedRule"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//TransformationDependency/fields"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//TransformationDependency/requiredTransformations"/>
     </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//AbstractRuleDependency"/>
-    <genClasses ecoreClass="Dsl.ecore#//RuleDependencyConjunction">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//RuleDependencyConjunction/requiredTransformations"/>
-    </genClasses>
-    <genClasses ecoreClass="Dsl.ecore#//RuleDependencyDisjunction">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//RuleDependencyDisjunction/requiredTransformations"/>
-    </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//RuleDependency">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//RuleDependency/rd"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Dsl.ecore#//RuleDependency/ed"/>
     </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//requiresDependency">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Dsl.ecore#//requiresDependency/requiredTransformation"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//requiresDependency/requiredRule"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Dsl.ecore#//requiresDependency/requiredRule"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//requiresDependency/fields"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//requiresDependency/oclExpression"/>
     </genClasses>
     <genClasses ecoreClass="Dsl.ecore#//excludeDependency">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Dsl.ecore#//excludeDependency/requiredTransformation"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//excludeDependency/requiredRule"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Dsl.ecore#//excludeDependency/requiredRule"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//excludeDependency/fields"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Dsl.ecore#//excludeDependency/oclExpression"/>
     </genClasses>

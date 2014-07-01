@@ -14,13 +14,9 @@ import org.eclipse.xtext.serializer.sequencer.ISemanticSequencer;
 import org.eclipse.xtext.serializer.sequencer.ITransientValueService;
 import org.eclipse.xtext.serializer.sequencer.ITransientValueService.ValueTransient;
 import org.trc.xtext.dsl.dsl.DslPackage;
-import org.trc.xtext.dsl.dsl.From;
+import org.trc.xtext.dsl.dsl.Module;
 import org.trc.xtext.dsl.dsl.ModuleList;
-import org.trc.xtext.dsl.dsl.Modules;
 import org.trc.xtext.dsl.dsl.RuleDependency;
-import org.trc.xtext.dsl.dsl.RuleDependencyConjunction;
-import org.trc.xtext.dsl.dsl.RuleDependencyDisjunction;
-import org.trc.xtext.dsl.dsl.Rules;
 import org.trc.xtext.dsl.dsl.Transformation;
 import org.trc.xtext.dsl.dsl.TransformationDependency;
 import org.trc.xtext.dsl.dsl.TransformationDependencyList;
@@ -29,6 +25,7 @@ import org.trc.xtext.dsl.dsl.TransformationList;
 import org.trc.xtext.dsl.dsl.TrcSpecification;
 import org.trc.xtext.dsl.dsl.excludeDependency;
 import org.trc.xtext.dsl.dsl.requiresDependency;
+import org.trc.xtext.dsl.dsl.trcRule;
 import org.trc.xtext.dsl.services.DslGrammarAccess;
 
 @SuppressWarnings("all")
@@ -39,9 +36,9 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	public void createSequence(EObject context, EObject semanticObject) {
 		if(semanticObject.eClass().getEPackage() == DslPackage.eINSTANCE) switch(semanticObject.eClass().getClassifierID()) {
-			case DslPackage.FROM:
-				if(context == grammarAccess.getFromRule()) {
-					sequence_From(context, (From) semanticObject); 
+			case DslPackage.MODULE:
+				if(context == grammarAccess.getModuleRule()) {
+					sequence_Module(context, (Module) semanticObject); 
 					return; 
 				}
 				else break;
@@ -51,34 +48,10 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 					return; 
 				}
 				else break;
-			case DslPackage.MODULES:
-				if(context == grammarAccess.getModulesRule()) {
-					sequence_Modules(context, (Modules) semanticObject); 
-					return; 
-				}
-				else break;
 			case DslPackage.RULE_DEPENDENCY:
 				if(context == grammarAccess.getAbstractRuleDependencyRule() ||
 				   context == grammarAccess.getRuleDependencyRule()) {
 					sequence_RuleDependency(context, (RuleDependency) semanticObject); 
-					return; 
-				}
-				else break;
-			case DslPackage.RULE_DEPENDENCY_CONJUNCTION:
-				if(context == grammarAccess.getRuleDependencyConjunctionRule()) {
-					sequence_RuleDependencyConjunction(context, (RuleDependencyConjunction) semanticObject); 
-					return; 
-				}
-				else break;
-			case DslPackage.RULE_DEPENDENCY_DISJUNCTION:
-				if(context == grammarAccess.getRuleDependencyDisjunctionRule()) {
-					sequence_RuleDependencyDisjunction(context, (RuleDependencyDisjunction) semanticObject); 
-					return; 
-				}
-				else break;
-			case DslPackage.RULES:
-				if(context == grammarAccess.getRulesRule()) {
-					sequence_Rules(context, (Rules) semanticObject); 
 					return; 
 				}
 				else break;
@@ -130,29 +103,19 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 					return; 
 				}
 				else break;
+			case DslPackage.TRC_RULE:
+				if(context == grammarAccess.getTrcRuleRule()) {
+					sequence_trcRule(context, (trcRule) semanticObject); 
+					return; 
+				}
+				else break;
 			}
 		if (errorAcceptor != null) errorAcceptor.accept(diagnosticProvider.createInvalidContextOrTypeDiagnostic(semanticObject, context));
 	}
 	
 	/**
 	 * Constraint:
-	 *     importURI=STRING
-	 */
-	protected void sequence_From(EObject context, From semanticObject) {
-		if(errorAcceptor != null) {
-			if(transientValues.isValueTransient(semanticObject, DslPackage.Literals.FROM__IMPORT_URI) == ValueTransient.YES)
-				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, DslPackage.Literals.FROM__IMPORT_URI));
-		}
-		INodesForEObjectProvider nodes = createNodeProvider(semanticObject);
-		SequenceFeeder feeder = createSequencerFeeder(semanticObject, nodes);
-		feeder.accept(grammarAccess.getFromAccess().getImportURISTRINGTerminalRuleCall_1_0(), semanticObject.getImportURI());
-		feeder.finish();
-	}
-	
-	
-	/**
-	 * Constraint:
-	 *     ((modules+=Modules modules+=Modules*)?)
+	 *     ((modules+=Module modules+=Module*)?)
 	 */
 	protected void sequence_ModuleList(EObject context, ModuleList semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
@@ -161,27 +124,9 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (path=EString name=EString ruleName+=Rules ruleName+=Rules*)
+	 *     (name=EString rules+=trcRule rules+=trcRule*)
 	 */
-	protected void sequence_Modules(EObject context, Modules semanticObject) {
-		genericSequencer.createSequence(context, semanticObject);
-	}
-	
-	
-	/**
-	 * Constraint:
-	 *     (requiredTransformations+=AbstractRuleDependency requiredTransformations+=AbstractRuleDependency*)
-	 */
-	protected void sequence_RuleDependencyConjunction(EObject context, RuleDependencyConjunction semanticObject) {
-		genericSequencer.createSequence(context, semanticObject);
-	}
-	
-	
-	/**
-	 * Constraint:
-	 *     (requiredTransformations+=AbstractRuleDependency requiredTransformations+=AbstractRuleDependency*)
-	 */
-	protected void sequence_RuleDependencyDisjunction(EObject context, RuleDependencyDisjunction semanticObject) {
+	protected void sequence_Module(EObject context, Module semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
 	}
 	
@@ -192,22 +137,6 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	 */
 	protected void sequence_RuleDependency(EObject context, RuleDependency semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
-	}
-	
-	
-	/**
-	 * Constraint:
-	 *     name=EString
-	 */
-	protected void sequence_Rules(EObject context, Rules semanticObject) {
-		if(errorAcceptor != null) {
-			if(transientValues.isValueTransient(semanticObject, DslPackage.Literals.RULES__NAME) == ValueTransient.YES)
-				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, DslPackage.Literals.RULES__NAME));
-		}
-		INodesForEObjectProvider nodes = createNodeProvider(semanticObject);
-		SequenceFeeder feeder = createSequencerFeeder(semanticObject, nodes);
-		feeder.accept(grammarAccess.getRulesAccess().getNameEStringParserRuleCall_0(), semanticObject.getName());
-		feeder.finish();
 	}
 	
 	
@@ -224,11 +153,13 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	 * Constraint:
 	 *     (
 	 *         appliedTransformation=[Transformation|EString] 
-	 *         appliedRule=EString 
+	 *         appliedRule=[trcRule|QualifiedName] 
 	 *         fields+=EString 
 	 *         fields+=EString* 
-	 *         requiredTransformations+=AbstractRuleDependency 
-	 *         requiredTransformations+=AbstractRuleDependency*
+	 *         (
+	 *             (requiredTransformations+=AbstractRuleDependency requiredTransformations+=AbstractRuleDependency*) | 
+	 *             (requiredTransformations+=AbstractRuleDependency requiredTransformations+=AbstractRuleDependency*)
+	 *         )
 	 *     )
 	 */
 	protected void sequence_TransformationDependency(EObject context, TransformationDependency semanticObject) {
@@ -256,7 +187,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (name=EString modules+=[Modules|EString] modules+=[Modules|EString]* (impacts+=TransformationImpact impacts+=TransformationImpact*)?)
+	 *     (name=EString modules+=[Module|EString] modules+=[Module|EString]* (impacts+=TransformationImpact impacts+=TransformationImpact*)?)
 	 */
 	protected void sequence_Transformation(EObject context, Transformation semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
@@ -265,7 +196,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (froms+=From* moduleList+=ModuleList transformationList+=TransformationList dependencyList+=TransformationDependencyList)
+	 *     (moduleList+=ModuleList transformationList+=TransformationList dependencyList+=TransformationDependencyList)
 	 */
 	protected void sequence_TrcSpecification(EObject context, TrcSpecification semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
@@ -274,7 +205,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (requiredTransformation+=[Transformation|EString] requiredRule=EString fields=EString oclExpression=EString)
+	 *     (requiredTransformation+=[Transformation|EString] requiredRule+=[trcRule|QualifiedName] fields=EString oclExpression=EString)
 	 */
 	protected void sequence_excludeDependency(EObject context, excludeDependency semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
@@ -283,9 +214,25 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (requiredTransformation+=[Transformation|EString] requiredRule=EString fields=EString oclExpression=EString)
+	 *     (requiredTransformation+=[Transformation|EString] requiredRule+=[trcRule|QualifiedName] fields=EString oclExpression=EString)
 	 */
 	protected void sequence_requiresDependency(EObject context, requiresDependency semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
+	}
+	
+	
+	/**
+	 * Constraint:
+	 *     name=EString
+	 */
+	protected void sequence_trcRule(EObject context, trcRule semanticObject) {
+		if(errorAcceptor != null) {
+			if(transientValues.isValueTransient(semanticObject, DslPackage.Literals.TRC_RULE__NAME) == ValueTransient.YES)
+				errorAcceptor.accept(diagnosticProvider.createFeatureValueMissing(semanticObject, DslPackage.Literals.TRC_RULE__NAME));
+		}
+		INodesForEObjectProvider nodes = createNodeProvider(semanticObject);
+		SequenceFeeder feeder = createSequencerFeeder(semanticObject, nodes);
+		feeder.accept(grammarAccess.getTrcRuleAccess().getNameEStringParserRuleCall_0(), semanticObject.getName());
+		feeder.finish();
 	}
 }

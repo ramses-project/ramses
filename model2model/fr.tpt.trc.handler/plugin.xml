@@ -27,7 +27,7 @@
        </with>
      </definition>
    </extension>
-   
+      
    <extension point="org.eclipse.ui.menus">
     <menuContribution
        locationURI="menu:org.eclipse.ui.main.menu">

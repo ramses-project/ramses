@@ -23,6 +23,7 @@ import org.trc.xtext.dsl.dsl.AbstractRuleDependency;
 import org.trc.xtext.dsl.dsl.DslPackage;
 import org.trc.xtext.dsl.dsl.Transformation;
 import org.trc.xtext.dsl.dsl.TransformationDependency;
+import org.trc.xtext.dsl.dsl.trcRule;
 
 /**
  * <!-- begin-user-doc -->
@@ -53,24 +54,14 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
   protected Transformation appliedTransformation;
 
   /**
-   * The default value of the '{@link #getAppliedRule() <em>Applied Rule</em>}' attribute.
+   * The cached value of the '{@link #getAppliedRule() <em>Applied Rule</em>}' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @see #getAppliedRule()
    * @generated
    * @ordered
    */
-  protected static final String APPLIED_RULE_EDEFAULT = null;
-
-  /**
-   * The cached value of the '{@link #getAppliedRule() <em>Applied Rule</em>}' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #getAppliedRule()
-   * @generated
-   * @ordered
-   */
-  protected String appliedRule = APPLIED_RULE_EDEFAULT;
+  protected trcRule appliedRule;
 
   /**
    * The cached value of the '{@link #getFields() <em>Fields</em>}' attribute list.
@@ -161,7 +152,27 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
    * <!-- end-user-doc -->
    * @generated
    */
-  public String getAppliedRule()
+  public trcRule getAppliedRule()
+  {
+    if (appliedRule != null && appliedRule.eIsProxy())
+    {
+      InternalEObject oldAppliedRule = (InternalEObject)appliedRule;
+      appliedRule = (trcRule)eResolveProxy(oldAppliedRule);
+      if (appliedRule != oldAppliedRule)
+      {
+        if (eNotificationRequired())
+          eNotify(new ENotificationImpl(this, Notification.RESOLVE, DslPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE, oldAppliedRule, appliedRule));
+      }
+    }
+    return appliedRule;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public trcRule basicGetAppliedRule()
   {
     return appliedRule;
   }
@@ -171,9 +182,9 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
    * <!-- end-user-doc -->
    * @generated
    */
-  public void setAppliedRule(String newAppliedRule)
+  public void setAppliedRule(trcRule newAppliedRule)
   {
-    String oldAppliedRule = appliedRule;
+    trcRule oldAppliedRule = appliedRule;
     appliedRule = newAppliedRule;
     if (eNotificationRequired())
       eNotify(new ENotificationImpl(this, Notification.SET, DslPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE, oldAppliedRule, appliedRule));
@@ -237,7 +248,8 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
         if (resolve) return getAppliedTransformation();
         return basicGetAppliedTransformation();
       case DslPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        return getAppliedRule();
+        if (resolve) return getAppliedRule();
+        return basicGetAppliedRule();
       case DslPackage.TRANSFORMATION_DEPENDENCY__FIELDS:
         return getFields();
       case DslPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
@@ -261,7 +273,7 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
         setAppliedTransformation((Transformation)newValue);
         return;
       case DslPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        setAppliedRule((String)newValue);
+        setAppliedRule((trcRule)newValue);
         return;
       case DslPackage.TRANSFORMATION_DEPENDENCY__FIELDS:
         getFields().clear();
@@ -289,7 +301,7 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
         setAppliedTransformation((Transformation)null);
         return;
       case DslPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        setAppliedRule(APPLIED_RULE_EDEFAULT);
+        setAppliedRule((trcRule)null);
         return;
       case DslPackage.TRANSFORMATION_DEPENDENCY__FIELDS:
         getFields().clear();
@@ -314,7 +326,7 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
       case DslPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
         return appliedTransformation != null;
       case DslPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        return APPLIED_RULE_EDEFAULT == null ? appliedRule != null : !APPLIED_RULE_EDEFAULT.equals(appliedRule);
+        return appliedRule != null;
       case DslPackage.TRANSFORMATION_DEPENDENCY__FIELDS:
         return fields != null && !fields.isEmpty();
       case DslPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
@@ -334,9 +346,7 @@ public class TransformationDependencyImpl extends MinimalEObjectImpl.Container i
     if (eIsProxy()) return super.toString();
 
     StringBuffer result = new StringBuffer(super.toString());
-    result.append(" (appliedRule: ");
-    result.append(appliedRule);
-    result.append(", fields: ");
+    result.append(" (fields: ");
     result.append(fields);
     result.append(')');
     return result.toString();

@@ -67,22 +67,13 @@ public interface DslPackage extends EPackage
   int TRC_SPECIFICATION = 0;
 
   /**
-   * The feature id for the '<em><b>Froms</b></em>' containment reference list.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int TRC_SPECIFICATION__FROMS = 0;
-
-  /**
    * The feature id for the '<em><b>Module List</b></em>' containment reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int TRC_SPECIFICATION__MODULE_LIST = 1;
+  int TRC_SPECIFICATION__MODULE_LIST = 0;
 
   /**
    * The feature id for the '<em><b>Transformation List</b></em>' containment reference list.
@@ -91,7 +82,7 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int TRC_SPECIFICATION__TRANSFORMATION_LIST = 2;
+  int TRC_SPECIFICATION__TRANSFORMATION_LIST = 1;
 
   /**
    * The feature id for the '<em><b>Dependency List</b></em>' containment reference list.
@@ -100,7 +91,7 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int TRC_SPECIFICATION__DEPENDENCY_LIST = 3;
+  int TRC_SPECIFICATION__DEPENDENCY_LIST = 2;
 
   /**
    * The number of structural features of the '<em>Trc Specification</em>' class.
@@ -109,45 +100,17 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int TRC_SPECIFICATION_FEATURE_COUNT = 4;
+  int TRC_SPECIFICATION_FEATURE_COUNT = 3;
 
   /**
-   * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.FromImpl <em>From</em>}' class.
+   * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.trcRuleImpl <em>trc Rule</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see org.trc.xtext.dsl.dsl.impl.FromImpl
-   * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getFrom()
+   * @see org.trc.xtext.dsl.dsl.impl.trcRuleImpl
+   * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#gettrcRule()
    * @generated
    */
-  int FROM = 1;
-
-  /**
-   * The feature id for the '<em><b>Import URI</b></em>' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int FROM__IMPORT_URI = 0;
-
-  /**
-   * The number of structural features of the '<em>From</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int FROM_FEATURE_COUNT = 1;
-
-  /**
-   * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.RulesImpl <em>Rules</em>}' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see org.trc.xtext.dsl.dsl.impl.RulesImpl
-   * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getRules()
-   * @generated
-   */
-  int RULES = 2;
+  int TRC_RULE = 1;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -156,16 +119,16 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int RULES__NAME = 0;
+  int TRC_RULE__NAME = 0;
 
   /**
-   * The number of structural features of the '<em>Rules</em>' class.
+   * The number of structural features of the '<em>trc Rule</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int RULES_FEATURE_COUNT = 1;
+  int TRC_RULE_FEATURE_COUNT = 1;
 
   /**
    * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.ModuleListImpl <em>Module List</em>}' class.
@@ -175,7 +138,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getModuleList()
    * @generated
    */
-  int MODULE_LIST = 3;
+  int MODULE_LIST = 2;
 
   /**
    * The feature id for the '<em><b>Modules</b></em>' containment reference list.
@@ -196,23 +159,14 @@ public interface DslPackage extends EPackage
   int MODULE_LIST_FEATURE_COUNT = 1;
 
   /**
-   * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.ModulesImpl <em>Modules</em>}' class.
+   * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.ModuleImpl <em>Module</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see org.trc.xtext.dsl.dsl.impl.ModulesImpl
-   * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getModules()
+   * @see org.trc.xtext.dsl.dsl.impl.ModuleImpl
+   * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getModule()
    * @generated
    */
-  int MODULES = 4;
-
-  /**
-   * The feature id for the '<em><b>Path</b></em>' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int MODULES__PATH = 0;
+  int MODULE = 3;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -221,25 +175,25 @@ public interface DslPackage extends EPackage
    * @generated
    * @ordered
    */
-  int MODULES__NAME = 1;
+  int MODULE__NAME = 0;
 
   /**
-   * The feature id for the '<em><b>Rule Name</b></em>' containment reference list.
+   * The feature id for the '<em><b>Rules</b></em>' containment reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int MODULES__RULE_NAME = 2;
+  int MODULE__RULES = 1;
 
   /**
-   * The number of structural features of the '<em>Modules</em>' class.
+   * The number of structural features of the '<em>Module</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int MODULES_FEATURE_COUNT = 3;
+  int MODULE_FEATURE_COUNT = 2;
 
   /**
    * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.TransformationListImpl <em>Transformation List</em>}' class.
@@ -249,7 +203,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getTransformationList()
    * @generated
    */
-  int TRANSFORMATION_LIST = 5;
+  int TRANSFORMATION_LIST = 4;
 
   /**
    * The feature id for the '<em><b>Transformations</b></em>' containment reference list.
@@ -277,7 +231,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getTransformation()
    * @generated
    */
-  int TRANSFORMATION = 6;
+  int TRANSFORMATION = 5;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -323,7 +277,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getTransformationImpact()
    * @generated
    */
-  int TRANSFORMATION_IMPACT = 7;
+  int TRANSFORMATION_IMPACT = 6;
 
   /**
    * The feature id for the '<em><b>Quality Attribute Name</b></em>' attribute.
@@ -360,7 +314,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getTransformationDependencyList()
    * @generated
    */
-  int TRANSFORMATION_DEPENDENCY_LIST = 8;
+  int TRANSFORMATION_DEPENDENCY_LIST = 7;
 
   /**
    * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -397,7 +351,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getTransformationDependency()
    * @generated
    */
-  int TRANSFORMATION_DEPENDENCY = 9;
+  int TRANSFORMATION_DEPENDENCY = 8;
 
   /**
    * The feature id for the '<em><b>Applied Transformation</b></em>' reference.
@@ -409,7 +363,7 @@ public interface DslPackage extends EPackage
   int TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION = 0;
 
   /**
-   * The feature id for the '<em><b>Applied Rule</b></em>' attribute.
+   * The feature id for the '<em><b>Applied Rule</b></em>' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
@@ -452,7 +406,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getAbstractRuleDependency()
    * @generated
    */
-  int ABSTRACT_RULE_DEPENDENCY = 10;
+  int ABSTRACT_RULE_DEPENDENCY = 9;
 
   /**
    * The number of structural features of the '<em>Abstract Rule Dependency</em>' class.
@@ -464,62 +418,6 @@ public interface DslPackage extends EPackage
   int ABSTRACT_RULE_DEPENDENCY_FEATURE_COUNT = 0;
 
   /**
-   * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.RuleDependencyConjunctionImpl <em>Rule Dependency Conjunction</em>}' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see org.trc.xtext.dsl.dsl.impl.RuleDependencyConjunctionImpl
-   * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getRuleDependencyConjunction()
-   * @generated
-   */
-  int RULE_DEPENDENCY_CONJUNCTION = 11;
-
-  /**
-   * The feature id for the '<em><b>Required Transformations</b></em>' containment reference list.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int RULE_DEPENDENCY_CONJUNCTION__REQUIRED_TRANSFORMATIONS = 0;
-
-  /**
-   * The number of structural features of the '<em>Rule Dependency Conjunction</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int RULE_DEPENDENCY_CONJUNCTION_FEATURE_COUNT = 1;
-
-  /**
-   * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.RuleDependencyDisjunctionImpl <em>Rule Dependency Disjunction</em>}' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see org.trc.xtext.dsl.dsl.impl.RuleDependencyDisjunctionImpl
-   * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getRuleDependencyDisjunction()
-   * @generated
-   */
-  int RULE_DEPENDENCY_DISJUNCTION = 12;
-
-  /**
-   * The feature id for the '<em><b>Required Transformations</b></em>' containment reference list.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int RULE_DEPENDENCY_DISJUNCTION__REQUIRED_TRANSFORMATIONS = 0;
-
-  /**
-   * The number of structural features of the '<em>Rule Dependency Disjunction</em>' class.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   * @ordered
-   */
-  int RULE_DEPENDENCY_DISJUNCTION_FEATURE_COUNT = 1;
-
-  /**
    * The meta object id for the '{@link org.trc.xtext.dsl.dsl.impl.RuleDependencyImpl <em>Rule Dependency</em>}' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -527,7 +425,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getRuleDependency()
    * @generated
    */
-  int RULE_DEPENDENCY = 13;
+  int RULE_DEPENDENCY = 10;
 
   /**
    * The feature id for the '<em><b>Rd</b></em>' containment reference list.
@@ -564,7 +462,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getrequiresDependency()
    * @generated
    */
-  int REQUIRES_DEPENDENCY = 14;
+  int REQUIRES_DEPENDENCY = 11;
 
   /**
    * The feature id for the '<em><b>Required Transformation</b></em>' reference list.
@@ -576,7 +474,7 @@ public interface DslPackage extends EPackage
   int REQUIRES_DEPENDENCY__REQUIRED_TRANSFORMATION = 0;
 
   /**
-   * The feature id for the '<em><b>Required Rule</b></em>' attribute.
+   * The feature id for the '<em><b>Required Rule</b></em>' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
@@ -619,7 +517,7 @@ public interface DslPackage extends EPackage
    * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getexcludeDependency()
    * @generated
    */
-  int EXCLUDE_DEPENDENCY = 15;
+  int EXCLUDE_DEPENDENCY = 12;
 
   /**
    * The feature id for the '<em><b>Required Transformation</b></em>' reference list.
@@ -631,7 +529,7 @@ public interface DslPackage extends EPackage
   int EXCLUDE_DEPENDENCY__REQUIRED_TRANSFORMATION = 0;
 
   /**
-   * The feature id for the '<em><b>Required Rule</b></em>' attribute.
+   * The feature id for the '<em><b>Required Rule</b></em>' reference list.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
@@ -678,17 +576,6 @@ public interface DslPackage extends EPackage
   EClass getTrcSpecification();
 
   /**
-   * Returns the meta object for the containment reference list '{@link org.trc.xtext.dsl.dsl.TrcSpecification#getFroms <em>Froms</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference list '<em>Froms</em>'.
-   * @see org.trc.xtext.dsl.dsl.TrcSpecification#getFroms()
-   * @see #getTrcSpecification()
-   * @generated
-   */
-  EReference getTrcSpecification_Froms();
-
-  /**
    * Returns the meta object for the containment reference list '{@link org.trc.xtext.dsl.dsl.TrcSpecification#getModuleList <em>Module List</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -722,46 +609,25 @@ public interface DslPackage extends EPackage
   EReference getTrcSpecification_DependencyList();
 
   /**
-   * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.From <em>From</em>}'.
+   * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.trcRule <em>trc Rule</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for class '<em>From</em>'.
-   * @see org.trc.xtext.dsl.dsl.From
+   * @return the meta object for class '<em>trc Rule</em>'.
+   * @see org.trc.xtext.dsl.dsl.trcRule
    * @generated
    */
-  EClass getFrom();
+  EClass gettrcRule();
 
   /**
-   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.From#getImportURI <em>Import URI</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Import URI</em>'.
-   * @see org.trc.xtext.dsl.dsl.From#getImportURI()
-   * @see #getFrom()
-   * @generated
-   */
-  EAttribute getFrom_ImportURI();
-
-  /**
-   * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.Rules <em>Rules</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for class '<em>Rules</em>'.
-   * @see org.trc.xtext.dsl.dsl.Rules
-   * @generated
-   */
-  EClass getRules();
-
-  /**
-   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.Rules#getName <em>Name</em>}'.
+   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.trcRule#getName <em>Name</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @return the meta object for the attribute '<em>Name</em>'.
-   * @see org.trc.xtext.dsl.dsl.Rules#getName()
-   * @see #getRules()
+   * @see org.trc.xtext.dsl.dsl.trcRule#getName()
+   * @see #gettrcRule()
    * @generated
    */
-  EAttribute getRules_Name();
+  EAttribute gettrcRule_Name();
 
   /**
    * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.ModuleList <em>Module List</em>}'.
@@ -785,47 +651,36 @@ public interface DslPackage extends EPackage
   EReference getModuleList_Modules();
 
   /**
-   * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.Modules <em>Modules</em>}'.
+   * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.Module <em>Module</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for class '<em>Modules</em>'.
-   * @see org.trc.xtext.dsl.dsl.Modules
+   * @return the meta object for class '<em>Module</em>'.
+   * @see org.trc.xtext.dsl.dsl.Module
    * @generated
    */
-  EClass getModules();
+  EClass getModule();
 
   /**
-   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.Modules#getPath <em>Path</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Path</em>'.
-   * @see org.trc.xtext.dsl.dsl.Modules#getPath()
-   * @see #getModules()
-   * @generated
-   */
-  EAttribute getModules_Path();
-
-  /**
-   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.Modules#getName <em>Name</em>}'.
+   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.Module#getName <em>Name</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @return the meta object for the attribute '<em>Name</em>'.
-   * @see org.trc.xtext.dsl.dsl.Modules#getName()
-   * @see #getModules()
+   * @see org.trc.xtext.dsl.dsl.Module#getName()
+   * @see #getModule()
    * @generated
    */
-  EAttribute getModules_Name();
+  EAttribute getModule_Name();
 
   /**
-   * Returns the meta object for the containment reference list '{@link org.trc.xtext.dsl.dsl.Modules#getRuleName <em>Rule Name</em>}'.
+   * Returns the meta object for the containment reference list '{@link org.trc.xtext.dsl.dsl.Module#getRules <em>Rules</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the containment reference list '<em>Rule Name</em>'.
-   * @see org.trc.xtext.dsl.dsl.Modules#getRuleName()
-   * @see #getModules()
+   * @return the meta object for the containment reference list '<em>Rules</em>'.
+   * @see org.trc.xtext.dsl.dsl.Module#getRules()
+   * @see #getModule()
    * @generated
    */
-  EReference getModules_RuleName();
+  EReference getModule_Rules();
 
   /**
    * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.TransformationList <em>Transformation List</em>}'.
@@ -977,15 +832,15 @@ public interface DslPackage extends EPackage
   EReference getTransformationDependency_AppliedTransformation();
 
   /**
-   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.TransformationDependency#getAppliedRule <em>Applied Rule</em>}'.
+   * Returns the meta object for the reference '{@link org.trc.xtext.dsl.dsl.TransformationDependency#getAppliedRule <em>Applied Rule</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Applied Rule</em>'.
+   * @return the meta object for the reference '<em>Applied Rule</em>'.
    * @see org.trc.xtext.dsl.dsl.TransformationDependency#getAppliedRule()
    * @see #getTransformationDependency()
    * @generated
    */
-  EAttribute getTransformationDependency_AppliedRule();
+  EReference getTransformationDependency_AppliedRule();
 
   /**
    * Returns the meta object for the attribute list '{@link org.trc.xtext.dsl.dsl.TransformationDependency#getFields <em>Fields</em>}'.
@@ -1018,48 +873,6 @@ public interface DslPackage extends EPackage
    * @generated
    */
   EClass getAbstractRuleDependency();
-
-  /**
-   * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.RuleDependencyConjunction <em>Rule Dependency Conjunction</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for class '<em>Rule Dependency Conjunction</em>'.
-   * @see org.trc.xtext.dsl.dsl.RuleDependencyConjunction
-   * @generated
-   */
-  EClass getRuleDependencyConjunction();
-
-  /**
-   * Returns the meta object for the containment reference list '{@link org.trc.xtext.dsl.dsl.RuleDependencyConjunction#getRequiredTransformations <em>Required Transformations</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference list '<em>Required Transformations</em>'.
-   * @see org.trc.xtext.dsl.dsl.RuleDependencyConjunction#getRequiredTransformations()
-   * @see #getRuleDependencyConjunction()
-   * @generated
-   */
-  EReference getRuleDependencyConjunction_RequiredTransformations();
-
-  /**
-   * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.RuleDependencyDisjunction <em>Rule Dependency Disjunction</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for class '<em>Rule Dependency Disjunction</em>'.
-   * @see org.trc.xtext.dsl.dsl.RuleDependencyDisjunction
-   * @generated
-   */
-  EClass getRuleDependencyDisjunction();
-
-  /**
-   * Returns the meta object for the containment reference list '{@link org.trc.xtext.dsl.dsl.RuleDependencyDisjunction#getRequiredTransformations <em>Required Transformations</em>}'.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @return the meta object for the containment reference list '<em>Required Transformations</em>'.
-   * @see org.trc.xtext.dsl.dsl.RuleDependencyDisjunction#getRequiredTransformations()
-   * @see #getRuleDependencyDisjunction()
-   * @generated
-   */
-  EReference getRuleDependencyDisjunction_RequiredTransformations();
 
   /**
    * Returns the meta object for class '{@link org.trc.xtext.dsl.dsl.RuleDependency <em>Rule Dependency</em>}'.
@@ -1115,15 +928,15 @@ public interface DslPackage extends EPackage
   EReference getrequiresDependency_RequiredTransformation();
 
   /**
-   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.requiresDependency#getRequiredRule <em>Required Rule</em>}'.
+   * Returns the meta object for the reference list '{@link org.trc.xtext.dsl.dsl.requiresDependency#getRequiredRule <em>Required Rule</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Required Rule</em>'.
+   * @return the meta object for the reference list '<em>Required Rule</em>'.
    * @see org.trc.xtext.dsl.dsl.requiresDependency#getRequiredRule()
    * @see #getrequiresDependency()
    * @generated
    */
-  EAttribute getrequiresDependency_RequiredRule();
+  EReference getrequiresDependency_RequiredRule();
 
   /**
    * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.requiresDependency#getFields <em>Fields</em>}'.
@@ -1169,15 +982,15 @@ public interface DslPackage extends EPackage
   EReference getexcludeDependency_RequiredTransformation();
 
   /**
-   * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.excludeDependency#getRequiredRule <em>Required Rule</em>}'.
+   * Returns the meta object for the reference list '{@link org.trc.xtext.dsl.dsl.excludeDependency#getRequiredRule <em>Required Rule</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Required Rule</em>'.
+   * @return the meta object for the reference list '<em>Required Rule</em>'.
    * @see org.trc.xtext.dsl.dsl.excludeDependency#getRequiredRule()
    * @see #getexcludeDependency()
    * @generated
    */
-  EAttribute getexcludeDependency_RequiredRule();
+  EReference getexcludeDependency_RequiredRule();
 
   /**
    * Returns the meta object for the attribute '{@link org.trc.xtext.dsl.dsl.excludeDependency#getFields <em>Fields</em>}'.
@@ -1235,14 +1048,6 @@ public interface DslPackage extends EPackage
     EClass TRC_SPECIFICATION = eINSTANCE.getTrcSpecification();
 
     /**
-     * The meta object literal for the '<em><b>Froms</b></em>' containment reference list feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference TRC_SPECIFICATION__FROMS = eINSTANCE.getTrcSpecification_Froms();
-
-    /**
      * The meta object literal for the '<em><b>Module List</b></em>' containment reference list feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -1267,32 +1072,14 @@ public interface DslPackage extends EPackage
     EReference TRC_SPECIFICATION__DEPENDENCY_LIST = eINSTANCE.getTrcSpecification_DependencyList();
 
     /**
-     * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.FromImpl <em>From</em>}' class.
+     * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.trcRuleImpl <em>trc Rule</em>}' class.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see org.trc.xtext.dsl.dsl.impl.FromImpl
-     * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getFrom()
+     * @see org.trc.xtext.dsl.dsl.impl.trcRuleImpl
+     * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#gettrcRule()
      * @generated
      */
-    EClass FROM = eINSTANCE.getFrom();
-
-    /**
-     * The meta object literal for the '<em><b>Import URI</b></em>' attribute feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EAttribute FROM__IMPORT_URI = eINSTANCE.getFrom_ImportURI();
-
-    /**
-     * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.RulesImpl <em>Rules</em>}' class.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see org.trc.xtext.dsl.dsl.impl.RulesImpl
-     * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getRules()
-     * @generated
-     */
-    EClass RULES = eINSTANCE.getRules();
+    EClass TRC_RULE = eINSTANCE.gettrcRule();
 
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -1300,7 +1087,7 @@ public interface DslPackage extends EPackage
      * <!-- end-user-doc -->
      * @generated
      */
-    EAttribute RULES__NAME = eINSTANCE.getRules_Name();
+    EAttribute TRC_RULE__NAME = eINSTANCE.gettrcRule_Name();
 
     /**
      * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.ModuleListImpl <em>Module List</em>}' class.
@@ -1321,22 +1108,14 @@ public interface DslPackage extends EPackage
     EReference MODULE_LIST__MODULES = eINSTANCE.getModuleList_Modules();
 
     /**
-     * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.ModulesImpl <em>Modules</em>}' class.
+     * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.ModuleImpl <em>Module</em>}' class.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see org.trc.xtext.dsl.dsl.impl.ModulesImpl
-     * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getModules()
+     * @see org.trc.xtext.dsl.dsl.impl.ModuleImpl
+     * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getModule()
      * @generated
      */
-    EClass MODULES = eINSTANCE.getModules();
-
-    /**
-     * The meta object literal for the '<em><b>Path</b></em>' attribute feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EAttribute MODULES__PATH = eINSTANCE.getModules_Path();
+    EClass MODULE = eINSTANCE.getModule();
 
     /**
      * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -1344,15 +1123,15 @@ public interface DslPackage extends EPackage
      * <!-- end-user-doc -->
      * @generated
      */
-    EAttribute MODULES__NAME = eINSTANCE.getModules_Name();
+    EAttribute MODULE__NAME = eINSTANCE.getModule_Name();
 
     /**
-     * The meta object literal for the '<em><b>Rule Name</b></em>' containment reference list feature.
+     * The meta object literal for the '<em><b>Rules</b></em>' containment reference list feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EReference MODULES__RULE_NAME = eINSTANCE.getModules_RuleName();
+    EReference MODULE__RULES = eINSTANCE.getModule_Rules();
 
     /**
      * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.TransformationListImpl <em>Transformation List</em>}' class.
@@ -1477,12 +1256,12 @@ public interface DslPackage extends EPackage
     EReference TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION = eINSTANCE.getTransformationDependency_AppliedTransformation();
 
     /**
-     * The meta object literal for the '<em><b>Applied Rule</b></em>' attribute feature.
+     * The meta object literal for the '<em><b>Applied Rule</b></em>' reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EAttribute TRANSFORMATION_DEPENDENCY__APPLIED_RULE = eINSTANCE.getTransformationDependency_AppliedRule();
+    EReference TRANSFORMATION_DEPENDENCY__APPLIED_RULE = eINSTANCE.getTransformationDependency_AppliedRule();
 
     /**
      * The meta object literal for the '<em><b>Fields</b></em>' attribute list feature.
@@ -1509,42 +1288,6 @@ public interface DslPackage extends EPackage
      * @generated
      */
     EClass ABSTRACT_RULE_DEPENDENCY = eINSTANCE.getAbstractRuleDependency();
-
-    /**
-     * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.RuleDependencyConjunctionImpl <em>Rule Dependency Conjunction</em>}' class.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see org.trc.xtext.dsl.dsl.impl.RuleDependencyConjunctionImpl
-     * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getRuleDependencyConjunction()
-     * @generated
-     */
-    EClass RULE_DEPENDENCY_CONJUNCTION = eINSTANCE.getRuleDependencyConjunction();
-
-    /**
-     * The meta object literal for the '<em><b>Required Transformations</b></em>' containment reference list feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference RULE_DEPENDENCY_CONJUNCTION__REQUIRED_TRANSFORMATIONS = eINSTANCE.getRuleDependencyConjunction_RequiredTransformations();
-
-    /**
-     * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.RuleDependencyDisjunctionImpl <em>Rule Dependency Disjunction</em>}' class.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @see org.trc.xtext.dsl.dsl.impl.RuleDependencyDisjunctionImpl
-     * @see org.trc.xtext.dsl.dsl.impl.DslPackageImpl#getRuleDependencyDisjunction()
-     * @generated
-     */
-    EClass RULE_DEPENDENCY_DISJUNCTION = eINSTANCE.getRuleDependencyDisjunction();
-
-    /**
-     * The meta object literal for the '<em><b>Required Transformations</b></em>' containment reference list feature.
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     * @generated
-     */
-    EReference RULE_DEPENDENCY_DISJUNCTION__REQUIRED_TRANSFORMATIONS = eINSTANCE.getRuleDependencyDisjunction_RequiredTransformations();
 
     /**
      * The meta object literal for the '{@link org.trc.xtext.dsl.dsl.impl.RuleDependencyImpl <em>Rule Dependency</em>}' class.
@@ -1591,12 +1334,12 @@ public interface DslPackage extends EPackage
     EReference REQUIRES_DEPENDENCY__REQUIRED_TRANSFORMATION = eINSTANCE.getrequiresDependency_RequiredTransformation();
 
     /**
-     * The meta object literal for the '<em><b>Required Rule</b></em>' attribute feature.
+     * The meta object literal for the '<em><b>Required Rule</b></em>' reference list feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EAttribute REQUIRES_DEPENDENCY__REQUIRED_RULE = eINSTANCE.getrequiresDependency_RequiredRule();
+    EReference REQUIRES_DEPENDENCY__REQUIRED_RULE = eINSTANCE.getrequiresDependency_RequiredRule();
 
     /**
      * The meta object literal for the '<em><b>Fields</b></em>' attribute feature.
@@ -1633,12 +1376,12 @@ public interface DslPackage extends EPackage
     EReference EXCLUDE_DEPENDENCY__REQUIRED_TRANSFORMATION = eINSTANCE.getexcludeDependency_RequiredTransformation();
 
     /**
-     * The meta object literal for the '<em><b>Required Rule</b></em>' attribute feature.
+     * The meta object literal for the '<em><b>Required Rule</b></em>' reference list feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EAttribute EXCLUDE_DEPENDENCY__REQUIRED_RULE = eINSTANCE.getexcludeDependency_RequiredRule();
+    EReference EXCLUDE_DEPENDENCY__REQUIRED_RULE = eINSTANCE.getexcludeDependency_RequiredRule();
 
     /**
      * The meta object literal for the '<em><b>Fields</b></em>' attribute feature.

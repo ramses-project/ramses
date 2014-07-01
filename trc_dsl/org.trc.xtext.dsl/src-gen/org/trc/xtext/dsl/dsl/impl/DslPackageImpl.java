@@ -12,13 +12,9 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
 import org.trc.xtext.dsl.dsl.AbstractRuleDependency;
 import org.trc.xtext.dsl.dsl.DslFactory;
 import org.trc.xtext.dsl.dsl.DslPackage;
-import org.trc.xtext.dsl.dsl.From;
+import org.trc.xtext.dsl.dsl.Module;
 import org.trc.xtext.dsl.dsl.ModuleList;
-import org.trc.xtext.dsl.dsl.Modules;
 import org.trc.xtext.dsl.dsl.RuleDependency;
-import org.trc.xtext.dsl.dsl.RuleDependencyConjunction;
-import org.trc.xtext.dsl.dsl.RuleDependencyDisjunction;
-import org.trc.xtext.dsl.dsl.Rules;
 import org.trc.xtext.dsl.dsl.Transformation;
 import org.trc.xtext.dsl.dsl.TransformationDependency;
 import org.trc.xtext.dsl.dsl.TransformationDependencyList;
@@ -27,6 +23,7 @@ import org.trc.xtext.dsl.dsl.TransformationList;
 import org.trc.xtext.dsl.dsl.TrcSpecification;
 import org.trc.xtext.dsl.dsl.excludeDependency;
 import org.trc.xtext.dsl.dsl.requiresDependency;
+import org.trc.xtext.dsl.dsl.trcRule;
 
 /**
  * <!-- begin-user-doc -->
@@ -48,14 +45,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass fromEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  private EClass rulesEClass = null;
+  private EClass trcRuleEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -69,7 +59,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  private EClass modulesEClass = null;
+  private EClass moduleEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -112,20 +102,6 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * @generated
    */
   private EClass abstractRuleDependencyEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  private EClass ruleDependencyConjunctionEClass = null;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  private EClass ruleDependencyDisjunctionEClass = null;
 
   /**
    * <!-- begin-user-doc -->
@@ -226,7 +202,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getTrcSpecification_Froms()
+  public EReference getTrcSpecification_ModuleList()
   {
     return (EReference)trcSpecificationEClass.getEStructuralFeatures().get(0);
   }
@@ -236,7 +212,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getTrcSpecification_ModuleList()
+  public EReference getTrcSpecification_TransformationList()
   {
     return (EReference)trcSpecificationEClass.getEStructuralFeatures().get(1);
   }
@@ -246,7 +222,7 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getTrcSpecification_TransformationList()
+  public EReference getTrcSpecification_DependencyList()
   {
     return (EReference)trcSpecificationEClass.getEStructuralFeatures().get(2);
   }
@@ -256,9 +232,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EReference getTrcSpecification_DependencyList()
+  public EClass gettrcRule()
   {
-    return (EReference)trcSpecificationEClass.getEStructuralFeatures().get(3);
+    return trcRuleEClass;
   }
 
   /**
@@ -266,39 +242,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EClass getFrom()
+  public EAttribute gettrcRule_Name()
   {
-    return fromEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EAttribute getFrom_ImportURI()
-  {
-    return (EAttribute)fromEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EClass getRules()
-  {
-    return rulesEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EAttribute getRules_Name()
-  {
-    return (EAttribute)rulesEClass.getEStructuralFeatures().get(0);
+    return (EAttribute)trcRuleEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -326,9 +272,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EClass getModules()
+  public EClass getModule()
   {
-    return modulesEClass;
+    return moduleEClass;
   }
 
   /**
@@ -336,9 +282,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EAttribute getModules_Path()
+  public EAttribute getModule_Name()
   {
-    return (EAttribute)modulesEClass.getEStructuralFeatures().get(0);
+    return (EAttribute)moduleEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -346,19 +292,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EAttribute getModules_Name()
+  public EReference getModule_Rules()
   {
-    return (EAttribute)modulesEClass.getEStructuralFeatures().get(1);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EReference getModules_RuleName()
-  {
-    return (EReference)modulesEClass.getEStructuralFeatures().get(2);
+    return (EReference)moduleEClass.getEStructuralFeatures().get(1);
   }
 
   /**
@@ -506,9 +442,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EAttribute getTransformationDependency_AppliedRule()
+  public EReference getTransformationDependency_AppliedRule()
   {
-    return (EAttribute)transformationDependencyEClass.getEStructuralFeatures().get(1);
+    return (EReference)transformationDependencyEClass.getEStructuralFeatures().get(1);
   }
 
   /**
@@ -539,46 +475,6 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
   public EClass getAbstractRuleDependency()
   {
     return abstractRuleDependencyEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EClass getRuleDependencyConjunction()
-  {
-    return ruleDependencyConjunctionEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EReference getRuleDependencyConjunction_RequiredTransformations()
-  {
-    return (EReference)ruleDependencyConjunctionEClass.getEStructuralFeatures().get(0);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EClass getRuleDependencyDisjunction()
-  {
-    return ruleDependencyDisjunctionEClass;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public EReference getRuleDependencyDisjunction_RequiredTransformations()
-  {
-    return (EReference)ruleDependencyDisjunctionEClass.getEStructuralFeatures().get(0);
   }
 
   /**
@@ -636,9 +532,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EAttribute getrequiresDependency_RequiredRule()
+  public EReference getrequiresDependency_RequiredRule()
   {
-    return (EAttribute)requiresDependencyEClass.getEStructuralFeatures().get(1);
+    return (EReference)requiresDependencyEClass.getEStructuralFeatures().get(1);
   }
 
   /**
@@ -686,9 +582,9 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
    * <!-- end-user-doc -->
    * @generated
    */
-  public EAttribute getexcludeDependency_RequiredRule()
+  public EReference getexcludeDependency_RequiredRule()
   {
-    return (EAttribute)excludeDependencyEClass.getEStructuralFeatures().get(1);
+    return (EReference)excludeDependencyEClass.getEStructuralFeatures().get(1);
   }
 
   /**
@@ -742,24 +638,19 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
 
     // Create classes and their features
     trcSpecificationEClass = createEClass(TRC_SPECIFICATION);
-    createEReference(trcSpecificationEClass, TRC_SPECIFICATION__FROMS);
     createEReference(trcSpecificationEClass, TRC_SPECIFICATION__MODULE_LIST);
     createEReference(trcSpecificationEClass, TRC_SPECIFICATION__TRANSFORMATION_LIST);
     createEReference(trcSpecificationEClass, TRC_SPECIFICATION__DEPENDENCY_LIST);
 
-    fromEClass = createEClass(FROM);
-    createEAttribute(fromEClass, FROM__IMPORT_URI);
-
-    rulesEClass = createEClass(RULES);
-    createEAttribute(rulesEClass, RULES__NAME);
+    trcRuleEClass = createEClass(TRC_RULE);
+    createEAttribute(trcRuleEClass, TRC_RULE__NAME);
 
     moduleListEClass = createEClass(MODULE_LIST);
     createEReference(moduleListEClass, MODULE_LIST__MODULES);
 
-    modulesEClass = createEClass(MODULES);
-    createEAttribute(modulesEClass, MODULES__PATH);
-    createEAttribute(modulesEClass, MODULES__NAME);
-    createEReference(modulesEClass, MODULES__RULE_NAME);
+    moduleEClass = createEClass(MODULE);
+    createEAttribute(moduleEClass, MODULE__NAME);
+    createEReference(moduleEClass, MODULE__RULES);
 
     transformationListEClass = createEClass(TRANSFORMATION_LIST);
     createEReference(transformationListEClass, TRANSFORMATION_LIST__TRANSFORMATIONS);
@@ -779,17 +670,11 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
 
     transformationDependencyEClass = createEClass(TRANSFORMATION_DEPENDENCY);
     createEReference(transformationDependencyEClass, TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION);
-    createEAttribute(transformationDependencyEClass, TRANSFORMATION_DEPENDENCY__APPLIED_RULE);
+    createEReference(transformationDependencyEClass, TRANSFORMATION_DEPENDENCY__APPLIED_RULE);
     createEAttribute(transformationDependencyEClass, TRANSFORMATION_DEPENDENCY__FIELDS);
     createEReference(transformationDependencyEClass, TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS);
 
     abstractRuleDependencyEClass = createEClass(ABSTRACT_RULE_DEPENDENCY);
-
-    ruleDependencyConjunctionEClass = createEClass(RULE_DEPENDENCY_CONJUNCTION);
-    createEReference(ruleDependencyConjunctionEClass, RULE_DEPENDENCY_CONJUNCTION__REQUIRED_TRANSFORMATIONS);
-
-    ruleDependencyDisjunctionEClass = createEClass(RULE_DEPENDENCY_DISJUNCTION);
-    createEReference(ruleDependencyDisjunctionEClass, RULE_DEPENDENCY_DISJUNCTION__REQUIRED_TRANSFORMATIONS);
 
     ruleDependencyEClass = createEClass(RULE_DEPENDENCY);
     createEReference(ruleDependencyEClass, RULE_DEPENDENCY__RD);
@@ -797,13 +682,13 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
 
     requiresDependencyEClass = createEClass(REQUIRES_DEPENDENCY);
     createEReference(requiresDependencyEClass, REQUIRES_DEPENDENCY__REQUIRED_TRANSFORMATION);
-    createEAttribute(requiresDependencyEClass, REQUIRES_DEPENDENCY__REQUIRED_RULE);
+    createEReference(requiresDependencyEClass, REQUIRES_DEPENDENCY__REQUIRED_RULE);
     createEAttribute(requiresDependencyEClass, REQUIRES_DEPENDENCY__FIELDS);
     createEAttribute(requiresDependencyEClass, REQUIRES_DEPENDENCY__OCL_EXPRESSION);
 
     excludeDependencyEClass = createEClass(EXCLUDE_DEPENDENCY);
     createEReference(excludeDependencyEClass, EXCLUDE_DEPENDENCY__REQUIRED_TRANSFORMATION);
-    createEAttribute(excludeDependencyEClass, EXCLUDE_DEPENDENCY__REQUIRED_RULE);
+    createEReference(excludeDependencyEClass, EXCLUDE_DEPENDENCY__REQUIRED_RULE);
     createEAttribute(excludeDependencyEClass, EXCLUDE_DEPENDENCY__FIELDS);
     createEAttribute(excludeDependencyEClass, EXCLUDE_DEPENDENCY__OCL_EXPRESSION);
   }
@@ -841,31 +726,26 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
 
     // Initialize classes and features; add operations and parameters
     initEClass(trcSpecificationEClass, TrcSpecification.class, "TrcSpecification", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getTrcSpecification_Froms(), this.getFrom(), null, "froms", null, 0, -1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getTrcSpecification_ModuleList(), this.getModuleList(), null, "moduleList", null, 0, -1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getTrcSpecification_TransformationList(), this.getTransformationList(), null, "transformationList", null, 0, -1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getTrcSpecification_DependencyList(), this.getTransformationDependencyList(), null, "dependencyList", null, 0, -1, TrcSpecification.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-    initEClass(fromEClass, From.class, "From", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEAttribute(getFrom_ImportURI(), ecorePackage.getEString(), "importURI", null, 0, 1, From.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-    initEClass(rulesEClass, Rules.class, "Rules", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEAttribute(getRules_Name(), ecorePackage.getEString(), "name", null, 0, 1, Rules.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEClass(trcRuleEClass, trcRule.class, "trcRule", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEAttribute(gettrcRule_Name(), ecorePackage.getEString(), "name", null, 0, 1, trcRule.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(moduleListEClass, ModuleList.class, "ModuleList", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getModuleList_Modules(), this.getModules(), null, "modules", null, 0, -1, ModuleList.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getModuleList_Modules(), this.getModule(), null, "modules", null, 0, -1, ModuleList.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-    initEClass(modulesEClass, Modules.class, "Modules", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEAttribute(getModules_Path(), ecorePackage.getEString(), "path", null, 0, 1, Modules.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEAttribute(getModules_Name(), ecorePackage.getEString(), "name", null, 0, 1, Modules.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getModules_RuleName(), this.getRules(), null, "ruleName", null, 0, -1, Modules.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEClass(moduleEClass, Module.class, "Module", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEAttribute(getModule_Name(), ecorePackage.getEString(), "name", null, 0, 1, Module.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getModule_Rules(), this.gettrcRule(), null, "rules", null, 0, -1, Module.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(transformationListEClass, TransformationList.class, "TransformationList", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getTransformationList_Transformations(), this.getTransformation(), null, "transformations", null, 0, -1, TransformationList.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(transformationEClass, Transformation.class, "Transformation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEAttribute(getTransformation_Name(), ecorePackage.getEString(), "name", null, 0, 1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEReference(getTransformation_Modules(), this.getModules(), null, "modules", null, 0, -1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getTransformation_Modules(), this.getModule(), null, "modules", null, 0, -1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getTransformation_Impacts(), this.getTransformationImpact(), null, "impacts", null, 0, -1, Transformation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(transformationImpactEClass, TransformationImpact.class, "TransformationImpact", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -878,17 +758,11 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
 
     initEClass(transformationDependencyEClass, TransformationDependency.class, "TransformationDependency", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getTransformationDependency_AppliedTransformation(), this.getTransformation(), null, "appliedTransformation", null, 0, 1, TransformationDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEAttribute(getTransformationDependency_AppliedRule(), ecorePackage.getEString(), "appliedRule", null, 0, 1, TransformationDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getTransformationDependency_AppliedRule(), this.gettrcRule(), null, "appliedRule", null, 0, 1, TransformationDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getTransformationDependency_Fields(), ecorePackage.getEString(), "fields", null, 0, -1, TransformationDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getTransformationDependency_RequiredTransformations(), this.getAbstractRuleDependency(), null, "requiredTransformations", null, 0, -1, TransformationDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(abstractRuleDependencyEClass, AbstractRuleDependency.class, "AbstractRuleDependency", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
-    initEClass(ruleDependencyConjunctionEClass, RuleDependencyConjunction.class, "RuleDependencyConjunction", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getRuleDependencyConjunction_RequiredTransformations(), this.getAbstractRuleDependency(), null, "requiredTransformations", null, 0, -1, RuleDependencyConjunction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-    initEClass(ruleDependencyDisjunctionEClass, RuleDependencyDisjunction.class, "RuleDependencyDisjunction", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-    initEReference(getRuleDependencyDisjunction_RequiredTransformations(), this.getAbstractRuleDependency(), null, "requiredTransformations", null, 0, -1, RuleDependencyDisjunction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(ruleDependencyEClass, RuleDependency.class, "RuleDependency", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getRuleDependency_Rd(), ecorePackage.getEObject(), null, "rd", null, 0, -1, RuleDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -896,13 +770,13 @@ public class DslPackageImpl extends EPackageImpl implements DslPackage
 
     initEClass(requiresDependencyEClass, requiresDependency.class, "requiresDependency", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getrequiresDependency_RequiredTransformation(), this.getTransformation(), null, "requiredTransformation", null, 0, -1, requiresDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEAttribute(getrequiresDependency_RequiredRule(), ecorePackage.getEString(), "requiredRule", null, 0, 1, requiresDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getrequiresDependency_RequiredRule(), this.gettrcRule(), null, "requiredRule", null, 0, -1, requiresDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getrequiresDependency_Fields(), ecorePackage.getEString(), "fields", null, 0, 1, requiresDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getrequiresDependency_OclExpression(), ecorePackage.getEString(), "oclExpression", null, 0, 1, requiresDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(excludeDependencyEClass, excludeDependency.class, "excludeDependency", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getexcludeDependency_RequiredTransformation(), this.getTransformation(), null, "requiredTransformation", null, 0, -1, excludeDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-    initEAttribute(getexcludeDependency_RequiredRule(), ecorePackage.getEString(), "requiredRule", null, 0, 1, excludeDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEReference(getexcludeDependency_RequiredRule(), this.gettrcRule(), null, "requiredRule", null, 0, -1, excludeDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getexcludeDependency_Fields(), ecorePackage.getEString(), "fields", null, 0, 1, excludeDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEAttribute(getexcludeDependency_OclExpression(), ecorePackage.getEString(), "oclExpression", null, 0, 1, excludeDependency.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

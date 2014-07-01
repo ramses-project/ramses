@@ -70,7 +70,7 @@ private static final String TRC_MM_URI =
   {
 //	for(int i=0; i<tableSize; i++)
 //	{
-	  AtlConverter.convertToModel(inModelPaths[0], resourceSet);
+	  AtlConverter.convertToModel(inModelPaths[10], resourceSet);
 	 
 //	}
 //	String rootAtl = "platform:/plugin/" + "fr.tpt.atl.utils/";
@@ -88,7 +88,7 @@ private static final String TRC_MM_URI =
 
     inModel = factory.newModel(mm_atlMetamodel);
 
-	String fileURI = URI.createFileURI(inModelPaths[0]).toString();
+	String fileURI = URI.createFileURI(inModelPaths[10]).toString();
 	injector.inject(inModel, new Path(fileURI).removeFileExtension()
 			.addFileExtension("atxl").toString());
 	// atxl file

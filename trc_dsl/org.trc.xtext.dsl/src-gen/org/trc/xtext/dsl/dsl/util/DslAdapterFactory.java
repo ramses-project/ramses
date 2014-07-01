@@ -80,14 +80,9 @@ public class DslAdapterFactory extends AdapterFactoryImpl
         return createTrcSpecificationAdapter();
       }
       @Override
-      public Adapter caseFrom(From object)
+      public Adapter casetrcRule(trcRule object)
       {
-        return createFromAdapter();
-      }
-      @Override
-      public Adapter caseRules(Rules object)
-      {
-        return createRulesAdapter();
+        return createtrcRuleAdapter();
       }
       @Override
       public Adapter caseModuleList(ModuleList object)
@@ -95,9 +90,9 @@ public class DslAdapterFactory extends AdapterFactoryImpl
         return createModuleListAdapter();
       }
       @Override
-      public Adapter caseModules(Modules object)
+      public Adapter caseModule(Module object)
       {
-        return createModulesAdapter();
+        return createModuleAdapter();
       }
       @Override
       public Adapter caseTransformationList(TransformationList object)
@@ -128,16 +123,6 @@ public class DslAdapterFactory extends AdapterFactoryImpl
       public Adapter caseAbstractRuleDependency(AbstractRuleDependency object)
       {
         return createAbstractRuleDependencyAdapter();
-      }
-      @Override
-      public Adapter caseRuleDependencyConjunction(RuleDependencyConjunction object)
-      {
-        return createRuleDependencyConjunctionAdapter();
-      }
-      @Override
-      public Adapter caseRuleDependencyDisjunction(RuleDependencyDisjunction object)
-      {
-        return createRuleDependencyDisjunctionAdapter();
       }
       @Override
       public Adapter caseRuleDependency(RuleDependency object)
@@ -192,31 +177,16 @@ public class DslAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link org.trc.xtext.dsl.dsl.From <em>From</em>}'.
+   * Creates a new adapter for an object of class '{@link org.trc.xtext.dsl.dsl.trcRule <em>trc Rule</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see org.trc.xtext.dsl.dsl.From
+   * @see org.trc.xtext.dsl.dsl.trcRule
    * @generated
    */
-  public Adapter createFromAdapter()
-  {
-    return null;
-  }
-
-  /**
-   * Creates a new adapter for an object of class '{@link org.trc.xtext.dsl.dsl.Rules <em>Rules</em>}'.
-   * <!-- begin-user-doc -->
-   * This default implementation returns null so that we can easily ignore cases;
-   * it's useful to ignore a case when inheritance will catch all the cases anyway.
-   * <!-- end-user-doc -->
-   * @return the new adapter.
-   * @see org.trc.xtext.dsl.dsl.Rules
-   * @generated
-   */
-  public Adapter createRulesAdapter()
+  public Adapter createtrcRuleAdapter()
   {
     return null;
   }
@@ -237,16 +207,16 @@ public class DslAdapterFactory extends AdapterFactoryImpl
   }
 
   /**
-   * Creates a new adapter for an object of class '{@link org.trc.xtext.dsl.dsl.Modules <em>Modules</em>}'.
+   * Creates a new adapter for an object of class '{@link org.trc.xtext.dsl.dsl.Module <em>Module</em>}'.
    * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;
    * it's useful to ignore a case when inheritance will catch all the cases anyway.
    * <!-- end-user-doc -->
    * @return the new adapter.
-   * @see org.trc.xtext.dsl.dsl.Modules
+   * @see org.trc.xtext.dsl.dsl.Module
    * @generated
    */
-  public Adapter createModulesAdapter()
+  public Adapter createModuleAdapter()
   {
     return null;
   }
@@ -337,36 +307,6 @@ public class DslAdapterFactory extends AdapterFactoryImpl
    * @generated
    */
   public Adapter createAbstractRuleDependencyAdapter()
-  {
-    return null;
-  }
-
-  /**
-   * Creates a new adapter for an object of class '{@link org.trc.xtext.dsl.dsl.RuleDependencyConjunction <em>Rule Dependency Conjunction</em>}'.
-   * <!-- begin-user-doc -->
-   * This default implementation returns null so that we can easily ignore cases;
-   * it's useful to ignore a case when inheritance will catch all the cases anyway.
-   * <!-- end-user-doc -->
-   * @return the new adapter.
-   * @see org.trc.xtext.dsl.dsl.RuleDependencyConjunction
-   * @generated
-   */
-  public Adapter createRuleDependencyConjunctionAdapter()
-  {
-    return null;
-  }
-
-  /**
-   * Creates a new adapter for an object of class '{@link org.trc.xtext.dsl.dsl.RuleDependencyDisjunction <em>Rule Dependency Disjunction</em>}'.
-   * <!-- begin-user-doc -->
-   * This default implementation returns null so that we can easily ignore cases;
-   * it's useful to ignore a case when inheritance will catch all the cases anyway.
-   * <!-- end-user-doc -->
-   * @return the new adapter.
-   * @see org.trc.xtext.dsl.dsl.RuleDependencyDisjunction
-   * @generated
-   */
-  public Adapter createRuleDependencyDisjunctionAdapter()
   {
     return null;
   }

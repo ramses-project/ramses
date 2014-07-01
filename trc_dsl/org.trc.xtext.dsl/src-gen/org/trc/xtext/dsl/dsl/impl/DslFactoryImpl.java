@@ -65,18 +65,15 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
     switch (eClass.getClassifierID())
     {
       case DslPackage.TRC_SPECIFICATION: return createTrcSpecification();
-      case DslPackage.FROM: return createFrom();
-      case DslPackage.RULES: return createRules();
+      case DslPackage.TRC_RULE: return createtrcRule();
       case DslPackage.MODULE_LIST: return createModuleList();
-      case DslPackage.MODULES: return createModules();
+      case DslPackage.MODULE: return createModule();
       case DslPackage.TRANSFORMATION_LIST: return createTransformationList();
       case DslPackage.TRANSFORMATION: return createTransformation();
       case DslPackage.TRANSFORMATION_IMPACT: return createTransformationImpact();
       case DslPackage.TRANSFORMATION_DEPENDENCY_LIST: return createTransformationDependencyList();
       case DslPackage.TRANSFORMATION_DEPENDENCY: return createTransformationDependency();
       case DslPackage.ABSTRACT_RULE_DEPENDENCY: return createAbstractRuleDependency();
-      case DslPackage.RULE_DEPENDENCY_CONJUNCTION: return createRuleDependencyConjunction();
-      case DslPackage.RULE_DEPENDENCY_DISJUNCTION: return createRuleDependencyDisjunction();
       case DslPackage.RULE_DEPENDENCY: return createRuleDependency();
       case DslPackage.REQUIRES_DEPENDENCY: return createrequiresDependency();
       case DslPackage.EXCLUDE_DEPENDENCY: return createexcludeDependency();
@@ -101,21 +98,10 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
    * <!-- end-user-doc -->
    * @generated
    */
-  public From createFrom()
+  public trcRule createtrcRule()
   {
-    FromImpl from = new FromImpl();
-    return from;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public Rules createRules()
-  {
-    RulesImpl rules = new RulesImpl();
-    return rules;
+    trcRuleImpl trcRule = new trcRuleImpl();
+    return trcRule;
   }
 
   /**
@@ -134,10 +120,10 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
    * <!-- end-user-doc -->
    * @generated
    */
-  public Modules createModules()
+  public Module createModule()
   {
-    ModulesImpl modules = new ModulesImpl();
-    return modules;
+    ModuleImpl module = new ModuleImpl();
+    return module;
   }
 
   /**
@@ -204,28 +190,6 @@ public class DslFactoryImpl extends EFactoryImpl implements DslFactory
   {
     AbstractRuleDependencyImpl abstractRuleDependency = new AbstractRuleDependencyImpl();
     return abstractRuleDependency;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public RuleDependencyConjunction createRuleDependencyConjunction()
-  {
-    RuleDependencyConjunctionImpl ruleDependencyConjunction = new RuleDependencyConjunctionImpl();
-    return ruleDependencyConjunction;
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public RuleDependencyDisjunction createRuleDependencyDisjunction()
-  {
-    RuleDependencyDisjunctionImpl ruleDependencyDisjunction = new RuleDependencyDisjunctionImpl();
-    return ruleDependencyDisjunction;
   }
 
   /**

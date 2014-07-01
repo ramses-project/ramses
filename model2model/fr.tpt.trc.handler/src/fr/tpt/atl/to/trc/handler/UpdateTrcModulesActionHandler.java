@@ -1,7 +1,11 @@
 package fr.tpt.atl.to.trc.handler;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.Iterator;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -12,23 +16,33 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.m2m.atl.emftvm.Model;
+import org.eclipse.m2m.atl.emftvm.Rule;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.xtext.parsetree.reconstr.Serializer;
+import org.eclipse.xtext.resource.IContainer;
+import org.eclipse.xtext.resource.XtextResource;
+import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.serializer.impl.Serializer;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.utils.Aadl2Utils;
 
 import fr.tpt.aadl.ramses.control.support.utils.Names;
-import fr.tpt.aadl.ramses.transformation.trc.Module;
-import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation;
 import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
 
 import org.trc.xtext.dsl.DslRuntimeModule;
-import org.trc.xtext.dsl.dsl.Modules;
+import org.trc.xtext.dsl.DslStandaloneSetup;
+import org.trc.xtext.dsl.dsl.Module;
+import org.trc.xtext.dsl.dsl.ModuleList;
+import org.trc.xtext.dsl.dsl.TrcSpecification;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 
@@ -36,8 +50,11 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 
   protected static boolean _isOutline = false;
   protected IProject _currentProject = null ;
-  public String trcFile = "";
+  public String oldSpecStr = "";
+  public String newSpecStr = "";
+
   int cpt =0;
+  private static Serializer SERIALIZER = null;  
 
   protected ExecutionEvent _event = null ;
   private static final String COMMAND_ID = "fr.tpt.atl.to.trc.handler.trc.update";
@@ -59,10 +76,15 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	}
 	  return event;
   }
+  
+
+  @Inject
+  private Injector injector;
 	
   protected void init(ExecutionEvent event, String Command)
     throws Exception
   {
+    String trcFile;
 //    List<Module> moduleList = new ArrayList<Module>();
 //    List<String> alreadyAdded = new ArrayList<String>();
     _event = event;
@@ -70,6 +92,7 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;		
 	_currentProject = node.getProject() ;
 	Resource resource = OsateResourceUtil.getResource((IResource) node) ;
+	
 
    	String atlDirPath = Aadl2Utils.getAbsolutePluginPath(Names.ATL_TRANSFORMATION_PLUGIN_ID).toString();
    	_LOGGER.info("OSATE project is \'" + _currentProject.getName() + '\'');
@@ -77,6 +100,7 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	//create hot launcher object
 	String[] AtlInputs = getFilesDirectory(atlDirPath);
 	
+
 //	for (int i=0; i<AtlInputs.length;i++)
 //	   	_LOGGER.info("Atl files is \'" + AtlInputs[i] + '\'');
 	
@@ -86,26 +110,63 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	hotLauncher.launchHot(AtlInputs, outputPath);
 	
 	Resource r = resource.getResourceSet().getResource(URI.createURI(outputPath), true);
+	
 	TrcSpecification newSpec = (TrcSpecification) r.getContents().get(0);
-	org.trc.xtext.dsl.dsl.TrcSpecification oldSpec = (org.trc.xtext.dsl.dsl.TrcSpecification) resource.getContents().get(0);
-	oldSpec.getModuleList().get(0).getModules().clear();
-	for(Module m: newSpec.getModuleList().getModules())
+	TrcSpecification oldSpec = (TrcSpecification) resource.getContents().get(0);
+		/*
+	 * 			List<Module> moduleList = new ArrayList<Module>();
+			List<String> alreadyAdded = new ArrayList<String>();
+			
+			for(Transformation t : transformations)
+			{
+			  for(Module m: t.getModules())
+			  {
+			    if(alreadyAdded.contains(m.getPath()))
+			      continue;
+			    alreadyAdded.add(m.getPath());
+			    moduleList.add(m);
+			  }
+			}
+	 */
+		
+	Module newM = null;
+	int numberOfModules = oldSpec.getModuleList().size();
+	int compteur =0;
+	System.out.println("number : "+numberOfModules);
+	oldSpec.getModuleList().clear();
+	
+	for(Module m: newSpec.getModuleList().get(compteur).getModules())
 	{
-		Modules newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModules();
+		newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModule();
 		newM.setName(m.getName());
-		newM.setPath(m.getPath());
-		oldSpec.getModuleList().get(0).getModules().add(newM);
+//		newM.setPath(m.getPath());
+		compteur++;
 	}
 	r.delete(null);
-	// Serialize xtext new trc module
-	
-	
-	Injector injector = Guice.createInjector(new  DslRuntimeModule());  
-	Serializer serializer = injector.getInstance(Serializer.class);  
-	String serializerr = serializer.serialize(newSpec);
-	URI trcUri = resource.getURI(); /// chemin
-	
+		
+	String ModulesSpec = valueOf(newM);
+	System.out.println("oldSpec : "+ModulesSpec.toString());
+
   }
+
+  private static Serializer getSerializer() {  
+	  if (SERIALIZER == null) {
+	   SERIALIZER = Guice.createInjector(new DslRuntimeModule())  
+	        .getInstance(Serializer.class);  
+	  }  
+	  return SERIALIZER;
+	 } 
+  
+  public static String valueOf(EObject eobj) {  
+	  if (eobj==null) {  
+	   return "null";  
+	  }  
+	  try {  
+	   return getSerializer().serialize(eobj);  
+	  } catch (Exception ex) { // fall back: 
+	   return eobj.getClass().getSimpleName()+'@'+eobj.hashCode();  
+	  }  
+	 }  
 
   private String[] getFilesDirectory(String path) 
   {
@@ -135,5 +196,12 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	}
     return AtlFiles;
   }
+  
+
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 
 }
