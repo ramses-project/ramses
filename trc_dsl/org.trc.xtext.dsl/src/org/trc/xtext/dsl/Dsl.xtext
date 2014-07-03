@@ -4,40 +4,40 @@ import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
 generate dsl "http://www.trc.org/xtext/dsl/Dsl"
 
-TrcSpecification returns TrcSpecification :
+TrcSpecification :
 		moduleList         += ModuleList
-		transformationList += TransformationList
-		dependencyList     += TransformationDependencyList		
+		(transformationList += TransformationList)?
+		(dependencyList     += TransformationDependencyList)?
 ;
 
    
-trcRule returns trcRule:
+trcRule:
 	name=EString
 ;  
 
-ModuleList returns ModuleList :
-	{ModuleList}
+ModuleList :
 'Modules'
 	'{'
-		(modules+=Module ( ";" modules+=Module)* )?
+		modules+=Module ( ";" modules+=Module)*
 	'}'
 ;
 
 QualifiedName:
 ID ('.' ID)*;
 
-Module returns Module:
-		name=EString ':' rules+=trcRule ( "," rules+=trcRule)*
+Module:
+{Module}
+		(name=EString ':' rules+=trcRule ( "," rules+=trcRule)*)?
 ;
 
-TransformationList returns TransformationList :
+TransformationList:
 	'Transformations'
 	'{'
 		transformations+=Transformation ( "," transformations+=Transformation)*
 	'}'
-;
+; 
 	
-Transformation returns Transformation :
+Transformation:
 		name=EString
 		'{'
 			'modules' ':' modules+=[Module|EString] ( "," modules+=[Module|EString])*
@@ -45,14 +45,14 @@ Transformation returns Transformation :
 		'}'
 ;
 
-TransformationImpact returns TransformationImpact:
+TransformationImpact:
 	'('
 		(qualityAttributeName=EString ',')? 
 		impactValue=EInt
 	')'
 ;
 
-TransformationDependencyList returns TransformationDependencyList :
+TransformationDependencyList:
 		'Dependencies' 
 		'{'
 		 	name=EString
@@ -62,7 +62,7 @@ TransformationDependencyList returns TransformationDependencyList :
 		'}' 
 ;
 
-TransformationDependency returns TransformationDependency :
+TransformationDependency :
 	'Apply'
 	'('
 //		appliedTransformation=[Transformation|EString]'.'appliedRule=[Rules|EString] ','
@@ -79,7 +79,7 @@ TransformationDependency returns TransformationDependency :
 	']'
 ;
 
-AbstractRuleDependency returns AbstractRuleDependency :
+AbstractRuleDependency:
 	//RuleDependencyConjunction | RuleDependencyDisjunction | RuleDependency
 	RuleDependency
 ;
@@ -92,11 +92,11 @@ AbstractRuleDependency returns AbstractRuleDependency :
 //	requiredTransformations+=AbstractRuleDependency 'or' (requiredTransformations+=AbstractRuleDependency)*
 //;
 
-RuleDependency returns RuleDependency:
+RuleDependency :
 		'requires' rd+=requiresDependency ('and' | 'or')? rd+=requiresDependency* | 'excludes' rd+=excludeDependency ('and' | 'or')? ed+=excludeDependency*
 ;
 
-requiresDependency returns requiresDependency:
+requiresDependency :
 	'('
 		requiredTransformation+=[Transformation|EString]'.'requiredRule+=[trcRule|QualifiedName]','fields=EString":"oclExpression=EString
 //		requiredTransformation+=[Transformation|EString]'.'requiredRule=[Rules|EString]','fields=EString":"oclExpression=EString

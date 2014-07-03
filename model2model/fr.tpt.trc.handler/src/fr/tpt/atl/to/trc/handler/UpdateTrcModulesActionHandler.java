@@ -15,6 +15,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -32,13 +34,15 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.utils.Aadl2Utils;
 
 import fr.tpt.aadl.ramses.control.support.utils.Names;
-import fr.tpt.aadl.ramses.transformation.trc.Transformation;
+import org.trc.xtext.dsl.dsl.Transformation;
+
 import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
 
 import org.trc.xtext.dsl.DslRuntimeModule;
 import org.trc.xtext.dsl.DslStandaloneSetup;
 import org.trc.xtext.dsl.dsl.Module;
 import org.trc.xtext.dsl.dsl.ModuleList;
+import org.trc.xtext.dsl.dsl.TransformationList;
 import org.trc.xtext.dsl.dsl.TrcSpecification;
 
 import com.google.inject.Guice;
@@ -50,8 +54,6 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 
   protected static boolean _isOutline = false;
   protected IProject _currentProject = null ;
-  public String oldSpecStr = "";
-  public String newSpecStr = "";
 
   int cpt =0;
   private static Serializer SERIALIZER = null;  
@@ -93,7 +95,6 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	_currentProject = node.getProject() ;
 	Resource resource = OsateResourceUtil.getResource((IResource) node) ;
 	
-
    	String atlDirPath = Aadl2Utils.getAbsolutePluginPath(Names.ATL_TRANSFORMATION_PLUGIN_ID).toString();
    	_LOGGER.info("OSATE project is \'" + _currentProject.getName() + '\'');
    	   	
@@ -110,63 +111,58 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	hotLauncher.launchHot(AtlInputs, outputPath);
 	
 	Resource r = resource.getResourceSet().getResource(URI.createURI(outputPath), true);
-	
+
 	TrcSpecification newSpec = (TrcSpecification) r.getContents().get(0);
 	TrcSpecification oldSpec = (TrcSpecification) resource.getContents().get(0);
-		/*
-	 * 			List<Module> moduleList = new ArrayList<Module>();
-			List<String> alreadyAdded = new ArrayList<String>();
 			
-			for(Transformation t : transformations)
-			{
-			  for(Module m: t.getModules())
-			  {
-			    if(alreadyAdded.contains(m.getPath()))
-			      continue;
-			    alreadyAdded.add(m.getPath());
-			    moduleList.add(m);
-			  }
-			}
-	 */
-		
-	Module newM = null;
-	int numberOfModules = oldSpec.getModuleList().size();
-	int compteur =0;
-	System.out.println("number : "+numberOfModules);
 	oldSpec.getModuleList().clear();
-	
-	for(Module m: newSpec.getModuleList().get(compteur).getModules())
-	{
-		newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModule();
-		newM.setName(m.getName());
-//		newM.setPath(m.getPath());
-		compteur++;
-	}
-	r.delete(null);
-		
-	String ModulesSpec = valueOf(newM);
-	System.out.println("oldSpec : "+ModulesSpec.toString());
 
+	Resource res2 = resource.getResourceSet().createResource(URI.createURI(_currentProject.getFullPath().toOSString()+"/dslExample.trcDsl"));
+	System.out.println("uri : "+res2.getURI().toString());
+	res2.getContents().add(newSpec);
+
+	for(Module m: newSpec.getModuleList().get(0).getModules())
+	{
+		Module newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModule();
+		newM.setName(m.getName());		
+		res2.getContents().add(newM);
+	}
+	
+	for(Transformation t: oldSpec.getTransformationList().get(0).getTransformations())
+	{
+		Transformation newT = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createTransformation();
+		newT.setName(t.getName());
+		System.out.println("valeur de newsT"+newT.getName());
+		res2.getContents().add(newT);
+
+	}
+
+	r.delete(null);		
+	
+	new DslStandaloneSetup().createInjectorAndDoEMFRegistration();
+		
+	res2.save(null);
+	
   }
 
-  private static Serializer getSerializer() {  
-	  if (SERIALIZER == null) {
-	   SERIALIZER = Guice.createInjector(new DslRuntimeModule())  
-	        .getInstance(Serializer.class);  
-	  }  
-	  return SERIALIZER;
-	 } 
-  
-  public static String valueOf(EObject eobj) {  
-	  if (eobj==null) {  
-	   return "null";  
-	  }  
-	  try {  
-	   return getSerializer().serialize(eobj);  
-	  } catch (Exception ex) { // fall back: 
-	   return eobj.getClass().getSimpleName()+'@'+eobj.hashCode();  
-	  }  
-	 }  
+//  private static Serializer getSerializer() {  
+//	  if (SERIALIZER == null) {
+//	   SERIALIZER = Guice.createInjector(new DslRuntimeModule())  
+//	        .getInstance(Serializer.class);  
+//	  }  
+//	  return SERIALIZER;
+//	 } 
+//  
+//  public static String valueOf(EObject eobj) {  
+//	  if (eobj==null) {  
+//	   return "null";  
+//	  }  
+//	  try {  
+//	   return getSerializer().serialize(eobj);  
+//	  } catch (Exception ex) { // fall back: 
+//	   return eobj.getClass().getSimpleName()+'@'+eobj.hashCode();  
+//	  }  
+//	 }  
 
   private String[] getFilesDirectory(String path) 
   {

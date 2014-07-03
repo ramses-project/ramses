@@ -50,7 +50,7 @@ public class DslSyntacticSequencer extends AbstractSyntacticSequencer {
 
 	/**
 	 * Syntax:
-	 *     ('or' | 'and')?
+	 *     ('and' | 'or')?
 	 */
 	protected void emit_RuleDependency___AndKeyword_0_2_0_or_OrKeyword_0_2_1__q(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
 		acceptNodes(transition, nodes);
@@ -58,7 +58,7 @@ public class DslSyntacticSequencer extends AbstractSyntacticSequencer {
 	
 	/**
 	 * Syntax:
-	 *     ('and' | 'or')?
+	 *     ('or' | 'and')?
 	 */
 	protected void emit_RuleDependency___AndKeyword_1_2_0_or_OrKeyword_1_2_1__q(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
 		acceptNodes(transition, nodes);

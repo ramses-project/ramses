@@ -115,7 +115,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     ((modules+=Module modules+=Module*)?)
+	 *     (modules+=Module modules+=Module*)
 	 */
 	protected void sequence_ModuleList(EObject context, ModuleList semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
@@ -124,7 +124,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (name=EString rules+=trcRule rules+=trcRule*)
+	 *     ((name=EString rules+=trcRule rules+=trcRule*)?)
 	 */
 	protected void sequence_Module(EObject context, Module semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
@@ -196,7 +196,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (moduleList+=ModuleList transformationList+=TransformationList dependencyList+=TransformationDependencyList)
+	 *     (moduleList+=ModuleList transformationList+=TransformationList? dependencyList+=TransformationDependencyList?)
 	 */
 	protected void sequence_TrcSpecification(EObject context, TrcSpecification semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
