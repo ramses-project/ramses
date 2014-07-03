@@ -492,3 +492,14 @@ helper context AADLI!SubprogramClassifier def: getType() : AADLBA!SubprogramType
 		self
 	endif
 ;
+
+helper context AADLI!ComponentInstance def: getOSMaxPriority() : Integer =
+	let res: AADLBA!IntegerLiteral = self.ownedPropertyAssociation
+		->any(pa|pa.property.name='Priority_Range').ownedValue
+		->first().ownedValue.minimum in 
+	if(res.oclIsUndefined()) then
+		30
+	else
+		res.value.longValue()
+	endif
+;

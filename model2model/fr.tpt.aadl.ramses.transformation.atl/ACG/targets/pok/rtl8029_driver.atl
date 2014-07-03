@@ -343,7 +343,10 @@ rule m_ConfigureSystemPartitionForCommunications_rtl8029
 		),
 		pollPrio: AADLBA!IntegerLiteral
 		(
-			value <- 10.longValue()
+			value <- thisModule.getOSMaxPriority()-2.longValue() 
+			-- max prio is for faults management
+			-- max prio-1 is for modes management
+			-- max prio-2 is for communications management
 		),
 		pollPeriod: AADLBA!IntegerLiteral
 		(
