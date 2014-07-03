@@ -1,11 +1,6 @@
 package fr.tpt.atl.to.trc.handler;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -15,39 +10,21 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2m.atl.emftvm.Model;
-import org.eclipse.m2m.atl.emftvm.Rule;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.xtext.resource.IContainer;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.resource.XtextResourceSet;
-import org.eclipse.xtext.serializer.impl.Serializer;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.utils.Aadl2Utils;
 
 import fr.tpt.aadl.ramses.control.support.utils.Names;
-import org.trc.xtext.dsl.dsl.Transformation;
-
 import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
 
-import org.trc.xtext.dsl.DslRuntimeModule;
 import org.trc.xtext.dsl.DslStandaloneSetup;
 import org.trc.xtext.dsl.dsl.Module;
-import org.trc.xtext.dsl.dsl.ModuleList;
-import org.trc.xtext.dsl.dsl.TransformationList;
+import org.trc.xtext.dsl.dsl.Transformation;
 import org.trc.xtext.dsl.dsl.TrcSpecification;
-
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 
 
 public class UpdateTrcModulesActionHandler extends AbstractHandler {
@@ -56,7 +33,6 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
   protected IProject _currentProject = null ;
 
   int cpt =0;
-  private static Serializer SERIALIZER = null;  
 
   protected ExecutionEvent _event = null ;
   private static final String COMMAND_ID = "fr.tpt.atl.to.trc.handler.trc.update";
@@ -78,17 +54,10 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	}
 	  return event;
   }
-  
-
-  @Inject
-  private Injector injector;
-	
+  	
   protected void init(ExecutionEvent event, String Command)
     throws Exception
   {
-    String trcFile;
-//    List<Module> moduleList = new ArrayList<Module>();
-//    List<String> alreadyAdded = new ArrayList<String>();
     _event = event;
 	ISelection s = HandlerUtil.getCurrentSelection(event) ;
 	IFile node = (IFile) ((IStructuredSelection) s).getFirstElement() ;		
@@ -111,58 +80,50 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	hotLauncher.launchHot(AtlInputs, outputPath);
 	
 	Resource r = resource.getResourceSet().getResource(URI.createURI(outputPath), true);
+	Resource res2 = resource.getResourceSet().createResource(URI.createURI(_currentProject.getFullPath().toOSString()+"/dslExample.trcDsl"));
 
 	TrcSpecification newSpec = (TrcSpecification) r.getContents().get(0);
 	TrcSpecification oldSpec = (TrcSpecification) resource.getContents().get(0);
 			
 	oldSpec.getModuleList().clear();
-
-	Resource res2 = resource.getResourceSet().createResource(URI.createURI(_currentProject.getFullPath().toOSString()+"/dslExample.trcDsl"));
-	System.out.println("uri : "+res2.getURI().toString());
-	res2.getContents().add(newSpec);
-
-	for(Module m: newSpec.getModuleList().get(0).getModules())
-	{
-		Module newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModule();
-		newM.setName(m.getName());		
-		res2.getContents().add(newM);
-	}
 	
-	for(Transformation t: oldSpec.getTransformationList().get(0).getTransformations())
-	{
-		Transformation newT = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createTransformation();
-		newT.setName(t.getName());
-		System.out.println("valeur de newsT"+newT.getName());
-		res2.getContents().add(newT);
+//	Transformation newT= null;
 
+	oldSpec.getModuleList().addAll(newSpec.getModuleList());
+
+//	for(Module m: newSpec.getModuleList().get(0).getModules())
+//	{
+//		Module newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModule();
+//		newM.setName(m.getName());
+//		oldSpec.getModuleList().get(0).getModules().add(newM);
+//	}
+//	
+	for (Transformation t : oldSpec.getTransformationList().get(0).getTransformations())
+	{
+		
+//		newT = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createTransformation();
+//		newT.setName(t.getName());
+		System.out.println("transformation name : "+t.getName());
+		System.out.println("transfo modules name :"+t.getModules().get(0).getName());
+//		t.getModules().get(0).setName(oldSpec.getModuleList().get(0).getModules().get(0).getName());
+//		newT.getImpacts().get(0).setImpactValue(t.getImpacts().get(0).getImpactValue());;
+//		newT.getImpacts().get(0).setQualityAttributeName(t.getImpacts().get(0).getQualityAttributeName());;
+//		newT.getModules().get(0).setName();
+//		res2.getContents().add(newT);
 	}
+//	resource.getContents().add(oldSpec);
+
+	res2.getContents().add(oldSpec);
 
 	r.delete(null);		
 	
 	new DslStandaloneSetup().createInjectorAndDoEMFRegistration();
 		
-	res2.save(null);
+//	resource.save(null);
+
+    res2.save(null);
 	
   }
-
-//  private static Serializer getSerializer() {  
-//	  if (SERIALIZER == null) {
-//	   SERIALIZER = Guice.createInjector(new DslRuntimeModule())  
-//	        .getInstance(Serializer.class);  
-//	  }  
-//	  return SERIALIZER;
-//	 } 
-//  
-//  public static String valueOf(EObject eobj) {  
-//	  if (eobj==null) {  
-//	   return "null";  
-//	  }  
-//	  try {  
-//	   return getSerializer().serialize(eobj);  
-//	  } catch (Exception ex) { // fall back: 
-//	   return eobj.getClass().getSimpleName()+'@'+eobj.hashCode();  
-//	  }  
-//	 }  
 
   private String[] getFilesDirectory(String path) 
   {

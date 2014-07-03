@@ -196,7 +196,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (moduleList+=ModuleList transformationList+=TransformationList? dependencyList+=TransformationDependencyList?)
+	 *     (moduleList+=ModuleList transformationList+=TransformationList dependencyList+=TransformationDependencyList)
 	 */
 	protected void sequence_TrcSpecification(EObject context, TrcSpecification semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);

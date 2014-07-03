@@ -29,10 +29,10 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		private final RuleCall cDependencyListTransformationDependencyListParserRuleCall_2_0 = (RuleCall)cDependencyListAssignment_2.eContents().get(0);
 		
 		//TrcSpecification:
-		//	moduleList+=ModuleList transformationList+=TransformationList? dependencyList+=TransformationDependencyList?;
+		//	moduleList+=ModuleList transformationList+=TransformationList dependencyList+=TransformationDependencyList;
 		public ParserRule getRule() { return rule; }
 
-		//moduleList+=ModuleList transformationList+=TransformationList? dependencyList+=TransformationDependencyList?
+		//moduleList+=ModuleList transformationList+=TransformationList dependencyList+=TransformationDependencyList
 		public Group getGroup() { return cGroup; }
 
 		//moduleList+=ModuleList
@@ -41,13 +41,13 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		//ModuleList
 		public RuleCall getModuleListModuleListParserRuleCall_0_0() { return cModuleListModuleListParserRuleCall_0_0; }
 
-		//transformationList+=TransformationList?
+		//transformationList+=TransformationList
 		public Assignment getTransformationListAssignment_1() { return cTransformationListAssignment_1; }
 
 		//TransformationList
 		public RuleCall getTransformationListTransformationListParserRuleCall_1_0() { return cTransformationListTransformationListParserRuleCall_1_0; }
 
-		//dependencyList+=TransformationDependencyList?
+		//dependencyList+=TransformationDependencyList
 		public Assignment getDependencyListAssignment_2() { return cDependencyListAssignment_2; }
 
 		//TransformationDependencyList
@@ -1040,7 +1040,7 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 
 	
 	//TrcSpecification:
-	//	moduleList+=ModuleList transformationList+=TransformationList? dependencyList+=TransformationDependencyList?;
+	//	moduleList+=ModuleList transformationList+=TransformationList dependencyList+=TransformationDependencyList;
 	public TrcSpecificationElements getTrcSpecificationAccess() {
 		return (pTrcSpecification != null) ? pTrcSpecification : (pTrcSpecification = new TrcSpecificationElements());
 	}

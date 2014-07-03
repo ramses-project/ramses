@@ -680,7 +680,7 @@ rule__TrcSpecification__Group__1__Impl
 :
 (
 { before(grammarAccess.getTrcSpecificationAccess().getTransformationListAssignment_1()); }
-(rule__TrcSpecification__TransformationListAssignment_1)?
+(rule__TrcSpecification__TransformationListAssignment_1)
 { after(grammarAccess.getTrcSpecificationAccess().getTransformationListAssignment_1()); }
 )
 
@@ -708,7 +708,7 @@ rule__TrcSpecification__Group__2__Impl
 :
 (
 { before(grammarAccess.getTrcSpecificationAccess().getDependencyListAssignment_2()); }
-(rule__TrcSpecification__DependencyListAssignment_2)?
+(rule__TrcSpecification__DependencyListAssignment_2)
 { after(grammarAccess.getTrcSpecificationAccess().getDependencyListAssignment_2()); }
 )
 

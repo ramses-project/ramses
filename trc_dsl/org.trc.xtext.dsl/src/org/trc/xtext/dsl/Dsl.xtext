@@ -6,8 +6,8 @@ generate dsl "http://www.trc.org/xtext/dsl/Dsl"
 
 TrcSpecification :
 		moduleList         += ModuleList
-		(transformationList += TransformationList)?
-		(dependencyList     += TransformationDependencyList)?
+		transformationList += TransformationList
+		dependencyList     += TransformationDependencyList
 ;
 
    

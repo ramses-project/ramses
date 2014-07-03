@@ -113,7 +113,7 @@ ruleTrcSpecification returns [EObject current=null]
 	    }
 
 )
-)?(
+)(
 (
 		{ 
 	        newCompositeNode(grammarAccess.getTrcSpecificationAccess().getDependencyListTransformationDependencyListParserRuleCall_2_0()); 
@@ -131,7 +131,7 @@ ruleTrcSpecification returns [EObject current=null]
 	    }
 
 )
-)?)
+))
 ;
 
 
