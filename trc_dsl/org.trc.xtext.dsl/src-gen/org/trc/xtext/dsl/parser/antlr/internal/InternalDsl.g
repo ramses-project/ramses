@@ -504,12 +504,10 @@ ruleTransformation returns [EObject current=null]
 	            $current = createModelElement(grammarAccess.getTransformationRule());
 	        }
         }
-		{ 
-	        newCompositeNode(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_4_0()); 
-	    }
-		ruleEString		{ 
-	        afterParserOrEnumRuleCall();
-	    }
+	otherlv_4=RULE_ID
+	{
+		newLeafNode(otherlv_4, grammarAccess.getTransformationAccess().getModulesModuleCrossReference_4_0()); 
+	}
 
 )
 )(	otherlv_5=',' 
@@ -523,12 +521,10 @@ ruleTransformation returns [EObject current=null]
 	            $current = createModelElement(grammarAccess.getTransformationRule());
 	        }
         }
-		{ 
-	        newCompositeNode(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_5_1_0()); 
-	    }
-		ruleEString		{ 
-	        afterParserOrEnumRuleCall();
-	    }
+	otherlv_6=RULE_ID
+	{
+		newLeafNode(otherlv_6, grammarAccess.getTransformationAccess().getModulesModuleCrossReference_5_1_0()); 
+	}
 
 )
 ))*(	otherlv_7='impacts' 

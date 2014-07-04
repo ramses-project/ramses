@@ -260,12 +260,12 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		private final Keyword cColonKeyword_3 = (Keyword)cGroup.eContents().get(3);
 		private final Assignment cModulesAssignment_4 = (Assignment)cGroup.eContents().get(4);
 		private final CrossReference cModulesModuleCrossReference_4_0 = (CrossReference)cModulesAssignment_4.eContents().get(0);
-		private final RuleCall cModulesModuleEStringParserRuleCall_4_0_1 = (RuleCall)cModulesModuleCrossReference_4_0.eContents().get(1);
+		private final RuleCall cModulesModuleIDTerminalRuleCall_4_0_1 = (RuleCall)cModulesModuleCrossReference_4_0.eContents().get(1);
 		private final Group cGroup_5 = (Group)cGroup.eContents().get(5);
 		private final Keyword cCommaKeyword_5_0 = (Keyword)cGroup_5.eContents().get(0);
 		private final Assignment cModulesAssignment_5_1 = (Assignment)cGroup_5.eContents().get(1);
 		private final CrossReference cModulesModuleCrossReference_5_1_0 = (CrossReference)cModulesAssignment_5_1.eContents().get(0);
-		private final RuleCall cModulesModuleEStringParserRuleCall_5_1_0_1 = (RuleCall)cModulesModuleCrossReference_5_1_0.eContents().get(1);
+		private final RuleCall cModulesModuleIDTerminalRuleCall_5_1_0_1 = (RuleCall)cModulesModuleCrossReference_5_1_0.eContents().get(1);
 		private final Group cGroup_6 = (Group)cGroup.eContents().get(6);
 		private final Keyword cImpactsKeyword_6_0 = (Keyword)cGroup_6.eContents().get(0);
 		private final Keyword cColonKeyword_6_1 = (Keyword)cGroup_6.eContents().get(1);
@@ -278,12 +278,12 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		private final Keyword cRightCurlyBracketKeyword_7 = (Keyword)cGroup.eContents().get(7);
 		
 		//Transformation:
-		//	name=EString "{" "modules" ":" modules+=[Module|EString] ("," modules+=[Module|EString])* ("impacts" ":"
-		//	impacts+=TransformationImpact ("," impacts+=TransformationImpact)*)? "}";
+		//	name=EString "{" "modules" ":" modules+=[Module] ("," modules+=[Module])* ("impacts" ":" impacts+=TransformationImpact
+		//	("," impacts+=TransformationImpact)*)? "}";
 		public ParserRule getRule() { return rule; }
 
-		//name=EString "{" "modules" ":" modules+=[Module|EString] ("," modules+=[Module|EString])* ("impacts" ":"
-		//impacts+=TransformationImpact ("," impacts+=TransformationImpact)*)? "}"
+		//name=EString "{" "modules" ":" modules+=[Module] ("," modules+=[Module])* ("impacts" ":" impacts+=TransformationImpact
+		//("," impacts+=TransformationImpact)*)? "}"
 		public Group getGroup() { return cGroup; }
 
 		//name=EString
@@ -301,29 +301,29 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 		//":"
 		public Keyword getColonKeyword_3() { return cColonKeyword_3; }
 
-		//modules+=[Module|EString]
+		//modules+=[Module]
 		public Assignment getModulesAssignment_4() { return cModulesAssignment_4; }
 
-		//[Module|EString]
+		//[Module]
 		public CrossReference getModulesModuleCrossReference_4_0() { return cModulesModuleCrossReference_4_0; }
 
-		//EString
-		public RuleCall getModulesModuleEStringParserRuleCall_4_0_1() { return cModulesModuleEStringParserRuleCall_4_0_1; }
+		//ID
+		public RuleCall getModulesModuleIDTerminalRuleCall_4_0_1() { return cModulesModuleIDTerminalRuleCall_4_0_1; }
 
-		//("," modules+=[Module|EString])*
+		//("," modules+=[Module])*
 		public Group getGroup_5() { return cGroup_5; }
 
 		//","
 		public Keyword getCommaKeyword_5_0() { return cCommaKeyword_5_0; }
 
-		//modules+=[Module|EString]
+		//modules+=[Module]
 		public Assignment getModulesAssignment_5_1() { return cModulesAssignment_5_1; }
 
-		//[Module|EString]
+		//[Module]
 		public CrossReference getModulesModuleCrossReference_5_1_0() { return cModulesModuleCrossReference_5_1_0; }
 
-		//EString
-		public RuleCall getModulesModuleEStringParserRuleCall_5_1_0_1() { return cModulesModuleEStringParserRuleCall_5_1_0_1; }
+		//ID
+		public RuleCall getModulesModuleIDTerminalRuleCall_5_1_0_1() { return cModulesModuleIDTerminalRuleCall_5_1_0_1; }
 
 		//("impacts" ":" impacts+=TransformationImpact ("," impacts+=TransformationImpact)*)?
 		public Group getGroup_6() { return cGroup_6; }
@@ -1100,8 +1100,8 @@ public class DslGrammarAccess extends AbstractGrammarElementFinder {
 	}
 
 	//Transformation:
-	//	name=EString "{" "modules" ":" modules+=[Module|EString] ("," modules+=[Module|EString])* ("impacts" ":"
-	//	impacts+=TransformationImpact ("," impacts+=TransformationImpact)*)? "}";
+	//	name=EString "{" "modules" ":" modules+=[Module] ("," modules+=[Module])* ("impacts" ":" impacts+=TransformationImpact
+	//	("," impacts+=TransformationImpact)*)? "}";
 	public TransformationElements getTransformationAccess() {
 		return (pTransformation != null) ? pTransformation : (pTransformation = new TransformationElements());
 	}

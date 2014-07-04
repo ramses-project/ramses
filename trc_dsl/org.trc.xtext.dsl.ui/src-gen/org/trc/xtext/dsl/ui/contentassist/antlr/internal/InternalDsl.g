@@ -4343,8 +4343,8 @@ rule__Transformation__ModulesAssignment_4
 (
 { before(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_4_0()); }
 (
-{ before(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_4_0_1()); }
-	ruleEString{ after(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_4_0_1()); }
+{ before(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_4_0_1()); }
+	RULE_ID{ after(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_4_0_1()); }
 )
 { after(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_4_0()); }
 )
@@ -4362,8 +4362,8 @@ rule__Transformation__ModulesAssignment_5_1
 (
 { before(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_5_1_0()); }
 (
-{ before(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_5_1_0_1()); }
-	ruleEString{ after(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_5_1_0_1()); }
+{ before(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_5_1_0_1()); }
+	RULE_ID{ after(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_5_1_0_1()); }
 )
 { after(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_5_1_0()); }
 )

@@ -11216,29 +11216,25 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
 
 
     // $ANTLR start "rule__Transformation__ModulesAssignment_4"
-    // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4338:1: rule__Transformation__ModulesAssignment_4 : ( ( ruleEString ) ) ;
+    // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4338:1: rule__Transformation__ModulesAssignment_4 : ( ( RULE_ID ) ) ;
     public final void rule__Transformation__ModulesAssignment_4() throws RecognitionException {
 
         		int stackSize = keepStackSize();
             
         try {
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4342:1: ( ( ( ruleEString ) ) )
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4343:1: ( ( ruleEString ) )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4342:1: ( ( ( RULE_ID ) ) )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4343:1: ( ( RULE_ID ) )
             {
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4343:1: ( ( ruleEString ) )
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4344:1: ( ruleEString )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4343:1: ( ( RULE_ID ) )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4344:1: ( RULE_ID )
             {
              before(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_4_0()); 
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4345:1: ( ruleEString )
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4346:1: ruleEString
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4345:1: ( RULE_ID )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4346:1: RULE_ID
             {
-             before(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_4_0_1()); 
-            pushFollow(FOLLOW_ruleEString_in_rule__Transformation__ModulesAssignment_48601);
-            ruleEString();
-
-            state._fsp--;
-
-             after(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_4_0_1()); 
+             before(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_4_0_1()); 
+            match(input,RULE_ID,FOLLOW_RULE_ID_in_rule__Transformation__ModulesAssignment_48601); 
+             after(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_4_0_1()); 
 
             }
 
@@ -11265,29 +11261,25 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
 
 
     // $ANTLR start "rule__Transformation__ModulesAssignment_5_1"
-    // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4357:1: rule__Transformation__ModulesAssignment_5_1 : ( ( ruleEString ) ) ;
+    // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4357:1: rule__Transformation__ModulesAssignment_5_1 : ( ( RULE_ID ) ) ;
     public final void rule__Transformation__ModulesAssignment_5_1() throws RecognitionException {
 
         		int stackSize = keepStackSize();
             
         try {
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4361:1: ( ( ( ruleEString ) ) )
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4362:1: ( ( ruleEString ) )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4361:1: ( ( ( RULE_ID ) ) )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4362:1: ( ( RULE_ID ) )
             {
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4362:1: ( ( ruleEString ) )
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4363:1: ( ruleEString )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4362:1: ( ( RULE_ID ) )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4363:1: ( RULE_ID )
             {
              before(grammarAccess.getTransformationAccess().getModulesModuleCrossReference_5_1_0()); 
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4364:1: ( ruleEString )
-            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4365:1: ruleEString
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4364:1: ( RULE_ID )
+            // ../org.trc.xtext.dsl.ui/src-gen/org/trc/xtext/dsl/ui/contentassist/antlr/internal/InternalDsl.g:4365:1: RULE_ID
             {
-             before(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_5_1_0_1()); 
-            pushFollow(FOLLOW_ruleEString_in_rule__Transformation__ModulesAssignment_5_18640);
-            ruleEString();
-
-            state._fsp--;
-
-             after(grammarAccess.getTransformationAccess().getModulesModuleEStringParserRuleCall_5_1_0_1()); 
+             before(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_5_1_0_1()); 
+            match(input,RULE_ID,FOLLOW_RULE_ID_in_rule__Transformation__ModulesAssignment_5_18640); 
+             after(grammarAccess.getTransformationAccess().getModulesModuleIDTerminalRuleCall_5_1_0_1()); 
 
             }
 
@@ -12484,7 +12476,7 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
         "\27\2\36\1\5\2\36\1\5\2\uffff\4\21\2\5\2\23\4\5\1\23\2\22\1\23\2"+
         "\22\2\5\4\30\2\27";
     static final String DFA1_acceptS =
-        "\45\uffff\1\2\1\1\32\uffff";
+        "\45\uffff\1\1\1\2\32\uffff";
     static final String DFA1_specialS =
         "\101\uffff}>";
     static final String[] DFA1_transitionS = {
@@ -12519,11 +12511,11 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
             "\1\36",
             "\1\37\1\40\12\uffff\1\41",
             "\1\42\1\43\12\uffff\1\44",
-            "\1\46\1\45\12\uffff\1\41\4\uffff\3\46",
-            "\1\46\1\45\12\uffff\1\41\4\uffff\3\45",
+            "\1\45\1\46\12\uffff\1\41\4\uffff\3\45",
+            "\1\45\1\46\12\uffff\1\41\4\uffff\3\46",
             "\1\47\1\50",
-            "\1\46\1\45\12\uffff\1\44\4\uffff\3\46",
-            "\1\46\1\45\12\uffff\1\44\4\uffff\3\45",
+            "\1\45\1\46\12\uffff\1\44\4\uffff\3\45",
+            "\1\45\1\46\12\uffff\1\44\4\uffff\3\46",
             "\1\51\1\52",
             "",
             "",
@@ -12551,8 +12543,8 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
             "\1\77",
             "\1\100",
             "\1\100",
-            "\1\46\1\45\12\uffff\1\41",
-            "\1\46\1\45\12\uffff\1\44"
+            "\1\45\1\46\12\uffff\1\41",
+            "\1\45\1\46\12\uffff\1\44"
     };
 
     static final short[] DFA1_eot = DFA.unpackEncodedString(DFA1_eotS);
@@ -12733,7 +12725,7 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
     public static final BitSet FOLLOW_rule__Transformation__Group__2__Impl_in_rule__Transformation__Group__23211 = new BitSet(new long[]{0x0000000000040000L});
     public static final BitSet FOLLOW_rule__Transformation__Group__3_in_rule__Transformation__Group__23214 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_21_in_rule__Transformation__Group__2__Impl3242 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rule__Transformation__Group__3__Impl_in_rule__Transformation__Group__33273 = new BitSet(new long[]{0x0000000000000030L});
+    public static final BitSet FOLLOW_rule__Transformation__Group__3__Impl_in_rule__Transformation__Group__33273 = new BitSet(new long[]{0x0000000000000020L});
     public static final BitSet FOLLOW_rule__Transformation__Group__4_in_rule__Transformation__Group__33276 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_18_in_rule__Transformation__Group__3__Impl3304 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rule__Transformation__Group__4__Impl_in_rule__Transformation__Group__43335 = new BitSet(new long[]{0x0000000000488000L});
@@ -12747,7 +12739,7 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
     public static final BitSet FOLLOW_rule__Transformation__Group_6__0_in_rule__Transformation__Group__6__Impl3486 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rule__Transformation__Group__7__Impl_in_rule__Transformation__Group__73517 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_15_in_rule__Transformation__Group__7__Impl3545 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_rule__Transformation__Group_5__0__Impl_in_rule__Transformation__Group_5__03592 = new BitSet(new long[]{0x0000000000000030L});
+    public static final BitSet FOLLOW_rule__Transformation__Group_5__0__Impl_in_rule__Transformation__Group_5__03592 = new BitSet(new long[]{0x0000000000000020L});
     public static final BitSet FOLLOW_rule__Transformation__Group_5__1_in_rule__Transformation__Group_5__03595 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_19_in_rule__Transformation__Group_5__0__Impl3623 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_rule__Transformation__Group_5__1__Impl_in_rule__Transformation__Group_5__13654 = new BitSet(new long[]{0x0000000000000002L});
@@ -12965,8 +12957,8 @@ public class InternalDslParser extends AbstractInternalContentAssistParser {
     public static final BitSet FOLLOW_ruleTransformation_in_rule__TransformationList__TransformationsAssignment_28504 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ruleTransformation_in_rule__TransformationList__TransformationsAssignment_3_18535 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ruleEString_in_rule__Transformation__NameAssignment_08566 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleEString_in_rule__Transformation__ModulesAssignment_48601 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ruleEString_in_rule__Transformation__ModulesAssignment_5_18640 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_ID_in_rule__Transformation__ModulesAssignment_48601 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_RULE_ID_in_rule__Transformation__ModulesAssignment_5_18640 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ruleTransformationImpact_in_rule__Transformation__ImpactsAssignment_6_28675 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ruleTransformationImpact_in_rule__Transformation__ImpactsAssignment_6_3_18706 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ruleEString_in_rule__TransformationImpact__QualityAttributeNameAssignment_1_08737 = new BitSet(new long[]{0x0000000000000002L});

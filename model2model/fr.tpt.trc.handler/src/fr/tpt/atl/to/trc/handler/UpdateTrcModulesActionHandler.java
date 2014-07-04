@@ -24,6 +24,7 @@ import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
 import org.trc.xtext.dsl.DslStandaloneSetup;
 import org.trc.xtext.dsl.dsl.Module;
 import org.trc.xtext.dsl.dsl.Transformation;
+import org.trc.xtext.dsl.dsl.TransformationDependency;
 import org.trc.xtext.dsl.dsl.TrcSpecification;
 
 
@@ -67,16 +68,14 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
    	String atlDirPath = Aadl2Utils.getAbsolutePluginPath(Names.ATL_TRANSFORMATION_PLUGIN_ID).toString();
    	_LOGGER.info("OSATE project is \'" + _currentProject.getName() + '\'');
    	   	
+	
+	String[] AtlInputs = getFilesDirectory(atlDirPath);	
+	for (int i=0; i<AtlInputs.length;i++)
+	   	_LOGGER.info("Atl files is \'" + AtlInputs[i] + '\'');
+	
 	//create hot launcher object
-	String[] AtlInputs = getFilesDirectory(atlDirPath);
-	
-
-//	for (int i=0; i<AtlInputs.length;i++)
-//	   	_LOGGER.info("Atl files is \'" + AtlInputs[i] + '\'');
-	
 	Atl2TrcLauncher hotLauncher = new Atl2TrcLauncher("Atl2Trc4Rule", resource.getResourceSet());
 	String outputPath=_currentProject.getFullPath().toOSString()+"/out_tmp.xmi";
-	
 	hotLauncher.launchHot(AtlInputs, outputPath);
 	
 	Resource r = resource.getResourceSet().getResource(URI.createURI(outputPath), true);
@@ -87,35 +86,26 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 			
 	oldSpec.getModuleList().clear();
 	
-//	Transformation newT= null;
+    oldSpec.getModuleList().addAll(newSpec.getModuleList());
+	oldSpec.getTransformationList().get(0).getTransformations().get(0).getModules().clear();	
 
-	oldSpec.getModuleList().addAll(newSpec.getModuleList());
-
-//	for(Module m: newSpec.getModuleList().get(0).getModules())
-//	{
-//		Module newM = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createModule();
-//		newM.setName(m.getName());
-//		oldSpec.getModuleList().get(0).getModules().add(newM);
-//	}
-//	
 	for (Transformation t : oldSpec.getTransformationList().get(0).getTransformations())
 	{
-		
-//		newT = org.trc.xtext.dsl.dsl.DslFactory.eINSTANCE.createTransformation();
-//		newT.setName(t.getName());
-		System.out.println("transformation name : "+t.getName());
-		System.out.println("transfo modules name :"+t.getModules().get(0).getName());
-//		t.getModules().get(0).setName(oldSpec.getModuleList().get(0).getModules().get(0).getName());
-//		newT.getImpacts().get(0).setImpactValue(t.getImpacts().get(0).getImpactValue());;
-//		newT.getImpacts().get(0).setQualityAttributeName(t.getImpacts().get(0).getQualityAttributeName());;
-//		newT.getModules().get(0).setName();
-//		res2.getContents().add(newT);
+		t.getModules().addAll(oldSpec.getModuleList().get(0).getModules());
 	}
+	
+	oldSpec.getTransformationList().get(0).getTransformations().get(0).getModules().clear();
+	oldSpec.getDependencyList().get(0).getTransformationDependencies().get(0).getAppliedTransformation().getModules().clear();
+	for (TransformationDependency td : oldSpec.getDependencyList().get(0).getTransformationDependencies())
+	{
+		td.getAppliedTransformation().getModules().addAll(oldSpec.getModuleList().get(0).getModules());
+	}
+
 //	resource.getContents().add(oldSpec);
 
 	res2.getContents().add(oldSpec);
 
-	r.delete(null);		
+//	r.delete(null);		
 	
 	new DslStandaloneSetup().createInjectorAndDoEMFRegistration();
 		
@@ -154,11 +144,5 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
     return AtlFiles;
   }
   
-
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
 
 }

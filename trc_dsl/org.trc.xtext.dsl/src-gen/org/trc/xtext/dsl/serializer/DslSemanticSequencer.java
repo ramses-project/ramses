@@ -187,7 +187,7 @@ public class DslSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	
 	/**
 	 * Constraint:
-	 *     (name=EString modules+=[Module|EString] modules+=[Module|EString]* (impacts+=TransformationImpact impacts+=TransformationImpact*)?)
+	 *     (name=EString modules+=[Module|ID] modules+=[Module|ID]* (impacts+=TransformationImpact impacts+=TransformationImpact*)?)
 	 */
 	protected void sequence_Transformation(EObject context, Transformation semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
