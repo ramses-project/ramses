@@ -256,7 +256,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   features
     p_in: in event port;
   properties
-    Dispatch_Protocol => Periodic;
+    Dispatch_Protocol => Timed;
     Period => 200 Ms;
     Priority => 10;
     Data_Size => 40000 bytes;
@@ -347,7 +347,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     source_name => "event_received";
     source_language => (C);
-    source_text => ("user_code.h","user_code.c");
+    source_text => ("event_code.h","event_code.c");
   end event_receiver_spg;
 
   subprogram event_sender_spg
@@ -356,14 +356,14 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     source_name => "send_event";
     source_language => (C);
-    source_text => ("user_code.h","user_code.c");
+    source_text => ("event_code.h","event_code.c");
   end event_sender_spg;
 
   subprogram nothing_received
   properties
     source_name => "nothing_received";
     source_language => (C);
-    source_text => ("user_code.h","user_code.c");
+    source_text => ("event_code.h","event_code.c");
   end nothing_received;
 
 

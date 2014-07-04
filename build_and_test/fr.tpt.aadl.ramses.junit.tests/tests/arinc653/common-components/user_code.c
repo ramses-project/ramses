@@ -39,30 +39,6 @@ void send(uint8_t* d)
     printf("send value: %d\n", *d);
 }
 
-uint8_t counter=0;
-
-void event_received()
-{
-  if(counter<10 && counter>1)
-    printf("received event: %d\n", counter);
-  counter++;
-}
-
-void nothing_received()
-{
-  if(counter<10 && counter>1)
-    printf("nothing received\n");
-}
-
-void send_event (__event_sender_spg_context * context)
-{
-  if(counter<10 && counter>1)
-  {
-    printf("send event\n");
-  }
-  __aadl_send_output (context->e, NULL);
-}
-
 void periodic()
 {
   if(value<10 && value>1)

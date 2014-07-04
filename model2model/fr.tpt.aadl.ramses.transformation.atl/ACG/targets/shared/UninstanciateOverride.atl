@@ -408,6 +408,14 @@ rule m_create_Thread_BA
 														endif
 													)
 												)
+												->union(
+													c.featureInstance->select(fi|fi.isEventPort() or fi.isEventDataPort() and fi.isOutputFeature())
+													->collect(fi|
+														fi.srcConnectionInstance->collect( cnxInst |
+															thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'barrierEntryPointAccessConnection')
+														)
+													)
+												)
 												->flatten()
 												->union(
 													c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
@@ -469,6 +477,13 @@ rule m_create_Thread_BA
 														Sequence{}
 													endif
 												)
+												->union(
+													if(c.isTimedThread()) then
+														thisModule.collectTimedThreadVariablesAccessConnections(c)
+													else
+														Sequence{}
+													endif
+												)
 												->flatten()->excluding(OclUndefined)
 		),
 		typeImg : AADLBA!ThreadType (
@@ -486,28 +501,44 @@ rule m_create_Thread_BA
 														f|f.getFeatureImg()
 													)
 								)
-													->union(
-														c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
-														->collect(
-	 														f| f.srcConnectionInstance->collect(cnxInst |
-																thisModule.resolveMatchedTupleIfExists(Sequence{f,cnxInst.connectionReference->first().connection}, 'f')
-															)
-														)
-													)->union(
-														thisModule.collectPeriodicDelayed_GlobalVariablesAccesses(c)
-													)
-													->union(
-														if(c.isSporadicThread()) then
-															thisModule.collectSporadicGlobalVariablesAccesses(c)
-														else
-															Sequence{}
-														endif
-													)
-													->union
-													(
-														c.featureInstance->select(e|e.feature.oclIsKindOf(AADLBA!DataAccess))
-													)
-													->flatten()->asSet()->excluding(OclUndefined)
+								->union(
+									c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
+									->collect(
+	 									f| f.srcConnectionInstance->collect(cnxInst |
+											thisModule.resolveMatchedTupleIfExists(Sequence{f,cnxInst.connectionReference->first().connection}, 'f')
+										)
+									)
+								)
+								->union(
+									c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
+									->collect(
+	 									f| f.srcConnectionInstance->collect(cnxInst |
+											thisModule.resolveMatchedTupleIfExists(Sequence{f,cnxInst.connectionReference->first().connection}, 'barrierThreadAccess')
+										)
+									)
+								)
+								->union(
+									thisModule.collectPeriodicDelayed_GlobalVariablesAccesses(c)
+								)
+								->union(
+									if(c.isSporadicThread()) then
+										thisModule.collectSporadicGlobalVariablesAccesses(c)
+									else
+										Sequence{}
+									endif
+								)
+								->union(
+									if(c.isTimedThread()) then
+										thisModule.collectTimedGlobalVariablesAccesses(c)
+									else
+										Sequence{}
+									endif
+								)
+								->union
+								(
+									c.featureInstance->select(e|e.feature.oclIsKindOf(AADLBA!DataAccess))
+								)
+								->flatten()->asSet()->excluding(OclUndefined)
  		)
 }
 
@@ -697,6 +728,17 @@ rule m_Process_Instance {
 															endif
 														)
 													)
+													->union
+													(
+														impl.getSubcomponentsInstances('thread')
+                                                        ->collect(c|
+															if(c.isTimedThread()) then
+																thisModule.collectTimedGlobalVariables(c)
+															else
+																Sequence{}
+															endif
+														)
+													)
 													->flatten()->excluding(OclUndefined),
 		ownedAccessConnection			<- impl.getConnectionsInstancesImg('accessConnection')
 												->union(impl.getSubcomponentsInstances('thread')
@@ -706,6 +748,17 @@ rule m_Process_Instance {
 															fi.srcConnectionInstance
 															->collect(cnxInst |
 																thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'accessConnection')
+															)->asSet()	
+														)
+													)
+												)->flatten()
+												->union(impl.getSubcomponentsInstances('thread')
+													->collect(c| c.featureInstance
+														->select (fi | fi.isOutputFeature())
+														->collect(fi |
+															fi.srcConnectionInstance
+															->collect(cnxInst |
+																thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'barrierThreadAccessConnection')
 															)->asSet()	
 														)
 													)
@@ -730,6 +783,17 @@ rule m_Process_Instance {
                                                            ->collect(c|
 														if(c.isSporadicThread()) then
 															thisModule.collectSporadicGlobalVariablesAccessConnections(c)
+														else
+															Sequence{}
+														endif
+													)
+												)
+												->union
+												(
+													impl.getSubcomponentsInstances('thread')
+                                                           ->collect(c|
+														if(c.isTimedThread()) then
+															thisModule.collectTimedGlobalVariablesAccessConnections(c)
 														else
 															Sequence{}
 														endif

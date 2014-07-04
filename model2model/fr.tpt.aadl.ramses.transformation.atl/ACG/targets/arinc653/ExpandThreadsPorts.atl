@@ -472,7 +472,30 @@ unique lazy rule CreateValidityDataSubcomponent
 	}
 }
 
-unique lazy rule CreateTimeOutSubcomponentFromCpt
+
+unique lazy rule CreateTimeOutSubcomponentFromCptPeriod
+{
+	from
+		inst : AADLI!ComponentInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.toStringLiteral(inst.getPeriodValue().toString());
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-inst.name+'_TimeOut',
+			dataSubcomponentType<-'System_Time_Type'.asDataType('ARINC653_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, inst);
+		dataSubcomponent;
+	}
+}
+
+unique lazy rule CreateInfiniteTimeOutSubcomponentFromCpt
 {
 	from
 		inst : AADLI!ComponentInstance

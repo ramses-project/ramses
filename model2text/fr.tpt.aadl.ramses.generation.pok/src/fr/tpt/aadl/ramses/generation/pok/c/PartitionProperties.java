@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.BlackBoardInfo;
+import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.EventInfo ;
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.QueueInfo;
 import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.SampleInfo;
 
@@ -30,7 +31,7 @@ public class PartitionProperties
   
   public Set<BlackBoardInfo> blackboardInfo = new LinkedHashSet<BlackBoardInfo>() ;
   
-  public Set<String> eventNames = new LinkedHashSet<String>() ;
+  public Set<EventInfo> eventInfo = new LinkedHashSet<EventInfo>() ;
   
   public Set<QueueInfo> bufferInfo = new LinkedHashSet<QueueInfo>() ;
   

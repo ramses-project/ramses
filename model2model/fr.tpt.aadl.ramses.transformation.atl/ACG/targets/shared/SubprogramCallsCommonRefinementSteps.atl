@@ -55,7 +55,8 @@ helper def: collectDataPutValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!S
 
 helper def: collectEventDataPutValueCalls(fi: AADLI!FeatureInstance, behavior:AADLI!SubprogramCallSequence, paramCnx:AADLBA!Connection, cnxInst:AADLI!ConnectionInstance): Sequence(AADLBA!SubprogramCall) =
 	Sequence{
-		thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call')
+		thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'call'),
+		thisModule.resolveMatchedTupleIfExists(Sequence{fi, behavior, paramCnx, cnxInst.connectionReference->first().connection} ,'callSetEvent')
 	}
 ;
 
@@ -146,6 +147,13 @@ rule m_ThreadEntrypoint {
 												e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveMatchedTupleIfExists(Sequence{e, cnxInst.connectionReference->first().connection}, 'f_entrypoint'))
 											)
 									)
+									->union(
+										c.featureInstance->select(e| e.isOutputFeature() and e.isEventOrEventDataPort())
+											->collect
+											(
+												e| e.srcConnectionInstance->collect(cnxInst| thisModule.resolveMatchedTupleIfExists(Sequence{e, cnxInst.connectionReference->first().connection}, 'barrierEntryPointAccess'))
+											)
+									)
 									->union
 									(
 										callSequences->collect(behavior | 
@@ -178,6 +186,15 @@ rule m_ThreadEntrypoint {
 									(
 										if(c.isSporadicThread()) then
 											thisModule.collectSporadicThreadVariablesAccesses(c)
+										else
+											Sequence{}
+										endif
+										
+									)
+									->union
+									(
+										if(c.isTimedThread()) then
+											thisModule.collectTimedThreadVariablesAccesses(c)
 										else
 											Sequence{}
 										endif
@@ -226,6 +243,13 @@ rule m_ThreadEntrypoint {
 												(
 													if c.isSporadicThread() then
 														thisModule.collectSporadicThreadVariables(c)
+													else
+														Sequence{}
+													endif
+												)
+												->union(
+													if c.isTimedThread() then
+														thisModule.collectTimedThreadVariables(c)
 													else
 														Sequence{}
 													endif
@@ -415,7 +439,13 @@ rule m_ThreadEntrypoint {
 }
 
 helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AADLBA!BehaviorAction) = 
-	if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveMatchedSingleIfExists(self,'waitDispatchCall')} endif
+	if(self.isSporadicThread()) then 
+		thisModule.collectSporadicBehaviorActions(self) 
+	else 
+		Sequence{thisModule.resolveMatchedSingleIfExists(self,'waitDispatchCall'),
+		thisModule.resolveMatchedSingleIfExists(self,'resetEventCall')
+	}
+	endif
 		->union(
 				self.featureInstance->select(fi| 
 					fi.isInputFeature() and
@@ -1233,20 +1263,23 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, paramCnx, cnxInst));
 					}
 				}
-				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.source.context=call  and portCnxIter.destination.connectionEnd = source.feature))
-				{
-					for(cnxInst in source.srcConnectionInstance)
-					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, portCnx, cnxInst));
-					}
-				}
-				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.destination.context=call  and portCnxIter.source.connectionEnd = source.feature))
-				{
-					for(cnxInst in source.srcConnectionInstance)
-					{
-						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, portCnx, cnxInst));
-					}
-				}
+				-- next is commented because port connections means subprogram has ports, which has to be managed in
+				-- user code. However, this is kept in case it becomes useful later.
+				
+--				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.source.context=call  and portCnxIter.destination.connectionEnd = source.feature))
+--				{
+--					for(cnxInst in source.srcConnectionInstance)
+--					{
+--						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, portCnx, cnxInst));
+--					}
+--				}
+--				for(portCnx in c.subcomponent.classifier.ownedPortConnection->select(portCnxIter|portCnxIter.destination.context=call  and portCnxIter.source.connectionEnd = source.feature))
+--				{
+--					for(cnxInst in source.srcConnectionInstance)
+--					{
+--						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, portCnx, cnxInst));
+--					}
+--				}
 			}
 		}
 		for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isDataPort()))
@@ -2025,6 +2058,26 @@ rule m_Output_EventPort
 		cnxRef: AADLI!PortConnection		
 		(
 			fi.isOutputFeature() and fi.isEventPort()
+			and
+			(cnxRef.source.connectionEnd = fi.feature)
+			and
+			portCnx.destination.connectionEnd = fi.feature
+			and
+			(behavior.ownedSubprogramCall->exists(e| portCnx.source.context = e))
+		)
+	to
+		call: AADLBA!SubprogramCallAction
+}
+
+rule m_Output_EventDataPort
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		portCnx: AADLI!PortConnection,
+		cnxRef: AADLI!PortConnection		
+		(
+			fi.isOutputFeature() and fi.isEventDataPort()
 			and
 			(cnxRef.source.connectionEnd = fi.feature)
 			and

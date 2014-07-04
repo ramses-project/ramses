@@ -22,10 +22,10 @@
 #ifndef __USER_CODE_H__
 #define __USER_CODE_H__
 
-void receive(uint8_t d);
-void send(uint8_t* d);
+#include "subprograms.h"
+
 void event_received();
 void nothing_received();
-void periodic();
+void send_event(__event_sender_spg_context * context);
 
 #endif

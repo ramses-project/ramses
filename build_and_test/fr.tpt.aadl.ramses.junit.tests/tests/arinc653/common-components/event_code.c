@@ -19,13 +19,30 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-#ifndef __USER_CODE_H__
-#define __USER_CODE_H__
+#include "user_code.h"
+#include <types.h>
+#include <libc/stdio.h>
 
-void receive(uint8_t d);
-void send(uint8_t* d);
-void event_received();
-void nothing_received();
-void periodic();
+uint8_t counter=0;
 
-#endif
+void event_received()
+{
+  if(counter<10 && counter>1)
+    printf("received event: %d\n", counter);
+  counter++;
+}
+
+void nothing_received()
+{
+  if(counter<10 && counter>1)
+    printf("nothing received\n");
+}
+
+void send_event (__event_sender_spg_context * context)
+{
+  if(counter<10 && counter>1)
+  {
+    printf("send event\n");
+  }
+  __aadl_send_output (context->e, NULL);
+}

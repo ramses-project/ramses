@@ -189,7 +189,7 @@ rule m_OutputBuffer_EventPort
 		portCnx: AADLI!PortConnection,
 		cnxRef: AADLI!PortConnection		
 		(
-			not fi.srcConnectionInstance->exists(e|not e.destination.getComponentInstance().isPeriodicThread())
+			fi.srcConnectionInstance->exists(e|not e.destination.getComponentInstance().isPeriodicThread())
 		)
 	using
 	{

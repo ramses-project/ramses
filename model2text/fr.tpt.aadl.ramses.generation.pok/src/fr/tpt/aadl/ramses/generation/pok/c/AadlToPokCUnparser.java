@@ -472,7 +472,15 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     return result ;
   }
   
-  // TODO : be refactored with generic interfaces. 
+  // TODO : be refactored with generic interfaces.
+  private void eventHandler(String id, ComponentInstance ci, PartitionProperties pp)
+  {
+    EventInfo eventInfo = new EventInfo();
+    eventInfo.id = id;
+    eventInfo.component= ci;
+    pp.eventInfo.add(eventInfo);
+  }
+  
   private void sampleHandler(String id, FeatureInstance fi, PartitionProperties pp)
   {
     Port p = (Port) fi.getFeature() ;
@@ -576,12 +584,12 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   private void genEventMainImpl(UnparseText mainImplCode,
                                  PartitionProperties pp)
   {
-    for(String eventId: pp.eventNames)
+    for(EventInfo eventInfo: pp.eventInfo)
     {
       mainImplCode.addOutput("  CREATE_EVENT (\"") ;
-      mainImplCode.addOutput(eventId);
+      mainImplCode.addOutput(eventInfo.id);
       mainImplCode.addOutput("\",");
-      mainImplCode.addOutput("&"+eventId+",");
+      mainImplCode.addOutput("&"+eventInfo.id+",");
       mainImplCode.addOutputNewline("& (ret));");
     }
   }
@@ -722,20 +730,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       mainImplCode.addOutput("char* pok_arinc653_events_names[POK_CONFIG_NB_EVENTS] = {") ;
 
-      for(String name : pp.eventNames)
+      for(EventInfo eventInfo : pp.eventInfo)
       {
         mainImplCode.addOutput("\"") ;
-        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput(eventInfo.id) ;
         mainImplCode.addOutput("\"") ;
       }
 
       mainImplCode.addOutputNewline("};") ;
       
       // Generate external variable (declared in deployment.c).
-      for(String name : pp.eventNames)
+      for(EventInfo eventInfo : pp.eventInfo)
       {
         mainImplCode.addOutput("EVENT_ID_TYPE ") ;
-        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput(eventInfo.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
     }
@@ -991,9 +999,6 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     mainImplCode.addOutputNewline("SYSTEM_TIME_TYPE time_out;");
     mainImplCode.addOutputNewline("MESSAGE_SIZE_TYPE length;");
     
-    mainImplCode.addOutputNewline("switch (port_variable) {");
-    mainImplCode.incrementIndent();
-    
     mainImplCode.addOutputNewline("if(value==NULL)");
     mainImplCode.addOutputNewline("{");
     mainImplCode.incrementIndent();
@@ -1001,6 +1006,9 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     mainImplCode.addOutputNewline("value = &i;");
     mainImplCode.decrementIndent();
     mainImplCode.addOutputNewline("}"); 
+    
+    mainImplCode.addOutputNewline("switch (port_variable) {");
+    mainImplCode.incrementIndent();
     
     int i = 0;
     for(FeatureInstance fi: featureInstances)
@@ -1016,8 +1024,13 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
           mainImplCode.addOutputNewline("time_out = "+info.timeOut+";");
           mainImplCode.addOutputNewline("length = "+"sizeof( "+info.dataType+" );");
           mainImplCode.addOutputNewline("SEND_BUFFER("+info.id+", value, length, time_out, &ret);");
-          
         }
+      }
+      for(EventInfo eventInfo : pp.eventInfo)
+      {
+        for(ConnectionInstance ci: fi.getSrcConnectionInstances())
+          if(eventInfo.component.equals(ci.getDestination().getComponentInstance()))
+            mainImplCode.addOutputNewline("SET_EVENT("+eventInfo.id+", &ret);");
       }
       for(QueueInfo qi: pp.queueInfo)
       {
@@ -1028,7 +1041,6 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
           mainImplCode.addOutputNewline("time_out = "+info.timeOut+";");
           mainImplCode.addOutputNewline("length = "+"sizeof( "+info.dataType+" );");
           mainImplCode.addOutputNewline("SEND_QUEUING_MESSAGE("+info.id+", value, length, time_out, &ret);");
-          
         }
       }
             
@@ -1156,7 +1168,9 @@ private void findCommunicationMechanism(ProcessImplementation process,
         else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
               .equalsIgnoreCase(EVENT_AADL_TYPE))
         {
-          pp.eventNames.add(s.getName());
+          
+          eventHandler(s.getName(), (ComponentInstance) HookAccessImpl.
+                       getTransformationTrace(s), pp);
           pp.hasEvent = true ;
         }
         else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
@@ -1266,10 +1280,10 @@ private void findCommunicationMechanism(ProcessImplementation process,
     {
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_EVENTS " +
-                  pp.eventNames.size()) ;
+                  pp.eventInfo.size()) ;
       mainHeaderCode
       .addOutputNewline("#define POK_CONFIG_ARINC653_NB_EVENTS " +
-            pp.eventNames.size()) ;
+            pp.eventInfo.size()) ;
       
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_ARINC653_EVENT 1") ;
@@ -1996,7 +2010,7 @@ private void findCommunicationMechanism(ProcessImplementation process,
       deploymentHeaderCode.addOutput(Integer
             .toString(pp.blackboardInfo.size()
                       + pp.bufferInfo.size()
-                      + pp.eventNames.size()
+                      + 3*pp.eventInfo.size() // Seems that an event port needs 3 locks. To be validated
                       + pp.semaphoreNames.size())) ;
       if(bindedProcess.indexOf(ps) < bindedProcess.size() - 1)
       {
@@ -2835,6 +2849,12 @@ private void findCommunicationMechanism(ProcessImplementation process,
   	public String id = null ;
       
   	public String dataType = null;
+  }
+  
+  public static class EventInfo
+  {
+    public ComponentInstance component ;
+    public String id = null ;
   }
   
   public static class QueueInfo
