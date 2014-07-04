@@ -37,9 +37,9 @@ create OUT : AADLBA 	from 		IN : AADLI,
 --------------------------------------------
 helper context AADLI!FeatureInstance def: needsBarrier(): Boolean =
 	self.srcConnectionInstance->exists(e| e.destination.getComponentInstance().isTimedThread()
-	or
-	(e.destination.getComponentInstance().isSporadicThread()
-		and thisModule.getDispatchTrigger(e.destination.getComponentInstance()).size()>1))
+		or
+		e.destination.getComponentInstance().isSporadicThread()
+	)
 ;
 
 helper context AADLI!FeatureInstance def: getBarrierImg(): AADLBA!DataSubcomponent =

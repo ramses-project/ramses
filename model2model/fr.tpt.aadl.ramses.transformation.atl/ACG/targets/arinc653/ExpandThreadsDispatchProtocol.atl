@@ -60,12 +60,7 @@ helper def: getTimedWaitSubprogram: AADLBA!SubprogramType = 'Timed_Wait'.asSubpr
 
 
 helper def: collectSporadicGlobalVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
-	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
-	if(portsForDispatch.size()>1) then
-		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID')}
-	else
-		Sequence{}
-	endif
+	Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID')}
 ;
 
 helper def: collectTimedGlobalVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
@@ -81,12 +76,7 @@ helper def: collectTimedThreadVariables (c: AADLI!ComponentInstance) : Sequence(
 ;
 
 helper def: collectSporadicGlobalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
-	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
-	if(portsForDispatch.size()>1) then
-		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESS')}
-	else
-		Sequence{}
-	endif
+	Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESS')}
 ;
 
 helper def: collectTimedGlobalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
@@ -94,12 +84,7 @@ helper def: collectTimedGlobalVariablesAccesses (c: AADLI!ComponentInstance) : S
 ;
 	
 helper def: collectSporadicThreadVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
-	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
-	if(portsForDispatch.size()>1) then
-		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESS')}
-	else
-		Sequence{}
-	endif
+	Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESS')}
 ;
 
 helper def: collectTimedThreadVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
@@ -107,12 +92,7 @@ helper def: collectTimedThreadVariablesAccesses (c: AADLI!ComponentInstance) : S
 ;
 
 helper def: collectSporadicThreadVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
-	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
-	if(portsForDispatch.size()>1) then
-		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESSCONNECTION')}
-	else
-		Sequence{}
-	endif
+	Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_LOCAL_ACCESSCONNECTION')}
 ;
 
 helper def: collectTimedThreadVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
@@ -120,12 +100,7 @@ helper def: collectTimedThreadVariablesAccessConnections (c: AADLI!ComponentInst
 ;
 
 helper def: collectSporadicGlobalVariablesAccessConnections (c: AADLI!ComponentInstance) : Sequence(AADLBA!AccessConnections) =
-	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
-	if(portsForDispatch.size()>1) then
-		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESSCONNECTION')}
-	else
-		Sequence{}
-	endif
+	Sequence{thisModule.resolveMatchedSingleIfExists(c, 'EVENT_ID_ACCESSCONNECTION')}
 ;
 
 	
@@ -134,14 +109,9 @@ helper def: collectTimedGlobalVariablesAccessConnections (c: AADLI!ComponentInst
 ;
 	
 helper def: collectSporadicBehaviorActions (c: AADLI!ComponentInstance) : Sequence(AADLBA!BehaviorAction) =
-	let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
-	if(portsForDispatch.size()>1) then
-		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'timedWaitCall'),thisModule.resolveMatchedSingleIfExists(c, 'waitDispatchCall'),
+	Sequence{thisModule.resolveMatchedSingleIfExists(c, 'timedWaitCall'),thisModule.resolveMatchedSingleIfExists(c, 'waitDispatchCall'),
 		thisModule.resolveMatchedSingleIfExists(c,'resetEventCall')
 	}
-	else
-		Sequence{thisModule.resolveMatchedSingleIfExists(c, 'timedWaitCall')}
-	endif
 ;
 
 helper def: getDispatchTrigger (c: AADLI!ComponentInstance) : Sequence(AADLI!FeatureInstance) =
@@ -289,7 +259,7 @@ rule m_TimedThread
 }
 
 
--- @extends m_ThreadEntrypoint
+-- @extends m_ThreadEntrypoint,m_SporadicOrTimedThread
 rule m_SporadicThread
 {
 	from
@@ -333,25 +303,3 @@ rule m_SporadicThread
 		)
 }
 
-
--- @extends m_SporadicThread,m_SporadicOrTimedThread
-rule m_SporadicThread_SeveralInputs
-{
-	from
-		c: AADLI!ComponentInstance
-    	(
-    		let portsForDispatch : Sequence(AADLI!FeatureInstance) = thisModule.getDispatchTrigger(c) in
-			portsForDispatch.size()>1
-		)
-	using
-	{
-		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(c, 'returnData');
-		spg_event : AADLBA!SubprogramType = thisModule.getWaitEventSubprogram;
-		spg_timed_wait: AADLBA!SubprogramType = thisModule.getTimedWaitSubprogram;
-	}
-	to
-		
-		sub: AADLBA!ThreadSubcomponent,
-		waitDispatchCall: AADLBA!SubprogramCallAction,
-		timedWaitCall: AADLBA!SubprogramCallAction
-}
