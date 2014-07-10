@@ -30,10 +30,13 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.ThreadType ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.PropertyUtils ;
 
+import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
@@ -52,12 +55,17 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule ;
+import fr.tpt.aadl.ramses.generation.utils.AadlToXUnparser ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.GlobalQueueInfo ;
+import fr.tpt.aadl.ramses.generation.utils.ProcessProperties ;
 import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.EventInfo ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.QueueInfo ;
 
 /**
  * Unparser to generate an oil file for OSEK from aadl.
  */
-public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
+public class AadlToOSEKNxtCUnparser extends AadlToXUnparser implements AadlTargetUnparser {
 
 	
 	private static String DATA_PORT_TYPE = "DataPortType";
@@ -554,7 +562,21 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	{
 	  _mainCCode.addOutputNewline("#include \"main.h\"");
 	  genCpu(process);
+	  
+	  StringBuilder sb = new StringBuilder(process.getQualifiedName());
+    ProcessProperties pp = new ProcessProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
+    
+    ProcessImplementation processImpl = (ProcessImplementation) 
+        process.getComponentImplementation() ;
+    
+    this.findCommunicationMechanism(processImpl, pp);
+    
+    ComponentInstance processInstance = (ComponentInstance) HookAccessImpl.getTransformationTrace(process);
+    
+    genSendOutputImpl(processInstance, _mainCCode, _mainHCode, pp);
+	  
 	}
+	
 	
 	@Override
 	public void setParameters(Map<Enum<?>, Object> parameters) {
@@ -634,5 +656,109 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
         }
       }
     }
+  }
+
+  @Override
+  protected String getBlackBoardType()
+  {
+    return "OSEK_runtime::DataPortType" ;
+  }
+
+  @Override
+  protected String getBufferType()
+  {
+    return "OSEK_runtime::PortQueueType" ;
+  }
+
+  @Override
+  protected String getEventType()
+  {
+    return null ;
+  }
+
+  @Override
+  protected String getQueuingType()
+  {
+    // return null: queuing (ARINC terminology) does not exist on OSEK
+    return null ;
+  }
+
+  @Override
+  protected String getSamplingType()
+  {
+    // return null: sampling (ARINC terminology) does not exist on OSEK
+    return null ;
+  }
+
+  @Override
+  protected String getSemaphoreType()
+  {
+    // TODO Auto-generated method stub
+    return null ;
+  }
+
+  @Override
+  protected String getVirtualPortType()
+  {
+    // TODO Auto-generated method stub
+    return null ;
+  }
+
+  @Override
+  protected String getFeatureLocalIdentifier(FeatureInstance fi)
+  {
+    return GenerationUtilsC.getGenerationCIdentifier(fi.getComponentInstance().
+                                                     getName()+"_"+fi.getName());
+  }
+
+  @Override
+  protected String getGenerationIdentifier(String prefix)
+  {
+    return GenerationUtilsC.getGenerationCIdentifier(prefix);
+  }
+
+  @Override
+  protected void sendOutputQueueing(UnparseText mainImplCode, QueueInfo info)
+  {
+    return;
+  }
+
+  @Override
+  protected void sendOutputEvent(UnparseText mainImplCode, EventInfo info)
+  {
+    return;
+  }
+
+  @Override
+  protected void sendOutputBuffer(UnparseText mainImplCode, QueueInfo info)
+  {
+    mainImplCode.addOutputNewline("ret = SendOutput_runtime(&" + info.gQueue.id +
+                                  ", "+ info.threadPortId + ", value);");   
+  }
+
+  @Override
+  protected void sendOutputPrologue(ComponentInstance processInstance,
+                                    UnparseText mainImplCode,
+                                    ProcessProperties pp)
+  {
+    mainImplCode.addOutputNewline("StatusType ret;");
+  }
+
+  @Override
+  protected String getGlobalQueueType()
+  {
+    return "OSEK_runtime::ThreadQueueType" ;
+  }
+
+  @Override
+  protected void sendOutputVariableAccess(ComponentInstance processInstance,
+                                          UnparseText mainImplCode,
+                                          ProcessProperties pp)
+  {
+    for(GlobalQueueInfo gqi: pp.globalQueueInfo)
+    {
+      mainImplCode.addOutputNewline("extern thread_queue_t "+ gqi.id+";");
+    }
+
   }
 }

@@ -22,6 +22,8 @@
 #ifndef __USER_SEND_H__
 #define __USER_SEND_H__
 
-void send(int* d);
+#include "main.h"
+
+void send(__sender_spg_context* ctx);
 
 #endif

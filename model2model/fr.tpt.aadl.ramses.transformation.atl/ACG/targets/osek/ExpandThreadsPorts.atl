@@ -268,6 +268,7 @@ rule m_Thread_IntraProcess_Input_EventDataPort_Instance
 		GvInit: AADLBA!ListValue
 	do
 	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
 		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
 								thisModule.structInitInitiator+
 								fi.getQueueSize().toString()+', 0, 0, 0, '+ thisModule.getSizeOfType(fi.getLengthInitialValue())
@@ -296,6 +297,10 @@ rule m_Thread_IntraProcess_Input_EventPort_Instance
 		(
 			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME')
 		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+	}
 }
 
 -- @extends m_Thread_InterProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance

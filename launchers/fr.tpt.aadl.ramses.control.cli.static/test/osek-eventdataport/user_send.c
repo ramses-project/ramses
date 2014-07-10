@@ -24,9 +24,9 @@
 
 int value=0;
 
-void send(int* d)
+void send(__sender_spg_context* ctx)
 {
-  *d = value;
   value++;
-  ecrobot_debug1(0, 0, *d);
+  __aadl_send_output(ctx->result, &value);
+  ecrobot_debug1(0, 0, value);
 }

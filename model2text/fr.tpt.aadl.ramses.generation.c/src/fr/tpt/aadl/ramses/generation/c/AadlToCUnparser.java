@@ -595,8 +595,10 @@ public class AadlToCUnparser extends AadlProcessingSwitch
   
   protected void getCTypeDeclarator(NamedElement object)
   {
+    
     String id = PropertyUtils.getStringValue(object, "Source_Name");
-    if(id == null)
+    if(id == null
+        || PropertyUtils.getStringListValue(object, "Source_Text")!=null)
       id = GenerationUtilsC.getGenerationCIdentifier(object.getQualifiedName()) ;
     TypeHolder dataTypeHolder = null ;
 
@@ -1026,7 +1028,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       case UNKNOWN :
       {
         try
-        {
+        { 
           _gtypesHeaderCode.addOutput("typedef ") ;
           resolveExistingCodeDependencies(object, _gtypesHeaderCode,
                                           _gtypesHeaderCode) ;
@@ -1038,8 +1040,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         {
           String errMsg =  RamsesException.formatRethrowMessage("cannot resolve dependencies for \'"+
                           object + '\'', e) ;
-          _LOGGER.error(errMsg, e);
-          ServiceProvider.SYS_ERR_REP.error(errMsg, true); ;
+          _LOGGER.warn(errMsg, e);
+          ServiceProvider.SYS_ERR_REP.warning(errMsg, true); ;
         }
 
         break ;

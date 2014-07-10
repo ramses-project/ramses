@@ -1,16 +1,13 @@
-package fr.tpt.aadl.ramses.generation.pok.c;
+package fr.tpt.aadl.ramses.generation.utils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.BlackBoardInfo;
-import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.EventInfo ;
-import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.QueueInfo;
-import fr.tpt.aadl.ramses.generation.pok.c.AadlToPokCUnparser.SampleInfo;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.* ;
 
-public class PartitionProperties
+public class ProcessProperties
 {
-  public PartitionProperties(String prefix)
+  public ProcessProperties(String prefix)
   {
 	this.prefix=prefix;
   }
@@ -28,6 +25,8 @@ public class PartitionProperties
   public boolean hasSample = false ;
   
   public boolean hasVirtual = false ;
+  
+  public Set<GlobalQueueInfo> globalQueueInfo = new LinkedHashSet<GlobalQueueInfo>() ;
   
   public Set<BlackBoardInfo> blackboardInfo = new LinkedHashSet<BlackBoardInfo>() ;
   

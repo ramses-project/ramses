@@ -29,6 +29,7 @@ import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
+import org.osate.aadl2.PropertyAssociation ;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.ba.aadlba.BehaviorAnnex;
 import org.osate.ba.aadlba.BehaviorState;
@@ -135,4 +136,7 @@ public interface HookAccess extends EObject
 	  
 	public void setOutputPackageName(String param);
 
+	public EList<String> getListOfPath(PropertyAssociation pa);
+	
+	
 } // HookAccess

@@ -526,10 +526,10 @@ rule PropertyAssociationRule(p : AADLI!PropertyAssociation,
 {
 	to
 		p2 : AADLBA!PropertyAssociation (
-			property <- p.property.debug('  property'),
+			property <- p.property,
 			constant <- p.constant,
 			append <- p.append,
-			ownedValue <- content.debug('  value')
+			ownedValue <- content
 		)
 	do
 	{

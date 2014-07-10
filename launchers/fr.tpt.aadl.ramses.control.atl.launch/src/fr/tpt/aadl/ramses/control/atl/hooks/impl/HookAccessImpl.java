@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.control.atl.hooks.impl ;
 
+import java.io.File ;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.Map;
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.xtext.nodemodel.INode;
@@ -40,8 +42,12 @@ import org.osate.aadl2.DirectedFeature;
 import org.osate.aadl2.DirectionType;
 import org.osate.aadl2.Element;
 import org.osate.aadl2.Feature;
+import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Port;
+import org.osate.aadl2.PropertyAssociation ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.instance.FeatureInstance;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.ComponentInstance;
@@ -476,6 +482,37 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 		return false;
 	  else
 		return isContainedBy(cpuToIgnore, (ComponentInstance) execUnit.eContainer());
+  }
+
+  
+  public EList<String> getListOfPath(PropertyAssociation pa)
+  {
+    List<String> res = new BasicEList<String>();
+    ListValue lv = (ListValue) pa.getOwnedValues().get(0).getOwnedValue();
+    URI dirURI = pa.eResource().getURI();
+    String path = "";
+    if(dirURI.isFile())
+      path = dirURI.toFileString();
+    else
+      path = dirURI.toString();
+    int index = path.lastIndexOf(File.separator);
+    path = path.substring(0, index+1);
+    
+    for(PropertyExpression pe: lv.getOwnedListElements())
+    {
+      StringLiteral sl = (StringLiteral) pe;
+      String fileName = sl.getValue();
+      File f = new File(fileName);
+      if(f.exists())
+        res.add(fileName);
+      else
+      {
+        File prefixedF = new File(path+fileName);
+        if(prefixedF.exists())
+          res.add(path+fileName);
+      }
+    }
+    return (EList<String>) res;
   }
 
   

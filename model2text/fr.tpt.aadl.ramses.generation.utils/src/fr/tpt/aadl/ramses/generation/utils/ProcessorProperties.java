@@ -19,7 +19,7 @@
  * http://www.eclipse.org/org/documents/epl-v10.php
  */
 
-package fr.tpt.aadl.ramses.generation.pok.c;
+package fr.tpt.aadl.ramses.generation.utils;
 
 import java.util.HashMap ;
 import java.util.Map ;
@@ -39,8 +39,8 @@ public class ProcessorProperties
   public Map<ProcessImplementation, Long> requiredStackSizePerPartition = 
         new HashMap<ProcessImplementation, Long>();
   
-  public Map<ProcessImplementation, PartitionProperties> partitionProperties = 
-        new HashMap<ProcessImplementation, PartitionProperties>();
+  public Map<ProcessImplementation, ProcessProperties> processProperties = 
+        new HashMap<ProcessImplementation, ProcessProperties>();
 
   public String hwAdress ;
 }

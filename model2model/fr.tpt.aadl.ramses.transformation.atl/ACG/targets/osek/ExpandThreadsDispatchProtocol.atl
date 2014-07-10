@@ -111,6 +111,7 @@ rule m_PeriodicThread_with_InputPort
 		GvInit: AADLBA!ListValue
 	do
 	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalQueue, c);
 		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
 								thisModule.structInitInitiator+'&'+
 								globalQueue.name+'_rez, &'+

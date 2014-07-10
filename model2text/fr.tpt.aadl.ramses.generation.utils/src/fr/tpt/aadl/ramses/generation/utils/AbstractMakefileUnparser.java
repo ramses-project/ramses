@@ -413,17 +413,17 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
 
   private File getDirectory(Element e)
   {
-	String path="";
-	URI dirURI = e.eResource().getURI();
-	if(dirURI.isFile())
-	  path = dirURI.toFileString();
-	else
-	  path = dirURI.toString();
-	int index = path.lastIndexOf(File.separator);
-	path = path.substring(0, index+1);
-	return new File(path);
+    String path="";
+    URI dirURI = e.eResource().getURI();
+    if(dirURI.isFile())
+      path = dirURI.toFileString();
+    else
+      path = dirURI.toString();
+    int index = path.lastIndexOf(File.separator);
+    path = path.substring(0, index+1);
+    return new File(path);
   }
-  
+
   protected boolean getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
                                                Set<File> result)
   {
@@ -452,6 +452,15 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
             StringLiteral sl = (StringLiteral) aPE ;
             String value = sl.getValue() ;
             boolean found = false ;
+            
+            File noPrefixFoundFile =
+                new File(value);
+            if(noPrefixFoundFile.exists())
+            {
+              tmp.add(noPrefixFoundFile) ;
+              found = true ;
+              continue;
+            }
             
             File dir = getDirectory(aPropertyAssociation);
             
@@ -497,6 +506,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
               String value = sl.getValue() ;
               boolean found = false ;
               File dir = getDirectory(aPropertyAssociation);
+              
+              File noPrefixFoundFile =
+                  new File(value);
+              if(noPrefixFoundFile.exists())
+              {
+                tmp.add(noPrefixFoundFile) ;
+                found = true ;
+                continue;
+              }
+              
               File foundFile =
                       new File(dir + File.separator + value) ;
               

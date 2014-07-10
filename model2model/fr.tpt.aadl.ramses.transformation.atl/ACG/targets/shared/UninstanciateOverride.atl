@@ -101,6 +101,48 @@ abstract rule m_Component_Implementation {
  	)
 }
 
+helper context AADLI!NamedElement def : mapSpgPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
+	let result : Sequence (AADLBA!PropertyAssociation) = self.ownedPropertyAssociation->
+		select(e|not (e.property.name.toLower() = 'source_text'))
+		->collect (e|thisModule.PropertyAssociation (e,false))->select(e| not e.oclIsUndefined())
+	in
+	let sourceTextPA: AADLBA!PropertyAssociation = self.ownedPropertyAssociation-> any(e| e.property.name.toLower() = 'source_text')
+	in
+	if (not result.isEmpty()) then
+		result->
+		append( 
+			if sourceTextPA.oclIsUndefined() then
+				OclUndefined
+			else
+				thisModule.copySourceText(sourceTextPA)
+			endif
+		)
+		->flatten()->select(e| not e.oclIsUndefined())
+	else
+		result
+	endif
+;
+
+rule copySourceText(p : AADLI!PropertyAssociation)
+{
+	to
+		p2 : AADLBA!PropertyAssociation (
+			property <- p.property,
+			constant <- p.constant,
+			append <- p.append,
+			ownedValue <- Sequence{mpv}
+		),
+		mpv: AADLBA!ModalPropertyValue(
+			ownedValue <- thisModule.CreateListValueFromListOfString(
+							ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().getListOfPath(p)
+						)
+		)
+	do
+	{
+		p2;
+	}
+}
+
 -- @extends m_Component_Type
 rule m_Subprogram_Type {
  from 
@@ -111,7 +153,7 @@ rule m_Subprogram_Type {
 		ownedDataAccess <- Sequence{contextAccess}->union(
 								type.ownedDataAccess->collect(p|thisModule.DataAccess(p))
 							),
-		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+		ownedPropertyAssociation <- type.mapSpgPropertyAssociationList()
 	),
 	contextAccess : AADLBA!DataAccess
 	(
