@@ -173,8 +173,19 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
         outputPlatformRelativePath =
               outputAbsolutePath.substring(outputPathHeaderIndex) ;
       }
-      outputPlatformRelativePath =
-            outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
+      if (Platform.getOS().equalsIgnoreCase(Platform.OS_WIN32))
+      {
+        workspaceLocation = workspaceLocation.substring(1, workspaceLocation.length());
+	workspaceLocation = workspaceLocation.replace("/", "\\");
+	outputPlatformRelativePath =
+	    outputAbsolutePath.replace(workspaceLocation, "") ;
+	outputPlatformRelativePath = outputPlatformRelativePath.replace("\\", "/");
+      }
+      else
+      {
+	outputPlatformRelativePath =
+	    outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
+      }
 
       uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
 
