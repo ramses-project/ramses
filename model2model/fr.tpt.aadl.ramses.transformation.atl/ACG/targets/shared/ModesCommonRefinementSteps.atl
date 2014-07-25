@@ -1,0 +1,368 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module ModesCommonRefinementSteps;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS;
+
+-- isModeInstanceOf
+helper context AADLI!ModeInstance def: isModeInstanceOf(p: AADLI!ComponentInstance): Boolean=
+	self.eContainer().equals(p)
+;
+
+-- createModeSwitchEventTriggers
+helper context AADLI!ModeTransition def:  createModeSwitchEventTriggers() : Sequence(AADLBA!Feature) =
+	self.ownedTrigger->collect(e| thisModule.copyTriggerPort(e))
+;
+
+unique lazy rule copyTriggerPort
+{
+	from
+		p: AADLI!ModeTransitionTrigger
+	to
+		img: AADLBA!EventPort
+		(
+			name <- p.triggerPort.name,
+			ownedPropertyAssociation <- Sequence{
+				thisModule.CreatePropertyAssociation ('Queue_Size', 'COMMUNICATION_PROPERTIES', queSize)
+			}
+		),
+		queSize: AADLBA!IntegerLiteral
+		(
+			value <- 2.longValue()
+		)
+	do
+	{
+		thisModule.theHOOK.setDirection(img, 'in');
+		img;
+	}
+}
+
+-- getMaxPriority	
+helper context AADLI!ComponentInstance def: getMaxPriority() : Integer =
+	self.getProcess().getProcessorBinding()->first().getOSMaxPriority()
+;
+
+-- createModeSwitchCondition
+lazy rule createModeSwitchCondition
+{
+	from
+		featureList: Sequence(AADLBA!Feature)
+	to
+		execCondition: AADLBA!ValueExpression
+		(
+			relations <- featureList->collect(e|thisModule.createPortCountComparison(e)),
+			logicalOperators <- featureList->excluding(featureList->first())->collect(e| #And)
+		)
+	do
+	{
+		execCondition;
+	}
+}
+
+rule createPortCountComparison(f: AADLI!Feature)
+{
+	to
+		portCountCheck: AADLBA!Relation
+		(
+			relationalOperator<-#NotEqual,
+			firstExpression<-thisModule.createPortCountValue(f),
+			secondExpression<-zeroValueConstantExpression
+		),
+		zeroValueConstantExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{zeroValueConstantTerm}
+		),
+		zeroValueConstantTerm: AADLBA!Term
+		(
+			factors <- Sequence{zeroValueConstantFactor}
+		),
+		zeroValueConstantFactor: AADLBA!Factor
+		(
+			firstValue <- zeroValueConstant
+		),
+		zeroValueConstant: AADLBA!BehaviorIntegerLiteral
+		(
+			value <- 0.longValue()
+		)
+	do
+	{
+		portCountCheck;
+	}
+}
+
+
+lazy rule createPortCountValue
+{
+	from
+		f: AADLI!Feature
+	to
+		res: AADLBA!SimpleExpression
+		(terms <- Sequence{t}),
+		t: AADLBA!Term
+		(
+			factors <- Sequence{fact}
+		),
+		fact: AADLBA!Factor
+		(
+			firstValue <- pcv
+		),
+		pcv: AADLBA!PortCountValue
+		(element<-f)
+	do
+	{
+		res;
+	}
+}
+
+-- createModeSwitchAction; this one is target specific
+
+unique lazy rule createModeSwitchAction
+{
+	from
+		mti: AADLI!ModeTransitionInstance
+}
+
+unique lazy rule modeTransitionInstanceToBehaviorTransition
+{
+	from
+		mti: AADLI!ModeTransitionInstance,
+		process: AADLI!ComponentInstance
+	using
+	{
+		destinationState: AADLBA!BehaviorState = thisModule.resolveTemp(Sequence{mti.source,process}, 'initCompleteState');
+	}
+	to
+		switchCondition: AADLBA!IfStatement
+		(
+			behaviorActions <- thisModule.createModeSwitchAction(mti),
+			logicalValueExpression <- thisModule.createModeSwitchCondition(mti.modeTransition.createModeSwitchEventTriggers())
+		)
+}
+
+
+lazy rule CreateReturnSubcomponentForModeTransition
+{
+	from
+		p : AADLI!ComponentInstance
+	using
+	{
+		initValuePE: AADLBA!PropertyExpression = thisModule.getErrorCodeInitValue();
+	}
+	to
+		dataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name<-p.name+'_ModeSwitchErrorCode',
+			dataSubcomponentType<-thisModule.getRuntimeReturnType(),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',thisModule.CreateListValueFromPropertyExpression(initValuePE))} 
+		)
+	do
+	{
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, p);
+		dataSubcomponent;
+	}
+}
+
+-- @extends m_Process_Instance
+rule m_Process_Modes {
+	from
+		c : AADLI!ComponentInstance (c.category = #process
+		and
+		not c.modeInstance->isEmpty())
+	using
+	{
+ 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+	}
+	to 
+		sub : AADLBA!ProcessSubcomponent,
+		implImg : AADLBA!ProcessImplementation (
+        	ownedThreadSubcomponent <- c.componentInstance->select(e|e.category=#thread)
+				->union(c.modeInstance->collect(e|thisModule.resolveTemp(Sequence{e, c}, 'modeThreadSub'))),
+			ownedPortConnection			<- impl.getConnectionsInstancesImg('portConnection')
+				->union(
+						c.modeTransitionInstance->collect(e|
+							thisModule.resolveTemp(Sequence{e,c}, 'cnx')
+						)
+					)
+				->excluding(OclUndefined),
+			ownedMode                   <- impl.getModesInstancesImg(),
+			ownedModeTransition         <- impl.getModesTransitionInstancesImg()
+		),
+		modeDataClassifier: AADLBA!DataType
+		(
+			name <- c.name+'_modeDataClassifier',
+			ownedExtension <- modeDataClassifierExtension,
+			ownedPropertyAssociation <- Sequence {
+												
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Data_Representation',
+													'DATA_MODEL',
+													'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
+												),
+												thisModule.CreatePropertyAssociation
+												(
+												 	'Enumerators',
+													'DATA_MODEL',
+													 thisModule.CreateListValueFromListOfString(c.modeInstance->collect(e|e.name))
+												)
+			}
+		),
+		modeDataClassifierExtension : AADLBA!TypeExtension
+		(
+			extended <- thisModule.getRuntimeModeType()
+		)
+}
+
+rule m_ProcessInstance_ModeTransition
+{
+	from
+		mti: AADLI!ModeTransitionInstance,
+		p: AADLI!ComponentInstance
+		(
+			mti.getProcess()=p
+		)
+	to
+		cnx: AADLBA!PortConnection
+		(
+			name <- mti.name.getProgrammationLanguageIdentifier(),
+			source <- sourceCE,
+			destination <- destinationCE
+		),
+		sourceCE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-mti.modeTransition.ownedTrigger->first().triggerPort,
+			context<-mti.modeTransition.ownedTrigger->first().context
+		),
+		destinationCE: AADLBA!ConnectedElement
+		(
+			connectionEnd<-thisModule.copyTriggerPort(mti.modeTransition.ownedTrigger->first()),
+			context<-thisModule.resolveTemp(Sequence{mti.source, p}, 'modeThreadSub')
+		)
+}
+
+rule m_ProcessInstance_Mode
+{
+	from
+		m: AADLI!ModeInstance,
+		p: AADLI!ComponentInstance
+		(
+			m.isModeInstanceOf(p)
+			and
+			not p.getThreadsInMode(m)->isEmpty()
+		)
+	using
+	{
+		threadsInM: Sequence(AADLI!ComponentInstance)
+			= p.getThreadsInMode(m);
+	}
+	to
+		modeThreadSub: AADLBA!ThreadSubcomponent
+		(
+			name <- p.name+'_mode_'+m.name,
+			threadSubcomponentType <- modeThreadImpl,
+			ownedModeBinding <- Sequence{thisModule.createModeBinding(thisModule.resolveTemp(m, 'mode'))}
+		),
+		modeThreadImpl: AADLBA!ThreadImplementation
+		(
+			name <- p.name+'_mode_'+m.name+'_modeSwitchManager.impl',
+			ownedRealization <- thisModule.Realization(modeThreadType),
+			ownedDataSubcomponent <- Sequence{thisModule.CreateReturnSubcomponentForModeTransition(p),targetModeValue}
+										->excluding(OclUndefined),
+			ownedAnnexSubclause <- Sequence{modeSwitchBa}
+		),
+		modeThreadType: AADLBA!ThreadType
+		(
+			name <- p.name+'_mode_'+m.name+'_modeSwitchManager',
+			ownedEventPort <- m.srcModeTransition->collect(
+							e|e.modeTransition.createModeSwitchEventTriggers()
+						)->flatten(),
+			ownedPropertyAssociation <- Sequence{
+				thisModule.CreatePropertyAssociation ('Dispatch_Protocol', 'THREAD_PROPERTIES', 'Periodic'.asEnumeration('AADL_PROJECT').asNamedValue()),
+				thisModule.CreatePropertyAssociation ('Period', 'TIMING_PROPERTIES', modeSwitchPeriod),
+				thisModule.CreatePropertyAssociation ('Priority', 'THREAD_PROPERTIES', modeSwitchPrio)
+			}
+		),
+		modeSwitchPeriod: AADLBA!IntegerLiteral
+		(
+			value <- thisModule.getHyperperiodFromThreads(p.getThreadsInMode(m)),
+		 	unit <- thisModule.UnitLiteral(p.getThreadsInMode(m)->first().getPeriodUnit())
+		),
+		modeSwitchPrio: AADLBA!IntegerLiteral
+		(
+			value <- (p.getMaxPriority()-1).longValue()
+		),
+		modeSwitchBa: AADLBA!BehaviorAnnex
+		(
+			name        <- 'behavior_specification',
+			states      <- Sequence{initCompleteState,finalState},
+			transitions <- Sequence{dispatchTransition},
+			actions		<- Sequence{switchActionBlock}
+						->union(
+							m.srcModeTransition->collect(
+								e|thisModule.createModeSwitchAction(e)
+							)
+						)
+		),
+		initCompleteState: AADLBA!BehaviorState
+		(
+			initial  <- true,
+			final    <- false,
+			complete <- true,
+			name     <- 'ModeSwitch_init_state'
+		),
+		finalState: AADLBA!BehaviorState
+		(
+			initial  <- false,
+			final    <- true,
+			complete <- false,
+			name     <- 'ModeSwitch_final_state'
+		),
+		dispatchTransition: AADLBA!BehaviorTransition
+		(
+			name <- 'dispatchTransition',
+			sourceState <- initCompleteState,
+			destinationState <- initCompleteState,
+			condition <- dispatchCondition,
+			actionBlock <- switchActionBlock
+			
+		),
+		dispatchCondition: AADLBA!DispatchCondition,
+		targetModeValue: AADLBA!DataSubcomponent
+		(
+			name <- 'targetModeValue',
+			dataSubcomponentType <- thisModule.resolveTemp(p, 'modeDataClassifier')
+		),
+		switchActionBlock: AADLBA!BehaviorActionBlock
+		(content<-switchActions),
+		switchActions: AADLBA!BehaviorActionSequence
+		(
+			actions <- m.srcModeTransition->collect(
+								e|thisModule.modeTransitionInstanceToBehaviorTransition(e, p)
+							)
+		)
+}

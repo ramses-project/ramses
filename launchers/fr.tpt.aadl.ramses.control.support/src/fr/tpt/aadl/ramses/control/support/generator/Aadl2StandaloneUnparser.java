@@ -2807,12 +2807,18 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
    */
   public void processModalElement(ModalElement mm)
   {
-    EList<Mode> list = mm.getAllInModes() ;
+    EList<Mode> list = mm.getInModes();
 
     if(!list.isEmpty())
     {
       aadlText.addOutput(" in modes (") ;
-      processEList(list, ",") ;
+      Iterator<Mode> iter = list.iterator();
+      while(iter.hasNext())
+      {
+        aadlText.addOutput(iter.next().getName());
+        if(iter.hasNext())
+          aadlText.addOutput(",");
+      }
       aadlText.addOutput(")") ;
     }
   }
@@ -2830,7 +2836,13 @@ public class Aadl2StandaloneUnparser extends AadlProcessingSwitch
     if(!list.isEmpty())
     {
       aadlText.addOutput(" in modes (") ;
-      processEList(list, ",") ;
+      Iterator<ModeFeature> iter = list.iterator();
+      while(iter.hasNext())
+      {
+        aadlText.addOutput(iter.next().getName());
+        if(iter.hasNext())
+          aadlText.addOutput(",");
+      }
       aadlText.addOutput(")") ;
     }
   }

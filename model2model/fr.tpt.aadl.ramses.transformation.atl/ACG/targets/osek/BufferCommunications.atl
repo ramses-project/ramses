@@ -152,7 +152,7 @@ rule m_Output_Buffer_ComputeEntrypointCallSequence
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
-		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		BUFFER_ID: AADLBA!DataAccess = fi.retreiveEntrypointFeature(cnxRef);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 		dst: AADLI!FeatureInstance = fi.srcConnectionInstance->any(e|e.connectionReference->first().connection = cnxRef).destination;
 	}
@@ -198,7 +198,7 @@ rule m_OutputBuffer_EventPort
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(int, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
-		BUFFER_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		BUFFER_ID: AADLBA!DataAccess = fi.retreiveEntrypointFeature(cnxRef);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to

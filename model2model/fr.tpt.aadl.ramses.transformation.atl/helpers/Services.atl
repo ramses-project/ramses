@@ -23,6 +23,7 @@
 
 library Services;
 
+
 --- Returns the same as thisModule.resolveTemp(var : OclAny, rule_name : String, target_pattern_name : String),
 --- except that it returns OclUndefined if no trace exists instead of throwing an error.
 helper def : resolveLazyTupleSingleIfExists(var : Sequence(OclAny), rule_name : String, target_pattern_name : String) : OclAny =
@@ -244,13 +245,40 @@ helper context AADLI!FeatureInstance def : isEventDataPort(): Boolean =
 helper context AADLI!FeatureInstance def : isDataPort(): Boolean =
 	self.feature.oclIsTypeOf(AADLI!DataPort);
 
+helper context AADLI!FeatureInstance def : connectedToDataComponent(): Boolean =
+	(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->first().destination.oclIsTypeOf(AADLI!ComponentInstance))
+	 or
+	(not self.dstConnectionInstance->isEmpty() and self.dstConnectionInstance->first().source.oclIsTypeOf(AADLI!ComponentInstance))
+;
+
+helper context AADLI!FeatureInstance def : connectedDataComponent(): AADLI!ComponentInstance =
+	if(not self.srcConnectionInstance->isEmpty() and self.srcConnectionInstance->first().destination.oclIsTypeOf(AADLI!ComponentInstance)) then
+		self.srcConnectionInstance->first().destination
+	else
+		self.dstConnectionInstance->first().source
+	endif
+;
+
+helper context AADLI!FeatureInstance def : connectedInMode(mode: AADLI!Mode) : Boolean =
+	let remainingModes: Sequence(AADLI!Mode) = self.getComponentInstance().inMode->select(e|not (e.mode=mode)) in
+	if(self.getComponentInstance().inMode->isEmpty()
+			or not remainingModes->isEmpty())
+	then
+		self.srcConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
+		or
+		self.dstConnectionInstance->exists(e|e.connectionReference->exists(f|f.connection.inModeOrTransition->includes(mode)))
+	else
+		false
+	endif
+;
+
 helper context AADLI!FeatureInstance def : isIntraProcessFeatureInstance(): Boolean =
 	not self.srcConnectionInstance->exists(e| not (e.destination.getProcess() = self.getProcess()))
 	and
 	not self.dstConnectionInstance->exists(e| not (e.source.getProcess() = self.getProcess()))
 ;
 
-helper context AADLI!FeatureInstance def : getProcess(): AADLI!ComponentInstance =
+helper context AADLI!InstanceObject def : getProcess(): AADLI!ComponentInstance =
 	if(self.getComponentInstance().category=#process) then
 		self.getComponentInstance()
 	else
@@ -495,11 +523,33 @@ helper context AADLI!SubprogramClassifier def: getType() : AADLBA!SubprogramType
 
 helper context AADLI!ComponentInstance def: getOSMaxPriority() : Integer =
 	let res: AADLBA!IntegerLiteral = self.ownedPropertyAssociation
-		->any(pa|pa.property.name='Priority_Range').ownedValue
-		->first().ownedValue.minimum in 
+		->any(pa|pa.property.name='Priority_Range') in 
 	if(res.oclIsUndefined()) then
-		30
+		10
 	else
-		res.value.longValue()
+		res.ownedValue
+		->first().ownedValue.maximum.value.longValue()
 	endif
+;
+
+-- getThreadsInMode
+helper context AADLI!ComponentInstance def: getThreadsInMode(m: AADLI!ModeInstance) : Sequence(AADLI!ComponentInstance) =
+	self.componentInstance->select(e | e.category = #thread)
+		->select(e|e.inMode->includes(m))
+;
+
+helper context OclAny def:minus(i: OclAny) : OclAny =
+	thisModule.theHOOK.minus(self,i)
+;
+
+helper context AADLI!InstanceObject def: getModeDataType(): AADLBA!DataClassifier = 
+	AADLI!DataType->allInstances()->any(e|e.name = self.getProcess().name+'_modeDataClassifier')
+;
+
+helper context AADLI!ComponentInstance def: needsModeVariable() : Boolean =
+	self.featureInstance->exists(f|f.needsModeVariable())
+;
+
+helper context AADLI!FeatureInstance def: needsModeVariable() : Boolean =
+	AADLI!ModeInstance.allInstancesFrom('IN')->exists(mi|self.connectedInMode(mi.mode))
 ;

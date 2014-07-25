@@ -122,18 +122,57 @@ helper context AADLI!InstanceObject def: isContainedIn(container : AADLI!Instanc
 	endif
 ;
 
+rule m_Mode_Instance {
+	from
+		m: AADLI!ModeInstance
+		(m.eContainer().oclIsTypeOf(AADLI!ComponentInstance))
+	to
+		mode: AADLBA!Mode
+		(
+			name <- m.mode.name,
+			initial <- m.initial
+		)
+}
+
+rule m_ModeTransition_Instance {
+	from
+		m: AADLI!ModeTransitionInstance
+		(m.eContainer().oclIsTypeOf(AADLI!ComponentInstance))
+	to
+		transition: AADLBA!ModeTransition
+		(
+			source <- m.source,
+			destination <- m.destination,
+			ownedTrigger <- m.modeTransition.ownedTrigger
+		)
+}
+
 abstract rule m_Component_Instance {
 	from
 		c : AADLI!ComponentInstance
 	to
 		sub: AADLBA!Subcomponent(
 				name <- c.name.debug('subcomponent created'),
-				ownedPropertyAssociation  <- c.collectSelfPropertyAssociationImg()
+				ownedPropertyAssociation  <- c.collectSelfPropertyAssociationImg(),
+				ownedModeBinding <- c.inMode->collect(e|
+										thisModule.createModeBinding(thisModule.resolveTemp(e, 'mode'))
+									)
 			)
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
 	}
+}
+
+lazy rule createModeBinding
+{
+	from
+		m: AADLBA!Mode
+	to
+		b: AADLBA!ModeBinding
+		(
+			parentMode <- m
+		)
 }
 
 -- @extends m_Component_Instance

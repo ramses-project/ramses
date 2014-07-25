@@ -29,31 +29,20 @@ create
 from 
 	IN 				: AADLI;
 
+
 helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
-	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemImplementation)
+	self.isInstanciated()
 	or self.type.needsCopy()
 ;
 
 helper context AADLI!ComponentType def: needsCopy(): Boolean =
-	self.isInstanciated() or self.oclIsKindOf(AADLI!SystemType)
+	self.isInstanciated()
 	or (self.oclIsKindOf(AADLI!SubprogramType) and self.ownedPrototype->isEmpty()
 		and
 		  (not self.ownedEventPort->isEmpty()
 			or
 		  not self.ownedEventDataPort->isEmpty())
 		)
-;
-
-helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
-	if self.source.isThreadPort() and not self.destination.context.oclIsUndefined() then
-		not self.destination.context.eContainer().isComputeEntryPointOf(self.source.eContainer())
-	else 
-		if(self.destination.isThreadPort() and not self.source.context.oclIsUndefined()) then
-			not self.source.context.eContainer().isComputeEntryPointOf(self.destination.eContainer())
-		else
-			false
-		endif
-	endif
 ;
 
 helper context AADLI!ComponentType def : isInstanciated() : Boolean =
@@ -67,17 +56,13 @@ helper context AADLI!ComponentImplementation def: isInstanciated() : Boolean =
 ;
 
 
-helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
-	self.ownedPropertyAssociation->select(e | not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
-									)->collectSelfPropertyAssociationImg()
-	->union(
-		if self.oclIsTypeOf(AADLI!ComponentInstance) and self.category=#thread then
-			Sequence{ thisModule.collectComputeEntryPoint_rule(self),
-					  thisModule.collectInitializationEntryPoint(self)}->excluding(OclUndefined)
-		else
-			Sequence{}
-		endif
-	)
+helper context AADLI!SystemType def : isInstanciated() : Boolean =
+	AADLI!SystemImplementation.allInstances()
+		->exists(e| e.type=self and e.isInstanciated())
+;
+
+helper context AADLI!SystemImplementation def: isInstanciated() : Boolean =
+	AADLI!SystemInstance.allInstancesFrom('IN')->exists(e| e.systemImplementation=self)
 ;
 
 helper context AADLI!FeatureInstance def: getOutputPortId(processInstance: AADLI!ComponentInstance): Integer = 
@@ -87,125 +72,7 @@ helper context AADLI!FeatureInstance def: getOutputPortId(processInstance: AADLI
 	->indexOf(self)-1
 ;
 
-abstract rule m_Component_Implementation {
- from
-    impl : AADLI!ComponentImplementation
-	(impl.needsCopy())
- to
- 	implImg : AADLBA!ComponentImplementation (
- 		name             			<- impl.name,
-		ownedComment     			<- impl.ownedComment,
-		ownedAccessConnection  		<- impl.getConnectionsInstancesImg('accessConnection'),
-		ownedParameterConnection 	<- impl.getConnectionsInstancesImg('parameterConnection'),
-		ownedRealization 			<- thisModule.Realization(impl.type.resolve())
- 	)
-}
 
-helper context AADLI!NamedElement def : mapSpgPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
-	let result : Sequence (AADLBA!PropertyAssociation) = self.ownedPropertyAssociation->
-		select(e|not (e.property.name.toLower() = 'source_text'))
-		->collect (e|thisModule.PropertyAssociation (e,false))->select(e| not e.oclIsUndefined())
-	in
-	let sourceTextPA: AADLBA!PropertyAssociation = self.ownedPropertyAssociation-> any(e| e.property.name.toLower() = 'source_text')
-	in
-	if (not result.isEmpty()) then
-		result->
-		append( 
-			if sourceTextPA.oclIsUndefined() then
-				OclUndefined
-			else
-				thisModule.copySourceText(sourceTextPA)
-			endif
-		)
-		->flatten()->select(e| not e.oclIsUndefined())
-	else
-		result
-	endif
-;
-
-rule copySourceText(p : AADLI!PropertyAssociation)
-{
-	to
-		p2 : AADLBA!PropertyAssociation (
-			property <- p.property,
-			constant <- p.constant,
-			append <- p.append,
-			ownedValue <- Sequence{mpv}
-		),
-		mpv: AADLBA!ModalPropertyValue(
-			ownedValue <- thisModule.CreateListValueFromListOfString(
-							ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().getListOfPath(p)
-						)
-		)
-	do
-	{
-		p2;
-	}
-}
-
--- @extends m_Component_Type
-rule m_Subprogram_Type {
- from 
- 	type : AADLI!SubprogramType
- to
- 	typeImg : AADLBA!SubprogramType (
-		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
-		ownedDataAccess <- Sequence{contextAccess}->union(
-								type.ownedDataAccess->collect(p|thisModule.DataAccess(p))
-							),
-		ownedPropertyAssociation <- type.mapSpgPropertyAssociationList()
-	),
-	contextAccess : AADLBA!DataAccess
-	(
-		name <- 'context',
-		dataFeatureClassifier <- ctxt,
-		kind <- #requires
-	),
-	ctxt: AADLBA!DataType
-	(
-		name <- type.name+'_context',
-		ownedPropertyAssociation <- Sequence{
-			thisModule.CreatePropertyAssociation
-			(
-		 		'Data_Representation',
-				'DATA_MODEL',
-				'Struct'.asEnumeration('DATA_MODEL').asNamedValue()
-			),
-			thisModule.CreatePropertyAssociation
-			(
-				'Element_Names',
-				'DATA_MODEL',
-				thisModule.CreateListValueFromListOfString(
-					type.ownedEventPort->collect(e|e.name)
-					->union(type.ownedEventDataPort->collect(e|e.name))
-					->excluding(OclUndefined)
-				)
-			),
-			thisModule.CreatePropertyAssociation('Base_Type', 'DATA_MODEL',
-				thisModule.CreateListValueFromListOfClassifier(
-					type.ownedEventPort->collect(e|e.name)
-					->union(type.ownedEventDataPort->collect(e|e.name))
-					->excluding(OclUndefined)
-					->collect(e|'Unsigned_8'.asClassifier('BASE_TYPES'))
-				)
-			),
-			thisModule.CreatePropertyAssociation('Source_Name', 'PROGRAMMING_PROPERTIES',
-				thisModule.CreateStringLiteralPropertyExpression('__'+type.name.toLower()+'_context')
-			)
-		}
-	)
-	
-}
-
-rule m_Data_Type {
- from
-   type : AADLI!DataType 
-}
-
-rule m_Thread_Type {
- from
-   type : AADLI!ThreadType 
-}
 
 -- @extends m_Component_Type
 rule m_Process_Type {
@@ -213,81 +80,6 @@ rule m_Process_Type {
  	type : AADLI!ProcessType
  to 
  	typeImg : AADLBA!ProcessType
-}
-
-rule m_Data_Implementation {
-  from
- 	impl : AADLI!DataImplementation
-}
-
--- @extends m_Feature_Instance
-rule m_DataPort_Instance
-{
-	from
-		fi: AADLI!FeatureInstance 
-		(
-			fi.category=#dataPort
-			and
-			not (fi.eContainer().category=#thread)
-			and
-			not (fi.eContainer().category=#process)
-		)
-	to
-		f: AADLBA!DataPort
-		(
-			direction <- fi.feature.direction,
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
-		)
-}
-
--- @extends m_Feature_Instance
-rule m_EventPort_Instance
-{
-	from
-		fi: AADLI!FeatureInstance 
-		(
-			fi.category=#eventPort
-			and
-			not (fi.eContainer().category=#thread)
-			and
-			not (fi.eContainer().category=#process)
-		)
-	to
-		f: AADLBA!EventPort
-		(
-			direction <- fi.feature.direction
-		)
-}
-
--- @extends m_Feature_Instance
-rule m_EventDataPort_Instance
-{
-	from
-		fi: AADLI!FeatureInstance 
-		(
-			fi.category=#eventDataPort
-			and
-			not (fi.eContainer().category=#thread)
-			and
-			not (fi.eContainer().category=#process)
-		)
-	to
-		f: AADLBA!EventDataPort
-		(
-			direction <- fi.feature.direction,
-			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
-		)
-}
-
-rule m_Thread_Implementation {
-  from
- 	impl : AADLI!ThreadImplementation
-}
-
-rule m_PortConnection_Reference
-{
-	from
-		cnxRef: AADLI!ConnectionReference (cnxRef.eContainer().kind = #portConnection)
 }
 
 -- @extends m_Connection_Reference
@@ -365,225 +157,6 @@ helper def : collectThreadVariables(c: AADLI!ComponentInstance): AADLBA!DataSubc
 	)
 ;
 
--- @extends m_Component_Instance
-rule m_create_Thread_BA
-{
-	from
-		c : AADLI!ComponentInstance (c.category = #thread)
-	using
- 	{
- 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
- 	}
-	to
-		sub : AADLBA!ThreadSubcomponent(
-			threadSubcomponentType <- implImg
-		),
-		implImg : AADLBA!ThreadImplementation (
- 			name <- c.uniqueName().concat('.impl'), -- name thread implmentation
-			ownedRealization <- thisModule.Realization(typeImg),
-			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
-			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data)
-												->append
-												(
-													thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA()},'currentState')
-												)
-												->union
-												(
-													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
-													->collect(e|thisModule.createFreshnessIndicator(e))
-												)
-												->union
-												(
-													thisModule.collectThreadVariables(c)
-												)
-												->flatten()->excluding(OclUndefined),
-			ownedSubprogramCallSequence     <- Sequence{
- 															thisModule.resolveMatchedSingleIfExists(c, 'callSequenceImg'),
- 															thisModule.collectInitCallSequence(c)
-														}
- 												->excluding(OclUndefined),
-			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
-												e.source.oclIsKindOf(AADLI!Parameter) and e.destination.oclIsKindOf(AADLI!Parameter))
-												->collect(e| thisModule.ParameterConnection(e))
-												->union(
-													impl.ownedParameterConnection->select (e| e.source.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.source.context.eContainer().isComputeEntryPointOf(c))
-													->collect(e| thisModule.ParameterConnection(e))
-												)
-												->union(
-													impl.ownedParameterConnection->select (e| e.destination.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.destination.context.eContainer().isComputeEntryPointOf(c))
-													->collect(e| thisModule.ParameterConnection(e))
-												)
-												->union
-												(
-													impl.ownedParameterConnection->select (e|
-														e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent) 
-													)
-													->collect(e|
-														impl.ownedSubprogramCallSequence
-														->collect(callSequence|
-															thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent = e.source.connectionEnd), callSequence, e}, 'parameterConnection')
-														)
-													)
-												)
-												->union
-												(
-													impl.ownedParameterConnection->select (e|
-														e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent) 
-													)
-													->collect(e|
-														impl.ownedSubprogramCallSequence
-														->collect(callSequence|
-															thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent = e.destination.connectionEnd), callSequence, e}, 'parameterConnection')
-														)
-													)
-												)
-												->flatten()->excluding(OclUndefined),
-			ownedAccessConnection			<- c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
-												->collect(fi| impl.ownedSubprogramCallSequence
-													->collect(callSequence|
-														if(fi.isInputFeature()) then
-															thisModule.resolveMatchedTupleIfExists(Sequence{fi,callSequence}, 'f_connection')
-														else
-															fi.srcConnectionInstance->collect( cnxInst |
-																thisModule.resolveMatchedTupleIfExists(Sequence{fi,callSequence,cnxInst.connectionReference->first().connection}, 'f_connection')
-															)
-														endif
-													)
-												)
-												->union(
-													c.featureInstance->select(fi|fi.isEventPort() or fi.isEventDataPort() and fi.isOutputFeature())
-													->collect(fi|
-														fi.srcConnectionInstance->collect( cnxInst |
-															thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxInst.connectionReference->first().connection}, 'barrierEntryPointAccessConnection')
-														)
-													)
-												)
-												->flatten()
-												->union(
-													c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
-													->collect(fi|
-															if(fi.isInputFeature()) then
-																thisModule.resolveMatchedTupleIfExists(Sequence{fi,impl.getBA()}, 'f_connection')
-															else
-																fi.srcConnectionInstance->collect( cnxInst |
-																	thisModule.resolveMatchedTupleIfExists(Sequence{fi,impl.getBA(),cnxInst.connectionReference->first().connection}, 'f_connection')
-																)
-															endif
-														)
-												)
-												->flatten()
-												->union(impl.ownedSubprogramCallSequence
-													->collect(callSequence | c.subcomponent.classifier.ownedAccessConnection
-														-> select(accessCnx| 
-															accessCnx.isAccessToParamConnection()
-															and
-															accessCnx.isPartOfCallSequence(callSequence)
-															and
-															callSequence.isComputeEntryPointOf(c)
-														)
-														->collect(
-															accessCnx | thisModule.resolveMatchedTupleIfExists(Sequence{c, callSequence, accessCnx}, 'accessConnection')
-														)
-													)
-												)->flatten()
-												->union
-												(
-													if(not impl.getBA().oclIsUndefined()) then
-														c.featureInstance->select(e | e.feature.oclIsKindOf(AADLBA!DataAccess))
-														->collect
-														(
-															fi | thisModule.createAccessConnectionFromBA(fi, impl.getBA())
-														)
-													else
-														Sequence{}
-													endif
-												)
-												->append
-												(
-													thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA()},'accessConnection_CURRENT_STATE')
-												)
-												->union
-												(
-													c.featureInstance->select(fi| fi.feature.oclIsKindOf(AADLI!Port) and fi.isUsedInFresh())
-													->collect(e|thisModule.resolveLazySingleIfExists(e, 'createFreshnessIndicator','freshnessIndicator_Connection'))	
-												)
-												->union(
-													impl.ownedSubprogramCallSequence->collect(callSequence |
-														thisModule.collectPeriodicDelayed_LocalVariablesConnections(c,callSequence)
-													)
-												)
-												->union(
-													if(c.isSporadicThread()) then
-														thisModule.collectSporadicThreadVariablesAccessConnections(c)
-													else
-														Sequence{}
-													endif
-												)
-												->union(
-													if(c.isTimedThread()) then
-														thisModule.collectTimedThreadVariablesAccessConnections(c)
-													else
-														Sequence{}
-													endif
-												)
-												->flatten()->excluding(OclUndefined)
-		),
-		typeImg : AADLBA!ThreadType (
- 	 		name <- c.uniqueName(),
-			ownedDataAccess <- c.featureInstance->select(e| e.feature.oclIsTypeOf(AADLI!DataAccess))->
-								collect
-								(
-										f|f.getFeatureImg()
-								)
-								->union
-								(
-													c.featureInstance->select(e| (e.isThreadPort() and e.isInputFeature()))->
-													collect
-													(
-														f|f.getFeatureImg()
-													)
-								)
-								->union(
-									c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
-									->collect(
-	 									f| f.srcConnectionInstance->collect(cnxInst |
-											thisModule.resolveMatchedTupleIfExists(Sequence{f,cnxInst.connectionReference->first().connection}, 'f')
-										)
-									)
-								)
-								->union(
-									c.featureInstance->select(e|e.isThreadPort() and e.isOutputFeature())
-									->collect(
-	 									f| f.srcConnectionInstance->collect(cnxInst |
-											thisModule.resolveMatchedTupleIfExists(Sequence{f,cnxInst.connectionReference->first().connection}, 'barrierThreadAccess')
-										)
-									)
-								)
-								->union(
-									thisModule.collectPeriodicDelayed_GlobalVariablesAccesses(c)
-								)
-								->union(
-									if(c.isSporadicThread()) then
-										thisModule.collectSporadicGlobalVariablesAccesses(c)
-									else
-										Sequence{}
-									endif
-								)
-								->union(
-									if(c.isTimedThread()) then
-										thisModule.collectTimedGlobalVariablesAccesses(c)
-									else
-										Sequence{}
-									endif
-								)
-								->union
-								(
-									c.featureInstance->select(e|e.feature.oclIsKindOf(AADLBA!DataAccess))
-								)
-								->flatten()->asSet()->excluding(OclUndefined)
- 		)
-}
-
 unique lazy rule createAccessConnectionFromBA
 {
 	from
@@ -603,7 +176,7 @@ unique lazy rule createAccessConnectionFromBA
 		),
 		accessCnx_Source: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
+			connectionEnd <- fi.retreiveEntrypointFeature()
 		),
 		accessCnx_Destination: AADLBA!ConnectedElement
 		(
@@ -672,23 +245,25 @@ unique lazy rule createFreshnessIndicatorAccess
 	}
 }
 
-
--- @extends m_create_Thread_BA
-rule m_Thread_Instance {
+unique lazy rule createPortCountSubcomponent
+{
 	from
-		c : AADLI!ComponentInstance (
-			c.category = #thread 
-			and c.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation)
-		)
-	using
- 	{
- 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
- 	}
+		fi:AADLI!FeatureInstance
 	to
-		sub : AADLBA!ThreadSubcomponent,
-		implImg : AADLBA!ThreadImplementation,
-		typeImg : AADLBA!ThreadType
-		
+		countVariable:AADLBA!DataSubcomponent
+		(
+			name<-fi.name+'_countValue',
+			dataSubcomponentType<-'Integer_16'.asClassifier('BASE_TYPES'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL', count_Init)}
+		),
+		count_Init: AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression('0')}
+		)
+	do
+	{
+		countVariable;
+	}
 }
 
 helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
@@ -728,6 +303,13 @@ rule m_Process_Instance {
         	ownedThreadSubcomponent         <- c.componentInstance->select(e|e.category=#thread),
 			ownedSubprogramSubcomponent 	<- c.componentInstance->select(e|e.category=#subprogram),
 			ownedDataSubcomponent 			<- c.componentInstance->select(e|e.category=#data)
+												->union	(
+													c.componentInstance->select(e|e.category=#thread)
+													->collect( e|
+														thisModule.resolveMatchedTupleIfExists(Sequence{e,e.subcomponent.subcomponentType.getBA()},'currentState')
+													)
+													
+												)
 												-- intraprocess input thread port
 												-- process output port
 												-- process input port
@@ -809,8 +391,12 @@ rule m_Process_Instance {
 													->collect(c| c.featureInstance
 														->select (fi | fi.isInputFeature())
 														->collect(fi |
-															thisModule.resolveMatchedSingleIfExists(fi, 'accessConnection')	
-														)
+															if(fi.getProcess().modeInstance->exists(mi| fi.connectedInMode(mi.mode))) then
+																fi.getProcess().modeInstance->collect(mi | thisModule.resolveMatchedTupleIfExists(Sequence{fi, mi.mode}, 'accessConnection'))
+															else
+																thisModule.resolveMatchedSingleIfExists(fi, 'accessConnection')
+															endif
+														)->flatten()
 													)
 												)
                                                 ->union(
@@ -841,106 +427,15 @@ rule m_Process_Instance {
 														endif
 													)
 												)
-                                               ->flatten()->excluding(OclUndefined)
-											
-	)--,
---	portIdEnums: AADLBA!DataType
---	(
---		name <- c.name+'_out_ports_Id',
---		ownedPropertyAssociation <- Sequence{
---			thisModule.CreatePropertyAssociation
---			(
---		 		'Data_Representation',
---				'DATA_MODEL',
---				'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
---			),
---			thisModule.CreatePropertyAssociation
---			(
---				'Enumerators',
---				'DATA_MODEL',
---				thisModule.CreateListValueFromListOfString(
---					c.componentInstance->select(e|e.category=#thread)
---					->collect(e|e.featureInstance->select(f|f.category=#eventPort or f.category=#eventDataPort and f.direction=#out))
---					->flatten()->excluding(OclUndefined)
---					->collect(e|e.name)
---				)
---			)
---		}
---	)
---	sendOutput: AADLBA!SubprogramType
---	(
---		name <- c.name+'_send_output',
---		ownedParameter <- Sequence{sendOutputPortId, sendOutputValue},
---		ownedDataAccess <- c.componentInstance->select(e|e.category=#thread)
---							->collect(f|f.featureInstance->collect(g|g.createPortIdAccess()))
---							->flatten()->excluding(OclUndefined),
---		ownedPropertyAssociation <- Sequence{
---					thisModule.CreatePropertyAssociation('Source_Name', 'PROGRAMMING_PROPERTIES',
---							thisModule.CreateStringLiteralPropertyExpression('aadl_send_output')
---					)
---			},
---		owneAnnexSubclause <- AADLBA!BehaviorAnnex
---	),
---	sendOutputPortId: AADLBA!Parameter
---	(
---		name <- 'portId',
---		dataFeatureClassifier <- outputPortIdEnum
---	),
---	outputPortIdEnum: AADLBA!DataType
---	( 
---		ownedPropertyAssociation <- Sequence{
---			thisModule.CreatePropertyAssociation
---			(
---		 		'Data_Representation',
---				'DATA_MODEL',
---				'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
---			)
---		}
---	),
---	sendOutputValue: AADLBA!Parameter
---	(
---		name <- 'valueOut',
---		dataFeatureClassifier <- outputValueType
---	),
---	outputValueType: AADLBA!DataType
---	(
---		ownedPropertyAssociation <- Sequence{
---			thisModule.CreatePropertyAssociation('Source_Name', 'PROGRAMMING_PROPERTIES',
---				thisModule.CreateStringLiteralPropertyExpression('output_value_type')
---			),
---			thisModule.CreatePropertyAssociation('Source_Text', 'PROGRAMMING_PROPERTIES',
---				thisModule.CreateListValueFromString('runtime.h')
---			)
---		}
---	),
---	threadArrayType: AADLBA!DataType
---	(
---		name <- c.name+'_ThreadsArray'
---	),
---	threadArrayImpl: AADLBA!DataImplementation
---	(
---		name <- c.name+'_ThreadsArray'+'.impl',
---		ownedRealization <- thisModule.Realization(threadArrayType),
---		ownedPropertyAssociation <- Sequence
---			{
---				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
---					'Array'.asEnumeration('DATA_MODEL').asNamedValue()),
---				thisModule.CreatePropertyAssociation('Base_Type', 'DATA_MODEL',
---					thisModule.CreateListValueFromClassifier(
---										'Unsigned_16'.asClassifier('BASE_TYPES')
---									)
---				),
---				thisModule.CreatePropertyAssociation('Dimension',
---													  'DATA_MODEL',
---													  thisModule.CreateListValueFromInteger(
---														c.componentInstance->select(e|e.category=#thread)->size())
---												)
---			}
---	),
---	threadArraySub: AADLBA!DataSubcomponent
---	(
---		dataSubcomponentType <- threadArrayImpl
---	)
+												->union	(
+													c.componentInstance->select(e|e.category=#thread)
+													->collect( e|
+														thisModule.resolveMatchedTupleIfExists(Sequence{e,e.subcomponent.subcomponentType.getBA()},'accessConnection_CURRENT_STATE_THREAD')
+													)
+												)
+                                               ->flatten()->excluding(OclUndefined),
+		ownedMode <- c.modeInstance
+	)
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(implImg, impl);

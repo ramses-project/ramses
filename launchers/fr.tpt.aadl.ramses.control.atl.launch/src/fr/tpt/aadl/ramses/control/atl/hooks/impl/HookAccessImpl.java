@@ -22,56 +22,62 @@
 package fr.tpt.aadl.ramses.control.atl.hooks.impl ;
 
 import java.io.File ;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayList ;
+import java.util.Collections ;
+import java.util.HashMap ;
+import java.util.HashSet ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
 import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.BasicEList ;
+import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.xtext.nodemodel.INode;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
-import org.osate.aadl2.ComponentImplementation;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.DirectedFeature;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.Feature;
+import org.eclipse.emf.ecore.EClass ;
+import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.impl.EObjectImpl ;
+import org.eclipse.xtext.EcoreUtil2 ;
+import org.eclipse.xtext.nodemodel.INode ;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.ComponentImplementation ;
+import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.DirectedFeature ;
+import org.osate.aadl2.DirectionType ;
+import org.osate.aadl2.Element ;
+import org.osate.aadl2.Feature ;
 import org.osate.aadl2.ListValue ;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.Port;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.Port ;
 import org.osate.aadl2.PropertyAssociation ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.StringLiteral ;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.SystemImplementation;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.aadl2.instance.ConnectionInstance;
-import org.osate.aadl2.instance.InstanceObject;
-import org.osate.aadl2.instance.SystemInstance;
-import org.osate.aadl2.parsesupport.LocationReference;
+import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.ConnectionInstance ;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.InstanceObject ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.parsesupport.LocationReference ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorElement ;
 import org.osate.ba.aadlba.BehaviorState ;
 import org.osate.ba.aadlba.BehaviorTransition ;
+import org.osate.ba.aadlba.PortCountValue ;
 import org.osate.ba.utils.AadlBaLocationReference ;
 import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.Aadl2Utils ;
-import org.osate.utils.PropertyUtils;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException;
-import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning;
+import fr.tpt.aadl.ramses.communication.dimensioning.DimensioningException ;
+import fr.tpt.aadl.ramses.communication.periodic.delayed.EventDataPortCommunicationDimensioning ;
 import fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage ;
 import fr.tpt.aadl.ramses.control.atl.hooks.HookAccess ;
 import fr.tpt.aadl.ramses.control.atl.hooks.utils.ComparablePortByCriticality ;
 import fr.tpt.aadl.ramses.control.support.RamsesException ;
-import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.util.math.LeastCommonMultiple ;
 import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
 
 /**
@@ -228,26 +234,34 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	 * @generated NOT
 	 */
 	public Long getHyperperiod(FeatureInstance port) {
-		Long hyperperiod= new Long(0);
-		try {
-			EventDataPortCommunicationDimensioning EDPCD = 
-					EventDataPortCommunicationDimensioning.create(port);
-			ArrayList<ComponentInstance> threads = new ArrayList<ComponentInstance>();
-			for(ConnectionInstance fi: port.getDstConnectionInstances())
-			{
-				threads.add((ComponentInstance) fi.getSource().eContainer());
-			}
-			threads.add((ComponentInstance) port.eContainer());
-			hyperperiod = EDPCD.getHyperperiod(threads);
-		} catch (DimensioningException e) {
-		  String errMsg =  RamsesException.formatRethrowMessage("cannot get the hyper period for \'"+
-		port + '\'', e) ;
-      _LOGGER.error(errMsg, e);
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-		}
-		return hyperperiod;
+	  Long hyperperiod= new Long(0);
+	  ArrayList<ComponentInstance> threads = new ArrayList<ComponentInstance>();
+	  for(ConnectionInstance fi: port.getDstConnectionInstances())
+	  {
+	    threads.add((ComponentInstance) fi.getSource().eContainer());
+	  }
+	  threads.add((ComponentInstance) port.eContainer());
+	  hyperperiod = getHyperperiod(threads);
+	  return hyperperiod;
 	}
 	
+	public Long getHyperperiodFromThreads(List<ComponentInstance> consideredTasks)
+	{
+	  return getHyperperiod(consideredTasks);
+	}
+	
+	public long getHyperperiod(List<ComponentInstance> consideredTasks)
+	{
+	  Long[] periods = new Long[consideredTasks.size()];
+	  ArrayList<Long> consideredPeriods = new ArrayList<Long>();
+	  for(ComponentInstance ci : consideredTasks)
+	  {
+	    consideredPeriods.add( AadlUtil.getInfoTaskPeriod(ci));
+	  }
+	  consideredPeriods.toArray(periods);
+	  return LeastCommonMultiple.lcm(periods);
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -363,10 +377,20 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  return l;
   }
 
-  public Boolean isUsedInFreshClause(BehaviorAnnex ba, Port p) {
-	return AadlBaVisitors.isFresh(ba, p);
+  public Boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName) {
+    if(operatorName.equalsIgnoreCase("fresh"))
+      return AadlBaVisitors.isFresh(ba, p);
+    else if(operatorName.equalsIgnoreCase("count"))
+    {
+      for(PortCountValue pcv : EcoreUtil2.getAllContentsOfType(ba, PortCountValue.class))
+      {
+        if(pcv.getElement().equals(p))
+          return true;
+      }
+    }
+    return false;
   }
-  
+    
   public List<FeatureInstance> getFeaturesOrderedByCriticality(ComponentInstance ci)
   {
 	List<FeatureInstance> result = new ArrayList<FeatureInstance>();
@@ -515,5 +539,39 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     return (EList<String>) res;
   }
 
+  public Integer minus (Long lhs, Long rhs)
+  {
+    return (int) (lhs-rhs);
+  }
+  
+  void allPortCount(List<PortCountValue> result, EObject e)
+  {
+    if(e instanceof BehaviorTransition)
+    {
+      BehaviorTransition bt = (BehaviorTransition) e;
+      allPortCount(result, bt.getActionBlock());
+    }
+    for(EObject be : EcoreUtil2.getAllContentsOfType(e, EObject.class))
+    {
+      if(be instanceof PortCountValue)
+        result.add((PortCountValue) be);
+      else
+        allPortCount(result, be);
+    }
+  }
+  
+  public EList<Port> allPortCount(BehaviorElement e)
+  {
+    List<PortCountValue> pcvList =  new ArrayList<PortCountValue>();
+    allPortCount(pcvList, e);
+    
+    Set<Port> pList = new HashSet<Port>();
+    for(PortCountValue pcv: pcvList)
+    {
+      pList.add((Port) pcv.getElement());
+    }
+    EList<Port> res = new BasicEList<Port>(pList);
+    return res;
+  }
   
 } //HookAccessImpl

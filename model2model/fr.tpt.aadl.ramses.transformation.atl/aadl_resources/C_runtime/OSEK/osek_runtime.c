@@ -1,4 +1,6 @@
 #include "osek_runtime.h"
+#include "ecrobot_interface.h"
+
 
 static void memcpy(char *dst, const char *src, unsigned int size)
 {
@@ -21,18 +23,21 @@ StatusType SendOutput_runtime(thread_queue_t * global_q, int port_id, void * val
   if ((port_q->write_idx+1) % port_q->queue_size == port_q->first_idx) {
     status = E_OS_LIMIT;
   } else {
+/*    static char c = 0;
+    c++;
+    ecrobot_debug1(c, 4, port_q->write_idx);*/
     global_q->msg_nb++;
     port_q->write_idx = (port_q->write_idx+1) % port_q->queue_size;
+    
     memcpy(&port_q->offset[port_q->write_idx*(port_q->msg_size/sizeof(char))], value, port_q->msg_size);
     if (global_q->waiting)
       status = SetEvent(*(global_q->in_task), *(global_q->event));
   }
-  
+      
   ReleaseResource(*(global_q->rez));
   return status;
 }
 
-#include "ecrobot_interface.h"
 
 StatusType NextValue_runtime(thread_queue_t * global_q, int port_id, void * dst)
 {
@@ -117,4 +122,19 @@ StatusType PutValueDataPort_runtime(data_port_t * p, void* data)
   memcpy (p->data, data, p->size);
   status = ReleaseResource(*(p->rez));
   return status;
+}
+
+StatusType GetCount_runtime(thread_queue_t * global_q, int port_id, int * count_res)
+{
+  StatusType status = E_OK;
+  struct port_queue_t * port_q = (struct port_queue_t*) global_q->port_queues[port_id];
+  status = GetResource(*(global_q->rez));
+  if (status != E_OK)
+    return status;
+  if(port_q->last_idx<port_q->first_idx)
+    *count_res = port_q->queue_size-port_q->first_idx+port_q->last_idx;
+  else
+    *count_res = port_q->last_idx-port_q->first_idx;
+
+  status = ReleaseResource(*(global_q->rez));
 }

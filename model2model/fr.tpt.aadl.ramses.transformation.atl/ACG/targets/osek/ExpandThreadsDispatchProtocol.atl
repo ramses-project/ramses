@@ -62,6 +62,56 @@ rule m_PeriodicThread
 	}
 }
 
+-- @extends m_PeriodicThread
+rule m_PeriodicThread_Mode
+{
+	from
+		c: AADLI!ComponentInstance
+		(c.needsModeVariable())
+	to
+		currentModeDataSubcomponent: AADLBA!DataSubcomponent
+		(
+			name <- c.name+'_currentMode',
+			dataSubcomponentType <- c.getModeDataType()
+		)
+}
+
+-- @extends m_BehaviorActionsFromThread
+rule m_BehaviorActionsFromThread_Periodic
+{
+	from
+		c: AADLI!ComponentInstance,
+		src_transition: AADLBA!BehaviorTransition
+		(
+			c.isPeriodicThread()
+			and
+			c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
+			and
+			src_transition.destinationState.complete=true
+		)
+	using
+	{
+		ba: AADLBA!BehaviorAnnex = src_transition.eContainer();
+		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
+	}
+	to
+		callSequenceImg: AADLBA!SubprogramCallSequence,
+		returnData: AADLBA!DataSubcomponent,
+		waitDispatchCall: AADLBA!SubprogramCallAction
+		(
+			subprogram<-dispatchHolder,
+			parameterLabels <- Sequence{}
+		),
+		dispatchHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
+	}
+}
+
 helper context AADLI!ComponentInstance def: collectGlobalVariableImg()  : Sequence(AADLBA!DataSubcomponent) =
 	if(self.needsGlobalQueue()) then
 		Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalQueue')}
@@ -130,13 +180,50 @@ rule m_PeriodicThread_with_InputPort
 	}
 }
 
+-- @extends m_PeriodicThread_with_InputPort,m_PeriodicThread_Mode
+rule m_PeriodicThread_with_InputPort_Mode
+{
+	from
+		c: AADLI!ComponentInstance
+	to
+		globalQueue: AADLBA!DataSubcomponent
+}
+
+-- Next rule should be overriden as it is target specific
+unique lazy rule createModeVariableUpdate
+{
+	from
+		c: AADLI!ComponentInstance
+	to
+		updateModeCall: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callHolder,
+			parameterLabels <- Sequence{MODE_HOLDER}
+		),
+		callHolder: AADLBA!SubprogramHolder
+		(
+			element <- 'GetActiveApplicationMode'.asSubprogramType('OSEK_RUNTIME')
+		),
+		MODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveMatchedSingleIfExists(c, 'currentModeDataSubcomponent')
+		)
+	do
+	{
+		updateModeCall;
+	}	
+}
+
+
 helper context AADLI!ComponentInstance def: collectDispatchActions():Sequence(AADLBA!BehaviorAction) = 
-	self.featureInstance->select(fi| 
-					fi.isInputFeature() and
-					(fi.isEventPort() or fi.isEventDataPort())
-			)
-			->collect(fi|thisModule.createReceiveInputCall(fi))
-		->union(thisModule.collectTransitionChoiceActions(self))
+--	self.featureInstance->select(fi| 
+--					fi.isInputFeature() and
+--					(fi.isEventPort() or fi.isEventDataPort())
+--			)
+--			->collect(fi|thisModule.createReceiveInputCall(fi))
+--		->union(
+			thisModule.collectTransitionChoiceActions(self)
+--		)
 		->union(
 			if(self.isSporadicThread()) then thisModule.collectSporadicBehaviorActions(self) else Sequence{thisModule.resolveMatchedSingleIfExists(self,'waitDispatchCall')} endif			
 		)

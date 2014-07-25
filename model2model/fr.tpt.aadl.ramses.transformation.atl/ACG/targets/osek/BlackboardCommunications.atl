@@ -81,7 +81,7 @@ abstract rule m_Input_BlackBoard
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
+			element<-fi.retreiveEntrypointFeature()
 		),
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
@@ -92,6 +92,78 @@ abstract rule m_Input_BlackBoard
 	{
 		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
 	}
+}
+
+-- @extends m_Input_BlackBoard_ComputeEntrypointCallSequence,m_Input_Port_ComputeEntrypointCallSequence_Mode
+rule m_Input_BlackBoard_ComputeEntrypointCallSequence_mode
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		mode: AADLI!Mode
+	to
+		call: AADLBA!SubprogramCallAction,
+		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi,mode}, 'f_entrypoint')
+		),
+		-- TODO: factorize next lines in a rule to inherit from !
+		ifActiveMode: AADLBA!IfStatement
+		(
+			logicalValueExpression <- isActiveMode,
+			behaviorActions <- activeModeActionSequence
+		),
+		isActiveMode: AADLBA!ValueExpression
+		(
+			relations <- Sequence{comparisonRelation}
+		),
+		activeModeActionSequence: AADLBA!BehaviorActionSequence
+		(
+			actions <- Sequence{call}
+		),
+		comparisonRelation: AADLBA!Relation
+		(
+			relationalOperator<-#Equal,
+			firstExpression<-comparisonFirstExpression,
+			secondExpression<-comparisonSecondExpression
+		),
+		comparisonFirstExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{currentStateAccessTerm}
+		),
+		currentStateAccessTerm: AADLBA!Term
+		(
+			factors <- Sequence{currentStateAccessFactor}
+		),
+		currentStateAccessFactor: AADLBA!Factor
+		(
+			firstValue <- currentStateAccessHolder
+		),
+		currentStateAccessHolder:AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.resolveTemp(fi.getComponentInstance(), 'currentModeDataSubcomponent')
+		),
+				comparisonSecondExpression: AADLBA!SimpleExpression
+		(
+			terms <- Sequence{enumValueSourceStateTerm}
+		),
+		enumValueSourceStateTerm: AADLBA!Term
+		(
+			factors <- Sequence{enumValueSourceStateFactor}
+		),
+		enumValueSourceStateFactor: AADLBA!Factor
+		(
+			firstValue <- sourceStateID
+		),
+		sourceStateID: AADLBA!BehaviorEnumerationLiteral
+		(
+			enumLiteral<-enumSourceStringLiteral,
+			component<- fi.getModeDataType()
+		),
+		enumSourceStringLiteral: AADLBA!StringLiteral
+		(
+			value <- mode.name
+		)
 }
 
 -- @extends m_Input_BlackBoard,m_Input_DataPort_ComputeEntrypointCallSequence
@@ -157,7 +229,7 @@ abstract rule m_Output_BlackBoard
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint')
+			element<-fi.retreiveEntrypointFeature(cnxRef)
 		),
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
@@ -186,6 +258,28 @@ rule m_Output_BlackBoard_ComputeEntrypointCallSequence
 			element <- RETURN_CODE
 		)
 }
+
+
+---- @extends m_Output_BlackBoard_ComputeEntrypointCallSequence
+--rule m_Output_BlackBoard_ComputeEntrypointCallSequence_mode
+--{
+--	from
+--		fi: AADLI!FeatureInstance,
+--		behavior: AADLI!SubprogramCallSequence,
+--		cnxRef: AADLI!PortConnection,
+--		mode: AADLI!Mode
+--		(cnxRef.inModeOrTransition->includes(mode))
+--	using
+--	{
+--		spg: AADLBA!SubprogramType = 'PutValueDataPort'.asSubprogramType('OSEK_RUNTIME');
+--		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, mode, spg);
+--	}
+--	to
+--		callHolder: AADLBA!CalledSubprogramHolder
+--		(
+--			element <- resolvedSpg
+--		)		
+--}
 
 -- @extends m_Output_BlackBoard,m_Output_Port_BehaviorAnnex
 rule m_Output_BlackBoard_BehaviorAnnex

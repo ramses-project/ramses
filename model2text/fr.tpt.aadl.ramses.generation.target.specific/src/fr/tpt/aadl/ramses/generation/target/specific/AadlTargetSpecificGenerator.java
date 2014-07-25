@@ -54,13 +54,10 @@ import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager 
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil ;
 import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
-import com.google.common.io.Files ;
-
 import fr.openpeople.rdal2.model.rdal.impl.SpecificationImpl ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
-import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;

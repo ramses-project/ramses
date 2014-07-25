@@ -27,10 +27,7 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.List ;
 
-import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
-import org.osate.aadl2.DataClassifier ;
-import org.osate.aadl2.DataType ;
 
 import fr.tpt.aadl.ramses.control.cli.instantiation.StandAloneInstantiator ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
@@ -44,7 +41,7 @@ public class PredefinedPackagesManager
 
   // File names without their extension.
   private static String[] names =
-  {"base_types", "aadl_runtime", "RAVENSCAR_runtime", "OJR_runtime",
+  {"base_types", "RAVENSCAR_runtime", "OJR_runtime",
    "ARINC653_runtime", "OSEK_runtime", "PeriodicDelayed_runtime",
    "PeriodicDelayedMutex_runtime", "RAMSES_processors",
    "RAMSES_buses", "rtl8029_driver"} ;
@@ -95,34 +92,9 @@ public class PredefinedPackagesManager
     }
   }
   
-  public Resource getRuntimeResource()
-  {
-    return resources.get("aadl_runtime") ;
-  }
-
   public Resource getBaseTypesResource()
   {
     return resources.get("base_types") ;
-  }
-
-  public DataClassifier getRuntimeDataClassifier(String name)
-  {
-    Resource aadlRuntime = resources.get("aadl_runtime") ;
-
-    for(EObject obj : aadlRuntime.getContents())
-    {
-      if(obj instanceof DataType)
-      {
-        DataType dataType = (DataType) obj ;
-
-        if(dataType.getName().equals(name))
-        {
-          return dataType ;
-        }
-      }
-    }
-
-    return null ;
   }
 
   public boolean allPackagesFound()

@@ -121,7 +121,7 @@ rule m_Output_Queuing_ComputeEntrypointCallSequence
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH_HOLDER: AADLBA!DataSubcomponent = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
 		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
-		QUEUE_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		QUEUE_ID: AADLBA!DataAccess = fi.retreiveEntrypointFeature(cnxRef);
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}
 	to

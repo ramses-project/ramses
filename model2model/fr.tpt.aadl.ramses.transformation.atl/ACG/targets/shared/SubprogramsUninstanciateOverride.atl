@@ -1,0 +1,110 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module SubprogramsUninstanciateOverride;
+create OUT : AADLBA 	from 		IN : AADLI,
+									AADL_RUNTIME: AADLBA,
+									DATA_MODEL: AADLBA,
+									PROGRAMMING_PROPERTIES: AADLBA,
+									HOOKS: ATLHOOKS;
+
+-- @extends m_Component_Type
+rule m_Subprogram_Type {
+ from 
+ 	type : AADLI!SubprogramType
+ to
+ 	typeImg : AADLBA!SubprogramType (
+		ownedParameter <- type.ownedParameter->collect(p|thisModule.Parameter(p)),
+		ownedDataAccess <- Sequence{contextAccess}->union(
+								type.ownedDataAccess->collect(p|thisModule.DataAccess(p))
+							),
+		ownedPropertyAssociation <- type.mapSpgPropertyAssociationList()
+	),
+	contextAccess : AADLBA!DataAccess
+	(
+		name <- 'context',
+		dataFeatureClassifier <- ctxt,
+		kind <- #requires
+	),
+	ctxt: AADLBA!DataType
+	(
+		name <- type.name+'_context',
+		ownedPropertyAssociation <- Sequence{
+			thisModule.CreatePropertyAssociation
+			(
+		 		'Data_Representation',
+				'DATA_MODEL',
+				'Struct'.asEnumeration('DATA_MODEL').asNamedValue()
+			),
+			thisModule.CreatePropertyAssociation
+			(
+				'Element_Names',
+				'DATA_MODEL',
+				thisModule.CreateListValueFromListOfString(
+					type.ownedEventPort->collect(e|e.name)
+					->union(type.ownedEventDataPort->collect(e|e.name))
+					->excluding(OclUndefined)
+				)
+			),
+			thisModule.CreatePropertyAssociation('Base_Type', 'DATA_MODEL',
+				thisModule.CreateListValueFromListOfClassifier(
+					type.ownedEventPort->collect(e|e.name)
+					->union(type.ownedEventDataPort->collect(e|e.name))
+					->excluding(OclUndefined)
+					->collect(e|'Unsigned_8'.asClassifier('BASE_TYPES'))
+				)
+			),
+			thisModule.CreatePropertyAssociation('Source_Name', 'PROGRAMMING_PROPERTIES',
+				thisModule.CreateStringLiteralPropertyExpression('__'+type.name.toLower()+'_context')
+			)
+		}
+	)
+	
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
+	}
+	
+}
+
+
+rule copySourceText(p : AADLI!PropertyAssociation)
+{
+	to
+		p2 : AADLBA!PropertyAssociation (
+			property <- p.property,
+			constant <- p.constant,
+			append <- p.append,
+			ownedValue <- Sequence{mpv}
+		),
+		mpv: AADLBA!ModalPropertyValue(
+			ownedValue <- thisModule.CreateListValueFromListOfString(
+							ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().getListOfPath(p)
+						)
+		)
+	do
+	{
+		p2;
+	}
+}

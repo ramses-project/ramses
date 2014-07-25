@@ -177,7 +177,7 @@ rule m_Input_Port_BehaviorAnnex
 		),
 		destinationCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
+			connectionEnd <- fi.retreiveEntrypointFeature()
 		)
 	do
 	{
@@ -215,13 +215,43 @@ rule m_Output_Port_BehaviorAnnex
 		),
 		destinationCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint')
+			connectionEnd <- fi.retreiveEntrypointFeature(cnxRef)
 		)
 	do
 	{
 		destinationCE.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint'));
 	}
 }
+
+rule m_Compute_EntryPoint_from_BA_dataAccess {
+ from 
+    c : AADLI!ComponentInstance,
+	behavior: AADLI!AnnexSubclause,
+	data: AADLI!ComponentInstance
+	(
+		c.category = #thread 
+		and
+		behavior.oclIsTypeOf(AADLBA!BehaviorAnnex)
+	  	and
+	  	c.subcomponent.classifier.getBA() = behavior
+		and
+		data.eContainer()=c
+		and
+		AADLBA!DataSubcomponentHolder.allInstances()->exists(f|f.element = data.subcomponent)
+	)
+  to
+  	dataAccess: AADLBA!DataAccess
+	(
+		name <- data.name+'_accessForBA',
+		dataFeatureClassifier <- data.subcomponent.dataSubcomponentType,
+		kind <- #requires
+	)
+  do
+  {
+  	thisModule.addImportedUnitFromInputModel(thisModule.public(), data.subcomponent.dataSubcomponentType);
+  }
+}
+
 
 -- @extends m_ThreadBehavior
 rule m_Compute_EntryPoint_from_BA {
@@ -279,7 +309,7 @@ rule m_Compute_EntryPoint_from_BA {
 	-- To be added in entryPointImg
 	currentState: AADLBA!DataSubcomponent
 	(
-		name <- 'Parent_BA_currentState',
+		name <- c.name+'Parent_BA_currentState',
 		dataSubcomponentType <- stateType
 	),
 	-- to be added in implImg
@@ -289,7 +319,12 @@ rule m_Compute_EntryPoint_from_BA {
 		dataFeatureClassifier <- stateType,
 		kind <- #requires
 	),
-	
+	currentStateAccessThread: AADLBA!DataAccess
+	(
+		name <- 'Parent_BA_currentState_Access',
+		dataFeatureClassifier <- stateType,
+		kind <- #requires
+	),
 	
 	-- connect currentState feature of entryPointImg to the data subcomponent of the implImg that
 	-- represents the state of implImg
@@ -300,7 +335,7 @@ rule m_Compute_EntryPoint_from_BA {
 	),
 	connectedSubcomponent_CURRENT_STATE: AADLBA!ConnectedElement
 	(
-		connectionEnd<-currentState
+		connectionEnd<-currentStateAccessThread
 	),
 	accessConnection_CURRENT_STATE: AADLBA!AccessConnection
 	(
@@ -309,14 +344,54 @@ rule m_Compute_EntryPoint_from_BA {
 		destination<-connectedSubcomponent_CURRENT_STATE,
 		accessCategory <- #data
 	),
+	
+	connectedAccessThread_CURRENT_STATE: AADLBA!ConnectedElement
+	(
+		connectionEnd<-currentStateAccessThread,
+		context<-c
+	),
+	connectedSubcomponentThread_CURRENT_STATE: AADLBA!ConnectedElement
+	(
+		connectionEnd<-currentState
+	),
+	accessConnection_CURRENT_STATE_THREAD: AADLBA!AccessConnection
+	(
+		name<-c.name+'_CNX_CURRENT_STATE_BA',
+		source<-connectedAccessThread_CURRENT_STATE,
+		destination<-connectedSubcomponentThread_CURRENT_STATE,
+		accessCategory <- #data
+	),
+	
 	computeEntryPointTransition: AADLBA!BehaviorTransition
 	(
 		name <- behavior.name+'_'+c.subcomponent.subcomponentType.ownedAnnexSubclause->indexOf(annexSubclause).toString()
 	),
 	computeEntryPointActions: AADLBA!BehaviorActionSequence
 	(
-		-- FIXME: to be sorted by priority
-		actions <- behavior.transitions->collect(e | thisModule.resolveMatchedTupleIfExists(Sequence{c, e}, 'ifStatement'))
+		actions <- if c.needsModeVariable() then
+					Sequence{thisModule.createModeVariableUpdate(c)}
+					else 
+					Sequence{} 
+					endif
+				->union
+				(
+					c.featureInstance->select(fi| 
+						fi.isInputFeature() and
+						(fi.isEventPort() or fi.isEventDataPort())
+					)
+					->collect(fi|thisModule.createReceiveInputCall(fi))
+				)
+				->union
+				(
+					behavior.transitions->collect(trans|trans.usedPortCount()->collect(e| thisModule.createPortCountValueUpdate(c.featureInstance->any(p|p.feature = e))))
+					->flatten()
+					->append(
+						thisModule.resolveMatchedTupleIfExists(Sequence{c,
+							behavior.transitions
+								->sortedBy(e| 0.longValue().minus(e.priority))
+								->first()},'ifStatement')
+						)
+				)
 	)
  do
  {
@@ -328,6 +403,15 @@ rule m_Compute_EntryPoint_from_BA {
  }
 }
 
+-- Next rule should be overriden as it is target specific
+unique lazy rule createModeVariableUpdate
+{
+	from
+		c: AADLI!ComponentInstance
+	to
+		
+}
+
 helper context OclAny def: resolve(c: AADLI!ComponentInstance): OclAny =
 	if(self.oclIsUndefined()) then
 		OclUndefined
@@ -336,8 +420,12 @@ helper context OclAny def: resolve(c: AADLI!ComponentInstance): OclAny =
 	endif
 ;
 
-helper context AADLBA!BehaviorActionSequence def: resolve(c: AADLI!ComponentInstance): Sequence(AADLBA!BehaviorActions) =
-	self.actions->collect(e| e.resolve(c))
+helper context AADLBA!BehaviorActionBlock  def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorActionBlock =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_actionBlock')
+;
+
+helper context AADLBA!BehaviorActionSequence def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorActionSequence =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_behaviorActionSequence')
 ;
 
 helper context AADLBA!AssignmentAction def: resolve(c: AADLI!ComponentInstance): AADLBA!SubprogramCallAction =
@@ -411,6 +499,10 @@ helper context AADLBA!Term def: resolve(c: AADLI!ComponentInstance): AADLBA!Elem
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_term')
 ;
 
+helper context AADLBA!BehaviorIntegerLiteral def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorIntegerLiteral =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_behaviorIntegerLiteral')
+;
+
 helper context AADLBA!ValueExpression def: resolve(c: AADLI!ComponentInstance): AADLBA!ValueExpression =
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_valueExpression')
 ;
@@ -423,6 +515,16 @@ helper context AADLBA!SimpleExpression def: resolve(c: AADLI!ComponentInstance):
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_simpleExpression')
 ;
 
+helper context AADLBA!BehaviorTransition def: usedPortCount() : Sequence(AADLBA!Port) =
+	thisModule.theHOOK.allPortCount(self)
+;
+
+-- next rule needs a target specific implementation
+lazy rule createPortCountValueUpdate
+{
+	from
+		fi: AADLI!FeatureInstance
+}
 
 rule m_BehaviorActionsFromThread
 {
@@ -440,30 +542,41 @@ rule m_BehaviorActionsFromThread
 	currentStateAccess: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'currentStateAccess');
 	stateType: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'stateType');
 	-- FIXME: to be sorted according to priority.
-	sortedTransitions: Sequence(AADLBA!BehaviorTransition) = ba.transitions;
+	sortedTransitions: Sequence(AADLBA!BehaviorTransition) = ba.transitions->sortedBy(e| 0.longValue().minus(e.priority));
   }
   to
 	ifStatement: AADLBA!IfStatement
 	(
 		logicalValueExpression <- isStateSource,
 		elif <- if(sortedTransitions->first() = src_transition) then false else true endif,
-		behaviorActions <- ifStatementActionSequence
+		behaviorActions <- ifStatementActionSequence,
+		elseStatement <- let index: Integer = sortedTransitions->indexOf(src_transition) in 
+						if(index>0 and sortedTransitions->size() > index) then
+							thisModule.resolveMatchedTupleIfExists(Sequence{c,
+								sortedTransitions->at(index+1)}, 'ifStatement')
+						else
+							OclUndefined
+						endif
 	),
 	ifStatementActionSequence: AADLBA!BehaviorActionSequence
 	(
 		actions <- 	if(src_transition.sourceState.complete=true)
 					then
-					c.featureInstance->select(f | (f.isInputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort))
-					->collect
-					(port | 
-						thisModule.resolveMatchedTupleIfExists(Sequence{port, src_transition.eContainer()}, 'call')
-					)
+						c.featureInstance->select(f | (f.isInputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort))
+						->collect
+							(port | 
+								thisModule.resolveMatchedTupleIfExists(Sequence{port, src_transition.eContainer()}, 'call')
+							)
 					else
-					Sequence{}
-					endif					
+						Sequence{}
+					endif
 					->union
 					(
-						Sequence{src_transition.actionBlock.content.resolve(c)}
+						if(src_transition.actionBlock.oclIsUndefined()) then
+							Sequence{}
+						else
+							Sequence{src_transition.actionBlock.content.resolve(c)}
+						endif
 					)
 					->flatten()
 					->union(
@@ -479,6 +592,7 @@ rule m_BehaviorActionsFromThread
 								cnx| thisModule.createUpdateFreshnessToSend(e, cnx.connectionReference->first().connection))
 						)
 					)
+					->append(updateState)
 					->union
 					(
 						if(src_transition.destinationState.complete=true)
@@ -495,13 +609,29 @@ rule m_BehaviorActionsFromThread
 						Sequence{}
 						endif
 					)
-					->append
-					(updateState)
 					->flatten()
 	),
 	isStateSource: AADLBA!ValueExpression
 	(
-		relations <- Sequence{comparisonRelation}	
+		relations <- Sequence{comparisonRelation}
+						->union(if src_transition.condition.oclIsTypeOf(AADLBA!ValueExpression)
+								then
+									src_transition.condition.relations
+									->collect(e|e.resolve(c))
+								else
+									Sequence{}
+								endif	
+								)
+						->excluding(OclUndefined),
+		logicalOperators <- if src_transition.condition.oclIsKindOf(AADLBA!ValueExpression) 
+							then
+								Sequence{#And}
+								-> union(
+									src_transition.condition.logicalOperators
+								)
+							else
+								Sequence{}
+							endif
 	),
 	comparisonRelation: AADLBA!Relation
 	(
@@ -582,49 +712,49 @@ rule m_BehaviorActionsFromThread
 	),
 	enumTargetStringLiteral: AADLBA!StringLiteral
 	(
-		value <- src_transition.sourceState.name
+		value <- src_transition.destinationState.name
 	)
 }
 
--- @extends m_BehaviorActionsFromThread
-rule m_BehaviorActionsFromThread_Periodic
-{
-	from
-		c: AADLI!ComponentInstance,
-		src_transition: AADLBA!BehaviorTransition
-		(
-			c.isPeriodicThread()
-			and
-			c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
-			and
-			src_transition.destinationState.complete=true
-		)
-	using
-	{
-		ba: AADLBA!BehaviorAnnex = src_transition.eContainer();
-		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
-	}
-	to
-		callSequenceImg: AADLBA!SubprogramCallSequence,
-		returnData: AADLBA!DataSubcomponent,
-		waitDispatchCall: AADLBA!SubprogramCallAction
-		(
-			subprogram<-dispatchHolder,
-			parameterLabels <- Sequence{RETURN_DATA_Holder}
-		),
-		dispatchHolder: AADLBA!CalledSubprogramHolder
-		(
-			element <- spg
-		),
-		RETURN_DATA_Holder: AADLBA!DataSubcomponentHolder
-		(
-			element<-thisModule.resolveMatchedSingleIfExists(c, 'returnData')
-		)
-	do
-	{
-		thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
-	}
-}
+---- @extends m_BehaviorActionsFromThread
+--rule m_BehaviorActionsFromThread_Periodic
+--{
+--	from
+--		c: AADLI!ComponentInstance,
+--		src_transition: AADLBA!BehaviorTransition
+--		(
+--			c.isPeriodicThread()
+--			and
+--			c.subcomponent.subcomponentType.getBA() = src_transition.eContainer()
+--			and
+--			src_transition.destinationState.complete=true
+--		)
+--	using
+--	{
+--		ba: AADLBA!BehaviorAnnex = src_transition.eContainer();
+--		spg : AADLBA!SubprogramType = thisModule.getWaitPeriodSubprogram;
+--	}
+--	to
+--		callSequenceImg: AADLBA!SubprogramCallSequence,
+--		returnData: AADLBA!DataSubcomponent,
+--		waitDispatchCall: AADLBA!SubprogramCallAction
+--		(
+--			subprogram<-dispatchHolder,
+--			parameterLabels <- Sequence{RETURN_DATA_Holder}
+--		),
+--		dispatchHolder: AADLBA!CalledSubprogramHolder
+--		(
+--			element <- spg
+--		),
+--		RETURN_DATA_Holder: AADLBA!DataSubcomponentHolder
+--		(
+--			element<-thisModule.resolveMatchedSingleIfExists(c, 'returnData')
+--		)
+--	do
+--	{
+--		thisModule.addImportedUnit(thisModule.public(), thisModule.getLoadedAADLRuntime, thisModule.getRuntimeName);
+--	}
+--}
 
 unique lazy rule createFreshnessIndicatorUpdateAction
 {
@@ -712,7 +842,13 @@ rule m_IfStatement
 rule m_BehaviorActionBlock
 {
 	from
-		src_actionBlock: AADLBA!BehaviorActionBlock
+		src_actionBlock: AADLBA!BehaviorActionBlock,
+		c: AADLI!ComponentInstance
+	to
+	    target_actionBlock: AADLBA!BehaviorActionBlock
+		(
+			content <- src_actionBlock.content.resolve(c)
+		)
 }
 
 rule m_BehaviorActionSequence
@@ -761,6 +897,26 @@ rule m_EventDataPortHolder
 		target_Holder: AADLBA!DataSubcomponentHolder
 		(
 			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+		)
+}
+
+rule m_DataSubcomponentHolder
+{
+	from
+		src_Holder: AADLBA!DataSubcomponentHolder,
+		c: AADLI!ComponentInstance
+		(
+			c.componentInstance->exists(e|e.subcomponent=src_Holder.element)
+		)
+	using
+	{
+		dataInstance: AADLI!ComponentInstance = c.componentInstance->any(e|e.subcomponent = src_Holder.element);
+		impl: AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
+	}
+	to
+		target_Holder: AADLBA!DataAccessHolder
+		(
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{c,impl.getBA(),dataInstance}, 'dataAccess')
 		)
 }
 
@@ -818,7 +974,7 @@ rule m_DataPortHolder_withFresh
 		functionalPartHolder.element<-thisModule.resolveLazySingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name).feature.dataFeatureClassifier, 'createFreshnessDataStructure','struct_functional_data_subcomponent');
 	}
 }
-
+		
 -- @extends m_ElementHolder
 rule m_DataPortHolder
 {
@@ -835,6 +991,27 @@ rule m_DataPortHolder
 		target_Holder: AADLBA!DataSubcomponentHolder
 		(
 			element<-thisModule.resolveMatchedSingleIfExists(c.featureInstance->any(e|e.name=src_Holder.element.name), 'localVariable')	
+		)
+}
+
+-- @extends m_ElementHolder
+rule m_PortCountValue
+{
+	from
+		src_Holder:AADLBA!PortCountValue,
+		c: AADLI!ComponentInstance
+		(
+			let f: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name) in 
+			c.featureInstance->exists(fi| fi.feature = src_Holder.element)
+		)
+	using
+	{
+		fi: AADLI!FeatureInstance = c.featureInstance->any(e|e.name=src_Holder.element.name);
+	}
+	to
+		target_Holder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.createPortCountSubcomponent(fi)
 		)
 }
 
@@ -927,6 +1104,24 @@ rule m_Factor {
 			binaryNumericOperator <- src_factor.binaryNumericOperator,
 			unaryNumericOperator <- src_factor.unaryNumericOperator,
 			unaryBooleanOperator <- src_factor.unaryBooleanOperator
+		)
+}
+
+rule m_BehaviorIntegerLiteral
+{
+	from
+		src_behaviorIntegerLiteral: AADLBA!BehaviorIntegerLiteral,
+		c: AADLI!ComponentInstance
+		(
+			src_behaviorIntegerLiteral.isThreadBehaviorElement()
+			and
+			src_behaviorIntegerLiteral.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_behaviorIntegerLiteral: AADLBA!BehaviorIntegerLiteral
+		(
+			base <- src_behaviorIntegerLiteral.base,
+			value <- src_behaviorIntegerLiteral.value
 		)
 }
 

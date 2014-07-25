@@ -222,7 +222,7 @@ rule m_Threads_HM
 		errorCode: AADLBA!BehaviorVariable
 		(
 			name <- 'error_code',
-			dataClassifier <- 'Return_Code_Type'.asDataType('ARINC653_RUNTIME')
+			dataClassifier <- thisModule.getRuntimeReturnType()
 		)
 }
 

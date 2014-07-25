@@ -539,8 +539,6 @@ unique lazy rule CreateTimeOutSubcomponentFromPort
 	}
 }
 
-helper def: getRuntimeReturnType() : AADLBA!DataSubcomponentType = 'Return_Code_Type'.asDataType('ARINC653_RUNTIME');
-
 
 -------------------------------------------------------------------------------------------
 ---- End of refactoring

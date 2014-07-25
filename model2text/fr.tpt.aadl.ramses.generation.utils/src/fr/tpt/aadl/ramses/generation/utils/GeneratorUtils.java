@@ -52,6 +52,7 @@ import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
+import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.ba.aadlba.DataRepresentation ;
 import org.osate.ba.analyzers.TypeHolder ;
 import org.osate.ba.utils.AadlBaUtils ;
@@ -61,6 +62,8 @@ import org.osate.utils.PropertyUtils ;
 import org.osate.utils.names.DataModelProperties ;
 
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.util.math.LeastCommonMultiple ;
+import fr.tpt.aadl.ramses.util.properties.AadlUtil ;
 
 
 public class GeneratorUtils
@@ -387,5 +390,17 @@ public class GeneratorUtils
         }
       }
     }
+  }
+  
+  public static long getHyperperiod(List<ComponentInstance> consideredTasks)
+  {
+    Long[] periods = new Long[consideredTasks.size()];
+    ArrayList<Long> consideredPeriods = new ArrayList<Long>();
+    for(ComponentInstance ci : consideredTasks)
+    {
+      consideredPeriods.add(AadlUtil.getInfoTaskPeriod(ci));
+    }
+    consideredPeriods.toArray(periods);
+    return LeastCommonMultiple.lcm(periods);
   }
 }

@@ -55,7 +55,10 @@ abstract rule m_Connection_Reference
 			name <- cnxRef.name,
 			source <- cnxSourceImg,
 			destination <- cnxDestinationImg,
-			bidirectional <- cnxRef.connection.bidirectional
+			bidirectional <- cnxRef.connection.bidirectional,
+			inModeOrTransition <- AADLI!ModeInstance->allInstancesFrom('IN')
+						->select(e| cnxRef.connection.inMode.includes(e.mode))
+						-->collect(e| thisModule.createModeOrTransition(e))
 		),
 		cnxSourceImg : AADLBA!ConnectedElement(
 			connectionEnd <- if(cnxRef.source.oclIsKindOf(AADLI!FeatureInstance)) then

@@ -139,15 +139,21 @@ properties
   Programming_Properties::Source_Text => ("kernel.h");
 end AppModeType;
 
--- TODO: GetActiveApplicationMode
 subprogram StartOS
 features
-  APP_MODE: in parameter AppModeType;
-  STATUS: out parameter StatusType;
+  APP_MODE: requires data access AppModeType {Access_Right=>read_only;};
 properties
   Programming_Properties::Source_Name => "StartOS";
   Programming_Properties::Source_Text => ("kernel.h");
 end StartOS;
+
+subprogram GetActiveApplicationMode
+features
+  APP_MODE: out parameter AppModeType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "GetActiveApplicationMode";
+  Programming_Properties::Source_Text => ("kernel.h");
+end GetActiveApplicationMode;
 
 subprogram ShutdownOS
 features
@@ -238,6 +244,17 @@ properties
   Programming_Properties::Source_Name => "ReceiveInputs_runtime";
   Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
 end ReceiveInputs;
+
+subprogram GetCount
+features
+  global_q: in parameter ThreadQueueType {Generation_Properties::Parameter_Usage=>By_Reference;};
+  port_id: in parameter Base_Types::Integer;
+  count_value: out parameter Base_Types::Integer;
+  status: out parameter StatusType {Generation_Properties::Return_Parameter => true;};
+properties
+  Programming_Properties::Source_Name => "GetCount_runtime";
+  Programming_Properties::Source_Text => ("osek_runtime.h", "osek_runtime.c");  
+end GetCount;
 
 subprogram PutValueDataPort
 prototypes

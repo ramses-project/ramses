@@ -60,7 +60,10 @@ abstract rule m_Component_Implementation {
 		ownedAccessConnection  		<- impl.getConnectionsInstancesImg('accessConnection')->excluding(OclUndefined),
 		ownedParameterConnection 	<- impl.getConnectionsInstancesImg('parameterConnection')->excluding(OclUndefined),
 		ownedFeatureGroupConnection <- impl.getConnectionsInstancesImg('featureGroupConnection')->excluding(OclUndefined),
-		ownedRealization 			<- thisModule.Realization(impl.type.resolve())
+		ownedRealization 			<- thisModule.Realization(impl.type.resolve()),
+		-- should be in a factorized rule for Classifier
+		ownedMode                   <- impl.getModesInstancesImg(),
+		ownedModeTransition         <- impl.getModesTransitionInstancesImg()
  	)
 }
 

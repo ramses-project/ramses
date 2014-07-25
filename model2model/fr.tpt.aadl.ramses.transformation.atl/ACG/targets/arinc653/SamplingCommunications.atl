@@ -153,7 +153,7 @@ abstract rule m_Output_Sampling
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
-		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		SAMPLING_ID: AADLBA!DataAccess = fi.retreiveEntrypointFeature(cnxRef);
 	}
 	to
 		call: AADLBA!SubprogramCallAction

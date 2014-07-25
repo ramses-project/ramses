@@ -43,7 +43,7 @@ public class Cpu {
 
 	private String name;
 	private Os os;
-	private String appmode;
+	private List<String> appmode;
 	private Counter counter;
 	private List<PeriodicTask> periodicTasks;
 	private List<Task> tasks;
@@ -64,7 +64,7 @@ public class Cpu {
 		return os;
 	}
 
-	public String getAppmode() {
+	public List<String> getAppmode() {
 		return appmode;
 	}
 
@@ -76,7 +76,7 @@ public class Cpu {
 		this.name = name;
 	}
 
-	public void setAppmode(String appmode) {
+	public void setAppmode(List<String> appmode) {
 		this.appmode = appmode;
 	}
 
@@ -111,8 +111,11 @@ public class Cpu {
 		code.addOutputNewline("CPU " + name + " {");
 		code.incrementIndent();
 		os.generateOil(code);
-		code.addOutputNewline("APPMODE " + appmode + " {");
-		code.addOutputNewline("};");
+		for(String mode: appmode)
+		{
+		  code.addOutputNewline("APPMODE " + mode + " {");
+		  code.addOutputNewline("};");
+		}
 		counter.generateOil(code);
 
 		for(DataSubcomponent ds: datasubcomponents)

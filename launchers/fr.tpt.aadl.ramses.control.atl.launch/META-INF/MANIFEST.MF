@@ -31,9 +31,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.apache.log4j,
  fr.tpt.aadl.ramses.control.support,
  fr.tpt.aadl.ramses.constraints.reporter.metamodel,
- fr.tpt.aadl.ramses.communication.periodic.delayed,
  fr.tpt.aadl.ramses.util.properties,
- fr.tpt.aadl.sched.wcetanalysis.results
+ fr.tpt.aadl.sched.wcetanalysis.results,
+ fr.tpt.aadl.ramses.communication.periodic.delayed,
+ fr.tpt.aadl.ramses.util.math
 Bundle-Activator: fr.tpt.aadl.ramses.control.atl.AtlLauncherActivator
 Bundle-ActivationPolicy: lazy
 

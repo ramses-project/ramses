@@ -21,19 +21,20 @@
 
 package fr.tpt.aadl.ramses.control.atl.hooks ;
 
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
-import org.osate.aadl2.ComponentType;
-import org.osate.aadl2.DirectedFeature;
-import org.osate.aadl2.Element;
-import org.osate.aadl2.Feature;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.Port;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.ecore.EObject ;
+import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.DirectedFeature ;
+import org.osate.aadl2.Element ;
+import org.osate.aadl2.Feature ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.Port ;
 import org.osate.aadl2.PropertyAssociation ;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.ba.aadlba.BehaviorAnnex;
-import org.osate.ba.aadlba.BehaviorState;
-import org.osate.ba.aadlba.BehaviorTransition;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorElement ;
+import org.osate.ba.aadlba.BehaviorState ;
+import org.osate.ba.aadlba.BehaviorTransition ;
 
 
 /**
@@ -127,7 +128,7 @@ public interface HookAccess extends EObject
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	Boolean isUsedInFreshClause(BehaviorAnnex ba, Port p);
+	Boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName);
 
 	
 	NamedElement getElement(NamedElement ne);
@@ -138,5 +139,8 @@ public interface HookAccess extends EObject
 
 	public EList<String> getListOfPath(PropertyAssociation pa);
 	
+	public Integer minus (Long lhs, Long rhs);
+	
+	public EList<Port> allPortCount(BehaviorElement e);
 	
 } // HookAccess

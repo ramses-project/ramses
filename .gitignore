@@ -5,3 +5,10 @@ target
 *.atxl
 *~
 .ramses-log*
+*.lo
+*.elf
+*.elf.map
+qemu.pid
+*.bin
+*.map
+sizes.c

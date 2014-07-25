@@ -107,16 +107,101 @@ helper context AADLI!ConnectionInstanceEnd def : getFeatureImg() : AADLBA!Featur
 	thisModule.resolveMatchedSingleIfExists(self, 'f')
 ;
 
-helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
-		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnxInst.connectionReference->first()}, 'f')
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(mode: AADLI!Mode) : AADLBA!Feature =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self, mode}, 'f')
 ;
 
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance) : AADLBA!Feature =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnxInst.connectionReference->first().connection}, 'f')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : getFeatureImg(cnxInst: AADLI!ConnectionInstance, mode: AADLI!Mode) : AADLBA!Feature =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnxInst.connectionReference->any(e|e.connection.inModeOrTransition->includes(mode)).connection,mode}, 'f')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectOutputFeatureImg(): Sequence(AADLBA!Feature) = 
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			self.srcConnectionInstance->collect(cnxInst |
+				self.getFeatureImg(cnxInst, mi.mode)
+			)
+		)
+		->flatten()
+	else
+		self.srcConnectionInstance->collect(cnxInst |
+			self.getFeatureImg(cnxInst)
+		)
+	endif
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectInputFeatureImg(): Sequence(AADLBA!Feature) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			self.getFeatureImg(mi.mode)
+		)
+	else
+		Sequence{self.getFeatureImg()}
+	endif
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectEntrypointFeature() : Sequence(AADLBA!DataAccess) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi | self.retreiveEntrypointFeature(mi.mode))
+		->flatten()
+	else
+		Sequence{self.retreiveEntrypointFeature()}
+	endif
+	->excluding(OclUndefined)
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectEntrypointFeature(cnx: AADLI!PortConnection) : Sequence(AADLBA!DataAccess) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi | self.retreiveEntrypointFeature(cnx,mi.mode))
+		->flatten()
+	else
+		Sequence{self.retreiveEntrypointFeature(cnx)}
+	endif
+	->excluding(OclUndefined)
+;
+	
 helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature() : AADLBA!DataAccess =
-	thisModule.resolveMatchedSingleIfExists(self, 'f_entrypoint')
+		thisModule.resolveMatchedSingleIfExists(self, 'f_entrypoint')
 ;
 
 helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnx: AADLI!PortConnection) : AADLBA!Feature =
 		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnx}, 'f_entrypoint')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(mode: AADLI!Mode) : AADLBA!DataAccess =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,mode}, 'f_entrypoint')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : retreiveEntrypointFeature(cnx: AADLI!PortConnection,mode: AADLI!Mode) : AADLBA!Feature =
+		thisModule.resolveMatchedTupleIfExists(Sequence{self,cnx,mode}, 'f_entrypoint')
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectInputFeatureConnectionImg(callSequence: AADLI!SubprogramCallSequence): Sequence(AADLBA!Connection) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence,mi.mode}, 'f_connection')
+		)
+	else
+		Sequence{thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence}, 'f_connection')}
+	endif
+;
+
+helper context AADLI!ConnectionInstanceEnd def : collectOutputFeatureConnectionImg(callSequence: AADLI!SubprogramCallSequence): Sequence(AADLBA!Connection) =
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.srcConnectionInstance->collect( cnxInst |
+			self.getProcess().modeInstance->collect(mi |
+				thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence,cnxInst.connectionReference->first().connection,mi.mode}, 'f_connection')
+			)
+		)
+	else
+		self.srcConnectionInstance->collect( cnxInst |
+			thisModule.resolveMatchedTupleIfExists(Sequence{self,callSequence,cnxInst.connectionReference->first().connection}, 'f_connection')
+		)
+	endif
 ;
 
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
@@ -264,3 +349,26 @@ helper context AADLI!DataClassifier def : mapDataClassifier() : AADLBA!DataClass
 	endif
 ;
 
+
+helper context AADLI!NamedElement def : mapSpgPropertyAssociationList() : Sequence (AADLBA!PropertyAssociation) =
+	let result : Sequence (AADLBA!PropertyAssociation) = self.ownedPropertyAssociation->
+		select(e|not (e.property.name.toLower() = 'source_text'))
+		->collect (e|thisModule.PropertyAssociation (e,false))->select(e| not e.oclIsUndefined())
+	in
+	let sourceTextPA: AADLBA!PropertyAssociation = self.ownedPropertyAssociation-> any(e| e.property.name.toLower() = 'source_text')
+	in
+	if (not result.isEmpty()) then
+		result->
+		append( 
+			if sourceTextPA.oclIsUndefined() then
+				OclUndefined
+			else
+				thisModule.copySourceText(sourceTextPA)
+			endif
+		)
+		->flatten()->select(e| not e.oclIsUndefined())
+	else
+		result
+	endif
+;
+		

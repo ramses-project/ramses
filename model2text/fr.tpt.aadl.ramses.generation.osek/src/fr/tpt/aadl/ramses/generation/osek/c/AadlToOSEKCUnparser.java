@@ -334,7 +334,9 @@ public class AadlToOSEKCUnparser extends AadlToXUnparser implements AadlTargetUn
 		cpu.setName(ps.getName());
 		genOsConfig(ps);
 
-		cpu.setAppmode(MAIN_APP_MODE);
+		List<String> modeIdList = new ArrayList<String>();
+		modeIdList.add(MAIN_APP_MODE);
+		cpu.setAppmode(modeIdList);
 
 	}
 
@@ -569,7 +571,9 @@ public class AadlToOSEKCUnparser extends AadlToXUnparser implements AadlTargetUn
       } catch(Exception exc)
       {
       }
-      Alarm alarm = new Alarm(counter, task, cpu);
+      List<String> modeIdList = new ArrayList<String>();
+      modeIdList.add(MAIN_APP_MODE);
+      Alarm alarm = new Alarm(counter, task, cpu, modeIdList);
 
       alarm.setName("wakeUp" + thread.getName());
       alarm.setAction(Action.ACTIVATETASK);

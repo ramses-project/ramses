@@ -173,8 +173,53 @@ rule m_Process_Output_EventPort_Instance
 }
 
 helper context AADLI!FeatureInstance def: collectPortGlobalVariableImg() : Sequence(AADLBA!DataSubcomponent) =
-	Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalVariableValue'), thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')}
+	if(self.getProcess().modeInstance->exists(mi| self.connectedInMode(mi.mode))) then
+		self.getProcess().modeInstance->collect(mi |
+			Sequence{
+			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariableValue'), 
+			thisModule.resolveMatchedTupleIfExists(Sequence{self, mi.mode}, 'globalVariable')
+		})->flatten()
+	else
+		Sequence{thisModule.resolveMatchedSingleIfExists(self, 'globalVariableValue'), thisModule.resolveMatchedSingleIfExists(self, 'globalVariable')}
+	endif
 ;
+
+-- @extends m_Thread_IntraProcess_Input_DataPort_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
+rule m_Thread_IntraProcess_Input_DataPort_Instance_to_DataSubcomponent
+{
+  	from
+		fi: AADLI!FeatureInstance
+		(
+			fi.connectedToDataComponent()
+		)
+  	to
+		f: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		f_entrypoint: AADLBA!DataAccess
+		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
+		globalVariable:AADLBA!DataSubcomponent
+		(
+			dataSubcomponentType <- 'DataPortType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		localVariable:AADLBA!DataSubcomponent,
+		GvInit: AADLBA!ListValue
+	do
+	{
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+'&'+
+								globalVariable.name+'_rez, &'+
+								fi.connectedDataComponent().name+', '+ thisModule.getSizeOfType(fi.getLengthInitialValue())+
+								thisModule.structInitTerminator		
+							)
+						};
+	}
+}
 
 
 -- @extends m_Thread_IntraProcess_Input_Port_Instance,m_Thread_DataOrEventDataPort_Input_Instance,m_Not_PeriodicDelayed_Port
@@ -182,7 +227,8 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 {
   	from
 		fi: AADLI!FeatureInstance
-		(fi.isDataPort())
+		(fi.isDataPort()
+		)
   	to
   		f: AADLBA!DataAccess
 		(dataFeatureClassifier <- 'DataPortType'.asDataType('OSEK_RUNTIME')),
@@ -215,6 +261,17 @@ rule m_Thread_IntraProcess_Input_DataPort_Instance
 							)
 						};
 	}
+}
+
+-- @extends m_Thread_IntraProcess_Input_Port_Instance_Mode,m_Thread_IntraProcess_Input_DataPort_Instance
+rule m_Thread_IntraProcess_Input_DataPort_Instance_Mode
+{
+	from
+		fi: AADLI!FeatureInstance,
+		mode: AADLI!Mode
+	to
+		f: AADLBA!DataAccess,
+		f_entrypoint: AADLBA!DataAccess
 }
 
 -- @extends m_Not_PeriodicDelayed_Port,m_Thread_DataOrEventDataPort_Input_Instance,m_Thread_IntraProcess_Input_Port_Instance
@@ -295,11 +352,49 @@ rule m_Thread_IntraProcess_Input_EventPort_Instance
 		localVariable:AADLBA!DataSubcomponent,
 		globalVariable:AADLBA!DataSubcomponent
 		(
-			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME')
-		)
+			dataSubcomponentType <- 'PortQueueType'.asDataType('OSEK_RUNTIME'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation(
+												 	'Initial_Value',
+													'DATA_MODEL',
+													GvInit
+												)
+									    }
+		),
+		globalVariableValue: AADLBA!DataSubcomponent
+		(
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_value',
+			dataSubcomponentType <- buffer
+		),
+		buffer: AADLBA!DataType
+		(
+			name <- fi.getComponentInstance().name+'_'+fi.name+'_bufferType',
+			ownedPropertyAssociation <- Sequence
+			{
+				thisModule.CreatePropertyAssociation('Data_Representation', 'DATA_MODEL',
+					'Array'.asEnumeration('DATA_MODEL').asNamedValue()),
+				thisModule.CreatePropertyAssociation('Base_Type', 'DATA_MODEL',
+					thisModule.CreateListValueFromClassifier(
+										'Integer'.asDataType('BASE_TYPES')
+									)
+				),
+				thisModule.CreatePropertyAssociation('Dimension',
+													  'DATA_MODEL',
+													  thisModule.CreateListValueFromInteger(
+														fi.getQueueSize())
+												)
+			}
+		),
+		GvInit: AADLBA!ListValue
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(globalVariable, fi);
+		GvInit.ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(
+								thisModule.structInitInitiator+
+								fi.getQueueSize().toString()+', 0, 0, 0, '+ thisModule.getSizeOfType(fi.getLengthInitialValue())
+								+', '+globalVariableValue.name+', 0'+
+								thisModule.structInitTerminator		
+							)
+						};
 	}
 }
 
@@ -530,7 +625,39 @@ unique lazy rule CreateInfiniteTimeOutSubcomponentFromCpt
 	}
 }
 
-
+lazy rule createPortCountValueUpdate
+{
+	from
+		fi: AADLI!FeatureInstance
+	using
+	{
+		spg: AADLI!SubprogramType = 'GetCount'.asSubprogramType('OSEK_RUNTIME');
+		GLOBAL_Q: AADLBA!DataAccess = fi.getFeatureImg();
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
+	}
+	to
+		callGetCount: AADLBA!SubprogramCallAction
+		(
+			subprogram <- getCountHolder,
+			parameterLabels <- Sequence{GLOBAL_Q_HOLDER,thisModule.createPortIdValueExpression(fi),COUNT_HOLDER,RETURN_CODE_HOLDER}
+		),
+		getCountHolder: AADLBA!SubprogramHolder
+		(
+			element <- spg
+		),
+		GLOBAL_Q_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-GLOBAL_Q
+		),
+		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		),
+		COUNT_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.createPortCountSubcomponent(fi)
+		)
+}
 
 -------------------------------------------------------------------------------------------
 ----	OVERRIDEN HELPERS

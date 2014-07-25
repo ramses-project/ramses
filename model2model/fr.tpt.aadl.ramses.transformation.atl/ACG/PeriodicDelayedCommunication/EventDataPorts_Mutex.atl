@@ -399,7 +399,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 --		PortVariable    : requires data access t_aadl_thread_data_queue.impl; 
 		portVariableHolder: AADLBA!DataAccessHolder
 		(
-			element <- thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'f_entrypoint')
+			element <- fi.retreiveEntrypointFeature(cnxRef)
 		),
 --  	DataValue       : requires data access t_request;
 		dataValueHolder: AADLBA!DataSubcomponentHolder
@@ -485,7 +485,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	),
   	portVariableHolder: AADLBA!DataAccessHolder
 	(
-		element <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')	
+		element <- fi.retreiveEntrypointFeature()	
 	)
 }
 
@@ -685,7 +685,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 		),
 		portVariableHolder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
+			element <- fi.retreiveEntrypointFeature()
 		),
 		dataValueHolder: AADLBA!DataSubcomponentHolder
 		(

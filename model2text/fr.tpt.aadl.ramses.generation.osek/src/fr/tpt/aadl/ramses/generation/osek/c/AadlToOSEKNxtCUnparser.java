@@ -19,6 +19,7 @@ import org.osate.aadl2.Connection ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DeviceSubcomponent ;
+import org.osate.aadl2.Mode ;
 import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
@@ -70,7 +71,7 @@ public class AadlToOSEKNxtCUnparser extends AadlToXUnparser implements AadlTarge
 	
 	private static String DATA_PORT_TYPE = "DataPortType";
 	private static String EVENTDATA_PORT_TYPE = "ThreadQueueType";
-	private final static String MAIN_APP_MODE = "std";
+	private final static String MAIN_APP_MODE = "default_mode";
 
 	/**
 	 * Variable OIL
@@ -147,6 +148,7 @@ public class AadlToOSEKNxtCUnparser extends AadlToXUnparser implements AadlTarge
 		Cpu cpu = oil.getCpu();
 		Os os = cpu.getOs();
 		_mainHCode.addOutputNewline("#include \"kernel.h\"");
+    _mainHCode.addOutputNewline("#include \"kernel_id.h\"");
 
 		/* Generate code for threads process */
 		ProcessImplementation pi = (ProcessImplementation) ps.getComponentImplementation();
@@ -196,11 +198,28 @@ public class AadlToOSEKNxtCUnparser extends AadlToXUnparser implements AadlTarge
         }
       }
 		}
-		cpu.setAppmode(MAIN_APP_MODE);
+		
+		List<String> modeIdList = getProcessModesIdentifiers(ps);
+		cpu.setAppmode(modeIdList);
+		
 		cpu.setName(ps.getName());
 		genOsConfig(ps);
 	}
 
+	
+	List<String> getProcessModesIdentifiers(ProcessSubcomponent ps)
+	{
+	  List<String> result = new ArrayList<String>();
+	  ProcessImplementation pi = (ProcessImplementation) ps.getSubcomponentType();
+	  List<Mode> modeList = pi.getOwnedModes();
+	  if(modeList.isEmpty())
+	    result.add(MAIN_APP_MODE);
+	  for(Mode m: modeList)
+	  {
+	    result.add(m.getName());
+	  }
+	  return result;
+	}
 	/**
 	 * Configuration de l'OS
 	 * 
@@ -398,7 +417,30 @@ public class AadlToOSEKNxtCUnparser extends AadlToXUnparser implements AadlTarge
 				} catch(Exception exc)
 				{
 				}
-				Alarm alarm = new Alarm(counter, task, cpu);
+				
+				List<String> inModeIdList = new ArrayList<String>();
+				ProcessImplementation pi = (ProcessImplementation) ps.getSubcomponentType();
+				if(pi.getOwnedModes().isEmpty())
+				  inModeIdList.add(MAIN_APP_MODE);
+				else
+				{
+				  if(thread.getAllInModes().isEmpty())
+				  {
+				    for(Mode m:pi.getOwnedModes())
+	          {
+	            inModeIdList.add(m.getName());
+	          }
+				  }
+				  else
+				  {
+				    for(Mode m:thread.getAllInModes())
+				    {
+				      inModeIdList.add(m.getName());
+				    }
+				  }
+				}
+				
+				Alarm alarm = new Alarm(counter, task, cpu, inModeIdList);
 
 				alarm.setName("wakeUp" + thread.getName());
 				alarm.setAction(Action.ACTIVATETASK);
