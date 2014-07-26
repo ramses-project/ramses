@@ -10,13 +10,13 @@
 <booleanAttribute key="clearConfig" value="false"/>
 <booleanAttribute key="clearws" value="false"/>
 <booleanAttribute key="clearwslog" value="false"/>
-<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/test_blackboard_osgi"/>
+<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/test_OSEK_eventports_osgi"/>
 <booleanAttribute key="default" value="false"/>
 <booleanAttribute key="includeOptional" value="true"/>
 <stringAttribute key="location" value=""/>
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-consoleLog -i ${project_loc:fr.tpt.aadl.ramses.junit.tests}/tests/arinc653/ -m common-components/common-pkg.aadl2,arinc653-blackboard/input/test_blackboard.aadl2  -g pok -s root.impl -o ${project_loc:fr.tpt.aadl.ramses.junit.tests}/tests/arinc653/arinc653-blackboard/output -r /usr/share/pok -l trace -p DEBUG=true"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-consoleLog -i ${project_loc:fr.tpt.aadl.ramses.control.cli.static} -m test/osek-eventport/test_osek_eventports.aadl2  -g osek -s root.impl -o ${project_loc:fr.tpt.aadl.ramses.control.cli.static}/test/osek-eventport/results/ -r /home/borde/Install/lego/nxtOSEK -l trace"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms40m -Xmx512m"/>
 <stringAttribute key="pde.version" value="3.3"/>
