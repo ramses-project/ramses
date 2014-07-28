@@ -83,42 +83,45 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
       {
         unparserContent.addOutputNewline("export " + POK_RUNTIME_VAR_ENV + "=" +
                                          _runtimePath.toString());
-        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("all:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
               .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " all\n") ;
+                aProcessorSubcomponent.getName() + " all") ;
         }
-
+        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("clean:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
               .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " clean\n") ;
+                aProcessorSubcomponent.getName() + " clean") ;
         }
-
+        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("run:") ;
 
         for(ProcessorSubcomponent aProcessorSubcomponent : object
               .getOwnedProcessorSubcomponents())
         {
           unparserContent.addOutputNewline("\t$(MAKE) -C " +
-                aProcessorSubcomponent.getName() + " run\n") ;
+                aProcessorSubcomponent.getName() + " run") ;
         }
-
+        
+        unparserContent.addOutputNewline("") ;
         unparserContent.addOutputNewline("test:") ;
         for(ProcessorSubcomponent aProcessorSubcomponent : object
                 .getOwnedProcessorSubcomponents())
           {
-            unparserContent.addOutput("\t$(MAKE) -C " + 
+            unparserContent.addOutputNewline("\t$(MAKE) -C " + 
             		aProcessorSubcomponent.getName() + " run " +
             		"QEMU_MISC=\"-nographic -serial /dev/stdout > " +
-            		aProcessorSubcomponent.getName()+".trace\"\n") ;
+            		aProcessorSubcomponent.getName()+".trace\"") ;
           }
         
         return DONE ;

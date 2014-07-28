@@ -12,7 +12,15 @@
               inputModelIdentifier="//@element/@outputModelIdentifier"/>
     <list>
       <file
+          path="ACG/targets/shared/ACGServices"/>
+      <file
           path="ACG/targets/shared/UninstanciateOverride"/>
+      <file
+          path="ACG/targets/shared/DataUninstanciateOverride"/>
+      <file
+          path="ACG/targets/shared/SubprogramsUninstanciateOverride"/>
+      <file
+          path="ACG/targets/shared/ThreadsUninstanciateOverride"/>
       <file
           path="ACG/targets/shared/SubprogramCallsCommonRefinementSteps"/>
       <file
@@ -21,6 +29,8 @@
           path="ACG/targets/shared/DispatchCommonRefinementSteps"/>
       <file
           path="ACG/targets/shared/BehaviorAnnexCommonRefinementSteps"/>
+      <file
+          path="ACG/targets/arinc653/Arinc653ACGServices"/>
       <file
           path="ACG/targets/arinc653/ExpandThreadsDispatchProtocol"/>
       <file

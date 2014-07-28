@@ -82,41 +82,41 @@ public class AadlTargetSpecificCodeGenerator
                        File[] includeDirs, 
                        IProgressMonitor monitor) throws GenerationException
   {
-	List<SystemImplementation> systemImplementationList=new ArrayList<SystemImplementation>();
-	
-	if ((inputResource == null ) || (inputResource.getContents() == null) || (inputResource.getContents().size() <= 0))
-	{
-	  String errMsg = "Cannot find AADL model sources" ;
-    _LOGGER.fatal(errMsg) ;
-	  throw new GenerationException(errMsg);
-	}
-	
-	EObject root = inputResource.getContents().get(0);
-	if(root instanceof SystemInstance)
-	{
-	  SystemInstance systemInstance = (SystemInstance) root;
-	  systemImplementationList.addAll(this.getListOfSystemImplementation(systemInstance));	    
-	}
-	else if(root instanceof AadlPackage)
-	{
-	  AadlPackage aadlPackage = (AadlPackage) root;
-	  PublicPackageSection pps = aadlPackage.getOwnedPublicSection();
-	  for(Classifier c : pps.getOwnedClassifiers())
-	  if(c instanceof SystemImplementation)
-		systemImplementationList.add((SystemImplementation)c);
-	}
-	else
-	{
-	  String errMsg = "Try to generate from a resources that is into an AADL model" ;
-    _LOGGER.fatal(errMsg) ;
-    throw new GenerationException(errMsg);
-	}
-	File generatedCodeDirectory =
-          new File(outputDir + GENERATED_DIR_NAME) ;
+    List<SystemImplementation> systemImplementationList=new ArrayList<SystemImplementation>();
+
+    if ((inputResource == null ) || (inputResource.getContents() == null) || (inputResource.getContents().size() <= 0))
+    {
+      String errMsg = "Cannot find AADL model sources" ;
+      _LOGGER.fatal(errMsg) ;
+      throw new GenerationException(errMsg);
+    }
+
+    EObject root = inputResource.getContents().get(0);
+    if(root instanceof SystemInstance)
+    {
+      SystemInstance systemInstance = (SystemInstance) root;
+      systemImplementationList.addAll(this.getListOfSystemImplementation(systemInstance));	    
+    }
+    else if(root instanceof AadlPackage)
+    {
+      AadlPackage aadlPackage = (AadlPackage) root;
+      PublicPackageSection pps = aadlPackage.getOwnedPublicSection();
+      for(Classifier c : pps.getOwnedClassifiers())
+        if(c instanceof SystemImplementation)
+          systemImplementationList.add((SystemImplementation)c);
+    }
+    else
+    {
+      String errMsg = "Try to generate from a resources that is into an AADL model" ;
+      _LOGGER.fatal(errMsg) ;
+      throw new GenerationException(errMsg);
+    }
+    File generatedCodeDirectory =
+        new File(outputDir + GENERATED_DIR_NAME) ;
     generatedCodeDirectory.mkdir() ;
 
     monitor.subTask("Code generation ..."); 
-    
+
     for(SystemImplementation sys: systemImplementationList)
     {
       SystemImplementation si = (SystemImplementation) sys ;
@@ -133,7 +133,7 @@ public class AadlTargetSpecificCodeGenerator
       {
         // create directory with the processor subcomponent name
         File processorFileDir =
-              new File(generatedFileDir + File.separator + ps.getName()) ;
+            new File(generatedFileDir + File.separator + ps.getName()) ;
         processorFileDir.mkdir() ;
 
         File kernelFileDir = new File(processorFileDir + KERNEL_DIR_NAME) ;
@@ -142,12 +142,12 @@ public class AadlTargetSpecificCodeGenerator
           _targetUnparser.process(ps, tarProp, runtimePath,
                                   kernelFileDir, monitor);
         List<ProcessSubcomponent> ownedProcess = 
-              GeneratorUtils.getBindedProcesses(ps) ;
+            GeneratorUtils.getBindedProcesses(ps) ;
 
         for(ProcessSubcomponent process : ownedProcess)
         {
           String generationTargetDirectory = processorFileDir +
-                File.separator + process.getName() ;
+              File.separator + process.getName() ;
           File processDirectory = new File(generationTargetDirectory) ;
           processDirectory.mkdir() ;
 
@@ -159,20 +159,20 @@ public class AadlTargetSpecificCodeGenerator
             _targetBuilderGen.process(process, runtimePath,
                                       processDirectory, includeDirs, monitor) ;
         }
-        
+
         if(_targetBuilderGen != null)
           _targetBuilderGen.process(ps, runtimePath,
                                     processorFileDir, includeDirs, monitor);
-        
-        // This line is at the end because it will launch the build of the generated code;
-        // Thus it is better is the code has been generated...
-        if(_targetBuilderGen!= null)
-          _targetBuilderGen.process(si, runtimePath,
-                                    generatedFileDir, includeDirs, monitor) ;
 
       }
+      // This line is at the end because it will launch the build of the generated code;
+      // Thus it is better is the code has been generated...
+      if(_targetBuilderGen!= null)
+        _targetBuilderGen.process(si, runtimePath,
+                                  generatedFileDir, includeDirs, monitor) ;
+
     }
- }
+  }
 
   private List<SystemImplementation> getListOfSystemImplementation(SystemInstance systemInstance)
   {
