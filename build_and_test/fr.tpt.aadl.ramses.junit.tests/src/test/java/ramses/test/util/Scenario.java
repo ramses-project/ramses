@@ -35,7 +35,7 @@ public abstract class Scenario
   protected Map<String, Object> parameters = new HashMap<String, Object>();
   
   private Process ramsesProcess;
-  protected long codeGenerationTimeout = 5 ;
+  protected long codeGenerationTimeout = 10 ;
   
   protected abstract Process executeGeneratedCode() throws Exception;
   

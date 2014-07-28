@@ -40,7 +40,7 @@ public class LogProcessTraceDisplay extends AbstractProcessTraceDisplay
   {
     BufferedReader in = new BufferedReader(new InputStreamReader(is));
     String line = null;
-    while ((line = in.readLine()) != null)
+    while ((line = in.readLine()) != null && !line.isEmpty())
     {
       if(isError)
       {
