@@ -3,12 +3,12 @@
 #include "arinc653/types.h"
 #include "arinc653/event.h"
 #include "arinc653/buffer.h"
-typedef BUFFER_ID_TYPE BUFFER_ID_TYPE;
-typedef EVENT_ID_TYPE EVENT_ID_TYPE;
-typedef RETURN_CODE_TYPE RETURN_CODE_TYPE;
+typedef BUFFER_ID_TYPE arinc653_runtime__Buffer_Id_Type;
+typedef EVENT_ID_TYPE arinc653_runtime__Event_Id_Type;
+typedef RETURN_CODE_TYPE arinc653_runtime__Return_Code_Type;
 typedef  int common_pkg__Integer;
-typedef MESSAGE_SIZE_TYPE MESSAGE_SIZE_TYPE;
-typedef SYSTEM_TIME_TYPE SYSTEM_TIME_TYPE;
+typedef MESSAGE_SIZE_TYPE arinc653_runtime__Message_Size_Type;
+typedef SYSTEM_TIME_TYPE arinc653_runtime__System_Time_Type;
 typedef enum e_test_sporadic_refined_model__the_proc_the_sender_behaviorIdentifier_enum {
 	test_sporadic_refined_model__the_proc_the_sender_behaviorIdentifier_enum_default_behavior
 } test_sporadic_refined_model__the_proc_the_sender_behaviorIdentifier_enum;

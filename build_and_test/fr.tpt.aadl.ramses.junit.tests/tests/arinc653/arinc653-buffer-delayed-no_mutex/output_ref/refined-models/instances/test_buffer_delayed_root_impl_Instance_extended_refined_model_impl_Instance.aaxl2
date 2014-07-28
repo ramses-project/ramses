@@ -27,7 +27,7 @@
         </ownedValue>
       </ownedValue>
     </ownedPropertyAssociation>
-    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.7/@ownedMemorySubcomponent.0"/>
+    <subcomponent xsi:type="aadl2:MemorySubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedMemorySubcomponent.0"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_proc" category="process">
@@ -166,7 +166,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <containmentPathElement>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.18/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.17/@ownedSubprogramCallSequence.0"/>
             </containmentPathElement>
           </ownedValue>
         </ownedValue>
@@ -214,7 +214,7 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <feature xsi:type="aadl2:DataAccess" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.19/@ownedDataAccess.0"/>
+        <feature xsi:type="aadl2:DataAccess" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.18/@ownedDataAccess.0"/>
       </featureInstance>
       <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedThreadSubcomponent.0"/>
       <index>0</index>
@@ -300,7 +300,7 @@
         <ownedValue>
           <ownedValue xsi:type="aadl2:ReferenceValue">
             <containmentPathElement>
-              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.23/@ownedSubprogramCallSequence.0"/>
+              <namedElement xsi:type="aadl2:SubprogramCallSequence" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.22/@ownedSubprogramCallSequence.0"/>
             </containmentPathElement>
           </ownedValue>
         </ownedValue>
@@ -348,7 +348,7 @@
             </ownedValue>
           </ownedValue>
         </ownedPropertyAssociation>
-        <feature xsi:type="aadl2:DataAccess" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.24/@ownedDataAccess.0"/>
+        <feature xsi:type="aadl2:DataAccess" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.23/@ownedDataAccess.0"/>
       </featureInstance>
       <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedThreadSubcomponent.1"/>
       <index>0</index>
@@ -363,7 +363,7 @@
         <connection xsi:type="aadl2:AccessConnection" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.0/@ownedAccessConnection.1"/>
       </connectionReference>
     </connectionInstance>
-    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.7/@ownedProcessSubcomponent.0"/>
+    <subcomponent xsi:type="aadl2:ProcessSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedProcessSubcomponent.0"/>
     <index>0</index>
   </componentInstance>
   <componentInstance name="the_cpu" category="processor">
@@ -689,9 +689,9 @@
       <subcomponent xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedVirtualProcessorSubcomponent.0"/>
       <index>0</index>
     </componentInstance>
-    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.7/@ownedProcessorSubcomponent.0"/>
+    <subcomponent xsi:type="aadl2:ProcessorSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4/@ownedProcessorSubcomponent.0"/>
     <index>0</index>
   </componentInstance>
   <systemOperationMode name="No Modes"/>
-  <systemImplementation href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.7"/>
+  <systemImplementation href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.4"/>
 </instance:SystemInstance>

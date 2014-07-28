@@ -59,16 +59,17 @@ void __aadl_send_output (unsigned int port_variable, void * value)
   RETURN_CODE_TYPE ret;
   SYSTEM_TIME_TYPE time_out;
   MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
   switch (port_variable) {
-    if(value==NULL)
-    {
-      char i=0;
-      value = &i;
-    }
     case 0:
       time_out = 0;
       length = sizeof( common_pkg__Integer );
       SEND_BUFFER(the_receiver_p_in_globalVariable, value, length, time_out, &ret);
+      SET_EVENT(the_proc_the_receiver_barrier, &ret);
       break;
   }
 }

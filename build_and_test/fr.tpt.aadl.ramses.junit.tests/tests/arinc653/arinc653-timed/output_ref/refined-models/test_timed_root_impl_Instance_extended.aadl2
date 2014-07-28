@@ -1,6 +1,6 @@
 package test_sporadic_refined_model
 public
-with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime,Base_Types;
+with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
   process implementation proc.impl
     subcomponents
       the_receiver_p_in_globalVariable: data arinc653_runtime::Buffer_Id_Type;
@@ -151,27 +151,13 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   process proc
   end proc;
   
-  subprogram Send_Output
-    features
-      OutputPorts: in parameter AADL_Runtime::t_aadl_port_id;
-      context: requires data access Send_Output_context;
-  end Send_Output;
-  
-  data Send_Output_context
-    properties
-      Data_Model::Data_Representation => Struct;
-      Data_Model::Element_Names => ("SendException");
-      Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
-      Source_Name => "__send_output_context";
-  end Send_Output_context;
-  
   subprogram event_sender_spg
     features
       context: requires data access event_sender_spg_context;
     properties
       Source_Name => "send_event";
       Source_Language => (C);
-      Source_Text => ("event_code.h", "event_code.c");
+      Source_Text => ("/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.h", "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.c");
   end event_sender_spg;
   
   data event_sender_spg_context
@@ -232,7 +218,7 @@ arinc653_runtime::Set_Event ! (cnx_p_out_entrypoint_barrier, the_proc_the_sender
         } 
       ;
     connections
-      p_out_accessCnx_call: data access cnx_p_out -> call_entrypoint.cnx_p_out;
+      p_out_accessCnx_call_cnx: data access cnx_p_out -> call_entrypoint.cnx_p_out;
       cnx_p_in_to_entrypoint_barrier: data access cnx_p_out_barrier -> call_entrypoint.cnx_p_out_entrypoint_barrier;
   end the_proc_the_sender.impl;
   

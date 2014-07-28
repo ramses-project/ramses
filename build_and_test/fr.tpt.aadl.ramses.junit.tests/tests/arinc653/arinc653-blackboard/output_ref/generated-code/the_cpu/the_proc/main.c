@@ -41,3 +41,20 @@ int main ()
 }
 
 /******************************************************************************/
+/*                                SEND OUTPUT                                 */
+
+void __aadl_send_output (unsigned int port_variable, void * value)
+{
+  RETURN_CODE_TYPE ret;
+  SYSTEM_TIME_TYPE time_out;
+  MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
+  switch (port_variable) {
+    case 0:
+      break;
+  }
+}
