@@ -133,7 +133,7 @@ end SEQ;
   
   memory implementation node1_main_memory.impl
   	properties
-  	  Memory_Size => 20 kbyte;
+  	  Memory_Size => 90 kbyte;
   end node1_main_memory.impl;
   
   virtual processor VP_S1
