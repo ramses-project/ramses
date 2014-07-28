@@ -109,7 +109,7 @@ public class WaitMonitor extends Thread
 
       // operation has finished before timeout.
       if(beforeWaiting + period > currentTime
-          && _action.getStatus()==Command.UNSET)
+          || _action.getStatus()==Command.UNSET)
       {
         hasToContinue = false ;
       }
