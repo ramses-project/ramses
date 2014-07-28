@@ -108,7 +108,8 @@ public class WaitMonitor extends Thread
       currentTime = System.currentTimeMillis() ;
 
       // operation has finished before timeout.
-      if(beforeWaiting + period > currentTime)
+      if(beforeWaiting + period > currentTime
+          && _action.getStatus()==Command.UNSET)
       {
         hasToContinue = false ;
       }

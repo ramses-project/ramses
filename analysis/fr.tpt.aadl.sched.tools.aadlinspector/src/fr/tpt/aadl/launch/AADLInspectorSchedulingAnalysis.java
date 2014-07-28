@@ -229,6 +229,13 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
       {
         return null ;
       }
+
+      @Override
+      public int getStatus()
+      {
+        // TODO Auto-generated method stub
+        return 0 ;
+      }
 		} ;
 		
 		int exitStatus ;

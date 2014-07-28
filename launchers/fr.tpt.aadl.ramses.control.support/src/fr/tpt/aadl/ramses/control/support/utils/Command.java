@@ -23,6 +23,9 @@ package fr.tpt.aadl.ramses.control.support.utils;
 
 public interface Command
 {
+  
+  public int getStatus();
+  
   /**
    * Unknown exit status.
    */

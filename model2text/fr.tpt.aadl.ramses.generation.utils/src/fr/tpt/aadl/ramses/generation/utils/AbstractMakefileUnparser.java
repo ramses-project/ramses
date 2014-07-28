@@ -688,12 +688,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         
         Command cmd = new Command()
         {
+          int status=Command.UNSET;
+          
           @Override
           public int run() throws Exception
           {
             int tmp = makeCleanProcess.waitFor() ;
             
-            return (tmp == 0) ? Command.OK : Command.ERROR ;
+            if(tmp == 0) status=Command.OK;
+            else status=Command.ERROR ;
+            return status;
           }
 
           @Override
@@ -706,6 +710,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           public String getLabel()
           {
             return "make clean" ;
+          }
+
+          @Override
+          public int getStatus()
+          {
+            return status;
           }
         } ;
 
@@ -725,6 +735,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         
         cmd = new Command()
         {
+          int status=Command.UNSET;
+          
           @Override
           public int run() throws Exception
           {
@@ -743,6 +755,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           public String getLabel()
           {
             return "make all" ;
+          }
+          
+          @Override
+          public int getStatus()
+          {
+            return status;
           }
         } ;
         
