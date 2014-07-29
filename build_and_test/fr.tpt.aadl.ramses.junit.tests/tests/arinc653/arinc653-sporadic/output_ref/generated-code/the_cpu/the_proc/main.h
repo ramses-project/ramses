@@ -5,6 +5,11 @@
 #define POK_NEEDS_CONSOLE 1
 #define POK_NEEDS_LIBC_STDIO 1
 #define POK_CONFIG_NB_THREADS 4
+#define POK_CONFIG_NB_EVENTS 1
+#define POK_CONFIG_ARINC653_NB_EVENTS 1
+#define POK_NEEDS_ARINC653_EVENT 1
+#define POK_NEEDS_EVENTS 1
+#define POK_NEEDS_ARINC653_EVENTS 1
 #define POK_CONFIG_NB_BUFFERS 1
 #define POK_NEEDS_BUFFERS 1
 #define POK_NEEDS_ARINC653_BUFFER 1
@@ -21,3 +26,4 @@
 #include "gtypes.h"
 
 #endif
+void __aadl_send_output (unsigned int port_variable, void * value);
