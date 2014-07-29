@@ -742,7 +742,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             int tmp = makeProcess.waitFor() ;
             
-            return (tmp == 0) ? Command.OK : Command.ERROR ;
+            if(tmp == 0) status=Command.OK;
+            else status=Command.ERROR ;
+            return status;
           }
 
           @Override
