@@ -125,6 +125,7 @@ public class WaitMonitor extends Thread
         }
         else 
         {
+          _LOGGER.trace("No result yet, compilation status = "+_action.getStatus());
           // Operation is not complete and has not been canceled.
           continue ;
         }

@@ -609,7 +609,7 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
       {
         String errMsg = "while compiling generated code: " ;
         _LOGGER.error(errMsg);
-        //ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
 
         InputStream is ;
         is = process.getInputStream() ;
@@ -626,10 +626,10 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         while((line = in.readLine()) != null)
         {
           _LOGGER.error(line);
-//          if(line.contains("error")
-//        		  || line.contains("Error")
-//        		  || line.contains("ERROR"))
-//        	  ServiceProvider.SYS_ERR_REP.error(line, true);
+          if(line.contains("error")
+        		  || line.contains("Error")
+        		  || line.contains("ERROR"))
+        	  ServiceProvider.SYS_ERR_REP.error(line, true);
         }
         
         break ;
@@ -729,6 +729,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           throw new OperationCanceledException(msg) ;
         }
         
+        _LOGGER.trace("Start compilation");
+        
         final Process makeProcess =
             runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
                          " all") ;
@@ -765,7 +767,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
             return status;
           }
         } ;
-        
+
+        _LOGGER.trace("Compilation command created");
+
         // Blocking.
         waitProcess(cmd, makeProcess) ;
       }
