@@ -1118,11 +1118,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 	{
 		portsInvoledInCall: Sequence(AADLI!FeatureInstance) = Sequence{};
 		c: AADLI!ComponentInstance = fi.getComponentInstance();
-		intermediateCallActionSequence: Sequence(AADLBA!BehaviorAction) = c.featureInstance->select(fi| 
-					fi.isInputFeature() and
-					(fi.isEventPort() or fi.isEventDataPort())
-			)
-			->collect(fi|thisModule.createReceiveInputCall(fi));
+		intermediateCallActionSequence: Sequence(AADLBA!BehaviorAction) = Sequence{};			
 	}
 	do
 	{
