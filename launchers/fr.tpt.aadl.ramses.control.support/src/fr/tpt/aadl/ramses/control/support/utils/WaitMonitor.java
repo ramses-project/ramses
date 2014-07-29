@@ -21,6 +21,11 @@
 
 package fr.tpt.aadl.ramses.control.support.utils;
 
+import java.io.BufferedReader ;
+import java.io.IOException ;
+import java.io.InputStream ;
+import java.io.InputStreamReader ;
+
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 
@@ -89,8 +94,9 @@ public class WaitMonitor extends Thread
    * @param period time in milliseconds that cancellation is check 
    * @return command exit code
    * @throws InterruptedException on any thread interruption
+   * @throws IOException 
    */
-  public int waitAndCheck(int period) throws InterruptedException
+  public int waitAndCheck(int period) throws InterruptedException, IOException
   {
     long currentTime ;
     long beforeWaiting ;
@@ -125,7 +131,15 @@ public class WaitMonitor extends Thread
         }
         else 
         {
-          _LOGGER.trace("No result yet, compilation status = "+_action.getStatus());
+          InputStream is ;
+          is = _action.getProcess().getInputStream() ;
+          BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
+
+          String line = null ;
+          while((line = in.readLine()) != null)
+          {
+            _LOGGER.trace(line);
+          }
           // Operation is not complete and has not been canceled.
           continue ;
         }

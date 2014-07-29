@@ -717,6 +717,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             return status;
           }
+
+          @Override
+          public Process getProcess()
+          {
+            return makeCleanProcess ;
+          }
         } ;
 
         // Blocking.
@@ -765,6 +771,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           public int getStatus()
           {
             return status;
+          }
+
+          @Override
+          public Process getProcess()
+          {
+            return makeProcess ;
           }
         } ;
 
