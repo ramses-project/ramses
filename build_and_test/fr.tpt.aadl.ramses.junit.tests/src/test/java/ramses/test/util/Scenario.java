@@ -103,8 +103,8 @@ public abstract class Scenario
       } ;
 
       FutureTask<Boolean> ft = new FutureTask<Boolean>(app) ;
-      try
-      {
+//      try
+//      {
         StringBuilder args = new StringBuilder() ;
 
         this.setupCommandLineArgsPrefix(args);
@@ -159,26 +159,26 @@ public abstract class Scenario
         new Thread(ft).start() ;
         ft.get(codeGenerationTimeout, TimeUnit.MINUTES) ;
         displayProcessMessages(ramsesProcess, 1) ;
-      }
-      catch(TimeoutException ee)
-      {
-        displayProcessMessages(ramsesProcess, 1, "exited on timeout") ;
-        if(ramsesProcess != null)
-        {
-          ramsesProcess.destroy() ;
-        }
-        fail() ;
-      }
-      catch(Exception e)
-      {
-        e.printStackTrace() ;
-        if(ramsesProcess != null)
-        {
-          ramsesProcess.destroy() ;
-        }
-        fail() ;
-        System.exit(-1) ;
-      }
+//      }
+//      catch(TimeoutException ee)
+//      {
+//        displayProcessMessages(ramsesProcess, 1, "exited on timeout") ;
+//        if(ramsesProcess != null)
+//        {
+//          ramsesProcess.destroy() ;
+//        }
+//        fail() ;
+//      }
+//      catch(Exception e)
+//      {
+//        e.printStackTrace() ;
+//        if(ramsesProcess != null)
+//        {
+//          ramsesProcess.destroy() ;
+//        }
+//        fail() ;
+//        System.exit(-1) ;
+//      }
       
       System.out.println("") ;
       System.out.println("***************************************************") ;
