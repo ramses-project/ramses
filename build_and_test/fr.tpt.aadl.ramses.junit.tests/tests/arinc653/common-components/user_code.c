@@ -1,4 +1,4 @@
-/**
+  /**
  * AADL-RAMSES
  * 
  * Copyright ¬© 2012 TELECOM ParisTech and CNRS
@@ -23,10 +23,14 @@
 #include <types.h>
 #include <libc/stdio.h>
 
+int counter;
 void receive(uint8_t d)
 {
-  if(d<10 && d>1)
+  if(d<10 && d>1 && counter<10)
+  {
     printf("received value: %d\n", d);
+    counter++;
+  }
 }
 
 uint8_t value=0;
