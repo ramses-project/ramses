@@ -23,7 +23,7 @@
 #include <types.h>
 #include <libc/stdio.h>
 
-int counter;
+int counter=0;
 void receive(uint8_t d)
 {
   if(d<10 && d>1 && counter<10)
