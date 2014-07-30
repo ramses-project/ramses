@@ -31,7 +31,7 @@ int main ()
   tattr.ENTRY_POINT = test_network_rtl8029_remote_communications_refined_model__the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_impl_Job;
   tattr.PERIOD = 1000;
   tattr.DEADLINE = 1000;
-  tattr.BASE_PRIORITY = 10;
+  tattr.BASE_PRIORITY = 8;
   strcpy(tattr.NAME, "the_cpu1_system_part_comm");
   CREATE_PROCESS (&(tattr), &(arinc_threads[2]), &(ret));
   START (arinc_threads[2], &(ret));
@@ -40,3 +40,18 @@ int main ()
 }
 
 /******************************************************************************/
+/*                                SEND OUTPUT                                 */
+
+void __aadl_send_output (unsigned int port_variable, void * value)
+{
+  RETURN_CODE_TYPE ret;
+  SYSTEM_TIME_TYPE time_out;
+  MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
+  switch (port_variable) {
+  }
+}
