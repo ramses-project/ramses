@@ -256,10 +256,16 @@ rule m_ThreadEntrypoint {
 		entryPointImg: AADLBA!SubprogramType
 		(
 			name <- c.uniqueName()+'_entrypoint',
-			ownedDataAccess <- 	
-								c.featureInstance->select(e| e.isInputFeature())
+			ownedDataAccess <- 	c.featureInstance->select(e| e.feature.oclIsTypeOf(AADLI!DataAccess))
+								->collect(
+									e|thisModule.resolveMatchedSingleIfExists(e, 'f_entrypoint')
+								)
+								->union
+								(
+									c.featureInstance->select(e| e.isInputFeature())
 									->collect(e|e.collectEntrypointFeature())
 									->flatten()
+								)
 									->union(
 										c.featureInstance->select(e| e.isOutputFeature())
 											->collect

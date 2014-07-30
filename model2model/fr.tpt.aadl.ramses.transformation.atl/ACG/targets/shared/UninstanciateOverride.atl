@@ -44,15 +44,23 @@ helper context AADLI!ComponentType def: needsCopy(): Boolean =
 		  not self.ownedEventDataPort->isEmpty())
 		)
 ;
-
+	
 helper context AADLI!ComponentType def : isInstanciated() : Boolean =
-	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
-		->exists(e| e.subcomponent.subcomponentType=self or if e.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation) then e.subcomponent.subcomponentType.type=self else false endif)
+	if self.oclIsKindOf(AADLI!SubprogramClassifier) then
+		false
+	else
+		AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
+			->exists(e| e.subcomponent.subcomponentType=self or if e.subcomponent.subcomponentType.oclIsKindOf(AADLI!ComponentImplementation) then e.subcomponent.subcomponentType.type=self else false endif)
+	endif
 ;
 
 helper context AADLI!ComponentImplementation def: isInstanciated() : Boolean =
-	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
-		->exists(e| e.subcomponent.subcomponentType=self)
+	if self.oclIsKindOf(AADLI!SubprogramClassifier) then
+		false
+	else
+		AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|not e.subcomponent.oclIsUndefined())
+			->exists(e| e.subcomponent.subcomponentType=self)
+	endif
 ;
 
 

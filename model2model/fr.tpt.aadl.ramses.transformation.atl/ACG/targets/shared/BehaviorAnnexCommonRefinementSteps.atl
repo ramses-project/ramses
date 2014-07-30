@@ -575,7 +575,11 @@ rule m_BehaviorActionsFromThread
 						if(src_transition.actionBlock.oclIsUndefined()) then
 							Sequence{}
 						else
-							Sequence{src_transition.actionBlock.content.resolve(c)}
+							if(src_transition.actionBlock.content.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
+								src_transition.actionBlock.content.actions->collect( e| e.resolve(c))
+					   		else
+					   			Sequence{src_transition.actionBlock.content.resolve(c)}
+					   		endif
 						endif
 					)
 					->flatten()
@@ -609,7 +613,7 @@ rule m_BehaviorActionsFromThread
 						Sequence{}
 						endif
 					)
-					->flatten()
+					->flatten()->excluding(OclUndefined)
 	),
 	isStateSource: AADLBA!ValueExpression
 	(

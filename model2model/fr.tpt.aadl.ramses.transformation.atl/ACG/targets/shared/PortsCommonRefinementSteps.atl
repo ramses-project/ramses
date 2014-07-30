@@ -626,7 +626,7 @@ helper def: GetOrCreateLengthDataSubcomponentHolder(port: AADLI!FeatureInstance)
 	endif
 ;
 
-unique lazy rule CreateLengthParameterHolder
+lazy rule CreateLengthParameterHolder
 {
 	from
 		port : AADLI!FeatureInstance
@@ -663,11 +663,26 @@ unique lazy rule CreateLengthParameterHolder
 	}
 }
 
-unique lazy rule CreateLengthDataSubcomponentHolder
+lazy rule CreateLengthDataSubcomponentHolder
 {
 	from
 		port : AADLI!FeatureInstance
 		(port.getModalPropertyValue('length_data_subcomponent').oclIsUndefined())
+	to
+		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
+		(
+			element <- thisModule.CreateLengthDataSubcomponent(port)
+		)
+	do
+	{
+		dataSubcomponentHolder;
+	}
+}
+
+unique lazy rule CreateLengthDataSubcomponent
+{
+	from
+		port : AADLI!FeatureInstance
 	using
 	{
 		typeId: String = port.getLengthInitialValue();
@@ -683,16 +698,11 @@ unique lazy rule CreateLengthDataSubcomponentHolder
 			name<-port.feature.name+'_Length',
 			dataSubcomponentType<-thisModule.getRuntimeSizeType,
 			ownedPropertyAssociation	<- Sequence {thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)}
-		),
-		dataSubcomponentHolder: AADLBA!DataSubcomponentHolder
-		(
-			element <- dataSubcomponent
 		)
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(dataSubcomponent, port);
-		
-		dataSubcomponentHolder;
+		dataSubcomponent;
 	}
 }
 
