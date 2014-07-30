@@ -2,6 +2,7 @@
 #define __GENERATED_GTYPES_H__
 #include "arinc653/sampling.h"
 #include "arinc653/types.h"
+#include "pingpong.h"
 typedef char * PingPong__TYPE_aadlKeywords;
 typedef  int PingPong__SEQ;
 typedef SAMPLING_PORT_ID_TYPE arinc653_runtime__Sampling_Port_Id_Type;
@@ -17,9 +18,9 @@ typedef enum e_PingPong__ID {
 	PingPong__ID_Cpong
 } PingPong__ID;
 typedef struct PingPong__PingPongMessage {
-	PingPong__TYPE_aadlKeywords m_type;
-	PingPong__ID m_sender;
-	PingPong__SEQ m_seqNb;
+	TYPE m_type;
+	ID m_sender;
+	SEQ m_seqNb;
 } PingPong__PingPongMessage;
 typedef  int PingPong__Exception;
 typedef VALIDITY_TYPE arinc653_runtime__Validity_Type;

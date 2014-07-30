@@ -1,29 +1,19 @@
-Declared size for partition 0 : 20000
-Real size for partition 0     : 86524
-FATAL ERROR: Partition size is not correct
-
-Current state
--------------
-Kernel thread        : 4
-Idle thread          : 5
-Current partition    : 0
-Thread index         : 0
-Thread low           : 0
-Thread high          : 2
-Thread capacity      : 2
-Base addr            : 0x139000
-Base vaddr           : 0x0
-Size                 : 20000
-Current thread       : 5
-Prev current thread  : 5
-Main thread          : 0
-Main thread entry    : 0x0
-Partition threads sp :
--------------
-Current thread    : 4
-Period            : 0
-Deadline          : 0
-Partition         : 0
-sp                : 0x0
-init_stack_addr   : 0x0
-entry             : 0x0
+POK kernel initialized
+In ping: current value = 0, received answer = 0
+In ping: OK!
+In changeState: Nominal
+In ping: current value = 1, received answer = 0
+In ping: NOK!
+In changeState: Switch
+In pong, returned value = 0
+In changeState: Nominal
+In pong, returned value = 0
+In changeState: Nominal
+In pong, returned value = 0
+In changeState: Nominal
+In pong, returned value = 0
+In changeState: Nominal
+In pong, returned value = 0
+In changeState: Nominal
+In pong, returned value = 0
+In changeState: Nominal
