@@ -1,5 +1,5 @@
-QPOK kernel initialized
-'help' for mornothing received
+POK kernel initialized
+nothing received
 nothing received
 nothing received
 nothing received
@@ -18,8 +18,14 @@ nothing received
 nothing received
 nothing received
 nothing received
+nothing received
 send event
 received event: 3
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
 nothing received
 nothing received
 nothing received
@@ -29,8 +35,19 @@ received event: 4
 nothing received
 nothing received
 nothing received
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
 send event
 received event: 5
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
 nothing received
 nothing received
 nothing received
@@ -40,13 +57,31 @@ received event: 6
 nothing received
 nothing received
 nothing received
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
 send event
 received event: 7
 nothing received
 nothing received
 nothing received
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
 send event
 received event: 8
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
+nothing received
 nothing received
 nothing received
 nothing received
