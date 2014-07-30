@@ -2,14 +2,14 @@ Archive member included because of file (symbol)
 
 /usr/share/pok/libpok/libpok.a(arch.lo)
                               /usr/share/pok/libpok/drivers/rtl8029.o (pok_inb)
-/usr/share/pok/libpok/libpok.a(core.lo)
-                              (__pok_partition_start)
 /usr/share/pok/libpok/libpok.a(middleware.lo)
                               activity.o (pok_port_virtual_create)
 /usr/share/pok/libpok/libpok.a(arinc653.lo)
                               subprograms.o (PERIODIC_WAIT)
 /usr/share/pok/libpok/libpok.a(libc.lo)
                               main.o (strcpy)
+/usr/share/pok/libpok/libpok.a(core.lo)
+                              /usr/share/pok/libpok/libpok.a(arinc653.lo) (pok_thread_resume)
 
 Allocating common symbols
 Common symbol       size              file
@@ -31,174 +31,167 @@ Linker script and memory map
                 0x0000000000000000                . = 0x0
                 0x0000000000000000                __partition_begin = .
 
-.text           0x0000000000000000     0x25c8
+.text           0x0000000000000000     0x2581
  *(.text)
- .text          0x0000000000000000      0x136 main.o
-                0x0000000000000000                main
- *fill*         0x0000000000000136        0x2 00
- .text          0x0000000000000138       0x6e activity.o
-                0x0000000000000138                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_system_part_comm_impl_Job
-                0x0000000000000185                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_impl_Job
- *fill*         0x00000000000001a6        0xa 00
- .text          0x00000000000001b0      0x109 subprograms.o
-                0x00000000000001b0                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_system_part_comm_entrypoint_impl
-                0x0000000000000259                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_entrypoint_impl
- *fill*         0x00000000000002b9        0x3 00
- .text          0x00000000000002bc        0x0 gtypes.o
- .text          0x00000000000002bc        0x0 deployment.o
- .text          0x00000000000002bc      0xbf5 /usr/share/pok/libpok/drivers/rtl8029.o
-                0x00000000000003c8                rtl8029_read
-                0x00000000000004b5                rtl8029_write
-                0x000000000000083d                rtl8029_polling
-                0x0000000000000b6b                rtl8029_init
- *fill*         0x0000000000000eb1        0x3 00
- .text          0x0000000000000eb4      0x179 /usr/share/pok/libpok/libpok.a(arch.lo)
-                0x0000000000000eb4                pok_inb
-                0x0000000000000f34                pok_outb
-                0x0000000000000fb4                pci_register
-                0x0000000000001008                pok_do_syscall
- *fill*         0x000000000000102d        0x3 00
- .text          0x0000000000001030      0x31f /usr/share/pok/libpok/libpok.a(core.lo)
-                0x0000000000001030                __pok_partition_start
-                0x0000000000001054                pok_thread_create
-                0x00000000000010a8                pok_thread_attr_init
-                0x0000000000001104                pok_thread_period
-                0x0000000000001158                pok_thread_sleep
-                0x00000000000011ac                pok_thread_status
-                0x0000000000001200                pok_thread_delayed_start
-                0x0000000000001254                pok_thread_id
-                0x00000000000012a8                pok_thread_set_priority
-                0x00000000000012fc                pok_thread_resume
- *fill*         0x000000000000134f        0x1 00
- .text          0x0000000000001350      0x248 /usr/share/pok/libpok/libpok.a(middleware.lo)
-                0x0000000000001350                pok_port_queueing_create
-                0x00000000000013a4                pok_port_queueing_receive
-                0x00000000000013f4                pok_port_queueing_send
-                0x0000000000001448                pok_port_virtual_create
-                0x000000000000149c                pok_port_virtual_destination
-                0x00000000000014f0                pok_port_virtual_nb_destinations
-                0x0000000000001544                pok_port_virtual_get_global
- *fill*         0x0000000000001598        0x8 00
- .text          0x00000000000015a0      0xa8d /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                0x00000000000015a0                GET_PROCESS_ID
-                0x00000000000015ec                GET_MY_ID
-                0x000000000000162e                GET_PROCESS_STATUS
-                0x00000000000016f0                CREATE_PROCESS
-                0x00000000000017fd                STOP_SELF
-                0x0000000000001851                SET_PRIORITY
-                0x00000000000018c6                SUSPEND
-                0x0000000000001966                RESUME
-                0x00000000000019e1                STOP
-                0x0000000000001a01                DELAYED_START
-                0x0000000000001a91                START
-                0x0000000000001acc                TIMED_WAIT
-                0x0000000000001afa                PERIODIC_WAIT
-                0x0000000000001b1c                CREATE_QUEUING_PORT
-                0x0000000000001bad                SEND_QUEUING_MESSAGE
-                0x0000000000001bf1                RECEIVE_QUEUING_MESSAGE
-                0x0000000000001c48                GET_QUEUING_PORT_ID
-                0x0000000000001ca1                GET_QUEUING_PORT_STATUS
-                0x0000000000001d1a                CLEAR_QUEUING_PORT
-                0x0000000000001d40                GET_PARTITION_STATUS
-                0x0000000000001ee5                SET_PARTITION_MODE
-                0x0000000000001fdc                process_name_exist
- *fill*         0x000000000000202d        0x3 00
- .text          0x0000000000002030      0x598 /usr/share/pok/libpok/libpok.a(libc.lo)
-                0x0000000000002360                vprintf
-                0x00000000000024bb                printf
-                0x00000000000024f0                memcpy
-                0x0000000000002530                strcmp
-                0x0000000000002588                strcpy
+ .text          0x0000000000000000      0x15e main.o
+                0x0000000000000000                __aadl_send_output
+                0x0000000000000005                main
+ *fill*         0x000000000000015e        0x2 00
+ .text          0x0000000000000160       0x6a activity.o
+                0x000000000000017f                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_system_part_comm_impl_Job
+                0x0000000000000160                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_impl_Job
+ *fill*         0x00000000000001ca        0x6 00
+ .text          0x00000000000001d0      0x118 subprograms.o
+                0x000000000000023a                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_system_part_comm_entrypoint_impl
+                0x00000000000001d0                test_network_rtl8029_remote_communications_refined_model__the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_entrypoint_impl
+ .text          0x00000000000002e8        0x0 gtypes.o
+ .text          0x00000000000002e8        0x0 deployment.o
+ .text          0x00000000000002e8      0xb5b /usr/share/pok/libpok/drivers/rtl8029.o
+                0x00000000000006fb                rtl8029_polling
+                0x00000000000003ed                rtl8029_init
+                0x0000000000000a25                rtl8029_write
+                0x0000000000000d5e                rtl8029_read
+ *fill*         0x0000000000000e43        0x1 00
+ .text          0x0000000000000e44      0x188 /usr/share/pok/libpok/libpok.a(arch.lo)
+                0x0000000000000fa8                pok_do_syscall
+                0x0000000000000ecc                pok_inb
+                0x0000000000000e44                pok_outb
+                0x0000000000000f54                pci_register
+ .text          0x0000000000000fcc      0x238 /usr/share/pok/libpok/libpok.a(middleware.lo)
+                0x0000000000000fcc                pok_port_queueing_create
+                0x000000000000106c                pok_port_queueing_send
+                0x00000000000010bc                pok_port_virtual_create
+                0x000000000000101c                pok_port_queueing_receive
+                0x00000000000011b0                pok_port_virtual_get_global
+                0x000000000000115c                pok_port_virtual_nb_destinations
+                0x000000000000110c                pok_port_virtual_destination
+ *fill*         0x0000000000001204        0xc 00
+ .text          0x0000000000001210      0xad6 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                0x00000000000012f0                RESUME
+                0x0000000000001754                PERIODIC_WAIT
+                0x000000000000141f                STOP_SELF
+                0x0000000000001471                SET_PRIORITY
+                0x00000000000014ed                GET_PROCESS_ID
+                0x000000000000164d                GET_PROCESS_STATUS
+                0x000000000000137c                SUSPEND
+                0x0000000000001932                CREATE_QUEUING_PORT
+                0x00000000000018e9                SEND_QUEUING_MESSAGE
+                0x00000000000019e0                SET_PARTITION_MODE
+                0x000000000000188f                RECEIVE_QUEUING_MESSAGE
+                0x00000000000017b6                GET_QUEUING_PORT_STATUS
+                0x0000000000001aea                GET_PARTITION_STATUS
+                0x00000000000017a8                CLEAR_QUEUING_PORT
+                0x000000000000170b                GET_MY_ID
+                0x0000000000001210                STOP
+                0x0000000000001831                GET_QUEUING_PORT_ID
+                0x000000000000177a                TIMED_WAIT
+                0x0000000000001c90                process_name_exist
+                0x00000000000012b9                START
+                0x000000000000121e                DELAYED_START
+                0x0000000000001541                CREATE_PROCESS
+ *fill*         0x0000000000001ce6        0xa 00
+ .text          0x0000000000001cf0      0x598 /usr/share/pok/libpok/libpok.a(libc.lo)
+                0x000000000000225c                strcpy
+                0x00000000000021a3                printf
+                0x00000000000021d0                memcpy
+                0x0000000000002020                vprintf
+                0x0000000000002200                strcmp
+ .text          0x0000000000002288      0x2f9 /usr/share/pok/libpok/libpok.a(core.lo)
+                0x00000000000022f8                pok_thread_attr_init
+                0x0000000000002530                pok_thread_resume
+                0x0000000000002344                pok_thread_period
+                0x00000000000022a8                pok_thread_create
+                0x00000000000023ec                pok_thread_status
+                0x000000000000243c                pok_thread_delayed_start
+                0x000000000000248c                pok_thread_id
+                0x0000000000002288                __pok_partition_start
+                0x0000000000002398                pok_thread_sleep
+                0x00000000000024e0                pok_thread_set_priority
 
-.iplt           0x00000000000025d0        0x0
- .iplt          0x0000000000000000        0x0 main.o
-
-.rodata         0x00000000000025e0       0x7d
+.rodata         0x00000000000025a0       0x7d
  *(.rodata)
- .rodata        0x00000000000025e0       0x7d /usr/share/pok/libpok/libpok.a(libc.lo)
+ .rodata        0x00000000000025a0       0x7d /usr/share/pok/libpok/libpok.a(libc.lo)
 
-.rodata.str1.4  0x0000000000002660      0x12c
+.rodata.str1.4  0x0000000000002620      0x12c
  .rodata.str1.4
-                0x0000000000002660       0x2f main.o
- *fill*         0x000000000000268f        0x1 00
+                0x0000000000002620       0x2f main.o
+ *fill*         0x000000000000264f        0x1 00
  .rodata.str1.4
-                0x0000000000002690       0xfc /usr/share/pok/libpok/drivers/rtl8029.o
-                                         0xfb (size before relaxing)
+                0x0000000000002650       0xfc /usr/share/pok/libpok/drivers/rtl8029.o
+                                         0xf9 (size before relaxing)
 
-.rodata.str1.1  0x000000000000278c       0x98
+.rodata.str1.1  0x000000000000274c       0x8f
  .rodata.str1.1
-                0x000000000000278c       0x1a main.o
+                0x000000000000274c       0x1a main.o
                                          0x2b (size before relaxing)
  .rodata.str1.1
-                0x00000000000027a6       0x1c activity.o
+                0x0000000000002766       0x1c activity.o
  .rodata.str1.1
-                0x00000000000027c2       0x29 /usr/share/pok/libpok/drivers/rtl8029.o
-                                         0x31 (size before relaxing)
+                0x0000000000002782       0x20 /usr/share/pok/libpok/drivers/rtl8029.o
  .rodata.str1.1
-                0x00000000000027eb       0x39 /usr/share/pok/libpok/libpok.a(arch.lo)
+                0x00000000000027a2       0x39 /usr/share/pok/libpok/libpok.a(arch.lo)
 
-.eh_frame       0x0000000000002824      0x964
- .eh_frame      0x0000000000002824       0x48 main.o
- .eh_frame      0x000000000000286c       0x3c activity.o
+.eh_frame       0x00000000000027dc      0x7f8
+ .eh_frame      0x00000000000027dc       0x64 main.o
+ .eh_frame      0x0000000000002840       0x3c activity.o
                                          0x54 (size before relaxing)
- .eh_frame      0x00000000000028a8       0x3c subprograms.o
+ .eh_frame      0x000000000000287c       0x3c subprograms.o
                                          0x54 (size before relaxing)
- .eh_frame      0x00000000000028e4       0xc8 /usr/share/pok/libpok/drivers/rtl8029.o
-                                         0xe0 (size before relaxing)
- .eh_frame      0x00000000000029ac       0x94 /usr/share/pok/libpok/libpok.a(arch.lo)
-                                         0xdc (size before relaxing)
- .eh_frame      0x0000000000002a40      0x140 /usr/share/pok/libpok/libpok.a(core.lo)
-                                        0x230 (size before relaxing)
- .eh_frame      0x0000000000002b80       0xe0 /usr/share/pok/libpok/libpok.a(middleware.lo)
-                                        0x188 (size before relaxing)
- .eh_frame      0x0000000000002c60      0x32c /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                                        0x3a4 (size before relaxing)
- .eh_frame      0x0000000000002f8c      0x1fc /usr/share/pok/libpok/libpok.a(libc.lo)
-                                        0x25c (size before relaxing)
+ .eh_frame      0x00000000000028b8       0xa0 /usr/share/pok/libpok/drivers/rtl8029.o
+                                         0xb8 (size before relaxing)
+ .eh_frame      0x0000000000002958       0x7c /usr/share/pok/libpok/libpok.a(arch.lo)
+                                         0xc4 (size before relaxing)
+ .eh_frame      0x00000000000029d4       0xc4 /usr/share/pok/libpok/libpok.a(middleware.lo)
+                                        0x16c (size before relaxing)
+ .eh_frame      0x0000000000002a98      0x29c /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                                        0x314 (size before relaxing)
+ .eh_frame      0x0000000000002d34      0x188 /usr/share/pok/libpok/libpok.a(libc.lo)
+                                        0x1e8 (size before relaxing)
+ .eh_frame      0x0000000000002ebc      0x118 /usr/share/pok/libpok/libpok.a(core.lo)
+                                        0x208 (size before relaxing)
 
-.rel.dyn        0x0000000000003188        0x0
- .rel.iplt      0x0000000000000000        0x0 main.o
+.rel.dyn        0x0000000000002fd4        0x0
  .rel.text      0x0000000000000000        0x0 main.o
 
-.data           0x00000000000031a0      0x3b8
+.data           0x0000000000002fe0      0x3bc
  *(.data)
- .data          0x00000000000031a0        0x0 main.o
- .data          0x00000000000031a0        0x0 activity.o
- .data          0x00000000000031a0        0x0 subprograms.o
- .data          0x00000000000031a0        0x0 gtypes.o
- .data          0x00000000000031a0        0x0 deployment.o
- .data          0x00000000000031a0        0x0 /usr/share/pok/libpok/drivers/rtl8029.o
- .data          0x00000000000031a0        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
- .data          0x00000000000031a0        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
- .data          0x00000000000031a0        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
- .data          0x00000000000031a0        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .data          0x00000000000031a0        0x0 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .data          0x0000000000002fe0        0x0 main.o
+ .data          0x0000000000002fe0        0x0 activity.o
+ .data          0x0000000000002fe0        0x0 subprograms.o
+ .data          0x0000000000002fe0        0x0 gtypes.o
+ .data          0x0000000000002fe0        0x0 deployment.o
+ .data          0x0000000000002fe0        0x0 /usr/share/pok/libpok/drivers/rtl8029.o
+ .data          0x0000000000002fe0        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .data          0x0000000000002fe0        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .data          0x0000000000002fe0        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .data          0x0000000000002fe0        0x0 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .data          0x0000000000002fe0        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
  *(.bss)
- .bss           0x00000000000031a0        0x0 main.o
- .bss           0x00000000000031a0        0x0 activity.o
- .bss           0x00000000000031a0        0x8 subprograms.o
-                0x00000000000031a0                the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_entrypoint_impl_current_state
-                0x00000000000031a4                the_cpu2_system_part_comProcess_system_part_comm_entrypoint_impl_current_state
- .bss           0x00000000000031a8        0x0 gtypes.o
- .bss           0x00000000000031a8        0x0 deployment.o
- *fill*         0x00000000000031a8       0x18 00
- .bss           0x00000000000031c0      0x26c /usr/share/pok/libpok/drivers/rtl8029.o
- .bss           0x000000000000342c        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
- .bss           0x000000000000342c        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
- .bss           0x000000000000342c        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
- .bss           0x000000000000342c        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- *fill*         0x000000000000342c       0x14 00
- .bss           0x0000000000003440       0x84 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .bss           0x0000000000002fe0        0x0 main.o
+ .bss           0x0000000000002fe0        0x0 activity.o
+ .bss           0x0000000000002fe0        0x8 subprograms.o
+                0x0000000000002fe0                the_cpu2_system_part_comProcess_system_part_comm_entrypoint_impl_current_state
+                0x0000000000002fe4                the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_entrypoint_impl_current_state
+ .bss           0x0000000000002fe8        0x0 gtypes.o
+ .bss           0x0000000000002fe8        0x0 deployment.o
+ *fill*         0x0000000000002fe8       0x18 00
+ .bss           0x0000000000003000      0x26c /usr/share/pok/libpok/drivers/rtl8029.o
+ .bss           0x000000000000326c        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .bss           0x000000000000326c        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .bss           0x000000000000326c        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ *fill*         0x000000000000326c       0x14 00
+ .bss           0x0000000000003280       0x84 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .bss           0x0000000000003304        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
  *(COMMON)
- COMMON         0x00000000000034c4       0x10 main.o
-                0x00000000000034c4                the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable
-                0x00000000000034c8                arinc_threads
- COMMON         0x00000000000034d4        0x4 /usr/share/pok/libpok/libpok.a(core.lo)
-                0x00000000000034d4                errno
- *fill*         0x00000000000034d8        0x8 00
- COMMON         0x00000000000034e0       0x78 /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                0x00000000000034e0                arinc_process_attribute
-                0x0000000000003558                __partition_end = .
+ COMMON         0x0000000000003304       0x10 main.o
+                0x0000000000003304                the_cpu2_system_part_comProcess_the_proc2_p_in_globalVariable
+                0x0000000000003308                arinc_threads
+ *fill*         0x0000000000003314        0xc 00
+ COMMON         0x0000000000003320       0x78 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                0x0000000000003320                arinc_process_attribute
+ COMMON         0x0000000000003398        0x4 /usr/share/pok/libpok/libpok.a(core.lo)
+                0x0000000000003398                errno
+                0x000000000000339c                __partition_end = .
 LOAD main.o
 LOAD activity.o
 LOAD subprograms.o
@@ -208,45 +201,78 @@ LOAD /usr/share/pok/libpok/drivers/rtl8029.o
 LOAD /usr/share/pok/libpok/libpok.a
 OUTPUT(the_cpu2_system_part_comProcess.elf elf32-i386)
 
-.igot.plt       0x0000000000003558        0x0
- .igot.plt      0x0000000000000000        0x0 main.o
+.debug_abbrev   0x0000000000000000     0x27a1
+ .debug_abbrev  0x0000000000000000      0x102 main.o
+ .debug_abbrev  0x0000000000000102       0xa9 activity.o
+ .debug_abbrev  0x00000000000001ab       0xe5 subprograms.o
+ .debug_abbrev  0x0000000000000290       0x33 gtypes.o
+ .debug_abbrev  0x00000000000002c3       0x51 deployment.o
+ .debug_abbrev  0x0000000000000314      0x24b /usr/share/pok/libpok/drivers/rtl8029.o
+ .debug_abbrev  0x000000000000055f      0x28a /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_abbrev  0x00000000000007e9      0x8b3 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .debug_abbrev  0x000000000000109c      0x574 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_abbrev  0x0000000000001610      0x667 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_abbrev  0x0000000000001c77      0xb2a /usr/share/pok/libpok/libpok.a(core.lo)
 
-.debug_info     0x0000000000000000     0x8903
- .debug_info    0x0000000000000000      0x283 main.o
- .debug_info    0x0000000000000283      0x12f activity.o
- .debug_info    0x00000000000003b2      0x29a subprograms.o
- .debug_info    0x000000000000064c       0x6c gtypes.o
- .debug_info    0x00000000000006b8       0x89 deployment.o
- .debug_info    0x0000000000000741      0x832 /usr/share/pok/libpok/drivers/rtl8029.o
- .debug_info    0x0000000000000f73      0xa73 /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_info    0x00000000000019e6     0x26ac /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_info    0x0000000000004092     0x1e48 /usr/share/pok/libpok/libpok.a(middleware.lo)
- .debug_info    0x0000000000005eda     0x1b48 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_info    0x0000000000007a22      0xee1 /usr/share/pok/libpok/libpok.a(libc.lo)
+.debug_info     0x0000000000000000     0x8936
+ .debug_info    0x0000000000000000      0x2e5 main.o
+ .debug_info    0x00000000000002e5      0x117 activity.o
+ .debug_info    0x00000000000003fc      0x26d subprograms.o
+ .debug_info    0x0000000000000669       0x6f gtypes.o
+ .debug_info    0x00000000000006d8       0x8c deployment.o
+ .debug_info    0x0000000000000764      0x80a /usr/share/pok/libpok/drivers/rtl8029.o
+ .debug_info    0x0000000000000f6e      0xa68 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_info    0x00000000000019d6     0x1e4a /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .debug_info    0x0000000000003820     0x1b74 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_info    0x0000000000005394      0xee4 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_info    0x0000000000006278     0x26be /usr/share/pok/libpok/libpok.a(core.lo)
 
-.debug_abbrev   0x0000000000000000     0x23b9
- .debug_abbrev  0x0000000000000000       0xc8 main.o
- .debug_abbrev  0x00000000000000c8       0x94 activity.o
- .debug_abbrev  0x000000000000015c       0xf5 subprograms.o
- .debug_abbrev  0x0000000000000251       0x2a gtypes.o
- .debug_abbrev  0x000000000000027b       0x48 deployment.o
- .debug_abbrev  0x00000000000002c3      0x24b /usr/share/pok/libpok/drivers/rtl8029.o
- .debug_abbrev  0x000000000000050e      0x25b /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_abbrev  0x0000000000000769      0x9ef /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_abbrev  0x0000000000001158      0x790 /usr/share/pok/libpok/libpok.a(middleware.lo)
- .debug_abbrev  0x00000000000018e8      0x4ea /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_abbrev  0x0000000000001dd2      0x5e7 /usr/share/pok/libpok/libpok.a(libc.lo)
+.debug_line     0x0000000000000000     0x246e
+ .debug_line    0x0000000000000000       0xb8 main.o
+ .debug_line    0x00000000000000b8      0x17a activity.o
+ .debug_line    0x0000000000000232      0x1ac subprograms.o
+ .debug_line    0x00000000000003de       0x1d gtypes.o
+ .debug_line    0x00000000000003fb       0x5f deployment.o
+ .debug_line    0x000000000000045a      0x1eb /usr/share/pok/libpok/drivers/rtl8029.o
+ .debug_line    0x0000000000000645      0x25e /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_line    0x00000000000008a3      0x78d /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .debug_line    0x0000000000001030      0x669 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_line    0x0000000000001699      0x3fe /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_line    0x0000000000001a97      0x9d7 /usr/share/pok/libpok/libpok.a(core.lo)
 
-.debug_loc      0x0000000000000000     0x1a07
- .debug_loc     0x0000000000000000       0x38 main.o
- .debug_loc     0x0000000000000038       0x58 activity.o
- .debug_loc     0x0000000000000090       0x58 subprograms.o
- .debug_loc     0x00000000000000e8      0x54a /usr/share/pok/libpok/drivers/rtl8029.o
- .debug_loc     0x0000000000000632      0x14a /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_loc     0x000000000000077c      0x230 /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_loc     0x00000000000009ac      0x188 /usr/share/pok/libpok/libpok.a(middleware.lo)
- .debug_loc     0x0000000000000b34      0x6c5 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_loc     0x00000000000011f9      0x80e /usr/share/pok/libpok/libpok.a(libc.lo)
+.debug_loc      0x0000000000000000     0x1605
+ .debug_loc     0x0000000000000000       0x29 main.o
+ .debug_loc     0x0000000000000029       0x28 activity.o
+ .debug_loc     0x0000000000000051       0x47 subprograms.o
+ .debug_loc     0x0000000000000098      0x37f /usr/share/pok/libpok/drivers/rtl8029.o
+ .debug_loc     0x0000000000000417       0xfc /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_loc     0x0000000000000513      0x165 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .debug_loc     0x0000000000000678      0x8d5 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_loc     0x0000000000000f4d      0x5d1 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_loc     0x000000000000151e       0xe7 /usr/share/pok/libpok/libpok.a(core.lo)
+
+.debug_pubnames
+                0x0000000000000000      0xa43
+ .debug_pubnames
+                0x0000000000000000       0x86 main.o
+ .debug_pubnames
+                0x0000000000000086      0x10b activity.o
+ .debug_pubnames
+                0x0000000000000191      0x1c8 subprograms.o
+ .debug_pubnames
+                0x0000000000000359       0x54 deployment.o
+ .debug_pubnames
+                0x00000000000003ad       0x5a /usr/share/pok/libpok/drivers/rtl8029.o
+ .debug_pubnames
+                0x0000000000000407       0x73 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_pubnames
+                0x000000000000047a      0x156 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .debug_pubnames
+                0x00000000000005d0      0x238 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_pubnames
+                0x0000000000000808       0x80 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_pubnames
+                0x0000000000000888      0x1bb /usr/share/pok/libpok/libpok.a(core.lo)
 
 .debug_aranges  0x0000000000000000      0x420
  .debug_aranges
@@ -260,64 +286,50 @@ OUTPUT(the_cpu2_system_part_comProcess.elf elf32-i386)
  .debug_aranges
                 0x0000000000000080       0x60 /usr/share/pok/libpok/libpok.a(arch.lo)
  .debug_aranges
-                0x00000000000000e0      0x140 /usr/share/pok/libpok/libpok.a(core.lo)
+                0x00000000000000e0       0xe0 /usr/share/pok/libpok/libpok.a(middleware.lo)
  .debug_aranges
-                0x0000000000000220       0xe0 /usr/share/pok/libpok/libpok.a(middleware.lo)
+                0x00000000000001c0       0xa0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
  .debug_aranges
-                0x0000000000000300       0xa0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                0x0000000000000260       0x80 /usr/share/pok/libpok/libpok.a(libc.lo)
  .debug_aranges
-                0x00000000000003a0       0x80 /usr/share/pok/libpok/libpok.a(libc.lo)
+                0x00000000000002e0      0x140 /usr/share/pok/libpok/libpok.a(core.lo)
 
-.debug_line     0x0000000000000000     0x2491
- .debug_line    0x0000000000000000       0xab main.o
- .debug_line    0x00000000000000ab      0x192 activity.o
- .debug_line    0x000000000000023d      0x1b7 subprograms.o
- .debug_line    0x00000000000003f4       0x1d gtypes.o
- .debug_line    0x0000000000000411       0x5f deployment.o
- .debug_line    0x0000000000000470      0x234 /usr/share/pok/libpok/drivers/rtl8029.o
- .debug_line    0x00000000000006a4      0x25c /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_line    0x0000000000000900      0x9e2 /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_line    0x00000000000012e2      0x794 /usr/share/pok/libpok/libpok.a(middleware.lo)
- .debug_line    0x0000000000001a76      0x623 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_line    0x0000000000002099      0x3f8 /usr/share/pok/libpok/libpok.a(libc.lo)
-
-.debug_str      0x0000000000000000     0x2b19
- .debug_str     0x0000000000000000      0x2f2 main.o
-                                        0x364 (size before relaxing)
- .debug_str     0x00000000000002f2      0x2f8 activity.o
-                                        0x478 (size before relaxing)
- .debug_str     0x00000000000005ea      0xd35 subprograms.o
-                                       0x103d (size before relaxing)
- .debug_str     0x000000000000131f        0x9 gtypes.o
-                                        0x13e (size before relaxing)
- .debug_str     0x0000000000001328        0xd deployment.o
-                                        0x18d (size before relaxing)
- .debug_str     0x0000000000001335      0x3e3 /usr/share/pok/libpok/drivers/rtl8029.o
+.debug_str      0x0000000000000000     0x2b33
+ .debug_str     0x0000000000000000      0x324 main.o
+                                        0x39d (size before relaxing)
+ .debug_str     0x0000000000000324      0x2eb activity.o
+                                        0x45b (size before relaxing)
+ .debug_str     0x000000000000060f      0xd18 subprograms.o
+                                       0x1010 (size before relaxing)
+ .debug_str     0x0000000000001327        0x9 gtypes.o
+                                        0x12e (size before relaxing)
+ .debug_str     0x0000000000001330        0xd deployment.o
+                                        0x17d (size before relaxing)
+ .debug_str     0x000000000000133d      0x40d /usr/share/pok/libpok/drivers/rtl8029.o
                                         0x4ea (size before relaxing)
- .debug_str     0x0000000000001718      0x4a5 /usr/share/pok/libpok/libpok.a(arch.lo)
-                                       0x1717 (size before relaxing)
- .debug_str     0x0000000000001bbd      0x3df /usr/share/pok/libpok/libpok.a(core.lo)
-                                       0x56ab (size before relaxing)
- .debug_str     0x0000000000001f9c      0x30e /usr/share/pok/libpok/libpok.a(middleware.lo)
-                                       0x46c2 (size before relaxing)
- .debug_str     0x00000000000022aa      0x629 /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                                       0x2bbc (size before relaxing)
- .debug_str     0x00000000000028d3      0x246 /usr/share/pok/libpok/libpok.a(libc.lo)
-                                        0xf8f (size before relaxing)
+ .debug_str     0x000000000000174a      0x49f /usr/share/pok/libpok/libpok.a(arch.lo)
+                                       0x16f1 (size before relaxing)
+ .debug_str     0x0000000000001be9      0x3d5 /usr/share/pok/libpok/libpok.a(middleware.lo)
+                                       0x463d (size before relaxing)
+ .debug_str     0x0000000000001fbe      0x651 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                                       0x2b83 (size before relaxing)
+ .debug_str     0x000000000000260f      0x246 /usr/share/pok/libpok/libpok.a(libc.lo)
+                                        0xf7c (size before relaxing)
+ .debug_str     0x0000000000002855      0x2de /usr/share/pok/libpok/libpok.a(core.lo)
+                                       0x5613 (size before relaxing)
 
-.comment        0x0000000000000000       0x2a
- .comment       0x0000000000000000       0x2a main.o
-                                         0x2b (size before relaxing)
- .comment       0x0000000000000000       0x2b activity.o
- .comment       0x0000000000000000       0x2b subprograms.o
- .comment       0x0000000000000000       0x2b gtypes.o
- .comment       0x0000000000000000       0x2b deployment.o
- .comment       0x0000000000000000       0x2b /usr/share/pok/libpok/drivers/rtl8029.o
- .comment       0x0000000000000000       0xac /usr/share/pok/libpok/libpok.a(arch.lo)
- .comment       0x0000000000000000      0x5e1 /usr/share/pok/libpok/libpok.a(core.lo)
- .comment       0x0000000000000000      0x408 /usr/share/pok/libpok/libpok.a(middleware.lo)
- .comment       0x0000000000000000      0x1d9 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .comment       0x0000000000000000      0x25a /usr/share/pok/libpok/libpok.a(libc.lo)
+.comment        0x0000000000000000      0x69c
+ .comment       0x0000000000000000       0x12 main.o
+ .comment       0x0000000000000012       0x12 activity.o
+ .comment       0x0000000000000024       0x12 subprograms.o
+ .comment       0x0000000000000036       0x12 gtypes.o
+ .comment       0x0000000000000048       0x12 deployment.o
+ .comment       0x000000000000005a       0x12 /usr/share/pok/libpok/drivers/rtl8029.o
+ .comment       0x000000000000006c       0x48 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .comment       0x00000000000000b4      0x1b0 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .comment       0x0000000000000264       0xc6 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .comment       0x000000000000032a       0xfc /usr/share/pok/libpok/libpok.a(libc.lo)
+ .comment       0x0000000000000426      0x276 /usr/share/pok/libpok/libpok.a(core.lo)
 
 .note.GNU-stack
                 0x0000000000000000        0x0
@@ -336,15 +348,14 @@ OUTPUT(the_cpu2_system_part_comProcess.elf elf32-i386)
  .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
  .note.GNU-stack
-                0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
- .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
  .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
  .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
 
-.debug_ranges   0x0000000000000000       0x78
- .debug_ranges  0x0000000000000000       0x18 subprograms.o
- .debug_ranges  0x0000000000000018       0x30 /usr/share/pok/libpok/drivers/rtl8029.o
- .debug_ranges  0x0000000000000048       0x30 /usr/share/pok/libpok/libpok.a(libc.lo)
+.debug_ranges   0x0000000000000000       0x60
+ .debug_ranges  0x0000000000000000       0x30 /usr/share/pok/libpok/drivers/rtl8029.o
+ .debug_ranges  0x0000000000000030       0x30 /usr/share/pok/libpok/libpok.a(libc.lo)

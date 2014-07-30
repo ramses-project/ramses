@@ -24,3 +24,4 @@
 #include <protocols/protocols.h>
 
 #endif
+void __aadl_send_output (unsigned int port_variable, void * value);

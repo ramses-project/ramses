@@ -1,17 +1,15 @@
 export POK_PATH=/usr/share/pok
+
 all:
 	$(MAKE) -C the_cpu1 all
-
 	$(MAKE) -C the_cpu2 all
 
 clean:
 	$(MAKE) -C the_cpu1 clean
-
 	$(MAKE) -C the_cpu2 clean
 
 run:
 	$(MAKE) -C the_cpu1 run
-
 	$(MAKE) -C the_cpu2 run
 
 test:

@@ -299,7 +299,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         };
       the_cpu1_system_part_comm: thread the_cpu1_system_part_pollTask.impl {
         Period => 1000 ms;
-        Priority => 10;
+        Priority => 8;
         Compute_Entrypoint_Call_Sequence => reference(system_part_pollCallSequence);
         Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
         Dispatch_Protocol => Periodic;
@@ -339,7 +339,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         };
       the_cpu2_system_part_comm: thread the_cpu2_system_part_pollTask.impl {
         Period => 1000 ms;
-        Priority => 10;
+        Priority => 8;
         Compute_Entrypoint_Call_Sequence => reference(system_part_pollCallSequence);
         Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
         Dispatch_Protocol => Periodic;

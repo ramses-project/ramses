@@ -1,13 +1,13 @@
 Archive member included because of file (symbol)
 
-/usr/share/pok/libpok/libpok.a(core.lo)
-                              (__pok_partition_start)
 /usr/share/pok/libpok/libpok.a(arinc653.lo)
                               subprograms.o (PERIODIC_WAIT)
 /usr/share/pok/libpok/libpok.a(libc.lo)
                               main.o (strcpy)
 /usr/share/pok/libpok/libpok.a(arch.lo)
-                              /usr/share/pok/libpok/libpok.a(core.lo) (pok_do_syscall)
+                              /usr/share/pok/libpok/libpok.a(arinc653.lo) (pok_do_syscall)
+/usr/share/pok/libpok/libpok.a(core.lo)
+                              /usr/share/pok/libpok/libpok.a(arinc653.lo) (pok_thread_resume)
 /usr/share/pok/libpok/libpok.a(middleware.lo)
                               /usr/share/pok/libpok/libpok.a(arinc653.lo) (pok_port_queueing_create)
 
@@ -31,200 +31,224 @@ Linker script and memory map
                 0x0000000000000000                . = 0x0
                 0x0000000000000000                __partition_begin = .
 
-.text           0x0000000000000000     0x1788
+.text           0x0000000000000000     0x1728
  *(.text)
- .text          0x0000000000000000       0xe7 main.o
-                0x0000000000000000                main
- *fill*         0x00000000000000e7        0x1 00
- .text          0x00000000000000e8       0x23 activity.o
-                0x00000000000000e8                test_network_rtl8029_remote_communications_refined_model__the_proc1_the_sender_impl_Job
- *fill*         0x000000000000010b        0x5 00
- .text          0x0000000000000110       0x95 subprograms.o
-                0x0000000000000110                test_network_rtl8029_remote_communications_refined_model__the_proc1_the_sender_entrypoint_impl
- *fill*         0x00000000000001a5        0x3 00
- .text          0x00000000000001a8        0x0 gtypes.o
- .text          0x00000000000001a8        0x0 deployment.o
- .text          0x00000000000001a8      0x15d /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
-                0x00000000000001a8                receive
-                0x00000000000001df                send
-                0x000000000000022a                event_received
-                0x000000000000026c                nothing_received
-                0x000000000000029f                send_event
-                0x00000000000002d2                periodic
- *fill*         0x0000000000000305        0x3 00
- .text          0x0000000000000308      0x31f /usr/share/pok/libpok/libpok.a(core.lo)
-                0x0000000000000308                __pok_partition_start
-                0x000000000000032c                pok_thread_create
-                0x0000000000000380                pok_thread_attr_init
-                0x00000000000003dc                pok_thread_period
-                0x0000000000000430                pok_thread_sleep
-                0x0000000000000484                pok_thread_status
-                0x00000000000004d8                pok_thread_delayed_start
-                0x000000000000052c                pok_thread_id
-                0x0000000000000580                pok_thread_set_priority
-                0x00000000000005d4                pok_thread_resume
- *fill*         0x0000000000000627        0x9 00
- .text          0x0000000000000630      0xa91 /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                0x0000000000000630                GET_PROCESS_ID
-                0x000000000000067c                GET_MY_ID
-                0x00000000000006be                GET_PROCESS_STATUS
-                0x0000000000000780                CREATE_PROCESS
-                0x000000000000088d                STOP_SELF
-                0x00000000000008e1                SET_PRIORITY
-                0x0000000000000956                SUSPEND
-                0x00000000000009f6                RESUME
-                0x0000000000000a71                STOP
-                0x0000000000000a91                DELAYED_START
-                0x0000000000000b21                START
-                0x0000000000000b5c                TIMED_WAIT
-                0x0000000000000b8a                PERIODIC_WAIT
-                0x0000000000000bac                CREATE_QUEUING_PORT
-                0x0000000000000c3d                SEND_QUEUING_MESSAGE
-                0x0000000000000c81                RECEIVE_QUEUING_MESSAGE
-                0x0000000000000cd8                GET_QUEUING_PORT_ID
-                0x0000000000000d31                GET_QUEUING_PORT_STATUS
-                0x0000000000000daa                CLEAR_QUEUING_PORT
-                0x0000000000000dd0                GET_PARTITION_STATUS
-                0x0000000000000f75                SET_PARTITION_MODE
-                0x000000000000106c                process_name_exist
- *fill*         0x00000000000010c1        0xf 00
- .text          0x00000000000010d0      0x598 /usr/share/pok/libpok/libpok.a(libc.lo)
-                0x0000000000001400                vprintf
-                0x000000000000155b                printf
-                0x0000000000001590                memcpy
-                0x00000000000015d0                strcmp
-                0x0000000000001628                strcpy
- .text          0x0000000000001668       0x25 /usr/share/pok/libpok/libpok.a(arch.lo)
-                0x0000000000001668                pok_do_syscall
- *fill*         0x000000000000168d        0x3 00
- .text          0x0000000000001690       0xf8 /usr/share/pok/libpok/libpok.a(middleware.lo)
-                0x0000000000001690                pok_port_queueing_create
-                0x00000000000016e4                pok_port_queueing_receive
-                0x0000000000001734                pok_port_queueing_send
+ .text          0x0000000000000000      0x10e main.o
+                0x0000000000000000                __aadl_send_output
+                0x0000000000000005                main
+ *fill*         0x000000000000010e        0x2 00
+ .text          0x0000000000000110       0x21 activity.o
+                0x0000000000000110                test_network_rtl8029_remote_communications_refined_model__the_proc1_the_sender_impl_Job
+ *fill*         0x0000000000000131        0xf 00
+ .text          0x0000000000000140       0x9c subprograms.o
+                0x0000000000000140                test_network_rtl8029_remote_communications_refined_model__the_proc1_the_sender_entrypoint_impl
+ .text          0x00000000000001dc        0x0 gtypes.o
+ .text          0x00000000000001dc        0x0 deployment.o
+ .text          0x00000000000001dc       0xb9 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+                0x0000000000000212                send
+                0x0000000000000260                receive
+                0x00000000000001dc                periodic
+ *fill*         0x0000000000000295        0xb 00
+ .text          0x00000000000002a0      0xae0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                0x0000000000000380                RESUME
+                0x00000000000007e4                PERIODIC_WAIT
+                0x00000000000004af                STOP_SELF
+                0x0000000000000501                SET_PRIORITY
+                0x000000000000057d                GET_PROCESS_ID
+                0x00000000000006dd                GET_PROCESS_STATUS
+                0x000000000000040c                SUSPEND
+                0x00000000000009c2                CREATE_QUEUING_PORT
+                0x0000000000000979                SEND_QUEUING_MESSAGE
+                0x0000000000000a70                SET_PARTITION_MODE
+                0x000000000000091f                RECEIVE_QUEUING_MESSAGE
+                0x0000000000000846                GET_QUEUING_PORT_STATUS
+                0x0000000000000b7a                GET_PARTITION_STATUS
+                0x0000000000000838                CLEAR_QUEUING_PORT
+                0x000000000000079b                GET_MY_ID
+                0x00000000000002a0                STOP
+                0x00000000000008c1                GET_QUEUING_PORT_ID
+                0x000000000000080a                TIMED_WAIT
+                0x0000000000000d20                process_name_exist
+                0x0000000000000349                START
+                0x00000000000002ae                DELAYED_START
+                0x00000000000005d1                CREATE_PROCESS
+ .text          0x0000000000000d80      0x598 /usr/share/pok/libpok/libpok.a(libc.lo)
+                0x00000000000012ec                strcpy
+                0x0000000000001233                printf
+                0x0000000000001260                memcpy
+                0x00000000000010b0                vprintf
+                0x0000000000001290                strcmp
+ .text          0x0000000000001318       0x24 /usr/share/pok/libpok/libpok.a(arch.lo)
+                0x0000000000001318                pok_do_syscall
+ .text          0x000000000000133c      0x2f9 /usr/share/pok/libpok/libpok.a(core.lo)
+                0x00000000000013ac                pok_thread_attr_init
+                0x00000000000015e4                pok_thread_resume
+                0x00000000000013f8                pok_thread_period
+                0x000000000000135c                pok_thread_create
+                0x00000000000014a0                pok_thread_status
+                0x00000000000014f0                pok_thread_delayed_start
+                0x0000000000001540                pok_thread_id
+                0x000000000000133c                __pok_partition_start
+                0x000000000000144c                pok_thread_sleep
+                0x0000000000001594                pok_thread_set_priority
+ *fill*         0x0000000000001635        0x3 00
+ .text          0x0000000000001638       0xf0 /usr/share/pok/libpok/libpok.a(middleware.lo)
+                0x0000000000001638                pok_port_queueing_create
+                0x00000000000016d8                pok_port_queueing_send
+                0x0000000000001688                pok_port_queueing_receive
 
-.iplt           0x0000000000001790        0x0
- .iplt          0x0000000000000000        0x0 main.o
-
-.rodata         0x00000000000017a0       0x7d
+.rodata         0x0000000000001740       0x7d
  *(.rodata)
- .rodata        0x00000000000017a0       0x7d /usr/share/pok/libpok/libpok.a(libc.lo)
+ .rodata        0x0000000000001740       0x7d /usr/share/pok/libpok/libpok.a(libc.lo)
 
-.rodata.str1.1  0x000000000000181d       0x86
+.rodata.str1.1  0x00000000000017bd       0x54
  .rodata.str1.1
-                0x000000000000181d       0x1b main.o
+                0x00000000000017bd       0x1b main.o
  .rodata.str1.1
-                0x0000000000001838       0x6b /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+                0x00000000000017d8       0x39 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
 
-.eh_frame       0x00000000000018a4      0x824
- .eh_frame      0x00000000000018a4       0x40 main.o
- .eh_frame      0x00000000000018e4       0x1c activity.o
+.eh_frame       0x0000000000001814      0x6a0
+ .eh_frame      0x0000000000001814       0x60 main.o
+ .eh_frame      0x0000000000001874       0x1c activity.o
                                          0x34 (size before relaxing)
- .eh_frame      0x0000000000001900       0x20 subprograms.o
+ .eh_frame      0x0000000000001890       0x20 subprograms.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000001920       0xc0 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
-                                         0xd8 (size before relaxing)
- .eh_frame      0x00000000000019e0      0x140 /usr/share/pok/libpok/libpok.a(core.lo)
-                                        0x230 (size before relaxing)
- .eh_frame      0x0000000000001b20      0x328 /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                                        0x3a0 (size before relaxing)
- .eh_frame      0x0000000000001e48      0x1fc /usr/share/pok/libpok/libpok.a(libc.lo)
-                                        0x25c (size before relaxing)
- .eh_frame      0x0000000000002044       0x24 /usr/share/pok/libpok/libpok.a(arch.lo)
-                                         0x3c (size before relaxing)
- .eh_frame      0x0000000000002068       0x60 /usr/share/pok/libpok/libpok.a(middleware.lo)
-                                         0xa8 (size before relaxing)
+ .eh_frame      0x00000000000018b0       0x54 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+                                         0x6c (size before relaxing)
+ .eh_frame      0x0000000000001904      0x29c /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                                        0x314 (size before relaxing)
+ .eh_frame      0x0000000000001ba0      0x188 /usr/share/pok/libpok/libpok.a(libc.lo)
+                                        0x1e8 (size before relaxing)
+ .eh_frame      0x0000000000001d28       0x20 /usr/share/pok/libpok/libpok.a(arch.lo)
+                                         0x38 (size before relaxing)
+ .eh_frame      0x0000000000001d48      0x118 /usr/share/pok/libpok/libpok.a(core.lo)
+                                        0x208 (size before relaxing)
+ .eh_frame      0x0000000000001e60       0x54 /usr/share/pok/libpok/libpok.a(middleware.lo)
+                                         0x9c (size before relaxing)
 
-.rel.dyn        0x00000000000020c8        0x0
- .rel.iplt      0x0000000000000000        0x0 main.o
+.rel.dyn        0x0000000000001eb4        0x0
  .rel.text      0x0000000000000000        0x0 main.o
 
-.data           0x00000000000020e0      0x110
+.data           0x0000000000001ec0      0x114
  *(.data)
- .data          0x00000000000020e0        0x0 main.o
- .data          0x00000000000020e0        0x0 activity.o
- .data          0x00000000000020e0        0x0 subprograms.o
- .data          0x00000000000020e0        0x0 gtypes.o
- .data          0x00000000000020e0        0x0 deployment.o
- .data          0x00000000000020e0        0x0 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
- .data          0x00000000000020e0        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
- .data          0x00000000000020e0        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .data          0x00000000000020e0        0x0 /usr/share/pok/libpok/libpok.a(libc.lo)
- .data          0x00000000000020e0        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
- .data          0x00000000000020e0        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .data          0x0000000000001ec0        0x0 main.o
+ .data          0x0000000000001ec0        0x0 activity.o
+ .data          0x0000000000001ec0        0x0 subprograms.o
+ .data          0x0000000000001ec0        0x0 gtypes.o
+ .data          0x0000000000001ec0        0x0 deployment.o
+ .data          0x0000000000001ec0        0x0 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+ .data          0x0000000000001ec0        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .data          0x0000000000001ec0        0x0 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .data          0x0000000000001ec0        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .data          0x0000000000001ec0        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
+ .data          0x0000000000001ec0        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
  *(.bss)
- .bss           0x00000000000020e0        0x0 main.o
- .bss           0x00000000000020e0        0x0 activity.o
- .bss           0x00000000000020e0        0x4 subprograms.o
-                0x00000000000020e0                the_proc1_the_sender_entrypoint_impl_current_state
- .bss           0x00000000000020e4        0x0 gtypes.o
- .bss           0x00000000000020e4        0x0 deployment.o
- .bss           0x00000000000020e4        0x4 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
-                0x00000000000020e4                counter
-                0x00000000000020e6                value
- .bss           0x00000000000020e8        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
- .bss           0x00000000000020e8        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- *fill*         0x00000000000020e8       0x18 00
- .bss           0x0000000000002100       0x84 /usr/share/pok/libpok/libpok.a(libc.lo)
- .bss           0x0000000000002184        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
- .bss           0x0000000000002184        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
+ .bss           0x0000000000001ec0        0x0 main.o
+ .bss           0x0000000000001ec0        0x0 activity.o
+ .bss           0x0000000000001ec0        0x4 subprograms.o
+                0x0000000000001ec0                the_proc1_the_sender_entrypoint_impl_current_state
+ .bss           0x0000000000001ec4        0x0 gtypes.o
+ .bss           0x0000000000001ec4        0x0 deployment.o
+ .bss           0x0000000000001ec4        0x2 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+                0x0000000000001ec4                value
+ *fill*         0x0000000000001ec6        0x2 00
+ .bss           0x0000000000001ec8        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ *fill*         0x0000000000001ec8       0x18 00
+ .bss           0x0000000000001ee0       0x84 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .bss           0x0000000000001f64        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .bss           0x0000000000001f64        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
+ .bss           0x0000000000001f64        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
  *(COMMON)
- COMMON         0x0000000000002184        0xc main.o
-                0x0000000000002184                arinc_threads
-                0x000000000000218c                the_proc1_p_out_globalVariable
- COMMON         0x0000000000002190        0x4 /usr/share/pok/libpok/libpok.a(core.lo)
-                0x0000000000002190                errno
- *fill*         0x0000000000002194        0xc 00
- COMMON         0x00000000000021a0       0x50 /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                0x00000000000021a0                arinc_process_attribute
-                0x00000000000021f0                __partition_end = .
+ COMMON         0x0000000000001f64        0xc main.o
+                0x0000000000001f64                arinc_threads
+                0x0000000000001f6c                the_proc1_p_out_globalVariable
+ *fill*         0x0000000000001f70       0x10 00
+ COMMON         0x0000000000001f80       0x50 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                0x0000000000001f80                arinc_process_attribute
+ COMMON         0x0000000000001fd0        0x4 /usr/share/pok/libpok/libpok.a(core.lo)
+                0x0000000000001fd0                errno
+                0x0000000000001fd4                __partition_end = .
 LOAD main.o
 LOAD activity.o
 LOAD subprograms.o
 LOAD gtypes.o
 LOAD deployment.o
-LOAD /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+LOAD /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
 LOAD /usr/share/pok/libpok/libpok.a
 OUTPUT(the_proc1.elf elf32-i386)
 
-.igot.plt       0x00000000000021f0        0x0
- .igot.plt      0x0000000000000000        0x0 main.o
+.debug_abbrev   0x0000000000000000     0x2242
+ .debug_abbrev  0x0000000000000000      0x102 main.o
+ .debug_abbrev  0x0000000000000102       0x6d activity.o
+ .debug_abbrev  0x000000000000016f       0xc1 subprograms.o
+ .debug_abbrev  0x0000000000000230       0x33 gtypes.o
+ .debug_abbrev  0x0000000000000263       0x51 deployment.o
+ .debug_abbrev  0x00000000000002b4       0x91 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+ .debug_abbrev  0x0000000000000345      0x574 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_abbrev  0x00000000000008b9      0x667 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_abbrev  0x0000000000000f20      0x165 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_abbrev  0x0000000000001085      0xb2a /usr/share/pok/libpok/libpok.a(core.lo)
+ .debug_abbrev  0x0000000000001baf      0x693 /usr/share/pok/libpok/libpok.a(middleware.lo)
 
-.debug_info     0x0000000000000000     0x6c77
- .debug_info    0x0000000000000000      0x292 main.o
- .debug_info    0x0000000000000292       0x9e activity.o
- .debug_info    0x0000000000000330      0x1ab subprograms.o
- .debug_info    0x00000000000004db       0x6c gtypes.o
- .debug_info    0x0000000000000547       0x89 deployment.o
- .debug_info    0x00000000000005d0      0x139 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
- .debug_info    0x0000000000000709     0x2524 /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_info    0x0000000000002c2d     0x1ab5 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_info    0x00000000000046e2      0xeb0 /usr/share/pok/libpok/libpok.a(libc.lo)
- .debug_info    0x0000000000005592      0x432 /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_info    0x00000000000059c4     0x12b3 /usr/share/pok/libpok/libpok.a(middleware.lo)
+.debug_info     0x0000000000000000     0x6cff
+ .debug_info    0x0000000000000000      0x2e5 main.o
+ .debug_info    0x00000000000002e5       0xa1 activity.o
+ .debug_info    0x0000000000000386      0x1ac subprograms.o
+ .debug_info    0x0000000000000532       0x6f gtypes.o
+ .debug_info    0x00000000000005a1       0x8c deployment.o
+ .debug_info    0x000000000000062d       0xf0 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+ .debug_info    0x000000000000071d     0x1ae1 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_info    0x00000000000021fe      0xeb3 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_info    0x00000000000030b1      0x43a /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_info    0x00000000000034eb     0x2536 /usr/share/pok/libpok/libpok.a(core.lo)
+ .debug_info    0x0000000000005a21     0x12de /usr/share/pok/libpok/libpok.a(middleware.lo)
 
-.debug_abbrev   0x0000000000000000     0x1e7a
- .debug_abbrev  0x0000000000000000       0xde main.o
- .debug_abbrev  0x00000000000000de       0x64 activity.o
- .debug_abbrev  0x0000000000000142       0xba subprograms.o
- .debug_abbrev  0x00000000000001fc       0x2a gtypes.o
- .debug_abbrev  0x0000000000000226       0x48 deployment.o
- .debug_abbrev  0x000000000000026e       0x88 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
- .debug_abbrev  0x00000000000002f6      0x9ef /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_abbrev  0x0000000000000ce5      0x4ea /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_abbrev  0x00000000000011cf      0x5e7 /usr/share/pok/libpok/libpok.a(libc.lo)
- .debug_abbrev  0x00000000000017b6      0x136 /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_abbrev  0x00000000000018ec      0x58e /usr/share/pok/libpok/libpok.a(middleware.lo)
+.debug_line     0x0000000000000000     0x1dc4
+ .debug_line    0x0000000000000000       0xb0 main.o
+ .debug_line    0x00000000000000b0       0x6b activity.o
+ .debug_line    0x000000000000011b      0x123 subprograms.o
+ .debug_line    0x000000000000023e       0x1d gtypes.o
+ .debug_line    0x000000000000025b       0x5f deployment.o
+ .debug_line    0x00000000000002ba       0xe1 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+ .debug_line    0x000000000000039b      0x667 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_line    0x0000000000000a02      0x3fe /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_line    0x0000000000000e00      0x110 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_line    0x0000000000000f10      0x9d7 /usr/share/pok/libpok/libpok.a(core.lo)
+ .debug_line    0x00000000000018e7      0x4dd /usr/share/pok/libpok/libpok.a(middleware.lo)
 
-.debug_loc      0x0000000000000000     0x13c4
- .debug_loc     0x0000000000000000       0x38 main.o
- .debug_loc     0x0000000000000038       0x2c activity.o
- .debug_loc     0x0000000000000064       0x2c subprograms.o
- .debug_loc     0x0000000000000090      0x150 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
- .debug_loc     0x00000000000001e0      0x230 /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_loc     0x0000000000000410      0x6c6 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_loc     0x0000000000000ad6      0x80e /usr/share/pok/libpok/libpok.a(libc.lo)
- .debug_loc     0x00000000000012e4       0x38 /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_loc     0x000000000000131c       0xa8 /usr/share/pok/libpok/libpok.a(middleware.lo)
+.debug_loc      0x0000000000000000     0x116d
+ .debug_loc     0x0000000000000000       0x29 main.o
+ .debug_loc     0x0000000000000029       0x14 activity.o
+ .debug_loc     0x000000000000003d       0x33 subprograms.o
+ .debug_loc     0x0000000000000070       0x86 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+ .debug_loc     0x00000000000000f6      0x8e0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_loc     0x00000000000009d6      0x5d1 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_loc     0x0000000000000fa7       0x27 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_loc     0x0000000000000fce       0xe7 /usr/share/pok/libpok/libpok.a(core.lo)
+ .debug_loc     0x00000000000010b5       0xb8 /usr/share/pok/libpok/libpok.a(middleware.lo)
+
+.debug_pubnames
+                0x0000000000000000      0x718
+ .debug_pubnames
+                0x0000000000000000       0x67 main.o
+ .debug_pubnames
+                0x0000000000000067       0x6e activity.o
+ .debug_pubnames
+                0x00000000000000d5       0xac subprograms.o
+ .debug_pubnames
+                0x0000000000000181       0x35 deployment.o
+ .debug_pubnames
+                0x00000000000001b6       0x3e /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+ .debug_pubnames
+                0x00000000000001f4      0x238 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .debug_pubnames
+                0x000000000000042c       0x80 /usr/share/pok/libpok/libpok.a(libc.lo)
+ .debug_pubnames
+                0x00000000000004ac       0x25 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .debug_pubnames
+                0x00000000000004d1      0x1bb /usr/share/pok/libpok/libpok.a(core.lo)
+ .debug_pubnames
+                0x000000000000068c       0x8c /usr/share/pok/libpok/libpok.a(middleware.lo)
 
 .debug_aranges  0x0000000000000000      0x360
  .debug_aranges
@@ -234,68 +258,54 @@ OUTPUT(the_proc1.elf elf32-i386)
  .debug_aranges
                 0x0000000000000040       0x20 subprograms.o
  .debug_aranges
-                0x0000000000000060       0x20 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+                0x0000000000000060       0x20 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
  .debug_aranges
-                0x0000000000000080      0x140 /usr/share/pok/libpok/libpok.a(core.lo)
+                0x0000000000000080       0xa0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
  .debug_aranges
-                0x00000000000001c0       0xa0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                0x0000000000000120       0x80 /usr/share/pok/libpok/libpok.a(libc.lo)
  .debug_aranges
-                0x0000000000000260       0x80 /usr/share/pok/libpok/libpok.a(libc.lo)
+                0x00000000000001a0       0x20 /usr/share/pok/libpok/libpok.a(arch.lo)
  .debug_aranges
-                0x00000000000002e0       0x20 /usr/share/pok/libpok/libpok.a(arch.lo)
+                0x00000000000001c0      0x140 /usr/share/pok/libpok/libpok.a(core.lo)
  .debug_aranges
                 0x0000000000000300       0x60 /usr/share/pok/libpok/libpok.a(middleware.lo)
 
-.debug_line     0x0000000000000000     0x1daf
- .debug_line    0x0000000000000000       0xa3 main.o
- .debug_line    0x00000000000000a3       0x70 activity.o
- .debug_line    0x0000000000000113      0x134 subprograms.o
- .debug_line    0x0000000000000247       0x1d gtypes.o
- .debug_line    0x0000000000000264       0x5f deployment.o
- .debug_line    0x00000000000002c3       0xfe /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
- .debug_line    0x00000000000003c1      0x9e2 /usr/share/pok/libpok/libpok.a(core.lo)
- .debug_line    0x0000000000000da3      0x623 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .debug_line    0x00000000000013c6      0x3f8 /usr/share/pok/libpok/libpok.a(libc.lo)
- .debug_line    0x00000000000017be      0x111 /usr/share/pok/libpok/libpok.a(arch.lo)
- .debug_line    0x00000000000018cf      0x4e0 /usr/share/pok/libpok/libpok.a(middleware.lo)
-
-.debug_str      0x0000000000000000     0x1ef9
- .debug_str     0x0000000000000000      0x2d0 main.o
-                                        0x336 (size before relaxing)
- .debug_str     0x00000000000002d0       0x63 activity.o
-                                        0x1ae (size before relaxing)
- .debug_str     0x0000000000000333      0x5e9 subprograms.o
-                                        0x805 (size before relaxing)
- .debug_str     0x000000000000091c        0x9 gtypes.o
-                                        0x128 (size before relaxing)
- .debug_str     0x0000000000000925        0xd deployment.o
-                                        0x158 (size before relaxing)
- .debug_str     0x0000000000000932       0xc4 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
-                                        0x15a (size before relaxing)
- .debug_str     0x00000000000009f6      0x980 /usr/share/pok/libpok/libpok.a(core.lo)
-                                       0x4f8b (size before relaxing)
- .debug_str     0x0000000000001376      0x683 /usr/share/pok/libpok/libpok.a(arinc653.lo)
-                                       0x2910 (size before relaxing)
- .debug_str     0x00000000000019f9      0x255 /usr/share/pok/libpok/libpok.a(libc.lo)
-                                        0xeab (size before relaxing)
- .debug_str     0x0000000000001c4e       0x75 /usr/share/pok/libpok/libpok.a(arch.lo)
+.debug_str      0x0000000000000000     0x1ed7
+ .debug_str     0x0000000000000000      0x302 main.o
+                                        0x368 (size before relaxing)
+ .debug_str     0x0000000000000302       0x63 activity.o
+                                        0x19e (size before relaxing)
+ .debug_str     0x0000000000000365      0x5d7 subprograms.o
+                                        0x7f5 (size before relaxing)
+ .debug_str     0x000000000000093c        0x9 gtypes.o
+                                        0x118 (size before relaxing)
+ .debug_str     0x0000000000000945        0xd deployment.o
+                                        0x148 (size before relaxing)
+ .debug_str     0x0000000000000952       0x7b /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+                                        0x117 (size before relaxing)
+ .debug_str     0x00000000000009cd      0xd12 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+                                       0x28d7 (size before relaxing)
+ .debug_str     0x00000000000016df      0x25c /usr/share/pok/libpok/libpok.a(libc.lo)
+                                        0xe98 (size before relaxing)
+ .debug_str     0x000000000000193b       0x88 /usr/share/pok/libpok/libpok.a(arch.lo)
                                         0x89c (size before relaxing)
- .debug_str     0x0000000000001cc3      0x236 /usr/share/pok/libpok/libpok.a(middleware.lo)
-                                       0x2620 (size before relaxing)
+ .debug_str     0x00000000000019c3      0x2de /usr/share/pok/libpok/libpok.a(core.lo)
+                                       0x4ef3 (size before relaxing)
+ .debug_str     0x0000000000001ca1      0x236 /usr/share/pok/libpok/libpok.a(middleware.lo)
+                                       0x25e7 (size before relaxing)
 
-.comment        0x0000000000000000       0x2a
- .comment       0x0000000000000000       0x2a main.o
-                                         0x2b (size before relaxing)
- .comment       0x0000000000000000       0x2b activity.o
- .comment       0x0000000000000000       0x2b subprograms.o
- .comment       0x0000000000000000       0x2b gtypes.o
- .comment       0x0000000000000000       0x2b deployment.o
- .comment       0x0000000000000000       0x2b /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
- .comment       0x0000000000000000      0x5e1 /usr/share/pok/libpok/libpok.a(core.lo)
- .comment       0x0000000000000000      0x1d9 /usr/share/pok/libpok/libpok.a(arinc653.lo)
- .comment       0x0000000000000000      0x25a /usr/share/pok/libpok/libpok.a(libc.lo)
- .comment       0x0000000000000000       0xac /usr/share/pok/libpok/libpok.a(arch.lo)
- .comment       0x0000000000000000      0x408 /usr/share/pok/libpok/libpok.a(middleware.lo)
+.comment        0x0000000000000000      0x69c
+ .comment       0x0000000000000000       0x12 main.o
+ .comment       0x0000000000000012       0x12 activity.o
+ .comment       0x0000000000000024       0x12 subprograms.o
+ .comment       0x0000000000000036       0x12 gtypes.o
+ .comment       0x0000000000000048       0x12 deployment.o
+ .comment       0x000000000000005a       0x12 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
+ .comment       0x000000000000006c       0xc6 /usr/share/pok/libpok/libpok.a(arinc653.lo)
+ .comment       0x0000000000000132       0xfc /usr/share/pok/libpok/libpok.a(libc.lo)
+ .comment       0x000000000000022e       0x48 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .comment       0x0000000000000276      0x276 /usr/share/pok/libpok/libpok.a(core.lo)
+ .comment       0x00000000000004ec      0x1b0 /usr/share/pok/libpok/libpok.a(middleware.lo)
 
 .note.GNU-stack
                 0x0000000000000000        0x0
@@ -310,15 +320,15 @@ OUTPUT(the_proc1.elf elf32-i386)
  .note.GNU-stack
                 0x0000000000000000        0x0 deployment.o
  .note.GNU-stack
-                0x0000000000000000        0x0 /home/borde/Dev/develop/ramses/build_and_test/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
- .note.GNU-stack
-                0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
+                0x0000000000000000        0x0 /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/user_code.o
  .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(arinc653.lo)
  .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(libc.lo)
  .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(arch.lo)
+ .note.GNU-stack
+                0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(core.lo)
  .note.GNU-stack
                 0x0000000000000000        0x0 /usr/share/pok/libpok/libpok.a(middleware.lo)
 

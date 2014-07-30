@@ -13,7 +13,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         };
       the_cpu1_system_part_comm: thread the_cpu1_system_part_comProcess_the_cpu1_system_part_comm.impl {
         Period => 1000 ms;
-        Priority => 10;
+        Priority => 8;
         Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
         Dispatch_Protocol => Periodic;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
@@ -34,7 +34,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         };
       the_cpu2_system_part_comm: thread the_cpu2_system_part_comProcess_the_cpu2_system_part_comm.impl {
         Period => 1000 ms;
-        Priority => 10;
+        Priority => 8;
         Initialize_Entrypoint_Call_Sequence => reference(system_part_initPollCallSequence);
         Dispatch_Protocol => Periodic;
         Compute_Entrypoint_Call_Sequence => reference(main_call);
@@ -497,7 +497,7 @@ Send_Queuing_Message_Integer ! (the_proc2_p_in_cnx_p_in, p_in_localVariable, the
         } 
       ;
     connections
-      p_in_accessCnx_the_cpu2_communicationCallSequence: data access the_proc2_p_in_cnx_p_in -> call_entrypoint.the_proc2_p_in_cnx_p_in;
+      p_in_accessCnx_the_cpu2_communicationCallSequence_the_proc2_p_in_cnx: data access the_proc2_p_in_cnx_p_in -> call_entrypoint.the_proc2_p_in_cnx_p_in;
       the_proc2_p_in_createVirtualPortCnx: parameter the_proc2_p_in_createVirtualPort.name -> the_proc2_p_in_createVirtualPortName;
       the_proc2_p_in_createVirtualPortCnx2: parameter the_proc2_p_in_createVirtualPort.id -> the_proc2_p_in_createVirtualPortId;
       the_proc2_p_in_comConnectionLength: parameter call_entrypoint.the_proc2_p_in_comConnectionLength_len -> the_proc2_p_in_length;
@@ -600,7 +600,7 @@ Send_Queuing_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_
         } 
       ;
     connections
-      p_out_accessCnx_call: data access cnx_p_out -> call_entrypoint.cnx_p_out;
+      p_out_accessCnx_call_cnx: data access cnx_p_out -> call_entrypoint.cnx_p_out;
   end the_proc1_the_sender.impl;
   
   thread the_proc1_the_sender
