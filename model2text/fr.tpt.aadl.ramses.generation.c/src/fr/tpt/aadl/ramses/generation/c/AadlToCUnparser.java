@@ -807,17 +807,19 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                   String type = PropertyUtils.getStringValue(cv.getClassifier(), "Source_Name");
                   List<String> fileNameList = PropertyUtils.getStringListValue(cv.getClassifier(), "Source_Text");
                   boolean headerReferenced = false;
-                  for(String fileName : fileNameList)
+                  if(fileNameList != null)
                   {
-                    if(fileName.endsWith(".h"))
+                    for(String fileName : fileNameList)
                     {
-                      headerReferenced=true;
-                      _additionalHeaders.get(_gtypesHeaderCode).add(fileName);
+                      if(fileName.endsWith(".h"))
+                      {
+                        headerReferenced=true;
+                        _additionalHeaders.get(_gtypesHeaderCode).add(fileName);
+                      }
                     }
+                    if(type == null && headerReferenced)
+                      type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
                   }
-                  if(type == null && headerReferenced)
-                    type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
-                  
                   structDefinition.append("\t"+type +
                         " " +
                         stringifiedElementNames.get(lv.getOwnedListElements()
