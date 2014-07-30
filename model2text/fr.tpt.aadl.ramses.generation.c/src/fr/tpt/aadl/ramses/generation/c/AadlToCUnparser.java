@@ -817,9 +817,9 @@ public class AadlToCUnparser extends AadlProcessingSwitch
                         _additionalHeaders.get(_gtypesHeaderCode).add(fileName);
                       }
                     }
-                    if(type == null && headerReferenced)
-                      type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
                   }
+                  if(type == null || headerReferenced==false)
+                    type = GenerationUtilsC.getGenerationCIdentifier(cv.getClassifier().getQualifiedName()) ;
                   structDefinition.append("\t"+type +
                         " " +
                         stringifiedElementNames.get(lv.getOwnedListElements()
