@@ -26,3 +26,4 @@
 #include <arinc653/blackboard.h>
 
 #endif
+void __aadl_send_output (unsigned int port_variable, void * value);
