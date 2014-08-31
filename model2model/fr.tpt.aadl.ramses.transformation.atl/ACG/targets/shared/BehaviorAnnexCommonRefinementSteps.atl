@@ -575,7 +575,11 @@ rule m_BehaviorActionsFromThread
 						if(src_transition.actionBlock.oclIsUndefined()) then
 							Sequence{}
 						else
-							Sequence{src_transition.actionBlock.content.resolve(c)}
+							if(src_transition.actionBlock.content.oclIsKindOf(AADLBA!BehaviorActionCollection)) then
+								src_transition.actionBlock.content.actions->collect(e|e.resolve(c))
+							else
+								Sequence{src_transition.actionBlock.content.resolve(c)}
+							endif
 						endif
 					)
 					->flatten()
@@ -589,7 +593,8 @@ rule m_BehaviorActionsFromThread
 						c.featureInstance->select(f| (f.isOutputFeature() or f.isInputOutputFeature()) and f.feature.oclIsTypeOf(AADLI!DataPort) and f.isUsedInFresh())
 						->collect( e | 
 							e.srcConnectionInstance->collect(
-								cnx| thisModule.createUpdateFreshnessToSend(e, cnx.connectionReference->first().connection))
+								cnx| thisModule.createUpdateFreshnessToSend(e, cnx.connectionReference->first().connection)
+							)
 						)
 					)
 					->append(updateState)
@@ -610,6 +615,7 @@ rule m_BehaviorActionsFromThread
 						endif
 					)
 					->flatten()
+					->excluding(OclUndefined)
 	),
 	isStateSource: AADLBA!ValueExpression
 	(
