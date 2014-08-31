@@ -194,19 +194,25 @@ public class ToolSuiteLauncher
                        ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, _monitor) ;
   }
 
-  void launchWorkflowProcess (List<File> mainModels,
-                              String systemToInstantiate,
-                              RamsesConfiguration config,
-                              File[] includeDirs,
-                              String workflowFilePath)
+  void launchWorkflowProcessForGeneration (List<File> mainModels,
+                                           String systemToInstantiate,
+                                           RamsesConfiguration config,
+                                           File[] includeDirs,
+                                           String workflowFilePath)
                                                       throws AnalysisException,
                                                       GenerationException,
                                                       TransformationException,
                                                       ParseException, FileNotFoundException
   {
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
-    Generator generator = registry.getGenerator(config.getTargetId()) ;
-    
+    Generator generator;
+    if(config.getTargetId()!=null)
+    {
+      generator = registry.getGenerator(config.getTargetId()) ;
+    }
+    else
+      generator = registry.getGenerator("workflow_only");
+                                        
     _monitor.subTask("Parse AADL models");
     List<Resource> aadlModels = _instantiator.parse(mainModels) ;
     

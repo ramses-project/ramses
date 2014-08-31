@@ -338,6 +338,8 @@ public class AadlTargetSpecificGenerator implements Generator
         Resource inputResource = modelsMap.get(xmlPilot.getInputModelId());
         if(inputResource!=null)
           r = inputResource;
+        if(runtimeDir==null)
+          throw new GenerationException("runtime path was not set, code generation cannot be complete.");
         doGeneration(runtimeDir, outputDir, includeDirs, r, monitor) ;
       }
       else if(operation.equals("loop"))
@@ -972,16 +974,17 @@ public class AadlTargetSpecificGenerator implements Generator
 
   @Override
   public List<String> getTransformationModuleList() {
-	List<String> res = AtlTransfoLauncher.getUninstanciateTransformationModuleList(); 
-	res.addAll(_targetTrans.getTransformationModuleList());
-	return res;
+    List<String> res = AtlTransfoLauncher.getUninstanciateTransformationModuleList(); 
+    res.addAll(_targetTrans.getTransformationModuleList());
+    return res;
   }
   
   @Override
   public List<String> getValidationModuleList() {
-	List<String> res = new ArrayList<String>(); 
-	res.addAll(_modelValidator.getTransformationModuleList());
-	return res;
+    List<String> res = new ArrayList<String>();
+    if(_modelValidator!=null)
+      res.addAll(_modelValidator.getTransformationModuleList());
+    return res;
   }
   
 }

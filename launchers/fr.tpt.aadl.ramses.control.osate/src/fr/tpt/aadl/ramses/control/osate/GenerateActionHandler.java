@@ -82,38 +82,59 @@ public class GenerateActionHandler extends RamsesActionHandler {
     try
     {
       _JOB_NAME = "RAMSES code generation";
-      init(event, _OUTLINE_COMMAND_ID) ;
       
-      // Fetch RAMSES configuration.
-      try
-      {
-        RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
-      }
-      catch (ConfigurationException ee)
-      {
-        if(RamsesPropertyPage.openPropertyDialog(_currentProject))
-        {
-          // Reload configuration.
-          RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
-        }
-        else // User has canceled.
-        {
-          return null ;
-        }
-      }
-      finally
-      {
-        // Only call once because it creates a log file.
-        LoggingConfigPage.fetchLoggingProperties(_currentProject);
-        _config.log() ;
-      }
+      init(event, _OUTLINE_COMMAND_ID) ;
       
       Resource r;
       if(_sysImpl!=null)
-    	  r = _sysImpl.eResource();
+        r = _sysImpl.eResource();
       else
-    	  r = _sysInst.eResource();
+        r = _sysInst.eResource();
       String workflowFile = getConfigFile(r, "workflow");
+
+      boolean foundGenerationPhase = false;
+
+      if(workflowFile!=null)
+      {
+        URI uri = URI.createFileURI(workflowFile);
+        Resource workflow = r.getResourceSet().getResource(uri, true);
+        TreeIterator<EObject> iter = workflow.getAllContents();
+        while(iter.hasNext())
+        {
+          EObject eObj = iter.next();
+          if(eObj instanceof fr.tpt.aadl.ramses.control.workflow.Generation)
+            foundGenerationPhase = true;
+        }
+      }
+      else
+        foundGenerationPhase = true;
+
+      if(foundGenerationPhase)
+      {
+        // Fetch RAMSES configuration.
+        try
+        {
+          RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
+        }
+        catch (ConfigurationException ee)
+        {
+          if(RamsesPropertyPage.openPropertyDialog(_currentProject))
+          {
+            // Reload configuration.
+            RamsesPropertyPage.fetchProperties(_currentProject, _config) ;
+          }
+          else // User has canceled.
+          {
+            return null ;
+          }
+        }
+        finally
+        {
+          // Only call once because it creates a log file.
+          LoggingConfigPage.fetchLoggingProperties(_currentProject);
+          _config.log() ;
+        }
+      }
       if(workflowFile!=null)
       {
         try
