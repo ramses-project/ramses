@@ -102,7 +102,6 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
         ARINC653::Module_Major_Frame => 4000 ms;
         POK::Scheduler => STATIC;
         ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
-        ARINC653::Slots_Allocation => (reference(the_part1), reference(the_part1), reference(the_part2));
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -153,6 +152,7 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
       Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2;
       Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2;
+      ARINC653::Slots_Allocation => (reference(the_cpu.the_part1), reference(the_cpu.the_part1), reference(the_cpu.the_part2)) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1.the_sender;
       Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2.the_receiver;

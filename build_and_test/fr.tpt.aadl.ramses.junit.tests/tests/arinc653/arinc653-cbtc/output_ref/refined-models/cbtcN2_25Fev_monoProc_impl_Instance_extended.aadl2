@@ -204,7 +204,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Thread_Swap_Execution_Time => 5 ms .. 10 ms;
         ARINC653::Module_Major_Frame => 600 ms;
         ARINC653::Partition_Slots => (300 ms, 300 ms);
-        ARINC653::Slots_Allocation => (reference(VP_railway_inst), reference(VP_train_inst));
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Module configuration error";
@@ -229,6 +228,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst;
       Actual_Processor_Binding => (reference(root_inst.VP_railway_inst)) applies to railway_inst;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to railway_inst;
+      ARINC653::Slots_Allocation => (reference(root_inst.VP_railway_inst), reference(root_inst.VP_train_inst)) applies to root_inst;
       Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to train_inst.TrainPpu_odometerAcquisition;
       Actual_Processor_Binding => (reference(root_inst.VP_train_inst)) applies to train_inst.TrainPpu_trainTraction;

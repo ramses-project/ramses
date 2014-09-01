@@ -261,7 +261,6 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
         Thread_Swap_Execution_Time => 5 ms .. 10 ms;
         ARINC653::Module_Major_Frame => 1000 ms;
         ARINC653::Partition_Slots => (500 ms, 500 ms);
-        ARINC653::Slots_Allocation => (reference(VP_S1_inst), reference(VP_S2_inst));
         ARINC653::Module_Version => "1.0";
         ARINC653::Module_Identifier => "ping-pong.root";
         Process_Swap_Execution_Time => 5 ms .. 10 ms;
@@ -276,6 +275,7 @@ with Base_Types,AADL_Project,Data_Model,Timing_Properties,Memory_Properties,Thre
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst;
       Actual_Processor_Binding => (reference(root_inst.VP_S2_inst)) applies to S2_inst;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S2_inst;
+      ARINC653::Slots_Allocation => (reference(root_inst.VP_S1_inst), reference(root_inst.VP_S2_inst)) applies to root_inst;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.State_baKeywords;
       Actual_Memory_Binding => (reference(root_main_memory_inst)) applies to S1_inst.seqNb;
       Actual_Processor_Binding => (reference(root_inst.VP_S1_inst)) applies to S1_inst.Monitor_changeState;

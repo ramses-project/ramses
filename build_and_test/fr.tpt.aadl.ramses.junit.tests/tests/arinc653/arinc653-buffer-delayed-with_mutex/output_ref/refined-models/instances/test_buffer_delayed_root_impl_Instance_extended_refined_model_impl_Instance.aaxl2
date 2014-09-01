@@ -539,6 +539,14 @@
   </componentInstance>
   <componentInstance name="the_cpu" category="processor">
     <ownedPropertyAssociation>
+      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/bundles/47/1/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.1"/>
+      <ownedValue>
+        <ownedValue xsi:type="aadl2:ListValue">
+          <ownedListElement xsi:type="instance:InstanceReferenceValue" referencedInstanceObject="//@componentInstance.2/@componentInstance.0"/>
+        </ownedValue>
+      </ownedValue>
+    </ownedPropertyAssociation>
+    <ownedPropertyAssociation>
       <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/bundles/47/1/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.2"/>
       <ownedValue>
         <ownedValue xsi:type="aadl2:IntegerLiteral" value="1000">
@@ -561,18 +569,6 @@
       <ownedValue>
         <ownedValue xsi:type="aadl2:NamedValue">
           <namedValue xsi:type="aadl2:EnumerationLiteral" href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/bundles/47/1/.cp/aadl_resources/propertyset/pok_properties.aadl2#//@ownedPropertyType.0/@ownedLiteral.5"/>
-        </ownedValue>
-      </ownedValue>
-    </ownedPropertyAssociation>
-    <ownedPropertyAssociation>
-      <property href="../../../../../../../ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/bundles/47/1/.cp/aadl_resources/propertyset/ARINC653.aadl2#//@ownedProperty.1"/>
-      <ownedValue>
-        <ownedValue xsi:type="aadl2:ListValue">
-          <ownedListElement xsi:type="aadl2:ReferenceValue">
-            <containmentPathElement>
-              <namedElement xsi:type="aadl2:VirtualProcessorSubcomponent" href="../test_buffer_delayed_root_impl_Instance_extended.aadl2#//@ownedPublicSection/@ownedClassifier.1/@ownedVirtualProcessorSubcomponent.0"/>
-            </containmentPathElement>
-          </ownedListElement>
         </ownedValue>
       </ownedValue>
     </ownedPropertyAssociation>

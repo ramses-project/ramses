@@ -91,7 +91,6 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       node_1_inst: processor node_1.impl {
         ARINC653::Module_Major_Frame => 2000 ms;
         ARINC653::Partition_Slots => (1000 ms, 1000 ms);
-        ARINC653::Slots_Allocation => (reference(VP_S1_inst), reference(VP_S2_inst));
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
         Scheduling_Protocol => (ARINC653);
@@ -101,6 +100,7 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S2_inst)) applies to S2_inst;
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst;
+      ARINC653::Slots_Allocation => (reference(node_1_inst.VP_S1_inst), reference(node_1_inst.VP_S2_inst)) applies to node_1_inst;
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.state_baKeywords;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S1_inst)) applies to S1_inst.a1_inst;
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst;

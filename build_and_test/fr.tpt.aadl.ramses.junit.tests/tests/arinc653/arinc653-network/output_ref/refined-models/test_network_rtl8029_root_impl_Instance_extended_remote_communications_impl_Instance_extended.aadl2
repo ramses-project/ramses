@@ -146,7 +146,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         ARINC653::Module_Major_Frame => 2000 ms;
         POK::Scheduler => STATIC;
         ARINC653::Partition_Slots => (1000 ms, 1000 ms);
-        ARINC653::Slots_Allocation => (reference(the_part), reference(system_part));
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -197,7 +196,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         ARINC653::Module_Major_Frame => 2000 ms;
         POK::Scheduler => STATIC;
         ARINC653::Partition_Slots => (1000 ms, 1000 ms);
-        ARINC653::Slots_Allocation => (reference(the_part), reference(system_part));
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -255,6 +253,8 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
       Actual_Memory_Binding => (reference(the_mem1.part1_mem)) applies to the_proc1;
       Actual_Processor_Binding => (reference(the_cpu2.the_part)) applies to the_proc2;
       Actual_Memory_Binding => (reference(the_mem2.part1_mem)) applies to the_proc2;
+      ARINC653::Slots_Allocation => (reference(the_cpu1.the_part), reference(the_cpu1.system_part)) applies to the_cpu1;
+      ARINC653::Slots_Allocation => (reference(the_cpu2.the_part), reference(the_cpu2.system_part)) applies to the_cpu2;
       Actual_Processor_Binding => (reference(the_cpu1.system_part)) applies to the_cpu1_system_part_comProcess.system_part_comm;
       Actual_Memory_Binding => (reference(the_mem1.part2_mem)) applies to the_cpu1_system_part_comProcess.system_part_comm;
       Actual_Processor_Binding => (reference(the_cpu1.system_part)) applies to the_cpu1_system_part_comProcess.the_cpu1_system_part_comm;
