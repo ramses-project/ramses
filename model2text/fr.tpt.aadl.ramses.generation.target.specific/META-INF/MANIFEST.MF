@@ -27,4 +27,3 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.generation.target.specific
 Bundle-Vendor: TELECOM Paristech
-Import-Package: fr.openpeople.rdal2.model.rdal.impl
