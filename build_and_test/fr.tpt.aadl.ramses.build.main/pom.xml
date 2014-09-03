@@ -55,7 +55,6 @@
     <module>../../analysis/fr.tpt.aadl.sched.wcetanalysis.results</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.result</module>
     <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
-    <module>../../requirements/fr.tpt.rdal.utils</module>
     <module>../fr.tpt.aadl.ramses.build.feature</module>
     <module>../fr.tpt.aadl.ramses.build.distribution</module>
     <module>../fr.tpt.aadl.ramses.build.update.site</module>
