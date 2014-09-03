@@ -1,18 +1,40 @@
 package fr.tpt.aadl.ramses.transformation.selection.sensitivity;
 
+import java.io.FileInputStream ;
+import java.io.IOException ;
+import java.io.InputStream ;
 import java.util.ArrayList ;
+import java.util.HashMap ;
 import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
+import java.util.Properties ;
 import java.util.Map.Entry ;
 import java.util.Set ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 
 import fr.openpeople.rdal2.model.rdal.Specification ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
+import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
+import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
+import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
+import fr.tpt.aadl.ramses.control.workflow.ResolutionMethod ;
+import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
+import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
+import fr.tpt.aadl.ramses.generation.target.specific.LoopManager ;
+import fr.tpt.aadl.ramses.transformation.launcher.ArchitectureRefinementProcessLauncher ;
 import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
 import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
 import fr.tpt.aadl.ramses.transformation.selection.TupleEntry ;
@@ -20,12 +42,15 @@ import fr.tpt.aadl.ramses.transformation.selection.utils.SelectionAlgorithm ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 import fr.tpt.rdal.parser.RdalParser ;
 
-public class SensitivityBasedSelection implements ITransformationSelection {
+public class SensitivityBasedSelection implements ITransformationSelection,LoopManager
+{
 
   private static Logger _LOGGER = Logger.getLogger(SensitivityBasedSelection.class) ;
   
@@ -35,14 +60,96 @@ public class SensitivityBasedSelection implements ITransformationSelection {
   private String currentQualityAttributeToImprove=null;
   private int maxSensitivities=0;
   
-  public SensitivityBasedSelection(TrcSpecification trc,
-                                   Specification rdalSpecification)
+  AadlTargetSpecificGenerator generator;
+  Resource currentImplResource;
+  AbstractLoop l;
+  AnalysisErrorReporterManager errManager;
+  WorkflowPilot workflowPilot;
+  RamsesConfiguration config;
+  IProgressMonitor monitor;
+  
+  Properties prop;
+  
+  public SensitivityBasedSelection(AadlTargetSpecificGenerator generator,
+                                   AbstractLoop l,
+                                   AnalysisErrorReporterManager errManager,
+                                   WorkflowPilot workflowPilot,
+                                   RamsesConfiguration config,
+                                   IProgressMonitor monitor)
   {
-    this.trc = trc;
-    this.rdal = rdalSpecification;
+    this.generator = generator;
+    
+    String propertyFile = (String) config.getParameters().get(Names.RAMSES_PROPERTIES);
+    
+    prop = new Properties();
+    try {
+      InputStream in = new FileInputStream(propertyFile);
+      prop.load(in);
+    } catch (IOException e) {
+      String message = "could not open property file "
+          + propertyFile;
+      _LOGGER.error(message);
+      e.printStackTrace();
+    }
+    
+    currentImplResource = generator.currentImplResource;
+    
+    ResourceSet rs = currentImplResource.getResourceSet();
+    
+    String trcPath = prop.getProperty("ArchitectureRefinementLauncher.trc");
+    if(trcPath!=null)
+      TrcParser.parse(trcPath, rs);
+    
+    String rdalPath = prop.getProperty("ArchitectureRefinementLauncher.rdal");
+    if(trcPath!=null)
+      RdalParser.parse(rdalPath, rs);
+        
+    List<Transformation> list = l.getTransformations();
+    Resource r = list.get(0).eResource();
+    trc = (TrcSpecification) r.getContents().get(0);
+    EObject obj = workflowPilot.getWokflowRoot().getRequirementsRoot();
+    rdal = (Specification) obj;
+    
   }
   
-  
+  @Override
+  public String getResolutionMethodName()
+  {
+    return ResolutionMethod.SENSITIVITY_MERGE.getName() ;
+  }
+
+  @Override
+  public Map<? extends String, ? extends Resource> processLoop() throws AnalysisException, ParseException, TransformationException, ConfigurationException, IOException
+  {
+    
+    Map<String, Resource> resultingMap = new HashMap<String, Resource>();
+    
+    ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
+        (trc,
+         this.currentImplResource.getResourceSet(),
+         config,
+         this,
+         prop,
+         l.getTransformations(),
+         generator._modelInstantiator,
+         generator._predefinedResourceManager
+         );
+    
+    SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
+    generator.loopIteration=0;
+    boolean loopAnalysis = false;
+    while(!loopAnalysis)
+    {
+      generator.loopIteration++;
+      Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
+      if(result==null)
+        break;
+      String modelIdSuffix = "_iter_"+generator.loopIteration;
+      resultingMap.put(workflowPilot.getOutputModelId()+modelIdSuffix, result);
+      loopAnalysis = generator.isValidLoopIteration(l.getAnalysis(), errManager, workflowPilot, config, workflowPilot.getOutputModelId(), modelIdSuffix, monitor);
+    }
+    return resultingMap;
+  }
   
     public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply)
     {
@@ -422,4 +529,5 @@ public class SensitivityBasedSelection implements ITransformationSelection {
 		}
 		return null; // Should never reach this line
 	}
+
 }

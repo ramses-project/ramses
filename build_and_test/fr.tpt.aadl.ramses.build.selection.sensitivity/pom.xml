@@ -17,49 +17,22 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.cli.core</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.cli.osgi</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.edit</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.editor</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.osate</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.cli.static</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.atl.launch</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.cli.instantiation</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.c</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.ada</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.ada.ravenscar</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.osek</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.pok</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.integrity</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.arinc653.xml</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.target.specific</module>
-    <module>../../model2text/fr.tpt.aadl.ramses.generation.utils</module>
-    <module>../../model2model/fr.tpt.aadl.ramses.transformation.atl</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.merge.launcher</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.tip</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.edit</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.editor</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection</module>
-    <module>../../model2model/fr.tpt.aadl.ramses.communication.periodic.delayed</module>
-    <module>../../model2model/fr.tpt.aadl.ramses.util.math</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection.sensitivity</module>
     <module>../../model2model/fr.tpt.atl.hots</module>
     <module>../../model2model/fr.tpt.atl.utils</module>
     <module>../../analysis/fr.tpt.aadl.ramses.util.properties</module>
     <module>../../analysis/fr.tpt.aadl.sched.propertiesextractor</module>
-    <module>../../analysis/fr.tpt.aadl.sched.tools.cheddar</module>
-    <module>../../analysis/fr.tpt.aadl.sched.tools.aadlinspector</module>
-    <module>../../analysis/fr.tpt.aadl.ramses.analysis.memoryfootprint</module>
-    <module>../../analysis/fr.tpt.aadl.ramses.analysis.asg</module>
-    <module>../../analysis/fr.tpt.aadl.sched.wcetanalysis.results</module>
-    <module>../../analysis/fr.tpt.aadl.ramses.analysis.result</module>
-    <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
     <module>../../requirements/fr.tpt.rdal.utils</module>
-    <module>../fr.tpt.aadl.ramses.build.feature</module>
-    <module>../fr.tpt.aadl.ramses.build.distribution</module>
-    <module>../fr.tpt.aadl.ramses.build.update.site</module>
-    <module>../fr.tpt.aadl.ramses.control.cli.osgi.product</module>
+    <module>../fr.tpt.aadl.ramses.build.feature.selection.sensitivity</module>
+    <module>../fr.tpt.aadl.ramses.build.update.site.selection.sensitivity</module>
   </modules>
 
   <dependencies> 
@@ -75,6 +48,11 @@
       <id>emftvm</id>
       <layout>p2</layout>
       <url>http://download.eclipse.org/mmt/atl/updates/milestones/3.5/S201405200835/</url>
+    </repository>
+    <repository>
+      <id>rdal</id>
+      <layout>p2</layout>
+      <url>http://aadl.telecom-paristech.fr/download/rdal-update-site/</url>
     </repository>
     <repository>
       <id>${platform-version-name}</id>
@@ -106,27 +84,7 @@
 
   <build>
     <plugins>
-<!--    
-       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jarsigner-plugin</artifactId>
-        <version>1.2</version>
-        <executions>
-          <execution>
-            <id>sign</id>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <keystore>/path/to/the/keystore</keystore>
-          <alias>Alias name</alias>
-          <storepass>Store password</storepass>
-          <keypass>Key password</keypass>
-        </configuration>
-      </plugin>
--->    
+
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-maven-plugin</artifactId>

@@ -114,7 +114,7 @@ public class SelectionAlgorithm {
 			}
 			else
 			{
-				for(String ruleName: (List<String>) t.getRuleName())
+				for(@SuppressWarnings("unused") String ruleName: (List<String>) t.getRuleName())
 				{
 					OrderedQualityImpact oqi = new OrderedQualityImpact(t);
 

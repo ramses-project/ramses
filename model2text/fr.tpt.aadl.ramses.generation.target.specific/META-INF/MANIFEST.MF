@@ -22,11 +22,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
  fr.tpt.aadl.ramses.control.atl.launch,
  fr.tpt.aadl.ramses.constraints.reporter.metamodel;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.transformation.merge.launcher,
- fr.tpt.aadl.ramses.transformation.selection.sensitivity,
- fr.tpt.aadl.ramses.transformation.selection;bundle-version="1.0.0",
- fr.tpt.aadl.ramses.transformation.selection.manual,
- fr.openpeople.rdal2.model,
- fr.tpt.rdal.utils
+ fr.tpt.aadl.ramses.transformation.selection;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.generation.target.specific

@@ -21,6 +21,7 @@ along with this program.  If not, see
 http://www.eclipse.org/org/documents/epl-v10.php
 -->
 <plugin>
+   <extension-point id="fr.tpt.aadl.ramses.generation.target.specific.loopManager" name="loopManager" schema="schema/loopManager.exsd"/>
    <extension
          point="fr.tpt.aadl.ramses.control.support.generator">
       <generator

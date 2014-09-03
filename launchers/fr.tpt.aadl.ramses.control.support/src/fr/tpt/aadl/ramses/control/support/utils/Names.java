@@ -36,6 +36,9 @@ public class Names
 
   public final static String GENERATOR_EXT_ID = "generator" ;
 
+  public static final String LOOPMANAGER_EXT_ID = "loopManager" ;
+
+  
   public static final String ATT_ID = "id" ;
   public static final String ATT_NAME = "name" ;
   public static final String ATT_ANNEXNAME = "annexName" ;
