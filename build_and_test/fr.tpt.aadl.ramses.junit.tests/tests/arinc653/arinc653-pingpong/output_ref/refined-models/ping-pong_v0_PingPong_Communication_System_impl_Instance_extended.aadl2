@@ -84,14 +84,13 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
   system implementation refined_model.impl
     subcomponents
       node1_main_memory_inst: memory node1_main_memory.impl {
-        Memory_Size => 20 KByte;
+        Memory_Size => 90 KByte;
         };
       S1_inst: process S1.impl;
       S2_inst: process S2.impl;
       node_1_inst: processor node_1.impl {
         ARINC653::Module_Major_Frame => 2000 ms;
         ARINC653::Partition_Slots => (1000 ms, 1000 ms);
-        ARINC653::Slots_Allocation => (reference(VP_S1_inst), reference(VP_S2_inst));
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
         Scheduling_Protocol => (ARINC653);
@@ -101,6 +100,7 @@ with ARINC653,POK,Base_Types,Data_Model,PingPong,PeriodicDelayed_runtime,arinc65
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S2_inst)) applies to S2_inst;
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S2_inst;
+      ARINC653::Slots_Allocation => (reference(node_1_inst.VP_S1_inst), reference(node_1_inst.VP_S2_inst)) applies to node_1_inst;
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.state_baKeywords;
       Actual_Processor_Binding => (reference(node_1_inst.VP_S1_inst)) applies to S1_inst.a1_inst;
       Actual_Memory_Binding => (reference(node1_main_memory_inst)) applies to S1_inst.a1_inst;
@@ -238,9 +238,9 @@ Write_Sampling_Message_PingPongMessage ! (C1_pong_implicit_cnx_C1_PongOut, C1_Po
         } 
       ;
     connections
-      Mon_mode_C2_accessCnx_call_seq: data access mode_implicit_cnx_Mon_mode_C2 -> call_entrypoint.mode_implicit_cnx_Mon_mode_C2;
-      C1_PingOut_accessCnx_call_seq: data access C1_ping_implicit_cnx_C1_PingOut -> call_entrypoint.C1_ping_implicit_cnx_C1_PingOut;
-      C1_PongOut_accessCnx_call_seq: data access C1_pong_implicit_cnx_C1_PongOut -> call_entrypoint.C1_pong_implicit_cnx_C1_PongOut;
+      Mon_mode_C2_accessCnx_call_seq_mode_implicit_cnx: data access mode_implicit_cnx_Mon_mode_C2 -> call_entrypoint.mode_implicit_cnx_Mon_mode_C2;
+      C1_PingOut_accessCnx_call_seq_C1_ping_implicit_cnx: data access C1_ping_implicit_cnx_C1_PingOut -> call_entrypoint.C1_ping_implicit_cnx_C1_PingOut;
+      C1_PongOut_accessCnx_call_seq_C1_pong_implicit_cnx: data access C1_pong_implicit_cnx_C1_PongOut -> call_entrypoint.C1_pong_implicit_cnx_C1_PongOut;
       C1_PingIn_accessCnx_call_seq: data access C1_PingIn -> call_entrypoint.C1_PingIn;
       C1_PongIn_accessCnx_call_seq: data access C1_PongIn -> call_entrypoint.C1_PongIn;
       Mon_error_C2_accessCnx_call_seq: data access Mon_error_C2 -> call_entrypoint.Mon_error_C2;
@@ -374,9 +374,9 @@ Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, 
       C2_mode_accessCnx_call_seq: data access C2_mode -> call_entrypoint.C2_mode;
       C2_PingIn_accessCnx_call_seq: data access C2_PingIn -> call_entrypoint.C2_PingIn;
       C2_PongIn_accessCnx_call_seq: data access C2_PongIn -> call_entrypoint.C2_PongIn;
-      C2_PingOut_accessCnx_call_seq: data access C2_ping_implicit_cnx_C2_PingOut -> call_entrypoint.C2_ping_implicit_cnx_C2_PingOut;
-      C2_PongOut_accessCnx_call_seq: data access C2_pong_implicit_cnx_C2_PongOut -> call_entrypoint.C2_pong_implicit_cnx_C2_PongOut;
-      C2_badSequenceNumber_accessCnx_call_seq: data access C2_error_implicit_cnx_C2_badSequenceNumber -> call_entrypoint.C2_error_implicit_cnx_C2_badSequenceNumber;
+      C2_PingOut_accessCnx_call_seq_C2_ping_implicit_cnx: data access C2_ping_implicit_cnx_C2_PingOut -> call_entrypoint.C2_ping_implicit_cnx_C2_PingOut;
+      C2_PongOut_accessCnx_call_seq_C2_pong_implicit_cnx: data access C2_pong_implicit_cnx_C2_PongOut -> call_entrypoint.C2_pong_implicit_cnx_C2_PongOut;
+      C2_badSequenceNumber_accessCnx_call_seq_C2_error_implicit_cnx: data access C2_error_implicit_cnx_C2_badSequenceNumber -> call_entrypoint.C2_error_implicit_cnx_C2_badSequenceNumber;
       cnx7_entrypoint: data access call_entrypoint.call_seq_seqNb_entrypoint -> seqNb;
   end S2_inst_a2_inst.impl;
   

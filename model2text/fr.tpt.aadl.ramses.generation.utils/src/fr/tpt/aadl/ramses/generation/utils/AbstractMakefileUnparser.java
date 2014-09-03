@@ -717,6 +717,12 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             return status;
           }
+
+          @Override
+          public Process getProcess()
+          {
+            return makeCleanProcess ;
+          }
         } ;
 
         // Blocking.
@@ -728,6 +734,8 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           _LOGGER.trace(msg);
           throw new OperationCanceledException(msg) ;
         }
+        
+        _LOGGER.trace("Start compilation");
         
         final Process makeProcess =
             runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
@@ -742,7 +750,9 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             int tmp = makeProcess.waitFor() ;
             
-            return (tmp == 0) ? Command.OK : Command.ERROR ;
+            if(tmp == 0) status=Command.OK;
+            else status=Command.ERROR ;
+            return status;
           }
 
           @Override
@@ -762,8 +772,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             return status;
           }
+
+          @Override
+          public Process getProcess()
+          {
+            return makeProcess ;
+          }
         } ;
-        
+
+        _LOGGER.trace("Compilation command created");
+
         // Blocking.
         waitProcess(cmd, makeProcess) ;
       }

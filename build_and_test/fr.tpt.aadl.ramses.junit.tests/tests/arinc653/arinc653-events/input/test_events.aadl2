@@ -21,7 +21,7 @@
 
 package test_events
 public
-  with POK, Data_Model, ARINC653;
+  with POK, Data_Model, ARINC653, common_pkg;
 
   system root
   end root;

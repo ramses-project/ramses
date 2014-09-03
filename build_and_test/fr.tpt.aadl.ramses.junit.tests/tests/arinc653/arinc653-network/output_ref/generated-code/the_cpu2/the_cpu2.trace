@@ -1,29 +1,11 @@
-QDeclared size for partitiolp' for more in 0 : 80000
-Real size for partition 0     : 96988
-FATAL ERROR: Partition size is not correct
-
-Current state
--------------
-Kernel thread        : 5
-Idle thread          : 6
-Current partition    : 0
-Thread index         : 0
-Thread low           : 0
-Thread high          : 3
-Thread capacity      : 3
-Base addr            : 0x13a000
-Base vaddr           : 0x0
-Size                 : 80000
-Current thread       : 6
-Prev current thread  : 6
-Main thread          : 0
-Main thread entry    : 0x0
-Partition threads sp :
--------------
-Current thread    : 5
-Period            : 0
-Deadline          : 0
-Partition         : 0
-sp                : 0x0
-init_stack_addr   : 0x0
-entry             : 0x0
+POK kernel initialized
+received value: 2
+received value: 2
+received value: 2
+received value: 2
+received value: 2
+received value: 2
+received value: 2
+received value: 2
+received value: 2
+received value: 2

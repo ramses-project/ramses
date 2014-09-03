@@ -26,6 +26,8 @@ public interface Command
   
   public int getStatus();
   
+  public Process getProcess();
+  
   /**
    * Unknown exit status.
    */

@@ -256,10 +256,16 @@ rule m_ThreadEntrypoint {
 		entryPointImg: AADLBA!SubprogramType
 		(
 			name <- c.uniqueName()+'_entrypoint',
-			ownedDataAccess <- 	
-								c.featureInstance->select(e| e.isInputFeature())
+			ownedDataAccess <- 	c.featureInstance->select(e| e.feature.oclIsTypeOf(AADLI!DataAccess))
+								->collect(
+									e|thisModule.resolveMatchedSingleIfExists(e, 'f_entrypoint')
+								)
+								->union
+								(
+									c.featureInstance->select(e| e.isInputFeature())
 									->collect(e|e.collectEntrypointFeature())
 									->flatten()
+								)
 									->union(
 										c.featureInstance->select(e| e.isOutputFeature())
 											->collect
@@ -1118,11 +1124,7 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 	{
 		portsInvoledInCall: Sequence(AADLI!FeatureInstance) = Sequence{};
 		c: AADLI!ComponentInstance = fi.getComponentInstance();
-		intermediateCallActionSequence: Sequence(AADLBA!BehaviorAction) = c.featureInstance->select(fi| 
-					fi.isInputFeature() and
-					(fi.isEventPort() or fi.isEventDataPort())
-			)
-			->collect(fi|thisModule.createReceiveInputCall(fi));
+		intermediateCallActionSequence: Sequence(AADLBA!BehaviorAction) = Sequence{};			
 	}
 	do
 	{

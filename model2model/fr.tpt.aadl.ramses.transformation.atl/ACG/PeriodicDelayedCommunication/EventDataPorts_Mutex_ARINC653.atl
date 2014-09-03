@@ -233,6 +233,11 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_AR
 												)
 									   }
 		)
+		
+		do
+		{
+			ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(semaphoreGlobalVariable, fi);
+		}
 }
 
 -- @extends m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex

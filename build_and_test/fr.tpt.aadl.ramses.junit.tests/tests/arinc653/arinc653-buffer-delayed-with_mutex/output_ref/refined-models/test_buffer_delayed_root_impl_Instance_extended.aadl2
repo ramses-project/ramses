@@ -53,15 +53,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         };
   end cpu.impl;
   
-  processor implementation cpu.single_partition
-  end cpu.single_partition;
-  
-  processor implementation cpu.two_partitions
-  end cpu.two_partitions;
-  
-  processor implementation connected_cpu.with_system_partition
-  end connected_cpu.with_system_partition;
-  
   memory implementation mem.impl
   end mem.impl;
   
@@ -80,7 +71,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         ARINC653::Module_Major_Frame => 1000 ms;
         ARINC653::Partition_Slots => (1000 ms);
         POK::Scheduler => STATIC;
-        ARINC653::Slots_Allocation => (reference(the_part));
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Numeric error";
@@ -128,6 +118,7 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
+      ARINC653::Slots_Allocation => (reference(the_cpu.the_part)) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;
@@ -145,6 +136,23 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
   
   process proc
   end proc;
+  
+  subprogram event_sender_spg
+    features
+      context: requires data access event_sender_spg_context;
+    properties
+      Source_Name => "send_event";
+      Source_Language => (C);
+      Source_Text => ("/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.h", "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.c");
+  end event_sender_spg;
+  
+  data event_sender_spg_context
+    properties
+      Data_Model::Data_Representation => Struct;
+      Data_Model::Element_Names => ("e");
+      Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
+      Source_Name => "__event_sender_spg_context";
+  end event_sender_spg_context;
   
   system refined_model
   end refined_model;
@@ -273,7 +281,7 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
         } 
       ;
     connections
-      p_out_accessCnx_call: data access cnx_p_out -> call_entrypoint.cnx_p_out;
+      p_out_accessCnx_call_cnx: data access cnx_p_out -> call_entrypoint.cnx_p_out;
       p_out_accessSem: data access p_out_semAccess -> call_entrypoint.p_out_entrypointSemAccess;
   end the_proc_the_sender.impl;
   

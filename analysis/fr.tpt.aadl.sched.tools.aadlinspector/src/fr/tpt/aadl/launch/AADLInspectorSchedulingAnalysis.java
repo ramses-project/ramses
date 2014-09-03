@@ -236,6 +236,13 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
         // TODO Auto-generated method stub
         return 0 ;
       }
+
+      @Override
+      public Process getProcess()
+      {
+        // TODO Auto-generated method stub
+        return null ;
+      }
 		} ;
 		
 		int exitStatus ;
@@ -245,7 +252,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
     {
       exitStatus = wm.waitAndCheck(500) ;
     }
-    catch(InterruptedException e)
+    catch(Exception e)
     {
       killThreads(aadlInspectorThreads) ;
       String msg = "AADL inspector monitoring has been interrupted" ;
