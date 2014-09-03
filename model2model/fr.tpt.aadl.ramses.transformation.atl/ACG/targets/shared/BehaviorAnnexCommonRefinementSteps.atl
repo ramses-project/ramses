@@ -614,12 +614,8 @@ rule m_BehaviorActionsFromThread
 						Sequence{}
 						endif
 					)
-<<<<<<< HEAD
 					->flatten()
 					->excluding(OclUndefined)
-=======
-					->flatten()->excluding(OclUndefined)
->>>>>>> 553ae7b11b0466fca2eaea0bb17e4f7a9768acc8
 	),
 	isStateSource: AADLBA!ValueExpression
 	(
