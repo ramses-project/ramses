@@ -71,24 +71,9 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="fr.tpt.aadl.ramses.transformation.selection.manual"/>
       <import plugin="org.apache.log4j" version="1.2.15" match="greaterOrEqual"/>
       <import plugin="org.eclipse.m2m.atl.debug.core"/>
-      <import plugin="fr.labsticc.framework.constraints.model"/>
-      <import plugin="fr.labsticc.framework.settings.model"/>
-      <import plugin="fr.labsticc.framework.emf"/>
-      <import plugin="fr.labsticc.framework.settings.ide"/>
       <import plugin="org.eclipse.emf.edit"/>
-      <import plugin="fr.labsticc.framework.constraints.model.edit"/>
-      <import plugin="fr.labsticc.framework.settings.model.edit"/>
-      <import plugin="fr.labsticc.framework.core"/>
-      <import plugin="fr.labsticc.framework.ide"/>
-      <import plugin="fr.labsticc.framework.settings.service"/>
       <import plugin="org.eclipse.emf.edit.ui"/>
       <import plugin="org.eclipse.ui" version="3.6.1" match="greaterOrEqual"/>
-      <import plugin="fr.labsticc.framework.constraints.core"/>
-      <import plugin="fr.labsticc.framework.constraints.ide"/>
-      <import plugin="fr.labsticc.framework.constraints.service"/>
-      <import plugin="fr.labsticc.framework.constraints.view"/>
-      <import plugin="fr.labsticc.framework.emf.view"/>
-      <import plugin="fr.openpeople.rdalte.service"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.emf.common.ui"/>
@@ -105,7 +90,6 @@ You should have received a copy of the Eclipse Public License along with this pr
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ui.views.properties.tabbed"/>
       <import plugin="org.eclipse.osgi"/>
-      <import plugin="fr.labsticc.framework.emf.view" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.xtext.ui"/>
