@@ -1,5 +1,4 @@
 bin
-target
 *.asm
 .DS_Store
 *.atxl
