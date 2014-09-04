@@ -4,7 +4,7 @@
   <properties>
     <tycho-version>0.20.0</tycho-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <platform-version-name>kepler</platform-version-name>
+    <platform-version-name>luna</platform-version-name>
     <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
     <xtext-site>http://download.itemis.com/updates/releases</xtext-site>
     <osate-version>1.0.0-SNAPSHOT</osate-version>
