@@ -48,7 +48,6 @@
     <module>../../model2model/fr.tpt.atl.utils</module>
     <module>../../analysis/fr.tpt.aadl.ramses.util.properties</module>
     <module>../../analysis/fr.tpt.aadl.sched.propertiesextractor</module>
-    <module>../../analysis/fr.tpt.aadl.sched.tools.cheddar</module>
     <module>../../analysis/fr.tpt.aadl.sched.tools.aadlinspector</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.memoryfootprint</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.asg</module>
