@@ -30,6 +30,8 @@ create OUT : AADLBA 	from 		IN : AADLI,
 									HOOKS: ATLHOOKS,
 									ARINC653_RUNTIME: AADLBA;
 
+-- List
+
 
 abstract rule m_Port_BehaviorAnnex
 {
@@ -482,7 +484,7 @@ helper context AADLBA!PortHolder def: resolve(c: AADLI!ComponentInstance): AADLB
 		thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_Holder')
 	endif
 ;
-
+-- instanciate the new classes.
 helper context AADLBA!BehaviorEnumerationLiteral def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorEnumerationLiteral =
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_behaviorEnumerationLiteral')
 ;
@@ -673,14 +675,18 @@ rule m_BehaviorActionsFromThread
 	(
 		firstValue <- sourceStateID
 	),
-	sourceStateID: AADLBA!BehaviorEnumerationLiteral
+	sourceStateID: AADLBA!ClassifierPropertyReference
 	(
-		enumLiteral<-enumSourceStringLiteral,
-		component<-stateType
+		classifier <- stateType,
+		properties <- Sequence {sourceStateIDPropertyNameHolder}
 	),
-	enumSourceStringLiteral: AADLBA!StringLiteral
+	sourceStateIDPropertyNameHolder: AADLBA!PropertyNameHolder
 	(
-		value <- src_transition.sourceState.name
+		property <- sourceStateIDPropertyExpressionHolder
+	),
+	sourceStateIDPropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+	(
+		element <- stateType.getStringLiteral('Enumerators', src_transition.sourceState.name)
 	),
 	updateState: AADLBA!AssignmentAction
 	(
@@ -711,14 +717,18 @@ rule m_BehaviorActionsFromThread
 	(
 		firstValue <- targetStateID
 	),
-	targetStateID: AADLBA!BehaviorEnumerationLiteral
+	targetStateID: AADLBA!ClassifierPropertyReference
 	(
-		enumLiteral<-enumTargetStringLiteral,
-		component<-stateType
+		classifier <- stateType,
+		properties <- Sequence {targetStateIDPropertyNameHolder}
 	),
-	enumTargetStringLiteral: AADLBA!StringLiteral
+	targetStateIDPropertyNameHolder: AADLBA!PropertyNameHolder
 	(
-		value <- src_transition.destinationState.name
+		property <- targetStateIDPropertyExpressionHolder
+	),
+	targetStateIDPropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+	(
+		element <- stateType.getStringLiteral('Enumerators', src_transition.destinationState.name)
 	)
 }
 
