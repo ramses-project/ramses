@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <genmodel:GenModel xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.transformation.atl.launch/src"
-    editDirectory="/fr.tpt.aadl.ramses.transformation.atl.edit/src" editorDirectory="/fr.tpt.aadl.ramses.transformation.atl.editor/src"
-    modelPluginID="fr.tpt.aadl.ramses.transformation.atl.launch" modelName="hooks"
-    editPluginClass="fr.tpt.aadl.ramses.transformation.atl.provider.AtlHooksEditPlugin"
-    editorPluginClass="fr.tpt.aadl.ramses.transformation.atl.presentation.AtlHooksEditorPlugin"
-    testSuiteClass="fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooks.tests.AtlHooksAllTests"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.control.atl.launch/src"
+    editDirectory="/fr.tpt.aadl.ramses.control.atl.edit/src" editorDirectory="/fr.tpt.aadl.ramses.control.atl.editor/src"
+    modelPluginID="fr.tpt.aadl.ramses.control.atl.launch" modelName="hooks"
+    editPluginClass="fr.tpt.aadl.ramses.control.atl.provider.AtlHooksEditPlugin"
+    editorPluginClass="fr.tpt.aadl.ramses.control.atl.presentation.AtlHooksEditorPlugin"
+    testSuiteClass="fr.tpt.aadl.ramses.control.atl.hooks.AtlHooks.tests.AtlHooksAllTests"
     importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0" copyrightFields="false"
-    editPluginID="fr.tpt.aadl.ramses.transformation.atl.edit" editorPluginID="fr.tpt.aadl.atl.transformation.editor"
-    usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../fr.tpt.aadl.annex.behavior/model/aadlba.genmodel#//aadlba ../../org.osate.aadl2/model/instance.genmodel#//instance">
+    editPluginID="fr.tpt.aadl.ramses.control.atl.edit" editorPluginID="fr.tpt.aadl.atl.control.editor"
+    usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../org.osate.ba/model/aadlba.genmodel#//aadlba ../../org.osate.aadl2/model/instance.genmodel#//instance">
   <foreignModel>ATLHooks.ecore</foreignModel>
-  <genPackages prefix="AtlHooks" basePackage="fr.tpt.aadl.ramses.transformation.atl"
+  <genPackages prefix="AtlHooks" basePackage="fr.tpt.aadl.ramses.control.atl"
       resource="XML" disposableProviderFactory="true" ecorePackage="ATLHooks.ecore#/">
     <genClasses ecoreClass="ATLHooks.ecore#//HookAccess">
       <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/orderFeatures">
