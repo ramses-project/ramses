@@ -197,7 +197,6 @@ PROPERTIES
   ARINC653::Partition_Identifier => 1;
   ARINC653::Partition_Name => "System";
   ARINC653::System_Partition => TRUE;
-  ARINC653::System_Overhead_Time => 10ms;
   POK::Scheduler => RR;
   POK::Additional_Features => (libc_stdio,console);
 END VP_System_aadlKeywords.impl;
@@ -210,7 +209,6 @@ PROPERTIES
   ARINC653::Partition_Identifier => 2;
   ARINC653::Partition_Name => "train";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
   POK::Scheduler => RR;
   POK::Additional_Features => (libc_stdio,console);
 END VP_train.impl;
@@ -223,7 +221,6 @@ PROPERTIES
   ARINC653::Partition_Identifier => 3;
   ARINC653::Partition_Name => "railway";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
   POK::Scheduler => RR;
   POK::Additional_Features => (libc_stdio,console);
 END VP_railway.impl;
