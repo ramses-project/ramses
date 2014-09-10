@@ -29,7 +29,8 @@ Export-Package: com.thoughtworks.xstream,
  fr.tpt.aadl.ramses.generation.arinc653.xml.model,
  org.xmlpull.v1
 Bundle-Vendor: TELECOM Paristech
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.8.0",
+Require-Bundle: org.apache.log4j;bundle-version="1.2.15",
+ org.eclipse.core.runtime;bundle-version="3.8.0",
  org.osate.aadl2,
  org.osate.utils,
  fr.tpt.aadl.ramses.control.support,
