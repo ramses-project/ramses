@@ -49,8 +49,9 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     ARINC653::Module_Major_Frame => 2000 ms;
     POK::Scheduler => static;
-    ARINC653::Partition_Slots => (2000 ms);
-    ARINC653::Slots_Allocation => (reference (the_part));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part); Duration => 2000ms; Periodic_Processing_Start => true;]
+    );
   end cpu.single_partition;
 
   processor implementation cpu.two_partitions
@@ -60,8 +61,11 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     ARINC653::Module_Major_Frame => 4000 ms;
     POK::Scheduler => static;
-    ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
-    ARINC653::Slots_Allocation => (reference (the_part1), reference (the_part1), reference (the_part2));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part1); Duration => 2000ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(the_part1); Duration => 1000ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(the_part2); Duration => 1000ms; Periodic_Processing_Start => true;]
+    );
     POK::Ports_Flush_Time => Partition_Slot_Switch;
   end cpu.two_partitions;
 
@@ -78,8 +82,10 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
     ARINC653::System_Partition => true applies to system_part;
     ARINC653::Module_Major_Frame => 2000 ms;
     POK::Scheduler => static;
-    ARINC653::Partition_Slots => (1000 ms, 1000 ms);
-    ARINC653::Slots_Allocation => (reference (the_part), reference (system_part));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part); Duration => 1000ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(system_part); Duration => 1000ms; Periodic_Processing_Start => true;]
+    );
     POK::Ports_Flush_Time => Partition_Slot_Switch;
   end connected_cpu.with_system_partition;
   --------------------------------------------------
