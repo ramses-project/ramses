@@ -119,8 +119,10 @@ SUBCOMPONENTS
   root_inst : PROCESSOR root.impl {
     Thread_Swap_Execution_Time => 5ms..10ms;
     ARINC653::Module_Major_Frame => 600ms;
-    ARINC653::Partition_Slots => (300ms,300ms);
-    ARINC653::Slots_Allocation => (REFERENCE(VP_railway_inst),REFERENCE(VP_train_inst));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(VP_railway_inst); Duration => 300ms; Periodic_Processing_Start => true;],
+	[Partition => reference(VP_train_inst); Duration => 300ms; Periodic_Processing_Start => true;],
+    );
     ARINC653::HM_Error_ID_Levels => (
     	[ErrorIdentifier => 1; Description => "Module configuration error"; ErrorLevel=>Module_Level;ErrorCode=>Module_Config;]
     );

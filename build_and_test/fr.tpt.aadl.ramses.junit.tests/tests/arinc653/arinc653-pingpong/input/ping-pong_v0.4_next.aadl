@@ -124,8 +124,10 @@ end SEQ;
       VP_S2_inst: virtual processor VP_S2.impl{Period => 1000 Ms;};
     properties
       ARINC653::Module_Major_Frame => 2000 ms;
-      ARINC653::Partition_Slots => (1000 ms, 1000 ms);
-      ARINC653::Slots_Allocation => (reference (VP_S1_inst), reference (VP_S2_inst));
+      ARINC653::Module_Schedule => (
+       	[Partition => reference(VP_S1_inst); Duration => 1000ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(VP_S2_inst); Duration => 1000ms; Periodic_Processing_Start => true;]
+    );
   end node_1.impl;
   
   memory node1_main_memory

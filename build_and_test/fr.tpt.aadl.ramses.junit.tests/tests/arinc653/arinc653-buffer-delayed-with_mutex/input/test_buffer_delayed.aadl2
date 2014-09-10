@@ -47,7 +47,9 @@ with common_pkg;
   processor implementation cpu.impl extends common_pkg::cpu.single_partition
   properties
     ARINC653::Module_Major_Frame => 1000 ms;
-    ARINC653::Partition_Slots => (1000 ms);
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part); Duration => 1000ms; Periodic_Processing_Start => true;]
+    );
   end cpu.impl;
 
   process proc
