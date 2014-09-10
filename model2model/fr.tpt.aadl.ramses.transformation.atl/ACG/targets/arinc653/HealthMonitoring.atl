@@ -745,14 +745,18 @@ lazy rule createCallSetPartitionMode
 	(
 		firstValue <- modeEnumLiteral
 	),
-	modeEnumLiteral:AADLBA!BehaviorEnumerationLiteral
+	modeEnumLiteral:AADLBA!ClassifierPropertyReference
 	(
-		component <- 'OPERATING_MODE_TYPE'.asDataType('ARINC653_RUNTIME'),
-		enumLiteral <- enumSL
+		classifier <- 'OPERATING_MODE_TYPE'.asDataType('ARINC653_RUNTIME'),
+		properties <- Sequence {modePropertyNameHolder}
 	),
-	enumSL: AADLBA!StringLiteral
+	modePropertyNameHolder: AADLBA!PropertyNameHolder
 	(
-		value <- mode
+		property <- modePropertyExpressionHolder
+    ),
+	modePropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+	(
+		element <- 'OPERATING_MODE_TYPE'.asDataType('ARINC653_RUNTIME').getStringLiteral('Enumerators', mode)
 	)
   do
   {
