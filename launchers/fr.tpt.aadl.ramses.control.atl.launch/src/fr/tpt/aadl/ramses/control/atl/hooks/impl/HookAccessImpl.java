@@ -40,6 +40,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl ;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.eclipse.xtext.nodemodel.INode ;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
@@ -97,25 +98,25 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   private static Logger _LOGGER = Logger.getLogger(HookAccessImpl.class);
 
 /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   protected HookAccessImpl()
   {
-		super();
-	}
+    super();
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   @Override
   protected EClass eStaticClass()
   {
-		return AtlHooksPackage.Literals.HOOK_ACCESS;
-	}
+    return AtlHooksPackage.Literals.HOOK_ACCESS;
+  }
 
   /**
    * <!-- begin-user-doc -->
@@ -166,6 +167,18 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     }
     
     target.setLocationReference(lr) ;
+  }
+
+    /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance)
+  {
+    // TODO: implement this method
+    // Ensure that you remove @generated or mark it @generated NOT
+    throw new UnsupportedOperationException();
   }
 
     /**
@@ -233,7 +246,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public Long getHyperperiod(FeatureInstance port) {
+	public long getHyperperiod(FeatureInstance port) {
 	  Long hyperperiod= new Long(0);
 	  ArrayList<ComponentInstance> threads = new ArrayList<ComponentInstance>();
 	  for(ConnectionInstance fi: port.getDstConnectionInstances())
@@ -377,7 +390,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  return l;
   }
 
-  public Boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName) {
+  public boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName) {
     if(operatorName.equalsIgnoreCase("fresh"))
       return AadlBaVisitors.isFresh(ba, p);
     else if(operatorName.equalsIgnoreCase("count"))
@@ -573,5 +586,28 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     EList<Port> res = new BasicEList<Port>(pList);
     return res;
   }
-  
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public StringLiteral getStringLiteral(Classifier classifier,
+                                        String propertyName,
+                                        String stringLiteralValue)
+  {
+    Element el = null ;
+    EList<PropertyExpression> pes = PropertyUtils.getPropertyExpression(classifier, propertyName) ;
+    for(PropertyExpression pe : pes)
+    {
+      el = PropertyUtils.getValue(pe, stringLiteralValue) ;
+      
+      if(el != null)
+      {
+        return (StringLiteral) el ;
+      }
+    }
+    
+    return null ;
+  }
 } //HookAccessImpl

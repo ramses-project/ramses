@@ -74,6 +74,9 @@ helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String)
 	v.ownedValue.getOwnedListElements()->collect(e|e.getValue())
 ;
 
+helper context AADLI!Classifier def: getStringLiteral(propertyName: String, stringLiteralValue: String) : AADLI!PropertyValue =
+	thisModule.theHOOK.getStringLiteral(self, propertyName, stringLiteralValue)
+;
 
 helper def : getProperty(propertyName : String) : AADLBA!Property =
 	if(propertyName.contains('::')) then
