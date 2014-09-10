@@ -226,7 +226,6 @@ rule m_Threads_HM
 		)
 }
 
-
 unique lazy rule createTransition
 {
   from
@@ -244,6 +243,11 @@ unique lazy rule createTransition
 										);
 
 	a: AADLBA!BehaviorAction = OclUndefined;
+	errorIdString: String = if(errorId.equalsIgnoreCase('Deadline_Miss')) then
+						'DEADLINE_MISSED'
+					else
+						errorId.toUpperCase()
+					endif;
   }
   to
   	t: AADLBA!BehaviorTransition
@@ -300,18 +304,19 @@ unique lazy rule createTransition
 	(
 		firstValue <- errorEnumLiteral
 	),
-	errorEnumLiteral: AADLBA!BehaviorEnumerationLiteral
+	errorEnumLiteral: AADLBA!ClassifierPropertyReference
 	(
-		component <- 'Error_Code_Type'.asDataType('ARINC653_RUNTIME'),
-		enumLiteral <- enumSL
+		classifier <- 'Error_Code_Type'.asDataType('ARINC653_RUNTIME'),
+		properties <- Sequence{errorPropertyNameHolder}
 	),
-	enumSL: AADLBA!StringLiteral
-	(value<-if(errorId.equalsIgnoreCase('Deadline_Miss')) then
-				'DEADLINE_MISSED'
-			else
-				errorId.toUpperCase()
-			endif	
-			),
+	errorPropertyNameHolder: AADLBA!PropertyNameHolder
+	(
+		property <- errorPropertyExpressionHolder
+	),
+	errorPropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+	(
+		element <- 'Error_Code_Type'.asDataType('ARINC653_RUNTIME').getStringLiteral('Enumerators', errorIdString)
+	),
 	recoveryActionBlock: AADLBA!BehaviorActionBlock
 	(
 		content<-recoveryactions
