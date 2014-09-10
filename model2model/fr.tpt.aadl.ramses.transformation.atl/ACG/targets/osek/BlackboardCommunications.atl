@@ -155,14 +155,18 @@ rule m_Input_BlackBoard_ComputeEntrypointCallSequence_mode
 		(
 			firstValue <- sourceStateID
 		),
-		sourceStateID: AADLBA!BehaviorEnumerationLiteral
+		sourceStateID: AADLBA!ClassifierPropertyReference
 		(
-			enumLiteral<-enumSourceStringLiteral,
-			component<- fi.getModeDataType()
+			classifier <- fi.getModeDataType(),
+			properties <- Sequence {modePropertyNameHolder}
 		),
-		enumSourceStringLiteral: AADLBA!StringLiteral
+		modePropertyNameHolder: AADLBA!PropertyNameHolder
 		(
-			value <- mode.name
+			property <- modePropertyExpressionHolder
+		),
+		modePropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+		(
+			element <- 	fi.getModeDataType().getStringLiteral('Enumerators', mode.name)
 		)
 }
 
