@@ -121,7 +121,7 @@ SUBCOMPONENTS
     ARINC653::Module_Major_Frame => 600ms;
     ARINC653::Module_Schedule => (
        	[Partition => reference(VP_railway_inst); Duration => 300ms; Periodic_Processing_Start => true;],
-	[Partition => reference(VP_train_inst); Duration => 300ms; Periodic_Processing_Start => true;],
+	[Partition => reference(VP_train_inst); Duration => 300ms; Periodic_Processing_Start => true;]
     );
     ARINC653::HM_Error_ID_Levels => (
     	[ErrorIdentifier => 1; Description => "Module configuration error"; ErrorLevel=>Module_Level;ErrorCode=>Module_Config;]
