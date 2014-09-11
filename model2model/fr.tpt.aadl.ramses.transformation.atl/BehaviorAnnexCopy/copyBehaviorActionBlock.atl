@@ -100,17 +100,93 @@ rule m_ElseStatement
 		)
 }
 
-rule m_BehaviorEnumerationLiteral
+rule m_PropertyReference
 {
 	from
-		src_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
-		(src_behaviorEnumerationLiteral.isThreadBehaviorElement())
-	to
-		target_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
+		src_propertyReference: AADLBA!PropertyReference
 		(
-			component <- src_behaviorEnumerationLiteral.component,
-			enumLiteral <- src_behaviorEnumerationLiteral.enumLiteral
+			src_propertyReference.isThreadBehaviorElement()
 		)
+	to
+		target_propertyReference: AADLBA!PropertyReference
+		(
+			properties <- src_propertyReference.properties
+		)
+}
+
+-- @extends m_PropertyReference
+rule m_ClassifierPropertyReference
+{
+	from
+		src_propertyReference: AADLBA!ClassifierPropertyReference
+	to
+		target_propertyReference: AADLBA!ClassifierPropertyReference
+		(
+			classifier <- src_propertyReference.classifier
+		)
+}
+
+-- @extends m_PropertyReference
+rule m_PropertySetPropertyReference
+{
+	from
+		src_propertyReference: AADLBA!PropertySetPropertyReference
+	to
+		target_propertyReference: AADLBA!PropertySetPropertyReference
+		(
+			propertyset <- src_propertyReference.propertyset
+		)
+}
+
+rule m_PropertyNameHolder
+{
+	from
+		src_propertyNameHolder: AADLBA!PropertyNameHolder
+		(
+			src_propertyNameHolder.isThreadBehaviorElement()
+		)
+	to
+		target_propertyNameHolder: AADLBA!PropertyNameHolder
+		(
+			property <- src_propertyNameHolder.property,
+			
+			field <- if src_propertyNameHolder.field.oclIsUndefined()
+					 then 
+						OclUndefined
+					 else 
+						src_propertyNameHolder.field
+					 endif
+		)
+}
+
+rule m_PropertyElementHolder
+{
+	from
+		src_propertyElementHolder: AADLBA!PropertyElementHolder
+		(
+			src_propertyElementHolder.isThreadBehaviorElement()	
+		)
+	to
+		target_propertyElementHolder: AADLBA!PropertyElementHolder
+		(
+			indexes <- if src_propertyElementHolder.indexes.oclIsUndefined()
+					   then
+					   	  OclUndefined
+					   else
+					   	  src_propertyElementHolder.indexes
+					   endif,
+			
+			element <- src_propertyElementHolder.element
+		)
+}
+
+-- @extends m_PropertyElementHolder
+rule m_PropertyExpressionHolder
+{
+	from
+		src_propertyElementHolder: AADLBA!PropertyExpressionHolder
+	to
+		target_propertyElementHolder: AADLBA!PropertyExpressionHolder
 }
 
 rule m_ValueExpression
