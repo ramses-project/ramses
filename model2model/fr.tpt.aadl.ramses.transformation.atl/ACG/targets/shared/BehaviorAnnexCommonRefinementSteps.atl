@@ -505,6 +505,10 @@ helper context AADLBA!LowerBound def: resolve(c: AADLI!ComponentInstance): AADLB
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_lowerBound')
 ;
 
+helper context AADLBA!PropertyExpressionHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!PropertyExpressionHolder =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyExpressionHolder')
+;
+
 helper context AADLBA!PortFreshValue def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'isFresh')
 ;
@@ -1107,6 +1111,32 @@ rule m_PropertyNameHolder
 						src_propertyNameHolder.field.resolve(c)
 					endif
 		)
+}
+
+-- Indexes not supported yet.
+rule m_PropertyElementHolder
+{
+	from
+		src_propertyElementHolder: AADLBA!PropertyElementHolder,
+		c: AADLI!ComponentInstance
+		(
+			src_propertyElementHolder.isPartOfBehaviorAnnexOf(c)	
+		)
+	to
+		target_propertyElementHolder: AADLBA!PropertyElementHolder
+		(
+			element <- src_propertyElementHolder.element
+		)
+}
+
+-- @extends m_PropertyElementHolder
+rule m_PropertyExpressionHolder
+{
+	from
+		src_propertyElementHolder: AADLBA!PropertyElementHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_propertyExpressionHolder: AADLBA!PropertyExpressionHolder
 }
 
 rule m_UpperBound
