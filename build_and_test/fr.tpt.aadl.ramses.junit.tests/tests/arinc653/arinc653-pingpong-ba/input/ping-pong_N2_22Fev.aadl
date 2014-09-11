@@ -77,8 +77,10 @@ SUBCOMPONENTS
   root_inst : PROCESSOR root.impl {
     Thread_Swap_Execution_Time => 5ms..10ms;
     ARINC653::Module_Major_Frame => 1000ms;
-    ARINC653::Partition_Slots => (500ms,500ms);
-    ARINC653::Slots_Allocation => (REFERENCE(VP_S1_inst),REFERENCE(VP_S2_inst));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(VP_S1_inst); Duration => 500ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(VP_S2_inst); Duration => 500ms; Periodic_Processing_Start => true;]
+    );
     ARINC653::Module_Version => "1.0";
     ARINC653::Module_Identifier => "ping-pong.root";
     Process_Swap_Execution_Time => 5ms..10ms;
@@ -167,7 +169,6 @@ PROPERTIES
   ARINC653::Partition_Identifier => 1;
   ARINC653::Partition_Name => "S1";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
   POK::Scheduler => RR;
   POK::Additional_Features => (libc_stdio,console);
 END VP_S1.impl;
@@ -180,7 +181,6 @@ PROPERTIES
   ARINC653::Partition_Identifier => 2;
   ARINC653::Partition_Name => "S2";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
   POK::Scheduler => RR;
   POK::Additional_Features => (libc_stdio,console);
 END VP_S2.impl;

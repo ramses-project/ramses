@@ -52,6 +52,7 @@ import org.osate.aadl2.Property ;
 import org.osate.aadl2.PropertyAssociation ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.RecordValue ;
+import org.osate.aadl2.ReferenceValue ;
 import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.Subprogram ;
@@ -1549,65 +1550,67 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     deploymentHeaderCode.addOutputNewline("}") ;
     
-    List<Long> slotPerPartition =
-        PropertyUtils.getIntListValue(processor, "Partition_Slots") ;
-    
-    if(slotPerPartition != null)
+    NamedElement ne = processor.getContainingClassifier();
+    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(ne, "Module_Schedule");
+    if(moduleSchedulePA == null)
     {
-      // POK_CONFIG_SCHEDULING_SLOTS extracted from POK::Paritions_Slots => (500 ms);
-      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
-      idx = 0 ;
-      for(Long l : slotPerPartition)
-      {
-        deploymentHeaderCode.addOutput(Long.toString(l)) ;
-
-        if(idx != slotPerPartition.size() - 1)
-        {
-          deploymentHeaderCode.addOutput(",") ;
-        }
-        idx++ ;
-      }
-
-      deploymentHeaderCode.addOutputNewline("}") ;
-      deploymentHeaderCode
-            .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
-                  Integer.toString(slotPerPartition.size())) ;
-
-    }
-    else
-    {
-      String errMsg =  "cannot fetch Partition_Slots for \'"+
-                                        processor.getName() + '\'' ;
+      String errMsg =  "cannot fetch Module_Schedule for \'"+
+          processor.getName() + '\'' ;
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
+    ModalPropertyValue mpv = moduleSchedulePA.getOwnedValues().get(0);
+    ListValue lv = (ListValue) mpv.getOwnedValue();
     
-    List<Subcomponent> slotsAllocation =
-          PropertyUtils.getSubcomponentList(processor, "Slots_Allocation") ;
-    if(! slotsAllocation.isEmpty())
+    deploymentHeaderCode
+    .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
+        Integer.toString(lv.getOwnedListElements().size())) ;
+
+    
+    deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
+    idx = 0 ;
+    for(PropertyExpression pe : lv.getOwnedListElements())
     {
-      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
-
-      for(Subcomponent sAllocation : slotsAllocation)
+      RecordValue rv = (RecordValue) pe;
+      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
       {
-        int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
-        deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
-
-        if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
+        if(bpa.getProperty().getName().equalsIgnoreCase("Duration"))
         {
-          deploymentHeaderCode.addOutput(",") ;
+          IntegerLiteral il =  (IntegerLiteral) bpa.getValue();
+          deploymentHeaderCode.addOutput(Long.toString(il.getValue())) ;
+          if(idx != lv.getOwnedListElements().size() - 1)
+          {
+            deploymentHeaderCode.addOutput(",") ;
+          }
+          idx++ ;
         }
       }
+    }
 
-      deploymentHeaderCode.addOutputNewline("}") ;
-    }
-    else
+    deploymentHeaderCode.addOutputNewline("}") ;
+    idx = 0;
+    deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
+    for(PropertyExpression pe : lv.getOwnedListElements())
     {
-      String errMsg = "cannot fetch Slots_Allocation for \'" +
-                          processor.getName() + '\'' ;
-      _LOGGER.error(errMsg) ;
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+      RecordValue rv = (RecordValue) pe;
+      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
+      {
+        if(bpa.getProperty().getName().equalsIgnoreCase("Partition"))
+        {
+          ReferenceValue sAllocation = (ReferenceValue) bpa.getValue();
+          int index = sAllocation.getContainmentPathElements().size()-1; 
+          int referencedComponentId = bindedVPS.indexOf(sAllocation.getContainmentPathElements().get(index).getNamedElement()) ;
+          
+          deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
+          if(idx != lv.getOwnedListElements().size() - 1)
+          {
+            deploymentHeaderCode.addOutput(",") ;
+          }
+          idx++ ;
+        }
+      }
     }
+    deploymentHeaderCode.addOutputNewline("}") ;
     
     Long majorFrame =
         PropertyUtils.getIntValue(processor, "Module_Major_Frame") ;

@@ -336,7 +336,7 @@ public class AadlTargetSpecificGenerator implements Generator
         if(inputResource!=null)
           r = inputResource;
         if(runtimeDir==null)
-          throw new GenerationException("runtime path was not set, code generation cannot be complete.");
+          throw new GenerationException("runtime path was not set, code generation cannot be completed.");
         doGeneration(runtimeDir, outputDir, includeDirs, r, monitor) ;
       }
       else if(operation.equals("loop"))

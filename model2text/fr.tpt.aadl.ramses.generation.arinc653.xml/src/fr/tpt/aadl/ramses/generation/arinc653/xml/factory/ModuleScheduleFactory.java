@@ -3,26 +3,36 @@ package fr.tpt.aadl.ramses.generation.arinc653.xml.factory;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger ;
+import org.osate.aadl2.BasicPropertyAssociation ;
 import org.osate.aadl2.ComponentCategory;
+import org.osate.aadl2.IntegerLiteral ;
 import org.osate.aadl2.ListValue;
+import org.osate.aadl2.ModalPropertyValue ;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NumberValue;
 import org.osate.aadl2.ProcessorImplementation;
 import org.osate.aadl2.ProcessorSubcomponent;
+import org.osate.aadl2.PropertyAssociation ;
 import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.ReferenceValue;
 import org.osate.aadl2.VirtualProcessorSubcomponent;
 import org.osate.aadl2.instance.ComponentInstance;
 import org.osate.utils.PropertyUtils;
 
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.generation.arinc653.xml.model.ModuleSchedule;
 import fr.tpt.aadl.ramses.generation.arinc653.xml.model.PartitionSchedule;
 import fr.tpt.aadl.ramses.generation.arinc653.xml.model.SystemProperties;
 
+
 public class ModuleScheduleFactory extends ModelFactory<ModuleSchedule> {
 
 	private ModelFactory<PartitionSchedule> partitionScheduleFactory;
+	
+	private static Logger _LOGGER = Logger.getLogger(ModuleScheduleFactory.class) ;
 	
 	@Override
 	public ModuleSchedule createFromAadl(NamedElement element,
@@ -40,21 +50,49 @@ public class ModuleScheduleFactory extends ModelFactory<ModuleSchedule> {
 			result.setMajorFrameSeconds(majorFrame);
 			List<PartitionSchedule> partitionSchedules = new ArrayList<PartitionSchedule>();
 			
-			ListValue lvSlots = (ListValue) PropertyUtils.getPropertyValue("Partition_Slots", element);
-			List<Double> partitionSlots = new ArrayList<Double>();
-			for(PropertyExpression pe : lvSlots.getOwnedListElements())
-			{
-				NumberValue nvSlot = (NumberValue)pe;
-				partitionSlots.add(nvSlot.getScaledValue("sec"));
-			}
 			
-			ListValue lvAlloc = (ListValue) PropertyUtils.getPropertyValue("Slots_Allocation", element);
-			List<VirtualProcessorSubcomponent> partitionSlotsAlloc = new ArrayList<VirtualProcessorSubcomponent>();
-			for(PropertyExpression pe : lvAlloc.getOwnedListElements())
-			{
-				ReferenceValue nvAlloc = (ReferenceValue)pe;
-				partitionSlotsAlloc.add((VirtualProcessorSubcomponent)nvAlloc.getContainmentPathElements().get(0).getNamedElement());
-			}
+			NamedElement ne = processor.getContainingClassifier();
+	    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(ne, "Module_Schedule");
+	    if(moduleSchedulePA == null)
+	    {
+	      String errMsg =  "cannot fetch Module_Schedule for \'"+
+	          processor.getName() + '\'' ;
+	      _LOGGER.error(errMsg);
+	      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+	    }
+	    ModalPropertyValue mpv = moduleSchedulePA.getOwnedValues().get(0);
+	    ListValue lv = (ListValue) mpv.getOwnedValue();
+	    
+	    List<Double> partitionSlots = new ArrayList<Double>();
+	    
+	    for(PropertyExpression pe : lv.getOwnedListElements())
+	    {
+	      RecordValue rv = (RecordValue) pe;
+	      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
+	      {
+	        if(bpa.getProperty().getName().equalsIgnoreCase("Duration"))
+	        {
+	          NumberValue nvSlot = (NumberValue) bpa.getValue();
+	          partitionSlots.add(nvSlot.getScaledValue("sec"));
+	        }
+	      }
+	    }
+
+	    List<VirtualProcessorSubcomponent> partitionSlotsAlloc = new ArrayList<VirtualProcessorSubcomponent>();
+      
+	    for(PropertyExpression pe : lv.getOwnedListElements())
+	    {
+	      RecordValue rv = (RecordValue) pe;
+	      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
+	      {
+	        if(bpa.getProperty().getName().equalsIgnoreCase("Partition"))
+	        {
+	          ReferenceValue nvAlloc = (ReferenceValue) bpa.getValue();
+	          partitionSlotsAlloc.add((VirtualProcessorSubcomponent)nvAlloc.getContainmentPathElements().get(0).getNamedElement());
+	        }
+	      }
+	    }
+			
 			for(ComponentInstance ci : processor.getComponentInstances())
 			{
 				if(false == ci.getCategory().equals(ComponentCategory.VIRTUAL_PROCESSOR))

@@ -30,18 +30,27 @@ import java.util.Map ;
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
+import org.osate.aadl2.BasicPropertyAssociation ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.ConnectedElement ;
 import org.osate.aadl2.DataPort ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.EventDataPort ;
+import org.osate.aadl2.IntegerLiteral ;
+import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.MemorySubcomponent ;
+import org.osate.aadl2.ModalPropertyValue ;
+import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.NumberValue ;
 import org.osate.aadl2.Port ;
 import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
+import org.osate.aadl2.PropertyAssociation ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.RecordValue ;
+import org.osate.aadl2.ReferenceValue ;
 import org.osate.aadl2.Subcomponent ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
@@ -1477,64 +1486,68 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     }
 
     deploymentHeaderCode.addOutputNewline("}") ;
+    NamedElement ne = processor.getContainingClassifier();
+    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(ne, "Module_Schedule");
+    if(moduleSchedulePA == null)
+    {
+      String errMsg =  "cannot fetch Module_Schedule for \'"+
+          processor.getName() + '\'' ;
+      _LOGGER.error(errMsg);
+      ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+    }
+    ModalPropertyValue mpv = moduleSchedulePA.getOwnedValues().get(0);
+    ListValue lv = (ListValue) mpv.getOwnedValue();
     
-    List<Long> slotPerPartition =
-        PropertyUtils.getIntListValue(processor, "Partition_Slots") ;
-    if(slotPerPartition != null)
+    deploymentHeaderCode
+    .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
+        Integer.toString(lv.getOwnedListElements().size())) ;
+
+    
+    deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
+    idx = 0 ;
+    for(PropertyExpression pe : lv.getOwnedListElements())
     {
-      // POK_CONFIG_SCHEDULING_SLOTS extracted from POK::Paritions_Slots => (500 ms);
-      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
-      idx = 0 ;
-      for(Long l : slotPerPartition)
+      RecordValue rv = (RecordValue) pe;
+      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
       {
-        deploymentHeaderCode.addOutput(Long.toString(l)) ;
-
-        if(idx != slotPerPartition.size() - 1)
+        if(bpa.getProperty().getName().equalsIgnoreCase("Duration"))
         {
-          deploymentHeaderCode.addOutput(",") ;
-        }
-        idx++ ;
-      }
-
-      deploymentHeaderCode.addOutputNewline("}") ;
-      deploymentHeaderCode
-            .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
-                  Integer.toString(slotPerPartition.size())) ;
-    }
-    else
-    {
-      String errMsg = "cannot fetch the partition slots for \'" +
-                                              processor.getName() + '\'' ;
-      _LOGGER.error(errMsg) ;
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
-    }
-
-    List<Subcomponent> slotsAllocation = PropertyUtils.getSubcomponentList(processor,
-                                                           "Slots_Allocation") ;
-    if(! slotsAllocation.isEmpty())
-    {
-      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
-
-      for(Subcomponent sAllocation : slotsAllocation)
-      {
-        int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
-        deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
-
-        if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
-        {
-          deploymentHeaderCode.addOutput(",") ;
+          IntegerLiteral il =  (IntegerLiteral) bpa.getValue();
+          deploymentHeaderCode.addOutput(Long.toString(il.getValue())) ;
+          if(idx != lv.getOwnedListElements().size() - 1)
+          {
+            deploymentHeaderCode.addOutput(",") ;
+          }
+          idx++ ;
         }
       }
+    }
 
-      deploymentHeaderCode.addOutputNewline("}") ;
-    }
-    else
+    deploymentHeaderCode.addOutputNewline("}") ;
+    idx = 0;
+    deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
+    for(PropertyExpression pe : lv.getOwnedListElements())
     {
-      String errMsg = "cannot fetch the Slots_Allocation for \'" +
-                                              processor.getName() + '\'' ;
-      _LOGGER.error(errMsg) ;
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+      RecordValue rv = (RecordValue) pe;
+      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
+      {
+        if(bpa.getProperty().getName().equalsIgnoreCase("Partition"))
+        {
+          ReferenceValue sAllocation = (ReferenceValue) bpa.getValue();
+          int index = sAllocation.getContainmentPathElements().size()-1; 
+          int referencedComponentId = bindedVPS.indexOf(sAllocation.getContainmentPathElements().get(index).getNamedElement()) ;
+          
+          deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
+          if(idx != lv.getOwnedListElements().size() - 1)
+          {
+            deploymentHeaderCode.addOutput(",") ;
+          }
+          idx++ ;
+        }
+      }
     }
+    deploymentHeaderCode.addOutputNewline("}") ;
+    
     
     Long majorFrame =
         PropertyUtils.getIntValue(processor, "Module_Major_Frame") ;
