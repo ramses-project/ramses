@@ -95,18 +95,12 @@ unique lazy rule createModeSwitchAction
 		),
 		targetModeFactor: AADLBA!Factor
 		(
-			firstValue <- targetModeLiteral
-		),
-		targetModeLiteral: AADLBA!BehaviorEnumerationLiteral
-		(-- resolve pending reference based on the given object & id.
-			component <- thisModule.resolveTemp(mti.eContainer(), 'modeDataClassifier'),
-			enumLiteral <- modeIDEnumLiteral
-		),
-		modeIDEnumLiteral: AADLBA!StringLiteral
-		(
-			value <- mti.destination.name
+			firstValue <- thisModule.bindDatatypeEnumStringliteral
+						  (
+						  	thisModule.resolveTemp(mti.eContainer(), 'modeDataClassifier'),
+							mti.destination.name
+						  )
 		)
-		
 	do
 	{
 		thisModule.addImportedUnit(thisModule.public(), 'OSEK_RUNTIME', 'OSEK_runtime');

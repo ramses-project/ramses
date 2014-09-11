@@ -10,7 +10,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.control.atl,
  fr.tpt.aadl.ramses.control.atl.hooks,
  fr.tpt.aadl.ramses.control.atl.hooks.impl,
- fr.tpt.aadl.ramses.control.atl.hooks.util,
  fr.tpt.aadl.ramses.control.atl.hooks.utils
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,

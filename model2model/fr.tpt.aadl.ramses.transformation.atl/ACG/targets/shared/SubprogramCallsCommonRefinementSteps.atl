@@ -143,6 +143,28 @@ helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
 	endif
 ;
 
+unique lazy rule createClassifierPropertyReference
+{
+	from
+		component: AADLI!Classifier,
+		sl:        AADLBA!StringLiteral
+    to
+	   classifierPropertyReference: AADLBA!ClassifierPropertyReference
+	   (
+	   	 classifier <- component,
+		 properties <- Sequence {ccpr_propertyNameHolder}
+	   ),
+	   ccpr_propertyNameHolder: AADLBA!PropertyNameHolder
+	   (
+		 property <- ccpr_PropertyExpressionHolder
+	   ),
+	   ccpr_PropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+	   (
+		 element <- sl
+	   )
+	do {classifierPropertyReference;}   
+}
+
 rule m_PortConnection_Reference
 {
 	from
@@ -541,14 +563,12 @@ rule m_ThreadEntrypoint {
 		),
 		updateDefaultBehaviorFactor: AADLBA!Factor
 		(
-			firstValue <- updateDefaultBehavior
+			firstValue <- thisModule.createClassifierPropertyReference
+			                         (
+			                         	whichPortActivatedDataDlassifier,
+										portIDEnumLiteral
+			                         )
 		),
-		updateDefaultBehavior: AADLBA!BehaviorEnumerationLiteral
-		(
-			component <- whichPortActivatedDataDlassifier,
-			enumLiteral <- portIDEnumLiteral
-		),
-		
 		initState: AADLBA!BehaviorState
 		(
 			initial  <- true,
@@ -756,12 +776,11 @@ rule createDefaultAssignement(c:AADLI!ComponentInstance)
 		),
 		updateDefaultBehaviorFactor: AADLBA!Factor
 		(
-			firstValue <- updateDefaultBehavior
-		),
-		updateDefaultBehavior: AADLBA!BehaviorEnumerationLiteral
-		(
-			component <- thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- thisModule.resolveMatchedSingleIfExists(c, 'portIDEnumLiteral')
+			firstValue <- thisModule.createClassifierPropertyReference
+			                         (
+			                         	thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
+										thisModule.resolveMatchedSingleIfExists(c, 'portIDEnumLiteral')
+			                         )
 		),
 		res: AADLBA!ElseStatement
 		(
@@ -878,7 +897,7 @@ lazy abstract rule createComputeEntryPointCondition
 		(
 			firstValue <- portIDEnum
 		),
-		portIDEnum: AADLBA!BehaviorEnumerationLiteral,
+		portIDEnum: AADLBA!ClassifierPropertyReference,
 		portIDEnumLiteral: AADLBA!StringLiteral
 	do
 	{
@@ -891,6 +910,15 @@ unique lazy rule createComputeEntryPointConditionForPort
 {
 	from
 		object: AADLI!FeatureInstance
+    using
+	{
+		portIDEnum: AADLBA!ClassifierPropertyReference = 
+			thisModule.createClassifierPropertyReference
+		                       (
+		                       		thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
+									portIDEnumLiteral
+		                       );
+	}
 	to
 		computeEntryPointCondition: AADLBA!ValueExpression,
 		portIDEnumLiteral: AADLBA!StringLiteral
@@ -900,11 +928,6 @@ unique lazy rule createComputeEntryPointConditionForPort
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
 			element <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'activatedPort')
-		),
-		portIDEnum: AADLBA!BehaviorEnumerationLiteral
-		(-- reference to output model.
-			component <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- portIDEnumLiteral
 		)
 	do
 	{
@@ -916,16 +939,20 @@ lazy rule createComputeEntryPointConditionForComponent
 {
 	from
 		object: AADLI!ComponentInstance
+    using
+	{
+		portIDEnum: AADLBA!ClassifierPropertyReference = 
+			thisModule.createClassifierPropertyReference
+		                       (
+		                       		thisModule.resolveMatchedSingleIfExists(object, 'whichPortActivatedDataDlassifier'),
+									thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral')
+		                       );
+	}
 	to
 		computeEntryPointCondition: AADLBA!ValueExpression,
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
 			element <- thisModule.resolveMatchedSingleIfExists(object, 'activatedPort')
-		),
-		portIDEnum: AADLBA!BehaviorEnumerationLiteral
-		(
-			component <- thisModule.resolveMatchedSingleIfExists(object, 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral')
 		)
 	do
 	{
@@ -1075,14 +1102,12 @@ rule m_PortBehavior
 		),
 		updateActivatedPortFactor: AADLBA!Factor
 		(
-			firstValue <- updateActivatedPort
-		),
-		updateActivatedPort: AADLBA!BehaviorEnumerationLiteral
-		(
-			component <- thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
-			enumLiteral <- thisModule.resolveLazySingleIfExists(fi, 'createComputeEntryPointConditionForPort', 'portIDEnumLiteral')
+			firstValue <- thisModule.createClassifierPropertyReference
+			                         (
+			                           	thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
+										thisModule.resolveLazySingleIfExists(fi, 'createComputeEntryPointConditionForPort', 'portIDEnumLiteral')			
+			                         )
 		)
-		
   	do
   	{
   		destinationCE.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint'));

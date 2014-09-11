@@ -282,7 +282,7 @@ rule CreateListValueFromClassifier (value: AADLBA!Classifier)
 unique lazy rule bindDatatypeEnumStringliteral
 {
 	from
-		component: AADLI!ComponentInstance,
+		component: AADLI!Classifier,
 		stringLiteral: String
 	to
 		classifierPropertyReference: AADLBA!ClassifierPropertyReference
