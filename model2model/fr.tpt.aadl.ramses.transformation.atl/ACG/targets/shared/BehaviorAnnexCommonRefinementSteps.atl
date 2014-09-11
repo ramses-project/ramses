@@ -1070,10 +1070,10 @@ rule m_PropertyReference
 rule m_ClassifierPropertyReference
 {
 	from
-		src_propertyReference: AADLBA!PropertyReference,
+		src_propertyReference: AADLBA!ClassifierPropertyReference,
 		c: AADLI!ComponentInstance
 	to
-		target_classifierPropertyReference: AADLBA!ClassifierPropertyReference
+		target_propertyReference: AADLBA!ClassifierPropertyReference
 		(
 			classifier <- src_propertyReference.classifier
 		)
@@ -1083,10 +1083,10 @@ rule m_ClassifierPropertyReference
 rule m_PropertySetPropertyReference
 {
 	from
-		src_propertyReference: AADLBA!PropertyReference,
+		src_propertyReference: AADLBA!PropertySetPropertyReference,
 		c: AADLI!ComponentInstance
 	to
-		target_propertySetPropertyReference: AADLBA!PropertySetPropertyReference
+		target_propertyReference: AADLBA!PropertySetPropertyReference
 		(
 			propertyset <- src_propertyReference.propertyset
 		)
@@ -1133,10 +1133,10 @@ rule m_PropertyElementHolder
 rule m_PropertyExpressionHolder
 {
 	from
-		src_propertyElementHolder: AADLBA!PropertyElementHolder,
+		src_propertyElementHolder: AADLBA!PropertyExpressionHolder,
 		c: AADLI!ComponentInstance
 	to
-		target_propertyExpressionHolder: AADLBA!PropertyExpressionHolder
+		target_propertyElementHolder: AADLBA!PropertyExpressionHolder
 }
 
 rule m_UpperBound
