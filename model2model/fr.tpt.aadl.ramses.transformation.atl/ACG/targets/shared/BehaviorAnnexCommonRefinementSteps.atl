@@ -484,9 +484,25 @@ helper context AADLBA!PortHolder def: resolve(c: AADLI!ComponentInstance): AADLB
 		thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_Holder')
 	endif
 ;
--- instanciate the new classes.
-helper context AADLBA!BehaviorEnumerationLiteral def: resolve(c: AADLI!ComponentInstance): AADLBA!BehaviorEnumerationLiteral =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_behaviorEnumerationLiteral')
+
+helper context AADLBA!ClassifierPropertyReference def: resolve(c: AADLI!ComponentInstance): AADLBA!ClassifierPropertyReference =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_classifierPropertyReference')
+;
+
+helper context AADLBA!PropertySetPropertyReference def: resolve(c: AADLI!ComponentInstance): AADLBA!PropertySetPropertyReference =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertySetPropertyReference')
+;
+
+helper context AADLBA!PropertyNameHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!PropertyNameHolder =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyNameHolder')
+;
+
+helper context AADLBA!UpperBound def: resolve(c: AADLI!ComponentInstance): AADLBA!UpperBound =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_upperBound')
+;
+
+helper context AADLBA!LowerBound def: resolve(c: AADLI!ComponentInstance): AADLBA!LowerBound =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_lowerBound')
 ;
 
 helper context AADLBA!PortFreshValue def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
@@ -1031,22 +1047,90 @@ rule m_PortCountValue
 		)
 }
 
-rule m_BehaviorEnumerationLiteral
+rule m_PropertyReference
 {
 	from
-		src_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral,
+		src_propertyReference: AADLBA!PropertyReference,
 		c: AADLI!ComponentInstance
 		(
-			src_behaviorEnumerationLiteral.isThreadBehaviorElement()
-			and
-			src_behaviorEnumerationLiteral.isPartOfBehaviorAnnexOf(c)
+			src_propertyReference.isPartOfBehaviorAnnexOf(c)
 		)
 	to
-		target_behaviorEnumerationLiteral: AADLBA!BehaviorEnumerationLiteral
+		target_propertyReference: AADLBA!PropertyReference
 		(
-			component <- src_behaviorEnumerationLiteral.component,
-			enumLiteral <- src_behaviorEnumerationLiteral.enumLiteral
+			properties <- src_propertyReference.properties->collect(propertyname| propertyname.resolve(c))
 		)
+}
+
+-- @extends m_PropertyReference
+rule m_ClassifierPropertyReference
+{
+	from
+		src_propertyReference: AADLBA!PropertyReference,
+		c: AADLI!ComponentInstance
+	to
+		target_classifierPropertyReference: AADLBA!ClassifierPropertyReference
+		(
+			classifier <- src_propertyReference.classifier
+		)
+}
+
+-- @extends m_PropertyReference
+rule m_PropertySetPropertyReference
+{
+	from
+		src_propertyReference: AADLBA!PropertyReference,
+		c: AADLI!ComponentInstance
+	to
+		target_propertySetPropertyReference: AADLBA!PropertySetPropertyReference
+		(
+			propertyset <- src_propertyReference.propertyset
+		)
+}
+
+rule m_PropertyNameHolder
+{
+	from
+		src_propertyNameHolder: AADLBA!PropertyNameHolder,
+		c: AADLI!ComponentInstance
+		(
+			src_propertyNameHolder.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_propertyNameHolder: AADLBA!PropertyNameHolder
+		(
+			property <- src_propertyNameHolder.property.resolve(c),
+			
+			field <- if src_propertyNameHolder.field.oclIsUndefined() then 
+						OclUndefined
+					else 
+						src_propertyNameHolder.field.resolve(c)
+					endif
+		)
+}
+
+rule m_UpperBound
+{
+	from
+		src_upperBound: AADLBA!UpperBound,
+		c: AADLI!ComponentInstance
+		(
+			src_upperBound.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_upperBound: AADLBA!UpperBound
+}
+
+rule m_LowerBound
+{
+	from
+		src_lowerBound: AADLBA!LowerBound,
+		c: AADLI!ComponentInstance
+		(
+			src_lowerBound.isPartOfBehaviorAnnexOf(c)
+		)
+	to
+		target_LowerBound: AADLBA!LowerBound
 }
 
 -- @extends m_CommunicationAction
