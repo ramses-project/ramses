@@ -902,7 +902,7 @@ unique lazy rule createComputeEntryPointConditionForPort
 			element <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'activatedPort')
 		),
 		portIDEnum: AADLBA!BehaviorEnumerationLiteral
-		(
+		(-- reference to output model.
 			component <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
 			enumLiteral <- portIDEnumLiteral
 		)

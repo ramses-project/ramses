@@ -98,7 +98,7 @@ unique lazy rule createModeSwitchAction
 			firstValue <- targetModeLiteral
 		),
 		targetModeLiteral: AADLBA!BehaviorEnumerationLiteral
-		(
+		(-- resolve pending reference based on the given object & id.
 			component <- thisModule.resolveTemp(mti.eContainer(), 'modeDataClassifier'),
 			enumLiteral <- modeIDEnumLiteral
 		),

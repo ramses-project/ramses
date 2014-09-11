@@ -302,20 +302,11 @@ unique lazy rule createTransition
 	),
 	errorEnumFactor: AADLBA!Factor
 	(
-		firstValue <- errorEnumLiteral
-	),
-	errorEnumLiteral: AADLBA!ClassifierPropertyReference
-	(
-		classifier <- 'Error_Code_Type'.asDataType('ARINC653_RUNTIME'),
-		properties <- Sequence{errorPropertyNameHolder}
-	),
-	errorPropertyNameHolder: AADLBA!PropertyNameHolder
-	(
-		property <- errorPropertyExpressionHolder
-	),
-	errorPropertyExpressionHolder: AADLBA!PropertyExpressionHolder
-	(
-		element <- 'Error_Code_Type'.asDataType('ARINC653_RUNTIME').getStringLiteral('Enumerators', errorIdString)
+		firstValue <- thisModule.bindDatatypeEnumStringliteral
+	                  (
+	                    'Error_Code_Type'.asDataType('ARINC653_RUNTIME'),
+					    errorIdString
+	                  )
 	),
 	recoveryActionBlock: AADLBA!BehaviorActionBlock
 	(
@@ -743,20 +734,11 @@ lazy rule createCallSetPartitionMode
 	),
 	modeEnumFactor: AADLBA!Factor
 	(
-		firstValue <- modeEnumLiteral
-	),
-	modeEnumLiteral:AADLBA!ClassifierPropertyReference
-	(
-		classifier <- 'OPERATING_MODE_TYPE'.asDataType('ARINC653_RUNTIME'),
-		properties <- Sequence {modePropertyNameHolder}
-	),
-	modePropertyNameHolder: AADLBA!PropertyNameHolder
-	(
-		property <- modePropertyExpressionHolder
-    ),
-	modePropertyExpressionHolder: AADLBA!PropertyExpressionHolder
-	(
-		element <- 'OPERATING_MODE_TYPE'.asDataType('ARINC653_RUNTIME').getStringLiteral('Enumerators', mode)
+		firstValue <- thisModule.bindDatatypeEnumStringliteral
+					  (
+					  	'OPERATING_MODE_TYPE'.asDataType('ARINC653_RUNTIME'),
+						mode
+					  )
 	)
   do
   {

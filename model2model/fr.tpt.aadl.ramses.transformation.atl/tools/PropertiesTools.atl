@@ -60,6 +60,8 @@ helper context String def : asClassifier(model : String) : AADLBA!Classifier =
 	AADLBA!Classifier->allInstancesFrom(model)->any(p|p.name=self)
 ;
 
+helper def : enumerators  : String = 'Enumerators';
+
 rule toStringLiteral(input: String)
 {
 	to
@@ -72,10 +74,6 @@ rule toStringLiteral(input: String)
 
 helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String) = 
 	v.ownedValue.getOwnedListElements()->collect(e|e.getValue())
-;
-
-helper context AADLI!Classifier def: getStringLiteral(propertyName: String, stringLiteralValue: String) : AADLI!PropertyValue =
-	thisModule.theHOOK.getStringLiteral(self, propertyName, stringLiteralValue)
 ;
 
 helper def : getProperty(propertyName : String) : AADLBA!Property =
@@ -279,4 +277,26 @@ rule CreateListValueFromClassifier (value: AADLBA!Classifier)
 	{
 		lv;
 	}
+}
+
+unique lazy rule bindDatatypeEnumStringliteral
+{
+	from
+		component: AADLI!ComponentInstance,
+		stringLiteral: String
+	to
+		classifierPropertyReference: AADLBA!ClassifierPropertyReference
+		(
+			classifier <- component,
+			properties <- Sequence {bdes_propertyNameHolder}
+		),
+		bdes_propertyNameHolder: AADLBA!PropertyNameHolder
+		(
+			property <- bdes_PropertyExpressionHolder
+		),
+		bdes_PropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+		(
+			element <- component.getStringLiteral(thisModule.enumerators, stringLiteral)
+		)
+     do {classifierPropertyReference;}
 }

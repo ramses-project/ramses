@@ -553,3 +553,7 @@ helper context AADLI!ComponentInstance def: needsModeVariable() : Boolean =
 helper context AADLI!FeatureInstance def: needsModeVariable() : Boolean =
 	AADLI!ModeInstance.allInstancesFrom('IN')->exists(mi|self.connectedInMode(mi.mode))
 ;
+
+helper context AADLI!Classifier def: getStringLiteral(propertyName: String, stringLiteralValue: String) : AADLI!PropertyValue =
+	thisModule.theHOOK.getStringLiteral(self, propertyName, stringLiteralValue)
+;

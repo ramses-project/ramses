@@ -693,20 +693,11 @@ rule m_BehaviorActionsFromThread
 	),
 	enumValueSourceStateFactor: AADLBA!Factor
 	(
-		firstValue <- sourceStateID
-	),
-	sourceStateID: AADLBA!ClassifierPropertyReference
-	(
-		classifier <- stateType,
-		properties <- Sequence {sourceStateIDPropertyNameHolder}
-	),
-	sourceStateIDPropertyNameHolder: AADLBA!PropertyNameHolder
-	(
-		property <- sourceStateIDPropertyExpressionHolder
-	),
-	sourceStateIDPropertyExpressionHolder: AADLBA!PropertyExpressionHolder
-	(
-		element <- stateType.getStringLiteral('Enumerators', src_transition.sourceState.name)
+		firstValue <- thisModule.bindDatatypeEnumStringliteral
+					  (
+					    stateType,
+						src_transition.sourceState.name
+					  )
 	),
 	updateState: AADLBA!AssignmentAction
 	(
@@ -735,20 +726,11 @@ rule m_BehaviorActionsFromThread
 	),
 	enumValueTargetStateFactor: AADLBA!Factor
 	(
-		firstValue <- targetStateID
-	),
-	targetStateID: AADLBA!ClassifierPropertyReference
-	(
-		classifier <- stateType,
-		properties <- Sequence {targetStateIDPropertyNameHolder}
-	),
-	targetStateIDPropertyNameHolder: AADLBA!PropertyNameHolder
-	(
-		property <- targetStateIDPropertyExpressionHolder
-	),
-	targetStateIDPropertyExpressionHolder: AADLBA!PropertyExpressionHolder
-	(
-		element <- stateType.getStringLiteral('Enumerators', src_transition.destinationState.name)
+		firstValue <- thisModule.bindDatatypeEnumStringliteral
+					  (
+					    stateType,
+						src_transition.destinationState.name
+					  )
 	)
 }
 
