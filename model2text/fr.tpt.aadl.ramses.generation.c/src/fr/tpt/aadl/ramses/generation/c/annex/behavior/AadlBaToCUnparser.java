@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.OperationNotSupportedException ;
+
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.AbstractEnumerator;
 import org.eclipse.emf.common.util.EList;
@@ -50,6 +52,7 @@ import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.Parameter;
 import org.osate.aadl2.ParameterConnectionEnd;
 import org.osate.aadl2.PrototypeBinding;
+import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.SubprogramClassifier;
 import org.osate.aadl2.SubprogramImplementation;
 import org.osate.aadl2.SubprogramPrototype;
@@ -70,7 +73,6 @@ import org.osate.ba.aadlba.BehaviorActions;
 import org.osate.ba.aadlba.BehaviorAnnex;
 import org.osate.ba.aadlba.BehaviorBooleanLiteral;
 import org.osate.ba.aadlba.BehaviorElement;
-import org.osate.ba.aadlba.BehaviorEnumerationLiteral;
 import org.osate.ba.aadlba.BehaviorIntegerLiteral;
 import org.osate.ba.aadlba.BehaviorRealLiteral;
 import org.osate.ba.aadlba.BehaviorState;
@@ -113,6 +115,7 @@ import org.osate.ba.aadlba.PortDequeueValue;
 import org.osate.ba.aadlba.PortFreezeAction;
 import org.osate.ba.aadlba.PortFreshValue;
 import org.osate.ba.aadlba.PortSendAction;
+import org.osate.ba.aadlba.PropertyReference ;
 import org.osate.ba.aadlba.Relation;
 import org.osate.ba.aadlba.RelationalOperator;
 import org.osate.ba.aadlba.SimpleExpression;
@@ -132,6 +135,7 @@ import org.osate.ba.analyzers.TypeHolder;
 import org.osate.ba.unparser.AadlBaUnparser;
 import org.osate.ba.utils.AadlBaUtils;
 import org.osate.ba.utils.AadlBaVisitors;
+import org.osate.ba.utils.DataModelEnumLiteral ;
 import org.osate.ba.utils.DimensionException;
 import org.osate.utils.Aadl2Utils;
 import org.osate.utils.PropertyUtils;
@@ -483,25 +487,35 @@ public class AadlBaToCUnparser extends AadlBaUnparser
 
         return DONE ;
       }
-
-      public String caseBehaviorEnumerationLiteral(BehaviorEnumerationLiteral object)
+      
+      public String casePropertyReference(PropertyReference object)
       {
-        // ComponentPropertyValue is defined to refer Enumerated data
-    	NamedElement component = object.getComponent();
-    	if(component!=null)
-    	{
-    	  String value = PropertyUtils.getStringValue(component, "Source_Name") ;
-        if(value != null)
+        DataModelEnumLiteral dmel = null ;
+        
+        try
         {
-          _cFileContent.addOutput(object.getEnumLiteral().getValue());
+          dmel = AadlBaUtils.toDataModelEnumLiteral(object) ;
+          Classifier component = dmel.classifier ;
+          StringLiteral sl = dmel.stringLiteral ;
+          String sourceName = PropertyUtils.getStringValue(component, "Source_Name") ;
+          
+          if(sourceName != null)
+          {
+            _cFileContent.addOutput(sl.getValue());
+          }
+          else
+          {
+            _cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier
+                                      (component.getQualifiedName())+
+                                      "_"+sl.getValue());
+          }
         }
-        else
-    		{
-    			_cFileContent.addOutput(GenerationUtilsC.getGenerationCIdentifier(component.getQualifiedName())+"_"+object.getEnumLiteral().getValue());
-    		}
-    	}
-    	else
-    		_cFileContent.addOutput(object.getEnumLiteral().getValue());
+        catch(OperationNotSupportedException ex)
+        {
+          String msg = "PropertyReference unparsing fatal error" ;
+          _LOGGER.fatal(msg, ex) ;
+          throw new UnsupportedOperationException(msg, ex) ;
+        }
         
         return DONE ;
       }
