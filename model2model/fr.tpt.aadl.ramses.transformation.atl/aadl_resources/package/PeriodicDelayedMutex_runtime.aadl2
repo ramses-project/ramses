@@ -197,17 +197,17 @@ annex behavior_specification {**
     t: s -[]-> s
     {
      if (BufferAccess.first_write != -1)
-       BufferState := ReturnCodeType#Ok;
+       BufferState := ReturnCodeType#Enumerators.Ok;
        if (BufferAccess.buffer[BufferAccess.first_write].TimeStamp <= CurrentPeriod)
          DataValue := BufferAccess.buffer[BufferAccess.first_write].MsgValue;
          tmp := BufferAccess.first_write;
          BufferAccess.first_write := BufferAccess.buffer[BufferAccess.first_write].Next;
          BufferAccess.buffer[tmp].Next := -2 -- free slot
        else
-         BufferState := ReturnCodeType#EmptyQueue
+         BufferState := ReturnCodeType#Enumerators.EmptyQueue
        end if
      else
-       BufferState := ReturnCodeType#EmptyQueue
+       BufferState := ReturnCodeType#Enumerators.EmptyQueue
      end if
     };
 **};

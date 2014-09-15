@@ -70,12 +70,12 @@ with Base_Types, Data_Model, Generation_Properties;
             output := buffer[first];
             if(first!=last)
         	  first := (first+1) mod bufferSize;
-        	  ReturnCode:=ReturnCodeType#Ok
+        	  ReturnCode:=ReturnCodeType#Enumerators.Ok
         	else
-        	  ReturnCode:=ReturnCodeType#EmptyQueue
+        	  ReturnCode:=ReturnCodeType#Enumerators.EmptyQueue
             end if
           else
-            ReturnCode:=ReturnCodeType#EmptyQueue
+            ReturnCode:=ReturnCodeType#Enumerators.EmptyQueue
           end if
         };
     **};
