@@ -894,11 +894,7 @@ lazy abstract rule createComputeEntryPointCondition
 			factors <- Sequence{portIDFactor}
 		),
 		portIDFactor: AADLBA!Factor
-		(
-			firstValue <- portIDEnum
-		),
-		portIDEnum: AADLBA!ClassifierPropertyReference,
-		portIDEnumLiteral: AADLBA!StringLiteral
+		
 	do
 	{
 		computeEntryPointCondition;
@@ -910,15 +906,6 @@ unique lazy rule createComputeEntryPointConditionForPort
 {
 	from
 		object: AADLI!FeatureInstance
-    using
-	{
-		portIDEnum: AADLBA!ClassifierPropertyReference = 
-			thisModule.createClassifierPropertyReference
-		                       (
-		                       		thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
-									portIDEnumLiteral
-		                       );
-	}
 	to
 		computeEntryPointCondition: AADLBA!ValueExpression,
 		portIDEnumLiteral: AADLBA!StringLiteral
@@ -928,6 +915,14 @@ unique lazy rule createComputeEntryPointConditionForPort
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
 			element <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'activatedPort')
+		),
+		portIDFactor: AADLBA!Factor
+		(
+			firstValue <- thisModule.createClassifierPropertyReference
+		                       (
+		                       		thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
+									portIDEnumLiteral
+		                       )
 		)
 	do
 	{
@@ -939,20 +934,19 @@ lazy rule createComputeEntryPointConditionForComponent
 {
 	from
 		object: AADLI!ComponentInstance
-    using
-	{
-		portIDEnum: AADLBA!ClassifierPropertyReference = 
-			thisModule.createClassifierPropertyReference
-		                       (
-		                       		thisModule.resolveMatchedSingleIfExists(object, 'whichPortActivatedDataDlassifier'),
-									thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral')
-		                       );
-	}
 	to
 		computeEntryPointCondition: AADLBA!ValueExpression,
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
 			element <- thisModule.resolveMatchedSingleIfExists(object, 'activatedPort')
+		),
+		portIDFactor: AADLBA!Factor
+		(
+			firstValue <- thisModule.createClassifierPropertyReference
+		                       (
+		                       		thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
+									thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral')
+		                       )
 		)
 	do
 	{

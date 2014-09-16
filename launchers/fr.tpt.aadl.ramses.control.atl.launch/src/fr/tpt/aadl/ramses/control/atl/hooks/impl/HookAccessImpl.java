@@ -172,18 +172,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
-  public void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance)
-  {
-    // TODO: implement this method
-    // Ensure that you remove @generated or mark it @generated NOT
-    throw new UnsupportedOperationException();
-  }
-
-    /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
    * @generated NOT
    */
     private static Map<NamedElement, NamedElement> _transformationTrace = new HashMap<NamedElement, NamedElement>();
@@ -596,18 +584,8 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
                                         String propertyName,
                                         String stringLiteralValue)
   {
-    Element el = null ;
-    EList<PropertyExpression> pes = PropertyUtils.getPropertyExpression(classifier, propertyName) ;
-    for(PropertyExpression pe : pes)
-    {
-      el = PropertyUtils.getValue(pe, stringLiteralValue) ;
-      
-      if(el != null)
-      {
-        return (StringLiteral) el ;
-      }
-    }
-    
-    return null ;
+    // TODO: implement this method
+    // Ensure that you remove @generated or mark it @generated NOT
+    throw new UnsupportedOperationException();
   }
 } //HookAccessImpl

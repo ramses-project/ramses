@@ -33,7 +33,6 @@ import org.osate.aadl2.Port ;
 import org.osate.aadl2.PropertyAssociation ;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.instance.FeatureInstance ;
-import org.osate.aadl2.instance.InstanceObject;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorElement ;
 import org.osate.ba.aadlba.BehaviorState ;
@@ -69,14 +68,13 @@ public interface HookAccess extends EObject
    */
   void copyLocationReference(Element target,
                              Element source) ;
-
     /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @model targetDeclarativeRequired="true" sourceInstanceRequired="true"
    * @generated
    */
-  void addTransformationBackTrace(NamedElement targetDeclarative, InstanceObject sourceInstance);
+  void addTransformationBackTrace(NamedElement targetDeclarative, NamedElement sourceInstance);
 
     /**
    * <!-- begin-user-doc -->

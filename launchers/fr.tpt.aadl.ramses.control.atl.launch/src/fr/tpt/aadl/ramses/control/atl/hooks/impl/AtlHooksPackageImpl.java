@@ -184,8 +184,8 @@ public class AtlHooksPackageImpl extends EPackageImpl implements AtlHooksPackage
 
     // Obtain other dependent packages
     Aadl2Package theAadl2Package = (Aadl2Package)EPackage.Registry.INSTANCE.getEPackage(Aadl2Package.eNS_URI);
-    InstancePackage theInstancePackage = (InstancePackage)EPackage.Registry.INSTANCE.getEPackage(InstancePackage.eNS_URI);
     AadlBaPackage theAadlBaPackage = (AadlBaPackage)EPackage.Registry.INSTANCE.getEPackage(AadlBaPackage.eNS_URI);
+    InstancePackage theInstancePackage = (InstancePackage)EPackage.Registry.INSTANCE.getEPackage(InstancePackage.eNS_URI);
 
     // Create type parameters
 
@@ -205,7 +205,7 @@ public class AtlHooksPackageImpl extends EPackageImpl implements AtlHooksPackage
 
     op = addEOperation(hookAccessEClass, null, "addTransformationBackTrace", 1, 1, IS_UNIQUE, IS_ORDERED);
     addEParameter(op, theAadl2Package.getNamedElement(), "targetDeclarative", 1, 1, IS_UNIQUE, IS_ORDERED);
-    addEParameter(op, theInstancePackage.getInstanceObject(), "sourceInstance", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getNamedElement(), "sourceInstance", 1, 1, IS_UNIQUE, IS_ORDERED);
 
     op = addEOperation(hookAccessEClass, null, "putTransitionWhereSrc", 1, 1, IS_UNIQUE, IS_ORDERED);
     addEParameter(op, theAadlBaPackage.getBehaviorState(), "state", 1, 1, IS_UNIQUE, IS_ORDERED);
