@@ -149,7 +149,6 @@ lazy rule createClassifierPropertyReference
 		component: AADLI!Classifier,
 		pa: 	   AADLI!PropertyAssociation,
 		sl:        AADLI!StringLiteral
-		(true.debug('$$$$$$$$$$$$$$$$$$ createClassifierPropertyReference'))
     to
 	   classifierPropertyReference: AADLBA!ClassifierPropertyReference
 	   (
@@ -969,9 +968,9 @@ lazy rule createComputeEntryPointConditionForComponent
 		(
 			firstValue <- thisModule.createClassifierPropertyReference
 		                       (
-		                       		thisModule.resolveMatchedSingleIfExists(object, 'whichPortActivatedDataDlassifier').debug('!!!!!!!!!!!!!!!!'),
-									thisModule.createComponentBehaviorEnumerators(object).debug('%%%%%%%%%%%%%%%%%%%%'),
-									thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral').debug('oooooooooooooooo')
+		                       		thisModule.resolveMatchedSingleIfExists(object, 'whichPortActivatedDataDlassifier'),
+									thisModule.createComponentBehaviorEnumerators(object),
+									thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral')
 		                       )
 		)
 	do
