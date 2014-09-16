@@ -60,8 +60,6 @@ helper context String def : asClassifier(model : String) : AADLBA!Classifier =
 	AADLBA!Classifier->allInstancesFrom(model)->any(p|p.name=self)
 ;
 
-helper def : enumerators  : String = 'Enumerators';
-
 rule toStringLiteral(input: String)
 {
 	to
@@ -284,19 +282,31 @@ unique lazy rule bindDatatypeEnumStringliteral
 	from
 		component: AADLI!Classifier,
 		stringLiteral: String
+		(
+		  true.debug('################# bindDatatypeEnumStringliteral')	
+		)
 	to
 		classifierPropertyReference: AADLBA!ClassifierPropertyReference
 		(
 			classifier <- component,
-			properties <- Sequence {bdes_propertyNameHolder}
+			properties <- Sequence {enumerators_propertyNameHolder, bdes_propertyNameHolder}
 		),
+		enumerators_propertyNameHolder: AADLBA!PropertyNameHolder
+		(
+			property <- enumerators_PropertyAssociationHolder
+		),
+		enumerators_PropertyAssociationHolder: AADLBA!PropertyAssociationHolder
+		(
+			element <- component.getEnumerators()
+		),		
 		bdes_propertyNameHolder: AADLBA!PropertyNameHolder
 		(
 			property <- bdes_PropertyExpressionHolder
 		),
 		bdes_PropertyExpressionHolder: AADLBA!PropertyExpressionHolder
 		(
-			element <- component.getStringLiteral(thisModule.enumerators, stringLiteral)
+			element <- thisModule.getStringLiteral(enumerators_PropertyAssociationHolder.element,
+				                                   stringLiteral)
 		)
      do {classifierPropertyReference;}
 }

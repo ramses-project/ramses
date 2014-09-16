@@ -143,16 +143,26 @@ helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
 	endif
 ;
 
-unique lazy rule createClassifierPropertyReference
+lazy rule createClassifierPropertyReference
 {
 	from
 		component: AADLI!Classifier,
-		sl:        AADLBA!StringLiteral
+		pa: 	   AADLI!PropertyAssociation,
+		sl:        AADLI!StringLiteral
+		(true.debug('$$$$$$$$$$$$$$$$$$ createClassifierPropertyReference'))
     to
 	   classifierPropertyReference: AADLBA!ClassifierPropertyReference
 	   (
 	   	 classifier <- component,
-		 properties <- Sequence {ccpr_propertyNameHolder}
+		 properties <- Sequence {enum_propertyNameHolder, ccpr_propertyNameHolder}
+	   ),
+	   enum_propertyNameHolder: AADLBA!PropertyNameHolder
+	   (
+	   	 property <- enum_PropertyAssociationHolder
+	   ),
+	   enum_PropertyAssociationHolder: AADLBA!PropertyAssociationHolder
+	   (
+	   	 element <- pa
 	   ),
 	   ccpr_propertyNameHolder: AADLBA!PropertyNameHolder
 	   (
@@ -163,6 +173,22 @@ unique lazy rule createClassifierPropertyReference
 		 element <- sl
 	   )
 	do {classifierPropertyReference;}   
+}
+
+unique lazy rule createComponentBehaviorEnumerators
+{
+	from
+	  c: AADLI!ComponentInstance
+	to
+	   p : AADLBA!PropertyAssociation (
+			property <- 'Enumerators'.asProperty('DATA_MODEL'),
+			ownedValue <- Sequence {mpv}
+		),
+		
+		mpv : AADLBA!ModalPropertyValue (
+			ownedValue <- thisModule.CreateListValueFromListOfString(Sequence{'default_behavior'}->union(c.featureInstance->select(fi|fi.isInputFeature())->collect(e|e.name)))
+		)
+	do { p; }
 }
 
 rule m_PortConnection_Reference
@@ -272,6 +298,7 @@ rule m_ThreadEntrypoint {
 		impl : AADLI!ThreadImplementation = c.subcomponent.subcomponentType;
 		callSequences: Sequence(AADLBA!SubprogramCallSequence) = if(not c.needsToMapBehaviorAnnex()) then impl.ownedSubprogramCallSequence->select(e|e.isComputeEntryPointOf(c))
 																 else Sequence{} endif;
+		property_association: AADLBA!PropertyAssociation = thisModule.createComponentBehaviorEnumerators(c);
 	}
 	to
 		sub : AADLBA!ThreadSubcomponent mapsTo c,
@@ -494,12 +521,7 @@ rule m_ThreadEntrypoint {
 													'DATA_MODEL',
 													'Enum'.asEnumeration('DATA_MODEL').asNamedValue()
 												),
-												thisModule.CreatePropertyAssociation
-												(
-												 	'Enumerators',
-													'DATA_MODEL',
-													 thisModule.CreateListValueFromListOfString(Sequence{'default_behavior'}->union(c.featureInstance->select(fi|fi.isInputFeature())->collect(e|e.name)))
-												),
+												property_association,
 												thisModule.CreatePropertyAssociation('Initial_Value','DATA_MODEL',lv)
 									}
 		),
@@ -507,10 +529,10 @@ rule m_ThreadEntrypoint {
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(c.targetPackagePrefix()+c.uniqueName()+'_behaviorIdentifier_enum'.concat('_').concat('default_behavior'))}
 		),
-		portIDEnumLiteral: AADLBA!StringLiteral
-		(
-			value <- 'default_behavior'
-		),
+	    portIDEnumLiteral: AADLBA!StringLiteral
+        (
+          value <- 'default_behavior'
+        ),
 		execState: AADLBA!BehaviorState
 		(
 			initial  <- false,
@@ -566,6 +588,7 @@ rule m_ThreadEntrypoint {
 			firstValue <- thisModule.createClassifierPropertyReference
 			                         (
 			                         	whichPortActivatedDataDlassifier,
+										property_association,
 										portIDEnumLiteral
 			                         )
 		),
@@ -779,6 +802,7 @@ rule createDefaultAssignement(c:AADLI!ComponentInstance)
 			firstValue <- thisModule.createClassifierPropertyReference
 			                         (
 			                         	thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
+										thisModule.createComponentBehaviorEnumerators(c),
 										thisModule.resolveMatchedSingleIfExists(c, 'portIDEnumLiteral')
 			                         )
 		),
@@ -908,10 +932,10 @@ unique lazy rule createComputeEntryPointConditionForPort
 		object: AADLI!FeatureInstance
 	to
 		computeEntryPointCondition: AADLBA!ValueExpression,
-		portIDEnumLiteral: AADLBA!StringLiteral
-		(
-			value <- object.name
-		),
+	    portIDEnumLiteral: AADLBA!StringLiteral
+        (
+          value <- object.name
+        ),
 		behaviorIdentifiverValueHolder: AADLBA!BehaviorVariableHolder
 		(
 			element <- thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'activatedPort')
@@ -921,6 +945,7 @@ unique lazy rule createComputeEntryPointConditionForPort
 			firstValue <- thisModule.createClassifierPropertyReference
 		                       (
 		                       		thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
+									thisModule.createComponentBehaviorEnumerators(object.getComponentInstance()),
 									portIDEnumLiteral
 		                       )
 		)
@@ -944,8 +969,9 @@ lazy rule createComputeEntryPointConditionForComponent
 		(
 			firstValue <- thisModule.createClassifierPropertyReference
 		                       (
-		                       		thisModule.resolveMatchedSingleIfExists(object.getComponentInstance(), 'whichPortActivatedDataDlassifier'),
-									thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral')
+		                       		thisModule.resolveMatchedSingleIfExists(object, 'whichPortActivatedDataDlassifier').debug('!!!!!!!!!!!!!!!!'),
+									thisModule.createComponentBehaviorEnumerators(object).debug('%%%%%%%%%%%%%%%%%%%%'),
+									thisModule.resolveMatchedSingleIfExists(object, 'portIDEnumLiteral').debug('oooooooooooooooo')
 		                       )
 		)
 	do
@@ -1099,6 +1125,7 @@ rule m_PortBehavior
 			firstValue <- thisModule.createClassifierPropertyReference
 			                         (
 			                           	thisModule.resolveMatchedSingleIfExists(c, 'whichPortActivatedDataDlassifier'),
+										thisModule.createComponentBehaviorEnumerators(c),
 										thisModule.resolveLazySingleIfExists(fi, 'createComputeEntryPointConditionForPort', 'portIDEnumLiteral')			
 			                         )
 		)

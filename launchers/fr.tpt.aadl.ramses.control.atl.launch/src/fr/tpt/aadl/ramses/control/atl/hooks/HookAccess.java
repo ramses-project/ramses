@@ -31,6 +31,7 @@ import org.osate.aadl2.Feature ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Port ;
 import org.osate.aadl2.PropertyAssociation ;
+import org.osate.aadl2.PropertyExpression;
 import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
@@ -156,9 +157,17 @@ public interface HookAccess extends EObject
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @model required="true" classifierRequired="true" propertyNameDataType="org.osate.aadl2.String" propertyNameRequired="true" stringLiteralValueDataType="org.osate.aadl2.String" stringLiteralValueRequired="true"
+   * @model required="true" paRequired="true" stringLiteralValueDataType="org.osate.aadl2.String" stringLiteralValueRequired="true"
    * @generated
    */
-  StringLiteral getStringLiteral(Classifier classifier, String propertyName, String stringLiteralValue);
+  StringLiteral getStringLiteral(PropertyAssociation pa, String stringLiteralValue);
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @model required="true" classifierRequired="true"
+   * @generated
+   */
+  PropertyAssociation getEnumerators(Classifier classifier);
 	
 } // HookAccess

@@ -243,9 +243,11 @@ public class AtlHooksPackageImpl extends EPackageImpl implements AtlHooksPackage
     addEParameter(op, theAadlBaPackage.getBehaviorElement(), "e", 1, 1, IS_UNIQUE, IS_ORDERED);
 
     op = addEOperation(hookAccessEClass, theAadl2Package.getStringLiteral(), "getStringLiteral", 1, 1, IS_UNIQUE, IS_ORDERED);
-    addEParameter(op, theAadl2Package.getClassifier(), "classifier", 1, 1, IS_UNIQUE, IS_ORDERED);
-    addEParameter(op, theAadl2Package.getString(), "propertyName", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getPropertyAssociation(), "pa", 1, 1, IS_UNIQUE, IS_ORDERED);
     addEParameter(op, theAadl2Package.getString(), "stringLiteralValue", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+    op = addEOperation(hookAccessEClass, theAadl2Package.getPropertyAssociation(), "getEnumerators", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getClassifier(), "classifier", 1, 1, IS_UNIQUE, IS_ORDERED);
 
     // Create resource
     createResource(eNS_URI);

@@ -35,10 +35,4 @@ http://www.eclipse.org/org/documents/epl-v10.php
             type="atlhooks"
             class="fr.tpt.aadl.ramses.control.atl.hooks.util.AtlHooksResourceFactoryImpl"/>
    </extension>
-
-   <extension point="org.eclipse.emf.ecore.extension_parser">
-      <parser
-            type="atlhooks"
-            class="fr.tpt.aadl.ramses.control.atl.hooks.utils.AtlHooksResourceFactoryImpl"/>
-   </extension>
 </plugin>

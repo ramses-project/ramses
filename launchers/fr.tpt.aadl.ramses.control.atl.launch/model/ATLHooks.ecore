@@ -50,9 +50,11 @@
       <eParameters name="e" lowerBound="1" eType="ecore:EClass ../../org.osate.ba/model/aadlba.ecore#//BehaviorElement"/>
     </eOperations>
     <eOperations name="getStringLiteral" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//StringLiteral">
-      <eParameters name="classifier" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Classifier"/>
-      <eParameters name="propertyName" lowerBound="1" eType="ecore:EDataType ../../org.osate.aadl2/model/aadl2.ecore#//String"/>
+      <eParameters name="pa" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//PropertyAssociation"/>
       <eParameters name="stringLiteralValue" lowerBound="1" eType="ecore:EDataType ../../org.osate.aadl2/model/aadl2.ecore#//String"/>
+    </eOperations>
+    <eOperations name="getEnumerators" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//PropertyAssociation">
+      <eParameters name="classifier" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Classifier"/>
     </eOperations>
   </eClassifiers>
 </ecore:EPackage>
