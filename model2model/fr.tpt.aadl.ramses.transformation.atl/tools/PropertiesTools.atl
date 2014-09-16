@@ -277,14 +277,11 @@ rule CreateListValueFromClassifier (value: AADLBA!Classifier)
 	}
 }
 
-unique lazy rule bindDatatypeEnumStringliteral
+lazy rule bindDatatypeEnumStringliteral
 {
 	from
 		component: AADLI!Classifier,
 		stringLiteral: String
-		(
-		  true.debug('################# bindDatatypeEnumStringliteral')	
-		)
 	to
 		classifierPropertyReference: AADLBA!ClassifierPropertyReference
 		(
