@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IFile ;
 import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IWorkspaceRoot ;
 import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.IPath ;
 import org.eclipse.core.runtime.IStatus ;
 import org.eclipse.core.runtime.MultiStatus ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
@@ -181,15 +182,19 @@ public class WorkbenchUtils
   // included.
   public static Set<File> getIncludeDirs(IProject p)
   {
-    String fullProjectPath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString() + p.getFullPath().toOSString() ;
+    Set<File> result = null;
+    String fullProjectPath = p.getLocation().toOSString() ;
     
     File projectPath = new File(fullProjectPath) ;
     
-    Set<File> result = FileUtils.getSubDirectories(projectPath) ;
-    
-    result.add(projectPath) ;
+    if(projectPath.exists())
+    {
+      result = FileUtils.getSubDirectories(projectPath) ;
+      result.add(projectPath) ;
+    }
     
     return result ;
+    
   }
 
   public static void showGenerationReport()
