@@ -150,12 +150,12 @@ end SEQ;
   
   virtual processor implementation VP_S1.impl
     properties
-      POK::Scheduler => RR;
+      Scheduling_Protocol => (Round_Robin_Protocol);
   end VP_S1.impl;
   
   virtual processor implementation VP_S2.impl
     properties
-      POK::Scheduler => RR;
+      Scheduling_Protocol => (Round_Robin_Protocol);
   end VP_S2.impl;
   
   process S1

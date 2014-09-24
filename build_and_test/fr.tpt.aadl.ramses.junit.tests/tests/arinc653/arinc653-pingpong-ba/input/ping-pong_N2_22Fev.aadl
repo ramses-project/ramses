@@ -169,7 +169,7 @@ PROPERTIES
   ARINC653::Partition_Identifier => 1;
   ARINC653::Partition_Name => "S1";
   ARINC653::System_Partition => FALSE;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Round_Robin_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_S1.impl;
 
@@ -181,7 +181,7 @@ PROPERTIES
   ARINC653::Partition_Identifier => 2;
   ARINC653::Partition_Name => "S2";
   ARINC653::System_Partition => FALSE;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Round_Robin_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_S2.impl;
 

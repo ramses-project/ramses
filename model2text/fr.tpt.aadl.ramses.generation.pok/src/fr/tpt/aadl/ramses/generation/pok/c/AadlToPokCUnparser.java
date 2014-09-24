@@ -1382,10 +1382,10 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       boolean foundRR = false ;
 
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RR") && foundRR == false)
+        if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol") && foundRR == false)
         {
           foundRR = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
@@ -1393,7 +1393,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       }
       else
       {
-        String errMsg = "scheduler is not provided for \'" +
+        String errMsg = "Scheduling_Protocol is not provided for \'" +
                              vps.getName() + '\'' ;
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
@@ -1406,10 +1406,10 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RR"))
+        if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol"))
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
         }
@@ -1421,7 +1421,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       }
       else
       {
-        String errMsg =  "cannot fetch the scheduler for \'" + vps.getName() + '\'';
+        String errMsg =  "cannot fetch the Scheduling_Protocol for \'" + vps.getName() + '\'';
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }

@@ -1322,10 +1322,10 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
     {
       boolean foundRR = false ;
 
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+     String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RR") && foundRR == false)
+        if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol") && foundRR == false)
         {
           foundRR = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
@@ -1333,7 +1333,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
       }
       else
       {
-        String errMsg = "scheduler is not provided for \'" + vps.getName() + '\'' ;
+        String errMsg = "Scheduling_Protocol is not provided for \'" + vps.getName() + '\'' ;
         _LOGGER.error(errMsg) ;
         ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
       }
@@ -1345,10 +1345,10 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
+      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RR"))
+        if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol"))
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
         }
@@ -1360,7 +1360,7 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
       }
       else
       {
-        String errMsg = "cannot fetch the scheduler for \'" +
+        String errMsg = "cannot fetch the Scheduling_Protocol for \'" +
                                                 vps.getName() + '\'' ;
         _LOGGER.error(errMsg) ;
         ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;

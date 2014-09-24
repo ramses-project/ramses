@@ -25,15 +25,26 @@
 module PokProperties;
 create OUT : CV 	from 		IN : AADLI;
 
+helper context AADLI!PropertyAssociation def : isValidPartitionScheduler() : Boolean =
+	let schedValue: String = self.ownedValue->first().ownedValue.debug(' !!!!!! ').ownedListElement->first().namedValue.name.debug(' !!!!!! ') in
+	schedValue.toLower() = 'round_robin_protocol'
+;
+
 
 --@extends check_VirtualProcessorInstance
-rule check_HasScheduler
+rule check_VirtualProcessorHasScheduler
 {
 	from
 	 	obj:AADLI!ComponentInstance
-		(not obj.hasProperty('Scheduler'))
+		(
+			obj.hasProperty('Scheduling_Protocol')
+			and
+			not obj.ownedPropertyAssociation->any(
+				e | e.property.name.toLower() = 'scheduling_protocol'
+			).isValidPartitionScheduler()
+		)
 	to
 		err: CV!Error
-		(message <- 'For code generation towards POK, each virtual processor must'+ 
-			'have a property value for POK::Scheduler' )
+		(message <- 'Invalid scheduling_protocol for POK; supported '+
+		'values are: Round_Robin_Protocol' )
 }

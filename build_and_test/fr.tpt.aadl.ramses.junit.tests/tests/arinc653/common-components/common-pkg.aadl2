@@ -48,7 +48,6 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
     the_part:  virtual processor part;
   properties
     ARINC653::Module_Major_Frame => 2000 ms;
-    POK::Scheduler => static;
     ARINC653::Module_Schedule => (
        	[Partition => reference(the_part); Duration => 2000ms; Periodic_Processing_Start => true;]
     );
@@ -60,7 +59,6 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
     the_part2:  virtual processor part;
   properties
     ARINC653::Module_Major_Frame => 4000 ms;
-    POK::Scheduler => static;
     ARINC653::Module_Schedule => (
        	[Partition => reference(the_part1); Duration => 2000ms; Periodic_Processing_Start => true;],
        	[Partition => reference(the_part1); Duration => 1000ms; Periodic_Processing_Start => true;],
@@ -81,7 +79,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     ARINC653::System_Partition => true applies to system_part;
     ARINC653::Module_Major_Frame => 2000 ms;
-    POK::Scheduler => static;
+    Scheduling_Protocol => (Round_Robin_Protocol);
     ARINC653::Module_Schedule => (
        	[Partition => reference(the_part); Duration => 1000ms; Periodic_Processing_Start => true;],
        	[Partition => reference(system_part); Duration => 1000ms; Periodic_Processing_Start => true;]
@@ -96,7 +94,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     ARINC653::Partition_Identifier => 1;
     POK::Additional_Features => (libc_stdio, console);
-    POK::Scheduler => RR;
+    Scheduling_Protocol => (Round_Robin_Protocol);
     Period => 1000 Ms;
     ARINC653::HM_Error_ID_Actions => (
     	[ErrorIdentifier => 3; Description => "Restart process"; Action => "Cold_Restart";],

@@ -33,3 +33,16 @@ abstract rule check_VirtualProcessorInstance
 	  (obj.category.getName().toLower() = 'virtual processor')
 }
 
+--@extends check_VirtualProcessorInstance
+rule check_VirtualProcessorHasScheduler
+{
+	from
+	 	obj:AADLI!ComponentInstance
+		(
+			not obj.hasProperty('Scheduling_Protocol')
+		)
+	to
+		err: CV!Error
+		(message <- 'For code generation, each virtual processor must'+ 
+			'have a property value for Scheduling_Protocol property' )
+}
