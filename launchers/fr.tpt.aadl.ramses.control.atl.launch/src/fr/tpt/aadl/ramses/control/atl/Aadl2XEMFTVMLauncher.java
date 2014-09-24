@@ -65,6 +65,7 @@ import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
 
 public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
@@ -222,7 +223,9 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 		}
 		catch(Exception e)
 		{
-		  _LOGGER.fatal("EMFTVM transformation failed", e);
+		  String msg = "EMFTVM transformation failed";
+		  _LOGGER.fatal(msg, e);
+		  ServiceProvider.SYS_ERR_REP.fatal(msg, e);
 		}
 		return outModel.getResource();
 	}
