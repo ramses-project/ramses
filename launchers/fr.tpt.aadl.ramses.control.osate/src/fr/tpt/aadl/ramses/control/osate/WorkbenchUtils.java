@@ -204,10 +204,19 @@ public class WorkbenchUtils
     final IStatus status ;
 //    int style = StatusManager.BLOCK ;
     int code = IStatus.INFO ;
-    sb.append("Code generation was successfully done") ;
    
+    sb.append("RAMSES execution");
+    if(errRep.getNbErrors() != 0)
+    {
+      sb.append(" failed");
+    }
+    else
+    {
+      sb.append(" succeeded");
+    }
     if(errRep.hasDelayedErrors())
     {
+
       sb.append(" with ") ;
       
       if(errRep.getNbWarnings() != 0)
