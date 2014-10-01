@@ -162,6 +162,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       int outputPathHeaderIndex = workspaceLocation.length() ;
       String outputAbsolutePath = outputFile.getAbsolutePath().toString() ;
       String outputPlatformRelativePath = "" ;
+      String finalResourcePath = "";
       String projectName=null;
       if(outputPathHeaderIndex > 0)
       {
@@ -184,12 +185,14 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       }
       else
       {
-        outputPlatformRelativePath =
+        finalResourcePath =
             outputAbsolutePath.replace(workspaceLocation + Path.SEPARATOR, "") ;
       }
-
-      uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
-
+      if(finalResourcePath.charAt(0) == Path.SEPARATOR)
+        uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true);
+      else
+        uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
+      
       ResourceSet rs = OsateResourceUtil.getResourceSet() ;
       xtextResource = rs.getResource(uri, true) ;
       IResource folderToUpdate = ResourcesPlugin.getWorkspace().getRoot().findMember(projectName);
