@@ -534,7 +534,7 @@ public class ToolSuiteLauncherCommand
     boolean isWorkflow = workflow_path != null ; 
     
     if(isWorkflow==false
-        || targetName!="workflow_only")
+        || false==targetName.equals("workflow_only"))
     {
       String path = options.getString(RUNTIME_PATH_OPTION_ID) ;
       status = config.setRuntimePath(path) ;
