@@ -131,7 +131,7 @@ public abstract class Scenario
           args.append(includeList) ;
         }
         
-        if(workflowPath != null && workflowPath != "")
+        if(workflowPath != null && false==workflowPath.equals(""))
         {
           args.append(" --workflow=") ;
           args.append(workflowPath) ;

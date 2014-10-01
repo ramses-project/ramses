@@ -12,21 +12,21 @@ public abstract class OSGIPOKScenario extends OSGIScenario
 	{
 		target="pok";
 		
-		if(runtimePath==null || runtimePath=="")
+		if(runtimePath==null || runtimePath.equals(""))
 		{
 		  runtimePath=EnvUtils.getExternalVariable("POK_PATH");
 	    
-	    if(runtimePath==null || runtimePath=="")
+	    if(runtimePath==null || runtimePath.equals(""))
 	    {
 	      runtimePath = DEFAULT_RUNTIME_PATH ;
 	    }
 		}
 		aadlInspectorPath = System.getenv("AADLINSPECTOR_PATH");
-		if(aadlInspectorPath == null || aadlInspectorPath=="")
+		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
 		
 		aadlInspectorPath = System.getenv("AADLINSPECTOR_PATH");
-		if(aadlInspectorPath == null || aadlInspectorPath=="")
+		if(aadlInspectorPath == null || aadlInspectorPath.equals(""))
 			aadlInspectorPath = System.getProperty("AADLINSPECTOR_PATH");
 		
 	}
