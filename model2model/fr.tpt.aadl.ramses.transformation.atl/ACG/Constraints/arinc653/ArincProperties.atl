@@ -24,7 +24,8 @@
 
 module ArincProperties;
 create OUT : CV 	from 		IN : AADLI,
-								TIMING_PROPERTIES : AADLI;
+								TIMING_PROPERTIES : AADLI,
+								ARINC653 : AADLI;
 
 -- @extends check_ComponentInstance
 abstract rule check_ProcessorInstance
@@ -80,64 +81,24 @@ rule check_HasMajorFrame
 }
 
 --@extends check_ProcessorInstance
-rule check_HasSlotsAllocation
+rule check_HasModuleSchedule
 {
 	from
 	 	obj:AADLI!ComponentInstance,
-		sa: AADLI!Property
+		sa: AADLI!Property in ARINC653
 		(
-			sa.name='Slots_Allocation'
+			sa.name='Module_Schedule'
 			and
-			not obj.hasProperty('Slots_Allocation')
+			not obj.hasProperty('Module_Schedule')
 		)
 	to
 		err: CV!Error
-		(message <- 'In ARINC653, each processor must'+ 
-			' have a property value for ARINC653::Slots_Allocation' )
+		(message <- obj.subcomponent.name + '; In ARINC653, each processor must'+ 
+			' have a property value for ARINC653::Module_Schedule' )
 }
 
 --@extends check_ProcessorInstance
-rule check_HasPartitionSlots
-{
-	from
-	 	obj:AADLI!ComponentInstance,
-		sa: AADLI!Property
-		(
-			sa.name='Slots_Allocation'
-			and not obj.hasProperty('Partition_Slots')
-		)
-	to
-		err: CV!Error
-		(message <- 'In ARINC653, each processor must '+ 
-			'have a property value for ARINC653::Partition_Slots' )
-}
-
---@extends check_ProcessorInstance
-rule check_ParitionSlotsAllocationNumber
-{
-	from
-	 	obj:AADLI!ComponentInstance,
-		ps: AADLI!PropertyAssociation,
-		pa: AADLI!PropertyAssociation 
-		( 
-		  ps.eContainer() = obj
-		  and
-		  ps.property.name = 'Partition_Slots'
-		  and
-		  pa.property.name = 'Slots_Allocation'
-		  and
-		  not(obj.ownedPropertyAssociation->any(pa|pa.property.name='Partition_Slots').ownedValue->first().ownedValue.ownedListElement->size()
-			=
-		  obj.ownedPropertyAssociation->any(pa|pa.property.name='Slots_Allocation').ownedValue->first().ownedValue.ownedListElement->size())
-		)
-	to
-		err: CV!Error
-		(message <- 'ARINC653::Partition_Slots and ARINC653::Slots_Allocation'+
-			' propeties and must contain the same number of elements')
-}
-
---@extends check_ProcessorInstance
-rule check_EachPartitionHasSlot
+rule check_EachPartitionHasScheduleSlot
 {
 	from
 	 	obj:AADLI!ComponentInstance,
@@ -145,11 +106,12 @@ rule check_EachPartitionHasSlot
 		(
 		  part.category.getName()='virtual processor'
 		  and
-		  obj.hasProperty('Slots_Allocation')
+		  obj.hasProperty('Module_Schedule')
 		  and
 		  obj.componentInstance->contains(part)
 		  and
-		  not obj.ownedPropertyAssociation->any(pa|pa.property.name='Slots_Allocation').ownedValue->first().ownedValue.ownedListElement->exists(e|e.containmentPathElement->first().namedElement = part.subcomponent)
+		  not obj.ownedPropertyAssociation->any(pa|pa.property.name='Module_Schedule').ownedValue->first().ownedValue.ownedListElement->exists(e|
+		  	e.ownedFieldValue->any(e| e.property.name.toLower()='partition').ownedValue.referencedInstanceObject = part)
 		)
 	to
 		err: CV!Error
@@ -195,3 +157,25 @@ helper context AADLI!ComponentInstance def: isNotAlone() : Boolean =
 	->contains(e|e=self.getActualProcessorBinding())
 ;
 
+helper context AADLI!PropertyAssociation def : isValidARINC653Scheduler() : Boolean =
+	let schedValue: String = self.ownedValue->first().ownedValue.ownedListElement->first().namedValue.name in
+	schedValue.toLower() = 'arinc653'
+;
+
+--@extends check_ProcessorInstance
+rule check_ProcessorHasARINC653Scheduler
+{
+	from
+	 	obj:AADLI!ComponentInstance
+		(
+			obj.hasProperty('Scheduling_Protocol')
+			and
+			not obj.ownedPropertyAssociation->any(
+				e | e.property.name.toLower() = 'scheduling_protocol'
+			).isValidARINC653Scheduler()
+		)
+	to
+		err: CV!Error
+		(message <- 'Invalid scheduling_protocol for '+obj.subcomponent.name+ 
+		' should be: arinc653' )
+}

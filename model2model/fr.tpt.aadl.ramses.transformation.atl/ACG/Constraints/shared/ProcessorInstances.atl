@@ -52,6 +52,7 @@ rule check_ProcessorHasScheduler
 		(not obj.hasProperty('Scheduling_Protocol'))
 	to
 		err: CV!Error
-		(message <- 'For code generation, each virtual processor must'+ 
-			'have a property value for Scheduling_Protocol property' )
+		(message <- 'Processor subcomponent ' + obj.subcomponent.name + 
+			' must have a property value for Scheduling_Protocol property' )
 }
+			
