@@ -81,20 +81,21 @@ endpoint rule addImportedPackages()
 	}
 }
 
-rule m_System_Instance {
-	from
-		c : AADLI!SystemInstance (c.category = #system and not c.eContainer().oclIsUndefined())
-	to
-		sub : AADLBA!SystemSubcomponent
-		(
-			systemSubcomponentType <- c.subcomponent.subcomponentType
-		)
-	do
-	{
-		c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg();
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
-	}
-}
+--rule m_System_Instance {
+--	from
+--		c : AADLI!ComponentInstance (c.category = #system and not c.eContainer().oclIsUndefined())
+--	to
+--		sub : AADLBA!SystemSubcomponent
+--		(
+--			name <- c.subcomponent.name,
+--			systemSubcomponentType <- c.subcomponent.subcomponentType
+--		)
+--	do
+--	{
+--		c.subcomponent.systemSubcomponentType.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg();
+--		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+--	}
+--}
 
 helper context AADLI!ComponentInstance def: getInstanceReferenceValue() : Sequence(AADLI!PropertyAssociation) =
 	self.componentInstance->collect(

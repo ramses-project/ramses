@@ -185,10 +185,16 @@ rule m_Subprogram_Type {
 	)
 }
 
+helper context AADLI!SystemType def:  isRoot() : Boolean = 
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.oclIsTypeOf(AADLI!SystemInstance))
+			->exists(e| e.systemImplementation.type=self)
+;
+
 -- @extends m_Component_Type
 rule m_System_Type {
  from 
  	type : AADLI!SystemType
+	(type.isRoot())
  to 
  	typeImg : AADLBA!SystemType (
  		name <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
@@ -203,6 +209,22 @@ rule m_System_Type {
 		ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))->excluding(OclUndefined),
 		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
 	)
+}
+
+rule m_System_Type_NotRoot {
+  from
+   	type : AADLI!SystemType
+	(not type.isRoot())
+  to
+  	typeImg: AADLBA!SystemType (
+  		name <- type.name,
+		ownedEventDataPort <- type.ownedEventDataPort->collect(e|e.getFeaturesInstances('eventDataPort'))->excluding(OclUndefined),
+		ownedDataPort <- type.ownedDataPort->collect(e|e.getFeaturesInstances('dataPort'))->excluding(OclUndefined),
+		ownedEventPort <- type.ownedEventPort->collect(e|e.getFeaturesInstances('eventPort'))->excluding(OclUndefined),
+		ownedDataAccess <- type.ownedDataAccess->collect(e|e.getFeaturesInstances('dataAccess'))->excluding(OclUndefined),
+		ownedSubprogramAccess <- type.ownedSubprogramAccess->collect(e|e.getFeaturesInstances('subprogramAccess'))->excluding(OclUndefined),
+		ownedPropertyAssociation <- type.mapOwnedPropertyAssociationList()
+  	)
 }
 
 -- @extends m_Component_Type

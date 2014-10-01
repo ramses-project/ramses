@@ -44,13 +44,13 @@ helper context AADLI!ComponentInstance def : getType() : AADLI!ComponentType =
 ;
 
 helper context AADLI!ComponentInstance def : getImpl() : AADLI!ComponentImplementation =
-	if (self.category = #system) then
+	if (self.category = #system and self.eContainer().oclIsUndefined()) then
 		self.systemImplementation
 	else
 		if (self.getSubcomponent().getClassifier().oclIsKindOf(AADLI!ComponentImplementation)) then
 			self.getSubcomponent().getClassifier()
 		else
-			OclUndefined
+			OclUndefined.debug(' WARNING: Implementation of ' + self.name + ' not identified')
 		endif
 	endif
 ;
@@ -229,13 +229,14 @@ helper def : getInstance(f: OclAny): AADLI!ComponentInstance =
 ;
 
 helper context AADLI!ComponentImplementation def : getSubcomponentsInstances(category : String) : Sequence(AADLI!ComponentInstance) =
-	let instance : AADLI!ComponentInstance = AADLI!ComponentInstance->allInstancesFrom('IN')->any(c|c.getImpl()=self)
+	let instance : AADLI!ComponentInstance = AADLI!ComponentInstance->allInstancesFrom('IN')->any(c|
+		c.getImpl()=self)
 	in
 	if(not instance.oclIsUndefined()) then
 		instance.componentInstance
 	                        ->select(c|c.category.getName()=category)
 	else
-		Sequence{}
+		Sequence{}.debug('WARNING: instances of ' + self.name + ' is empty')
 	endif
 ;
 	

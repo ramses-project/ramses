@@ -144,11 +144,24 @@ rule m_Process_Implementation {
 	)
 }
 
+helper context AADLI!SystemImplementation def:  isRoot() : Boolean = 
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.oclIsTypeOf(AADLI!SystemInstance))
+			->exists(e| e.systemImplementation=self)
+;
+
+helper context AADLI!ComponentInstance def: getSystemSubcomponent(): Sequence(AADLI!ComponentInstance) =
+	self.componentInstance->select(e|e.category=#system)
+	->collect(e|e.getSystemSubcomponent())
+	->union(Sequence{self})
+;
+
 --@extends m_Component_Implementation
 rule m_System_Implementation {
   from
   	impl : AADLI!SystemImplementation
-	
+	(
+		impl.isRoot()
+	)
   to
   	implImg : AADLBA!SystemImplementation
 	(
@@ -160,14 +173,36 @@ rule m_System_Implementation {
 		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory')->excluding(OclUndefined),
 		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor')->excluding(OclUndefined),
 		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device')->excluding(OclUndefined),
+		ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system')->excluding(OclUndefined),
 		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor')->excluding(OclUndefined),
 		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process')->excluding(OclUndefined),
 		ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram')->excluding(OclUndefined),
-		ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system')->excluding(OclUndefined),
 		ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')->excluding(OclUndefined),
 		ownedBusSubcomponent             <- impl.getSubcomponentsInstances('bus')->excluding(OclUndefined)
 	)
 }
+
+--rule m_System_Implementation_NotRoot {
+--  from
+--  	impl : AADLI!SystemImplementation
+--	(
+--		not impl.isRoot()	
+--	)
+--  to
+--  	implImg : AADLBA!SystemImplementation
+--	(
+--		name                              <- impl.name,
+--		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory')->excluding(OclUndefined),
+--		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor')->excluding(OclUndefined),
+--		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device')->excluding(OclUndefined),
+--		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor')->excluding(OclUndefined),
+--		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process')->excluding(OclUndefined),
+--		ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram')->excluding(OclUndefined),
+--		ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system')->excluding(OclUndefined),
+--		ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')->excluding(OclUndefined),
+--		ownedBusSubcomponent             <- impl.getSubcomponentsInstances('bus')->excluding(OclUndefined)
+--	)
+--}
 
 --@extends m_Component_Implementation
 rule m_ThreadGroup_Implementation {
@@ -192,7 +227,7 @@ rule m_Thread_Implementation {
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
 		ownedSubprogramCallSequence     <- impl.ownedSubprogramCallSequence,
-		ownedParameterConnection		<- impl.ownedParameterConnection->collect(e|thisModule.ParameterConnection(e)),
+		ownedParameterConnection		<- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->collect(e|thisModule.ParameterConnection(e)),
 		ownedAccessConnection			<- impl.ownedAccessConnection->collect(e|thisModule.AccessConnection(e))
 	)
 }
