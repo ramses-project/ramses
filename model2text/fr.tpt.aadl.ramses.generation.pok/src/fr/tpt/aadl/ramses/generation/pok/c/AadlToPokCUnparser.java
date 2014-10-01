@@ -31,9 +31,11 @@ import java.util.Set ;
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
+import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.BasicPropertyAssociation ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.BooleanLiteral ;
+import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.EnumerationLiteral ;
@@ -61,6 +63,7 @@ import org.osate.aadl2.SubprogramCallSequence ;
 import org.osate.aadl2.SubprogramImplementation ;
 import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.SystemSubcomponent ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
@@ -1269,8 +1272,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       {
         String errMsg = "cannot fetch the Additional_Features for \'" +
                                                         vps.getName() + '\'' ;
-        _LOGGER.error(errMsg) ;
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+        _LOGGER.warn(errMsg) ;
+        ServiceProvider.SYS_ERR_REP.warning(errMsg, true) ;
         // Nothing to do
       }
     }
@@ -1385,7 +1388,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
       String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
       if(requiredScheduler != null)
       {
-        if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol") && foundRR == false)
+        if(requiredScheduler.equalsIgnoreCase("RMS") && foundRR == false)
         {
           foundRR = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
@@ -1413,7 +1416,10 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
         }
-
+        else if(requiredScheduler.equalsIgnoreCase("RMS"))
+        {
+          deploymentHeaderCode.addOutput("POK_SCHED_RMS") ;
+        }
         if(bindedVPS.indexOf(vps) != bindedVPS.size() - 1)
         {
           deploymentHeaderCode.addOutput(",") ;
@@ -1550,8 +1556,9 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     deploymentHeaderCode.addOutputNewline("}") ;
     
-    NamedElement ne = processor.getContainingClassifier();
-    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(ne, "Module_Schedule");
+    NamedElement rootSystem = getRootSystem((AadlPackage)
+                                            processor.getContainingClassifier().eContainer().eContainer());
+    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(rootSystem, "Module_Schedule");
     if(moduleSchedulePA == null)
     {
       String errMsg =  "cannot fetch Module_Schedule for \'"+
@@ -1769,6 +1776,29 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     deploymentHeaderCode.addOutputNewline("#endif") ;
     
   }                                            
+
+  private NamedElement getRootSystem(AadlPackage pkg)
+  {
+    for(Classifier c: pkg.getOwnedPublicSection().getOwnedClassifiers())
+      if(c instanceof SystemImplementation && isRoot(pkg, (SystemImplementation) c))
+        return c;
+    return null;
+  }
+
+
+  private boolean isRoot(AadlPackage pkg, SystemImplementation sys)
+  {
+    for(Classifier c: pkg.getOwnedPublicSection().getOwnedClassifiers())
+      if(c instanceof SystemImplementation)
+      {
+        SystemImplementation potentialRoot = (SystemImplementation) c;
+        for(SystemSubcomponent subSys: potentialRoot.getOwnedSystemSubcomponents())
+          if(subSys.getSubcomponentType().equals(sys))
+            return false;
+      }
+    return true;
+  }
+
 
   private boolean usesOperation(BehavioredImplementation bi, 
                                 String subprogramName)

@@ -1352,6 +1352,10 @@ public class AadlToConfADAUnparser implements AadlTargetUnparser
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
         }
+        else if(requiredScheduler.equalsIgnoreCase("RMS"))
+        {
+          deploymentHeaderCode.addOutput("POK_SCHED_RMS") ;
+        }
 
         if(bindedVPS.indexOf(vps) != bindedVPS.size() - 1)
         {

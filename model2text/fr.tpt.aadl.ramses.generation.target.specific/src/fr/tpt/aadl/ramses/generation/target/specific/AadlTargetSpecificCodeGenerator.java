@@ -35,6 +35,7 @@ import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
 import org.osate.aadl2.PublicPackageSection ;
 import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.SystemSubcomponent ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.SystemInstance ;
 
@@ -95,14 +96,15 @@ public class AadlTargetSpecificCodeGenerator
     if(root instanceof SystemInstance)
     {
       SystemInstance systemInstance = (SystemInstance) root;
-      systemImplementationList.addAll(this.getListOfSystemImplementation(systemInstance));	    
+      if(systemInstance.eContainer()==null)
+        systemImplementationList.addAll(this.getListOfSystemImplementation(systemInstance));	    
     }
     else if(root instanceof AadlPackage)
     {
       AadlPackage aadlPackage = (AadlPackage) root;
       PublicPackageSection pps = aadlPackage.getOwnedPublicSection();
-      for(Classifier c : pps.getOwnedClassifiers())
-        if(c instanceof SystemImplementation)
+      for(Classifier c : pps.getOwnedClassifiers() )
+        if(c instanceof SystemImplementation && isRootSystemImplementation((SystemImplementation)c, pps))
           systemImplementationList.add((SystemImplementation)c);
     }
     else
@@ -128,8 +130,20 @@ public class AadlTargetSpecificCodeGenerator
       if(_targetUnparser != null)
         tarProp = _targetUnparser.process(si, runtimePath,
                                           outputDir, monitor);
-
-      for(ProcessorSubcomponent ps : si.getOwnedProcessorSubcomponents())
+      
+      List<ProcessorSubcomponent> psList = new ArrayList<ProcessorSubcomponent>();
+      psList.addAll(si.getOwnedProcessorSubcomponents());
+      
+      for(SystemSubcomponent ss: si.getOwnedSystemSubcomponents())
+      {
+        if(ss.getSystemSubcomponentType() instanceof SystemImplementation)
+        {
+          SystemImplementation subSi = (SystemImplementation)  ss.getSystemSubcomponentType();
+          psList.addAll(subSi.getOwnedProcessorSubcomponents());
+        }
+      }
+      
+      for(ProcessorSubcomponent ps : psList)
       {
         // create directory with the processor subcomponent name
         File processorFileDir =
@@ -172,6 +186,22 @@ public class AadlTargetSpecificCodeGenerator
                                   generatedFileDir, includeDirs, monitor) ;
 
     }
+  }
+
+  private boolean isRootSystemImplementation(SystemImplementation c,
+                                             PublicPackageSection pps)
+  {
+    for(Classifier c2 : pps.getOwnedClassifiers() )
+    {
+      if(c2 instanceof SystemImplementation)
+      {
+        SystemImplementation si = (SystemImplementation) c2;
+        for(SystemSubcomponent s: si.getOwnedSystemSubcomponents())
+          if(s.getSubcomponentType().equals(c))
+          return false;
+      }
+    }
+    return true ;
   }
 
   private List<SystemImplementation> getListOfSystemImplementation(SystemInstance systemInstance)

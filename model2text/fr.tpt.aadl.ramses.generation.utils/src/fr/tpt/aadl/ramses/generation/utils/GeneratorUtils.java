@@ -169,22 +169,19 @@ public class GeneratorUtils
     return null ;
   }
 
-  public static List<ProcessSubcomponent> getBindedProcesses(
-                                                   ProcessorSubcomponent object)
+  public static List<ProcessSubcomponent> getBindedProcesses(ProcessorSubcomponent object)
   {
-    List<ProcessSubcomponent> bindedProcess =
-          new ArrayList<ProcessSubcomponent>() ;
-    SystemImplementation si = (SystemImplementation) object.eContainer() ;
-
+    List<ProcessSubcomponent> bindedProcess = new ArrayList<ProcessSubcomponent>() ;
+    SystemImplementation si = (SystemImplementation) object.eContainer();
     for(ProcessSubcomponent ps : si.getOwnedProcessSubcomponents())
     {
       if(getDeloymentProcessorSubcomponentName(ps)
-            .equals(object))
+          .equals(object))
       {
         bindedProcess.add(ps) ;
       }
     }
-
+    
     return bindedProcess ;
   }
 
