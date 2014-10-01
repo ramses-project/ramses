@@ -644,7 +644,7 @@ lazy rule CreateLengthParameterHolder
 									)
 								->union
 								(
-									impl.ownedParameterConnection
+									impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )
 									->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
 									->collect(e|
 										callSequences->collect(behavior |

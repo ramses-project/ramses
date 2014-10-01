@@ -132,7 +132,7 @@ unique lazy abstract rule a_createRemoteSendSubprogram
 			ownedListElement <- Sequence{initValuePE}
 		),
 		rvDataSubcomponent: AADLBA!ReferenceValue
-		(containmentPathElement <- Sequence{cpeDataSubcomponent}),
+		(path <-cpeDataSubcomponent),
 		cpeDataSubcomponent: AADLBA!ContainmentPathElement
 		(
 			namedElement <- length
@@ -336,7 +336,7 @@ rule m_ConfigureSystemPartitionForCommunications_rtl8029
 												}
 		),
 		rv: AADLBA!ReferenceValue
-		(containmentPathElement <- Sequence{cpe}),
+		(path <- cpe),
 		cpe: AADLBA!ContainmentPathElement
 		(
 			namedElement <- callSeq
@@ -365,7 +365,7 @@ rule m_ConfigureSystemPartitionForCommunications_rtl8029
 		),
 		
 		rvInit: AADLBA!ReferenceValue
-		(containmentPathElement <- Sequence{cpeInit}),
+		(path <- cpeInit),
 		cpeInit: AADLBA!ContainmentPathElement
 		(
 			namedElement <- callSeqInit
@@ -462,7 +462,7 @@ rule m_Processor_With_Remote_Connection_rtl8029
 									->excluding(OclUndefined)
 	),
 	rvInit: AADLBA!ReferenceValue
-	(containmentPathElement <- Sequence{cpeInit}),
+	(path <- cpeInit),
 	cpeInit: AADLBA!ContainmentPathElement
 	(
 		namedElement <- callSeqInit

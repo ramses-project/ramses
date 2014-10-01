@@ -81,6 +81,74 @@ helper context AADLI!FeatureInstance def: getOutputPortId(processInstance: AADLI
 ;
 
 
+----- Remove systems hierarchy
+
+helper def : createContainmentPathElement(neList: Sequence(AADLI!NamedElement)) : AADLBA!ContainmentPathElement =
+	thisModule.createContainmentPathElementLazyRule
+		(
+			neList->select(e|e.oclIsKindOf(AADLI!ComponentInstance) and not (e.category=#system))
+		)
+;
+
+--@extends m_Component_Implementation
+rule m_System_Implementation {
+  from
+  	impl : AADLI!SystemImplementation
+	(
+		impl.isRoot()
+	)
+  to
+  	implImg : AADLBA!SystemImplementation
+	(
+		name                              <- if(thisModule.theHOOK.getOutputPackageName().oclIsUndefined()) then
+											 impl.name
+											 else
+											 thisModule.theHOOK.getOutputPackageName()+'.impl'
+											 endif,
+		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory')
+													->union(
+														impl.getSubcomponentsInstances('system')
+														->collect(e| e.getSystemSubcomponent())
+														->flatten()
+														->collect(e|e.componentInstance)
+														->flatten()
+														->select(e|e.category=#memory)
+													)
+													->asSet()
+													->excluding(OclUndefined),
+		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor')
+													->union(
+														impl.getSubcomponentsInstances('system')
+														->collect(e| e.getSystemSubcomponent())
+														->flatten()
+														->collect(e|e.componentInstance)
+														->flatten()
+														->select(e|e.category=#processor)
+													)
+													->asSet()
+													->excluding(OclUndefined),
+		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device')
+													->union(
+														impl.getSubcomponentsInstances('system')
+														->collect(e| e.getSystemSubcomponent())
+														->flatten()
+														->collect(e|e.componentInstance)
+														->flatten()
+														->select(e|e.category=#device)
+													)
+													->asSet()
+													->excluding(OclUndefined),
+		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor')->excluding(OclUndefined),
+		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process')
+													->excluding(OclUndefined),
+		ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram')->excluding(OclUndefined),
+		ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')->excluding(OclUndefined),
+		ownedBusSubcomponent             <- impl.getSubcomponentsInstances('bus')->excluding(OclUndefined)
+	)
+}
+
+-------- End of code to remove systems hirarchy
+
 
 -- @extends m_Component_Type
 rule m_Process_Type {
@@ -138,7 +206,7 @@ unique lazy rule collectComputeEntryPoint_rule
 		),
 		v: AADLBA!ReferenceValue
 		(
-			containmentPathElement <- Sequence{cpe}
+			path <- cpe
 		),
 		cpe: AADLBA!ContainmentPathElement
 		(
@@ -300,7 +368,8 @@ rule m_Process_Instance {
 			processSubcomponentType <- implImg
 		),
 		implImg : AADLBA!ProcessImplementation (
- 			name 							<- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then c.processSubcomponentType.name+'.impl'
+ 			name 							<- if c.subcomponent.processSubcomponentType.oclIsKindOf(AADLBA!ComponentType)  then
+												c.subcomponent.processSubcomponentType.name+'.impl'
 											else c.subcomponent.processSubcomponentType.name
 											endif,
 			ownedRealization 				<- thisModule.Realization(
@@ -455,74 +524,4 @@ rule m_Process_Implementation {
  	impl : AADLI!ProcessImplementation
  to 
  	
-}
-
-helper def : getProcessorSchedulingProtocol() : String = 'Posix_1003_Highest_Priority_First_Protocol';
-
-helper def : getVirtualProcessorSchedulingProtocol() : String = 'Posix_1003_Highest_Priority_First_Protocol';
-
-rule m_Processor_Instance {
-	from
-		c : AADLI!ComponentInstance (c.category = #processor)
-	to
-		sub : AADLBA!ProcessorSubcomponent
-		(
-			name <- c.name.debug('subcomponent created'),
-			processorSubcomponentType <- c.subcomponent.subcomponentType,
-			ownedPropertyAssociation  <- c.ownedPropertyAssociation->select(e | not (e.property.name.toLower() = 'scheduling_protocol'))
-												->collectSelfPropertyAssociationImg()
-												-> append(thisModule.CreatePropertyAssociation ('Scheduling_Protocol', 'DEPLOYMENT_PROPERTIES', listValue))
-												
-		),
-		listValue : AADLBA!ListValue
-		(
-			ownedListElement <- Sequence{sched}
-		),
-		sched : AADLBA!NamedValue
-		(
-			namedValue <- el
-		),
-		el : AADLBA!EnumerationLiteral
-		(
-			name <- thisModule.getProcessorSchedulingProtocol()
-		)
-		
-		
-	do
-	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
-	}
-}
-
-rule m_VirtualProcessor_Instance {
-	from
-		c : AADLI!ComponentInstance (c.category.getName() = 'virtual processor')
-	to
-		sub : AADLBA!VirtualProcessorSubcomponent
-		(
-			name <- c.name.debug('subcomponent created'),
-			virtualProcessorSubcomponentType <- c.subcomponent.subcomponentType,
-			ownedPropertyAssociation  <- c.ownedPropertyAssociation->select(e | not (e.property.name.toLower() = 'scheduling_protocol'))
-												->collectSelfPropertyAssociationImg()
-												-> append(thisModule.CreatePropertyAssociation ('Scheduling_Protocol', 'DEPLOYMENT_PROPERTIES', listValue))
-												
-		),
-		listValue : AADLBA!ListValue
-		(
-			ownedListElement <- Sequence{sched}
-		),
-		sched : AADLBA!NamedValue
-		(
-			namedValue <- el
-		),
-		el : AADLBA!EnumerationLiteral
-		(
-			name <- thisModule.getVirtualProcessorSchedulingProtocol()
-		)
-		
-		
-	do
-	{
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
-	}
 }

@@ -83,7 +83,7 @@ rule m_Processor_With_Remote_Connection
 		ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Compute_Entrypoint_Call_Sequence', 'PROGRAMMING_PROPERTIES', rv)}
 	),
 	rv: AADLBA!ReferenceValue
-	(containmentPathElement <- Sequence{cpe}),
+	(path <- cpe),
 	cpe: AADLBA!ContainmentPathElement
 	(
 		namedElement <- callSeq

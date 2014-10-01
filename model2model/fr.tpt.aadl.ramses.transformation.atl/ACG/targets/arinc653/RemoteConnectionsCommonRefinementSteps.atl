@@ -195,11 +195,12 @@ rule m_ConfigureSystemPartitionForCommunications
 		),
 		v: AADLBA!ReferenceValue
 		(
-			containmentPathElement <- Sequence{cpe1, cpe2}
+			path <- cpe1
 		),
 		cpe1: AADLBA!ContainmentPathElement
 		(
-			namedElement <- c.getProcessorContainer()
+			namedElement <- c.getProcessorContainer(),
+			path <- cpe2
 		),
 		cpe2: AADLBA!ContainmentPathElement
 		(
@@ -211,11 +212,12 @@ rule m_ConfigureSystemPartitionForCommunications
 		),
 		memoryRef: AADLBA!ReferenceValue
 		(
-			containmentPathElement <- Sequence{cpeMemory1, cpeMemory2}
+			containmentPathElement <- cpeMemory1
 		),
 		cpeMemory1: AADLBA!ContainmentPathElement
 		(
-			namedElement <- mainMemory.eContainer()
+			namedElement <- mainMemory.eContainer(),
+			path <- cpeMemory2
 		),
 		cpeMemory2:AADLBA!ContainmentPathElement
 		(

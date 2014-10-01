@@ -337,7 +337,7 @@ rule m_ThreadEntrypoint {
 										
 									)
 									->flatten()->excluding(OclUndefined)->asSet(),
-			ownedParameter <- impl.ownedParameterConnection
+			ownedParameter <- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )
 								->select(e|e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
 								->collect(e|
 									callSequences->collect(behavior |
@@ -345,7 +345,7 @@ rule m_ThreadEntrypoint {
 									)
 								->union
 								(
-									impl.ownedParameterConnection
+									impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )
 									->select(e|e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent))
 									->collect(e|
 										callSequences->collect(behavior |
@@ -1142,11 +1142,11 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 		{
 			if(fi.isInputFeature() and fi.isEventOrEventDataPort())
 			{
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = fi.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = fi.feature))
 				{
 					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataPutValueCalls(fi,behavior,paramCnx));
 				}
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = fi.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = fi.feature))
 				{
 					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectDataPutValueCalls(fi,behavior,paramCnx));
 				}
@@ -1174,14 +1174,14 @@ rule populateFeatureComputeEntryPointActions (fi: AADLI!FeatureInstance,
 			
 			if(fi.isOutputFeature() and fi.isEventOrEventDataPort())
 			{
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = fi.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = fi.feature))
 				{
 					for(cnxInst in fi.srcConnectionInstance)
 					{
 						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(fi, behavior, paramCnx, cnxInst));
 					}
 				}
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = fi.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = fi.feature))
 				{
 					for(cnxInst in fi.srcConnectionInstance)
 					{
@@ -1254,14 +1254,14 @@ rule m_ComputeEntrypointCallSequence {
 helper def : getPortsInvoledInCall(c: AADLI!ComponentInstance, call: AADLI!SubprogramCall) : Sequence(AADLI!FeatureInstance) = 
 	c.featureInstance->select(e| 
 		e.isInputFeature() and 
-		c.subcomponent.classifier.ownedParameterConnection->exists(paramCnxIter|
+		c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->exists(paramCnxIter|
 			paramCnxIter.source.context=call and 
 			paramCnxIter.destination.connectionEnd = e.feature)
 	)
 	->union(
 		c.featureInstance->select(e| 
 		e.isInputFeature() and
-		c.subcomponent.classifier.ownedParameterConnection->exists(paramCnxIter|
+		c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->exists(paramCnxIter|
 			paramCnxIter.destination.context=call and 
 			paramCnxIter.source.connectionEnd = e.feature)
 		)
@@ -1404,11 +1404,11 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 		{
 			for(destination in c.featureInstance->select(e| e.isInputFeature() and e.isEventOrEventDataPort()))
 			{
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = destination.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = destination.feature))
 				{
 					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataNextValueCalls(destination, behavior, paramCnx));
 				}
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = destination.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = destination.feature))
 				{
 					intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataNextValueCalls(destination, behavior, paramCnx));
 				}
@@ -1435,14 +1435,14 @@ rule populateComputeEntryPointActions (c: AADLI!ComponentInstance,
 			
 			for(source in c.featureInstance->select(e| e.isOutputFeature() and e.isEventOrEventDataPort()))
 			{
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = source.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.source.context=call and paramCnxIter.destination.connectionEnd = source.feature))
 				{
 					for(cnxInst in source.srcConnectionInstance)
 					{
 						intermediateCallActionSequence <- intermediateCallActionSequence.union(thisModule.collectEventDataPutValueCalls(source, behavior, paramCnx, cnxInst));
 					}
 				}
-				for(paramCnx in c.subcomponent.classifier.ownedParameterConnection->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = source.feature))
+				for(paramCnx in c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(paramCnxIter|paramCnxIter.destination.context=call  and paramCnxIter.source.connectionEnd = source.feature))
 				{
 					for(cnxInst in source.srcConnectionInstance)
 					{
@@ -1589,18 +1589,18 @@ lazy rule populateParameterLabels
   		{
   			if(feature.oclIsTypeOf(AADLI!DataAccess))
  			{
-  				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.source.connectionEnd = feature and behavior.ownedSubprogramCall->exists(f | e.source.context = f)))
+  				for(cnx in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!AccessConnection) )->select(e | e.accessCategory = #data and e.source.connectionEnd = feature and behavior.ownedSubprogramCall->exists(f | e.source.context = f)))
 				{
   					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior, cnx}, 'dataAccess')));
 				}
-  				for(cnx in impl.ownedAccessConnection->select(e | e.accessCategory = #data and e.destination.connectionEnd = feature and behavior.ownedSubprogramCall->exists(f | e.destination.context = f)))
+  				for(cnx in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!AccessConnection) )->select(e | e.accessCategory = #data and e.destination.connectionEnd = feature and behavior.ownedSubprogramCall->exists(f | e.destination.context = f)))
 				{
   					intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.CreateDataAccessHolder(thisModule.resolveMatchedTupleIfExists(Sequence{c,behavior, cnx}, 'dataAccess')));
 				}
   			}
   			else if(feature.oclIsKindOf(AADLI!Parameter))
   			{
-  				for(cnx in impl.ownedParameterConnection->select(e | e.source.connectionEnd = feature and e.source.context = subprogramCall))
+  				for(cnx in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(e | e.source.connectionEnd = feature and e.source.context = subprogramCall))
 				{
 					if(cnx.destination.connectionEnd.oclIsTypeOf(AADLI!Parameter))
 					{
@@ -1617,7 +1617,7 @@ lazy rule populateParameterLabels
 						intermediateParameterLabelList <- intermediateParameterLabelList.append(thisModule.resolveMatchedTupleIfExists(Sequence{c.featureInstance->any(e|e.feature = cnx.destination.connectionEnd), behavior, cnx}, 'holder'));
 					}
 				}
-  				for(cnx in impl.ownedParameterConnection->select(e | e.destination.connectionEnd = feature and e.destination.context = subprogramCall))
+  				for(cnx in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select(e | e.destination.connectionEnd = feature and e.destination.context = subprogramCall))
 				{
 					if(cnx.source.connectionEnd.oclIsTypeOf(AADLI!Parameter))
 					{
@@ -2689,7 +2689,7 @@ rule mapSubprogramParameters(implImg: AADLBA!ComponentImplementation, impl: AADL
 {
 	do
 	{
-		for(paramConnection in impl.ownedParameterConnection)
+		for(paramConnection in impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) ))
 		{
 			if(paramConnection.source.connectionEnd.oclIsKindOf(AADLI!Parameter) and paramConnection.destination.connectionEnd.oclIsKindOf(AADLI!Parameter))
 			{
@@ -2751,22 +2751,22 @@ rule mapConstantParameter(p: AADLBA!Parameter,
 }
 
 helper context AADLBA!SubprogramCall def:getConnectedParamDataSubcomponent(p: AADLBA!Parameter) : AADLBA!DataSubcomponent =
-	if(not self.eContainer().eContainer().getOwnedParameterConnections()->any
+	if(not self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->any
 	( paramCnx |
 		paramCnx.source.getContext() = self and paramCnx.source.connectionEnd = p
 	).oclIsUndefined())
 	then
-		self.eContainer().eContainer().getOwnedParameterConnections()->any
+		self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->any
 		( paramCnx |
 			paramCnx.source.getContext() = self and paramCnx.source.connectionEnd = p
 		).destination.connectionEnd
 	else 
-		if(not self.eContainer().eContainer().getOwnedParameterConnections()->any
+		if(not self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->any
 		( paramCnx |
 			paramCnx.destination.getContext() = self and paramCnx.destination.connectionEnd = p
 		).oclIsUndefined())
 		then
-			self.eContainer().eContainer().getOwnedParameterConnections()->any
+			self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->any
 			( paramCnx |
 				paramCnx.destination.getContext() = self and paramCnx.destination.connectionEnd = p
 			).source.connectionEnd
@@ -2777,22 +2777,22 @@ helper context AADLBA!SubprogramCall def:getConnectedParamDataSubcomponent(p: AA
 ;
 
 helper context AADLBA!SubprogramCall def:getConnectedAccessDataSubcomponent(p: AADLBA!DataAccess) : AADLBA!DataSubcomponent =
-	if(not self.eContainer().eContainer().getOwnedAccessConnections()->any
+	if(not self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!AccessConnection) )->any
 	( accessCnx |
 		accessCnx.source.getContext() = self and accessCnx.source.connectionEnd = p
 	).oclIsUndefined())
 	then
-		self.eContainer().eContainer().getOwnedAccessConnections()->any
+		self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!AccessConnection) )->any
 		( accessCnx |
 			accessCnx.source.getContext() = self and accessCnx.source.connectionEnd = p
 		).destination.connectionEnd
 	else 
-		if(not self.eContainer().eContainer().getOwnedAccessConnections()->any
+		if(not self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!AccessConnection) )->any
 		( accessCnx |
 			accessCnx.destination.getContext() = self and accessCnx.destination.connectionEnd = p
 		).oclIsUndefined())
 		then
-			self.eContainer().eContainer().getOwnedAccessConnections()->any
+			self.eContainer().eContainer().getAllConnections()->select(e| e.oclIsKindOf(AADLI!AccessConnection) )->any
 			( accessCnx |
 				accessCnx.destination.getContext() = self and accessCnx.destination.connectionEnd = p
 			).source.connectionEnd

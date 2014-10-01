@@ -183,7 +183,7 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		),
 		v: AADLBA!ReferenceValue
 		(
-			containmentPathElement <- Sequence{cpe}
+			path <- cpe
 		),
 		cpe: AADLBA!ContainmentPathElement
 		(

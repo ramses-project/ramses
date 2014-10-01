@@ -117,7 +117,7 @@ rule m_Threads_HM
 		),
 		v: AADLBA!ReferenceValue
 		(
-			containmentPathElement <- Sequence{cpe}
+			path <- cpe
 		),
 		cpe: AADLBA!ContainmentPathElement
 		(

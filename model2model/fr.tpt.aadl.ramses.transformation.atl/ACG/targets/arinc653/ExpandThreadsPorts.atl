@@ -84,7 +84,7 @@ helper def: collectCommunicationsLocalVariables(c: AADLI!ComponentInstance, call
 	)
 	->union
 	(
-		callSequences->collect(callSequence | c.subcomponent.classifier.ownedParameterConnection -> select(paramCnx| 
+		callSequences->collect(callSequence | c.subcomponent.classifier.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) ) -> select(paramCnx| 
 				paramCnx.isParamToParamConnection()
 				and
 				paramCnx.isPartOfCallSequence(callSequence)
@@ -446,7 +446,8 @@ unique lazy rule createResolvedSpg
 		actualParam : AADLBA!Parameter
 		(
 			refined <- param,
-			direction <- param.direction,
+			in <- param.in,
+			out <- param.out,
 			dataFeatureClassifier <- classifier
 		)
 	do

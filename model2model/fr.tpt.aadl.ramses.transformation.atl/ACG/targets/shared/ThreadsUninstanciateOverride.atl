@@ -39,6 +39,12 @@ rule m_Thread_Implementation {
  	impl : AADLI!ThreadImplementation
 }
 
+helper context AADLI!ComponentImplementation def: getAllSubprogramCallSequence() :Sequence(AADLI!SubprogramCallSequence) =
+	self.getSelfPlusAllExtended()
+	->collect(e|e.ownedSubprogramCallSequence)
+	->excluding(OclUndefined)->flatten()
+;
+
 -- @extends m_Component_Instance
 abstract rule m_create_Thread_BA
 {
@@ -72,24 +78,24 @@ abstract rule m_create_Thread_BA
  															thisModule.collectInitCallSequence(c)
 														}
  												->excluding(OclUndefined),
-			ownedParameterConnection		<- impl.ownedParameterConnection->select (e|
+			ownedParameterConnection		<- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select (e|
 												e.source.oclIsKindOf(AADLI!Parameter) and e.destination.oclIsKindOf(AADLI!Parameter))
 												->collect(e| thisModule.ParameterConnection(e))
 												->union(
-													impl.ownedParameterConnection->select (e| e.source.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.source.context.eContainer().isComputeEntryPointOf(c))
+													impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select (e| e.source.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.source.context.eContainer().isComputeEntryPointOf(c))
 													->collect(e| thisModule.ParameterConnection(e))
 												)
 												->union(
-													impl.ownedParameterConnection->select (e| e.destination.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.destination.context.eContainer().isComputeEntryPointOf(c))
+													impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select (e| e.destination.connectionEnd.oclIsKindOf(AADLI!Parameter) and not e.destination.context.eContainer().isComputeEntryPointOf(c))
 													->collect(e| thisModule.ParameterConnection(e))
 												)
 												->union
 												(
-													impl.ownedParameterConnection->select (e|
+													impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select (e|
 														e.source.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent) 
 													)
 													->collect(e|
-														impl.ownedSubprogramCallSequence
+														impl.getAllSubprogramCallSequence()
 														->collect(callSequence|
 															thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent = e.source.connectionEnd), callSequence, e}, 'parameterConnection')
 														)
@@ -97,11 +103,11 @@ abstract rule m_create_Thread_BA
 												)
 												->union
 												(
-													impl.ownedParameterConnection->select (e|
+													impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->select (e|
 														e.destination.connectionEnd.oclIsKindOf(AADLI!DataSubcomponent) 
 													)
 													->collect(e|
-														impl.ownedSubprogramCallSequence
+														impl.getAllSubprogramCallSequence()
 														->collect(callSequence|
 															thisModule.resolveMatchedTupleIfExists(Sequence{c.componentInstance->any(f|f.subcomponent = e.destination.connectionEnd), callSequence, e}, 'parameterConnection')
 														)
@@ -109,7 +115,7 @@ abstract rule m_create_Thread_BA
 												)
 												->flatten()->excluding(OclUndefined),
 			ownedAccessConnection			<- c.featureInstance->select(fi|fi.feature.oclIsKindOf(AADLI!Port))
-												->collect(fi| impl.ownedSubprogramCallSequence
+												->collect(fi| impl.getAllSubprogramCallSequence()
 													->collect(callSequence|
 														if(fi.isInputFeature()) then
 															fi.collectInputFeatureConnectionImg(callSequence)
@@ -149,7 +155,7 @@ abstract rule m_create_Thread_BA
 													->collect(e| thisModule.createAccessConnectionForBA(e,c))
 																										
 												)
-												->union(impl.ownedSubprogramCallSequence
+												->union(impl.getAllSubprogramCallSequence()
 													->collect(callSequence | c.subcomponent.classifier.ownedAccessConnection
 														-> select(accessCnx| 
 															accessCnx.isAccessToParamConnection()
@@ -185,7 +191,7 @@ abstract rule m_create_Thread_BA
 													->collect(e|thisModule.resolveLazySingleIfExists(e, 'createFreshnessIndicator','freshnessIndicator_Connection'))	
 												)
 												->union(
-													impl.ownedSubprogramCallSequence->collect(callSequence |
+													impl.getAllSubprogramCallSequence()->collect(callSequence |
 														thisModule.collectPeriodicDelayed_LocalVariablesConnections(c,callSequence)
 													)
 												)
