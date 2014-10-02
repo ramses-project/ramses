@@ -55,4 +55,3 @@ rule check_ProcessorHasScheduler
 		(message <- 'Processor subcomponent ' + obj.subcomponent.name + 
 			' must have a property value for Scheduling_Protocol property' )
 }
-			
