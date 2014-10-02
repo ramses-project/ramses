@@ -257,12 +257,12 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_sender_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
 arinc653_runtime::Wait_Semaphore ! (p_out_entrypointSemAccess, p_out_semTimeOut, p_out_SemErrorCode) ;
 Put_Value_the_sender_p_out.impl ! (cnx_p_out, p_out_localVariable, CurrentDeadline, MsgPriority, 10) ;
 arinc653_runtime::Signal_Semaphore ! (p_out_entrypointSemAccess, p_out_SemErrorCode) ;
 PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, CurrentPeriod, CurrentDeadline)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_sender_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_sender_runtime_call_ret)} ;
 **};
   end the_proc_the_sender_entrypoint.impl;
@@ -349,14 +349,14 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_receiver_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Input_mutex_the_receiver_p_in.impl ! (p_in, PeriodValue, CurrentPeriod) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Input_mutex_the_receiver_p_in.impl ! (p_in, PeriodValue, CurrentPeriod) ;
 arinc653_runtime::Wait_Semaphore ! (p_in_entrypointSemAccess, p_in_semTimeOut, p_in_SemErrorCode) ;
 Next_Value_the_receiver_p_in.impl ! (p_in, p_in_localVariable, CurrentPeriod, p_in_ErrorCode) ;
 arinc653_runtime::Signal_Semaphore ! (p_in_entrypointSemAccess, p_in_SemErrorCode) ;
 if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
    ;
 PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, CurrentPeriod, CurrentDeadline)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_receiver_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_receiver_runtime_call_ret)} ;
 **};
   end the_proc_the_receiver_entrypoint.impl;

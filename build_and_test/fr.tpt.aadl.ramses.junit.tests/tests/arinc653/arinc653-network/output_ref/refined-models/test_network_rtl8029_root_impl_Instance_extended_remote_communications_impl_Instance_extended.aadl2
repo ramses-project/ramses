@@ -333,10 +333,10 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  the_cpu1_communicationCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu1_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Queuing_Message_Integer ! (p_out, p_out_TimeOut, p_out_localVariable, the_proc1_p_out_comConnectionLength_len, p_out_ErrorCode) ;
+  the_cpu1_communicationCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu1_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Queuing_Message_Integer ! (p_out, p_out_TimeOut, p_out_localVariable, the_proc1_p_out_comConnectionLength_len, p_out_ErrorCode) ;
 if (p_out_ErrorCode = 0) test_network_rtl8029_remote_communications::the_proc1_p_out_comSendSpg ! (the_proc1_p_out_comConnectionPortId_port_id, p_out_localVariable, the_proc1_p_out_comConnectionLength_len) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu1_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu1_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_cpu1_system_part_comProcess_system_part_comm_runtime_call_ret)} ;
 **};
   end the_cpu1_system_part_comProcess_system_part_comm_entrypoint.impl;
@@ -405,8 +405,8 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  system_part_pollCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {rtl8029_driver::rtl8029_polling !} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_behaviorIdentifier_enum#default_behavior} ;
+  system_part_pollCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {rtl8029_driver::rtl8029_polling !} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_runtime_call_ret)} ;
 **};
   end the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_entrypoint.impl;
@@ -456,9 +456,9 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  the_cpu2_communicationCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu2_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {test_network_rtl8029_remote_communications::the_proc2_p_in_comReceiveSpg ! (the_proc2_p_in_comConnectionPortId_port_id, p_in_localVariable, the_proc2_p_in_comConnectionLength_len) ;
+  the_cpu2_communicationCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu2_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {test_network_rtl8029_remote_communications::the_proc2_p_in_comReceiveSpg ! (the_proc2_p_in_comConnectionPortId_port_id, p_in_localVariable, the_proc2_p_in_comConnectionLength_len) ;
 Send_Queuing_Message_Integer ! (the_proc2_p_in_cnx_p_in, p_in_localVariable, the_proc2_p_in_comConnectionLength_len, p_in_TimeOut, the_cpu2_system_part_comProcess_system_part_comm_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu2_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu2_system_part_comProcess_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_cpu2_system_part_comProcess_system_part_comm_runtime_call_ret)} ;
 **};
   end the_cpu2_system_part_comProcess_system_part_comm_entrypoint.impl;
@@ -527,8 +527,8 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  system_part_pollCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {rtl8029_driver::rtl8029_polling !} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_behaviorIdentifier_enum#default_behavior} ;
+  system_part_pollCallSequence [0] : BA_entrypoint_exec_state -[whichPortActivated = the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {rtl8029_driver::rtl8029_polling !} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_runtime_call_ret)} ;
 **};
   end the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_entrypoint.impl;
@@ -579,9 +579,9 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc1_the_sender_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc1_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
 Send_Queuing_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_out_TimeOut, the_proc1_the_sender_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc1_the_sender_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc1_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc1_the_sender_runtime_call_ret)} ;
 **};
   end the_proc1_the_sender_entrypoint.impl;
@@ -635,10 +635,10 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc2_the_receiver_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Queuing_Message_Integer ! (p_in, p_in_TimeOut, p_in_localVariable, p_in_Length, p_in_ErrorCode) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc2_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Queuing_Message_Integer ! (p_in, p_in_TimeOut, p_in_localVariable, p_in_Length, p_in_ErrorCode) ;
 if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc2_the_receiver_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc2_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc2_the_receiver_runtime_call_ret)} ;
 **};
   end the_proc2_the_receiver_entrypoint.impl;
