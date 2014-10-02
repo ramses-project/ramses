@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil ;
 import org.eclipse.emf.transaction.TransactionalCommandStack;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.jface.viewers.ISelection;
@@ -21,10 +22,12 @@ import org.eclipse.m2m.atl.emftvm.util.VMException;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
+import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.SystemImplementation;
 import org.osate.aadl2.instance.SystemInstance;
 import org.osate.aadl2.instantiation.InstantiateModel;
 import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
+import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl;
 import fr.tpt.aadl.ramses.control.support.config.ConfigStatus;
@@ -86,15 +89,22 @@ public abstract class RamsesActionHandler extends AbstractHandler {
       try
       {
         ISelection s = HandlerUtil.getCurrentSelection(event) ;
-
-        // Prior checking were performed on the selection (for instance, object type).
-        // See OutlinePropertyTester.
-        // It doesn't worth to perform theses checking twice.
-
+        OsateResourceUtil.refreshResourceSet();
         EObjectNode node = (EObjectNode)((IStructuredSelection) s).getFirstElement() ;
         Resource resource = OsateResourceUtil.getResource(node.getEObjectURI()) ;
-        EObject obj = node.getEObject(resource) ;
-        result = (SystemImplementation) obj ;
+        PropertiesLinkingService pls = new PropertiesLinkingService() ;
+        if(resource.getContents().get(0) instanceof AadlPackage)
+        {
+          String systemName = node.getText().toString();
+          systemName = systemName.substring(systemName.lastIndexOf(' ')+1, systemName.length());
+          result =
+                (SystemImplementation) pls
+                      .findNamedElementInsideAadlPackage(systemName,
+                                                         ((AadlPackage) resource
+                                                               .getContents()
+                                                               .get(0))
+                                                               .getOwnedPublicSection()) ;
+        }
       }
       catch (Exception e)
       {
