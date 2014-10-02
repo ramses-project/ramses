@@ -24,7 +24,7 @@
 
 module PokProperties;
 create OUT : CV 	from 		IN : AADLI,
-								POK_PROPERTIES: AADLI;
+								POK: AADLI;
 
 helper context AADLI!PropertyAssociation def : isValidPartitionScheduler() : Boolean =
 	let schedValue: String = self.ownedValue->first().ownedValue.ownedListElement->first().namedValue.name in
@@ -57,7 +57,7 @@ rule check_ProcessorHasBSP
 {
 	from
 	 	obj:AADLI!ComponentInstance,
-		p: AADLI!Property in POK_PROPERTIES
+		p: AADLI!Property in POK
 		(
 		 	p.name = 'BSP'
 			and
@@ -73,7 +73,7 @@ rule check_ProcessorHasArchitecture
 {
 	from
 	 	obj:AADLI!ComponentInstance,
-		p: AADLI!Property in POK_PROPERTIES
+		p: AADLI!Property in POK
 		(
 		 	p.name = 'Architecture'
 			and
