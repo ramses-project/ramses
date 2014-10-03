@@ -1,6 +1,12 @@
 package NamesResolutionTest
 public
 with AADL_Project,Data_Model,Base_Types,AadlBaTestPropertySet,AadlBaTest::Types,AadlBaTestSubprogram;
+  abstract MyAbstractComponent
+  end MyAbstractComponent;
+  
+  processor p
+  end p;
+  
   subprogram procedure
   end procedure;
   
@@ -61,6 +67,7 @@ transitions
       ;
     features
       fakePort: out data port AadlBaTest::Types::Opaque;
+      abstractPort: in event data port MyAbstractComponent;
       inPortA: in event data port Base_Types::Integer;
       inPortB: in event data port Base_Types::Integer;
       inPortC: in event data port Base_Types::Integer;
@@ -113,7 +120,7 @@ transitions
   a -[]-> a ;
   a -[]-> a {tmp := 1 timeout 20 ms} ;
   a -[]-> a {tmp := 1 timeout x ms} ;
-  a -[]-> a {tmp := 1 timeout AadlBaTestPropertySet:aConstant ms} ;
+  a -[]-> a {tmp := 1 timeout #AadlBaTestPropertySet::aConstant ms} ;
   regular1 : a -[]-> a ;
   regular2 [1] : a -[]-> a ;
   regular3 [12] : a -[]-> a ;
@@ -127,13 +134,14 @@ transitions
   a2 -[on dispatch inPortA]-> a ;
   a2 -[on dispatch inPortA frozen inPortB]-> a ;
   a2 -[on dispatch mulProvided]-> a ;
+  a2 -[on dispatch abstractPort]-> a ;
   a2 -[on dispatch inPortA or inPortB]-> a ;
   a2 -[on dispatch inPortA and inPortB]-> a ;
   a2 -[on dispatch inPortA or inPortB and inPortC or inPortD]-> a ;
   a2 -[on dispatch timeout ]-> a ;
   a2 -[on dispatch timeout 10 min]-> a ;
   a2 -[on dispatch timeout tab[x] min]-> a ;
-  a2 -[on dispatch timeout AadlBaTestPropertySet:aConstant min]-> a ;
+  a2 -[on dispatch timeout #AadlBaTestPropertySet::aConstant min]-> a ;
   a -[timeout]-> a ;
   a -[otherwise]-> a ;
   a -[2 > 1]-> a ;
@@ -153,8 +161,8 @@ transitions
   a -[1 + x > 0]-> a ;
   a -[+x * 0 = 0]-> a ;
   a -[1 / x > 0]-> a ;
-  a -[AadlBaTestPropertySet:aConstant mod x > 0 or true]-> a ;
-  a -[AadlBaTestPropertySet:aValue > 0 or bool1]-> a ;
+  a -[#AadlBaTestPropertySet::aConstant mod x > 0 or true]-> a ;
+  a -[#AadlBaTestPropertySet::aValue > 0 or bool1]-> a ;
   a -[+y rem x > 0]-> a ;
   a -[x < -y + 3 and bool1 or bool2]-> a ;
   a -[abs x > 2]-> a ;
@@ -169,16 +177,16 @@ transitions
   a -[]-> a {tmp := 1 ;
 x := 1 ;
 y := 1} ;
-  a -[]-> a {tmp := 1 &
-x := 1 &
+  a -[]-> a {tmp := 1 ;
+x := 1 ;
 y := 1} ;
   a -[]-> a {tmp := 1 ;
 x := 1 ;
 y := 1 timeout 100 ms} ;
-  a -[]-> a {tmp := 1 &
-x := 1 &
+  a -[]-> a {tmp := 1 ;
+x := 1 ;
 y := 1 timeout x ms} ;
-  a -[]-> c {tmp := 1 timeout AadlBaTestPropertySet:aValue ms} ;
+  a -[]-> c {tmp := 1 timeout #AadlBaTestPropertySet::aValue ms} ;
   a -[]-> a ;
   a -[]-> a {procedure !} ;
   a -[]-> a {mul ! (0, 0, tmp)} ;
@@ -199,7 +207,7 @@ y := 1 timeout x ms} ;
   a -[]-> a {outPortA ! (1 + 1)} ;
   a -[]-> a {outPortA ! (-1 * tmp)} ;
   a -[]-> a {outPortB ! (! (x = y))} ;
-  a -[]-> a {{outPortA ! (1 + 1) &
+  a -[]-> a {{outPortA ! (1 + 1) ;
 outPortB ! (true)}} ;
   a -[]-> a {outPortA ! (1 + 1)} ;
   a -[]-> a { !} ;
@@ -214,6 +222,7 @@ outPortB ! (true)}} ;
   a -[]-> a {*!<} ;
   a -[]-> a {computation (2 hr)} ;
   a -[]-> a {computation (1 min .. 300 sec)} ;
+  a -[]-> a {computation (100 ms)} ;
   a -[]-> a {{tmp := 1}} ;
   a -[]-> a {{tmp := 1 + 2}} ;
   a -[]-> a {{x := 1 + x}} ;
@@ -225,7 +234,7 @@ outPortB ! (true)}} ;
   a -[]-> a {if (true) tmp := 1 ;
 tmp := 1 end if
   } ;
-  a -[]-> a {if (true) outPortA ! (1 + 1) &
+  a -[]-> a {if (true) outPortA ! (1 + 1) ;
 outPortB ! (true) end if
   } ;
   a -[]-> a {if (bool1) tmp := 1 else tmp := 2 end if
@@ -242,7 +251,7 @@ outPortB ! (true)
   } ;
   a -[]-> a {for (i : Integer in 0 .. 9)
   {
-    outPortA ! (1 + 1) &
+    outPortA ! (1 + 1) ;
 outPortB ! (true)
   }
   } ;
@@ -284,7 +293,7 @@ tmp := 1
   } ;
   a -[]-> a {forall (i : Integer in 0 .. 9)
   {
-    tmp := 1 &
+    tmp := 1 ;
 x := 1
   }
   } ;
@@ -321,7 +330,7 @@ tmp := 1
   } ;
   a -[]-> a {while (bool1)
   {
-    tmp := 1 &
+    tmp := 1 ;
 x := 1
   }
   } ;
@@ -335,7 +344,7 @@ x := 1
   until (true)
   } ;
   a -[]-> a {do
-  tmp := 1 &
+  tmp := 1 ;
 x := 1
   until (true)
   } ;
