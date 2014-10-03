@@ -27,6 +27,12 @@ LOG_FILE='test.log'
 
 ################################## MAIN ########################################
 
+if [ $1 -z ]
+  then
+    echo -e 'linux or mac ?'
+    exit -1
+fi
+
 case $1 in
   'linux') ZIP_FILE=${ZIP_FILE_PREFIX}${LINUX_SUFFIX} ;;
   'mac') ZIP_FILE=${ZIP_FILE_PREFIX}${MAC_SUFFIX} ;;
