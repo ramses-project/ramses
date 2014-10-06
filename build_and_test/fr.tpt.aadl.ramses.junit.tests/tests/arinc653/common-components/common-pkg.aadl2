@@ -41,6 +41,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
     	[ErrorIdentifier => 1; Description => "Restart partition"; Action => "Stop";],
     	[ErrorIdentifier => 2; Description => "Warm partition restart"; Action => "Reset";]
     );
+   Scheduling_Protocol => (Arinc653);
   end cpu;
 
   processor implementation cpu.single_partition
