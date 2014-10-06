@@ -1383,14 +1383,24 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      boolean foundRR = false ;
+      boolean foundSched = false ;
 
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
-      if(requiredScheduler != null)
+      PropertyAssociation pa = PropertyUtils.getPropertyAssociation(vps, "Scheduling_Protocol");
+      if(pa!=null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RMS") && foundRR == false)
+        ModalPropertyValue v = pa.getOwnedValues().get(0);
+		ListValue lv = (ListValue) v.getOwnedValue();
+		NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
+		EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+		String requiredScheduler = el.getName();
+		if(requiredScheduler.equalsIgnoreCase("RMS") && foundSched == false)
         {
-          foundRR = true ;
+          foundSched = true ;
+          deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RMS 1") ;
+        }
+        else if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol") && foundSched == false)
+        {
+          foundSched = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
         }
       }
@@ -1409,9 +1419,14 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduling_Protocol") ;
-      if(requiredScheduler != null)
+      PropertyAssociation pa = PropertyUtils.getPropertyAssociation(vps, "Scheduling_Protocol");
+      if(pa!=null)
       {
+        ModalPropertyValue v = pa.getOwnedValues().get(0);
+  		ListValue lv = (ListValue) v.getOwnedValue();
+  		NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
+  		EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+  		String requiredScheduler = el.getName();
         if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol"))
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
