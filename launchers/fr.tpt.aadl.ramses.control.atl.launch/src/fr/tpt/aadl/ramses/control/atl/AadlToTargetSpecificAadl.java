@@ -193,11 +193,13 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
       else
         uri = URI.createPlatformResourceURI(outputPlatformRelativePath, true) ;
       
+      OsateResourceUtil.refreshResourceSet();
       ResourceSet rs = OsateResourceUtil.getResourceSet() ;
       xtextResource = rs.getResource(uri, true) ;
       IResource folderToUpdate = ResourcesPlugin.getWorkspace().getRoot().findMember(projectName);
       try {
 		folderToUpdate.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		
 	  } catch (CoreException e) {
 		String errMsg = "could not refresh output directory" ;
         _LOGGER.fatal(errMsg, e) ;
