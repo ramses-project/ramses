@@ -211,9 +211,13 @@ rule m_Parameter_Instance
 	to
 		f: AADLBA!Parameter
 		(
-			direction <- fi.feature.direction,
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
 		)
+	do
+	{
+		f.setIn(fi.feature.isIn());
+		f.setOut(fi.feature.isOut());
+	}
 }
 
 
