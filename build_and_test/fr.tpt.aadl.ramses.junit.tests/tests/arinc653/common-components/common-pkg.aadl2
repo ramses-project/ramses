@@ -80,7 +80,7 @@ with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
   properties
     ARINC653::System_Partition => true applies to system_part;
     ARINC653::Module_Major_Frame => 2000 ms;
-    Scheduling_Protocol => (Round_Robin_Protocol);
+    Scheduling_Protocol => (ARINC653);
     ARINC653::Module_Schedule => (
        	[Partition => reference(the_part); Duration => 1000ms; Periodic_Processing_Start => true;],
        	[Partition => reference(system_part); Duration => 1000ms; Periodic_Processing_Start => true;]
