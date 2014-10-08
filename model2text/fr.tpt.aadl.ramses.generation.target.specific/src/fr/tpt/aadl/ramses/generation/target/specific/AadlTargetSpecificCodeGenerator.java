@@ -119,6 +119,13 @@ public class AadlTargetSpecificCodeGenerator
 
     monitor.subTask("Code generation ..."); 
 
+    if(systemImplementationList.isEmpty())
+    {
+      String errMsg = "No root system in output model used for code generation" ;
+      _LOGGER.fatal(errMsg) ;
+      throw new GenerationException(errMsg);
+    }
+    
     for(SystemImplementation sys: systemImplementationList)
     {
       SystemImplementation si = (SystemImplementation) sys ;
