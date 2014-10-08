@@ -298,7 +298,7 @@ lazy rule createContainmentPathElementLazyRule
 	}
 	to
 		cpe : AADLBA!ContainmentPathElement (
-				namedElement<-if(neList->at(1).resolve().oclIsKindOf(AADLI!NamedElement)) then 
+				namedElement<-if(neList->size()>0 and neList->at(1).resolve().oclIsKindOf(AADLI!NamedElement)) then 
 								neList->at(1).resolve() 
 							else 
 								OclUndefined 
