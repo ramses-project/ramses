@@ -19,7 +19,7 @@ public class Test_JUnit_Delayed_Buffer_No_Mutex extends OSGIPOKScenario {
 		ramses_dir = System.getProperty("RAMSES_DIR");
 		output = "tests/arinc653/arinc653-buffer-delayed-no_mutex/output";
 		output_ref = "tests/arinc653/arinc653-buffer-delayed-no_mutex/output_ref";
-		workflowPath = "tests/arinc653/arinc653-buffer-delayed-no_mutex/input/Workflow.xmi";
+		workflowPath = "tests/arinc653/arinc653-buffer-delayed-no_mutex/input/PDP_no_mutex.workflow";
 		this.exec();
 	}
 
