@@ -130,9 +130,12 @@ rule m_DataPort_Instance
 	to
 		f: AADLBA!DataPort
 		(
-			direction <- fi.feature.direction,
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
 		)
+	do
+	{
+		thisModule.setDirection(f, fi.feature);
+	}
 }
 
 -- @extends m_Feature_Instance
@@ -142,9 +145,10 @@ rule m_EventPort_Instance
 		fi: AADLI!FeatureInstance (fi.category=#eventPort)
 	to
 		f: AADLBA!EventPort
-		(
-			direction <- fi.feature.direction
-		)
+	do
+	{
+		thisModule.setDirection(f, fi.feature);
+	}
 }
 
 -- @extends m_Feature_Instance
@@ -155,9 +159,12 @@ rule m_EventDataPort_Instance
 	to
 		f: AADLBA!EventDataPort
 		(
-			direction <- fi.feature.direction,
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
 		)
+	do
+	{
+		thisModule.setDirection(f, fi.feature);
+	}
 }
 
 -- @extends m_Feature_Instance
@@ -203,6 +210,15 @@ rule m_SubprogramAccess_Instance
 		)
 }
 
+rule setDirection(f_tgt: AADLBA!Feature, f_src: AADLBA!Feature)
+{
+	do
+	{
+		f_tgt.setIn(f_src.isIn());
+		f_tgt.setOut(f_src.isOut());
+	}
+}
+
 -- @extends m_Feature_Instance
 rule m_Parameter_Instance
 {
@@ -215,8 +231,7 @@ rule m_Parameter_Instance
 		)
 	do
 	{
-		f.setIn(fi.feature.isIn());
-		f.setOut(fi.feature.isOut());
+		thisModule.setDirection(f, fi.feature);
 	}
 }
 
@@ -243,12 +258,12 @@ unique lazy rule Parameter {
 	to
 		f2 : AADLBA!Parameter
 		(
-			direction <- f.direction,
 			dataFeatureClassifier <- f.dataFeatureClassifier,
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
 	do
 	{
+		thisModule.setDirection(f2, f);
 		f2;
 	}
 }
@@ -277,11 +292,11 @@ unique lazy rule EventPort {
 	to
 		f2 : AADLBA!EventPort
 		(
-			direction <- f.direction,
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
 	do
 	{
+		thisModule.setDirection(f2, f);
 		f2;
 	}
 }
@@ -294,11 +309,11 @@ unique lazy rule EventDataPort {
 		f2 : AADLBA!EventDataPort
 		(
 			dataFeatureClassifier <- f.dataFeatureClassifier,
-			direction <- f.direction,
 			ownedPropertyAssociation <- f.mapOwnedPropertyAssociationList()
 		)
 	do
 	{
+		thisModule.setDirection(f2, f);
 		f2;
 	}
 }
