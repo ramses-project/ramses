@@ -178,12 +178,15 @@ abstract rule m_Process_InputPort_Remote_Connection
     fi: AADLI!FeatureInstance
 	(fi.isInputFeature())
   to
-    f_mirror: AADLBA!Port
-	(direction <- #out),
+    f_mirror: AADLBA!Port,
 	call_comm: AADLBA!SubprogramCall
 	(
 		calledSubprogram <- thisModule.createRemoteReceiveSubprogram(fi)
 	)
+  do
+  {
+  	f_mirror.setOut(true);
+  }
 }
 
 -- @extends m_Process_InputPort_Remote_Connection, m_Process_EventPort_Remote_Connection

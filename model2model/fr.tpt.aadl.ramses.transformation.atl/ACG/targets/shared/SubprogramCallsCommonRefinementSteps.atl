@@ -165,9 +165,12 @@ rule m_DataPort_Instance
 	to
 		f: AADLBA!DataPort
 		(
-			direction <- fi.feature.direction,
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
 		)
+	do
+	{
+		thisModule.setDirection(f, fi.feature);
+	}
 }
 
 -- @extends m_Feature_Instance
@@ -184,9 +187,10 @@ rule m_EventPort_Instance
 		)
 	to
 		f: AADLBA!EventPort
-		(
-			direction <- fi.feature.direction
-		)
+	do
+	{
+		thisModule.setDirection(f, fi.feature);
+	}
 }
 
 -- @extends m_Feature_Instance
@@ -204,9 +208,12 @@ rule m_EventDataPort_Instance
 	to
 		f: AADLBA!EventDataPort
 		(
-			direction <- fi.feature.direction,
 			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
 		)
+	do
+	{
+		thisModule.setDirection(f, fi.feature);
+	}
 }
 
 abstract rule m_Component_Implementation {

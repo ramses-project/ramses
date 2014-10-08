@@ -36,12 +36,6 @@ from
 	SCHEDULER_RUNTIME	   : AADLBA;
 
 
-rule CreateEventPort(portName: String, dir: String){
- to
-   p : AADLBA!EventPort(name <- portName, direction <- dir)
- do {p;}
-}
-
 rule CreateDataComponentPrototypeActual(d: AADLBA!DataClassifier)
 {
 	to

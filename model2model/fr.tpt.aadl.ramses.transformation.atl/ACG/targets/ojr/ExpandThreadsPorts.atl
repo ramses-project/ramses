@@ -409,11 +409,11 @@ unique lazy rule createResolvedSpg
 		actualParam : AADLBA!Parameter
 		(
 			refined <- param,
-			direction <- param.direction,
 			dataFeatureClassifier <- classifier
 		)
 	do
 	{
+		thisModule.setDirection(actualParam, param);
 		spg_ResolvedType;
 	}
 }
