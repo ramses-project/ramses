@@ -47,5 +47,8 @@ unzip ${ZIP_FILE}
 mv ${ZIP_FILE_PREFIX} ${RAMSES_DIR}
 rm ${ZIP_FILE}
 cd ${JUNIT_DIR}
+echo "Tests in progress ..."
+echo "tail -f ${LOG_FILE} to follow the progression"
 mvn clean test > ${LOG_FILE}
+echo "Tests completed"
 cd ..
