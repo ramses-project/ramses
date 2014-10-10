@@ -44,6 +44,7 @@ import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
+import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
 import org.osate.aadl2.ListValue ;
@@ -318,18 +319,15 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	public void setDirection(DirectedFeature feature, String direction) {
 		if(direction.equals("in"))
 		{
-		  feature.setIn(true);
-		  feature.setOut(false);
+		  feature.setDirection(DirectionType.IN);
 		}
 		else if(direction.equals("out"))
 		{
-		  feature.setIn(false);
-		  feature.setOut(true);
+		  feature.setDirection(DirectionType.OUT);
 		}
 		else
 		{
-			feature.setIn(true);
-			feature.setOut(true);
+		  feature.setDirection(DirectionType.IN_OUT);
 		}
 	}
 
