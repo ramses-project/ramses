@@ -139,6 +139,7 @@ transitions
   a -[]-> a {int := MyData.v1#aSimpleValue} ;
   a -[]-> a {int := MyData.v2#aSimpleValue} ;
   a -[]-> a {int := AadlBaTest::Types::Integer.v1#aSimpleValue} ;
+  a -[]-> a {int := MyThreadv2.impl#Period} ;
   a -[]-> a {int := MyData#aRange.upper_bound} ;
   a -[]-> a {int := MyData#aRange.lower_bound} ;
   a -[]-> a {if (MyData#aEnum = #AadlBaTestPropertySet::enumType.nine) int := 1 end if
