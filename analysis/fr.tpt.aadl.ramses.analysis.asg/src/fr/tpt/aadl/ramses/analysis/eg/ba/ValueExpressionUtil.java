@@ -25,6 +25,8 @@ import java.util.ArrayList ;
 import java.util.Collections ;
 import java.util.List ;
 
+import javax.naming.OperationNotSupportedException ;
+
 import org.apache.log4j.Logger ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataClassifier ;
@@ -34,7 +36,6 @@ import org.osate.aadl2.DataSubcomponentType ;
 import org.osate.aadl2.Parameter ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.ba.aadlba.BehaviorBooleanLiteral ;
-import org.osate.ba.aadlba.BehaviorEnumerationLiteral ;
 import org.osate.ba.aadlba.BehaviorIntegerLiteral ;
 import org.osate.ba.aadlba.BehaviorVariable ;
 import org.osate.ba.aadlba.BehaviorVariableHolder ;
@@ -49,6 +50,7 @@ import org.osate.ba.aadlba.IntegerValue ;
 import org.osate.ba.aadlba.LogicalOperator ;
 import org.osate.ba.aadlba.MultiplyingOperator ;
 import org.osate.ba.aadlba.ParameterHolder ;
+import org.osate.ba.aadlba.PropertyReference ;
 import org.osate.ba.aadlba.Relation ;
 import org.osate.ba.aadlba.RelationalOperator ;
 import org.osate.ba.aadlba.SimpleExpression ;
@@ -58,6 +60,8 @@ import org.osate.ba.aadlba.UnaryBooleanOperator ;
 import org.osate.ba.aadlba.UnaryNumericOperator ;
 import org.osate.ba.aadlba.Value ;
 import org.osate.ba.aadlba.ValueExpression ;
+import org.osate.ba.utils.AadlBaUtils ;
+import org.osate.ba.utils.DataModelEnumLiteral ;
 
 import fr.tpt.aadl.ramses.analysis.eg.context.EGContext ;
 import fr.tpt.aadl.ramses.analysis.eg.context.SubprogramCallContext ;
@@ -218,9 +222,9 @@ public class ValueExpressionUtil {
 		{
 			return getTokens((DataComponentReference) v, copyTarget);
 		}
-		else if (v instanceof BehaviorEnumerationLiteral)
+		else if (v instanceof PropertyReference)
 		{
-		  return getTokens((BehaviorEnumerationLiteral) v, copyTarget);
+		  return getTokens((PropertyReference) v, copyTarget);
 		}
 		else if (v instanceof BehaviorIntegerLiteral)
 		{
@@ -358,11 +362,25 @@ public class ValueExpressionUtil {
 	  return tokens;
 	}
 	
-	private static List<ExpressionToken> getTokens(BehaviorEnumerationLiteral v, boolean copyTarget)
+	private static List<ExpressionToken> getTokens(PropertyReference ref,
+	                                               boolean copyTarget)
   {
-	  List<ExpressionToken> tokens = new ArrayList<ExpressionToken>();
-	  tokens.add(new DataToken("Literal_"+v.getEnumLiteral().getValue(),1));
-	  return tokens;
+	  try
+	  {
+	    List<ExpressionToken> tokens = new ArrayList<ExpressionToken>();
+	    
+	    DataModelEnumLiteral dmel = AadlBaUtils.toDataModelEnumLiteral(ref) ;
+	    
+	    tokens.add(new DataToken("Literal_"+ dmel.stringLiteral.getValue(),1));
+	    
+	    return tokens;
+	  }
+	  catch(OperationNotSupportedException ex)
+	  {
+	    String msg = "PropertyReference unparsing fatal error" ;
+      _LOGGER.fatal(msg, ex) ;
+      throw new UnsupportedOperationException(msg, ex) ;
+	  }
   }
 	
 	private static List<ExpressionToken> getTokens(BehaviorIntegerLiteral v, boolean copyTarget)

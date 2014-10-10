@@ -42,189 +42,214 @@ import org.osate.ba.aadlba.AadlBaPackage ;
 public class AtlHooksPackageImpl extends EPackageImpl implements AtlHooksPackage
 {
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   private EClass hookAccessEClass = null;
 
   /**
-	 * Creates an instance of the model <b>Package</b>, registered with
-	 * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
-	 * package URI value.
-	 * <p>Note: the correct way to create the package is via the static
-	 * factory method {@link #init init()}, which also performs
-	 * initialization of the package, or returns the registered package,
-	 * if one already exists.
-	 * <!-- begin-user-doc -->
+   * Creates an instance of the model <b>Package</b>, registered with
+   * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
+   * package URI value.
+   * <p>Note: the correct way to create the package is via the static
+   * factory method {@link #init init()}, which also performs
+   * initialization of the package, or returns the registered package,
+   * if one already exists.
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @see org.eclipse.emf.ecore.EPackage.Registry
-	 * @see fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage#eNS_URI
-	 * @see #init()
-	 * @generated
-	 */
+   * @see org.eclipse.emf.ecore.EPackage.Registry
+   * @see fr.tpt.aadl.ramses.control.atl.hooks.AtlHooksPackage#eNS_URI
+   * @see #init()
+   * @generated
+   */
   private AtlHooksPackageImpl()
   {
-		super(eNS_URI, AtlHooksFactory.eINSTANCE);
-	}
+    super(eNS_URI, AtlHooksFactory.eINSTANCE);
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   private static boolean isInited = false;
 
   /**
-	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-	 * 
-	 * <p>This method is used to initialize {@link AtlHooksPackage#eINSTANCE} when that field is accessed.
-	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
-	 * <!-- begin-user-doc -->
+   * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
+   * 
+   * <p>This method is used to initialize {@link AtlHooksPackage#eINSTANCE} when that field is accessed.
+   * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @see #eNS_URI
-	 * @see #createPackageContents()
-	 * @see #initializePackageContents()
-	 * @generated
-	 */
+   * @see #eNS_URI
+   * @see #createPackageContents()
+   * @see #initializePackageContents()
+   * @generated
+   */
   public static AtlHooksPackage init()
   {
-		if (isInited) return (AtlHooksPackage)EPackage.Registry.INSTANCE.getEPackage(AtlHooksPackage.eNS_URI);
+    if (isInited) return (AtlHooksPackage)EPackage.Registry.INSTANCE.getEPackage(AtlHooksPackage.eNS_URI);
 
-		// Obtain or create and register package
-		AtlHooksPackageImpl theAtlHooksPackage = (AtlHooksPackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof AtlHooksPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new AtlHooksPackageImpl());
+    // Obtain or create and register package
+    AtlHooksPackageImpl theAtlHooksPackage = (AtlHooksPackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof AtlHooksPackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new AtlHooksPackageImpl());
 
-		isInited = true;
+    isInited = true;
 
-		// Initialize simple dependencies
-		AadlBaPackage.eINSTANCE.eClass();
-		InstancePackage.eINSTANCE.eClass();
+    // Initialize simple dependencies
+    AadlBaPackage.eINSTANCE.eClass();
+    InstancePackage.eINSTANCE.eClass();
 
-		// Create package meta-data objects
-		theAtlHooksPackage.createPackageContents();
+    // Create package meta-data objects
+    theAtlHooksPackage.createPackageContents();
 
-		// Initialize created meta-data
-		theAtlHooksPackage.initializePackageContents();
+    // Initialize created meta-data
+    theAtlHooksPackage.initializePackageContents();
 
-		// Mark meta-data to indicate it can't be changed
-		theAtlHooksPackage.freeze();
+    // Mark meta-data to indicate it can't be changed
+    theAtlHooksPackage.freeze();
 
   
-		// Update the registry and return the package
-		EPackage.Registry.INSTANCE.put(AtlHooksPackage.eNS_URI, theAtlHooksPackage);
-		return theAtlHooksPackage;
-	}
+    // Update the registry and return the package
+    EPackage.Registry.INSTANCE.put(AtlHooksPackage.eNS_URI, theAtlHooksPackage);
+    return theAtlHooksPackage;
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public EClass getHookAccess()
   {
-		return hookAccessEClass;
-	}
+    return hookAccessEClass;
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public AtlHooksFactory getAtlHooksFactory()
   {
-		return (AtlHooksFactory)getEFactoryInstance();
-	}
+    return (AtlHooksFactory)getEFactoryInstance();
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   private boolean isCreated = false;
 
   /**
-	 * Creates the meta-model objects for the package.  This method is
-	 * guarded to have no affect on any invocation but its first.
-	 * <!-- begin-user-doc -->
+   * Creates the meta-model objects for the package.  This method is
+   * guarded to have no affect on any invocation but its first.
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public void createPackageContents()
   {
-		if (isCreated) return;
-		isCreated = true;
+    if (isCreated) return;
+    isCreated = true;
 
-		// Create classes and their features
-		hookAccessEClass = createEClass(HOOK_ACCESS);
-	}
+    // Create classes and their features
+    hookAccessEClass = createEClass(HOOK_ACCESS);
+  }
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   private boolean isInitialized = false;
 
   /**
-	 * Complete the initialization of the package and its meta-model.  This
-	 * method is guarded to have no affect on any invocation but its first.
-	 * <!-- begin-user-doc -->
+   * Complete the initialization of the package and its meta-model.  This
+   * method is guarded to have no affect on any invocation but its first.
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   public void initializePackageContents()
   {
-		if (isInitialized) return;
-		isInitialized = true;
+    if (isInitialized) return;
+    isInitialized = true;
 
-		// Initialize package
-		setName(eNAME);
-		setNsPrefix(eNS_PREFIX);
-		setNsURI(eNS_URI);
+    // Initialize package
+    setName(eNAME);
+    setNsPrefix(eNS_PREFIX);
+    setNsURI(eNS_URI);
 
-		// Obtain other dependent packages
-		Aadl2Package theAadl2Package = (Aadl2Package)EPackage.Registry.INSTANCE.getEPackage(Aadl2Package.eNS_URI);
-		InstancePackage theInstancePackage = (InstancePackage)EPackage.Registry.INSTANCE.getEPackage(InstancePackage.eNS_URI);
-		AadlBaPackage theAadlBaPackage = (AadlBaPackage)EPackage.Registry.INSTANCE.getEPackage(AadlBaPackage.eNS_URI);
+    // Obtain other dependent packages
+    Aadl2Package theAadl2Package = (Aadl2Package)EPackage.Registry.INSTANCE.getEPackage(Aadl2Package.eNS_URI);
+    AadlBaPackage theAadlBaPackage = (AadlBaPackage)EPackage.Registry.INSTANCE.getEPackage(AadlBaPackage.eNS_URI);
+    InstancePackage theInstancePackage = (InstancePackage)EPackage.Registry.INSTANCE.getEPackage(InstancePackage.eNS_URI);
 
-		// Create type parameters
+    // Create type parameters
 
-		// Set bounds for type parameters
+    // Set bounds for type parameters
 
-		// Add supertypes to classes
+    // Add supertypes to classes
 
-		// Initialize classes and features; add operations and parameters
-		initEClass(hookAccessEClass, HookAccess.class, "HookAccess", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    // Initialize classes and features; add operations and parameters
+    initEClass(hookAccessEClass, HookAccess.class, "HookAccess", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
-		EOperation op = addEOperation(hookAccessEClass, theAadl2Package.getFeature(), "orderFeatures", 0, -1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theAadl2Package.getComponentType(), "cpt", 0, 1, IS_UNIQUE, IS_ORDERED);
+    EOperation op = addEOperation(hookAccessEClass, theAadl2Package.getFeature(), "orderFeatures", 0, -1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getComponentType(), "cpt", 0, 1, IS_UNIQUE, IS_ORDERED);
 
-		op = addEOperation(hookAccessEClass, null, "copyLocationReference", 0, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theAadl2Package.getElement(), "target", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theAadl2Package.getElement(), "source", 1, 1, IS_UNIQUE, IS_ORDERED);
+    op = addEOperation(hookAccessEClass, null, "copyLocationReference", 0, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getElement(), "target", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getElement(), "source", 1, 1, IS_UNIQUE, IS_ORDERED);
 
-		op = addEOperation(hookAccessEClass, null, "addTransformationBackTrace", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theAadl2Package.getNamedElement(), "targetDeclarative", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theInstancePackage.getInstanceObject(), "sourceInstance", 1, 1, IS_UNIQUE, IS_ORDERED);
+    op = addEOperation(hookAccessEClass, null, "addTransformationBackTrace", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getNamedElement(), "targetDeclarative", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getNamedElement(), "sourceInstance", 1, 1, IS_UNIQUE, IS_ORDERED);
 
-		op = addEOperation(hookAccessEClass, null, "putTransitionWhereSrc", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theAadlBaPackage.getBehaviorState(), "state", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theAadlBaPackage.getBehaviorTransition(), "transition", 1, 1, IS_UNIQUE, IS_ORDERED);
+    op = addEOperation(hookAccessEClass, null, "putTransitionWhereSrc", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadlBaPackage.getBehaviorState(), "state", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadlBaPackage.getBehaviorTransition(), "transition", 1, 1, IS_UNIQUE, IS_ORDERED);
 
-		op = addEOperation(hookAccessEClass, ecorePackage.getELong(), "getCurrentPerionReadTable", 0, -1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theInstancePackage.getFeatureInstance(), "port", 1, 1, IS_UNIQUE, IS_ORDERED);
+    op = addEOperation(hookAccessEClass, ecorePackage.getELong(), "getCurrentPerionReadTable", 0, -1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theInstancePackage.getFeatureInstance(), "port", 1, 1, IS_UNIQUE, IS_ORDERED);
 
-		op = addEOperation(hookAccessEClass, ecorePackage.getELong(), "getCurrentDeadlineWriteTable", 0, -1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theInstancePackage.getFeatureInstance(), "port", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theInstancePackage.getFeatureInstance(), "destinationPort", 0, 1, IS_UNIQUE, IS_ORDERED);
+    op = addEOperation(hookAccessEClass, ecorePackage.getELong(), "getCurrentDeadlineWriteTable", 0, -1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theInstancePackage.getFeatureInstance(), "port", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theInstancePackage.getFeatureInstance(), "destinationPort", 0, 1, IS_UNIQUE, IS_ORDERED);
 
-		op = addEOperation(hookAccessEClass, ecorePackage.getELong(), "getBufferSize", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theInstancePackage.getFeatureInstance(), "destinationFeatureInstance", 1, 1, IS_UNIQUE, IS_ORDERED);
+    op = addEOperation(hookAccessEClass, ecorePackage.getELong(), "getBufferSize", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theInstancePackage.getFeatureInstance(), "destinationFeatureInstance", 1, 1, IS_UNIQUE, IS_ORDERED);
 
-		op = addEOperation(hookAccessEClass, null, "setInDirection", 1, 1, IS_UNIQUE, IS_ORDERED);
-		addEParameter(op, theAadl2Package.getDirectedFeature(), "feature", 1, 1, IS_UNIQUE, IS_ORDERED);
+    op = addEOperation(hookAccessEClass, null, "setDirection", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getDirectedFeature(), "feature", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadlBaPackage.getString(), "direction", 0, 1, IS_UNIQUE, IS_ORDERED);
 
-		// Create resource
-		createResource(eNS_URI);
-	}
+    op = addEOperation(hookAccessEClass, theAadl2Package.getBoolean(), "isUsedInSpecialOperator", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadlBaPackage.getBehaviorAnnex(), "ba", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getPort(), "p", 0, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getString(), "operatorName", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+    op = addEOperation(hookAccessEClass, ecorePackage.getELong(), "getHyperperiod", 0, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theInstancePackage.getFeatureInstance(), "port", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+    op = addEOperation(hookAccessEClass, theAadl2Package.getString(), "getTimingPrecision", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getNamedElement(), "namedElement", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+    op = addEOperation(hookAccessEClass, theAadl2Package.getString(), "getListOfPath", 0, -1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getPropertyAssociation(), "pa", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+    op = addEOperation(hookAccessEClass, theAadl2Package.getPort(), "allPortCount", 0, -1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadlBaPackage.getBehaviorElement(), "e", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+    op = addEOperation(hookAccessEClass, theAadl2Package.getStringLiteral(), "getStringLiteral", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getPropertyAssociation(), "pa", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getString(), "stringLiteralValue", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+    op = addEOperation(hookAccessEClass, theAadl2Package.getPropertyAssociation(), "getEnumerators", 1, 1, IS_UNIQUE, IS_ORDERED);
+    addEParameter(op, theAadl2Package.getClassifier(), "classifier", 1, 1, IS_UNIQUE, IS_ORDERED);
+
+    // Create resource
+    createResource(eNS_URI);
+  }
 } //AtlHooksPackageImpl

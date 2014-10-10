@@ -40,6 +40,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl ;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.eclipse.xtext.nodemodel.INode ;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
@@ -94,32 +95,33 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   private String outputPackageName;
   
   private static Logger _LOGGER = Logger.getLogger(HookAccessImpl.class);
+  
+  private static final String _ENUMERATORS = "Enumerators" ;
 
 /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
   protected HookAccessImpl()
   {
-		super();
-	}
-
-  /**
-	 * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-	 * @generated
-	 */
-  @Override
-  protected EClass eStaticClass()
-  {
-		return AtlHooksPackage.Literals.HOOK_ACCESS;
-	}
+    super();
+  }
 
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
+   * @generated
+   */
+  @Override
+  protected EClass eStaticClass()
+  {
+    return AtlHooksPackage.Literals.HOOK_ACCESS;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
    */
   public EList<Feature> orderFeatures(ComponentType cpt)
   {
@@ -131,7 +133,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
    */
   public void copyLocationReference(Element target,
                                     Element source)
@@ -170,7 +171,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
    */
     private static Map<NamedElement, NamedElement> _transformationTrace = new HashMap<NamedElement, NamedElement>();
     
@@ -186,7 +186,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated NOT
    */
   public void putTransitionWhereSrc(BehaviorState state, BehaviorTransition transition)
   {
@@ -197,7 +196,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
   /**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public EList<Long> getCurrentPerionReadTable(FeatureInstance port) {
 		EList<Long> CPRTable = new BasicEList<Long>();
@@ -230,9 +228,8 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
-	public Long getHyperperiod(FeatureInstance port) {
+	public long getHyperperiod(FeatureInstance port) {
 	  Long hyperperiod= new Long(0);
 	  ArrayList<ComponentInstance> threads = new ArrayList<ComponentInstance>();
 	  for(ConnectionInstance fi: port.getDstConnectionInstances())
@@ -264,7 +261,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public EList<Long> getCurrentDeadlineWriteTable(FeatureInstance port, FeatureInstance destinationPort) {
 		EList<Long> CDWTable = new BasicEList<Long>();
@@ -297,7 +293,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public long getBufferSize(FeatureInstance destinationFeatureInstance) {
 		try {
@@ -319,7 +314,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
 	public void setDirection(DirectedFeature feature, String direction) {
 		if(direction.equals("in"))
@@ -342,7 +336,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated NOT
 	 */
   public static NamedElement getTransformationTrace(NamedElement targetDeclarative)
   {
@@ -385,7 +378,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	  return l;
   }
 
-  public Boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName) {
+  public boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName) {
     if(operatorName.equalsIgnoreCase("fresh"))
       return AadlBaVisitors.isFresh(ba, p);
     else if(operatorName.equalsIgnoreCase("count"))
@@ -581,5 +574,37 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     EList<Port> res = new BasicEList<Port>(pList);
     return res;
   }
-  
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   */
+  public StringLiteral getStringLiteral(PropertyAssociation pa,
+                                        String stringLiteralValue)
+  {
+    Element el = null ;
+    EList<PropertyExpression> pes = PropertyUtils.getPropertyExpression(pa) ;
+    for(PropertyExpression pe : pes)
+    {
+      el = PropertyUtils.getValue(pe, stringLiteralValue) ;
+    
+      if(el != null)
+      {
+        return (StringLiteral) el ;
+      }
+    }
+    
+    return null ;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   */
+  public PropertyAssociation getEnumerators(Classifier classifier)
+  {
+    EList<PropertyAssociation> pas = PropertyUtils.
+                              getPropertyAssociations(classifier, _ENUMERATORS);
+    return pas.get(pas.size() -1) ;
+  }
 } //HookAccessImpl

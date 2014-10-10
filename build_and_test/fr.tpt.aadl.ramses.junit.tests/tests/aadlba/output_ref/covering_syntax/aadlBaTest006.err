@@ -16,7 +16,7 @@
 <Syntax Error> missing behavior action sequence separator ';' in aadlBaTest006.aadl at line 80
 <Syntax Error> extraneous input ';', delete it in aadlBaTest006.aadl at line 81
 <Syntax Error> missing behavior action sequence separator ';' in aadlBaTest006.aadl at line 74
-<Syntax Error> mismatched input 'elif' expecting ''elsif'' in aadlBaTest006.aadl at line 90
+<Syntax Error> mismatched input 'elif' expecting ''\u000B'' in aadlBaTest006.aadl at line 90
 <Syntax Error> unbalanced {} in aadlBaTest006.aadl at line 97
 <Syntax Error> unbalanced () in aadlBaTest006.aadl at line 94
 <Syntax Error> mismatched input 'endif' expecting 'end if' in aadlBaTest006.aadl at line 102
@@ -32,8 +32,10 @@
 <Syntax Error> unbalanced () in aadlBaTest006.aadl at line 126
 <Syntax Error> missing subprogram parameter separator ',' in aadlBaTest006.aadl at line 127
 <Syntax Error> unbalanced () in aadlBaTest006.aadl at line 131
-<Syntax Error> mismatched input '==' expecting '=' in aadlBaTest006.aadl at line 134
-<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 136
-<Syntax Error> mismatched input '=' expecting ':=' in aadlBaTest006.aadl at line 138
-<Syntax Error> extraneous input ';', delete it in aadlBaTest006.aadl at line 138
+<Syntax Error> missing processor parameter separator ',' in aadlBaTest006.aadl at line 134
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 134
+<Syntax Error> mismatched input '==' expecting ';' in aadlBaTest006.aadl at line 136
+<Syntax Error> unbalanced () in aadlBaTest006.aadl at line 138
+<Syntax Error> mismatched input '=' expecting '3' in aadlBaTest006.aadl at line 140
+<Syntax Error> extraneous input ';', delete it in aadlBaTest006.aadl at line 140
 <Internal Warning> t has parsing errors. Its annexes have not been resolved.

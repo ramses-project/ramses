@@ -377,7 +377,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_odometerAcquisition_currentState#switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_odometerAcquisition_currentState#Enumerators.switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) ;
 if ((trainDataIn_localVariable.fresh_ba != trainDataIn_freshnessIndicator_access)) cbtc::TrainPpu_odometerAcquisition ! (trainDataIn_localVariable.pvalue, odometerOut) ;
 odometerIn := odometerOut ;
 cbtc::WheelAngleAcquisition_wheelAngleAcquisition ! (odometerIn, wheelAngleOut_localVariable.pvalue) end if
@@ -385,10 +385,10 @@ cbtc::WheelAngleAcquisition_wheelAngleAcquisition ! (odometerIn, wheelAngleOut_l
 trainDataIn_freshnessIndicator_access := trainDataIn_localVariable.fresh_ba ;
 wheelAngleOut_freshnessIndicator_access := wheelAngleOut_freshnessIndicator_access + 1 ;
 wheelAngleOut_localVariable.fresh_ba := wheelAngleOut_freshnessIndicator_access ;
-Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_currentState#switch ;
+Parent_BA_currentState_Access := train_inst_TrainPpu_odometerAcquisition_currentState#Enumerators.switch ;
 Display_Blackboard_OdometerData ! (PortCnx1_wheelAngleOut, wheelAngleOut_localVariable, wheelAngleOut_Length, train_inst_TrainPpu_odometerAcquisition_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_odometerAcquisition_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_TrainPpu_odometerAcquisition_runtime_call_ret)} ;
 **};
   end train_inst_TrainPpu_odometerAcquisition_entrypoint.impl;
@@ -502,17 +502,17 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_trainTraction_currentState#switch) Read_Blackboard_TractionData ! (tractionIn, tractionIn_TimeOut, tractionIn_localVariable, tractionIn_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainPpu_trainTraction_currentState#Enumerators.switch) Read_Blackboard_TractionData ! (tractionIn, tractionIn_TimeOut, tractionIn_localVariable, tractionIn_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
 Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
 if ((tractionIn_localVariable.fresh_ba != tractionIn_freshnessIndicator_access) and (trainDataIn_localVariable.fresh_ba != trainDataIn_freshnessIndicator_access)) cbtc::TrainPpu_trainTraction ! (tractionIn_localVariable.pvalue, trainDataIn_localVariable.pvalue, additionalTrainPositionOffset_localVariable, trainDataOut_localVariable) end if
    ;
 tractionIn_freshnessIndicator_access := tractionIn_localVariable.fresh_ba ;
 trainDataIn_freshnessIndicator_access := trainDataIn_localVariable.fresh_ba ;
-Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#switch ;
+Parent_BA_currentState_Access := train_inst_TrainPpu_trainTraction_currentState#Enumerators.switch ;
 Display_Blackboard_TrainPositionOffset ! (PortCnx2_additionalTrainPositionOffset, additionalTrainPositionOffset_localVariable, additionalTrainPositionOffset_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) ;
 Write_Sampling_Message_TrainData ! (PortCnx9_trainDataOut, trainDataOut_localVariable, trainDataOut_Length, train_inst_TrainPpu_trainTraction_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainPpu_trainTraction_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_TrainPpu_trainTraction_runtime_call_ret)} ;
 **};
   end train_inst_TrainPpu_trainTraction_entrypoint.impl;
@@ -630,7 +630,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#switch) Read_Blackboard_TrainPositionOffset ! (additionalTrainPositionOffset, additionalTrainPositionOffset_TimeOut, additionalTrainPositionOffset_localVariable, additionalTrainPositionOffset_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#Enumerators.switch) Read_Blackboard_TrainPositionOffset ! (additionalTrainPositionOffset, additionalTrainPositionOffset_TimeOut, additionalTrainPositionOffset_localVariable, additionalTrainPositionOffset_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
 Read_Blackboard_OdometerData ! (wheelAngleIn, wheelAngleIn_TimeOut, wheelAngleIn_localVariable, wheelAngleIn_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) ;
 cbtc::VobcTrainPositionEstimation_delayed_additionalTrainPositionOffset ! (additionalTrainPositionOffset_localVariable, delayed_additionalTrainPositionOffset) ;
 if ((wheelAngleIn_localVariable.fresh_ba != wheelAngleIn_freshnessIndicator_access)) cbtc::VobcTrainPositionEstimation_vobcTrainPositionEstimation ! (wheelAngleIn_localVariable.pvalue, delayed_additionalTrainPositionOffset, trainPositionOut) ;
@@ -640,10 +640,10 @@ cbtc::VobcTrainPositionSending_vobcTrainPositionSending ! (trainPositionIn, trai
 wheelAngleIn_freshnessIndicator_access := wheelAngleIn_localVariable.fresh_ba ;
 trainPositionOut_F_freshnessIndicator_access := trainPositionOut_F_freshnessIndicator_access + 1 ;
 trainPositionOut_F_localVariable.fresh_ba := trainPositionOut_F_freshnessIndicator_access ;
-Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#switch ;
+Parent_BA_currentState_Access := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_currentState#Enumerators.switch ;
 Display_Blackboard_VobcData ! (PortCnx3_trainPositionOut_F, trainPositionOut_F_localVariable, trainPositionOut_F_Length, train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_runtime_call_ret)} ;
 **};
   end train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_entrypoint.impl;
@@ -768,7 +768,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#switch) Read_Sampling_Message_EndOfAuthority ! (eoaIn, eoaIn_localVariable, eoaIn_Length, eoaIn_Validity, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#Enumerators.switch) Read_Sampling_Message_EndOfAuthority ! (eoaIn, eoaIn_localVariable, eoaIn_Length, eoaIn_Validity, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 Read_Blackboard_VobcData ! (trainPositionIn, trainPositionIn_TimeOut, trainPositionIn_localVariable, trainPositionIn_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 if ((eoaIn_localVariable.fresh_ba != eoaIn_freshnessIndicator_access) and (trainPositionIn_localVariable.fresh_ba != trainPositionIn_freshnessIndicator_access)) cbtc::TrainSpeedAccelCompute_trainSpeedAccelCompute ! (eoaIn_localVariable.pvalue, trainPositionIn_localVariable.pvalue, trainAccelOut, trainPositionForMauOut_localVariable.pvalue) ;
 trainAccelIn := trainAccelOut ;
@@ -780,11 +780,11 @@ trainPositionForMauOut_freshnessIndicator_access := trainPositionForMauOut_fresh
 trainPositionForMauOut_localVariable.fresh_ba := trainPositionForMauOut_freshnessIndicator_access ;
 tractionOut_freshnessIndicator_access := tractionOut_freshnessIndicator_access + 1 ;
 tractionOut_localVariable.fresh_ba := tractionOut_freshnessIndicator_access ;
-Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#switch ;
+Parent_BA_currentState_Access := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_currentState#Enumerators.switch ;
 Write_Sampling_Message_VobcData ! (PortCnx8_trainPositionForMauOut, trainPositionForMauOut_localVariable, trainPositionForMauOut_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) ;
 Display_Blackboard_TractionData ! (PortCnx4_tractionOut, tractionOut_localVariable, tractionOut_Length, train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_runtime_call_ret)} ;
 **};
   end train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_entrypoint.impl;
@@ -917,7 +917,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#switch) Read_Sampling_Message_VobcData ! (trainPositionVobcForMauIn, trainPositionVobcForMauIn_localVariable, trainPositionVobcForMauIn_Length, trainPositionVobcForMauIn_Validity, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#Enumerators.switch) Read_Sampling_Message_VobcData ! (trainPositionVobcForMauIn, trainPositionVobcForMauIn_localVariable, trainPositionVobcForMauIn_Length, trainPositionVobcForMauIn_Validity, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
 Read_Blackboard_ViuData ! (trainPositionViuForMauIn, trainPositionViuForMauIn_TimeOut, trainPositionViuForMauIn_localVariable, trainPositionViuForMauIn_Length, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) ;
 if ((trainPositionVobcForMauIn_localVariable.fresh_ba != trainPositionVobcForMauIn_freshnessIndicator_access) and (trainPositionViuForMauIn_localVariable.fresh_ba != trainPositionViuForMauIn_freshnessIndicator_access)) cbtc::TrainPositionsCorrelation_trainPositionsCorrelation ! (trainPositionVobcForMauIn_localVariable.pvalue, trainPositionViuForMauIn_localVariable.pvalue, delayed_trainPositionMauOut) ;
 cbtc::TrainPositionsCorrelation_store_trainPositionMauOut ! (delayed_trainPositionMauOut, trainPositionMauOut) ;
@@ -930,10 +930,10 @@ trainPositionVobcForMauIn_freshnessIndicator_access := trainPositionVobcForMauIn
 trainPositionViuForMauIn_freshnessIndicator_access := trainPositionViuForMauIn_localVariable.fresh_ba ;
 eoaForVobcOut_freshnessIndicator_access := eoaForVobcOut_freshnessIndicator_access + 1 ;
 eoaForVobcOut_localVariable.fresh_ba := eoaForVobcOut_freshnessIndicator_access ;
-Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#switch ;
+Parent_BA_currentState_Access := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_currentState#Enumerators.switch ;
 Write_Sampling_Message_EndOfAuthority ! (PortCnx7_eoaForVobcOut, eoaForVobcOut_localVariable, eoaForVobcOut_Length, railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_runtime_call_ret)} ;
 **};
   end railway_inst_TrainPositionsCorrelation_trainPositionsCorrelation_entrypoint.impl;
@@ -1053,7 +1053,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#switch) Read_Blackboard_CdvData ! (trackIn, trackIn_TimeOut, trackIn_localVariable, trackIn_Length, railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#Enumerators.switch) Read_Blackboard_CdvData ! (trackIn, trackIn_TimeOut, trackIn_localVariable, trackIn_Length, railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) ;
 if ((trackIn_localVariable.fresh_ba != trackIn_freshnessIndicator_access)) cbtc::ViuTrainPositionEstimation_viuTrainPositionEstimation ! (trackIn_localVariable.pvalue, trainPositionOut) ;
 trainPositionIn := trainPositionOut ;
 cbtc::ViuTrainPositionSending_viuTrainPositionSending ! (trainPositionIn, trainPositionForMauOut_localVariable.pvalue) end if
@@ -1061,10 +1061,10 @@ cbtc::ViuTrainPositionSending_viuTrainPositionSending ! (trainPositionIn, trainP
 trackIn_freshnessIndicator_access := trackIn_localVariable.fresh_ba ;
 trainPositionForMauOut_freshnessIndicator_access := trainPositionForMauOut_freshnessIndicator_access + 1 ;
 trainPositionForMauOut_localVariable.fresh_ba := trainPositionForMauOut_freshnessIndicator_access ;
-Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#switch ;
+Parent_BA_currentState_Access := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_currentState#Enumerators.switch ;
 Display_Blackboard_ViuData ! (PortCnx1_trainPositionForMauOut, trainPositionForMauOut_localVariable, trainPositionForMauOut_Length, railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_runtime_call_ret)} ;
 **};
   end railway_inst_ViuTrainPositionEstimation_viuTrainPositionEstimation_entrypoint.impl;
@@ -1171,7 +1171,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_trainSimulation_currentState#switch) Read_Blackboard_TrainData ! (delayed_trainDataIn, delayed_trainDataIn_TimeOut, delayed_trainDataIn_localVariable, delayed_trainDataIn_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_trainSimulation_currentState#Enumerators.switch) Read_Blackboard_TrainData ! (delayed_trainDataIn, delayed_trainDataIn_TimeOut, delayed_trainDataIn_localVariable, delayed_trainDataIn_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
 cbtc::TrainSimu_trainSimulation ! (delayed_trainDataIn_localVariable, trainDataOut_localVariable.pvalue) ;
 trainDataOut_localVariable.pvalue := trainDataIn ;
 cbtc::TrackPpu_cdvAcquisition ! (trainDataIn, cdvOut) ;
@@ -1181,11 +1181,11 @@ trainDataOut_freshnessIndicator_access := trainDataOut_freshnessIndicator_access
 trainDataOut_localVariable.fresh_ba := trainDataOut_freshnessIndicator_access ;
 trackOut_freshnessIndicator_access := trackOut_freshnessIndicator_access + 1 ;
 trackOut_localVariable.fresh_ba := trackOut_freshnessIndicator_access ;
-Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentState#switch ;
+Parent_BA_currentState_Access := railway_inst_TrainSimu_trainSimulation_currentState#Enumerators.switch ;
 Write_Sampling_Message_TrainData ! (PortCnx6_trainDataOut, trainDataOut_localVariable, trainDataOut_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) ;
 Display_Blackboard_CdvData ! (PortCnx3_trackOut, trackOut_localVariable, trackOut_Length, railway_inst_TrainSimu_trainSimulation_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_trainSimulation_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_TrainSimu_trainSimulation_runtime_call_ret)} ;
 **};
   end railway_inst_TrainSimu_trainSimulation_entrypoint.impl;
@@ -1296,12 +1296,12 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_delayed_trainDataIn_currentState#switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = railway_inst_TrainSimu_delayed_trainDataIn_currentState#Enumerators.switch) Read_Sampling_Message_TrainData ! (trainDataIn, trainDataIn_localVariable, trainDataIn_Length, trainDataIn_Validity, railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) ;
 cbtc::TrainSimu_delayed_trainDataIn ! (trainDataIn_localVariable, delayed_trainDataIn_localVariable) ;
-Parent_BA_currentState_Access := railway_inst_TrainSimu_delayed_trainDataIn_currentState#switch ;
+Parent_BA_currentState_Access := railway_inst_TrainSimu_delayed_trainDataIn_currentState#Enumerators.switch ;
 Display_Blackboard_TrainData ! (PortCnx2_delayed_trainDataIn, delayed_trainDataIn_localVariable, delayed_trainDataIn_Length, railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := railway_inst_TrainSimu_delayed_trainDataIn_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (railway_inst_TrainSimu_delayed_trainDataIn_runtime_call_ret)} ;
 **};
   end railway_inst_TrainSimu_delayed_trainDataIn_entrypoint.impl;

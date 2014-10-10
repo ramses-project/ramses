@@ -194,7 +194,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_a1_inst_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_PingPongMessage ! (C1_PingIn, C1_PingIn_localVariable, C1_PingIn_Length, C1_PingIn_Validity, C1_PingIn_ErrorCode) ;
+  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_a1_inst_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_PingPongMessage ! (C1_PingIn, C1_PingIn_localVariable, C1_PingIn_Length, C1_PingIn_Validity, C1_PingIn_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C1_PongIn, C1_PongIn_localVariable, C1_PongIn_Length, C1_PongIn_Validity, C1_PongIn_ErrorCode) ;
 Read_Sampling_Message_Exception ! (Mon_error_C2, Mon_error_C2_localVariable, Mon_error_C2_Length, Mon_error_C2_Validity, Mon_error_C2_ErrorCode) ;
 if (Mon_error_C2_ErrorCode = 0) PingPong::Monitor_activate ! (call_seq_state_baKeywords_entrypoint, cnx7_localVariable, Mon_error_C2_localVariable, cnx9_localVariable, Mon_mode_C2_localVariable) end if
@@ -204,7 +204,7 @@ if (C1_PingIn_ErrorCode = 0 and C1_PongIn_ErrorCode = 0) PingPong::IPingOrPong_m
 Write_Sampling_Message_ROLE ! (mode_implicit_cnx_Mon_mode_C2, Mon_mode_C2_localVariable, Mon_mode_C2_Length, S1_inst_a1_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C1_ping_implicit_cnx_C1_PingOut, C1_PingOut_localVariable, C1_PingOut_Length, S1_inst_a1_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C1_pong_implicit_cnx_C1_PongOut, C1_PongOut_localVariable, C1_PongOut_Length, S1_inst_a1_inst_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_a1_inst_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_a1_inst_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S1_inst_a1_inst_runtime_call_ret)} ;
 **};
   end S1_inst_a1_inst_entrypoint.impl;
@@ -336,7 +336,7 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_a2_inst_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_ROLE ! (C2_mode, C2_mode_localVariable, C2_mode_Length, C2_mode_Validity, C2_mode_ErrorCode) ;
+  call_seq [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_a2_inst_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Sampling_Message_ROLE ! (C2_mode, C2_mode_localVariable, C2_mode_Length, C2_mode_Validity, C2_mode_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C2_PingIn, C2_PingIn_localVariable, C2_PingIn_Length, C2_PingIn_Validity, C2_PingIn_ErrorCode) ;
 Read_Sampling_Message_PingPongMessage ! (C2_PongIn, C2_PongIn_localVariable, C2_PongIn_Length, C2_PongIn_Validity, C2_PongIn_ErrorCode) ;
 if (C2_mode_ErrorCode = 0 and C2_PingIn_ErrorCode = 0 and C2_PongIn_ErrorCode = 0) PingPong::IPingOrPong_mode ! (call_seq_seqNb_entrypoint, C2_PingIn_localVariable, C2_PingOut_localVariable, C2_PongIn_localVariable, C2_PongOut_localVariable, C2_badSequenceNumber_localVariable, C2_mode_localVariable) end if
@@ -344,7 +344,7 @@ if (C2_mode_ErrorCode = 0 and C2_PingIn_ErrorCode = 0 and C2_PongIn_ErrorCode = 
 Write_Sampling_Message_PingPongMessage ! (C2_ping_implicit_cnx_C2_PingOut, C2_PingOut_localVariable, C2_PingOut_Length, S2_inst_a2_inst_runtime_call_ret) ;
 Write_Sampling_Message_PingPongMessage ! (C2_pong_implicit_cnx_C2_PongOut, C2_PongOut_localVariable, C2_PongOut_Length, S2_inst_a2_inst_runtime_call_ret) ;
 Write_Sampling_Message_Exception ! (C2_error_implicit_cnx_C2_badSequenceNumber, C2_badSequenceNumber_localVariable, C2_badSequenceNumber_Length, S2_inst_a2_inst_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_a2_inst_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_a2_inst_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S2_inst_a2_inst_runtime_call_ret)} ;
 **};
   end S2_inst_a2_inst_entrypoint.impl;

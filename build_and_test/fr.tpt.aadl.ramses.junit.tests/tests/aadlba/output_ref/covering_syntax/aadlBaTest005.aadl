@@ -67,8 +67,6 @@ with Data_Model,Base_Types,AadlBaTestPropertySet,AadlBaTest::Types,AadlBaTestSub
   
   subprogram group MySubprogramGroup
     features
-      portGrp: feature group MyPortGroup;
-      dataAccessGrp: feature group MyDataAccessGroup;
       prototypeGrp: feature group MyPrototGroupConcrete;
       subprog: requires subprogram access multiplication;
       recursiveGrpAccess: requires subprogram group access MySubprogramGroup;
@@ -157,8 +155,12 @@ with Data_Model,Base_Types,AadlBaTestPropertySet,AadlBaTest::Types,AadlBaTestSub
       subprogGrpAccess: requires subprogram group access MySubprogramGroup.impl;
   end thread1;
   
-  thread implementation thread1.impl
+  thread thread2
+    extends thread1
     (threadGrpProt => thread group MyThreadGroup.impl)
+  end thread2;
+  
+  thread implementation thread2.impl
     subcomponents
       subprogGrp: subprogram group MySubprogramGroup.impl;
       spg1: subprogram procedure;
@@ -180,15 +182,12 @@ transitions
   a -[]-> a {outPortA := 0} ;
   a -[]-> a {portGrp.outPort := 0} ;
   a -[]-> a {portGrp.recursiveGrp.outPort := 0} ;
-  a -[]-> a {subprogGrp.portGrp.recursiveGrp.outPort := 0} ;
-  a -[]-> a {subprogGrp.recursiveGrpAccess.portGrp.recursiveGrp.outPort := 0} ;
   a -[]-> a {dataAccess.int := 0} ;
   a -[]-> a {dataAccessArray[0].int := 0} ;
   a -[]-> a {dataAccess.intArray[0][0] := 0} ;
   a -[]-> a {dataAccessArray[0].intArray[0][0] := 0} ;
   a -[]-> a {dataAccessGrp.dataAccess.int := 0} ;
   a -[]-> a {dataAccessGrp.dataAccess.intArray[0][0] := 0} ;
-  a -[]-> a {subprogGrp.dataAccessGrp.dataAccess.intArray[0][0] := 0} ;
   a -[]-> a {x := inPortA' count} ;
   a -[]-> a {bool1 := inPortA' fresh} ;
   a -[]-> a {x := inPortA ?} ;
@@ -197,19 +196,12 @@ transitions
   a -[]-> a {bool1 := portGrp.inPort' fresh} ;
   a -[]-> a {x := portGrp.inPort} ;
   a -[]-> a {x := portGrp.recursiveGrp.inPort} ;
-  a -[]-> a {x := subprogGrp.portGrp.inPort ?} ;
-  a -[]-> a {x := subprogGrp.portGrp.inPort' count} ;
-  a -[]-> a {bool1 := subprogGrp.portGrp.inPort' fresh} ;
-  a -[]-> a {x := subprogGrp.portGrp.inPort} ;
-  a -[]-> a {x := subprogGrp.portGrp.recursiveGrp.inPort} ;
-  a -[]-> a {x := subprogGrp.recursiveGrpAccess.portGrp.recursiveGrp.outPort' count} ;
   a -[]-> a {x := dataAccess.int} ;
   a -[]-> a {x := dataAccessArray[0].int} ;
   a -[]-> a {x := dataAccess.intArray[0][0]} ;
   a -[]-> a {x := dataAccessArray[0].intArray[0][0]} ;
   a -[]-> a {x := dataAccessGrp.dataAccess.int} ;
   a -[]-> a {x := dataAccessGrp.dataAccess.intArray[0][0]} ;
-  a -[]-> a {x := subprogGrp.dataAccessGrp.dataAccess.intArray[0][0]} ;
   a -[]-> a {subprogGrp.spg1[0] !} ;
   a -[]-> a {subprogGrp.spg2 ! (x, 0, y)} ;
   a -[]-> a {subprogGrp.subprog ! (x, 0, y)} ;
@@ -225,22 +217,12 @@ transitions
   a -[]-> a {portGrp.outPort ! (x)} ;
   a -[]-> a {portGrp.inPort >>} ;
   a -[]-> a {portGrp.inPort ? (x)} ;
-  a -[]-> a {subprogGrp.portGrp.outPort ! (x)} ;
-  a -[]-> a {subprogGrp.portGrp.inPort >>} ;
-  a -[]-> a {subprogGrp.portGrp.inPort ? (x)} ;
-  a -[]-> a {subprogGrp.recursiveGrp.portGrp.outPort ! (x)} ;
-  a -[]-> a {subprogGrp.recursiveGrp.portGrp.inPort >>} ;
-  a -[]-> a {subprogGrp.recursiveGrp.portGrp.inPort ? (x)} ;
-  a -[]-> a {subprogGrp.recursiveGrpAccess.portGrp.outPort ! (x)} ;
-  a -[]-> a {subprogGrp.recursiveGrpAccess.portGrp.inPort >>} ;
-  a -[]-> a {subprogGrp.recursiveGrpAccess.portGrp.inPort ? (x)} ;
-  a -[]-> a {threadGrpProt.subprogGrp.recursiveGrpAccess.portGrp.inPort ? (x)} ;
   a -[]-> a {dataAccessGrp.dataAccess !<} ;
   a -[]-> a {dataAccessGrp.dataAccess !>} ;
   a -[]-> a {dataAccessGrp.recursiveGrp.dataAccess !<} ;
   a -[]-> a {dataAccessGrp.recursiveGrp.dataAccess !>} ;
 **};
-  end thread1.impl;
+  end thread2.impl;
   
   process process1
   end process1;
@@ -259,11 +241,9 @@ transitions
   a -[]-> a {threadGrp.outPort := 0} ;
   a -[]-> a {threadGrp.portGrp.outPort := 0} ;
   a -[]-> a {threadGrp.recursiveGrp.portGrp.outPort := 0} ;
-  a -[]-> a {threadGrp.subprogGrpAccess.portGrp.outPort := 0} ;
   a -[]-> a {threadGrp.dataAccessGrp.dataAccess.intArray[0][0] := 0} ;
   a -[]-> a {threadGrp.recursiveGrp.dataAccessGrp.dataAccess.intArray[0][0] := 0} ;
   a -[]-> a {threadGrp.recursiveGrp.myStruct[0].intArray[0][0] := 0} ;
-  a -[]-> a {threadGrp.subprogGrpAccess.dataAccessGrp.dataAccess.intArray[0][0] := 0} ;
   a -[]-> a {x := threadGrp.inPort' count} ;
   a -[]-> a {bool1 := threadGrp.inPort' fresh} ;
   a -[]-> a {x := threadGrp.inPort ?} ;
@@ -273,7 +253,6 @@ transitions
   a -[]-> a {x := threadGrp.portGrp.inPort} ;
   a -[]-> a {x := threadGrp.portGrp.recursiveGrp.inPort} ;
   a -[]-> a {x := threadGrp.recursiveGrp.portGrp.recursiveGrp.inPort} ;
-  a -[]-> a {x := threadGrp.subprogGrpAccess.portGrp.recursiveGrp.inPort} ;
   a -[]-> a {x := threadGrp.dataAccessGrp.dataAccess.intArray[0][0]} ;
   a -[]-> a {x := threadGrp.myStruct[0].int} ;
   a -[]-> a {x := threadGrp.myStruct[0].intArray[0][0]} ;
@@ -292,15 +271,6 @@ transitions
   a -[]-> a {threadGrp.portGrp.outPort ! (x)} ;
   a -[]-> a {threadGrp.portGrp.inPort >>} ;
   a -[]-> a {threadGrp.portGrp.inPort ? (x)} ;
-  a -[]-> a {threadGrp.subprogGrp.portGrp.outPort ! (x)} ;
-  a -[]-> a {threadGrp.subprogGrp.portGrp.inPort >>} ;
-  a -[]-> a {threadGrp.subprogGrp.portGrp.inPort ? (x)} ;
-  a -[]-> a {threadGrp.subprogGrp.recursiveGrp.portGrp.outPort ! (x)} ;
-  a -[]-> a {threadGrp.subprogGrp.recursiveGrp.portGrp.inPort >>} ;
-  a -[]-> a {threadGrp.subprogGrp.recursiveGrp.portGrp.inPort ? (x)} ;
-  a -[]-> a {threadGrp.subprogGrp.recursiveGrpAccess.portGrp.outPort ! (x)} ;
-  a -[]-> a {threadGrp.subprogGrp.recursiveGrpAccess.portGrp.inPort >>} ;
-  a -[]-> a {threadGrp.subprogGrp.recursiveGrpAccess.portGrp.inPort ? (x)} ;
   a -[]-> a {threadGrp.dataAccessGrp.dataAccess !<} ;
   a -[]-> a {threadGrp.dataAccessGrp.dataAccess !>} ;
   a -[]-> a {threadGrp.dataAccessGrp.recursiveGrp.dataAccess !<} ;

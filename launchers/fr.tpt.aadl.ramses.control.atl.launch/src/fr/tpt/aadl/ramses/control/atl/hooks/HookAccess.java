@@ -23,6 +23,7 @@ package fr.tpt.aadl.ramses.control.atl.hooks ;
 
 import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.ecore.EObject ;
+import org.osate.aadl2.Classifier;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
 import org.osate.aadl2.Element ;
@@ -30,6 +31,8 @@ import org.osate.aadl2.Feature ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Port ;
 import org.osate.aadl2.PropertyAssociation ;
+import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.StringLiteral;
 import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorElement ;
@@ -51,84 +54,92 @@ public interface HookAccess extends EObject
 {
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @model
-	 * @generated
-	 */
+   * @model
+   * @generated
+   */
   EList<Feature> orderFeatures(ComponentType cpt) ;
 
   /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @model targetRequired="true" sourceRequired="true"
-	 * @generated
-	 */
+   * @model targetRequired="true" sourceRequired="true"
+   * @generated
+   */
   void copyLocationReference(Element target,
                              Element source) ;
-
     /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @model targetDeclarativeRequired="true" sourceInstanceRequired="true"
-	 * @generated
-	 */
+   * @model targetDeclarativeRequired="true" sourceInstanceRequired="true"
+   * @generated
+   */
   void addTransformationBackTrace(NamedElement targetDeclarative, NamedElement sourceInstance);
 
     /**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-	 * @model stateRequired="true" transitionRequired="true"
-	 * @generated
-	 */
+   * @model stateRequired="true" transitionRequired="true"
+   * @generated
+   */
   void putTransitionWhereSrc(BehaviorState state, BehaviorTransition transition);
 
 				/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @model portRequired="true"
-	 * @generated
-	 */
+   * @model portRequired="true"
+   * @generated
+   */
 	EList<Long> getCurrentPerionReadTable(FeatureInstance port);
 	
 	/**
-	* <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @model portRequired="true"
-	 * @generated
-	 */
-	Long getHyperperiod(FeatureInstance port);
+   * @model portRequired="true"
+   * @generated
+   */
+	long getHyperperiod(FeatureInstance port);
 	
 				/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @model dataType="org.osate.aadl2.String" required="true" namedElementRequired="true"
+   * @generated
+   */
+  String getTimingPrecision(NamedElement namedElement);
+
+        /**
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @model portRequired="true"
-	 * @generated
-	 */
+   * @model portRequired="true"
+   * @generated
+   */
 	EList<Long> getCurrentDeadlineWriteTable(FeatureInstance port, FeatureInstance destinationPort);
 
 				/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @model required="true" destinationFeatureInstanceRequired="true"
-	 * @generated
-	 */
+   * @model required="true" destinationFeatureInstanceRequired="true"
+   * @generated
+   */
 	long getBufferSize(FeatureInstance destinationFeatureInstance);
 
 				/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @model featureRequired="true"
-	 * @generated
-	 */
+   * @model featureRequired="true" directionDataType="org.osate.ba.aadlba.String"
+   * @generated
+   */
 	void setDirection(DirectedFeature feature, String direction);
 	
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	Boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName);
+   * @model dataType="org.osate.aadl2.Boolean" required="true" baRequired="true" operatorNameDataType="org.osate.aadl2.String" operatorNameRequired="true"
+   * @generated
+   */
+	boolean isUsedInSpecialOperator(BehaviorAnnex ba, Port p, String operatorName);
 
 	
 	NamedElement getElement(NamedElement ne);
@@ -142,5 +153,21 @@ public interface HookAccess extends EObject
 	public Integer minus (Long lhs, Long rhs);
 	
 	public EList<Port> allPortCount(BehaviorElement e);
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @model required="true" paRequired="true" stringLiteralValueDataType="org.osate.aadl2.String" stringLiteralValueRequired="true"
+   * @generated
+   */
+  StringLiteral getStringLiteral(PropertyAssociation pa, String stringLiteralValue);
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @model required="true" classifierRequired="true"
+   * @generated
+   */
+  PropertyAssociation getEnumerators(Classifier classifier);
 	
 } // HookAccess

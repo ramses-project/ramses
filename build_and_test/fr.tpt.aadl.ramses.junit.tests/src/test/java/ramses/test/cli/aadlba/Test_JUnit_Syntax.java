@@ -17,7 +17,9 @@ public class Test_JUnit_Syntax extends BaExamplesScenario
                                  "aadlBaTest002.aadl",
                                  "aadlBaTest003.aadl",
                                  "aadlBaTest004.aadl",
-                                 "aadlBaTest006.aadl"//, "aadlBaTest005.aadl"
+                                 "aadlBaTest005.aadl",
+                                 "aadlBaTest006.aadl",
+                                 "aadlBaTest007.aadl"
                                } ;
     
     _include = "tests/aadlba/input/covering_syntax" ;

@@ -12,7 +12,7 @@
     </eOperations>
     <eOperations name="addTransformationBackTrace" lowerBound="1">
       <eParameters name="targetDeclarative" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//NamedElement"/>
-      <eParameters name="sourceInstance" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/instance.ecore#//InstanceObject"/>
+      <eParameters name="sourceInstance" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//NamedElement"/>
     </eOperations>
     <eOperations name="putTransitionWhereSrc" lowerBound="1">
       <eParameters name="state" lowerBound="1" eType="ecore:EClass ../../org.osate.ba/model/aadlba.ecore#//BehaviorState"/>
@@ -32,7 +32,7 @@
       <eParameters name="feature" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//DirectedFeature"/>
       <eParameters name="direction" eType="ecore:EDataType ../../org.osate.ba/model/aadlba.ecore#//String"/>
     </eOperations>
-    <eOperations name="isUsedInSpecialOperator" lowerBound="1" eType="ecore:EDataType ../../org.osate.ba/model/aadlba.ecore#//Boolean">
+    <eOperations name="isUsedInSpecialOperator" lowerBound="1" eType="ecore:EDataType ../../org.osate.aadl2/model/aadl2.ecore#//Boolean">
       <eParameters name="ba" lowerBound="1" eType="ecore:EClass ../../org.osate.ba/model/aadlba.ecore#//BehaviorAnnex"/>
       <eParameters name="p" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Port"/>
       <eParameters name="operatorName" lowerBound="1" eType="ecore:EDataType ../../org.osate.aadl2/model/aadl2.ecore#//String"/>
@@ -48,6 +48,13 @@
     </eOperations>
     <eOperations name="allPortCount" upperBound="-1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Port">
       <eParameters name="e" lowerBound="1" eType="ecore:EClass ../../org.osate.ba/model/aadlba.ecore#//BehaviorElement"/>
+    </eOperations>
+    <eOperations name="getStringLiteral" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//StringLiteral">
+      <eParameters name="pa" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//PropertyAssociation"/>
+      <eParameters name="stringLiteralValue" lowerBound="1" eType="ecore:EDataType ../../org.osate.aadl2/model/aadl2.ecore#//String"/>
+    </eOperations>
+    <eOperations name="getEnumerators" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//PropertyAssociation">
+      <eParameters name="classifier" lowerBound="1" eType="ecore:EClass ../../org.osate.aadl2/model/aadl2.ecore#//Classifier"/>
     </eOperations>
   </eClassifiers>
 </ecore:EPackage>
