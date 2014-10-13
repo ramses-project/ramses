@@ -40,11 +40,10 @@ import org.eclipse.emf.ecore.impl.EObjectImpl ;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.eclipse.xtext.nodemodel.INode ;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
-import org.osate.aadl2.Classifier;
+import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
-import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
 import org.osate.aadl2.ListValue ;
@@ -319,15 +318,18 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	public void setDirection(DirectedFeature feature, String direction) {
 		if(direction.equals("in"))
 		{
-		  feature.setDirection(DirectionType.IN);
+		  feature.setIn(true);
+		  feature.setOut(false);
 		}
 		else if(direction.equals("out"))
 		{
-		  feature.setDirection(DirectionType.OUT);
+		  feature.setIn(false);
+      feature.setOut(true);
 		}
 		else
 		{
-		  feature.setDirection(DirectionType.IN_OUT);
+		  feature.setIn(true);
+      feature.setOut(true);
 		}
 	}
 
