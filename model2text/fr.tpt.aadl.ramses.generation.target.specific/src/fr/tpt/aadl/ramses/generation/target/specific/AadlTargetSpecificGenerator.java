@@ -291,8 +291,8 @@ public class AadlTargetSpecificGenerator implements Generator
 
     systemToInstantiate = xmlPilot.getOutputModelId() + ".impl" ;
     PublicPackageSection pps = (PublicPackageSection) systemInstance.
-                                                      getSystemImplementation().
-                                                      getOwner() ;
+                                                   getComponentImplementation().
+                                                   getOwner() ;
     AadlPackage p = (AadlPackage) pps.getOwner() ;
     final String initialPackageName = p.getName() ;
 

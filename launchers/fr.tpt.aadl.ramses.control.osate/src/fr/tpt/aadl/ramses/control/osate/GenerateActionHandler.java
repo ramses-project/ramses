@@ -245,8 +245,8 @@ public class GenerateActionHandler extends RamsesActionHandler {
     registry = ServiceProvider.getServiceRegistry() ;
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     
-    SystemImplementation sysImpl = sinst.getSystemImplementation() ;
-    
+    SystemImplementation sysImpl = (SystemImplementation) sinst.
+                                                  getComponentImplementation() ;
     
     String workflow = getConfigFile(sysImpl.eResource(), "workflow");
     
@@ -272,8 +272,10 @@ public class GenerateActionHandler extends RamsesActionHandler {
                          monitor) ;
     else
     {
-      EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(sinst.getSystemImplementation().eResource().getResourceSet(),
-                                                           workflow);
+      EcoreWorkflowPilot xmlPilot = new EcoreWorkflowPilot(
+                                             sinst.getComponentImplementation().
+                                                   eResource().getResourceSet(),
+                                                                      workflow);
       generator.generateWorkflow(sinst,
                                  config,
                                  xmlPilot,
