@@ -51,7 +51,7 @@ rule m_RootSystem_Instance {
 		c : AADLI!SystemInstance (c.category = #system and c.eContainer().oclIsUndefined())
 	using
 	{
-		src_package : AADLI!AadlPackage = c.systemImplementation.getNamespace().getOwner();
+		src_package : AADLI!AadlPackage = c.componentImplementation.getNamespace().getOwner();
 	}
 	to
 		section : AADLBA!PublicPackageSection (
@@ -64,12 +64,12 @@ rule m_RootSystem_Instance {
 	do
 	{
 		thisModule.allImportedUnits <- thisModule.allImportedUnits->including(src_package.ownedPublicSection.importedUnit);
-		if(AADLBA!SystemImplementation.allInstancesFrom('OUT')->contains(c.systemImplementation.resolve()))
-			c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()
+		if(AADLBA!SystemImplementation.allInstancesFrom('OUT')->contains(c.componentImplementation.resolve()))
+			c.componentImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()
 																		->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveMatchedSingleIfExists(p, 'p2')))
 																		->union(c.collectSelfPropertyAssociationImg())
 																		->excluding(OclUndefined);
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.componentImplementation.resolve(), c);
 	}
 }
 

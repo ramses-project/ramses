@@ -187,7 +187,7 @@ rule m_Subprogram_Type {
 
 helper context AADLI!SystemType def:  isRoot() : Boolean = 
 	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.oclIsTypeOf(AADLI!SystemInstance))
-			->exists(e| e.systemImplementation.type=self)
+			->exists(e| e.componentImplementation.type=self)
 ;
 
 -- @extends m_Component_Type

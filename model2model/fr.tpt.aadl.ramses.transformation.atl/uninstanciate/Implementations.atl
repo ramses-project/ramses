@@ -146,7 +146,7 @@ rule m_Process_Implementation {
 
 helper context AADLI!SystemImplementation def:  isRoot() : Boolean = 
 	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.oclIsTypeOf(AADLI!SystemInstance))
-			->exists(e| e.systemImplementation=self)
+			->exists(e| e.componentImplementation=self)
 ;
 
 helper context AADLI!ComponentInstance def: getSystemSubcomponent(): Sequence(AADLI!ComponentInstance) =

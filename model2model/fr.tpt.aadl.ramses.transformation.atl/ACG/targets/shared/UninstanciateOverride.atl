@@ -70,7 +70,7 @@ helper context AADLI!SystemType def : isInstanciated() : Boolean =
 ;
 
 helper context AADLI!SystemImplementation def: isInstanciated() : Boolean =
-	AADLI!SystemInstance.allInstancesFrom('IN')->exists(e| e.systemImplementation=self)
+	AADLI!SystemInstance.allInstancesFrom('IN')->exists(e| e.componentImplementation=self)
 ;
 
 helper context AADLI!FeatureInstance def: getOutputPortId(processInstance: AADLI!ComponentInstance): Integer = 

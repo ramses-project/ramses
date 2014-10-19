@@ -45,7 +45,7 @@ helper context AADLI!ComponentInstance def : getType() : AADLI!ComponentType =
 
 helper context AADLI!ComponentInstance def : getImpl() : AADLI!ComponentImplementation =
 	if (self.category = #system and self.eContainer().oclIsUndefined()) then
-		self.systemImplementation
+		self.componentImplementation
 	else
 		if (self.getSubcomponent().getClassifier().oclIsKindOf(AADLI!ComponentImplementation)) then
 			self.getSubcomponent().getClassifier()
@@ -93,7 +93,7 @@ helper context AADLI!ComponentInstance def : owner() : AADLI!ComponentInstance =
 
 helper context AADLI!ComponentInstance def : ownerImplImg() : AADLBA!ComponentImplementation = 
 	if (self.eContainer().category = #system) then
-		thisModule.resolveMatchedSingleIfExists(self.eContainer().systemImplementation, 'implImg')
+		thisModule.resolveMatchedSingleIfExists(self.eContainer().componentImplementation, 'implImg')
 	else
 		thisModule.resolveMatchedSingleIfExists(self.eContainer(), 'sub').getSubcomponentType()
 	endif

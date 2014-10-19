@@ -49,7 +49,7 @@ helper context AADLBA!BehaviorElement def: isThreadBehaviorElement(): Boolean =
 
 helper context AADLBA!BehaviorElement def: isPartOfBehaviorAnnexOf(c: AADLI!ComponentInstance): Boolean =
 	if(c.oclIsKindOf(AADLI!SystemInstance)) then
-		c.systemImplementation.getBA() = self.getBehaviorAnnex()
+		c.componentImplementation.getBA() = self.getBehaviorAnnex()
 	else
 		c.subcomponent.subcomponentType.getBA() = self.getBehaviorAnnex()
 	endif

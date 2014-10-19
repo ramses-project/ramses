@@ -132,7 +132,7 @@ rule m_Memory_Implementation {
 rule m_System_Type {
  from
  	type : AADLI!SystemType
-	(AADLI!ComponentInstance.allInstancesFrom('IN')->select(e| e.category=#system)->exists(e|e.systemImplementation.type=type))
+	(AADLI!ComponentInstance.allInstancesFrom('IN')->select(e| e.category=#system)->exists(e|e.componentImplementation.type=type))
  to
  	typeImg: AADLBA!SystemType
 	(
@@ -152,7 +152,7 @@ rule m_System_Type {
 rule m_System_Implementation {
   from
   	impl : AADLI!SystemImplementation
-	(AADLI!ComponentInstance.allInstancesFrom('IN')->select(e| e.category=#system)->exists(e|e.systemImplementation=impl))
+	(AADLI!ComponentInstance.allInstancesFrom('IN')->select(e| e.category=#system)->exists(e|e.componentImplementation=impl))
   to
   	implImg : AADLBA!SystemImplementation
 	(
