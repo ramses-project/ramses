@@ -442,17 +442,17 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_Monitor_changeState_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_Monitor_changeState_currentState#switch) Read_Blackboard_Exception ! (error_C1, error_C1_TimeOut, error_C1_localVariable, error_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_Monitor_changeState_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_Monitor_changeState_currentState#Enumerators.switch) Read_Blackboard_Exception ! (error_C1, error_C1_TimeOut, error_C1_localVariable, error_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
 Read_Blackboard_Exception ! (delayed_error_C2, delayed_error_C2_TimeOut, delayed_error_C2_localVariable, delayed_error_C2_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
 PingPong::Monitor_delayed_error_C1 ! (error_C1_localVariable, delayed_error_C1) ;
 PingPong::Monitor_changeState ! (delayed_error_C1, delayed_error_C2_localVariable, mode_C1_localVariable, mode_C2_localVariable, State_baKeywords, State_baKeywords) ;
-Parent_BA_currentState_Access := S1_inst_Monitor_changeState_currentState#switch ;
+Parent_BA_currentState_Access := S1_inst_Monitor_changeState_currentState#Enumerators.switch ;
 Display_Blackboard_ROLE ! (PortCnx1_mode_C1, mode_C1_localVariable, mode_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
 Display_Blackboard_ROLE ! (PortCnx2_mode_C1, mode_C1_localVariable, mode_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
 Display_Blackboard_ROLE ! (PortCnx3_mode_C1, mode_C1_localVariable, mode_C1_Length, S1_inst_Monitor_changeState_runtime_call_ret) ;
 Write_Sampling_Message_ROLE ! (PortCnx8_mode_C2, mode_C2_localVariable, mode_C2_Length, S1_inst_Monitor_changeState_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_Monitor_changeState_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_Monitor_changeState_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S1_inst_Monitor_changeState_runtime_call_ret)} ;
 **};
   end S1_inst_Monitor_changeState_entrypoint.impl;
@@ -556,12 +556,12 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_Monitor_delayed_error_C2_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_Monitor_delayed_error_C2_currentState#switch) Read_Sampling_Message_Exception ! (error_C2, error_C2_localVariable, error_C2_Length, error_C2_Validity, S1_inst_Monitor_delayed_error_C2_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_Monitor_delayed_error_C2_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_Monitor_delayed_error_C2_currentState#Enumerators.switch) Read_Sampling_Message_Exception ! (error_C2, error_C2_localVariable, error_C2_Length, error_C2_Validity, S1_inst_Monitor_delayed_error_C2_runtime_call_ret) ;
 PingPong::Monitor_delayed_error_C2 ! (error_C2_localVariable, delayed_error_C2_localVariable) ;
-Parent_BA_currentState_Access := S1_inst_Monitor_delayed_error_C2_currentState#switch ;
+Parent_BA_currentState_Access := S1_inst_Monitor_delayed_error_C2_currentState#Enumerators.switch ;
 Display_Blackboard_Exception ! (PortCnx11_delayed_error_C2, delayed_error_C2_localVariable, delayed_error_C2_Length, S1_inst_Monitor_delayed_error_C2_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_Monitor_delayed_error_C2_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_Monitor_delayed_error_C2_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S1_inst_Monitor_delayed_error_C2_runtime_call_ret)} ;
 **};
   end S1_inst_Monitor_delayed_error_C2_entrypoint.impl;
@@ -665,17 +665,17 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_IPingOrPong_Cping_ping_currentState#switch) Read_Blackboard_PingPongMessage ! (delayed_PongIn, delayed_PongIn_TimeOut, delayed_PongIn_localVariable, delayed_PongIn_Length, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_IPingOrPong_Cping_ping_currentState#Enumerators.switch) Read_Blackboard_PingPongMessage ! (delayed_PongIn, delayed_PongIn_TimeOut, delayed_PongIn_localVariable, delayed_PongIn_Length, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
 Read_Blackboard_ROLE ! (mode_aadlKeywords, mode_aadlKeywords_TimeOut, mode_aadlKeywords_localVariable, mode_aadlKeywords_Length, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
-if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPING) PingPong::IPingOrPong_Cping_ping ! (delayed_PongIn_localVariable, PingOut_localVariable.pvalue, badSequenceNumber_localVariable, seqNb, seqNb) end if
+if (mode_aadlKeywords_localVariable = PingPong::ROLE#Enumerators.E_ROLE_CPING) PingPong::IPingOrPong_Cping_ping ! (delayed_PongIn_localVariable, PingOut_localVariable.pvalue, badSequenceNumber_localVariable, seqNb, seqNb) end if
    ;
 PingOut_freshnessIndicator_access := PingOut_freshnessIndicator_access + 1 ;
 PingOut_localVariable.fresh_ba := PingOut_freshnessIndicator_access ;
-Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cping_ping_currentState#switch ;
+Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cping_ping_currentState#Enumerators.switch ;
 Write_Sampling_Message_PingPongMessage ! (PortCnx9_PingOut, PingOut_localVariable, PingOut_Length, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
 Display_Blackboard_Exception ! (PortCnx4_badSequenceNumber, badSequenceNumber_localVariable, badSequenceNumber_Length, S1_inst_IPingOrPong_Cping_ping_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S1_inst_IPingOrPong_Cping_ping_runtime_call_ret)} ;
 **};
   end S1_inst_IPingOrPong_Cping_ping_entrypoint.impl;
@@ -789,14 +789,14 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState#switch) Read_Sampling_Message_PingPongMessage ! (PongIn, PongIn_localVariable, PongIn_Length, PongIn_Validity, S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState#Enumerators.switch) Read_Sampling_Message_PingPongMessage ! (PongIn, PongIn_localVariable, PongIn_Length, PongIn_Validity, S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) ;
 Read_Blackboard_ROLE ! (mode_aadlKeywords, mode_aadlKeywords_TimeOut, mode_aadlKeywords_localVariable, mode_aadlKeywords_Length, S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) ;
-if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPING) PingPong::IPingOrPong_Cping_delayed_PongIn ! (PongIn_localVariable, delayed_PongIn_localVariable) end if
+if (mode_aadlKeywords_localVariable = PingPong::ROLE#Enumerators.E_ROLE_CPING) PingPong::IPingOrPong_Cping_delayed_PongIn ! (PongIn_localVariable, delayed_PongIn_localVariable) end if
    ;
-Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState#switch ;
+Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cping_delayed_PongIn_currentState#Enumerators.switch ;
 Display_Blackboard_PingPongMessage ! (PortCnx12_delayed_PongIn, delayed_PongIn_localVariable, delayed_PongIn_Length, S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S1_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret)} ;
 **};
   end S1_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint.impl;
@@ -902,16 +902,16 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_IPingOrPong_Cpong_pong_currentState#switch) Read_Sampling_Message_PingPongMessage ! (PingIn, PingIn_localVariable, PingIn_Length, PingIn_Validity, S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S1_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S1_inst_IPingOrPong_Cpong_pong_currentState#Enumerators.switch) Read_Sampling_Message_PingPongMessage ! (PingIn, PingIn_localVariable, PingIn_Length, PingIn_Validity, S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
 Read_Blackboard_ROLE ! (mode_aadlKeywords, mode_aadlKeywords_TimeOut, mode_aadlKeywords_localVariable, mode_aadlKeywords_Length, S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
-if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPONG) if ((PingIn_localVariable.fresh_ba != PingIn_freshnessIndicator_access)) PingPong::IPingOrPong_Cpong_pong ! (PingIn_localVariable.pvalue, PongOut_localVariable) end if
+if (mode_aadlKeywords_localVariable = PingPong::ROLE#Enumerators.E_ROLE_CPONG) if ((PingIn_localVariable.fresh_ba != PingIn_freshnessIndicator_access)) PingPong::IPingOrPong_Cpong_pong ! (PingIn_localVariable.pvalue, PongOut_localVariable) end if
    end if
    ;
 PingIn_freshnessIndicator_access := PingIn_localVariable.fresh_ba ;
-Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cpong_pong_currentState#switch ;
+Parent_BA_currentState_Access := S1_inst_IPingOrPong_Cpong_pong_currentState#Enumerators.switch ;
 Write_Sampling_Message_PingPongMessage ! (PortCnx10_PongOut, PongOut_localVariable, PongOut_Length, S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S1_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S1_inst_IPingOrPong_Cpong_pong_runtime_call_ret)} ;
 **};
   end S1_inst_IPingOrPong_Cpong_pong_entrypoint.impl;
@@ -1023,17 +1023,17 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S2_inst_IPingOrPong_Cping_ping_currentState#switch) Read_Blackboard_PingPongMessage ! (delayed_PongIn, delayed_PongIn_TimeOut, delayed_PongIn_localVariable, delayed_PongIn_Length, S2_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S2_inst_IPingOrPong_Cping_ping_currentState#Enumerators.switch) Read_Blackboard_PingPongMessage ! (delayed_PongIn, delayed_PongIn_TimeOut, delayed_PongIn_localVariable, delayed_PongIn_Length, S2_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
 Read_Sampling_Message_ROLE ! (mode_aadlKeywords, mode_aadlKeywords_localVariable, mode_aadlKeywords_Length, mode_aadlKeywords_Validity, S2_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
-if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPING) PingPong::IPingOrPong_Cping_ping ! (delayed_PongIn_localVariable, PingOut_localVariable.pvalue, badSequenceNumber_localVariable, seqNb, seqNb) end if
+if (mode_aadlKeywords_localVariable = PingPong::ROLE#Enumerators.E_ROLE_CPING) PingPong::IPingOrPong_Cping_ping ! (delayed_PongIn_localVariable, PingOut_localVariable.pvalue, badSequenceNumber_localVariable, seqNb, seqNb) end if
    ;
 PingOut_freshnessIndicator_access := PingOut_freshnessIndicator_access + 1 ;
 PingOut_localVariable.fresh_ba := PingOut_freshnessIndicator_access ;
-Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cping_ping_currentState#switch ;
+Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cping_ping_currentState#Enumerators.switch ;
 Write_Sampling_Message_PingPongMessage ! (PortCnx6_PingOut, PingOut_localVariable, PingOut_Length, S2_inst_IPingOrPong_Cping_ping_runtime_call_ret) ;
 Write_Sampling_Message_Exception ! (PortCnx8_badSequenceNumber, badSequenceNumber_localVariable, badSequenceNumber_Length, S2_inst_IPingOrPong_Cping_ping_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_IPingOrPong_Cping_ping_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S2_inst_IPingOrPong_Cping_ping_runtime_call_ret)} ;
 **};
   end S2_inst_IPingOrPong_Cping_ping_entrypoint.impl;
@@ -1152,14 +1152,14 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState#switch) Read_Sampling_Message_PingPongMessage ! (PongIn, PongIn_localVariable, PongIn_Length, PongIn_Validity, S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState#Enumerators.switch) Read_Sampling_Message_PingPongMessage ! (PongIn, PongIn_localVariable, PongIn_Length, PongIn_Validity, S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) ;
 Read_Sampling_Message_ROLE ! (mode_aadlKeywords, mode_aadlKeywords_localVariable, mode_aadlKeywords_Length, mode_aadlKeywords_Validity, S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) ;
-if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPING) PingPong::IPingOrPong_Cping_delayed_PongIn ! (PongIn_localVariable, delayed_PongIn_localVariable) end if
+if (mode_aadlKeywords_localVariable = PingPong::ROLE#Enumerators.E_ROLE_CPING) PingPong::IPingOrPong_Cping_delayed_PongIn ! (PongIn_localVariable, delayed_PongIn_localVariable) end if
    ;
-Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState#switch ;
+Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cping_delayed_PongIn_currentState#Enumerators.switch ;
 Display_Blackboard_PingPongMessage ! (PortCnx9_delayed_PongIn, delayed_PongIn_localVariable, delayed_PongIn_Length, S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_IPingOrPong_Cping_delayed_PongIn_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S2_inst_IPingOrPong_Cping_delayed_PongIn_runtime_call_ret)} ;
 **};
   end S2_inst_IPingOrPong_Cping_delayed_PongIn_entrypoint.impl;
@@ -1263,16 +1263,16 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S2_inst_IPingOrPong_Cpong_pong_currentState#switch) Read_Sampling_Message_PingPongMessage ! (PingIn, PingIn_localVariable, PingIn_Length, PingIn_Validity, S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
+  behavior_specification_1 [0] : BA_entrypoint_exec_state -[whichPortActivated = S2_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {if (Parent_BA_currentState_Access = S2_inst_IPingOrPong_Cpong_pong_currentState#Enumerators.switch) Read_Sampling_Message_PingPongMessage ! (PingIn, PingIn_localVariable, PingIn_Length, PingIn_Validity, S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
 Read_Sampling_Message_ROLE ! (mode_aadlKeywords, mode_aadlKeywords_localVariable, mode_aadlKeywords_Length, mode_aadlKeywords_Validity, S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret) ;
-if (mode_aadlKeywords_localVariable = PingPong::ROLE#E_ROLE_CPONG) if ((PingIn_localVariable.fresh_ba != PingIn_freshnessIndicator_access)) PingPong::IPingOrPong_Cpong_pong ! (PingIn_localVariable.pvalue, PongOut_localVariable) end if
+if (mode_aadlKeywords_localVariable = PingPong::ROLE#Enumerators.E_ROLE_CPONG) if ((PingIn_localVariable.fresh_ba != PingIn_freshnessIndicator_access)) PingPong::IPingOrPong_Cpong_pong ! (PingIn_localVariable.pvalue, PongOut_localVariable) end if
    end if
    ;
 PingIn_freshnessIndicator_access := PingIn_localVariable.fresh_ba ;
-Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cpong_pong_currentState#switch ;
+Parent_BA_currentState_Access := S2_inst_IPingOrPong_Cpong_pong_currentState#Enumerators.switch ;
 Write_Sampling_Message_PingPongMessage ! (PortCnx7_PongOut, PongOut_localVariable, PongOut_Length, S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := S2_inst_IPingOrPong_Cpong_pong_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (S2_inst_IPingOrPong_Cpong_pong_runtime_call_ret)} ;
 **};
   end S2_inst_IPingOrPong_Cpong_pong_entrypoint.impl;

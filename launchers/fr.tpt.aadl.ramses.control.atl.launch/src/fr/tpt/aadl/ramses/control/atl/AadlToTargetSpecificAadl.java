@@ -210,7 +210,7 @@ public abstract class AadlToTargetSpecificAadl extends AbstractAadlToAadl
     {
       uri = URI.createFileURI(outputFile.getAbsolutePath().toString()) ;
       xtextResource =
-            si.getSystemImplementation().eResource().getResourceSet()
+            si.getComponentImplementation().eResource().getResourceSet()
                   .getResource(uri, true) ;
       xtextResource.load(null) ;
 

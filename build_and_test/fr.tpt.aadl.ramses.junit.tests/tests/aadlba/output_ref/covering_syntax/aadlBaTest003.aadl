@@ -256,14 +256,14 @@ requiresAccessProto.myInt := providesAccessProto.myInt} ;
   a -[]-> a {outPortMyIntegerArray_A ! (localMyIntegerArray_B[0][0][0])} ;
   a -[]-> a {AnOtherSubprogConcrete ! (localMyStruct_A.int, localMyStruct_B, localMyIntegerArray_B[0][0][0])} ;
   a -[]-> a {subMyEnum_A := subMyEnum_B} ;
-  a -[]-> a {subMyEnum_A := MyEnum#monday} ;
+  a -[]-> a {subMyEnum_A := MyEnum#Enumerators.monday} ;
   a -[]-> a {for (i : MyStruct_A in localArrayMyStruct_A)
   {
     localMyStruct_A.float := i.float
   }
   } ;
-  a -[]-> a {localMyEnum := AadlBaTest::Types::Days.v1#monday ;
-localDay := MyEnum#monday ;
+  a -[]-> a {localMyEnum := AadlBaTest::Types::Days.v1#Enumerators.monday ;
+localDay := MyEnum#Enumerators.monday ;
 localMyEnum := localDay} ;
   a -[]-> a { := any} ;
   a -[]-> a { := any} ;

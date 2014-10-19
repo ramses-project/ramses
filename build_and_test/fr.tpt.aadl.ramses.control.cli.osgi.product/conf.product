@@ -3,15 +3,19 @@
 
 <product name="osate2-cli" uid="osate2-cli" id="fr.tpt.aadl.ramses.control.cli.osgi.product" application="fr.tpt.aadl.ramses.control.cli.osgi.application" version="1.0.0" useFeatures="false" includeLaunchers="true">
 
+
    <configIni use="">
    </configIni>
 
    <launcherArgs>
-      <programArgs>-consoleLog</programArgs>
-      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms40m -Xmx512m</vmArgs>
+      <programArgs>-consoleLog
+      </programArgs>
+      <vmArgs>-Dosgi.requiredJavaVersion=1.6 -XX:MaxPermSize=256m -Xms40m -Xmx512m
+      </vmArgs>
    </launcherArgs>
 
    <windowImages/>
+
 
    <launcher name="osate2-cli">
       <solaris/>
@@ -19,6 +23,7 @@
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
@@ -58,7 +63,6 @@
       <plugin id="fr.tpt.aadl.ramses.util.math"/>
       <plugin id="fr.tpt.aadl.ramses.util.properties"/>
       <plugin id="fr.tpt.aadl.sched.tools.aadlinspector"/>
-      <plugin id="fr.tpt.aadl.sched.tools.cheddar"/>
       <plugin id="fr.tpt.aadl.sched.wcetanalysis.results"/>
       <plugin id="fr.tpt.atl.hots"/>
       <plugin id="fr.tpt.atl.utils"/>

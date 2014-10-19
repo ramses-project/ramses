@@ -197,9 +197,9 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_sender_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
 Display_Blackboard_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, the_proc_the_sender_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_sender_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_sender_runtime_call_ret)} ;
 **};
   end the_proc_the_sender_entrypoint.impl;
@@ -256,10 +256,10 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_receiver_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Blackboard_Integer ! (p_in, p_in_TimeOut, p_in_localVariable, p_in_Length, p_in_ErrorCode) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Read_Blackboard_Integer ! (p_in, p_in_TimeOut, p_in_localVariable, p_in_Length, p_in_ErrorCode) ;
 if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_receiver_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc_the_receiver_runtime_call_ret)} ;
 **};
   end the_proc_the_receiver_entrypoint.impl;

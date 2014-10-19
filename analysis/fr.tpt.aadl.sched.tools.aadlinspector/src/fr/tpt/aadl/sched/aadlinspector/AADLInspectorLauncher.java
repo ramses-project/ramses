@@ -216,7 +216,8 @@ public class AADLInspectorLauncher
 		  extension = ".exe";
 		  BIN_PATH = BIN_PATH.replace('/', '\\');
 		}
-		final SystemImplementation si = root.getSystemImplementation();
+		final SystemImplementation si = (SystemImplementation) 
+		                                          root.getComponentImplementation();
 		final PublicPackageSection pps = (PublicPackageSection) si.eContainer();
 		final List<String> paths = new ArrayList<String>();
 		URI uri = si.eResource().getURI();

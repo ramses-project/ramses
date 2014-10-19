@@ -216,8 +216,9 @@ public class AadlTargetSpecificCodeGenerator
 
     List<SystemImplementation> systemInstanceList =
           new ArrayList<SystemImplementation>() ;
-    if(systemInstance.getSystemImplementation() != null)
-      systemInstanceList.add(systemInstance.getSystemImplementation()) ;
+    if(systemInstance.getComponentImplementation() != null)
+      systemInstanceList.add((SystemImplementation) systemInstance.
+                                                 getComponentImplementation()) ;
     for(ComponentInstance ci : systemInstance.getComponentInstances())
     {
       if(ci instanceof SystemInstance)

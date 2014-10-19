@@ -111,7 +111,7 @@ thread implementation Transmitter1_Thread.impl
       {
          Minimal_Example::Transmitter1_Init_Subprog ! ;
          Transmitter1_Thread_Routine ! (P1_Portvariable, P1_Monitor, P1_Mutex,
-                                        P1_Pending_Event_Chain, Period, Is_Alive) ;
+                                        P1_Pending_Event_Chain, Transmitter1_Thread.impl#Period, Is_Alive) ;
          Minimal_Example::Transmitter1_Finalization_Subprog !
       } ; 
    **} ;
@@ -222,7 +222,7 @@ thread implementation Transmitter2_Thread.impl
       {
          Minimal_Example::Transmitter2_Init_Subprog ! ;
          Transmitter2_Thread_Routine ! (P2_Portvariable, P2_Monitor, P2_Mutex,
-                                        P2_Pending_Event_Chain, Period, Is_Alive) ;
+                                        P2_Pending_Event_Chain, Transmitter2_Thread.impl#Period, Is_Alive) ;
          Minimal_Example::Transmitter2_Finalization_Subprog !
       } ; 
    **} ;

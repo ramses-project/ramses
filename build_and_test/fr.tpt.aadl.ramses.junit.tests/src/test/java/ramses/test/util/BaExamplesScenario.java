@@ -7,8 +7,6 @@ import java.io.IOException ;
 import java.util.ArrayList ;
 import java.util.List ;
 
-import junit.framework.AssertionFailedError ;
-
 public abstract class BaExamplesScenario extends BaScenario
 {
   protected String[] _inputArray ;
@@ -33,7 +31,7 @@ public abstract class BaExamplesScenario extends BaScenario
         {
           super.exec() ;
         }
-        catch(AssertionFailedError ee)
+        catch(AssertionError ee)
         {
           _failedTests.add(currentModel) ;
         }

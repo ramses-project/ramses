@@ -450,7 +450,7 @@ ANNEX behavior_specification {**
     switch : INITIAL COMPLETE STATE;
   TRANSITIONS
     unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
-    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cping )
+    IF ( mode_aadlKeywords=ROLE#Enumerators.E_ROLE_Cping )
     IPingOrPong_Cping_ping ! (delayed_PongIn,PingOut,badSequenceNumber,seqNb,seqNb)
     END IF
   };
@@ -474,7 +474,7 @@ ANNEX behavior_specification {**
     switch : INITIAL COMPLETE STATE;
   TRANSITIONS
     unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
-    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cping )
+    IF ( mode_aadlKeywords=ROLE#Enumerators.E_ROLE_Cping )
     IPingOrPong_Cping_delayed_PongIn ! (PongIn,delayed_PongIn)
     END IF
   };
@@ -498,7 +498,7 @@ ANNEX behavior_specification {**
     switch : INITIAL COMPLETE STATE;
   TRANSITIONS
     unnamed_B2 : switch -[ ON DISPATCH ]-> switch {
-    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cpong )
+    IF ( mode_aadlKeywords=ROLE#EnumeratorsE_ROLE_Cpong )
     IF ( PingIn'FRESH )
     IPingOrPong_Cpong_pong ! (PingIn,PongOut)
     END IF

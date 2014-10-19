@@ -51,7 +51,6 @@ import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManag
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
-import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 
 /**
  * This class provides services to the Command 
@@ -228,8 +227,10 @@ public class ToolSuiteLauncher
       System.exit(-1);
     }
 
-    EcoreWorkflowPilot workflowPilot = new EcoreWorkflowPilot(instance.getSystemImplementation().eResource().getResourceSet(),
-                                                         workflowFilePath);
+    EcoreWorkflowPilot workflowPilot = new EcoreWorkflowPilot(
+                                          instance.getComponentImplementation().
+                                                   eResource().getResourceSet(),
+                                                              workflowFilePath);
     
     generator.generateWorkflow(instance, config, workflowPilot, includeDirs,
                                ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER,
