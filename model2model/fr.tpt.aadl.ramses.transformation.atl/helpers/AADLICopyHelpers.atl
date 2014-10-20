@@ -73,7 +73,7 @@ helper context AADLI!InstanceObject def : uniqueName() : String =
 
 helper context AADLI!InstanceObject def : targetPackagePrefix() : String =
 	if (self.getSystemInstance().getComponentImplementation().eContainer().eContainer().oclIsKindOf(AADLI!AadlPackage)) then
-		self.getSystemInstance().getComponentlementation().eContainer().eContainer().name+thisModule.getPackageSuffix()+'__'
+		self.getSystemInstance().getComponentImplementation().eContainer().eContainer().name+thisModule.getPackageSuffix()+'__'
 	else
 		''
 	endif
