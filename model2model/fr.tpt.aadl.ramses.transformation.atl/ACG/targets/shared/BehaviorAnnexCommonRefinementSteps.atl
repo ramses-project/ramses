@@ -562,7 +562,7 @@ rule m_BehaviorActionsFromThread
   {
 	ba: AADLBA!BehaviorAnnex = src_transition.eContainer();
 	currentStateAccess: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'currentStateAccess');
-	stateType: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'stateType');
+	stateType: AADLBA!DataClassifier = thisModule.resolveMatchedTupleIfExists(Sequence{c,ba},'stateType');
 	-- FIXME: to be sorted according to priority.
 	sortedTransitions: Sequence(AADLBA!BehaviorTransition) = ba.transitions->sortedBy(e| 0.longValue().minus(e.priority));
   }
@@ -691,14 +691,7 @@ rule m_BehaviorActionsFromThread
 	(
 		element <- currentStateAccess
 	),
-	enumValueSourceStateFactor: AADLBA!Factor
-	(
-		firstValue <- thisModule.bindDatatypeEnumStringliteral
-					  (
-					    stateType,
-						src_transition.sourceState.name
-					  )
-	),
+	enumValueSourceStateFactor: AADLBA!Factor,
 	updateState: AADLBA!AssignmentAction
 	(
 		target <- updateStateAccessHolder,
@@ -725,13 +718,21 @@ rule m_BehaviorActionsFromThread
 		factors <- Sequence{enumValueTargetStateFactor}
 	),
 	enumValueTargetStateFactor: AADLBA!Factor
-	(
-		firstValue <- thisModule.bindDatatypeEnumStringliteral
+  do
+  {
+  	enumValueSourceStateFactor.firstValue
+					<- thisModule.bindDatatypeEnumStringliteral
+					  (
+					    stateType,
+						src_transition.sourceState.name
+					  );
+    enumValueTargetStateFactor.firstValue 
+					<- thisModule.bindDatatypeEnumStringliteral
 					  (
 					    stateType,
 						src_transition.destinationState.name
-					  )
-	)
+					  );
+  }
 }
 
 ---- @extends m_BehaviorActionsFromThread
@@ -1160,7 +1161,7 @@ rule m_SubprogramCallAction
 			subprogram <- src_communicationAction.subprogram.resolve(c),
 			parameterLabels <- src_communicationAction.parameterLabels
 								->collect(param | param.resolve(c)),
-			dataAccess <- src_communicationAction.dataAccess.resolve(c)
+			proxy <- src_communicationAction.proxy.resolve(c)
 		)
 }
 

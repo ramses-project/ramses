@@ -23,7 +23,7 @@ package fr.tpt.aadl.ramses.control.atl.hooks ;
 
 import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.ecore.EObject ;
-import org.osate.aadl2.Classifier;
+import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentType ;
 import org.osate.aadl2.DirectedFeature ;
 import org.osate.aadl2.Element ;
@@ -31,8 +31,7 @@ import org.osate.aadl2.Feature ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Port ;
 import org.osate.aadl2.PropertyAssociation ;
-import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.StringLiteral;
+import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorElement ;
@@ -160,7 +159,7 @@ public interface HookAccess extends EObject
    * @model required="true" paRequired="true" stringLiteralValueDataType="org.osate.aadl2.String" stringLiteralValueRequired="true"
    * @generated
    */
-  StringLiteral getStringLiteral(PropertyAssociation pa, String stringLiteralValue);
+  StringLiteral getStringLiteral(PropertyAssociation pah, String stringLiteralValue);
 
   /**
    * <!-- begin-user-doc -->

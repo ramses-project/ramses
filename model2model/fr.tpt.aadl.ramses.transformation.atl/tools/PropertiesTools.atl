@@ -282,6 +282,13 @@ lazy rule bindDatatypeEnumStringliteral
 	from
 		component: AADLI!Classifier,
 		stringLiteral: String
+	
+	using
+	{
+		enum: AADLI!PropertyValue = component.getEnumerators();
+	}
+	         	 
+		
 	to
 		classifierPropertyReference: AADLBA!ClassifierPropertyReference
 		(
@@ -294,7 +301,7 @@ lazy rule bindDatatypeEnumStringliteral
 		),
 		enumerators_PropertyAssociationHolder: AADLBA!PropertyAssociationHolder
 		(
-			element <- component.getEnumerators()
+			element <- enum
 		),		
 		bdes_propertyNameHolder: AADLBA!PropertyNameHolder
 		(
@@ -302,8 +309,11 @@ lazy rule bindDatatypeEnumStringliteral
 		),
 		bdes_PropertyExpressionHolder: AADLBA!PropertyExpressionHolder
 		(
-			element <- thisModule.getStringLiteral(enumerators_PropertyAssociationHolder.element,
+			element <- thisModule.getStringLiteral(enum,
 				                                   stringLiteral)
 		)
-     do {classifierPropertyReference;}
+     do 
+     {
+     	classifierPropertyReference;	
+     }
 }
