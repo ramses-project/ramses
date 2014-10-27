@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader ;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -260,4 +261,25 @@ public class Atl2EmftvmCompiler implements AtlStandaloneCompiler {
 
 		return nbErrors;
 	}
+
+  @Override
+  public CompileTimeError[] compile(Reader arg0, String arg1)
+  {
+    // TODO Auto-generated method stub
+    return null ;
+  }
+
+  @Override
+  public EObject[] compileWithProblemModel(Reader arg0, String arg1)
+  {
+    // TODO Auto-generated method stub
+    return null ;
+  }
+
+  @Override
+  public EObject[] compileWithProblemModel(Reader arg0, OutputStream arg1)
+  {
+    // TODO Auto-generated method stub
+    return null ;
+  }
 }

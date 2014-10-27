@@ -336,7 +336,7 @@ public class RdalParser {
       if(io instanceof SystemInstance)
       {
         SystemInstance si = (SystemInstance) io;
-        return si.getSystemImplementation().equals(neInRdal);
+        return si.getComponentImplementation().equals(neInRdal);
       }
       else if(io instanceof ComponentInstance)
       {

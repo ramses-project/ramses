@@ -145,7 +145,7 @@ rule m_Process_Implementation {
 }
 
 helper context AADLI!SystemImplementation def:  isRoot() : Boolean = 
-	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.oclIsTypeOf(AADLI!SystemInstance))
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.subcomponent.oclIsUndefined()).debug(' !!!!!!!! ')
 			->exists(e| e.componentImplementation=self)
 ;
 
@@ -181,28 +181,6 @@ rule m_System_Implementation {
 		ownedBusSubcomponent             <- impl.getSubcomponentsInstances('bus')->excluding(OclUndefined)
 	)
 }
-
---rule m_System_Implementation_NotRoot {
---  from
---  	impl : AADLI!SystemImplementation
---	(
---		not impl.isRoot()	
---	)
---  to
---  	implImg : AADLBA!SystemImplementation
---	(
---		name                              <- impl.name,
---		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory')->excluding(OclUndefined),
---		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor')->excluding(OclUndefined),
---		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device')->excluding(OclUndefined),
---		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor')->excluding(OclUndefined),
---		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process')->excluding(OclUndefined),
---		ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram')->excluding(OclUndefined),
---		ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system')->excluding(OclUndefined),
---		ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')->excluding(OclUndefined),
---		ownedBusSubcomponent             <- impl.getSubcomponentsInstances('bus')->excluding(OclUndefined)
---	)
---}
 
 --@extends m_Component_Implementation
 rule m_ThreadGroup_Implementation {

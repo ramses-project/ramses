@@ -85,11 +85,7 @@ public class GenerateActionHandler extends RamsesActionHandler {
       
       init(event, _OUTLINE_COMMAND_ID) ;
       
-      Resource r;
-      if(_sysImpl!=null)
-        r = _sysImpl.eResource();
-      else
-        r = _sysInst.eResource();
+      Resource r = _sysInst.eResource();
       String workflowFile = getConfigFile(r, "workflow");
 
       boolean foundGenerationPhase = false;
@@ -202,13 +198,6 @@ public class GenerateActionHandler extends RamsesActionHandler {
     
     instantiator.setProgressMonitor(monitor);
     
-    // For the executed command from outline menu,the system implementation 
-    // root has to be instantiated prior to the code generation.
-    if(_isOutline)
-    {
-      // Fetch instantiate the model.
-      _sysInst = instantiator.instantiate(_sysImpl) ;
-    }
     // For executed command from the button or the RAMSES menu,system
     // implementation has already been instantiated.
     

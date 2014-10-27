@@ -650,7 +650,7 @@ public class AadlTargetSpecificGenerator implements Generator
       IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry() ;
       IExtensionPoint extensionPoint =
           extensionRegistry
-          .getExtensionPoint(Names.RAMSES_SUPPORT_PLUGIN_ID,
+          .getExtensionPoint(Names.RAMSES_TARGET_SPECIFIC_PLUGIN_ID,
                              extensionId) ;
       if(extensionPoint!=null)
       {
@@ -663,7 +663,7 @@ public class AadlTargetSpecificGenerator implements Generator
 
           for(int j = 0 ; j < configElems.length ; j++)
           {
-            if(extensionId==Names.GENERATOR_EXT_ID)
+            if(extensionId==Names.LOOPMANAGER_EXT_ID)
             {
               try
               {
@@ -674,7 +674,9 @@ public class AadlTargetSpecificGenerator implements Generator
                                                             l, errManager,
                                                             workflowPilot, config,
                                                             monitor);
-                if(gen.getResolutionMethodName().equals(l.getMethod()))
+                String resolutionMethodName = gen.getResolutionMethodName();
+                String methodNameInWorkflow = l.getMethod().getName();
+                if(resolutionMethodName.equals(methodNameInWorkflow))
                 {
                   foundLoopManagementPlugin = true;
                   modelsMap.putAll(gen.processLoop());
@@ -685,7 +687,6 @@ public class AadlTargetSpecificGenerator implements Generator
                 ConfigStatus.NOT_FOUND.msg = "loop manager factory \'" + 
                     configElems[j].getName() +
                     "\' is not found" ;
-                throw new ConfigurationException(ConfigStatus.NOT_FOUND) ;
               }
             }
           }

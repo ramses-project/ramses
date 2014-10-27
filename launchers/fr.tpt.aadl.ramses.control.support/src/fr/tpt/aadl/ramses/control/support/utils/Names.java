@@ -29,6 +29,10 @@ public class Names
   public final static String RAMSES_SUPPORT_PLUGIN_ID =
                                           "fr.tpt.aadl.ramses.control.support" ;
   
+  public final static String RAMSES_TARGET_SPECIFIC_PLUGIN_ID =
+                               "fr.tpt.aadl.ramses.generation.target.specific" ;
+
+  
   public final static String ATL_TRANSFORMATION_PLUGIN_ID =
                                        "fr.tpt.aadl.ramses.transformation.atl" ;
 

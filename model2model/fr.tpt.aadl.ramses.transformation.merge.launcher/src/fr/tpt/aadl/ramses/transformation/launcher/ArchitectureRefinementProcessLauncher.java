@@ -362,8 +362,6 @@ public class ArchitectureRefinementProcessLauncher {
     // store the result of the selection: generate TIP
     TipUtils.addElementTransformationToLastIteration(getOutputDir()+getTipId(), resourceSet, TipUtils.getTipSpecification(), tuplesToApply);
 
-    if(false==this.transformationSelection.shouldSelectionContinue())
-      return null;
     
     
     _LOGGER.trace("Finished selection step");
