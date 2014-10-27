@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ManualSelection
-Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.selection.manual
+Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.selection.manual;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: fr.tpt.aadl.ramses.transformation.selection.manual.Activator
 Require-Bundle: org.eclipse.ui,
