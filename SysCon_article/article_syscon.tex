@@ -1,4 +1,3 @@
-
 \documentclass[conference]{IEEEtran}
 %
 %% article_syscon.tex
@@ -117,7 +116,7 @@ Email: firstname.name@telecom-paristech.fr}}
 
 \begin{abstract}
 The size and complexity of modern systems is rapidly increasing. Meanwhile, the ability to understand and maintain such systems is decreasing almost as fast.
-Model Driven Engineering (MDE) promotes the automation of design activities by means of model transformations, enabling to cope with systems complexity. However, the design space produced by the composition of these model transformations is difficult to explore automatically. The main reasons that make this exploration difficult are (i) the size of the design space; and (ii) the difficulty to prune inconsistent model transformations compositions.
+Model Driven Engineering (MDE) promotes the automation of design activities by means of model transformations, enabling to cope with systems complexity. However, the design space produced by the composition of these model transformations is difficult to explore automatically. The main reason that make this exploration difficult is the size of the design space : the number of possible design choices grows exponentially with the number of model transformation alternatives.
 This paper presents a MDA approach for design space exploration to deal with the ever-growing challenge of designing complex embedded systems. This approach allows the system architects to automatically select the most adequate model transformations compositions by using multi-objectives optimization evolutionary algorithms (MOEA) mechanisms.
 
 %modeling solution for their application, platform, and mapping between application and platform, in an integrated and simultaneous way and at a very early design stage, before system synthesis and code generation have been performed. 
@@ -149,28 +148,40 @@ This paper presents a MDA approach for design space exploration to deal with the
 \section{Introduction}
 Nowadays, modern systems become more and more large and complex and therefore more difficult to develop and maintain. For example, embedded critical systems which are often built to accomplish specific functionalities, can integrate thousands of buses, software and hardware components. To guarantee properties such as safety, availability and robustness makes the design of these systems very challenging and complicated.
 
-Model Driven Engineering (MDE) proposes the use of models as the key assets in the development of such systems, and hence all sorts of model modifications are needed. In this way, model transformations become one of the basic building blocks of MDE. Even though MDE is being successfully applied in many scenarios, it still needs appropriate mechanisms to handle the development of complex, large-scale systems. One such mechanism is a facility to make transformations reusable, so that we can apply them to different contexts. In this work, we use generic model transformation to model non-functional properties (NFP) of a system. This process will help us to predict NFP of a system before it development\cite{1291833}. This prediction can be exploited to drive decisions about which components should be used and how they should be connected so as to meet the NFP imposed on the design.
+Model Driven Engineering (MDE) proposes the use of models as the key assets in the development of such systems, and hence all sorts of model modifications are needed. In this way, model transformations become one of the basic building blocks of MDE. Even though MDE is being successfully applied in many scenarios, it still needs appropriate mechanisms to handle the development of complex, large-scale systems. One such mechanism is a facility to make transformations reusable, so that we can apply them to different contexts. In this work, we use generic model transformation to model design alternatives of the system. This process will help us to predict NFP of a system before it development\cite{1291833}. This prediction can be exploited to drive decisions about which components should be used and how they should be connected so as to meet the NFP imposed on the design.
 
-Moreover, an issue in modeling the NFP of a system is that, the NFP could conflict with each other. For example, improving the availability of a service is often done by replication of the service, which causes the decreasing of the response time of these services\cite{Yu:2001:CLA:502059.502038}. Developing a system that satisfies all its NFP simultaneously is often not possible : improving a NFP of a system can deteriorate another NFP. As a consequence, system architects have to come up with several design alternatives and select the optimal solution (Pareto optimal solutions) from all feasible alternatives through the trade-off analysis regarding all NFP\cite{Coello98acomprehensive}.
-In order to obtain the set of Pareto optimal alternatives, some advanced multi-objective optimization evolutionary algorithms (MOEA) have been proposed. These algorithm apply some fitness evaluations and generic operators of variation. Thus, they are applicable to search spaces (e.g. design space) taking into account domain specific characteristics of the problem (e.g. prediction of NFP). MOEA also provide selection operators which guide the search towards interesting regions of the search space. As a primary priority, these operators favorise non-dominated solutions : where a solution x1 is dominated by another solution x2 , if x2 matches or exceeds x1 in all objectives. As a secondary priority finding a diverse set of solutions on the Pareto front. 
+Moreover, an issue in modeling the NFP of a system is that, the NFP could conflict\footnote{improving one property can have a negative impact on other properties} with each other. For example, improving the availability of a service is often done by replication of the service, which causes the increasing of the response time of these services\cite{Yu:2001:CLA:502059.502038}. Developing a system that satisfies at best all its NFP simultaneously is often not possible : improving a NFP of a system can deteriorate another NFP. As a consequence, system architects have to come up with several design alternatives and select the optimal solution (Pareto optimal solutions) from all feasible alternatives through the trade-off analysis regarding all NFP\cite{Coello98acomprehensive}.
 
-Our approach, consists in improving the NFP of an architecture design through a generic method using model transformations compositions and advanced MOEA. This method will automate the search for optimal compositions from all feasible alternative. More specific, beginning with some initial architecture that specifies a set of NFP, design alternatives are generated by applying model transformation compositions\cite{Jouault:2005:TMA:2153686.2153705}. To get the best design alternatives, the model transformation rules enter into a meta-heuristic loop. That is, we generate transformation rules alternatives (TRA) through some genetic operations such as mutation and crossover. The models transformed by the selected TRA are evaluated and corresponding multiple NFP criteria of interests are obtained afterwards.
+In order to obtain the set of Pareto optimal alternatives, some advanced multi-objective optimization evolutionary algorithms (MOEA) have been proposed. These algorithm apply some fitness evaluations and generic operators of variation. Thus, they are applicable to search spaces (e.g. design space) taking into account domain specific characteristics of the problem (e.g. prediction of NFP). MOEA also provides selection operators which guide the search towards interesting regions of the search space by (i) favorizing non-dominated solutions : where a solution x1 is dominated by another solution x2 , if x2 matches or exceeds x1 in all objectives; (ii) finding a diverse set of solutions on the Pareto front.
 
-The remainder of this paper is organized as follows. Section~\ref{Problem} is dedicated to the problem statement. Section~\ref{Approach} gives an overview  of our approach. While Section~\ref{Adapting} details our approach. Section~\ref{Related} presents the related work. Finally, conclusions and perspectives are given in Section~\ref{Conclu}.
-%This paper is organized as follows. In Section~\ref{Problem} we explain the different issues to solve in this paper. Section~\ref{Approach} gives an overview of the idea of using MOEA. In Section~\ref{Adapting}, we illustrate how do we adapt the NSGA-II algorithm to our architecture design problem. Section~\ref{Related} describes related works and discusses in which respect it is different from ours. Finally, conclusions and perspectives are given in Section~\ref{Conclu}.
+Our approach, consists in improving the NFP of an architecture design through a generic method using model transformations compositions and advanced MOEA. This method will automate the search for optimal compositions from all feasible alternatives. More specific, beginning with some initial architecture that specifies a set of NFP, design alternatives are generated by applying model transformation compositions\cite{Jouault:2005:TMA:2153686.2153705}. To get the non-dominated alternatives, model transformation rules enter into a meta-heuristic loop. That is, we generate transformation rules alternatives (TRA) through some genetic operations such as mutation and crossover. The models transformed by the selected TRA are evaluated and corresponding multiple NFP criteria of interests are obtained after application of transformations in order to obtain more precise analysis.
 
+The reminder of this paper is organized as follows. Section~\ref{Problem} is dedicated to the problem statement. Section~\ref{Approach} gives an overview  of our approach. While Section~\ref{Adapting} details our approach. Section~\ref{Related} presents the related work.
+%The remainder of this paper is organized as follows. Section~\ref{Problem} is dedicated to the problem statement. Section~\ref{Approach} gives an overview  of our approach. While Section~\ref{Adapting} details our approach. Section~\ref{Related} presents the related work. Finally, conclusions and perspectives are given in Section~\ref{Conclu}.
 
 \section{Problem}
 \label{Problem}
-During the design of a safety-critical system, it is useful to model non functional objectives (NFP), such as reliability, availability or temporal performances, already in early stages of the development process. Early NFP modeling enables the developer of the system to make design decision based on analyses and simulations. But, one major difficulty is that these NFP can be in conflict with each other, that is, improving one NFP can have a negative impact on others. To construct a system that fulfils all its NFP simultaneously is often not possible. As a consequence, system architects have to consider several design alternatives, and identify a solution that fulfils most NFP (an optimal solution) from all feasible alternatives. A possible solution to this issue is to formalize design alternatives so they can be reusable in different products or projects (i.e. by using model transformation techniques). After the formalization step, explore the design space to identify the set of optimal model transformation alternatives : solutions that fulfils most NFP.
+During the design of a safety-critical system, it is useful to model non functional properties (NFP), such as reliability, availability or temporal performances, already in early stages of the development process. Early NFP modeling enables the developer of the system to make design decision based on analyses and simulations. But, one major difficulty is that these NFP can be in conflict with each other, that is, improving one NFP can have a negative impact on others. To construct a system that fulfils all its NFP simultaneously is often not possible. As a consequence, system architects have to consider several design alternatives, and identify a solution that fulfils most NFP (an optimal solution) from all feasible alternatives. 
 
-However, with a complex system and a larger design space, it is almost impossible for software architects to find optimal architecture designs. The exploration of such design space can be very difficult to do manually and error-prone. To overcome this issue, we propose an approach to assist architects throughout the modeling phase and automate the design space exploration by using existing multiple objective evolutionary algorithms (MOEA).
+A possible solution to this issue is to implement these design alternatives in a way that they can be seen as design patterns. Where each pattern implement a well-known architectural solution which fulfils a set of NFP. To formalize these design patterns in a way that allow their reuse in different projects or products we implement them as model transformations.
 
-Moreover, using MOEA to deal with design alternatives can be challenging. We have (i) to generalize the architecture design problem as a multiple objective optimization problem and, (ii) select the more suitable evolutionary algorithm to solve this optimization problem.
+%These design patterns are implemented as model transformations. It  which allows us to applied them to various sets of NFP
+
+%improving a set NFP, and solving the conflict between these NFP.  Model transformations are usually defined to be generic such as design patterns which allows us to applied them to various sets of NFP.
+
+
+%A set of model transformations that implement refinements or improvements of the source model, each of them focusing on increasing the satisfaction of a given goal (reducing power consumption, increasing availability, etc.). These model transformations can be seen as design patterns, each of them implementing a well-known solution to a given quality objective.
+
+
+%A possible solution to this issue is to formalize design alternatives so they can be reusable in different products or projects (i.e. by using model transformation techniques). After the formalization step, explore the design space to identify the set of optimal model transformation alternatives : solutions that fulfils most NFP.
+
+The second challenge in this work comes from the size of the design space to explore in order to study such NFP trade-offs. With a complex system and a larger design space, it is almost impossible for software architects to find optimal architecture designs. The exploration of such design space can be very difficult to do manually and error-prone. To overcome this issue, we propose an approach to assist architects throughout the modeling phase and automate the design space exploration by using existing multiple objective evolutionary algorithms (MOEA).
+
+Moreover, using MOEA to deal with mode transformations alternatives can be challenging. We have (i) to generalize the architecture design problem as a multiple objective optimization problem; (ii) select the more suitable evolutionary algorithm to solve this optimization problem; and (iii) adapting the notions of model transformation compositions to this evolutionary algorithm.
 
 \section{Using evolutionary algorithms for identifying good design alternatives}
 \label{Approach}
-Figure~\ref{IS} graphically illustrates the approach proposed in this paper by showing the process underlying it. As can be seen in Figure~\ref{IS}, the process starts with an initial input software architecture which could be designed by software architects by using some architecture design language\cite{Medvidovic}. After that, this architecture model is transformed into a set of alternative architecture models (more detailed models) which fulfils a set of NFP such as reliability, availability and response time. To reuse these models into different product, we formalize them by using model transformations and compositions techniques. The final step in Figure~\ref{IS} consists in exploring the design space composed of all model transformation compositions and select which transformation fulfil at best the NFP of the system. This step is done by using an advanced evolutionary algorithm.
+Figure~\ref{IS} graphically illustrates the approach proposed in this paper by showing the process underlying it. As can be seen in Figure~\ref{IS}, the process starts with an initial input software architecture which could be designed by software architects by using some architecture design language\cite{Medvidovic}. After that, this architecture model is transformed into a set of alternative architecture models (more detailed models) which fulfils a set of competing NFP such as reliability, availability and response time. To solve the trade-off between NFP we expressed the architecture alternatives as design patterns implemented by means of model transformations and compositions techniques. The final step in Figure~\ref{IS} consists in exploring the design space composed of all model transformation compositions and select which transformation fulfil at best the NFP of the system. This step is done by using an advanced evolutionary algorithm.
 
 \begin{figure}[!t]
 \centering
@@ -180,14 +191,16 @@ Figure~\ref{IS} graphically illustrates the approach proposed in this paper by s
 \end{figure}
 
 \subsection{System architecture modelisation}
-Since our application domain is embedded systems, we have chosen AADL (Architecture Analysis \& Design Language) as the underlying architecture description language. AADL has been designed on the foundation of the architecture description language MetaH and its goals are (i) specification of support model-based quality analysis (e.g. safety); and (ii) specification of design architectures for complex embedded systems. It offers a standardized semantics, mostly expressed using natural language and the components are composed hierarchically according to standardized composition rules. AADL also allows the designers to expand model by defining new property sets in their own specific way.
+%For software architecture modeling step, as a natural extension of previous work RAMSES and  we choose to use AADL (Architecture Analysis & Design Language) as the underlying architecture description language.
+
+Since our application domain is embedded systems, we have chosen AADL (Architecture Analysis \& Design Language) as the underlying architecture description language. AADL has been designed on the foundation of the architecture description language MetaH and its goals are (i) specification of quality analysis (e.g. safety); and (ii) design architectures for complex embedded systems. It offers a standardized semantics, mostly expressed using natural language and the components are composed hierarchically according to standardized composition rules. AADL also allows the designers to expand model by defining new property sets in their own specific way. The other reason of choosing AADL is to integrate our work in an existing framework RAMSES\footnote{Refinement of AADL Models for the Synthesis of Embdded Systems. \url{http://penelope.enst.fr/aadl/wiki/Projects}} which apply selection of design alternatives.
 
 \subsection{Multi-Objective Genetic Algorithm}
 In order to deal with the multi-objective nature of our problem (which model transformation achieve the best possible trade-off among NFP) we use MOEA. 
 Among the many MOEAs that have been proposed in the literature : NSGA-II\cite{Deb:2002:FEM:2221359.2221582}, SPEA2\cite{Zitzler01spea2:improving}, IBEA\cite{Zitzler04indicatorbasedselection}, only one have been considered in this work, namely NSGA-II (Non-dominated Sorting Genetic Algorithm). It was proposed in the early 90's and still considered today as one of the state-of-the-art MOEA for its robustness across a variety of application domain.
 
 \subsection{NSGA-II}
-NSGA-II is an improved version of NSGA\cite{Srinivas94multiobjectiveoptimization} (Non-dominated sorting genetic algorithm). It inherited the non-dominance concept from its old version and showed three innovations, (i) a crowding approach for diversity preservation; (ii) an elitism operator that helps in significantly speeding up the performance of the genetic algorithm (fast non-dominated sort); and (iii) an objective-wise distance computation. 
+NSGA-II is an improved version of NSGA\cite{Srinivas94multiobjectiveoptimization} (Non-dominated sorting genetic algorithm). It inherited the non-dominance concept from NSGA and showed three innovations, (i) a crowding approach for diversity preservation; (ii) an elitism operator that helps in significantly speeding up the performance of the genetic algorithm (fast non-dominated sort); and (iii) an objective-wise distance computation. 
 
 \begin{figure}[!t]
 \centering
@@ -196,11 +209,11 @@ NSGA-II is an improved version of NSGA\cite{Srinivas94multiobjectiveoptimization
 \label{nsgaii}
 \end{figure}
 
-Figure~\ref{nsgaii} gives an overview of how to use NSGA-II to automate the exploration of some design space. The steps of this algorithm are as follow :
+Figure~\ref{nsgaii} gives an overview of how to use NSGA-II to automate the exploration of complex systems design space. The steps of this algorithm are as follow :
 
 \begin{enumerate}
 \item Initially, Create a random parent population $P_{0}$ composed of N genomes (N = 3 in Figure~\ref{nsgaii}).
-\item After that sort this population based on a non domination criterion (e.g. reliability, availability and response time).
+\item Sort the current population based on a non domination criterion (e.g. reliability, availability and response time).
 \item For each non-dominated solution, assign a fitness (rank) equal to its non-domination level (1 is the best level, 2 is the next best level, and so on).
 \item Create a child population $Q_{0}$ of size N using binary tournament selection, recombination, and mutation operators.
 \item From the first generation onwards, creation of each new generation constitutes the following steps :
@@ -214,44 +227,19 @@ Figure~\ref{nsgaii} gives an overview of how to use NSGA-II to automate the expl
 
 \end{enumerate}
 
-%The solution we propose is to use the NSGA-II algorithm to search efficiently optimal architectures (which fulfil at best the NFP of the system) from the design space. The design space is formalized by using model transformations and the exploration in this space is done by the NSGA-II algorithm
-
-%transformation rules alternatives (TRA). Where 
-%Figure~\ref{EAA} gives an overview of how to use NSGA-II to optimize the result of the identification step. The optimization select from the output which alternative apply to satisfy at best the NFP. As we can seen if Figure~\ref{EAA}, The evolution usually starts from a population (parent) of randomly generated individuals, and is an iterative process, with the population in each iteration called a generation. 
-
-%In each generation we (i) evaluate the fitness of every individuals, (ii) select the more fit individuals, (iii) create an offspring population and (vi) modify each individuals by using some genetic operators. The algorithm terminates when either a maximum number of generations has been produced, or a satisfactory fitness level has been reached for the population.
-
-%\subsubsection{\textbf{Fitness evaluation}}
-%In each generation, the fitness of every individual is evaluated. The fitness is usually the value of the objective function in the optimization problem being solved. In our approach, the fitness $f_{i}(x)$ evaluates a specific NFP of the architecture, for example, $f_{1}$ the reliability, $f_{2}$ the availability and $f_{3}$ the response time. For example TRA11 = {1,2,2} : this transformation rule has the value 1 for the reliability, 2 for the availability and 2 for the response time.
-%A fitness function is a particular type of objective function that is used to summarise, as a single figure of merit, how close a given design solution is to achieving the set aims.
-
-%\subsubsection{\textbf{Selection}}
-%The selection step determines, which individuals are chosen for mating (recombination) and how many offspring each selected individual produces. Individuals are selected according to their fitness by means of one of the following algorithms : roulette-wheel selection, stochastic universal sampling, local selection, truncation selection or tournament selection. For example in Figure~\ref{EAA}, we select as individuals the transformation rules alternatives TRA11 and TRA12 since they have better fitness than others, TRA11 = {1,2,2} and TRA12 = {1,1,2}.
-
-%\subsubsection{\textbf{Offspring creation}}
-%This step consists in producing an offspring population (new individuals) by combining the current population, this process is called mating population. Depending on the representation of the variables of the individuals the following algorithms can be applied : Binary valued recombination, Real valued recombination or discrete recombination. From TRA11 and TRA12 we produce the set \{TRA11, TRA112, TRA121, TRA12\}.
-
-%\subsubsection{\textbf{Genetic operators}}
-%After the offspring creation, every individuals of this population undergoes mutation. Offspring variables are mutated by small perturbations (size of the mutation step), with low probability. In Figure~\ref{EAA} we mutate the population \{TRA11, TRA112, TRA121, TRA12\} into \{TRA111, TRA222, TRA221, TRA122\} by using a mutation operator.
-
-%The fitness of the offspring is then computed. The offspring are inserted into the population replacing the parents, producing a new generation. This cycle is performed until the optimization criteria are reached. In this paper we propose to adapt the genetic algorithm NSGA-II to solve the optimization quality problem. This step will be detailed in the next section.
-
-%The more fit individuals are stochastically selected from the current population, and each pair $<$Elements, Rule$>$ is modified (recombined and possibly randomly mutated) to form a new generation. The new generation of candidate solutions is then used in the next iteration of the algorithm. Commonly, the algorithm terminates when either a maximum number of generations has been produced, or a satisfactory fitness level has been reached for the population. In this paper we propose to adapt the genetic algorithm NSGA-II to solve the optimization quality problem. This step will be detailed in the next section.
-
-%To deal with multi-objective optimization problems a generic algorithm has to be adapted in the following ways. Firstly, the ranking of individuals in step 2 and 5 must include all objectives. One simple, but limited, approach is to use a weighted sum of the objective functions, where the weights represent customer preferences. Another approach uses the concept of dominating solutions, where a solution x1 is dominated by another solution x2 , if x2 matches or exceeds x1 in all objectives. Based on this concept, an integer value representing the number of dominating solutions can be assigned to each individual and the individuals with the lowest number are ranked best. Other ranking approaches can be found in the literature [9]. Secondly, diverse individuals should be selected for the next iteration in step 5, since we are interested in a broad set of solutions. This will result in a better chance to find a large set of Pareto-optimal solutions and help to avoid local optima.
-
-
-%in using multiple-objective genetic algorithms to optimize the result of the identification step and select from the output SOT which rules apply on which elements to satisfy at best the architectural requirements. So we see the architecture design problem as a multiple-objective optimization problem : $x$ represent the solution space which describes all possible architecture specifications that fulfil the requirements of the system : a discrete, combinatorial search space. In figure~\ref{MOEA_approach} $x$ represents the output of the identification step SOT. The non functional objectives to fulfil are : $f_{1}$ reliability, $f_{2}$ availability and $f_{3}$ response time. The conditions based on $g_{j}(x)$ and $h_{j}(x)$ with $j = 1, 2, ...K$ represents a number of constraints which any feasible solution must satisfy. 
-
-%There exists m = 3 objectives : $f_{1}$ reliability, $f_{2}$ availability and $f_{3}$ response time. The conditions based on $g_{j}(x)$ and $h_{j}(x) with j=1,2,...K$ represents a number of constraints which any feasible solution must satisfy. The aim is not to provide one optimal solution but rather to provide a large variety of non-dominated solutions, which represent trade-off in the objective space. The dominance relation is represented like follow :\\ 
-%a solution $x$ dominates a solution $x'$ is equivalent to $ \forall i \in {1,..,M} : f_{i}(x) \leq f_{i}(x')$ and \\
-%$ \exists j \in {1,..,M} : f_{j}(x) < f_{i}(x')$
-%Evolutionary algorithms are preferred for solving multi-objective optimization problems. These evolutionary algorithms follow the idea of natural evolution and try to optimize or improve a population of candidate solutions,
-
 \section{Compose model transformation alternatives by using NSGA-II}
 \label{Adapting}
 
 In this paper we propose a generic method to automate the search of optimal architectures (which fulfil at best the NFP of the system) from the design space. To represent the design space (set of architecture alternatives) we use model transformations compositions. The exploration step is done by using the NSGA-II algorithm.
+
+\subsection{Model transformations languages}
+In general, model transformations are grouped into two main categories of model transformation languages : (i) rule-based transformation languages, or (ii)
+imperative transformation languages. We used in our work the first category of languages since it express model transformation logics in a way that is easy to interpret and \textbf{adapt} in other methods (in this paper MOEA). To be continued by giving more explanations about rule-based transformations languages
+
+%Examples of rule-based transformation languages ATL (for Atlas Transformation Language) and QVT-R (for ).
+
+
+%such as ATL and QVT-R, are of great interest in our context since they express model transformation logics in a way that is easy to interpret and adapt. Indeed, modifying the pattern matching part of a transformation rule is sufficient to modify the set of elements this rule applies to. In addition, superimposition helps to combine different sets of rules [15]. Contrasting with rule-based formalisms, the adaptation of imperative transformation languages requires a deep understanding of the control flow graph that leads to the execution of one or another transformation. Model transformations we deal with in this paper are endogenous (AADL[13] to AADL model transformations) in order to refine or improve the architecture of an embedded system while representing the result of this refinement in an analyzable model (using AADL as an output language).
 
 \subsection{Genome representation}
 The first step of our work consists in applying the definition of the multi-objective optimization problem on our architecture design problem. Where the population to optimize or the design space represent a set of architecture alternatives and the objectives functions are $f_{1}:$ reliability, $f_{2}:$ availability and $f_{3}:$ response time. The architecture alternatives are formalized in a way that allow their reuse in different projects or products. To do so, we use model transformations methods. An issue in using such methods is their complexity : how to identify which elements of the input architecture model transformation alternatives can be applied. To ease the development and maintenance of such model transformations, we propose to use a rule-based transformation language and composition mechanisms. These languages define rules which define the mapping from source elements (elements of the software architecture) to target element (architecture alternative). 
@@ -281,7 +269,7 @@ In NSGA-II, in each iteration, the N genomes selected from the previous generati
 \subsubsection{\textbf{Binary tournament selection}}
 This operation consists of choosing some genomes at random in the population, and selecting the fittest two for reproduction. The selection criteria are the rank of the containing front and the crowding distance for solutions within the same front. Several tournaments are run to produce the N needed genomes.
 
-Figure~\ref{binary} illustrates this operation. We have four genomes (G1,G2,G3,G4) and we apply two tournaments to produce the needed genomes. The final genomes of the competition will always be the fittest genomes in the population. The more successful the genome is in competition, the more often that genome is expected to appear in the mating pool (In Figure~\ref{binary} the fittest genome is G4).
+Figure~\ref{binary} illustrates this operation. On this figure, we suppose we have four genomes (G1,G2,G3,G4) and we apply two tournaments to produce the needed genomes. The final genomes of the competition will always be the fittest genomes in the population. The more successful the genome is in competition, the more often that genome is expected to appear in the mating pool (In Figure~\ref{binary} the fittest genome is G4).
 
 \begin{figure}[!t]
 \centering
@@ -305,7 +293,7 @@ Figure~\ref{crossover} illustrates the result of applying the crossover operator
 
 \subsubsection{\textbf{Mutation}}
 After performing the crossover, the obtained solutions could be mutated with a given mutation probability.
-The mutation operator act on a single genome G1 to obtained a muted genome G11 as follows. The mutation operator selects a gene at random in the genome and changes its value. In Figure~\ref{mutation}, the third tile TRA13 is selected to mutate into TRA14 : we apply a different rule (i.e. rule4) to the set of selected elements.
+The mutation operator act on a single genome G1 to obtained a muted genome G11 acts as follows. The mutation operator selects a gene at random in the genome and changes its value. In Figure~\ref{mutation}, the third tile TRA13 is selected to mutate into TRA14 : we apply a different rule (i.e. rule4) to the set of selected elements.
 
 %In the genetic algorithm used in the evolutionary design system above the genotypes consist of 1's and 0's, applying the mutation operator to a genotype of this kind switches a randomly selected 1 to a 0 or vice versa. 
 %Indicating the core in the tile TRA as cs and ct as the core with which cs communicates most frequently, cs is remapped on a tile adjacent to Ts so as to reduce the distance between cs and ct . thus obtaining the mutated chromosome C0.
@@ -331,14 +319,21 @@ The mutation operator act on a single genome G1 to obtained a muted genome G11 a
 
 \section{Related Work}
 \label{Related}
-There is some existing works related to our contribution and they are different from our proposed approach. First, Grunske\cite{Gr5069138} framework called ArchOpteryx which use also evolutionary algorithms to deal with design alternatives selection. Unlike this method, our approach consider dependencies between model alternatives. There is also the DesignBots\cite{Diaz-Pace:2007:UPT:1784860.1784865}, where each transformation is not performed atomically unlike our approach. There is also the cyclic process\cite{Bosch99softwarearchitecture} to deal with the optimization of non-functional properties. The benefit of this process is its simplicity. The process can be tailored to different non-functional properties by using specific evaluation methods and architecture transformations. But this process focuses on only one non-functional property at a time unlike us who take into account several properties at a same time (e.g. reliability, availability and response time).
+Our work is based on system performance prediction\cite{1291833} by using model transformations techniques and multi-objective metaheuristic optimization\cite{Coello98acomprehensive}.
+
+Aleti et al.\cite{Gr5069138} have developed the ArchOpteryx framework. ArchOpteryx assists the system architects during the design to create architectures that meet non-functional properties by using multi-objective optimization strategies. Unlike this method, design alternatives are implemented as model transformations driven by NFP. Using model transformations help the design architects to (i) automating the system production; (ii) reusing architecture alternatives in other projects (or products) and (iii) solving the competition issue between NFP. Compared to DesignBots\cite{Diaz-Pace:2007:UPT:1784860.1784865}, in our method model transformations are not decomposed into subplans, each transformation is performed atomically.
+
+Koziolek et al.\cite{Koziolek:2011:PAA:2000259.2000267} have developed the Peropteryx framework for improvement of system architecture models using a metaheuristic search guided by architectural tactics.
+
+For the optimization of NFP another work consists at using a cyclic process\cite{Bosch99softwarearchitecture}. The benefit of this process is its simplicity. The process can be tailored to different non-functional properties by using specific evaluation methods and architecture transformations. But this process focuses on only one non-functional property at a time unlike us who take into account several properties at a same time (e.g. reliability, availability and response time).
 
 \section{Conclusion}
 \label{Conclu}
-An architecture design method has been presented that explicitly addresses the NFP put on the architecture. The proposed approach aims at improving system architecture models using two mechanisms. In one side model transformations compositions to ensure model design alternatives, which represent the design space. In the other side an elitist multiple-objective optimisation algorithm to explore this design space.
+An architecture design method has been presented that explicitly addresses the NFP put on the architecture. The proposed approach aims at improving system architecture models using two mechanisms. On the one hand, model transformations compositions to formalize model design alternatives. On the other hand, an elitist multiple-objective optimisation algorithm to explore this design space.
 
-The main benefits of this approach is to handle a large search spaces of quality optimization problems and to automate the identification of good architecture design alternatives. This will reduce development costs and improve the quality of the final system. Additionally this approach enables the ranking of design alternatives with respect to conflicting NFP and the possibility to reuse these alternatives in other projects or products by using model transformations.
-In the future, we plan to integrate our approach in an existing framework RAMSES\footnote{Refinement of AADL Models for the Synthesis of Embdded Systems. \url{http://penelope.enst.fr/aadl/wiki/Projects}} which apply selection of design alternatives. Also evaluate our approach in more details quantitatively (i.e. experimenting it on a an industrial case study).
+The main benefits of this approach is to handle a large search spaces of quality optimization problems and to automate the identification of good architecture design alternatives. This will reduce development costs and improve the quality of the final system. Additionally this approach enables the ranking of design alternatives with respect to conflicting NFP and the possibility to reuse these alternatives in other projects or products by reusing model transformations.
+
+In the future, we plan to integrate our approach in the framework RAMSES and evaluating our approach in more details quantitatively (i.e. experimenting it on a an industrial case study)\cite{greg}.
 
 %Older works and experiments have shown that evolutionary algorithms and multiobjective optimization strategies can be used to identify Pareto-optimal or near Pareto-optimal architecture designs, which can be used as an input for architecture trade-off analysis techniques. 
 
@@ -410,6 +405,13 @@ A.~G. Kleppe, J.~Warmer, and W.~Bast, \emph{MDA Explained: The Model Driven
   Architecture: Practice and Promise}.\hskip 1em plus 0.5em minus 0.4em\relax
   Boston, MA, USA: Addison-Wesley Longman Publishing Co., Inc., 2003.
 
+\bibitem{greg}
+G.~Loniewski, E.~Borde, D.~Blouin and E.Insfran {\'{}}, ``An Automated Approach for Architectural Model
+  Transformations,'' in \emph{Information Systems
+  Development, 22nd International Conference, {ISD} 2013,
+  Sevilla, Spain, September 2013. Proceedings}, 2013, pp. 295-306.
+  [Online]. Available: \url{http://infres.enst.fr/~borde/isd2013loniewski.pdf}
+
 \bibitem{Medvidovic}
 N.~Medvidovic and R.~N. Taylor, ``A classification and comparison framework for
   software architecture description languages,'' \emph{IEEE Trans. Softw.
@@ -440,9 +442,18 @@ E.~Zitzler, M.~Laumanns, and L.~Thiele, ``Spea2: Improving the strength pareto
 
 \bibitem{Zitzler04indicatorbasedselection}
 E.~Zitzler and S.~Künzli, ``Indicator-based selection in multiobjective
-  search,'' in \emph{in Proc. 8th International Conference on Parallel Problem
-  Solving from Nature (PPSN VIII}.\hskip 1em plus 0.5em minus 0.4em\relax
+  search,'' in \emph{in Proc. 22nd International Conference on Information Systems
+  Development (ISD 2013}.\hskip 1em plus 0.5em minus 0.4em\relax
   Springer, 2004, pp. 832--842.
+
+\bibitem{Koziolek:2011:PAA:2000259.2000267}
+A.~Koziolek, H.~Koziolek, and R.~Reussner, ``Peropteryx: Automated application
+  of tactics in multi-objective software architecture optimization,'' in
+  \emph{Proceedings of the Joint ACM SIGSOFT Conference -- QoSA and ACM SIGSOFT
+  Symposium -- ISARCS on Quality of Software Architectures -- QoSA and
+  Architecting Critical Systems -- ISARCS}, ser. QoSA-ISARCS '11.\hskip 1em
+  plus 0.5em minus 0.4em\relax New York, NY, USA: ACM, 2011, pp. 33--42.
+  [Online]. Available: \url{http://doi.acm.org/10.1145/2000259.2000267}
 
 \end{thebibliography}
 
