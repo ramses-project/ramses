@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  29 OCT 2014 16:04
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  29 OCT 2014 16:40
 entering extended mode
  %&-line parsing enabled.
 **article_syscon.tex
@@ -298,25 +298,24 @@ File: IDMT.pdf Graphic file (type pdf)
  <use IDMT.pdf> [2 <./IDMT.pdf>]
 <NSGAII.pdf, id=24, 1608.0075pt x 1301.86375pt>
 File: NSGAII.pdf Graphic file (type pdf)
- <use NSGAII.pdf> [3 <./NSGAII.pdf>] <genome.pdf, id=58, 1514.65875pt x 445.665
-pt>
+ <use NSGAII.pdf>
+<genome.pdf, id=26, 1514.65875pt x 445.665pt>
 File: genome.pdf Graphic file (type pdf)
- <use genome.pdf>
-<bt.pdf, id=60, 1751.54375pt x 893.3375pt>
+ <use genome.pdf> [3 <./NSGAII.pdf>] <bt.pdf, id=60, 1751.54375pt x 893.3375pt>
 File: bt.pdf Graphic file (type pdf)
  <use bt.pdf>
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 246.
+<crossover.pdf, id=62, 1341.01pt x 1496.59125pt>
+File: crossover.pdf Graphic file (type pdf)
+ <use crossover.pdf>
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 253.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 246.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 253.
 
-<crossover.pdf, id=62, 1341.01pt x 1496.59125pt>
-File: crossover.pdf Graphic file (type pdf)
- <use crossover.pdf>
 <mutation.pdf, id=64, 1687.30376pt x 898.35625pt>
 File: mutation.pdf Graphic file (type pdf)
  <use mutation.pdf> [4 <./genome.pdf> <./bt.pdf>]
@@ -359,7 +358,7 @@ amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
 re/texmf-texlive/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fo
 nts/type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/
 utmri8a.pfb>
-Output written on article_syscon.pdf (6 pages, 329264 bytes).
+Output written on article_syscon.pdf (6 pages, 329270 bytes).
 PDF statistics:
  148 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

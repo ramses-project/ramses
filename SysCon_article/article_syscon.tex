@@ -167,7 +167,7 @@ Among the many MOEAs that have been proposed in the literature : NSGA-II\cite{De
 \subsection{NSGA-II}
 NSGA-II is an improved version of NSGA\cite{Srinivas94multiobjectiveoptimization} (Non-dominated sorting genetic algorithm). It inherited the non-dominance concept from NSGA and showed three innovations, (i) a crowding approach for diversity preservation; (ii) an elitism operator that helps in significantly speeding up the performance of the genetic algorithm (fast non-dominated sort); and (iii) an objective-wise distance computation. 
 
-\begin{figure}[!t]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=3.49in]{NSGAII.pdf}
 \caption{Schema of the NSGA-II algorithm}
@@ -207,16 +207,17 @@ We used in our work the first category of languages since it more easy to adapt 
 A rule-based transformation $T$ is generally composed of a set of transformation rules $(TR_{j}, j \in {1,2,..,n})$. Each transformation rule $TR_{j}$ is defined by a pair $<E_{j},R_{j}>$, where $E_{j}$ is the scope of the transformation rule $TR_{j}$ : the set of elements from the input model the transformation rule $TR_{j}$ can be applied to. And $R_{j}$ is the set of rules or actions which $TR_{j}$ executes when it is applied to an element of $E_{j}$ (i.e. creation of elements in the target model).
 
 \subsection{Genome representation}
-The first step of our work consists in applying the definition of the multi-objective optimization problem on our architecture design problem. Where the population to optimize or the design space represent a set of architecture alternatives and the objectives functions are $f_{1}:$ reliability, $f_{2}:$ availability and $f_{3}:$ response time. The architecture alternatives are formalized in a way that allow their reuse in different projects or products. To do so, we use model transformations mechanisms. An issue in using such methods is their complexity : how to identify which elements of the input architecture model transformation alternatives can be applied. To ease the development and maintenance of such model transformations, we propose to use a rule-based transformation languages and composition mechanisms. 
 
-In our approach we have several Transformation Rules Alternatives (TRA). They represent the genomes to optimize in our multi-objective problem. Figure~\ref{genome} gives an overview of these genomes. Each genome $G_{i}, i \in {1,2,...,n}$ is composed of a set of TRA $(G = {TRA_{i}, i \in {1,2,...n}})$. Each $TRA_{i}$ is, in turn, encoded as a pair $TRA_{i} = <Elements_{i},Rule_{i}>$ where $Elements_{i} (i ={1,2,...,n})$ is a list of elements from the input model, and $Rule_{i} (i ={1,2,...,n})$ is a transformation rule which can be applied to $Elements_{i}$.
-
-\begin{figure}[!t]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=3.49in]{genome.pdf}
 \caption{Genome overview}
 \label{genome}
 \end{figure}
+
+The first step of our work consists in applying the definition of the multi-objective optimization problem on our architecture design problem. Where the population to optimize or the design space represent a set of architecture alternatives and the objectives functions are $f_{1}:$ reliability, $f_{2}:$ availability and $f_{3}:$ response time. The architecture alternatives are formalized in a way that allow their reuse in different projects or products. To do so, we use model transformations mechanisms. An issue in using such methods is their complexity : how to identify which elements of the input architecture model transformation alternatives can be applied. To ease the development and maintenance of such model transformations, we propose to use a rule-based transformation languages and composition mechanisms. 
+
+In our approach we have several Transformation Rules Alternatives (TRA). They represent the genomes to optimize in our multi-objective problem. Figure~\ref{genome} gives an overview of these genomes. Each genome $G_{i}, i \in {1,2,...,n}$ is composed of a set of TRA $(G = {TRA_{i}, i \in {1,2,...n}})$. Each $TRA_{i}$ is, in turn, encoded as a pair $TRA_{i} = <Elements_{i},Rule_{i}>$ where $Elements_{i} (i ={1,2,...,n})$ is a list of elements from the input model, and $Rule_{i} (i ={1,2,...,n})$ is a transformation rule which can be applied to $Elements_{i}$.
 
 \subsection{Genome evaluation}
 In each generation, the fitness of every genome in the population is evaluated. The fitness is usually the value of the objective function in the optimization problem being solved. We defined in our work one fitness function corresponding to three objectives reliability, availability and response time.
@@ -230,38 +231,38 @@ In NSGA-II, in each iteration, the N genomes selected from the previous generati
 \subsubsection{\textbf{Binary tournament selection}}
 This operation consists of choosing some genomes at random in the population, and selecting the fittest two for reproduction. The selection criteria are the rank of the containing front and the crowding distance for solutions within the same front. Several tournaments are run to produce the N needed genomes.
 
-Figure~\ref{binary} illustrates this operation. On this figure, we suppose we have four genomes (G1,G2,G3,G4) and we apply two tournaments to produce the needed genomes. The final genomes of the competition will always be the fittest genomes in the population. The more successful the genome is in competition, the more often that genome is expected to appear in the mating pool (In Figure~\ref{binary} the fittest genome is G4).
-
-\begin{figure}[!t]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=3.49in]{bt.pdf}
 \caption{Tournament Competition between Genomes}
 \label{binary}
 \end{figure}
 
+Figure~\ref{binary} illustrates this operation. On this figure, we suppose we have four genomes (G1,G2,G3,G4) and we apply two tournaments to produce the needed genomes. The final genomes of the competition will always be the fittest genomes in the population. The more successful the genome is in competition, the more often that genome is expected to appear in the mating pool (In Figure~\ref{binary} the fittest genome is G4).
 
 \subsubsection{\textbf{Crossover}}
 The crossover consists of producing new genomes from the existing ones. When two genomes are selected using the binary tournament selection, two offspring solutions are created, with a given crossover probability, by exchanging parts of the parent genomes. This consists in randomly selecting a cut point in the genome vector, and all the target fragments beyond that point in either parent are swapped between the two parents.
 
-Figure~\ref{crossover} illustrates the result of applying the crossover operator to two parent genomes G1 and G2 respectively composed of \{TRA11,TRA12,TRA13\} and \{TRA21,TRA22,TRA23\} to produce a new genome G3. As can be seen in Figure~\ref{crossover}, this operator combines G1 and G2 by selecting a single point on the genome and swapping the genes between the two genomes that lie beyond this point. 
-
-\begin{figure}[!t]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=3.49in]{crossover.pdf}
 \caption{Crossover operator}
 \label{crossover}
 \end{figure}
 
+Figure~\ref{crossover} illustrates the result of applying the crossover operator to two parent genomes G1 and G2 respectively composed of \{TRA11,TRA12,TRA13\} and \{TRA21,TRA22,TRA23\} to produce a new genome G3. As can be seen in Figure~\ref{crossover}, this operator combines G1 and G2 by selecting a single point on the genome and swapping the genes between the two genomes that lie beyond this point. 
+
 \subsubsection{\textbf{Mutation}}
 After performing the crossover, the obtained solutions could be mutated with a given mutation probability.
-The mutation operator act on a single genome G1 to obtained a muted genome G11 acts as follows. The mutation operator selects a gene at random in the genome and changes its value. In Figure~\ref{mutation}, the third tile TRA13 is selected to mutate into TRA14 : we apply a different rule (i.e. rule4) to the set of selected elements.
 
-\begin{figure}[!t]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=3.49in]{mutation.pdf}
 \caption{Mutation operator}
 \label{mutation}
 \end{figure}
+
+The mutation operator act on a single genome G1 to obtained a muted genome G11 acts as follows. The mutation operator selects a gene at random in the genome and changes its value. In Figure~\ref{mutation}, the third tile TRA13 is selected to mutate into TRA14 : we apply a different rule (i.e. rule4) to the set of selected elements.
 
 \section{Related Work}
 \label{Related}
