@@ -233,19 +233,20 @@ Figure~\ref{nsgaii} gives an overview of how to use NSGA-II to automate the expl
 In this paper we propose a generic method to automate the search of optimal architectures (which fulfil at best the NFP of the system) from the design space. To represent the design space (set of architecture alternatives) we use model transformations compositions. The exploration step is done by using the NSGA-II algorithm.
 
 \subsection{Model transformations languages}
-In general, model transformations are grouped into two main categories of model transformation languages : (i) rule-based transformation languages, or (ii)
-imperative transformation languages. We used in our work the first category of languages since it express model transformation logics in a way that is easy to interpret and \textbf{adapt} in other methods (in this paper MOEA). To be continued by giving more explanations about rule-based transformations languages
+In major cases, model transformations are grouped into two main categories of model transformation languages : (i) rule-based transformation languages, or (ii) imperative transformation languages\cite{Gorp06integratinga}.
 
-%Examples of rule-based transformation languages ATL (for Atlas Transformation Language) and QVT-R (for ).
+The first category express model transformation logics in a way that is easy to interpret and \textbf{adapt}. It permit to modify the pattern matching part of a transformation rule $TR$ which is sufficient to modify the set of elements this rule applies to. In contrary, the adaptation of imperative transformation languages are more difficult and requires a deep understanding of the control flow graph that leads to the execution of one or another transformation.
 
+We used in our work the first category of languages since it more easy to adapt in other methods (in this paper MOEA). Where model transformations are endogenous : the source and target models are the same. In our work we use a AADL to AADL model transformations in order to refine or improve the architecture of an embedded system while representing the result of this refinement in an analyzable model. More specific, we use the rule-based transformation language ATL (for Atlas Transformation Language).
 
-%such as ATL and QVT-R, are of great interest in our context since they express model transformation logics in a way that is easy to interpret and adapt. Indeed, modifying the pattern matching part of a transformation rule is sufficient to modify the set of elements this rule applies to. In addition, superimposition helps to combine different sets of rules [15]. Contrasting with rule-based formalisms, the adaptation of imperative transformation languages requires a deep understanding of the control flow graph that leads to the execution of one or another transformation. Model transformations we deal with in this paper are endogenous (AADL[13] to AADL model transformations) in order to refine or improve the architecture of an embedded system while representing the result of this refinement in an analyzable model (using AADL as an output language).
+A rule-based transformation $T$ is generally composed of a set of transformation rules $(TR_{j}, j \in {1,2,..,n})$. Each transformation rule $TR_{j}$ is defined by a pair $<E_{j},R_{j}>$, where $E_{j}$ is the scope of the transformation rule $TR_{j}$ : the set of elements from the input model the transformation rule $TR_{j}$ can be applied to. And $R_{j}$ is the set of rules or actions which $TR_{j}$ executes when it is applied to an element of $E_{j}$ (i.e. creation of elements in the target model).
 
 \subsection{Genome representation}
-The first step of our work consists in applying the definition of the multi-objective optimization problem on our architecture design problem. Where the population to optimize or the design space represent a set of architecture alternatives and the objectives functions are $f_{1}:$ reliability, $f_{2}:$ availability and $f_{3}:$ response time. The architecture alternatives are formalized in a way that allow their reuse in different projects or products. To do so, we use model transformations methods. An issue in using such methods is their complexity : how to identify which elements of the input architecture model transformation alternatives can be applied. To ease the development and maintenance of such model transformations, we propose to use a rule-based transformation language and composition mechanisms. These languages define rules which define the mapping from source elements (elements of the software architecture) to target element (architecture alternative). 
+The first step of our work consists in applying the definition of the multi-objective optimization problem on our architecture design problem. Where the population to optimize or the design space represent a set of architecture alternatives and the objectives functions are $f_{1}:$ reliability, $f_{2}:$ availability and $f_{3}:$ response time. The architecture alternatives are formalized in a way that allow their reuse in different projects or products. To do so, we use model transformations mechanisms. An issue in using such methods is their complexity : how to identify which elements of the input architecture model transformation alternatives can be applied. To ease the development and maintenance of such model transformations, we propose to use a rule-based transformation languages and composition mechanisms. 
 
-In our approach we call these rules TRA (Transformation Rules Alternatives). They represent the genomes to optimize in our multi-objective problem. Figure~\ref{genome} gives an overview of these genomes. Each genome $G_{i}, i \in {1,2,...,n}$ is composed of a set of TRA $(G = {TRA_{i}, i \in {1,2,...n}})$. Each $TRA_{i}$ is, in turn, encoded as a pair $TRA_{i} = <Elements_{i},Rule_{i}>$ where $Elements_{i} (i ={1,2,...,n})$ is a list of elements from the input model, and $Rule_{i} (i ={1,2,...,n})$ is a transformation rule which can be applied to $Elements_{i}$.
+In our approach we have several Transformation Rules Alternatives (TRA). They represent the genomes to optimize in our multi-objective problem. Figure~\ref{genome} gives an overview of these genomes. Each genome $G_{i}, i \in {1,2,...,n}$ is composed of a set of TRA $(G = {TRA_{i}, i \in {1,2,...n}})$. Each $TRA_{i}$ is, in turn, encoded as a pair $TRA_{i} = <Elements_{i},Rule_{i}>$ where $Elements_{i} (i ={1,2,...,n})$ is a list of elements from the input model, and $Rule_{i} (i ={1,2,...,n})$ is a transformation rule which can be applied to $Elements_{i}$.
 
+%These languages define rules which define the mapping from source elements (elements of the software architecture) to target element (architecture alternative). 
 
 \begin{figure}[!t]
 \centering
@@ -321,6 +322,10 @@ The mutation operator act on a single genome G1 to obtained a muted genome G11 a
 \label{Related}
 Our work is based on system performance prediction\cite{1291833} by using model transformations techniques and multi-objective metaheuristic optimization\cite{Coello98acomprehensive}.
 
+\subsection{model transformations techniques}
+Recently, several works 
+
+\subsection{multi-objective metaheuristic optimization}
 Aleti et al.\cite{Gr5069138} have developed the ArchOpteryx framework. ArchOpteryx assists the system architects during the design to create architectures that meet non-functional properties by using multi-objective optimization strategies. Unlike this method, design alternatives are implemented as model transformations driven by NFP. Using model transformations help the design architects to (i) automating the system production; (ii) reusing architecture alternatives in other projects (or products) and (iii) solving the competition issue between NFP. Compared to DesignBots\cite{Diaz-Pace:2007:UPT:1784860.1784865}, in our method model transformations are not decomposed into subplans, each transformation is performed atomically.
 
 Koziolek et al.\cite{Koziolek:2011:PAA:2000259.2000267} have developed the Peropteryx framework for improvement of system architecture models using a metaheuristic search guided by architectural tactics.
@@ -385,6 +390,11 @@ J.~A. D\'{\i}az-Pace and M.~R. Campo, ``Using planning techniques to assist
   1em plus 0.5em minus 0.4em\relax Berlin, Heidelberg: Springer-Verlag, 2007,
   pp. 33--52. [Online]. Available:
   \url{http://dl.acm.org/citation.cfm?id=1784860.1784865}
+
+\bibitem{Gorp06integratinga}
+P.~V. Gorp, O.~Muliawan, D.~Janssens, P.~V. Gorp, O.~Muliawan, and D.~Janssens,
+  ``Integrating a declarative with an imperative model transformation
+  language,'' 2006.
 
 \bibitem{Johnsen1753}
 A.~Johnsen and K.~Lundqvist, ``Developing dependable software-intensive

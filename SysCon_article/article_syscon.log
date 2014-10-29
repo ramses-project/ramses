@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  28 OCT 2014 18:09
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  29 OCT 2014 11:49
 entering extended mode
  %&-line parsing enabled.
 **article_syscon.tex
@@ -305,28 +305,25 @@ File: genome.pdf Graphic file (type pdf)
 <bt.pdf, id=60, 1751.54375pt x 893.3375pt>
 File: bt.pdf Graphic file (type pdf)
  <use bt.pdf>
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 285.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 286.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 285.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 286.
 
 <crossover.pdf, id=62, 1341.01pt x 1496.59125pt>
 File: crossover.pdf Graphic file (type pdf)
  <use crossover.pdf>
 <mutation.pdf, id=64, 1687.30376pt x 898.35625pt>
 File: mutation.pdf Graphic file (type pdf)
- <use mutation.pdf>
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [4 <./genome.pdf> <./bt.pdf> <./crossover.pdf>]
+ <use mutation.pdf> [4 <./genome.pdf> <./bt.pdf>]
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
- [5 <./mutation.pdf>]
+ [5 <./crossover.pdf> <./mutation.pdf>]
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ¼ in font ptmr7t!
 
@@ -345,13 +342,13 @@ Before submitting the final camera ready copy, remember to:
 
 ] (./article_syscon.aux) ) 
 Here is how much of TeX's memory you used:
- 3337 strings out of 493848
- 49592 string characters out of 1152824
- 117450 words of memory out of 3000000
- 6590 multiletter control sequences out of 15000+50000
+ 3338 strings out of 493848
+ 49612 string characters out of 1152824
+ 119454 words of memory out of 3000000
+ 6591 multiletter control sequences out of 15000+50000
  40832 words of font info for 74 fonts, out of 3000000 for 9000
  717 hyphenation exceptions out of 8191
- 36i,8n,38p,1002b,306s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,8n,38p,991b,306s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc
 }</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/shar
 e/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-texl
@@ -362,7 +359,7 @@ msy6.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share
 /texmf-texlive/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/font
 s/type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/ut
 mri8a.pfb>
-Output written on article_syscon.pdf (6 pages, 326287 bytes).
+Output written on article_syscon.pdf (6 pages, 328039 bytes).
 PDF statistics:
  148 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
