@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  30 OCT 2014 10:41
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  30 OCT 2014 16:53
 entering extended mode
  %&-line parsing enabled.
 **article_syscon.tex
@@ -300,31 +300,35 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
 
 ]
-<IDMT.pdf, id=9, 1096.095pt x 1071.00125pt>
-File: IDMT.pdf Graphic file (type pdf)
- <use IDMT.pdf> [2 <./IDMT.pdf>]
-<NSGAII.pdf, id=26, 1608.0075pt x 1301.86375pt>
+<NSGAII.pdf, id=9, 1700.3525pt x 2086.79625pt>
 File: NSGAII.pdf Graphic file (type pdf)
- <use NSGAII.pdf> [3 <./NSGAII.pdf>] <genome.pdf, id=59, 1514.65875pt x 445.665
+ <use NSGAII.pdf> [2 <./NSGAII.pdf>] <IDMT.pdf, id=39, 1037.8775pt x 1255.69125
 pt>
+File: IDMT.pdf Graphic file (type pdf)
+ <use IDMT.pdf> [3 <./IDMT.pdf>]
+Underfull \hbox (badness 7851) in paragraph at lines 237--237
+ \OT1/ptm/m/it/10 C. Map-ping model trans-for-ma-tion al-ter-na-tives into a
+ []
+
+<genome.pdf, id=65, 1514.65875pt x 445.665pt>
 File: genome.pdf Graphic file (type pdf)
  <use genome.pdf>
-<bt.pdf, id=61, 1751.54375pt x 893.3375pt>
+<bt.pdf, id=67, 2316.655pt x 1654.18pt>
 File: bt.pdf Graphic file (type pdf)
- <use bt.pdf> [4 <./genome.pdf> <./bt.pdf>] <crossover.pdf, id=87, 1341.01pt x 
+ <use bt.pdf> [4 <./genome.pdf> <./bt.pdf>] <crossover.pdf, id=99, 1341.01pt x 
 1496.59125pt>
 File: crossover.pdf Graphic file (type pdf)
  <use crossover.pdf>
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 288.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 290.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 288.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 290.
 
-<mutation.pdf, id=89, 1687.30376pt x 898.35625pt>
+<mutation.pdf, id=101, 1687.30376pt x 898.35625pt>
 File: mutation.pdf Graphic file (type pdf)
  <use mutation.pdf> [5 <./crossover.pdf> <./mutation.pdf>]
 Missing character: There is no â in font ptmr7t!
@@ -348,27 +352,27 @@ Before submitting the final camera ready copy, remember to:
 
 [6] (./article_syscon.aux) ) 
 Here is how much of TeX's memory you used:
- 3358 strings out of 493848
- 49972 string characters out of 1152824
- 121466 words of memory out of 3000000
- 6611 multiletter control sequences out of 15000+50000
+ 3359 strings out of 493848
+ 49982 string characters out of 1152824
+ 120488 words of memory out of 3000000
+ 6612 multiletter control sequences out of 15000+50000
  42255 words of font info for 78 fonts, out of 3000000 for 9000
  717 hyphenation exceptions out of 8191
- 36i,14n,38p,991b,351s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,14n,38p,978b,351s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.e
 nc}</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/sh
 are/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-te
 xlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/
 type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/public/
 amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
-/cmsy6.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy7.pfb><
-/usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/t
-exmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-texlive/fonts/t
-ype1/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmr
-8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
-Output written on article_syscon.pdf (6 pages, 348024 bytes).
+/cmsy6.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmsy8.pfb><
+/usr/share/texmf-texlive/fonts/type1/urw/times/utmb8a.pfb></usr/share/texmf-tex
+live/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/ur
+w/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
+
+Output written on article_syscon.pdf (6 pages, 370373 bytes).
 PDF statistics:
- 156 PDF objects out of 1000 (max. 8388607)
+ 166 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
