@@ -101,16 +101,32 @@
 \begin{document}
 \title{Using NSGA-II to compose model transformations alternatives }
 
-\author{\IEEEauthorblockN{Smail Rahmoun}
-\IEEEauthorblockA{Institute for Technological Research\\SystemX\\
-Palaiseau France\\
-Email: smail.rahmoun@irt-systemx.fr}
-\and
-\IEEEauthorblockN{Etienne Borde\\ and Laurent Pautet}
-\IEEEauthorblockA{TELECOM Paristech Institut\\
-LTCI-UMR 5141\\
-Paris, France\\
-Email: firstname.name@telecom-paristech.fr}}
+%\author{\IEEEauthorblockN{Smail Rahmoun}
+%\IEEEauthorblockA{Institute for Technological Research\\SystemX\\
+%Palaiseau France\\
+%Email: smail.rahmoun@irt-systemx.fr}
+%\and
+%\IEEEauthorblockN{Etienne Borde\\ and Laurent Pautet}
+%\IEEEauthorblockA{TELECOM Paristech Institut\\
+%LTCI-UMR 5141\\
+%Paris, France\\
+%Email: firstname.name@telecom-paristech.fr}}
+ \author{\IEEEauthorblockN{
+  Smail Rahmoun\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},
+  Etienne Borde\IEEEauthorrefmark{2},
+  Laurent Pautet\IEEEauthorrefmark{2},
+}
+
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Institute for Technological Research SystemX
+                - 8, Avenue de la Vauve 91120 PALAISEAU\\
+                % Palaiseau France\\
+                smail.rahmoun@irt-systemx.fr}
+
+\IEEEauthorblockA{\IEEEauthorrefmark{2}Institut Telecom;TELECOM ParisTech; LTCI - UMR 5141
+                - 46 rue Barrault, 75013 Paris, France\\
+                firstname.lastname@telecom-paristech.fr}
+
+}
 
 \maketitle
 
@@ -160,9 +176,26 @@ Figure~\ref{IS} graphically illustrates the approach proposed in this paper by s
 \subsection{System architecture modelisation}
 Since our application domain is embedded systems, we have chosen AADL (Architecture Analysis \& Design Language) as the underlying architecture description language. AADL has been designed on the foundation of the architecture description language MetaH and its goals are (i) specification of quality analysis (e.g. safety); and (ii) design architectures for complex embedded systems. It offers a standardized semantics, mostly expressed using natural language and the components are composed hierarchically according to standardized composition rules. AADL also allows the designers to expand model by defining new property sets in their own specific way. The other reason of choosing AADL is to integrate our work in an existing framework RAMSES\footnote{Refinement of AADL Models for the Synthesis of Embdded Systems. \url{http://penelope.enst.fr/aadl/wiki/Projects}} which apply selection of design alternatives.
 
-\subsection{Multi-Objective Genetic Algorithm}
+\subsection{Multi-Objective Evolutionary Algorithm}
 In order to deal with the multi-objective nature of our problem (which model transformation achieve the best possible trade-off among NFP) we use MOEA. 
 Among the many MOEAs that have been proposed in the literature : NSGA-II\cite{Deb:2002:FEM:2221359.2221582}, SPEA2\cite{Zitzler01spea2:improving}, IBEA\cite{Zitzler04indicatorbasedselection}, only one have been considered in this work, namely NSGA-II (Non-dominated Sorting Genetic Algorithm). It was proposed in the early 90's and still considered today as one of the state-of-the-art MOEA for its robustness across a variety of application domain.
+
+\subsubsection{\textbf{Definitions}}
+An evolutionary algorithm (EA) is characterized by three features :
+\begin{itemize}
+\item a set of solution candidates is maintained,
+\item a mating selection process is performed on this set, and
+\item several solutions may be combined in terms of recombination to generate new solutions.
+\end{itemize}
+
+The solution candidates are called \textbf{genomes} (or individuals) and the set of solution candidates is called the \textbf{population}. Each genome represents a possible solution, i.e., a decision vector, to the problem at hand; however, a genome is not a decision vector but rather encodes it based on an appropriate representation.
+
+The mating selection process usually consists of two steps: \textbf{fitness evaluation} and \textbf{mating pool}. In the first step, the genomes are evaluated in the objective space and then assigned a scalar value called \textbf{fitness}, reflecting their quality. Afterwards, a mating pool is created by random sampling from the population according to the fitness values. For example using a binary tournament selection. Where two genomes are randomly chosen from the population, and the one with the better fitness value is copied to the mating pool. This procedure is repeated until the mating pool is filled.
+
+Then, the variation operators are applied to the mating pool. Usually these operators are called \textbf{genetic operators}. With EAs, there are two operators namely the crossover (or recombination) and the mutation.
+
+%here badness
+Based on the above concepts, EAs are simulated by an iterative computation process. First, an initial population is created at random, which is the starting point of the evolution process. Then a loop consisting of the fitness evaluation, selection, genetic operators is executed a certain number of times. Each loop iteration is called a generation, and often a predefined maximum number of generations serves as the termination criterion of the loop.
 
 \subsection{NSGA-II}
 NSGA-II is an improved version of NSGA\cite{Srinivas94multiobjectiveoptimization} (Non-dominated sorting genetic algorithm). It inherited the non-dominance concept from NSGA and showed three innovations, (i) a crowding approach for diversity preservation; (ii) an elitism operator that helps in significantly speeding up the performance of the genetic algorithm (fast non-dominated sort); and (iii) an objective-wise distance computation. 
@@ -219,7 +252,7 @@ The first step of our work consists in applying the definition of the multi-obje
 
 In our approach we have several Transformation Rules Alternatives (TRA). They represent the genomes to optimize in our multi-objective problem. Figure~\ref{genome} gives an overview of these genomes. Each genome $G_{i}, i \in {1,2,...,n}$ is composed of a set of TRA $(G = {TRA_{i}, i \in {1,2,...n}})$. Each $TRA_{i}$ is, in turn, encoded as a pair $TRA_{i} = <Elements_{i},Rule_{i}>$ where $Elements_{i} (i ={1,2,...,n})$ is a list of elements from the input model, and $Rule_{i} (i ={1,2,...,n})$ is a transformation rule which can be applied to $Elements_{i}$.
 
-\subsection{Genome evaluation}
+\subsection{Fitness evaluation of each genome}
 In each generation, the fitness of every genome in the population is evaluated. The fitness is usually the value of the objective function in the optimization problem being solved. We defined in our work one fitness function corresponding to three objectives reliability, availability and response time.
 The aim of our work is to maximize these three objectives. 
 
@@ -238,7 +271,9 @@ This operation consists of choosing some genomes at random in the population, an
 \label{binary}
 \end{figure}
 
-Figure~\ref{binary} illustrates this operation. On this figure, we suppose we have four genomes (G1,G2,G3,G4) and we apply two tournaments to produce the needed genomes. The final genomes of the competition will always be the fittest genomes in the population. The more successful the genome is in competition, the more often that genome is expected to appear in the mating pool (In Figure~\ref{binary} the fittest genome is G4).
+Figure~\ref{binary} illustrates this operation. On this figure, we suppose we have four genomes G1,G2,G3 and G4 respectively composed of TRA11,TRA21,TRA31 and TRA41. We apply two tournaments between paired genomes to produce the needed genomes. In the first round we have two tournaments between two different pairs of genomes (G1 with G2 and G3 with G4). In the second round we apply another tournament on the victorious genomes in the previous round (G2 and G4) . 
+
+The final genomes of the competition will always be the fittest genomes in the population. The more successful the genome is in competition, the more often that genome is expected to appear in the mating pool (In Figure~\ref{binary} the fittest genome is G4).
 
 \subsubsection{\textbf{Crossover}}
 The crossover consists of producing new genomes from the existing ones. When two genomes are selected using the binary tournament selection, two offspring solutions are created, with a given crossover probability, by exchanging parts of the parent genomes. This consists in randomly selecting a cut point in the genome vector, and all the target fragments beyond that point in either parent are swapped between the two parents.
@@ -250,7 +285,7 @@ The crossover consists of producing new genomes from the existing ones. When two
 \label{crossover}
 \end{figure}
 
-Figure~\ref{crossover} illustrates the result of applying the crossover operator to two parent genomes G1 and G2 respectively composed of \{TRA11,TRA12,TRA13\} and \{TRA21,TRA22,TRA23\} to produce a new genome G3. As can be seen in Figure~\ref{crossover}, this operator combines G1 and G2 by selecting a single point on the genome and swapping the genes between the two genomes that lie beyond this point. 
+Figure~\ref{crossover} illustrates the result of applying the crossover operator to two parent genomes G1 and G2 respectively composed of \{TRA11,TRA12,TRA13\} and \{TRA21,TRA22,TRA23\} to produce a new genome G3. As can be seen in Figure~\ref{crossover}, this operator combines TRA11 from G1 and {TRA22,TRA23} from G2 by selecting a single point on the genome and swapping the genes between the two genomes that lie beyond this point. 
 
 \subsubsection{\textbf{Mutation}}
 After performing the crossover, the obtained solutions could be mutated with a given mutation probability.
