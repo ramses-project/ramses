@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  30 OCT 2014 17:43
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  31 OCT 2014 16:55
 entering extended mode
  %&-line parsing enabled.
 **article_syscon.tex
@@ -300,35 +300,40 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
 
 ]
-<NSGAII.pdf, id=9, 1700.3525pt x 2284.535pt>
+<NSGAII.pdf, id=9, 1742.51pt x 2069.7325pt>
 File: NSGAII.pdf Graphic file (type pdf)
  <use NSGAII.pdf> [2 <./NSGAII.pdf>] <IDMT.pdf, id=39, 1037.8775pt x 1255.69125
 pt>
 File: IDMT.pdf Graphic file (type pdf)
  <use IDMT.pdf> [3 <./IDMT.pdf>]
-Underfull \hbox (badness 7851) in paragraph at lines 237--237
+Underfull \hbox (badness 7851) in paragraph at lines 235--235
  \OT1/ptm/m/it/10 C. Map-ping model trans-for-ma-tion al-ter-na-tives into a
  []
 
 <genome.pdf, id=65, 1571.8725pt x 432.61626pt>
 File: genome.pdf Graphic file (type pdf)
  <use genome.pdf>
-<bt.pdf, id=67, 2812.5075pt x 2648.89626pt>
+<bt.pdf, id=67, 2823.54875pt x 2643.8775pt>
 File: bt.pdf Graphic file (type pdf)
- <use bt.pdf> [4 <./genome.pdf> <./bt.pdf>] <crossover.pdf, id=106, 1159.33125p
-t x 1397.22pt>
+ <use bt.pdf> [4 <./genome.pdf> <./bt.pdf>] <crossover.pdf, id=107, 1116.17pt x
+ 1157.32375pt>
 File: crossover.pdf Graphic file (type pdf)
  <use crossover.pdf>
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 286.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 281.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 286.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 281.
 
-<mutation.pdf, id=108, 1810.765pt x 905.3825pt>
+Underfull \hbox (badness 2922) in paragraph at lines 281--282
+\OT1/ptm/m/n/10 and \OMS/cmsy/m/n/10 f\OT1/ptm/m/n/10 TRA21,TRA22,TRA23\OMS/cms
+y/m/n/10 g \OT1/ptm/m/n/10 to pro-duce new genomes
+ []
+
+<mutation.pdf, id=109, 1810.765pt x 905.3825pt>
 File: mutation.pdf Graphic file (type pdf)
  <use mutation.pdf> [5 <./crossover.pdf> <./mutation.pdf>]
 Missing character: There is no Ã in font ptmr7t!
@@ -349,13 +354,13 @@ Before submitting the final camera ready copy, remember to:
 
 [6] (./article_syscon.aux) ) 
 Here is how much of TeX's memory you used:
- 3359 strings out of 493848
- 49982 string characters out of 1152824
- 121488 words of memory out of 3000000
- 6612 multiletter control sequences out of 15000+50000
+ 3358 strings out of 493848
+ 49951 string characters out of 1152824
+ 120494 words of memory out of 3000000
+ 6611 multiletter control sequences out of 15000+50000
  42255 words of font info for 78 fonts, out of 3000000 for 9000
  717 hyphenation exceptions out of 8191
- 36i,14n,38p,978b,351s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,14n,38p,999b,351s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.e
 nc}</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/sh
 are/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-te
@@ -367,7 +372,7 @@ amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
 live/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/ur
 w/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on article_syscon.pdf (6 pages, 419545 bytes).
+Output written on article_syscon.pdf (6 pages, 418715 bytes).
 PDF statistics:
  187 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
