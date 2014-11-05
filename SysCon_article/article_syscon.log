@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  31 OCT 2014 16:55
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2014.1.8)  5 NOV 2014 10:02
 entering extended mode
  %&-line parsing enabled.
 **article_syscon.tex
@@ -306,10 +306,6 @@ File: NSGAII.pdf Graphic file (type pdf)
 pt>
 File: IDMT.pdf Graphic file (type pdf)
  <use IDMT.pdf> [3 <./IDMT.pdf>]
-Underfull \hbox (badness 7851) in paragraph at lines 235--235
- \OT1/ptm/m/it/10 C. Map-ping model trans-for-ma-tion al-ter-na-tives into a
- []
-
 <genome.pdf, id=65, 1571.8725pt x 432.61626pt>
 File: genome.pdf Graphic file (type pdf)
  <use genome.pdf>
@@ -319,19 +315,14 @@ File: bt.pdf Graphic file (type pdf)
  1157.32375pt>
 File: crossover.pdf Graphic file (type pdf)
  <use crossover.pdf>
-LaTeX Font Info:    Try loading font information for OMS+ptm on input line 281.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 277.
 
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 281.
-
-Underfull \hbox (badness 2922) in paragraph at lines 281--282
-\OT1/ptm/m/n/10 and \OMS/cmsy/m/n/10 f\OT1/ptm/m/n/10 TRA21,TRA22,TRA23\OMS/cms
-y/m/n/10 g \OT1/ptm/m/n/10 to pro-duce new genomes
- []
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 277.
 
 <mutation.pdf, id=109, 1810.765pt x 905.3825pt>
 File: mutation.pdf Graphic file (type pdf)
@@ -372,7 +363,7 @@ amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm
 live/fonts/type1/urw/times/utmbi8a.pfb></usr/share/texmf-texlive/fonts/type1/ur
 w/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on article_syscon.pdf (6 pages, 418715 bytes).
+Output written on article_syscon.pdf (6 pages, 418568 bytes).
 PDF statistics:
  187 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

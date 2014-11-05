@@ -133,20 +133,16 @@
 \begin{abstract}
 The size and complexity of modern systems is rapidly increasing. Meanwhile, the ability to understand and maintain such systems is decreasing almost as fast.
 Model Driven Engineering promotes the automation of design activities by means of model transformations, enabling to cope with systems complexity. However, the design space produced by the composition of these model transformations is difficult to explore automatically. The main reason that makes this exploration difficult is the size of the design space: the number of possible design choices grows exponentially with the number of model transformation alternatives.
-This paper presents a MDA approach for design space exploration to deal with the ever-growing challenge of designing complex embedded systems. This approach allows the system architects to automatically select the most adequate model transformations compositions by using multi-objectives optimization evolutionary algorithms.
+This paper presents a Model Driven Engineering approach for design space exploration to deal with the ever-growing challenge of designing complex embedded systems. This approach allows the system architects to automatically select the most adequate model transformations compositions by using multi-objectives optimization evolutionary algorithms.
 
 \end{abstract}
 
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
-
-
 Nowadays, modern systems become more and more large and complex and therefore more difficult to develop and maintain. For example, embedded critical systems such as avionic, railway and automotive are often built to guarantee the safety and robustness properties. To meet these challenging properties makes the design of embedded systems very complex.
 
-Model Driven Engineering (MDE) proposes the use of models as the key assets in the development of such systems. These models cover the whole system development cycle. They can be manipulated manually or automatically using model transformations. These transformations aims to enhance portability by way of separating system (abstract) architecture from platform (concrete) architecture. They facilitate the development of a system in abstraction, and simplifies implementation of that system across a variety of target platforms. In this work, we use model transformations to model design alternatives of the system. This process will help system architects to predict Non-Functional Properties (NFP) of a system before its development\cite{1291833}. This prediction can be exploited to drive decisions about which components should be used and how they should be connected so as to meet the NFP imposed on the design.
-
-%Even though MDE is being successfully applied in many scenarios, it still needs appropriate mechanisms to handle the development of complex, large-scale systems. One such mechanism is a facility to make transformations reusable, so that we can apply them to different contexts. 
+Model Driven Engineering (MDE) proposes the use of models as the key assets in the development of such systems. These models cover the whole system development cycle. They can be manipulated manually or automatically using model transformations. These transformations aims to enhance portability by way of separating system (abstract) architecture from platform (concrete) architecture. They facilitate the development of a system in abstraction, and simplifies implementation of that system across a variety of target platforms. In this work, we use model transformations to model the system design alternatives. This process will help system architects to predict Non-Functional Properties (NFP) of a system before its development\cite{1291833}. This prediction can be exploited to drive decisions about which components should be used and how they should be connected so as to meet the NFP imposed on the design.
 
 Moreover, an issue in modeling a system is that, the NFP could conflict with each other: improving one property can have a negative impact on other properties. For example, improving the availability of a service is often done by replication of the service, which causes the increasing of the response time of these services\cite{Yu:2001:CLA:502059.502038}. Developing a system that satisfies at best all its NFP simultaneously is often not possible: improving a NFP of a system can deteriorate another NFP. As a consequence, system architects have to come up with several design alternatives and select the solutions which fulfils at best all NFP\cite{Coello98acomprehensive} simultaneously from all feasible alternatives. The selected solutions are called non-dominated solutions or Pareto optimal solutions: a solution x2 is non-dominated by another solution x1, if x2 matches or exceeds x1 in all objectives (NFP).
 
@@ -232,7 +228,7 @@ In major cases, model transformations are grouped into two main categories of mo
 In the application of a rule based transformation language, a model transformation $MT$ is generally composed of a set of transformation rules $(TR_{i})$.
 Each transformation rule $TR_{i}$ is defined by a pair $<E_{j},R_{j}>$. Where $E_{j}$ is the scope of the transformation rule $TR_{i}$. And $R_{j}$ is the set of rules or actions which $TR_{i}$ executes. The scope of each transformation rule is defined by pattern matching semantics : a transformation rule $TR$ is applied to every element in the model that matches a boolean expression (e.g. the boolean expression ``from" in the ATL language). Then, actions consists of a declarative creation and configuration of elements in the output model.
 
-\subsection{Mapping model transformation alternatives into a multiple-objectives optimization problem}
+\subsection{Mapping model transformation alternatives into a multiple objectives optimization problem}
 \label{Adapting}
 The next step of our approach consist in using model transformations compositions described in Section~\ref{transfos} and integrate them into a multiple-objectives optimization problem (MOOP). Where the population to optimize or the design space represent a set of model transformations alternatives and the objectives to fulfils are NFP such as reliability, availability and response time. The integration process is described in the following sections.
 
@@ -278,7 +274,7 @@ The crossover consists in producing new genomes from the existing ones. When two
 \label{crossover}
 \end{figure}
 
-Figure~\ref{crossover} illustrates the result of applying the crossover operator to two parent genomes MTA1 and MTA2 respectively composed of the following genes \{TRA11,TRA12,TRA13\} and \{TRA21,TRA22,TRA23\} to produce new genomes MTA12 and MTA21, respectively composed of new sequences \{TRA21,TRA12,TRA13\} and \{TRA11,TRA22,TRA23\}. This operator combines MTA1 and MTA2 by selecting a single point on the genome and swapping the genes between the two genomes that lie beyond this point.
+Figure~\ref{crossover} illustrates the result of applying the crossover operator to two parent genomes MTA1 and MTA2 respectively composed of the following genes \{TRA11, TRA12, TRA13\} and \{TRA21, TRA22, TRA23\} to produce new genomes MTA12 and MTA21, respectively composed of new sequences \{TRA21,TRA12,TRA13\} and \{TRA11,TRA22,TRA23\}. This operator combines MTA1 and MTA2 by selecting a single point on the genome and swapping the genes between the two genomes that lie beyond this point.
 
 \textbf{Mutation :}
 After performing the crossover, the obtained solutions could be mutated with a given mutation probability.
