@@ -40,12 +40,6 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider ;
  */
 public class GenerationItemProvider
   extends WorkflowElementItemProvider
-  implements
-    IEditingDomainItemProvider,
-    IStructuredItemContentProvider,
-    ITreeItemContentProvider,
-    IItemLabelProvider,
-    IItemPropertySource
 {
   /**
    * This constructs an instance from a factory and a notifier.

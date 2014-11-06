@@ -45,6 +45,7 @@ import fr.tpt.aadl.ramses.transformation.selection.IHM.IHM ;
 import fr.tpt.aadl.ramses.transformation.launcher.ArchitectureRefinementProcessLauncher ;
 import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
 import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
+import fr.tpt.aadl.ramses.transformation.selection.TransformationRuleAlternative ;
 import fr.tpt.aadl.ramses.transformation.selection.TupleEntry ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
@@ -305,7 +306,10 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 	        				Map.Entry<List<EObject>, ArrayList<String>> tuple = GlobalVariables.testMap.entrySet().iterator().next();
 	        				if( GlobalVariables.tuplesToApply.get(i).Rules.size()>1){
 		        				try{	 
-			        					RuleApplicationUtils.setTransformationToApply(tuple, GlobalVariables.tuplesToApply.get(i).getChoosenRule(), GlobalVariables.applytuple);
+		        				  TransformationRuleAlternative tra = new TransformationRuleAlternative(tuple.getKey(), 
+		        	                                                                              tuple.getValue());
+		        	        
+			        					RuleApplicationUtils.setTransformationToApply(tra, GlobalVariables.tuplesToApply.get(i).getChoosenRule(), GlobalVariables.applytuple);
 			        					//System.out.println("setTransformationToApply is succefully set !");
 			        				}
 			        				catch(Exception e){

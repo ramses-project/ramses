@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated DependencyGraph -->
+      <package
+            uri="http://fr.tpt.aadl.ramses.transformation/DependencyGraph/1.0"
+            class="fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphPackage"
+            genModel="model/DependencyGraph.genmodel"/>
+   </extension>
+
+</plugin>

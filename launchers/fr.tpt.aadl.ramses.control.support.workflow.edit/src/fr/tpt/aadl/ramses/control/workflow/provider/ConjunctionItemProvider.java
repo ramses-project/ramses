@@ -42,12 +42,6 @@ import fr.tpt.aadl.ramses.control.workflow.WorkflowPackage ;
  */
 public class ConjunctionItemProvider
   extends AnalysisSequenceItemProvider
-  implements
-    IEditingDomainItemProvider,
-    IStructuredItemContentProvider,
-    ITreeItemContentProvider,
-    IItemLabelProvider,
-    IItemPropertySource
 {
   /**
    * This constructs an instance from a factory and a notifier.

@@ -37,6 +37,7 @@ import fr.tpt.aadl.ramses.generation.target.specific.LoopManager ;
 import fr.tpt.aadl.ramses.transformation.launcher.ArchitectureRefinementProcessLauncher ;
 import fr.tpt.aadl.ramses.transformation.selection.ITransformationSelection ;
 import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
+import fr.tpt.aadl.ramses.transformation.selection.TransformationRuleAlternative ;
 import fr.tpt.aadl.ramses.transformation.selection.TupleEntry ;
 import fr.tpt.aadl.ramses.transformation.selection.utils.SelectionAlgorithm ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
@@ -379,7 +380,9 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 			// so options have to be considered in lists of combinations, and the choice
 			// (selectBestTransformation) is made with 
 			// execute the selection algorithm for dependencies
-			RuleApplicationUtils.setTransformationToApply(tuple, transformationsToApply.get(0), tuplesToApply);
+			TransformationRuleAlternative tra = new TransformationRuleAlternative(tuple.getKey(), 
+                                                                            tuple.getValue());
+			RuleApplicationUtils.setTransformationToApply(tra, transformationsToApply.get(0), tuplesToApply);
 			
 			treatedObjects.add(tuple.getKey());
 			List<RuleApplicationTulpe> ruleApplicationList = selectBestTransformation(inclusionDependencies, new ArrayList<String>());
@@ -395,7 +398,10 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 							&& newTuple.getValue().contains(rat.getTransformationRuleName())
 					  )
 					{
-						RuleApplicationUtils.setTransformationToApply(newTuple, rat.getTransformationRuleName(), tuplesToApply);
+					  TransformationRuleAlternative newTra = new TransformationRuleAlternative(newTuple.getKey(), 
+					                                                                        newTuple.getValue());
+			      
+						RuleApplicationUtils.setTransformationToApply(newTra, rat.getTransformationRuleName(), tuplesToApply);
 						treatedObjects.add(newTuple.getKey());
 					}
 				}
@@ -423,7 +429,10 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 		  {
 		    if(TipUtils.alreadyReferenced((List<EObject>) tuple.getKey(), tuplesToApply))
 		      continue;
-		    RuleApplicationUtils.setTransformationToApply(tuple, transformationsToApply.get(0), tuplesToApply);
+		    TransformationRuleAlternative newTra = new TransformationRuleAlternative(tuple.getKey(), 
+		                                                                             tuple.getValue());
+           
+		    RuleApplicationUtils.setTransformationToApply(newTra, transformationsToApply.get(0), tuplesToApply);
 		  }
 		  else
 		  {

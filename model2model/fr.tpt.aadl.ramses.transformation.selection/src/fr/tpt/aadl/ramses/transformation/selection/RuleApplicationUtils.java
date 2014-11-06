@@ -19,14 +19,14 @@ public class RuleApplicationUtils {
 		return rulesInheritenceMap;
 	}
 	
-	public static void setTransformationToApply(Entry<List<EObject>, ArrayList<String>> tupleWithAlternatives, 
+	public static void setTransformationToApply(TransformationRuleAlternative tupleWithAlternatives, 
 			String transformationToApply,
 			ArrayList<ElementTransformation> tuplesToApply)
 	{
-		ElementTransformation et = TipUtils.createElementTransformation((List<EObject>) tupleWithAlternatives.getKey(), transformationToApply);
+		ElementTransformation et = TipUtils.createElementTransformation((List<EObject>) tupleWithAlternatives.getMatchedElements(), transformationToApply);
 		tuplesToApply.add(et);
 		// Exclude not selected rules
-		for(String s: tupleWithAlternatives.getValue())
+		for(String s: tupleWithAlternatives.getAlternativeRules())
 		{
 			List<String> toExclude = new ArrayList<String>();
 			if(s.equals(transformationToApply))
@@ -52,7 +52,7 @@ public class RuleApplicationUtils {
 			}
 			for(String toExcludeRule: toExclude)
 			{
-			  ElementTransformation exc = TipUtils.createElementTransformation((List<EObject>) tupleWithAlternatives.getKey(), toExcludeRule);
+			  ElementTransformation exc = TipUtils.createElementTransformation((List<EObject>) tupleWithAlternatives.getMatchedElements(), toExcludeRule);
 			  exc.setIsExclusion(true);
 			  tuplesToApply.add(exc);
 			}
