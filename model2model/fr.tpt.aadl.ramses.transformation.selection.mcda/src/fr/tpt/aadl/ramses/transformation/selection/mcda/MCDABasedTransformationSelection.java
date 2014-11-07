@@ -90,6 +90,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     
     ResourceSet rs = currentImplResource.getResourceSet();
     
+    
     String trcPath = prop.getProperty("ArchitectureRefinementLauncher.trc");
     if(trcPath!=null)
       TrcParser.parse(trcPath, rs);
@@ -152,8 +153,12 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         }
         
         // 4 - select alternatives for elements in connectedDepGraph
+        SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
         TransformationRuleSelection trs = 
-            new TransformationRuleSelection(trc, connectedAlternativesMap);
+            new TransformationRuleSelection(trc, 
+                                            sinst,
+                                            connectedAlternativesMap);
+        
         List<RuleApplicationTulpe> ratList = trs.selectBestRulesAlternatives();
         
         for(RuleApplicationTulpe rat:ratList)
