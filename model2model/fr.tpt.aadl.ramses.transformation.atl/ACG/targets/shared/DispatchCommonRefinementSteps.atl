@@ -39,6 +39,10 @@ helper def: collectSporadicThreadVariables (c: AADLI!ComponentInstance) : Sequen
 	Sequence{}
 ;
 
+helper def: collectTimedThreadVariables (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataSubcomponent) =
+	Sequence{}
+;
+
 helper def: collectSporadicGlobalVariablesAccesses (c: AADLI!ComponentInstance) : Sequence(AADLBA!DataAccess) =
 	Sequence{}
 ;

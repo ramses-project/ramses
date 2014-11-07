@@ -279,6 +279,11 @@ public class RamsesPropertyPage extends PropertyPage {
     osek.setText("OSEX/NXT - nxtOSEK (http://lejos-osek.sourceforge.net/)");
     osek.setData(OSEKGeneratorFactory.OSEK_GENERATOR_NAME);
     
+    addSeparator(composite);
+    Label installDirInfo = new Label(composite, SWT.BOLD);
+    installDirInfo.setText("3 - Select install directory of target platforms");
+    
+    
     if(config.getTargetId() != null)
     {
       if(config.getTargetId().
@@ -305,7 +310,7 @@ public class RamsesPropertyPage extends PropertyPage {
       public void handleEvent(Event event)
       {
         Button button = (Button)(event.widget);
-        selectedPathLabel.setText("Select path for :"+button);
+        selectedPathLabel.setText("Select path for " + button.getText());
         selectedPathLabel.redraw();
         if (button.getSelection())
         {
@@ -325,7 +330,7 @@ public class RamsesPropertyPage extends PropertyPage {
 
     selectedPathLabel = new Label(composite, SWT.BOLD); 
     selectedPathLabel.setText("Path for target not selected ...");
-    selectedPathLabel.setSize(TEXT_FIELD_WIDTH, 50);
+    selectedPathLabel.setSize(90, 50);
     GridData grdPath = new GridData();
     grdPath.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
     selectedPathLabel.setLayoutData(grdPath) ;

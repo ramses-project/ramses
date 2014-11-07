@@ -70,7 +70,7 @@ abstract rule m_Input_Sampling
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
 		VALIDITY: AADLBA!DataSubcomponent = thisModule.CreateValidityDataSubcomponent(fi);
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
 		SAMPLING_ID: AADLBA!DataAccess = fi.getFeatureImg();
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.CreateReturnSubcomponentFromPort(fi);
 	}
@@ -91,10 +91,6 @@ abstract rule m_Input_Sampling
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- MESSAGE_ADDR
-		),
-		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
-		(
-			element <- LENGTH
 		),
 		VALIDITY_HOLDER: AADLBA!DataSubcomponentHolder
 		(
@@ -156,8 +152,8 @@ abstract rule m_Output_Sampling
 		spg: AADLBA!SubprogramType = 'Write_Sampling_Message'.asSubprogramType('ARINC653_RUNTIME');
 		resolvedSpg: AADLBA!SubprogramType = thisModule.createResolvedSpg(fi.feature.dataFeatureClassifier, spg);
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
-		SAMPLING_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint');
+		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
+		SAMPLING_ID: AADLBA!DataAccess = fi.retreiveEntrypointFeature(cnxRef);
 	}
 	to
 		call: AADLBA!SubprogramCallAction
@@ -176,10 +172,6 @@ abstract rule m_Output_Sampling
 		MESSAGE_ADDR_HOLDER: AADLBA!DataSubcomponentHolder
 		(
 			element <- MESSAGE_ADDR
-		),
-		LENGTH_HOLDER: AADLBA!DataSubcomponentHolder
-		(
-			element <- LENGTH
 		),
 		RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
 }

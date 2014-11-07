@@ -3,9 +3,9 @@ package ramses.test.cli.arinc653;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ramses.test.util.POKScenario;
+import ramses.test.util.OSGIPOKScenario ;
 
-public class Test_JUnit_Buffer extends POKScenario {
+public class Test_JUnit_Buffer extends OSGIPOKScenario {
 
 
 	@BeforeClass
@@ -21,4 +21,10 @@ public class Test_JUnit_Buffer extends POKScenario {
 		output_ref = "tests/arinc653/arinc653-buffer/output_ref";
 		this.exec();
 	}
+
+  @Override
+  protected void initAdditionalParameters()
+  {
+    // TODO Auto-generated method stub 
+  }
 }

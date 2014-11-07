@@ -1,3 +1,13 @@
 bin
-target
 *.asm
+.DS_Store
+*.atxl
+*~
+.ramses-log*
+*.lo
+*.elf
+*.elf.map
+qemu.pid
+*.bin
+*.map
+sizes.c

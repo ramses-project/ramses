@@ -1,6 +1,6 @@
 package test_queuing_refined_model
 public
-with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime;
+with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc653_runtime;
   process implementation proc1.impl
     subcomponents
       the_proc1_p_out_globalVariable: data arinc653_runtime::Queuing_Port_Id_Type;
@@ -41,6 +41,7 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   processor implementation cpu.two_partitions
     subcomponents
       the_part1: virtual processor part {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
@@ -53,9 +54,10 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         ]);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
       the_part2: virtual processor part {
+        Period => 1000 ms;
         POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
@@ -68,7 +70,7 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         ]);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (Rate_Monotonic_Protocol);
+        Scheduling_Protocol => (RMS);
         };
   end cpu.two_partitions;
   
@@ -76,21 +78,30 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   end mem.impl;
   
   memory implementation mem.two_partitions
+    subcomponents
+      part1_mem: memory part_mem {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
+      part2_mem: memory part_mem {
+        Memory_Size => 150000 Bytes;
+        Memory_Protocol => read_write;
+        ARINC653::Memory_Type => (Data_Memory);
+        };
   end mem.two_partitions;
   
   system implementation refined_model.impl
     subcomponents
-      the_proc1: process proc1.impl {
-        POK::Needed_Memory_Size => 200 KByte;
+      the_mem: memory mem.two_partitions {
+        Memory_Size => 200000 Bytes;
         };
-      the_proc2: process proc2.impl {
-        POK::Needed_Memory_Size => 200 KByte;
-        };
+      the_proc1: process proc1.impl;
+      the_proc2: process proc2.impl;
       the_cpu: processor cpu.two_partitions {
         ARINC653::Module_Major_Frame => 4000 ms;
         POK::Scheduler => STATIC;
         ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
-        ARINC653::Slots_Allocation => (reference(the_part1), reference(the_part1), reference(the_part2));
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -138,13 +149,15 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
         };
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1;
+      Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2;
+      Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2;
+      ARINC653::Slots_Allocation => (reference(the_cpu.the_part1), reference(the_cpu.the_part1), reference(the_cpu.the_part2)) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1.the_sender;
+      Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2.the_receiver;
+      Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2.the_receiver;
   end refined_model.impl;
-  
-  processor cpu_x86
-  end cpu_x86;
   
   processor cpu
   end cpu;
@@ -163,6 +176,23 @@ with POK,Data_Model,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime
   
   process proc2
   end proc2;
+  
+  subprogram event_sender_spg
+    features
+      context: requires data access event_sender_spg_context;
+    properties
+      Source_Name => "send_event";
+      Source_Language => (C);
+      Source_Text => ("/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.h", "/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/common-components/event_code.c");
+  end event_sender_spg;
+  
+  data event_sender_spg_context
+    properties
+      Data_Model::Data_Representation => Struct;
+      Data_Model::Element_Names => ("e");
+      Data_Model::Base_Type => (classifier(Base_Types::Unsigned_8));
+      Source_Name => "__event_sender_spg_context";
+  end event_sender_spg_context;
   
   system refined_model
   end refined_model;
@@ -191,9 +221,9 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc1_the_sender_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc1_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {common_pkg::sender_spg ! (p_out_localVariable) ;
 Send_Queuing_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_out_TimeOut, the_proc1_the_sender_runtime_call_ret)} ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc1_the_sender_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc1_the_sender_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc1_the_sender_runtime_call_ret)} ;
 **};
   end the_proc1_the_sender_entrypoint.impl;
@@ -212,12 +242,15 @@ Send_Queuing_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_
         } 
       ;
     connections
-      p_out_accessCnx_call: data access cnx_p_out -> call_entrypoint.cnx_p_out;
+      p_out_accessCnx_call_cnx: data access cnx_p_out -> call_entrypoint.cnx_p_out;
   end the_proc1_the_sender.impl;
   
   thread the_proc1_the_sender
     features
-      cnx_p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type;
+      cnx_p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type {
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
   end the_proc1_the_sender;
   
   subprogram the_proc2_the_receiver_entrypoint
@@ -247,10 +280,10 @@ states
   BA_entrypoint_exec_state : state ;
   BA_entrypoint_final_state : final state ;
 transitions
-  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc2_the_receiver_behaviorIdentifier_enum#default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Queuing_Message_Integer ! (p_in, p_in_TimeOut, p_in_localVariable, p_in_Length, p_in_ErrorCode) ;
+  call [0] : BA_entrypoint_exec_state -[whichPortActivated = the_proc2_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior]-> BA_entrypoint_wait_dispatch_state {Receive_Queuing_Message_Integer ! (p_in, p_in_TimeOut, p_in_localVariable, p_in_Length, p_in_ErrorCode) ;
 if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   } ;
-  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc2_the_receiver_behaviorIdentifier_enum#default_behavior} ;
+  which_behavior_default_mode : BA_entrypoint_init_state -[]-> BA_entrypoint_exec_state {whichPortActivated := the_proc2_the_receiver_behaviorIdentifier_enum#Enumerators.default_behavior} ;
   dispatch_transition : BA_entrypoint_wait_dispatch_state -[]-> BA_entrypoint_exec_state {arinc653_runtime::Periodic_Wait ! (the_proc2_the_receiver_runtime_call_ret)} ;
 **};
   end the_proc2_the_receiver_entrypoint.impl;
@@ -274,7 +307,10 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   
   thread the_proc2_the_receiver
     features
-      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type;
+      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type {
+        Data_Model::Data_Representation => Integer;
+        Data_Size => 4 Bytes;
+        };
   end the_proc2_the_receiver;
   
   subprogram Receive_Queuing_Message_Integer

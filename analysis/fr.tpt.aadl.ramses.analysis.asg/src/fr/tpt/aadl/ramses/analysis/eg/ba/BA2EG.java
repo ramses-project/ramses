@@ -46,18 +46,20 @@ public class BA2EG
 {
   private final boolean isThread;
   private final NamedElement element;
+  private final NamedElement concreteElement;
   private final BehaviorAnnex ba;
   private final String ownerName;
   
   private Map<BehaviorState, EGNode> stateToNode 
   = new HashMap<BehaviorState,EGNode>();
   
-  public BA2EG (BehaviorAnnex ba)
+  public BA2EG (BehaviorAnnex ba, NamedElement ne)
   {
     this.ba = ba;
     this.element = (NamedElement) ba.eContainer();
     this.isThread = (element instanceof ThreadClassifier);
     this.ownerName = element.getName();
+    concreteElement = ne;
   }
   
   /**
@@ -158,7 +160,7 @@ public class BA2EG
     BehaviorActionBlock bak = tr.getActionBlock();
     if (bak != null)
     {
-      EGNode nTrans = BehaviorAction2EG.actionBlockToEG(bak, name);
+      EGNode nTrans = BehaviorAction2EG.actionBlockToEG(bak, name, concreteElement);
       nTrans.setKind(EGNodeKind.TransitionStart);
       nTrans.getBlockEnd().setKind(EGNodeKind.TransitionEnd);
       return nTrans;

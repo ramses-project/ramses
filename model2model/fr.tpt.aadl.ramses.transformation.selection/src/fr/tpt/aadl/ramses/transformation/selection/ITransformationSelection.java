@@ -10,6 +10,8 @@ import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation;
 
 public interface ITransformationSelection {
 
-	public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply) throws Exception; 
+	public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply);
+
+  boolean shouldSelectionContinue() ;
 	
 }

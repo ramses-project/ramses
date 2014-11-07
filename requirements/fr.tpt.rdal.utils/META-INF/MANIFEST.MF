@@ -3,18 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Utils
 Bundle-SymbolicName: fr.tpt.rdal.utils
 Bundle-Version: 1.0.0.qualifier
-Export-Package: fr.labsticc.framework.settings.model.settings,
- fr.labsticc.framework.settings.model.settings.impl,
- fr.labsticc.framework.settings.model.settings.util,
- fr.openpeople.rdal2.model.rdal,
- fr.openpeople.rdal2.model.rdal.impl,
- fr.openpeople.rdal2.model.rdal.util,
- fr.tpt.rdal.parser
+Export-Package: fr.tpt.rdal.parser
 Require-Bundle: org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.xmi,
+ org.apache.log4j;bundle-version="1.2.15",
  org.eclipse.xtext;bundle-version="2.3.1",
  org.osate.aadl2,
- org.osate.xtext.aadl2
+ org.osate.xtext.aadl2,
+ fr.openpeople.rdal2.model
 Bundle-ClassPath: .,
  lib/fr.openpeople.rdal2.model_1.0.0.201312131039.jar,
  lib/fr.labsticc.framework.settings.model_1.0.0.201312131039.jar,

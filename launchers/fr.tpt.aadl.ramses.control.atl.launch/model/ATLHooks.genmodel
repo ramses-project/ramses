@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<genmodel:GenModel xmi:version="2.0"
-    xmlns:xmi="http://www.omg.org/XMI" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.transformation.atl.launch/src"
-    editDirectory="/fr.tpt.aadl.ramses.transformation.atl.edit/src" editorDirectory="/fr.tpt.aadl.ramses.transformation.atl.editor/src"
-    modelPluginID="fr.tpt.aadl.ramses.transformation.atl.launch" modelName="hooks"
-    editPluginClass="fr.tpt.aadl.ramses.transformation.atl.provider.AtlHooksEditPlugin"
-    editorPluginClass="fr.tpt.aadl.ramses.transformation.atl.presentation.AtlHooksEditorPlugin"
-    testSuiteClass="fr.tpt.aadl.ramses.transformation.atl.hooks.AtlHooks.tests.AtlHooksAllTests"
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel"
+    modelDirectory="/fr.tpt.aadl.ramses.control.atl.launch/src" editDirectory="/fr.tpt.aadl.ramses.control.atl.edit/src"
+    editorDirectory="/fr.tpt.aadl.ramses.control.atl.editor/src" modelPluginID="fr.tpt.aadl.ramses.control.atl.launch"
+    modelName="hooks" editPluginClass="fr.tpt.aadl.ramses.control.atl.provider.AtlHooksEditPlugin"
+    editorPluginClass="fr.tpt.aadl.ramses.control.atl.presentation.AtlHooksEditorPlugin"
+    testSuiteClass="fr.tpt.aadl.ramses.control.atl.hooks.AtlHooks.tests.AtlHooksAllTests"
     importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0" copyrightFields="false"
-    editPluginID="fr.tpt.aadl.ramses.transformation.atl.edit" editorPluginID="fr.tpt.aadl.atl.transformation.editor"
-    usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../fr.tpt.aadl.annex.behavior/model/aadlba.genmodel#//aadlba ../../org.osate.aadl2/model/instance.genmodel#//instance">
+    editPluginID="fr.tpt.aadl.ramses.control.atl.edit" editorPluginID="fr.tpt.aadl.atl.control.editor"
+    usedGenPackages="../../org.osate.aadl2/model/aadl2.genmodel#//aadl2 ../../org.osate.ba/model/aadlba.genmodel#//aadlba ../../org.osate.aadl2/model/instance.genmodel#//instance">
   <foreignModel>ATLHooks.ecore</foreignModel>
-  <genPackages prefix="AtlHooks" basePackage="fr.tpt.aadl.ramses.transformation.atl"
-      resource="XML" disposableProviderFactory="true" ecorePackage="ATLHooks.ecore#/">
+  <genPackages prefix="AtlHooks" basePackage="fr.tpt.aadl.ramses.control.atl" resource="XML"
+      disposableProviderFactory="true" ecorePackage="ATLHooks.ecore#/">
     <genClasses ecoreClass="ATLHooks.ecore#//HookAccess">
       <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/orderFeatures">
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/orderFeatures/cpt"/>
@@ -38,8 +37,31 @@
       <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getBufferSize">
         <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getBufferSize/destinationFeatureInstance"/>
       </genOperations>
-      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/setInDirection">
-        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/setInDirection/feature"/>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/setDirection">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/setDirection/feature"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/setDirection/direction"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/isUsedInSpecialOperator">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/isUsedInSpecialOperator/ba"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/isUsedInSpecialOperator/p"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/isUsedInSpecialOperator/operatorName"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getHyperperiod">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getHyperperiod/port"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getTimingPrecision">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getTimingPrecision/namedElement"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getListOfPath">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getListOfPath/pa"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/allPortCount">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/allPortCount/e"/>
+      </genOperations>
+      <genOperations ecoreOperation="ATLHooks.ecore#//HookAccess/getStringLiteral">
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getStringLiteral/classifier"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getStringLiteral/propertyName"/>
+        <genParameters ecoreParameter="ATLHooks.ecore#//HookAccess/getStringLiteral/stringLiteralValue"/>
       </genOperations>
     </genClasses>
   </genPackages>

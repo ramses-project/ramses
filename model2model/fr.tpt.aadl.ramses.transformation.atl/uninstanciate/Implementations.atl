@@ -33,6 +33,9 @@ from
 	IN 				: AADLI;
 
 
+helper context AADLI!ComponentImplementation def: needsCopy(): Boolean =
+	true
+;
 
 unique lazy rule Realization {
 	from
@@ -48,15 +51,19 @@ unique lazy rule Realization {
 abstract rule m_Component_Implementation {
  from
     impl : AADLI!ComponentImplementation
+	(impl.needsCopy())
  to
  	implImg : AADLBA!ComponentImplementation (
  		name             			<- impl.name,
 		ownedComment     			<- impl.ownedComment,
-		ownedPortConnection  		<- impl.getConnectionsInstancesImg('portConnection'),
-		ownedAccessConnection  		<- impl.getConnectionsInstancesImg('accessConnection'),
-		ownedParameterConnection 	<- impl.getConnectionsInstancesImg('parameterConnection'),
-		ownedFeatureGroupConnection <- impl.getConnectionsInstancesImg('featureGroupConnection'),
-		ownedRealization 			<- thisModule.Realization(impl.type.resolve())
+		ownedPortConnection  		<- impl.getConnectionsInstancesImg('portConnection')->excluding(OclUndefined),
+		ownedAccessConnection  		<- impl.getConnectionsInstancesImg('accessConnection')->excluding(OclUndefined),
+		ownedParameterConnection 	<- impl.getConnectionsInstancesImg('parameterConnection')->excluding(OclUndefined),
+		ownedFeatureGroupConnection <- impl.getConnectionsInstancesImg('featureGroupConnection')->excluding(OclUndefined),
+		ownedRealization 			<- thisModule.Realization(impl.type.resolve()),
+		-- should be in a factorized rule for Classifier
+		ownedMode                   <- impl.getModesInstancesImg(),
+		ownedModeTransition         <- impl.getModesTransitionInstancesImg()
  	)
 }
 
@@ -120,7 +127,7 @@ rule m_Memory_Implementation {
  	impl : AADLI!MemoryImplementation
  to 
  	implImg : AADLBA!MemoryImplementation (
-		ownedMemorySubcomponent <- impl.getSubcomponentsInstances('memory')
+		ownedMemorySubcomponent <- impl.getSubcomponentsInstances('memory')->excluding(OclUndefined)
 	)
 }
 
@@ -130,18 +137,31 @@ rule m_Process_Implementation {
  	impl : AADLI!ProcessImplementation
  to 
  	implImg : AADLBA!ProcessImplementation (
-		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('threadgroup'),
-		ownedThreadSubcomponent 		<- impl.getSubcomponentsInstances('thread'),
-		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
-		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')
+		ownedThreadGroupSubcomponent 	<- impl.getSubcomponentsInstances('threadgroup')->excluding(OclUndefined),
+		ownedThreadSubcomponent 		<- impl.getSubcomponentsInstances('thread')->excluding(OclUndefined),
+		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram')->excluding(OclUndefined),
+		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data')->excluding(OclUndefined)
 	)
 }
+
+helper context AADLI!SystemImplementation def:  isRoot() : Boolean = 
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.subcomponent.oclIsUndefined()).debug(' !!!!!!!! ')
+			->exists(e| e.componentImplementation=self)
+;
+
+helper context AADLI!ComponentInstance def: getSystemSubcomponent(): Sequence(AADLI!ComponentInstance) =
+	self.componentInstance->select(e|e.category=#system)
+	->collect(e|e.getSystemSubcomponent())
+	->union(Sequence{self})
+;
 
 --@extends m_Component_Implementation
 rule m_System_Implementation {
   from
   	impl : AADLI!SystemImplementation
-	
+	(
+		impl.isRoot()
+	)
   to
   	implImg : AADLBA!SystemImplementation
 	(
@@ -150,14 +170,15 @@ rule m_System_Implementation {
 											 else
 											 thisModule.theHOOK.getOutputPackageName()+'.impl'
 											 endif,
-		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory'),
-		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor'),
-		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device'),
-		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor'),
-		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process'),
-		ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram'),
-		ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system'),
-		ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')
+		ownedMemorySubcomponent           <- impl.getSubcomponentsInstances('memory')->excluding(OclUndefined),
+		ownedProcessorSubcomponent        <- impl.getSubcomponentsInstances('processor')->excluding(OclUndefined),
+		ownedDeviceSubcomponent           <- impl.getSubcomponentsInstances('device')->excluding(OclUndefined),
+		ownedSystemSubcomponent           <- impl.getSubcomponentsInstances('system')->excluding(OclUndefined),
+		ownedVirtualProcessorSubcomponent <- impl.getSubcomponentsInstances('virtual processor')->excluding(OclUndefined),
+		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('process')->excluding(OclUndefined),
+		ownedSubprogramSubcomponent       <- impl.getSubcomponentsInstances('subprogram')->excluding(OclUndefined),
+		ownedDataSubcomponent             <- impl.getSubcomponentsInstances('data')->excluding(OclUndefined),
+		ownedBusSubcomponent             <- impl.getSubcomponentsInstances('bus')->excluding(OclUndefined)
 	)
 }
 
@@ -184,55 +205,65 @@ rule m_Thread_Implementation {
 		ownedSubprogramSubcomponent 	<- impl.getSubcomponentsInstances('subprogram'),
 		ownedDataSubcomponent 			<- impl.getSubcomponentsInstances('data'),
 		ownedSubprogramCallSequence     <- impl.ownedSubprogramCallSequence,
-		ownedParameterConnection		<- impl.ownedParameterConnection->collect(e|thisModule.ParameterConnection(e)),
+		ownedParameterConnection		<- impl.getAllConnections()->select(e| e.oclIsKindOf(AADLI!ParameterConnection) )->collect(e|thisModule.ParameterConnection(e)),
 		ownedAccessConnection			<- impl.ownedAccessConnection->collect(e|thisModule.AccessConnection(e))
 	)
- do
- {
- 	if(impl.ownedAnnexSubclause->exists(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)))
-	{
-		implImg.ownedAnnexSubclause.add
-		(
---			thisModule.copyBehaviorAnnex(c, impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)) )
-		);	
-	}
- 	implImg;
- }
 }
 
 --@extends m_Component_Implementation
 rule m_Subprogram_Implementation {
  from
- 	impl : AADLI!SubprogramImplementation 
+ 	impl : AADLI!SubprogramImplementation
  to 
  	implImg : AADLBA!SubprogramImplementation (
 		ownedPropertyAssociation    <- impl.mapOwnedPropertyAssociationList(),
-		ownedSubprogramCallSequence <- thisModule.copyCallSequence(OclUndefined, impl,implImg),
+		ownedSubprogramCallSequence <- impl.ownedSubprogramCallSequence,
 		ownedAccessConnection		<- impl.ownedAccessConnection->collect(co|thisModule.AccessConnection(co, implImg))
 	)
- do
- {
- 	if(not impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)).oclIsUndefined())
-	{
-		implImg.ownedAnnexSubclause.add
-		(
-			thisModule.copyBehaviorAnnex(OclUndefined, impl.ownedAnnexSubclause->any(e| e.oclIsTypeOf(AADLBA!BehaviorAnnex)) )
-		);
-	}
- }
 }
 
-helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AADLBA!ComponentImplementation) : AADLBA!SubprogramCallSequence =
-	if( impl.behaviorFromImpl().oclIsUndefined() ) then
-		if(impl.behaviorFromComputeEntryPoint().oclIsUndefined()) then
-			OclUndefined
-		else
-			thisModule.mapComputeEntrypoint(implImg, c, impl)
-		endif
-	else
-		thisModule.mapCallSequence(implImg, c, impl)
-	endif
-;
+rule m_SubprogramCallSequence
+{
+	from
+		seq : AADLI!SubprogramCallSequence
+	to
+		seqImg: AADLBA!SubprogramCallSequence(
+			name <- seq.name,
+			ownedSubprogramCall <- seq.ownedSubprogramCall
+		)
+	do
+	{
+		seqImg;
+	}
+}
+
+rule m_SubprogramCall
+{
+	from
+		sc: AADLI!SubprogramCall
+	to
+		call : AADLBA!SubprogramCall (
+			name <- sc.name,
+			calledSubprogram <- sc.calledSubprogram
+		)
+	do
+	{
+		call;
+	}
+}
+
+
+--helper def : copyCallSequence(c : AADLI!ComponentInstance, impl : AADLI!ComponentImplementation, implImg : AADLBA!ComponentImplementation) : AADLBA!SubprogramCallSequence =
+--	if( impl.behaviorFromImpl().oclIsUndefined() ) then
+--		if(impl.behaviorFromComputeEntryPoint().oclIsUndefined()) then
+--			OclUndefined
+--		else
+--			thisModule.mapComputeEntrypoint(implImg, c, impl)
+--		endif
+--	else
+--		thisModule.mapCallSequence(implImg, c, impl)
+--	endif
+--;
 
 
 ----@extends m_Component_Implementation

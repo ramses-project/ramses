@@ -238,8 +238,10 @@ public abstract class AtlTransfoLauncher
 	fileNameList.add("/uninstanciate/Features") ;
 	fileNameList.add("/uninstanciate/Implementations") ;
 	fileNameList.add("/uninstanciate/Properties") ;
+	fileNameList.add("/uninstanciate/Modes") ;
 	fileNameList.add("/uninstanciate/Types") ;
 	fileNameList.add("/uninstanciate/Connections") ;
+	fileNameList.add("/uninstanciate/Modes") ;
 	fileNameList.add("/helpers/Services") ;
 	fileNameList.add("/tools/BehaviorAnnexTools") ;
 	fileNameList.add("/BehaviorAnnexCopy/copyBehaviorActionBlock") ;

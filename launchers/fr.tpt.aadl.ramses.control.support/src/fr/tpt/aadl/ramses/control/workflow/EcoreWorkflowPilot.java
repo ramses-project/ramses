@@ -32,7 +32,6 @@ import org.eclipse.emf.common.util.Diagnostic ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.emf.ecore.util.Diagnostician ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
@@ -41,8 +40,6 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
  * described in an Ecore resource.
  */
 public class EcoreWorkflowPilot  implements WorkflowPilot {
-
-	private ResourceSet resourceSet;
 
 	private String workflowFileName;
 
@@ -63,17 +60,18 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	 * the workflow description.
 	 * @throws FileNotFoundException if the path does not point to any file
 	 */
-	public EcoreWorkflowPilot(String workflowFileName) throws FileNotFoundException{
+	public EcoreWorkflowPilot(ResourceSet resourceSet,
+	                          String workflowFileName) throws FileNotFoundException{
 
 		this.workflowFileName = workflowFileName;
 
-		getResourceSet().setResourceFactoryRegistry(
+		resourceSet.setResourceFactoryRegistry(
 				Resource.Factory.Registry.INSTANCE);
 
-		getResourceSet().getResourceFactoryRegistry()
+		resourceSet.getResourceFactoryRegistry()
 				.getExtensionToFactoryMap()
 				.put("xmi", new XMIResourceFactoryImpl());
-		getResourceSet().getPackageRegistry().put(WorkflowPackage.eNS_URI,
+		resourceSet.getPackageRegistry().put(WorkflowPackage.eNS_URI,
 				WorkflowPackage.eINSTANCE);
 
 		final Resource resource;
@@ -86,8 +84,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 			throw new FileNotFoundException(errMsg);
 		}
 
-		if (getResourceSet().getURIConverter().exists(workflow_uri, null)) {
-			resource = getResourceSet().getResource(workflow_uri, true);
+		if (resourceSet.getURIConverter().exists(workflow_uri, null)) {
+			resource = resourceSet.getResource(workflow_uri, true);
 			workflowRootObject = (Workflow) resource.getContents()
 					.get(0);
 			
@@ -143,7 +141,8 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 				return "unparse";
 			} else if (currentWorkflowElement instanceof Loop) {
 			  return "loop";
-			}
+			} else if (currentWorkflowElement instanceof ErrorState)
+			  return "errorstate";
 		}
 		return null;
 	}
@@ -264,17 +263,6 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	}
 
 	/**
-	 * This method returns the workflow resource set.
-	 * @return the workflow resource set.
-	 */
-	protected ResourceSet getResourceSet() {
-		if (resourceSet == null) {
-			resourceSet = new ResourceSetImpl();
-		}
-		return resourceSet;
-	}
-
-	/**
 	 * @see WorkflowPilot#getInputModelId()
 	 */
 	@Override
@@ -288,6 +276,10 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 			Analysis a = (Analysis) currentWorkflowElement;
 			result = a.getInputModelIdentifier().getId();
 		}
+		if (currentWorkflowElement instanceof Generation) {
+		  Generation g = (Generation) currentWorkflowElement;
+      result = g.getInputModelIdentifier().getId();
+    }
 		return result;
 	}
 

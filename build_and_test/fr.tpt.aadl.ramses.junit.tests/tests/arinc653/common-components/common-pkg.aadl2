@@ -21,7 +21,7 @@
 
 package common_pkg
 public
-with ARINC653,POK,RAMSES_processors,Data_Model;
+with Data_Model,ARINC653,POK,RAMSES_processors,RAMSES_buses;
 
   --------------------------------------------------
   --- PROCESSOR COMPONENTS
@@ -41,6 +41,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     	[ErrorIdentifier => 1; Description => "Restart partition"; Action => "Stop";],
     	[ErrorIdentifier => 2; Description => "Warm partition restart"; Action => "Reset";]
     );
+   Scheduling_Protocol => (Arinc653);
   end cpu;
 
   processor implementation cpu.single_partition
@@ -48,9 +49,9 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     the_part:  virtual processor part;
   properties
     ARINC653::Module_Major_Frame => 2000 ms;
-    POK::Scheduler => static;
-    ARINC653::Partition_Slots => (2000 ms);
-    ARINC653::Slots_Allocation => (reference (the_part));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part); Duration => 2000ms; Periodic_Processing_Start => true;]
+    );
   end cpu.single_partition;
 
   processor implementation cpu.two_partitions
@@ -59,12 +60,33 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
     the_part2:  virtual processor part;
   properties
     ARINC653::Module_Major_Frame => 4000 ms;
-    POK::Scheduler => static;
-    ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
-    ARINC653::Slots_Allocation => (reference (the_part1), reference (the_part1), reference (the_part2));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part1); Duration => 2000ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(the_part1); Duration => 1000ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(the_part2); Duration => 1000ms; Periodic_Processing_Start => true;]
+    );
     POK::Ports_Flush_Time => Partition_Slot_Switch;
   end cpu.two_partitions;
 
+  processor connected_cpu extends cpu
+  features
+    bus_access: requires bus access RAMSES_buses::rtl8029;
+  end connected_cpu;
+
+  processor implementation connected_cpu.with_system_partition
+  subcomponents
+    the_part:  virtual processor part;
+    system_part:  virtual processor part;
+  properties
+    ARINC653::System_Partition => true applies to system_part;
+    ARINC653::Module_Major_Frame => 2000 ms;
+    Scheduling_Protocol => (ARINC653);
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part); Duration => 1000ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(system_part); Duration => 1000ms; Periodic_Processing_Start => true;]
+    );
+    POK::Ports_Flush_Time => Partition_Slot_Switch;
+  end connected_cpu.with_system_partition;
   --------------------------------------------------
   --- VIRTUAL PROCESSOR COMPONENTS
   --------------------------------------------------
@@ -73,7 +95,8 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   properties
     ARINC653::Partition_Identifier => 1;
     POK::Additional_Features => (libc_stdio, console);
-    POK::Scheduler => RR;
+    Scheduling_Protocol => (Round_Robin_Protocol);
+    Period => 1000 Ms;
     ARINC653::HM_Error_ID_Actions => (
     	[ErrorIdentifier => 3; Description => "Restart process"; Action => "Cold_Restart";],
     	[ErrorIdentifier => 4; Description => "Warm partition restart"; Action => "Warm_Restart";]
@@ -86,11 +109,12 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   --------------------------------------------------
 
   memory mem
+  properties
+    Memory_Size => 200000 bytes;
   end mem;
 
   memory implementation mem.impl
   properties
-    Memory_Size => 200000 bytes;
     Memory_Protocol => read_write;
     ARINC653::Memory_Type => (Data_Memory);
   end mem.impl;
@@ -104,7 +128,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
 
   memory part_mem
   properties
-    Memory_Size => 80000 bytes;
+    Memory_Size => 150000 bytes;
     Memory_Protocol => read_write;
     ARINC653::Memory_Type => (Data_Memory);
   end part_mem;
@@ -237,7 +261,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   features
     p_in: in event port;
   properties
-    Dispatch_Protocol => Periodic;
+    Dispatch_Protocol => Timed;
     Period => 200 Ms;
     Priority => 10;
     Data_Size => 40000 bytes;
@@ -328,7 +352,7 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   properties
     source_name => "event_received";
     source_language => (C);
-    source_text => ("user_code.h","user_code.c");
+    source_text => ("event_code.h","event_code.c");
   end event_receiver_spg;
 
   subprogram event_sender_spg
@@ -337,14 +361,14 @@ with ARINC653,POK,RAMSES_processors,Data_Model;
   properties
     source_name => "send_event";
     source_language => (C);
-    source_text => ("user_code.h","user_code.c");
+    source_text => ("event_code.h","event_code.c");
   end event_sender_spg;
 
   subprogram nothing_received
   properties
     source_name => "nothing_received";
     source_language => (C);
-    source_text => ("user_code.h","user_code.c");
+    source_text => ("event_code.h","event_code.c");
   end nothing_received;
 
 

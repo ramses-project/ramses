@@ -30,6 +30,7 @@ import org.osate.aadl2.ConnectedElement ;
 import org.osate.aadl2.Connection ;
 import org.osate.aadl2.ConnectionEnd ;
 import org.osate.aadl2.DataAccess ;
+import org.osate.aadl2.DataClassifier ;
 import org.osate.aadl2.Feature ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.SubprogramClassifier ;
@@ -90,15 +91,14 @@ import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 public class BehaviorAction2EG
 {
   private static final Logger _LOGGER = Logger.getLogger(BehaviorAction2EG.class) ; 
-  
   private BehaviorAction2EG(){}
 
-  public static EGNode actionBlockToEG (BehaviorActionBlock block, String name)
+  public static EGNode actionBlockToEG (BehaviorActionBlock block, String name, NamedElement concreteElement)
   {
-    return actionsToEG (block.getContent(), name);
+    return actionsToEG (block.getContent(), name, concreteElement);
   }
   
-  public static EGNode actionsToEG (BehaviorActions actions, String name)
+  public static EGNode actionsToEG (BehaviorActions actions, String name, NamedElement concreteElement)
   {
     List<BehaviorAction> actionList = BehaviorUtil.getBehaviorActions(actions);
     EGNode trStartNode   = new EGNode(name + "_start");
@@ -112,7 +112,7 @@ public class BehaviorAction2EG
       EGNode actionNode ;
       try
       {
-        actionNode = actionToEG(action) ;
+        actionNode = actionToEG(action, concreteElement) ;
       }
       catch(UnsupportedOperationException e)
       {
@@ -135,13 +135,13 @@ public class BehaviorAction2EG
    * @param action behavior action
    * @return root node of the subgraph corresponding to the given action
    */
-  public static EGNode actionToEG (BehaviorAction action)
+  public static EGNode actionToEG (BehaviorAction action, NamedElement concreteElement)
   {
     if (action instanceof BasicAction)
     {
       if (action instanceof AssignmentAction)
       {
-        return assignmentToEG((AssignmentAction) action);
+        return assignmentToEG((AssignmentAction) action, concreteElement);
       }
       else if (action instanceof SubprogramCallAction)
       {
@@ -171,7 +171,7 @@ public class BehaviorAction2EG
     {
       if (action instanceof IfStatement)
       {
-        return ifToEG((IfStatement) action);
+        return ifToEG((IfStatement) action, concreteElement);
       }
       else if (action instanceof ForOrForAllStatement)
       {
@@ -182,7 +182,7 @@ public class BehaviorAction2EG
         }
         else
         {
-          return forToEG (s);
+          return forToEG (s, concreteElement);
         }
       }
       else if (action instanceof WhileOrDoUntilStatement)
@@ -194,7 +194,7 @@ public class BehaviorAction2EG
         }
         else
         {
-          return whileToEG (s);
+          return whileToEG (s, concreteElement);
         }
       }
       else
@@ -214,15 +214,15 @@ public class BehaviorAction2EG
     }
   }
   
-  private static EGNode assignmentToEG (AssignmentAction a)
+  private static EGNode assignmentToEG (AssignmentAction a, NamedElement concreteElement)
   {
     Target target = a.getTarget();
     ValueExpression assigned = a.getValueExpression();
     
     boolean ignoreCopy = ((target instanceof DataAccessHolder) 
                       || (target instanceof DataAccessPrototypeHolder));
-    
-    String targetName = AadlBaUtils.getDataClassifier(target).getName() ;
+    DataClassifier dc = AadlBaUtils.getDataClassifier(target, concreteElement);
+    String targetName = dc.getName() ;
     EGNode assignmentNode = subExpressionsToEG(assigned,"Assign_"+ targetName, 
                                                false, ignoreCopy);
     return assignmentNode;
@@ -631,14 +631,14 @@ public class BehaviorAction2EG
     return n ;
   }
   
-  private static EGNode ifToEG (IfStatement a)
+  private static EGNode ifToEG (IfStatement a, NamedElement concreteElement)
   {
     EGNode nIf = new EGNode("if");
     
     EGNode nEndif = new EGNode("endif");
     EGNode nCond = subExpressionsToEG (a.getLogicalValueExpression(), "ifcond",
                                                                     false,true);
-    EGNode nThenStart = actionsToEG (a.getBehaviorActions(), "ifthen") ;
+    EGNode nThenStart = actionsToEG (a.getBehaviorActions(), "ifthen", concreteElement) ;
     
     nIf.addNext(nCond);
     nIf.setBlockEnd(nEndif);
@@ -650,7 +650,7 @@ public class BehaviorAction2EG
     EGNode nElseStart = null;
     if (e != null)
     {
-      nElseStart = actionsToEG (e.getBehaviorActions(), "ifelse") ;
+      nElseStart = actionsToEG (e.getBehaviorActions(), "ifelse", concreteElement) ;
     }
     else
     {
@@ -664,7 +664,7 @@ public class BehaviorAction2EG
     return nIf;
   }
   
-  private static EGNode forToEG (ForOrForAllStatement a)
+  private static EGNode forToEG (ForOrForAllStatement a, NamedElement concreteElement)
   {
     IntegerRange r = null;
     try
@@ -692,7 +692,7 @@ public class BehaviorAction2EG
     for(int i=r.getMin();i<=r.getMax();i++)
     {
       EGNode nIt = BehaviorAction2EG.actionsToEG(
-          a.getBehaviorActions(), "Iteration_it="+i);
+          a.getBehaviorActions(), "Iteration_it="+i, concreteElement);
       first.addNext(nIt);
       first = nIt;
     }
@@ -701,7 +701,7 @@ public class BehaviorAction2EG
     return nodeFor;
   }
 
-  private static EGNode whileToEG (WhileOrDoUntilStatement a)
+  private static EGNode whileToEG (WhileOrDoUntilStatement a, NamedElement concreteElement)
   {
     final int iterations = WhileLoopUtil.computeMaxIterations(a);
     EGNode actionWhile = new EGNode("while");
@@ -721,7 +721,7 @@ public class BehaviorAction2EG
       //debug("Iteration " + (i+1), "*");
       
       /** Iteration body */
-      EGNode nodeIter = BehaviorAction2EG.actionsToEG(body, "iteration_" + (i+1));
+      EGNode nodeIter = BehaviorAction2EG.actionsToEG(body, "iteration_" + (i+1), concreteElement);
       iterationNode.addNext(nodeIter);
       iterationNode = nodeIter;
       

@@ -4,12 +4,12 @@
 #include "arinc653/types.h"
 #include "arinc653/blackboard.h"
 #include "business-code/cbtc_module.h"
-typedef enum e_cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState {
-	cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState_switch
-} cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState;
 typedef signed int Base_Types__Integer_16;
 typedef SAMPLING_PORT_ID_TYPE arinc653_runtime__Sampling_Port_Id_Type;
 typedef BLACKBOARD_ID_TYPE arinc653_runtime__Blackboard_Id_Type;
+typedef enum e_cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState {
+	cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState_switch
+} cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_currentState;
 typedef struct cbtc_refined_model__TrainData_freshness_t_impl {
 	TrainData pvalue;
 	Base_Types__Integer_16 fresh_ba;

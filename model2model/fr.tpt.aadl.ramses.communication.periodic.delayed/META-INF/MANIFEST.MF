@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.osate.aadl2,
  org.apache.log4j,
  fr.tpt.aadl.ramses.util.properties,
- fr.tpt.aadl.ramses.util.math
+ fr.tpt.aadl.ramses.util.math;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.communication.dimensioning,

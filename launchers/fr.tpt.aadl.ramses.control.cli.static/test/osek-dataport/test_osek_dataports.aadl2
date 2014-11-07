@@ -40,7 +40,7 @@ with OSEK,Data_Model;
 
   processor implementation cpu.impl
   properties
-      Scheduling_Protocol => (Rate_Monotonic_Protocol) ;
+      Scheduling_Protocol => (RMS) ;
       OSEK::SystemCounter_MaxAllowedValue => 2000;
       OSEK::SystemCounter_TicksPerBase => 1;
       OSEK::SystemCounter_MinCycle => 1;

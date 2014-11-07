@@ -24,6 +24,7 @@ package fr.tpt.aadl.ramses.analysis.impl;
 
 import org.eclipse.emf.common.notify.Notification;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
@@ -51,225 +52,251 @@ import fr.tpt.aadl.ramses.analysis.AnalysisSource;
  */
 public abstract class AnalysisResultImpl extends EObjectImpl implements AnalysisResult {
 	/**
-	 * The default value of the '{@link #getResultUUId() <em>Result UU Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The default value of the '{@link #getResultUUId() <em>Result UU Id</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getResultUUId()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getResultUUId()
+   * @generated
+   * @ordered
+   */
 	protected static final String RESULT_UU_ID_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getResultUUId() <em>Result UU Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getResultUUId() <em>Result UU Id</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getResultUUId()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getResultUUId()
+   * @generated
+   * @ordered
+   */
 	protected String resultUUId = RESULT_UU_ID_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getNfpId() <em>Nfp Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The default value of the '{@link #getNfpId() <em>Nfp Id</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getNfpId()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getNfpId()
+   * @generated
+   * @ordered
+   */
 	protected static final String NFP_ID_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getNfpId() <em>Nfp Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getNfpId() <em>Nfp Id</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getNfpId()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getNfpId()
+   * @generated
+   * @ordered
+   */
 	protected String nfpId = NFP_ID_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getSource() <em>Source</em>}' reference.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getSource() <em>Source</em>}' containment reference.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getSource()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getSource()
+   * @generated
+   * @ordered
+   */
 	protected AnalysisSource source;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected AnalysisResultImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return AnalysisResultPackage.Literals.ANALYSIS_RESULT;
-	}
+    return AnalysisResultPackage.Literals.ANALYSIS_RESULT;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public String getResultUUId() {
-		return resultUUId;
-	}
+    return resultUUId;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public String getNfpId() {
-		return nfpId;
-	}
+    return nfpId;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setNfpId(String newNfpId) {
-		String oldNfpId = nfpId;
-		nfpId = newNfpId;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID, oldNfpId, nfpId));
-	}
+    String oldNfpId = nfpId;
+    nfpId = newNfpId;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID, oldNfpId, nfpId));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public AnalysisSource getSource() {
-		if (source != null && source.eIsProxy()) {
-			InternalEObject oldSource = (InternalEObject)source;
-			source = (AnalysisSource)eResolveProxy(oldSource);
-			if (source != oldSource) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, oldSource, source));
-			}
-		}
-		return source;
-	}
+    return source;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public AnalysisSource basicGetSource() {
-		return source;
-	}
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain basicSetSource(AnalysisSource newSource, NotificationChain msgs)
+  {
+    AnalysisSource oldSource = source;
+    source = newSource;
+    if (eNotificationRequired())
+    {
+      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, oldSource, newSource);
+      if (msgs == null) msgs = notification; else msgs.add(notification);
+    }
+    return msgs;
+  }
 
-	/**
-	 * <!-- begin-user-doc -->
+  /**
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setSource(AnalysisSource newSource) {
-		AnalysisSource oldSource = source;
-		source = newSource;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, oldSource, source));
-	}
+    if (newSource != source)
+    {
+      NotificationChain msgs = null;
+      if (source != null)
+        msgs = ((InternalEObject)source).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, null, msgs);
+      if (newSource != null)
+        msgs = ((InternalEObject)newSource).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, null, msgs);
+      msgs = basicSetSource(newSource, msgs);
+      if (msgs != null) msgs.dispatch();
+    }
+    else if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, AnalysisResultPackage.ANALYSIS_RESULT__SOURCE, newSource, newSource));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
+  {
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
+        return basicSetSource(null, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_RESULT__RESULT_UU_ID:
-				return getResultUUId();
-			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
-				return getNfpId();
-			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
-				if (resolve) return getSource();
-				return basicGetSource();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_RESULT__RESULT_UU_ID:
+        return getResultUUId();
+      case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
+        return getNfpId();
+      case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
+        return getSource();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
-				setNfpId((String)newValue);
-				return;
-			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
-				setSource((AnalysisSource)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
+        setNfpId((String)newValue);
+        return;
+      case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
+        setSource((AnalysisSource)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
-				setNfpId(NFP_ID_EDEFAULT);
-				return;
-			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
-				setSource((AnalysisSource)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
+        setNfpId(NFP_ID_EDEFAULT);
+        return;
+      case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
+        setSource((AnalysisSource)null);
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_RESULT__RESULT_UU_ID:
-				return RESULT_UU_ID_EDEFAULT == null ? resultUUId != null : !RESULT_UU_ID_EDEFAULT.equals(resultUUId);
-			case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
-				return NFP_ID_EDEFAULT == null ? nfpId != null : !NFP_ID_EDEFAULT.equals(nfpId);
-			case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
-				return source != null;
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_RESULT__RESULT_UU_ID:
+        return RESULT_UU_ID_EDEFAULT == null ? resultUUId != null : !RESULT_UU_ID_EDEFAULT.equals(resultUUId);
+      case AnalysisResultPackage.ANALYSIS_RESULT__NFP_ID:
+        return NFP_ID_EDEFAULT == null ? nfpId != null : !NFP_ID_EDEFAULT.equals(nfpId);
+      case AnalysisResultPackage.ANALYSIS_RESULT__SOURCE:
+        return source != null;
+    }
+    return super.eIsSet(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+    if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (resultUUId: ");
-		result.append(resultUUId);
-		result.append(", nfpId: ");
-		result.append(nfpId);
-		result.append(')');
-		return result.toString();
-	}
+    StringBuffer result = new StringBuffer(super.toString());
+    result.append(" (resultUUId: ");
+    result.append(resultUUId);
+    result.append(", nfpId: ");
+    result.append(nfpId);
+    result.append(')');
+    return result.toString();
+  }
 
 } //AnalysisResultImpl

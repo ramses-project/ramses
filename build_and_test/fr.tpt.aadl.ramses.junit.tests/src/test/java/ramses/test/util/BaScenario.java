@@ -5,15 +5,13 @@ import static org.junit.Assert.fail ;
 import java.io.File ;
 import java.io.IOException ;
 
-import junit.framework.Assert ;
-
+import org.junit.Assert ;
 import org.osate.utils.FileUtils ;
 
 import com.saxman.textdiff.Report ;
 import com.saxman.textdiff.TextDiff ;
 
 import fr.tpt.aadl.ramses.control.support.reporters.StdProcessTraceDisplay ;
-import fr.tpt.aadl.ramses.control.support.utils.Names ;
 
 public abstract class BaScenario
 {
@@ -28,7 +26,7 @@ public abstract class BaScenario
   protected StringBuffer _args ;
   
   protected final static String _RAMSES_DIR ;
-  protected final static String _RAMSES_FILE_NAME = "ramses-exe.jar" ;
+  protected final static String _RAMSES_FILE_NAME = "osate2-cli" ;
   protected final static String _ERR_EXTENSION_FILE = ".err" ;
   protected final static char _SEPARATOR = ',' ;
   
@@ -41,25 +39,12 @@ public abstract class BaScenario
   {
     _args = new StringBuffer() ;
     
-    _args.append("java") ;
-    
-    _args.append(" -DDEBUG ") ;
-    
-    if(_RAMSES_DIR != null)
-    {
-      _args.append("-D") ;
-      _args.append(Names.RAMSES_RESOURCES_VAR) ;
-      _args.append('=') ;
-      _args.append(_RAMSES_DIR) ;
-    }
-    
-    _args.append(" -jar ") ;
     
     if(_RAMSES_DIR != null)
     {
       _args.append(_RAMSES_DIR) ;
     }
-
+    
     _args.append(_RAMSES_FILE_NAME) ;
     
     _args.append(" -l trace") ;

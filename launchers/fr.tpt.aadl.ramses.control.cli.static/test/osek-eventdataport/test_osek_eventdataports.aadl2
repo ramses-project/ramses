@@ -29,13 +29,15 @@ with OSEK, Data_Model;
   subcomponents
     the_cpu: processor cpu.impl;
     the_proc1: process proc1.impl;
+    the_mem: memory mem;
   properties
     actual_processor_binding => (reference (the_cpu)) applies to the_proc1;
+    actual_memory_binding => (reference(the_mem)) applies to the_proc1;
   end root.impl;
 
   processor cpu
   properties
-      Scheduling_Protocol => (Rate_Monotonic_Protocol) ;
+      Scheduling_Protocol => (RMS) ;
       OSEK::SystemCounter_MaxAllowedValue => 2000;
       OSEK::SystemCounter_TicksPerBase => 1;
       OSEK::SystemCounter_MinCycle => 1;
@@ -43,6 +45,9 @@ with OSEK, Data_Model;
 
   processor implementation cpu.impl
   end cpu.impl;
+
+  memory mem
+  end mem;
 
   process proc1
   end proc1;
@@ -72,14 +77,14 @@ with OSEK, Data_Model;
   calls
     call : { c : subprogram sender_spg;};
   connections
-    cnx: parameter c.result -> p;
+    cnx: port c.result -> p;
   properties
     Compute_Entrypoint_Call_Sequence => reference (call);
   end sender.impl;
 
   subprogram sender_spg
   features
-    result : out parameter Integer;
+    result : out event data port Integer;
   properties
     source_name => "send";
     source_language => (C);
@@ -104,11 +109,9 @@ with OSEK, Data_Model;
   calls
     call : { 
     	c1 : subprogram receiver_spg;
-    	c2 : subprogram receiver_spg;
     };
   connections
     cnx1: parameter p -> c1.input;
-    cnx2: parameter p -> c2.input;
   properties
     Compute_Entrypoint_Call_Sequence => reference (call);
   end receiver.impl;

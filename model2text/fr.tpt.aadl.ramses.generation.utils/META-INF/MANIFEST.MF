@@ -10,6 +10,9 @@ Require-Bundle: org.osate.utils,
  org.osate.aadl2.modelsupport,
  org.apache.log4j,
  fr.tpt.aadl.ramses.control.support,
+ fr.tpt.aadl.ramses.util.math,
+ fr.tpt.aadl.ramses.util.properties,
+ org.osate.ba,
  fr.tpt.aadl.ramses.control.atl.launch
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

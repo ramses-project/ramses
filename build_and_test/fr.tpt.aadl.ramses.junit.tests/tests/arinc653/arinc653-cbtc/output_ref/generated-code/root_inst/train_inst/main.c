@@ -24,10 +24,6 @@ SAMPLING_PORT_ID_TYPE train_inst_trainPpu_inst_trainDataInglobalVariable;
 
 int main ()
 {
-cbtc_refined_model__train_inst_TrainPpu_odometerAcquisition_impl_Init();
-cbtc_refined_model__train_inst_TrainPpu_trainTraction_impl_Init();
-cbtc_refined_model__train_inst_VobcTrainPositionEstimation_vobcTrainPositionEstimation_impl_Init();
-cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_BLACKBOARD ("TrainPpu_trainTraction_tractionIn_globalVariable", sizeof (cbtc_refined_model__TractionData_freshness_t_impl), &(TrainPpu_trainTraction_tractionIn_globalVariable), &(ret));
@@ -79,3 +75,30 @@ cbtc_refined_model__train_inst_TrainSpeedAccelCompute_trainSpeedAccelCompute_imp
 }
 
 /******************************************************************************/
+/*                                SEND OUTPUT                                 */
+
+void __aadl_send_output (unsigned int port_variable, void * value)
+{
+  RETURN_CODE_TYPE ret;
+  SYSTEM_TIME_TYPE time_out;
+  MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
+  switch (port_variable) {
+    case 0:
+      break;
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    case 5:
+      break;
+  }
+}

@@ -333,20 +333,6 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		)
 }
 
-rule CreateDataComponentPrototypeActual(d: AADLBA!DataClassifier)
-{
-	to
-		putValueOutputActual: AADLBA!ComponentPrototypeActual
-		(
-			category<-#data
-		)
-	do
-	{
-		putValueOutputActual.setSubcomponentType(d);
-		putValueOutputActual;
-	}
-}
-
 -- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
 rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
 {

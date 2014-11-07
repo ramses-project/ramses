@@ -31,16 +31,14 @@ import java.util.Set ;
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.common.util.EList ;
-import org.osate.aadl2.AnnexSubclause ;
+import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.BasicPropertyAssociation ;
+import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.BooleanLiteral ;
+import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentCategory ;
-import org.osate.aadl2.DataPort ;
-import org.osate.aadl2.DataSubcomponent ;
-import org.osate.aadl2.DefaultAnnexSubclause;
 import org.osate.aadl2.DirectionType ;
 import org.osate.aadl2.EnumerationLiteral ;
-import org.osate.aadl2.EventDataPort ;
 import org.osate.aadl2.IntegerLiteral ;
 import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.MemorySubcomponent ;
@@ -48,7 +46,6 @@ import org.osate.aadl2.ModalPropertyValue ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.NamedValue ;
 import org.osate.aadl2.NumberValue ;
-import org.osate.aadl2.Port ;
 import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorImplementation ;
@@ -57,9 +54,16 @@ import org.osate.aadl2.Property ;
 import org.osate.aadl2.PropertyAssociation ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.RecordValue ;
+import org.osate.aadl2.ReferenceValue ;
 import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.Subcomponent ;
+import org.osate.aadl2.Subprogram ;
+import org.osate.aadl2.SubprogramCall ;
+import org.osate.aadl2.SubprogramCallSequence ;
+import org.osate.aadl2.SubprogramImplementation ;
+import org.osate.aadl2.SubprogramType ;
 import org.osate.aadl2.SystemImplementation ;
+import org.osate.aadl2.SystemSubcomponent ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.VirtualProcessorSubcomponent ;
@@ -67,23 +71,30 @@ import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
 import org.osate.aadl2.instance.FeatureCategory ;
 import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.InstanceReferenceValue ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.UnparseText ;
-import org.osate.ba.aadlba.BehaviorAnnex ;
-import org.osate.ba.utils.AadlBaVisitors ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.utils.FileUtils ;
 import fr.tpt.aadl.ramses.generation.c.GenerationUtilsC ;
+import fr.tpt.aadl.ramses.generation.utils.AadlToXUnparser ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.BlackBoardInfo ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.EventInfo ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.QueueInfo ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.SampleInfo ;
 import fr.tpt.aadl.ramses.generation.utils.GeneratorUtils ;
+import fr.tpt.aadl.ramses.generation.utils.ProcessProperties ;
+import fr.tpt.aadl.ramses.generation.utils.ProcessorProperties ;
 import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
 
-public class AadlToPokCUnparser implements AadlTargetUnparser
+public class AadlToPokCUnparser extends AadlToXUnparser implements AadlTargetUnparser
 {
   private final static long DEFAULT_REQUIRED_STACK_SIZE = 16384 ;
   
@@ -105,6 +116,11 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   
   public final static String SEMAPHORE_AADL_TYPE = 
 		  								  "arinc653_runtime::Semaphore_Id_Type" ;
+  
+  public final static String VIRTUAL_PORT_AADL_TYPE = 
+      "rtl8029_driver::Pok_Port_Id_T" ;
+
+  private static final String VIRTUAL_PORT_SUFFIX = "_virtual_port" ;
   
   private ProcessorProperties _processorProp;
   
@@ -162,343 +178,9 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     }
   }
   
-  //TODO : be refactored with generic interfaces.
-  private void blackBoardHandler(String id, FeatureInstance fi, PartitionProperties pp)
-  {
-
-    BlackBoardInfo blackboardInfo = new BlackBoardInfo() ;
-    blackboardInfo.id = id;
-
-    if(fi.getCategory() == FeatureCategory.DATA_PORT)
-    {
-      DataPort p  = (DataPort) fi.getFeature() ;
-      if(isUsedInFresh(fi))
-    		  blackboardInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+p.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
-      else
-      {
-    	  String value = PropertyUtils.getStringValue(p.getDataFeatureClassifier(),
-    	                                              "Source_Name") ;
-    	  if(value != null)
-    	  {
-    		  blackboardInfo.dataType=value ;
-    	  }
-    	  else
-    	  {
-    		  blackboardInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(p.getDataFeatureClassifier().getQualifiedName()) ;
-    	  }
-      }
-    }
-    pp.blackboardInfo.add(blackboardInfo); 
-
-  }
-  
-  private boolean isUsedInFresh(FeatureInstance fi)
-  {
-    if(fi.getComponentInstance().getCategory() == ComponentCategory.PROCESS)
-    {
-      ComponentInstance process = fi.getComponentInstance() ;
-      for(ComponentInstance thread : process.getComponentInstances())
-      {
-        if(!thread.getCategory().equals(ComponentCategory.THREAD))
-          continue ;
-        for(FeatureInstance threadFeature : thread.getFeatureInstances())
-        {
-          if(threadFeature.getDirection() == DirectionType.IN)
-          {
-            for(ConnectionInstance cnxInst : threadFeature
-                  .getDstConnectionInstances())
-            {
-              int last = cnxInst.getConnectionReferences().size() - 1 ;
-              if(cnxInst.getConnectionReferences().get(last).getSource() == fi)
-              {
-                if(isUsedInFresh((FeatureInstance) cnxInst
-                      .getConnectionReferences().get(last).getDestination()))
-                  return true ;
-              }
-            }
-          }
-          if(threadFeature.getDirection() == DirectionType.OUT)
-          {
-            for(ConnectionInstance cnxInst : threadFeature
-                  .getSrcConnectionInstances())
-            {
-              if(cnxInst.getConnectionReferences().get(0).getDestination() == fi)
-              {
-                if(isUsedInFresh((FeatureInstance) cnxInst
-                      .getConnectionReferences().get(0).getSource()))
-                  return true ;
-              }
-            }
-          }
-        }
-      }
-    }
-    if(fi.getComponentInstance().getCategory() == ComponentCategory.THREAD)
-    {
-      Port p = (Port) fi.getFeature() ;
-      BehaviorAnnex ba = getBa(fi) ;
-      if(ba != null)
-      {
-        if(AadlBaVisitors.isFresh(ba, p))
-          return true ;
-        for(ConnectionInstance cnxi : fi.getSrcConnectionInstances())
-        {
-          if(cnxi.getSource() instanceof FeatureInstance)
-          {
-            FeatureInstance f = (FeatureInstance) cnxi.getSource() ;
-            ba = getBa(f) ;
-            if(f.getFeature() instanceof Port &&
-                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
-              return true ;
-          }
-          if(cnxi.getDestination() instanceof FeatureInstance)
-          {
-            FeatureInstance f = (FeatureInstance) cnxi.getDestination() ;
-            ba = getBa(f) ;
-            if(f.getFeature() instanceof Port &&
-                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
-              return true ;
-          }
-
-        }
-        for(ConnectionInstance cnxi : fi.getDstConnectionInstances())
-        {
-          if(cnxi.getSource() instanceof FeatureInstance)
-          {
-            FeatureInstance f = (FeatureInstance) cnxi.getSource() ;
-            ba = getBa(f) ;
-            if(f.getFeature() instanceof Port &&
-                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
-              return true ;
-          }
-          if(cnxi.getDestination() instanceof FeatureInstance)
-          {
-            FeatureInstance f = (FeatureInstance) cnxi.getDestination() ;
-            ba = getBa(f) ;
-            if(f.getFeature() instanceof Port &&
-                  AadlBaVisitors.isFresh(ba, (Port) f.getFeature()))
-              return true ;
-          }
-        }
-      }
-    }
-    return false ;
-  }
-
-  private BehaviorAnnex getBa(FeatureInstance fi)
-  {
-    ComponentInstance ci = (ComponentInstance) fi.eContainer() ;
-    BehaviorAnnex ba = null ;
-    for(AnnexSubclause as : ci.getSubcomponent().getClassifier()
-          .getOwnedAnnexSubclauses())
-    {
-      if(as.getName().equalsIgnoreCase("behavior_specification"))
-      {
-    	if(as instanceof BehaviorAnnex)
-        {
-    	  ba = (BehaviorAnnex) as ;
-    	  break ;
-        }
-    	else if(as instanceof DefaultAnnexSubclause)
-    	{
-    	  DefaultAnnexSubclause das = (DefaultAnnexSubclause) as ;
-    	  ba = (BehaviorAnnex) das.getParsedAnnexSubclause();
-    	  break;
-    	}
-      }
-    }
-    return ba ;
-  }
-
-//TODO : be refactored with generic interfaces.
-  private void queueHandler(String id, FeatureInstance fi, PartitionProperties pp)
-  {
-    Port p = (Port) fi.getFeature() ;
-    
-    QueueInfo queueInfo = new QueueInfo() ;
-    
-    queueInfo.id = id;
-    queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
-    queueInfo.direction = p.getDirection() ;
-    
-    if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
-    {
-      EventDataPort port  = (EventDataPort) fi.getFeature() ;
-      if(isUsedInFresh(fi))
-    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
-      else
-      {
-        String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
-                                                    "Source_Name") ;
-        if(value != null)
-        {
-          queueInfo.dataType=value ;
-        }
-        else
-        {
-    	  queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
-        }
-      }
-    }
-    if(getQueueInfo(p, queueInfo))
-    {
-      pp.queueInfo.add(queueInfo) ;
-    }
-  }
-  
-  private void bufferHandler(String id, FeatureInstance fi, PartitionProperties pp)
-  {
-    QueueInfo queueInfo = new QueueInfo() ;
-    
-    queueInfo.id = id;
-    queueInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
-    
-    if(fi.getCategory() == FeatureCategory.EVENT_DATA_PORT)
-    {
-      EventDataPort port  = (EventDataPort) fi.getFeature() ;
-      if(isUsedInFresh(fi))
-    	  queueInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
-      else
-      {
-        String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
-                                                    "Source_Name") ;
-        if(value != null)
-        {
-          queueInfo.dataType=value ;
-        }
-        else
-        {
-          queueInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
-        }
-      }
-    }
-    else if(fi.getCategory() == FeatureCategory.EVENT_PORT)
-    {
-      queueInfo.dataType="int";
-    }
-    
-    
-    if(getQueueInfo((Port)fi.getFeature(), queueInfo))
-    {
-      pp.bufferInfo.add(queueInfo) ;
-    }
-    else
-    {
-      queueInfo.type = "FIFO";
-      queueInfo.size = 10;
-      pp.bufferInfo.add(queueInfo) ;
-    }
-    
-  }
-  
-  // Return false QueueInfo object is not completed.
-  private boolean getQueueInfo(Port port, QueueInfo info)
-  {
-    boolean result = true ;
-    
-    // XXX temporary. Until ATL transformation modifications.
-    //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
-    
-    if(info.type == null)
-    {
-      String value = PropertyUtils.getEnumValue(port, "Queue_Processing_Protocol") ;
-      if(value != null)
-      {
-        info.type = value ;
-      }
-      else
-      {
-        result = false ;
-      }
-    }
-    
-    if(info.size == -1)
-    {
-      Long value = PropertyUtils.getIntValue(port, "Queue_Size") ;
-      if(value != null)
-      {
-        info.size = value ;
-      }
-      else
-      {
-        result = false ;
-      }
-    }
-    
-    return result ;
-  }
-  
-  // TODO : be refactored with generic interfaces. 
-  private void sampleHandler(String id, FeatureInstance fi, PartitionProperties pp)
-  {
-    Port p = (Port) fi.getFeature() ;
-    
-    SampleInfo sampleInfo = new SampleInfo() ;
-    sampleInfo.direction = p.getDirection() ;
-    
-    if(fi.getCategory() == FeatureCategory.DATA_PORT)
-    {
-      DataPort port  = (DataPort) fi.getFeature() ;
-      if(isUsedInFresh(fi))
-      {
-    	  sampleInfo.dataType=GenerationUtilsC.getGenerationCIdentifier(pp.prefix)+port.getDataFeatureClassifier().getName()+"_freshness_t_impl" ;
-      }
-      else
-      {
-    	  String value = PropertyUtils.getStringValue(port.getDataFeatureClassifier(),
-    	                                              "Source_Name") ;
-    	  if(value != null)
-    	  {
-    		  sampleInfo.dataType=value ;
-    	  }
-    	  else
-    	  {
-    		  sampleInfo.dataType = GenerationUtilsC.getGenerationCIdentifier(port.getDataFeatureClassifier().getQualifiedName()) ;
-    	  }
-      }
-    }
-    
-    sampleInfo.id = id;
-    sampleInfo.uniqueId = AadlToPokCUtils.getFeatureLocalIdentifier(fi);
-    
-    if(getSampleInfo(p, sampleInfo))
-    {
-      pp.sampleInfo.add(sampleInfo) ;
-    }
-  }
-  
-  private boolean getSampleInfo(Port port, SampleInfo info)
-  {
-    boolean result = true ;
-    
-    // XXX temporary. Until ATL transformation modifications.
-    //  info.id = RoutingProperties.getFeatureLocalIdentifier(fi) ;
-    
-    if(info.refresh == -1)
-    {
-      Long value = PropertyUtils.getIntValue(port,
-                                             "Sampling_Refresh_Period") ;
-      if(value != null)
-      {
-        info.refresh = value ;
-      }
-      else
-      {
-        String msg =  "set default Sampling_Refresh_Period value for sampling port \'" +
-                      port.getQualifiedName() + "\'" ;
-        _LOGGER.warn(msg);
-        ServiceProvider.SYS_ERR_REP.warning(msg, true);
-
-        info.refresh = 10l;
-        //TODO: restore and resolve issue with pingpong-ba result = false ;
-      }
-    }
-    
-    return result ;
-  }
   
   private void genQueueMainImpl(UnparseText mainImplCode,
-                                PartitionProperties pp)
+                                ProcessProperties pp)
   {
     for(QueueInfo info : pp.queueInfo)
     {
@@ -530,20 +212,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   }
   
   private void genEventMainImpl(UnparseText mainImplCode,
-                                 PartitionProperties pp)
+                                 ProcessProperties pp)
   {
-    for(String eventId: pp.eventNames)
+    for(EventInfo eventInfo: pp.eventInfo)
     {
       mainImplCode.addOutput("  CREATE_EVENT (\"") ;
-      mainImplCode.addOutput(eventId);
+      mainImplCode.addOutput(eventInfo.id);
       mainImplCode.addOutput("\",");
-      mainImplCode.addOutput("&"+eventId+",");
+      mainImplCode.addOutput("&"+eventInfo.id+",");
       mainImplCode.addOutputNewline("& (ret));");
     }
   }
   
   private void genBufferMainImpl(UnparseText mainImplCode,
-                                PartitionProperties pp)
+                                ProcessProperties pp)
  {
    for(QueueInfo info: pp.bufferInfo)
    {
@@ -561,7 +243,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
  }
   
   private void genSampleMainImpl(UnparseText mainImplCode,
-                                 PartitionProperties pp)
+                                 ProcessProperties pp)
   {
     for(SampleInfo info : pp.sampleInfo)
     {
@@ -596,7 +278,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
                       IProgressMonitor monitor)
   {
 	  StringBuilder sb = new StringBuilder(process.getQualifiedName());
-    PartitionProperties pp = new PartitionProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
+    ProcessProperties pp = new ProcessProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
     
     ProcessImplementation processImpl = (ProcessImplementation) 
                                           process.getComponentImplementation() ;
@@ -610,6 +292,12 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     // Generate main.c
     UnparseText mainImplCode = new UnparseText() ;
     genMainImpl(processImpl, mainImplCode, pp) ;
+    
+    ComponentInstance processInstance = (ComponentInstance) HookAccessImpl.getTransformationTrace(process);
+    
+    mainImplCode.addOutputNewline(GenerationUtilsC
+                                  .generateSectionTitle("SEND OUTPUT")) ;
+    genSendOutputImpl(processInstance, mainImplCode, mainHeaderCode, pp);
     
     try
     {
@@ -631,7 +319,7 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
   //Generate global variables.
   private void genGlobalVariablesMainImpl(ProcessImplementation process, EList<ThreadSubcomponent> lthreads,
                                           UnparseText mainImplCode,
-                                          PartitionProperties pp)
+                                          ProcessProperties pp)
   {
     mainImplCode.addOutputNewline(GenerationUtilsC.generateSectionMark()) ;
     mainImplCode.addOutputNewline(GenerationUtilsC
@@ -674,20 +362,20 @@ public class AadlToPokCUnparser implements AadlTargetUnparser
     {
       mainImplCode.addOutput("char* pok_arinc653_events_names[POK_CONFIG_NB_EVENTS] = {") ;
 
-      for(String name : pp.eventNames)
+      for(EventInfo eventInfo : pp.eventInfo)
       {
         mainImplCode.addOutput("\"") ;
-        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput(eventInfo.id) ;
         mainImplCode.addOutput("\"") ;
       }
 
       mainImplCode.addOutputNewline("};") ;
       
       // Generate external variable (declared in deployment.c).
-      for(String name : pp.eventNames)
+      for(EventInfo eventInfo : pp.eventInfo)
       {
         mainImplCode.addOutput("EVENT_ID_TYPE ") ;
-        mainImplCode.addOutput(name) ;
+        mainImplCode.addOutput(eventInfo.id) ;
         mainImplCode.addOutputNewline(";") ;
       }
     }
@@ -885,7 +573,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
   }
   
   private void genBlackboardMainImpl(UnparseText mainImplCode,
-                                     PartitionProperties pp)
+                                     ProcessProperties pp)
   {
     // For each blackboard
     for(BlackBoardInfo info : pp.blackboardInfo)
@@ -901,22 +589,22 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
   }
   
   private void genSemaphoreMainImpl(UnparseText mainImplCode,
-          PartitionProperties pp)
+          ProcessProperties pp)
   {
     // For each semaphore
-	for(String info : pp.semaphoreNames)
-	{
+    for(String info : pp.semaphoreNames)
+    {
       mainImplCode.addOutput("  CREATE_SEMAPHORE (\"") ;
       mainImplCode.addOutput(info) ;
       mainImplCode.addOutput("\", 1, 1, PRIORITY, &") ;
       mainImplCode.addOutput(info);
       mainImplCode.addOutputNewline(", &(ret));") ;
-	}
+    }
   }
   
   private void genMainImpl(ProcessImplementation process,
                            UnparseText mainImplCode,
-                           PartitionProperties pp)
+                           ProcessProperties pp)
   {
     EList<ThreadSubcomponent> lthreads =
                                          process.getOwnedThreadSubcomponents() ;
@@ -932,14 +620,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
           .generateSectionTitle("MAIN")) ;
     mainImplCode.addOutputNewline("int main ()") ;
     mainImplCode.addOutputNewline("{") ;
-    for(ThreadSubcomponent ts:process.getOwnedThreadSubcomponents())
-    {
-      mainImplCode.addOutputNewline(
-    	GenerationUtilsC.getInitializationCall(
-    			(ThreadImplementation) ts.getClassifier()
-    			)
-      );
-    }
+    
     mainImplCode.addOutputNewline("  PROCESS_ATTRIBUTE_TYPE tattr;") ;
     mainImplCode.addOutputNewline("  RETURN_CODE_TYPE ret;") ;
     
@@ -997,67 +678,11 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
   protected void genMainImplEnd(ProcessImplementation process,
 		  					    UnparseText mainImplCode){}
 
-private void findCommunicationMechanism(ProcessImplementation process,
-                                          PartitionProperties pp)
-  {
-    EList<Subcomponent> subcmpts = process.getAllSubcomponents() ;
-    
-    for(Subcomponent s : subcmpts)
-    {
-      if(s instanceof DataSubcomponent)
-      {
-        if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
-              .equalsIgnoreCase(BLACKBOARD_AADL_TYPE))
-        {
-          blackBoardHandler(s.getName(),
-                            (FeatureInstance) HookAccessImpl.
-                            getTransformationTrace(s), pp);
-          pp.hasBlackboard = true;
-        }
-        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
-              .equalsIgnoreCase(QUEUING_AADL_TYPE))
-        {
-          queueHandler(s.getName(),
-                       (FeatureInstance) HookAccessImpl.
-                       getTransformationTrace(s), pp);
-          
-          pp.hasQueue = true ;
-        }
-        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
-              .equalsIgnoreCase(SAMPLING_AADL_TYPE))
-        {
-          sampleHandler(s.getName(), (FeatureInstance) HookAccessImpl.
-                       getTransformationTrace(s), pp);
-          pp.hasSample = true ;
-        }
-        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
-              .equalsIgnoreCase(EVENT_AADL_TYPE))
-        {
-          pp.eventNames.add(s.getName());
-          pp.hasEvent = true ;
-        }
-        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
-              .equalsIgnoreCase(BUFFER_AADL_TYPE))
-        {
-          bufferHandler(s.getName(),
-                       (FeatureInstance) HookAccessImpl.
-                       getTransformationTrace(s), pp);
-          pp.hasBuffer = true ;
-        }
-        else if(((DataSubcomponent) s).getDataSubcomponentType().getQualifiedName()
-                .equalsIgnoreCase(SEMAPHORE_AADL_TYPE))
-        {
-          pp.semaphoreNames.add(s.getName());
-          pp.hasSemaphore = true;
-        }
-      }
-    }
-  }
   
-  private PartitionProperties genMainHeader(ProcessImplementation process,
+  private ProcessProperties genMainHeader(ProcessImplementation process,
                                             UnparseText mainHeaderCode,
                                             ProcessorProperties processorProp,
-                                            PartitionProperties pp)
+                                            ProcessProperties pp)
   {
     List<ThreadSubcomponent> bindedThreads =
                                          process.getOwnedThreadSubcomponents() ;
@@ -1137,10 +762,10 @@ private void findCommunicationMechanism(ProcessImplementation process,
     {
       mainHeaderCode
             .addOutputNewline("#define POK_CONFIG_NB_EVENTS " +
-                  pp.eventNames.size()) ;
+                  pp.eventInfo.size()) ;
       mainHeaderCode
       .addOutputNewline("#define POK_CONFIG_ARINC653_NB_EVENTS " +
-            pp.eventNames.size()) ;
+            pp.eventInfo.size()) ;
       
       mainHeaderCode
             .addOutputNewline("#define POK_NEEDS_ARINC653_EVENT 1") ;
@@ -1202,6 +827,38 @@ private void findCommunicationMechanism(ProcessImplementation process,
     // XXX ARBITRARY
     mainHeaderCode
           .addOutputNewline("#define POK_NEEDS_MIDDLEWARE 1") ;
+    
+    // The macro POK_NEEDS_PORTS_VIRTUAL is used to include functions definition
+    // create and use virtual ports (for remote communications for instance)
+    for(ThreadSubcomponent th : bindedThreads)
+    {
+      if(th.getSubcomponentType() instanceof BehavioredImplementation)
+      {
+        BehavioredImplementation bi = (BehavioredImplementation) th.getSubcomponentType();
+        if(usesOperation(bi, "pok_port_virtual_create"))
+        {
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_PORTS_VIRTUAL");
+          break;
+        }
+      }
+    }
+    
+    for(ThreadSubcomponent th : bindedThreads)
+    {
+      if(th.getSubcomponentType() instanceof BehavioredImplementation)
+      {
+        BehavioredImplementation bi = (BehavioredImplementation) th.getSubcomponentType();
+        if(usesOperation(bi, "rtl8029_init"))
+        {
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_RTL8029");
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_PCI 1");
+          mainHeaderCode.addOutputNewline("#define POK_NEEDS_IO 1");
+          if(_processorProp.hwAdress!=null)
+            mainHeaderCode.addOutputNewline("#define POK_HW_ADDR \""+_processorProp.hwAdress+"\"");
+          break;
+        }
+      }
+    }
     
     /**** "#INCLUDE ****/
     
@@ -1615,12 +1272,16 @@ private void findCommunicationMechanism(ProcessImplementation process,
       {
         String errMsg = "cannot fetch the Additional_Features for \'" +
                                                         vps.getName() + '\'' ;
-        _LOGGER.error(errMsg) ;
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+        _LOGGER.warn(errMsg) ;
+        ServiceProvider.SYS_ERR_REP.warning(errMsg, true) ;
         // Nothing to do
       }
     }
-
+    
+    String hwAddr = PropertyUtils.getStringValue(processor, "Address");
+    if(hwAddr!=null && false==hwAddr.isEmpty())
+      _processorProp.hwAdress = hwAddr;
+    
     // TODO: the integer ID in this macro must be set carefully to respect the
     // routing table defined in deployment.c files in the generated code for a
     // partition.
@@ -1629,6 +1290,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
                 .getOwnedProcessorSubcomponents().indexOf(processor) ;
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_LOCAL_NODE " +
           Integer.toString(id)) ;
+    
+    String address = PropertyUtils.getStringValue(processor, "Address");
+    if(address!=null)
+    {
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PCI 1");
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_IO 1");
+      deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PORTS_VIRTUAL 1");
+    }
     // POK_GENERATED_CODE 1 always true in our usage context
     deploymentHeaderCode.addOutputNewline("#define POK_GENERATED_CODE 1") ;
 
@@ -1641,7 +1310,7 @@ private void findCommunicationMechanism(ProcessImplementation process,
       deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_PARTITIONS 1") ;
     }
 
-    if(System.getProperty("DEBUG")!=null)
+    if(RamsesConfiguration.IS_DEBUG_MODE)
     {
       deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_DEBUG 1") ;
     }
@@ -1686,12 +1355,13 @@ private void findCommunicationMechanism(ProcessImplementation process,
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
     }
-    //  The maccro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
+    
+    //  The macro POK_CONFIG_NB_THREADS indicates the amount of threads used in 
     //  the kernel.It comprises the tasks for the partition and the main task of 
     //  each partition that initialize all ressources.
     deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_THREADS " +
           Integer.toString(2 + bindedProcess.size() + bindedThreads.size())) ;
-    //  The maccro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of 
+    //  The macro POK_CONFIG_NB_PARTITIONS_NTHREADS indicates the amount of 
     //  threads in each partition we also add an additional process that 
     //  initialize all partition's entities (communication, threads, ...)
     deploymentHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_NTHREADS {") ;
@@ -1713,20 +1383,30 @@ private void findCommunicationMechanism(ProcessImplementation process,
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      boolean foundRR = false ;
+      boolean foundSched = false ;
 
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
-      if(requiredScheduler != null)
+      PropertyAssociation pa = PropertyUtils.getPropertyAssociation(vps, "Scheduling_Protocol");
+      if(pa!=null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RR") && foundRR == false)
+        ModalPropertyValue v = pa.getOwnedValues().get(0);
+		ListValue lv = (ListValue) v.getOwnedValue();
+		NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
+		EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+		String requiredScheduler = el.getName();
+		if(requiredScheduler.equalsIgnoreCase("RMS") && foundSched == false)
         {
-          foundRR = true ;
+          foundSched = true ;
+          deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RMS 1") ;
+        }
+        else if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol") && foundSched == false)
+        {
+          foundSched = true ;
           deploymentHeaderCode.addOutputNewline("#define POK_NEEDS_SCHED_RR 1") ;
         }
       }
       else
       {
-        String errMsg = "scheduler is not provided for \'" +
+        String errMsg = "Scheduling_Protocol is not provided for \'" +
                              vps.getName() + '\'' ;
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
@@ -1739,14 +1419,22 @@ private void findCommunicationMechanism(ProcessImplementation process,
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      String requiredScheduler = PropertyUtils.getEnumValue(vps, "Scheduler") ;
-      if(requiredScheduler != null)
+      PropertyAssociation pa = PropertyUtils.getPropertyAssociation(vps, "Scheduling_Protocol");
+      if(pa!=null)
       {
-        if(requiredScheduler.equalsIgnoreCase("RR"))
+        ModalPropertyValue v = pa.getOwnedValues().get(0);
+  		ListValue lv = (ListValue) v.getOwnedValue();
+  		NamedValue nv = (NamedValue) lv.getOwnedListElements().get(0);
+  		EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+  		String requiredScheduler = el.getName();
+        if(requiredScheduler.equalsIgnoreCase("Round_Robin_Protocol"))
         {
           deploymentHeaderCode.addOutput("POK_SCHED_RR") ;
         }
-
+        else if(requiredScheduler.equalsIgnoreCase("RMS"))
+        {
+          deploymentHeaderCode.addOutput("POK_SCHED_RMS") ;
+        }
         if(bindedVPS.indexOf(vps) != bindedVPS.size() - 1)
         {
           deploymentHeaderCode.addOutput(",") ;
@@ -1754,7 +1442,7 @@ private void findCommunicationMechanism(ProcessImplementation process,
       }
       else
       {
-        String errMsg =  "cannot fetch the scheduler for \'" + vps.getName() + '\'';
+        String errMsg =  "cannot fetch the Scheduling_Protocol for \'" + vps.getName() + '\'';
         _LOGGER.error(errMsg);
         ServiceProvider.SYS_ERR_REP.error(errMsg, true);
       }
@@ -1769,14 +1457,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
     {
       ProcessImplementation process =
             (ProcessImplementation) ps.getComponentImplementation() ;
-      if(!_processorProp.partitionProperties.containsKey(process))
+      if(!_processorProp.processProperties.containsKey(process))
       {
     	StringBuilder sb = new StringBuilder(process.getQualifiedName());
-        PartitionProperties pp = new PartitionProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
-        _processorProp.partitionProperties.put(process, pp) ;
+        ProcessProperties pp = new ProcessProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
+        _processorProp.processProperties.put(process, pp) ;
         findCommunicationMechanism(process, pp) ;
       }
-      PartitionProperties pp = _processorProp.partitionProperties.get(process) ;
+      ProcessProperties pp = _processorProp.processProperties.get(process) ;
       if(pp.hasBlackboard || pp.hasBuffer || pp.hasEvent || pp.hasSemaphore)
       {
         deploymentHeaderCode
@@ -1816,13 +1504,13 @@ private void findCommunicationMechanism(ProcessImplementation process,
           .addOutput("#define POK_CONFIG_PARTITIONS_NLOCKOBJECTS {") ;
     for(ProcessSubcomponent ps : bindedProcess)
     {
-      PartitionProperties pp =
-            _processorProp.partitionProperties.get((ProcessImplementation) ps
+      ProcessProperties pp =
+            _processorProp.processProperties.get((ProcessImplementation) ps
                   .getComponentImplementation()) ;
       deploymentHeaderCode.addOutput(Integer
             .toString(pp.blackboardInfo.size()
                       + pp.bufferInfo.size()
-                      + pp.eventNames.size()
+                      + 3*pp.eventInfo.size() // Seems that an event port needs 3 locks. To be validated
                       + pp.semaphoreNames.size())) ;
       if(bindedProcess.indexOf(ps) < bindedProcess.size() - 1)
       {
@@ -1883,65 +1571,68 @@ private void findCommunicationMechanism(ProcessImplementation process,
 
     deploymentHeaderCode.addOutputNewline("}") ;
     
-    List<Long> slotPerPartition =
-        PropertyUtils.getIntListValue(processor, "Partition_Slots") ;
-    
-    if(slotPerPartition != null)
+    NamedElement rootSystem = getRootSystem((AadlPackage)
+                                            processor.getContainingClassifier().eContainer().eContainer());
+    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(rootSystem, "Module_Schedule");
+    if(moduleSchedulePA == null)
     {
-      // POK_CONFIG_SCHEDULING_SLOTS extracted from POK::Paritions_Slots => (500 ms);
-      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
-      idx = 0 ;
-      for(Long l : slotPerPartition)
-      {
-        deploymentHeaderCode.addOutput(Long.toString(l)) ;
-
-        if(idx != slotPerPartition.size() - 1)
-        {
-          deploymentHeaderCode.addOutput(",") ;
-        }
-        idx++ ;
-      }
-
-      deploymentHeaderCode.addOutputNewline("}") ;
-      deploymentHeaderCode
-            .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
-                  Integer.toString(slotPerPartition.size())) ;
-
-    }
-    else
-    {
-      String errMsg =  "cannot fetch Partition_Slots for \'"+
-                                        processor.getName() + '\'' ;
+      String errMsg =  "cannot fetch Module_Schedule for \'"+
+          processor.getName() + '\'' ;
       _LOGGER.error(errMsg);
       ServiceProvider.SYS_ERR_REP.error(errMsg, true);
     }
+    ModalPropertyValue mpv = moduleSchedulePA.getOwnedValues().get(0);
+    ListValue lv = (ListValue) mpv.getOwnedValue();
     
-    List<Subcomponent> slotsAllocation =
-          PropertyUtils.getSubcomponentList(processor, "Slots_Allocation") ;
-    if(! slotsAllocation.isEmpty())
+    deploymentHeaderCode
+    .addOutputNewline("#define POK_CONFIG_SCHEDULING_NBSLOTS " +
+        Integer.toString(lv.getOwnedListElements().size())) ;
+
+    
+    deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS {") ;
+    idx = 0 ;
+    for(PropertyExpression pe : lv.getOwnedListElements())
     {
-      deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
-
-      for(Subcomponent sAllocation : slotsAllocation)
+      RecordValue rv = (RecordValue) pe;
+      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
       {
-        int referencedComponentId = bindedVPS.indexOf(sAllocation) ;
-        deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
-
-        if(slotsAllocation.indexOf(sAllocation) != slotsAllocation.size() - 1)
+        if(bpa.getProperty().getName().equalsIgnoreCase("Duration"))
         {
-          deploymentHeaderCode.addOutput(",") ;
+          IntegerLiteral il =  (IntegerLiteral) bpa.getValue();
+          deploymentHeaderCode.addOutput(Long.toString(il.getValue())) ;
+          if(idx != lv.getOwnedListElements().size() - 1)
+          {
+            deploymentHeaderCode.addOutput(",") ;
+          }
+          idx++ ;
         }
       }
+    }
 
-      deploymentHeaderCode.addOutputNewline("}") ;
-    }
-    else
+    deploymentHeaderCode.addOutputNewline("}") ;
+    idx = 0;
+    deploymentHeaderCode.addOutput("#define POK_CONFIG_SCHEDULING_SLOTS_ALLOCATION {") ;
+    for(PropertyExpression pe : lv.getOwnedListElements())
     {
-      String errMsg = "cannot fetch Slots_Allocation for \'" +
-                          processor.getName() + '\'' ;
-      _LOGGER.error(errMsg) ;
-      ServiceProvider.SYS_ERR_REP.error(errMsg, true) ;
+      RecordValue rv = (RecordValue) pe;
+      for(BasicPropertyAssociation bpa: rv.getOwnedFieldValues())
+      {
+        if(bpa.getProperty().getName().equalsIgnoreCase("Partition"))
+        {
+          ReferenceValue sAllocation = (ReferenceValue) bpa.getValue();
+          int index = sAllocation.getContainmentPathElements().size()-1; 
+          int referencedComponentId = bindedVPS.indexOf(sAllocation.getContainmentPathElements().get(index).getNamedElement()) ;
+          
+          deploymentHeaderCode.addOutput(Integer.toString(referencedComponentId)) ;
+          if(idx != lv.getOwnedListElements().size() - 1)
+          {
+            deploymentHeaderCode.addOutput(",") ;
+          }
+          idx++ ;
+        }
+      }
     }
+    deploymentHeaderCode.addOutputNewline("}") ;
     
     Long majorFrame =
         PropertyUtils.getIntValue(processor, "Module_Major_Frame") ;
@@ -2101,6 +1792,92 @@ private void findCommunicationMechanism(ProcessImplementation process,
     
   }                                            
 
+  private NamedElement getRootSystem(AadlPackage pkg)
+  {
+    for(Classifier c: pkg.getOwnedPublicSection().getOwnedClassifiers())
+      if(c instanceof SystemImplementation && isRoot(pkg, (SystemImplementation) c))
+        return c;
+    return null;
+  }
+
+
+  private boolean isRoot(AadlPackage pkg, SystemImplementation sys)
+  {
+    for(Classifier c: pkg.getOwnedPublicSection().getOwnedClassifiers())
+      if(c instanceof SystemImplementation)
+      {
+        SystemImplementation potentialRoot = (SystemImplementation) c;
+        for(SystemSubcomponent subSys: potentialRoot.getOwnedSystemSubcomponents())
+          if(subSys.getSubcomponentType().equals(sys))
+            return false;
+      }
+    return true;
+  }
+
+
+  private boolean usesOperation(BehavioredImplementation bi, 
+                                String subprogramName)
+  {
+    for(SubprogramCallSequence scs: bi.getOwnedSubprogramCallSequences())
+    {
+      for(SubprogramCall sc: scs.getOwnedSubprogramCalls())
+      {
+        Subprogram s = (Subprogram) sc.getCalledSubprogram();
+        if(s.getName().equals(subprogramName))
+        {
+          return true;
+        }
+        else if(s instanceof SubprogramType)
+        {
+          SubprogramType st = (SubprogramType) s;
+          if(extendsSubprogramType(st,subprogramName))
+            return true;
+        }
+        else if(s instanceof SubprogramImplementation)
+        {
+          SubprogramImplementation si = (SubprogramImplementation) s;
+          if(extendsSubprogramImpl(si,subprogramName))
+            return true;
+        }
+        if(s instanceof BehavioredImplementation)
+          usesOperation((BehavioredImplementation) s, subprogramName);
+      }
+    }
+    return false;
+  }
+
+  private boolean extendsSubprogramType(SubprogramType st, 
+                                   String subprogramName)
+  {
+    if(st.getOwnedExtension()!=null)
+    {
+      SubprogramType parent = (SubprogramType) st.getOwnedExtension().getExtended();
+      if(parent.getName().equals(subprogramName))
+      {
+        return true;
+      }
+      else
+        return extendsSubprogramType(parent, subprogramName);
+    }
+    return false;
+  }
+  
+  private boolean extendsSubprogramImpl(SubprogramImplementation si, 
+                                        String subprogramName)
+  {
+    if(si.getOwnedExtension()!=null)
+    {
+      SubprogramImplementation parent = (SubprogramImplementation) si.getOwnedExtension().getExtended();
+      if(parent.getName().equals(subprogramName))
+      {
+        return true;
+      }
+      else
+        return extendsSubprogramImpl(parent, subprogramName);
+    }
+    return false;
+  }
+  
   protected void genDeploymentHeaderEnd(UnparseText deploymentHeaderCode){}
 
 @Override
@@ -2136,16 +1913,29 @@ private void findCommunicationMechanism(ProcessImplementation process,
 		                                          RoutingProperties routeProp)
 	                                                    throws GenerationException
   {
-	List<FeatureInstance> localPorts = new ArrayList<FeatureInstance>();
-	if(routeProp.processPerProcessor.get(processor).isEmpty())
-		return localPorts;
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  localPorts.addAll(routeProp.portPerProcess.get(deployedProcess));
-	}
-	return localPorts;
+    List<FeatureInstance> localPorts = new ArrayList<FeatureInstance>();
+    if(routeProp.processPerProcessor.get(processor).isEmpty())
+      return localPorts;
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      localPorts.addAll(routeProp.portPerProcess.get(deployedProcess));
+    }
+    return localPorts;
   }
   
+  private List<FeatureInstance> getLocalVirtualPorts(ComponentInstance processor,
+                                              RoutingProperties routeProp)
+                                                      throws GenerationException
+  {
+    List<FeatureInstance> localPorts = new ArrayList<FeatureInstance>();
+    if(routeProp.processPerProcessor.get(processor).isEmpty())
+      return localPorts;
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      localPorts.addAll(routeProp.virtualPortPerProcess.get(deployedProcess));
+    }
+    return localPorts;
+  }
   private void genRoutingHeader(ComponentInstance processor,
                                 UnparseText routingHeaderCode,
                                 RoutingProperties routeProp)
@@ -2156,12 +1946,15 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	
 	if(routeProp.processPerProcessor.get(processor)!=null)
 	{
-	  int globalPortNb = routeProp.globalPort.size();
+	  int globalPortNb = routeProp.globalPort.size()
+	      +routeProp.globalVirtualPort.size();
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_GLOBAL_PORTS " +
 			  Integer.toString(globalPortNb));
 		
 	  List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
-	  int localPortNb = localPorts.size();
+	  List<FeatureInstance> localVirtualPorts = getLocalVirtualPorts(processor, routeProp);
+	  int localPortNb = localPorts.size()
+	      + localVirtualPorts.size();
 	  
 	  routingHeaderCode.addOutputNewline("#define POK_CONFIG_NB_PORTS " +
 			  Integer.toString(localPortNb));
@@ -2172,28 +1965,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	  Set<ComponentInstance> bindedPorcesses = routeProp.processPerProcessor.get(processor);
 	  
 	  if(!localPorts.isEmpty())
-      {
+    {
 	    routingHeaderCode.addOutput("#define POK_CONFIG_PARTITIONS_PORTS {");
-	    for(FeatureInstance fi: localPorts)
-	    {
-		  ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance();
-		  if(processInstance.getCategory() == ComponentCategory.PROCESS)
-		  {
-
-			int partitionIndex = 0;
-			for (Object entry:bindedPorcesses) {
-			  if (entry.equals(processInstance)) break;
-			  partitionIndex++;
-			}
-			
-			routingHeaderCode.addOutput(Integer.toString(partitionIndex));
-		  }
-		  routingHeaderCode.addOutput(",");
-	    }
+	    generateLocalPortsToPartitionsArray(localPorts, routingHeaderCode, bindedPorcesses);
+	    generateVirtualPortsToPartitionsArray(localVirtualPorts, routingHeaderCode, bindedPorcesses, routeProp);
 	    routingHeaderCode.addOutputNewline("}");
-      }
-	  
-	  
+    }
+
+
 	  routingHeaderCode.addOutputNewline("typedef enum") ;
 	  routingHeaderCode.addOutputNewline("{") ;
 	  routingHeaderCode.incrementIndent() ;
@@ -2201,10 +1980,10 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	  int idx=0;
 	  for(ComponentInstance node : routeProp.processors)
 	  {
-		routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(node)) ;
-		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-		routingHeaderCode.addOutputNewline(",") ;
-		idx++;
+	    routingHeaderCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(node)) ;
+	    routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+	    routingHeaderCode.addOutputNewline(",") ;
+	    idx++;
 	  }
 	  routingHeaderCode.decrementIndent() ;
 	  routingHeaderCode.addOutputNewline("} pok_node_identifier_t;") ;
@@ -2215,11 +1994,18 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	  routingHeaderCode.incrementIndent() ;
 	  for(FeatureInstance fi: localPorts)
 	  {
-		routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
-		routingHeaderCode.addOutput(" = "+Integer.toString(idx));
-		routingHeaderCode.addOutputNewline(",") ;
-		idx++;
+	    routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
+	    routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+	    routingHeaderCode.addOutputNewline(",") ;
+	    idx++;
 	  }
+	  for(FeatureInstance fi: localVirtualPorts)
+    {
+      routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX);
+      routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+      routingHeaderCode.addOutputNewline(",") ;
+      idx++;
+    }
 	  routingHeaderCode.addOutput("invalid_local_port");
 	  routingHeaderCode.addOutputNewline(" = "+Integer.toString(idx));
 	  routingHeaderCode.decrementIndent() ;
@@ -2236,6 +2022,14 @@ private void findCommunicationMechanism(ProcessImplementation process,
 		  routingHeaderCode.addOutputNewline(",") ;
 		  idx++;
 	  }
+	  for(FeatureInstance fi: routeProp.globalVirtualPort)
+    {
+      routingHeaderCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi)
+                                  +VIRTUAL_PORT_SUFFIX);
+      routingHeaderCode.addOutput(" = "+Integer.toString(idx));
+      routingHeaderCode.addOutputNewline(",") ;
+      idx++;
+    }
 	  routingHeaderCode.decrementIndent() ;
 	  routingHeaderCode.addOutputNewline("} pok_port_identifier_t;") ;
 
@@ -2259,284 +2053,449 @@ private void findCommunicationMechanism(ProcessImplementation process,
 	routingHeaderCode.addOutputNewline("#endif");
   }
 
+  private
+      void
+      generateVirtualPortsToPartitionsArray(List<FeatureInstance> localVirtualPorts,
+                                            UnparseText routingHeaderCode,
+                                            Set<ComponentInstance> bindedPorcesses,
+                                            RoutingProperties routeProp)
+  {
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      ComponentInstance processInstance = routeProp.processVirtualPort.get(fi);
+      if(processInstance.getCategory() == ComponentCategory.PROCESS)
+      {
+
+        int partitionIndex = 0;
+        for (Object entry:bindedPorcesses) {
+          if (entry.equals(processInstance)) break;
+          partitionIndex++;
+        }
+
+        routingHeaderCode.addOutput(Integer.toString(partitionIndex));
+      }
+      routingHeaderCode.addOutput(",");
+    }
+  }
+
+  private void generateLocalPortsToPartitionsArray(List<FeatureInstance> localPorts,
+                                        UnparseText routingHeaderCode,
+                                        Set<ComponentInstance> bindedPorcesses)
+  {
+    for(FeatureInstance fi: localPorts)
+    {
+      ComponentInstance processInstance = (ComponentInstance) fi.getComponentInstance();
+      if(processInstance.getCategory() == ComponentCategory.PROCESS)
+      {
+
+        int partitionIndex = 0;
+        for (Object entry:bindedPorcesses) {
+          if (entry.equals(processInstance)) break;
+          partitionIndex++;
+        }
+
+        routingHeaderCode.addOutput(Integer.toString(partitionIndex));
+      }
+      routingHeaderCode.addOutput(",");
+    }
+  }
+
   private void genRoutingImpl(ComponentInstance processor,
                               UnparseText routingImplCode,
                               RoutingProperties routeProp)
                                                       throws GenerationException
   {
-	routingImplCode.addOutputNewline("#include \"routing.h\"") ;
-	routingImplCode.addOutputNewline("#include \"middleware/port.h\"") ;
-	routingImplCode.addOutputNewline("#include <types.h>") ;
-	
-	if(routeProp.processPerProcessor.get(processor)==null)
-	  return;
-	
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  // compute list of ports for each partition deployed on "processor"
-	  String processName = deployedProcess.getSubcomponent().getName();
-	  int nbPorts = routeProp.portPerProcess.get(deployedProcess).size();
-	  routingImplCode.addOutput("uint8_t ");
-	  routingImplCode.addOutput(processName+"_partport["+Integer.toString(nbPorts)
-	        +"] = {" );
-	  for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
-	  {
-		routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
-		routingImplCode.addOutput(",");
-	  }
-	  routingImplCode.addOutputNewline("};");
-	  
-	  // compute list of destination ports for each port of partitions deployed on "processor"
-	  for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
-	  {
-	    if(fi.getDirection().equals(DirectionType.OUT)
-	          || fi.getDirection().equals(DirectionType.IN_OUT))
-	    {
-	      List<FeatureInstance> destinations = RoutingProperties.getFeatureDestinations(fi);
-	      routingImplCode.addOutput("uint8_t ");
-	      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+
-	                                "_deployment_destinations["+
-	                                Integer.toString(destinations.size())+"] = {");
-	      for(FeatureInstance dst:destinations)
-	      {
-	        routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(dst));
-	        routingImplCode.addOutput(",");
-	      }
-	      routingImplCode.addOutputNewline("};");	  
-	    }
-	  }
-	}
-	
-	List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
-	
-	routingImplCode.addOutput("uint8_t pok_global_ports_to_local_ports" +
-			"[POK_CONFIG_NB_GLOBAL_PORTS] = {");
-	for(FeatureInstance fi:routeProp.globalPort)
-	{
-	  if(localPorts.contains(fi))
-		routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
-	  else
-		routingImplCode.addOutput("invalid_local_port");
-	  
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_local_ports_to_global_ports" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi:localPorts)
-	{
-	  routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_nodes" +
-			"[POK_CONFIG_NB_GLOBAL_PORTS] = {");
-	for(FeatureInstance fi : routeProp.globalPort)
-	{
-	  ComponentInstance inst = routeProp.processorPort.get(fi);
-	  routingImplCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(inst));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_nb_ports_by_partition" +
-			"[POK_CONFIG_NB_PARTITIONS] = {");
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  int nbPort = routeProp.portPerProcess.get(deployedProcess).size();
-	  routingImplCode.addOutput(Integer.toString(nbPort));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t* pok_ports_by_partition" +
-			"[POK_CONFIG_NB_PARTITIONS] = {");
-	for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
-	{
-	  routingImplCode.addOutput(deployedProcess.getSubcomponent().getName()
-			  +"_partport");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("char* pok_ports_names" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  routingImplCode.addOutput("\""+
-	        AadlToPokCUtils.getFeatureLocalIdentifier(fi)
-			  +"\"");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_identifiers" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  routingImplCode.addOutput(""+
-	        AadlToPokCUtils.getFeatureLocalIdentifier(fi)
-			  +"");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_nb_destinations" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  int destNb = RoutingProperties.getFeatureDestinations(fi).size();
-	  routingImplCode.addOutput(Integer.toString(destNb));
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t* pok_ports_destinations" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  int destNb = RoutingProperties.getFeatureDestinations(fi).size();
-	  if(destNb==0)
-		  routingImplCode.addOutput("NULL");
-	  else
-		  routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)
-				  +"_deployment_destinations");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
-	
-	routingImplCode.addOutput("uint8_t pok_ports_kind" +
-			"[POK_CONFIG_NB_PORTS] = {");
-	for(FeatureInstance fi: localPorts)
-	{
-	  if(fi.getCategory().equals(FeatureCategory.DATA_PORT))
-		  routingImplCode.addOutput("POK_PORT_KIND_SAMPLING");
-	  if(fi.getCategory().equals(FeatureCategory.EVENT_DATA_PORT)
-			  || fi.getCategory().equals(FeatureCategory.EVENT_PORT))
-		  routingImplCode.addOutput("POK_PORT_KIND_QUEUEING");
-	  routingImplCode.addOutput(",");
-	}
-	routingImplCode.addOutputNewline("};");
+    routingImplCode.addOutputNewline("#include \"routing.h\"") ;
+    routingImplCode.addOutputNewline("#include \"middleware/port.h\"") ;
+    routingImplCode.addOutputNewline("#include <types.h>") ;
+
+    if(routeProp.processPerProcessor.get(processor)==null)
+      return;
+
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      // compute list of ports for each partition deployed on "processor"
+      String processName = deployedProcess.getSubcomponent().getName();
+      int nbPorts = routeProp.portPerProcess.get(deployedProcess).size()
+          + routeProp.virtualPortPerProcess.get(deployedProcess).size();
+      routingImplCode.addOutput("uint8_t ");
+      routingImplCode.addOutput(processName+"_partport["+Integer.toString(nbPorts)
+                                +"] = {" );
+      for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
+      {
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
+        routingImplCode.addOutput(",");
+      }
+      for(FeatureInstance fi : routeProp.virtualPortPerProcess.get(deployedProcess))
+      {
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX);
+        routingImplCode.addOutput(",");
+      }
+      routingImplCode.addOutputNewline("};");
+
+      // compute list of destination ports for each port of partitions deployed on "processor"
+      for(FeatureInstance fi : routeProp.portPerProcess.get(deployedProcess))
+      {
+        generateDestinationInit(fi, routingImplCode);
+      }
+
+      for(FeatureInstance fi : routeProp.virtualPortPerProcess.get(deployedProcess))
+      {
+        generateDestinationInit(fi, routingImplCode, VIRTUAL_PORT_SUFFIX);
+      }
+    }
+
+    List<FeatureInstance> localPorts = getLocalPorts(processor, routeProp);
+    List<FeatureInstance> localVirtualPorts = getLocalVirtualPorts(processor, routeProp);
+    routingImplCode.addOutput("uint8_t pok_global_ports_to_local_ports" +
+        "[POK_CONFIG_NB_GLOBAL_PORTS] = {");
+    for(FeatureInstance fi:routeProp.globalPort)
+    {
+      if(localPorts.contains(fi))
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi));
+      else
+        routingImplCode.addOutput("invalid_local_port");
+
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi:routeProp.globalVirtualPort)
+    {
+      if(localVirtualPorts.contains(fi))
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+                                  +VIRTUAL_PORT_SUFFIX);
+      else
+        routingImplCode.addOutput("invalid_local_port");
+
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_global_ports_to_bus" +
+        "[POK_CONFIG_NB_GLOBAL_PORTS] = {");
+    for(@SuppressWarnings("unused") FeatureInstance fi:routeProp.globalPort)
+    {
+      routingImplCode.addOutput("invalid_bus");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi:routeProp.globalVirtualPort)
+    {
+      Iterable<ConnectionInstance> cnxIter = fi.allEnclosingConnectionInstances();
+      for(ConnectionInstance connectionInstance : cnxIter)
+      {
+        if(false==connectionInstance.getKind().equals(org.osate.aadl2.instance.ConnectionKind.PORT_CONNECTION))
+          continue;
+        PropertyExpression pe = PropertyUtils.getPropertyValue("Actual_Connection_Binding", connectionInstance);
+        ListValue lvBus = (ListValue) pe;
+        InstanceReferenceValue irvBus = (InstanceReferenceValue) lvBus.getOwnedListElements().get(0);
+        ComponentInstance inst = (ComponentInstance) irvBus.getReferencedInstanceObject();
+        routingImplCode.addOutput(inst.getName());
+        routingImplCode.addOutput(",");
+        break;
+      }
+    }
+    routingImplCode.addOutputNewline("};");
+    
+    
+    routingImplCode.addOutput("uint8_t pok_local_ports_to_global_ports" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi:localPorts)
+    {
+      routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi));
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi:localVirtualPorts)
+    {
+      routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(fi)+
+                                VIRTUAL_PORT_SUFFIX);
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_nodes" +
+        "[POK_CONFIG_NB_GLOBAL_PORTS] = {");
+    for(FeatureInstance fi : routeProp.globalPort)
+    {
+      ComponentInstance inst = routeProp.processorPort.get(fi);
+      routingImplCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(inst));
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi : routeProp.globalVirtualPort)
+    {
+      ComponentInstance inst = routeProp.processorVirtualPort.get(fi);
+      routingImplCode.addOutput(AadlToPokCUtils.getComponentInstanceIdentifier(inst));
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_nb_ports_by_partition" +
+        "[POK_CONFIG_NB_PARTITIONS] = {");
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      int nbPort = routeProp.portPerProcess.get(deployedProcess).size();
+      int nbVirtualPort=routeProp.virtualPortPerProcess.get(deployedProcess).size();
+      routingImplCode.addOutput(Integer.toString(nbPort+nbVirtualPort));
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t* pok_ports_by_partition" +
+        "[POK_CONFIG_NB_PARTITIONS] = {");
+    for(ComponentInstance deployedProcess:routeProp.processPerProcessor.get(processor))
+    {
+      routingImplCode.addOutput(deployedProcess.getSubcomponent().getName()
+                                +"_partport");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("char* pok_ports_names" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      routingImplCode.addOutput("\""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+          +"\"");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      routingImplCode.addOutput("\""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX
+          +"\"");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_identifiers" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      routingImplCode.addOutput(""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+          +"");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      routingImplCode.addOutput(""+
+          AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX
+          +"");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_nb_destinations" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      routingImplCode.addOutput(Integer.toString(destNb));
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      routingImplCode.addOutput(Integer.toString(destNb));
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t* pok_ports_destinations" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      if(destNb==0)
+        routingImplCode.addOutput("NULL");
+      else
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)
+                                  +"_deployment_destinations");
+      routingImplCode.addOutput(",");
+    }
+    for(FeatureInstance fi: localVirtualPorts)
+    {
+      int destNb = RoutingProperties.getFeatureDestinations(fi).size();
+      if(destNb==0)
+        routingImplCode.addOutput("NULL");
+      else
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+VIRTUAL_PORT_SUFFIX
+                                  +"_deployment_destinations");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
+
+    routingImplCode.addOutput("uint8_t pok_ports_kind" +
+        "[POK_CONFIG_NB_PORTS] = {");
+    for(FeatureInstance fi: localPorts)
+    {
+      if(fi.getCategory().equals(FeatureCategory.DATA_PORT))
+        routingImplCode.addOutput("POK_PORT_KIND_SAMPLING");
+      if(fi.getCategory().equals(FeatureCategory.EVENT_DATA_PORT)
+          || fi.getCategory().equals(FeatureCategory.EVENT_PORT))
+        routingImplCode.addOutput("POK_PORT_KIND_QUEUEING");
+      routingImplCode.addOutput(",");
+    }
+    for(@SuppressWarnings("unused") FeatureInstance fi: localVirtualPorts)
+    {
+      routingImplCode.addOutput("POK_PORT_KIND_VIRTUAL");
+      routingImplCode.addOutput(",");
+    }
+    routingImplCode.addOutputNewline("};");
   }
   
-  public static class BlackBoardInfo
+  private void generateDestinationInit(FeatureInstance fi,
+                                       UnparseText routingImplCode,
+                                       String portSuffix)
   {
-  	public String id = null ;
-      
-  	public String dataType = null;
+    if(fi.getDirection().equals(DirectionType.OUT)
+        || fi.getDirection().equals(DirectionType.IN_OUT))
+    {
+      List<FeatureInstance> destinations = RoutingProperties.getFeatureDestinations(fi);
+      routingImplCode.addOutput("uint8_t ");
+      routingImplCode.addOutput(AadlToPokCUtils.getFeatureLocalIdentifier(fi)+portSuffix+
+                                "_deployment_destinations["+
+                                Integer.toString(destinations.size())+"] = {");
+      for(FeatureInstance dst:destinations)
+      {
+        routingImplCode.addOutput(AadlToPokCUtils.getFeatureGlobalIdentifier(dst)+portSuffix);
+        routingImplCode.addOutput(",");
+      }
+      routingImplCode.addOutputNewline("};");   
+    }
   }
+
+  private void generateDestinationInit(FeatureInstance fi,
+                                       UnparseText routingImplCode)
+  {
+    generateDestinationInit(fi, routingImplCode, "");
+  }
+
+
+  @Override
+  protected String getBlackBoardType()
+  {
+    return BLACKBOARD_AADL_TYPE ;
+  }
+
+
+  @Override
+  protected String getBufferType()
+  {
+    return BUFFER_AADL_TYPE;
+  }
+
+
+  @Override
+  protected String getEventType()
+  {
+    return EVENT_AADL_TYPE ;
+  }
+
+
+  @Override
+  protected String getQueuingType()
+  {
+    return QUEUING_AADL_TYPE ;
+  }
+
+
+  @Override
+  protected String getSamplingType()
+  {
+    return SAMPLING_AADL_TYPE ;
+  }
+
+
+  @Override
+  protected String getSemaphoreType()
+  {
+    return SEMAPHORE_AADL_TYPE ;
+  }
+
+
+  @Override
+  protected String getVirtualPortType()
+  {
+    return VIRTUAL_PORT_AADL_TYPE ;
+  }
+
+
+  @Override
+  protected String getFeatureLocalIdentifier(FeatureInstance fi)
+  {
+    return AadlToPokCUtils.getFeatureLocalIdentifier(fi) ;
+  }
+
+
+  @Override
+  protected String getGenerationIdentifier(String prefix)
+  {
+    return GenerationUtilsC.getGenerationCIdentifier(prefix) ;
+  }
+
+
+  @Override
+  protected void sendOutputQueueing(UnparseText mainImplCode, 
+                                      QueueInfo info)
+  {
+    mainImplCode.addOutputNewline("time_out = "+info.timeOut+";");
+    mainImplCode.addOutputNewline("length = "+"sizeof( "+info.dataType+" );");
+    mainImplCode.addOutputNewline("SEND_QUEUING_MESSAGE("+info.id+", value, length, time_out, &ret);");
+  }
+
+
+  @Override
+  protected void
+      sendOutputEvent(UnparseText mainImplCode, 
+                      EventInfo eventInfo)
+  {
+    mainImplCode.addOutputNewline("SET_EVENT("+eventInfo.id+", &ret);");
+  }
+
+
+  @Override
+  protected void sendOutputBuffer(UnparseText mainImplCode, 
+                                    QueueInfo info)
+  {
+    mainImplCode.addOutputNewline("time_out = "+info.timeOut+";");
+    mainImplCode.addOutputNewline("length = "+"sizeof( "+info.dataType+" );");
+    mainImplCode.addOutputNewline("SEND_BUFFER("+info.id+", value, length, time_out, &ret);");
+  }
+
+
+  @Override
+  protected void sendOutputPrologue(ComponentInstance processInstance,
+                                    UnparseText mainImplCode,
+                                    ProcessProperties pp)
+  {
+    mainImplCode.addOutputNewline("RETURN_CODE_TYPE ret;");
+    mainImplCode.addOutputNewline("SYSTEM_TIME_TYPE time_out;");
+    mainImplCode.addOutputNewline("MESSAGE_SIZE_TYPE length;");
+
+    mainImplCode.addOutputNewline("if(value==NULL)");
+    mainImplCode.addOutputNewline("{");
+    mainImplCode.incrementIndent();
+    mainImplCode.addOutputNewline("char i=0;");
+    mainImplCode.addOutputNewline("value = &i;");
+    mainImplCode.decrementIndent();
+    mainImplCode.addOutputNewline("}"); 
+  }
+
+
+  @Override
+  protected String getGlobalQueueType()
+  {
+    return null ;
+  }
+
+
+  @Override
+  protected void sendOutputVariableAccess(ComponentInstance processInstance,
+                                          UnparseText mainImplCode,
+                                          ProcessProperties pp)
+  {
+    // Nothing to do here
+  }
+
   
-  public static class QueueInfo
-  {
-	public String id = null ;
-    
-	public String uniqueId = null;
-    
-	public long size = -1 ;
-    
-	public String type = null ;
-    
-	public String dataType = null;
-    
-	public DirectionType direction = null ;
-  }
-  
-  public static class SampleInfo
-  {
-	public String id = null ;
-    
-	public String uniqueId = null;
-    
-	public long refresh = -1 ;
-    
-	public String dataType = null;
-    
-	public DirectionType direction = null ;
-  }
-  
-  public static class BufferInfo
-  {
-	public String id = null ;
-    
-	public String uniqueId = null;
-    
-	public long refresh = -1 ;
-    
-	public String dataType = null;
-    
-	public DirectionType direction = null ;
-  }
 }
-
-/*
-TODO
-
-****** ALL EXAMPLE :
-
-KERNEL
-
-deployment.h
-
-  #define POK_CONFIG_NB_NODES 1
-
-
-****** BUFFER EXAMPLE:
-
-KERNEL
-
-  #define POK_CONFIG_NB_LOCKOBJECTS 1 (also for blackboard and event and buffer)
-DONE  deploymentHeaderCode.addOutputNewline("#define POK_CONFIG_NB_BUSES 0"); 
-
-
-PART
-
-main.h
-
-  #define POK_CONFIG_NB_BUFFERS 1
-  #define POK_NEEDS_BUFFERS 1
-  #define POK_NEEDS_ARINC653_BUFFER 1
-  
-  #include <arinc653/buffer.h>
-  
-deployment.c
-
-  uint8_t input_id;
-  char* pok_buffers_names[POK_CONFIG_NB_BUFFERS] = {"input"};
-  
-activity.c
-  
-  test__myint input_dvalue; ?????????????
-  extern BUFFER_ID_TYPE input_id;
-  
-main.c
-
-  extern BUFFER_ID_TYPE input_id;
-  CREATE_BUFFER ("input", sizeof (BUFFER_ID_TYPE), 1, FIFO, &(input_id), &(ret));  
-
-****** EVENT EXAMPLE :
-
-PART
-
-main.h 
-
-#define POK_CONFIG_NB_EVENTS 1
-#define POK_NEEDS_EVENTS 1
-#define POK_CONFIG_ARINC653_NB_EVENTS 1
-#define POK_NEEDS_ARINC653_EVENT 1
-
-#include <arinc653/event.h>
-
-deployment.c
-
-EVENT_ID_TYPE input_id;
-char* pok_arinc653_events_names[POK_CONFIG_ARINC653_NB_EVENTS] = {"input"};
-
-main.c
-
-extern EVENT_ID_TYPE input_id;
-
-CREATE_EVENT ("input", &(input_id), &(ret));
-
-*/

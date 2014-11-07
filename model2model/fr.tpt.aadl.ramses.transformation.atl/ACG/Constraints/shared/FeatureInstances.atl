@@ -35,3 +35,23 @@ abstract rule check_FeatureInstance
 	  	object <:= obj.feature
 	  )
 }
+
+-- @extends check_FeatureInstance
+rule check_FeatureInstanceHasConcreteDataType
+{
+	from
+	  obj: AADLI!FeatureInstance
+	  (
+	  	obj.isDataOrEventDataPort()
+		and
+		not obj.feature.dataFeatureClassifier.hasConcreteDataType()
+	  )
+	to
+	  err: CV!Error
+	  (
+	  	message <- 'In ' + obj.feature.dataFeatureClassifier.name + ', concrete data type is not defined. '
+		+'Use data modeling annex (Data_Model::Data_Representation property) '
+		+'of refer existing source code files '
+		+'(Source_Text property)'
+	  )
+}

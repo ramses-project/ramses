@@ -30,6 +30,9 @@ from
 	IN 				: AADLI;
 
 
+helper context AADLI!ConnectionReference def: needsCopy() : Boolean =
+	true
+;
 
 helper context AADLI!Classifier def : getConnectionsInstancesImg(connectionKind: String) : Sequence(AADLBA!Connection) =
 	let connectionReferenceList : Sequence(AADLI!ConnectionReference) = AADLI!ConnectionInstance->allInstancesFrom('IN')
@@ -52,10 +55,17 @@ abstract rule m_Connection_Reference
 			name <- cnxRef.name,
 			source <- cnxSourceImg,
 			destination <- cnxDestinationImg,
-			bidirectional <- cnxRef.connection.bidirectional
+			bidirectional <- cnxRef.connection.bidirectional,
+			inModeOrTransition <- AADLI!ModeInstance->allInstancesFrom('IN')
+						->select(e| cnxRef.connection.inMode.includes(e.mode))
+						-->collect(e| thisModule.createModeOrTransition(e))
 		),
 		cnxSourceImg : AADLBA!ConnectedElement(
-			connectionEnd <- cnxRef.source,
+			connectionEnd <- if(cnxRef.source.oclIsKindOf(AADLI!FeatureInstance)) then
+						thisModule.resolveTemp(cnxRef.source, 'f')
+					else
+						cnxRef.source
+					endif,
 			context <- if(cnxRef.connection.bidirectional and not cnxRef.connection.oclIsKindOf(AADLBA!AccessConnection))then
 							if(not cnxRef.connection.destination.context.oclIsUndefined()) then 
 								cnxRef.source.eContainer()
@@ -70,7 +80,11 @@ abstract rule m_Connection_Reference
 						endif
 		),
 		cnxDestinationImg : AADLBA!ConnectedElement(
-			connectionEnd <- cnxRef.destination,
+			connectionEnd <- if(cnxRef.destination.oclIsKindOf(AADLI!FeatureInstance)) then
+						thisModule.resolveTemp(cnxRef.destination, 'f')
+					else
+						cnxRef.destination
+					endif,
 			context <- if(cnxRef.connection.bidirectional and not cnxRef.connection.oclIsKindOf(AADLBA!AccessConnection))then
 							if(not cnxRef.connection.source.context.oclIsUndefined()) then 
 								cnxRef.destination.eContainer()
@@ -90,7 +104,11 @@ abstract rule m_Connection_Reference
 rule m_PortConnection_Reference
 {
 	from
-		cnxRef: AADLI!ConnectionReference (cnxRef.eContainer().kind = #portConnection)
+		cnxRef: AADLI!ConnectionReference (
+			cnxRef.eContainer().kind = #portConnection
+			and
+			cnxRef.needsCopy()
+			)
 	to
 		cnxImg: AADLBA!PortConnection
 }

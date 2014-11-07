@@ -15,8 +15,6 @@ PROCESS_ID_TYPE arinc_threads[POK_CONFIG_NB_THREADS];
 
 int main ()
 {
-test_buffer_delayed_refined_model__the_proc_the_sender_impl_Init();
-test_buffer_delayed_refined_model__the_proc_the_receiver_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   tattr.ENTRY_POINT = test_buffer_delayed_refined_model__the_proc_the_sender_impl_Job;
@@ -40,3 +38,20 @@ test_buffer_delayed_refined_model__the_proc_the_receiver_impl_Init();
 }
 
 /******************************************************************************/
+/*                                SEND OUTPUT                                 */
+
+void __aadl_send_output (unsigned int port_variable, void * value)
+{
+  RETURN_CODE_TYPE ret;
+  SYSTEM_TIME_TYPE time_out;
+  MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
+  switch (port_variable) {
+    case 0:
+      break;
+  }
+}

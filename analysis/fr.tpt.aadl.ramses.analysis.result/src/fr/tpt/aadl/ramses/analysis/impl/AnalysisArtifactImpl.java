@@ -51,111 +51,117 @@ import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
  */
 public class AnalysisArtifactImpl extends EObjectImpl implements AnalysisArtifact {
 	/**
-	 * The cached value of the '{@link #getResults() <em>Results</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getResults() <em>Results</em>}' containment reference list.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getResults()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getResults()
+   * @generated
+   * @ordered
+   */
 	protected EList results;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected AnalysisArtifactImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return AnalysisResultPackage.Literals.ANALYSIS_ARTIFACT;
-	}
+    return AnalysisResultPackage.Literals.ANALYSIS_ARTIFACT;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public EList getResults() {
-		if (results == null) {
-			results = new EObjectContainmentEList(AnalysisResult.class, this, AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS);
-		}
-		return results;
-	}
+    if (results == null)
+    {
+      results = new EObjectContainmentEList(AnalysisResult.class, this, AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS);
+    }
+    return results;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
-				return ((InternalEList)getResults()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
+        return ((InternalEList)getResults()).basicRemove(otherEnd, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
-				return getResults();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
+        return getResults();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
-				getResults().clear();
-				getResults().addAll((Collection)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
+        getResults().clear();
+        getResults().addAll((Collection)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
-				getResults().clear();
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
+        getResults().clear();
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
-				return results != null && !results.isEmpty();
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID)
+    {
+      case AnalysisResultPackage.ANALYSIS_ARTIFACT__RESULTS:
+        return results != null && !results.isEmpty();
+    }
+    return super.eIsSet(featureID);
+  }
 
 } //AnalysisArtifactImpl

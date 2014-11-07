@@ -1,97 +1,26 @@
 package fr.tpt.aadl.ramses.transformation.selection.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.ArrayList ;
+import java.util.Collections ;
+import java.util.Comparator ;
+import java.util.Iterator ;
+import java.util.List ;
 
-import org.eclipse.emf.ecore.EObject;
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.ecore.EObject ;
 
-import fr.tpt.aadl.ramses.transformation.tip.util.TipParser;
-import fr.tpt.aadl.ramses.transformation.tip.TipSpecification;
-import fr.tpt.aadl.ramses.transformation.trc.Module;
-import fr.tpt.aadl.ramses.transformation.trc.Transformation;
-import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
-import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser;
+import fr.tpt.aadl.ramses.transformation.tip.TipSpecification ;
+import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
+import fr.tpt.aadl.ramses.transformation.trc.Module ;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class SelectionAlgorithm {
 		
-
-	/*	*//**
-	 * Returns a list of transformation's identifiers of transformation rules that can applay to element of type Elem 
-	 *
-	 * @param availableTransformations	 transformations declared in the TRC document or a subset of these transformations
-	 * @return       a list of transformation's identifiers corresponding to a given element 
-	 *//*
-	public List<String> findTransformationAlternativesFromTuples(){
-		List<String> transformationsFound = new ArrayList<String>();
-		
-		Iterator<Transformation> it = getTrcSpecification().getTransformations().iterator(); 
-		while (it.hasNext()){
-			Transformation transformationObj = it.next();
-			transformationsFound.add(transformationObj.getName());
-			if (transformationObj.getElementType().equals(elementType)){
-				transformationsFound.add(transformationObj.getId());
-				// System.out.print(" "+transformationObj.getId());
-			}
-		}
-
-		if (transformationsFound.size() > 0){
-			return transformationsFound;
-		} 
-		return null;
-	}*/
-
-	
-	/**
-	 * Returns a list of transformation's identifiers of transformation rules that can applay to element of type Elem
-	 * without considering sensitivities, transformations found are the best wrt QA, and equivalent with respect to other QAs 
-	 *
-	 * @param qaID	 quality attribute identifier
-	 * @return       a list of transformations corresponding to a given element, considering given QA but not considering element's sensitivities
-	 */
-	public static List<String> findBestAllocations(final TrcSpecification trcSpec,
-	                                               ArrayList<String> availableTransformationsIdList, final TrcSpecification trcSpecification, final String qaID){
-/*		List<Transformation> transformationsAvailable = new ArrayList<Transformation>();
-		
-		Iterator availableTransformationIdsIt = availableTransformationsIdList.iterator();
-		while (availableTransformationIdsIt.hasNext()){
-			
-			Transformation tr = TrcParser.getTransformationById(trcSpecification, availableTransformationIdsIt.next().toString());
-			transformationsAvailable.add(tr);
-			
-		}*/
-		
-		List<String> transformationsNamesList = availableTransformationsIdList;//convertToTransformationsNameStrings(transformationsAvailable);
-		
-		// System.out.println("transformation strings before: "+transformationsList);
-		Collections.sort(transformationsNamesList, new Comparator<String>(){
-			public int compare(String s1, String s2) {
-				
-				Transformation t1 = TrcUtils.getTransformationById(trcSpec, s1);
-				Transformation t2 = TrcUtils.getTransformationById(trcSpec, s2);
-				
-				Integer sensitivityValueT1 = TrcParser.getQualityImpactValue(t1, qaID);
-				Integer sensitivityValueT2 = TrcParser.getQualityImpactValue(t2, qaID);
-
-				// descending order sorting
-				if (sensitivityValueT1 != null && sensitivityValueT2 != null) { 
-					return sensitivityValueT2 - sensitivityValueT1;
-				} else if (sensitivityValueT1 == null && sensitivityValueT2 != null) {
-					return 1;					
-				} else if (sensitivityValueT1 != null && sensitivityValueT2 == null) {
-					return -1;					
-				}
-				return 0;
-			}});
-		// System.out.println("transformation strings after: "+transformationsList);
-
-		return transformationsNamesList;
-	}
-	
-	
+  private static Logger _LOGGER = Logger.getLogger(SelectionAlgorithm.class) ;
+  
 	
 	/**
 	 * Returns a list of transformation's identifiers of transformation rules that can applay to element of type Elem
@@ -106,15 +35,16 @@ public class SelectionAlgorithm {
 		// create List of available transformations from Strings
 		List<Transformation> transformationsAvailable = new ArrayList<Transformation>();
 		Iterator<String> availableTransformationIdsIt = availableTransformationsIdList.iterator();
-		while (availableTransformationIdsIt.hasNext()){
+		_LOGGER.trace("Search best allocation among "+availableTransformationsIdList.size());
+    while (availableTransformationIdsIt.hasNext()){
 			Transformation tr = TrcUtils.getTransformationById(trcSpec, availableTransformationIdsIt.next().toString());
 			if(tr!=null)
 				transformationsAvailable.add(tr);
 		}
-	
+    _LOGGER.trace("Found "+availableTransformationsIdList.size()+" equivalent transformations in TRC");
+    
 		// for each possible transformation create a list of values for the sensitivities it is 
 		List<OrderedQualityImpact> transSensList = getTransformationOrderBySensitivities(transformationsAvailable, sensitivities);
-		
 		Collections.sort(transSensList, new Comparator<OrderedQualityImpact>(){
 			public int compare(OrderedQualityImpact arg0, OrderedQualityImpact arg1) {
 				for (int i=0; i< arg0.sensitivityValuesList.size(); i++){
@@ -126,6 +56,8 @@ public class SelectionAlgorithm {
 			}
 		});
 
+		_LOGGER.trace("Ordered quality attributes " + transSensList.size());
+		
 		List<String> results = new ArrayList<String>();
 		
 		for (Iterator<OrderedQualityImpact> transSensIt = transSensList.iterator(); transSensIt.hasNext();){
@@ -148,10 +80,12 @@ public class SelectionAlgorithm {
 			}
 
 		}
-		
+		_LOGGER.error("Did not find transformation");
 		return results;
 	}
 
+	
+	
 	/**
 	 * Returns a list of objects containing transformation' identifier and list of values of the impacts for a list of sensitive QAs
 	 *
@@ -180,7 +114,7 @@ public class SelectionAlgorithm {
 			}
 			else
 			{
-				for(String ruleName: (List<String>) t.getRuleName())
+				for(@SuppressWarnings("unused") String ruleName: (List<String>) t.getRuleName())
 				{
 					OrderedQualityImpact oqi = new OrderedQualityImpact(t);
 
@@ -214,31 +148,6 @@ public class SelectionAlgorithm {
 	}
 /*	----------------------------------------------------------------------------------------------- */
 	
-	
-	
-	/**
-	 * Returns a list of transformation's identifiers of transformation rules that can applay to element of type Elem
-	 * not considering element's sensitivities, but excluding some already tested transformations
-	 * transformations found are the best wrt QA, and equivalent with respect to other QAs 
-	 *
-	 * @param qaID	   quality attribute identifier
-	 * @param ignored  list of transformations to be ignored while best allocation selection
-	 * @return         a list of transformations corresponding to a given element, considering given QA and element's sensitivities
-	 */
-	public static List<String> findBestAllocationsNext(TrcSpecification trcSpec,
-	                                                   ArrayList<String> availableTransformationsIdList, TrcSpecification trcSpecification, String qaID, List<String> ignored){
-		List<String> results = new ArrayList<String>();
-		
-		List<String> transformationsList = findBestAllocations(trcSpec,
-		                                                       availableTransformationsIdList, trcSpecification, qaID);
-		Iterator<String> it = transformationsList.iterator();
-		while(it.hasNext()){
-			String transformationId = it.next();
-			if (!ignored.contains(transformationId))
-				results.add(transformationId);
-		}
-		return results;
-	}
 
 	/**
 	 * Returns a list of transformation's identifiers of transformation rules that can applay to element of type Elem

@@ -49,11 +49,16 @@ public class AadlArinc653Transformation extends
   {
     super(modelInstantiator, predefinedAadlModels) ;
     _atlFileNames = new ArrayList<String>();
+    _atlFileNames.add("ACG/targets/shared/ACGServices");
     _atlFileNames.add("ACG/targets/shared/UninstanciateOverride");
+    _atlFileNames.add("ACG/targets/shared/DataUninstanciateOverride");
+    _atlFileNames.add("ACG/targets/shared/SubprogramsUninstanciateOverride");
+    _atlFileNames.add("ACG/targets/shared/ThreadsUninstanciateOverride");
     _atlFileNames.add("ACG/targets/shared/SubprogramCallsCommonRefinementSteps");
     _atlFileNames.add("ACG/targets/shared/PortsCommonRefinementSteps");
     _atlFileNames.add("ACG/targets/shared/DispatchCommonRefinementSteps");
     _atlFileNames.add("ACG/targets/shared/BehaviorAnnexCommonRefinementSteps");
+    _atlFileNames.add("ACG/targets/arinc653/Arinc653ACGServices");
     _atlFileNames.add("ACG/targets/arinc653/ExpandThreadsPorts");
     _atlFileNames.add("ACG/targets/arinc653/BlackboardCommunications");
     _atlFileNames.add("ACG/targets/arinc653/BufferCommunications");

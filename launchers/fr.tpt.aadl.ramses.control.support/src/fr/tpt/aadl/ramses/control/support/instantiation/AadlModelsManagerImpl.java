@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.SystemImplementation ;
@@ -29,7 +28,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 
 	protected InstantiateModel _instantiateModel ;
         
-	private ResourceSet aadlResourceSet = new ResourceSetImpl();
+	
 //	protected AadlModelInstantiatior _modelInstantiator ;
 	protected IProgressMonitor _monitor = new NullProgressMonitor() ;
 	protected AnalysisErrorReporterManager _errManager ;
@@ -67,30 +66,38 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	    _LOGGER.fatal(errMsg);
 	    throw new RuntimeException(errMsg) ;
 	  }
-	  URI instanceURI =
-	      OsateResourceUtil.getInstanceModelURI(si) ;
-
-	  Resource aadlResource = aadlResourceSet.getResource(instanceURI,
+	  String instanceURIString =
+	      OsateResourceUtil.getInstanceModelURI(si).toString() ;
+	  
+	  int indexOfSharp = instanceURIString.indexOf('#');
+	  if(indexOfSharp>0)
+	    instanceURIString = instanceURIString.substring(0, indexOfSharp);
+	  URI instanceURI = URI.createURI(instanceURIString);
+	  ResourceSet rs = si.eResource().getResourceSet();
+	  Resource aadlResource = rs.getResource(instanceURI,
 	                                                      false) ;
+	  
+	  SystemInstance instance = null;
 	  if(aadlResource != null)
 	  {
 	    try
 	    {
-	      aadlResource.delete(null) ;
+	      instance = InstantiateModel.buildInstanceModelFile(si);
+	      aadlResource.load(null);
 	    }
-	    catch(IOException e)
+	    catch(Exception e)
 	    {
 	      String errMsg =  "cannot delete the previous AADL resource set" ;
 	      _LOGGER.fatal(errMsg, e);
 	      throw new RuntimeException(errMsg, e) ;
 	    }
 	  }
-    
-	  aadlResource = aadlResourceSet
-              .createResource(instanceURI) ;
+	  else
+	  {
+	    instance = _instantiateModel.createSystemInstanceInt(si,
+	                                                                        aadlResource) ;
+	  }
 
-	  SystemInstance instance = _instantiateModel.createSystemInstanceInt(si,
-	                                                    aadlResource) ;
 	  
 	  if(instance == null)
 	  {

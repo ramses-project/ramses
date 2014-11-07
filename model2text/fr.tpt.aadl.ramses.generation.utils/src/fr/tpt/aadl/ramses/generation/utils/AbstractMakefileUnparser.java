@@ -413,17 +413,17 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
 
   private File getDirectory(Element e)
   {
-	String path="";
-	URI dirURI = e.eResource().getURI();
-	if(dirURI.isFile())
-	  path = dirURI.toFileString();
-	else
-	  path = dirURI.toString();
-	int index = path.lastIndexOf(File.separator);
-	path = path.substring(0, index+1);
-	return new File(path);
+    String path="";
+    URI dirURI = e.eResource().getURI();
+    if(dirURI.isFile())
+      path = dirURI.toFileString();
+    else
+      path = dirURI.toString();
+    int index = path.lastIndexOf(File.separator);
+    path = path.substring(0, index+1);
+    return new File(path);
   }
-  
+
   protected boolean getListOfReferencedObjects(PropertyAssociation aPropertyAssociation,
                                                Set<File> result)
   {
@@ -452,6 +452,15 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
             StringLiteral sl = (StringLiteral) aPE ;
             String value = sl.getValue() ;
             boolean found = false ;
+            
+            File noPrefixFoundFile =
+                new File(value);
+            if(noPrefixFoundFile.exists())
+            {
+              tmp.add(noPrefixFoundFile) ;
+              found = true ;
+              continue;
+            }
             
             File dir = getDirectory(aPropertyAssociation);
             
@@ -497,6 +506,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
               String value = sl.getValue() ;
               boolean found = false ;
               File dir = getDirectory(aPropertyAssociation);
+              
+              File noPrefixFoundFile =
+                  new File(value);
+              if(noPrefixFoundFile.exists())
+              {
+                tmp.add(noPrefixFoundFile) ;
+                found = true ;
+                continue;
+              }
+              
               File foundFile =
                       new File(dir + File.separator + value) ;
               
@@ -669,12 +688,16 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
         
         Command cmd = new Command()
         {
+          int status=Command.UNSET;
+          
           @Override
           public int run() throws Exception
           {
             int tmp = makeCleanProcess.waitFor() ;
             
-            return (tmp == 0) ? Command.OK : Command.ERROR ;
+            if(tmp == 0) status=Command.OK;
+            else status=Command.ERROR ;
+            return status;
           }
 
           @Override
@@ -688,6 +711,18 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             return "make clean" ;
           }
+
+          @Override
+          public int getStatus()
+          {
+            return status;
+          }
+
+          @Override
+          public Process getProcess()
+          {
+            return makeCleanProcess ;
+          }
         } ;
 
         // Blocking.
@@ -700,18 +735,24 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           throw new OperationCanceledException(msg) ;
         }
         
+        _LOGGER.trace("Start compilation");
+        
         final Process makeProcess =
             runtime.exec("make -C " + generatedFilePath.getAbsolutePath() +
                          " all") ;
         
         cmd = new Command()
         {
+          int status=Command.UNSET;
+          
           @Override
           public int run() throws Exception
           {
             int tmp = makeProcess.waitFor() ;
             
-            return (tmp == 0) ? Command.OK : Command.ERROR ;
+            if(tmp == 0) status=Command.OK;
+            else status=Command.ERROR ;
+            return status;
           }
 
           @Override
@@ -725,8 +766,22 @@ public abstract class AbstractMakefileUnparser extends AadlProcessingSwitch
           {
             return "make all" ;
           }
+          
+          @Override
+          public int getStatus()
+          {
+            return status;
+          }
+
+          @Override
+          public Process getProcess()
+          {
+            return makeProcess ;
+          }
         } ;
-        
+
+        _LOGGER.trace("Compilation command created");
+
         // Blocking.
         waitProcess(cmd, makeProcess) ;
       }

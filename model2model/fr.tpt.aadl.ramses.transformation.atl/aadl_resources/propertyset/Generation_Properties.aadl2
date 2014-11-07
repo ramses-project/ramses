@@ -4,8 +4,4 @@ property set Generation_Properties is
 
   Return_Parameter: aadlboolean => false applies to (parameter);
 
-  Constant_Value: list of aadlstring applies to (subprogram, subprogram access);
-
-  Constant_Value_Parameters: list of aadlstring applies to (subprogram, subprogram access); 
-
 end Generation_Properties;

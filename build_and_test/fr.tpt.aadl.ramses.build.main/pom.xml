@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   
   <properties>
-    <tycho-version>0.19.0</tycho-version>
+    <tycho-version>0.20.0</tycho-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-     <platform-version-name>kepler</platform-version-name>
+    <platform-version-name>luna</platform-version-name>
     <eclipse-site>http://download.eclipse.org/releases/${platform-version-name}</eclipse-site>
     <xtext-site>http://download.itemis.com/updates/releases</xtext-site>
     <osate-version>1.0.0-SNAPSHOT</osate-version>
@@ -42,23 +42,22 @@
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.edit</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.editor</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection</module>
-    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection.sensitivity</module>
     <module>../../model2model/fr.tpt.aadl.ramses.communication.periodic.delayed</module>
     <module>../../model2model/fr.tpt.aadl.ramses.util.math</module>
     <module>../../model2model/fr.tpt.atl.hots</module>
     <module>../../model2model/fr.tpt.atl.utils</module>
     <module>../../analysis/fr.tpt.aadl.ramses.util.properties</module>
     <module>../../analysis/fr.tpt.aadl.sched.propertiesextractor</module>
-    <module>../../analysis/fr.tpt.aadl.sched.tools.cheddar</module>
     <module>../../analysis/fr.tpt.aadl.sched.tools.aadlinspector</module>
+    <module>../../analysis/fr.tpt.aadl.ramses.analysis.memoryfootprint</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.asg</module>
     <module>../../analysis/fr.tpt.aadl.sched.wcetanalysis.results</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.result</module>
     <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
-    <module>../../requirements/fr.tpt.rdal.utils</module>
     <module>../fr.tpt.aadl.ramses.build.feature</module>
     <module>../fr.tpt.aadl.ramses.build.distribution</module>
     <module>../fr.tpt.aadl.ramses.build.update.site</module>
+    <module>../fr.tpt.aadl.ramses.control.cli.osgi.product</module>
   </modules>
 
   <dependencies> 
@@ -73,7 +72,7 @@
     <repository>
       <id>emftvm</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/mmt/atl/updates/milestones/3.4/S201305211502/</url>
+      <url>http://download.eclipse.org/mmt/atl/updates/milestones/3.5/S201405200835/</url>
     </repository>
     <repository>
       <id>${platform-version-name}</id>

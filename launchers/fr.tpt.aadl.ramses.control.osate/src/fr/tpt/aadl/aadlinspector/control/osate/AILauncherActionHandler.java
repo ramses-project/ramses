@@ -108,13 +108,6 @@ public class AILauncherActionHandler extends RamsesActionHandler {
 	    
 	    instantiator.setProgressMonitor(monitor);
 	    
-	    // For the executed command from outline menu,the system implementation 
-	    // root has to be instantiated prior to the code generation.
-	    if(_isOutline)
-	    {
-	      // Fetch instantiate the model.
-	      _sysInst = instantiator.instantiate(_sysImpl) ;
-	    }
 	    // For executed command from the button or the RAMSES menu,system
 	    // implementation has already been instantiated.
 	    

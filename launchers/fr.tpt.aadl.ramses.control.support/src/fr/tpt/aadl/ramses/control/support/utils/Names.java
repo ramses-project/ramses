@@ -29,6 +29,10 @@ public class Names
   public final static String RAMSES_SUPPORT_PLUGIN_ID =
                                           "fr.tpt.aadl.ramses.control.support" ;
   
+  public final static String RAMSES_TARGET_SPECIFIC_PLUGIN_ID =
+                               "fr.tpt.aadl.ramses.generation.target.specific" ;
+
+  
   public final static String ATL_TRANSFORMATION_PLUGIN_ID =
                                        "fr.tpt.aadl.ramses.transformation.atl" ;
 
@@ -36,6 +40,9 @@ public class Names
 
   public final static String GENERATOR_EXT_ID = "generator" ;
 
+  public static final String LOOPMANAGER_EXT_ID = "loopManager" ;
+
+  
   public static final String ATT_ID = "id" ;
   public static final String ATT_NAME = "name" ;
   public static final String ATT_ANNEXNAME = "annexName" ;
@@ -61,4 +68,13 @@ public class Names
   public static final String VALIDATOR_SUFFIX = "-validator";
 
   public static final String RAMSES_PROPERTIES = "RAMSES_PROPERTIES" ;
+  
+  public final static String TIMING_ANALYSIS_PLUGIN_NAME = "AADLInspector-SchedulingAnalysis";
+  public final static String TIMING_SENSITIVITY_NAME = "TimingPerformance";
+  
+  public static final String MEMORY_ANALYSIS_PLUGIN_NAME = "RAMSES-MemoryFootprintAnalysis";
+  public final static String MEMORY_SENSITIVITY_NAME = "MemoryFootprint";
+  
+  public final static String MAINTENANCE_QA = "Maintenance";
+  
 }

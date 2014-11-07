@@ -1,0 +1,5 @@
+property set Maintainability_Property is
+
+Maintenance_Penalty: aadlinteger applies to (thread, subprogram);
+
+end Maintainability_Property;

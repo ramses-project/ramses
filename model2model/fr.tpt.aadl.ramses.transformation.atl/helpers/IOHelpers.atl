@@ -74,7 +74,7 @@ helper context AADLI!FeatureInstance def: isImmediatePort() : Boolean =
 ;
 
 
-helper context AADLI!ComponentInstance def : memoryBinding() : AADLBA!ProcessorSubcomponent =
+helper context AADLI!ComponentInstance def : memoryBinding() : AADLI!ComponentInstance =
 	self.ownedPropertyAssociation->any(pa|pa.property.name='Actual_Memory_Binding')
 		.ownedValue->first().ownedValue.ownedListElement->first().referencedInstanceObject
 ;
@@ -376,4 +376,8 @@ helper context AADLI!FeatureInstance def : getWriteTime() : Real =
 helper context AADLI!ConnectionInstance def : getIOTime() : Real =
 	Sequence{self.source.getReadTime(), self.destination.getWriteTime()}
 		->sum().doubleValue()
+;
+		
+helper context AADLI!FeatureInstance def : isPartOf(cnx: AADLI!ConnectionInstance) : Boolean =
+	cnx.connectionReference->exists(e| e.source=self or e.destination=self)
 ;

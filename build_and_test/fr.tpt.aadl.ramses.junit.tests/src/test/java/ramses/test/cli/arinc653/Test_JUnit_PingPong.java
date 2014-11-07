@@ -3,9 +3,9 @@ package ramses.test.cli.arinc653;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ramses.test.util.POKScenario;
+import ramses.test.util.OSGIPOKScenario ;
 
-public class Test_JUnit_PingPong extends POKScenario {
+public class Test_JUnit_PingPong extends OSGIPOKScenario {
 
 
 	@BeforeClass
@@ -21,4 +21,11 @@ public class Test_JUnit_PingPong extends POKScenario {
 		system_impl = "PingPong_Communication_System.impl";
 		this.exec();
 	}
+
+  @Override
+  protected void initAdditionalParameters()
+  {
+    // TODO Auto-generated method stub
+    
+  }
 }

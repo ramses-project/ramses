@@ -21,6 +21,8 @@
 
 package fr.tpt.aadl.ramses.generation.osek.ast;
 
+import java.util.List ;
+
 import org.osate.aadl2.modelsupport.UnparseText;
 
 public class Alarm {
@@ -37,11 +39,13 @@ public class Alarm {
 	private int alarmTime;
 	private int cycleTime;
 	private Cpu cpu;
+  private List<String> inModes ;
 	
-	public Alarm(Counter counter, Task task, Cpu cpu) {
+	public Alarm(Counter counter, Task task, Cpu cpu, List<String> inModes) {
 		this.counter = counter;
 		this.task = task;
 		this.cpu = cpu;
+		this.inModes = inModes;
 	}
 	
 	public void setName(String name) {
@@ -66,26 +70,31 @@ public class Alarm {
 
 	public void generateOil(UnparseText code) {
 
-		code.addOutputNewline("ALARM " + name + " {");
-		code.incrementIndent();
-		code.addOutputNewline("COUNTER = " + counter.getName() + ";");
+	  for(String modeId: inModes)
+	  {
 
-		code.addOutputNewline("ACTION = " + action + " {");
-		code.incrementIndent();
-		code.addOutputNewline("TASK = " + task.getName() + ";");
-		code.decrementIndent();
-		code.addOutputNewline("};");
+	    code.addOutputNewline("ALARM " + name + "_"+ modeId +"{");
+	    code.incrementIndent();
+	    code.addOutputNewline("COUNTER = " + counter.getName() + ";");
 
-		code.addOutputNewline("AUTOSTART = " + Boolean.toString(autostart).toUpperCase() + " {");
-		code.incrementIndent();
-		code.addOutputNewline("ALARMTIME = " + alarmTime + ";");
-		code.addOutputNewline("CYCLETIME = " + cycleTime + ";");
-		code.addOutputNewline("APPMODE = " + cpu.getAppmode() + ";");
-		code.decrementIndent();
-		code.addOutputNewline("};");
+	    code.addOutputNewline("ACTION = " + action + " {");
+	    code.incrementIndent();
+	    code.addOutputNewline("TASK = " + task.getName() + ";");
+	    code.decrementIndent();
+	    code.addOutputNewline("};");
 
-		code.decrementIndent();
-		code.addOutputNewline("};");
-		code.addOutputNewline("");
+	    code.addOutputNewline("AUTOSTART = " + Boolean.toString(autostart).toUpperCase() + " {");
+	    code.incrementIndent();
+	    code.addOutputNewline("ALARMTIME = " + alarmTime + ";");
+	    code.addOutputNewline("CYCLETIME = " + cycleTime + ";");
+	    code.addOutputNewline("APPMODE = " + modeId + ";");
+
+	    code.decrementIndent();
+	    code.addOutputNewline("};");
+
+	    code.decrementIndent();
+	    code.addOutputNewline("};");
+	    code.addOutputNewline("");
+	  }
 	}
 }

@@ -1,10 +1,10 @@
 package fr.tpt.aadl.ramses.transformation.launcher;
 
 import java.io.File ;
-import java.io.FileInputStream ;
 import java.io.FilenameFilter ;
 import java.io.IOException ;
-import java.io.InputStream ;
+import java.io.PrintWriter ;
+import java.io.StringWriter ;
 import java.util.ArrayList ;
 import java.util.Arrays ;
 import java.util.HashMap ;
@@ -14,6 +14,7 @@ import java.util.Map ;
 import java.util.Map.Entry ;
 import java.util.Properties ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
@@ -25,17 +26,18 @@ import org.eclipse.m2m.atl.engine.compiler.CompileTimeError ;
 import org.osate.aadl2.instance.SystemInstance ;
 
 import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
+import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.Generator ;
+import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
-import fr.tpt.aadl.ramses.control.workflow.Generation ;
 import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
@@ -51,10 +53,8 @@ import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Module ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
-import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 import fr.tpt.atl.compiler.Atl2EmftvmCompiler ;
-import fr.tpt.atl.hot.launcher.Atl2AtlLauncher ;
 import fr.tpt.atl.hot.launcher.AtlTip2AtlLauncher ;
 import fr.tpt.atl.patternmatching.util.PatternMatchingUtils ;
 
@@ -64,6 +64,9 @@ public class ArchitectureRefinementProcessLauncher {
   
   private NullProgressMonitor monitor = new NullProgressMonitor();
 
+  private static Logger _LOGGER = Logger.getLogger(ArchitectureRefinementProcessLauncher.class) ;
+  
+  
   /**
    * The property file. Stores trc and tip locations.
    */
@@ -76,6 +79,7 @@ public class ArchitectureRefinementProcessLauncher {
   private List<Transformation> transformations;
   private TrcSpecification trcSpec;
 
+  
   private final File outputPathSave ;
   
   public ArchitectureRefinementProcessLauncher(TrcSpecification trcSpec,
@@ -196,7 +200,10 @@ public class ArchitectureRefinementProcessLauncher {
       if(errors.length > 0)
       {
         for(int i=0; i< errors.length; i++)
-          System.err.println("ERROR: "+errors[i].getDescription());
+        {
+          String message = errors[i].getDescription();
+          _LOGGER.error(message);
+        }
       }
     }
 
@@ -209,16 +216,19 @@ public class ArchitectureRefinementProcessLauncher {
    * This method executes the architecture refinement process
    * INPUT: AADL candidate architecture model, RDAL specification, TRC artifact
    * OUTPUT: AADL architecture model is obtained from the workflow execution
+   * @return Resource obtained after merge and execution of the transformation
    * @throws ParseException 
    * @throws ConfigurationException 
+   * @throws TransformationException 
+   * @throws AnalysisException 
    * 
    * @throws IOException 
    * 
    */		
-  public void launch(SystemInstance systemInstance,
-                     String outputResourceSuffix,
+  public Resource launch(SystemInstance systemInstance,
+                     String outputResourceID,
                      int nbIterations) 
-                         throws ParseException, ConfigurationException
+                         throws ParseException, ConfigurationException, AnalysisException, TransformationException, IOException
   {
 
     File outputDir = new File(getPatternMatchingOutputDir());
@@ -229,27 +239,29 @@ public class ArchitectureRefinementProcessLauncher {
 
     config.setRamsesOutputDir(outputDir.getAbsolutePath());
     
+    
     // First, execute the HOT that produces pattern matching results
     PatternMatchingForTrcHotLauncher pmHotLauncher = new PatternMatchingForTrcHotLauncher(transformations,
                                                                                           resourceSet,
                                                                                           config);
     pmHotLauncher.launch();
-
+    
+    String message = "End of HOT to produce pattern matching traces";
+    _LOGGER.trace(message);
+    
     try {
-      for(int i=0; i<nbIterations; i++)
-      {
         TipUtils.setCurrentIteration(TipUtils.getCurrentIteration()+1);
-        
-        this.runArchitectureRefinementIteration(trcSpec,
-                                                systemInstance, 
-                                                config,
-                                                outputResourceSuffix);
-        
+        message = "Start production of " + outputResourceID;
+        _LOGGER.trace(message);
+        Resource r = this.runArchitectureRefinementIteration(trcSpec,
+                                                             systemInstance, 
+                                                             config,
+                                                             outputResourceID);
+        if(r==null)
+          return r;
+        message = "Finish production of " + outputResourceID;
         config.setRamsesOutputDir(outputPathSave.getAbsolutePath());
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.exit(-1);
+        return r;
     }
     finally
     {
@@ -267,13 +279,17 @@ public class ArchitectureRefinementProcessLauncher {
    * This method executes an iteration of architecture refinement process
    * INPUT: AADL candidate architecture model, RDAL specification, TRC artifact
    * OUTPUT: AADL architecture model is obtained from the workflow execution
+   * @return 
+   * @throws IOException 
+   * @throws TransformationException 
+   * @throws AnalysisException 
    * @throws Exception 
    * 
    */	
-  public void runArchitectureRefinementIteration(TrcSpecification trcSpec,
+  private Resource runArchitectureRefinementIteration(TrcSpecification trcSpec,
                                                  SystemInstance sinst,
                                                  RamsesConfiguration config,
-                                                 String outputResourceSuffix) throws Exception
+                                                 String outputResourceID) throws IOException, AnalysisException, TransformationException
   {
 
     TipUtils.addIteration(TipUtils.getTipSpecification(),
@@ -289,7 +305,9 @@ public class ArchitectureRefinementProcessLauncher {
 
     //create candidate tuples of possible transformations -> execute the AADL to pattern matching (all the files with ending "_2pml.atl")
     List<Transformation> transfoList = trcSpec.getTransformationList().getTransformations();
-	
+    
+    _LOGGER.trace("Start identification step (trace all pattern matching)");
+    
     for(Transformation transfo : transfoList)
     {
       PatternMatchingTransformationLauncher pmtl = new PatternMatchingTransformationLauncher(this.modelInstantiator,
@@ -307,10 +325,11 @@ public class ArchitectureRefinementProcessLauncher {
 
       AtlTransfoLauncher.initTransformation();
       pmtl.setResourceSet(resourceSet);
+      
       pmtl.doTransformation(emftvmFiles, 
                             sinst.eResource(),  
                             getOutputDir(),
-                            outputResourceSuffix, 
+                            outputResourceID, 
                             monitor);
     }
 
@@ -325,23 +344,32 @@ public class ArchitectureRefinementProcessLauncher {
 
     long finishTimeIdentification = System.nanoTime();
 
-    System.out.println("STEP1: time = "+Long.toString(finishTimeIdentification-startTimeIdentification));
+    _LOGGER.trace("Finished identification step (trace all pattern matching)");
+    _LOGGER.trace("STEP1: time = "+
+          Long.toString(finishTimeIdentification-startTimeIdentification));
 
     /**
      * Second step: select the transformations to apply.
      * 
      */
 
+    _LOGGER.trace("Start selection step");
+    
     long startTimeSelection = System.nanoTime();
 
     this.transformationSelection.selectTransformation(patternMatchingMap, tuplesToApply);
-
+    
     // store the result of the selection: generate TIP
     TipUtils.addElementTransformationToLastIteration(getOutputDir()+getTipId(), resourceSet, TipUtils.getTipSpecification(), tuplesToApply);
 
+    
+    
+    _LOGGER.trace("Finished selection step");
+
     long finishTimeSelection = System.nanoTime();
 
-    System.out.println("STEP2: time = "+Long.toString(finishTimeSelection-startTimeSelection));
+    _LOGGER.trace("STEP2: time = "+
+          Long.toString(finishTimeSelection-startTimeSelection));
 
     /**
      * 
@@ -349,6 +377,8 @@ public class ArchitectureRefinementProcessLauncher {
      * 
      */
 
+    _LOGGER.trace("Start specialization step");
+    
     long startTimeSpecialization = System.nanoTime();
 
     File outputDir = new File(this.outputPathSave+"/iter_"+TipUtils.getCurrentIteration());
@@ -376,13 +406,20 @@ public class ArchitectureRefinementProcessLauncher {
       }
     }
 
+    _LOGGER.trace("Start specialization HOT");
     // generate transformations for particular elements
     try {
       this.generateDedicatedAtlForTip(sinst.eResource(),tuplesToApply, getOutputDir()+getTipId());
     } catch (ATLCoreException e) {
-      e.printStackTrace();
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      e.printStackTrace(pw);
+      _LOGGER.fatal(sw.toString());
     }
 
+    _LOGGER.trace("Finished specialization HOT");
+    _LOGGER.trace("Create iteration workflow");
+    
     // warning: this code concatenates all the produced transformations in the produced workflow; 
     // a clean of the output directory has been done to restart from scratch.
     File[] additionalTransfoFiles = dirFileForWorkflow.listFiles(new FilenameFilter() {
@@ -398,16 +435,10 @@ public class ArchitectureRefinementProcessLauncher {
     //generate ramses workflow from TIP
     String workflowPath = getOutputDir()+"workflow"+
         TipParser.getLastIterationId()+".xmi";
-    //        fr.tpt.aadl.ramses.control.workflow.Transformation parentTransfo = null;
-    //        fr.tpt.aadl.ramses.control.workflow.Transformation rootTransfo = null;
-    //        for(int k=0;k<transfoList.size();k++)
-    //		{
-    //Transformation Ti = transfoList.get(k);
-    //			fr.tpt.aadl.ramses.control.workflow.Transformation t = WorkflowFactory.eINSTANCE.createTransformation();
     fr.tpt.aadl.ramses.control.workflow.Transformation rootTransfo = WorkflowFactory.eINSTANCE.createTransformation();
     
     ModelIdentifier outputMi = WorkflowFactory.eINSTANCE.createModelIdentifier();
-    outputMi.setId("applied_"+TipParser.getLastIterationId());
+    outputMi.setId(outputResourceID);
     rootTransfo.setOutputModelIdentifier(outputMi);
     
     ModelIdentifier inputMi = WorkflowFactory.eINSTANCE.createModelIdentifier();
@@ -415,8 +446,8 @@ public class ArchitectureRefinementProcessLauncher {
     rootTransfo.setInputModelIdentifier(inputMi);
     
     fr.tpt.aadl.ramses.control.workflow.List l = WorkflowFactory.eINSTANCE.createList();
-    //			t.setList(l);
     rootTransfo.setList(l);
+    
     // retreive module dependencies for current transformation.
     List<Module> completeModuleList = TrcUtils.buildDependencyList(transfoList);
     // add dependencies in the workflow model.
@@ -455,33 +486,36 @@ public class ArchitectureRefinementProcessLauncher {
     }
 
     // create workflow and save the workflow file
-    WorkflowUtils.createNewWorkflow(workflowPath, rootTransfo, inputMi);
+    WorkflowUtils.createNewWorkflow(resourceSet,workflowPath, rootTransfo, inputMi);
 
+    _LOGGER.trace("Finished specialization step");
+    
     long finishTimeSpecialization = System.nanoTime();
+    _LOGGER.trace("STEP3: time = "+Long.toString(finishTimeSpecialization-startTimeSpecialization));
 
-    System.out.println("STEP3: time = "+Long.toString(finishTimeSpecialization-startTimeSpecialization));
 
-
-    // execute ramses workflow transformation -> running java from command line, 
-    // example: -m test/simple-component2/model.aadl  -g pok -s s.i -o test/simple-component2/gen -i test/ --xml test/simple-component2/comp.xml
-    WorkflowPilot workflowPilot = new EcoreWorkflowPilot(workflowPath);
+    _LOGGER.trace("Launch specialized transformation");
+    
+    // execute ramses workflow transformation 
+    WorkflowPilot workflowPilot = new EcoreWorkflowPilot(this.resourceSet,
+                                                         workflowPath);
     ServiceRegistry registry = ServiceProvider.getServiceRegistry() ;
 
     Generator generator = registry.getGenerator(config.getTargetId()) ;
     try {
 
-      generator.generateWorkflow(sinst, config, workflowPilot, null, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, monitor);
-
-    } catch (GenerationException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+      Map<String, Resource> res = generator.generateWorkflow(sinst, config, workflowPilot, null, ServiceRegistry.ANALYSIS_ERR_REPORTER_MANAGER, monitor);
+      return res.get(outputResourceID);
+    } catch (GenerationException e) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      e.printStackTrace(pw);
+      _LOGGER.fatal(sw.toString());
     }
+    return null ;
 
 
   }
-
-
-
 
 
   //--------------------------------------------------------------------

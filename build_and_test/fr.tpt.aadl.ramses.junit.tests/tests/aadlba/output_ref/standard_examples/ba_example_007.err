@@ -9,4 +9,5 @@
 <Syntax Error> (from OSATE) Couldn't resolve reference to ConnectionEnd 'result'. in ba_example_007.aadl at line 71
 <Analysis Error> The destination of a data access connection must be a data access feature or a data subcomponent. in ba_example_007.aadl at line 7
 <Analysis Error> The destination of a data access connection must be a data access feature or a data subcomponent. in ba_example_007.aadl at line 7
-<Fatal Error> Abort on fatal error (see log file for more information): parse error. Note that annexes were not resolved
+<Fatal Error> Abort on fatal error (see log file (in /data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests) for more information): parse error. Note that annexes were not resolved
+Osate2-cli: Cannot open display:

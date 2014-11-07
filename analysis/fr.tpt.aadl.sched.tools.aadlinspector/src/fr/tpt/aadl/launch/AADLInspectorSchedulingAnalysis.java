@@ -55,11 +55,12 @@ import fr.tpt.aadl.ramses.analysis.eg.model.EGNode ;
 import fr.tpt.aadl.ramses.control.atl.AtlTransfoLauncher ;
 import fr.tpt.aadl.ramses.control.support.analysis.AbstractAnalyzer ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
-import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration;
+import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.utils.Command ;
+import fr.tpt.aadl.ramses.control.support.utils.Names ;
 import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 import fr.tpt.aadl.sched.aadlinspector.AADLInspectorLauncher ;
 import fr.tpt.aadl.sched.aadlinspector.output.AnalysisResult ;
@@ -69,9 +70,9 @@ import fr.tpt.aadl.sched.wcetanalysis.result.reducedba.AnalysisModel ;
 
 public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
-	private final static String ANALYZER_NAME = "AADLInspector-SchedulingAnalysis";
-	public final static String PLUGIN_NAME = "AADLInspector-SchedulingAnalysis";
-	private final static String PLUGIN_ID = "AADLInspector-SchedulingAnalysis";
+	private final static String ANALYZER_NAME = Names.TIMING_ANALYSIS_PLUGIN_NAME;
+	public final static String PLUGIN_NAME = Names.TIMING_ANALYSIS_PLUGIN_NAME;
+	private final static String PLUGIN_ID = Names.TIMING_ANALYSIS_PLUGIN_NAME;
 	private AadlModelInstantiatior _instantiator ;
 	private PredefinedAadlModelManager _predefinedResourcesManager ;
 	private String outputModelIdentifier;
@@ -132,7 +133,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			final IProgressMonitor monitor
 			)
 					throws AnalysisException
-					{
+	{
 		
 		this._config = config;
 		this._monitor = monitor;
@@ -171,6 +172,10 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
 		if(size==0)
 		{
+		  message = "At least one task has no worst case execution time defined in the " +
+		      "analysis model";
+		  _logger.error(message);
+		  ServiceProvider.SYS_ERR_REP.error(message, false);
 			return null;
 		}
 		// Launch analysis for each configuration
@@ -224,6 +229,20 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
       {
         return null ;
       }
+
+      @Override
+      public int getStatus()
+      {
+        // TODO Auto-generated method stub
+        return 0 ;
+      }
+
+      @Override
+      public Process getProcess()
+      {
+        // TODO Auto-generated method stub
+        return null ;
+      }
 		} ;
 		
 		int exitStatus ;
@@ -233,7 +252,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
     {
       exitStatus = wm.waitAndCheck(500) ;
     }
-    catch(InterruptedException e)
+    catch(Exception e)
     {
       killThreads(aadlInspectorThreads) ;
       String msg = "AADL inspector monitoring has been interrupted" ;
@@ -283,6 +302,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		int i=0;
 		String outputModelId="";
 		List<EGNode> resultingEGNodeList =  new ArrayList<EGNode>();
+		
 		for(ComponentInstance ci: responseTimeResultList.keySet())
 		{
 			List<EGNode> tmp=null;
@@ -302,7 +322,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 				}
 				for(TaskResponseTimeResult rt :ufr.getResponseTimes().values())
 					responseTimeSum += rt.worst;
-				if(responseTimeSum>maxResponseTime && schedulable)
+				if(responseTimeSum>=maxResponseTime && schedulable)
 				{
 					tmp = new ArrayList<EGNode>();
 					tmp.addAll(this.analysisResult.get(ufr));
@@ -311,13 +331,21 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 				}
 				i++;
 			}
-			resultingEGNodeList.addAll(tmp);
+			if(tmp!=null)
+			  resultingEGNodeList.addAll(tmp);
+			else
+			{
+			  String errMsg = "AADL Inspector error: results show a schedulable" +
+			      " task set, tasks have execution time, but the sum of tasks response time is null" ;
+        _logger.error(errMsg);
+        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
+			}
 		}
 		
 		return resultingEGNodeList;
 		
 		
-					}
+	}
 	
 	private void killThreads(Thread[] aadlInspectorThreads)
   {
@@ -327,20 +355,23 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 
 
   public void performAnalysis(SystemInstance root,
-			RamsesConfiguration config,
-			AnalysisErrorReporterManager errorReporter,
-			IProgressMonitor monitor
-			)
-					throws AnalysisException
-					{
+                              RamsesConfiguration config,
+                              AnalysisErrorReporterManager errorReporter,
+                              IProgressMonitor monitor
+      )
+          throws AnalysisException
+  {
 		
-		List<ComponentInstance> cpuList = new  ArrayList<ComponentInstance>();
 		List<EGNode> resultingEGNodeList = new ArrayList<EGNode>();
 		for(ComponentInstance ci : EcoreUtil2.getAllContentsOfType(root, ComponentInstance.class))
 		{
 			if(ci.getCategory().equals(ComponentCategory.PROCESSOR))
 			{
-				resultingEGNodeList.addAll(this.performAnalysis(ci, config, errorReporter, monitor));
+			  List<EGNode> executionGraphNodeList = this.performAnalysis(ci, config, errorReporter, monitor);
+				if(executionGraphNodeList!=null)
+				  resultingEGNodeList.addAll(executionGraphNodeList);
+				else
+				  return;
 			}
 		}
 		
@@ -361,15 +392,12 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			synchronized (this) {
 				wait();
 			}
-			if(last.analysisResult!=null)
-				last.analysisResult.normalize(currentResult);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		return;
-					}
+	}
 
 
 	synchronized private void addAnalysisResult(ComponentInstance ci, ResponseTimeResult rtr, List<EGNode> nodes)
@@ -395,11 +423,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 			                                      IProgressMonitor monitor)
 	{
 	  Wcet2AadlEMFTVMLauncher launcher = new Wcet2AadlEMFTVMLauncher(m, _instantiator, _predefinedResourcesManager, cpuList);
-//    List<File> transformationFileList = new ArrayList<File>();
-//    
-//    for(String s: getTransformationModuleList())
-//      transformationFileList.add(new File(s));
-    
+
     Aadl2Util.setUseTunedEqualsMethods (false);
 
     launcher.setOutputPackageName(outputModelId);
@@ -433,13 +457,13 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 		
 		public AADLInspectorAnalysisThread(AADLInspectorSchedulingAnalysis aadlInspectorSchedulingAnalysis, List<EGNode> egNodeList,
 				File outputDir, ComponentInstance cpu, String outputModelId, String mode) {
-        	this.initiator = aadlInspectorSchedulingAnalysis;
+      
+		  this.initiator = aadlInspectorSchedulingAnalysis;
 			this.egNodeList = egNodeList;
 			this.outputDir = outputDir;
 			this.root = cpu.getSystemInstance();
 			this.outputModelId = outputModelId;
 			this.mode = mode;
-			
 			for(ComponentInstance ci : EcoreUtil2.getAllContentsOfType(root, ComponentInstance.class))
 			{
 				if(ci.getCategory().equals(ComponentCategory.PROCESSOR)
@@ -518,6 +542,10 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
                                                                            ci.getName()) ;
             initiator.addAnalysisResult(ci, ufr, egNodeList) ;
           }
+        }
+        synchronized (this.initiator.currentResult)
+        {
+          analysisResult.normalize(this.initiator.currentResult);
         }
       }
 			catch(InterruptedException e)

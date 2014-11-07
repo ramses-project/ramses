@@ -22,7 +22,6 @@
 -- @atlcompiler emftvm
 
 -- TODO: make iteration_counter a global variable
--- TODO: remove CPRTable and CDWTable from SharedRules
 
 module EventDataPorts_LowMFP;
 
@@ -171,10 +170,6 @@ helper def: collectPeriodicDelayed_LocalVariables_LowMFP(c: AADLI!ComponentInsta
 		e.srcConnectionInstance->collect(f| thisModule.createThreadID(e, f.destination))
 		)
 		->flatten()
-;
-
-helper def: getHyperperiod(destinationPort: AADLI!FeatureInstance) : Integer = 
-	thisModule.theHOOK.getHyperperiod(destinationPort)
 ;
 
 helper context AADLI!FeatureInstance def: initWriterContext() : String =
@@ -464,7 +459,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
      	--- connect buffer: requires data access ArrayDataType {Access_Right=>write_only;};
 		Buffer_Holder: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef} ,'f_entrypoint')
+			element<-fi.retreiveEntrypointFeature(cnxRef)
 		)
 }
 

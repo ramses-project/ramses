@@ -67,7 +67,7 @@ property set POK is
 
   Refresh_Time : Time applies to (data port);
 
-  Hw_Addr : aadlstring applies to (device);
+  Address : aadlstring applies to (device, processor);
 
   PCI_Vendor_Id : aadlstring applies to (device);
 

@@ -19,6 +19,7 @@ import org.osate.aadl2.Connection ;
 import org.osate.aadl2.DataAccess ;
 import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DeviceSubcomponent ;
+import org.osate.aadl2.Mode ;
 import org.osate.aadl2.ProcessImplementation ;
 import org.osate.aadl2.ProcessSubcomponent ;
 import org.osate.aadl2.ProcessorSubcomponent ;
@@ -30,10 +31,13 @@ import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.ThreadImplementation ;
 import org.osate.aadl2.ThreadSubcomponent ;
 import org.osate.aadl2.ThreadType ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.aadl2.modelsupport.UnparseText ;
 import org.osate.utils.Aadl2Utils ;
 import org.osate.utils.PropertyUtils ;
 
+import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.generator.AadlTargetUnparser ;
 import fr.tpt.aadl.ramses.control.support.generator.GenerationException ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
@@ -52,17 +56,22 @@ import fr.tpt.aadl.ramses.generation.osek.ast.Os.Status ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Subprogram ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task ;
 import fr.tpt.aadl.ramses.generation.osek.ast.Task.Schedule ;
+import fr.tpt.aadl.ramses.generation.utils.AadlToXUnparser ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.GlobalQueueInfo ;
+import fr.tpt.aadl.ramses.generation.utils.ProcessProperties ;
 import fr.tpt.aadl.ramses.generation.utils.RoutingProperties ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.EventInfo ;
+import fr.tpt.aadl.ramses.generation.utils.GenerationInfos.QueueInfo ;
 
 /**
  * Unparser to generate an oil file for OSEK from aadl.
  */
-public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
+public class AadlToOSEKNxtCUnparser extends AadlToXUnparser implements AadlTargetUnparser {
 
 	
 	private static String DATA_PORT_TYPE = "DataPortType";
 	private static String EVENTDATA_PORT_TYPE = "ThreadQueueType";
-	private final static String MAIN_APP_MODE = "std";
+	private final static String MAIN_APP_MODE = "default_mode";
 
 	/**
 	 * Variable OIL
@@ -124,95 +133,8 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
     _mainHCode = new UnparseText();
     _startupHook = new Hook();
     _shutdownHook = new Hook();
-		genDevice(si);
 
 		return new RoutingProperties();
-	}
-
-	/**
-	 * Method call on subprogram implementation
-	 */
-  public void process(SubprogramType elt,
-                      File generatedFilePath)
-  {
-    //		Os os = oil.getCpu().getOs();
-
-    String name = PropertyUtils.getStringValue(elt, "Source_Name") ;
-    String port = PropertyUtils.getStringValue(elt, "nxtport") ;
-    
-    if(name == null || port == null)
-    {
-      String what = "";
-      if(name == null)
-      {
-        what = "Source_Name";
-      }
-      
-      if(port == null)
-      {
-        what += " nxtport";
-      }
-      
-      String msg = "cannot fetch " + what + " for \'" + elt.getName() + '\'' ;
-      _LOGGER.error(msg);
-      ServiceProvider.SYS_ERR_REP.error(msg, true);
-      return ;
-    }
-    else
-    {
-      Subprogram subprogram = new Subprogram() ;
-      subprogram.setName(name) ;
-      subprogram.addParameter(port) ;
-      
-      if(_startupHook.getReferences().contains(elt.getName()))
-      {
-        _startupHook.addSubrogram(subprogram) ;
-      }
-      else if(_shutdownHook.getReferences().contains(elt.getName()))
-      {
-        _shutdownHook.addSubrogram(subprogram) ;
-      }
-    }
-  }
-
-	private void genDevice(SystemImplementation si) {
-
-		Os os = oil.getCpu().getOs();
-
-		for (DeviceSubcomponent device : si.getOwnedDeviceSubcomponents())
-		{
-		  Classifier classifier = PropertyUtils.getClassifierValue(device, "Initialize_Entrypoint");
-			if(classifier != null)
-			{
-				/*
-				 * If one thread/device contains Initialize_Entrypoint STARTUPHOOK = true
-				 */
-				os.setStartupHook(true);
-				_startupHook.addReference(classifier.getName());
-			}
-			else
-			{
-			  String errMsg = "cannot fetch initialize entrypoint for " + device ;
-		    _LOGGER.error(errMsg);
-		    ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-			}
-			
-			classifier = PropertyUtils.getClassifierValue(device, "Finalize_Entrypoint");
-			if(classifier != null)
-			{
-				/*
-				 * If one thread/device contains Finalize_Entrypoint SHUTDOWNHOOK = true
-				 */
-				os.setShutdownHook(true);
-				_shutdownHook.addReference(classifier.getName());
-			}
-			else
-			{
-			  String errMsg = "cannot fetch finalize entrypoint for " + device ;
-        _LOGGER.error(errMsg);
-        ServiceProvider.SYS_ERR_REP.error(errMsg, true);
-			}
-		}
 	}
 
 	/**
@@ -226,6 +148,7 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 		Cpu cpu = oil.getCpu();
 		Os os = cpu.getOs();
 		_mainHCode.addOutputNewline("#include \"kernel.h\"");
+    _mainHCode.addOutputNewline("#include \"kernel_id.h\"");
 
 		/* Generate code for threads process */
 		ProcessImplementation pi = (ProcessImplementation) ps.getComponentImplementation();
@@ -275,11 +198,28 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
         }
       }
 		}
-		cpu.setAppmode(MAIN_APP_MODE);
+		
+		List<String> modeIdList = getProcessModesIdentifiers(ps);
+		cpu.setAppmode(modeIdList);
+		
 		cpu.setName(ps.getName());
 		genOsConfig(ps);
 	}
 
+	
+	List<String> getProcessModesIdentifiers(ProcessSubcomponent ps)
+	{
+	  List<String> result = new ArrayList<String>();
+	  ProcessImplementation pi = (ProcessImplementation) ps.getSubcomponentType();
+	  List<Mode> modeList = pi.getOwnedModes();
+	  if(modeList.isEmpty())
+	    result.add(MAIN_APP_MODE);
+	  for(Mode m: modeList)
+	  {
+	    result.add(m.getName());
+	  }
+	  return result;
+	}
 	/**
 	 * Configuration de l'OS
 	 * 
@@ -449,18 +389,6 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
         }
       }
 		}
-		for(SubprogramCallSequence scs: ti.getOwnedSubprogramCallSequences())
-		{
-		  for(SubprogramCall cs: scs.getOwnedSubprogramCalls())
-		  {
-		    if(cs instanceof SubprogramCall)
-		    {
-		      SubprogramCall sc = (SubprogramCall) cs;
-		      if(sc.getCalledSubprogram() instanceof SubprogramType)
-		        this.process((SubprogramType) sc.getCalledSubprogram(), _generatedCodeDirectory);
-		    }
-		  }
-		}
 		
 		/* End task */
 
@@ -489,7 +417,30 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 				} catch(Exception exc)
 				{
 				}
-				Alarm alarm = new Alarm(counter, task, cpu);
+				
+				List<String> inModeIdList = new ArrayList<String>();
+				ProcessImplementation pi = (ProcessImplementation) ps.getSubcomponentType();
+				if(pi.getOwnedModes().isEmpty())
+				  inModeIdList.add(MAIN_APP_MODE);
+				else
+				{
+				  if(thread.getAllInModes().isEmpty())
+				  {
+				    for(Mode m:pi.getOwnedModes())
+	          {
+	            inModeIdList.add(m.getName());
+	          }
+				  }
+				  else
+				  {
+				    for(Mode m:thread.getAllInModes())
+				    {
+				      inModeIdList.add(m.getName());
+				    }
+				  }
+				}
+				
+				Alarm alarm = new Alarm(counter, task, cpu, inModeIdList);
 
 				alarm.setName("wakeUp" + thread.getName());
 				alarm.setAction(Action.ACTIVATETASK);
@@ -653,7 +604,21 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
 	{
 	  _mainCCode.addOutputNewline("#include \"main.h\"");
 	  genCpu(process);
+	  
+	  StringBuilder sb = new StringBuilder(process.getQualifiedName());
+    ProcessProperties pp = new ProcessProperties(sb.substring(0, sb.lastIndexOf("::")+2)) ;
+    
+    ProcessImplementation processImpl = (ProcessImplementation) 
+        process.getComponentImplementation() ;
+    
+    this.findCommunicationMechanism(processImpl, pp);
+    
+    ComponentInstance processInstance = (ComponentInstance) HookAccessImpl.getTransformationTrace(process);
+    
+    genSendOutputImpl(processInstance, _mainCCode, _mainHCode, pp);
+	  
 	}
+	
 	
 	@Override
 	public void setParameters(Map<Enum<?>, Object> parameters) {
@@ -733,5 +698,109 @@ public class AadlToOSEKNxtCUnparser implements AadlTargetUnparser {
         }
       }
     }
+  }
+
+  @Override
+  protected String getBlackBoardType()
+  {
+    return "OSEK_runtime::DataPortType" ;
+  }
+
+  @Override
+  protected String getBufferType()
+  {
+    return "OSEK_runtime::PortQueueType" ;
+  }
+
+  @Override
+  protected String getEventType()
+  {
+    return null ;
+  }
+
+  @Override
+  protected String getQueuingType()
+  {
+    // return null: queuing (ARINC terminology) does not exist on OSEK
+    return null ;
+  }
+
+  @Override
+  protected String getSamplingType()
+  {
+    // return null: sampling (ARINC terminology) does not exist on OSEK
+    return null ;
+  }
+
+  @Override
+  protected String getSemaphoreType()
+  {
+    // TODO Auto-generated method stub
+    return null ;
+  }
+
+  @Override
+  protected String getVirtualPortType()
+  {
+    // TODO Auto-generated method stub
+    return null ;
+  }
+
+  @Override
+  protected String getFeatureLocalIdentifier(FeatureInstance fi)
+  {
+    return GenerationUtilsC.getGenerationCIdentifier(fi.getComponentInstance().
+                                                     getName()+"_"+fi.getName());
+  }
+
+  @Override
+  protected String getGenerationIdentifier(String prefix)
+  {
+    return GenerationUtilsC.getGenerationCIdentifier(prefix);
+  }
+
+  @Override
+  protected void sendOutputQueueing(UnparseText mainImplCode, QueueInfo info)
+  {
+    return;
+  }
+
+  @Override
+  protected void sendOutputEvent(UnparseText mainImplCode, EventInfo info)
+  {
+    return;
+  }
+
+  @Override
+  protected void sendOutputBuffer(UnparseText mainImplCode, QueueInfo info)
+  {
+    mainImplCode.addOutputNewline("ret = SendOutput_runtime(&" + info.gQueue.id +
+                                  ", "+ info.threadPortId + ", value);");   
+  }
+
+  @Override
+  protected void sendOutputPrologue(ComponentInstance processInstance,
+                                    UnparseText mainImplCode,
+                                    ProcessProperties pp)
+  {
+    mainImplCode.addOutputNewline("StatusType ret;");
+  }
+
+  @Override
+  protected String getGlobalQueueType()
+  {
+    return "OSEK_runtime::ThreadQueueType" ;
+  }
+
+  @Override
+  protected void sendOutputVariableAccess(ComponentInstance processInstance,
+                                          UnparseText mainImplCode,
+                                          ProcessProperties pp)
+  {
+    for(GlobalQueueInfo gqi: pp.globalQueueInfo)
+    {
+      mainImplCode.addOutputNewline("extern thread_queue_t "+ gqi.id+";");
+    }
+
   }
 }

@@ -4,14 +4,14 @@
 #include "arinc653/types.h"
 #include "arinc653/blackboard.h"
 #include "business-code/PingPong_module.h"
-typedef enum e_PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState {
-	PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState_switch
-} PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState;
 typedef signed int Base_Types__Integer_16;
 typedef  int COAL__integer;
 typedef SEQ PingPong__SEQ;
 typedef BLACKBOARD_ID_TYPE arinc653_runtime__Blackboard_Id_Type;
 typedef SAMPLING_PORT_ID_TYPE arinc653_runtime__Sampling_Port_Id_Type;
+typedef enum e_PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState {
+	PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState_switch
+} PingPong_refined_model__S2_inst_IPingOrPong_Cping_ping_currentState;
 typedef struct PingPong__PingPongMessage {
 } PingPong__PingPongMessage;
 typedef MESSAGE_SIZE_TYPE arinc653_runtime__Message_Size_Type;

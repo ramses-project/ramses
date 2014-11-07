@@ -35,6 +35,122 @@ create OUT : AADLBA 	from 		IN : AADLI,
 --------------------------------------------
 ---                EVENT                 ---
 --------------------------------------------
+helper context AADLI!FeatureInstance def: needsBarrier(): Boolean =
+	self.srcConnectionInstance->exists(e| e.destination.getComponentInstance().isTimedThread()
+		or
+		e.destination.getComponentInstance().isSporadicThread()
+	)
+;
+
+helper context AADLI!FeatureInstance def: getBarrierImg(): AADLBA!DataSubcomponent =
+	thisModule.resolveMatchedSingleIfExists(self.getComponentInstance(),'EVENT_ID')
+;
+
+--@extends m_Thread_Output_Port_Instance,m_Thread_Output_IntraProcess_EventOrEventDataPort_Instance
+rule m_Output_EventOrEventDataPort_Barrier
+{
+	from
+		fi: AADLI!FeatureInstance,
+		cnxRef: AADLI!PortConnection
+		(fi.isEventPort() or fi.isEventDataPort()
+			and fi.needsBarrier()
+		)
+	to
+		barrierThreadAccess: AADLBA!DataAccess
+		(
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name+'_barrier',
+			kind <- #requires,
+			dataFeatureClassifier <- 'Event_Id_Type'.asDataType('ARINC653_RUNTIME')
+		),
+		barrierThreadAccessConnection: AADLBA!AccessConnection
+		(
+			name <- cnxRef.uniqueName()+'_'+cnxRef.destination.connectionEnd.name+'_to_barrier',
+			source<-connectedBarrierSubcomponent,
+			accessCategory<-#data,
+			destination<-connectedBarriedAccess
+		),
+		connectedBarrierSubcomponent: AADLBA!ConnectedElement
+		(
+			connectionEnd<-fi.srcConnectionInstance->any(e| e.connectionReference->exists(f|f.connection = cnxRef)).connectionReference->any(e|e.source=fi).destination.getBarrierImg()
+		),
+		connectedBarriedAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-barrierThreadAccess
+		),
+		barrierEntryPointAccess: AADLBA!DataAccess
+		(
+			name <- cnxRef.uniqueName()+'_'+fi.feature.name+'_entrypoint_barrier',
+			kind <- #requires,
+			dataFeatureClassifier <- 'Event_Id_Type'.asDataType('ARINC653_RUNTIME')
+		),
+		barrierEntryPointAccessConnection: AADLBA!AccessConnection
+		(
+			name <- cnxRef.uniqueName()+'_'+cnxRef.destination.connectionEnd.name+'_to_entrypoint_barrier',
+			source<-connectedBarrierThreadAccess,
+			accessCategory<-#data,
+			destination<-connectedBarrierSubprogramAccess
+		),
+		connectedBarrierSubprogramAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-barrierEntryPointAccess
+		),
+		connectedBarrierThreadAccess: AADLBA!ConnectedElement
+		(
+			connectionEnd<-barrierThreadAccess
+		)
+	do
+	{
+		connectedBarriedAccess.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'sub'));
+		connectedBarrierSubprogramAccess.setContext(thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'callEntryPoint'));
+	}
+}
+-- @extends m_Output_Buffer_ComputeEntrypointCallSequence
+rule m_Output_Buffer_ComputeEntrypointCallSequence_Barrier
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		paramCnx: AADLI!ParameterConnection,
+		cnxRef: AADLI!PortConnection		
+		(
+			fi.needsBarrier()
+		)
+	using
+	{
+		spg: AADLBA!SubprogramType = 'Set_Event'.asSubprogramType('ARINC653_RUNTIME');
+		int: AADLBA!DataType = 'Integer_16'.asClassifier('BASE_TYPES');
+		TIME_OUT: AADLBA!DataSubcomponent = thisModule.CreateTimeOutSubcomponentFromPort(fi);
+		EVENT_ID: AADLBA!DataAccess = thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'barrierEntryPointAccess');
+		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
+	}
+	to
+		callSetEvent: AADLBA!SubprogramCallAction
+		(
+			subprogram <- callSetEventHolder,
+			parameterLabels <- Sequence{EVENT_ID_HOLDER,EVENT_RETURN_CODE_HOLDER} 
+		),
+		callSetEventHolder: AADLBA!CalledSubprogramHolder
+		(
+			element <- spg
+		),
+		EVENT_ID_HOLDER: AADLBA!DataAccessHolder
+		(
+			element<-EVENT_ID
+		),
+		EVENT_RETURN_CODE_HOLDER: AADLBA!DataSubcomponentHolder
+		(
+			element <- RETURN_CODE
+		)
+	do
+	{
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
+	}
+}
+
+
+
+
+
 
 -- @extends m_Not_PeriodicDelayed_Port
 rule m_EventSubprogramCall
@@ -55,7 +171,7 @@ rule m_EventSubprogramCall
 	using
 	{
 		MESSAGE_ADDR: AADLBA!DataSubcomponent = fi.retreiveMessageAddress();
-		LENGTH: AADLBA!DataSubcomponent = thisModule.CreateLengthDataSubcomponent(fi);
+		LENGTH_HOLDER: AADLBA!ElementHolder = thisModule.GetOrCreateLengthDataSubcomponentHolder(fi);
 		EVENT_ID: AADLBA!DataAccess = fi.getFeatureImg();
 		RETURN_CODE: AADLBA!DataSubcomponent = thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'returnData');
 	}

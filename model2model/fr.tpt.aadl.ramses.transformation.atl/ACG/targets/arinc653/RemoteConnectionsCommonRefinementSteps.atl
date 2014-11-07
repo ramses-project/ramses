@@ -1,0 +1,398 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLBA=/fr.tpt.aadl.annex.behavior/model/aadlba.ecore
+-- @atlcompiler emftvm
+
+module RemoteConnectionsCommonRefinementSteps;
+
+create OUT: AADLBA from IN: AADLI;
+
+helper context AADLI!ComponentInstance def: isSystemPartition() : Boolean =
+	let mpv: AADLBA!ModalPropertyValue = self.getModalPropertyValue('System_Partition') in
+	if(mpv.oclIsUndefined()) then
+		false
+	else
+		mpv.ownedValue.value = true
+	endif
+;
+
+helper context AADLI!ComponentInstance def: holdsProcesses() : Boolean =
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.category=#process)
+	->collect(e|e.getActualProcessorBinding())->flatten()
+	->includes(self)
+;
+
+helper context AADLI!ComponentInstance def: holdedProcesses(): Sequence(AADLI!ComponentInstance) =
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.category=#process and 
+		e.getActualProcessorBinding()->includes(self))
+	
+;
+
+helper context AADLI!ComponentInstance def: getEmptyMemory() : Sequence(AADLI!ComponentInstance) =
+	let usedMemory: Sequence(AADLI!ComponentInstance) = AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.category=#process)
+														->collect(e|e.memoryBinding())->flatten() in
+	self.componentInstance->select(e|e.category=#memory)->select(e|
+		usedMemory->excludes(e)
+	)
+;
+
+
+helper context AADLI!ComponentInstance def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =   
+	self.ownedPropertyAssociation->collectSelfPropertyAssociationImg()
+	->union(
+		self.componentInstance->select(e|e.category=#processor)
+		->collect(e| e.componentInstance->select(f|f.isPartitionSystemForCommunications()))
+		->flatten()
+		->collect(f | thisModule.CreatePropertyAssociationAppliesTo ('Actual_Processor_Binding', 'DEPLOYMENT_PROPERTIES', 
+																		thisModule.resolveTemp(f,'lv'),
+																		thisModule.createContainedNamedElement(
+																			thisModule.resolveTemp(f,'process_commSub')
+																		)
+																		)
+				)
+	)
+	->union(
+		self.componentInstance->select(e|e.category=#processor)
+		->collect(e| e.componentInstance->select(f|f.isPartitionSystemForCommunications()))
+		->flatten()
+		->collect(f | thisModule.CreatePropertyAssociationAppliesTo ('Actual_Memory_Binding', 'DEPLOYMENT_PROPERTIES', 
+																		thisModule.resolveTemp(f,'memoryLv'),
+																		thisModule.createContainedNamedElement(
+																			thisModule.resolveTemp(f,'process_commSub')
+																		)
+																		)
+				)
+	)
+;
+
+--@extends m_System_Implementation
+rule m_System_Implementation_WithCommunicationProcess {
+  from
+  	impl : AADLI!SystemImplementation
+  to
+  	implImg : AADLBA!SystemImplementation
+	(
+		ownedProcessSubcomponent          <- impl.getSubcomponentsInstances('processor')
+													->collect(e|e.componentInstance)
+													->flatten()->select(f|f.category.getName()='virtual processor')
+													->collect(g|thisModule.resolveMatchedSingleIfExists(g, 'process_commSub'))
+													->flatten()->excluding(OclUndefined)
+												->union(
+													impl.getSubcomponentsInstances('process')
+												),
+		ownedPortConnection				<- impl.getSubcomponentsInstances('processor')
+											->collect(e|e.componentInstance->select(f|f.category.getName()='virtual processor'))
+											->flatten()
+											-> collect(e| e.eContainer().getRemotelyConnectedFeatures()
+												->collect(f| thisModule.createCommunicationProcessConnection(f,e))
+											)
+											-> flatten()
+											->excluding(OclUndefined)
+	)
+}
+
+unique lazy rule createCommunicationProcessConnection
+{
+	from
+		fi: AADLI!FeatureInstance,
+		vp: AADLI!ComponentInstance
+		(
+			fi.getProcess().getActualProcessorBinding()->includes(vp)
+		)
+	to
+		cnx: AADLBA!PortConnection
+		(
+			name <- fi.getProcess().name+'_'+fi.name+'_ComProcessCnx',
+			source <- sourceCE,
+			destination <- destinationCE
+		),
+		sourceCE: AADLBA!ConnectedElement
+		(
+			context <- if(fi.direction.getName()='in') then
+					thisModule.resolveMatchedSingleIfExists(vp.getProcessorContainer().componentInstance->any(e|e.isPartitionSystemForCommunications()), 'process_commSub')
+				else
+					fi.eContainer()
+				endif,
+			connectionEnd <- if(fi.direction.getName()='in') then
+					fi.createMirrorPort()
+				else
+					fi
+				endif
+		),
+		destinationCE: AADLBA!ConnectedElement
+		(
+			context <- if(fi.direction.getName()='out') then
+					thisModule.resolveMatchedSingleIfExists(vp.getProcessorContainer().componentInstance->any(e|e.isPartitionSystemForCommunications()), 'process_commSub')
+				else
+					fi.eContainer()
+				endif,
+			connectionEnd <- if(fi.direction.getName()='out') then
+					fi.createMirrorPort()
+				else
+					fi
+				endif
+		)
+	do
+	{
+		cnx;
+	}
+		
+}
+
+helper context AADLI!ComponentInstance def: isPartitionSystemForCommunications(): Boolean =
+	self.category.getName()='virtual processor'
+		and
+	self.isSystemPartition()
+		and not self.holdsProcesses()
+;
+
+-- @extends m_VirtualProcessor_Instance
+rule m_ConfigureSystemPartitionForCommunications
+{
+	from
+		c: AADLI!ComponentInstance
+		(
+			c.isPartitionSystemForCommunications()
+		)
+	using
+	{
+		mainMemory: AADLI!ComponentInstance = c.eContainer().componentInstance->any(e|not (e=c))
+													.holdedProcesses()->at(1).memoryBinding();
+		featureInstanceList: Sequence(AADLI!FeatureInstance) = c.eContainer().componentInstance->select(e|not (e=c))
+													->collect(e|e.holdedProcesses())->flatten()
+													->collect(e|e.featureInstance)->flatten();
+	}
+	to
+		sub : AADLBA!VirtualProcessorSubcomponent,
+		process_commSub: AADLBA!ProcessSubcomponent
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_'+'comProcess',
+			processSubcomponentType <- process_commImpl,
+			ownedPropertyAssociation <- Sequence{}
+		),
+		lv:AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{v}
+		),
+		v: AADLBA!ReferenceValue
+		(
+			path <- cpe1
+		),
+		cpe1: AADLBA!ContainmentPathElement
+		(
+			namedElement <- c.getProcessorContainer(),
+			path <- cpe2
+		),
+		cpe2: AADLBA!ContainmentPathElement
+		(
+			namedElement <- c
+		),
+		memoryLv:AADLBA!ListValue
+		(
+			ownedListElement <- Sequence{memoryRef}
+		),
+		memoryRef: AADLBA!ReferenceValue
+		(
+			containmentPathElement <- cpeMemory1
+		),
+		cpeMemory1: AADLBA!ContainmentPathElement
+		(
+			namedElement <- mainMemory.eContainer(),
+			path <- cpeMemory2
+		),
+		cpeMemory2:AADLBA!ContainmentPathElement
+		(
+			namedElement <- mainMemory.eContainer().getEmptyMemory()->first()
+		),
+		process_commImpl: AADLBA!ProcessImplementation
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_'+'comProcess.impl',
+			ownedRealization <- thisModule.Realization(process_commType),
+			ownedThreadSubcomponent <- Sequence{comThreadSub},
+			ownedPortConnection  <- featureInstanceList->collect(e|thisModule.createPortConnection(e, comThreadSub))			
+		),
+		comThreadSub: AADLBA!ThreadSubcomponent
+		(
+			name <- c.name+'_comm',
+			threadSubcomponentType <- thisModule.resolveTemp(c.getProcessorContainer(),'comThreadImpl'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation ('Period', 'TIMING_PROPERTIES', period),
+											thisModule.CreatePropertyAssociation ('Priority', 'THREAD_PROPERTIES', prio)
+										}
+		),
+		period: AADLBA!IntegerLiteral
+		(
+			value <- c.getPeriod(),
+		 	unit <- thisModule.UnitLiteral(c.getPeriodUnit())
+		),
+		prio: AADLBA!IntegerLiteral
+		(
+			value <- 5.longValue()
+		),
+		process_commType: AADLBA!ProcessType
+		(
+			name <- c.getProcessorContainer().name+'_'+c.name+'_'+'comProcess',
+			ownedEventDataPort <- featureInstanceList->select(e|e.isEventDataPort())
+									->collect(e|thisModule.mirrorEventDataPort(e)),
+	 		ownedDataPort <- featureInstanceList->select(e|e.isDataPort())
+									->collect(e|thisModule.mirrorDataPort(e)),
+	 		ownedEventPort <- featureInstanceList->select(e|e.isEventPort())
+									->collect(e|thisModule.mirrorEventPort(e))
+		)
+}
+
+
+
+unique lazy rule mirrorEventDataPort
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventDataPort())
+	to
+		f: AADLBA!EventDataPort
+		(
+			name <- fi.eContainer().name+'_'+fi.name,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier,
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Queue_Processing_Protocol', 'COMMUNICATION_PROPERTIES', 
+																		thisModule.CreateEnumValuePropertyExpression('FIFO')),
+												thisModule.CreatePropertyAssociation('Queue_Size', 'COMMUNICATION_PROPERTIES', 
+														size)				
+												}
+		),
+		size: AADLBA!IntegerLiteral
+		(
+			value <- fi.getModalPropertyValue('Queue_Size').ownedValue.value
+		)
+	do
+	{
+		if(fi.direction.getName()='out')
+			thisModule.theHOOK.setDirection(f, 'in');
+		else if(fi.direction.getName()='in')
+			thisModule.theHOOK.setDirection(f, 'out');
+		f;
+	}
+}
+
+unique lazy rule mirrorDataPort
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isDataPort())
+	to
+		f: AADLBA!DataPort
+		(
+			name <- fi.eContainer().name+'_'+fi.name,
+			dataFeatureClassifier <- fi.feature.dataFeatureClassifier
+		)
+	do
+	{
+		if(fi.direction.getName()='out')
+			thisModule.theHOOK.setDirection(f, 'in');
+		else if(fi.direction.getName()='in')
+			thisModule.theHOOK.setDirection(f, 'out');
+		f;
+	}
+}
+
+unique lazy rule mirrorEventPort
+{
+	from
+		fi: AADLI!FeatureInstance
+		(fi.isEventPort())
+	to
+		f: AADLBA!EventPort
+		(
+			name <- fi.eContainer().name+'_'+fi.name,
+			dataFeatureClassifier <- 'Unsigned_8'.asDataType('Base_Types'),
+			ownedPropertyAssociation <- Sequence{thisModule.CreatePropertyAssociation('Queue_Processing_Protocol', 'COMMUNICATION_PROPERTIES', 
+																		thisModule.CreateEnumValuePropertyExpression('FIFO')),
+												thisModule.CreatePropertyAssociation('Queue_Size', 'COMMUNICATION_PROPERTIES', 
+														size)				
+												}
+		),
+		size: AADLBA!IntegerLiteral
+		(
+			value <- fi.getModalPropertyValue('Queue_Size').ownedValue.value
+		)
+	do
+	{
+		if(fi.direction.getName()='out')
+			thisModule.theHOOK.setDirection(f, 'in');
+		else if(fi.direction.getName()='in')
+			thisModule.theHOOK.setDirection(f, 'out');
+		f;
+	}
+}
+
+unique lazy rule createPortConnection
+{
+	from
+		fi: AADLI!FeatureInstance,
+		sub: AADLI!Subcomponent
+	to
+		cnxImg: AADLBA!PortConnection
+		(
+			name <- fi.eContainer().name+'_'+fi.name+'_cnx',
+			source <- sourceCE,
+			destination <- destinationCE
+		),
+		sourceCE: AADLBA!ConnectedElement
+		(
+			connectionEnd <- if(fi.direction.getName()='out') then
+								fi.createMirrorPort()
+							 else
+							 	thisModule.resolveMatchedSingleIfExists(fi, 'f_mirror')
+							 endif,
+			context <- if(fi.direction.getName()='out') then
+							OclUndefined
+						else
+							sub
+						endif
+		),
+		destinationCE: AADLBA!ConnectedElement
+		(
+			connectionEnd <- if(fi.direction.getName()='in') then
+								fi.createMirrorPort()
+							 else
+							 	thisModule.resolveMatchedSingleIfExists(fi, 'f_mirror')
+							 endif,
+			context <- if(fi.direction.getName()='in') then
+							OclUndefined
+						else
+							sub
+						endif
+		)
+	do
+	{
+		cnxImg;
+	}
+}
+
+helper context AADLI!FeatureInstance def: createMirrorPort(): AADLBA!Feature =
+	if self.isEventDataPort() then
+		thisModule.mirrorEventDataPort(self)
+	else if self.isDataPort() then
+			thisModule.mirrorDataPort(self)
+		else
+		 	thisModule.mirrorEventPort(self)
+		endif
+	endif
+;

@@ -1,7 +1,8 @@
+#include "arinc653/event.h"
 #include "arinc653/buffer.h"
 #include "subprograms.h"
 test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_BA_State_t the_proc_the_sender_entrypoint_impl_current_state = test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_init_state;
-void test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl(BUFFER_ID_TYPE *  cnx_p_out)
+void test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl(BUFFER_ID_TYPE *  cnx_p_out, EVENT_ID_TYPE *  cnx_p_out_entrypoint_barrier)
 {
   RETURN_CODE_TYPE test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_the_proc_the_sender_runtime_call_ret;
   common_pkg__Integer test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_p_out_localVariable;
@@ -35,13 +36,14 @@ while(1)
       the_proc_the_sender_entrypoint_impl_current_state = test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_BA_entrypoint_wait_dispatch_state;
       send (&test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_p_out_localVariable);
       SEND_BUFFER ((*cnx_p_out), &test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_p_out_localVariable, test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_p_out_Length, test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_p_out_TimeOut, &test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_the_proc_the_sender_runtime_call_ret);
+      SET_EVENT ((*cnx_p_out_entrypoint_barrier), &test_sporadic_refined_model__the_proc_the_sender_entrypoint_impl_the_proc_the_sender_runtime_call_ret);
       break;
     }
   }
 }
 }
 test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_BA_State_t the_proc_the_receiver_entrypoint_impl_current_state = test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_init_state;
-void test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl(BUFFER_ID_TYPE *  p_in)
+void test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl(BUFFER_ID_TYPE *  p_in, EVENT_ID_TYPE *  the_receiver_PortIdAccess_barrier)
 {
   RETURN_CODE_TYPE test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_the_proc_the_receiver_runtime_call_ret;
   common_pkg__Integer test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_p_in_localVariable;
@@ -69,6 +71,8 @@ while(1)
     {
       the_proc_the_receiver_entrypoint_impl_current_state = test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_exec_state;
       TIMED_WAIT (test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_the_proc_the_receiver_timed_wait, &test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_the_proc_the_receiver_runtime_call_ret);
+      WAIT_EVENT ((*the_receiver_PortIdAccess_barrier), test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_the_receiver_TimeOut, &test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_the_proc_the_receiver_runtime_call_ret);
+      RESET_EVENT ((*the_receiver_PortIdAccess_barrier), &test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_the_proc_the_receiver_runtime_call_ret);
       break;
     }
     case test_sporadic_refined_model__the_proc_the_receiver_entrypoint_impl_BA_entrypoint_exec_state:

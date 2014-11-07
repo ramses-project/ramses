@@ -21,7 +21,6 @@
 
 package fr.tpt.aadl.ramses.generation.pok.c;
 
-import org.osate.aadl2.ComponentCategory ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.FeatureInstance ;
 
@@ -31,13 +30,11 @@ public class AadlToPokCUtils
 {
   private static String getProcessPortName(FeatureInstance fi)
   {
-	if(((ComponentInstance)fi.eContainer()).getCategory()==ComponentCategory.PROCESS)
-	  return ((ComponentInstance) fi.eContainer()).getName();
-	return null;
+	  return fi.getComponentInstance().getName();
   }
+  
   public static String getFeatureLocalIdentifier(FeatureInstance fi)
   {
-	
     return GenerationUtilsC.getGenerationCIdentifier(getProcessPortName(fi)+"_"+fi.getName());
   }
   

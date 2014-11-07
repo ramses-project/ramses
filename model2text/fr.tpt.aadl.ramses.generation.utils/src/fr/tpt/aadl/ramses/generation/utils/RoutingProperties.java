@@ -21,28 +21,30 @@
 
 package fr.tpt.aadl.ramses.generation.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList ;
+import java.util.HashMap ;
+import java.util.LinkedHashSet ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Set ;
 
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.DirectionType;
-import org.osate.aadl2.ListValue;
-import org.osate.aadl2.ModalPropertyValue;
-import org.osate.aadl2.PropertyAssociation;
-import org.osate.aadl2.PropertyExpression;
-import org.osate.aadl2.instance.ComponentInstance;
+import org.eclipse.xtext.EcoreUtil2 ;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.DirectionType ;
+import org.osate.aadl2.ListValue ;
+import org.osate.aadl2.ModalPropertyValue ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.PropertyAssociation ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.ConnectionInstance ;
-import org.osate.aadl2.instance.ConnectionReference;
+import org.osate.aadl2.instance.ConnectionReference ;
 import org.osate.aadl2.instance.FeatureCategory ;
-import org.osate.aadl2.instance.FeatureInstance;
-import org.osate.aadl2.instance.InstanceReferenceValue;
-import org.osate.aadl2.instance.SystemInstance;
+import org.osate.aadl2.instance.FeatureInstance ;
+import org.osate.aadl2.instance.InstanceReferenceValue ;
+import org.osate.aadl2.instance.SystemInstance ;
 
-
+import fr.tpt.aadl.ramses.control.atl.hooks.impl.HookAccessImpl ;
 import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 
 public class RoutingProperties implements TargetProperties {
@@ -56,13 +58,24 @@ public class RoutingProperties implements TargetProperties {
 	public Set<ComponentInstance> buses = new LinkedHashSet<ComponentInstance>();
 	
 	public Map<ComponentInstance, List<FeatureInstance>> portPerProcess = 
-	                      new HashMap<ComponentInstance, List<FeatureInstance>>();
+	    new HashMap<ComponentInstance, List<FeatureInstance>>();
 
 	public Map<FeatureInstance, ComponentInstance> processorPort = 
-	                            new HashMap<FeatureInstance, ComponentInstance>();
+	    new HashMap<FeatureInstance, ComponentInstance>();
 
 	public Map<ComponentInstance, Set<ComponentInstance>> processPerProcessor =
-	                    new HashMap<ComponentInstance, Set<ComponentInstance>>();
+	    new HashMap<ComponentInstance, Set<ComponentInstance>>();
+
+	public Map<ComponentInstance, List<FeatureInstance>> virtualPortPerProcess = 
+	    new HashMap<ComponentInstance, List<FeatureInstance>>();
+
+	public Set<FeatureInstance> globalVirtualPort = new LinkedHashSet<FeatureInstance>();
+
+	public Map<FeatureInstance, ComponentInstance> processorVirtualPort = 
+      new HashMap<FeatureInstance, ComponentInstance>();
+
+  public Map<FeatureInstance, ComponentInstance> processVirtualPort =
+      new HashMap<FeatureInstance, ComponentInstance>();
 	
 	public void setRoutingProperties(SystemInstance system)
 	{
@@ -102,10 +115,29 @@ public class RoutingProperties implements TargetProperties {
 		  if(RoutingProperties.needsRoutage(f))
 		  {		  
 		    processPorts.add(f);
-			globalPort.add(f);
-			processorPort.put(f, getProcessorBinding(process));
+		    globalPort.add(f);
+		    processorPort.put(f, getProcessorBinding(process));
 		  }
 		}
+		
+		List<FeatureInstance> processVirtualPorts = new ArrayList<FeatureInstance>();
+		virtualPortPerProcess.put(process, processVirtualPorts);
+		List<ComponentInstance> subcomponents = 
+		    EcoreUtil2.getAllContentsOfType(process, ComponentInstance.class);
+		for(ComponentInstance c: subcomponents)
+		  if(c.getCategory().equals(ComponentCategory.DATA))
+		  {
+		    NamedElement ne = HookAccessImpl.getTransformationTrace(c.getSubcomponent());
+		    if(ne!=null && ne instanceof FeatureInstance
+		        && RoutingProperties.needsRoutage((FeatureInstance) ne))
+		    {
+		      FeatureInstance f = (FeatureInstance) ne;
+		      processVirtualPorts.add(f);
+		      globalVirtualPort.add(f);
+		      processVirtualPort.put(f, process);
+		      processorVirtualPort.put(f, getProcessorBinding(process));
+		    }
+		  }
 	}
 
 	private ComponentInstance getProcessorBinding(ComponentInstance process)

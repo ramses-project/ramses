@@ -28,11 +28,6 @@ SAMPLING_PORT_ID_TYPE S1_inst_Mon_error_C2globalVariable;
 
 int main ()
 {
-PingPong_refined_model__S1_inst_Monitor_changeState_impl_Init();
-PingPong_refined_model__S1_inst_Monitor_delayed_error_C2_impl_Init();
-PingPong_refined_model__S1_inst_IPingOrPong_Cping_ping_impl_Init();
-PingPong_refined_model__S1_inst_IPingOrPong_Cping_delayed_PongIn_impl_Init();
-PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_impl_Init();
   PROCESS_ATTRIBUTE_TYPE tattr;
   RETURN_CODE_TYPE ret;
   CREATE_BLACKBOARD ("Monitor_changeState_error_C1_globalVariable", sizeof (Exception), &(Monitor_changeState_error_C1_globalVariable), &(ret));
@@ -99,3 +94,32 @@ PingPong_refined_model__S1_inst_IPingOrPong_Cpong_pong_impl_Init();
 }
 
 /******************************************************************************/
+/*                                SEND OUTPUT                                 */
+
+void __aadl_send_output (unsigned int port_variable, void * value)
+{
+  RETURN_CODE_TYPE ret;
+  SYSTEM_TIME_TYPE time_out;
+  MESSAGE_SIZE_TYPE length;
+  if(value==NULL)
+  {
+    char i=0;
+    value = &i;
+  }
+  switch (port_variable) {
+    case 0:
+      break;
+    case 1:
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    case 4:
+      break;
+    case 5:
+      break;
+    case 6:
+      break;
+  }
+}

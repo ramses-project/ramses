@@ -77,8 +77,10 @@ SUBCOMPONENTS
   root_inst : PROCESSOR root.impl {
     Thread_Swap_Execution_Time => 5ms..10ms;
     ARINC653::Module_Major_Frame => 1000ms;
-    ARINC653::Partition_Slots => (500ms,500ms);
-    ARINC653::Slots_Allocation => (REFERENCE(VP_S1_inst),REFERENCE(VP_S2_inst));
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(VP_S1_inst); Duration => 500ms; Periodic_Processing_Start => true;],
+       	[Partition => reference(VP_S2_inst); Duration => 500ms; Periodic_Processing_Start => true;]
+    );
     ARINC653::Module_Version => "1.0";
     ARINC653::Module_Identifier => "ping-pong.root";
     Process_Swap_Execution_Time => 5ms..10ms;
@@ -119,8 +121,8 @@ END root;
 
 PROCESSOR IMPLEMENTATION root.impl
 SUBCOMPONENTS
-  VP_S1_inst : VIRTUAL PROCESSOR VP_S1.impl;
-  VP_S2_inst : VIRTUAL PROCESSOR VP_S2.impl;
+  VP_S1_inst : VIRTUAL PROCESSOR VP_S1.impl{Period=>1000 Ms;};
+  VP_S2_inst : VIRTUAL PROCESSOR VP_S2.impl{Period=>1000 Ms;};
 END root.impl;
 
 MEMORY root_main_memory
@@ -138,7 +140,8 @@ END root_main_memory.impl;
 MEMORY S1_memory
 PROPERTIES
   Base_Address => 16#3200#;
-  Word_Size => 10000Bytes;
+  Word_Size => 1Bytes;
+  Memory_Size => 10000Bytes;
   Memory_Protocol => read_write;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory);
 END S1_memory;
@@ -149,7 +152,8 @@ END S1_memory.impl;
 MEMORY S2_memory
 PROPERTIES
   Base_Address => 16#4200#;
-  Word_Size => 10000Bytes;
+  Word_Size => 1Bytes;
+  Memory_Size => 10000Bytes;
   Memory_Protocol => read_write;
   ARINC653::Memory_Type => (Data_Memory,Code_Memory);
 END S2_memory;
@@ -165,8 +169,7 @@ PROPERTIES
   ARINC653::Partition_Identifier => 1;
   ARINC653::Partition_Name => "S1";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Round_Robin_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_S1.impl;
 
@@ -178,8 +181,7 @@ PROPERTIES
   ARINC653::Partition_Identifier => 2;
   ARINC653::Partition_Name => "S2";
   ARINC653::System_Partition => FALSE;
-  ARINC653::System_Overhead_Time => 10ms;
-  POK::Scheduler => RR;
+  Scheduling_Protocol => (Round_Robin_Protocol);
   POK::Additional_Features => (libc_stdio,console);
 END VP_S2.impl;
 
@@ -448,7 +450,7 @@ ANNEX behavior_specification {**
     switch : INITIAL COMPLETE STATE;
   TRANSITIONS
     unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
-    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cping )
+    IF ( mode_aadlKeywords=ROLE#Enumerators.E_ROLE_Cping )
     IPingOrPong_Cping_ping ! (delayed_PongIn,PingOut,badSequenceNumber,seqNb,seqNb)
     END IF
   };
@@ -472,7 +474,7 @@ ANNEX behavior_specification {**
     switch : INITIAL COMPLETE STATE;
   TRANSITIONS
     unnamed_B1 : switch -[ ON DISPATCH ]-> switch {
-    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cping )
+    IF ( mode_aadlKeywords=ROLE#Enumerators.E_ROLE_Cping )
     IPingOrPong_Cping_delayed_PongIn ! (PongIn,delayed_PongIn)
     END IF
   };
@@ -496,7 +498,7 @@ ANNEX behavior_specification {**
     switch : INITIAL COMPLETE STATE;
   TRANSITIONS
     unnamed_B2 : switch -[ ON DISPATCH ]-> switch {
-    IF ( mode_aadlKeywords=ROLE#E_ROLE_Cpong )
+    IF ( mode_aadlKeywords=ROLE#EnumeratorsE_ROLE_Cpong )
     IF ( PingIn'FRESH )
     IPingOrPong_Cpong_pong ! (PingIn,PongOut)
     END IF

@@ -26,7 +26,6 @@ void receive(uint8_t d);
 void send(uint8_t* d);
 void event_received();
 void nothing_received();
-void send_event();
 void periodic();
 
 #endif

@@ -80,7 +80,7 @@ abstract rule m_Input_BlackBoard
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedSingleIfExists(fi, 'f_entrypoint')
+			element<-fi.retreiveEntrypointFeature()
 		),
 		OBJ_HOLDER: AADLBA!DataSubcomponentHolder
 		(
@@ -150,7 +150,7 @@ abstract rule m_Output_BlackBoard
 		),
 		BLACKBOARD_ID_HOLDER: AADLBA!DataAccessHolder
 		(
-			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi,cnxRef}, 'f_entrypoint')
+			element<-fi.retreiveEntrypointFeature(cnxRef)
 		),
 		OBJ_HOLDER: AADLBA!DataSubcomponentHolder
 		(

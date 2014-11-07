@@ -51,11 +51,11 @@ rule m_RootSystem_Instance {
 		c : AADLI!SystemInstance (c.category = #system and c.eContainer().oclIsUndefined())
 	using
 	{
-		src_package : AADLI!AadlPackage = c.systemImplementation.getNamespace().getOwner();
+		src_package : AADLI!AadlPackage = c.componentImplementation.getNamespace().getOwner();
 	}
 	to
 		section : AADLBA!PublicPackageSection (
-			ownedClassifier <- AADLI!Classifier.allInstancesFrom('OUT')
+			ownedClassifier <- AADLBA!Classifier.allInstancesFrom('OUT')
 		),
 		pkg : AADLBA!AadlPackage (
 			name <- src_package.name+thisModule.getPackageSuffix(),
@@ -64,9 +64,12 @@ rule m_RootSystem_Instance {
 	do
 	{
 		thisModule.allImportedUnits <- thisModule.allImportedUnits->including(src_package.ownedPublicSection.importedUnit);
-		if(AADLBA!SystemImplementation.allInstancesFrom('OUT')->contains(c.systemImplementation.resolve()))
-			c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveMatchedSingleIfExists(p, 'p2')));
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
+		if(AADLBA!SystemImplementation.allInstancesFrom('OUT')->contains(c.componentImplementation.resolve()))
+			c.componentImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg()
+																		->union(c.getInstanceReferenceValue()->collect (p |  thisModule.resolveMatchedSingleIfExists(p, 'p2')))
+																		->union(c.collectSelfPropertyAssociationImg())
+																		->excluding(OclUndefined);
+		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.componentImplementation.resolve(), c);
 	}
 }
 
@@ -78,20 +81,21 @@ endpoint rule addImportedPackages()
 	}
 }
 
-rule m_System_Instance {
-	from
-		c : AADLI!SystemInstance (c.category = #system and not c.eContainer().oclIsUndefined())
-	to
-		sub : AADLBA!SystemSubcomponent
-		(
-			systemSubcomponentType <- c.subcomponent.subcomponentType
-		)
-	do
-	{
-		c.systemImplementation.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg();
-		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(c.systemImplementation.resolve(), c);
-	}
-}
+--rule m_System_Instance {
+--	from
+--		c : AADLI!ComponentInstance (c.category = #system and not c.eContainer().oclIsUndefined())
+--	to
+--		sub : AADLBA!SystemSubcomponent
+--		(
+--			name <- c.subcomponent.name,
+--			systemSubcomponentType <- c.subcomponent.subcomponentType
+--		)
+--	do
+--	{
+--		c.subcomponent.systemSubcomponentType.resolve().ownedPropertyAssociation <- c.getPropertyAssociationImg();
+--		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
+--	}
+--}
 
 helper context AADLI!ComponentInstance def: getInstanceReferenceValue() : Sequence(AADLI!PropertyAssociation) =
 	self.componentInstance->collect(
@@ -119,18 +123,57 @@ helper context AADLI!InstanceObject def: isContainedIn(container : AADLI!Instanc
 	endif
 ;
 
+rule m_Mode_Instance {
+	from
+		m: AADLI!ModeInstance
+		(m.eContainer().oclIsTypeOf(AADLI!ComponentInstance))
+	to
+		mode: AADLBA!Mode
+		(
+			name <- m.mode.name,
+			initial <- m.initial
+		)
+}
+
+rule m_ModeTransition_Instance {
+	from
+		m: AADLI!ModeTransitionInstance
+		(m.eContainer().oclIsTypeOf(AADLI!ComponentInstance))
+	to
+		transition: AADLBA!ModeTransition
+		(
+			source <- m.source,
+			destination <- m.destination,
+			ownedTrigger <- m.modeTransition.ownedTrigger
+		)
+}
+
 abstract rule m_Component_Instance {
 	from
 		c : AADLI!ComponentInstance
 	to
 		sub: AADLBA!Subcomponent(
 				name <- c.name.debug('subcomponent created'),
-				ownedPropertyAssociation  <- c.collectSelfPropertyAssociationImg()
+				ownedPropertyAssociation  <- c.collectSelfPropertyAssociationImg(),
+				ownedModeBinding <- c.inMode->collect(e|
+										thisModule.createModeBinding(thisModule.resolveTemp(e, 'mode'))
+									)
 			)
 	do
 	{
 		ATLHOOKS!HookAccess.allInstancesFrom('HOOKS')->first().addTransformationBackTrace(sub, c);
 	}
+}
+
+lazy rule createModeBinding
+{
+	from
+		m: AADLBA!Mode
+	to
+		b: AADLBA!ModeBinding
+		(
+			parentMode <- m
+		)
 }
 
 -- @extends m_Component_Instance

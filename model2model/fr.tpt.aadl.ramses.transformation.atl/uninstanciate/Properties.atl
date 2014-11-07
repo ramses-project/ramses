@@ -94,7 +94,7 @@ rule m_PropertyAssociationAppliesToParent {
 			ownedValue <- p.ownedValue
     	),
 		cne: AADLBA!ContainedNamedElement (
-			containmentPathElement<- l->collect(e|thisModule.createContainmentPathElement(e))
+			path <- thisModule.createContainmentPathElement(l)
 		)
 }
 
@@ -218,7 +218,7 @@ rule m_ReferenceValue extends m_PropertyValue {
     	v : AADLI!ReferenceValue in IN
     to
     	v2 : AADLBA!ReferenceValue (
-    		containmentPathElement <- v.containmentPathElement
+    		path <- v.path
     	)
 }
 
@@ -244,7 +244,7 @@ rule m_InstanceReferenceValue extends m_PropertyValue {
 	}
     to
         v2 : AADLBA!ReferenceValue (
-    		containmentPathElement <- l->collect(e|thisModule.createContainmentPathElement(e))   			
+    		path <- thisModule.createContainmentPathElement(l)			
     	)
 	do
 	{
@@ -265,7 +265,7 @@ rule m_InstanceReferenceValueToParent extends m_PropertyValue {
 	}
     to
         v2 : AADLBA!ReferenceValue (
-    		containmentPathElement <- l->collect(e|thisModule.createContainmentPathElement(e))   			
+    		path <- thisModule.createContainmentPathElement(l)   			
     	)
 	do
 	{
@@ -276,13 +276,38 @@ rule m_InstanceReferenceValueToParent extends m_PropertyValue {
 	}
 }
 
-lazy rule createContainmentPathElement
+helper def : createContainmentPathElement(neList: Sequence(AADLI!NamedElement)) : AADLBA!ContainmentPathElement =
+	thisModule.createContainmentPathElementLazyRule
+		(
+			neList
+		)
+;
+
+lazy rule createContainmentPathElementLazyRule
 {
 	from
-		ne: AADLI!NamedElement
+		neList: Sequence(AADLI!NamedElement)
+	using
+	{
+		neSubList: Sequence(AADLI!NamedElement) = 
+			if(neList->size()>1) then
+				neList->excluding(neList->first())
+			else
+				OclUndefined
+			endif;
+	}
 	to
 		cpe : AADLBA!ContainmentPathElement (
-				namedElement<-if(ne.resolve().oclIsKindOf(AADLI!NamedElement)) then ne else OclUndefined endif
+				namedElement<-if(neList->size()>0 and neList->at(1).resolve().oclIsKindOf(AADLI!NamedElement)) then 
+								neList->at(1).resolve() 
+							else 
+								OclUndefined 
+							endif,
+				path <- if(not neSubList.oclIsUndefined()) then
+							thisModule.createContainmentPathElement(neSubList)
+						else
+							OclUndefined
+						endif
 			)
 	do
 	{
@@ -526,10 +551,10 @@ rule PropertyAssociationRule(p : AADLI!PropertyAssociation,
 {
 	to
 		p2 : AADLBA!PropertyAssociation (
-			property <- p.property.debug('  property'),
+			property <- p.property,
 			constant <- p.constant,
 			append <- p.append,
-			ownedValue <- content.debug('  value')
+			ownedValue <- content
 		)
 	do
 	{
@@ -547,7 +572,7 @@ lazy rule createContainedNamedElement
 		ne: AADLBA!NamedElement
 	to
 		cne: AADLBA!ContainedNamedElement
-		(containmentPathElement <- Sequence{cpe}),
+		(path <- cpe),
 		cpe: AADLBA!ContainmentPathElement
 		(namedElement<-ne)
 	do
@@ -595,7 +620,6 @@ lazy rule ModalPropertyValueRule {
 --			ComputedValue
 --			NamedValue
 --			StringLiteral
-
 
 helper context AADLI!ListValue def: PropertyExpression() : AADLBA!ListValue =
 	let elements : Sequence(AADLBA!PropertyExpression) = self.ownedListElement->collect(e|e.PropertyExpression())
@@ -649,24 +673,20 @@ lazy rule BooleanLiteral {
 	do { l2; }
 }
 
---helper context AADLI!ClassifierValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ClassifierValue =
---	if(referencesOnly)then
---		OclUndefined
---	else
---		thisModule.ClassifierValue(self)
---	endif
---;
---
---lazy rule ClassifierValue {
---	from
---		l : AADLI!ClassifierValue
---	to
---		l2 : AADLBA!ClassifierValue(classifier <- l.classifier.resolve())
---	do 
---	{
---		l2; 
---	}
---}
+helper context AADLI!ClassifierValue def: PropertyExpression() : AADLBA!ClassifierValue =
+	thisModule.ClassifierValue(self)
+;
+
+lazy rule ClassifierValue {
+	from
+		l : AADLI!ClassifierValue
+	to
+		l2 : AADLBA!ClassifierValue(classifier <- l.classifier)
+	do 
+	{
+		l2; 
+	}
+}
 
 
 --helper context AADLI!ComputedValue def: PropertyExpression(referencesOnly:Boolean) : AADLBA!ComputedValue =

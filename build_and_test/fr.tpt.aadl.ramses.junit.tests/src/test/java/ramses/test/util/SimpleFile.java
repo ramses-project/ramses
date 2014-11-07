@@ -1,6 +1,7 @@
 package ramses.test.util;
 
 import java.io.File;
+import java.io.IOException ;
 
 import com.saxman.textdiff.Report;
 import com.saxman.textdiff.TextDiff;
@@ -37,9 +38,9 @@ public class SimpleFile implements Comparable<Object> {
 	 * @param File
 	 *            : f1
 	 * @return true only if the two files (same name, same size,
-	 * @throws Exception 
+	 * @throws IOException
 	 */
-	public boolean equals(SimpleFile f1) throws Exception {
+	public boolean equals(SimpleFile f1) throws IOException {
 		boolean s = true;
 		s = s && (f1.path.compareTo(this.path) == 0);
 			

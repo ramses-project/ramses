@@ -74,7 +74,6 @@ helper def: getStringListValue(v : AADLBA!ModalPropertyValue) : Sequence(String)
 	v.ownedValue.getOwnedListElements()->collect(e|e.getValue())
 ;
 
-
 helper def : getProperty(propertyName : String) : AADLBA!Property =
 	if(propertyName.contains('::')) then
 		let index: Integer = propertyName.indexOf('::') in
@@ -172,6 +171,16 @@ rule CreateStringLiteralPropertyExpression (value : String) {
 	}
 }
 
+rule CreateClassifierValuePropertyExpression(value: AADLBA!Classifier)
+{
+	to
+		pr : AADLBA!ClassifierValue(classifier<-value)
+	do
+	{
+		pr;
+	}
+}
+
 rule CreateEnumValuePropertyExpression (value : String) {
 	to
 		pr : AADLBA!NamedValue(namedValue<-el),
@@ -244,6 +253,19 @@ rule CreateListValueFromListOfString(value: Sequence(String))
 	}
 }
 
+rule CreateListValueFromListOfClassifier(value: Sequence(AADLBA!Classifier))
+{
+	to
+		lv:AADLBA!ListValue
+		(
+			ownedListElement <- value->collect(e | thisModule.CreateClassifierValuePropertyExpression(e))
+		)
+	do
+	{
+		lv;
+	}
+}
+
 rule CreateListValueFromClassifier (value: AADLBA!Classifier)
 {
 	to
@@ -253,4 +275,45 @@ rule CreateListValueFromClassifier (value: AADLBA!Classifier)
 	{
 		lv;
 	}
+}
+
+lazy rule bindDatatypeEnumStringliteral
+{
+	from
+		component: AADLI!Classifier,
+		stringLiteral: String
+	
+	using
+	{
+		enum: AADLI!PropertyValue = component.getEnumerators();
+	}
+	         	 
+		
+	to
+		classifierPropertyReference: AADLBA!ClassifierPropertyReference
+		(
+			classifier <- component,
+			properties <- Sequence {enumerators_propertyNameHolder, bdes_propertyNameHolder}
+		),
+		enumerators_propertyNameHolder: AADLBA!PropertyNameHolder
+		(
+			property <- enumerators_PropertyAssociationHolder
+		),
+		enumerators_PropertyAssociationHolder: AADLBA!PropertyAssociationHolder
+		(
+			element <- enum
+		),		
+		bdes_propertyNameHolder: AADLBA!PropertyNameHolder
+		(
+			property <- bdes_PropertyExpressionHolder
+		),
+		bdes_PropertyExpressionHolder: AADLBA!PropertyExpressionHolder
+		(
+			element <- thisModule.getStringLiteral(enum,
+				                                   stringLiteral)
+		)
+     do 
+     {
+     	classifierPropertyReference;	
+     }
 }
