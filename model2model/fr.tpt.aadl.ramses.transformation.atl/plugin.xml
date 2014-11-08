@@ -78,5 +78,15 @@
             id="fr.tpt.aadl.packages.ramses_buses.aadlcontribution"
             name="RAMSES_buses">
       </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/package/MCDA.aadl2"
+            id="fr.tpt.aadl.packages.mcda.aadlcontribution"
+            name="MCDA">
+      </aadlcontribution>
+      <aadlcontribution
+            file="aadl_resources/package/Maintainability.aadl2"
+            id="fr.tpt.aadl.packages.maintainance.aadlcontribution"
+            name="Maintainability">
+      </aadlcontribution>
    </extension>
 </plugin>

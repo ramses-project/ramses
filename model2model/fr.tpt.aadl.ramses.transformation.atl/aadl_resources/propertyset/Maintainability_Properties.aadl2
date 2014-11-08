@@ -1,5 +1,7 @@
 property set Maintainability_Property is
 
-Maintenance_Penalty: aadlinteger applies to (thread, subprogram);
+Maintenance_Cost: aadlinteger applies to (subprogram);
+
+Maintenance_Budget: aadlinteger applies to (thread, process);
 
 end Maintainability_Property;

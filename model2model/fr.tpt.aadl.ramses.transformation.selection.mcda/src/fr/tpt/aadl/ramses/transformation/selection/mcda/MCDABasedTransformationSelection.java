@@ -17,8 +17,12 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.osate.aadl2.ListValue ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
@@ -48,9 +52,9 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 {
 
   private static Logger _LOGGER = Logger.getLogger(MCDABasedTransformationSelection.class) ;
-  
+
   private List<DependencyNode> treatedAlternatives;
-  
+
   private AadlTargetSpecificGenerator generator ;
   private TrcSpecification trc ;
   private Resource currentImplResource ;
@@ -61,12 +65,14 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   private AnalysisErrorReporterManager errManager;
   private IProgressMonitor monitor;
 
+  private List<String> qualityAttributesIdentifiers;
+  
   public MCDABasedTransformationSelection(AadlTargetSpecificGenerator generator,
-                                   AbstractLoop loop,
-                                   AnalysisErrorReporterManager errManager,
-                                   WorkflowPilot workflowPilot,
-                                   RamsesConfiguration config,
-                                   IProgressMonitor monitor)
+                                          AbstractLoop loop,
+                                          AnalysisErrorReporterManager errManager,
+                                          WorkflowPilot workflowPilot,
+                                          RamsesConfiguration config,
+                                          IProgressMonitor monitor)
   {
     this.generator = generator;
     this.loop = loop;
@@ -74,7 +80,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     this.errManager = errManager;
     this.monitor = monitor;
     String propertyFile = (String) config.getParameters().get(Names.RAMSES_PROPERTIES);
-    
+
     prop = new Properties() ;
     try {
       InputStream in = new FileInputStream(propertyFile);
@@ -85,42 +91,48 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       _LOGGER.error(message);
       e.printStackTrace();
     }
-    
+
     currentImplResource = generator.currentImplResource;
-    
+
     ResourceSet rs = currentImplResource.getResourceSet();
-    
-    
+
+
     String trcPath = prop.getProperty("ArchitectureRefinementLauncher.trc");
     if(trcPath!=null)
       TrcParser.parse(trcPath, rs);
-    
+
     List<Transformation> list = loop.getTransformations();
     Resource r = list.get(0).eResource();
     trc = (TrcSpecification) r.getContents().get(0);
-    
+
   }
-  
+
   @Override
   public
-      void
-      selectTransformation(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
-                           ArrayList<ElementTransformation> tuplesToApply)
+  void
+  selectTransformation(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
+                       ArrayList<ElementTransformation> tuplesToApply)
   {
-    
+
     // 1 - create the dependency graph of alternatives
     DependencyGraph dg = DependencyGraphUtils.
         createDependencyGraph(trc, patternMatchingMap);
-    
-    
+
+    // TODO: check if it already exists
+
     // 2 - isolate elements having alternatives
-    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
-    
+    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = 
+        patternMatchingMap.entrySet().iterator();
+
+    boolean stop = false;
+
     while (patternMatchingIt.hasNext()) 
     {
-      Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
+      Map.Entry<List<EObject>, ArrayList<String>> tuple =
+          (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
       List<EObject> currentElements = tuple.getKey();
       List<String> currentTransformationAlternatives = tuple.getValue();
+
       if(currentTransformationAlternatives.size()==1)
       {
         TransformationRuleAlternative tra = new TransformationRuleAlternative(currentElements, 
@@ -131,18 +143,31 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       }
       else
       {
+        // 3 - Check if Performance is available for Elements
+        // TODO: add a service to get Acceptable Impact
+        if(false==isAcceptableImpactRatioAvailable(currentElements,
+                                                   qualityAttributesIdentifiers.size()))
+        {
+          stop = true;
+          _LOGGER.error("Property acceptable_impact ratio not found" +
+              " or incomplete for:"+
+              getIdentifier(currentElements));
+        }
+        if(stop)
+          continue;
         DependencyNode currentNode = DependencyGraphUtils.getDependencyNode
             (dg, currentElements);
         if(treatedAlternatives.contains(currentNode))
           continue;
-        // 3 - isolate a connected subgraph containing currentElements
+        // 4 - isolate a connected subgraph containing currentElements
+        // TODO: check if it already exists
         List<DependencyNode> connectedDepNodes = DependencyGraphUtils.
-                                                getConnectedSubgraph(dg, currentElements);
+            getConnectedSubgraph(dg, currentElements);
         for(DependencyNode dn: connectedDepNodes)
         {
           treatedAlternatives.add(dn);
         }
-        
+
         Map<List<EObject>, ArrayList<String>> connectedAlternativesMap = 
             new LinkedHashMap<List<EObject>, ArrayList<String>>();
         for(DependencyNode dn : connectedDepNodes)
@@ -151,16 +176,16 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
           ArrayList<String> transformationRules = patternMatchingMap.get(matchedElements);
           connectedAlternativesMap.put(matchedElements, transformationRules);
         }
-        
-        // 4 - select alternatives for elements in connectedDepGraph
+
+        // 5 - select alternatives for elements in connectedDepGraph
         SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
         TransformationRuleSelection trs = 
             new TransformationRuleSelection(trc, 
                                             sinst,
                                             connectedAlternativesMap);
-        
+
         List<RuleApplicationTulpe> ratList = trs.selectBestRulesAlternatives();
-        
+
         for(RuleApplicationTulpe rat:ratList)
         {
           List<EObject> ratElements = rat.getPatternMatchedElement();
@@ -173,9 +198,52 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         }
       }
     }
-    
-    
-    
+
+
+
+  }
+
+  private String getIdentifier(List<EObject> currentElements)
+  {
+    String result = "";
+    for(EObject obj: currentElements)
+    {
+      if(obj instanceof NamedElement)
+      {
+        NamedElement ne = (NamedElement) obj;
+        result += " "+ne.getQualifiedName();
+      }
+      else
+        result = "NaNE";
+    }
+    return result ;
+  }
+
+  private boolean isAcceptableImpactRatioAvailable(List<EObject> currentElements,
+                                         int numberOfQualityAttributes)
+  {
+    for(EObject obj: currentElements)
+    {
+      boolean isNamedElement = obj instanceof NamedElement; 
+      if(isNamedElement==false)
+      {
+        // TODO: look in eContainer...
+        continue;
+      }
+      NamedElement ne = (NamedElement) obj;
+      PropertyExpression pe = 
+          PropertyUtils.getPropertyValue("Acceptable_Impact",
+                                         ne);
+      if(pe==null)
+        continue;
+      
+      // TODO: look in eContainer...
+      
+      ListValue lv = (ListValue) pe;
+      if(numberOfQualityAttributes==lv.getOwnedListElements().size())
+        return true;
+    }
+    return false;
   }
 
   @Override
@@ -192,11 +260,11 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 
   @Override
   public Map<? extends String, ? extends Resource>
-      processLoop() throws AnalysisException, ParseException,
-                   TransformationException, ConfigurationException, IOException
+  processLoop() throws AnalysisException, ParseException,
+  TransformationException, ConfigurationException, IOException
   {
     Map<String, Resource> resultingMap = new HashMap<String, Resource>();
-    
+
     ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
         (trc,
          this.currentImplResource.getResourceSet(),
@@ -206,8 +274,8 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
          loop.getTransformations(),
          generator._modelInstantiator,
          generator._predefinedResourceManager
-         );
-    
+            );
+
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
     boolean loopAnalysis = false;
     generator.loopIteration++;
