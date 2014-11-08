@@ -1,5 +1,5 @@
 Bundle-Vendor: TELECOM ParisTech
-Bundle-SymbolicName: fr.tpt.aadl.sched.tools.aadlinspector;singleton:=true
+Bundle-SymbolicName: fr.tpt.aadl.ramses.analysis.sched.aadlinspector;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Name: AADL-RAMSES-Inspector-Interface
 Export-Package: fr.tpt.aadl.launch,
