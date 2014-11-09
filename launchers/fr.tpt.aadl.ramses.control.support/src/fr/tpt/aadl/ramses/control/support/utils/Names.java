@@ -75,6 +75,8 @@ public class Names
   public static final String MEMORY_ANALYSIS_PLUGIN_NAME = "RAMSES-MemoryFootprintAnalysis";
   public final static String MEMORY_SENSITIVITY_NAME = "MemoryFootprint";
   
+  public static final String MAINTAINABILITY_ANALYSIS_PLUGIN_NAME = "RAMSES-MaintainabilityAnalysis";
+  
   public final static String MAINTENANCE_QA = "Maintenance";
   
 }
