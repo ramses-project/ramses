@@ -1,11 +1,16 @@
 package fr.tpt.aadl.ramses.transformation.selection.mcda;
 
+import java.util.AbstractMap ;
 import java.util.ArrayList ;
+import java.util.Comparator ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Map.Entry ;
 import java.util.Set ;
+import java.util.SortedMap ;
+import java.util.TreeMap ;
+import java.util.TreeSet ;
 
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -35,7 +40,7 @@ public class TransformationRuleSelection
   {
     // 1 - order potential results
     Set<List<RuleApplicationTulpe>> orderedPotentialResults =
-      orderPotentialSolutions();
+      orderPotentialSolutions().keySet();
     
     
     
@@ -53,7 +58,7 @@ public class TransformationRuleSelection
     return null ;
   }
 
-  private Set<List<RuleApplicationTulpe>> orderPotentialSolutions()
+  private SortedMap<List<RuleApplicationTulpe>, Float> orderPotentialSolutions()
   {
 
     // TODO: SG, if you can work on that part, it would be great
@@ -67,7 +72,7 @@ public class TransformationRuleSelection
     List<Set<RuleApplicationTulpe>> sets = 
         new ArrayList<Set<RuleApplicationTulpe>>(alternativeMap.size());
     
-    Set<List<RuleApplicationTulpe>> result ;
+    Set<List<RuleApplicationTulpe>> unsortedSolutions ;
     
     // 1 - browse elements in alternativeMap to construct "result" 
     
@@ -79,7 +84,6 @@ public class TransformationRuleSelection
       
       Set<RuleApplicationTulpe> tuples = new HashSet<RuleApplicationTulpe>
                                                              (patterns.size()) ;
-            
       for(String pat: patterns)
       {
         tmp = new RuleApplicationTulpe() ;
@@ -91,15 +95,29 @@ public class TransformationRuleSelection
       sets.add(tuples) ;
     }
     
-    result = Sets.cartesianProduct(sets) ;
+    unsortedSolutions = Sets.cartesianProduct(sets) ;
     
-    orderSolutions(result) ;
+    return orderSolutions(unsortedSolutions) ;
+  }
+
+  private SortedMap<List<RuleApplicationTulpe>, Float>orderSolutions(
+                              Set<List<RuleApplicationTulpe>> unsortedSolutions)
+  {
+    TreeMap<List<RuleApplicationTulpe>, Float> result =
+              new TreeMap<List<RuleApplicationTulpe>, Float>();
+    
+    for(List<RuleApplicationTulpe> listTuples: unsortedSolutions)
+    {
+      Float perf = computePerformance(listTuples) ;
+      result.put(listTuples, perf) ;
+    }
     
     return result ;
   }
 
-  private void orderSolutions(Set<List<RuleApplicationTulpe>> result)
+  private Float computePerformance(List<RuleApplicationTulpe> listTuples)
   {
     // TODO Auto-generated method stub
+    return null ;
   }
 }
