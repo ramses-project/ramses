@@ -1,11 +1,16 @@
 package fr.tpt.aadl.ramses.transformation.selection.mcda;
 
 import java.util.ArrayList ;
+import java.util.HashSet ;
 import java.util.List ;
 import java.util.Map ;
+import java.util.Map.Entry ;
+import java.util.Set ;
 
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.instance.SystemInstance ;
+
+import com.google.common.collect.Sets ;
 
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
@@ -14,12 +19,12 @@ public class TransformationRuleSelection
 {
 
   private TrcSpecification trc;
-  private Map<List<EObject>, ArrayList<String>> alternativeMap;
+  private Map<List<EObject>, List<String>> alternativeMap;
   private SystemInstance rootSystem;
   
   public TransformationRuleSelection(TrcSpecification trc,
                                      SystemInstance rootSystem,
-                                     Map<List<EObject>, ArrayList<String>> alternativeMap)
+                                     Map<List<EObject>, List<String>> alternativeMap)
   {
     this.trc = trc;
     this.alternativeMap = alternativeMap;
@@ -29,7 +34,7 @@ public class TransformationRuleSelection
   public List<RuleApplicationTulpe> selectBestRulesAlternatives()
   {
     // 1 - order potential results
-    List<List<RuleApplicationTulpe>> orderedPotentialResults =
+    Set<List<RuleApplicationTulpe>> orderedPotentialResults =
       orderPotentialSolutions();
     
     
@@ -48,7 +53,7 @@ public class TransformationRuleSelection
     return null ;
   }
 
-  private List<List<RuleApplicationTulpe>> orderPotentialSolutions()
+  private Set<List<RuleApplicationTulpe>> orderPotentialSolutions()
   {
 
     // TODO: SG, if you can work on that part, it would be great
@@ -59,13 +64,42 @@ public class TransformationRuleSelection
     //    --> compute average values if several (and different) air files are referenced
     
     // from the root system
-    List<List<RuleApplicationTulpe>> result = 
-        new ArrayList<List<RuleApplicationTulpe>>();
-    // 1 - browse elements in alternativeMap to construct "result" 
-     
+    List<Set<RuleApplicationTulpe>> sets = 
+        new ArrayList<Set<RuleApplicationTulpe>>(alternativeMap.size());
     
-    return null ;
+    Set<List<RuleApplicationTulpe>> result ;
+    
+    // 1 - browse elements in alternativeMap to construct "result" 
+    
+    for(Entry<List<EObject>, List<String>> e : alternativeMap.entrySet())
+    {
+      RuleApplicationTulpe tmp ;
+      List<EObject> elList = e.getKey() ;
+      List<String> patterns = e.getValue() ;
+      
+      Set<RuleApplicationTulpe> tuples = new HashSet<RuleApplicationTulpe>
+                                                             (patterns.size()) ;
+            
+      for(String pat: patterns)
+      {
+        tmp = new RuleApplicationTulpe() ;
+        tmp.setPatternMatchedElement(elList);
+        tmp.setTransformationRuleName(pat);
+        tuples.add(tmp) ;  
+      }
+      
+      sets.add(tuples) ;
+    }
+    
+    result = Sets.cartesianProduct(sets) ;
+    
+    orderSolutions(result) ;
+    
+    return result ;
   }
-  
-  
+
+  private void orderSolutions(Set<List<RuleApplicationTulpe>> result)
+  {
+    // TODO Auto-generated method stub
+  }
 }
