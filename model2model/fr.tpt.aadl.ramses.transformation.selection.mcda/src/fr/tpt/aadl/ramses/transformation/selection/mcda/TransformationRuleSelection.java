@@ -123,21 +123,16 @@ public class TransformationRuleSelection
     float result = 0f ;
     
     float currentQaPerf ;
-    QualityAttribut[] qas = getQualityAttributes() ;
-    float trcPerf ;
-    float airPerf ;
+    QualityAttribute[] qas = getQualityAttributes(rootSystem) ;
     
     for(RuleApplicationTulpe tuple: listTuples)
     {
-      for(QualityAttribut currentQa: qas)
+      setTrcPerformance(tuple.getTransformationRuleName(), qas) ;
+      computeAirPerf(tuple.getPatternMatchedElement(), qas) ;
+      
+      for(QualityAttribute currentQa: qas)
       {
-        trcPerf = getTrcPerformance(tuple.getTransformationRuleName(),
-                                    currentQa) ;
-        
-        airPerf = getAirPerf(tuple.getPatternMatchedElement(), currentQa) ;
-        
-        currentQaPerf = currentQa.qaWeight * (trcPerf + airPerf) / 2 ;
-        
+        currentQaPerf = currentQa.qaWeight * (currentQa.trcPerf + currentQa.airPerf) / 2 ;
         result += currentQaPerf ;
       }
     }
@@ -145,30 +140,74 @@ public class TransformationRuleSelection
     return result ;
   }
 
-  private float getAirPerf(List<EObject> patternMatchedElement,
-                           QualityAttribut qa)
+  private void computeAirPerf(List<EObject> patternMatchedElement,
+                          QualityAttribute[] qas)
   {
-    // TODO Auto-generated method stub
-    return 0 ;
+    int[] count = new int[qas.length] ;
+    
+    for(int i = 0 ; i < qas.length ; i++)
+    {
+      count[i] = 0 ;
+    }
+    
+    for(EObject element: patternMatchedElement)
+    {
+      boolean[] hasAir = addAirPerf(element, qas) ;
+      
+      for(int i = 0 ; i < qas.length ; i++)
+      {
+        if(hasAir[i])
+        {
+          count[i]++ ;
+        }
+      }
+    }
+    
+    for(int i = 0 ; i < qas.length ; i++)
+    {
+      // the mean of provided performances for a given quality attribute.
+      qas[i].airPerf /= count[i] ;
+    }
   }
 
-  private float getTrcPerformance(String transformationRuleName,
-                                  QualityAttribut qa)
+  private boolean[] addAirPerf(EObject element, QualityAttribute[] qas)
   {
+    // get Acceptable_Quality_Impacts: 
+    // list of MCDA::Acceptable_Quality_Impact_Type applies to (Element);
+    // return found/not found impact for each quality attribute. 
+    
     // TODO Auto-generated method stub
-    return 0 ;
+    
+    return null ;
   }
 
-  private QualityAttribut[] getQualityAttributes()
+  private void setTrcPerformance(String transformationRuleName,
+                                 QualityAttribute[] qas)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  // Instantiates a quality attribute array with quality attribute's weight set.
+  private QualityAttribute[] getQualityAttributes(SystemInstance system)
   {
     // TODO Auto-generated method stub
     return null ;
   }
 }
 
-class QualityAttribut
+class QualityAttribute
 {
+  public String id = "" ;
+  
   public float qaWeight = 0f ;
   
-  // Id ???
+  public float trcPerf = 0f ;
+  
+  public int airPerf = 0 ;
+  
+  public QualityAttribute(String id)
+  {
+    this.id = id ;
+  }
 }
