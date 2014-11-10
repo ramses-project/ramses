@@ -1,11 +1,18 @@
 package fr.tpt.aadl.ramses.transformation.selection.mcda;
 
 import java.util.ArrayList ;
+import java.util.HashSet ;
 import java.util.List ;
 import java.util.Map ;
+import java.util.Map.Entry ;
+import java.util.Set ;
+import java.util.SortedMap ;
+import java.util.TreeMap ;
 
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.instance.SystemInstance ;
+
+import com.google.common.collect.Sets ;
 
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
@@ -14,12 +21,12 @@ public class TransformationRuleSelection
 {
 
   private TrcSpecification trc;
-  private Map<List<EObject>, ArrayList<String>> alternativeMap;
+  private Map<List<EObject>, List<String>> alternativeMap;
   private SystemInstance rootSystem;
   
   public TransformationRuleSelection(TrcSpecification trc,
                                      SystemInstance rootSystem,
-                                     Map<List<EObject>, ArrayList<String>> alternativeMap)
+                                     Map<List<EObject>, List<String>> alternativeMap)
   {
     this.trc = trc;
     this.alternativeMap = alternativeMap;
@@ -29,8 +36,8 @@ public class TransformationRuleSelection
   public List<RuleApplicationTulpe> selectBestRulesAlternatives()
   {
     // 1 - order potential results
-    List<List<RuleApplicationTulpe>> orderedPotentialResults =
-      orderPotentialSolutions();
+    Set<List<RuleApplicationTulpe>> orderedPotentialResults =
+      orderPotentialSolutions().keySet();
     
     
     
@@ -47,8 +54,10 @@ public class TransformationRuleSelection
     }
     return null ;
   }
-
-  private List<List<RuleApplicationTulpe>> orderPotentialSolutions()
+  
+  // Returns a map of list of tuples associated with its performance (float).
+  // This map is sorted according to the performance of the list of tuples.
+  private SortedMap<List<RuleApplicationTulpe>, Float> orderPotentialSolutions()
   {
 
     // TODO: SG, if you can work on that part, it would be great
@@ -59,13 +68,107 @@ public class TransformationRuleSelection
     //    --> compute average values if several (and different) air files are referenced
     
     // from the root system
-    List<List<RuleApplicationTulpe>> result = 
-        new ArrayList<List<RuleApplicationTulpe>>();
-    // 1 - browse elements in alternativeMap to construct "result" 
-     
+    List<Set<RuleApplicationTulpe>> sets = 
+        new ArrayList<Set<RuleApplicationTulpe>>(alternativeMap.size());
     
+    Set<List<RuleApplicationTulpe>> unsortedSolutions ;
+    
+    // 1 - browse elements in alternativeMap to construct "result" 
+    
+    for(Entry<List<EObject>, List<String>> e : alternativeMap.entrySet())
+    {
+      RuleApplicationTulpe tmp ;
+      List<EObject> elList = e.getKey() ;
+      List<String> patterns = e.getValue() ;
+      
+      Set<RuleApplicationTulpe> tuples = new HashSet<RuleApplicationTulpe>
+                                                             (patterns.size()) ;
+      for(String pat: patterns)
+      {
+        tmp = new RuleApplicationTulpe() ;
+        tmp.setPatternMatchedElement(elList);
+        tmp.setTransformationRuleName(pat);
+        tuples.add(tmp) ;  
+      }
+      
+      sets.add(tuples) ;
+    }
+    
+    // 2 - cartesian product of the sets of tuples.
+    
+    unsortedSolutions = Sets.cartesianProduct(sets) ;
+    
+    // 3 - order the solution according to their performance.
+    
+    return orderSolutions(unsortedSolutions) ;
+  }
+
+  private SortedMap<List<RuleApplicationTulpe>, Float>orderSolutions(
+                              Set<List<RuleApplicationTulpe>> unsortedSolutions)
+  {
+    TreeMap<List<RuleApplicationTulpe>, Float> result =
+              new TreeMap<List<RuleApplicationTulpe>, Float>();
+    
+    for(List<RuleApplicationTulpe> listTuples: unsortedSolutions)
+    {
+      float perf = computePerformance(listTuples) ;
+      result.put(listTuples, perf) ; // Sorts according to performance/ natural order.
+    }
+    
+    return result ;
+  }
+
+  private Float computePerformance(List<RuleApplicationTulpe> listTuples)
+  {
+    float result = 0f ;
+    
+    float currentQaPerf ;
+    QualityAttribut[] qas = getQualityAttributes() ;
+    float trcPerf ;
+    float airPerf ;
+    
+    for(RuleApplicationTulpe tuple: listTuples)
+    {
+      for(QualityAttribut currentQa: qas)
+      {
+        trcPerf = getTrcPerformance(tuple.getTransformationRuleName(),
+                                    currentQa) ;
+        
+        airPerf = getAirPerf(tuple.getPatternMatchedElement(), currentQa) ;
+        
+        currentQaPerf = currentQa.qaWeight * (trcPerf + airPerf) / 2 ;
+        
+        result += currentQaPerf ;
+      }
+    }
+    
+    return result ;
+  }
+
+  private float getAirPerf(List<EObject> patternMatchedElement,
+                           QualityAttribut qa)
+  {
+    // TODO Auto-generated method stub
+    return 0 ;
+  }
+
+  private float getTrcPerformance(String transformationRuleName,
+                                  QualityAttribut qa)
+  {
+    // TODO Auto-generated method stub
+    return 0 ;
+  }
+
+  private QualityAttribut[] getQualityAttributes()
+  {
+    // TODO Auto-generated method stub
     return null ;
   }
+}
+
+class QualityAttribut
+{
+  public float qaWeight = 0f ;
   
-  
+  // Id ???
 }

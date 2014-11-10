@@ -168,8 +168,8 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
           treatedAlternatives.add(dn);
         }
 
-        Map<List<EObject>, ArrayList<String>> connectedAlternativesMap = 
-            new LinkedHashMap<List<EObject>, ArrayList<String>>();
+        Map<List<EObject>, List<String>> connectedAlternativesMap = 
+            new LinkedHashMap<List<EObject>, List<String>>();
         for(DependencyNode dn : connectedDepNodes)
         {
           List<EObject> matchedElements = dn.getMatchedElements();
