@@ -1,14 +1,27 @@
 package fr.tpt.aadl.ramses.analysis.maintainability ;
 
+import java.util.ArrayList ;
 import java.util.HashMap ;
+import java.util.List ;
 import java.util.Map ;
 
 import org.apache.log4j.Logger ;
+import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.Element ;
 import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.SubprogramCall ;
+import org.osate.aadl2.SubprogramCallSequence ;
+import org.osate.aadl2.SubprogramClassifier ;
 import org.osate.aadl2.instance.ComponentInstance ;
 import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.ba.aadlba.BehaviorAction ;
+import org.osate.ba.aadlba.BehaviorActionBlock ;
+import org.osate.ba.aadlba.BehaviorActionSequence ;
+import org.osate.ba.aadlba.BehaviorAnnex ;
+import org.osate.ba.aadlba.BehaviorTransition ;
+import org.osate.ba.aadlba.SubprogramCallAction ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.launch.MaintainabilityAnalyzer ;
@@ -131,13 +144,58 @@ public class MaintainabilityAnalysis
     sourceQar.setIterationId(iterationCounter);
   }
   
-  private Long computeMaintenanceCost(NamedElement component)
+  private Long computeMaintainanceCost(NamedElement component,
+                                      List<Element> treatedElements)
   {
     Long cost = (long) 0 ;
+    if(component instanceof SubprogramClassifier)
+    {
+      cost += getMaintainanceCost(component);
+    }
     if(component instanceof BehavioredImplementation)
     {
       BehavioredImplementation bi = (BehavioredImplementation) component;
-      cost += getMaintainanceCost(bi);
+      if(treatedElements.contains(bi))
+        return cost;
+      treatedElements.add(bi);
+      
+      for(AnnexSubclause as: bi.getOwnedAnnexSubclauses())
+      {
+        if(as instanceof BehaviorAnnex)
+        {
+          BehaviorAnnex ba = (BehaviorAnnex) as;
+          for(BehaviorTransition bt: ba.getTransitions())
+          {
+            BehaviorActionBlock bab = (BehaviorActionBlock) bt.getActionBlock();
+            if(bab.getContent() instanceof BehaviorActionSequence)
+            {
+              BehaviorActionSequence bas = (BehaviorActionSequence) bab.getContent();
+              for(BehaviorAction bAction: bas.getActions())
+              {
+                if(bAction instanceof SubprogramCallAction)
+                {
+                  SubprogramCallAction sca = (SubprogramCallAction) bAction;
+                  cost+=computeMaintainanceCost(sca.getSubprogram().getElement(),
+                                               treatedElements);
+                }
+              }
+            }
+          }
+        }
+      }
+      // check if found cost in BA
+      if(cost>0)
+        return cost;
+      
+      // if no BA
+      for(SubprogramCallSequence scs: bi.getOwnedSubprogramCallSequences())
+      {
+        for(SubprogramCall sc: scs.getOwnedSubprogramCalls())
+        {
+          cost+=computeMaintainanceCost((NamedElement)sc.getCalledSubprogram(),
+                                       treatedElements);
+        }
+      }
     }
     return cost ;
   }
@@ -155,13 +213,16 @@ public class MaintainabilityAnalysis
   
   private Long getThreadConsumption(ComponentInstance c)
   {
+    List<Element> treatedElements =
+        new ArrayList<Element>();
     Long threadConsumption = (long) 0;
     if(maintenanceCostMap.containsKey(c))
       threadConsumption = maintenanceCostMap.get(c);
     else
     {
-      threadConsumption = computeMaintenanceCost((BehavioredImplementation) 
-                             c.getComponentClassifier());
+      threadConsumption = computeMaintainanceCost((BehavioredImplementation) 
+                             c.getComponentClassifier(), treatedElements);
+      treatedElements.add(c.getComponentClassifier());
       maintenanceCostMap.put(c, threadConsumption);
     }
     return threadConsumption;
