@@ -1,0 +1,190 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright ¬© 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+package test_buffer_delayed_w_rdal
+public
+
+with Base_Types;
+with Data_Model;
+with POK;
+with ARINC653;
+with MCDA;
+
+  system root_aadlre_test
+  end root_aadlre_test;
+
+  system implementation root_aadlre_test.impl
+  subcomponents
+    the_cpu: processor cpu.impl;
+    the_proc: process proc.impl;
+    the_mem: memory mem.impl;
+  properties
+    Actual_Processor_Binding => (reference (the_cpu.the_part)) applies to the_proc;
+    Actual_Memory_Binding => (reference (the_mem)) applies to the_proc;
+    MCDA::Quality_Attributes_Weight => (
+    	[QualityAttribute=>Maintainability; Value=>23;],
+    	[QualityAttribute=>Memory_Footprint; Value=>50;],
+    	[QualityAttribute=>Threads_Response_Time; Value=>27;]
+    );
+    MCDA::Acceptable_Quality_Impacts => (
+    	[QualityAttribute=>Maintainability; Value=>30;],
+    	[QualityAttribute=>Memory_Footprint; Value=>50;],
+    	[QualityAttribute=>Threads_Response_Time; Value=>70;]
+    ) applies to the_proc.the_sender_1, the_proc.the_sender_2, the_proc.the_sender_3, the_proc.the_sender_4;
+    MCDA::Acceptable_Quality_Impacts => (
+    	[QualityAttribute=>Maintainability; Value=>30;],
+    	[QualityAttribute=>Memory_Footprint; Value=>50;],
+    	[QualityAttribute=>Threads_Response_Time; Value=>70;]
+    ) applies to the_proc.the_receiver_1, the_proc.the_receiver_2, the_proc.the_receiver_3, the_proc.the_receiver_4;
+  end root_aadlre_test.impl;
+
+  processor cpu
+  properties
+    POK::Architecture => x86;
+    POK::BSP => x86_qemu;
+  end cpu;
+
+  processor implementation cpu.impl
+  subcomponents
+    the_part:  virtual processor part.impl{Period=>1000 Ms;};
+  properties
+    ARINC653::Module_Major_Frame => 1000 ms;
+    POK::Scheduler => STATIC;
+    ARINC653::Partition_Slots => (1000 ms);
+    ARINC653::Slots_Allocation => (reference (the_part));
+  end cpu.impl;
+
+  virtual processor part
+  properties
+    POK::Additional_Features => (libc_stdio, console);
+  end part;
+
+  virtual processor implementation part.impl
+  properties
+    POK::Scheduler => RR;
+  end part.impl;
+
+  process proc
+  end proc;
+
+  process implementation proc.impl
+  subcomponents
+    the_sender_1: thread sender.impl;
+    the_receiver_1: thread receiver.impl;
+    the_sender_2: thread sender.impl;
+    the_receiver_2: thread receiver.impl;
+    the_sender_3: thread sender.impl;
+    the_receiver_3: thread receiver.impl;
+    the_sender_4: thread sender.impl;
+    the_receiver_4: thread receiver.impl;
+  connections
+    cnx1: port the_sender_1.p -> the_receiver_1.p { Timing => delayed; };
+    cnx2: port the_sender_2.p -> the_receiver_2.p { Timing => delayed; };
+    cnx3: port the_sender_3.p -> the_receiver_3.p { Timing => delayed; };
+    cnx4: port the_sender_4.p -> the_receiver_4.p { Timing => delayed; };
+  properties
+    Data_Size => 250 Kbyte;
+    Code_Size => 100 Kbyte;
+  end proc.impl;
+
+  memory mem
+  end mem;
+
+  memory implementation mem.impl
+  properties
+    Memory_Size => 160000 Bytes;
+    Word_Size => 16 bits;
+  end mem.impl;
+
+  thread sender
+  features
+    p: out event data port Integer;
+  properties
+    Dispatch_Protocol => Periodic;
+    Period => 1000 ms;
+    Priority => 1;
+    Data_Size => 40000 Bytes;
+    Stack_Size => 40 Bytes;
+    Code_Size => 40 Bytes;
+  end sender;
+
+  thread implementation sender.impl
+  calls
+    call : { c : subprogram sender_spg;};
+  connections
+    cnx: parameter c.result -> p;
+  properties
+    Compute_Entrypoint_Call_Sequence => reference (call);
+  end sender.impl;
+
+  subprogram sender_spg
+  features
+    result : out parameter Integer;
+  properties
+    Source_Name => "send";
+    Source_Language => (C);
+    Source_Text => ("user_code.h","user_code.c");
+    Compute_Execution_Time => 0 ms .. 1 ms;
+    Stack_Size => 4 Bytes;
+  end sender_spg;
+
+  thread receiver
+  features
+    p: in event data port Integer 
+    { 
+	Dequeue_Protocol => AllItems; 
+    };
+  properties
+    Dispatch_Protocol => Periodic;
+    Period => 200 ms;
+    Priority => 2;
+    Data_Size => 25 Bytes;
+    Stack_Size => 40 Bytes;
+    Code_Size => 40 Bytes;
+  end receiver;
+
+  thread implementation receiver.impl
+  calls
+    call : { c : subprogram receiver_spg;};
+  connections
+    cnx: parameter p -> c.input;
+  properties
+    Compute_Entrypoint_Call_Sequence => reference (call);
+  end receiver.impl;
+
+  subprogram receiver_spg
+  features
+    input : in parameter Integer;
+  properties
+    Source_Name => "receive";
+    Source_Language => (C);
+    Source_Text => ("user_code.h","user_code.c");
+    Compute_Execution_Time => 0 ms .. 1 ms;
+    Stack_Size => 4 Bytes;
+  end receiver_spg;
+
+  data Integer
+  properties
+    Data_Model::Data_Representation => Integer;
+    Data_Size => 4 Bytes;
+  end Integer;
+
+end test_buffer_delayed_w_rdal;
