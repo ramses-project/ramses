@@ -73,6 +73,7 @@ public class MaintainabilityAnalysis
       }
       if (c.getCategory()==ComponentCategory.THREAD)
       {
+        // TODO: add management of maintainability overhead (thread specific code)
         Long budget = getMaintainanceBudget(c);
         maintenanceBudgetMap.put(c, budget);
       }
