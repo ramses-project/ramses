@@ -1,8 +1,6 @@
 package fr.tpt.aadl.ramses.transformation.selection.mcda;
 
-import java.util.AbstractMap ;
 import java.util.ArrayList ;
-import java.util.Comparator ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Map ;
@@ -10,7 +8,6 @@ import java.util.Map.Entry ;
 import java.util.Set ;
 import java.util.SortedMap ;
 import java.util.TreeMap ;
-import java.util.TreeSet ;
 
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -57,7 +54,9 @@ public class TransformationRuleSelection
     }
     return null ;
   }
-
+  
+  // Returns a map of list of tuples associated with its performance (float).
+  // This map is sorted according to the performance of the list of tuples.
   private SortedMap<List<RuleApplicationTulpe>, Float> orderPotentialSolutions()
   {
 
@@ -95,7 +94,11 @@ public class TransformationRuleSelection
       sets.add(tuples) ;
     }
     
+    // 2 - cartesian product of the sets of tuples.
+    
     unsortedSolutions = Sets.cartesianProduct(sets) ;
+    
+    // 3 - order the solution according to their performance.
     
     return orderSolutions(unsortedSolutions) ;
   }
@@ -108,8 +111,8 @@ public class TransformationRuleSelection
     
     for(List<RuleApplicationTulpe> listTuples: unsortedSolutions)
     {
-      Float perf = computePerformance(listTuples) ;
-      result.put(listTuples, perf) ;
+      float perf = computePerformance(listTuples) ;
+      result.put(listTuples, perf) ; // Sorts according to performance/ natural order.
     }
     
     return result ;
@@ -117,7 +120,55 @@ public class TransformationRuleSelection
 
   private Float computePerformance(List<RuleApplicationTulpe> listTuples)
   {
+    float result = 0f ;
+    
+    float currentQaPerf ;
+    QualityAttribut[] qas = getQualityAttributes() ;
+    float trcPerf ;
+    float airPerf ;
+    
+    for(RuleApplicationTulpe tuple: listTuples)
+    {
+      for(QualityAttribut currentQa: qas)
+      {
+        trcPerf = getTrcPerformance(tuple.getTransformationRuleName(),
+                                    currentQa) ;
+        
+        airPerf = getAirPerf(tuple.getPatternMatchedElement(), currentQa) ;
+        
+        currentQaPerf = currentQa.qaWeight * (trcPerf + airPerf) / 2 ;
+        
+        result += currentQaPerf ;
+      }
+    }
+    
+    return result ;
+  }
+
+  private float getAirPerf(List<EObject> patternMatchedElement,
+                           QualityAttribut qa)
+  {
+    // TODO Auto-generated method stub
+    return 0 ;
+  }
+
+  private float getTrcPerformance(String transformationRuleName,
+                                  QualityAttribut qa)
+  {
+    // TODO Auto-generated method stub
+    return 0 ;
+  }
+
+  private QualityAttribut[] getQualityAttributes()
+  {
     // TODO Auto-generated method stub
     return null ;
   }
+}
+
+class QualityAttribut
+{
+  public float qaWeight = 0f ;
+  
+  // Id ???
 }
