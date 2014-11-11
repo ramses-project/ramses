@@ -53,7 +53,8 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 
   private static Logger _LOGGER = Logger.getLogger(MCDABasedTransformationSelection.class) ;
 
-  private List<DependencyNode> treatedAlternatives;
+  private List<DependencyNode> treatedAlternatives = 
+      new ArrayList<DependencyNode>();
 
   private AadlTargetSpecificGenerator generator ;
   private TrcSpecification trc ;
@@ -79,6 +80,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     this.workflowPilot = workflowPilot;
     this.errManager = errManager;
     this.monitor = monitor;
+    this.config = config;
     String propertyFile = (String) config.getParameters().get(Names.RAMSES_PROPERTIES);
 
     prop = new Properties() ;
@@ -113,7 +115,10 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   selectTransformation(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
                        ArrayList<ElementTransformation> tuplesToApply)
   {
-
+    SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
+    
+    qualityAttributesIdentifiers = MCDAUtils.getReferencedQualityAttributes(sinst);
+    
     // 1 - create the dependency graph of alternatives
     DependencyGraph dg = DependencyGraphUtils.
         createDependencyGraph(trc, patternMatchingMap);
@@ -143,6 +148,8 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       }
       else
       {
+        
+        
         // 3 - Check if Performance is available for Elements
         // TODO: add a service to get Acceptable Impact
         if(false==isAcceptableImpactRatioAvailable(currentElements,
@@ -178,7 +185,6 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         }
 
         // 5 - select alternatives for elements in connectedDepGraph
-        SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
         TransformationRuleSelection trs = 
             new TransformationRuleSelection(trc, 
                                             sinst,

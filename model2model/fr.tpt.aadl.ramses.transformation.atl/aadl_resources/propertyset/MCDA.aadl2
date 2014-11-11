@@ -20,6 +20,6 @@ Acceptable_Quality_Impact_Type: type record (
 );
 
 Acceptable_Quality_Impacts: 
-	list of MCDA::Acceptable_Quality_Impact_Type applies to (Element);
+	list of MCDA::Acceptable_Quality_Impact_Type applies to (NamedElement);
 
 end MCDA;

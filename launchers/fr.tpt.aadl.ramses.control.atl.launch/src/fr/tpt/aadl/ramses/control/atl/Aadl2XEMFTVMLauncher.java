@@ -236,7 +236,8 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 			                             String resourceSuffix,
 			                             IProgressMonitor monitor)
 	{
-		
+		if(transformationFileList.isEmpty())
+		  return null;
 		
 		if(env == null)
 		  env = EmftvmFactory.eINSTANCE.createExecEnv();

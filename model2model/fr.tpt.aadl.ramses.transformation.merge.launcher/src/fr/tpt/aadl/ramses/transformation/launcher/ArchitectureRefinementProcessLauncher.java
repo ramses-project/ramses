@@ -109,7 +109,7 @@ public class ArchitectureRefinementProcessLauncher {
 
     String tipPath = this.getTipId();
     URI tipURI = URI.createFileURI(getOutputDir()+tipPath);
-    Resource r = resourceSet.getResource(tipURI, false);
+    Resource r = resourceSet.getResource(tipURI, true);
     if(r==null)
     {
       r=resourceSet.createResource(tipURI);
@@ -272,7 +272,7 @@ public class ArchitectureRefinementProcessLauncher {
 
   private String getPatternMatchingOutputDir()
   {
-    return this.outputPathSave.getAbsolutePath()+"/PatternMatchingTransformations/";
+    return this.outputPathSave.getAbsolutePath()+"/.PatternMatchingTransformations/";
   }
 
   /**
@@ -320,6 +320,8 @@ public class ArchitectureRefinementProcessLauncher {
         String modulePath = moduleList.get(i-1).getPath();
         modulePath = modulePath.substring(0, modulePath.length()-4)+"_2pml.emftvm";
         File f = new File(getPatternMatchingOutputDir()+modulePath);
+        if(f.exists())
+          continue;
         emftvmFiles.add(f);
       }
 
@@ -529,7 +531,7 @@ public class ArchitectureRefinementProcessLauncher {
    * @return the TIP URI
    */
   protected String getTipId() {
-    return "tmp.tip";
+    return ".ramses-generated.tip";
   }
 
 

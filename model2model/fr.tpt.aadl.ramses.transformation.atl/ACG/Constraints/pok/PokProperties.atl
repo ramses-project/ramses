@@ -48,8 +48,9 @@ rule check_VirtualProcessorHasScheduler
 		)
 	to
 		err: CV!Error
-		(message <- 'Invalid scheduling_protocol for POK; supported '+
-		'values are: Round_Robin_Protocol' )
+		(message <- obj.subcomponent.name + 
+			' has invalid scheduling_protocol for POK; supported '+
+			'values are: Round_Robin_Protocol and RMS' )
 }
 
 --@extends check_ProcessorInstance

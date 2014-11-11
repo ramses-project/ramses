@@ -33,10 +33,11 @@ public class DependencyGraphUtils
       Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
       List<EObject> currentElements = tuple.getKey();
       List<String> currentTransformationAlternatives = tuple.getValue();
-      if(false == treatedObjects.contains(currentElements))
-        treatedObjects.add(currentElements);
+      if(true == treatedObjects.contains(currentElements))
+        continue;
       else
       {
+        treatedObjects.add(currentElements);
         DependencyNode dn = getOrCreateDependencyNode(result, currentElements);
         
         // Retrieve dependencies for each alternative

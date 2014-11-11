@@ -103,6 +103,9 @@ public class TipUtils {
 		ElementTransformation et = TipFactory.eINSTANCE.createElementTransformation();
 		for(EObject obj: elementId)
 		{
+		  boolean isNamedElement = obj instanceof NamedElement;
+		  if(false==isNamedElement)
+		    continue;
 			et.getElementId().add(obj);
 			et.getElementName().add(getQualifiedName(obj));			
 		}

@@ -19,7 +19,7 @@
 -- http://www.eclipse.org/org/documents/epl-v10.php
 --
 
-package test_buffer_delayed_w_rdal
+package test_buffer_delayed_mcda
 public
 
 with Base_Types;
@@ -67,9 +67,10 @@ with MCDA;
     the_part:  virtual processor part.impl{Period=>1000 Ms;};
   properties
     ARINC653::Module_Major_Frame => 1000 ms;
-    POK::Scheduler => STATIC;
-    ARINC653::Partition_Slots => (1000 ms);
-    ARINC653::Slots_Allocation => (reference (the_part));
+    Scheduling_Protocol => (arinc653);
+    ARINC653::Module_Schedule => (
+       	[Partition => reference(the_part); Duration => 1000ms; Periodic_Processing_Start => true;]
+    );
   end cpu.impl;
 
   virtual processor part
@@ -79,7 +80,7 @@ with MCDA;
 
   virtual processor implementation part.impl
   properties
-    POK::Scheduler => RR;
+    Scheduling_Protocol => (RMS);
   end part.impl;
 
   process proc
@@ -187,4 +188,4 @@ with MCDA;
     Data_Size => 4 Bytes;
   end Integer;
 
-end test_buffer_delayed_w_rdal;
+end test_buffer_delayed_mcda;

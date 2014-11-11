@@ -18,8 +18,7 @@ public class MaintainabilityAnalysisFactory implements AnalyzerFactory
       createAnalyzer(AadlModelInstantiatior modelInstantiatior,
                      PredefinedAadlModelManager predefinedAadlModels)
   {
-    // TODO Auto-generated method stub
-    return null ;
+    return new MaintainabilityAnalyzer(modelInstantiatior, predefinedAadlModels);
   }
 
 }

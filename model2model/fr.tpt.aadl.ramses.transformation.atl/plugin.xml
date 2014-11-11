@@ -79,13 +79,13 @@
             name="RAMSES_buses">
       </aadlcontribution>
       <aadlcontribution
-            file="aadl_resources/package/MCDA.aadl2"
-            id="fr.tpt.aadl.packages.mcda.aadlcontribution"
+            file="aadl_resources/propertyset/MCDA.aadl2"
+            id="fr.tpt.aadl.properties.mcda.aadlcontribution"
             name="MCDA">
       </aadlcontribution>
       <aadlcontribution
-            file="aadl_resources/package/Maintainability.aadl2"
-            id="fr.tpt.aadl.packages.maintainance.aadlcontribution"
+            file="aadl_resources/propertyset/Maintainability.aadl2"
+            id="fr.tpt.aadl.properties.maintainance.aadlcontribution"
             name="Maintainability">
       </aadlcontribution>
    </extension>

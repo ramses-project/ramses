@@ -15,10 +15,10 @@ import org.osate.aadl2.instance.InstanceObject;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#getTransformationId <em>Transformation Id</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#getElementId <em>Element Id</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#getElementName <em>Element Name</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#isIsExclusion <em>Is Exclusion</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#getTransformationId <em>Transformation Id</em>}</li>
  * </ul>
  * </p>
  *
@@ -28,87 +28,87 @@ import org.osate.aadl2.instance.InstanceObject;
  */
 public interface ElementTransformation extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Transformation Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+   * Returns the value of the '<em><b>Transformation Id</b></em>' attribute.
+   * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Transformation Id</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Transformation Id</em>' attribute.
-	 * @see #setTransformationId(String)
-	 * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_TransformationId()
-	 * @model
-	 * @generated
-	 */
+   * @return the value of the '<em>Transformation Id</em>' attribute.
+   * @see #setTransformationId(String)
+   * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_TransformationId()
+   * @model
+   * @generated
+   */
 	String getTransformationId();
 
 	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#getTransformationId <em>Transformation Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#getTransformationId <em>Transformation Id</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Transformation Id</em>' attribute.
-	 * @see #getTransformationId()
-	 * @generated
-	 */
+   * @param value the new value of the '<em>Transformation Id</em>' attribute.
+   * @see #getTransformationId()
+   * @generated
+   */
 	void setTransformationId(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Element Id</b></em>' reference list.
-	 * The list contents are of type {@link org.osate.aadl2.NamedElement}.
-	 * <!-- begin-user-doc -->
+   * Returns the value of the '<em><b>Element Id</b></em>' reference list.
+   * The list contents are of type {@link org.osate.aadl2.NamedElement}.
+   * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Element Id</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Element Id</em>' reference list.
-	 * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_ElementId()
-	 * @model type="org.osate.aadl2.NamedElement" required="true"
-	 * @generated
-	 */
+   * @return the value of the '<em>Element Id</em>' reference list.
+   * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_ElementId()
+   * @model type="org.osate.aadl2.NamedElement" required="true"
+   * @generated
+   */
 	EList getElementId();
 
 	/**
-	 * Returns the value of the '<em><b>Element Name</b></em>' attribute list.
-	 * The list contents are of type {@link java.lang.String}.
-	 * <!-- begin-user-doc -->
+   * Returns the value of the '<em><b>Element Name</b></em>' attribute list.
+   * The list contents are of type {@link java.lang.String}.
+   * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Element Name</em>' attribute list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Element Name</em>' attribute list.
-	 * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_ElementName()
-	 * @model dataType="org.osate.aadl2.String" required="true"
-	 * @generated
-	 */
+   * @return the value of the '<em>Element Name</em>' attribute list.
+   * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_ElementName()
+   * @model dataType="org.osate.aadl2.String" required="true"
+   * @generated
+   */
 	EList getElementName();
 
 	/**
-	 * Returns the value of the '<em><b>Is Exclusion</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+   * Returns the value of the '<em><b>Is Exclusion</b></em>' attribute.
+   * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Is Exclusion</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Is Exclusion</em>' attribute.
-	 * @see #setIsExclusion(boolean)
-	 * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_IsExclusion()
-	 * @model dataType="org.osate.aadl2.Boolean" required="true"
-	 * @generated
-	 */
+   * @return the value of the '<em>Is Exclusion</em>' attribute.
+   * @see #setIsExclusion(boolean)
+   * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_IsExclusion()
+   * @model dataType="org.osate.aadl2.Boolean" required="true"
+   * @generated
+   */
 	boolean isIsExclusion();
 
 	/**
-	 * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#isIsExclusion <em>Is Exclusion</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.tip.ElementTransformation#isIsExclusion <em>Is Exclusion</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Is Exclusion</em>' attribute.
-	 * @see #isIsExclusion()
-	 * @generated
-	 */
+   * @param value the new value of the '<em>Is Exclusion</em>' attribute.
+   * @see #isIsExclusion()
+   * @generated
+   */
 	void setIsExclusion(boolean value);
 
 } // ElementTransformation

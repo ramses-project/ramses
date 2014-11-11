@@ -102,7 +102,7 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
       TrcParser.parse(trcPath, rs);
     
     String rdalPath = prop.getProperty("ArchitectureRefinementLauncher.rdal");
-    if(trcPath!=null)
+    if(trcPath!=null && rdalPath!=null)
       RdalParser.parse(rdalPath, rs);
         
     List<Transformation> list = l.getTransformations();
