@@ -1,43 +1,37 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.Iterator ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Map.Entry ;
 
 import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EClass ;
 import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.EOperation;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.emf.ecore.EStructuralFeature ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
-import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency;
-import fr.tpt.aadl.ramses.transformation.trc.Module;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependency;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction;
-import fr.tpt.aadl.ramses.transformation.trc.Transformation;
-import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency;
-import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact;
-import fr.tpt.aadl.ramses.transformation.trc.TrcFactory;
-import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
-import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
+import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency ;
+import fr.tpt.aadl.ramses.transformation.trc.Module ;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependency ;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction ;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction ;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency ;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcFactory ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcPackage ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 
 public class TrcUtils {
 
-	private static Resource resource;
-	private static TrcSpecification trcSpecification;
-
+	
 	private static Logger _LOGGER = Logger.getLogger(TrcUtils.class) ;
   
 	
@@ -59,7 +53,7 @@ public class TrcUtils {
 		resourceSet.getPackageRegistry().put("http://fr.tpt.aadl.ramses.transformation/TRC/1.0", TrcPackage.eINSTANCE);
 
 		if (!resourceSet.getURIConverter().exists(trc_uri, null)){
-			resource = resourceSet.createResource(trc_uri);
+			Resource resource = resourceSet.createResource(trc_uri);
 			//getResource(trcPath).getContents().add(spec);
 			saveTrc(resource, spec);
 		} else {
@@ -150,26 +144,55 @@ public class TrcUtils {
 	public static void addQualityImpactsForTransformation(String trcPath,
 	                                                      ResourceSet resourceSet,
 	                                                      String transformationId, 
-	                                                      Map qualityImpactMap){
+	                                                      Map<String, Integer> qualityImpactMap){
 
-		TrcSpecification specification = TrcParser.parse(trcPath,resourceSet);
-		Transformation t = getTransformationById(specification, transformationId);
-		t.getImpacts().clear();
-		
-	    Iterator it = qualityImpactMap.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry entry = (Map.Entry)it.next();
-			TransformationImpact impact = TrcFactory.eINSTANCE.createTransformationImpact();
+	  TrcSpecification specification = TrcParser.parse(trcPath,resourceSet);
+	  Transformation t = getTransformationById(specification, transformationId);
+	  t.getImpacts().clear();
 
-			impact.setQualityAttributeName((String) entry.getKey());
-			impact.setImpactValue(new Integer(entry.getValue().toString()).intValue());
+	  Iterator<Entry<String, Integer>> it = qualityImpactMap.entrySet().iterator();
+	  while (it.hasNext()) {
+	    Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>)it.next();
+	    TransformationImpact impact = TrcFactory.eINSTANCE.createTransformationImpact();
 
-			t.getImpacts().add(impact);
-	    }
-		
-		saveTrc(getResource(trcPath, resourceSet), specification);
+	    impact.setQualityAttributeName((String) entry.getKey());
+	    impact.setImpactValue(new Integer(entry.getValue().toString()).intValue());
+
+	    t.getImpacts().add(impact);
+	  }
+
+	  saveTrc(getResource(trcPath, resourceSet), specification);
 	}
 
+	/**
+   * Returns the quality impact of a given transformation, for a given
+   * quality attribute 
+   *
+   * @param spec                the TRC specification object
+   * @param transformationId    String representing transformation's id
+   * @param qualityAttributeId  String identifying a quality attribute
+   */
+	public static int getQualityImpactsForTransformation(TrcSpecification spec,
+	                                   String transformationId,
+	                                   String qualityAttributeId)
+	{
+	  int result = -1;
+	  
+	  
+	  for(Transformation trans: spec.getTransformationList().getTransformations())
+	  {
+	    if(trans.getName().equals(transformationId))
+	    {
+	      for(TransformationImpact ti: trans.getImpacts())
+	      {
+	        if(ti.getQualityAttributeName().equals(qualityAttributeId))
+	          return ti.getImpactValue();
+	      }
+	    }
+	  }
+	  
+	  return result;
+	}
 	
 	
 	/**
@@ -203,7 +226,7 @@ public class TrcUtils {
 		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("trc", new XMIResourceFactoryImpl());
 		resourceSet.getPackageRegistry().put("http://fr.tpt.aadl.ramses.transformation/TRC/1.0", TrcPackage.eINSTANCE);
 		
-		resource = resourceSet.getResource(p_uri, true);
+		Resource resource = resourceSet.getResource(p_uri, true);
 
 		return resource;
 	}
@@ -211,7 +234,7 @@ public class TrcUtils {
 	
 	public static Transformation getTransformationById(TrcSpecification specification,
                                                      String transformationId){
-    Iterator transformationsIt = specification.getTransformationList().getTransformations().iterator();
+    Iterator<Transformation> transformationsIt = specification.getTransformationList().getTransformations().iterator();
     while (transformationsIt.hasNext()){
       Transformation transformation = (Transformation)transformationsIt.next();
       for(Module module: (List<Module>)transformation.getModules())
@@ -253,7 +276,7 @@ public class TrcUtils {
   
   
   public static Transformation getTransformationByName(TrcSpecification specification, String transformationName){
-    Iterator transformationsIt = specification.getTransformationList().getTransformations().iterator();
+    Iterator<Transformation> transformationsIt = specification.getTransformationList().getTransformations().iterator();
     while (transformationsIt.hasNext()){
       Transformation transformation = (Transformation)transformationsIt.next();
       for(String ruleName:(List<String>)transformation.getRuleName())

@@ -16,6 +16,7 @@ import com.google.common.collect.Sets ;
 
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class TransformationRuleSelection
 {
@@ -123,13 +124,13 @@ public class TransformationRuleSelection
     float result = 0f ;
     
     float currentQaPerf ;
-    QualityAttribut[] qas = getQualityAttributes() ;
+    QualityAttribute[] qas = getQualityAttributes() ;
     float trcPerf ;
     float airPerf ;
     
     for(RuleApplicationTulpe tuple: listTuples)
     {
-      for(QualityAttribut currentQa: qas)
+      for(QualityAttribute currentQa: qas)
       {
         trcPerf = getTrcPerformance(tuple.getTransformationRuleName(),
                                     currentQa) ;
@@ -146,29 +147,35 @@ public class TransformationRuleSelection
   }
 
   private float getAirPerf(List<EObject> patternMatchedElement,
-                           QualityAttribut qa)
+                           QualityAttribute qa)
   {
     // TODO Auto-generated method stub
     return 0 ;
   }
 
-  private float getTrcPerformance(String transformationRuleName,
-                                  QualityAttribut qa)
+  private Long getTrcPerformance(String transformationRuleName,
+                                  QualityAttribute qa)
   {
     // TODO Auto-generated method stub
-    return 0 ;
+    String transformationId = transformationRuleName.substring(0,
+                                                               transformationRuleName.lastIndexOf('/'));
+    String qualityAttributeId = qa.getId();
+    return TrcUtils.getQualityImpactsForTransformation(trc,transformationId,qualityAttributeId);
   }
 
-  private QualityAttribut[] getQualityAttributes()
+  private QualityAttribute[] getQualityAttributes()
   {
     // TODO Auto-generated method stub
     return null ;
   }
 }
 
-class QualityAttribut
+class QualityAttribute
 {
   public float qaWeight = 0f ;
-  
+  String getId()
+  {
+    return "";
+  }
   // Id ???
 }
