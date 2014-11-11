@@ -109,7 +109,9 @@ public class ArchitectureRefinementProcessLauncher {
 
     String tipPath = this.getTipId();
     URI tipURI = URI.createFileURI(getOutputDir()+tipPath);
-    Resource r = resourceSet.getResource(tipURI, true);
+    String tipFilePath = tipURI.toFileString();
+    File tipFile = new File(tipFilePath);
+    Resource r = resourceSet.getResource(tipURI, tipFile.exists());
     if(r==null)
     {
       r=resourceSet.createResource(tipURI);
@@ -320,8 +322,6 @@ public class ArchitectureRefinementProcessLauncher {
         String modulePath = moduleList.get(i-1).getPath();
         modulePath = modulePath.substring(0, modulePath.length()-4)+"_2pml.emftvm";
         File f = new File(getPatternMatchingOutputDir()+modulePath);
-        if(f.exists())
-          continue;
         emftvmFiles.add(f);
       }
 

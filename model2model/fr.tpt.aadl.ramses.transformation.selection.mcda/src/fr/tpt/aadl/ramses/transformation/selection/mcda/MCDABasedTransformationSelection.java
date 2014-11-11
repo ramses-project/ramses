@@ -138,15 +138,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       List<EObject> currentElements = tuple.getKey();
       List<String> currentTransformationAlternatives = tuple.getValue();
 
-      if(currentTransformationAlternatives.size()==1)
-      {
-        TransformationRuleAlternative tra = new TransformationRuleAlternative(currentElements, 
-                                                                              currentTransformationAlternatives);
-        RuleApplicationUtils.setTransformationToApply(tra,
-                                                      currentTransformationAlternatives.get(0),
-                                                      tuplesToApply);
-      }
-      else
+      if(currentTransformationAlternatives.size()>1)
       {
         
         

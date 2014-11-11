@@ -323,7 +323,11 @@ rule IncludedAndNotExcludedMatchedRule {
 		)
     to t : MM_ATL!"ATL::MatchedRule" (
         location <- s.location,
-        commentsBefore <- s.commentsBefore->excluding(s.commentsBefore->last())->append(s.commentsBefore->last()+','+s.name),
+        commentsBefore <- if(s.commentsBefore->last().oclIsUndefined()) then
+        					'-- ' + s.name
+						else
+							s.commentsBefore->excluding(s.commentsBefore->last())->append(s.commentsBefore->last()+','+s.name)
+						endif,
         --commentsAfter <- s.commentsAfter,
         name <- s.name +'_applied_'+thisModule.getLastIteration().id,
         isAbstract <- s.isAbstract,
