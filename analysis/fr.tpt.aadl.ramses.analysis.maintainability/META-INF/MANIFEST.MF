@@ -13,5 +13,5 @@ Require-Bundle: org.eclipse.ui,
  org.osate.ba;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.control.support;bundle-version="1.0.0",
  fr.tpt.aadl.ramses.analysis.result
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

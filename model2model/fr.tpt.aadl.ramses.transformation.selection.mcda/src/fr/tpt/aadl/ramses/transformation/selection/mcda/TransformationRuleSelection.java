@@ -9,18 +9,31 @@ import java.util.Set ;
 import java.util.SortedMap ;
 import java.util.TreeMap ;
 
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.ecore.EObject ;
+import org.osate.aadl2.Aadl2Package ;
+import org.osate.aadl2.BasicPropertyAssociation ;
+import org.osate.aadl2.EnumerationLiteral ;
+import org.osate.aadl2.IntegerLiteral ;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.NamedValue ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.utils.PropertyUtils ;
 
 import com.google.common.collect.Sets ;
 
+import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class TransformationRuleSelection
 {
-
+  private static Logger _LOGGER = Logger.getLogger(TrcUtils.class) ;
+  
   private TrcSpecification trc;
   private Map<List<EObject>, List<String>> alternativeMap;
   private SystemInstance rootSystem;
@@ -65,8 +78,8 @@ public class TransformationRuleSelection
     // attribute "trc" would give you the impact of transformations on QA
     // attribute "alternativeMap" gives you the transformation rules alternatives to consider
     // QA model (quality attibutes definition and weights) is an excel file referenced
-    // air files should be obtained from EObjects in the matched elements
-    //    --> compute average values if several (and different) air files are referenced
+    // aqi files should be obtained from EObjects in the matched elements
+    //    --> compute average values if several (and different) aqi files are referenced
     
     // from the root system
     List<Set<RuleApplicationTulpe>> sets = 
@@ -130,11 +143,11 @@ public class TransformationRuleSelection
     for(RuleApplicationTulpe tuple: listTuples)
     {
       setTrcPerformance(tuple.getTransformationRuleName(), qas) ;
-      computeAirPerf(tuple.getPatternMatchedElement(), qas) ;
+      computeAqiPerf(tuple.getPatternMatchedElement(), qas) ;
       
       for(QualityAttribute currentQa: qas)
       {
-        currentQaPerf = currentQa.qaWeight * (currentQa.trcPerf + currentQa.airPerf) / 2 ;
+        currentQaPerf = currentQa.qaWeight * (currentQa.trcImpact + currentQa.aqi) / 2 ;
         result += currentQaPerf ;
       }
     }
@@ -143,8 +156,8 @@ public class TransformationRuleSelection
   }
 
 
-  private void computeAirPerf(List<EObject> patternMatchedElement,
-                          QualityAttribute[] qas)
+  private void computeAqiPerf(List<EObject> patternMatchedElement,
+                              QualityAttribute[] qas)
   {
     int[] count = new int[qas.length] ;
     
@@ -155,11 +168,11 @@ public class TransformationRuleSelection
     
     for(EObject element: patternMatchedElement)
     {
-      boolean[] hasAir = addAirPerf(element, qas) ;
+      boolean[] hasAqi = addAqiPerf(element, qas) ;
       
       for(int i = 0 ; i < qas.length ; i++)
       {
-        if(hasAir[i])
+        if(hasAqi[i])
         {
           count[i]++ ;
         }
@@ -168,62 +181,181 @@ public class TransformationRuleSelection
     
     for(int i = 0 ; i < qas.length ; i++)
     {
-      // the mean of provided performances for a given quality attribute.
-      qas[i].airPerf /= count[i] ;
+      // Calculates the mean of provided impacts for a given quality attribute.
+      qas[i].aqi /= count[i] ;
     }
   }
 
-  private boolean[] addAirPerf(EObject element, QualityAttribute[] qas)
+  // Add every impact found to the right quality attribute.
+  // Returns found/not found impact for each quality attribute. 
+  private boolean[] addAqiPerf(EObject element, QualityAttribute[] qas)
   {
-    // get Acceptable_Quality_Impacts: 
-    // list of MCDA::Acceptable_Quality_Impact_Type applies to (Element);
-    // return found/not found impact for each quality attribute. 
+    boolean[] result = new boolean[qas.length] ;
     
-    // TODO Auto-generated method stub
+    for(int i = 0 ; i < result.length ; i++)
+    {
+      result[i] = false ;
+    }
     
-    return null ;
+    NamedElement ne = MCDAUtils.getContainingNamedElement(element) ;
+    
+    // Quality attribute impacts are modeled by a list of AADL record properties.
+    List<RecordValue> recs = PropertyUtils.getListRecordValue(ne,
+                                      MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS);
+    for(RecordValue rv: recs)
+    {
+      EList<BasicPropertyAssociation> bpas = rv.getOwnedFieldValues() ;
+      PropertyExpression value ;
+      int classId ;
+      long impact = -1l ;
+      QualityAttribute selectedQa = null ;
+      
+      for(BasicPropertyAssociation bpa : bpas)
+      {
+        value = bpa.getOwnedValue() ;
+        classId = value.eClass().getClassifierID() ;
+        
+        if(Aadl2Package.NAMED_VALUE == classId)
+        {
+          NamedValue nv = (NamedValue) value;
+
+          if (Aadl2Package.ENUMERATION_LITERAL == nv.getNamedValue().eClass().
+                                                                getClassifierID())
+          {
+            String enumLiteral = ((EnumerationLiteral) nv.getNamedValue()).
+                                                                   getName() ;
+            for(int i=0 ; i<qas.length; i++)
+            {
+              if(enumLiteral.equalsIgnoreCase(qas[i].id))
+              {
+                selectedQa = qas[i] ;
+                result[i] = true ;
+                break ;
+              }
+            }
+            
+            // Early affectation.
+            if(impact != -1l)
+            {
+              selectedQa.aqi += impact ; 
+              selectedQa = null ;
+              impact = -1l ;
+            }
+          }
+        }
+        else if(Aadl2Package.INTEGER_LITERAL == classId )
+        {
+          impact = ((IntegerLiteral) value).getValue() ;
+          
+          // Early affectation.
+          if(selectedQa != null)
+          {
+            selectedQa.aqi += impact ; 
+            selectedQa = null ;
+            impact = -1l ;
+          }
+        }
+        else
+        {
+          // DEBUG
+          System.out.println("********** ERROR ************** " + value) ;
+        }
+      }
+    }
+    
+    return result ;
   }
 
   private void setTrcPerformance(String transformationRuleName,
                                  QualityAttribute[] qas)
   {
     String transformationId = transformationRuleName.substring(0,
-                                                               transformationRuleName.lastIndexOf('/'));
-    for(int i=0;i<qas.length;i++)
-    {
-      String qualityAttributeId = qas[i].getId();
-      int impact = TrcUtils
-          .getQualityImpactsForTransformation(trc,transformationId,qualityAttributeId);
-    }
+                                       transformationRuleName.lastIndexOf('/'));
+    EList<TransformationImpact> tis = TrcUtils
+    .getQualityImpactsForTransformation(trc,transformationId);
     
+    for(TransformationImpact ti: tis)
+    {
+      for(int i=0 ; i<qas.length; i++)
+      {
+        if(ti.getQualityAttributeName().equalsIgnoreCase(qas[i].id))
+        {
+          qas[i].trcImpact = ti.getImpactValue() ;
+          break ;
+        }
+      }
+    }
   }
 
   // Instantiates a quality attribute array with quality attribute's weight set.
   private QualityAttribute[] getQualityAttributes(SystemInstance system)
   {
-    // TODO Auto-generated method stub
-    return null ;
+    QualityAttribute[] result = null ;
+    
+    // Quality attribute weights are modeled by a list of AADL record properties.
+    List<RecordValue> recs = PropertyUtils.getListRecordValue(system,
+                                        MCDAUtils.QUALITY_ATTRIBUTES_WEIGHT_PS);
+    
+    if(recs != null)
+    {
+      result = new QualityAttribute[recs.size()] ;
+
+      for(int i = 0 ; i < result.length ;  i++)
+      {
+        result[i] = toQualityAttribute(recs.get(i)) ;
+      }
+    }
+    
+    return result ;
+  }
+  
+  private QualityAttribute toQualityAttribute(RecordValue qa)
+  {
+    QualityAttribute result = new QualityAttribute();
+
+    EList<BasicPropertyAssociation> bpas = qa.getOwnedFieldValues() ;
+    PropertyExpression value ;
+    int classId ;
+    
+    for(BasicPropertyAssociation bpa : bpas)
+    {
+      value = bpa.getOwnedValue() ;
+      classId = value.eClass().getClassifierID() ;
+      
+      if(Aadl2Package.NAMED_VALUE == classId)
+      {
+        NamedValue nv = (NamedValue) value;
+
+        if (Aadl2Package.ENUMERATION_LITERAL == nv.getNamedValue().eClass().
+                                                              getClassifierID())
+        {
+          EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+          result.id = el.getName() ;
+        }
+      }
+      else if(Aadl2Package.INTEGER_LITERAL == classId )
+      {
+        result.qaWeight = ((IntegerLiteral) value).getValue() ;
+      }
+      else
+      {
+        // DEBUG
+        _LOGGER.debug("********** ERROR ************** " + value) ;
+      }
+    }
+    
+    return result ;
   }
 }
 
+// Default value are 0 .
 class QualityAttribute
 {
   public String id = "" ;
   
-  public float qaWeight = 0f ;
+  public long qaWeight = 0 ;
   
-  public float trcPerf = 0f ;
+  public int trcImpact = 0 ;
   
-  public int airPerf = 0 ;
-  
-  public QualityAttribute(String id)
-  {
-    this.id = id ;
-  }
-  
-  String getId()
-  {
-    return this.id;
-  }
-
+  public long aqi = 0 ;
 }

@@ -172,26 +172,19 @@ public class TrcUtils {
    * @param transformationId    String representing transformation's id
    * @param qualityAttributeId  String identifying a quality attribute
    */
-	public static int getQualityImpactsForTransformation(TrcSpecification spec,
-	                                   String transformationId,
-	                                   String qualityAttributeId)
+	public static EList<TransformationImpact> getQualityImpactsForTransformation(
+	                                                        TrcSpecification spec,
+	                                                      String transformationId)
 	{
-	  int result = -1;
-	  
-	  
 	  for(Transformation trans: spec.getTransformationList().getTransformations())
 	  {
 	    if(trans.getName().equals(transformationId))
 	    {
-	      for(TransformationImpact ti: trans.getImpacts())
-	      {
-	        if(ti.getQualityAttributeName().equals(qualityAttributeId))
-	          return ti.getImpactValue();
-	      }
+	      return trans.getImpacts() ;
 	    }
 	  }
 	  
-	  return result;
+	  return null ;
 	}
 	
 	
