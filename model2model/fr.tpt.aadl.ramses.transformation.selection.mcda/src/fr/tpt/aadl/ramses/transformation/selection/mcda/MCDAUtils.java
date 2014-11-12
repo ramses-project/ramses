@@ -16,9 +16,12 @@ import org.osate.utils.PropertyUtils ;
 public class MCDAUtils
 {
   
-  public static String QUALITY_ATTRIBUTES_WEIGHT_PS = 
-      "Quality_Attributes_Weight";
+  public static final String QUALITY_ATTRIBUTES_WEIGHT_PS = 
+                                                    "Quality_Attributes_Weight";
   
+  public static final String ACCEPTABLE_QUALITY_IMPACT_PS = 
+                                                   "Acceptable_Quality_Impacts";
+
   public static List<String> getReferencedQualityAttributes(SystemInstance si)
   {
     List<String> result = new ArrayList<String>();

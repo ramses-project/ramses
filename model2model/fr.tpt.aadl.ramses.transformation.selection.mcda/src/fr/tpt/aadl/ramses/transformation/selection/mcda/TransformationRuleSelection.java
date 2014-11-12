@@ -9,6 +9,7 @@ import java.util.Set ;
 import java.util.SortedMap ;
 import java.util.TreeMap ;
 
+import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.Aadl2Package ;
@@ -31,16 +32,11 @@ import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class TransformationRuleSelection
 {
-
+  private static Logger _LOGGER = Logger.getLogger(TrcUtils.class) ;
+  
   private TrcSpecification trc;
   private Map<List<EObject>, List<String>> alternativeMap;
   private SystemInstance rootSystem;
-  
-  private static final String ACCEPTABLE_QUALITY_IMPACT_PROPERTY_NAME = 
-                                             "MCDA::Acceptable_Quality_Impacts";
-  
-  private static final String QUALITY_ATTRIBUTE_WEIGHT_PROPERTY_NAME =
-                                              "MCDA::Quality_Attributes_Weight";
   
   public TransformationRuleSelection(TrcSpecification trc,
                                      SystemInstance rootSystem,
@@ -207,7 +203,7 @@ public class TransformationRuleSelection
       
       // Quality attribute impacts are modeled by a list of AADL record properties.
       List<RecordValue> recs = PropertyUtils.getListRecordValue(ne,
-                                         ACCEPTABLE_QUALITY_IMPACT_PROPERTY_NAME);
+                                        MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS);
       for(RecordValue rv: recs)
       {
         EList<BasicPropertyAssociation> bpas = rv.getOwnedFieldValues() ;
@@ -301,7 +297,7 @@ public class TransformationRuleSelection
     
     // Quality attribute weights are modeled by a list of AADL record properties.
     List<RecordValue> recs = PropertyUtils.getListRecordValue(system,
-                                        QUALITY_ATTRIBUTE_WEIGHT_PROPERTY_NAME);
+                                        MCDAUtils.QUALITY_ATTRIBUTES_WEIGHT_PS);
     
     if(recs != null)
     {
@@ -347,7 +343,7 @@ public class TransformationRuleSelection
       else
       {
         // DEBUG
-        System.out.println("********** ERROR ************** " + value) ;
+        _LOGGER.debug("********** ERROR ************** " + value) ;
       }
     }
     
