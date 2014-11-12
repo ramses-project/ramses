@@ -24,6 +24,7 @@ import org.osate.utils.PropertyUtils ;
 
 import com.google.common.collect.Sets ;
 
+import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
@@ -205,15 +206,20 @@ public class TransformationRuleSelection
   {
     String transformationId = transformationRuleName.substring(0,
                                        transformationRuleName.lastIndexOf('/'));
-    for(int i=0;i<qas.length;i++)
-    {
-      String qualityAttributeId = qas[i].id;
-      int impact = TrcUtils
-          .getQualityImpactsForTransformation(trc,transformationId,qualityAttributeId);
-      
-      qas[i].trcImpact = impact ;
-    }
+    EList<TransformationImpact> tis = TrcUtils
+    .getQualityImpactsForTransformation(trc,transformationId);
     
+    for(TransformationImpact ti: tis)
+    {
+      for(int i=0 ; i<qas.length; i++)
+      {
+        if(ti.getQualityAttributeName().equalsIgnoreCase(qas[i].id))
+        {
+          qas[i].trcImpact = ti.getImpactValue() ;
+          break ;
+        }
+      }
+    }
   }
 
   // Instantiates a quality attribute array with quality attribute's weight set.
