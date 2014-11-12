@@ -21,8 +21,8 @@ Require-Bundle: org.eclipse.ui,
  fr.tpt.aadl.ramses.generation.target.specific,
  fr.tpt.aadl.ramses.control.cli.core,
  fr.tpt.aadl.ramses.transformation.merge.launcher
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph,
  fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.impl,
  fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.util
 Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
