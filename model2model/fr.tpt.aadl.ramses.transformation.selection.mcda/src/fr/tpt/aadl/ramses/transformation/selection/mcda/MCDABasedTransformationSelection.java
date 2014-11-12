@@ -1,5 +1,6 @@
 package fr.tpt.aadl.ramses.transformation.selection.mcda;
 
+import java.io.File ;
 import java.io.FileInputStream ;
 import java.io.IOException ;
 import java.io.InputStream ;
@@ -22,6 +23,7 @@ import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
+import org.osate.utils.FileUtils ;
 import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
@@ -131,6 +133,21 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 
     boolean stop = false;
 
+    String alternatives = RuleApplicationUtils.printAlternativesToFile(patternMatchingMap);
+    File alternativeFiles = new File(config.getRamsesOutputDir().getAbsolutePath()+"/alternatives.txt");
+    if(alternativeFiles.exists())
+      alternativeFiles.delete();
+    try
+    {
+      FileUtils.copyIntoFile(alternativeFiles, alternatives);
+    }
+    catch(IOException e)
+    {
+      _LOGGER.error("Could not save file containing the list of " +
+          "alternatives to select");
+    }
+    
+    
     while (patternMatchingIt.hasNext()) 
     {
       Map.Entry<List<EObject>, ArrayList<String>> tuple =
@@ -196,7 +213,6 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         }
       }
     }
-
 
 
   }
