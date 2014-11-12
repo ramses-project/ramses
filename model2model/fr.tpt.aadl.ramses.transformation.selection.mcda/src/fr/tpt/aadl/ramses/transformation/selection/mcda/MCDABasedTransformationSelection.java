@@ -144,13 +144,13 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         
         // 3 - Check if Performance is available for Elements
         // TODO: add a service to get Acceptable Impact
-        if(false==isAcceptableImpactRatioAvailable(currentElements,
+        if(false==hasAcceptableQualityImpacts(currentElements,
                                                    qualityAttributesIdentifiers.size()))
         {
           stop = true;
-          _LOGGER.error("Property acceptable_impact ratio not found" +
-              " or incomplete for:"+
-              getIdentifier(currentElements));
+          _LOGGER.error("Property " + MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS +
+                        " ratio not found or incomplete for: " +
+                        getIdentifier(currentElements));
         }
         if(stop)
           continue;
@@ -217,7 +217,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     return result ;
   }
 
-  private boolean isAcceptableImpactRatioAvailable(List<EObject> currentElements,
+  private boolean hasAcceptableQualityImpacts(List<EObject> currentElements,
                                          int numberOfQualityAttributes)
   {
     for(EObject obj: currentElements)
@@ -234,12 +234,10 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       
       NamedElement ne = (NamedElement) obj;
       PropertyExpression pe = 
-          PropertyUtils.getPropertyValue("Acceptable_Impact",
+          PropertyUtils.getPropertyValue(MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS,
                                          ne);
       if(pe==null)
         continue;
-      
-      // TODO: look in eContainer...
       
       ListValue lv = (ListValue) pe;
       if(numberOfQualityAttributes==lv.getOwnedListElements().size())
