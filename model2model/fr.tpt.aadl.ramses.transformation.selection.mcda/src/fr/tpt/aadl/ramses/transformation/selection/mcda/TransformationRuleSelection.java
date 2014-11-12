@@ -9,8 +9,18 @@ import java.util.Set ;
 import java.util.SortedMap ;
 import java.util.TreeMap ;
 
+import org.eclipse.emf.common.util.EList ;
 import org.eclipse.emf.ecore.EObject ;
+import org.osate.aadl2.Aadl2Package ;
+import org.osate.aadl2.BasicProperty ;
+import org.osate.aadl2.BasicPropertyAssociation ;
+import org.osate.aadl2.EnumerationLiteral ;
+import org.osate.aadl2.IntegerLiteral ;
+import org.osate.aadl2.NamedValue ;
+import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.utils.PropertyUtils ;
 
 import com.google.common.collect.Sets ;
 
@@ -24,6 +34,12 @@ public class TransformationRuleSelection
   private TrcSpecification trc;
   private Map<List<EObject>, List<String>> alternativeMap;
   private SystemInstance rootSystem;
+  
+  private static final String ACCEPTABLE_QUALITY_IMPACT_PROPERTY_NAME = 
+                                             "MCDA::Acceptable_Quality_Impacts";
+  
+  private static final String QUALITY_ATTRIBUTE_WEIGHT_PROPERTY_NAME =
+                                              "MCDA::Quality_Attributes_Weight";
   
   public TransformationRuleSelection(TrcSpecification trc,
                                      SystemInstance rootSystem,
@@ -134,7 +150,7 @@ public class TransformationRuleSelection
       
       for(QualityAttribute currentQa: qas)
       {
-        currentQaPerf = currentQa.qaWeight * (currentQa.trcPerf + currentQa.aqiPerf) / 2 ;
+        currentQaPerf = currentQa.qaWeight * (currentQa.trcImpact + currentQa.aqi) / 2 ;
         result += currentQaPerf ;
       }
     }
@@ -169,7 +185,7 @@ public class TransformationRuleSelection
     for(int i = 0 ; i < qas.length ; i++)
     {
       // the mean of provided performances for a given quality attribute.
-      qas[i].aqiPerf /= count[i] ;
+      qas[i].aqi /= count[i] ;
     }
   }
 
@@ -188,12 +204,14 @@ public class TransformationRuleSelection
                                  QualityAttribute[] qas)
   {
     String transformationId = transformationRuleName.substring(0,
-                                                               transformationRuleName.lastIndexOf('/'));
+                                       transformationRuleName.lastIndexOf('/'));
     for(int i=0;i<qas.length;i++)
     {
       String qualityAttributeId = qas[i].id;
       int impact = TrcUtils
           .getQualityImpactsForTransformation(trc,transformationId,qualityAttributeId);
+      
+      qas[i].trcImpact = impact ;
     }
     
   }
@@ -201,8 +219,61 @@ public class TransformationRuleSelection
   // Instantiates a quality attribute array with quality attribute's weight set.
   private QualityAttribute[] getQualityAttributes(SystemInstance system)
   {
-    // TODO Auto-generated method stub
-    return null ;
+    QualityAttribute[] result = null ;
+    
+    // Quality attribute impacts are modeled by a list of AADL record properties.
+    List<RecordValue> recs = PropertyUtils.getListRecordValue(system,
+                                        QUALITY_ATTRIBUTE_WEIGHT_PROPERTY_NAME);
+    
+    if(recs != null)
+    {
+      result = new QualityAttribute[recs.size()] ;
+
+      for(int i = 0 ; i < result.length ;  i++)
+      {
+        result[i] = toQualityAttribute(recs.get(i)) ;
+      }
+    }
+    
+    return result ;
+  }
+  
+  private QualityAttribute toQualityAttribute(RecordValue qa)
+  {
+    QualityAttribute result = new QualityAttribute();
+
+    EList<BasicPropertyAssociation> bpas = qa.getOwnedFieldValues() ;
+    PropertyExpression value ;
+    int classId ;
+    
+    for(BasicPropertyAssociation bpa : bpas)
+    {
+      value = bpa.getOwnedValue() ;
+      classId = value.eClass().getClassifierID() ;
+      
+      if(Aadl2Package.NAMED_VALUE == classId)
+      {
+        NamedValue nv = (NamedValue) value;
+
+        if (Aadl2Package.ENUMERATION_LITERAL == nv.getNamedValue().eClass().
+                                                              getClassifierID())
+        {
+          EnumerationLiteral el = (EnumerationLiteral) nv.getNamedValue();
+          result.id = el.getName() ;
+        }
+      }
+      else if(Aadl2Package.INTEGER_LITERAL == classId )
+      {
+        result.qaWeight = ((IntegerLiteral) value).getValue() ;
+      }
+      else
+      {
+        // DEBUG
+        System.out.println("********** ERROR ************** " + value) ;
+      }
+    }
+    
+    return result ;
   }
 }
 
@@ -210,14 +281,9 @@ class QualityAttribute
 {
   public String id = "" ;
   
-  public float qaWeight = 0f ;
+  public long qaWeight = -1 ;
   
-  public float trcPerf = 0f ;
+  public int trcImpact = -1 ;
   
-  public int aqiPerf = 0 ;
-  
-  public QualityAttribute(String id)
-  {
-    this.id = id ;
-  }
+  public long aqi = -1 ;
 }
