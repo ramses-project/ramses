@@ -25,6 +25,7 @@ import org.osate.utils.PropertyUtils ;
 
 import com.google.common.collect.Sets ;
 
+import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
@@ -200,8 +201,9 @@ public class TransformationRuleSelection
     NamedElement ne = MCDAUtils.getContainingNamedElement(element) ;
     
     // Quality attribute impacts are modeled by a list of AADL record properties.
-    List<RecordValue> recs = PropertyUtils.getListRecordValue(ne,
-                                      MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS);
+    List<RecordValue> recs = 
+        MCDAUtils.getAcceptableQualityImpacts(ne);
+    
     for(RecordValue rv: recs)
     {
       EList<BasicPropertyAssociation> bpas = rv.getOwnedFieldValues() ;
@@ -269,10 +271,9 @@ public class TransformationRuleSelection
   private void setTrcPerformance(String transformationRuleName,
                                  QualityAttribute[] qas)
   {
-    String transformationId = transformationRuleName.substring(0,
-                                       transformationRuleName.lastIndexOf('/'));
-    EList<TransformationImpact> tis = TrcUtils
-    .getQualityImpactsForTransformation(trc,transformationId);
+    Transformation t = TrcUtils.getTransformationById(trc,transformationRuleName);
+    
+    EList<TransformationImpact> tis = t.getImpacts();
     
     for(TransformationImpact ti: tis)
     {

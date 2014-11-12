@@ -163,30 +163,6 @@ public class TrcUtils {
 
 	  saveTrc(getResource(trcPath, resourceSet), specification);
 	}
-
-	/**
-   * Returns the quality impact of a given transformation, for a given
-   * quality attribute 
-   *
-   * @param spec                the TRC specification object
-   * @param transformationId    String representing transformation's id
-   * @param qualityAttributeId  String identifying a quality attribute
-   */
-	public static EList<TransformationImpact> getQualityImpactsForTransformation(
-	                                                        TrcSpecification spec,
-	                                                      String transformationId)
-	{
-	  for(Transformation trans: spec.getTransformationList().getTransformations())
-	  {
-	    if(trans.getName().equals(transformationId))
-	    {
-	      return trans.getImpacts() ;
-	    }
-	  }
-	  
-	  return null ;
-	}
-	
 	
 	/**
 	 * Saves the given specification at the resource location 

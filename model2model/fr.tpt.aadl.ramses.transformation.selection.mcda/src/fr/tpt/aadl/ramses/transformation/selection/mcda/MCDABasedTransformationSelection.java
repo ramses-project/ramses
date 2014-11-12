@@ -21,6 +21,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 import org.osate.utils.FileUtils ;
@@ -162,7 +163,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         // 3 - Check if Performance is available for Elements
         // TODO: add a service to get Acceptable Impact
         if(false==hasAcceptableQualityImpacts(currentElements,
-                                                   qualityAttributesIdentifiers.size()))
+                                              qualityAttributesIdentifiers.size()))
         {
           stop = true;
           _LOGGER.error("Property " + MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS +
@@ -238,25 +239,8 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   {
     for(EObject obj: currentElements)
     {
-      boolean isNamedElement = obj instanceof NamedElement; 
-      if(isNamedElement==false)
-      {
-        obj = MCDAUtils.getContainingNamedElement(obj) ;
-        if(obj == null)
-        {
-          continue ;
-        }
-      }
-      
-      NamedElement ne = (NamedElement) obj;
-      PropertyExpression pe = 
-          PropertyUtils.getPropertyValue(MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS,
-                                         ne);
-      if(pe==null)
-        continue;
-      
-      ListValue lv = (ListValue) pe;
-      if(numberOfQualityAttributes==lv.getOwnedListElements().size())
+      List<RecordValue> lv = MCDAUtils.getAcceptableQualityImpacts(obj);
+      if(numberOfQualityAttributes==lv.size())
         return true;
     }
     return false;

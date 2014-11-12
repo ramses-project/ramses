@@ -63,4 +63,49 @@ public class MCDAUtils
     
     return null ;
   }
+  
+  public static PropertyExpression getContainingPropertyExpression(String propertyName,
+                                                                   NamedElement ne)
+  {
+    PropertyExpression pe = 
+        PropertyUtils.getPropertyValue(MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS,
+                                       ne);
+    if(pe!=null)
+      return pe;
+    NamedElement parent = getContainingNamedElement(ne.eContainer());
+    if(pe==null && parent!=null)
+      return getContainingPropertyExpression(propertyName, parent);
+    return null;
+  }
+  
+  public static List<RecordValue> getAcceptableQualityImpacts(EObject currentElement)
+  {
+    List<RecordValue> result = new ArrayList<RecordValue>();
+    boolean isNamedElement = currentElement instanceof NamedElement; 
+    if(isNamedElement==false)
+    {
+      currentElement = MCDAUtils.getContainingNamedElement(currentElement) ;
+      if(currentElement == null)
+      {
+        return result ;
+      }
+    }
+
+    NamedElement ne = (NamedElement) currentElement;
+    PropertyExpression pe = 
+        MCDAUtils.getContainingPropertyExpression(
+                                                  MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS,
+                                                  ne);
+    if(pe==null)
+      return result;
+
+    ListValue lv = (ListValue) pe;
+    for(PropertyExpression rv : lv.getOwnedListElements())
+    {
+      result.add((RecordValue)rv);
+    }
+    return result;
+  }
+  
+  
 }
