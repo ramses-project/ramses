@@ -65,8 +65,8 @@ public class TransformationRuleSelection
     // attribute "trc" would give you the impact of transformations on QA
     // attribute "alternativeMap" gives you the transformation rules alternatives to consider
     // QA model (quality attibutes definition and weights) is an excel file referenced
-    // air files should be obtained from EObjects in the matched elements
-    //    --> compute average values if several (and different) air files are referenced
+    // aqi files should be obtained from EObjects in the matched elements
+    //    --> compute average values if several (and different) aqi files are referenced
     
     // from the root system
     List<Set<RuleApplicationTulpe>> sets = 
@@ -130,11 +130,11 @@ public class TransformationRuleSelection
     for(RuleApplicationTulpe tuple: listTuples)
     {
       setTrcPerformance(tuple.getTransformationRuleName(), qas) ;
-      computeAirPerf(tuple.getPatternMatchedElement(), qas) ;
+      computeAqiPerf(tuple.getPatternMatchedElement(), qas) ;
       
       for(QualityAttribute currentQa: qas)
       {
-        currentQaPerf = currentQa.qaWeight * (currentQa.trcPerf + currentQa.airPerf) / 2 ;
+        currentQaPerf = currentQa.qaWeight * (currentQa.trcPerf + currentQa.aqiPerf) / 2 ;
         result += currentQaPerf ;
       }
     }
@@ -143,7 +143,7 @@ public class TransformationRuleSelection
   }
 
 
-  private void computeAirPerf(List<EObject> patternMatchedElement,
+  private void computeAqiPerf(List<EObject> patternMatchedElement,
                           QualityAttribute[] qas)
   {
     int[] count = new int[qas.length] ;
@@ -155,11 +155,11 @@ public class TransformationRuleSelection
     
     for(EObject element: patternMatchedElement)
     {
-      boolean[] hasAir = addAirPerf(element, qas) ;
+      boolean[] hasAqi = addAqiPerf(element, qas) ;
       
       for(int i = 0 ; i < qas.length ; i++)
       {
-        if(hasAir[i])
+        if(hasAqi[i])
         {
           count[i]++ ;
         }
@@ -169,11 +169,11 @@ public class TransformationRuleSelection
     for(int i = 0 ; i < qas.length ; i++)
     {
       // the mean of provided performances for a given quality attribute.
-      qas[i].airPerf /= count[i] ;
+      qas[i].aqiPerf /= count[i] ;
     }
   }
 
-  private boolean[] addAirPerf(EObject element, QualityAttribute[] qas)
+  private boolean[] addAqiPerf(EObject element, QualityAttribute[] qas)
   {
     // get Acceptable_Quality_Impacts: 
     // list of MCDA::Acceptable_Quality_Impact_Type applies to (Element);
@@ -191,7 +191,7 @@ public class TransformationRuleSelection
                                                                transformationRuleName.lastIndexOf('/'));
     for(int i=0;i<qas.length;i++)
     {
-      String qualityAttributeId = qas[i].getId();
+      String qualityAttributeId = qas[i].id;
       int impact = TrcUtils
           .getQualityImpactsForTransformation(trc,transformationId,qualityAttributeId);
     }
@@ -214,16 +214,10 @@ class QualityAttribute
   
   public float trcPerf = 0f ;
   
-  public int airPerf = 0 ;
+  public int aqiPerf = 0 ;
   
   public QualityAttribute(String id)
   {
     this.id = id ;
   }
-  
-  String getId()
-  {
-    return this.id;
-  }
-
 }
