@@ -197,71 +197,68 @@ public class TransformationRuleSelection
       result[i] = false ;
     }
     
-    if(element instanceof NamedElement)
+    NamedElement ne = MCDAUtils.getContainingNamedElement(element) ;
+    
+    // Quality attribute impacts are modeled by a list of AADL record properties.
+    List<RecordValue> recs = PropertyUtils.getListRecordValue(ne,
+                                      MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS);
+    for(RecordValue rv: recs)
     {
-      NamedElement ne = (NamedElement) element ;
+      EList<BasicPropertyAssociation> bpas = rv.getOwnedFieldValues() ;
+      PropertyExpression value ;
+      int classId ;
+      long impact = -1l ;
+      QualityAttribute selectedQa = null ;
       
-      // Quality attribute impacts are modeled by a list of AADL record properties.
-      List<RecordValue> recs = PropertyUtils.getListRecordValue(ne,
-                                        MCDAUtils.ACCEPTABLE_QUALITY_IMPACT_PS);
-      for(RecordValue rv: recs)
+      for(BasicPropertyAssociation bpa : bpas)
       {
-        EList<BasicPropertyAssociation> bpas = rv.getOwnedFieldValues() ;
-        PropertyExpression value ;
-        int classId ;
-        long impact = -1l ;
-        QualityAttribute selectedQa = null ;
+        value = bpa.getOwnedValue() ;
+        classId = value.eClass().getClassifierID() ;
         
-        for(BasicPropertyAssociation bpa : bpas)
+        if(Aadl2Package.NAMED_VALUE == classId)
         {
-          value = bpa.getOwnedValue() ;
-          classId = value.eClass().getClassifierID() ;
-          
-          if(Aadl2Package.NAMED_VALUE == classId)
-          {
-            NamedValue nv = (NamedValue) value;
+          NamedValue nv = (NamedValue) value;
 
-            if (Aadl2Package.ENUMERATION_LITERAL == nv.getNamedValue().eClass().
-                                                                  getClassifierID())
+          if (Aadl2Package.ENUMERATION_LITERAL == nv.getNamedValue().eClass().
+                                                                getClassifierID())
+          {
+            String enumLiteral = ((EnumerationLiteral) nv.getNamedValue()).
+                                                                   getName() ;
+            for(int i=0 ; i<qas.length; i++)
             {
-              String enumLiteral = ((EnumerationLiteral) nv.getNamedValue()).
-                                                                     getName() ;
-              for(int i=0 ; i<qas.length; i++)
+              if(enumLiteral.equalsIgnoreCase(qas[i].id))
               {
-                if(enumLiteral.equalsIgnoreCase(qas[i].id))
-                {
-                  selectedQa = qas[i] ;
-                  result[i] = true ;
-                  break ;
-                }
-              }
-              
-              // Early affectation.
-              if(impact != -1l)
-              {
-                selectedQa.aqi += impact ; 
-                selectedQa = null ;
-                impact = -1l ;
+                selectedQa = qas[i] ;
+                result[i] = true ;
+                break ;
               }
             }
-          }
-          else if(Aadl2Package.INTEGER_LITERAL == classId )
-          {
-            impact = ((IntegerLiteral) value).getValue() ;
             
             // Early affectation.
-            if(selectedQa != null)
+            if(impact != -1l)
             {
               selectedQa.aqi += impact ; 
               selectedQa = null ;
               impact = -1l ;
             }
           }
-          else
+        }
+        else if(Aadl2Package.INTEGER_LITERAL == classId )
+        {
+          impact = ((IntegerLiteral) value).getValue() ;
+          
+          // Early affectation.
+          if(selectedQa != null)
           {
-            // DEBUG
-            System.out.println("********** ERROR ************** " + value) ;
+            selectedQa.aqi += impact ; 
+            selectedQa = null ;
+            impact = -1l ;
           }
+        }
+        else
+        {
+          // DEBUG
+          System.out.println("********** ERROR ************** " + value) ;
         }
       }
     }

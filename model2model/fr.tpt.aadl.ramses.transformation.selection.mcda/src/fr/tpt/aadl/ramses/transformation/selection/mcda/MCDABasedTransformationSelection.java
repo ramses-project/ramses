@@ -225,9 +225,13 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       boolean isNamedElement = obj instanceof NamedElement; 
       if(isNamedElement==false)
       {
-        // TODO: look in eContainer...
-        continue;
+        obj = MCDAUtils.getContainingNamedElement(obj) ;
+        if(obj == null)
+        {
+          continue ;
+        }
       }
+      
       NamedElement ne = (NamedElement) obj;
       PropertyExpression pe = 
           PropertyUtils.getPropertyValue("Acceptable_Impact",

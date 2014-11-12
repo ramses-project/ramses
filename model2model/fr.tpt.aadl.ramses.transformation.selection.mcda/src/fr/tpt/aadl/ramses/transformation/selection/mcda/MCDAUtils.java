@@ -3,10 +3,12 @@ package fr.tpt.aadl.ramses.transformation.selection.mcda;
 import java.util.ArrayList ;
 import java.util.List ;
 
+import org.eclipse.emf.ecore.EObject ;
 import org.osate.aadl2.AbstractNamedValue ;
 import org.osate.aadl2.BasicPropertyAssociation ;
 import org.osate.aadl2.EnumerationLiteral ;
 import org.osate.aadl2.ListValue ;
+import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.NamedValue ;
 import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.RecordValue ;
@@ -45,5 +47,20 @@ public class MCDAUtils
       }
     }
     return result;
+  }
+
+  public static NamedElement getContainingNamedElement(EObject obj)
+  {
+    while(obj != null)
+    {
+      if(obj instanceof NamedElement)
+      {
+        return (NamedElement) obj ;
+      }
+      
+      obj = obj.eContainer() ;
+    }
+    
+    return null ;
   }
 }
