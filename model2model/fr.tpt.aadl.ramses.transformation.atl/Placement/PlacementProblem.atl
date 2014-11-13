@@ -25,9 +25,8 @@
 module PlacementProblem;
 create OUT : AADLBA 	from IN : AADLI;
 
--- Actual_Processor_Binding => (reference (Node1) applies to SIL0 (sequence); 
 
-rule softwareComponent_binding
+abstract rule m_SoftwareComponentPlacement
 {
     from
          swCpt:AADLI!ComponentInstance, -- swCpt représente le composant ou process SIL0
@@ -46,11 +45,9 @@ rule softwareComponent_binding
            swCpt.category = #process -- SoftComp <- process
             and
            (hwCpt.category = #processor or hwCpt.category.getName() = 'virtual processor')
-            and
-           not (swCpt.ownedPropertyAssociation->exists(	e | e.property.name = 'Actual_Processsor_Binding')) -- check that component is not already deployed...
         )
     to
-        p : AADLBA!PropertyAssociation -- qui permet de créer une propriété AADL
+        p : AADLBA!PropertyAssociation
         (
             property  <- thisModule.getProperty('Actual_Processsor_Binding'), -- property <- propertyName
             appliesTo <- Sequence{swCpt}, -- liste de SIL0
@@ -66,5 +63,29 @@ rule softwareComponent_binding
 		cpe: AADLBA!ContainmentPathElement
 		(
 			namedElement <- hwCpt.Subcomponent.NamedElement
+		)
+}
+
+-- @extends m_SoftwareComponentPlacement
+rule m_SoftwareComponentPlacement_NoPlacement
+{
+	from
+         swCpt:AADLI!ComponentInstance, -- swCpt représente le composant ou process SIL0
+         hwCpt:AADLI!ComponentInstance
+		 (
+		 	not swCpt.hasProperty('Actual_Processsor_Binding')
+		) -- check that component is not already deployed...
+		 	
+}
+-- @extends m_SoftwareComponentPlacement
+rule m_SoftwareComponentPlacement_AllowedPlacement
+{
+	from
+         swCpt:AADLI!ComponentInstance, -- swCpt représente le composant ou process SIL0
+         hwCpt:AADLI!ComponentInstance
+		 (
+		 	swCpt.hasProperty('Allowed_Processsor_Binding')
+			-- and
+			-- TODO check that hwCpt is in the list of allowed processors for binding
 		)
 }
