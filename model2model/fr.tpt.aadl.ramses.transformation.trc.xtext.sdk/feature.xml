@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature id="fr.tpt.aadl.ramses.transformation.trc.xtext.sdk"
+	label="TRC SDK Feature "
+	version="1.0.0.qualifier">
+	<plugin
+			id="fr.tpt.aadl.ramses.transformation.trc.xtext"
+			download-size="0"
+			install-size="0"
+			version="0.0.0"
+			unpack="false"/>
+	<plugin
+			id="fr.tpt.aadl.ramses.transformation.trc.xtext.ui"
+			download-size="0"
+			install-size="0"
+			version="0.0.0"
+			unpack="false"/>
+</feature>

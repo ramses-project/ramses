@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+
+  <extension point="org.eclipse.emf.ecore.generated_package">
+    <package 
+       uri = "http://www.tpt.fr/aadl/ramses/transformation/trc/xtext/TRC" 
+       class = "fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.TRCPackage"
+       genModel = "model/generated/TRC.genmodel" /> 
+	
+  </extension>
+
+
+
+</plugin>

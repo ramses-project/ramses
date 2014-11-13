@@ -1,0 +1,70 @@
+--
+-- AADL-RAMSES
+-- 
+-- Copyright © 2012 TELECOM ParisTech and CNRS
+-- 
+-- TELECOM ParisTech/LTCI
+-- 
+-- Authors: see AUTHORS
+-- 
+-- This program is free software: you can redistribute it and/or modify 
+-- it under the terms of the Eclipse Public License as published by Eclipse,
+-- either version 1.0 of the License, or (at your option) any later version.
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-- Eclipse Public License for more details.
+-- You should have received a copy of the Eclipse Public License
+-- along with this program.  If not, see 
+-- http://www.eclipse.org/org/documents/epl-v10.php
+--
+
+-- @nsURI AADLI=http:///AADL2/instance
+-- @atlcompiler emftvm
+
+module PlacementProblem;
+create OUT : AADLBA 	from IN : AADLI;
+
+-- Actual_Processor_Binding => (reference (Node1) applies to SIL0 (sequence); 
+
+rule softwareComponent_binding
+{
+    from
+         swCpt:AADLI!ComponentInstance, -- swCpt représente le composant ou process SIL0
+         hwCpt:AADLI!ComponentInstance
+        (
+           swCpt.ownedPropertyAssociation->any(ps|ps.property.name='Alstom_Components').ownedValue.namedValue.name= 'SIL0' --not sur -- necessite de créer un property set pour alstom
+		    --property set Alstom_Components is
+			-- ...
+			-- name : aadlinteger
+			-- Criticity : aadlinteger
+			-- Deadline : aadlinteger applies to (...);
+			-- Source_Text : inherit list of aadlstring applies to (data, port, thread, ...);
+			-- ...
+			--end Alstom_Components;		   
+            and
+           swCpt.category = #process -- SoftComp <- process
+            and
+           (hwCpt.category = #processor or hwCpt.category.getName() = 'virtual processor')
+            and
+           not (swCpt.ownedPropertyAssociation->exists(	e | e.property.name = 'Actual_Processsor_Binding')) -- check that component is not already deployed...
+        )
+    to
+        p : AADLBA!PropertyAssociation -- qui permet de créer une propriété AADL
+        (
+            property  <- thisModule.getProperty('Actual_Processsor_Binding'), -- property <- propertyName
+            appliesTo <- Sequence{swCpt}, -- liste de SIL0
+            ownedValue <- modalpropvalue  -- ownedValue <- ModalPropertyValue
+        ),
+		modalpropvalue : AADLBA!ModalPropertyValue (
+			ownedValue <- ov --hwCpt.Subcomponent.NamedElement  -- ownedValue <- PropertyExpression -> Element
+		),
+		ov: AADLBA!ReferenceValue
+		(
+			containmentPathElement <- cpe
+		),
+		cpe: AADLBA!ContainmentPathElement
+		(
+			namedElement <- hwCpt.Subcomponent.NamedElement
+		)
+}

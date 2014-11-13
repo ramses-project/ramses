@@ -19,13 +19,11 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.utils.Aadl2Utils;
 
 import fr.tpt.aadl.ramses.control.support.utils.Names;
+import fr.tpt.aadl.ramses.transformation.trc.xtext.TRCStandaloneSetup;
+import fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.Transformation;
+import fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.TransformationDependency;
+import fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.TrcSpecification;
 import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
-
-import org.trc.xtext.dsl.DslStandaloneSetup;
-import org.trc.xtext.dsl.dsl.Module;
-import org.trc.xtext.dsl.dsl.Transformation;
-import org.trc.xtext.dsl.dsl.TransformationDependency;
-import org.trc.xtext.dsl.dsl.TrcSpecification;
 
 
 public class UpdateTrcModulesActionHandler extends AbstractHandler {
@@ -107,7 +105,7 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 
 //	r.delete(null);		
 	
-	new DslStandaloneSetup().createInjectorAndDoEMFRegistration();
+	new TRCStandaloneSetup().createInjectorAndDoEMFRegistration();
 		
 //	resource.save(null);
 
