@@ -160,7 +160,6 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         
         
         // 3 - Check if Performance is available for Elements
-        // TODO: add a service to get Acceptable Impact
         if(false==hasAcceptableQualityImpacts(currentElements,
                                               qualityAttributesIdentifiers.size()))
         {
