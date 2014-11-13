@@ -469,7 +469,7 @@ public class AadlToOSEKCUnparser extends AadlToXUnparser implements AadlTargetUn
 		 * true
 		 */
 		if (os.getStartupHook() == false) {
-			if (PropertyUtils.findProperty("Initialize_Entrypoint", thread) != null)
+			if (PropertyUtils.findPropertyAssociation("Initialize_Entrypoint", thread) != null)
 				os.setStartupHook(true);
 		}
 
@@ -477,7 +477,7 @@ public class AadlToOSEKCUnparser extends AadlToXUnparser implements AadlTargetUn
 		 * If one thread/device contains Finalize_Entrypoint SHUTDOWNHOOK = true
 		 */
 		if (os.getShutdownHook() == false) {
-			if (PropertyUtils.findProperty("Finalize_Entrypoint", thread) != null)
+			if (PropertyUtils.findPropertyAssociation("Finalize_Entrypoint", thread) != null)
 				os.setShutdownHook(true);
 		}
 

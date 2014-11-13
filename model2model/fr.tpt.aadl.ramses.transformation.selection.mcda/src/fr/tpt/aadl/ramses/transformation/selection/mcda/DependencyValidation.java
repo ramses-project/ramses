@@ -80,11 +80,17 @@ public class DependencyValidation
     
     int indexInRuleApplicationList = ruleApplicationList.indexOf(dependencyElements);
     
-    String solutionRule = ruleApplicationList
-        .get(indexInRuleApplicationList)
-        .getTransformationRuleName();
-    
-    return solutionRule.equals(dependencyRule) ;
+    if(indexInRuleApplicationList != -1)
+    {
+      String solutionRule = ruleApplicationList.get(indexInRuleApplicationList)
+          .getTransformationRuleName();
+      
+      return solutionRule.equals(dependencyRule) ;
+    }
+    else
+    {
+      return false ;
+    }
   }
 
 }

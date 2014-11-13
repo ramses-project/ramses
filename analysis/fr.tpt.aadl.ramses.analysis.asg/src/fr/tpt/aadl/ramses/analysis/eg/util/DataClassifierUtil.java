@@ -73,7 +73,7 @@ public class DataClassifierUtil
   {
     DataClassifier dc = null;
     
-    PropertyAssociation pa = PropertyUtils.findProperty("Base_Type", e);
+    PropertyAssociation pa = PropertyUtils.findPropertyAssociation("Base_Type", e);
     
     if(pa != null)
     {

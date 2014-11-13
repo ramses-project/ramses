@@ -102,7 +102,7 @@ public class GeneratorUtils
         DataClassifier dc = (DataClassifier) d ;
         EList<PropertyExpression> initialValueProperty =
             PropertyUtils
-            .getPropertyExpression(dc,
+            .findPropertyExpression(dc,
                                    DataModelProperties.INITIAL_VALUE) ;
         setInitialization(dc, initialization, initialValueProperty, language) ;
         return initialization.toString() ;
@@ -123,7 +123,7 @@ public class GeneratorUtils
                                        ProcessSubcomponent aProcessSubcomponent)
   {
     PropertyAssociation aPropertyAssociation =
-          PropertyUtils.findProperty("Actual_Processor_Binding",
+          PropertyUtils.findPropertyAssociation("Actual_Processor_Binding",
                                      aProcessSubcomponent) ;
 
     if(aPropertyAssociation == null)
@@ -285,7 +285,7 @@ public class GeneratorUtils
   {
     // aProcessSubcomponent could be a of class ComponentInstance as well
     PropertyAssociation aPropertyAssociation =
-          PropertyUtils.findProperty("Actual_Memory_Binding",
+          PropertyUtils.findPropertyAssociation("Actual_Memory_Binding",
                                      aProcessSubcomponent) ;
 
     if(aPropertyAssociation != null)

@@ -59,7 +59,7 @@ import org.osate.aadl2.DataSubcomponent ;
 import org.osate.aadl2.DataSubcomponentType ;
 import org.osate.aadl2.DataType ;
 import org.osate.aadl2.DefaultAnnexLibrary ;
-import org.osate.aadl2.DefaultAnnexSubclause;
+import org.osate.aadl2.DefaultAnnexSubclause ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.EnumerationLiteral ;
 import org.osate.aadl2.Feature ;
@@ -617,7 +617,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
     EList<PropertyExpression> numberRepresentation =
           PropertyUtils
-                .getPropertyExpression(dataTypeHolder.klass,
+                .findPropertyExpression(dataTypeHolder.klass,
                                        DataModelProperties.NUMBER_REPRESENTATION) ;
     String numberRepresentationValue = "" ;
 
@@ -635,7 +635,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     // define types the current data type depends on
     EList<PropertyExpression> referencedBaseType =
           PropertyUtils
-                .getPropertyExpression(dataTypeHolder.klass,
+                .findPropertyExpression(dataTypeHolder.klass,
                                        DataModelProperties.BASE_TYPE) ;
 
     for(PropertyExpression baseTypeProperty : referencedBaseType)
@@ -694,7 +694,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         List<String> stringifiedRepresentation = new ArrayList<String>() ;
         EList<PropertyExpression> dataRepresentation =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.REPRESENTATION) ;
 
         for(PropertyExpression representationProperty : dataRepresentation)
@@ -716,7 +716,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         EList<PropertyExpression> dataEnumerators =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ENUMERATORS) ;
 
         for(PropertyExpression enumeratorProperty : dataEnumerators)
@@ -765,7 +765,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         StringBuilder structDefinition = new StringBuilder("typedef struct " + id + " {\n");
         EList<PropertyExpression> elementNames =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ELEMENT_NAMES) ;
         if(elementNames.isEmpty()==false)
         {
@@ -790,7 +790,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
           EList<PropertyExpression> elementTypes =
                 PropertyUtils
-                      .getPropertyExpression(dataTypeHolder.klass,
+                      .findPropertyExpression(dataTypeHolder.klass,
                                              DataModelProperties.BASE_TYPE) ;
 
           for(PropertyExpression elementTypeProperty : elementTypes)
@@ -902,7 +902,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     	StringBuilder unionDeclaration = new StringBuilder("typedef union " + id + " {\n");
         EList<PropertyExpression> elementNames =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.ELEMENT_NAMES) ;
         List<String> stringifiedElementNames = new ArrayList<String>() ;
 
@@ -925,7 +925,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
 
         EList<PropertyExpression> elementTypes =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
 
         for(PropertyExpression elementTypeProperty : elementTypes)
@@ -963,7 +963,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
     	StringBuilder arrayDef = new StringBuilder ("typedef ");
         EList<PropertyExpression> baseType =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.BASE_TYPE) ;
         boolean found = false;
         boolean isAbstract = false;
@@ -1005,7 +1005,7 @@ public class AadlToCUnparser extends AadlProcessingSwitch
         _gtypesHeaderCode.addOutput(id) ;
         EList<PropertyExpression> arrayDimensions =
               PropertyUtils
-                    .getPropertyExpression(dataTypeHolder.klass,
+                    .findPropertyExpression(dataTypeHolder.klass,
                                            DataModelProperties.DIMENSION) ;
 
         if(arrayDimensions.isEmpty())
@@ -1756,8 +1756,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
       
       public String caseThreadSubcomponent(ThreadSubcomponent object)
       {
-        PropertyAssociation pa = PropertyUtils.getPropertyAssociation(object,
-                                           "Compute_Entrypoint_Call_Sequence") ;
+        PropertyAssociation pa = PropertyUtils.findPropertyAssociation(
+                                   "Compute_Entrypoint_Call_Sequence", object) ;
         
         if(pa != null)
         {
@@ -1766,8 +1766,8 @@ public class AadlToCUnparser extends AadlProcessingSwitch
           _currentBehaviorCallSequence = (SubprogramCallSequence) rv.getContainmentPathElements()
                                                                     .get(0)
                                                                     .getNamedElement() ;
-          pa = PropertyUtils.getPropertyAssociation(object,
-                                                    "Initialize_Entrypoint_Call_Sequence") ;
+          pa = PropertyUtils.findPropertyAssociation(
+                                "Initialize_Entrypoint_Call_Sequence", object) ;
           if(pa != null)
           {
             rv = (ReferenceValue) pa.getOwnedValues().get(0).getOwnedValue() ;

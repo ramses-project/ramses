@@ -1,6 +1,8 @@
 package fr.tpt.aadl.ramses.transformation.selection.mcda;
 
 import java.util.ArrayList ;
+import java.util.Comparator ;
+import java.util.HashMap ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.Map ;
@@ -56,8 +58,7 @@ public class TransformationRuleSelection
     
     
     
-    for(List<RuleApplicationTulpe> potentialResults
-        : orderedPotentialResults)
+    for(List<RuleApplicationTulpe> potentialResults: orderedPotentialResults)
     {
       // 2 - validate dependencies
       DependencyValidation depValidation = 
@@ -67,6 +68,7 @@ public class TransformationRuleSelection
       if(validResult)
         return potentialResults;
     }
+    
     return null ;
   }
   
@@ -74,15 +76,6 @@ public class TransformationRuleSelection
   // This map is sorted according to the performance of the list of tuples.
   private SortedMap<List<RuleApplicationTulpe>, Float> orderPotentialSolutions()
   {
-
-    // TODO: SG, if you can work on that part, it would be great
-    // attribute "trc" would give you the impact of transformations on QA
-    // attribute "alternativeMap" gives you the transformation rules alternatives to consider
-    // QA model (quality attibutes definition and weights) is an excel file referenced
-    // aqi files should be obtained from EObjects in the matched elements
-    //    --> compute average values if several (and different) aqi files are referenced
-    
-    // from the root system
     List<Set<RuleApplicationTulpe>> sets = 
         new ArrayList<Set<RuleApplicationTulpe>>(alternativeMap.size());
     
@@ -121,14 +114,55 @@ public class TransformationRuleSelection
   private SortedMap<List<RuleApplicationTulpe>, Float>orderSolutions(
                               Set<List<RuleApplicationTulpe>> unsortedSolutions)
   {
+    final HashMap<List<RuleApplicationTulpe>, Float> ref =
+        new HashMap<List<RuleApplicationTulpe>, Float>(unsortedSolutions.size());
+    
+    Comparator<List<RuleApplicationTulpe>> comp = new Comparator
+                                                  <List<RuleApplicationTulpe>>()
+    {
+      @Override
+      public int compare(List<RuleApplicationTulpe> o1,
+                         List<RuleApplicationTulpe> o2)
+      {
+        int result = 0 ;
+        
+        Float perfO1 = ref.get(o1) ;
+        Float perfO2 = ref.get(o2) ;
+        
+        result = perfO2.compareTo(perfO1) ; // Descending order.
+        
+        if(result == 0)
+        {
+          result = -1 ; // Priority to the already stored tuple. 
+        }
+        
+        return result ;
+      }
+    } ;
+    
     TreeMap<List<RuleApplicationTulpe>, Float> result =
-              new TreeMap<List<RuleApplicationTulpe>, Float>();
+              new TreeMap<List<RuleApplicationTulpe>, Float>(comp);
     
     for(List<RuleApplicationTulpe> listTuples: unsortedSolutions)
     {
       float perf = computePerformance(listTuples) ;
-      result.put(listTuples, perf) ; // Sorts according to performance/ natural order.
+      ref.put(listTuples, perf) ;
     }
+    
+    result.putAll(ref);
+    
+    StringBuilder sb  = new StringBuilder("list of tuples in descending order: \n") ;
+    
+    for(Entry<List<RuleApplicationTulpe>, Float> e: result.entrySet())
+    {
+      sb.append("   list #");
+      sb.append(e.getKey().hashCode());
+      sb.append(" with perf:");
+      sb.append(e.getValue()) ;
+      sb.append('\n') ;
+    }
+    
+    _LOGGER.debug(sb.toString()) ;
     
     return result ;
   }
@@ -141,21 +175,47 @@ public class TransformationRuleSelection
     
     QualityAttribute[] qas = getQualityAttributes(rootSystem) ;
     
+    StringBuilder sb = new StringBuilder() ;
+    sb.append("--- liste of tuples #" + listTuples.hashCode() + " ---\n") ;
+    
     for(RuleApplicationTulpe tuple: listTuples)
     {
       setTrcPerformance(tuple.getTransformationRuleName(), qas) ;
       computeAqiPerf(tuple.getPatternMatchedElement(), qas) ;
       
+      sb.append("   for tuple " + tuple.hashCode());
+      sb.append(" ; ");
+      sb.append("number of matched elements: ");
+      sb.append(tuple.getPatternMatchedElement().size());
+      sb.append('\n');
+      
       for(QualityAttribute currentQa: qas)
       {
         currentQaPerf = currentQa.qaWeight * (currentQa.trcImpact + currentQa.aqi) / 2 ;
         result += currentQaPerf ;
+        
+        sb.append("       ");
+        sb.append(currentQa.id);
+        sb.append(" perf: ");
+        sb.append(currentQaPerf);
+        sb.append(" weight: ");
+        sb.append(currentQa.qaWeight);
+        sb.append(" aqi: ");
+        sb.append(currentQa.aqi);
+        sb.append(" trcImpact: ");
+        sb.append(currentQa.trcImpact) ;
+        sb.append('\n');
       }
     }
     
+    sb.append("--- global performance: ");
+    sb.append(result);
+    sb.append(" ---\n");
+    
+    _LOGGER.debug(sb.toString()) ;
+    
     return result ;
   }
-
 
   private void computeAqiPerf(List<EObject> patternMatchedElement,
                               QualityAttribute[] qas)
@@ -165,6 +225,7 @@ public class TransformationRuleSelection
     for(int i = 0 ; i < qas.length ; i++)
     {
       count[i] = 0 ;
+      qas[i].aqi = 0l ; // Reset from the previous computation.
     }
     
     for(EObject element: patternMatchedElement)
@@ -257,11 +318,6 @@ public class TransformationRuleSelection
             impact = -1l ;
           }
         }
-        else
-        {
-          // DEBUG
-          System.out.println("********** ERROR ************** " + value) ;
-        }
       }
     }
     
@@ -338,11 +394,6 @@ public class TransformationRuleSelection
       {
         result.qaWeight = ((IntegerLiteral) value).getValue() ;
       }
-      else
-      {
-        // DEBUG
-        _LOGGER.debug("********** ERROR ************** " + value) ;
-      }
     }
     
     return result ;
@@ -354,9 +405,9 @@ class QualityAttribute
 {
   public String id = "" ;
   
-  public long qaWeight = 0 ;
+  public long qaWeight = 0l ;
   
   public int trcImpact = 0 ;
   
-  public long aqi = 0 ;
+  public long aqi = 0l ;
 }

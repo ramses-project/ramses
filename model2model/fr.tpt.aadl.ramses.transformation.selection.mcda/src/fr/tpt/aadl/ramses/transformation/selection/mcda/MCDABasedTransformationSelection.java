@@ -10,22 +10,19 @@ import java.util.Iterator ;
 import java.util.LinkedHashMap ;
 import java.util.List ;
 import java.util.Map ;
-import java.util.Properties ;
 import java.util.Map.Entry ;
+import java.util.Properties ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.NamedElement ;
-import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.instance.SystemInstance ;
 import org.osate.aadl2.modelsupport.errorreporting.AnalysisErrorReporterManager ;
 import org.osate.utils.FileUtils ;
-import org.osate.utils.PropertyUtils ;
 
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisException ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;

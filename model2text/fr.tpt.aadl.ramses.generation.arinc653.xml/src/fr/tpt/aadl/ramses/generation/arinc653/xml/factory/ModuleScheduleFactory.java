@@ -1,31 +1,28 @@
 package fr.tpt.aadl.ramses.generation.arinc653.xml.factory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayList ;
+import java.util.List ;
 
 import org.apache.log4j.Logger ;
 import org.osate.aadl2.BasicPropertyAssociation ;
-import org.osate.aadl2.ComponentCategory;
-import org.osate.aadl2.IntegerLiteral ;
-import org.osate.aadl2.ListValue;
+import org.osate.aadl2.ComponentCategory ;
+import org.osate.aadl2.ListValue ;
 import org.osate.aadl2.ModalPropertyValue ;
-import org.osate.aadl2.NamedElement;
-import org.osate.aadl2.NumberValue;
-import org.osate.aadl2.ProcessorImplementation;
-import org.osate.aadl2.ProcessorSubcomponent;
+import org.osate.aadl2.NamedElement ;
+import org.osate.aadl2.NumberValue ;
 import org.osate.aadl2.PropertyAssociation ;
-import org.osate.aadl2.PropertyExpression;
+import org.osate.aadl2.PropertyExpression ;
 import org.osate.aadl2.RecordValue ;
-import org.osate.aadl2.ReferenceValue;
-import org.osate.aadl2.VirtualProcessorSubcomponent;
-import org.osate.aadl2.instance.ComponentInstance;
-import org.osate.utils.PropertyUtils;
+import org.osate.aadl2.ReferenceValue ;
+import org.osate.aadl2.VirtualProcessorSubcomponent ;
+import org.osate.aadl2.instance.ComponentInstance ;
+import org.osate.utils.PropertyUtils ;
 
-import fr.tpt.aadl.ramses.control.support.generator.TargetProperties;
+import fr.tpt.aadl.ramses.control.support.generator.TargetProperties ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
-import fr.tpt.aadl.ramses.generation.arinc653.xml.model.ModuleSchedule;
-import fr.tpt.aadl.ramses.generation.arinc653.xml.model.PartitionSchedule;
-import fr.tpt.aadl.ramses.generation.arinc653.xml.model.SystemProperties;
+import fr.tpt.aadl.ramses.generation.arinc653.xml.model.ModuleSchedule ;
+import fr.tpt.aadl.ramses.generation.arinc653.xml.model.PartitionSchedule ;
+import fr.tpt.aadl.ramses.generation.arinc653.xml.model.SystemProperties ;
 
 
 public class ModuleScheduleFactory extends ModelFactory<ModuleSchedule> {
@@ -52,7 +49,8 @@ public class ModuleScheduleFactory extends ModelFactory<ModuleSchedule> {
 			
 			
 			NamedElement ne = processor.getContainingClassifier();
-	    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(ne, "Module_Schedule");
+	    PropertyAssociation moduleSchedulePA = PropertyUtils.
+	                               findPropertyAssociation("Module_Schedule", ne);
 	    if(moduleSchedulePA == null)
 	    {
 	      String errMsg =  "cannot fetch Module_Schedule for \'"+

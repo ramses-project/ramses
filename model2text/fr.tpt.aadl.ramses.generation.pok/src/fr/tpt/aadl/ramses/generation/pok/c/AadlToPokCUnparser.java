@@ -902,7 +902,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     deploymentImplCode.addOutputNewline("#include \"deployment.h\"") ;
     
     String propertyName = "HM_Error_ID_Levels";
-    PropertyAssociation pa = PropertyUtils.findProperty(propertyName, processor);
+    PropertyAssociation pa = PropertyUtils.findPropertyAssociation(propertyName, processor);
     
     if(pa!=null)
     {
@@ -928,7 +928,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     
     for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
     {
-      pa = PropertyUtils.findProperty(propertyName, vps);
+      pa = PropertyUtils.findPropertyAssociation(propertyName, vps);
       if(pa!=null)
       {
         partitionLevelErrors = true;
@@ -977,7 +977,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     deploymentImplCode.incrementIndent();
     
     String propertyName = "HM_Error_ID_Levels";
-    PropertyAssociation pa = PropertyUtils.findProperty(propertyName, ne);
+    PropertyAssociation pa = PropertyUtils.findPropertyAssociation(propertyName, ne);
 
     if (pa != null) {
       Property p = pa.getProperty();
@@ -1131,7 +1131,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
   private String getActionId(NamedElement ne, long errorIdentifier)
   {
     String propertyName = "HM_Error_ID_Actions";
-    PropertyAssociation pa = PropertyUtils.findProperty(propertyName, ne);
+    PropertyAssociation pa = PropertyUtils.findPropertyAssociation(propertyName, ne);
 
     if (pa != null) {
       Property p = pa.getProperty();
@@ -1385,7 +1385,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     {
       boolean foundSched = false ;
 
-      PropertyAssociation pa = PropertyUtils.getPropertyAssociation(vps, "Scheduling_Protocol");
+      PropertyAssociation pa = PropertyUtils.findPropertyAssociation(
+                                                    "Scheduling_Protocol", vps);
       if(pa!=null)
       {
         ModalPropertyValue v = pa.getOwnedValues().get(0);
@@ -1419,7 +1420,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
 
     for(VirtualProcessorSubcomponent vps : bindedVPS)
     {
-      PropertyAssociation pa = PropertyUtils.getPropertyAssociation(vps, "Scheduling_Protocol");
+      PropertyAssociation pa = PropertyUtils.findPropertyAssociation(
+                                                    "Scheduling_Protocol", vps);
       if(pa!=null)
       {
         ModalPropertyValue v = pa.getOwnedValues().get(0);
@@ -1573,7 +1575,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     
     NamedElement rootSystem = getRootSystem((AadlPackage)
                                             processor.getContainingClassifier().eContainer().eContainer());
-    PropertyAssociation moduleSchedulePA = PropertyUtils.getPropertyAssociation(rootSystem, "Module_Schedule");
+    PropertyAssociation moduleSchedulePA = PropertyUtils.findPropertyAssociation
+                                                ("Module_Schedule", rootSystem);
     if(moduleSchedulePA == null)
     {
       String errMsg =  "cannot fetch Module_Schedule for \'"+
@@ -1728,8 +1731,8 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     
     boolean needErrorHandler=false,needPartitionErrorHandler=false,needKernelErrorHandler = false;
     
-    if(PropertyUtils.findProperty("HM_Error_ID_Levels", processor) != null
-        && PropertyUtils.findProperty("HM_Error_ID_Actions", processor) != null)
+    if(PropertyUtils.findPropertyAssociation("HM_Error_ID_Levels", processor) != null
+        && PropertyUtils.findPropertyAssociation("HM_Error_ID_Actions", processor) != null)
     {
       needErrorHandler = true;
       needKernelErrorHandler = true;
@@ -1742,7 +1745,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
     ProcessorImplementation pi = (ProcessorImplementation) processor.getSubcomponentType();
     for(VirtualProcessorSubcomponent vps: pi.getOwnedVirtualProcessorSubcomponents())
     {
-      if(PropertyUtils.findProperty("HM_Error_ID_Actions", vps) != null)
+      if(PropertyUtils.findPropertyAssociation("HM_Error_ID_Actions", vps) != null)
       {
         needErrorHandler = true;
         needPartitionErrorHandler = true;
@@ -1761,7 +1764,7 @@ private void genFileIncludedMainImpl(UnparseText mainImplCode)
             (ProcessImplementation) ps.getSubcomponentType() ;
       for(ThreadSubcomponent ts : procImpl.getOwnedThreadSubcomponents())
       {
-        if(PropertyUtils.findProperty("HM_Error_ID_Actions", ts) != null)
+        if(PropertyUtils.findPropertyAssociation("HM_Error_ID_Actions", ts) != null)
         {
           needErrorHandler = true ;
           break ;
