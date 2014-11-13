@@ -67,7 +67,7 @@ public abstract class AbstractHealthMonitoringFactory extends ModelFactory<Abstr
 	
 	private void populateHMErrors(ComponentInstance element,
 			List<SystemStateEntry> sseList) {
-		PropertyAssociation pa = PropertyUtils.findProperty("HM_Error_ID_Levels", element);
+		PropertyAssociation pa = PropertyUtils.findPropertyAssociation("HM_Error_ID_Levels", element);
 		if (pa==null)
 			return;
 		
@@ -145,7 +145,7 @@ public abstract class AbstractHealthMonitoringFactory extends ModelFactory<Abstr
 
 	private void populateHMActions(ComponentInstance element, List<SystemStateEntry> sseList)
 	{
-		PropertyAssociation pa = PropertyUtils.findProperty("HM_Error_ID_Actions", element);
+		PropertyAssociation pa = PropertyUtils.findPropertyAssociation("HM_Error_ID_Actions", element);
 		if (pa==null)
 			return;
 		

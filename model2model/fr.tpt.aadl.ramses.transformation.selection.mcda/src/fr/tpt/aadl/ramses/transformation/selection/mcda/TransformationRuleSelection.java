@@ -260,7 +260,7 @@ public class TransformationRuleSelection
         else
         {
           // DEBUG
-          System.out.println("********** ERROR ************** " + value) ;
+          _LOGGER.debug("********** ERROR ************** " + value) ;
         }
       }
     }

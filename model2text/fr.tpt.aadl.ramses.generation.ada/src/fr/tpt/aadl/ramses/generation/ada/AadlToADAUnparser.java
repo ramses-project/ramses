@@ -682,7 +682,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 		 EList<PropertyExpression> numberRepresentation =
 				 PropertyUtils
-				 .getPropertyExpression(dataTypeHolder.klass,
+				 .findPropertyExpression(dataTypeHolder.klass,
 						 DataModelProperties.NUMBER_REPRESENTATION) ;
 		 String numberRepresentationValue = "" ;
 
@@ -700,7 +700,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		 // define types the current data type depends on
 		 EList<PropertyExpression> referencedBaseType =
 				 PropertyUtils
-				 .getPropertyExpression(dataTypeHolder.klass,
+				 .findPropertyExpression(dataTypeHolder.klass,
 						 DataModelProperties.BASE_TYPE) ;
 
 		 for(PropertyExpression baseTypeProperty : referencedBaseType)
@@ -773,7 +773,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 		        List<String> stringifiedRepresentation = new ArrayList<String>() ;
 		        EList<PropertyExpression> dataRepresentation =
 		              PropertyUtils
-		                    .getPropertyExpression(dataTypeHolder.klass,
+		                    .findPropertyExpression(dataTypeHolder.klass,
 		                                           DataModelProperties.REPRESENTATION) ;
 
 		        for(PropertyExpression representationProperty : dataRepresentation)
@@ -795,7 +795,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 		        EList<PropertyExpression> dataEnumerators =
 		              PropertyUtils
-		                    .getPropertyExpression(dataTypeHolder.klass,
+		                    .findPropertyExpression(dataTypeHolder.klass,
 		                                           DataModelProperties.ENUMERATORS) ;
 
 		        for(PropertyExpression enumeratorProperty : dataEnumerators)
@@ -844,7 +844,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 StringBuilder structDefinition = new StringBuilder("type " + id + " is record\n");
 			 EList<PropertyExpression> elementNames =
 					 PropertyUtils
-					 .getPropertyExpression(dataTypeHolder.klass,
+					 .findPropertyExpression(dataTypeHolder.klass,
 							 DataModelProperties.ELEMENT_NAMES) ;
 			 if(elementNames.isEmpty()==false)
 			 {
@@ -869,7 +869,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 				 EList<PropertyExpression> elementTypes =
 						 PropertyUtils
-						 .getPropertyExpression(dataTypeHolder.klass,
+						 .findPropertyExpression(dataTypeHolder.klass,
 								 DataModelProperties.BASE_TYPE) ;
 
 				 for(PropertyExpression elementTypeProperty : elementTypes)
@@ -975,7 +975,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 			 StringBuilder unionDeclaration = new StringBuilder("case " + id + " is ");
 		        EList<PropertyExpression> elementNames =
 		              PropertyUtils
-		                    .getPropertyExpression(dataTypeHolder.klass,
+		                    .findPropertyExpression(dataTypeHolder.klass,
 		                                           DataModelProperties.ELEMENT_NAMES) ;
 		        List<String> stringifiedElementNames = new ArrayList<String>() ;
 
@@ -998,7 +998,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 
 		        EList<PropertyExpression> elementTypes =
 		              PropertyUtils
-		                    .getPropertyExpression(dataTypeHolder.klass,
+		                    .findPropertyExpression(dataTypeHolder.klass,
 		                                           DataModelProperties.BASE_TYPE) ;
 
 		        for(PropertyExpression elementTypeProperty : elementTypes)
@@ -1043,7 +1043,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 _gtypesHeaderCode.addOutput("subtype "+id+" is " +parentID);
 				 EList<PropertyExpression> arrayDimensions =
 						 PropertyUtils
-						 .getPropertyExpression(dataTypeHolder.klass,
+						 .findPropertyExpression(dataTypeHolder.klass,
 								 DataModelProperties.DIMENSION) ;
 
 				 if(false == arrayDimensions.isEmpty())
@@ -1076,7 +1076,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 
 				 EList<PropertyExpression> baseType =
 						 PropertyUtils
-						 .getPropertyExpression(dataTypeHolder.klass,
+						 .findPropertyExpression(dataTypeHolder.klass,
 								 DataModelProperties.BASE_TYPE) ;
 				 String baseTypeName="";
 				 boolean found = false;
@@ -1115,7 +1115,7 @@ public class AadlToADAUnparser extends AadlProcessingSwitch implements AadlGener
 				 //			 _gtypesHeaderCode.addOutput(id) ;
 				 EList<PropertyExpression> arrayDimensions =
 						 PropertyUtils
-						 .getPropertyExpression(dataTypeHolder.klass,
+						 .findPropertyExpression(dataTypeHolder.klass,
 								 DataModelProperties.DIMENSION) ;
 
 				 if(arrayDimensions.isEmpty())
