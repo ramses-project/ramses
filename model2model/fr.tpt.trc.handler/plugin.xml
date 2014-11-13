@@ -17,7 +17,7 @@
              </instanceof>
              <test
                property="org.eclipse.core.resources.extension"
-               value="trcDsl">
+               value="trc">
              </test>
            </iterate>
            <count
