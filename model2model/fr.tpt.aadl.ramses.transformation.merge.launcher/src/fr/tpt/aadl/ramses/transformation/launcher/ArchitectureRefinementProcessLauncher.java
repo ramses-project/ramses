@@ -82,6 +82,11 @@ public class ArchitectureRefinementProcessLauncher {
   
   private final File outputPathSave ;
   
+  public File getOutputPathSave()
+  {
+    return outputPathSave ;
+  }
+
   public ArchitectureRefinementProcessLauncher(TrcSpecification trcSpec,
                                                 ResourceSet resourceSet,
                                                 RamsesConfiguration config,
@@ -451,7 +456,7 @@ public class ArchitectureRefinementProcessLauncher {
     rootTransfo.setList(l);
     
     // retreive module dependencies for current transformation.
-    List<Module> completeModuleList = TrcUtils.buildDependencyList(transfoList);
+    List<Module> completeModuleList = TrcUtils.buildVerticalDependencyList(transfoList);
     // add dependencies in the workflow model.
     for(int i = completeModuleList.size()-1; i>=0; i--)
     {

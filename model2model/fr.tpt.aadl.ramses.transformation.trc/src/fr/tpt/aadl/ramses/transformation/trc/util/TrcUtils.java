@@ -68,7 +68,7 @@ public class TrcUtils {
 	 * @param transformationName   	String representing transformation's name
 	 * @param transformationFile   	String representing transformation's location (.atl transformation)
 	 */
-	public static void addTransformation(String trcPath,
+	public static void addTransformationToTrc(String trcPath,
 	                                     ResourceSet resourceSet,
 	                                     String transformationName, 
 	                                     List<String> transformationFile){
@@ -257,7 +257,8 @@ public class TrcUtils {
     return null;
   }
 	
-	public static List<Module> buildDependencyList(List<Transformation> inputTransformationList)
+	public static List<Module> 
+	  buildVerticalDependencyList(List<Transformation> inputTransformationList)
 	{
 		ArrayList<Module> result = new ArrayList<Module>();
 		Transformation T0 = inputTransformationList.get(0);
@@ -343,7 +344,17 @@ public class TrcUtils {
 		return result;
 	}
 	
-	// return list of possible rule according to dependencies of an appliedRule on an EObject
+	/**
+   *  Returns the list of RuleApplication (tuples <Elements,Rule>) that could
+   *  be selected when the tuple <candidateObjects, appliedRule> is 
+   *  selected
+   *  
+   * @param trcSpecification the TRC
+   * @param candidateObjects EObjects to be transformed by appliedRule 
+   * @param appliedRule selected transformation rule
+   * @return the list of RuleApplication (tuples <Elements,Rule>) that could
+   *  be excluded
+   */
 	public static List<List<RuleApplicationTulpe>> getInclusionDependencies(TrcSpecification spec,
 	                                                                        List<EObject> eObjList,
 	                                                                        String appliedRule)
@@ -366,7 +377,19 @@ public class TrcUtils {
 		return result;
 	}
 	
-	//return list of possible rule according to dependencies of an appliedRule on an EObject
+	/**
+   *  Returns the list of TaggedRuleApplication (tuples <Elements,Rule> marked as
+   *  included or excluded) that have to be respected when the 
+   *  tuple <candidateObjects, appliedRule> is selected. The result is a list of
+   *  list implementing a disjunctive normal form: elements from the first list 
+   *  are separated with ORs; elements from the second list are separated by ANDs
+   *  
+   * @param trcSpecification the TRC
+   * @param candidateObjects EObjects to be transformed by appliedRule 
+   * @param appliedRule selected transformation rule
+   * @return TaggedRuleApplication (tuples <Elements,Rule> marked as
+   *  included or excluded) that have to be respected
+   */
 	public static List<List<TaggedRuleApplicationTulpe>> getNormalizedDependencies(TrcSpecification spec,
 	                                                                         List<EObject> eObjList,
 	                                                                         String appliedRule)
@@ -577,6 +600,18 @@ public class TrcUtils {
 		return result;
 	}
 
+	
+	/**
+	 *  Returns the list of RuleApplication (tuples <Elements,Rule>) that have
+	 *  to be excluded when the tuple <candidateObjects, appliedRule> is 
+	 *  selected
+	 *  
+	 * @param trcSpecification the TRC
+	 * @param candidateObjects EObjects to be transformed by appliedRule 
+	 * @param appliedRule selected transformation rule
+	 * @return the list of RuleApplication (tuples <Elements,Rule>) that have
+   *  to be excluded
+	 */
 	public static List<List<RuleApplicationTulpe>> getExlcusionDependencies(TrcSpecification trcSpecification,
 	                                                                        List<EObject> candidateObjects,
 	                                                                        String appliedRule) {

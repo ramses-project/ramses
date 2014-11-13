@@ -71,6 +71,8 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 
   private List<String> qualityAttributesIdentifiers;
   
+  private ArchitectureRefinementProcessLauncher mergeLauncher;
+  
   public MCDABasedTransformationSelection(AadlTargetSpecificGenerator generator,
                                           AbstractLoop loop,
                                           AnalysisErrorReporterManager errManager,
@@ -135,7 +137,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     boolean stop = false;
 
     String alternatives = RuleApplicationUtils.printAlternativesToFile(patternMatchingMap);
-    File alternativeFiles = new File(config.getRamsesOutputDir().getAbsolutePath()+"/alternatives.txt");
+    File alternativeFiles = new File(mergeLauncher.getOutputPathSave()+"/alternatives.txt");
     if(alternativeFiles.exists())
       alternativeFiles.delete();
     try
@@ -265,7 +267,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   {
     Map<String, Resource> resultingMap = new HashMap<String, Resource>();
 
-    ArchitectureRefinementProcessLauncher mergeLauncher = new ArchitectureRefinementProcessLauncher
+    mergeLauncher = new ArchitectureRefinementProcessLauncher
         (trc,
          this.currentImplResource.getResourceSet(),
          config,

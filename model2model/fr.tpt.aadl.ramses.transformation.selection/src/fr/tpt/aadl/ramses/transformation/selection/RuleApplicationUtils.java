@@ -118,7 +118,7 @@ public class RuleApplicationUtils {
       
       if (candidateTransformationList.size()>1) {
         
-        objectsToDisplay += "\n Alternative "+cpt+":\n" ;
+        objectsToDisplay += "Alternative "+cpt+":\n" ;
         objectsToDisplay += "\tfor {";
         for (int j = 0; j < candidateObjects.size(); j++) {
           if (j==0) {
@@ -196,7 +196,7 @@ public class RuleApplicationUtils {
           }
           cptOb +=1;
         }
-        applyStr += "};";
+        applyStr += "};\n";
         applyAStr.add(applyStr);
 //        TaggedRuleApplicationT = TrcUtils.getNormalizedDependencies(trc, candidateObjects, candidateTransformationList.get(0));
 //        applyAStr.add(printListList(TaggedRuleApplicationT));
