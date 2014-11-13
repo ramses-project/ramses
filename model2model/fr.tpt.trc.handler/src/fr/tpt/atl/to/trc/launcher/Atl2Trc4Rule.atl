@@ -17,7 +17,7 @@ thisModule.resolveTemp(MM_TRC!Module.allInstancesFrom('IN')->first(), 't')
 
 rule Module {
     from s : MM_ATL!"ATL::Module" (thisModule.inElements->includes(s))
-    to t : MM_TRC!"dsl::Module" 
+    to t : MM_TRC!"tRC::Module" 
 		(    		
     		name  <- s.name,
 			rules <- s.elements->select(e|e.oclIsTypeOf(MM_ATL!MatchedRule))

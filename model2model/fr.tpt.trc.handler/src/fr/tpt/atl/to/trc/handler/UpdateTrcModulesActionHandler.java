@@ -47,7 +47,7 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
     {
 	  init(event, COMMAND_ID);
 	} 
-    catch (Exception e) 
+    catch (Exception e)
 	{
 	  _LOGGER.error("Error in update of TRC Modules");
 	}
@@ -77,7 +77,7 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	hotLauncher.launchHot(AtlInputs, outputPath);
 	
 	Resource r = resource.getResourceSet().getResource(URI.createURI(outputPath), true);
-	Resource res2 = resource.getResourceSet().createResource(URI.createURI(_currentProject.getFullPath().toOSString()+"/dslExample.trcDsl"));
+	Resource res2 = resource.getResourceSet().createResource(URI.createURI(_currentProject.getFullPath().toOSString()+"/Example.trc"));
 
 	TrcSpecification newSpec = (TrcSpecification) r.getContents().get(0);
 	TrcSpecification oldSpec = (TrcSpecification) resource.getContents().get(0);
