@@ -1,12 +1,14 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
+import java.util.ArrayList ;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
 
-public class RuleApplicationTulpe {
+public class RuleApplicationTuple {
 
-	private List<EObject> _patternMatchedElementList;
+	private List<EObject> _patternMatchedElementList = 
+	    new ArrayList<EObject>();
 	private String  _transformationRuleName;
 	
 	

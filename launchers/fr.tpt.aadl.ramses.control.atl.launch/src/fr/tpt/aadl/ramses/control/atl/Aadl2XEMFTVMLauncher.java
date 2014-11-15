@@ -237,7 +237,6 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 			                             IProgressMonitor monitor)
 	{
 		
-		
 		if(env == null)
 		  env = EmftvmFactory.eINSTANCE.createExecEnv();
 		

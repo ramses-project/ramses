@@ -1,5 +1,6 @@
 package fr.tpt.aadl.ramses.transformation.launcher;
 
+import java.io.File ;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,19 +70,24 @@ public class PatternMatchingForTrcHotLauncher {
 			while (modulesIt.hasNext()) {
 				Module moduleObject = modulesIt.next();
 				String mainATLFileName = moduleObject.getPath();
-				String refinedAtlFile = config.getRamsesOutputDir().getAbsolutePath()
+				String refinedAtlFilePath = config.getRamsesOutputDir().getAbsolutePath()
 				    +"/"+mainATLFileName.replace(
 						".atl", "_2pml.atl");
 
+				// check if HOT was already done
+				File refinedAtlFile = new File(refinedAtlFilePath);
+				if(refinedAtlFile.exists())
+				  continue;
+				
 				// execute ATL 2 PatternMatching transformation
 				String[] inputs = new String[]{RamsesConfiguration.getRamsesResourceDir().getAbsolutePath()
 				                               +"/"+mainATLFileName}; 
 
-				hotLauncher.launchHot(inputs, refinedAtlFile);
+				hotLauncher.launchHot(inputs, refinedAtlFilePath);
 
 				//compile generated transformation
 				Atl2EmftvmCompiler aec = new Atl2EmftvmCompiler();
-				CompileTimeError[] errors = aec.compile(refinedAtlFile, refinedAtlFile.replace(".atl", ""));
+				CompileTimeError[] errors = aec.compile(refinedAtlFilePath, refinedAtlFilePath.replace(".atl", ""));
 				if(errors.length > 0)
 				{
 					for(int i=0; i< errors.length; i++)

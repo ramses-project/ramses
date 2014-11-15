@@ -38,7 +38,7 @@ public class DataSizeHelper
     DataClassifier dc = null;
     try
     {
-      PropertyAssociation pa = PropertyUtils.findProperty("Base_Type", e);
+      PropertyAssociation pa = PropertyUtils.findPropertyAssociation("Base_Type", e);
       ModalPropertyValue mpv = pa.getOwnedValues().get(0);
       PropertyExpression pex = mpv.getOwnedValue();
       if (pex != null && pex instanceof ListValue)

@@ -1,43 +1,37 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException ;
+import java.util.ArrayList ;
+import java.util.Iterator ;
+import java.util.List ;
+import java.util.Map ;
+import java.util.Map.Entry ;
 
 import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.common.util.EList ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.EClass ;
 import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.EOperation;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.emf.ecore.EStructuralFeature ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 
-import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency;
-import fr.tpt.aadl.ramses.transformation.trc.Module;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependency;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction;
-import fr.tpt.aadl.ramses.transformation.trc.Transformation;
-import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency;
-import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact;
-import fr.tpt.aadl.ramses.transformation.trc.TrcFactory;
-import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
-import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
+import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency ;
+import fr.tpt.aadl.ramses.transformation.trc.Module ;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependency ;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction ;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction ;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency ;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcFactory ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcPackage ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 
 public class TrcUtils {
 
-	private static Resource resource;
-	private static TrcSpecification trcSpecification;
-
+	
 	private static Logger _LOGGER = Logger.getLogger(TrcUtils.class) ;
   
 	
@@ -59,7 +53,7 @@ public class TrcUtils {
 		resourceSet.getPackageRegistry().put("http://fr.tpt.aadl.ramses.transformation/TRC/1.0", TrcPackage.eINSTANCE);
 
 		if (!resourceSet.getURIConverter().exists(trc_uri, null)){
-			resource = resourceSet.createResource(trc_uri);
+			Resource resource = resourceSet.createResource(trc_uri);
 			//getResource(trcPath).getContents().add(spec);
 			saveTrc(resource, spec);
 		} else {
@@ -74,7 +68,7 @@ public class TrcUtils {
 	 * @param transformationName   	String representing transformation's name
 	 * @param transformationFile   	String representing transformation's location (.atl transformation)
 	 */
-	public static void addTransformation(String trcPath,
+	public static void addTransformationToTrc(String trcPath,
 	                                     ResourceSet resourceSet,
 	                                     String transformationName, 
 	                                     List<String> transformationFile){
@@ -150,27 +144,25 @@ public class TrcUtils {
 	public static void addQualityImpactsForTransformation(String trcPath,
 	                                                      ResourceSet resourceSet,
 	                                                      String transformationId, 
-	                                                      Map qualityImpactMap){
+	                                                      Map<String, Integer> qualityImpactMap){
 
-		TrcSpecification specification = TrcParser.parse(trcPath,resourceSet);
-		Transformation t = getTransformationById(specification, transformationId);
-		t.getImpacts().clear();
-		
-	    Iterator it = qualityImpactMap.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry entry = (Map.Entry)it.next();
-			TransformationImpact impact = TrcFactory.eINSTANCE.createTransformationImpact();
+	  TrcSpecification specification = TrcParser.parse(trcPath,resourceSet);
+	  Transformation t = getTransformationById(specification, transformationId);
+	  t.getImpacts().clear();
 
-			impact.setQualityAttributeName((String) entry.getKey());
-			impact.setImpactValue(new Integer(entry.getValue().toString()).intValue());
+	  Iterator<Entry<String, Integer>> it = qualityImpactMap.entrySet().iterator();
+	  while (it.hasNext()) {
+	    Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>)it.next();
+	    TransformationImpact impact = TrcFactory.eINSTANCE.createTransformationImpact();
 
-			t.getImpacts().add(impact);
-	    }
-		
-		saveTrc(getResource(trcPath, resourceSet), specification);
+	    impact.setQualityAttributeName((String) entry.getKey());
+	    impact.setImpactValue(new Integer(entry.getValue().toString()).intValue());
+
+	    t.getImpacts().add(impact);
+	  }
+
+	  saveTrc(getResource(trcPath, resourceSet), specification);
 	}
-
-	
 	
 	/**
 	 * Saves the given specification at the resource location 
@@ -203,7 +195,7 @@ public class TrcUtils {
 		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("trc", new XMIResourceFactoryImpl());
 		resourceSet.getPackageRegistry().put("http://fr.tpt.aadl.ramses.transformation/TRC/1.0", TrcPackage.eINSTANCE);
 		
-		resource = resourceSet.getResource(p_uri, true);
+		Resource resource = resourceSet.getResource(p_uri, true);
 
 		return resource;
 	}
@@ -211,7 +203,7 @@ public class TrcUtils {
 	
 	public static Transformation getTransformationById(TrcSpecification specification,
                                                      String transformationId){
-    Iterator transformationsIt = specification.getTransformationList().getTransformations().iterator();
+    Iterator<Transformation> transformationsIt = specification.getTransformationList().getTransformations().iterator();
     while (transformationsIt.hasNext()){
       Transformation transformation = (Transformation)transformationsIt.next();
       for(Module module: (List<Module>)transformation.getModules())
@@ -253,7 +245,7 @@ public class TrcUtils {
   
   
   public static Transformation getTransformationByName(TrcSpecification specification, String transformationName){
-    Iterator transformationsIt = specification.getTransformationList().getTransformations().iterator();
+    Iterator<Transformation> transformationsIt = specification.getTransformationList().getTransformations().iterator();
     while (transformationsIt.hasNext()){
       Transformation transformation = (Transformation)transformationsIt.next();
       for(String ruleName:(List<String>)transformation.getRuleName())
@@ -265,7 +257,8 @@ public class TrcUtils {
     return null;
   }
 	
-	public static List<Module> buildDependencyList(List<Transformation> inputTransformationList)
+	public static List<Module> 
+	  buildVerticalDependencyList(List<Transformation> inputTransformationList)
 	{
 		ArrayList<Module> result = new ArrayList<Module>();
 		Transformation T0 = inputTransformationList.get(0);
@@ -351,18 +344,28 @@ public class TrcUtils {
 		return result;
 	}
 	
-	// return list of possible rule according to dependencies of an appliedRule on an EObject
-	public static List<List<RuleApplicationTulpe>> getInclusionDependencies(TrcSpecification spec,
+	/**
+   *  Returns the list of RuleApplication (tuples <Elements,Rule>) that could
+   *  be selected when the tuple <candidateObjects, appliedRule> is 
+   *  selected
+   *  
+   * @param trcSpecification the TRC
+   * @param candidateObjects EObjects to be transformed by appliedRule 
+   * @param appliedRule selected transformation rule
+   * @return the list of RuleApplication (tuples <Elements,Rule>) that could
+   *  be excluded
+   */
+	public static List<List<RuleApplicationTuple>> getInclusionDependencies(TrcSpecification spec,
 	                                                                        List<EObject> eObjList,
 	                                                                        String appliedRule)
 	{
-		List<List<RuleApplicationTulpe>> result = new ArrayList<List<RuleApplicationTulpe>>();
+		List<List<RuleApplicationTuple>> result = new ArrayList<List<RuleApplicationTuple>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
 				continue;
 			_LOGGER.trace("Search dependency for "+appliedRule);
-			List<RuleApplicationTulpe> localDependencyList = new ArrayList<RuleApplicationTulpe>();
+			List<RuleApplicationTuple> localDependencyList = new ArrayList<RuleApplicationTuple>();
 			result.add(localDependencyList);
 			for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 			{
@@ -374,17 +377,29 @@ public class TrcUtils {
 		return result;
 	}
 	
-	//return list of possible rule according to dependencies of an appliedRule on an EObject
-	public static List<List<TaggedRuleApplicationTulpe>> getNormalizedDependencies(TrcSpecification spec,
+	/**
+   *  Returns the list of TaggedRuleApplication (tuples <Elements,Rule> marked as
+   *  included or excluded) that have to be respected when the 
+   *  tuple <candidateObjects, appliedRule> is selected. The result is a list of
+   *  list implementing a disjunctive normal form: elements from the first list 
+   *  are separated with ORs; elements from the second list are separated by ANDs
+   *  
+   * @param trcSpecification the TRC
+   * @param candidateObjects EObjects to be transformed by appliedRule 
+   * @param appliedRule selected transformation rule
+   * @return TaggedRuleApplication (tuples <Elements,Rule> marked as
+   *  included or excluded) that have to be respected
+   */
+	public static List<List<TaggedRuleApplicationTuple>> getNormalizedDependencies(TrcSpecification spec,
 	                                                                         List<EObject> eObjList,
 	                                                                         String appliedRule)
 	                                                                         {
-	  List<List<TaggedRuleApplicationTulpe>> result = new ArrayList<List<TaggedRuleApplicationTulpe>>();
+	  List<List<TaggedRuleApplicationTuple>> result = new ArrayList<List<TaggedRuleApplicationTuple>>();
 	  for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
 	  {
 	    if(false==dep.getAppliedRule().equals(appliedRule))
 	      continue;
-	    List<TaggedRuleApplicationTulpe> localDependencyList = new ArrayList<TaggedRuleApplicationTulpe>();
+	    List<TaggedRuleApplicationTuple> localDependencyList = new ArrayList<TaggedRuleApplicationTuple>();
 	    result.add(localDependencyList);
 	    for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 	    {
@@ -396,8 +411,8 @@ public class TrcUtils {
 
 	private static void getPossibleDependencies(AbstractRuleDependency ar, 
 	                                           List<EObject> eObjList, 
-	                                           List<TaggedRuleApplicationTulpe> currentDependencyList,
-	                                           List<List<TaggedRuleApplicationTulpe>> result)
+	                                           List<TaggedRuleApplicationTuple> currentDependencyList,
+	                                           List<List<TaggedRuleApplicationTuple>> result)
   {
 	  // Here, we have to organize dependencies according to a disjunctive normal form.
 	  if(ar instanceof RuleDependency)
@@ -405,7 +420,7 @@ public class TrcUtils {
 	    RuleDependency rd = (RuleDependency) ar;
 	    try
 	    {
-	      TaggedRuleApplicationTulpe dep = new TaggedRuleApplicationTulpe();
+	      TaggedRuleApplicationTuple dep = new TaggedRuleApplicationTuple();
 	      List<EObject> depObjList = new ArrayList<EObject>();
 	      for(EObject eObj: eObjList)
 	      {
@@ -440,7 +455,7 @@ public class TrcUtils {
 	      }
 	      else
 	      {
-	        List<TaggedRuleApplicationTulpe> disjuncResult = new ArrayList<TaggedRuleApplicationTulpe>();
+	        List<TaggedRuleApplicationTuple> disjuncResult = new ArrayList<TaggedRuleApplicationTuple>();
 	        disjuncResult.addAll(currentDependencyList);
 	        getPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result);
 	        result.add(disjuncResult);
@@ -451,8 +466,8 @@ public class TrcUtils {
 	
 	private static void getRestrictedPossibleDependencies(AbstractRuleDependency ar, 
 												  List<EObject> eObjList, 
-												  List<RuleApplicationTulpe> currentDependencyList,
-												  List<List<RuleApplicationTulpe>> result,
+												  List<RuleApplicationTuple> currentDependencyList,
+												  List<List<RuleApplicationTuple>> result,
 												  boolean isExclusion)
 	{
 		// Here, we have to organize dependencies according to a disjunctive normal form.
@@ -464,7 +479,7 @@ public class TrcUtils {
 			  return;
 			try
 			{
-				RuleApplicationTulpe dep = new RuleApplicationTulpe();
+				RuleApplicationTuple dep = new RuleApplicationTuple();
 				List<EObject> depObjList = new ArrayList<EObject>();
 				for(EObject eObj: eObjList)
 				{
@@ -499,7 +514,7 @@ public class TrcUtils {
 				}
 				else
 				{
-					List<RuleApplicationTulpe> disjuncResult = new ArrayList<RuleApplicationTulpe>();
+					List<RuleApplicationTuple> disjuncResult = new ArrayList<RuleApplicationTuple>();
 					disjuncResult.addAll(currentDependencyList);
 					getRestrictedPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result, isExclusion);
 					result.add(disjuncResult);
@@ -585,15 +600,27 @@ public class TrcUtils {
 		return result;
 	}
 
-	public static List<List<RuleApplicationTulpe>> getExlcusionDependencies(TrcSpecification trcSpecification,
+	
+	/**
+	 *  Returns the list of RuleApplication (tuples <Elements,Rule>) that have
+	 *  to be excluded when the tuple <candidateObjects, appliedRule> is 
+	 *  selected
+	 *  
+	 * @param trcSpecification the TRC
+	 * @param candidateObjects EObjects to be transformed by appliedRule 
+	 * @param appliedRule selected transformation rule
+	 * @return the list of RuleApplication (tuples <Elements,Rule>) that have
+   *  to be excluded
+	 */
+	public static List<List<RuleApplicationTuple>> getExlcusionDependencies(TrcSpecification trcSpecification,
 	                                                                        List<EObject> candidateObjects,
 	                                                                        String appliedRule) {
-		List<List<RuleApplicationTulpe>> exclusionDependencyList = new ArrayList<List<RuleApplicationTulpe>>();
+		List<List<RuleApplicationTuple>> exclusionDependencyList = new ArrayList<List<RuleApplicationTuple>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) trcSpecification.getDependencyList().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
 				continue;
-			List<RuleApplicationTulpe> localDependencyList = new ArrayList<RuleApplicationTulpe>();
+			List<RuleApplicationTuple> localDependencyList = new ArrayList<RuleApplicationTuple>();
 			exclusionDependencyList.add(localDependencyList);
 			for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 			{

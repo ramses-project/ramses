@@ -39,7 +39,8 @@ public interface PredefinedAadlModelManager {
    "Modeling_Properties.aadl", "Programming_Properties.aadl",
    "Thread_Properties.aadl", "Timing_Properties.aadl",
    "Generation_Properties.aadl2", "pok_properties.aadl2",
-   "osek_properties.aadl2", "RAMSES.aadl2", "AI.aadl"} ;
+   "osek_properties.aadl2", "RAMSES.aadl2", "AI.aadl",
+   "MCDA.aadl2"} ;
   
   /**
    * This method returns the list of resources resulting from the parsing

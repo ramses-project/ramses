@@ -922,6 +922,7 @@ public class WorkflowPackageImpl extends EPackageImpl implements WorkflowPackage
     addEEnumLiteral(resolutionMethodEEnum, ResolutionMethod.MANUAL_MERGE);
     addEEnumLiteral(resolutionMethodEEnum, ResolutionMethod.SENSITIVITY_MERGE);
     addEEnumLiteral(resolutionMethodEEnum, ResolutionMethod.GENETIC_MERGE);
+    addEEnumLiteral(resolutionMethodEEnum, ResolutionMethod.MCDA_MERGE);
 
     // Create resource
     createResource(eNS_URI);

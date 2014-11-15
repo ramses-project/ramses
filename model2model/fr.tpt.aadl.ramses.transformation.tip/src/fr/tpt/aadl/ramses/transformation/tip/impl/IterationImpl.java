@@ -39,177 +39,183 @@ import fr.tpt.aadl.ramses.transformation.tip.TipPackage;
  */
 public class IterationImpl extends EObjectImpl implements Iteration {
 	/**
-	 * The default value of the '{@link #getId() <em>Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The default value of the '{@link #getId() <em>Id</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getId()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getId()
+   * @generated
+   * @ordered
+   */
 	protected static final int ID_EDEFAULT = 0;
 
 	/**
-	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getId()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getId()
+   * @generated
+   * @ordered
+   */
 	protected int id = ID_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getElements() <em>Elements</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
+   * The cached value of the '{@link #getElements() <em>Elements</em>}' containment reference list.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getElements()
-	 * @generated
-	 * @ordered
-	 */
+   * @see #getElements()
+   * @generated
+   * @ordered
+   */
 	protected EList elements;
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected IterationImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	protected EClass eStaticClass() {
-		return TipPackage.Literals.ITERATION;
-	}
+    return TipPackage.Literals.ITERATION;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public int getId() {
-		return id;
-	}
+    return id;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void setId(int newId) {
-		int oldId = id;
-		id = newId;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TipPackage.ITERATION__ID, oldId, id));
-	}
+    int oldId = id;
+    id = newId;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, TipPackage.ITERATION__ID, oldId, id));
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public EList getElements() {
-		if (elements == null) {
-			elements = new EObjectContainmentEList(ElementTransformation.class, this, TipPackage.ITERATION__ELEMENTS);
-		}
-		return elements;
-	}
+    if (elements == null)
+    {
+      elements = new EObjectContainmentEList(ElementTransformation.class, this, TipPackage.ITERATION__ELEMENTS);
+    }
+    return elements;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case TipPackage.ITERATION__ELEMENTS:
-				return ((InternalEList)getElements()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
+    switch (featureID)
+    {
+      case TipPackage.ITERATION__ELEMENTS:
+        return ((InternalEList)getElements()).basicRemove(otherEnd, msgs);
+    }
+    return super.eInverseRemove(otherEnd, featureID, msgs);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case TipPackage.ITERATION__ID:
-				return new Integer(getId());
-			case TipPackage.ITERATION__ELEMENTS:
-				return getElements();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
+    switch (featureID)
+    {
+      case TipPackage.ITERATION__ID:
+        return new Integer(getId());
+      case TipPackage.ITERATION__ELEMENTS:
+        return getElements();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case TipPackage.ITERATION__ID:
-				setId(((Integer)newValue).intValue());
-				return;
-			case TipPackage.ITERATION__ELEMENTS:
-				getElements().clear();
-				getElements().addAll((Collection)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
+    switch (featureID)
+    {
+      case TipPackage.ITERATION__ID:
+        setId(((Integer)newValue).intValue());
+        return;
+      case TipPackage.ITERATION__ELEMENTS:
+        getElements().clear();
+        getElements().addAll((Collection)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public void eUnset(int featureID) {
-		switch (featureID) {
-			case TipPackage.ITERATION__ID:
-				setId(ID_EDEFAULT);
-				return;
-			case TipPackage.ITERATION__ELEMENTS:
-				getElements().clear();
-				return;
-		}
-		super.eUnset(featureID);
-	}
+    switch (featureID)
+    {
+      case TipPackage.ITERATION__ID:
+        setId(ID_EDEFAULT);
+        return;
+      case TipPackage.ITERATION__ELEMENTS:
+        getElements().clear();
+        return;
+    }
+    super.eUnset(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case TipPackage.ITERATION__ID:
-				return id != ID_EDEFAULT;
-			case TipPackage.ITERATION__ELEMENTS:
-				return elements != null && !elements.isEmpty();
-		}
-		return super.eIsSet(featureID);
-	}
+    switch (featureID)
+    {
+      case TipPackage.ITERATION__ID:
+        return id != ID_EDEFAULT;
+      case TipPackage.ITERATION__ELEMENTS:
+        return elements != null && !elements.isEmpty();
+    }
+    return super.eIsSet(featureID);
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+    if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (id: ");
-		result.append(id);
-		result.append(')');
-		return result.toString();
-	}
+    StringBuffer result = new StringBuffer(super.toString());
+    result.append(" (id: ");
+    result.append(id);
+    result.append(')');
+    return result.toString();
+  }
 
 } //IterationImpl

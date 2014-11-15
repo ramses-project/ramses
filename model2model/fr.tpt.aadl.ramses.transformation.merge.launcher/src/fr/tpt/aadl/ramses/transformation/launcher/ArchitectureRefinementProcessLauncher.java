@@ -82,6 +82,11 @@ public class ArchitectureRefinementProcessLauncher {
   
   private final File outputPathSave ;
   
+  public File getOutputPathSave()
+  {
+    return outputPathSave ;
+  }
+
   public ArchitectureRefinementProcessLauncher(TrcSpecification trcSpec,
                                                 ResourceSet resourceSet,
                                                 RamsesConfiguration config,
@@ -109,7 +114,9 @@ public class ArchitectureRefinementProcessLauncher {
 
     String tipPath = this.getTipId();
     URI tipURI = URI.createFileURI(getOutputDir()+tipPath);
-    Resource r = resourceSet.getResource(tipURI, false);
+    String tipFilePath = tipURI.toFileString();
+    File tipFile = new File(tipFilePath);
+    Resource r = resourceSet.getResource(tipURI, tipFile.exists());
     if(r==null)
     {
       r=resourceSet.createResource(tipURI);
@@ -272,7 +279,7 @@ public class ArchitectureRefinementProcessLauncher {
 
   private String getPatternMatchingOutputDir()
   {
-    return this.outputPathSave.getAbsolutePath()+"/PatternMatchingTransformations/";
+    return this.outputPathSave.getAbsolutePath()+"/.PatternMatchingTransformations/";
   }
 
   /**
@@ -360,7 +367,8 @@ public class ArchitectureRefinementProcessLauncher {
     this.transformationSelection.selectTransformation(patternMatchingMap, tuplesToApply);
     
     // store the result of the selection: generate TIP
-    TipUtils.addElementTransformationToLastIteration(getOutputDir()+getTipId(), resourceSet, TipUtils.getTipSpecification(), tuplesToApply);
+    String tipPath = outputPathSave+"/"+getTipId();
+    TipUtils.addElementTransformationToLastIteration(tipPath, resourceSet, TipUtils.getTipSpecification(), tuplesToApply);
 
     
     
@@ -449,7 +457,7 @@ public class ArchitectureRefinementProcessLauncher {
     rootTransfo.setList(l);
     
     // retreive module dependencies for current transformation.
-    List<Module> completeModuleList = TrcUtils.buildDependencyList(transfoList);
+    List<Module> completeModuleList = TrcUtils.buildVerticalDependencyList(transfoList);
     // add dependencies in the workflow model.
     for(int i = completeModuleList.size()-1; i>=0; i--)
     {
@@ -458,16 +466,19 @@ public class ArchitectureRefinementProcessLauncher {
       Module m = completeModuleList.get(i);
       String mPath = m.getPath();
       if(mPath.endsWith(".atl"))
-        mPath = mPath.substring(0,mPath.length()-4)+".emftvm";
-      if(false == mPath.startsWith(File.separator))
-      {
-        String prefix = RamsesConfiguration.getRamsesResourceDir().getAbsolutePath();
-        if(false==prefix.endsWith("/"))
-          prefix+="/";
-        mPath=prefix+mPath;
-
-      }
-      String prefix = mPath.substring(mPath.lastIndexOf("/")+1,mPath.lastIndexOf("."));
+        mPath = mPath.substring(0,mPath.length()-4);
+      if(mPath.endsWith(".emftvm"))
+        mPath=mPath.substring(0, mPath.length()-7);
+      
+//      if(false == mPath.startsWith(File.separator))
+//      {
+//        String prefix = RamsesConfiguration.getRamsesResourceDir().getAbsolutePath();
+//        if(false==prefix.endsWith("/"))
+//          prefix+="/";
+//        mPath=prefix+mPath;
+//
+//      }
+      String prefix = mPath.substring(mPath.lastIndexOf("/")+1,mPath.length());
       fr.tpt.aadl.ramses.control.workflow.File f = WorkflowFactory.eINSTANCE.createFile();
       f.setPath(mPath);
       l.getFile().add(f);
@@ -529,7 +540,7 @@ public class ArchitectureRefinementProcessLauncher {
    * @return the TIP URI
    */
   protected String getTipId() {
-    return "tmp.tip";
+    return ".ramses-generated.tip";
   }
 
 

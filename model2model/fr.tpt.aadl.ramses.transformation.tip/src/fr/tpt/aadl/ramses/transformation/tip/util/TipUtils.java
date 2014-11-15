@@ -103,8 +103,17 @@ public class TipUtils {
 		ElementTransformation et = TipFactory.eINSTANCE.createElementTransformation();
 		for(EObject obj: elementId)
 		{
-			et.getElementId().add(obj);
-			et.getElementName().add(getQualifiedName(obj));			
+		  boolean isNamedElement = obj instanceof NamedElement;
+		  if(false==isNamedElement)
+		  {
+		    et.getElementId().add(obj);
+	      et.getElementName().add("NaNE");
+		  }
+		  else
+		  {
+		    et.getElementId().add(obj);
+	      et.getElementName().add(getQualifiedName(obj));
+		  }			
 		}
 		et.setTransformationId(transformationId);
 		return et;

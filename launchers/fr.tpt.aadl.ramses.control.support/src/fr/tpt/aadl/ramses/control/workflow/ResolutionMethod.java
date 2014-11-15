@@ -74,7 +74,15 @@ public enum ResolutionMethod implements Enumerator
    * @generated
    * @ordered
    */
-  GENETIC_MERGE(3, "GeneticMerge", "GeneticMerge");
+  GENETIC_MERGE(3, "GeneticMerge", "GeneticMerge"), /**
+   * The '<em><b>Mcda Merge</b></em>' literal object.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #MCDA_MERGE_VALUE
+   * @generated
+   * @ordered
+   */
+  MCDA_MERGE(4, "McdaMerge", "McdaMerge");
 
   /**
    * The '<em><b>Try Each</b></em>' literal value.
@@ -137,6 +145,21 @@ public enum ResolutionMethod implements Enumerator
   public static final int GENETIC_MERGE_VALUE = 3;
 
   /**
+   * The '<em><b>Mcda Merge</b></em>' literal value.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of '<em><b>Mcda Merge</b></em>' literal object isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @see #MCDA_MERGE
+   * @model name="McdaMerge"
+   * @generated
+   * @ordered
+   */
+  public static final int MCDA_MERGE_VALUE = 4;
+
+  /**
    * An array of all the '<em><b>Resolution Method</b></em>' enumerators.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -149,6 +172,7 @@ public enum ResolutionMethod implements Enumerator
       MANUAL_MERGE,
       SENSITIVITY_MERGE,
       GENETIC_MERGE,
+      MCDA_MERGE,
     };
 
   /**
@@ -211,6 +235,7 @@ public enum ResolutionMethod implements Enumerator
       case MANUAL_MERGE_VALUE: return MANUAL_MERGE;
       case SENSITIVITY_MERGE_VALUE: return SENSITIVITY_MERGE;
       case GENETIC_MERGE_VALUE: return GENETIC_MERGE;
+      case MCDA_MERGE_VALUE: return MCDA_MERGE;
     }
     return null;
   }

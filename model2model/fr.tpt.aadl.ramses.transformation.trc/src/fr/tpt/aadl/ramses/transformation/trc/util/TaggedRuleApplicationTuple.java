@@ -1,10 +1,6 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
-import java.util.List;
-
-import org.eclipse.emf.ecore.EObject;
-
-public class TaggedRuleApplicationTulpe extends RuleApplicationTulpe {
+public class TaggedRuleApplicationTuple extends RuleApplicationTuple {
 
 	boolean _exclusion=false;
 	

@@ -84,5 +84,6 @@
     <eLiterals name="ManualMerge" value="1" literal="ManualMerge"/>
     <eLiterals name="SensitivityMerge" value="2" literal="SensitivityMerge"/>
     <eLiterals name="GeneticMerge" value="3"/>
+    <eLiterals name="McdaMerge" value="4"/>
   </eClassifiers>
 </ecore:EPackage>

@@ -603,8 +603,6 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
    */
   public PropertyAssociation getEnumerators(Classifier classifier)
   {
-    EList<PropertyAssociation> pas = PropertyUtils.
-                              getPropertyAssociations(classifier, _ENUMERATORS);
-    return pas.get(pas.size() -1) ;
+    return PropertyUtils.findPropertyAssociation(_ENUMERATORS, classifier);
   }
 } //HookAccessImpl

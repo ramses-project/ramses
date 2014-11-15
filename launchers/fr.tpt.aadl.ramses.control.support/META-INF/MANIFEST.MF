@@ -44,7 +44,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.osate.aadl2.instantiation,
  org.osate.utils,
  org.apache.log4j,
- fr.tpt.aadl.ramses.transformation.trc,
+ fr.tpt.aadl.ramses.transformation.trc;visibility:=reexport,
  org.eclipse.core.resources
 Eclipse-LazyStart: true
 Bundle-ClassPath: lib/jdom-2.0.2.jar,

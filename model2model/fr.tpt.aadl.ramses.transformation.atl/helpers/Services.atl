@@ -23,6 +23,17 @@
 
 library Services;
 
+helper context AADLI!Element def: getInstanceObjectPathIfNE() : String = 
+	if(self.oclIsKindOf(AADLI!InstanceObject)) then
+		self.getInstanceObjectPath()
+	else
+		if(self.oclIsKindOf(AADLI!NamedElement)) then
+			self.getQualifiedName()
+		else
+			'NaNE'
+		endif
+	endif
+;
 
 --- Returns the same as thisModule.resolveTemp(var : OclAny, rule_name : String, target_pattern_name : String),
 --- except that it returns OclUndefined if no trace exists instead of throwing an error.

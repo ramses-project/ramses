@@ -20,96 +20,100 @@ import fr.tpt.aadl.ramses.transformation.tip.*;
  */
 public class TipFactoryImpl extends EFactoryImpl implements TipFactory {
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc -->
+   * Creates the default factory implementation.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public static TipFactory init() {
-		try {
-			TipFactory theTipFactory = (TipFactory)EPackage.Registry.INSTANCE.getEFactory(TipPackage.eNS_URI);
-			if (theTipFactory != null) {
-				return theTipFactory;
-			}
-		}
-		catch (Exception exception) {
-			EcorePlugin.INSTANCE.log(exception);
-		}
-		return new TipFactoryImpl();
-	}
+    try
+    {
+      TipFactory theTipFactory = (TipFactory)EPackage.Registry.INSTANCE.getEFactory(TipPackage.eNS_URI);
+      if (theTipFactory != null)
+      {
+        return theTipFactory;
+      }
+    }
+    catch (Exception exception)
+    {
+      EcorePlugin.INSTANCE.log(exception);
+    }
+    return new TipFactoryImpl();
+  }
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc -->
+   * Creates an instance of the factory.
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public TipFactoryImpl() {
-		super();
-	}
+    super();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public EObject create(EClass eClass) {
-		switch (eClass.getClassifierID()) {
-			case TipPackage.TIP_SPECIFICATION: return createTipSpecification();
-			case TipPackage.ITERATION: return createIteration();
-			case TipPackage.ELEMENT_TRANSFORMATION: return createElementTransformation();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
-		}
-	}
+    switch (eClass.getClassifierID())
+    {
+      case TipPackage.TIP_SPECIFICATION: return createTipSpecification();
+      case TipPackage.ITERATION: return createIteration();
+      case TipPackage.ELEMENT_TRANSFORMATION: return createElementTransformation();
+      default:
+        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+    }
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public TipSpecification createTipSpecification() {
-		TipSpecificationImpl tipSpecification = new TipSpecificationImpl();
-		return tipSpecification;
-	}
+    TipSpecificationImpl tipSpecification = new TipSpecificationImpl();
+    return tipSpecification;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public Iteration createIteration() {
-		IterationImpl iteration = new IterationImpl();
-		return iteration;
-	}
+    IterationImpl iteration = new IterationImpl();
+    return iteration;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public ElementTransformation createElementTransformation() {
-		ElementTransformationImpl elementTransformation = new ElementTransformationImpl();
-		return elementTransformation;
-	}
+    ElementTransformationImpl elementTransformation = new ElementTransformationImpl();
+    return elementTransformation;
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
+   * @generated
+   */
 	public TipPackage getTipPackage() {
-		return (TipPackage)getEPackage();
-	}
+    return (TipPackage)getEPackage();
+  }
 
 	/**
-	 * <!-- begin-user-doc -->
+   * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @deprecated
-	 * @generated
-	 */
+   * @deprecated
+   * @generated
+   */
 	public static TipPackage getPackage() {
-		return TipPackage.eINSTANCE;
-	}
+    return TipPackage.eINSTANCE;
+  }
 
 } //TipFactoryImpl
