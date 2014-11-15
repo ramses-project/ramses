@@ -182,7 +182,7 @@ rule IncludedAndExcludedMatchedRule {
 									OclUndefined,
 									s.inPattern.elements
 								);
-			--local2 <- thisModule.createAndOperatorCallExp(s.inPattern.filter, local.debug(' !!!!!!!!!!!!!!!!! '+s.name));
+			--local2 <- thisModule.createAndOperatorCallExp(s.inPattern.filter, local);
 			ip.filter <- 
 				thisModule.populateExclusion
 				(
@@ -323,8 +323,9 @@ rule IncludedAndNotExcludedMatchedRule {
 		)
     to t : MM_ATL!"ATL::MatchedRule" (
         location <- s.location,
-        commentsBefore <- if(s.commentsBefore->last().oclIsUndefined()) then
-        					'-- ' + s.name
+        commentsBefore <- --s.commentsBefore,
+						if(s.commentsBefore->last().oclIsUndefined()) then
+        					'-- @extends ' + s.name
 						else
 							s.commentsBefore->excluding(s.commentsBefore->last())->append(s.commentsBefore->last()+','+s.name)
 						endif,
@@ -433,7 +434,7 @@ rule initOrOperatorCall(ElementTransfos: Set(MM_TIP!ElementTransformation), inpu
 			stringSymbol <- ElementTransfos->first().elementName->first()
 		),
 		argcall: MM_ATL!OperationCallExp(
-			operationName <- 'getInstanceObjectPath',
+			operationName <- 'getInstanceObjectPathIfNE',
 			source <- argcallsrc			
 		),
 		argcallsrc : MM_ATL!VariableExp(
@@ -686,11 +687,7 @@ lazy rule createEqualsOperatorCallExp {
 			stringSymbol <- s
 		),
 		argcall: MM_ATL!OperationCallExp(
-			operationName <- if(elem.oclIsKindOf(AADLI!InstanceObject)) then
-								'getInstanceObjectPath'
-							else
-								'getQualifiedName'
-							endif,
+			operationName <- 'getInstanceObjectPathIfNE',
 			source <- argcallsrc			
 		),
 		argcallsrc : MM_ATL!VariableExp(

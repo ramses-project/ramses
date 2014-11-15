@@ -17,6 +17,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getOutArcs <em>Out Arcs</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getInArcs <em>In Arcs</em>}</li>
  *   <li>{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getMatchedElements <em>Matched Elements</em>}</li>
+ *   <li>{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getTransformationRule <em>Transformation Rule</em>}</li>
  * </ul>
  * </p>
  *
@@ -73,5 +74,31 @@ public interface DependencyNode extends EObject
    * @generated
    */
   EList<EObject> getMatchedElements();
+
+  /**
+   * Returns the value of the '<em><b>Transformation Rule</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <p>
+   * If the meaning of the '<em>Transformation Rule</em>' attribute isn't clear,
+   * there really should be more of a description here...
+   * </p>
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Transformation Rule</em>' attribute.
+   * @see #setTransformationRule(String)
+   * @see fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphPackage#getDependencyNode_TransformationRule()
+   * @model
+   * @generated
+   */
+  String getTransformationRule();
+
+  /**
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getTransformationRule <em>Transformation Rule</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Transformation Rule</em>' attribute.
+   * @see #getTransformationRule()
+   * @generated
+   */
+  void setTransformationRule(String value);
 
 } // DependencyNode

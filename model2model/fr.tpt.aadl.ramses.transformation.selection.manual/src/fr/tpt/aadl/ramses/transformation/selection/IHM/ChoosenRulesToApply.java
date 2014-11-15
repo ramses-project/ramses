@@ -7,7 +7,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.NamedElement;
 
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
-import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTulpe;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils;
 
 public class ChoosenRulesToApply implements Serializable {

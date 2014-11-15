@@ -55,7 +55,7 @@ public interface ElementTransformation extends EObject {
 
 	/**
    * Returns the value of the '<em><b>Element Id</b></em>' reference list.
-   * The list contents are of type {@link org.osate.aadl2.NamedElement}.
+   * The list contents are of type {@link org.osate.aadl2.Element}.
    * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Element Id</em>' reference list isn't clear,
@@ -64,7 +64,7 @@ public interface ElementTransformation extends EObject {
 	 * <!-- end-user-doc -->
    * @return the value of the '<em>Element Id</em>' reference list.
    * @see fr.tpt.aadl.ramses.transformation.tip.TipPackage#getElementTransformation_ElementId()
-   * @model type="org.osate.aadl2.NamedElement" required="true"
+   * @model type="org.osate.aadl2.Element" required="true"
    * @generated
    */
 	EList getElementId();

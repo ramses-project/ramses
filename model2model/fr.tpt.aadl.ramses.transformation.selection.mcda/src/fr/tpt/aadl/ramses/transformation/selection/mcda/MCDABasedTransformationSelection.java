@@ -6,12 +6,14 @@ import java.io.IOException ;
 import java.io.InputStream ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
+import java.util.HashSet ;
 import java.util.Iterator ;
 import java.util.LinkedHashMap ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Map.Entry ;
 import java.util.Properties ;
+import java.util.Set ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
@@ -45,7 +47,7 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.util.D
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
-import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 
 public class MCDABasedTransformationSelection implements ITransformationSelection,LoopManager
@@ -170,22 +172,30 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         }
         if(stop)
           continue;
-        DependencyNode currentNode = DependencyGraphUtils.getDependencyNode
-            (dg, currentElements);
-        if(treatedAlternatives.contains(currentNode))
-          continue;
-        // 4 - isolate a connected subgraph containing currentElements
-        // TODO: check if it already exists
-        List<DependencyNode> connectedDepNodes = DependencyGraphUtils.
-            getConnectedSubgraph(dg, currentElements);
-        for(DependencyNode dn: connectedDepNodes)
+        Set<DependencyNode> dependencyNodeList =
+            new HashSet<DependencyNode>();
+        for(String rule: currentTransformationAlternatives)
         {
-          treatedAlternatives.add(dn);
+          DependencyNode currentNode = DependencyGraphUtils.getDependencyNode
+              (dg, currentElements, rule);
+          if(treatedAlternatives.contains(currentNode))
+            continue;
+          dependencyNodeList.add(currentNode);
+          // 4 - isolate a connected subgraph containing currentElements
+          List<DependencyNode> connectedDepNodes = DependencyGraphUtils.
+              getConnectedSubgraph(dg, currentElements, rule);
+          dependencyNodeList.addAll(connectedDepNodes);
+          for(DependencyNode dn: connectedDepNodes)
+          {
+            treatedAlternatives.add(dn);
+          }
         }
+        if(dependencyNodeList.isEmpty())
+          continue;
 
         Map<List<EObject>, List<String>> connectedAlternativesMap = 
             new LinkedHashMap<List<EObject>, List<String>>();
-        for(DependencyNode dn : connectedDepNodes)
+        for(DependencyNode dn : dependencyNodeList)
         {
           List<EObject> matchedElements = dn.getMatchedElements();
           ArrayList<String> transformationRules = patternMatchingMap.get(matchedElements);
@@ -198,9 +208,9 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
                                             sinst,
                                             connectedAlternativesMap);
 
-        List<RuleApplicationTulpe> ratList = trs.selectBestRulesAlternatives();
+        List<RuleApplicationTuple> ratList = trs.selectBestRulesAlternatives();
 
-        for(RuleApplicationTulpe rat:ratList)
+        for(RuleApplicationTuple rat:ratList)
         {
           List<EObject> ratElements = rat.getPatternMatchedElement();
           List<String> ratRules = patternMatchingMap.get(rat.getPatternMatchedElement());

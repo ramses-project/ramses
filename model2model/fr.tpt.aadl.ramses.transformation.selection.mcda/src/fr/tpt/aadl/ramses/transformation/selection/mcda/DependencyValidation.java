@@ -5,18 +5,18 @@ import java.util.List ;
 import org.eclipse.emf.ecore.EObject ;
 
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
-import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
-import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class DependencyValidation
 {
 
   private TrcSpecification trc;
-  private List<RuleApplicationTulpe> ruleApplicationList ;
+  private List<RuleApplicationTuple> ruleApplicationList ;
   
   public DependencyValidation(TrcSpecification trc,
-                              List<RuleApplicationTulpe> ruleApplicationList)
+                              List<RuleApplicationTuple> ruleApplicationList)
   {
     this.trc = trc;
     this.ruleApplicationList = ruleApplicationList;
@@ -25,9 +25,9 @@ public class DependencyValidation
   public boolean validate()
   {
     
-    for(RuleApplicationTulpe rat: ruleApplicationList)
+    for(RuleApplicationTuple rat: ruleApplicationList)
     {
-      List<List<TaggedRuleApplicationTulpe>> dependenciesDisjunctionList = 
+      List<List<TaggedRuleApplicationTuple>> dependenciesDisjunctionList = 
           TrcUtils.getNormalizedDependencies(trc,
                                              rat.getPatternMatchedElement(),
                                              rat.getTransformationRuleName());
@@ -35,7 +35,7 @@ public class DependencyValidation
         continue;
       
       boolean isDisjunctionValid = false;
-      for(List<TaggedRuleApplicationTulpe> dependencyConjunctionList:
+      for(List<TaggedRuleApplicationTuple> dependencyConjunctionList:
         dependenciesDisjunctionList)
       {
         if(validateConjunction(dependencyConjunctionList))
@@ -54,9 +54,9 @@ public class DependencyValidation
 
   private
       boolean
-      validateConjunction(List<TaggedRuleApplicationTulpe> dependencyConjunctionList)
+      validateConjunction(List<TaggedRuleApplicationTuple> dependencyConjunctionList)
   {
-    for(TaggedRuleApplicationTulpe trat: dependencyConjunctionList)
+    for(TaggedRuleApplicationTuple trat: dependencyConjunctionList)
     {
       if(false==validateDependency(trat))
         return false;
@@ -64,7 +64,7 @@ public class DependencyValidation
     return true ;
   }
 
-  private boolean validateDependency(TaggedRuleApplicationTulpe trat)
+  private boolean validateDependency(TaggedRuleApplicationTuple trat)
   {
     // check if trat is valid in ruleApplicationList
     if(trat.isExclusion())
@@ -73,24 +73,31 @@ public class DependencyValidation
       return isInRuleApplicationList(trat);
   }
 
-  private boolean isInRuleApplicationList(TaggedRuleApplicationTulpe trat)
+  private boolean isInRuleApplicationList(TaggedRuleApplicationTuple trat)
   {
     List<EObject> dependencyElements = trat.getPatternMatchedElement();
     String dependencyRule = trat.getTransformationRuleName();
     
-    int indexInRuleApplicationList = ruleApplicationList.indexOf(dependencyElements);
-    
-    if(indexInRuleApplicationList != -1)
+    for(RuleApplicationTuple rat:ruleApplicationList)
     {
-      String solutionRule = ruleApplicationList.get(indexInRuleApplicationList)
-          .getTransformationRuleName();
-      
-      return solutionRule.equals(dependencyRule) ;
+      boolean stop = false;
+      for(EObject depObj:dependencyElements)
+      {
+        if(rat.getPatternMatchedElement().contains(depObj))
+          continue;
+        else
+        {
+          stop=true;
+          break;
+        }
+      }
+      if(stop)
+        continue;
+      if(rat.getTransformationRuleName().equals(dependencyRule))
+        return true;
+      else
+        continue;
     }
-    else
-    {
-      return false ;
-    }
+    return false;
   }
-
 }

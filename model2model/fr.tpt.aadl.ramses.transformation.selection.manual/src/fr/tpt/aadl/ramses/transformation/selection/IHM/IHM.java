@@ -56,7 +56,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.osate.aadl2.NamedElement;
 
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
-import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTulpe;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils;
 
 
@@ -78,7 +78,7 @@ public class IHM extends JFrame implements ItemListener,ActionListener,Serializa
 	
 	final JRootPane comboBoxPanel;
 	private JButton applyAlternative;
-	private List<List<TaggedRuleApplicationTulpe>> TaggedRuleApplicationT =  new ArrayList<List<TaggedRuleApplicationTulpe>>();
+	private List<List<TaggedRuleApplicationTuple>> TaggedRuleApplicationT =  new ArrayList<List<TaggedRuleApplicationTuple>>();
 
 	private boolean comboBoxItemChangeListenerIsActive = true;
 	private int NumberOfAlternative =0 ;
@@ -415,9 +415,9 @@ public class IHM extends JFrame implements ItemListener,ActionListener,Serializa
 		copyIntoFile("RulesToApply",s);
 	}
 	
-	public void consequences(List<List<TaggedRuleApplicationTulpe>> taggedRuleApplicationList,int index){
+	public void consequences(List<List<TaggedRuleApplicationTuple>> taggedRuleApplicationList,int index){
 		
-		List<TaggedRuleApplicationTulpe> taggedRuleApplicationTuple = new ArrayList<TaggedRuleApplicationTulpe>();
+		List<TaggedRuleApplicationTuple> taggedRuleApplicationTuple = new ArrayList<TaggedRuleApplicationTuple>();
 		Map<List<EObject>,String> inclusionTuple = new HashMap<List<EObject>,String>();
 		Map<List<EObject>,String> exclusionTuple = new HashMap<List<EObject>,String>();
 		int k=0 ;

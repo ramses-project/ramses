@@ -21,7 +21,7 @@ import javax.swing.border.LineBorder;
 import org.eclipse.emf.ecore.EObject;
 
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
-import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTulpe;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple;
 
 
 public class AlternativePanel implements Serializable {
@@ -71,7 +71,7 @@ public class AlternativePanel implements Serializable {
 	}
 
 	
-	public void AddSelection(List<List<TaggedRuleApplicationTulpe>> taggedRuleApplicationT){
+	public void AddSelection(List<List<TaggedRuleApplicationTuple>> taggedRuleApplicationT){
 		panels.add(new PanelGroup());
 		alternetivePanel.add(panels.get(panels.size()-1).getPanelGroup());	
 		panels.get(panels.size()-1).addSelection(taggedRuleApplicationT);
@@ -84,9 +84,9 @@ public class AlternativePanel implements Serializable {
 
 
 	public void SetAlternative(
-			List<List<TaggedRuleApplicationTulpe>> taggedRuleApplicationT,
+			List<List<TaggedRuleApplicationTuple>> taggedRuleApplicationT,
 			int index) {
-		List<TaggedRuleApplicationTulpe> taggedRuleApplicationTuple = new ArrayList<TaggedRuleApplicationTulpe>();
+		List<TaggedRuleApplicationTuple> taggedRuleApplicationTuple = new ArrayList<TaggedRuleApplicationTuple>();
 		int k=0 ;
 		int i=0;
 		int SelectionNumber=0;

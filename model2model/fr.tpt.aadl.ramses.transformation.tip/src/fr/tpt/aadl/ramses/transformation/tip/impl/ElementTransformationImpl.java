@@ -148,7 +148,7 @@ public class ElementTransformationImpl extends EObjectImpl implements ElementTra
 	public EList getElementId() {
     if (elementId == null)
     {
-      elementId = new EObjectResolvingEList(NamedElement.class, this, TipPackage.ELEMENT_TRANSFORMATION__ELEMENT_ID);
+      elementId = new EObjectResolvingEList(Element.class, this, TipPackage.ELEMENT_TRANSFORMATION__ELEMENT_ID);
     }
     return elementId;
   }

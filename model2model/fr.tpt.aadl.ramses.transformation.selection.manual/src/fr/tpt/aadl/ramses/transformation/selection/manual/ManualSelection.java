@@ -50,8 +50,8 @@ import fr.tpt.aadl.ramses.transformation.selection.TupleEntry ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
-import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
-import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 
 /**
@@ -137,7 +137,7 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 		// retreive elt into patternMatchingMap as a collection
 		Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingCollection = patternMatchingMap.entrySet().iterator();
 		
-		List<List<RuleApplicationTulpe>> exclusionDependencies = new ArrayList<List<RuleApplicationTulpe>>();
+		List<List<RuleApplicationTuple>> exclusionDependencies = new ArrayList<List<RuleApplicationTuple>>();
 		//unnamedEobjects= null ;
 		// for debuging
 		String inFile = "../fileRamses.rdsl";
@@ -145,7 +145,7 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 		ArrayList<String> mesElts = new ArrayList<String>();
 		ArrayList<EObject> mesObjs = new ArrayList<EObject>();
 		ArrayList<String> applyAStr = new ArrayList<String>();
-		List<List<TaggedRuleApplicationTulpe>> TaggedRuleApplicationT =  new ArrayList<List<TaggedRuleApplicationTulpe>>();
+		List<List<TaggedRuleApplicationTuple>> TaggedRuleApplicationT =  new ArrayList<List<TaggedRuleApplicationTuple>>();
 		String afficheLesObjets = "";
 		int cpt=1;
 		int cptOb=0;
@@ -346,12 +346,12 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 	}
 	
 	private String printListList(
-			List<List<TaggedRuleApplicationTulpe>> taggedRuleApplicationList, String compteur) {
+			List<List<TaggedRuleApplicationTuple>> taggedRuleApplicationList, String compteur) {
 		
 		String Printable= "Consequences : null \n";
 		int k=0 ;
 		int i=0;
-		List<TaggedRuleApplicationTulpe> taggedRuleApplicationTuple = new ArrayList<TaggedRuleApplicationTulpe>();		
+		List<TaggedRuleApplicationTuple> taggedRuleApplicationTuple = new ArrayList<TaggedRuleApplicationTuple>();		
 		for (k = 0; k < taggedRuleApplicationList.size(); k++){		
 			if(k== 0) Printable= "Consequences : \n";
 			taggedRuleApplicationTuple.addAll(taggedRuleApplicationList.get(k));
@@ -425,7 +425,7 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 		return null;
 	}
 	
-	 public List<String> transformationsToApply(List<String> candidateTransformationList, Entry<List<EObject>, ArrayList<String>> tuple, List<List<RuleApplicationTulpe>> exclusionDependencies) {
+	 public List<String> transformationsToApply(List<String> candidateTransformationList, Entry<List<EObject>, ArrayList<String>> tuple, List<List<RuleApplicationTuple>> exclusionDependencies) {
 		    List<String> transformationsToApply = null; 
 		  
 			if(candidateTransformationList.size()==1){
@@ -435,9 +435,9 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 				List<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
 				
-				for(List<RuleApplicationTulpe> toExcludeList: exclusionDependencies)
+				for(List<RuleApplicationTuple> toExcludeList: exclusionDependencies)
 				{
-					for(RuleApplicationTulpe toExclude: toExcludeList)
+					for(RuleApplicationTuple toExclude: toExcludeList)
 					{
 						// verify if our EObject containt List<EObject> _patternMatchedElementList
 						if(!containsAll(tuple.getKey(), toExclude.getPatternMatchedElement()))

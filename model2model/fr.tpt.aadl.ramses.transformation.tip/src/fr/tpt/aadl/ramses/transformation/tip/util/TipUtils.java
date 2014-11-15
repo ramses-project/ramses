@@ -105,9 +105,15 @@ public class TipUtils {
 		{
 		  boolean isNamedElement = obj instanceof NamedElement;
 		  if(false==isNamedElement)
-		    continue;
-			et.getElementId().add(obj);
-			et.getElementName().add(getQualifiedName(obj));			
+		  {
+		    et.getElementId().add(obj);
+	      et.getElementName().add("NaNE");
+		  }
+		  else
+		  {
+		    et.getElementId().add(obj);
+	      et.getElementName().add(getQualifiedName(obj));
+		  }			
 		}
 		et.setTransformationId(transformationId);
 		return et;

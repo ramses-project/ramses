@@ -13,6 +13,7 @@ import org.osate.aadl2.instance.InstanceObject ;
 
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 
 public class RuleApplicationUtils {
 
@@ -67,6 +68,27 @@ public class RuleApplicationUtils {
 		rulesInheritenceMap.clear();
 	}
 
+	
+	public static String getRuleApplicationAsString(RuleApplicationTuple rat)
+	{
+	  String result="[";
+	  for(EObject obj: rat.getPatternMatchedElement())
+	    if(obj instanceof InstanceObject)
+	    {
+	      InstanceObject io = (InstanceObject) obj;
+	      result+=io.getInstanceObjectPath()+"; ";
+	    }
+	    else if(obj instanceof NamedElement)
+	    {
+	      NamedElement ne = (NamedElement) obj;
+	      result+=ne.getQualifiedName()+"; ";
+	    }
+	    else
+	      result+="NaNE; ";
+	  result+="] --> ";
+	  result += rat.getTransformationRuleName();
+	  return result;
+	}
 	
 	public static String printAlternativesToFile(Map<List<EObject>, ArrayList<String>> patternMatchingMap)
 	{

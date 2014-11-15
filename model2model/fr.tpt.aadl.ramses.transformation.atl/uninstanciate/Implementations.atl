@@ -145,7 +145,7 @@ rule m_Process_Implementation {
 }
 
 helper context AADLI!SystemImplementation def:  isRoot() : Boolean = 
-	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.subcomponent.oclIsUndefined()).debug(' !!!!!!!! ')
+	AADLI!ComponentInstance.allInstancesFrom('IN')->select(e|e.subcomponent.oclIsUndefined())
 			->exists(e| e.componentImplementation=self)
 ;
 

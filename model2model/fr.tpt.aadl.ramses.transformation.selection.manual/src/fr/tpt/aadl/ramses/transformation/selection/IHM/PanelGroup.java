@@ -20,7 +20,7 @@ import javax.swing.border.TitledBorder;
 
 import org.eclipse.emf.ecore.EObject;
 
-import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTulpe;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils;
 
 
@@ -61,7 +61,7 @@ public class PanelGroup implements ActionListener,Serializable{
 	}
 	
 	
-	public void addSelection(List<List<TaggedRuleApplicationTulpe>> taggedRuleApplicationT){
+	public void addSelection(List<List<TaggedRuleApplicationTuple>> taggedRuleApplicationT){
 		applyButton = new JButton("Apply");
 		applyButton.addActionListener(this);
 		JSplitPane splitPane = new JSplitPane();

@@ -367,7 +367,8 @@ public class ArchitectureRefinementProcessLauncher {
     this.transformationSelection.selectTransformation(patternMatchingMap, tuplesToApply);
     
     // store the result of the selection: generate TIP
-    TipUtils.addElementTransformationToLastIteration(getOutputDir()+getTipId(), resourceSet, TipUtils.getTipSpecification(), tuplesToApply);
+    String tipPath = outputPathSave+"/"+getTipId();
+    TipUtils.addElementTransformationToLastIteration(tipPath, resourceSet, TipUtils.getTipSpecification(), tuplesToApply);
 
     
     
@@ -465,16 +466,19 @@ public class ArchitectureRefinementProcessLauncher {
       Module m = completeModuleList.get(i);
       String mPath = m.getPath();
       if(mPath.endsWith(".atl"))
-        mPath = mPath.substring(0,mPath.length()-4)+".emftvm";
-      if(false == mPath.startsWith(File.separator))
-      {
-        String prefix = RamsesConfiguration.getRamsesResourceDir().getAbsolutePath();
-        if(false==prefix.endsWith("/"))
-          prefix+="/";
-        mPath=prefix+mPath;
-
-      }
-      String prefix = mPath.substring(mPath.lastIndexOf("/")+1,mPath.lastIndexOf("."));
+        mPath = mPath.substring(0,mPath.length()-4);
+      if(mPath.endsWith(".emftvm"))
+        mPath=mPath.substring(0, mPath.length()-7);
+      
+//      if(false == mPath.startsWith(File.separator))
+//      {
+//        String prefix = RamsesConfiguration.getRamsesResourceDir().getAbsolutePath();
+//        if(false==prefix.endsWith("/"))
+//          prefix+="/";
+//        mPath=prefix+mPath;
+//
+//      }
+      String prefix = mPath.substring(mPath.lastIndexOf("/")+1,mPath.length());
       fr.tpt.aadl.ramses.control.workflow.File f = WorkflowFactory.eINSTANCE.createFile();
       f.setPath(mPath);
       l.getFile().add(f);

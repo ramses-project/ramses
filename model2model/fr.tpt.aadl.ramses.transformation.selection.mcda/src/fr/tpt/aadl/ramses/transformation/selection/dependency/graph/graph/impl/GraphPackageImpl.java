@@ -8,6 +8,7 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.Depend
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphFactory;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphPackage;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
@@ -171,6 +172,16 @@ public class GraphPackageImpl extends EPackageImpl implements GraphPackage
    * <!-- end-user-doc -->
    * @generated
    */
+  public EAttribute getDependencyNode_TransformationRule()
+  {
+    return (EAttribute)dependencyNodeEClass.getEStructuralFeatures().get(3);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   public EClass getDependencyArc()
   {
     return dependencyArcEClass;
@@ -233,6 +244,7 @@ public class GraphPackageImpl extends EPackageImpl implements GraphPackage
     createEReference(dependencyNodeEClass, DEPENDENCY_NODE__OUT_ARCS);
     createEReference(dependencyNodeEClass, DEPENDENCY_NODE__IN_ARCS);
     createEReference(dependencyNodeEClass, DEPENDENCY_NODE__MATCHED_ELEMENTS);
+    createEAttribute(dependencyNodeEClass, DEPENDENCY_NODE__TRANSFORMATION_RULE);
 
     dependencyArcEClass = createEClass(DEPENDENCY_ARC);
     createEReference(dependencyArcEClass, DEPENDENCY_ARC__SOURCE_NODE);
@@ -277,6 +289,7 @@ public class GraphPackageImpl extends EPackageImpl implements GraphPackage
     initEReference(getDependencyNode_OutArcs(), this.getDependencyArc(), null, "outArcs", null, 0, -1, DependencyNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getDependencyNode_InArcs(), this.getDependencyArc(), null, "inArcs", null, 0, -1, DependencyNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
     initEReference(getDependencyNode_MatchedElements(), ecorePackage.getEObject(), null, "matchedElements", null, 1, -1, DependencyNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getDependencyNode_TransformationRule(), ecorePackage.getEString(), "transformationRule", null, 0, 1, DependencyNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(dependencyArcEClass, DependencyArc.class, "DependencyArc", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
     initEReference(getDependencyArc_SourceNode(), this.getDependencyNode(), null, "sourceNode", null, 1, 1, DependencyArc.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

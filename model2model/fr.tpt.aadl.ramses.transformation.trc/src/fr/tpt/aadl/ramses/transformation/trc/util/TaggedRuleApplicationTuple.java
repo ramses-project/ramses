@@ -1,6 +1,6 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
-public class TaggedRuleApplicationTulpe extends RuleApplicationTulpe {
+public class TaggedRuleApplicationTuple extends RuleApplicationTuple {
 
 	boolean _exclusion=false;
 	

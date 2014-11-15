@@ -13,12 +13,52 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.Depend
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphFactory ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
-import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class DependencyGraphUtils
 {
 
+  
+  private static List<RuleApplicationTuple> getActualRuleApplicationTuple(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
+                                               List<TaggedRuleApplicationTuple> dependencyList)
+  {
+    List<RuleApplicationTuple> result = new ArrayList<RuleApplicationTuple>();
+    
+    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
+    while (patternMatchingIt.hasNext()) 
+    {
+      Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
+      for(TaggedRuleApplicationTuple trat:dependencyList)
+      {
+        for(String ruleName: tuple.getValue())
+        {
+          if(trat.getTransformationRuleName().equals(ruleName))
+          {
+            boolean stop=false;
+            for(EObject obj : trat.getPatternMatchedElement())
+            {
+              if(tuple.getKey().contains(obj)==false)
+              {
+                stop=true;
+                break;
+              }
+            }
+            if(!stop)
+            {
+              RuleApplicationTuple newRat = new RuleApplicationTuple();
+              newRat.setTransformationRuleName(ruleName);
+              newRat.getPatternMatchedElement().addAll(tuple.getKey());
+              result.add(newRat);
+            }
+          }
+        }
+      }
+    }
+    
+    return result;
+  }
   public static DependencyGraph createDependencyGraph(
       TrcSpecification trc,
       Map<List<EObject>, ArrayList<String>> patternMatchingMap)
@@ -38,19 +78,27 @@ public class DependencyGraphUtils
       else
       {
         treatedObjects.add(currentElements);
-        DependencyNode dn = getOrCreateDependencyNode(result, currentElements);
         
         // Retrieve dependencies for each alternative
         for(String ruleId: currentTransformationAlternatives)
         {
-          List<List<TaggedRuleApplicationTulpe>> accessibleTupleList =
+          DependencyNode dn = getOrCreateDependencyNode(result,
+                                                        currentElements,
+                                                        ruleId);
+          
+          List<List<TaggedRuleApplicationTuple>> accessibleTupleList =
               TrcUtils.getNormalizedDependencies(trc, currentElements, ruleId);
           
-          for(List<TaggedRuleApplicationTulpe> tarList: accessibleTupleList)
+          for(List<TaggedRuleApplicationTuple> tarList: accessibleTupleList)
           {
-            for(TaggedRuleApplicationTulpe tar: tarList)
+            List<RuleApplicationTuple> realTarList = 
+                getActualRuleApplicationTuple(patternMatchingMap, tarList);
+                
+            for(RuleApplicationTuple tar: realTarList)
             {
-              DependencyNode nextNode = getOrCreateDependencyNode(result, tar.getPatternMatchedElement());
+              DependencyNode nextNode = getOrCreateDependencyNode(result, 
+                                                                  tar.getPatternMatchedElement(),
+                                                                  tar.getTransformationRuleName());
               
               // Add nodes to arcs 
               
@@ -82,46 +130,81 @@ public class DependencyGraphUtils
 
   private static DependencyNode
       getOrCreateDependencyNode(DependencyGraph graph,
-                                List<EObject> elements)
+                                List<EObject> elements,
+                                String rule)
   {
-    DependencyNode result = getDependencyNode(graph,elements);
+    DependencyNode result = getDependencyNode(graph,
+                                              elements,
+                                              rule);
     if(result!=null)
       return result;
     
     result = GraphFactory.eINSTANCE.createDependencyNode();
     graph.getNodes().add(result);
     result.getMatchedElements().addAll(elements);
+    result.setTransformationRule(rule);
     return result ;
   }
   
   public static DependencyNode
       getDependencyNode(DependencyGraph graph,
-                        List<EObject> elements)
+                        List<EObject> elements,
+                        String rule)
   {
     for(DependencyNode dn: graph.getNodes())
     {
-      if(dn.getMatchedElements().equals(elements))
+      if(dn.getMatchedElements().equals(elements)
+          && dn.getTransformationRule().equals(rule))
         return dn;
     }
     return null;
   }
 
   public static List<DependencyNode>
-      getConnectedSubgraph(DependencyGraph dg, List<EObject> currentElements)
+      getConnectedSubgraph(DependencyGraph dg, 
+                           List<EObject> currentElements,
+                           String rule)
   {
     // 1 - Identify nodes for currentElements
     DependencyNode firstNode=null;
     for(DependencyNode dn: dg.getNodes())
     {
-      if(dn.getMatchedElements().equals(currentElements))
+      if(dn.getMatchedElements().equals(currentElements)
+          && dn.getTransformationRule().equals(rule))
       {
         firstNode = dn;
         break;
       }
     }
+//    if(firstNode==null)
+//    {
+//      for(DependencyNode dn: dg.getNodes())
+//      {
+//        if(!dn.getTransformationRule().equals(rule))
+//          continue;
+//        boolean stop = false;
+//        for(EObject obj : dn.getMatchedElements())
+//        {
+//          if(currentElements.contains(obj))
+//            continue;
+//          else
+//          {
+//            stop=true;
+//            break;
+//          }
+//        }
+//
+//        if(false==stop)
+//        {
+//          firstNode = dn;
+//          break;
+//        }
+//      }
+//    }
     if(firstNode==null)
       return null;
     
+      
     // 2 - Look for connected nodes
     List<DependencyNode> result = new ArrayList<DependencyNode>();
     getConnectedSubgraph(firstNode,result);

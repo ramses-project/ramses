@@ -355,17 +355,17 @@ public class TrcUtils {
    * @return the list of RuleApplication (tuples <Elements,Rule>) that could
    *  be excluded
    */
-	public static List<List<RuleApplicationTulpe>> getInclusionDependencies(TrcSpecification spec,
+	public static List<List<RuleApplicationTuple>> getInclusionDependencies(TrcSpecification spec,
 	                                                                        List<EObject> eObjList,
 	                                                                        String appliedRule)
 	{
-		List<List<RuleApplicationTulpe>> result = new ArrayList<List<RuleApplicationTulpe>>();
+		List<List<RuleApplicationTuple>> result = new ArrayList<List<RuleApplicationTuple>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
 				continue;
 			_LOGGER.trace("Search dependency for "+appliedRule);
-			List<RuleApplicationTulpe> localDependencyList = new ArrayList<RuleApplicationTulpe>();
+			List<RuleApplicationTuple> localDependencyList = new ArrayList<RuleApplicationTuple>();
 			result.add(localDependencyList);
 			for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 			{
@@ -390,16 +390,16 @@ public class TrcUtils {
    * @return TaggedRuleApplication (tuples <Elements,Rule> marked as
    *  included or excluded) that have to be respected
    */
-	public static List<List<TaggedRuleApplicationTulpe>> getNormalizedDependencies(TrcSpecification spec,
+	public static List<List<TaggedRuleApplicationTuple>> getNormalizedDependencies(TrcSpecification spec,
 	                                                                         List<EObject> eObjList,
 	                                                                         String appliedRule)
 	                                                                         {
-	  List<List<TaggedRuleApplicationTulpe>> result = new ArrayList<List<TaggedRuleApplicationTulpe>>();
+	  List<List<TaggedRuleApplicationTuple>> result = new ArrayList<List<TaggedRuleApplicationTuple>>();
 	  for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
 	  {
 	    if(false==dep.getAppliedRule().equals(appliedRule))
 	      continue;
-	    List<TaggedRuleApplicationTulpe> localDependencyList = new ArrayList<TaggedRuleApplicationTulpe>();
+	    List<TaggedRuleApplicationTuple> localDependencyList = new ArrayList<TaggedRuleApplicationTuple>();
 	    result.add(localDependencyList);
 	    for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 	    {
@@ -411,8 +411,8 @@ public class TrcUtils {
 
 	private static void getPossibleDependencies(AbstractRuleDependency ar, 
 	                                           List<EObject> eObjList, 
-	                                           List<TaggedRuleApplicationTulpe> currentDependencyList,
-	                                           List<List<TaggedRuleApplicationTulpe>> result)
+	                                           List<TaggedRuleApplicationTuple> currentDependencyList,
+	                                           List<List<TaggedRuleApplicationTuple>> result)
   {
 	  // Here, we have to organize dependencies according to a disjunctive normal form.
 	  if(ar instanceof RuleDependency)
@@ -420,7 +420,7 @@ public class TrcUtils {
 	    RuleDependency rd = (RuleDependency) ar;
 	    try
 	    {
-	      TaggedRuleApplicationTulpe dep = new TaggedRuleApplicationTulpe();
+	      TaggedRuleApplicationTuple dep = new TaggedRuleApplicationTuple();
 	      List<EObject> depObjList = new ArrayList<EObject>();
 	      for(EObject eObj: eObjList)
 	      {
@@ -455,7 +455,7 @@ public class TrcUtils {
 	      }
 	      else
 	      {
-	        List<TaggedRuleApplicationTulpe> disjuncResult = new ArrayList<TaggedRuleApplicationTulpe>();
+	        List<TaggedRuleApplicationTuple> disjuncResult = new ArrayList<TaggedRuleApplicationTuple>();
 	        disjuncResult.addAll(currentDependencyList);
 	        getPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result);
 	        result.add(disjuncResult);
@@ -466,8 +466,8 @@ public class TrcUtils {
 	
 	private static void getRestrictedPossibleDependencies(AbstractRuleDependency ar, 
 												  List<EObject> eObjList, 
-												  List<RuleApplicationTulpe> currentDependencyList,
-												  List<List<RuleApplicationTulpe>> result,
+												  List<RuleApplicationTuple> currentDependencyList,
+												  List<List<RuleApplicationTuple>> result,
 												  boolean isExclusion)
 	{
 		// Here, we have to organize dependencies according to a disjunctive normal form.
@@ -479,7 +479,7 @@ public class TrcUtils {
 			  return;
 			try
 			{
-				RuleApplicationTulpe dep = new RuleApplicationTulpe();
+				RuleApplicationTuple dep = new RuleApplicationTuple();
 				List<EObject> depObjList = new ArrayList<EObject>();
 				for(EObject eObj: eObjList)
 				{
@@ -514,7 +514,7 @@ public class TrcUtils {
 				}
 				else
 				{
-					List<RuleApplicationTulpe> disjuncResult = new ArrayList<RuleApplicationTulpe>();
+					List<RuleApplicationTuple> disjuncResult = new ArrayList<RuleApplicationTuple>();
 					disjuncResult.addAll(currentDependencyList);
 					getRestrictedPossibleDependencies(disjunctedAr, eObjList, disjuncResult, result, isExclusion);
 					result.add(disjuncResult);
@@ -612,15 +612,15 @@ public class TrcUtils {
 	 * @return the list of RuleApplication (tuples <Elements,Rule>) that have
    *  to be excluded
 	 */
-	public static List<List<RuleApplicationTulpe>> getExlcusionDependencies(TrcSpecification trcSpecification,
+	public static List<List<RuleApplicationTuple>> getExlcusionDependencies(TrcSpecification trcSpecification,
 	                                                                        List<EObject> candidateObjects,
 	                                                                        String appliedRule) {
-		List<List<RuleApplicationTulpe>> exclusionDependencyList = new ArrayList<List<RuleApplicationTulpe>>();
+		List<List<RuleApplicationTuple>> exclusionDependencyList = new ArrayList<List<RuleApplicationTuple>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) trcSpecification.getDependencyList().getTransformationDependencies())
 		{
 			if(false==dep.getAppliedRule().equals(appliedRule))
 				continue;
-			List<RuleApplicationTulpe> localDependencyList = new ArrayList<RuleApplicationTulpe>();
+			List<RuleApplicationTuple> localDependencyList = new ArrayList<RuleApplicationTuple>();
 			exclusionDependencyList.add(localDependencyList);
 			for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
 			{

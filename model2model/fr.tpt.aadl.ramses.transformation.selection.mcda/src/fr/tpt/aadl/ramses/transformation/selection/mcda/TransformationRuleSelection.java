@@ -27,10 +27,11 @@ import org.osate.utils.PropertyUtils ;
 
 import com.google.common.collect.Sets ;
 
+import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
-import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class TransformationRuleSelection
@@ -50,15 +51,15 @@ public class TransformationRuleSelection
     this.rootSystem = rootSystem;
   }
 
-  public List<RuleApplicationTulpe> selectBestRulesAlternatives()
+  public List<RuleApplicationTuple> selectBestRulesAlternatives()
   {
     // 1 - order potential results
-    Set<List<RuleApplicationTulpe>> orderedPotentialResults =
+    Set<List<RuleApplicationTuple>> orderedPotentialResults =
       orderPotentialSolutions().keySet();
     
     
     
-    for(List<RuleApplicationTulpe> potentialResults: orderedPotentialResults)
+    for(List<RuleApplicationTuple> potentialResults: orderedPotentialResults)
     {
       // 2 - validate dependencies
       DependencyValidation depValidation = 
@@ -66,7 +67,10 @@ public class TransformationRuleSelection
       
       boolean validResult = depValidation.validate();
       if(validResult)
+      {
+        RuleApplicationTuple rat = potentialResults.get(0);
         return potentialResults;
+      }
     }
     
     return null ;
@@ -74,26 +78,26 @@ public class TransformationRuleSelection
   
   // Returns a map of list of tuples associated with its performance (float).
   // This map is sorted according to the performance of the list of tuples.
-  private SortedMap<List<RuleApplicationTulpe>, Float> orderPotentialSolutions()
+  private SortedMap<List<RuleApplicationTuple>, Float> orderPotentialSolutions()
   {
-    List<Set<RuleApplicationTulpe>> sets = 
-        new ArrayList<Set<RuleApplicationTulpe>>(alternativeMap.size());
+    List<Set<RuleApplicationTuple>> sets = 
+        new ArrayList<Set<RuleApplicationTuple>>(alternativeMap.size());
     
-    Set<List<RuleApplicationTulpe>> unsortedSolutions ;
+    Set<List<RuleApplicationTuple>> unsortedSolutions ;
     
     // 1 - browse elements in alternativeMap to construct "result" 
     
     for(Entry<List<EObject>, List<String>> e : alternativeMap.entrySet())
     {
-      RuleApplicationTulpe tmp ;
+      RuleApplicationTuple tmp ;
       List<EObject> elList = e.getKey() ;
       List<String> patterns = e.getValue() ;
       
-      Set<RuleApplicationTulpe> tuples = new HashSet<RuleApplicationTulpe>
+      Set<RuleApplicationTuple> tuples = new HashSet<RuleApplicationTuple>
                                                              (patterns.size()) ;
       for(String pat: patterns)
       {
-        tmp = new RuleApplicationTulpe() ;
+        tmp = new RuleApplicationTuple() ;
         tmp.setPatternMatchedElement(elList);
         tmp.setTransformationRuleName(pat);
         tuples.add(tmp) ;  
@@ -111,18 +115,18 @@ public class TransformationRuleSelection
     return orderSolutions(unsortedSolutions) ;
   }
 
-  private SortedMap<List<RuleApplicationTulpe>, Float>orderSolutions(
-                              Set<List<RuleApplicationTulpe>> unsortedSolutions)
+  private SortedMap<List<RuleApplicationTuple>, Float>orderSolutions(
+                              Set<List<RuleApplicationTuple>> unsortedSolutions)
   {
-    final HashMap<List<RuleApplicationTulpe>, Float> ref =
-        new HashMap<List<RuleApplicationTulpe>, Float>(unsortedSolutions.size());
+    final HashMap<List<RuleApplicationTuple>, Float> ref =
+        new HashMap<List<RuleApplicationTuple>, Float>(unsortedSolutions.size());
     
-    Comparator<List<RuleApplicationTulpe>> comp = new Comparator
-                                                  <List<RuleApplicationTulpe>>()
+    Comparator<List<RuleApplicationTuple>> comp = new Comparator
+                                                  <List<RuleApplicationTuple>>()
     {
       @Override
-      public int compare(List<RuleApplicationTulpe> o1,
-                         List<RuleApplicationTulpe> o2)
+      public int compare(List<RuleApplicationTuple> o1,
+                         List<RuleApplicationTuple> o2)
       {
         int result = 0 ;
         
@@ -140,10 +144,10 @@ public class TransformationRuleSelection
       }
     } ;
     
-    TreeMap<List<RuleApplicationTulpe>, Float> result =
-              new TreeMap<List<RuleApplicationTulpe>, Float>(comp);
+    TreeMap<List<RuleApplicationTuple>, Float> result =
+              new TreeMap<List<RuleApplicationTuple>, Float>(comp);
     
-    for(List<RuleApplicationTulpe> listTuples: unsortedSolutions)
+    for(List<RuleApplicationTuple> listTuples: unsortedSolutions)
     {
       float perf = computePerformance(listTuples) ;
       ref.put(listTuples, perf) ;
@@ -153,10 +157,18 @@ public class TransformationRuleSelection
     
     StringBuilder sb  = new StringBuilder("list of tuples in descending order: \n") ;
     
-    for(Entry<List<RuleApplicationTulpe>, Float> e: result.entrySet())
+    for(Entry<List<RuleApplicationTuple>, Float> e: result.entrySet())
     {
       sb.append("   list #");
-      sb.append(e.getKey().hashCode());
+      sb.append(e.getKey().hashCode()+"\n");
+      for(RuleApplicationTuple rat: e.getKey())
+      {
+        sb.append("\t\t");
+        String ratId =
+            RuleApplicationUtils.getRuleApplicationAsString(rat);
+        sb.append(ratId);
+        sb.append("\n");
+      }
       sb.append(" with perf:");
       sb.append(e.getValue()) ;
       sb.append('\n') ;
@@ -167,7 +179,7 @@ public class TransformationRuleSelection
     return result ;
   }
 
-  private Float computePerformance(List<RuleApplicationTulpe> listTuples)
+  private Float computePerformance(List<RuleApplicationTuple> listTuples)
   {
     float result = 0f ;
     
@@ -178,7 +190,7 @@ public class TransformationRuleSelection
     StringBuilder sb = new StringBuilder() ;
     sb.append("--- liste of tuples #" + listTuples.hashCode() + " ---\n") ;
     
-    for(RuleApplicationTulpe tuple: listTuples)
+    for(RuleApplicationTuple tuple: listTuples)
     {
       setTrcPerformance(tuple.getTransformationRuleName(), qas) ;
       computeAqiPerf(tuple.getPatternMatchedElement(), qas) ;

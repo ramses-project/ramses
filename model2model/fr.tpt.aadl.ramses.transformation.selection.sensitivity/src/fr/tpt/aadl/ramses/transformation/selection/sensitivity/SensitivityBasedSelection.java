@@ -45,7 +45,7 @@ import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
-import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTulpe ;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 import fr.tpt.rdal.parser.RdalParser ;
@@ -303,7 +303,7 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 		// execute the selection algorithm for this object (key)
 		// retrieve dependency objects
 				
-		List<List<RuleApplicationTulpe>> exclusionDependencies = new ArrayList<List<RuleApplicationTulpe>>();
+		List<List<RuleApplicationTuple>> exclusionDependencies = new ArrayList<List<RuleApplicationTuple>>();
 		// add this object (and dependencies)
 		List<List<EObject>> treatedObjects = new ArrayList<List<EObject>>();
 		while (patternMatchingIt.hasNext()) 
@@ -317,9 +317,9 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 			  _LOGGER.trace("need to proceed to selection, exclusions nb="+exclusionDependencies.size());
 				ArrayList<String> newCandidateTransformationList = new ArrayList<String>();
 				newCandidateTransformationList.addAll(tuple.getValue());
-				for(List<RuleApplicationTulpe> toExcludeList: exclusionDependencies)
+				for(List<RuleApplicationTuple> toExcludeList: exclusionDependencies)
 				{
-					for(RuleApplicationTulpe toExclude: toExcludeList)
+					for(RuleApplicationTuple toExclude: toExcludeList)
 					{
 						if(!containsAll(tuple.getKey(), toExclude.getPatternMatchedElement()))
 							continue;
@@ -371,7 +371,7 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 			exclusionDependencies.addAll(TrcUtils.getExlcusionDependencies(trc,candidateObjects, transformationsToApply.get(0)));
 			_LOGGER.trace("Dependencies to exclude: "+exclusionDependencies.size());
 			
-			List<List<RuleApplicationTulpe>> inclusionDependencies = TrcUtils.getInclusionDependencies(trc,candidateObjects, transformationsToApply.get(0));
+			List<List<RuleApplicationTuple>> inclusionDependencies = TrcUtils.getInclusionDependencies(trc,candidateObjects, transformationsToApply.get(0));
 			_LOGGER.trace("Dependencies to include: "+inclusionDependencies.size());
 			
 			if(inclusionDependencies.size()==0)
@@ -385,8 +385,8 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 			RuleApplicationUtils.setTransformationToApply(tra, transformationsToApply.get(0), tuplesToApply);
 			
 			treatedObjects.add(tuple.getKey());
-			List<RuleApplicationTulpe> ruleApplicationList = selectBestTransformation(inclusionDependencies, new ArrayList<String>());
-			for(RuleApplicationTulpe rat : ruleApplicationList)
+			List<RuleApplicationTuple> ruleApplicationList = selectBestTransformation(inclusionDependencies, new ArrayList<String>());
+			for(RuleApplicationTuple rat : ruleApplicationList)
 			{
 				if(transformationsToApply.get(0).equals(rat.getTransformationRuleName()))
 					continue;
@@ -488,15 +488,15 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 
 	}
 
-  private List<RuleApplicationTulpe> selectBestTransformation(
-			List<List<RuleApplicationTulpe>> possibleDependencyList,
+  private List<RuleApplicationTuple> selectBestTransformation(
+			List<List<RuleApplicationTuple>> possibleDependencyList,
 			List<String> ignoredTransformations) {
 
 		List<String> sensitivities = new ArrayList<String>();
 		List<String> candidates = new ArrayList<String>();
-		for(List<RuleApplicationTulpe> alternativeTransformationList: possibleDependencyList)
+		for(List<RuleApplicationTuple> alternativeTransformationList: possibleDependencyList)
 		{
-			for(RuleApplicationTulpe rat: alternativeTransformationList)
+			for(RuleApplicationTuple rat: alternativeTransformationList)
 			{
 				sensitivities.addAll(RdalParser.getSensitivitiesForDesignElement(rdal, rat.getPatternMatchedElement()));
 				candidates.add(rat.getTransformationRuleName());
@@ -511,9 +511,9 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 		if(selectedTransformations.size()==1)
 		{
 			// return list of transformations containing the selected transfo
-			for(List<RuleApplicationTulpe> alternativeTransformationList: possibleDependencyList)
+			for(List<RuleApplicationTuple> alternativeTransformationList: possibleDependencyList)
 			{
-				for(RuleApplicationTulpe rat: alternativeTransformationList)
+				for(RuleApplicationTuple rat: alternativeTransformationList)
 				{
 					if(selectedTransformations.contains(rat.getTransformationRuleName()))
 						return alternativeTransformationList;
@@ -522,11 +522,11 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 		}
 		else
 		{
-			List<List<RuleApplicationTulpe>> filteredAlternatives = new ArrayList<List<RuleApplicationTulpe>>();
+			List<List<RuleApplicationTuple>> filteredAlternatives = new ArrayList<List<RuleApplicationTuple>>();
 			
-			for(List<RuleApplicationTulpe> alternativeTransformationList: possibleDependencyList)
+			for(List<RuleApplicationTuple> alternativeTransformationList: possibleDependencyList)
 			{
-				for(RuleApplicationTulpe rat: alternativeTransformationList)
+				for(RuleApplicationTuple rat: alternativeTransformationList)
 				{
 					if(selectedTransformations.contains(rat.getTransformationRuleName()))
 					{
