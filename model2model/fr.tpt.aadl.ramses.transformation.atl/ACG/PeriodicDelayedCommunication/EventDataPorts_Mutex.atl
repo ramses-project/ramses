@@ -148,6 +148,10 @@ rule m_Thread_With_Output_PeriodicDelayed_Port
 	}
 	to
 		sub: AADLBA!ThreadSubcomponent,
+		periodSub : AADLBA!DataSubcomponent,
+		currentPeriodSub : AADLBA!DataSubcomponent,
+		currentDeadlineSub : AADLBA!DataSubcomponent,
+		deadlineSub : AADLBA!DataSubcomponent,
 		msgPrioritySub : AADLBA!DataSubcomponent (
 			name <- 'MsgPriority',
 			dataSubcomponentType <- 'Integer_16'.asDataType('BASE_TYPES'),
@@ -172,6 +176,10 @@ rule m_Thread_With_Input_PeriodicDelayed_Port
 		)
 	to
 		sub: AADLBA!ThreadSubcomponent,
+		periodSub : AADLBA!DataSubcomponent,
+		currentPeriodSub : AADLBA!DataSubcomponent,
+		currentDeadlineSub : AADLBA!DataSubcomponent,
+		deadlineSub : AADLBA!DataSubcomponent,
 		pa: AADLBA!PropertyAssociation
 		(
 			property <- thisModule.getProperty('Initialize_Entrypoint_Call_Sequence'),  

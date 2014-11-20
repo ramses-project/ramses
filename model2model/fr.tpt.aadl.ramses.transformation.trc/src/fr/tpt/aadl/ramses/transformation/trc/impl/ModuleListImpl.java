@@ -34,132 +34,126 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class ModuleListImpl extends EObjectImpl implements ModuleList
 {
   /**
-   * The cached value of the '{@link #getModules() <em>Modules</em>}' containment reference list.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getModules() <em>Modules</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getModules()
-   * @generated
-   * @ordered
-   */
+	 * @see #getModules()
+	 * @generated
+	 * @ordered
+	 */
   protected EList<Module> modules;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected ModuleListImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.MODULE_LIST;
-  }
+		return TrcPackage.Literals.MODULE_LIST;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public EList<Module> getModules()
   {
-    if (modules == null)
-    {
-      modules = new EObjectContainmentEList<Module>(Module.class, this, TrcPackage.MODULE_LIST__MODULES);
-    }
-    return modules;
-  }
+		if (modules == null) {
+			modules = new EObjectContainmentEList<Module>(Module.class, this, TrcPackage.MODULE_LIST__MODULES);
+		}
+		return modules;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
-    switch (featureID)
-    {
-      case TrcPackage.MODULE_LIST__MODULES:
-        return ((InternalEList<?>)getModules()).basicRemove(otherEnd, msgs);
-    }
-    return super.eInverseRemove(otherEnd, featureID, msgs);
-  }
+		switch (featureID) {
+			case TrcPackage.MODULE_LIST__MODULES:
+				return ((InternalEList<?>)getModules()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType)
   {
-    switch (featureID)
-    {
-      case TrcPackage.MODULE_LIST__MODULES:
-        return getModules();
-    }
-    return super.eGet(featureID, resolve, coreType);
-  }
+		switch (featureID) {
+			case TrcPackage.MODULE_LIST__MODULES:
+				return getModules();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @SuppressWarnings("unchecked")
   @Override
   public void eSet(int featureID, Object newValue)
   {
-    switch (featureID)
-    {
-      case TrcPackage.MODULE_LIST__MODULES:
-        getModules().clear();
-        getModules().addAll((Collection<? extends Module>)newValue);
-        return;
-    }
-    super.eSet(featureID, newValue);
-  }
+		switch (featureID) {
+			case TrcPackage.MODULE_LIST__MODULES:
+				getModules().clear();
+				getModules().addAll((Collection<? extends Module>)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.MODULE_LIST__MODULES:
-        getModules().clear();
-        return;
-    }
-    super.eUnset(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.MODULE_LIST__MODULES:
+				getModules().clear();
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.MODULE_LIST__MODULES:
-        return modules != null && !modules.isEmpty();
-    }
-    return super.eIsSet(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.MODULE_LIST__MODULES:
+				return modules != null && !modules.isEmpty();
+		}
+		return super.eIsSet(featureID);
+	}
 
 } //ModuleListImpl

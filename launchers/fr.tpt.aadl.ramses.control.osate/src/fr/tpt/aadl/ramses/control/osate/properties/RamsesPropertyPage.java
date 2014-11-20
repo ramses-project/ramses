@@ -521,6 +521,8 @@ public class RamsesPropertyPage extends PropertyPage {
     String value = project.getPersistentProperty(new QualifiedName(
                                                    RamsesPropertyPage.PREFIX,
                                                    property));
+    if(value==null)
+        value = project.getLocation().toString();
     return value ;
   }
   

@@ -78,13 +78,12 @@ public abstract class AtlHotTransfoLauncher {
 	 */
 	public AtlHotTransfoLauncher(String transformation,
 	                             ResourceSet rs) throws IOException {
-		
 	  this.hotTransformationName = transformation;
 	  this.properties = new Properties();
 	  try {
-      properties.load(getFileURL(transformation+".properties").openStream());
+      properties.load(this.getFileURL(transformation+".properties").openStream());
     } catch (IOException e) {
-      e.printStackTrace();
+    	e.printStackTrace();
     }
 
 //		this.setHotTransformationName(getHotTransformationName());
@@ -212,10 +211,11 @@ public abstract class AtlHotTransfoLauncher {
 	 * @generated
 	 */
 	protected String getMetamodelUri(String metamodelName) {
-		String root = "platform:/plugin/" + "fr.tpt.atl.utils/";
+		String root = "platform:/plugin/" + "fr.tpt.atl.utils/";		
 		return root+properties.getProperty(getHotTransformationName()+".metamodels."
 				+ metamodelName);
 	}
+
 
 	/**
 	 * Returns the file name of the given library, parameterized from the
@@ -267,7 +267,7 @@ public abstract class AtlHotTransfoLauncher {
 	 * 
 	 * @generated
 	 */
-	protected static URL getFileURL(String fileName) throws IOException {
+	protected URL getFileURL(String fileName) throws IOException {
 		final URL fileURL;
 		fileURL = AtlHotTransfoLauncher.class.getResource(fileName);
 

@@ -25,18 +25,18 @@ public interface TransformationList extends EObject
 {
 
   /**
-   * Returns the value of the '<em><b>Transformations</b></em>' containment reference list.
-   * The list contents are of type {@link fr.tpt.aadl.ramses.transformation.trc.Transformation}.
-   * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Transformations</b></em>' containment reference list.
+	 * The list contents are of type {@link fr.tpt.aadl.ramses.transformation.trc.Transformation}.
+	 * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Transformations</em>' containment reference list isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Transformations</em>' containment reference list.
-   * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTransformationList_Transformations()
-   * @model containment="true" required="true"
-   * @generated
-   */
+	 * @return the value of the '<em>Transformations</em>' containment reference list.
+	 * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getTransformationList_Transformations()
+	 * @model containment="true" required="true"
+	 * @generated
+	 */
   EList<Transformation> getTransformations();
 } // TransformationList

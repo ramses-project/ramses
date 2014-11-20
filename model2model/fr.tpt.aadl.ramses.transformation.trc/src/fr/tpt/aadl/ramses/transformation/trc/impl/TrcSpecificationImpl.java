@@ -45,305 +45,294 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecification
 {
   /**
-   * The cached value of the '{@link #getTransformationList() <em>Transformation List</em>}' containment reference.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getTransformationList() <em>Transformation List</em>}' containment reference.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getTransformationList()
-   * @generated
-   * @ordered
-   */
+	 * @see #getTransformationList()
+	 * @generated
+	 * @ordered
+	 */
   protected TransformationList transformationList;
 
   /**
-   * The cached value of the '{@link #getDependencyList() <em>Dependency List</em>}' containment reference.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getDependencyList() <em>Dependency List</em>}' containment reference.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getDependencyList()
-   * @generated
-   * @ordered
-   */
+	 * @see #getDependencyList()
+	 * @generated
+	 * @ordered
+	 */
   protected TransformationDependencyList dependencyList;
 
   /**
-   * The cached value of the '{@link #getModuleList() <em>Module List</em>}' containment reference.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getModuleList() <em>Module List</em>}' containment reference.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getModuleList()
-   * @generated
-   * @ordered
-   */
+	 * @see #getModuleList()
+	 * @generated
+	 * @ordered
+	 */
   protected ModuleList moduleList;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TrcSpecificationImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.TRC_SPECIFICATION;
-  }
+		return TrcPackage.Literals.TRC_SPECIFICATION;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransformationList getTransformationList()
   {
-    return transformationList;
-  }
+		return transformationList;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public NotificationChain basicSetTransformationList(TransformationList newTransformationList, NotificationChain msgs)
   {
-    TransformationList oldTransformationList = transformationList;
-    transformationList = newTransformationList;
-    if (eNotificationRequired())
-    {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, oldTransformationList, newTransformationList);
-      if (msgs == null) msgs = notification; else msgs.add(notification);
-    }
-    return msgs;
-  }
+		TransformationList oldTransformationList = transformationList;
+		transformationList = newTransformationList;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, oldTransformationList, newTransformationList);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public void setTransformationList(TransformationList newTransformationList)
   {
-    if (newTransformationList != transformationList)
-    {
-      NotificationChain msgs = null;
-      if (transformationList != null)
-        msgs = ((InternalEObject)transformationList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, null, msgs);
-      if (newTransformationList != null)
-        msgs = ((InternalEObject)newTransformationList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, null, msgs);
-      msgs = basicSetTransformationList(newTransformationList, msgs);
-      if (msgs != null) msgs.dispatch();
-    }
-    else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, newTransformationList, newTransformationList));
-  }
+		if (newTransformationList != transformationList) {
+			NotificationChain msgs = null;
+			if (transformationList != null)
+				msgs = ((InternalEObject)transformationList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, null, msgs);
+			if (newTransformationList != null)
+				msgs = ((InternalEObject)newTransformationList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, null, msgs);
+			msgs = basicSetTransformationList(newTransformationList, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST, newTransformationList, newTransformationList));
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransformationDependencyList getDependencyList()
   {
-    return dependencyList;
-  }
+		return dependencyList;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public NotificationChain basicSetDependencyList(TransformationDependencyList newDependencyList, NotificationChain msgs)
   {
-    TransformationDependencyList oldDependencyList = dependencyList;
-    dependencyList = newDependencyList;
-    if (eNotificationRequired())
-    {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, oldDependencyList, newDependencyList);
-      if (msgs == null) msgs = notification; else msgs.add(notification);
-    }
-    return msgs;
-  }
+		TransformationDependencyList oldDependencyList = dependencyList;
+		dependencyList = newDependencyList;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, oldDependencyList, newDependencyList);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public void setDependencyList(TransformationDependencyList newDependencyList)
   {
-    if (newDependencyList != dependencyList)
-    {
-      NotificationChain msgs = null;
-      if (dependencyList != null)
-        msgs = ((InternalEObject)dependencyList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, null, msgs);
-      if (newDependencyList != null)
-        msgs = ((InternalEObject)newDependencyList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, null, msgs);
-      msgs = basicSetDependencyList(newDependencyList, msgs);
-      if (msgs != null) msgs.dispatch();
-    }
-    else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, newDependencyList, newDependencyList));
-  }
+		if (newDependencyList != dependencyList) {
+			NotificationChain msgs = null;
+			if (dependencyList != null)
+				msgs = ((InternalEObject)dependencyList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, null, msgs);
+			if (newDependencyList != null)
+				msgs = ((InternalEObject)newDependencyList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, null, msgs);
+			msgs = basicSetDependencyList(newDependencyList, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST, newDependencyList, newDependencyList));
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public ModuleList getModuleList()
   {
-    return moduleList;
-  }
+		return moduleList;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public NotificationChain basicSetModuleList(ModuleList newModuleList, NotificationChain msgs)
   {
-    ModuleList oldModuleList = moduleList;
-    moduleList = newModuleList;
-    if (eNotificationRequired())
-    {
-      ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__MODULE_LIST, oldModuleList, newModuleList);
-      if (msgs == null) msgs = notification; else msgs.add(notification);
-    }
-    return msgs;
-  }
+		ModuleList oldModuleList = moduleList;
+		moduleList = newModuleList;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__MODULE_LIST, oldModuleList, newModuleList);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public void setModuleList(ModuleList newModuleList)
   {
-    if (newModuleList != moduleList)
-    {
-      NotificationChain msgs = null;
-      if (moduleList != null)
-        msgs = ((InternalEObject)moduleList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__MODULE_LIST, null, msgs);
-      if (newModuleList != null)
-        msgs = ((InternalEObject)newModuleList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__MODULE_LIST, null, msgs);
-      msgs = basicSetModuleList(newModuleList, msgs);
-      if (msgs != null) msgs.dispatch();
-    }
-    else if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__MODULE_LIST, newModuleList, newModuleList));
-  }
+		if (newModuleList != moduleList) {
+			NotificationChain msgs = null;
+			if (moduleList != null)
+				msgs = ((InternalEObject)moduleList).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__MODULE_LIST, null, msgs);
+			if (newModuleList != null)
+				msgs = ((InternalEObject)newModuleList).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRC_SPECIFICATION__MODULE_LIST, null, msgs);
+			msgs = basicSetModuleList(newModuleList, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRC_SPECIFICATION__MODULE_LIST, newModuleList, newModuleList));
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
-        return basicSetTransformationList(null, msgs);
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
-        return basicSetDependencyList(null, msgs);
-      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
-        return basicSetModuleList(null, msgs);
-    }
-    return super.eInverseRemove(otherEnd, featureID, msgs);
-  }
+		switch (featureID) {
+			case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+				return basicSetTransformationList(null, msgs);
+			case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+				return basicSetDependencyList(null, msgs);
+			case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+				return basicSetModuleList(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
-        return getTransformationList();
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
-        return getDependencyList();
-      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
-        return getModuleList();
-    }
-    return super.eGet(featureID, resolve, coreType);
-  }
+		switch (featureID) {
+			case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+				return getTransformationList();
+			case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+				return getDependencyList();
+			case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+				return getModuleList();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @SuppressWarnings("unchecked")
   @Override
   public void eSet(int featureID, Object newValue)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
-        setTransformationList((TransformationList)newValue);
-        return;
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
-        setDependencyList((TransformationDependencyList)newValue);
-        return;
-      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
-        setModuleList((ModuleList)newValue);
-        return;
-    }
-    super.eSet(featureID, newValue);
-  }
+		switch (featureID) {
+			case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+				setTransformationList((TransformationList)newValue);
+				return;
+			case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+				setDependencyList((TransformationDependencyList)newValue);
+				return;
+			case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+				setModuleList((ModuleList)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
-        setTransformationList((TransformationList)null);
-        return;
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
-        setDependencyList((TransformationDependencyList)null);
-        return;
-      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
-        setModuleList((ModuleList)null);
-        return;
-    }
-    super.eUnset(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+				setTransformationList((TransformationList)null);
+				return;
+			case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+				setDependencyList((TransformationDependencyList)null);
+				return;
+			case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+				setModuleList((ModuleList)null);
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
-        return transformationList != null;
-      case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
-        return dependencyList != null;
-      case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
-        return moduleList != null;
-    }
-    return super.eIsSet(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRC_SPECIFICATION__TRANSFORMATION_LIST:
+				return transformationList != null;
+			case TrcPackage.TRC_SPECIFICATION__DEPENDENCY_LIST:
+				return dependencyList != null;
+			case TrcPackage.TRC_SPECIFICATION__MODULE_LIST:
+				return moduleList != null;
+		}
+		return super.eIsSet(featureID);
+	}
 
 } //TrcSpecificationImpl

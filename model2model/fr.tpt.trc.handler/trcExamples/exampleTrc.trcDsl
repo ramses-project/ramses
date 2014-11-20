@@ -1,0 +1,34 @@
+from "platform:/resource/fr.tpt.aadl.ramses.transformation.atl";
+//import fr.tpt.aadl.ramses.transformation.atl;
+
+Modules 
+{ 
+ 	 ACG_ARINC653 :: BlackboardCommunication: m_BlackBoard,m_Input_BlackBoard,r3;
+	 ACG_RAVENSCAR :: BlackboardCommunication: m_BlackBoard,m_Input_BlackBoard,r3;
+	 ACG_ARINC653 :: BufferCommunication: threadEventData, r4;
+	 ACG_ARINC653 :: BufferCommunication: threadEventData,r4;
+	 ACG_ARINC653 :: ExpandThreadsPorts: r2,r4;
+	 ACG_ARINC653 :: BlackboardCommunication:r3
+}
+
+Transformations { 
+	PIM2PSMArinc653 {
+		modules : BlackboardCommunication,BufferCommunication, ExpandThreadsPorts
+		impacts : ( "MemoryfootPrint" , 1), ("PowerConsumption", 3)
+	}
+}
+
+Dependencies {
+	connectedPort {
+		Apply (PIM2PSMArinc653.r2,{sender_thread_port,Any})
+		[
+			requires (PIM2PSMArinc653.r2,sender_thread_port : Oclexpression) and (PIM2PSMArinc653.r2, sender_thread_port:OclExpression) 
+			or excludes (PIM2PSMArinc653.r3,eventdataPort:ocl)
+		];
+		Apply (PIM2PSMArinc653.r4,{sender_thread_port,Any})
+		[
+			requires (PIM2PSMArinc653.r2,sender_thread_port : Oclexpression) and (PIM2PSMArinc653.r3, sender_thread_port:OclExpression) 
+			or excludes (PIM2PSMArinc653.r3,eventdataPort:ocl)
+		]
+	}
+}

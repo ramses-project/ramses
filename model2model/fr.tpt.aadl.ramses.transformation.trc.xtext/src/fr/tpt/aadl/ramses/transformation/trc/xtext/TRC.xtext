@@ -1,0 +1,169 @@
+grammar fr.tpt.aadl.ramses.transformation.trc.xtext.TRC with org.eclipse.xtext.common.Terminals
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+//import "http://www.eclipse.org/ocl/3.1.0/EssentialOCLCST" as essentialocl
+import "platform:/resource/fr.tpt.aadl.ramses.transformation.trc/model/TRC.ecore" as TRC
+
+//generate tRC "http://www.tpt.fr/aadl/ramses/transformation/trc/xtext/TRC"
+
+TrcSpecification returns TRC::TrcSpecification :
+		moduleList         = ModuleList
+		transformationList = TransformationList
+		dependencyList     = TransformationDependencyList
+;
+   
+TrcRule returns TRC::TrcRule:
+	name=EString
+;  
+
+ModuleList returns TRC::ModuleList:
+'Modules'
+	'{'
+		modules+=Module ";" ( modules+=Module";")*
+	'}'
+;
+
+QualifiedName:
+ID ('.' ID)*;
+
+Module returns TRC::Module:
+		name=EString '['path=EString']' (':'  rules+=TrcRule ( "," rules+=TrcRule)*)?
+;
+
+TransformationList returns TRC::TransformationList :
+	'Transformations'
+	'{'
+		transformations+=Transformation ( "," transformations+=Transformation)*
+	'}'
+; 
+	
+Transformation returns TRC::Transformation :
+		name=EString
+		'{'
+			'modules' ':' modules+=[TRC::Module] ( "," modules+=[TRC::Module])*
+			('impacts' ':'  impacts+=TransformationImpact ( "," impacts+=TransformationImpact)* )?
+		'}'
+;
+
+TransformationImpact returns TRC::TransformationImpact :
+	'('
+		(qualityAttributeName=EString ',')? 
+		impactValue=EInt
+	')'
+;
+
+TransformationDependencyList returns TRC::TransformationDependencyList :
+	'Dependencies' 
+	'{'
+			transformationDependencies+=TransformationDependency";" ( transformationDependencies+=TransformationDependency";")* 
+	'}' 
+;
+
+TransformationDependency returns TRC::TransformationDependency:
+	'Apply'
+	'('
+		appliedTransformation=[TRC::Transformation|EString]'.'appliedRule=[TRC::TrcRule|QualifiedName] ','
+		'{' variableId+=EString ( "," variableId+=EString)* '}'
+	')'
+	'['	
+		requiredTransformations=AbstractRuleDependency  
+	']'
+;
+
+RuleDependencyDisjunction  returns TRC:: RuleDependencyDisjunction:
+	requiredTransformations+=AbstractRuleDependency 
+	('or'
+	requiredTransformations+=AbstractRuleDependency)+
+;
+
+RuleDependencyComposite  returns TRC::RuleDependencyComposite :
+	 '(' RuleDependencyConjunction ')' 
+	|'(' RuleDependencyDisjunction ')'
+;
+
+RuleDependencyConjunction  returns TRC::RuleDependencyConjunction :
+	requiredTransformations+=AbstractRuleDependency
+	('and'
+	requiredTransformations+=AbstractRuleDependency)+
+;
+
+AbstractRuleDependency returns TRC::AbstractRuleDependency :
+	(RuleDependencyComposite | RuleDependency)
+;
+
+RuleDependency returns TRC::RuleDependency :
+		type=('requires' | 'excludes') 
+		'('
+		requiredTransformation=[TRC::Transformation|EString]'.'requiredRule=[TRC::TrcRule|QualifiedName]','
+			'{'fieldNames+=EString (',' fieldNames+=EString)*'}'
+		')'
+;
+
+TransformationElement :
+	'TransformationElement'
+;
+
+SpecificationElement :
+	'SpecificationElement'
+;
+
+EString returns ecore::EString:
+STRING | ID;
+
+EInt returns ecore::EInt:
+'-'? INT;
+
+EBoolean returns ecore::EBoolean:
+'true' | 'false';
+
+
+EssentialOCLUnrestrictedName returns ecore::EString:
+	Identifier;
+
+Identifier:
+	ID;
+	
+
+UnrestrictedName returns ecore::EString: // Intended to be overridden
+	EssentialOCLUnrestrictedName;
+
+
+LOWER returns ecore::EInt:
+	INT
+;
+
+UPPER returns ecore::EInt:
+	INT
+;
+
+UnreservedName returns ecore::EString: // Intended to be overridden
+	EssentialOCLUnreservedName;
+
+EssentialOCLUnreservedName returns ecore::EString:
+UnrestrictedName
+|	CollectionTypeIdentifier
+|	PrimitiveTypeIdentifier
+|	'Tuple'
+;
+
+PrimitiveTypeIdentifier:
+	'Boolean'
+	| 'Integer'
+	| 'Real'
+	| 'String'
+	| 'UnlimitedNatural'
+	| 'OclAny'
+	| 'OclInvalid'
+	| 'OclVoid';
+
+CollectionTypeIdentifier returns ecore::EString:
+	'Set'
+	| 'Bag'
+	| 'Sequence'
+	| 'Collection'
+	| 'OrderedSet';
+
+
+
+terminal UNQUOTED_STRING:	// Never forward parsed; just provides a placeholder
+	'£$%^£$%^'				//  for reverse serialisation of embedded OCL 
+;

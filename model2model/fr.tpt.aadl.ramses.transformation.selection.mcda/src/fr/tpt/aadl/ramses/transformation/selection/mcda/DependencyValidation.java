@@ -1,5 +1,6 @@
 package fr.tpt.aadl.ramses.transformation.selection.mcda;
 
+import java.util.ArrayList;
 import java.util.List ;
 
 import org.eclipse.emf.ecore.EObject ;
@@ -24,7 +25,7 @@ public class DependencyValidation
 
   public boolean validate()
   {
-    
+   List<RuleApplicationTuple> forDebug = new ArrayList<RuleApplicationTuple>(ruleApplicationList); 
     for(RuleApplicationTuple rat: ruleApplicationList)
     {
       List<List<TaggedRuleApplicationTuple>> dependenciesDisjunctionList = 
@@ -93,7 +94,10 @@ public class DependencyValidation
       }
       if(stop)
         continue;
-      if(rat.getTransformationRuleName().equals(dependencyRule))
+      String ratRuleName = rat.getTransformationRuleName();
+      if(ratRuleName.contains("."))
+    	  ratRuleName = ratRuleName.substring(ratRuleName.indexOf('.')+1);
+      if(ratRuleName.equals(dependencyRule))
         return true;
       else
         continue;

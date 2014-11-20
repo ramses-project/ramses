@@ -1,0 +1,111 @@
+module Atl2Trc4Rule;
+
+create OUT : MM_TRC from IN : MM_ATL;
+
+helper def : inElements : Set(MM_ATL!LocatedElement) = MM_ATL!LocatedElement.allInstancesFrom('IN');
+
+--returns module name of the IN model
+helper def : getModuleName : String = MM_ATL!Module.allInstancesFrom('IN')->first().name;
+
+helper def : getTransformationId(transformationName : String) : String =
+	thisModule.getModuleName+'.'+transformationName;
+
+--gets the output module object
+helper def : getOutputModule() : MM_ATL!Module = 
+thisModule.resolveTemp(MM_TRC!Module.allInstancesFrom('IN')->first(), 't')
+;
+
+rule Module {
+    from s : MM_ATL!"ATL::Module" (thisModule.inElements->includes(s))
+    to t : MM_TRC!"dsl::Module" 
+		(    		
+    		name  <- s.name,
+			rules <- s.elements->select(e|e.oclIsTypeOf(MM_ATL!MatchedRule))
+		),
+
+	   t2 :MM_TRC!"TrcSpecification" 
+		(
+			moduleList <- t3
+		),
+	   t3 :MM_TRC!"ModuleList"
+	   (
+	   		modules <- Sequence{t}
+	   )
+	   
+}
+
+rule ModuleList {
+	from
+		matchR : MM_ATL!MatchedRule
+    to
+	   t4 :MM_TRC!"trcRule"
+	   (
+	   		name <- matchR.name
+	   )
+}
+
+--rule ModuleMatchedRule {
+--    from 
+--		s : MM_ATL!"ATL::MatchedRule" in IN
+--	to
+--		t : MM_TRC!"dsl::trcRule" (
+--			ruleName <- s.name
+----			superRule <- s.superRule,
+----			isAbstract <- s.isAbstract
+--		)	
+--}
+
+
+--module Atl2Trc4Rule;
+--
+--create OUT : MM_TRC from IN : MM_ATL;
+--
+--helper def : inElements : Set(MM_ATL!LocatedElement) = MM_ATL!LocatedElement.allInstancesFrom('IN');
+--
+----returns module name of the IN model
+--helper def : getModuleName : String = MM_ATL!Module.allInstancesFrom('IN')->first().name;
+--
+--helper def : getTransformationId(transformationName : String) : String =
+--	thisModule.getModuleName+'.'+transformationName;
+--
+----gets the output module object
+--helper def : getOutputModule() : MM_ATL!Module = 
+--thisModule.resolveTemp(MM_TRC!Module.allInstancesFrom('IN')->first(), 't')
+--;
+--
+--rule Module {
+--    from s : MM_ATL!"ATL::Module" (thisModule.inElements->includes(s))
+--    to t : MM_TRC!"trc::Module" 
+--		(    		
+--    	name  <- s.name,
+--		path  <- s.name+'_Module_path' -- location dont give the path
+--		),
+--
+--	   t2 :MM_TRC!"TrcSpecification" 
+--		(
+--			moduleList <- t3
+--		),
+--	   t3 :MM_TRC!"ModuleList"
+--	   (
+--	   		modules <- t
+--	   )
+--}
+--
+--
+--rule ModuleMatchedRule {
+--    from 
+--		s : MM_ATL!"ATL::MatchedRule" in IN
+--	to
+--		t : MM_TRC!"trc::trcRule" (
+--			ruleName <- s.name,
+--			superRule <- s.superRule,
+--			isAbstract <- s.isAbstract
+--		)	
+--}
+--
+--
+----		t :MM_TRC!"trcRule"
+----	    (
+----	   	ruleName <- s.elements -> collect(e | e.Module.name)
+----  	    )
+--

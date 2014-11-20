@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/fr.tpt.aadl.ramses.transformation.trc.xtext/src-gen"
+    editDirectory="/fr.tpt.aadl.ramses.transformation.trc.xtext.edit/src" editorDirectory="/fr.tpt.aadl.ramses.transformation.trc.xtext.editor/src"
+    modelPluginID="fr.tpt.aadl.ramses.transformation.trc.xtext" forceOverwrite="true"
+    modelName="TRC" updateClasspath="false" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    complianceLevel="5.0" copyrightFields="false" editPluginID="fr.tpt.aadl.ramses.transformation.trc.xtext.edit"
+    editorPluginID="fr.tpt.aadl.ramses.transformation.trc.xtext.editor" runtimeVersion="2.10">
+  <genPackages prefix="TRC" basePackage="fr.tpt.aadl.ramses.transformation.trc.xtext"
+      disposableProviderFactory="true" fileExtensions="trc" ecorePackage="TRC.ecore#/">
+    <genClasses ecoreClass="TRC.ecore#//TrcSpecification">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/moduleList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/transformationList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/dependencyList"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//trcRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//trcRule/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//ModuleList">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ModuleList/modules"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//Module">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Module/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//Module/rules"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TransformationList">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationList/transformations"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//Transformation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Transformation/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//Transformation/modules"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//Transformation/impacts"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TransformationImpact">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationImpact/qualityAttributeName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationImpact/impactValue"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TransformationDependencyList">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationDependencyList/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependencyList/transformationDependencies"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TransformationDependency">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/appliedTransformation"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/appliedRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationDependency/fields"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/requiredTransformations"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/boolOP"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//BooleanOperations">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//BooleanOperations/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//RuleDependency">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//RuleDependency/kw"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//RuleDependency/red"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//RuleDependency/boolOP"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//KeyWord">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//KeyWord/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//requiresOrExcludeDependency">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//requiresOrExcludeDependency/requiredTransformation"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//requiresOrExcludeDependency/requiredRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//requiresOrExcludeDependency/fields"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//requiresOrExcludeDependency/oclExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//oclExpr"/>
+    <genClasses ecoreClass="TRC.ecore#//ClassifierContextDeclCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//ClassifierContextDeclCS/selfName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ClassifierContextDeclCS/invariants"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ClassifierContextDeclCS/definitions"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//OperationContextDeclCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//OperationContextDeclCS/pathName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//OperationContextDeclCS/parameters"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//OperationContextDeclCS/ownedType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//OperationContextDeclCS/preconditions"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//OperationContextDeclCS/postconditions"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//OperationContextDeclCS/bodies"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//ParameterCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//ParameterCS/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ParameterCS/ownedType"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//ConstraintCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//ConstraintCS/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ConstraintCS/messageSpecification"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ConstraintCS/specification"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//DefCS"/>
+    <genClasses ecoreClass="TRC.ecore#//DefPropertyCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//DefPropertyCS/static"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//DefPropertyCS/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//DefPropertyCS/ownedType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//DefPropertyCS/specification"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TypedRefCS"/>
+    <genClasses ecoreClass="TRC.ecore#//MultiplicityCS"/>
+    <genClasses ecoreClass="TRC.ecore#//MultiplicityStringCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//MultiplicityStringCS/stringBounds"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//MultiplicityBoundsCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//MultiplicityBoundsCS/lowerBound"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//MultiplicityBoundsCS/upperBound"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//NamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//NamedElement/isStatic"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//NamedElement/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//NameSpace">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//NameSpace/ID"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TypeNameExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TypeNameExpCS/multiplicity"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TypeNameExpCS/pathName"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//PathNameCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//PathNameCS/path"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//PathElementCS">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//PathElementCS/element"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//SpecificationCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//SpecificationCS/ownedExpression"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//SpecificationCS/exprString"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//EssentialOCLInfixOperatorCS"/>
+    <genClasses ecoreClass="TRC.ecore#//BinaryOperatorCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//BinaryOperatorCS/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//NavigationOperatorCS"/>
+    <genClasses ecoreClass="TRC.ecore#//ContextCs">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ContextCs/ownedExpression"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ContextCs/B"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ContextCs/BO"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//ExpressCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ExpressCS/ownedExpression"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ExpressCS/ownedOperator"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//PrefixedExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//EssentialOCLPrefixOperator">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//EssentialOCLPrefixOperator/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//PrefixedExpOrLetExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//PrimaryExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//ConstructorPartCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//ConstructorPartCS/property"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ConstructorPartCS/initExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TypeLiteralWithMultiplicityCS"/>
+    <genClasses ecoreClass="TRC.ecore#//TypeLiteralCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TypeLiteralCS/multiplicity"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TypeLiteralCS/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TupleTypeCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TupleTypeCS/ownedParts"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TuplePartCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TuplePartCS/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TuplePartCS/ownedType"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//PrimitiveTypeCS"/>
+    <genClasses ecoreClass="TRC.ecore#//TypeLiteralExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TypeLiteralExpCS/ownedType"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//CollectionLiteralExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//CollectionLiteralExpCS/ownedType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//CollectionLiteralExpCS/ownedParts"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//CollectionLiteralPartCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//CollectionLiteralPartCS/expressionCS"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//CollectionLiteralPartCS/lastExpressionCS"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//CollectionTypeCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//CollectionTypeCS/ownedType"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//NestedExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//NestedExpCS/source"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//SelfExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//PrimaryExpOrLetExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//LetExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//LetExpCS/variable"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//LetExpCS/in"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//LetVariableCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//LetVariableCS/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//LetVariableCS/ownedType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//LetVariableCS/initExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//NavigatingArgCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//NavigatingArgCS/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//NavigatingArgCS/ownedType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//NavigatingArgCS/init"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//NavigatingArgCS/prefix"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//ExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//IfExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//IfExpCS/condition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//IfExpCS/thenExpression"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//IfExpCS/elseExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TupleLiteralExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TupleLiteralExpCS/ownedParts"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TupleLiteralPartCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TupleLiteralPartCS/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TupleLiteralPartCS/ownedType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TupleLiteralPartCS/initExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//PrimitiveLiteralExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//NumberLiteralExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//NumberLiteralExpCS/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//BigNumber">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//BigNumber/number"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//StringLiteralExpCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//StringLiteralExpCS/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//BooleanLiteralExpCS">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//BooleanLiteralExpCS/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//UnlimitedNaturalLiteralExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//InvalidLiteralExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//NullLiteralExpCS"/>
+    <genClasses ecoreClass="TRC.ecore#//PrefixExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//PrefixExpCS/ownedOperator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//PrefixExpCS/ownedExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//IndexExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//IndexExpCS/pathName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//IndexExpCS/firstIndexes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//IndexExpCS/secondIndexes"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//IndexExpCS/atPre"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//ConstructorExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ConstructorExpCS/pathName"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//ConstructorExpCS/ownedParts"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//ConstructorExpCS/value"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//InvocationExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//InvocationExpCS/pathName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//InvocationExpCS/atPre"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//InvocationExpCS/argument"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//NameExpCS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//NameExpCS/pathName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//NameExpCS/atPre"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

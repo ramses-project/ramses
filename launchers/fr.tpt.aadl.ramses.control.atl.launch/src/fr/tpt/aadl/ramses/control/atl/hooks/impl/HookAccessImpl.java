@@ -587,7 +587,7 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
     for(PropertyExpression pe : pes)
     {
       el = PropertyUtils.getValue(pe, stringLiteralValue) ;
-    
+      
       if(el != null)
       {
         return (StringLiteral) el ;

@@ -131,6 +131,15 @@ public class GenerateActionHandler extends RamsesActionHandler {
           _config.log() ;
         }
       }
+      else if(workflowFile!=null)
+      {
+    	  _config.setGenerationTargetId("workflow_only");
+    	  _config.setRamsesOutputDir(RamsesPropertyPage.
+    			  fetchPropertiesValue(_currentProject, RamsesPropertyPage.OUTPUT_DIR)) ;
+    	  // Only call once because it creates a log file.
+    	  LoggingConfigPage.fetchLoggingProperties(_currentProject);
+          _config.log() ;
+      }
       if(workflowFile!=null)
       {
         try

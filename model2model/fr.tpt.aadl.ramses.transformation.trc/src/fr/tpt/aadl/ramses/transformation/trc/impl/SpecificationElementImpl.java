@@ -21,24 +21,24 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 public abstract class SpecificationElementImpl extends EObjectImpl implements SpecificationElement
 {
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected SpecificationElementImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.SPECIFICATION_ELEMENT;
-  }
+		return TrcPackage.Literals.SPECIFICATION_ELEMENT;
+	}
 
 } //SpecificationElementImpl

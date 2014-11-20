@@ -1,33 +1,62 @@
 package fr.tpt.aadl.ramses.transformation.trc.util;
 
-import java.io.IOException ;
-import java.util.ArrayList ;
-import java.util.Iterator ;
-import java.util.List ;
-import java.util.Map ;
-import java.util.Map.Entry ;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.EList ;
-import org.eclipse.emf.common.util.URI ;
-import org.eclipse.emf.ecore.EClass ;
-import org.eclipse.emf.ecore.EObject ;
-import org.eclipse.emf.ecore.EStructuralFeature ;
-import org.eclipse.emf.ecore.resource.Resource ;
-import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
+import org.apache.log4j.Logger;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EEnumLiteral;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EOperation;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EParameter;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.ocl.Environment;
+import org.eclipse.ocl.ParserException;
+import org.eclipse.ocl.Query;
+import org.eclipse.ocl.ecore.CallOperationAction;
+import org.eclipse.ocl.ecore.Constraint;
+import org.eclipse.ocl.ecore.EcoreEnvironmentFactory;
+import org.eclipse.ocl.ecore.OCL;
+import org.eclipse.ocl.ecore.OCL.Helper;
+import org.eclipse.ocl.ecore.SendSignalAction;
+import org.eclipse.ocl.expressions.ExpressionsFactory;
+import org.eclipse.ocl.expressions.OCLExpression;
+import org.eclipse.ocl.expressions.Variable;
+import org.eclipse.ocl.util.Bag;
+import org.eclipse.xtext.EcoreUtil2;
+import org.osate.aadl2.Aadl2Package;
+import org.osate.aadl2.instance.ComponentInstance;
+import org.osate.aadl2.instance.InstanceObject;
+import org.osate.aadl2.instance.InstancePackage;
+import org.osate.aadl2.instance.SystemInstance;
 
-import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency ;
-import fr.tpt.aadl.ramses.transformation.trc.Module ;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependency ;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction ;
-import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction ;
-import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
-import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency ;
-import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
-import fr.tpt.aadl.ramses.transformation.trc.TrcFactory ;
-import fr.tpt.aadl.ramses.transformation.trc.TrcPackage ;
-import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
+import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency;
+import fr.tpt.aadl.ramses.transformation.trc.Module;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependency;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction;
+import fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact;
+import fr.tpt.aadl.ramses.transformation.trc.TrcFactory;
+import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
 
 public class TrcUtils {
 
@@ -152,10 +181,10 @@ public class TrcUtils {
 
 	  Iterator<Entry<String, Integer>> it = qualityImpactMap.entrySet().iterator();
 	  while (it.hasNext()) {
-	    Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>)it.next();
+	    Map.Entry<String, Integer> entry = it.next();
 	    TransformationImpact impact = TrcFactory.eINSTANCE.createTransformationImpact();
 
-	    impact.setQualityAttributeName((String) entry.getKey());
+	    impact.setQualityAttributeName(entry.getKey());
 	    impact.setImpactValue(new Integer(entry.getValue().toString()).intValue());
 
 	    t.getImpacts().add(impact);
@@ -205,7 +234,7 @@ public class TrcUtils {
                                                      String transformationId){
     Iterator<Transformation> transformationsIt = specification.getTransformationList().getTransformations().iterator();
     while (transformationsIt.hasNext()){
-      Transformation transformation = (Transformation)transformationsIt.next();
+      Transformation transformation = transformationsIt.next();
       for(Module module: (List<Module>)transformation.getModules())
       {
         String moduleName = module.getName().replaceFirst(".atl", "");
@@ -247,7 +276,7 @@ public class TrcUtils {
   public static Transformation getTransformationByName(TrcSpecification specification, String transformationName){
     Iterator<Transformation> transformationsIt = specification.getTransformationList().getTransformations().iterator();
     while (transformationsIt.hasNext()){
-      Transformation transformation = (Transformation)transformationsIt.next();
+      Transformation transformation = transformationsIt.next();
       for(String ruleName:(List<String>)transformation.getRuleName())
       {
         if (ruleName.equals(transformationName))
@@ -377,6 +406,12 @@ public class TrcUtils {
 		return result;
 	}
 	
+	public static String getRuleName(TrcRule rule)
+	{
+		Module m = (Module) rule.eContainer();
+		return m.getName()+"."+rule.getName();
+	}
+	
 	/**
    *  Returns the list of TaggedRuleApplication (tuples <Elements,Rule> marked as
    *  included or excluded) that have to be respected when the 
@@ -397,18 +432,27 @@ public class TrcUtils {
 	  List<List<TaggedRuleApplicationTuple>> result = new ArrayList<List<TaggedRuleApplicationTuple>>();
 	  for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
 	  {
-	    if(false==dep.getAppliedRule().equals(appliedRule))
+		TrcRule depRule = dep.getAppliedRule();
+	    if(false==getRuleName(depRule).equals(appliedRule))
 	      continue;
 	    List<TaggedRuleApplicationTuple> localDependencyList = new ArrayList<TaggedRuleApplicationTuple>();
 	    result.add(localDependencyList);
-	    for(AbstractRuleDependency req: (List<AbstractRuleDependency>) dep.getRequiredTransformations())
-	    {
-	      getPossibleDependencies(req, eObjList, localDependencyList, result);
-	    }
+	    getPossibleDependencies(dep.getRequiredTransformations(), eObjList, localDependencyList, result);
 	  }
 	  return result;
 	                                                                         }
 
+	
+	private static TransformationDependency getTransformationDependency(AbstractRuleDependency rd)
+	{
+		EObject container = rd.eContainer();
+		if(container instanceof TransformationDependency)
+			return (TransformationDependency) container;
+		else if(container instanceof AbstractRuleDependency)
+			return getTransformationDependency((AbstractRuleDependency) container);
+		return null;
+	}
+	
 	private static void getPossibleDependencies(AbstractRuleDependency ar, 
 	                                           List<EObject> eObjList, 
 	                                           List<TaggedRuleApplicationTuple> currentDependencyList,
@@ -420,22 +464,23 @@ public class TrcUtils {
 	    RuleDependency rd = (RuleDependency) ar;
 	    try
 	    {
-	      TaggedRuleApplicationTuple dep = new TaggedRuleApplicationTuple();
-	      List<EObject> depObjList = new ArrayList<EObject>();
-	      for(EObject eObj: eObjList)
+	      List<EObject> depObjList = 
+	    		  getReferencedEObjects(rd.getFieldNames(), getTransformationDependency(rd).getVariableId(), eObjList);
+	      for(EObject obj : depObjList)
 	      {
-	        List<EObject> depObj = getReferenceList(eObj,rd.getFieldNames());
-	        depObjList.addAll(depObj);
-	      }
-	      currentDependencyList.add(dep);
-	      dep.setPatternMatchedElement(depObjList);
-	      dep.setTransformationRuleName(rd.getRequiredRule());
-	      dep.setExclusion(rd.isIsExclusion());
+	    	TaggedRuleApplicationTuple dep = new TaggedRuleApplicationTuple();  
+			List<EObject> objList = new ArrayList<EObject>();
+			objList.add(obj);
+			currentDependencyList.add(dep);
+			dep.setPatternMatchedElement(objList);
+			dep.setTransformationRuleName(rd.getRequiredRule().getName());
+		      dep.setExclusion(rd.isIsExclusion());
+			_LOGGER.trace("Retreived (excluded) dependency to "+rd.getRequiredRule().getName());
+		  }
 	    }
 	    catch(Exception e)
 	    {
-	      e.printStackTrace();
-	      System.exit(-1);
+	      _LOGGER.fatal("failed when retreiving transformation dependencies", e);
 	    }
 	  }
 	  else if(ar instanceof RuleDependencyConjunction)
@@ -463,6 +508,97 @@ public class TrcUtils {
 	    }
 	  }
   }
+
+	
+	@SuppressWarnings("unchecked")
+	private static List<EObject> getReferencedEObjects(String queryText, 
+			List<String> formalParameterList,
+			List<EObject> actualParameterList) throws ParserException
+	{
+		if(queryText.startsWith("\""))
+			queryText = queryText.substring(1);
+		if(queryText.endsWith("\""))
+			queryText = queryText.substring(0,queryText.length()-1);
+		
+		OCL ocl = OCL.newInstance(EcoreEnvironmentFactory.INSTANCE);
+		Helper helper = ocl.createOCLHelper();
+
+		int i=-1;
+		for(String formal: formalParameterList)
+		{
+			i++;
+			if(formal.equals("_"))
+				continue;
+			EObject actual = actualParameterList.get(i);
+			Variable<EClassifier, EParameter> parameterVariable =
+			        ExpressionsFactory.eINSTANCE.createVariable();
+			parameterVariable.setName(formal);
+			helper.setInstanceContext(actual);
+			parameterVariable.setType(helper.getContextClassifier());
+			ocl.getEnvironment().addElement(formal, parameterVariable, true);
+		}
+		EObject eObj = (EObject) actualParameterList.get(0);
+		if(eObj instanceof InstanceObject)
+		{
+			InstanceObject io = (InstanceObject) eObj;
+			while(io.eContainer()!=null)
+				io = (InstanceObject) io.eContainer();
+			eObj = io;
+		}
+		helper.setInstanceContext(eObj);
+		
+		Map<EClass, Set<? extends EObject>> extents =
+				new HashMap<EClass, Set<? extends EObject>>();
+		
+		// next should not be here to optimize code
+		List<ComponentInstance> ciList = 
+				EcoreUtil2.getAllContentsOfType(eObj, ComponentInstance.class);
+		extents.put(InstancePackage.Literals.COMPONENT_INSTANCE,
+				new HashSet<ComponentInstance>(ciList));
+		
+		ocl.setExtentMap(extents);
+		
+		@SuppressWarnings("rawtypes")
+		OCLExpression query = helper.createQuery(queryText);
+		
+		// create a Query to evaluate our query expression
+		Query<EClassifier, EClass, EObject> queryEval = ocl.createQuery(query);
+		i=-1;
+		for(String formal: formalParameterList)
+		{
+			i++;
+			if(formal.equals("_"))
+				continue;
+			EObject actual = actualParameterList.get(i);
+			queryEval.getEvaluationEnvironment().add(formal, actual);
+		}
+		Object queryResult = queryEval.evaluate();
+		if(queryResult instanceof Bag)
+			return new ArrayList<EObject>((Bag<EObject>)queryResult);
+		else
+		{
+			EObject eo = (EObject) queryResult;
+			List<EObject> evalList = new ArrayList<EObject>();
+			evalList.add(eo);
+			return evalList;
+		}
+	}
+	
+	private static List<EObject> 
+			getReferencedEObjects(List<String> queryTextList, 
+				   				  List<String> formalParameterList,
+				   				  List<EObject> actualParameterList) throws ParserException
+	{
+		List<EObject> result = new ArrayList<EObject>();
+		for(String queryText: queryTextList)
+		{
+			result.addAll(getReferencedEObjects(queryText,
+					formalParameterList,
+					actualParameterList));
+		}
+		return result;
+
+	}
 	
 	private static void getRestrictedPossibleDependencies(AbstractRuleDependency ar, 
 												  List<EObject> eObjList, 
@@ -479,22 +615,22 @@ public class TrcUtils {
 			  return;
 			try
 			{
-				RuleApplicationTuple dep = new RuleApplicationTuple();
-				List<EObject> depObjList = new ArrayList<EObject>();
-				for(EObject eObj: eObjList)
+				List<EObject> depObjList = 
+						getReferencedEObjects(rd.getFieldNames(), getTransformationDependency(rd).getVariableId(), eObjList);
+				for(EObject obj : depObjList)
 				{
-					List<EObject> depObj = getReferenceList(eObj,rd.getFieldNames());
-					depObjList.addAll(depObj);
+					List<EObject> objList = new ArrayList<EObject>();
+					objList.add(obj);
+					RuleApplicationTuple dep = new RuleApplicationTuple();
+					currentDependencyList.add(dep);
+					dep.setPatternMatchedElement(objList);
+					dep.setTransformationRuleName(rd.getRequiredRule().getName());
+					_LOGGER.trace("Retreived (included) dependency to "+rd.getRequiredRule().getName());
 				}
-				currentDependencyList.add(dep);
-				dep.setPatternMatchedElement(depObjList);
-				dep.setTransformationRuleName(rd.getRequiredRule());
-				_LOGGER.trace("Retreived dependency to "+rd.getRequiredRule());
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				System.exit(-1);
+				_LOGGER.fatal("Error when retreiving rules dependencies", e);
 			}
 		}
 		else if(ar instanceof RuleDependencyConjunction)
@@ -524,81 +660,81 @@ public class TrcUtils {
 	  _LOGGER.trace("Finished retreive dependencies under disjunctive normal form");
 	}
 	
-	private static List<EObject> getReferenceList(EObject eObj, List<String> referenceNameList) throws Exception
-	{
-		List<EObject> result= new ArrayList<EObject>();
-		for(String fieldName:referenceNameList)
-		{
-			if(fieldName.equals("self"))
-				result.add(eObj);
-			else
-				result = getReferenceList(result, fieldName);
-		}
-		return result;
-	}
+//	private static List<EObject> getReferenceList(EObject eObj, List<String> referenceNameList) throws Exception
+//	{
+//		List<EObject> result= new ArrayList<EObject>();
+//		for(String fieldName:referenceNameList)
+//		{
+//			if(fieldName.equals("self"))
+//				result.add(eObj);
+//			else
+//				result = getReferenceList(result, fieldName);
+//		}
+//		return result;
+//	}
 	
-	private static List<EObject> getReferenceList(List<EObject> eObjList, String referenceName) throws Exception
-	{
-		List<EObject> result= new ArrayList<EObject>();
-		for(EObject eObj: eObjList)
-		{
-		final EClass type = eObj.eClass();
-		if(referenceName.contains("("))
-		{
-			int firstParenthesisIdx = referenceName.indexOf("(");
-			int lastParenthesisIdx = referenceName.lastIndexOf(")");
-			String operationName = referenceName.substring(0, firstParenthesisIdx);
-			String argumentListName = referenceName.substring(firstParenthesisIdx+1, lastParenthesisIdx);
-			argumentListName = argumentListName.replaceAll(" ", "");
-			String[] argumentArray = argumentListName.split("\\s*,\\s*");
-			if(argumentArray.length>0)
-			{
-				for(int i = 0; i<argumentArray.length; i++)
-				{
-					String argumentName = argumentArray[i];
-					if(argumentName.equals(""))
-						continue;
-				}
-			}
-			final Class cl = eObj.getClass();
-			for(int i=0;i<cl.getMethods().length;i++)
-			{
-				if(operationName.equals(cl.getMethods()[i].getName()))
-				{
-					Object o = cl.getMethods()[i].invoke(eObj);
-					if(o instanceof List)
-					{
-						result.addAll((List<EObject>)o);
-					}
-					else
-						result.add((EObject) o);
-				}
-			}
-		}
-		else
-		{
-			final EStructuralFeature sf = type.getEStructuralFeature(referenceName);
-			if (sf != null) {
-				Object ref = eObj.eGet(sf);
-				if(ref instanceof EObject)
-					result.add((EObject) ref);
-				else
-					throw new Exception("Expected EObject, found regular Java Object");
-			} // TODO: lists need to ne handled; but not in a first iteration.
-			else
-			{
-				String id="";
-
-				final EStructuralFeature qn = type.getEStructuralFeature("qualifiedName");
-				if (qn != null) {
-					id=(String) eObj.eGet(qn);
-				}
-				throw new Exception("could not find "+referenceName+" on element "+id);
-			}
-		}
-		}
-		return result;
-	}
+//	private static List<EObject> getReferenceList(List<EObject> eObjList, String referenceName) throws Exception
+//	{
+//		List<EObject> result= new ArrayList<EObject>();
+//		for(EObject eObj: eObjList)
+//		{
+//		final EClass type = eObj.eClass();
+//		if(referenceName.contains("("))
+//		{
+//			int firstParenthesisIdx = referenceName.indexOf("(");
+//			int lastParenthesisIdx = referenceName.lastIndexOf(")");
+//			String operationName = referenceName.substring(0, firstParenthesisIdx);
+//			String argumentListName = referenceName.substring(firstParenthesisIdx+1, lastParenthesisIdx);
+//			argumentListName = argumentListName.replaceAll(" ", "");
+//			String[] argumentArray = argumentListName.split("\\s*,\\s*");
+//			if(argumentArray.length>0)
+//			{
+//				for(int i = 0; i<argumentArray.length; i++)
+//				{
+//					String argumentName = argumentArray[i];
+//					if(argumentName.equals(""))
+//						continue;
+//				}
+//			}
+//			final Class<? extends EObject> cl = eObj.getClass();
+//			for(int i=0;i<cl.getMethods().length;i++)
+//			{
+//				if(operationName.equals(cl.getMethods()[i].getName()))
+//				{
+//					Object o = cl.getMethods()[i].invoke(eObj);
+//					if(o instanceof List)
+//					{
+//						result.addAll((List<EObject>)o);
+//					}
+//					else
+//						result.add((EObject) o);
+//				}
+//			}
+//		}
+//		else
+//		{
+//			final EStructuralFeature sf = type.getEStructuralFeature(referenceName);
+//			if (sf != null) {
+//				Object ref = eObj.eGet(sf);
+//				if(ref instanceof EObject)
+//					result.add((EObject) ref);
+//				else
+//					throw new Exception("Expected EObject, found regular Java Object");
+//			} // TODO: lists need to ne handled; but not in a first iteration.
+//			else
+//			{
+//				String id="";
+//
+//				final EStructuralFeature qn = type.getEStructuralFeature("qualifiedName");
+//				if (qn != null) {
+//					id=(String) eObj.eGet(qn);
+//				}
+//				throw new Exception("could not find "+referenceName+" on element "+id);
+//			}
+//		}
+//		}
+//		return result;
+//	}
 
 	
 	/**

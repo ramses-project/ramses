@@ -14,4 +14,5 @@ public class TaggedRuleApplicationTuple extends RuleApplicationTuple {
     this._exclusion = _exclusion ;
   }
   
+
 }

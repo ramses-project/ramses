@@ -20,6 +20,8 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.util.CancelIndicator;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -109,6 +111,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 
     List<Transformation> list = loop.getTransformations();
     Resource r = list.get(0).eResource();
+    EcoreUtil2.resolveAll(r, CancelIndicator.NullImpl);
     trc = (TrcSpecification) r.getContents().get(0);
 
   }
@@ -149,7 +152,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
           "alternatives to select");
     }
     
-    
+    List<List<EObject>> treatedObjectInTIP = new ArrayList<List<EObject>>();
     while (patternMatchingIt.hasNext()) 
     {
       Map.Entry<List<EObject>, ArrayList<String>> tuple =
@@ -157,6 +160,9 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       List<EObject> currentElements = tuple.getKey();
       List<String> currentTransformationAlternatives = tuple.getValue();
 
+      if(treatedObjectInTIP.contains(currentElements))
+    	continue;
+      
       if(currentTransformationAlternatives.size()>1)
       {
         
@@ -213,12 +219,22 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         for(RuleApplicationTuple rat:ratList)
         {
           List<EObject> ratElements = rat.getPatternMatchedElement();
+          if(treatedObjectInTIP.contains(ratElements))
+        	  continue;
+          treatedObjectInTIP.add(ratElements);
+          
           List<String> ratRules = patternMatchingMap.get(rat.getPatternMatchedElement());
           TransformationRuleAlternative tra = 
               new TransformationRuleAlternative(ratElements,ratRules);
+          String ratRuleName = rat.getTransformationRuleName();
+          if(ratRuleName.contains("."))
+          {
+        	  ratRuleName.substring(ratRuleName.indexOf('.')+1);
+          }
           RuleApplicationUtils.setTransformationToApply(tra, 
-                                                        rat.getTransformationRuleName(),
+        		  									    ratRuleName,
                                                         tuplesToApply);
+          
         }
       }
     }

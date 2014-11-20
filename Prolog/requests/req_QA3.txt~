@@ -1,0 +1,1 @@
+computeAllAffectations(Solutions,[1, 2, 11, 12, 21, 22],[t1,t2,t3,t4,t5,t6,t7]), computeAffectationsSubset(SolutionsSubset, Solutions, 1, 'the_result_QA_3.txt').

@@ -11,3 +11,4 @@ qemu.pid
 *.bin
 *.map
 sizes.c
+*.class

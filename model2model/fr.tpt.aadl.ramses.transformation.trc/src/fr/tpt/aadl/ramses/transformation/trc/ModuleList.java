@@ -25,18 +25,18 @@ public interface ModuleList extends EObject
 {
 
   /**
-   * Returns the value of the '<em><b>Modules</b></em>' containment reference list.
-   * The list contents are of type {@link fr.tpt.aadl.ramses.transformation.trc.Module}.
-   * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Modules</b></em>' containment reference list.
+	 * The list contents are of type {@link fr.tpt.aadl.ramses.transformation.trc.Module}.
+	 * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Modules</em>' containment reference list isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Modules</em>' containment reference list.
-   * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getModuleList_Modules()
-   * @model containment="true"
-   * @generated
-   */
+	 * @return the value of the '<em>Modules</em>' containment reference list.
+	 * @see fr.tpt.aadl.ramses.transformation.trc.TrcPackage#getModuleList_Modules()
+	 * @model containment="true"
+	 * @generated
+	 */
   EList<Module> getModules();
 } // ModuleList
