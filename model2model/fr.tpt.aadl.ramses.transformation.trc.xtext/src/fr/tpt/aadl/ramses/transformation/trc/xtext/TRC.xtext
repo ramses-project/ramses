@@ -1,107 +1,110 @@
 grammar fr.tpt.aadl.ramses.transformation.trc.xtext.TRC with org.eclipse.xtext.common.Terminals
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+//import "http://www.eclipse.org/ocl/3.1.0/EssentialOCLCST" as essentialocl
+import "platform:/resource/fr.tpt.aadl.ramses.transformation.trc/model/TRC.ecore" as TRC
 
-generate tRC "http://www.tpt.fr/aadl/ramses/transformation/trc/xtext/TRC"
+//generate tRC "http://www.tpt.fr/aadl/ramses/transformation/trc/xtext/TRC"
 
-
-TrcSpecification :
-		moduleList         += ModuleList
-		transformationList += TransformationList
-		dependencyList     += TransformationDependencyList
+TrcSpecification returns TRC::TrcSpecification :
+		moduleList         = ModuleList
+		transformationList = TransformationList
+		dependencyList     = TransformationDependencyList
 ;
    
-trcRule:
+TrcRule returns TRC::TrcRule:
 	name=EString
 ;  
 
-ModuleList :
+ModuleList returns TRC::ModuleList:
 'Modules'
 	'{'
-		modules+=Module ( ";" modules+=Module)*
+		modules+=Module ";" ( modules+=Module";")*
 	'}'
 ;
 
 QualifiedName:
 ID ('.' ID)*;
 
-Module:
-{Module}
-		(name=EString ':' rules+=trcRule ( "," rules+=trcRule)*)?
+Module returns TRC::Module:
+		name=EString '['path=EString']' (':'  rules+=TrcRule ( "," rules+=TrcRule)*)?
 ;
 
-TransformationList:
+TransformationList returns TRC::TransformationList :
 	'Transformations'
 	'{'
 		transformations+=Transformation ( "," transformations+=Transformation)*
 	'}'
 ; 
 	
-Transformation:
+Transformation returns TRC::Transformation :
 		name=EString
 		'{'
-			'modules' ':' modules+=[Module] ( "," modules+=[Module])*
+			'modules' ':' modules+=[TRC::Module] ( "," modules+=[TRC::Module])*
 			('impacts' ':'  impacts+=TransformationImpact ( "," impacts+=TransformationImpact)* )?
 		'}'
 ;
 
-TransformationImpact:
+TransformationImpact returns TRC::TransformationImpact :
 	'('
 		(qualityAttributeName=EString ',')? 
 		impactValue=EInt
 	')'
 ;
 
-TransformationDependencyList:
-		'Dependencies' 
-		'{'
-		 	name=EString
-		 	'{'
-				transformationDependencies+=TransformationDependency ( ";" transformationDependencies+=TransformationDependency)* 
-			'}'
-		'}' 
+TransformationDependencyList returns TRC::TransformationDependencyList :
+	'Dependencies' 
+	'{'
+			transformationDependencies+=TransformationDependency";" ( transformationDependencies+=TransformationDependency";")* 
+	'}' 
 ;
 
-TransformationDependency :
+TransformationDependency returns TRC::TransformationDependency:
 	'Apply'
 	'('
-		appliedTransformation=[Transformation|EString]'.'appliedRule=[trcRule|QualifiedName] ','
-		'{' fields+=EString ( "," fields+=EString)* '}'
+		appliedTransformation=[TRC::Transformation|EString]'.'appliedRule=[TRC::TrcRule|QualifiedName] ','
+		'{' variableId+=EString ( "," variableId+=EString)* '}'
 	')'
 	'['	
-	requiredTransformations+=RuleDependency boolOP=BooleanOperations (requiredTransformations+=RuleDependency)*  
+		requiredTransformations=AbstractRuleDependency  
 	']'
 ;
 
-
-BooleanOperations returns BooleanOperations:
-	name=('and'|'or');
-
-RuleDependency :
-		kw=KeyWord red+=requiresOrExcludeDependency (boolOP=BooleanOperations red+=requiresOrExcludeDependency)?
+RuleDependencyDisjunction  returns TRC:: RuleDependencyDisjunction:
+	requiredTransformations+=AbstractRuleDependency 
+	('or'
+	requiredTransformations+=AbstractRuleDependency)+
 ;
 
-KeyWord returns KeyWord :
-	name = ('requires' | 'excludes')
+RuleDependencyComposite  returns TRC::RuleDependencyComposite :
+	 '(' RuleDependencyConjunction ')' 
+	|'(' RuleDependencyDisjunction ')'
 ;
 
-requiresOrExcludeDependency :
-	'('
-		requiredTransformation+=[Transformation|EString]'.'requiredRule+=[trcRule|QualifiedName]','fields=EString":"oclExpression+=oclExpr
-	')'
-; 
-
-
-oclExpr :
-	ClassifierContextDeclCS | ExpressCS
-	//| ExpressCS
+RuleDependencyConjunction  returns TRC::RuleDependencyConjunction :
+	requiredTransformations+=AbstractRuleDependency
+	('and'
+	requiredTransformations+=AbstractRuleDependency)+
 ;
-//TransformationElement :
-//	'TransformationElement'
-//;
-//
-//SpecificationElement :
-//	'SpecificationElement'
-//;
+
+AbstractRuleDependency returns TRC::AbstractRuleDependency :
+	(RuleDependencyComposite | RuleDependency)
+;
+
+RuleDependency returns TRC::RuleDependency :
+		type=('requires' | 'excludes') 
+		'('
+		requiredTransformation=[TRC::Transformation|EString]'.'requiredRule=[TRC::TrcRule|QualifiedName]','
+			'{'fieldNames+=EString (',' fieldNames+=EString)*'}'
+		')'
+;
+
+TransformationElement :
+	'TransformationElement'
+;
+
+SpecificationElement :
+	'SpecificationElement'
+;
 
 EString returns ecore::EString:
 STRING | ID;
@@ -112,30 +115,6 @@ EInt returns ecore::EInt:
 EBoolean returns ecore::EBoolean:
 'true' | 'false';
 
-ClassifierContextDeclCS :
-	'context' (selfName=UnrestrictedName)?
-//	pathName=PathNameCS
-	(('inv' invariants+=ConstraintCS)
-	| definitions+=DefCS
-	)+
-;
-
-OperationContextDeclCS returns OperationContextDeclCS:
-	'context' pathName=PathNameCS '(' 
-	(parameters+=ParameterCS (',' parameters+=ParameterCS)*)?
-	')' ':' (ownedType=TypeExpCS)?
-	(('pre' preconditions+=ConstraintCS)
-	| ('post' postconditions+=ConstraintCS)
-	| ('body' UnrestrictedName? ':' bodies+=SpecificationCS)
-	)*
-	;
-
-ParameterCS returns ParameterCS:
-	(name=UnrestrictedName ':')? ownedType=TypeExpCS;
-
-//ConstraintCS returns base::ConstraintCS:
-ConstraintCS returns ConstraintCS:
-	(name=UnrestrictedName ('(' messageSpecification=SpecificationCS ')')?)? ':' specification+=SpecificationCS (specification+=SpecificationCS)*;
 
 EssentialOCLUnrestrictedName returns ecore::EString:
 	Identifier;
@@ -147,36 +126,6 @@ Identifier:
 UnrestrictedName returns ecore::EString: // Intended to be overridden
 	EssentialOCLUnrestrictedName;
 
-DefCS returns DefCS:
-//	DefOperationCS
-	//|
-	DefPropertyCS
-;
-	
-DefPropertyCS returns DefPropertyCS:
-	(static?='static')? 'def' UnrestrictedName? 
-	':' name=UnrestrictedName ':' 
-	ownedType=TypeExpCS
-	'=' specification=SpecificationCS
-;
-
-//TypeExpCS returns base::TypedRefCS:
-TypeExpCS returns TypedRefCS:	
-	(
-	TypeNameExpCS 
-//	| 
-//	TypeLiteralCS
-	)
-	multiplicity=MultiplicityCS?;
-
-MultiplicityCS returns MultiplicityCS:
-	'[' (MultiplicityBoundsCS | MultiplicityStringCS) ']';
-
-MultiplicityStringCS returns MultiplicityStringCS:
-	stringBounds=('*'|'+'|'?');
-
-MultiplicityBoundsCS returns MultiplicityBoundsCS:
-	lowerBound=LOWER ('..' upperBound=UPPER)?;
 
 LOWER returns ecore::EInt:
 	INT
@@ -185,32 +134,6 @@ LOWER returns ecore::EInt:
 UPPER returns ecore::EInt:
 	INT
 ;
-
-NamedElement :  // to be extended
-	NameSpace |
-	(
-	isStatic = EBoolean
-	name = EString
-	)
-;
-
-NameSpace :
-	ID = EString  /// not complete
-;
-
-TypeNameExpCS returns TypeNameExpCS:
-	pathName=PathNameCS;
-
-//PathNameCS returns base::PathNameCS:
-PathNameCS returns PathNameCS:
-	path+=FirstPathElementCS ('::' path+=NextPathElementCS)*;
-	
-//FirstPathElementCS returns base::PathElementCS:
-FirstPathElementCS returns PathElementCS:	
-	element=[NamedElement|UnrestrictedName];
-	
-NextPathElementCS returns PathElementCS:
-	element=[NamedElement|UnreservedName];
 
 UnreservedName returns ecore::EString: // Intended to be overridden
 	EssentialOCLUnreservedName;
@@ -240,186 +163,7 @@ CollectionTypeIdentifier returns ecore::EString:
 	| 'OrderedSet';
 
 
-SpecificationCS returns SpecificationCS:
-	ownedExpression+=ContextCs
-	| exprString=UNQUOTED_STRING;
-
-
 
 terminal UNQUOTED_STRING:	// Never forward parsed; just provides a placeholder
 	'£$%^£$%^'				//  for reverse serialisation of embedded OCL 
 ;
-
-EssentialOCLInfixOperatorCS returns EssentialOCLInfixOperatorCS:
-	{EssentialOCLInfixOperatorCS}
-	name=('*' | '/' | '+' | '-' | '>' | '<' | '>=' | '<=' | '=' | '<>' | 'and' | 'or' | 'xor' | 'implies');
-
-BinaryOperatorCS returns BinaryOperatorCS:
-	EssentialOCLInfixOperatorCS | NavigationOperatorCS;
-	
-NavigationOperatorCS returns NavigationOperatorCS:
-	name=('.' | '->');
-	
- ContextCs :
- //	ownedOperator+=UnaryOperatorCS+
- 	ownedExpression+=LetExpCS
- 	|
- 	(B=BinaryOperatorCS)? ('self.'? ID (BO=BinaryOperatorCS) 'self.'? ID) 
-// 	| ID
- ;
-  
-
- ExpressCS:
-( (ownedExpression+=PrefixedExpCS ownedOperator+=BinaryOperatorCS)+
-ownedExpression+=PrefixedExpOrLetExpCS)
-| (ownedOperator+=EssentialOCLPrefixOperator ownedExpression+=PrimaryExpOrLetExpCS)
-| PrimaryExpOrLetExpCS
-;
-
-
-PrefixedExpCS :
-//PrimaryExpCS // <----- the location of the warnings showed after compilation of the grammar
-//| 
-({PrefixExpCS} ownedOperator+=EssentialOCLPrefixOperator //ownedExpression=PrimaryExpCS
-);
-
-EssentialOCLPrefixOperator:
-	name = ('-' | 'not');
-//
-PrefixedExpOrLetExpCS :
-PrimaryExpOrLetExpCS
-| ({PrefixExpCS} ownedOperator+=EssentialOCLPrefixOperator
-	ownedExpression=PrimaryExpOrLetExpCS
-);
-
-PrimaryExpCS :	// These rules are ordered most rejectable first
-({IndexExpCS} pathName=PathNameCS '[' firstIndexes+=ExpressCS (',' firstIndexes+=ExpressCS)* ']'
-('[' secondIndexes+=ExpressCS (',' secondIndexes+=ExpressCS)* ']')? (atPre?='@' 'pre')?)
-|	({ConstructorExpCS} pathName=PathNameCS
-'{' ((ownedParts+=ConstructorPartCS (',' ownedParts+=ConstructorPartCS)*) | (value=ID)) '}')
-| ({InvocationExpCS} pathName=PathNameCS (atPre?='@' 'pre')?
-'(' (argument+=NavigatingArgCS (argument+=NavigatingCommaArgCS)*
-(argument+=NavigatingSemiArgCS (argument+=NavigatingCommaArgCS)*)?
-(argument+=NavigatingBarArgCS (argument+=NavigatingCommaArgCS)*)?)?
-')')
-|	({NameExpCS} pathName=PathNameCS (atPre?='@' 'pre')?)
-|	SelfExpCS
-| PrimitiveLiteralExpCS
-| TupleLiteralExpCS
-| CollectionLiteralExpCS
-| TypeLiteralExpCS
-| IfExpCS
-| NestedExpCS;
-
-ConstructorPartCS returns ConstructorPartCS:
-property=UnrestrictedName '=' initExpression=ExpressCS
-//UnrestrictedName =? [Property|UnrestrictedName]
-;
-
-TypeLiteralWithMultiplicityCS :
-TypeLiteralCS multiplicity=MultiplicityCS?;
-
-TypeLiteralCS :
-PrimitiveTypeCS
-| CollectionTypeCS
-| TupleTypeCS;
-
-TupleTypeCS :
-name='Tuple' ('(' (ownedParts+=TuplePartCS (',' ownedParts+=TuplePartCS)*)? ')')?;
-
-TuplePartCS :
-name=UnrestrictedName ':' ownedType=TypeExpCS;
-
-PrimitiveTypeCS :
-name=PrimitiveTypeIdentifier;
-
-TypeLiteralExpCS returns TypeLiteralExpCS:
-ownedType=TypeLiteralWithMultiplicityCS;
-
-CollectionLiteralExpCS returns CollectionLiteralExpCS:
-ownedType=CollectionTypeCS
-'{' (ownedParts+=CollectionLiteralPartCS
-(',' ownedParts+=CollectionLiteralPartCS)*)?
-'}';
-
-CollectionLiteralPartCS returns CollectionLiteralPartCS:
-expressionCS=ExpressCS ('..' lastExpressionCS=ExpressCS)?;
-
-CollectionTypeCS returns CollectionTypeCS:
-name=CollectionTypeIdentifier ('(' ownedType=TypeExpCS ')')?;
-
-NestedExpCS returns NestedExpCS:
-'(' source=ExpressCS ')'
-;
-
-SelfExpCS returns SelfExpCS:
-{SelfExpCS} 'self';
-
-PrimaryExpOrLetExpCS :
-LetExpCS;
-
-LetExpCS returns LetExpCS:
-'let' variable+=LetVariableCS (',' variable+=LetVariableCS)*
-'in' in=ExpressCS;
-
-LetVariableCS returns LetVariableCS:
-name=UnrestrictedName (':' ownedType=TypeExpCS)? '=' initExpression=ExpressCS;
-
-NavigatingArgCS returns NavigatingArgCS:
-name=NavigatingArgExpCS (':' ownedType=TypeExpCS ('=' init=ExpressCS)?)?;	
-
-NavigatingBarArgCS returns NavigatingArgCS:
-prefix='|' name=NavigatingArgExpCS (':' ownedType=TypeExpCS ('=' init=ExpressCS)?)?;
-
-NavigatingSemiArgCS returns NavigatingArgCS:
-prefix=';' name=NavigatingArgExpCS (':' ownedType=TypeExpCS ('=' init=ExpressCS)?)?;
-
-NavigatingArgExpCS returns ExpCS: // Intended to be overridden
-ExpressCS
-// '?' -- defined by Complete OCL
-;
-
-NavigatingCommaArgCS returns NavigatingArgCS:
-prefix=',' name=NavigatingArgExpCS (':' ownedType=TypeExpCS ('=' init=ExpressCS)?)?;
-
-IfExpCS returns IfExpCS:
-'if' condition=ExpressCS
-'then' thenExpression=ExpressCS
-'else' elseExpression=ExpressCS
-'endif';
-
-TupleLiteralExpCS returns TupleLiteralExpCS:
-'Tuple' '{' ownedParts+=TupleLiteralPartCS (',' ownedParts+=TupleLiteralPartCS)* '}';
-
-TupleLiteralPartCS returns TupleLiteralPartCS:
-name=UnrestrictedName (':' ownedType=TypeExpCS)? '=' initExpression=ExpressCS;
-
-PrimitiveLiteralExpCS returns PrimitiveLiteralExpCS:
-NumberLiteralExpCS
-| StringLiteralExpCS
-| BooleanLiteralExpCS
-| UnlimitedNaturalLiteralExpCS
-| InvalidLiteralExpCS
-| NullLiteralExpCS;
-
-NumberLiteralExpCS returns NumberLiteralExpCS:
-name=NUMBER_LITERAL;
-
-NUMBER_LITERAL returns BigNumber: // Not terminal to allow parser backtracking to sort out "5..7"
-number=INT; // EssentialOCLTokenSource pieces this together ('.' INT)? (('e' | 'E') ('+' | '-')? INT)?;
-
-StringLiteralExpCS returns StringLiteralExpCS:
-name+=ID+;
-
-BooleanLiteralExpCS returns BooleanLiteralExpCS:
-name='true'
-| name='false';
-
-UnlimitedNaturalLiteralExpCS returns UnlimitedNaturalLiteralExpCS:
-{UnlimitedNaturalLiteralExpCS} '*';
-
-InvalidLiteralExpCS returns InvalidLiteralExpCS:
-{InvalidLiteralExpCS} 'invalid';
-
-NullLiteralExpCS returns NullLiteralExpCS:
-{NullLiteralExpCS} 'null';

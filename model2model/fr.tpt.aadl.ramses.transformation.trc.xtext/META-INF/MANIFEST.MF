@@ -18,14 +18,12 @@ Require-Bundle: org.eclipse.xtext;visibility:=reexport,
  org.eclipse.xtext.xbase.lib,
  org.antlr.runtime,
  org.eclipse.xtext.common.types,
- org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional
+ org.objectweb.asm;bundle-version="[5.0.1,6.0.0)";resolution:=optional,
+ fr.tpt.aadl.ramses.transformation.trc;bundle-version="1.0.0"
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: fr.tpt.aadl.ramses.transformation.trc.xtext,
  fr.tpt.aadl.ramses.transformation.trc.xtext.services,
- fr.tpt.aadl.ramses.transformation.trc.xtext.tRC,
- fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.impl,
- fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.util,
  fr.tpt.aadl.ramses.transformation.trc.xtext.serializer,
  fr.tpt.aadl.ramses.transformation.trc.xtext.parser.antlr,
  fr.tpt.aadl.ramses.transformation.trc.xtext.parser.antlr.internal,

@@ -12,7 +12,7 @@ public class AbstractTRCValidator extends org.eclipse.xtext.validation.AbstractD
 	@Override
 	protected List<EPackage> getEPackages() {
 	    List<EPackage> result = new ArrayList<EPackage>();
-	    result.add(fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.TRCPackage.eINSTANCE);
+	    result.add(EPackage.Registry.INSTANCE.getEPackage("http://fr.tpt.aadl.ramses.transformation/TRC/1.0"));
 		return result;
 	}
 }
