@@ -19,10 +19,10 @@ import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.utils.Aadl2Utils;
 
 import fr.tpt.aadl.ramses.control.support.utils.Names;
+import fr.tpt.aadl.ramses.transformation.trc.Transformation;
+import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
 import fr.tpt.aadl.ramses.transformation.trc.xtext.TRCStandaloneSetup;
-import fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.Transformation;
-import fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.TransformationDependency;
-import fr.tpt.aadl.ramses.transformation.trc.xtext.tRC.TrcSpecification;
 import fr.tpt.atl.to.trc.launcher.Atl2TrcLauncher;
 
 
@@ -82,21 +82,21 @@ public class UpdateTrcModulesActionHandler extends AbstractHandler {
 	TrcSpecification newSpec = (TrcSpecification) r.getContents().get(0);
 	TrcSpecification oldSpec = (TrcSpecification) resource.getContents().get(0);
 			
-	oldSpec.getModuleList().clear();
+	oldSpec.getModuleList().getModules().clear();
 	
-    oldSpec.getModuleList().addAll(newSpec.getModuleList());
-	oldSpec.getTransformationList().get(0).getTransformations().get(0).getModules().clear();	
+    oldSpec.getModuleList().getModules().addAll(newSpec.getModuleList().getModules());
+	oldSpec.getTransformationList().getTransformations().get(0).getModules().clear();	
 
-	for (Transformation t : oldSpec.getTransformationList().get(0).getTransformations())
+	for (Transformation t : oldSpec.getTransformationList().getTransformations())
 	{
-		t.getModules().addAll(oldSpec.getModuleList().get(0).getModules());
+		t.getModules().addAll(oldSpec.getModuleList().getModules());
 	}
 	
-	oldSpec.getTransformationList().get(0).getTransformations().get(0).getModules().clear();
-	oldSpec.getDependencyList().get(0).getTransformationDependencies().get(0).getAppliedTransformation().getModules().clear();
-	for (TransformationDependency td : oldSpec.getDependencyList().get(0).getTransformationDependencies())
+	oldSpec.getTransformationList().getTransformations().get(0).getModules().clear();
+	oldSpec.getDependencyList().getTransformationDependencies().get(0).getAppliedTransformation().getModules().clear();
+	for (TransformationDependency td : oldSpec.getDependencyList().getTransformationDependencies())
 	{
-		td.getAppliedTransformation().getModules().addAll(oldSpec.getModuleList().get(0).getModules());
+		td.getAppliedTransformation().getModules().addAll(oldSpec.getModuleList().getModules());
 	}
 
 //	resource.getContents().add(oldSpec);
