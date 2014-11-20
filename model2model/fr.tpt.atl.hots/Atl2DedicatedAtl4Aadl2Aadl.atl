@@ -119,80 +119,80 @@ rule Module {
 --}
 
 
-rule IncludedAndExcludedMatchedRule {
-    from 
-		s : MM_ATL!"ATL::MatchedRule" in IN
-		--here an argument for the transformationID matching should be added
-		(
-		 	(
-		 	if thisModule.inElements->includes(s) then
-				s.oclIsTypeOf(MM_ATL!"ATL::MatchedRule")
-			else false endif
-			) 
-    		and
-			(
-				(thisModule.inExcludedTransformationsInTip->includes(s.name)
-				and
-				thisModule.inIncludedTransformationsInTip->includes(s.name))
-			)
-		)
-	using
-	{
-		local: MM_ATL!OclExpression = OclUndefined;
-		local2: MM_ATL!OperatorCallExp = OclUndefined;
-	}
-	to
-		t : MM_ATL!"ATL::MatchedRule" (
-        	location <- s.location,
-        	commentsBefore <- s.commentsBefore,
-			name <- s.name,
-			isAbstract <- s.isAbstract,
-        	isRefining <- s.isRefining,
-        	isNoDefault <- s.isNoDefault,
-        	outPattern <- s.outPattern,
-        	actionBlock <- s.actionBlock,
-        	variables <- s.variables,
-			inPattern <- ip, 
-        	children <- s.children,
-        	superRule <- s.superRule
-		),
-		ip : MM_ATL!InPattern (
-			elements <- s.inPattern.elements->collect(e|thisModule.mapInputElement(e))
-			--filter <- ifilter
-		)
-	do
-	{
-		if(s.inPattern.filter.oclIsUndefined())
-		{
-			local <- thisModule.populateOrOperatorCall(
-									thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, false),-->excluding(thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name)->first()) 
-									OclUndefined,
-									s.inPattern.elements
-								);
-			ip.filter <- thisModule.populateExclusion(
-					thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, true), 
-					local,
-					s.inPattern.elements
-			);
-		}
-		else
-		{
-			local <- thisModule.populateOrOperatorCall(
-									thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, false),-->excluding(thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name)->first()) 
-									OclUndefined,
-									s.inPattern.elements
-								);
-			--local2 <- thisModule.createAndOperatorCallExp(s.inPattern.filter, local);
-			ip.filter <- 
-				thisModule.populateExclusion
-				(
-					thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, true), 
-					local,
-					s.inPattern.elements
-				);
-		}
-	}
-}
+--rule IncludedAndExcludedMatchedRule {
+--    from 
+--		s : MM_ATL!"ATL::MatchedRule" in IN
+--		--here an argument for the transformationID matching should be added
+--		(
+--		 	(
+--		 	if thisModule.inElements->includes(s) then
+--				s.oclIsTypeOf(MM_ATL!"ATL::MatchedRule")
+--			else false endif
+--			) 
+--    		and
+--			(
+--				(thisModule.inExcludedTransformationsInTip->includes(s.name)
+--				and
+--				thisModule.inIncludedTransformationsInTip->includes(s.name))
+--			)
+--		)
+--	using
+--	{
+--		local: MM_ATL!OclExpression = OclUndefined;
+--		local2: MM_ATL!OperatorCallExp = OclUndefined;
+--	}
+--	to
+--		t : MM_ATL!"ATL::MatchedRule" (
+--        	location <- s.location,
+--        	commentsBefore <- s.commentsBefore,
+--			name <- s.name,
+--			isAbstract <- s.isAbstract,
+--        	isRefining <- s.isRefining,
+--        	isNoDefault <- s.isNoDefault,
+--        	outPattern <- s.outPattern,
+--        	actionBlock <- s.actionBlock,
+--        	variables <- s.variables,
+--			inPattern <- ip, 
+--        	children <- s.children,
+--        	superRule <- s.superRule
+--		),
+--		ip : MM_ATL!InPattern (
+--			elements <- s.inPattern.elements->collect(e|thisModule.mapInputElement(e))
+--			--filter <- ifilter
+--		)
+--	do
+--	{
+--		if(s.inPattern.filter.oclIsUndefined())
+--		{
+--			local <- thisModule.populateOrOperatorCall(
+--									thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, false),-->excluding(thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name)->first()) 
+--									OclUndefined,
+--									s.inPattern.elements
+--								);
+--			ip.filter <- thisModule.populateExclusion(
+--					thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, true), 
+--					local,
+--					s.inPattern.elements
+--			);
+--		}
+--		else
+--		{
+--			local <- thisModule.populateOrOperatorCall(
+--									thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, false),-->excluding(thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name)->first()) 
+--									OclUndefined,
+--									s.inPattern.elements
+--								);
+--			--local2 <- thisModule.createAndOperatorCallExp(s.inPattern.filter, local);
+--			ip.filter <- 
+--				thisModule.populateExclusion
+--				(
+--					thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, true), 
+--					local,
+--					s.inPattern.elements
+--				);
+--		}
+--	}
+--}
 
 
 
@@ -209,8 +209,8 @@ rule ExcludedAndNotIncludedMatchedRule {
     		and
 			(
 				thisModule.inExcludedTransformationsInTip->includes(s.name)
-				and
-				not thisModule.inIncludedTransformationsInTip->includes(s.name)
+--				and
+--				not thisModule.inIncludedTransformationsInTip->includes(s.name)
 			) 
 		)
 	using
@@ -232,11 +232,7 @@ rule ExcludedAndNotIncludedMatchedRule {
         	children <- s.children,
         	superRule <- s.superRule
 		)
-		
---		ip : MM_ATL!InPattern (
---			elements <- s.inPattern.elements->collect(e|thisModule.mapInputElement(e))
---		)
-		
+				
 	do
 	{
 		if(s.inPattern.filter.oclIsUndefined())
@@ -304,56 +300,56 @@ rule populateExclusion(ElementTransfos: Set(MM_TIP!ElementTransformation), filte
 }
 
 
-rule IncludedAndNotExcludedMatchedRule {
-    from 
-		s : MM_ATL!"ATL::MatchedRule" in IN
-		--here an argument for the transformationID matching should be added
-		(
-		 	(
-		 	if thisModule.inElements->includes(s) then
-				s.oclIsTypeOf(MM_ATL!"ATL::MatchedRule")
-			else false endif
-			) 
-    		and
-			(
-				not thisModule.inExcludedTransformationsInTip->includes(s.name)
-				and
-				thisModule.inIncludedTransformationsInTip->includes(s.name)
-			) 
-		)
-    to t : MM_ATL!"ATL::MatchedRule" (
-        location <- s.location,
-        commentsBefore <- --s.commentsBefore,
-						if(s.commentsBefore->last().oclIsUndefined()) then
-        					'-- @extends ' + s.name
-						else
-							s.commentsBefore->excluding(s.commentsBefore->last())->append(s.commentsBefore->last()+','+s.name)
-						endif,
-        --commentsAfter <- s.commentsAfter,
-        name <- s.name +'_applied_'+thisModule.getLastIteration().id,
-        isAbstract <- s.isAbstract,
-        isRefining <- s.isRefining,
-        isNoDefault <- s.isNoDefault,
-        outPattern <- s.outPattern,
-        actionBlock <- s.actionBlock,
-        variables <- s.variables,
-		inPattern <- ip, 
-        children <- s.children,
-        superRule <- s.superRule),
-		
-		ip : MM_ATL!InPattern (
-			elements <- s.inPattern.elements->collect(e|thisModule.mapInputElement(e))
-			--filter <- ifilter
-		)
-	do
-	{
-		ip.filter <- thisModule.populateOrOperatorCall(
-									thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, false),-->excluding(thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name)->first()) 
-									OclUndefined,
-									s.inPattern.elements
-								);
-	}
-}
+--rule IncludedAndNotExcludedMatchedRule {
+--    from 
+--		s : MM_ATL!"ATL::MatchedRule" in IN
+--		--here an argument for the transformationID matching should be added
+--		(
+--		 	(
+--		 	if thisModule.inElements->includes(s) then
+--				s.oclIsTypeOf(MM_ATL!"ATL::MatchedRule")
+--			else false endif
+--			) 
+--    		and
+--			(
+--				not thisModule.inExcludedTransformationsInTip->includes(s.name)
+--				and
+--				thisModule.inIncludedTransformationsInTip->includes(s.name)
+--			) 
+--		)
+--    to t : MM_ATL!"ATL::MatchedRule" (
+--        location <- s.location,
+--        commentsBefore <- --s.commentsBefore,
+--						if(s.commentsBefore->last().oclIsUndefined()) then
+--        					'-- @extends ' + s.name
+--						else
+--							s.commentsBefore->excluding(s.commentsBefore->last())->append(s.commentsBefore->last()+','+s.name)
+--						endif,
+--        --commentsAfter <- s.commentsAfter,
+--        name <- s.name +'_applied_'+thisModule.getLastIteration().id,
+--        isAbstract <- s.isAbstract,
+--        isRefining <- s.isRefining,
+--        isNoDefault <- s.isNoDefault,
+--        outPattern <- s.outPattern,
+--        actionBlock <- s.actionBlock,
+--        variables <- s.variables,
+--		inPattern <- ip, 
+--        children <- s.children,
+--        superRule <- s.superRule),
+--		
+--		ip : MM_ATL!InPattern (
+--			elements <- s.inPattern.elements->collect(e|thisModule.mapInputElement(e))
+--			--filter <- ifilter
+--		)
+--	do
+--	{
+--		ip.filter <- thisModule.populateOrOperatorCall(
+--									thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name, false),-->excluding(thisModule.getElementTransformationForTransfo(thisModule.getModuleName+'.'+s.name)->first()) 
+--									OclUndefined,
+--									s.inPattern.elements
+--								);
+--	}
+--}
 
 unique lazy rule mapInputElement
 {

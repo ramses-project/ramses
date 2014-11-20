@@ -212,7 +212,7 @@ public abstract class AtlHotTransfoLauncher {
 	 */
 	protected String getMetamodelUri(String metamodelName) {
 		String root = "platform:/plugin/" + "fr.tpt.atl.utils/";		
-		return properties.getProperty(getHotTransformationName()+".metamodels."
+		return root+properties.getProperty(getHotTransformationName()+".metamodels."
 				+ metamodelName);
 	}
 
