@@ -34,132 +34,126 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public abstract class RuleDependencyCompositeImpl extends AbstractRuleDependencyImpl implements RuleDependencyComposite
 {
   /**
-   * The cached value of the '{@link #getRequiredTransformations() <em>Required Transformations</em>}' containment reference list.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getRequiredTransformations() <em>Required Transformations</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getRequiredTransformations()
-   * @generated
-   * @ordered
-   */
+	 * @see #getRequiredTransformations()
+	 * @generated
+	 * @ordered
+	 */
   protected EList<AbstractRuleDependency> requiredTransformations;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected RuleDependencyCompositeImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.RULE_DEPENDENCY_COMPOSITE;
-  }
+		return TrcPackage.Literals.RULE_DEPENDENCY_COMPOSITE;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public EList<AbstractRuleDependency> getRequiredTransformations()
   {
-    if (requiredTransformations == null)
-    {
-      requiredTransformations = new EObjectContainmentEList<AbstractRuleDependency>(AbstractRuleDependency.class, this, TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS);
-    }
-    return requiredTransformations;
-  }
+		if (requiredTransformations == null) {
+			requiredTransformations = new EObjectContainmentEList<AbstractRuleDependency>(AbstractRuleDependency.class, this, TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS);
+		}
+		return requiredTransformations;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
-    switch (featureID)
-    {
-      case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
-        return ((InternalEList<?>)getRequiredTransformations()).basicRemove(otherEnd, msgs);
-    }
-    return super.eInverseRemove(otherEnd, featureID, msgs);
-  }
+		switch (featureID) {
+			case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
+				return ((InternalEList<?>)getRequiredTransformations()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType)
   {
-    switch (featureID)
-    {
-      case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
-        return getRequiredTransformations();
-    }
-    return super.eGet(featureID, resolve, coreType);
-  }
+		switch (featureID) {
+			case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
+				return getRequiredTransformations();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @SuppressWarnings("unchecked")
   @Override
   public void eSet(int featureID, Object newValue)
   {
-    switch (featureID)
-    {
-      case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
-        getRequiredTransformations().clear();
-        getRequiredTransformations().addAll((Collection<? extends AbstractRuleDependency>)newValue);
-        return;
-    }
-    super.eSet(featureID, newValue);
-  }
+		switch (featureID) {
+			case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
+				getRequiredTransformations().clear();
+				getRequiredTransformations().addAll((Collection<? extends AbstractRuleDependency>)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
-        getRequiredTransformations().clear();
-        return;
-    }
-    super.eUnset(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
+				getRequiredTransformations().clear();
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
-        return requiredTransformations != null && !requiredTransformations.isEmpty();
-    }
-    return super.eIsSet(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.RULE_DEPENDENCY_COMPOSITE__REQUIRED_TRANSFORMATIONS:
+				return requiredTransformations != null && !requiredTransformations.isEmpty();
+		}
+		return super.eIsSet(featureID);
+	}
 
 } //RuleDependencyCompositeImpl

@@ -216,7 +216,7 @@ public class ArchitectureRefinementProcessLauncher {
 
     // remove tmpTip, not useful anymore.
     TipUtils.getTipSpecification().getIterations().add(iter);
-    tmpTipResource.delete(null);
+    //tmpTipResource.delete(null);
   }
 
   /**
@@ -322,9 +322,9 @@ public class ArchitectureRefinementProcessLauncher {
       
       List<Module> moduleList = transfo.getModules();
       List<File> emftvmFiles = new ArrayList<File>();
-      for(int i = moduleList.size(); i>0; i--)
+      for(int i = 0; i<moduleList.size(); i++)
       {
-        String modulePath = moduleList.get(i-1).getPath();
+        String modulePath = moduleList.get(i).getPath();
         modulePath = modulePath.substring(0, modulePath.length()-4)+"_2pml.emftvm";
         File f = new File(getPatternMatchingOutputDir()+modulePath);
         emftvmFiles.add(f);
@@ -459,7 +459,7 @@ public class ArchitectureRefinementProcessLauncher {
     // retreive module dependencies for current transformation.
     List<Module> completeModuleList = TrcUtils.buildVerticalDependencyList(transfoList);
     // add dependencies in the workflow model.
-    for(int i = completeModuleList.size()-1; i>=0; i--)
+    for(int i = 0; i<completeModuleList.size(); i++)
     {
       // iterator on system specific model transformations (resulting from second HOT)
       Iterator<File> additionalTransfoIt = additionnalTransfoList.iterator();

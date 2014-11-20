@@ -21,24 +21,24 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 public abstract class TransformationElementImpl extends EObjectImpl implements TransformationElement
 {
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TransformationElementImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.TRANSFORMATION_ELEMENT;
-  }
+		return TrcPackage.Literals.TRANSFORMATION_ELEMENT;
+	}
 
 } //TransformationElementImpl

@@ -36,132 +36,126 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class TransformationDependencyListImpl extends EObjectImpl implements TransformationDependencyList
 {
   /**
-   * The cached value of the '{@link #getTransformationDependencies() <em>Transformation Dependencies</em>}' containment reference list.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getTransformationDependencies() <em>Transformation Dependencies</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getTransformationDependencies()
-   * @generated
-   * @ordered
-   */
+	 * @see #getTransformationDependencies()
+	 * @generated
+	 * @ordered
+	 */
   protected EList<TransformationDependency> transformationDependencies;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TransformationDependencyListImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.TRANSFORMATION_DEPENDENCY_LIST;
-  }
+		return TrcPackage.Literals.TRANSFORMATION_DEPENDENCY_LIST;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public EList<TransformationDependency> getTransformationDependencies()
   {
-    if (transformationDependencies == null)
-    {
-      transformationDependencies = new EObjectContainmentEList<TransformationDependency>(TransformationDependency.class, this, TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES);
-    }
-    return transformationDependencies;
-  }
+		if (transformationDependencies == null) {
+			transformationDependencies = new EObjectContainmentEList<TransformationDependency>(TransformationDependency.class, this, TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES);
+		}
+		return transformationDependencies;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
-        return ((InternalEList<?>)getTransformationDependencies()).basicRemove(otherEnd, msgs);
-    }
-    return super.eInverseRemove(otherEnd, featureID, msgs);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
+				return ((InternalEList<?>)getTransformationDependencies()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
-        return getTransformationDependencies();
-    }
-    return super.eGet(featureID, resolve, coreType);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
+				return getTransformationDependencies();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @SuppressWarnings("unchecked")
   @Override
   public void eSet(int featureID, Object newValue)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
-        getTransformationDependencies().clear();
-        getTransformationDependencies().addAll((Collection<? extends TransformationDependency>)newValue);
-        return;
-    }
-    super.eSet(featureID, newValue);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
+				getTransformationDependencies().clear();
+				getTransformationDependencies().addAll((Collection<? extends TransformationDependency>)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
-        getTransformationDependencies().clear();
-        return;
-    }
-    super.eUnset(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
+				getTransformationDependencies().clear();
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
-        return transformationDependencies != null && !transformationDependencies.isEmpty();
-    }
-    return super.eIsSet(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST__TRANSFORMATION_DEPENDENCIES:
+				return transformationDependencies != null && !transformationDependencies.isEmpty();
+		}
+		return super.eIsSet(featureID);
+	}
 
 } //TransformationDependencyListImpl

@@ -34,423 +34,433 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
  */
 public class TrcItemProviderAdapterFactory extends TrcAdapterFactory implements ComposeableAdapterFactory, IChangeNotifier, IDisposable {
 	/**
-   * This keeps track of the root adapter factory that delegates to this adapter factory.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the root adapter factory that delegates to this adapter factory.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ComposedAdapterFactory parentAdapterFactory;
 
 	/**
-   * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}.
-   * <!-- begin-user-doc -->
+	 * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected IChangeNotifier changeNotifier = new ChangeNotifier();
 
 	/**
-   * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}.
-   * <!-- begin-user-doc -->
+	 * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected Collection<Object> supportedTypes = new ArrayList<Object>();
 
 	/**
-   * This constructs an instance.
-   * <!-- begin-user-doc -->
+	 * This constructs an instance.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public TrcItemProviderAdapterFactory() {
-    supportedTypes.add(IEditingDomainItemProvider.class);
-    supportedTypes.add(IStructuredItemContentProvider.class);
-    supportedTypes.add(ITreeItemContentProvider.class);
-    supportedTypes.add(IItemLabelProvider.class);
-    supportedTypes.add(IItemPropertySource.class);
-  }
+		supportedTypes.add(IEditingDomainItemProvider.class);
+		supportedTypes.add(IStructuredItemContentProvider.class);
+		supportedTypes.add(ITreeItemContentProvider.class);
+		supportedTypes.add(IItemLabelProvider.class);
+		supportedTypes.add(IItemPropertySource.class);
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected TrcSpecificationItemProvider trcSpecificationItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TrcSpecification}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createTrcSpecificationAdapter() {
-    if (trcSpecificationItemProvider == null)
-    {
-      trcSpecificationItemProvider = new TrcSpecificationItemProvider(this);
-    }
+		if (trcSpecificationItemProvider == null) {
+			trcSpecificationItemProvider = new TrcSpecificationItemProvider(this);
+		}
 
-    return trcSpecificationItemProvider;
-  }
+		return trcSpecificationItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.Transformation} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.Transformation} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected TransformationItemProvider transformationItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.Transformation}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.Transformation}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createTransformationAdapter() {
-    if (transformationItemProvider == null)
-    {
-      transformationItemProvider = new TransformationItemProvider(this);
-    }
+		if (transformationItemProvider == null) {
+			transformationItemProvider = new TransformationItemProvider(this);
+		}
 
-    return transformationItemProvider;
-  }
+		return transformationItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationImpact} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationImpact} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected TransformationImpactItemProvider transformationImpactItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationImpact}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationImpact}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createTransformationImpactAdapter() {
-    if (transformationImpactItemProvider == null)
-    {
-      transformationImpactItemProvider = new TransformationImpactItemProvider(this);
-    }
+		if (transformationImpactItemProvider == null) {
+			transformationImpactItemProvider = new TransformationImpactItemProvider(this);
+		}
 
-    return transformationImpactItemProvider;
-  }
+		return transformationImpactItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.Module} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.Module} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ModuleItemProvider moduleItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.Module}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.Module}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createModuleAdapter() {
-    if (moduleItemProvider == null)
-    {
-      moduleItemProvider = new ModuleItemProvider(this);
-    }
+		if (moduleItemProvider == null) {
+			moduleItemProvider = new ModuleItemProvider(this);
+		}
 
-    return moduleItemProvider;
-  }
+		return moduleItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependency} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependency} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected TransformationDependencyItemProvider transformationDependencyItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependency}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependency}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createTransformationDependencyAdapter() {
-    if (transformationDependencyItemProvider == null)
-    {
-      transformationDependencyItemProvider = new TransformationDependencyItemProvider(this);
-    }
+		if (transformationDependencyItemProvider == null) {
+			transformationDependencyItemProvider = new TransformationDependencyItemProvider(this);
+		}
 
-    return transformationDependencyItemProvider;
-  }
+		return transformationDependencyItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected RuleDependencyConjunctionItemProvider ruleDependencyConjunctionItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyConjunction}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createRuleDependencyConjunctionAdapter() {
-    if (ruleDependencyConjunctionItemProvider == null)
-    {
-      ruleDependencyConjunctionItemProvider = new RuleDependencyConjunctionItemProvider(this);
-    }
+		if (ruleDependencyConjunctionItemProvider == null) {
+			ruleDependencyConjunctionItemProvider = new RuleDependencyConjunctionItemProvider(this);
+		}
 
-    return ruleDependencyConjunctionItemProvider;
-  }
+		return ruleDependencyConjunctionItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected RuleDependencyDisjunctionItemProvider ruleDependencyDisjunctionItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependencyDisjunction}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createRuleDependencyDisjunctionAdapter() {
-    if (ruleDependencyDisjunctionItemProvider == null)
-    {
-      ruleDependencyDisjunctionItemProvider = new RuleDependencyDisjunctionItemProvider(this);
-    }
+		if (ruleDependencyDisjunctionItemProvider == null) {
+			ruleDependencyDisjunctionItemProvider = new RuleDependencyDisjunctionItemProvider(this);
+		}
 
-    return ruleDependencyDisjunctionItemProvider;
-  }
+		return ruleDependencyDisjunctionItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependency} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependency} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected RuleDependencyItemProvider ruleDependencyItemProvider;
 
 	/**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependency}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.RuleDependency}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter createRuleDependencyAdapter() {
-    if (ruleDependencyItemProvider == null)
-    {
-      ruleDependencyItemProvider = new RuleDependencyItemProvider(this);
-    }
+		if (ruleDependencyItemProvider == null) {
+			ruleDependencyItemProvider = new RuleDependencyItemProvider(this);
+		}
 
-    return ruleDependencyItemProvider;
-  }
+		return ruleDependencyItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.ModuleList} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.ModuleList} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected ModuleListItemProvider moduleListItemProvider;
 
   /**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.ModuleList}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.ModuleList}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Adapter createModuleListAdapter()
   {
-    if (moduleListItemProvider == null)
-    {
-      moduleListItemProvider = new ModuleListItemProvider(this);
-    }
+		if (moduleListItemProvider == null) {
+			moduleListItemProvider = new ModuleListItemProvider(this);
+		}
 
-    return moduleListItemProvider;
-  }
+		return moduleListItemProvider;
+	}
 
   /**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationList} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationList} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TransformationListItemProvider transformationListItemProvider;
 
   /**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationList}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationList}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Adapter createTransformationListAdapter()
   {
-    if (transformationListItemProvider == null)
-    {
-      transformationListItemProvider = new TransformationListItemProvider(this);
-    }
+		if (transformationListItemProvider == null) {
+			transformationListItemProvider = new TransformationListItemProvider(this);
+		}
 
-    return transformationListItemProvider;
-  }
+		return transformationListItemProvider;
+	}
 
   /**
-   * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependencyList} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependencyList} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TransformationDependencyListItemProvider transformationDependencyListItemProvider;
 
   /**
-   * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependencyList}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TransformationDependencyList}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Adapter createTransformationDependencyListAdapter()
   {
-    if (transformationDependencyListItemProvider == null)
-    {
-      transformationDependencyListItemProvider = new TransformationDependencyListItemProvider(this);
-    }
+		if (transformationDependencyListItemProvider == null) {
+			transformationDependencyListItemProvider = new TransformationDependencyListItemProvider(this);
+		}
 
-    return transformationDependencyListItemProvider;
-  }
+		return transformationDependencyListItemProvider;
+	}
 
   /**
-   * This returns the root adapter factory that contains this factory.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link fr.tpt.aadl.ramses.transformation.trc.TrcRule} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
+	protected TrcRuleItemProvider trcRuleItemProvider;
+
+		/**
+	 * This creates an adapter for a {@link fr.tpt.aadl.ramses.transformation.trc.TrcRule}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createTrcRuleAdapter() {
+		if (trcRuleItemProvider == null) {
+			trcRuleItemProvider = new TrcRuleItemProvider(this);
+		}
+
+		return trcRuleItemProvider;
+	}
+
+		/**
+	 * This returns the root adapter factory that contains this factory.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public ComposeableAdapterFactory getRootAdapterFactory() {
-    return parentAdapterFactory == null ? this : parentAdapterFactory.getRootAdapterFactory();
-  }
+		return parentAdapterFactory == null ? this : parentAdapterFactory.getRootAdapterFactory();
+	}
 
 	/**
-   * This sets the composed adapter factory that contains this factory.
-   * <!-- begin-user-doc -->
+	 * This sets the composed adapter factory that contains this factory.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void setParentAdapterFactory(ComposedAdapterFactory parentAdapterFactory) {
-    this.parentAdapterFactory = parentAdapterFactory;
-  }
+		this.parentAdapterFactory = parentAdapterFactory;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public boolean isFactoryForType(Object type) {
-    return supportedTypes.contains(type) || super.isFactoryForType(type);
-  }
+		return supportedTypes.contains(type) || super.isFactoryForType(type);
+	}
 
 	/**
-   * This implementation substitutes the factory itself as the key for the adapter.
-   * <!-- begin-user-doc -->
+	 * This implementation substitutes the factory itself as the key for the adapter.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Adapter adapt(Notifier notifier, Object type) {
-    return super.adapt(notifier, this);
-  }
+		return super.adapt(notifier, this);
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
   public Object adapt(Object object, Object type) {
-    if (isFactoryForType(type))
-    {
-      Object adapter = super.adapt(object, type);
-      if (!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter)))
-      {
-        return adapter;
-      }
-    }
+		if (isFactoryForType(type)) {
+			Object adapter = super.adapt(object, type);
+			if (!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter))) {
+				return adapter;
+			}
+		}
 
-    return null;
-  }
+		return null;
+	}
 
 	/**
-   * This adds a listener.
-   * <!-- begin-user-doc -->
+	 * This adds a listener.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void addListener(INotifyChangedListener notifyChangedListener) {
-    changeNotifier.addListener(notifyChangedListener);
-  }
+		changeNotifier.addListener(notifyChangedListener);
+	}
 
 	/**
-   * This removes a listener.
-   * <!-- begin-user-doc -->
+	 * This removes a listener.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void removeListener(INotifyChangedListener notifyChangedListener) {
-    changeNotifier.removeListener(notifyChangedListener);
-  }
+		changeNotifier.removeListener(notifyChangedListener);
+	}
 
 	/**
-   * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}.
-   * <!-- begin-user-doc -->
+	 * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void fireNotifyChanged(Notification notification) {
-    changeNotifier.fireNotifyChanged(notification);
+		changeNotifier.fireNotifyChanged(notification);
 
-    if (parentAdapterFactory != null)
-    {
-      parentAdapterFactory.fireNotifyChanged(notification);
-    }
-  }
+		if (parentAdapterFactory != null) {
+			parentAdapterFactory.fireNotifyChanged(notification);
+		}
+	}
 
 	/**
-   * This disposes all of the item providers created by this factory. 
-   * <!-- begin-user-doc -->
+	 * This disposes all of the item providers created by this factory. 
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void dispose() {
-    if (trcSpecificationItemProvider != null) trcSpecificationItemProvider.dispose();
-    if (transformationImpactItemProvider != null) transformationImpactItemProvider.dispose();
-    if (moduleItemProvider != null) moduleItemProvider.dispose();
-    if (transformationItemProvider != null) transformationItemProvider.dispose();
-    if (transformationDependencyItemProvider != null) transformationDependencyItemProvider.dispose();
-    if (ruleDependencyConjunctionItemProvider != null) ruleDependencyConjunctionItemProvider.dispose();
-    if (ruleDependencyDisjunctionItemProvider != null) ruleDependencyDisjunctionItemProvider.dispose();
-    if (ruleDependencyItemProvider != null) ruleDependencyItemProvider.dispose();
-    if (moduleListItemProvider != null) moduleListItemProvider.dispose();
-    if (transformationListItemProvider != null) transformationListItemProvider.dispose();
-    if (transformationDependencyListItemProvider != null) transformationDependencyListItemProvider.dispose();
-  }
+		if (trcSpecificationItemProvider != null) trcSpecificationItemProvider.dispose();
+		if (transformationImpactItemProvider != null) transformationImpactItemProvider.dispose();
+		if (moduleItemProvider != null) moduleItemProvider.dispose();
+		if (transformationItemProvider != null) transformationItemProvider.dispose();
+		if (transformationDependencyItemProvider != null) transformationDependencyItemProvider.dispose();
+		if (ruleDependencyConjunctionItemProvider != null) ruleDependencyConjunctionItemProvider.dispose();
+		if (ruleDependencyDisjunctionItemProvider != null) ruleDependencyDisjunctionItemProvider.dispose();
+		if (ruleDependencyItemProvider != null) ruleDependencyItemProvider.dispose();
+		if (moduleListItemProvider != null) moduleListItemProvider.dispose();
+		if (transformationListItemProvider != null) transformationListItemProvider.dispose();
+		if (transformationDependencyListItemProvider != null) transformationDependencyListItemProvider.dispose();
+		if (trcRuleItemProvider != null) trcRuleItemProvider.dispose();
+	}
 
 }

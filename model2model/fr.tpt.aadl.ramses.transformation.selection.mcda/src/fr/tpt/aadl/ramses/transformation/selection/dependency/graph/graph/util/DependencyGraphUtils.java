@@ -34,6 +34,8 @@ public class DependencyGraphUtils
       {
         for(String ruleName: tuple.getValue())
         {
+          if(ruleName.contains("."))
+        	  ruleName = ruleName.substring(ruleName.indexOf('.')+1);
           if(trat.getTransformationRuleName().equals(ruleName))
           {
             boolean stop=false;

@@ -7,9 +7,9 @@
   <genPackages prefix="Trc" basePackage="fr.tpt.aadl.ramses.transformation" disposableProviderFactory="true"
       ecorePackage="TRC.ecore#/">
     <genClasses ecoreClass="TRC.ecore#//TrcSpecification">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/transformations"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/dependencies"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/modules"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/transformationList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/dependencyList"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcSpecification/moduleList"/>
     </genClasses>
     <genClasses ecoreClass="TRC.ecore#//TransformationImpact">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationImpact/impactValue"/>
@@ -17,8 +17,8 @@
     </genClasses>
     <genClasses ecoreClass="TRC.ecore#//Module">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Module/name"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Module/ruleName"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//Module/path"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//Module/rules"/>
     </genClasses>
     <genClasses ecoreClass="TRC.ecore#//Transformation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//Transformation/impacts"/>
@@ -30,7 +30,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationDependency/variableId"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/appliedTransformation"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/requiredTransformations"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TransformationDependency/appliedRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependency/appliedRule"/>
     </genClasses>
     <genClasses image="false" ecoreClass="TRC.ecore#//AbstractRuleDependency"/>
     <genClasses ecoreClass="TRC.ecore#//RuleDependencyConjunction"/>
@@ -55,6 +55,11 @@
     </genClasses>
     <genClasses ecoreClass="TRC.ecore#//TransformationDependencyList">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TRC.ecore#//TransformationDependencyList/transformationDependencies"/>
+    </genClasses>
+    <genClasses ecoreClass="TRC.ecore#//TrcRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TrcRule/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TRC.ecore#//TrcRule/superRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TRC.ecore#//TrcRule/isAbstract"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

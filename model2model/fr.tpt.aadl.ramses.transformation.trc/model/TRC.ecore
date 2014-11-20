@@ -19,7 +19,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="rules" upperBound="-1"
-        eType="#//trcRule"/>
+        eType="#//TrcRule" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Transformation">
     <eStructuralFeatures xsi:type="ecore:EReference" name="impacts" upperBound="-1"
@@ -36,22 +36,24 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="appliedTransformation"
         lowerBound="1" eType="#//Transformation"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="requiredTransformations"
-        lowerBound="1" upperBound="-1" eType="#//AbstractRuleDependency" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="appliedRule" lowerBound="1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        lowerBound="1" eType="#//AbstractRuleDependency" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="appliedRule" eType="#//TrcRule"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractRuleDependency" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="RuleDependencyConjunction" eSuperTypes="#//RuleDependencyComposite"/>
   <eClassifiers xsi:type="ecore:EClass" name="RuleDependencyDisjunction" eSuperTypes="#//RuleDependencyComposite"/>
   <eClassifiers xsi:type="ecore:EClass" name="RuleDependency" eSuperTypes="#//AbstractRuleDependency">
+    <eOperations name="isExclusion" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="variableId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="fieldNames" lowerBound="1"
         upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="requiredTransformation"
         eType="#//Transformation"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="requiredRule" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isExclusion" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
         defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="requiredRule" lowerBound="1"
+        eType="#//TrcRule"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RuleDependencyComposite" abstract="true"
       eSuperTypes="#//AbstractRuleDependency">
@@ -72,10 +74,9 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="transformationDependencies"
         lowerBound="1" upperBound="-1" eType="#//TransformationDependency" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="trcRule">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ruleName" upperBound="-1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="superRule" eType="#//trcRule"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TrcRule">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="superRule" eType="#//TrcRule"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isAbstract" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
 </ecore:EPackage>

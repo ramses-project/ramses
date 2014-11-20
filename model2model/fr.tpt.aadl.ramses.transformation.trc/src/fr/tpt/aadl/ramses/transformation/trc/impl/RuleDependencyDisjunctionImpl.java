@@ -19,24 +19,24 @@ import org.eclipse.emf.ecore.EClass;
 public class RuleDependencyDisjunctionImpl extends RuleDependencyCompositeImpl implements RuleDependencyDisjunction
 {
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected RuleDependencyDisjunctionImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.RULE_DEPENDENCY_DISJUNCTION;
-  }
+		return TrcPackage.Literals.RULE_DEPENDENCY_DISJUNCTION;
+	}
 
 } //RuleDependencyDisjunctionImpl

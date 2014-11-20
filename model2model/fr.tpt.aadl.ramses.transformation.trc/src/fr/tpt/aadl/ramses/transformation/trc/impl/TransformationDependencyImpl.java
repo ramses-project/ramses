@@ -7,6 +7,7 @@ import fr.tpt.aadl.ramses.transformation.trc.Transformation;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency;
 import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule;
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -43,303 +44,329 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class TransformationDependencyImpl extends EObjectImpl implements TransformationDependency
 {
   /**
-   * The cached value of the '{@link #getVariableId() <em>Variable Id</em>}' attribute list.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getVariableId() <em>Variable Id</em>}' attribute list.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getVariableId()
-   * @generated
-   * @ordered
-   */
+	 * @see #getVariableId()
+	 * @generated
+	 * @ordered
+	 */
   protected EList<String> variableId;
 
   /**
-   * The cached value of the '{@link #getAppliedTransformation() <em>Applied Transformation</em>}' reference.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getAppliedTransformation() <em>Applied Transformation</em>}' reference.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getAppliedTransformation()
-   * @generated
-   * @ordered
-   */
+	 * @see #getAppliedTransformation()
+	 * @generated
+	 * @ordered
+	 */
   protected Transformation appliedTransformation;
 
   /**
-   * The cached value of the '{@link #getRequiredTransformations() <em>Required Transformations</em>}' containment reference list.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getRequiredTransformations() <em>Required Transformations</em>}' containment reference.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getRequiredTransformations()
-   * @generated
-   * @ordered
-   */
-  protected EList<AbstractRuleDependency> requiredTransformations;
+	 * @see #getRequiredTransformations()
+	 * @generated
+	 * @ordered
+	 */
+  protected AbstractRuleDependency requiredTransformations;
 
   /**
-   * The default value of the '{@link #getAppliedRule() <em>Applied Rule</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getAppliedRule() <em>Applied Rule</em>}' reference.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getAppliedRule()
-   * @generated
-   * @ordered
-   */
-  protected static final String APPLIED_RULE_EDEFAULT = null;
+	 * @see #getAppliedRule()
+	 * @generated
+	 * @ordered
+	 */
+  protected TrcRule appliedRule;
 
   /**
-   * The cached value of the '{@link #getAppliedRule() <em>Applied Rule</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getAppliedRule()
-   * @generated
-   * @ordered
-   */
-  protected String appliedRule = APPLIED_RULE_EDEFAULT;
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TransformationDependencyImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.TRANSFORMATION_DEPENDENCY;
-  }
+		return TrcPackage.Literals.TRANSFORMATION_DEPENDENCY;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public EList<String> getVariableId()
   {
-    if (variableId == null)
-    {
-      variableId = new EDataTypeUniqueEList<String>(String.class, this, TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID);
-    }
-    return variableId;
-  }
+		if (variableId == null) {
+			variableId = new EDataTypeUniqueEList<String>(String.class, this, TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID);
+		}
+		return variableId;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public Transformation getAppliedTransformation()
   {
-    if (appliedTransformation != null && appliedTransformation.eIsProxy())
-    {
-      InternalEObject oldAppliedTransformation = (InternalEObject)appliedTransformation;
-      appliedTransformation = (Transformation)eResolveProxy(oldAppliedTransformation);
-      if (appliedTransformation != oldAppliedTransformation)
-      {
-        if (eNotificationRequired())
-          eNotify(new ENotificationImpl(this, Notification.RESOLVE, TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION, oldAppliedTransformation, appliedTransformation));
-      }
-    }
-    return appliedTransformation;
-  }
+		if (appliedTransformation != null && appliedTransformation.eIsProxy()) {
+			InternalEObject oldAppliedTransformation = (InternalEObject)appliedTransformation;
+			appliedTransformation = (Transformation)eResolveProxy(oldAppliedTransformation);
+			if (appliedTransformation != oldAppliedTransformation) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION, oldAppliedTransformation, appliedTransformation));
+			}
+		}
+		return appliedTransformation;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public Transformation basicGetAppliedTransformation()
   {
-    return appliedTransformation;
-  }
+		return appliedTransformation;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public void setAppliedTransformation(Transformation newAppliedTransformation)
   {
-    Transformation oldAppliedTransformation = appliedTransformation;
-    appliedTransformation = newAppliedTransformation;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION, oldAppliedTransformation, appliedTransformation));
-  }
+		Transformation oldAppliedTransformation = appliedTransformation;
+		appliedTransformation = newAppliedTransformation;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION, oldAppliedTransformation, appliedTransformation));
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
-  public EList<AbstractRuleDependency> getRequiredTransformations()
+	 * @generated
+	 */
+  public AbstractRuleDependency getRequiredTransformations()
   {
-    if (requiredTransformations == null)
-    {
-      requiredTransformations = new EObjectContainmentEList<AbstractRuleDependency>(AbstractRuleDependency.class, this, TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS);
-    }
-    return requiredTransformations;
-  }
+		return requiredTransformations;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetRequiredTransformations(AbstractRuleDependency newRequiredTransformations, NotificationChain msgs) {
+		AbstractRuleDependency oldRequiredTransformations = requiredTransformations;
+		requiredTransformations = newRequiredTransformations;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS, oldRequiredTransformations, newRequiredTransformations);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+		/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setRequiredTransformations(AbstractRuleDependency newRequiredTransformations) {
+		if (newRequiredTransformations != requiredTransformations) {
+			NotificationChain msgs = null;
+			if (requiredTransformations != null)
+				msgs = ((InternalEObject)requiredTransformations).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS, null, msgs);
+			if (newRequiredTransformations != null)
+				msgs = ((InternalEObject)newRequiredTransformations).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS, null, msgs);
+			msgs = basicSetRequiredTransformations(newRequiredTransformations, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS, newRequiredTransformations, newRequiredTransformations));
+	}
+
+		/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
-  public String getAppliedRule()
+	 * @generated
+	 */
+  public TrcRule getAppliedRule()
   {
-    return appliedRule;
-  }
+		if (appliedRule != null && appliedRule.eIsProxy()) {
+			InternalEObject oldAppliedRule = (InternalEObject)appliedRule;
+			appliedRule = (TrcRule)eResolveProxy(oldAppliedRule);
+			if (appliedRule != oldAppliedRule) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE, oldAppliedRule, appliedRule));
+			}
+		}
+		return appliedRule;
+	}
 
   /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  public void setAppliedRule(String newAppliedRule)
-  {
-    String oldAppliedRule = appliedRule;
-    appliedRule = newAppliedRule;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE, oldAppliedRule, appliedRule));
-  }
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public TrcRule basicGetAppliedRule() {
+		return appliedRule;
+	}
 
-  /**
-   * <!-- begin-user-doc -->
+		/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setAppliedRule(TrcRule newAppliedRule) {
+		TrcRule oldAppliedRule = appliedRule;
+		appliedRule = newAppliedRule;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE, oldAppliedRule, appliedRule));
+	}
+
+		/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
-        return ((InternalEList<?>)getRequiredTransformations()).basicRemove(otherEnd, msgs);
-    }
-    return super.eInverseRemove(otherEnd, featureID, msgs);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
+				return basicSetRequiredTransformations(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
-        return getVariableId();
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
-        if (resolve) return getAppliedTransformation();
-        return basicGetAppliedTransformation();
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
-        return getRequiredTransformations();
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        return getAppliedRule();
-    }
-    return super.eGet(featureID, resolve, coreType);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
+				return getVariableId();
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
+				if (resolve) return getAppliedTransformation();
+				return basicGetAppliedTransformation();
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
+				return getRequiredTransformations();
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
+				if (resolve) return getAppliedRule();
+				return basicGetAppliedRule();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @SuppressWarnings("unchecked")
   @Override
   public void eSet(int featureID, Object newValue)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
-        getVariableId().clear();
-        getVariableId().addAll((Collection<? extends String>)newValue);
-        return;
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
-        setAppliedTransformation((Transformation)newValue);
-        return;
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
-        getRequiredTransformations().clear();
-        getRequiredTransformations().addAll((Collection<? extends AbstractRuleDependency>)newValue);
-        return;
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        setAppliedRule((String)newValue);
-        return;
-    }
-    super.eSet(featureID, newValue);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
+				getVariableId().clear();
+				getVariableId().addAll((Collection<? extends String>)newValue);
+				return;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
+				setAppliedTransformation((Transformation)newValue);
+				return;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
+				setRequiredTransformations((AbstractRuleDependency)newValue);
+				return;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
+				setAppliedRule((TrcRule)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
-        getVariableId().clear();
-        return;
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
-        setAppliedTransformation((Transformation)null);
-        return;
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
-        getRequiredTransformations().clear();
-        return;
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        setAppliedRule(APPLIED_RULE_EDEFAULT);
-        return;
-    }
-    super.eUnset(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
+				getVariableId().clear();
+				return;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
+				setAppliedTransformation((Transformation)null);
+				return;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
+				setRequiredTransformations((AbstractRuleDependency)null);
+				return;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
+				setAppliedRule((TrcRule)null);
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
-        return variableId != null && !variableId.isEmpty();
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
-        return appliedTransformation != null;
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
-        return requiredTransformations != null && !requiredTransformations.isEmpty();
-      case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
-        return APPLIED_RULE_EDEFAULT == null ? appliedRule != null : !APPLIED_RULE_EDEFAULT.equals(appliedRule);
-    }
-    return super.eIsSet(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__VARIABLE_ID:
+				return variableId != null && !variableId.isEmpty();
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_TRANSFORMATION:
+				return appliedTransformation != null;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__REQUIRED_TRANSFORMATIONS:
+				return requiredTransformations != null;
+			case TrcPackage.TRANSFORMATION_DEPENDENCY__APPLIED_RULE:
+				return appliedRule != null;
+		}
+		return super.eIsSet(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public String toString()
   {
-    if (eIsProxy()) return super.toString();
+		if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
-    result.append(" (variableId: ");
-    result.append(variableId);
-    result.append(", appliedRule: ");
-    result.append(appliedRule);
-    result.append(')');
-    return result.toString();
-  }
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (variableId: ");
+		result.append(variableId);
+		result.append(')');
+		return result.toString();
+	}
 
 } //TransformationDependencyImpl

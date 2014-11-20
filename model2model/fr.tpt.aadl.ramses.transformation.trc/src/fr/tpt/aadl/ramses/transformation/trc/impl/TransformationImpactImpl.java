@@ -28,205 +28,201 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 public class TransformationImpactImpl extends TransformationElementImpl implements TransformationImpact
 {
   /**
-   * The default value of the '{@link #getImpactValue() <em>Impact Value</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getImpactValue() <em>Impact Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getImpactValue()
-   * @generated
-   * @ordered
-   */
+	 * @see #getImpactValue()
+	 * @generated
+	 * @ordered
+	 */
   protected static final int IMPACT_VALUE_EDEFAULT = 0;
 
   /**
-   * The cached value of the '{@link #getImpactValue() <em>Impact Value</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getImpactValue() <em>Impact Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getImpactValue()
-   * @generated
-   * @ordered
-   */
+	 * @see #getImpactValue()
+	 * @generated
+	 * @ordered
+	 */
   protected int impactValue = IMPACT_VALUE_EDEFAULT;
 
   /**
-   * The default value of the '{@link #getQualityAttributeName() <em>Quality Attribute Name</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getQualityAttributeName() <em>Quality Attribute Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getQualityAttributeName()
-   * @generated
-   * @ordered
-   */
+	 * @see #getQualityAttributeName()
+	 * @generated
+	 * @ordered
+	 */
   protected static final String QUALITY_ATTRIBUTE_NAME_EDEFAULT = null;
 
   /**
-   * The cached value of the '{@link #getQualityAttributeName() <em>Quality Attribute Name</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getQualityAttributeName() <em>Quality Attribute Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getQualityAttributeName()
-   * @generated
-   * @ordered
-   */
+	 * @see #getQualityAttributeName()
+	 * @generated
+	 * @ordered
+	 */
   protected String qualityAttributeName = QUALITY_ATTRIBUTE_NAME_EDEFAULT;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TransformationImpactImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.TRANSFORMATION_IMPACT;
-  }
+		return TrcPackage.Literals.TRANSFORMATION_IMPACT;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public int getImpactValue()
   {
-    return impactValue;
-  }
+		return impactValue;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public void setImpactValue(int newImpactValue)
   {
-    int oldImpactValue = impactValue;
-    impactValue = newImpactValue;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE, oldImpactValue, impactValue));
-  }
+		int oldImpactValue = impactValue;
+		impactValue = newImpactValue;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE, oldImpactValue, impactValue));
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public String getQualityAttributeName()
   {
-    return qualityAttributeName;
-  }
+		return qualityAttributeName;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public void setQualityAttributeName(String newQualityAttributeName)
   {
-    String oldQualityAttributeName = qualityAttributeName;
-    qualityAttributeName = newQualityAttributeName;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME, oldQualityAttributeName, qualityAttributeName));
-  }
+		String oldQualityAttributeName = qualityAttributeName;
+		qualityAttributeName = newQualityAttributeName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME, oldQualityAttributeName, qualityAttributeName));
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
-        return getImpactValue();
-      case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
-        return getQualityAttributeName();
-    }
-    return super.eGet(featureID, resolve, coreType);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
+				return getImpactValue();
+			case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
+				return getQualityAttributeName();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eSet(int featureID, Object newValue)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
-        setImpactValue((Integer)newValue);
-        return;
-      case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
-        setQualityAttributeName((String)newValue);
-        return;
-    }
-    super.eSet(featureID, newValue);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
+				setImpactValue((Integer)newValue);
+				return;
+			case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
+				setQualityAttributeName((String)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
-        setImpactValue(IMPACT_VALUE_EDEFAULT);
-        return;
-      case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
-        setQualityAttributeName(QUALITY_ATTRIBUTE_NAME_EDEFAULT);
-        return;
-    }
-    super.eUnset(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
+				setImpactValue(IMPACT_VALUE_EDEFAULT);
+				return;
+			case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
+				setQualityAttributeName(QUALITY_ATTRIBUTE_NAME_EDEFAULT);
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID)
   {
-    switch (featureID)
-    {
-      case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
-        return impactValue != IMPACT_VALUE_EDEFAULT;
-      case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
-        return QUALITY_ATTRIBUTE_NAME_EDEFAULT == null ? qualityAttributeName != null : !QUALITY_ATTRIBUTE_NAME_EDEFAULT.equals(qualityAttributeName);
-    }
-    return super.eIsSet(featureID);
-  }
+		switch (featureID) {
+			case TrcPackage.TRANSFORMATION_IMPACT__IMPACT_VALUE:
+				return impactValue != IMPACT_VALUE_EDEFAULT;
+			case TrcPackage.TRANSFORMATION_IMPACT__QUALITY_ATTRIBUTE_NAME:
+				return QUALITY_ATTRIBUTE_NAME_EDEFAULT == null ? qualityAttributeName != null : !QUALITY_ATTRIBUTE_NAME_EDEFAULT.equals(qualityAttributeName);
+		}
+		return super.eIsSet(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public String toString()
   {
-    if (eIsProxy()) return super.toString();
+		if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
-    result.append(" (impactValue: ");
-    result.append(impactValue);
-    result.append(", qualityAttributeName: ");
-    result.append(qualityAttributeName);
-    result.append(')');
-    return result.toString();
-  }
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (impactValue: ");
+		result.append(impactValue);
+		result.append(", qualityAttributeName: ");
+		result.append(qualityAttributeName);
+		result.append(')');
+		return result.toString();
+	}
 
 } //TransformationImpactImpl

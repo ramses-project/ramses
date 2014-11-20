@@ -5,6 +5,7 @@ package fr.tpt.aadl.ramses.transformation.trc.impl;
 import fr.tpt.aadl.ramses.transformation.trc.*;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 
@@ -21,206 +22,213 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 public class TrcFactoryImpl extends EFactoryImpl implements TrcFactory
 {
   /**
-   * Creates the default factory implementation.
-   * <!-- begin-user-doc -->
+	 * Creates the default factory implementation.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public static TrcFactory init()
   {
-    try
-    {
-      TrcFactory theTrcFactory = (TrcFactory)EPackage.Registry.INSTANCE.getEFactory(TrcPackage.eNS_URI);
-      if (theTrcFactory != null)
-      {
-        return theTrcFactory;
-      }
-    }
-    catch (Exception exception)
-    {
-      EcorePlugin.INSTANCE.log(exception);
-    }
-    return new TrcFactoryImpl();
-  }
+		try {
+			TrcFactory theTrcFactory = (TrcFactory)EPackage.Registry.INSTANCE.getEFactory(TrcPackage.eNS_URI);
+			if (theTrcFactory != null) {
+				return theTrcFactory;
+			}
+		}
+		catch (Exception exception) {
+			EcorePlugin.INSTANCE.log(exception);
+		}
+		return new TrcFactoryImpl();
+	}
 
   /**
-   * Creates an instance of the factory.
-   * <!-- begin-user-doc -->
+	 * Creates an instance of the factory.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TrcFactoryImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public EObject create(EClass eClass)
   {
-    switch (eClass.getClassifierID())
-    {
-      case TrcPackage.TRC_SPECIFICATION: return createTrcSpecification();
-      case TrcPackage.TRANSFORMATION_IMPACT: return createTransformationImpact();
-      case TrcPackage.MODULE: return createModule();
-      case TrcPackage.TRANSFORMATION: return createTransformation();
-      case TrcPackage.TRANSFORMATION_DEPENDENCY: return createTransformationDependency();
-      case TrcPackage.RULE_DEPENDENCY_CONJUNCTION: return createRuleDependencyConjunction();
-      case TrcPackage.RULE_DEPENDENCY_DISJUNCTION: return createRuleDependencyDisjunction();
-      case TrcPackage.RULE_DEPENDENCY: return createRuleDependency();
-      case TrcPackage.MODULE_LIST: return createModuleList();
-      case TrcPackage.TRANSFORMATION_LIST: return createTransformationList();
-      case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST: return createTransformationDependencyList();
-      default:
-        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
-    }
-  }
+		switch (eClass.getClassifierID()) {
+			case TrcPackage.TRC_SPECIFICATION: return createTrcSpecification();
+			case TrcPackage.TRANSFORMATION_IMPACT: return createTransformationImpact();
+			case TrcPackage.MODULE: return createModule();
+			case TrcPackage.TRANSFORMATION: return createTransformation();
+			case TrcPackage.TRANSFORMATION_DEPENDENCY: return createTransformationDependency();
+			case TrcPackage.RULE_DEPENDENCY_CONJUNCTION: return createRuleDependencyConjunction();
+			case TrcPackage.RULE_DEPENDENCY_DISJUNCTION: return createRuleDependencyDisjunction();
+			case TrcPackage.RULE_DEPENDENCY: return createRuleDependency();
+			case TrcPackage.MODULE_LIST: return createModuleList();
+			case TrcPackage.TRANSFORMATION_LIST: return createTransformationList();
+			case TrcPackage.TRANSFORMATION_DEPENDENCY_LIST: return createTransformationDependencyList();
+			case TrcPackage.TRC_RULE: return createTrcRule();
+			default:
+				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		}
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TrcSpecification createTrcSpecification()
   {
-    TrcSpecificationImpl trcSpecification = new TrcSpecificationImpl();
-    return trcSpecification;
-  }
+		TrcSpecificationImpl trcSpecification = new TrcSpecificationImpl();
+		return trcSpecification;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public Transformation createTransformation()
   {
-    TransformationImpl transformation = new TransformationImpl();
-    return transformation;
-  }
+		TransformationImpl transformation = new TransformationImpl();
+		return transformation;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransformationImpact createTransformationImpact()
   {
-    TransformationImpactImpl transformationImpact = new TransformationImpactImpl();
-    return transformationImpact;
-  }
+		TransformationImpactImpl transformationImpact = new TransformationImpactImpl();
+		return transformationImpact;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public Module createModule()
   {
-    ModuleImpl module = new ModuleImpl();
-    return module;
-  }
+		ModuleImpl module = new ModuleImpl();
+		return module;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransformationDependency createTransformationDependency()
   {
-    TransformationDependencyImpl transformationDependency = new TransformationDependencyImpl();
-    return transformationDependency;
-  }
+		TransformationDependencyImpl transformationDependency = new TransformationDependencyImpl();
+		return transformationDependency;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public RuleDependencyConjunction createRuleDependencyConjunction()
   {
-    RuleDependencyConjunctionImpl ruleDependencyConjunction = new RuleDependencyConjunctionImpl();
-    return ruleDependencyConjunction;
-  }
+		RuleDependencyConjunctionImpl ruleDependencyConjunction = new RuleDependencyConjunctionImpl();
+		return ruleDependencyConjunction;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public RuleDependencyDisjunction createRuleDependencyDisjunction()
   {
-    RuleDependencyDisjunctionImpl ruleDependencyDisjunction = new RuleDependencyDisjunctionImpl();
-    return ruleDependencyDisjunction;
-  }
+		RuleDependencyDisjunctionImpl ruleDependencyDisjunction = new RuleDependencyDisjunctionImpl();
+		return ruleDependencyDisjunction;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public RuleDependency createRuleDependency()
   {
-    RuleDependencyImpl ruleDependency = new RuleDependencyImpl();
-    return ruleDependency;
-  }
+		RuleDependencyImpl ruleDependency = new RuleDependencyImpl();
+		return ruleDependency;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public ModuleList createModuleList()
   {
-    ModuleListImpl moduleList = new ModuleListImpl();
-    return moduleList;
-  }
+		ModuleListImpl moduleList = new ModuleListImpl();
+		return moduleList;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransformationList createTransformationList()
   {
-    TransformationListImpl transformationList = new TransformationListImpl();
-    return transformationList;
-  }
+		TransformationListImpl transformationList = new TransformationListImpl();
+		return transformationList;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransformationDependencyList createTransformationDependencyList()
   {
-    TransformationDependencyListImpl transformationDependencyList = new TransformationDependencyListImpl();
-    return transformationDependencyList;
-  }
+		TransformationDependencyListImpl transformationDependencyList = new TransformationDependencyListImpl();
+		return transformationDependencyList;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public TrcRule createTrcRule() {
+		TrcRuleImpl trcRule = new TrcRuleImpl();
+		return trcRule;
+	}
+
+		/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TrcPackage getTrcPackage()
   {
-    return (TrcPackage)getEPackage();
-  }
+		return (TrcPackage)getEPackage();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @deprecated
-   * @generated
-   */
+	 * @deprecated
+	 * @generated
+	 */
   @Deprecated
   public static TrcPackage getPackage()
   {
-    return TrcPackage.eINSTANCE;
-  }
+		return TrcPackage.eINSTANCE;
+	}
 
 } //TrcFactoryImpl

@@ -19,24 +19,24 @@ import org.eclipse.emf.ecore.EClass;
 public class RuleDependencyConjunctionImpl extends RuleDependencyCompositeImpl implements RuleDependencyConjunction
 {
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected RuleDependencyConjunctionImpl()
   {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-    return TrcPackage.Literals.RULE_DEPENDENCY_CONJUNCTION;
-  }
+		return TrcPackage.Literals.RULE_DEPENDENCY_CONJUNCTION;
+	}
 
 } //RuleDependencyConjunctionImpl
