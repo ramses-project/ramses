@@ -131,6 +131,8 @@ rule m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_AR
 			dataFeatureClassifier <- semaphoreType,
 			kind<-#requires
 		),
+		nextValueSpgImpl: AADLBA!SubprogramImplementation,
+		receiveInputSpgImpl: AADLBA!SubprogramImplementation,
 		semaphoreEntryPointAccessCnx: AADLBA!AccessConnection
 		(
 			source <- sourceSemEntryPointCE,
@@ -375,13 +377,14 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 			name <- fi.uniqueName()+'_accessSemGlobalVariable',
 			accessCategory <- #data
 		),
+		putValueSpgImpl: AADLBA!SubprogramImplementation,
 		sourceSemGVCE: AADLBA!ConnectedElement
 		(
 			connectionEnd <- thisModule.resolveMatchedSingleIfExists(consumerPort, 'semaphoreGlobalVariable')
 		),
 		destinationSemGVCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'semaphoreThreadDataAccess'),
+			connectionEnd <- thisModule.resolveMatchedSingleIfExists(consumerPort, 'semaphoreThreadDataAccess'),
 			context <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(),'sub')
 		)
 }
@@ -403,7 +406,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
 		lockSemaphore: AADLI!SubprogramType = 'Wait_Semaphore'.asSubprogramType('ARINC653_RUNTIME');
 		unlockSemaphore: AADLI!SubprogramType = 'Signal_Semaphore'.asSubprogramType('ARINC653_RUNTIME');
-		semaphoreAccess: AADLBA!DataAccess = thisModule.resolveMatchedSingleIfExists(fi,'semaphoreEntryPointDataAccess');
+		semaphoreAccess: AADLBA!DataAccess = thisModule.resolveMatchedSingleIfExists(consumerPort,'semaphoreEntryPointDataAccess');
 	}
 	to
 		callLockPutValue: AADLBA!SubprogramCallAction
@@ -421,11 +424,11 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		semaphoreTimeOutHolder_l: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi, 'infinityTimeOut')
+			element <- thisModule.resolveMatchedSingleIfExists(consumerPort, 'infinityTimeOut')
 		),
 		returnCodeHolder_l: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi,'semCallReturnCode')
+			element <- thisModule.resolveMatchedSingleIfExists(consumerPort,'semCallReturnCode')
 		),
 		callUnlockPutValue: AADLBA!SubprogramCallAction
 		(
@@ -442,7 +445,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		returnCodeHolder_ul: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi,'semCallReturnCode')
+			element <- thisModule.resolveMatchedSingleIfExists(consumerPort,'semCallReturnCode')
 		)
 }
 -----------------------------------------------------------------------------------------------------
