@@ -205,8 +205,24 @@ helper context AADLI!ConnectionInstanceEnd def : collectOutputFeatureConnectionI
 ;
 
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
-	self.ownedPropertyAssociation->collectSelfPropertyAssociationImg()
+	self.ownedPropertyAssociation
+	->select(e|e.isApplicableTo(self.resolve()))
+	->collectSelfPropertyAssociationImg()
+	
 ;
+
+helper context AADLBA!PropertyAssociation def: isApplicableTo(ne: AADLI!NamedElement) : Boolean = 
+	if(ne.oclIsUndefined()) then
+		false
+	else
+		ne.acceptsProperty(self.property)
+	endif
+;
+
+helper context AADLBA!PropertyAssociation def: isApplicableTo(ne: AADLI!Element) : Boolean =
+	false
+;
+
 
 helper context Sequence(AADLBA!PropertyAssociation) def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
 	self->select(e|(e.collectInstanceReferenceValue()->isEmpty()))

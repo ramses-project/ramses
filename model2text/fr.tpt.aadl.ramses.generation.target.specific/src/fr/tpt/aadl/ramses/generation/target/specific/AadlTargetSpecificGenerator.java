@@ -114,7 +114,7 @@ public class AadlTargetSpecificGenerator implements Generator
   
   /** Loop debug  (loopValidIteration must be negative to disable debug) **/
   private static int loopValidIteration = -1;
-  public Integer loopIteration = -1;
+  
   private List<AnalysisResult> analysis_results = new ArrayList<AnalysisResult>();
   /****************/
   
@@ -450,9 +450,8 @@ public class AadlTargetSpecificGenerator implements Generator
   {
     _modelInstantiator = new AadlModelsManagerImpl(errManager) ;
 
-    String qualifiedAnalysisModelInputIdentifier = analysisModelInputIdentifier;
     
-    Resource inputResource = modelsMap.get(qualifiedAnalysisModelInputIdentifier) ;
+    Resource inputResource = modelsMap.get(analysisModelInputIdentifier) ;
     SystemInstance currentInstance ;
     PropertiesLinkingService pls = new PropertiesLinkingService() ;
     if(inputResource.getContents().get(0) instanceof AadlPackage)
@@ -680,6 +679,16 @@ public class AadlTargetSpecificGenerator implements Generator
                 {
                   foundLoopManagementPlugin = true;
                   modelsMap.putAll(gen.processLoop());
+                  boolean loopAnalysis = isValidLoopIteration(l.getAnalysis(), 
+                                                              errManager, 
+                                                              workflowPilot, 
+                                                              config, 
+                                                              workflowPilot.getOutputModelId(), 
+                                                              gen.getModelIdSuffix(), 
+                                                              monitor,
+                                                              gen.getCurrentIterationNb());
+                  if(loopAnalysis==false)
+                    _LOGGER.error("Analysis results show that some constraints are not satisfied");
                 }
               }
               catch (CoreException e)
@@ -720,8 +729,7 @@ public class AadlTargetSpecificGenerator implements Generator
   {
     AbstractLoop.AbstractAnalysis a = l.getAnalysis();
     final String inputId = l.getInputModelIdentifier();
-    final String outputId = l.getOutputModelIdentifier();
-    loopIteration = 0;
+    int loopIteration = 0;
     for(fr.tpt.aadl.ramses.transformation.trc.Transformation 
         transfo : l.getTransformations())
     {
@@ -730,20 +738,24 @@ public class AadlTargetSpecificGenerator implements Generator
         moduleList.add(m.getPath());
       
       loopIteration++;
+      String outputId = l.getOutputModelIdentifier()+loopIteration;
+      
       String msg = "Start loop iteration = " + loopIteration ;
       _LOGGER.trace(msg);
       String transfoId = workflowPilot.getTransformationName();
-      doTransformation(transfoId, moduleList,inputId,outputId,config, monitor);
-      if (isValidLoopIteration(a,errManager,workflowPilot,config,inputId,outputId,monitor))
+      SystemInstance si = doTransformation(transfoId, moduleList,inputId,outputId,config, monitor);
+      modelsMap.put(outputId, si.eResource());
+      if (isValidLoopIteration(a,errManager,workflowPilot,config,inputId,Integer.toString(loopIteration),monitor,loopIteration))
       {
         break;
       }
     }
   }
 
-  public boolean isValidLoopIteration (AbstractLoop.AbstractAnalysis a, AnalysisErrorReporterManager errManager,
+  private boolean isValidLoopIteration (AbstractLoop.AbstractAnalysis a, AnalysisErrorReporterManager errManager,
                                         WorkflowPilot xmlPilot, RamsesConfiguration config,
-                                        String inputId, String suffix, IProgressMonitor monitor) throws AnalysisException
+                                        String inputId, String suffix, IProgressMonitor monitor,
+                                        int loopIteration) throws AnalysisException
   {
     boolean result = doLoopAnalysis(a,errManager,xmlPilot,config,monitor,inputId, suffix);
     xmlPilot.setAnalysisResult(result);
@@ -775,7 +787,7 @@ public class AadlTargetSpecificGenerator implements Generator
        inputId = (inputIdSpecific == null) ? inputId : inputIdSpecific;
        inputIdSpecific+=suffix;
        outputIdSpecific+=suffix;
-       doAnalysis(aa.getMethod(),aa.getMode(),inputId,outputIdSpecific,errManager,
+       doAnalysis(aa.getMethod(),aa.getMode(),inputIdSpecific,outputIdSpecific,errManager,
                   xmlPilot,config,monitor);
       
        return xmlPilot.getAnalysisResult();
@@ -787,9 +799,10 @@ public class AadlTargetSpecificGenerator implements Generator
       { 
          if (! doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix))
          {
-           Resource inputResource = modelsMap.get(inputId) ;
+           String realInputId = inputId+suffix;
+           Resource inputResource = modelsMap.get(realInputId) ;
            inputResource.unload();
-           modelsMap.remove(inputId);
+           modelsMap.remove(realInputId);
            return false;
          }
       }

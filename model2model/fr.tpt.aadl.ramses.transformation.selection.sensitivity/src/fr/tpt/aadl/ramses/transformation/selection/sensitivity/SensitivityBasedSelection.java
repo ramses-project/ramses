@@ -137,17 +137,13 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
          );
     
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
-    generator.loopIteration=0;
     boolean loopAnalysis = false;
     while(!loopAnalysis)
     {
-      generator.loopIteration++;
       Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
       if(result==null)
         break;
-      String modelIdSuffix = "_iter_"+generator.loopIteration;
-      resultingMap.put(workflowPilot.getOutputModelId()+modelIdSuffix, result);
-      loopAnalysis = generator.isValidLoopIteration(l.getAnalysis(), errManager, workflowPilot, config, workflowPilot.getOutputModelId(), modelIdSuffix, monitor);
+      resultingMap.put(workflowPilot.getOutputModelId()+getModelIdSuffix(), result);
     }
     return resultingMap;
   }
@@ -538,5 +534,17 @@ public class SensitivityBasedSelection implements ITransformationSelection,LoopM
 		}
 		return null; // Should never reach this line
 	}
+
+  @Override
+  public String getModelIdSuffix()
+  {
+    return "_iter_"+TipUtils.getCurrentIteration() ;
+  }
+
+  @Override
+  public int getCurrentIterationNb()
+  {
+    return TipUtils.getCurrentIteration() ;
+  }
 
 }

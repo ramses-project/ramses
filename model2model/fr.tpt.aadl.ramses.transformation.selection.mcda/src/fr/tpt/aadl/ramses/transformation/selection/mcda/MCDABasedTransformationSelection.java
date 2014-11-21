@@ -47,6 +47,8 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.Depend
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.util.DependencyGraphUtils ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
+import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
+import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
@@ -70,6 +72,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   private AnalysisErrorReporterManager errManager;
   private IProgressMonitor monitor;
 
+  private int iterationNb=0;
   private List<String> qualityAttributesIdentifiers;
   
   private ArchitectureRefinementProcessLauncher mergeLauncher;
@@ -161,7 +164,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       List<String> currentTransformationAlternatives = tuple.getValue();
 
       if(treatedObjectInTIP.contains(currentElements))
-    	continue;
+        continue;
       
       if(currentTransformationAlternatives.size()>1)
       {
@@ -182,8 +185,11 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
             new HashSet<DependencyNode>();
         for(String rule: currentTransformationAlternatives)
         {
+          RuleApplicationTuple r = DependencyGraphUtils.getActualRuleApplicationTuple(patternMatchingMap,
+                                                                                      currentElements,
+                                                                                      rule);
           DependencyNode currentNode = DependencyGraphUtils.getDependencyNode
-              (dg, currentElements, rule);
+              (dg, r.getPatternMatchedElement(), r.getTransformationRuleName());
           if(treatedAlternatives.contains(currentNode))
             continue;
           dependencyNodeList.add(currentNode);
@@ -232,7 +238,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         	  ratRuleName.substring(ratRuleName.indexOf('.')+1);
           }
           RuleApplicationUtils.setTransformationToApply(tra, 
-        		  									    ratRuleName,
+                                                        ratRuleName,
                                                         tuplesToApply);
           
         }
@@ -301,15 +307,26 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
             );
 
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
-    boolean loopAnalysis = false;
-    generator.loopIteration++;
-    Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), loop.getIterationNb());
-    String modelIdSuffix = "_iter_"+generator.loopIteration;
-    resultingMap.put(workflowPilot.getOutputModelId()+modelIdSuffix, result);
-    loopAnalysis = generator.isValidLoopIteration(loop.getAnalysis(), errManager, workflowPilot, config, workflowPilot.getOutputModelId(), modelIdSuffix, monitor);
-    if(loopAnalysis==false)
-      _LOGGER.error("Analysis results show that some constraints are not satisfied");
+    
+    iterationNb = TipUtils.getCurrentIteration()+1;
+    String modelIdSuffix = getModelIdSuffix();
+    String outputModelId = workflowPilot.getOutputModelId()+modelIdSuffix;
+    
+    Resource result = mergeLauncher.launch(sinst, outputModelId, loop.getIterationNb());
+    resultingMap.put(outputModelId, result);
     return resultingMap;
+  }
+
+  @Override
+  public String getModelIdSuffix()
+  {
+    return "_iter_"+getCurrentIterationNb() ;
+  }
+
+  @Override
+  public int getCurrentIterationNb()
+  {
+    return iterationNb ;
   }
 
 }

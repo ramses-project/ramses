@@ -120,7 +120,9 @@ helper def: collectComputeEntryPointActionBlocks(c: AADLI!ComponentInstance): Se
 
 helper context AADLI!InstanceObject def : collectSelfPropertyAssociationImg() : Sequence(AADLBA!PropertyAssociation) =
 	self.ownedPropertyAssociation->select(e | not e.property.name.equalsIgnoreCase('Compute_Entrypoint_Call_Sequence')
-									)->collectSelfPropertyAssociationImg()
+									)
+									->select(e|e.isApplicableTo(self.resolve()))
+									->collectSelfPropertyAssociationImg()
 	->union(
 		if self.oclIsTypeOf(AADLI!ComponentInstance) and self.category=#thread then
 			Sequence{ thisModule.collectComputeEntryPoint_rule(self),

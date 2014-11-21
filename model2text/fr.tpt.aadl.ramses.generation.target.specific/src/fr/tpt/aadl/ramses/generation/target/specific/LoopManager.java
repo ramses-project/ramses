@@ -17,4 +17,8 @@ public interface LoopManager
 
   Map<? extends String, ? extends Resource> processLoop() throws AnalysisException, ParseException, TransformationException, ConfigurationException, IOException ;
 
+  String getModelIdSuffix() ;
+
+  int getCurrentIterationNb() ;
+
 }

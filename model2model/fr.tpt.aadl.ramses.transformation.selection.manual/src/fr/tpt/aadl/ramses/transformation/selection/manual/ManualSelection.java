@@ -66,6 +66,7 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 	private Map<EObject,String> EObjectList_EObjectKey = new HashMap<EObject,String>();
 	
 	private Map<List<EObject>, List<String>> AlternativesRules = new HashMap<List<EObject>, List<String>>();
+	int loopIteration=0;
 	
 	private IHM frame ; 
 	
@@ -581,19 +582,23 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
          );
     
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
-    generator.loopIteration=0;
-    boolean loopAnalysis = false;
-    while(!loopAnalysis)
-    {
-      generator.loopIteration++;
-      Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
-      if(result==null)
-        break;
-      String modelIdSuffix = "_iter_"+generator.loopIteration;
-      resultingMap.put(workflowPilot.getOutputModelId()+modelIdSuffix, result);
-      loopAnalysis = generator.isValidLoopIteration(l.getAnalysis(), errManager, workflowPilot, config, workflowPilot.getOutputModelId(), modelIdSuffix, monitor);
-    }
+    loopIteration++;
+    Resource result = mergeLauncher.launch(sinst, workflowPilot.getOutputModelId(), l.getIterationNb());
+    String modelIdSuffix = "_iter_"+loopIteration;
+    resultingMap.put(workflowPilot.getOutputModelId()+modelIdSuffix, result);
     return resultingMap;
+  }
+
+  @Override
+  public String getModelIdSuffix()
+  {
+    return workflowPilot.getOutputModelId() +  "_iter_"+ loopIteration;
+  }
+
+  @Override
+  public int getCurrentIterationNb()
+  {
+    return loopIteration;
   }
 	
 

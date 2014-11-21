@@ -75,7 +75,7 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	  URI instanceURI = URI.createURI(instanceURIString);
 	  ResourceSet rs = si.eResource().getResourceSet();
 	  Resource aadlResource = rs.getResource(instanceURI,
-	                                                      false) ;
+	                                         false) ;
 	  
 	  SystemInstance instance = null;
 	  if(aadlResource != null)
@@ -94,8 +94,9 @@ public class AadlModelsManagerImpl implements AadlModelInstantiatior {
 	  }
 	  else
 	  {
+	    aadlResource = rs.createResource(instanceURI);
 	    instance = _instantiateModel.createSystemInstanceInt(si,
-	                                                                        aadlResource) ;
+	                                                         aadlResource) ;
 	  }
 
 	  

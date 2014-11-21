@@ -1,5 +1,3 @@
-// TODO; add m_PeriodicThread vs m_Thread_With_Output_PeriodicDelayed_Port
-
 Modules 
 {
 	SharedRules ["ACG/PeriodicDelayedCommunication/SharedRules.atl"]:m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput;
@@ -89,14 +87,6 @@ Dependencies {
     and
     // checked, it exists in alternatives
      requires (lowET.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port.dstConnectionInstance->collect(e|e.source)"})
-//    and
-//     (
-//     	requires (lowET.EventDataPorts_LowET.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET, 
-//      	{"port.dstConnectionInstance->collect(e|e.source)"})
-//      	or
-//      	requires (lowMFP.EventDataPorts_LowMFP.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP, 
-//      	{"port.dstConnectionInstance->collect(e|e.source)"})
-//    )
       and
       // checked, it exists in alternatives
       excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653,{"port"})
@@ -130,13 +120,16 @@ Dependencies {
      	excludes (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {"port.srcConnectionInstance->collect(e|e.destination)"})
      	and
      	// checked, it exists in alternatives
-     	requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
+     	excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
   		and
   		// checked, it exists in alternatives
-  		requires(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		excludes(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
   		and
   		// checked, it exists in alternatives
-  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
+  		excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		and
+  		// checked, it exists in alternatives
+  		excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
   	)
   ];
   Apply (lowMFP.EventDataPorts_LowMFP.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_LowMFP,{port})
@@ -150,15 +143,6 @@ Dependencies {
     and
      // checked, it exists in alternatives
      requires (lowMFP.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port.dstConnectionInstance->collect(e|e.source)"})
-//    and
-//     (
-//     	requires (lowET.EventDataPorts_LowET.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowET, 
-//      	{"port.dstConnectionInstance->collect(e|e.source)"})
-//      	or
-//      	requires (lowMFP.EventDataPorts_LowMFP.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_LowMFP, 
-//      	{"port.dstConnectionInstance->collect(e|e.source)"})
-//     
-//     )
      and
       // checked, it exists in alternatives
       excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653,{"port"})
@@ -192,18 +176,25 @@ Dependencies {
      	excludes (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {"port.srcConnectionInstance->collect(e|e.destination)"})
      	and
      	// checked, it exists in alternatives
-     	requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
+     	excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
   		and
   		// checked, it exists in alternatives
-  		requires(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		excludes(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
   		and
   		// checked, it exists in alternatives
-  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
+  		excludes (lowMC.EventDataPorts_Mutex.m_Thread_With_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		and
+  		// checked, it exists in alternatives
+  		excludes(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
   	)
   ];
+  
   Apply (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {port})
   [
   	(
+  		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port.dstConnectionInstance->collect(e|e.source)"})
+  		and
   		// checked, it exists in alternatives
   		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_NextValue_Mutex_ARINC653,{"port"})
   		and
@@ -211,26 +202,33 @@ Dependencies {
   		requires(lowMC.EventDataPorts_Mutex.m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_ReceiveInputs_Mutex, {"port"})
   		and
   		// checked, it exists in alternatives
-  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port.dstConnectionInstance->collect(e|e.source)"})
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC, {"port.dstConnectionInstance->collect(e|e.source)"})
   		and
   		// checked, it exists in alternatives
   		requires(lowMC.EventDataPorts_Mutex.m_Thread_With_Input_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
   		and
-  		// checked, it exists in alternatives
-  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port.dstConnectionInstance->collect(e|e.source)"})
+  		excludes(lowET.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
   	)
   ];
   Apply (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_Mutex_ARINC, {port})
   [
   	(
   		// checked, it exists in alternatives
-  		requires (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {"port.srcConnectionInstance->collect(e|e.destination)"})
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_Mutex, {"port"})
   		and
   		// checked, it exists in alternatives
   		requires (lowMC.SharedRules.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput, {"port"})
   		and
   		// checked, it exists in alternatives
+  		requires(lowMC.EventDataPorts_Mutex_ARINC653.m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_PutValue_Mutex_ARINC653, {"port"})
+  		and
+  		// checked, it exists in alternatives
+  		requires (lowMC.EventDataPorts_Mutex_ARINC653.m_Thread_IntraProcess_Input_EventDataPort_PeriodicDelayed_Instance_Mutex_ARINC653, {"port.srcConnectionInstance->collect(e|e.destination)"})
+  		and
+  		// checked, it exists in alternatives
   		requires (lowMC.EventDataPorts_Mutex.m_Thread_With_Output_PeriodicDelayed_Port, {"ComponentInstance.allInstances()->any(e|e.featureInstance->includes(port))"})
+  		and
+  		excludes(lowET.PortsCommonRefinementSteps.m_Thread_DataOrEventDataPort_Output_Instance, {"port"})
   	)
   ];
 }

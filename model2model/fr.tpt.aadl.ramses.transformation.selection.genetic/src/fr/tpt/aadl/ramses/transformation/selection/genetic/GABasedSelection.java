@@ -17,6 +17,7 @@ import fr.tpt.aadl.ramses.control.workflow.ResolutionMethod ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
 import fr.tpt.aadl.ramses.generation.target.specific.AadlTargetSpecificGenerator ;
 import fr.tpt.aadl.ramses.generation.target.specific.LoopManager ;
+import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 
 public class GABasedSelection implements LoopManager
 {
@@ -55,6 +56,18 @@ public class GABasedSelection implements LoopManager
   {
     // TODO Auto-generated method stub
     return null ;
+  }
+
+  @Override
+  public String getModelIdSuffix()
+  {
+    return "_iter_"+TipUtils.getCurrentIteration() ;
+  }
+
+  @Override
+  public int getCurrentIterationNb()
+  {
+    return TipUtils.getCurrentIteration();
   }
 
 }

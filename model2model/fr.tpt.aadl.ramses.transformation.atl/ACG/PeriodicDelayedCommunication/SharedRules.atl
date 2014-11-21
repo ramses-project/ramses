@@ -241,7 +241,7 @@ unique lazy rule createIterationCounter
 }
 
 helper def : PDC_RUNTIME_NAME : String = 'PeriodicDelayed_runtime';
-
+helper def : PDC_RUNTIME_MUTEX_NAME : String = 'PeriodicDelayedMutex_runtime';
 abstract rule m_PeriodicDelayed_Port
 {
 	from
@@ -251,6 +251,7 @@ abstract rule m_PeriodicDelayed_Port
 	{
 		--thisModule.addImportedUnit(thisModule.public(), 'PERIODICDELAYED_RUNTIME', 'PeriodicDelayed_runtime');
 		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_RUNTIME_NAME.toUpper(), thisModule.PDC_RUNTIME_NAME);
+		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_RUNTIME_MUTEX_NAME.toUpper(), thisModule.PDC_RUNTIME_MUTEX_NAME);
 	}
 }
 

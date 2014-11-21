@@ -20,9 +20,43 @@ import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 public class DependencyGraphUtils
 {
 
+  public static RuleApplicationTuple getActualRuleApplicationTuple(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
+                                                                   List<EObject> matchedElements,
+                                                                   String transformationRuleName)
+  {
+    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
+    while (patternMatchingIt.hasNext()) 
+    {
+      Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
+      for(String ruleName: tuple.getValue())
+      {
+        if(transformationRuleName.equals(ruleName))
+        {
+          boolean stop=false;
+          for(EObject obj : matchedElements)
+          {
+            if(tuple.getKey().contains(obj)==false)
+            {
+              stop=true;
+              break;
+            }
+          }
+          if(!stop)
+          {
+            RuleApplicationTuple newRat = new RuleApplicationTuple();
+            newRat.setTransformationRuleName(ruleName);
+            newRat.getPatternMatchedElement().addAll(tuple.getKey());
+            return newRat;
+          }
+        }
+      }
+    }
+    return null;
+  }
+  
   
   private static List<RuleApplicationTuple> getActualRuleApplicationTuple(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
-                                               List<TaggedRuleApplicationTuple> dependencyList)
+                                                                          List<TaggedRuleApplicationTuple> dependencyList)
   {
     List<RuleApplicationTuple> result = new ArrayList<RuleApplicationTuple>();
     
@@ -155,8 +189,11 @@ public class DependencyGraphUtils
   {
     for(DependencyNode dn: graph.getNodes())
     {
+      String dnRuleName = dn.getTransformationRule();
+      if(dnRuleName.contains(".") && rule.contains(".")==false)
+        dnRuleName = dnRuleName.substring(dnRuleName.indexOf('.')+1);
       if(dn.getMatchedElements().equals(elements)
-          && dn.getTransformationRule().equals(rule))
+          && dnRuleName.equals(rule))
         return dn;
     }
     return null;
