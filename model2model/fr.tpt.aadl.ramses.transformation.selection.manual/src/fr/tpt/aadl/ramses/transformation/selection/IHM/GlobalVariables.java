@@ -9,6 +9,7 @@ import java.util.Map;
 import org.eclipse.emf.ecore.EObject;
 
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
 
 public class GlobalVariables implements Serializable {
@@ -23,6 +24,6 @@ public class GlobalVariables implements Serializable {
 	public static boolean JFrameIsClosed = false ;
 	public static ArrayList<ElementTransformation> applytuple = new ArrayList<ElementTransformation>();
 	
-	public static Map<List<EObject>, ArrayList<String>> testMap = new HashMap<List<EObject>, ArrayList<String>>();
+	public static Map<List<EObject>, ArrayList<TrcRule>> testMap = new HashMap<List<EObject>, ArrayList<TrcRule>>();
 
 }

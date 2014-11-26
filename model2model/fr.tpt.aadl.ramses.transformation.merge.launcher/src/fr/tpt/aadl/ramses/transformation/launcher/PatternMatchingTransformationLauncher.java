@@ -23,16 +23,22 @@ import fr.tpt.aadl.ramses.control.atl.Aadl2XEMFTVMLauncher ;
 import fr.tpt.aadl.ramses.control.support.instantiation.AadlModelInstantiatior ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.atl.patternmatching.ElementTransformationTuple ;
 
 public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher {
 
 	public PatternMatchingTransformationLauncher(
 			AadlModelInstantiatior modelInstantiator,
-			PredefinedAadlModelManager predefinedResourcesManager) {
+			PredefinedAadlModelManager predefinedResourcesManager,
+			TrcSpecification trcSpec) {
 		super(modelInstantiator, predefinedResourcesManager);
+		this.trcSpec = trcSpec;
 	}
 
+	TrcSpecification trcSpec; 
+	
 	private static final String AADLI_MM_URI =
 			org.osate.aadl2.instance.InstancePackage.eNS_URI ;
 	private static final String AADLBA_MM_URI =
@@ -116,12 +122,14 @@ public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher 
 	          return 0;
 	        }
 	      });
-	      List<String> inheritedModuleName = new ArrayList<String>();
+	      List<TrcRule> inheritedModuleName = new ArrayList<TrcRule>();
 	      for(Rule inheritedRule: inheritedRules)
 	      {
-	        inheritedModuleName.add(getCompleteName(inheritedRule));
+	        String qualifiedName = getCompleteName(inheritedRule);
+	        inheritedModuleName.add(trcSpec.getTrcRule(qualifiedName));
 	      }
-	      RuleApplicationUtils.getRulesInheritenceMap().put(getCompleteName(r), inheritedModuleName);
+	      TrcRule trcRule = trcSpec.getTrcRule(getCompleteName(r));
+	      RuleApplicationUtils.getRulesInheritenceMap().put(trcRule, inheritedModuleName);
 	    }
 	  }
 	  

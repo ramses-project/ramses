@@ -2,7 +2,6 @@
  */
 package fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph;
 
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
@@ -132,7 +131,7 @@ public interface GraphPackage extends EPackage
   int DEPENDENCY_NODE__MATCHED_ELEMENTS = 2;
 
   /**
-   * The feature id for the '<em><b>Transformation Rule</b></em>' attribute.
+   * The feature id for the '<em><b>Transformation Rule</b></em>' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
@@ -270,15 +269,15 @@ public interface GraphPackage extends EPackage
   EReference getDependencyNode_MatchedElements();
 
   /**
-   * Returns the meta object for the attribute '{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getTransformationRule <em>Transformation Rule</em>}'.
+   * Returns the meta object for the reference '{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getTransformationRule <em>Transformation Rule</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @return the meta object for the attribute '<em>Transformation Rule</em>'.
+   * @return the meta object for the reference '<em>Transformation Rule</em>'.
    * @see fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getTransformationRule()
    * @see #getDependencyNode()
    * @generated
    */
-  EAttribute getDependencyNode_TransformationRule();
+  EReference getDependencyNode_TransformationRule();
 
   /**
    * Returns the meta object for class '{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyArc <em>Dependency Arc</em>}'.
@@ -389,12 +388,12 @@ public interface GraphPackage extends EPackage
     EReference DEPENDENCY_NODE__MATCHED_ELEMENTS = eINSTANCE.getDependencyNode_MatchedElements();
 
     /**
-     * The meta object literal for the '<em><b>Transformation Rule</b></em>' attribute feature.
+     * The meta object literal for the '<em><b>Transformation Rule</b></em>' reference feature.
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      * @generated
      */
-    EAttribute DEPENDENCY_NODE__TRANSFORMATION_RULE = eINSTANCE.getDependencyNode_TransformationRule();
+    EReference DEPENDENCY_NODE__TRANSFORMATION_RULE = eINSTANCE.getDependencyNode_TransformationRule();
 
     /**
      * The meta object literal for the '{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.impl.DependencyArcImpl <em>Dependency Arc</em>}' class.

@@ -5,6 +5,7 @@ import java.util.List ;
 
 import org.eclipse.emf.ecore.EObject ;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
@@ -31,7 +32,7 @@ public class DependencyValidation
       List<List<TaggedRuleApplicationTuple>> dependenciesDisjunctionList = 
           TrcUtils.getNormalizedDependencies(trc,
                                              rat.getPatternMatchedElement(),
-                                             rat.getTransformationRuleName());
+                                             rat.getTransformationRule());
       if(dependenciesDisjunctionList.isEmpty())
         continue;
       
@@ -77,7 +78,7 @@ public class DependencyValidation
   private boolean isInRuleApplicationList(TaggedRuleApplicationTuple trat)
   {
     List<EObject> dependencyElements = trat.getPatternMatchedElement();
-    String dependencyRule = trat.getTransformationRuleName();
+    TrcRule dependencyRule = trat.getTransformationRule();
     
     for(RuleApplicationTuple rat:ruleApplicationList)
     {
@@ -94,9 +95,7 @@ public class DependencyValidation
       }
       if(stop)
         continue;
-      String ratRuleName = rat.getTransformationRuleName();
-      if(ratRuleName.contains("."))
-    	  ratRuleName = ratRuleName.substring(ratRuleName.indexOf('.')+1);
+      TrcRule ratRuleName = rat.getTransformationRule();
       if(ratRuleName.equals(dependencyRule))
         return true;
       else

@@ -96,9 +96,9 @@ public class AlternativePanel implements Serializable {
 			taggedRuleApplicationTuple.addAll(taggedRuleApplicationT.get(k));
 			for (i = 0; i < taggedRuleApplicationTuple.size(); i++){
 				if(!taggedRuleApplicationTuple.get(i).isExclusion()){
-					string= "SELECT "+ taggedRuleApplicationTuple.get(i).getTransformationRuleName() +" FOR { "+ printAllObjects(taggedRuleApplicationTuple.get(i).getPatternMatchedElement()) +" }";
+					string= "SELECT "+ taggedRuleApplicationTuple.get(i).getTransformationRule() +" FOR { "+ printAllObjects(taggedRuleApplicationTuple.get(i).getPatternMatchedElement()) +" }";
 					panels.get(panels.size()-1).decisionComboBox.addItem(string);	//exclusionTuple.put(taggedRuleApplicationTuple.get(i).getPatternMatchedElement(), taggedRuleApplicationTuple.get(i).getTransformationRuleName());
-					panels.get(panels.size()-1).ruleToApply.add(new ChoosenRulesToApply(taggedRuleApplicationTuple.get(i).getPatternMatchedElement(),taggedRuleApplicationTuple.get(i).getTransformationRuleName()));
+					panels.get(panels.size()-1).ruleToApply.add(new ChoosenRulesToApply(taggedRuleApplicationTuple.get(i).getPatternMatchedElement(),taggedRuleApplicationTuple.get(i).getTransformationRule()));
 				}
 			}
 		}

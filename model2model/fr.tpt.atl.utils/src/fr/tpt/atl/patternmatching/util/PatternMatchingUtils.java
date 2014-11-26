@@ -18,6 +18,8 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.atl.patternmatching.ElementTransformationTuple;
 import fr.tpt.atl.patternmatching.patternmatchingPackage;
 
@@ -27,31 +29,37 @@ public class PatternMatchingUtils {
 	
 	/**
 	 * Returns a map of elementId associated transformationIds from a given pml file
+	 * @param trcSpec 
 	 *
 	 * @param startingMap   Map of elementId-transformationIds to which new results from a given file will be added
 	 * @param pmlFilePath	String representing the path of the ".pml" file
 	 * @return  a map of elementId associated transformationIds
 	 */
-	public static Map getGroupedCandidateTuplesFromFile(LinkedHashMap<List<EObject>, ArrayList<String>> startingMap,
-	                                                    String patternMatchingFilePath,
-	                                                    ResourceSet resourceSet){
-		LinkedHashMap<List<EObject>, ArrayList<String>> results = startingMap;
+	public static Map<List<EObject>, ArrayList<TrcRule>> getGroupedCandidateTuplesFromFile(TrcSpecification trcSpec, 
+	                                                                                       LinkedHashMap<List<EObject>, ArrayList<TrcRule>> startingMap,
+	                                                                                      String patternMatchingFilePath,
+	                                                                                      ResourceSet resourceSet){
+		LinkedHashMap<List<EObject>, ArrayList<TrcRule>> results = startingMap;
 		
 		File f = new File(patternMatchingFilePath);
-		ArrayList<ElementTransformationTuple> tuplesList = PatternMatchingUtils.getCandidateTuplesFromFile(f,resourceSet);
+		ArrayList<ElementTransformationTuple> tuplesList = PatternMatchingUtils.
+		    getCandidateTuplesFromFile(f,resourceSet);
 		if (tuplesList != null){
 			Iterator<ElementTransformationTuple> tuplesIt = tuplesList.iterator();
 			while (tuplesIt.hasNext()){
 				ElementTransformationTuple tupleObject = tuplesIt.next();
 				if (!resultsContainsKey(results.keySet(), tupleObject.getKey())){
-					ArrayList<String> array = new ArrayList<String>();
-					array.add(tupleObject.getValue());
+					ArrayList<TrcRule> array = new ArrayList<TrcRule>();
+					TrcRule rule = trcSpec.getTrcRule(tupleObject.getValue());
+					array.add(rule);
 					results.put(tupleObject.getKey(), array);
 				} else {
-					String newVal = tupleObject.getValue();
-					List<String> oldVals = results.get(tupleObject.getKey());
+				  TrcRule newVal = trcSpec.getTrcRule(tupleObject.getValue());
+					List<TrcRule> oldVals = results.get(tupleObject.getKey());
 					if(false == oldVals.contains(newVal))
-						results.get(tupleObject.getKey()).add(tupleObject.getValue());
+					{
+						results.get(tupleObject.getKey()).add(newVal);
+					}
 				}
 			}
 			
@@ -127,13 +135,14 @@ public class PatternMatchingUtils {
 	
 	/**
 	 * Returns a map of elementId associated transformationIds from all the ".pml" files from a given directory
+	 * @param trcSpec 
 	 *
 	 * @param directoryPath	String representing a path to directory containing the ".pml" files
 	 * @return  a map of elementId associated transformationIds
 	 */
-	public static Map<List<EObject>, ArrayList<String>> getGroupedCandidateTuplesFromDirectory(String directoryPath,
+	public static Map<List<EObject>, ArrayList<TrcRule>> getGroupedCandidateTuplesFromDirectory(TrcSpecification trcSpec, String directoryPath,
 	                                                                                  ResourceSet resourceSet){
-		LinkedHashMap<List<EObject>, ArrayList<String>> results = new LinkedHashMap<List<EObject>, ArrayList<String>>();		
+		LinkedHashMap<List<EObject>, ArrayList<TrcRule>> results = new LinkedHashMap<List<EObject>, ArrayList<TrcRule>>();		
 		
 		File dirFile = new File(directoryPath);
 		File[] files = dirFile.listFiles(new FilenameFilter() {
@@ -143,7 +152,8 @@ public class PatternMatchingUtils {
 		});
 		
 		for (int i=0; i<files.length; i++){
-			getGroupedCandidateTuplesFromFile(results,
+			getGroupedCandidateTuplesFromFile(trcSpec,
+			                                  results,
 			                                  files[i].getPath(),
 			                                  resourceSet);
 		}

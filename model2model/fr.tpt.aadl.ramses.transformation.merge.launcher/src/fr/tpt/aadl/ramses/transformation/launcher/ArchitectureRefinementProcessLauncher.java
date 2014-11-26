@@ -52,6 +52,7 @@ import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Module ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 import fr.tpt.atl.compiler.Atl2EmftvmCompiler ;
@@ -168,7 +169,8 @@ public class ArchitectureRefinementProcessLauncher {
 
     while (tuplesToApplyIt.hasNext()){
       ElementTransformation etObj = tuplesToApplyIt.next();
-      Transformation transformationObject = TrcUtils.getTransformationById(trcSpec,etObj.getTransformationId());
+      Transformation transformationObject = TrcUtils.getTransformationById(trcSpec,
+                                                                           trcSpec.getTrcRule(etObj.getTransformationId()));
       Module m = null;
       for(Module moduleIter: (List<Module>) transformationObject.getModules())
       {
@@ -318,7 +320,8 @@ public class ArchitectureRefinementProcessLauncher {
     for(Transformation transfo : transfoList)
     {
       PatternMatchingTransformationLauncher pmtl = new PatternMatchingTransformationLauncher(this.modelInstantiator,
-                                                                                             this.predefinedResourcesManager);  
+                                                                                             this.predefinedResourcesManager,
+                                                                                             trcSpec);  
       
       List<Module> moduleList = transfo.getModules();
       List<File> emftvmFiles = new ArrayList<File>();
@@ -343,8 +346,10 @@ public class ArchitectureRefinementProcessLauncher {
 
 
     //get the pattern matching results as a Map(elemenId, ArrayList(transformationId))
-    Map<List<EObject>, ArrayList<String>> patternMatchingMap = 
-        PatternMatchingUtils.getGroupedCandidateTuplesFromDirectory(config.getRamsesOutputDir().getAbsolutePath(), resourceSet);
+    Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap = 
+        PatternMatchingUtils.getGroupedCandidateTuplesFromDirectory(trcSpec,
+                                                                    config.getRamsesOutputDir().getAbsolutePath(),
+                                                                    resourceSet);
 
 
     ArrayList<ElementTransformation> tuplesToApply = new ArrayList<ElementTransformation>();

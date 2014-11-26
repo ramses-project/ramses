@@ -13,6 +13,7 @@ import fr.tpt.aadl.ramses.transformation.tip.TipSpecification ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.trc.Module ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
@@ -29,15 +30,15 @@ public class SelectionAlgorithm {
 	 * @param sensitivities	 quality attribute identifiers to which the element is sensitive (ordered by priority)
 	 * @return      		 a list of transformation's identifiers corresponding to a given element, considering element's sensitivities
 	 */
-	public static List<String> findBestAllocationsWithSensitivities(TrcSpecification trcSpec,
-	                                                                List<String> availableTransformationsIdList,  
+	public static List<TrcRule> findBestAllocationsWithSensitivities(TrcSpecification trcSpec,
+	                                                                List<TrcRule> availableTransformationsIdList,  
 	                                                                List<String> sensitivities){
 		// create List of available transformations from Strings
 		List<Transformation> transformationsAvailable = new ArrayList<Transformation>();
-		Iterator<String> availableTransformationIdsIt = availableTransformationsIdList.iterator();
+		Iterator<TrcRule> availableTransformationIdsIt = availableTransformationsIdList.iterator();
 		_LOGGER.trace("Search best allocation among "+availableTransformationsIdList.size());
     while (availableTransformationIdsIt.hasNext()){
-			Transformation tr = TrcUtils.getTransformationById(trcSpec, availableTransformationIdsIt.next().toString());
+			Transformation tr = TrcUtils.getTransformationById(trcSpec, availableTransformationIdsIt.next());
 			if(tr!=null)
 				transformationsAvailable.add(tr);
 		}
@@ -58,19 +59,19 @@ public class SelectionAlgorithm {
 
 		_LOGGER.trace("Ordered quality attributes " + transSensList.size());
 		
-		List<String> results = new ArrayList<String>();
+		List<TrcRule> results = new ArrayList<TrcRule>();
 		
 		for (Iterator<OrderedQualityImpact> transSensIt = transSensList.iterator(); transSensIt.hasNext();){
 			OrderedQualityImpact oqi = transSensIt.next();
 			Transformation selectedTransfo = oqi.transformation;
-			for(String availableTransfo: availableTransformationsIdList)
+			for(TrcRule availableTransfo: availableTransformationsIdList)
 			{
 				for(Module m: (List<Module>)selectedTransfo.getModules())
 				{
 					// look for module in selectd transfo
 					String moduleName = m.getPath();
 					moduleName = moduleName.substring(moduleName.lastIndexOf("/")+1, moduleName.length()-4);
-					if(availableTransfo.startsWith(moduleName))
+					if(availableTransfo.getQualifiedName().startsWith(moduleName))
 					{
 						results.add(availableTransfo);
 						return results;
@@ -160,13 +161,15 @@ public class SelectionAlgorithm {
 	 * @param ignored  							List of transformations identifiers (qualified name) to be ignored while best allocation selection
 	 * @return         			a list of transformations corresponding to a given element, considering given QA and element's sensitivities
 	 */
-	public static List<String> findBestAllocationsWithSensitivitiesNext(TrcSpecification trcSpec,
-	                                                                    List<String> availableTransformationsIdList, List<String> sensitivities, List<String> ignoredTransformationList){
-		List<String> results = new ArrayList<String>();
-		List<String> updatedAvailableTransformationsIdList = new ArrayList<String>();
+	public static List<TrcRule> findBestAllocationsWithSensitivitiesNext(TrcSpecification trcSpec,
+	                                                                    List<TrcRule> availableTransformationsIdList, 
+	                                                                    List<String> sensitivities,
+	                                                                    List<TrcRule> ignoredTransformationList){
+		List<TrcRule> results = new ArrayList<TrcRule>();
+		List<TrcRule> updatedAvailableTransformationsIdList = new ArrayList<TrcRule>();
 		if(ignoredTransformationList!=null)
 		{
-			for(String s: availableTransformationsIdList)
+			for(TrcRule s: availableTransformationsIdList)
 			{
 				if(!ignoredTransformationList.contains(s))
 					updatedAvailableTransformationsIdList.add(s);
@@ -174,11 +177,11 @@ public class SelectionAlgorithm {
 		}
 		else
 			updatedAvailableTransformationsIdList.addAll(availableTransformationsIdList);
-		List<String> transformationsList = findBestAllocationsWithSensitivities(trcSpec,
+		List<TrcRule> transformationsList = findBestAllocationsWithSensitivities(trcSpec,
 		                                                                        updatedAvailableTransformationsIdList, sensitivities);
-		Iterator<String> it = transformationsList.iterator();
+		Iterator<TrcRule> it = transformationsList.iterator();
 		while(it.hasNext()){
-			String s = it.next();
+		  TrcRule s = it.next();
 			if(ignoredTransformationList == null || ignoredTransformationList.isEmpty())
 				results.addAll(transformationsList);
 			else if (!ignoredTransformationList.contains(s))

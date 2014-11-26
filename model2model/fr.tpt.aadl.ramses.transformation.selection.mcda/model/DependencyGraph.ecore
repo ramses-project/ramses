@@ -13,7 +13,7 @@
         eType="#//DependencyArc"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="matchedElements" lowerBound="1"
         upperBound="-1" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="transformationRule" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="transformationRule" eType="ecore:EClass ../../fr.tpt.aadl.ramses.transformation.trc/model/TRC.ecore#//TrcRule"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DependencyArc">
     <eStructuralFeatures xsi:type="ecore:EReference" name="sourceNode" lowerBound="1"

@@ -4,14 +4,16 @@ import java.util.List ;
 
 import org.eclipse.emf.ecore.EObject ;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
+
 public class TransformationRuleAlternative
 {
 
   private List<EObject> matchedElements;
-  private List<String> alternativeRules;
+  private List<TrcRule> alternativeRules;
 
   public TransformationRuleAlternative(List<EObject> matchedElements,
-                                       List<String> alternativeRules)
+                                       List<TrcRule> alternativeRules)
   {
     this.alternativeRules = alternativeRules;
     this.matchedElements = matchedElements;
@@ -23,7 +25,7 @@ public class TransformationRuleAlternative
     return matchedElements ;
   }
 
-  public List<String> getAlternativeRules()
+  public List<TrcRule> getAlternativeRules()
   {
     return alternativeRules ;
   }

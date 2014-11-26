@@ -2,6 +2,7 @@
  */
 package fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule;
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
@@ -76,29 +77,29 @@ public interface DependencyNode extends EObject
   EList<EObject> getMatchedElements();
 
   /**
-   * Returns the value of the '<em><b>Transformation Rule</b></em>' attribute.
+   * Returns the value of the '<em><b>Transformation Rule</b></em>' reference.
    * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Transformation Rule</em>' attribute isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Transformation Rule</em>' attribute.
-   * @see #setTransformationRule(String)
+   * @return the value of the '<em>Transformation Rule</em>' reference.
+   * @see #setTransformationRule(TrcRule)
    * @see fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphPackage#getDependencyNode_TransformationRule()
    * @model
    * @generated
    */
-  String getTransformationRule();
+  TrcRule getTransformationRule();
 
   /**
-   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getTransformationRule <em>Transformation Rule</em>}' attribute.
+   * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode#getTransformationRule <em>Transformation Rule</em>}' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Transformation Rule</em>' attribute.
+   * @param value the new value of the '<em>Transformation Rule</em>' reference.
    * @see #getTransformationRule()
    * @generated
    */
-  void setTransformationRule(String value);
+  void setTransformationRule(TrcRule value);
 
 } // DependencyNode

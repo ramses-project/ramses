@@ -2,9 +2,12 @@
  */
 package fr.tpt.aadl.ramses.transformation.trc;
 
-import org.eclipse.emf.common.util.EList;
+import java.util.List ;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
 
 /**
  * <!-- begin-user-doc -->
@@ -104,4 +107,20 @@ public interface TrcSpecification extends EObject
 	 */
   void setModuleList(ModuleList value);
 
+  /**
+   * 
+   * @generated NOT
+   */
+  TrcRule getTrcRule(String value) ;
+
+  List<List<TaggedRuleApplicationTuple>>
+      getNormalizedDependencies(List<EObject> eObjList, TrcRule appliedRule) ;
+
+  void
+      addNormalizedDependencies(List<EObject> eObjList, 
+                                TrcRule appliedRule,
+                                List<List<TaggedRuleApplicationTuple>> dep) ;
+  
+  void cleanup();
+  
 } // TrcSpecification

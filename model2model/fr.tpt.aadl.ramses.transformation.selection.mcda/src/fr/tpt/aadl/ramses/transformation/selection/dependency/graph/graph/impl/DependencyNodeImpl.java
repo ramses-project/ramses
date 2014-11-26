@@ -6,6 +6,7 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.Depend
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphPackage;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule;
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -73,24 +74,14 @@ public class DependencyNodeImpl extends MinimalEObjectImpl.Container implements 
   protected EList<EObject> matchedElements;
 
   /**
-   * The default value of the '{@link #getTransformationRule() <em>Transformation Rule</em>}' attribute.
+   * The cached value of the '{@link #getTransformationRule() <em>Transformation Rule</em>}' reference.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @see #getTransformationRule()
    * @generated
    * @ordered
    */
-  protected static final String TRANSFORMATION_RULE_EDEFAULT = null;
-
-  /**
-   * The cached value of the '{@link #getTransformationRule() <em>Transformation Rule</em>}' attribute.
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @see #getTransformationRule()
-   * @generated
-   * @ordered
-   */
-  protected String transformationRule = TRANSFORMATION_RULE_EDEFAULT;
+  protected TrcRule transformationRule;
 
   /**
    * <!-- begin-user-doc -->
@@ -160,7 +151,27 @@ public class DependencyNodeImpl extends MinimalEObjectImpl.Container implements 
    * <!-- end-user-doc -->
    * @generated
    */
-  public String getTransformationRule()
+  public TrcRule getTransformationRule()
+  {
+    if (transformationRule != null && transformationRule.eIsProxy())
+    {
+      InternalEObject oldTransformationRule = (InternalEObject)transformationRule;
+      transformationRule = (TrcRule)eResolveProxy(oldTransformationRule);
+      if (transformationRule != oldTransformationRule)
+      {
+        if (eNotificationRequired())
+          eNotify(new ENotificationImpl(this, Notification.RESOLVE, GraphPackage.DEPENDENCY_NODE__TRANSFORMATION_RULE, oldTransformationRule, transformationRule));
+      }
+    }
+    return transformationRule;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public TrcRule basicGetTransformationRule()
   {
     return transformationRule;
   }
@@ -170,9 +181,9 @@ public class DependencyNodeImpl extends MinimalEObjectImpl.Container implements 
    * <!-- end-user-doc -->
    * @generated
    */
-  public void setTransformationRule(String newTransformationRule)
+  public void setTransformationRule(TrcRule newTransformationRule)
   {
-    String oldTransformationRule = transformationRule;
+    TrcRule oldTransformationRule = transformationRule;
     transformationRule = newTransformationRule;
     if (eNotificationRequired())
       eNotify(new ENotificationImpl(this, Notification.SET, GraphPackage.DEPENDENCY_NODE__TRANSFORMATION_RULE, oldTransformationRule, transformationRule));
@@ -211,7 +222,8 @@ public class DependencyNodeImpl extends MinimalEObjectImpl.Container implements 
       case GraphPackage.DEPENDENCY_NODE__MATCHED_ELEMENTS:
         return getMatchedElements();
       case GraphPackage.DEPENDENCY_NODE__TRANSFORMATION_RULE:
-        return getTransformationRule();
+        if (resolve) return getTransformationRule();
+        return basicGetTransformationRule();
     }
     return super.eGet(featureID, resolve, coreType);
   }
@@ -240,7 +252,7 @@ public class DependencyNodeImpl extends MinimalEObjectImpl.Container implements 
         getMatchedElements().addAll((Collection<? extends EObject>)newValue);
         return;
       case GraphPackage.DEPENDENCY_NODE__TRANSFORMATION_RULE:
-        setTransformationRule((String)newValue);
+        setTransformationRule((TrcRule)newValue);
         return;
     }
     super.eSet(featureID, newValue);
@@ -266,7 +278,7 @@ public class DependencyNodeImpl extends MinimalEObjectImpl.Container implements 
         getMatchedElements().clear();
         return;
       case GraphPackage.DEPENDENCY_NODE__TRANSFORMATION_RULE:
-        setTransformationRule(TRANSFORMATION_RULE_EDEFAULT);
+        setTransformationRule((TrcRule)null);
         return;
     }
     super.eUnset(featureID);
@@ -289,26 +301,9 @@ public class DependencyNodeImpl extends MinimalEObjectImpl.Container implements 
       case GraphPackage.DEPENDENCY_NODE__MATCHED_ELEMENTS:
         return matchedElements != null && !matchedElements.isEmpty();
       case GraphPackage.DEPENDENCY_NODE__TRANSFORMATION_RULE:
-        return TRANSFORMATION_RULE_EDEFAULT == null ? transformationRule != null : !TRANSFORMATION_RULE_EDEFAULT.equals(transformationRule);
+        return transformationRule != null;
     }
     return super.eIsSet(featureID);
-  }
-
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  public String toString()
-  {
-    if (eIsProxy()) return super.toString();
-
-    StringBuffer result = new StringBuffer(super.toString());
-    result.append(" (transformationRule: ");
-    result.append(transformationRule);
-    result.append(')');
-    return result.toString();
   }
 
 } //DependencyNodeImpl

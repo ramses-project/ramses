@@ -8,22 +8,25 @@ import fr.tpt.aadl.ramses.transformation.trc.Transformation;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationDependency;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationDependencyList;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationList;
+import fr.tpt.aadl.ramses.transformation.trc.TrcFactory ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
 
 import java.util.Collection;
+import java.util.HashMap ;
+import java.util.List ;
+import java.util.Map ;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -334,5 +337,104 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
 		}
 		return super.eIsSet(featureID);
 	}
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated NOT
+   */
+  Map<String, TrcRule> rulesMap = 
+      new HashMap<String, TrcRule>();
+  
+  @Override
+  public TrcRule getTrcRule(String value)
+  {
+    if(rulesMap.containsKey(value))
+      return rulesMap.get(value) ;
+    else
+    {
+      String prefix = value;
+      if(prefix.contains("."))
+        prefix = prefix.substring(0, prefix.indexOf('.'));
+      Module trcModule=null;
+      for(Module m: this.getModuleList().getModules())
+      {
+        String trcPrefix = m.getName();
+        if(false==prefix.equals(trcPrefix))
+        {
+          continue;
+        }
+        trcModule = m;
+        for(TrcRule r:m.getRules())
+        {
+          String qualifiedName = trcPrefix+'.'+r.getName(); 
+          if(qualifiedName.equals(value))
+          {
+            rulesMap.put(value, r);
+            return r;
+          }
+        }
+      }
+      if(trcModule==null)
+      {
+        trcModule = TrcFactory.eINSTANCE.createModule();
+        this.getModuleList().getModules().add(trcModule);
+        trcModule.setName(prefix);
+      }
+      TrcRule r = TrcFactory.eINSTANCE.createTrcRule();
+      String ruleName = value;
+      if(ruleName.contains("."))
+        ruleName = ruleName.substring(ruleName.indexOf('.')+1, ruleName.length());
+      r.setName(ruleName);
+      trcModule.getRules().add(r);
+      rulesMap.put(value, r);
+      return r;
+    }
+  }
+
+  
+  Map<List<EObject>, Map<TrcRule, List<List<TaggedRuleApplicationTuple>>>> normalizedDependencyMap
+    = new HashMap<List<EObject>, Map<TrcRule, List<List<TaggedRuleApplicationTuple>>>>();
+  
+    
+  
+  @Override
+  public List<List<TaggedRuleApplicationTuple>>
+      getNormalizedDependencies(List<EObject> eObjList, TrcRule appliedRule)
+  {
+    if(normalizedDependencyMap.get(eObjList)==null)
+      return null;
+    return normalizedDependencyMap.get(eObjList).get(appliedRule);
+  }
+
+  @Override
+  public void
+      addNormalizedDependencies(List<EObject> eObjList, 
+                                TrcRule appliedRule,
+                                List<List<TaggedRuleApplicationTuple>> depList)
+  {
+    if(normalizedDependencyMap.get(eObjList) == null)
+    {
+      Map<TrcRule, List<List<TaggedRuleApplicationTuple>>> newMap = 
+          new HashMap<TrcRule, List<List<TaggedRuleApplicationTuple>>>();
+      newMap.put(appliedRule, depList);
+      normalizedDependencyMap.put(eObjList, newMap);
+    }
+    else
+    {
+      Map<TrcRule, List<List<TaggedRuleApplicationTuple>>> m =
+          normalizedDependencyMap.get(eObjList);
+      m.put(appliedRule, depList);
+    }
+  }
+
+  @Override
+  public void cleanup()
+  {
+    normalizedDependencyMap.clear();
+    rulesMap.clear();
+  }
+  
+  
 
 } //TrcSpecificationImpl

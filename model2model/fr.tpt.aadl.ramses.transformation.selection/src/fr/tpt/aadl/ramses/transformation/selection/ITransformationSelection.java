@@ -7,10 +7,11 @@ import java.util.Map;
 import org.eclipse.emf.ecore.EObject ;
 
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 
 public interface ITransformationSelection {
 
-	public void selectTransformation (Map<List<EObject>, ArrayList<String>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply);
+	public void selectTransformation (Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap, ArrayList<ElementTransformation> tuplesToApply);
 
   boolean shouldSelectionContinue() ;
 	

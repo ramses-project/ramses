@@ -30,6 +30,7 @@ import com.google.common.collect.Sets ;
 import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
@@ -39,12 +40,12 @@ public class TransformationRuleSelection
   private static Logger _LOGGER = Logger.getLogger(TrcUtils.class) ;
   
   private TrcSpecification trc;
-  private Map<List<EObject>, List<String>> alternativeMap;
+  private Map<List<EObject>, List<TrcRule>> alternativeMap;
   private SystemInstance rootSystem;
   
   public TransformationRuleSelection(TrcSpecification trc,
                                      SystemInstance rootSystem,
-                                     Map<List<EObject>, List<String>> alternativeMap)
+                                     Map<List<EObject>, List<TrcRule>> alternativeMap)
   {
     this.trc = trc;
     this.alternativeMap = alternativeMap;
@@ -87,19 +88,19 @@ public class TransformationRuleSelection
     
     // 1 - browse elements in alternativeMap to construct "result" 
     
-    for(Entry<List<EObject>, List<String>> e : alternativeMap.entrySet())
+    for(Entry<List<EObject>, List<TrcRule>> e : alternativeMap.entrySet())
     {
       RuleApplicationTuple tmp ;
       List<EObject> elList = e.getKey() ;
-      List<String> patterns = e.getValue() ;
+      List<TrcRule> patterns = e.getValue() ;
       
       Set<RuleApplicationTuple> tuples = new HashSet<RuleApplicationTuple>
                                                              (patterns.size()) ;
-      for(String pat: patterns)
+      for(TrcRule pat: patterns)
       {
         tmp = new RuleApplicationTuple() ;
         tmp.setPatternMatchedElement(elList);
-        tmp.setTransformationRuleName(pat);
+        tmp.setTransformationRule(pat);
         tuples.add(tmp) ;  
       }
       
@@ -192,7 +193,7 @@ public class TransformationRuleSelection
     
     for(RuleApplicationTuple tuple: listTuples)
     {
-      setTrcPerformance(tuple.getTransformationRuleName(), qas) ;
+      setTrcPerformance(tuple.getTransformationRule(), qas) ;
       computeAqiPerf(tuple.getPatternMatchedElement(), qas) ;
       
       sb.append("   for tuple " + tuple.hashCode());
@@ -336,7 +337,7 @@ public class TransformationRuleSelection
     return result ;
   }
 
-  private void setTrcPerformance(String transformationRuleName,
+  private void setTrcPerformance(TrcRule transformationRuleName,
                                  QualityAttribute[] qas)
   {
     Transformation t = TrcUtils.getTransformationById(trc,transformationRuleName);

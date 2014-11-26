@@ -49,6 +49,7 @@ import fr.tpt.aadl.ramses.transformation.selection.TransformationRuleAlternative
 import fr.tpt.aadl.ramses.transformation.selection.TupleEntry ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
@@ -123,11 +124,11 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void selectTransformation(
-			Map<List<EObject>, ArrayList<String>> patternMatchingMap,
+			Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap,
 			ArrayList<ElementTransformation> tuplesToApply) {
 		String message = "In manual selection branch";
 		_LOGGER.trace(message);
-				
+		
 		GlobalVariables.applytuple = tuplesToApply;
 		System.out.println("******************* Start debugin *********************");
 		// patternMatchingMap = Map< List<Elt>,List<Transformation> >	; Transformation = {rule}	
@@ -136,7 +137,7 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 		List <Object[] > patternMatchingMap2=null;
 		
 		// retreive elt into patternMatchingMap as a collection
-		Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingCollection = patternMatchingMap.entrySet().iterator();
+		Iterator<Entry<List<EObject>, ArrayList<TrcRule>>> patternMatchingCollection = patternMatchingMap.entrySet().iterator();
 		
 		List<List<RuleApplicationTuple>> exclusionDependencies = new ArrayList<List<RuleApplicationTuple>>();
 		//unnamedEobjects= null ;
@@ -304,7 +305,7 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 	        			{
 	        				GlobalVariables.testMap.clear();
 	        				GlobalVariables.testMap.put(GlobalVariables.tuplesToApply.get(i).EObjectList, (ArrayList) GlobalVariables.tuplesToApply.get(i).Rules);
-	        				Map.Entry<List<EObject>, ArrayList<String>> tuple = GlobalVariables.testMap.entrySet().iterator().next();
+	        				Map.Entry<List<EObject>, ArrayList<TrcRule>> tuple = GlobalVariables.testMap.entrySet().iterator().next();
 	        				if( GlobalVariables.tuplesToApply.get(i).Rules.size()>1){
 		        				try{	 
 		        				  TransformationRuleAlternative tra = new TransformationRuleAlternative(tuple.getKey(), 
@@ -360,23 +361,23 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 			for (i = 0; i < taggedRuleApplicationTuple.size(); i++){
 				if(i <taggedRuleApplicationTuple.size()-1){
 					if(!taggedRuleApplicationTuple.get(i).isExclusion()){
-						Printable += "\t\t\tSELECT " + taggedRuleApplicationTuple.get(i).getTransformationRuleName() ; 
+						Printable += "\t\t\tSELECT " + taggedRuleApplicationTuple.get(i).getTransformationRule() ; 
 						Printable += " for { " + printAllObjects(taggedRuleApplicationTuple.get(i).getPatternMatchedElement()) +" }";
 					}
 					else{
-						Printable += "\t\t\tEXCLUDE " + taggedRuleApplicationTuple.get(i).getTransformationRuleName();
+						Printable += "\t\t\tEXCLUDE " + taggedRuleApplicationTuple.get(i).getTransformationRule();
 						Printable += " for { " +printAllObjects(taggedRuleApplicationTuple.get(i).getPatternMatchedElement())+" }\n" ; 
 					}	
 				}
 				else {
 					if(!taggedRuleApplicationTuple.get(i).isExclusion()){
 						Printable += "\t\t\tOR\n " ;
-						Printable += "\t\t\tSELECT " + taggedRuleApplicationTuple.get(i).getTransformationRuleName() ; 
+						Printable += "\t\t\tSELECT " + taggedRuleApplicationTuple.get(i).getTransformationRule() ; 
 						Printable += " for { " + printAllObjects(taggedRuleApplicationTuple.get(i).getPatternMatchedElement()) +" }\n";
 					}
 					else{
 						Printable += "\t\t\tAND\n " ;
-						Printable += "\t\t\tEXLUDE " + taggedRuleApplicationTuple.get(i).getTransformationRuleName();
+						Printable += "\t\t\tEXLUDE " + taggedRuleApplicationTuple.get(i).getTransformationRule();
 						Printable += " for { " +printAllObjects(taggedRuleApplicationTuple.get(i).getPatternMatchedElement())+" }" ; 
 					}	
 				}
@@ -446,7 +447,7 @@ public class ManualSelection implements ITransformationSelection,LoopManager {
 						for(String s: tuple.getValue())
 						{
 							// toExclude.getTransformationRuleName() == _transformationRuleName
-							if(s.equalsIgnoreCase(toExclude.getTransformationRuleName()))
+							if(s.equalsIgnoreCase(toExclude.getTransformationRule().getQualifiedName()))
 							{
 								newCandidateTransformationList.remove(s);
 							}

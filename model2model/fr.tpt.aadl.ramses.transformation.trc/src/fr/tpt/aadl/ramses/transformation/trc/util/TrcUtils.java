@@ -146,7 +146,7 @@ public class TrcUtils {
 	 */
 	public static void addQualityImpactForTransformation(String trcPath,
 	                                                     ResourceSet resourceSet,
-	                                                     String transformationId, 
+	                                                     TrcRule transformationId, 
 	                                                     String qualityAttribute, 
 	                                                     int impactValue){
 
@@ -172,7 +172,7 @@ public class TrcUtils {
 	 */
 	public static void addQualityImpactsForTransformation(String trcPath,
 	                                                      ResourceSet resourceSet,
-	                                                      String transformationId, 
+	                                                      TrcRule transformationId, 
 	                                                      Map<String, Integer> qualityImpactMap){
 
 	  TrcSpecification specification = TrcParser.parse(trcPath,resourceSet);
@@ -231,7 +231,8 @@ public class TrcUtils {
 
 	
 	public static Transformation getTransformationById(TrcSpecification specification,
-                                                     String transformationId){
+                                                     TrcRule transformationRule){
+	  String transformationId = transformationRule.getQualifiedName();
     Iterator<Transformation> transformationsIt = specification.getTransformationList().getTransformations().iterator();
     while (transformationsIt.hasNext()){
       Transformation transformation = transformationsIt.next();
@@ -256,8 +257,7 @@ public class TrcUtils {
           for(String ruleName:(List<String>)transformation.getRuleName())
           {
             String qualifiedTransformationName = moduleName+"."+ruleName;
-            //System.out.println("Transformation qualified name: "+qualifiedTransformationName);
-
+            
             if (qualifiedTransformationName.equals(transformationId)){
               return transformation;
             }
@@ -386,7 +386,7 @@ public class TrcUtils {
    */
 	public static List<List<RuleApplicationTuple>> getInclusionDependencies(TrcSpecification spec,
 	                                                                        List<EObject> eObjList,
-	                                                                        String appliedRule)
+	                                                                        TrcRule appliedRule)
 	{
 		List<List<RuleApplicationTuple>> result = new ArrayList<List<RuleApplicationTuple>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
@@ -406,11 +406,6 @@ public class TrcUtils {
 		return result;
 	}
 	
-	public static String getRuleName(TrcRule rule)
-	{
-		Module m = (Module) rule.eContainer();
-		return m.getName()+"."+rule.getName();
-	}
 	
 	/**
    *  Returns the list of TaggedRuleApplication (tuples <Elements,Rule> marked as
@@ -427,20 +422,24 @@ public class TrcUtils {
    */
 	public static List<List<TaggedRuleApplicationTuple>> getNormalizedDependencies(TrcSpecification spec,
 	                                                                         List<EObject> eObjList,
-	                                                                         String appliedRule)
-	                                                                         {
-	  List<List<TaggedRuleApplicationTuple>> result = new ArrayList<List<TaggedRuleApplicationTuple>>();
+	                                                                         TrcRule appliedRule)
+  {
+	  List<List<TaggedRuleApplicationTuple>> result = spec.getNormalizedDependencies(eObjList, appliedRule);
+	  if(result != null)
+	    return result;
+	  result = new ArrayList<List<TaggedRuleApplicationTuple>>();
 	  for(TransformationDependency dep: (List<TransformationDependency>) spec.getDependencyList().getTransformationDependencies())
 	  {
-		TrcRule depRule = dep.getAppliedRule();
-	    if(false==getRuleName(depRule).equals(appliedRule))
+	    TrcRule depRule = dep.getAppliedRule();
+	    if(false==depRule.equals(appliedRule))
 	      continue;
 	    List<TaggedRuleApplicationTuple> localDependencyList = new ArrayList<TaggedRuleApplicationTuple>();
 	    result.add(localDependencyList);
 	    getPossibleDependencies(dep.getRequiredTransformations(), eObjList, localDependencyList, result);
 	  }
+    spec.addNormalizedDependencies(eObjList, appliedRule, result);
 	  return result;
-	                                                                         }
+  }
 
 	
 	private static TransformationDependency getTransformationDependency(AbstractRuleDependency rd)
@@ -473,7 +472,7 @@ public class TrcUtils {
 			objList.add(obj);
 			currentDependencyList.add(dep);
 			dep.setPatternMatchedElement(objList);
-			dep.setTransformationRuleName(rd.getRequiredRule().getName());
+			dep.setTransformationRule(rd.getRequiredRule());
 		      dep.setExclusion(rd.isIsExclusion());
 			_LOGGER.trace("Retreived (excluded) dependency to "+rd.getRequiredRule().getName());
 		  }
@@ -624,7 +623,7 @@ public class TrcUtils {
 					RuleApplicationTuple dep = new RuleApplicationTuple();
 					currentDependencyList.add(dep);
 					dep.setPatternMatchedElement(objList);
-					dep.setTransformationRuleName(rd.getRequiredRule().getName());
+					dep.setTransformationRule(rd.getRequiredRule());
 					_LOGGER.trace("Retreived (included) dependency to "+rd.getRequiredRule().getName());
 				}
 			}
@@ -750,7 +749,7 @@ public class TrcUtils {
 	 */
 	public static List<List<RuleApplicationTuple>> getExlcusionDependencies(TrcSpecification trcSpecification,
 	                                                                        List<EObject> candidateObjects,
-	                                                                        String appliedRule) {
+	                                                                        TrcRule appliedRule) {
 		List<List<RuleApplicationTuple>> exclusionDependencyList = new ArrayList<List<RuleApplicationTuple>>();
 		for(TransformationDependency dep: (List<TransformationDependency>) trcSpecification.getDependencyList().getTransformationDependencies())
 		{

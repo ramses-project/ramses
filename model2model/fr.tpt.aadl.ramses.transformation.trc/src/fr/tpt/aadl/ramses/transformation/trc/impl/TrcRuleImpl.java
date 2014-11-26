@@ -2,21 +2,18 @@
  */
 package fr.tpt.aadl.ramses.transformation.trc.impl;
 
+import fr.tpt.aadl.ramses.transformation.trc.Module ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
 import fr.tpt.aadl.ramses.transformation.trc.TrcRule;
 
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 
 /**
@@ -281,5 +278,18 @@ public class TrcRuleImpl extends EObjectImpl implements TrcRule {
 		result.append(')');
 		return result.toString();
 	}
+
+	/**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated NOT
+   */
+  @Override
+  public String getQualifiedName()
+  {
+    Module m = (Module) this.eContainer();
+    return m.getName()+'.'+this.getName();
+    
+  }
 
 } //TrcRuleImpl

@@ -426,10 +426,10 @@ public class IHM extends JFrame implements ItemListener,ActionListener,Serializa
 			taggedRuleApplicationTuple.addAll(taggedRuleApplicationList.get(k));
 			for (i = 0; i < taggedRuleApplicationTuple.size(); i++){
 				if(!taggedRuleApplicationTuple.get(i).isExclusion()){
-					exclusionTuple.put(taggedRuleApplicationTuple.get(i).getPatternMatchedElement(), taggedRuleApplicationTuple.get(i).getTransformationRuleName());
+					exclusionTuple.put(taggedRuleApplicationTuple.get(i).getPatternMatchedElement(), taggedRuleApplicationTuple.get(i).getTransformationRule());
 				}
 				else{
-					inclusionTuple.put(taggedRuleApplicationTuple.get(i).getPatternMatchedElement(), taggedRuleApplicationTuple.get(i).getTransformationRuleName());					
+					inclusionTuple.put(taggedRuleApplicationTuple.get(i).getPatternMatchedElement(), taggedRuleApplicationTuple.get(i).getTransformationRule());					
 				}
 			}
 		}

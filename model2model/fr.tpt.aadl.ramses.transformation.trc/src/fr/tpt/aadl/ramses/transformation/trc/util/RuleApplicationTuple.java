@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
 
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
+
 public class RuleApplicationTuple {
 
 	private List<EObject> _patternMatchedElementList = 
 	    new ArrayList<EObject>();
-	private String  _transformationRuleName;
+	private TrcRule  _transformationRuleName;
 	
 	
   public List<EObject> getPatternMatchedElement() {
@@ -20,11 +22,11 @@ public class RuleApplicationTuple {
 		this._patternMatchedElementList = patternMatchedElement;
 	}
 	
-	public String getTransformationRuleName() {
+	public TrcRule getTransformationRule() {
 		return _transformationRuleName;
 	}
 	
-	public void setTransformationRuleName(String transformationRuleName) {
+	public void setTransformationRule(TrcRule transformationRuleName) {
 		this._transformationRuleName = transformationRuleName;
 	}
   

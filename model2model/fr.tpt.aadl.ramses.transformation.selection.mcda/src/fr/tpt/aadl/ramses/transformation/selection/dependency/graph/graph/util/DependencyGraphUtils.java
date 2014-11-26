@@ -12,6 +12,7 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.Depend
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyGraph ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.GraphFactory ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
@@ -20,15 +21,15 @@ import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 public class DependencyGraphUtils
 {
 
-  public static RuleApplicationTuple getActualRuleApplicationTuple(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
+  public static RuleApplicationTuple getActualRuleApplicationTuple(Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap,
                                                                    List<EObject> matchedElements,
-                                                                   String transformationRuleName)
+                                                                   TrcRule transformationRuleName)
   {
-    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
+    Iterator<Entry<List<EObject>, ArrayList<TrcRule>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
     while (patternMatchingIt.hasNext()) 
     {
-      Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
-      for(String ruleName: tuple.getValue())
+      Map.Entry<List<EObject>, ArrayList<TrcRule>> tuple = (Map.Entry<List<EObject>, ArrayList<TrcRule>>)patternMatchingIt.next();
+      for(TrcRule ruleName: tuple.getValue())
       {
         if(transformationRuleName.equals(ruleName))
         {
@@ -44,7 +45,7 @@ public class DependencyGraphUtils
           if(!stop)
           {
             RuleApplicationTuple newRat = new RuleApplicationTuple();
-            newRat.setTransformationRuleName(ruleName);
+            newRat.setTransformationRule(ruleName);
             newRat.getPatternMatchedElement().addAll(tuple.getKey());
             return newRat;
           }
@@ -55,22 +56,20 @@ public class DependencyGraphUtils
   }
   
   
-  private static List<RuleApplicationTuple> getActualRuleApplicationTuple(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
+  private static List<RuleApplicationTuple> getActualRuleApplicationTuple(Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap,
                                                                           List<TaggedRuleApplicationTuple> dependencyList)
   {
     List<RuleApplicationTuple> result = new ArrayList<RuleApplicationTuple>();
     
-    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
+    Iterator<Entry<List<EObject>, ArrayList<TrcRule>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
     while (patternMatchingIt.hasNext()) 
     {
-      Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
+      Map.Entry<List<EObject>, ArrayList<TrcRule>> tuple = (Map.Entry<List<EObject>, ArrayList<TrcRule>>)patternMatchingIt.next();
       for(TaggedRuleApplicationTuple trat:dependencyList)
       {
-        for(String ruleName: tuple.getValue())
+        for(TrcRule ruleName: tuple.getValue())
         {
-          if(ruleName.contains("."))
-        	  ruleName = ruleName.substring(ruleName.indexOf('.')+1);
-          if(trat.getTransformationRuleName().equals(ruleName))
+          if(trat.getTransformationRule().equals(ruleName))
           {
             boolean stop=false;
             for(EObject obj : trat.getPatternMatchedElement())
@@ -84,7 +83,7 @@ public class DependencyGraphUtils
             if(!stop)
             {
               RuleApplicationTuple newRat = new RuleApplicationTuple();
-              newRat.setTransformationRuleName(ruleName);
+              newRat.setTransformationRule(ruleName);
               newRat.getPatternMatchedElement().addAll(tuple.getKey());
               result.add(newRat);
             }
@@ -97,18 +96,18 @@ public class DependencyGraphUtils
   }
   public static DependencyGraph createDependencyGraph(
       TrcSpecification trc,
-      Map<List<EObject>, ArrayList<String>> patternMatchingMap)
+      Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap)
   {
     DependencyGraph result = GraphFactory.eINSTANCE.createDependencyGraph();
     
-    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
+    Iterator<Entry<List<EObject>, ArrayList<TrcRule>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
     
     List<List<EObject>> treatedObjects = new ArrayList<List<EObject>>();
     while (patternMatchingIt.hasNext()) 
     {
-      Map.Entry<List<EObject>, ArrayList<String>> tuple = (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
+      Map.Entry<List<EObject>, ArrayList<TrcRule>> tuple = (Map.Entry<List<EObject>, ArrayList<TrcRule>>)patternMatchingIt.next();
       List<EObject> currentElements = tuple.getKey();
-      List<String> currentTransformationAlternatives = tuple.getValue();
+      List<TrcRule> currentTransformationAlternatives = tuple.getValue();
       if(true == treatedObjects.contains(currentElements))
         continue;
       else
@@ -116,7 +115,7 @@ public class DependencyGraphUtils
         treatedObjects.add(currentElements);
         
         // Retrieve dependencies for each alternative
-        for(String ruleId: currentTransformationAlternatives)
+        for(TrcRule ruleId: currentTransformationAlternatives)
         {
           DependencyNode dn = getOrCreateDependencyNode(result,
                                                         currentElements,
@@ -134,7 +133,7 @@ public class DependencyGraphUtils
             {
               DependencyNode nextNode = getOrCreateDependencyNode(result, 
                                                                   tar.getPatternMatchedElement(),
-                                                                  tar.getTransformationRuleName());
+                                                                  tar.getTransformationRule());
               
               // Add nodes to arcs 
               
@@ -167,7 +166,7 @@ public class DependencyGraphUtils
   private static DependencyNode
       getOrCreateDependencyNode(DependencyGraph graph,
                                 List<EObject> elements,
-                                String rule)
+                                TrcRule rule)
   {
     DependencyNode result = getDependencyNode(graph,
                                               elements,
@@ -185,13 +184,11 @@ public class DependencyGraphUtils
   public static DependencyNode
       getDependencyNode(DependencyGraph graph,
                         List<EObject> elements,
-                        String rule)
+                        TrcRule rule)
   {
     for(DependencyNode dn: graph.getNodes())
     {
-      String dnRuleName = dn.getTransformationRule();
-      if(dnRuleName.contains(".") && rule.contains(".")==false)
-        dnRuleName = dnRuleName.substring(dnRuleName.indexOf('.')+1);
+      TrcRule dnRuleName = dn.getTransformationRule();
       if(dn.getMatchedElements().equals(elements)
           && dnRuleName.equals(rule))
         return dn;
@@ -202,7 +199,7 @@ public class DependencyGraphUtils
   public static List<DependencyNode>
       getConnectedSubgraph(DependencyGraph dg, 
                            List<EObject> currentElements,
-                           String rule)
+                           TrcRule rule)
   {
     // 1 - Identify nodes for currentElements
     DependencyNode firstNode=null;
@@ -215,31 +212,6 @@ public class DependencyGraphUtils
         break;
       }
     }
-//    if(firstNode==null)
-//    {
-//      for(DependencyNode dn: dg.getNodes())
-//      {
-//        if(!dn.getTransformationRule().equals(rule))
-//          continue;
-//        boolean stop = false;
-//        for(EObject obj : dn.getMatchedElements())
-//        {
-//          if(currentElements.contains(obj))
-//            continue;
-//          else
-//          {
-//            stop=true;
-//            break;
-//          }
-//        }
-//
-//        if(false==stop)
-//        {
-//          firstNode = dn;
-//          break;
-//        }
-//      }
-//    }
     if(firstNode==null)
       return null;
     

@@ -50,6 +50,7 @@ import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
@@ -122,7 +123,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   @Override
   public
   void
-  selectTransformation(Map<List<EObject>, ArrayList<String>> patternMatchingMap,
+  selectTransformation(Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap,
                        ArrayList<ElementTransformation> tuplesToApply)
   {
     SystemInstance sinst = (SystemInstance) this.currentImplResource.getContents().get(0);
@@ -136,7 +137,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     // TODO: check if it already exists
 
     // 2 - isolate elements having alternatives
-    Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = 
+    Iterator<Entry<List<EObject>, ArrayList<TrcRule>>> patternMatchingIt = 
         patternMatchingMap.entrySet().iterator();
 
     boolean stop = false;
@@ -158,10 +159,10 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     List<List<EObject>> treatedObjectInTIP = new ArrayList<List<EObject>>();
     while (patternMatchingIt.hasNext()) 
     {
-      Map.Entry<List<EObject>, ArrayList<String>> tuple =
-          (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
+      Map.Entry<List<EObject>, ArrayList<TrcRule>> tuple =
+          (Map.Entry<List<EObject>, ArrayList<TrcRule>>)patternMatchingIt.next();
       List<EObject> currentElements = tuple.getKey();
-      List<String> currentTransformationAlternatives = tuple.getValue();
+      List<TrcRule> currentTransformationAlternatives = tuple.getValue();
 
       if(treatedObjectInTIP.contains(currentElements))
         continue;
@@ -183,13 +184,13 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
           continue;
         Set<DependencyNode> dependencyNodeList =
             new HashSet<DependencyNode>();
-        for(String rule: currentTransformationAlternatives)
+        for(TrcRule rule: currentTransformationAlternatives)
         {
           RuleApplicationTuple r = DependencyGraphUtils.getActualRuleApplicationTuple(patternMatchingMap,
                                                                                       currentElements,
                                                                                       rule);
           DependencyNode currentNode = DependencyGraphUtils.getDependencyNode
-              (dg, r.getPatternMatchedElement(), r.getTransformationRuleName());
+              (dg, r.getPatternMatchedElement(), r.getTransformationRule());
           if(treatedAlternatives.contains(currentNode))
             continue;
           dependencyNodeList.add(currentNode);
@@ -205,12 +206,12 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         if(dependencyNodeList.isEmpty())
           continue;
 
-        Map<List<EObject>, List<String>> connectedAlternativesMap = 
-            new LinkedHashMap<List<EObject>, List<String>>();
+        Map<List<EObject>, List<TrcRule>> connectedAlternativesMap = 
+            new LinkedHashMap<List<EObject>, List<TrcRule>>();
         for(DependencyNode dn : dependencyNodeList)
         {
           List<EObject> matchedElements = dn.getMatchedElements();
-          ArrayList<String> transformationRules = patternMatchingMap.get(matchedElements);
+          ArrayList<TrcRule> transformationRules = patternMatchingMap.get(matchedElements);
           connectedAlternativesMap.put(matchedElements, transformationRules);
         }
 
@@ -229,14 +230,10 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         	  continue;
           treatedObjectInTIP.add(ratElements);
           
-          List<String> ratRules = patternMatchingMap.get(rat.getPatternMatchedElement());
+          List<TrcRule> ratRules = patternMatchingMap.get(rat.getPatternMatchedElement());
           TransformationRuleAlternative tra = 
               new TransformationRuleAlternative(ratElements,ratRules);
-          String ratRuleName = rat.getTransformationRuleName();
-          if(ratRuleName.contains("."))
-          {
-        	  ratRuleName.substring(ratRuleName.indexOf('.')+1);
-          }
+          TrcRule ratRuleName = rat.getTransformationRule();
           RuleApplicationUtils.setTransformationToApply(tra, 
                                                         ratRuleName,
                                                         tuplesToApply);
@@ -244,7 +241,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         }
       }
     }
-
+    trc.cleanup();
 
   }
 

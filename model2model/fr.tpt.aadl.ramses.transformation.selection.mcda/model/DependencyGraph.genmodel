@@ -5,8 +5,8 @@
     modelPluginID="fr.tpt.aadl.ramses.transformation.selection.mcda" modelName="DependencyGraph"
     rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore"
     complianceLevel="8.0" copyrightFields="false" editPluginID="/fr.tpt.aadl.ramses.transformation.dependency.graph.edit"
-    editorPluginID="/fr.tpt.aadl.ramses.transformation.dependency.graph.editor" operationReflection="true"
-    importOrganizing="true">
+    editorPluginID="/fr.tpt.aadl.ramses.transformation.dependency.graph.editor" usedGenPackages="../../fr.tpt.aadl.ramses.transformation.trc/model/TRC.genmodel#//trc"
+    operationReflection="true" importOrganizing="true">
   <foreignModel>DependencyGraph.ecore</foreignModel>
   <genPackages prefix="Graph" basePackage="fr.tpt.aadl.ramses.transformation.selection.dependency.graph"
       disposableProviderFactory="true" ecorePackage="DependencyGraph.ecore#/">
@@ -16,6 +16,8 @@
     <genClasses ecoreClass="DependencyGraph.ecore#//DependencyNode">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DependencyGraph.ecore#//DependencyNode/outArcs"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DependencyGraph.ecore#//DependencyNode/inArcs"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DependencyGraph.ecore#//DependencyNode/matchedElements"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DependencyGraph.ecore#//DependencyNode/transformationRule"/>
     </genClasses>
     <genClasses ecoreClass="DependencyGraph.ecore#//DependencyArc">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DependencyGraph.ecore#//DependencyArc/sourceNode"/>

@@ -42,6 +42,12 @@ public interface TrcRule extends EObject {
 	String getName();
 
 	/**
+   * 
+   * @generated NOT
+   */
+  String getQualifiedName();
+  
+	/**
 	 * Sets the value of the '{@link fr.tpt.aadl.ramses.transformation.trc.TrcRule#getName <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

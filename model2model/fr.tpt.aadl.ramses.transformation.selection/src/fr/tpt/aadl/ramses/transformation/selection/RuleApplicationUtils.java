@@ -13,34 +13,36 @@ import org.osate.aadl2.instance.InstanceObject ;
 
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils;
+import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 
 public class RuleApplicationUtils {
 
-  static Map<String, List> rulesInheritenceMap = new HashMap<String, List>();
+  static Map<TrcRule, List<TrcRule>> rulesInheritenceMap = new HashMap<TrcRule, List<TrcRule>>();
 	
-	public static Map<String, List> getRulesInheritenceMap() {
+	public static Map<TrcRule, List<TrcRule>> getRulesInheritenceMap() {
 		return rulesInheritenceMap;
 	}
 	
 	public static void setTransformationToApply(TransformationRuleAlternative tupleWithAlternatives, 
-			String transformationToApply,
-			ArrayList<ElementTransformation> tuplesToApply)
+	                                            TrcRule transformationToApply,
+	                                            ArrayList<ElementTransformation> tuplesToApply)
 	{
-		ElementTransformation et = TipUtils.createElementTransformation((List<EObject>) tupleWithAlternatives.getMatchedElements(), transformationToApply);
+		ElementTransformation et = TipUtils.createElementTransformation((List<EObject>) tupleWithAlternatives.getMatchedElements(), 
+		                                                                transformationToApply.getQualifiedName());
 		tuplesToApply.add(et);
 		// Exclude not selected rules
-		for(String s: tupleWithAlternatives.getAlternativeRules())
+		for(TrcRule s: tupleWithAlternatives.getAlternativeRules())
 		{
 			List<String> toExclude = new ArrayList<String>();
 			if(s.equals(transformationToApply))
 				continue;
-			toExclude.add(s);
+			toExclude.add(s.getQualifiedName());
 			// we cut the branch as close as possible from the trunk
-			List<String> inheritedRulesForInclusion = rulesInheritenceMap.get(transformationToApply);
+			List<TrcRule> inheritedRulesForInclusion = rulesInheritenceMap.get(transformationToApply);
 			if(inheritedRulesForInclusion.contains(s))
 				continue;
-			List<String> inheritedRulesForExclusion = rulesInheritenceMap.get(s);
+			List<TrcRule> inheritedRulesForExclusion = rulesInheritenceMap.get(s);
 
 			if(inheritedRulesForExclusion!=null && inheritedRulesForExclusion.size()>0)
 			{
@@ -50,7 +52,7 @@ public class RuleApplicationUtils {
 						continue;
 					if(false == inheritedRulesForExclusion.get(i).equals(transformationToApply))
 					{
-						toExclude.add(inheritedRulesForExclusion.get(i));
+						toExclude.add(inheritedRulesForExclusion.get(i).getQualifiedName());
 					}
 				}
 			}
@@ -86,13 +88,13 @@ public class RuleApplicationUtils {
 	    else
 	      result+="NaNE; ";
 	  result+="] --> ";
-	  result += rat.getTransformationRuleName();
+	  result += rat.getTransformationRule();
 	  return result;
 	}
 	
-	public static String printAlternativesToFile(Map<List<EObject>, ArrayList<String>> patternMatchingMap)
+	public static String printAlternativesToFile(Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap)
 	{
-	  Iterator<Entry<List<EObject>, ArrayList<String>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
+	  Iterator<Entry<List<EObject>, ArrayList<TrcRule>>> patternMatchingIt = patternMatchingMap.entrySet().iterator();
 	  
 	  ArrayList<String> mesElts = new ArrayList<String>();
     ArrayList<EObject> mesObjs = new ArrayList<EObject>();
@@ -109,9 +111,9 @@ public class RuleApplicationUtils {
     // iterate through a collection, for each key entry retreive the list of rule that can be applied
     while(patternMatchingIt.hasNext()) {
       String applyStr = "";
-      Map.Entry<List<EObject>, ArrayList<String>> tuple =
-          (Map.Entry<List<EObject>, ArrayList<String>>)patternMatchingIt.next();
-      List<String> candidateTransformationList = tuple.getValue();
+      Map.Entry<List<EObject>, ArrayList<TrcRule>> tuple =
+          (Map.Entry<List<EObject>, ArrayList<TrcRule>>)patternMatchingIt.next();
+      List<TrcRule> candidateTransformationList = tuple.getValue();
       List<EObject> candidateObjects = tuple.getKey();
       
       // Get all the EObjects and affect for each one a unique name if he does'nt have one already
@@ -176,9 +178,9 @@ public class RuleApplicationUtils {
         int cptVal=0;
         for (int j = 0; j < candidateTransformationList.size(); j++) {
           if (cptVal==0) {
-            objectsToDisplay += "\t\t" + candidateTransformationList.get(j);
+            objectsToDisplay += "\t\t" + candidateTransformationList.get(j).getQualifiedName();
           } else {
-            objectsToDisplay += "\n\t\tor\n\t\t" + candidateTransformationList.get(j);
+            objectsToDisplay += "\n\t\tor\n\t\t" + candidateTransformationList.get(j).getQualifiedName();
           }
           cptVal +=1;
         } 
