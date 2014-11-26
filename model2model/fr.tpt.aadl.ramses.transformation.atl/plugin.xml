@@ -84,8 +84,8 @@
             name="MCDA">
       </aadlcontribution>
       <aadlcontribution
-            file="aadl_resources/propertyset/Maintainability.aadl2"
-            id="fr.tpt.aadl.properties.maintainance.aadlcontribution"
+            file="aadl_resources/propertyset/Maintainability_Properties.aadl2"
+            id="fr.tpt.aadl.properties.maintainability.aadlcontribution"
             name="Maintainability">
       </aadlcontribution>
    </extension>
