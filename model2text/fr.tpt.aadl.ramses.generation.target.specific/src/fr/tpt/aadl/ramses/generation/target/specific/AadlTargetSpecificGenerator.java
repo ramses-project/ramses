@@ -308,7 +308,7 @@ public class AadlTargetSpecificGenerator implements Generator
       if(operation.equals("analysis"))
       {
         monitor.subTask("Model analysis: " + xmlPilot.getAnalysisName());
-        doAnalysis(xmlPilot, config, monitor, errManager) ;
+        doAnalysis(xmlPilot, config, monitor, errManager, 0) ;
       }
       else if(operation.equals("transformation"))
       {
@@ -430,14 +430,16 @@ public class AadlTargetSpecificGenerator implements Generator
   
   private void doAnalysis(WorkflowPilot workflowPilot, RamsesConfiguration config,
                           IProgressMonitor monitor,
-                          AnalysisErrorReporterManager errManager) throws AnalysisException
+                          AnalysisErrorReporterManager errManager,
+                          int iterationCounter) throws AnalysisException
   {
     String analysisName = workflowPilot.getAnalysisName();
     String analysisMode = workflowPilot.getAnalysisMode();
     String analysisModelInputIdentifier = workflowPilot.getInputModelId();
     String analysisModelOutputIdentifier = workflowPilot.getOutputModelId();
     doAnalysis(analysisName,analysisMode,analysisModelInputIdentifier,
-               analysisModelOutputIdentifier, errManager,workflowPilot,config,monitor);
+               analysisModelOutputIdentifier, 
+               errManager,workflowPilot,config,monitor,iterationCounter);
   }
   
   private void doAnalysis(String analysisName, String analysisMode,
@@ -446,7 +448,8 @@ public class AadlTargetSpecificGenerator implements Generator
                           AnalysisErrorReporterManager errManager,
                           WorkflowPilot workflowPilot,
                           RamsesConfiguration config,
-                          IProgressMonitor monitor) throws AnalysisException
+                          IProgressMonitor monitor,
+                          int iterationCounter) throws AnalysisException
   {
     _modelInstantiator = new AadlModelsManagerImpl(errManager) ;
 
@@ -489,6 +492,8 @@ public class AadlTargetSpecificGenerator implements Generator
     
     ServiceRegistry sr = ServiceProvider.getServiceRegistry() ;
     Analyzer a = sr.getAnalyzer(analysisName) ;
+    a.setIterationCounter(iterationCounter);
+    
     Map<String, Object> analysisParam = new HashMap<String, Object>() ;
     
     analysisParam.put("Mode", analysisMode) ;
@@ -679,6 +684,7 @@ public class AadlTargetSpecificGenerator implements Generator
                 {
                   foundLoopManagementPlugin = true;
                   modelsMap.putAll(gen.processLoop());
+                  workflowPilot.setLoopModelIdSuffix(gen.getModelIdSuffix());
                   boolean loopAnalysis = isValidLoopIteration(l.getAnalysis(), 
                                                               errManager, 
                                                               workflowPilot, 
@@ -757,7 +763,7 @@ public class AadlTargetSpecificGenerator implements Generator
                                         String inputId, String suffix, IProgressMonitor monitor,
                                         int loopIteration) throws AnalysisException
   {
-    boolean result = doLoopAnalysis(a,errManager,xmlPilot,config,monitor,inputId, suffix);
+    boolean result = doLoopAnalysis(a,errManager,xmlPilot,config,monitor,inputId, suffix, loopIteration);
     xmlPilot.setAnalysisResult(result);
     if (loopValidIteration >= 0 && !result)
     {
@@ -777,7 +783,8 @@ public class AadlTargetSpecificGenerator implements Generator
                               RamsesConfiguration config,
                               IProgressMonitor monitor,
                               String inputId,
-                              String suffix) throws AnalysisException
+                              String suffix,
+                              int iterationCounter) throws AnalysisException
   {
     if (a instanceof AbstractLoop.Analysis)
     {
@@ -788,7 +795,7 @@ public class AadlTargetSpecificGenerator implements Generator
        inputIdSpecific+=suffix;
        outputIdSpecific+=suffix;
        doAnalysis(aa.getMethod(),aa.getMode(),inputIdSpecific,outputIdSpecific,errManager,
-                  xmlPilot,config,monitor);
+                  xmlPilot,config,monitor, iterationCounter);
       
        return xmlPilot.getAnalysisResult();
     }
@@ -797,7 +804,7 @@ public class AadlTargetSpecificGenerator implements Generator
       AbstractLoop.Conjunction c = (AbstractLoop.Conjunction) a;
       for(AbstractLoop.AbstractAnalysis aa : c.getSequence())
       { 
-         if (! doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix))
+         if (! doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix,iterationCounter))
          {
            String realInputId = inputId+suffix;
            Resource inputResource = modelsMap.get(realInputId) ;
@@ -813,7 +820,7 @@ public class AadlTargetSpecificGenerator implements Generator
       AbstractLoop.Disjunction d = (AbstractLoop.Disjunction) a;
       for(AbstractLoop.AbstractAnalysis aa : d.getSequence())
       {
-         if (doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix))
+         if (doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix,iterationCounter))
          {
            return true;
          }
