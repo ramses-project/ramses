@@ -6,6 +6,7 @@ import java.util.List ;
 import java.util.Map ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.xtext.EcoreUtil2 ;
 import org.osate.aadl2.AnnexSubclause ;
 import org.osate.aadl2.BehavioredImplementation ;
 import org.osate.aadl2.ComponentCategory ;
@@ -37,7 +38,7 @@ public class MaintainabilityAnalysis
 
   public MaintainabilityAnalysis(){}
   private final AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
-  private static int iterationCounter=0;
+  private int iterationCounter;
   
   Map<ComponentInstance, Long> maintenanceCostMap = 
       new HashMap<ComponentInstance, Long>();
@@ -50,16 +51,17 @@ public class MaintainabilityAnalysis
   
   private boolean analysisValid = true;
   
-  public void doAnalysis(SystemInstance s, AnalysisArtifact currentResult )
+  public void doAnalysis(SystemInstance s, 
+                         AnalysisArtifact currentResult,
+                         int iterationCounter)
   {
-    
+    this.iterationCounter = iterationCounter;
     final QualitativeAnalysisResult qar = f.createQualitativeAnalysisResult();
     qar.setValidated(true);
     AnalysisSource sourceQar = f.createAnalysisSource();
     sourceQar.setMethodName(MaintainabilityAnalyzer.PLUGIN_NAME);
     sourceQar.setScope(s.getQualifiedName());
     qar.setSource(sourceQar);
-    iterationCounter++;
     double margin=2; 
     /** For each process create a result indicating maintainability margin */
     for (ComponentInstance c : s.getAllComponentInstances())
@@ -109,22 +111,22 @@ public class MaintainabilityAnalysis
                                 ComponentInstance c,
                                 QualitativeAnalysisResult qar)
   {
-    if(margin<2)
-    {                
-      analysisValid &= (margin >= 0d);
-      addQualitativeAnalysisResult(currentResult, c, analysisValid);
 
-      AnalysisSource source = f.createAnalysisSource();
-      source.setMethodName(MaintainabilityAnalyzer.PLUGIN_NAME);
-      source.setScope(c.getQualifiedName());
-      source.setIterationId(iterationCounter);
-      
-      QuantitativeAnalysisResult r = f.createQuantitativeAnalysisResult();
-      r.setSource(source);
-      r.setMargin((float) margin);
-      currentResult.getResults().add(r);
-    }
-    else
+
+    analysisValid &= (margin >= 0d);
+    addQualitativeAnalysisResult(currentResult, c, analysisValid);
+
+    AnalysisSource source = f.createAnalysisSource();
+    source.setMethodName(MaintainabilityAnalyzer.PLUGIN_NAME);
+    source.setScope(c.getQualifiedName());
+    source.setIterationId(iterationCounter);
+
+    QuantitativeAnalysisResult r = f.createQuantitativeAnalysisResult();
+    r.setSource(source);
+    r.setMargin((float) margin);
+    currentResult.getResults().add(r);
+
+    if(margin>=2)
       analysisValid = false;
     qar.setValidated(analysisValid);
     if(margin<0
@@ -165,23 +167,11 @@ public class MaintainabilityAnalysis
         if(as instanceof BehaviorAnnex)
         {
           BehaviorAnnex ba = (BehaviorAnnex) as;
-          for(BehaviorTransition bt: ba.getTransitions())
-          {
-            BehaviorActionBlock bab = (BehaviorActionBlock) bt.getActionBlock();
-            if(bab.getContent() instanceof BehaviorActionSequence)
-            {
-              BehaviorActionSequence bas = (BehaviorActionSequence) bab.getContent();
-              for(BehaviorAction bAction: bas.getActions())
-              {
-                if(bAction instanceof SubprogramCallAction)
-                {
-                  SubprogramCallAction sca = (SubprogramCallAction) bAction;
-                  cost+=computeMaintainanceCost(sca.getSubprogram().getElement(),
+          List<SubprogramCallAction> scaList =
+              EcoreUtil2.getAllContentsOfType(ba,SubprogramCallAction.class);
+          for(SubprogramCallAction sca : scaList)
+            cost+=computeMaintainanceCost(sca.getSubprogram().getElement(),
                                                treatedElements);
-                }
-              }
-            }
-          }
         }
       }
       // check if found cost in BA
@@ -207,7 +197,7 @@ public class MaintainabilityAnalysis
     final Long maintenanceBudget = maintenanceBudgetMap.get(component);
     double margin=2;
     if(maintenanceBudget!=0)
-      margin = (maintenanceBudget-maintenanceCost)/maintenanceBudget;
+      margin = (maintenanceBudget.floatValue()-maintenanceCost.floatValue())/maintenanceBudget.floatValue();
     return margin;
   }
 
@@ -252,12 +242,18 @@ public class MaintainabilityAnalysis
   
   private Long getMaintainanceCost(NamedElement ne)
   {
-    return getPropertyMaintenanceValue(ne, MAINTAINANCE_COST) ;
+    Long res = getPropertyMaintenanceValue(ne, MAINTAINANCE_COST) ;
+    if(res==null)
+      res = (long) 0;
+    return res;
   }
   
   private Long getMaintainanceBudget(NamedElement ne)
   {
-    return getPropertyMaintenanceValue(ne, MAINTAINANCE_BUDGET) ;
+    Long res = getPropertyMaintenanceValue(ne, MAINTAINANCE_BUDGET) ;
+    if(res==null)
+      res = (long) 0;
+    return res;
   }
   
   private Long getPropertyMaintenanceValue(NamedElement e,

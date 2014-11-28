@@ -50,7 +50,7 @@ public class MemoryFootprintAnalysis
   public MemoryFootprintAnalysis(){}
   private SystemInstance root;
   private final AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
-  private static int iterationCounter=0;
+  private int iterationCounter;
   private Map<ComponentInstance, ComponentInstance> memoryMap =
       new HashMap<ComponentInstance, ComponentInstance>();
   private final String CODE_SIZE = "Code_Size";
@@ -61,17 +61,16 @@ public class MemoryFootprintAnalysis
   
   private boolean analysisValid = true;
   
-  public void doAnalysis(SystemInstance s, AnalysisArtifact currentResult )
+  public void doAnalysis(SystemInstance s, AnalysisArtifact currentResult, int iterationCounter)
   {
     root=s;
-    
+    this.iterationCounter = iterationCounter;
     final QualitativeAnalysisResult qar = f.createQualitativeAnalysisResult();
     qar.setValidated(true);
     AnalysisSource sourceQar = f.createAnalysisSource();
     sourceQar.setMethodName(MemoryFootprintAnalyzer.PLUGIN_NAME);
     sourceQar.setScope(s.getQualifiedName());
     qar.setSource(sourceQar);
-    iterationCounter++;
     double margin=2; 
     /** For each process create a result indicating memory overhead margin */
     for (ComponentInstance c : s.getAllComponentInstances())

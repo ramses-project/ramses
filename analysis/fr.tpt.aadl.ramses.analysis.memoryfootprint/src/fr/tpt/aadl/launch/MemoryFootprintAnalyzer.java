@@ -35,6 +35,7 @@ public class MemoryFootprintAnalyzer extends AbstractAnalyzer
   }
 
   private boolean first = true;
+  private int iterationCounter ;
   
   @Override
   public void setParameters(Map<String, Object> parameters)
@@ -75,7 +76,7 @@ public class MemoryFootprintAnalyzer extends AbstractAnalyzer
                                                        throws AnalysisException
   {
     MemoryFootprintAnalysis mfa = new MemoryFootprintAnalysis();
-    mfa.doAnalysis(systemInstance, currentResult);
+    mfa.doAnalysis(systemInstance, currentResult, iterationCounter);
   }
 
   @Override
@@ -83,5 +84,12 @@ public class MemoryFootprintAnalyzer extends AbstractAnalyzer
   {
     // TODO Auto-generated method stub
     return null ;
+  }
+
+  @Override
+  public void setIterationCounter(int iterationCounter)
+  {
+    this.iterationCounter = iterationCounter;
+    
   }
 }

@@ -94,6 +94,8 @@ public interface WorkflowPilot {
 	 */
 	public String getInputModelId();
 	
+	public void setLoopModelIdSuffix(String suffix);
+	
 	/**
 	 * This method retrieves the identifier of the output model for the 
 	 * current action in the workflow being processed.

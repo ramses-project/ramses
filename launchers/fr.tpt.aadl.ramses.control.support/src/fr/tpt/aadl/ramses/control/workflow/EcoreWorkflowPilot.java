@@ -44,7 +44,11 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	private String workflowFileName;
 
 	private AnalysisElement currentWorkflowElement;
-
+	
+	private AnalysisElement previousWorkflowElement;
+	
+	private String loopModelIdSuffix;
+	
 	private boolean analysisResult;
 	
 	private String sourceModelId;
@@ -232,6 +236,7 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 	 * @see WorkflowPilot#goForward()
 	 */
 	public void goForward() {
+	  previousWorkflowElement = currentWorkflowElement;
 		if (currentWorkflowElement instanceof Analysis) {
 			
 			if (analysisResult) {
@@ -280,7 +285,16 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
 		  Generation g = (Generation) currentWorkflowElement;
       result = g.getInputModelIdentifier().getId();
     }
+		if(previousWorkflowElement instanceof Loop)
+    {
+      result += loopModelIdSuffix;
+    }
 		return result;
+	}
+	
+	public void setLoopModelIdSuffix(String suffix)
+	{
+	  loopModelIdSuffix = suffix ;
 	}
 
 	/**
@@ -317,11 +331,10 @@ public class EcoreWorkflowPilot  implements WorkflowPilot {
       
       /** Convert analysis */
       AbstractLoop.AbstractAnalysis aa = convertAnalysis(l.getAnalysis());
-      
       return new AbstractLoop(aa,l.getAlternatives(),
-          inputModelIdentifier,outputModelIdentifier,
-          l.getResolutionMethod(),
-          l.getMaxNbIteration());
+                                 inputModelIdentifier,outputModelIdentifier,
+                                 l.getResolutionMethod(),
+                                 l.getMaxNbIteration()); 
     }
     return null;
   }

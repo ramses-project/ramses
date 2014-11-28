@@ -49,12 +49,19 @@ public class AnalysisResult
 		= new HashMap<String,ResponseTimeResult>();
 
 	private SystemInstance model = null;
+
+  private int iterationNb ;
 	
 	void setModel(SystemInstance model) 
 	{
 		this.model = model;
 	}
 
+	public void setIterationNb(int iterationNb)
+	{
+	  this.iterationNb = iterationNb;
+	}
+	
 	public boolean isSchedulable()
 	{
 		Set<String> cpuNames = responseTimeResults.keySet();
@@ -112,6 +119,7 @@ public class AnalysisResult
 	    schedulable = f.createQualitativeAnalysisResult();
 	    AnalysisSource schedulable_s = f.createAnalysisSource();
 	    schedulable_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
+	    schedulable_s.setIterationId(this.iterationNb);
 	    schedulable.setValidated(isSchedulable());
 	    schedulable.setSource(schedulable_s);
 	    aaResults.getResults().add(schedulable);
@@ -154,7 +162,7 @@ public class AnalysisResult
           AnalysisSource responseMargin_s = f.createAnalysisSource();
           responseMargin_s.setMethodName(AADLInspectorSchedulingAnalysis.PLUGIN_NAME);
           responseMargin_s.setScope(taskName);
-          
+          responseMargin_s.setIterationId(this.iterationNb);
           responseMargin = f.createQuantitativeAnalysisResult();
           responseMargin.setMargin((float) margin);
           responseMargin.setLimit((float) deadline);

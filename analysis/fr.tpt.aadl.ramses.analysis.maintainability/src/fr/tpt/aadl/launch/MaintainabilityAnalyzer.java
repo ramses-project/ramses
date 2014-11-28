@@ -26,6 +26,7 @@ public class MaintainabilityAnalyzer extends AbstractAnalyzer
 
   protected final AadlModelInstantiatior modelInstantiator;
   protected final PredefinedAadlModelManager predefinedAadlModels;
+  private int iterationCounter;
   
   public MaintainabilityAnalyzer(AadlModelInstantiatior modelInstantiator,
                                  PredefinedAadlModelManager predefinedAadlModels)
@@ -75,9 +76,15 @@ public class MaintainabilityAnalyzer extends AbstractAnalyzer
                                                        throws AnalysisException
   {
     MaintainabilityAnalysis mfa = new MaintainabilityAnalysis();
-    mfa.doAnalysis(systemInstance, currentResult);
+    mfa.doAnalysis(systemInstance, currentResult, iterationCounter);
   }
 
+  @Override
+  public void setIterationCounter(int iterationCounter)
+  {
+    this.iterationCounter = iterationCounter;
+  }
+  
   @Override
   public List<String> getTransformationModuleList()
   {

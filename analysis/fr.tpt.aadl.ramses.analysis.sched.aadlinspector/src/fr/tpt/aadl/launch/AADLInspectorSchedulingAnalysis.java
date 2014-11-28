@@ -545,6 +545,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
         }
         synchronized (this.initiator.currentResult)
         {
+          analysisResult.setIterationNb(this.initiator.iterationCounter);
           analysisResult.normalize(this.initiator.currentResult);
         }
       }
@@ -631,6 +632,7 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
     }
 
 	List<String> _ransformationModuleList = null;
+  private int iterationCounter ;
 	
 	@Override
 	public List<String> getTransformationModuleList() 
@@ -643,4 +645,11 @@ public class AADLInspectorSchedulingAnalysis extends AbstractAnalyzer {
 	  }
 	  return _ransformationModuleList;
 	}
+
+
+  @Override
+  public void setIterationCounter(int iterationCounter)
+  {
+    this.iterationCounter = iterationCounter;
+  }
 }
