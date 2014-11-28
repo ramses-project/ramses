@@ -16,7 +16,8 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.ocl,
  org.eclipse.ocl.ecore,
  org.osate.aadl2,
- org.eclipse.xtext
+ org.eclipse.xtext,
+ fr.tpt.aadl.ramses.control.support
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

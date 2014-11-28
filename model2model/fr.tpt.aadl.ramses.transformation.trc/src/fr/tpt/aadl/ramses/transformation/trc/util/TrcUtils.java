@@ -45,6 +45,7 @@ import org.osate.aadl2.instance.InstanceObject;
 import org.osate.aadl2.instance.InstancePackage;
 import org.osate.aadl2.instance.SystemInstance;
 
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.transformation.trc.AbstractRuleDependency;
 import fr.tpt.aadl.ramses.transformation.trc.Module;
 import fr.tpt.aadl.ramses.transformation.trc.RuleDependency;
@@ -629,7 +630,9 @@ public class TrcUtils {
 			}
 			catch(Exception e)
 			{
-				_LOGGER.fatal("Error when retreiving rules dependencies", e);
+			  String msg = "Error when retreiving rules dependencies";
+				_LOGGER.fatal(msg, e);
+				ServiceProvider.SYS_ERR_REP.fatal(msg, e);
 			}
 		}
 		else if(ar instanceof RuleDependencyConjunction)
