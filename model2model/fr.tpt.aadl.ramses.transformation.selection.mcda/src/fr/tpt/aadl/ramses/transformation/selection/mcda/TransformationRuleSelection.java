@@ -27,13 +27,13 @@ import org.osate.utils.PropertyUtils ;
 
 import com.google.common.collect.Sets ;
 
+import fr.tpt.aadl.ramses.control.support.utils.TrcUtils ;
 import fr.tpt.aadl.ramses.transformation.selection.RuleApplicationUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TransformationImpact ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
-import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class TransformationRuleSelection
 {

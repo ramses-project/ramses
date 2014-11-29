@@ -9,6 +9,7 @@ import java.util.List ;
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.ecore.EObject ;
 
+import fr.tpt.aadl.ramses.control.support.utils.TrcUtils ;
 import fr.tpt.aadl.ramses.transformation.tip.TipSpecification ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.trc.Module ;
@@ -16,7 +17,6 @@ import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
-import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class SelectionAlgorithm {
 		

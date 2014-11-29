@@ -5,11 +5,11 @@ import java.util.List ;
 
 import org.eclipse.emf.ecore.EObject ;
 
+import fr.tpt.aadl.ramses.control.support.utils.TrcUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification ;
 import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
 import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
-import fr.tpt.aadl.ramses.transformation.trc.util.TrcUtils ;
 
 public class DependencyValidation
 {

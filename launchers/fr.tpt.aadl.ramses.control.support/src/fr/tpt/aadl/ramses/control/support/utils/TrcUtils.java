@@ -1,4 +1,4 @@
-package fr.tpt.aadl.ramses.transformation.trc.util;
+package fr.tpt.aadl.ramses.control.support.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,6 +58,9 @@ import fr.tpt.aadl.ramses.transformation.trc.TrcFactory;
 import fr.tpt.aadl.ramses.transformation.trc.TrcPackage;
 import fr.tpt.aadl.ramses.transformation.trc.TrcRule;
 import fr.tpt.aadl.ramses.transformation.trc.TrcSpecification;
+import fr.tpt.aadl.ramses.transformation.trc.util.RuleApplicationTuple ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TaggedRuleApplicationTuple ;
+import fr.tpt.aadl.ramses.transformation.trc.util.TrcParser ;
 
 public class TrcUtils {
 
