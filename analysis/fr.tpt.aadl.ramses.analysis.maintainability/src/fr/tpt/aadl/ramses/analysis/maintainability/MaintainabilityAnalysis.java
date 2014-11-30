@@ -36,7 +36,6 @@ public class MaintainabilityAnalysis
 {
   private final static Logger _LOGGER = Logger.getLogger(MaintainabilityAnalysis.class) ;
 
-  public MaintainabilityAnalysis(){}
   private final AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
   private int iterationCounter;
   
@@ -61,6 +60,7 @@ public class MaintainabilityAnalysis
     AnalysisSource sourceQar = f.createAnalysisSource();
     sourceQar.setMethodName(MaintainabilityAnalyzer.PLUGIN_NAME);
     sourceQar.setScope(s.getQualifiedName());
+    sourceQar.setIterationId(iterationCounter);
     qar.setSource(sourceQar);
     double margin=2; 
     /** For each process create a result indicating maintainability margin */
@@ -143,8 +143,8 @@ public class MaintainabilityAnalysis
     AnalysisSource sourceQar = f.createAnalysisSource();
     sourceQar.setMethodName(MaintainabilityAnalyzer.PLUGIN_NAME);
     sourceQar.setScope(c.getQualifiedName());
-    qar.setSource(sourceQar);
     sourceQar.setIterationId(iterationCounter);
+    qar.setSource(sourceQar);
   }
   
   private Long computeMaintainanceCost(NamedElement component,

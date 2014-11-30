@@ -70,6 +70,7 @@ public class MemoryFootprintAnalysis
     AnalysisSource sourceQar = f.createAnalysisSource();
     sourceQar.setMethodName(MemoryFootprintAnalyzer.PLUGIN_NAME);
     sourceQar.setScope(s.getQualifiedName());
+    sourceQar.setIterationId(iterationCounter);
     qar.setSource(sourceQar);
     double margin=2; 
     /** For each process create a result indicating memory overhead margin */
@@ -151,8 +152,8 @@ public class MemoryFootprintAnalysis
     AnalysisSource sourceQar = f.createAnalysisSource();
     sourceQar.setMethodName(MemoryFootprintAnalyzer.PLUGIN_NAME);
     sourceQar.setScope(c.getQualifiedName());
-    qar.setSource(sourceQar);
     sourceQar.setIterationId(iterationCounter);
+    qar.setSource(sourceQar);
   }
   
   private double getThreadComponentMargin(ComponentInstance threadComponent)

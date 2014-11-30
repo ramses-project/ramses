@@ -8,11 +8,6 @@ import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManag
 public class MaintainabilityAnalysisFactory implements AnalyzerFactory
 {
 
-  public MaintainabilityAnalysisFactory()
-  {
-    // TODO Auto-generated constructor stub
-  }
-
   @Override
   public Analyzer
       createAnalyzer(AadlModelInstantiatior modelInstantiatior,

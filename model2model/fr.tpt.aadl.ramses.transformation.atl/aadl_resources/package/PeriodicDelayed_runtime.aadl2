@@ -1,7 +1,7 @@
 package PeriodicDelayed_runtime
 public
 
-with Base_Types, Data_Model, Generation_Properties;
+with Base_Types, Data_Model, Generation_Properties,Maintainability_Property;
 
   data ReturnCodeType
     properties
@@ -27,6 +27,7 @@ with Base_Types, Data_Model, Generation_Properties;
       ReturnCode: out parameter ReturnCodeType ;
     properties
         Compute_Execution_Time => 0 ms .. 1 ms;
+  		Maintainability_Property::Maintenance_Cost => 5;
      annex behavior_specification {**
        variables
        	 next : Base_Types::Integer_16;
@@ -60,6 +61,7 @@ with Base_Types, Data_Model, Generation_Properties;
       ReturnCode: out parameter ReturnCodeType ;
     properties
       Compute_Execution_Time => 0 ms .. 1 ms;
+      Maintainability_Property::Maintenance_Cost => 5;
     annex behavior_specification {**
       states
     	s: initial final state;
@@ -92,6 +94,7 @@ with Base_Types, Data_Model, Generation_Properties;
       buffer: requires data access ArrayDataType {Access_Right=>write_only;};
     properties
       Compute_Execution_Time => 0 ms .. 1 ms;
+      Maintainability_Property::Maintenance_Cost => 5;
     annex behavior_specification {**
       states
         s: initial final state;
@@ -109,6 +112,7 @@ with Base_Types, Data_Model, Generation_Properties;
     CDWSize: in parameter Base_Types::Integer_16;
   properties
       Compute_Execution_Time => 0 ms .. 1 ms;
+      Maintainability_Property::Maintenance_Cost => 5;
   annex behavior_specification {**
   	states
   	  s: initial final state;
@@ -173,6 +177,7 @@ with Base_Types, Data_Model, Generation_Properties;
       Source_Name => "Compute_CPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
       Stack_Size => 22 Bytes;
+      Maintainability_Property::Maintenance_Cost => 2;
   end Compute_CPR;
   
   subprogram Compute_PPR
@@ -186,6 +191,7 @@ with Base_Types, Data_Model, Generation_Properties;
       Source_Name => "Compute_PPR";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
       Stack_Size => 22 Bytes;
+      Maintainability_Property::Maintenance_Cost => 2;
   end Compute_PPR;
   
   subprogram Compute_CDW
@@ -202,6 +208,7 @@ with Base_Types, Data_Model, Generation_Properties;
       Source_Name => "Compute_CDW";
       Source_Text => ("PeriodicDelayed_runtime.h", "PeriodicDelayed_runtime.c");
       Stack_Size => 26 Bytes;
+      Maintainability_Property::Maintenance_Cost => 1;
   end Compute_CDW;
 
   subprogram Receive_Input_LowFP
@@ -214,6 +221,8 @@ with Base_Types, Data_Model, Generation_Properties;
       first: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       last: requires data access Base_Types::Integer_16 {Access_Right=>read_write;};
       ReturnCode: out parameter ReturnCodeType ;
+    properties
+      Maintainability_Property::Maintenance_Cost => 1;
     annex behavior_specification {**
       states
         s: initial final state;
@@ -238,6 +247,8 @@ with Base_Types, Data_Model, Generation_Properties;
       pvalue: in parameter value_type;
       periodic_delayed_context : requires data access context_prototype{Access_Right=>read_write;};
       buffer: requires data access ArrayDataType {Access_Right=>write_only;};
+    properties
+      Maintainability_Property::Maintenance_Cost => 1;
     annex behavior_specification {**
       variables
         CDWIndex : Base_Types::Integer_16;

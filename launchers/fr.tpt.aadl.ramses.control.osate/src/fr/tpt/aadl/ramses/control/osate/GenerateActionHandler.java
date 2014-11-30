@@ -193,7 +193,7 @@ public class GenerateActionHandler extends RamsesActionHandler {
   @Override
   protected void jobCore(IProgressMonitor monitor) throws Exception
   {
-    monitor.beginTask("Code generation", IProgressMonitor.UNKNOWN);
+    monitor.beginTask("RAMSES execution", IProgressMonitor.UNKNOWN);
     
     if(monitor.isCanceled())
     {

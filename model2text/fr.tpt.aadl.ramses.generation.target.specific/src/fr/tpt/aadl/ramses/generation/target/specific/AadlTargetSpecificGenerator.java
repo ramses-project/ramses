@@ -241,12 +241,9 @@ public class AadlTargetSpecificGenerator implements Generator
     File runtimeDir = config.getRuntimePath(); 
     ResourceSet resourceSet = currentImplResource.getResourceSet();
     if(_analysisResults == null)
-      _analysisResults = AnalysisUtils.createNewAnalysisArtifact(
-                                                                 resourceSet,
-                                                                 outputDir.getAbsolutePath() +
-                                                                 File.pathSeparator+
-                                                                 systemInstance.getName() +
-                                                                 ".ares") ;
+      
+      _analysisResults = AnalysisUtils.createNewAnalysisArtifact(resourceSet,
+                                                                 config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares") ;
     if(monitor.isCanceled())
     {
       String msg = "generation has been canceled after analysis result" ;
