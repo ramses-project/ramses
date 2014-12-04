@@ -535,7 +535,13 @@ rule m_ThreadEntrypoint {
 		),
 		lv: AADLBA!ListValue
 		(
-			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(c.targetPackagePrefix()+c.uniqueName()+'_behaviorIdentifier_enum'.concat('_').concat('default_behavior'))}
+			ownedListElement <- Sequence{
+				thisModule.CreateStringLiteralPropertyExpression(
+				c.targetPackagePrefix().getProgrammationLanguageIdentifier()+
+				c.uniqueName().getProgrammationLanguageIdentifier()+
+				'_behaviorIdentifier_enum'.concat('_').concat('default_behavior')
+				)
+			}
 		),
 	    portIDEnumLiteral: AADLBA!StringLiteral
         (
