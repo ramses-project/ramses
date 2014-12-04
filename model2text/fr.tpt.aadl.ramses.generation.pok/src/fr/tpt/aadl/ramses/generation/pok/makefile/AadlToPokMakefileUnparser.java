@@ -178,7 +178,7 @@ public class AadlToPokMakefileUnparser extends AbstractAadlToCMakefileUnparser
           while(it.hasNext())
           {
             include = it.next() ;
-            unparserContent.addOutput("-I" + include.getAbsolutePath() + " ") ;
+            unparserContent.addOutput("-I\"" + include.getAbsolutePath() + "\" ") ;
           }
           unparserContent.addOutput("\n") ;
         }
