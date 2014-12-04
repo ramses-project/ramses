@@ -262,21 +262,18 @@ public class Atl2EmftvmCompiler implements AtlStandaloneCompiler {
 		return nbErrors;
 	}
 
-  @Override
   public CompileTimeError[] compile(Reader arg0, String arg1)
   {
     // TODO Auto-generated method stub
     return null ;
   }
 
-  @Override
   public EObject[] compileWithProblemModel(Reader arg0, String arg1)
   {
     // TODO Auto-generated method stub
     return null ;
   }
 
-  @Override
   public EObject[] compileWithProblemModel(Reader arg0, OutputStream arg1)
   {
     // TODO Auto-generated method stub
