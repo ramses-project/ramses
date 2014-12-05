@@ -47,7 +47,7 @@
     <module>../../model2model/fr.tpt.atl.hots</module>
     <module>../../model2model/fr.tpt.atl.utils</module>
     <module>../../analysis/fr.tpt.aadl.ramses.util.properties</module>
-    <module>../../analysis/fr.tpt.aadl.sched.propertiesextractor</module>
+    <module>../../analysis/fr.tpt.aadl.ramses.analysis.sched.propertiesextractor</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.sched.aadlinspector</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.memoryfootprint</module>
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.maintainability</module>
