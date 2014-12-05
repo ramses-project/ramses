@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.analysis.util;
 
+import java.io.File ;
 import java.io.IOException ;
 import java.util.HashSet ;
 import java.util.List ;
@@ -67,11 +68,11 @@ public class AnalysisUtils {
 			return resource;
 		} else
 		{
-		  String msg = "analysis artifact of the specified path \'"+analysisPath+"\' already exists" ;
-      _LOGGER.error(msg) ;
-      ServiceProvider.SYS_ERR_REP.error(msg, true);
+		 	    
+	    return resourceSet
+	        .getResource(resourceSet.getURIConverter().normalize(analysis_uri), 
+	                     true);
 		}
-		return null;
 	}
 
 	/**

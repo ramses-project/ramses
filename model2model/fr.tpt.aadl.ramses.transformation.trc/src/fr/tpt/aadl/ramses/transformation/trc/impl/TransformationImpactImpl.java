@@ -118,6 +118,9 @@ public class TransformationImpactImpl extends TransformationElementImpl implemen
 	 */
   public String getQualityAttributeName()
   {
+    if(qualityAttributeName.contains("\""))
+      qualityAttributeName = qualityAttributeName.substring(1,
+                                                            qualityAttributeName.length()-1);
 		return qualityAttributeName;
 	}
 

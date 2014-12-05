@@ -491,7 +491,8 @@ public class ArchitectureRefinementProcessLauncher {
         fr.tpt.aadl.ramses.control.workflow.File additionalFile = WorkflowFactory.eINSTANCE.createFile();
         String fPath = additionalTransfoIt.next().getPath();
 
-        String additionalFilePrefix = fPath.substring(fPath.lastIndexOf("/")+1,fPath.lastIndexOf(".")-10);
+        int iter = TipParser.getLastIterationId();
+        String additionalFilePrefix = fPath.substring(fPath.lastIndexOf("/")+1,fPath.lastIndexOf(Integer.toString(iter))-9);
         if(false == additionalFilePrefix.equals(prefix))
           continue;
         if(fPath.endsWith(".emftvm"))
