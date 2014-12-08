@@ -44,12 +44,12 @@ with MCDA;
     	[QualityAttribute=>Memory_Footprint; Value=>50;],
     	[QualityAttribute=>Threads_Response_Time; Value=>27;]
     );
-    MCDA::Acceptable_Quality_Impacts => (
+    MCDA::Quality_Impact_Importance => (
     	[QualityAttribute=>Maintainability; Value=>30;],
     	[QualityAttribute=>Memory_Footprint; Value=>50;],
     	[QualityAttribute=>Threads_Response_Time; Value=>70;]
     ) applies to the_proc.the_sender_1, the_proc.the_sender_2, the_proc.the_sender_3, the_proc.the_sender_4;
-    MCDA::Acceptable_Quality_Impacts => (
+    MCDA::Quality_Impact_Importance => (
     	[QualityAttribute=>Maintainability; Value=>30;],
     	[QualityAttribute=>Memory_Footprint; Value=>50;],
     	[QualityAttribute=>Threads_Response_Time; Value=>70;]

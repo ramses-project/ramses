@@ -257,7 +257,8 @@ public class TransformationRuleSelection
     for(int i = 0 ; i < qas.length ; i++)
     {
       // Calculates the mean of provided impacts for a given quality attribute.
-      qas[i].aqi /= count[i] ;
+      if(count[i]!=0)
+        qas[i].aqi /= count[i] ;
     }
   }
 
