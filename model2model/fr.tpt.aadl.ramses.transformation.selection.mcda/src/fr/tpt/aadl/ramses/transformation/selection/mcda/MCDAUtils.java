@@ -22,7 +22,7 @@ public class MCDAUtils
                                                     "Quality_Attributes_Weight";
   
   public static final String ACCEPTABLE_QUALITY_IMPACT_PS = 
-                                                   "Acceptable_Quality_Impacts";
+                                                   "Quality_Impact_Importance";
 
   public static List<String> getReferencedQualityAttributes(SystemInstance si)
   {

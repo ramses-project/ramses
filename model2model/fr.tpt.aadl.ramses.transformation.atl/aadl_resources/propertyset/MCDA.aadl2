@@ -14,12 +14,12 @@ Quality_Attributes_Weight_Type: type record (
 Quality_Attributes_Weight:
 	list of MCDA::Quality_Attributes_Weight_Type applies to (System);
 
-Acceptable_Quality_Impact_Type: type record (
+Quality_Impact_Type: type record (
 	QualityAttribute : MCDA::Quality_Attribute;
 	Value            : aadlinteger;
 );
 
-Acceptable_Quality_Impacts: 
-	list of MCDA::Acceptable_Quality_Impact_Type applies to (NamedElement);
+Quality_Impact_Importance: 
+	list of MCDA::Quality_Impact_Type applies to (NamedElement);
 
 end MCDA;
