@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AADL-RAMSES-WCET-Result
-Bundle-SymbolicName: fr.tpt.aadl.sched.wcetanalysis.results;singleton:=true
+Bundle-SymbolicName: fr.tpt.aadl.analysis.sched.wcrtanalysis.results;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: TELECOM ParisTech

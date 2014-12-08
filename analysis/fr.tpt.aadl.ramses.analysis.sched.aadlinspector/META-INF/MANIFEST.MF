@@ -20,5 +20,5 @@ Require-Bundle: org.eclipse.m2m.atl.engine.emfvm.launch;bundle-version="3.4.0",
  fr.tpt.aadl.ramses.analysis.result,
  fr.tpt.aadl.ramses.util.properties,
  fr.tpt.aadl.ramses.analysis.asg,
- fr.tpt.aadl.sched.wcetanalysis.results
+ fr.tpt.aadl.analysis.sched.wcrtanalysis.results
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
