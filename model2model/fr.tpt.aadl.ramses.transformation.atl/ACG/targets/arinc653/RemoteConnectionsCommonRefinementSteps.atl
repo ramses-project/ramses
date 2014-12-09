@@ -212,7 +212,7 @@ rule m_ConfigureSystemPartitionForCommunications
 		),
 		memoryRef: AADLBA!ReferenceValue
 		(
-			containmentPathElement <- cpeMemory1
+			path <- cpeMemory1
 		),
 		cpeMemory1: AADLBA!ContainmentPathElement
 		(
