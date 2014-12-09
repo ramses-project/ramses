@@ -384,7 +384,7 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance_
 		),
 		destinationSemGVCE: AADLBA!ConnectedElement
 		(
-			connectionEnd <- thisModule.resolveMatchedSingleIfExists(consumerPort, 'semaphoreThreadDataAccess'),
+			connectionEnd <- thisModule.resolveMatchedSingleIfExists(fi, 'semaphoreThreadDataAccess'),
 			context <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(),'sub')
 		)
 }
@@ -406,7 +406,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		consumerPort: AADLI!FeatureInstance = cnxInst.destination;
 		lockSemaphore: AADLI!SubprogramType = 'Wait_Semaphore'.asSubprogramType('ARINC653_RUNTIME');
 		unlockSemaphore: AADLI!SubprogramType = 'Signal_Semaphore'.asSubprogramType('ARINC653_RUNTIME');
-		semaphoreAccess: AADLBA!DataAccess = thisModule.resolveMatchedSingleIfExists(consumerPort,'semaphoreEntryPointDataAccess');
+		semaphoreAccess: AADLBA!DataAccess = thisModule.resolveMatchedSingleIfExists(fi,'semaphoreEntryPointDataAccess');
 	}
 	to
 		callLockPutValue: AADLBA!SubprogramCallAction
@@ -424,11 +424,11 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		semaphoreTimeOutHolder_l: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(consumerPort, 'infinityTimeOut')
+			element <- thisModule.resolveMatchedSingleIfExists(fi, 'infinityTimeOut')
 		),
 		returnCodeHolder_l: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(consumerPort,'semCallReturnCode')
+			element <- thisModule.resolveMatchedSingleIfExists(fi,'semCallReturnCode')
 		),
 		callUnlockPutValue: AADLBA!SubprogramCallAction
 		(
@@ -445,7 +445,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		),
 		returnCodeHolder_ul: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(consumerPort,'semCallReturnCode')
+			element <- thisModule.resolveMatchedSingleIfExists(fi,'semCallReturnCode')
 		)
 }
 -----------------------------------------------------------------------------------------------------
