@@ -114,7 +114,7 @@ helper def: collectComputeEntryPointActionBlocks(c: AADLI!ComponentInstance): Se
 	->union(
 			c.getComputeEntryPoints()->collect(cep | thisModule.resolveMatchedTupleIfExists(Sequence{c, cep}, 'computeEntryPointActionBlock'))
 		)
-	->append(thisModule.resolveMatchedSingleIfExists(c, 'whichPortActionBlock'))
+	-->append(thisModule.resolveMatchedSingleIfExists(c, 'whichPortActionBlock'))
 	->flatten()
 ;
 
@@ -501,6 +501,7 @@ rule m_ThreadEntrypoint {
 										else
 											thisModule.collectComputeEntryPointActionBlocks(c)
 										endif
+										->append(whichPortActionBlock)
 									),
 			variables   <- if(not c.subcomponent.classifier.getBA().oclIsUndefined()) then
 								c.subcomponent.classifier.getBA().variables
@@ -777,6 +778,7 @@ unique lazy rule collectTransitionChoiceActions
 		results;
 	}
 }
+
 
 rule createDefaultAssignement(c:AADLI!ComponentInstance)
 {

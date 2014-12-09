@@ -275,7 +275,7 @@ rule m_SubprogramCallAction
 		(
 			subprogram <- src_communicationAction.subprogram,
 			parameterLabels <- src_communicationAction.parameterLabels,
-			dataAccess <- src_communicationAction.dataAccess
+			proxy <- src_communicationAction.proxy
 		)
 }
 
