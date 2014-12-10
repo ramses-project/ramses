@@ -498,7 +498,7 @@ ANNEX behavior_specification {**
     switch : INITIAL COMPLETE STATE;
   TRANSITIONS
     unnamed_B2 : switch -[ ON DISPATCH ]-> switch {
-    IF ( mode_aadlKeywords=ROLE#EnumeratorsE_ROLE_Cpong )
+    IF ( mode_aadlKeywords=ROLE#Enumerators.E_ROLE_Cpong )
     IF ( PingIn'FRESH )
     IPingOrPong_Cpong_pong ! (PingIn,PongOut)
     END IF
