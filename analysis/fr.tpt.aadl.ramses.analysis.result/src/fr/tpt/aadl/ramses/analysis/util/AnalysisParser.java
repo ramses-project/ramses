@@ -21,13 +21,18 @@
 
 package fr.tpt.aadl.ramses.analysis.util;
 
-import org.apache.log4j.Logger ;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import java.util.List ;
 
-import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage;
+import org.apache.log4j.Logger ;
+import org.eclipse.emf.common.util.URI ;
+import org.eclipse.emf.ecore.resource.Resource ;
+import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
+
+import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage ;
+import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 
@@ -60,5 +65,35 @@ public class AnalysisParser {
 		
 		return null;
 	}
+
+  public static int getLastIterationId(String analysisPath)
+  {
+    int res = -1;
+    AnalysisArtifact aa = parse(analysisPath, new ResourceSetImpl());
+    if(aa != null)
+    {
+      List<Object> resultsList = aa.getResults();
+      for(Object obj: resultsList)
+      {
+        if(obj instanceof QualitativeAnalysisResult)
+        {
+          QualitativeAnalysisResult qar = 
+              (QualitativeAnalysisResult) obj;
+          int iter = qar.getSource().getIterationId();
+          if(iter>res)
+            res=iter;
+        }
+        else if (obj instanceof QuantitativeAnalysisResult)
+        {
+          QuantitativeAnalysisResult qar = 
+              (QuantitativeAnalysisResult) obj;
+          int iter = qar.getSource().getIterationId();
+          if(iter>res)
+            res=iter;
+        }
+      }
+    }
+    return res ;
+  }
 	
 }

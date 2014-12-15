@@ -48,7 +48,7 @@ public class EGAnalyzer extends AbstractAnalyzer
   private static AnalysisArtifact createResult()
   {
     /** WCET analysis returns always true (it must be followed 
-     * by a scheduling analysis */
+     * by a scheduling analysis) */
     
     final AnalysisResultFactory f = AnalysisResultFactory.eINSTANCE;
     

@@ -57,10 +57,12 @@ public class MaintainabilityAnalysis
     this.iterationCounter = iterationCounter;
     final QualitativeAnalysisResult qar = f.createQualitativeAnalysisResult();
     qar.setValidated(true);
+    
     AnalysisSource sourceQar = f.createAnalysisSource();
     sourceQar.setMethodName(MaintainabilityAnalyzer.PLUGIN_NAME);
     sourceQar.setScope(s.getQualifiedName());
     sourceQar.setIterationId(iterationCounter);
+    
     qar.setSource(sourceQar);
     double margin=2; 
     /** For each process create a result indicating maintainability margin */
@@ -98,6 +100,9 @@ public class MaintainabilityAnalysis
      *  if memory size is enough. */
     AnalysisSource source = f.createAnalysisSource();
     source.setMethodName(MaintainabilityAnalyzer.PLUGIN_NAME);
+    source.setScope(s.getQualifiedName());
+    source.setIterationId(iterationCounter);
+    
     
     QualitativeAnalysisResult r = f.createQualitativeAnalysisResult();
     r.setSource(source);

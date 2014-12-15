@@ -20,6 +20,7 @@ import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.osate.properties.RamsesPropertyPage ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
@@ -127,7 +128,7 @@ public abstract class AnalysisActionHandler extends RamsesActionHandler
     {
       AnalysisArtifact existingAa = 
         (AnalysisArtifact) r.getContents().get(0);
-      updateAnalysisArtifact(existingAa, aa);
+      AnalysisUtils.updateAnalysisArtifact(existingAa, aa);
     }
     
     r.save(null);
@@ -141,67 +142,6 @@ public abstract class AnalysisActionHandler extends RamsesActionHandler
     
     WorkbenchUtils.showGenerationReport() ;
     
-  }
-
-  private void updateAnalysisArtifact(AnalysisArtifact existingArtefact,
-                                      AnalysisArtifact newArtefact)
-  {
-    boolean foundAnalysisToUpdate = false;
-    for(Object existingAr: existingArtefact.getResults())
-    {
-      if(foundAnalysisToUpdate)
-        break;
-      AnalysisResult existingQar =
-          (AnalysisResult) existingAr;
-      AnalysisSource existingAs = existingQar.getSource();
-      for(Object newAr: newArtefact.getResults())
-      {
-        AnalysisResult newQar =
-            (AnalysisResult) newAr;
-        if(newQar instanceof QualitativeAnalysisResult
-            && existingQar instanceof QuantitativeAnalysisResult)
-          continue;
-        if(newQar instanceof QuantitativeAnalysisResult
-            && existingQar instanceof QualitativeAnalysisResult)
-          continue;
-        AnalysisSource newAs = newQar.getSource();
-        if(newAs.getIterationId() == 
-            existingAs.getIterationId()
-            && 
-            newAs.getMethodName().equals(existingAs.getMethodName()))
-        {
-          updateAnalysisResult(existingQar, newQar);
-          foundAnalysisToUpdate = true;
-          break;
-        }
-      }
-    }
-    if(foundAnalysisToUpdate == false)
-      existingArtefact.getResults().addAll(newArtefact.getResults());
-  }
-
-  private void updateAnalysisResult(AnalysisResult existingQar,
-                                    AnalysisResult newQar)
-  {
-    if(existingQar instanceof QualitativeAnalysisResult
-        && newQar instanceof QualitativeAnalysisResult)
-    {
-      QualitativeAnalysisResult existingQarCasted = 
-          (QualitativeAnalysisResult) existingQar;
-      QualitativeAnalysisResult newQarCasted = 
-          (QualitativeAnalysisResult) newQar;
-      existingQarCasted.setValidated(newQarCasted.isValidated());
-    }
-    else if(existingQar instanceof QuantitativeAnalysisResult
-        && newQar instanceof QuantitativeAnalysisResult)
-    {
-      QuantitativeAnalysisResult existingQarCasted = 
-          (QuantitativeAnalysisResult) existingQar;
-      QuantitativeAnalysisResult newQarCasted = 
-          (QuantitativeAnalysisResult) newQar;
-      existingQarCasted.setMargin(newQarCasted.getMargin());
-      existingQarCasted.setValue(newQarCasted.getValue());
-    }
   }
 
   protected abstract AnalysisArtifact analysis(SystemInstance _sysInst, 

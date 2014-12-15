@@ -35,8 +35,11 @@ import org.eclipse.emf.ecore.resource.ResourceSet ;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 import org.osate.aadl2.NamedElement ;
 
+import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultPackage ;
+import fr.tpt.aadl.ramses.analysis.AnalysisSource ;
+import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.QuantitativeAnalysisResult ;
 import fr.tpt.aadl.ramses.control.support.analysis.AnalysisArtifact ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
@@ -179,4 +182,65 @@ public class AnalysisUtils {
     return current ; 
   }
 
+  public static void updateAnalysisArtifact(AnalysisArtifact existingArtefact,
+                                      AnalysisArtifact newArtefact)
+  {
+    boolean foundAnalysisToUpdate = false;
+    for(Object existingAr: existingArtefact.getResults())
+    {
+      if(foundAnalysisToUpdate)
+        break;
+      AnalysisResult existingQar =
+          (AnalysisResult) existingAr;
+      AnalysisSource existingAs = existingQar.getSource();
+      for(Object newAr: newArtefact.getResults())
+      {
+        AnalysisResult newQar =
+            (AnalysisResult) newAr;
+        if(newQar instanceof QualitativeAnalysisResult
+            && existingQar instanceof QuantitativeAnalysisResult)
+          continue;
+        if(newQar instanceof QuantitativeAnalysisResult
+            && existingQar instanceof QualitativeAnalysisResult)
+          continue;
+        AnalysisSource newAs = newQar.getSource();
+        if(newAs.getIterationId() == 
+            existingAs.getIterationId()
+            && 
+            newAs.getMethodName().equals(existingAs.getMethodName()))
+        {
+          updateAnalysisResult(existingQar, newQar);
+          foundAnalysisToUpdate = true;
+          break;
+        }
+      }
+    }
+    if(foundAnalysisToUpdate == false)
+      existingArtefact.getResults().addAll(newArtefact.getResults());
+  }
+
+  public static void updateAnalysisResult(AnalysisResult existingQar,
+                                    AnalysisResult newQar)
+  {
+    if(existingQar instanceof QualitativeAnalysisResult
+        && newQar instanceof QualitativeAnalysisResult)
+    {
+      QualitativeAnalysisResult existingQarCasted = 
+          (QualitativeAnalysisResult) existingQar;
+      QualitativeAnalysisResult newQarCasted = 
+          (QualitativeAnalysisResult) newQar;
+      existingQarCasted.setValidated(newQarCasted.isValidated());
+    }
+    else if(existingQar instanceof QuantitativeAnalysisResult
+        && newQar instanceof QuantitativeAnalysisResult)
+    {
+      QuantitativeAnalysisResult existingQarCasted = 
+          (QuantitativeAnalysisResult) existingQar;
+      QuantitativeAnalysisResult newQarCasted = 
+          (QuantitativeAnalysisResult) newQar;
+      existingQarCasted.setMargin(newQarCasted.getMargin());
+      existingQarCasted.setValue(newQarCasted.getValue());
+    }
+  }
+  
 }

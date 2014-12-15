@@ -20,8 +20,8 @@ import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
-import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.util.CancelIndicator;
+import org.eclipse.xtext.EcoreUtil2 ;
+import org.eclipse.xtext.util.CancelIndicator ;
 import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.RecordValue ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -33,7 +33,10 @@ import fr.tpt.aadl.ramses.control.support.config.ConfigurationException ;
 import fr.tpt.aadl.ramses.control.support.config.RamsesConfiguration ;
 import fr.tpt.aadl.ramses.control.support.generator.TransformationException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
+import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
+import fr.tpt.aadl.ramses.control.support.utils.Command ;
 import fr.tpt.aadl.ramses.control.support.utils.Names ;
+import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 import fr.tpt.aadl.ramses.control.workflow.AbstractLoop ;
 import fr.tpt.aadl.ramses.control.workflow.ResolutionMethod ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowPilot ;
@@ -47,7 +50,6 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.Depend
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.util.DependencyGraphUtils ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
-import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
@@ -77,6 +79,9 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   private List<String> qualityAttributesIdentifiers;
   
   private ArchitectureRefinementProcessLauncher mergeLauncher;
+
+  public int cpt = 0 ;
+  public int size ;
   
   public MCDABasedTransformationSelection(AadlTargetSpecificGenerator generator,
                                           AbstractLoop loop,
@@ -157,6 +162,9 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     }
     
     List<List<EObject>> treatedObjectInTIP = new ArrayList<List<EObject>>();
+    
+    List<Map<List<EObject>, List<TrcRule>>> connectedAlternativesMapList =
+        new ArrayList<Map<List<EObject>, List<TrcRule>>>();
     while (patternMatchingIt.hasNext()) 
     {
       Map.Entry<List<EObject>, ArrayList<TrcRule>> tuple =
@@ -215,36 +223,127 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
           connectedAlternativesMap.put(matchedElements, transformationRules);
         }
 
-        // 5 - select alternatives for elements in connectedDepGraph
-        TransformationRuleSelection trs = 
-            new TransformationRuleSelection(trc, 
-                                            sinst,
-                                            connectedAlternativesMap);
-
-        List<RuleApplicationTuple> ratList = trs.selectBestRulesAlternatives();
-
-        for(RuleApplicationTuple rat:ratList)
-        {
-          List<EObject> ratElements = rat.getPatternMatchedElement();
-          if(treatedObjectInTIP.contains(ratElements))
-        	  continue;
-          treatedObjectInTIP.add(ratElements);
-          
-          List<TrcRule> ratRules = patternMatchingMap.get(rat.getPatternMatchedElement());
-          TransformationRuleAlternative tra = 
-              new TransformationRuleAlternative(ratElements,ratRules);
-          TrcRule ratRuleName = rat.getTransformationRule();
-          RuleApplicationUtils.setTransformationToApply(tra, 
-                                                        ratRuleName,
-                                                        tuplesToApply);
-          
-        }
+        connectedAlternativesMapList.add(connectedAlternativesMap);
       }
     }
+    size = connectedAlternativesMapList.size();
+    final Thread[] rulesSelectionThreads = new Thread[size] ;
+    int iter = 0;
+    for(Map<List<EObject>, List<TrcRule>> connectedAlternativesMap:
+      connectedAlternativesMapList)
+    {
+      rulesSelectionThreads[iter] = new TransformationRuleSelectionThread(trc, 
+                                                                          sinst, 
+                                                                          connectedAlternativesMap, 
+                                                                          this);
+      iter++;
+    }
+    
+    final MCDABasedTransformationSelection app = this ;
+    Command cmd = new Command()
+    {
+      int status = Command.UNSET;
+      @Override
+      public int run() throws Exception
+      {
+        for(Thread t : rulesSelectionThreads)
+        {
+          t.start();
+        }
+        
+        // Wait all the thread end.
+        synchronized (app) {
+          app.wait();
+        }
+        
+        
+        status = Command.OK ;
+        return status ;
+      }
+
+      @Override
+      public boolean isCanceled()
+      {
+        return monitor.isCanceled() ;
+      }
+
+      @Override
+      public String getLabel()
+      {
+        return null ;
+      }
+
+      @Override
+      public int getStatus()
+      {
+        return status;
+      }
+
+      @Override
+      public Process getProcess()
+      {
+        // TODO Auto-generated method stub
+        return null ;
+      }
+    } ;
+    
+    int exitStatus ;
+    WaitMonitor wm = new WaitMonitor(cmd) ;
+    wm.start();
+    
+    try
+    {
+      exitStatus = wm.waitAndCheck(500) ;
+    }
+    catch(Exception e)
+    {
+      killThreads(rulesSelectionThreads) ;
+      String msg = "Transformation rules selection" +
+          " monitoring has been interrupted" ;
+      _LOGGER.fatal(msg, e);
+      trc.cleanup();
+      throw new RuntimeException(msg, e) ;
+    }
+    for(Thread t : rulesSelectionThreads)
+    {
+      List<RuleApplicationTuple> ratList = 
+          ((TransformationRuleSelectionThread) t).ratList;
+      if(ratList == null)
+      {
+        String msg = "Transformation rules selection" +
+            " failed" ;
+        _LOGGER.error(msg);
+        trc.cleanup();
+        ServiceProvider.SYS_ERR_REP.error(msg, false);
+      }
+      for(RuleApplicationTuple rat:ratList)
+      {
+        List<EObject> ratElements = rat.getPatternMatchedElement();
+        if(treatedObjectInTIP.contains(ratElements))
+          continue;
+        treatedObjectInTIP.add(ratElements);
+
+        List<TrcRule> ratRules = patternMatchingMap.get(rat.getPatternMatchedElement());
+        TransformationRuleAlternative tra = 
+            new TransformationRuleAlternative(ratElements,ratRules);
+        TrcRule ratRuleName = rat.getTransformationRule();
+        RuleApplicationUtils.setTransformationToApply(tra, 
+                                                      ratRuleName,
+                                                      tuplesToApply);
+
+      }
+    }
+    // Multi-threaded search
     trc.cleanup();
 
   }
 
+  private void killThreads(Thread[] aadlInspectorThreads)
+  {
+    for(Thread t : aadlInspectorThreads)
+      t.interrupt();
+  }
+  
   private String getIdentifier(List<EObject> currentElements)
   {
     String result = "";
@@ -326,4 +425,59 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     return iterationNb ;
   }
 
+  
+  static class TransformationRuleSelectionThread extends Thread
+  {
+    
+    private TrcSpecification trc;
+    private SystemInstance sinst;
+    private Map<List<EObject>, List<TrcRule>> connectedAlternativesMap;
+    private final MCDABasedTransformationSelection initiator;
+    
+    public List<RuleApplicationTuple> ratList;
+    
+    public TransformationRuleSelectionThread(TrcSpecification trc,
+                                             SystemInstance sinst,
+                                             Map<List<EObject>, List<TrcRule>> connectedAlternativesMap,
+                                             MCDABasedTransformationSelection initiator)
+    {
+      this.trc = trc;
+      this.sinst = sinst;
+      this.connectedAlternativesMap = connectedAlternativesMap;
+      this.initiator = initiator;
+    }
+    
+    @Override
+    public void run()
+    {
+      // 5 - select alternatives for elements in connectedDepGraph
+      TransformationRuleSelection trs = 
+          new TransformationRuleSelection(this.trc, 
+                                          sinst,
+                                          connectedAlternativesMap);
+
+      ratList = trs.selectBestRulesAlternatives();
+      
+      synchronized(sinst)
+      {
+        initiator.cpt++ ;
+        String message =
+                         initiator.cpt +
+                             " execution(s) of transformation selection" +
+                             " done." ;
+        _LOGGER.trace(message) ;
+        evaluateIfFinished() ;
+      }
+      
+    }
+    
+    void evaluateIfFinished()
+    {
+      if(initiator.cpt==initiator.size)
+      synchronized (initiator) {
+        initiator.notify();
+        initiator.cpt=0;
+      }
+    }
+  }
 }

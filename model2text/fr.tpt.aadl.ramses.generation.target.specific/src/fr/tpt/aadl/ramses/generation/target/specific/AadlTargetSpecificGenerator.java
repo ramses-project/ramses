@@ -109,8 +109,7 @@ public class AadlTargetSpecificGenerator implements Generator
   
   public PredefinedAadlModelManager _predefinedResourceManager;
 
-  private final AnalysisResultFactory analysisResultFactory = AnalysisResultFactory.eINSTANCE;
-  private final AnalysisArtifact analysisArtefact = analysisResultFactory.createAnalysisArtifact();
+  private AnalysisArtifact analysisArtefact = null ;
   
   /** Loop debug  (loopValidIteration must be negative to disable debug) **/
   private static int loopValidIteration = -1;
@@ -241,9 +240,11 @@ public class AadlTargetSpecificGenerator implements Generator
     File runtimeDir = config.getRuntimePath(); 
     ResourceSet resourceSet = currentImplResource.getResourceSet();
     if(_analysisResults == null)
-      
+    {
       _analysisResults = AnalysisUtils.createNewAnalysisArtifact(resourceSet,
                                                                  config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares") ;
+    }
+    analysisArtefact = (AnalysisArtifact) _analysisResults.getContents().get(0); 
     if(monitor.isCanceled())
     {
       String msg = "generation has been canceled after analysis result" ;
@@ -394,7 +395,8 @@ public class AadlTargetSpecificGenerator implements Generator
         Resource resResource = rs.getResource(uri, false);
         if(resResource==null)
           resResource = rs.createResource(uri);
-        resResource.getContents().add(analysisArtefact);
+        if(resResource.getContents().isEmpty())
+          resResource.getContents().add(analysisArtefact);
         resResource.save(null);
       }
       catch(IOException e)
@@ -547,7 +549,22 @@ public class AadlTargetSpecificGenerator implements Generator
         workflowPilot.setAnalysisResult(false) ;
         return;
       }
-      _analysisResults.getContents().add(aa) ;
+      if(_analysisResults.getContents().isEmpty())
+        _analysisResults.getContents().add(aa) ;
+      else
+      {
+        AnalysisArtifact existingAa = 
+            (AnalysisArtifact) _analysisResults.getContents().get(0);
+        AnalysisUtils.updateAnalysisArtifact(existingAa, aa);
+      }
+      try
+      {
+        _analysisResults.save(null);
+      }
+      catch(IOException e)
+      {
+        _LOGGER.error("could not save analysis result resource");
+      }
       QualitativeAnalysisResult result = null ;
       for(int j = aa.getResults().size() - 1 ; j >= 0 ; j--)
       {

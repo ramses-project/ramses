@@ -132,6 +132,9 @@ public class WaitMonitor extends Thread
         else 
         {
           InputStream is ;
+          Process p = _action.getProcess();
+          if(p==null)
+            continue;
           is = _action.getProcess().getInputStream() ;
           BufferedReader in = new BufferedReader(new InputStreamReader(is)) ;
 

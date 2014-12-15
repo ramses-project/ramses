@@ -107,6 +107,8 @@ public class MemoryFootprintAnalysis
      *  if memory size is enough. */
     AnalysisSource source = f.createAnalysisSource();
     source.setMethodName(MemoryFootprintAnalyzer.PLUGIN_NAME);
+    source.setScope(s.getQualifiedName());
+    source.setIterationId(iterationCounter);
     
     QualitativeAnalysisResult r = f.createQualitativeAnalysisResult();
     r.setSource(source);
