@@ -6,8 +6,11 @@ import org.apache.log4j.Logger ;
 import org.eclipse.core.commands.ExecutionEvent ;
 import org.eclipse.core.commands.ExecutionException ;
 import org.eclipse.core.resources.IFile ;
+import org.eclipse.core.resources.IResource ;
+import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.IProgressMonitor ;
+import org.eclipse.core.runtime.NullProgressMonitor ;
 import org.eclipse.core.runtime.OperationCanceledException ;
 import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.resource.Resource ;
@@ -106,19 +109,19 @@ public abstract class AnalysisActionHandler extends RamsesActionHandler
     
     String resultFilePath = _config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares";
     File resultFile = new File(resultFilePath);
-    String projectPathString = _currentProject.getLocation().toOSString();
-    projectPathString = projectPathString.substring(0, projectPathString.lastIndexOf('/'));
-    if(resultFilePath.contains(projectPathString))
-      resultFilePath = resultFilePath.substring(projectPathString.length()+1,resultFilePath.length());
+//    String projectPathString = _currentProject.getLocation().toOSString();
+//    projectPathString = projectPathString.substring(0, projectPathString.lastIndexOf('/'));
+//    if(resultFilePath.contains(projectPathString))
+//      resultFilePath = resultFilePath.substring(projectPathString.length()+1,resultFilePath.length());
     URI resultFileURI =
-        URI.createPlatformResourceURI(resultFilePath, true);
+        URI.createFileURI(resultFilePath);
     
-    Resource r = _sysInst.eResource()
+    Resource r = _sysInst.getComponentImplementation().eResource()
         .getResourceSet()
         .getResource(resultFileURI, 
                      resultFile.exists());
     if(r==null)
-      r =  _sysInst.eResource()
+      r =  _sysInst.getComponentImplementation().eResource()
           .getResourceSet().createResource(resultFileURI);
     
     AnalysisArtifact aa = analysis(_sysInst, monitor);

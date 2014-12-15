@@ -60,6 +60,7 @@ import org.osate.xtext.aadl2.properties.linking.PropertiesLinkingService ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResult ;
 import fr.tpt.aadl.ramses.analysis.AnalysisResultFactory ;
 import fr.tpt.aadl.ramses.analysis.QualitativeAnalysisResult ;
+import fr.tpt.aadl.ramses.analysis.util.AnalysisParser ;
 import fr.tpt.aadl.ramses.analysis.util.AnalysisUtils ;
 import fr.tpt.aadl.ramses.control.atl.AadlModelValidator ;
 import fr.tpt.aadl.ramses.control.atl.AadlToTargetSpecificAadl ;
@@ -241,8 +242,8 @@ public class AadlTargetSpecificGenerator implements Generator
     ResourceSet resourceSet = currentImplResource.getResourceSet();
     if(_analysisResults == null)
     {
-      _analysisResults = AnalysisUtils.createNewAnalysisArtifact(resourceSet,
-                                                                 config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares") ;
+      _analysisResults = AnalysisParser.parse(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares",
+                                              resourceSet).eResource() ;
     }
     analysisArtefact = (AnalysisArtifact) _analysisResults.getContents().get(0); 
     if(monitor.isCanceled())
@@ -390,14 +391,15 @@ public class AadlTargetSpecificGenerator implements Generator
       // save analysis results
       try
       {
-        URI uri = URI.createFileURI(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares");
-        ResourceSet rs = currentImplResource.getResourceSet();
-        Resource resResource = rs.getResource(uri, false);
-        if(resResource==null)
-          resResource = rs.createResource(uri);
-        if(resResource.getContents().isEmpty())
-          resResource.getContents().add(analysisArtefact);
-        resResource.save(null);
+//        File analysisResultFile = new File(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares");
+//        URI uri = URI.createFileURI(analysisResultFile.getAbsolutePath());
+//        ResourceSet rs = currentImplResource.getResourceSet();
+//        Resource resResource = rs.getResource(uri, analysisResultFile.exists());
+//        if(resResource==null)
+//          resResource = rs.createResource(uri);
+//        if(resResource.getContents().isEmpty())
+//          resResource.getContents().add(analysisArtefact);
+        _analysisResults.save(null);
       }
       catch(IOException e)
       {
@@ -556,6 +558,7 @@ public class AadlTargetSpecificGenerator implements Generator
         AnalysisArtifact existingAa = 
             (AnalysisArtifact) _analysisResults.getContents().get(0);
         AnalysisUtils.updateAnalysisArtifact(existingAa, aa);
+        aa = existingAa;
       }
       try
       {

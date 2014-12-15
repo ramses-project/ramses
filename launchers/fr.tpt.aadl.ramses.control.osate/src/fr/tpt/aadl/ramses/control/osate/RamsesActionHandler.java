@@ -6,6 +6,8 @@ import org.eclipse.core.commands.ExecutionEvent ;
 import org.eclipse.core.resources.IFile ;
 import org.eclipse.core.resources.IProject ;
 import org.eclipse.core.resources.IResource ;
+import org.eclipse.core.resources.ResourcesPlugin ;
+import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.core.runtime.IStatus ;
 import org.eclipse.core.runtime.NullProgressMonitor ;
@@ -312,5 +314,15 @@ public abstract class RamsesActionHandler extends AbstractHandler {
 	    
 	    job.setUser(true);
 	    job.schedule();
+	    
+	    try
+	    {
+	      ResourcesPlugin.getWorkspace().getRoot().
+	      refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+	    }
+	    catch(CoreException e)
+	    {
+	      _LOGGER.error("Error when refreshing project", e);
+	    }
 	  }
 }

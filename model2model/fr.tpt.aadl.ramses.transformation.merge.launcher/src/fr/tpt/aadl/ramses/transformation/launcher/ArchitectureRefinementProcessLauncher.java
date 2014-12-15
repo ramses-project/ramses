@@ -303,7 +303,7 @@ public class ArchitectureRefinementProcessLauncher {
 
     TipUtils.addIteration(TipUtils.getTipSpecification(),
                           resourceSet,
-                          getTipId());	
+                          getOutputPathSave()+"/"+getTipId());	
 
     /**
      * First step: produces the pattern matching information

@@ -21,6 +21,7 @@
 
 package fr.tpt.aadl.ramses.analysis.util;
 
+import java.io.File ;
 import java.util.List ;
 
 import org.apache.log4j.Logger ;
@@ -45,22 +46,21 @@ public class AnalysisParser {
 	                                     ResourceSet rs){
 		
 		final Resource resource;
-		
+		File analysisFile = new File(analysisPath);
 		URI p_uri = URI.createFileURI(analysisPath);
 		
 		rs.getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
 		rs.getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
 		
-		if (rs.getURIConverter().exists(p_uri, null))
+		resource = rs.getResource(p_uri, analysisFile.exists());
+		if (resource!=null)
 		{
-			resource = rs.getResource(p_uri, true);			
 			return (AnalysisArtifact) resource.getContents().get(0);	
 		}
 		else
 		{
 			String msg = "analysisArtifact of specified path \'"+analysisPath+"\' does not exit" ;
 		  _LOGGER.error(msg) ;
-		  ServiceProvider.SYS_ERR_REP.error(msg, true);
 		}
 		
 		return null;

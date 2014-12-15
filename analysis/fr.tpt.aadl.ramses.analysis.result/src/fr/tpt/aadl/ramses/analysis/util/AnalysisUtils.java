@@ -50,33 +50,6 @@ public class AnalysisUtils {
 	private static Resource resource;
 	private static Logger _LOGGER = Logger.getLogger(AnalysisUtils.class) ;
 	
-	/**
-	 * Creates a new Analysis artifact of a specified path 
-	 *
-	 * @param analysisPath   	String representing the artifact path
-	 * @return 
-	 */
-	public static Resource createNewAnalysisArtifact(ResourceSet resourceSet,
-	                                                 String analysisPath){
-		
-		AnalysisArtifact analysisSpec = AnalysisResultFactory.eINSTANCE.createAnalysisArtifact(); 
-		URI analysis_uri = URI.createFileURI(analysisPath);
-
-		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put(AnalysisResultPackage.eNS_PREFIX, new XMIResourceFactoryImpl());
-		resourceSet.getPackageRegistry().put(AnalysisResultPackage.eNS_URI, AnalysisResultPackage.eINSTANCE);
-
-		if (!resourceSet.getURIConverter().exists(analysis_uri, null)){
-			resource = resourceSet.createResource(analysis_uri);
-			resource.getContents().add(analysisSpec);
-			return resource;
-		} else
-		{
-		 	    
-	    return resourceSet
-	        .getResource(resourceSet.getURIConverter().normalize(analysis_uri), 
-	                     true);
-		}
-	}
 
 	/**
 	 * Saves the given specification at the resource location 
