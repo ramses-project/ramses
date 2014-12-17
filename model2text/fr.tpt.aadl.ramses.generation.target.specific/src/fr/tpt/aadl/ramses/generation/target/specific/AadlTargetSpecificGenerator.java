@@ -387,7 +387,7 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       
       xmlPilot.goForward() ;
-      if(analysisArtefact!=null && !analysis_results.isEmpty() )
+      if(analysisArtefact!=null)
         analysisArtefact.getResults().addAll(analysis_results);
     }
     
