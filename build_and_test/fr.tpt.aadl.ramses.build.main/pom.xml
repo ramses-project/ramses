@@ -41,7 +41,11 @@
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.edit</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.editor</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.xtext</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.trc.xtext.ui</module>
     <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection.mcda</module>
+    <module>../../model2model/fr.tpt.aadl.ramses.transformation.selection.genetic</module>
     <module>../../model2model/fr.tpt.aadl.ramses.communication.periodic.delayed</module>
     <module>../../model2model/fr.tpt.aadl.ramses.util.math</module>
     <module>../../model2model/fr.tpt.atl.hots</module>
