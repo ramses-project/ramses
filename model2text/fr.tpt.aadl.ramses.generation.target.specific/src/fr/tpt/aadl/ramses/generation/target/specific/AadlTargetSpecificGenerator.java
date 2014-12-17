@@ -242,10 +242,14 @@ public class AadlTargetSpecificGenerator implements Generator
     ResourceSet resourceSet = currentImplResource.getResourceSet();
     if(_analysisResults == null)
     {
-      _analysisResults = AnalysisParser.parse(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares",
+      analysisArtefact  = AnalysisParser.parse(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares",
+                                               resourceSet);
+      if(analysisArtefact!=null)
+        _analysisResults = AnalysisParser.parse(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares",
                                               resourceSet).eResource() ;
     }
-    analysisArtefact = (AnalysisArtifact) _analysisResults.getContents().get(0); 
+    if(_analysisResults!=null)
+      analysisArtefact = (AnalysisArtifact) _analysisResults.getContents().get(0); 
     if(monitor.isCanceled())
     {
       String msg = "generation has been canceled after analysis result" ;
@@ -383,7 +387,8 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       
       xmlPilot.goForward() ;
-      analysisArtefact.getResults().addAll(analysis_results);
+      if(analysisArtefact!=null && !analysis_results.isEmpty() )
+        analysisArtefact.getResults().addAll(analysis_results);
     }
     
     if(false==analysisArtefact.getResults().isEmpty())
