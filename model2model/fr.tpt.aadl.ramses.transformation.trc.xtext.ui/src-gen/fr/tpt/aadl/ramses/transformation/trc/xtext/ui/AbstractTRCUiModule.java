@@ -79,34 +79,34 @@ public abstract class AbstractTRCUiModule extends DefaultUiModule {
 	}
 
 	// contributed by org.eclipse.xtext.ui.generator.labeling.LabelProviderFragment
-	public Class<? extends org.eclipse.jface.viewers.ILabelProvider> bindILabelProvider() {
-		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.labeling.TRCLabelProvider.class;
-	}
+//	public Class<? extends org.eclipse.jface.viewers.ILabelProvider> bindILabelProvider() {
+//		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.labeling.TRCLabelProvider.class;
+//	}
 
 	// contributed by org.eclipse.xtext.ui.generator.labeling.LabelProviderFragment
-	public void configureResourceUIServiceLabelProvider(com.google.inject.Binder binder) {
-		binder.bind(org.eclipse.jface.viewers.ILabelProvider.class).annotatedWith(org.eclipse.xtext.ui.resource.ResourceServiceDescriptionLabelProvider.class).to(fr.tpt.aadl.ramses.transformation.trc.xtext.ui.labeling.TRCDescriptionLabelProvider.class);
-	}
+//	public void configureResourceUIServiceLabelProvider(com.google.inject.Binder binder) {
+//		binder.bind(org.eclipse.jface.viewers.ILabelProvider.class).annotatedWith(org.eclipse.xtext.ui.resource.ResourceServiceDescriptionLabelProvider.class).to(fr.tpt.aadl.ramses.transformation.trc.xtext.ui.labeling.TRCDescriptionLabelProvider.class);
+//	}
 
 	// contributed by org.eclipse.xtext.ui.generator.outline.OutlineTreeProviderFragment
-	public Class<? extends org.eclipse.xtext.ui.editor.outline.IOutlineTreeProvider> bindIOutlineTreeProvider() {
-		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.outline.TRCOutlineTreeProvider.class;
-	}
+//	public Class<? extends org.eclipse.xtext.ui.editor.outline.IOutlineTreeProvider> bindIOutlineTreeProvider() {
+//		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.outline.TRCOutlineTreeProvider.class;
+//	}
 
 	// contributed by org.eclipse.xtext.ui.generator.outline.OutlineTreeProviderFragment
-	public Class<? extends org.eclipse.xtext.ui.editor.outline.impl.IOutlineTreeStructureProvider> bindIOutlineTreeStructureProvider() {
-		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.outline.TRCOutlineTreeProvider.class;
-	}
+//	public Class<? extends org.eclipse.xtext.ui.editor.outline.impl.IOutlineTreeStructureProvider> bindIOutlineTreeStructureProvider() {
+//		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.outline.TRCOutlineTreeProvider.class;
+//	}
 
 	// contributed by org.eclipse.xtext.ui.generator.quickfix.QuickfixProviderFragment
-	public Class<? extends org.eclipse.xtext.ui.editor.quickfix.IssueResolutionProvider> bindIssueResolutionProvider() {
-		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.quickfix.TRCQuickfixProvider.class;
-	}
+//	public Class<? extends org.eclipse.xtext.ui.editor.quickfix.IssueResolutionProvider> bindIssueResolutionProvider() {
+//		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.quickfix.TRCQuickfixProvider.class;
+//	}
 
 	// contributed by org.eclipse.xtext.ui.generator.contentAssist.ContentAssistFragment
-	public Class<? extends org.eclipse.xtext.ui.editor.contentassist.IContentProposalProvider> bindIContentProposalProvider() {
-		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.contentassist.TRCProposalProvider.class;
-	}
+//	public Class<? extends org.eclipse.xtext.ui.editor.contentassist.IContentProposalProvider> bindIContentProposalProvider() {
+//		return fr.tpt.aadl.ramses.transformation.trc.xtext.ui.contentassist.TRCProposalProvider.class;
+//	}
 
 	// contributed by org.eclipse.xtext.generator.parser.antlr.XtextAntlrUiGeneratorFragment
 	public Class<? extends org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext.Factory> bindContentAssistContext$Factory() {
