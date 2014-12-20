@@ -189,6 +189,15 @@ rule m_PropertyExpressionHolder
 		target_propertyElementHolder: AADLBA!PropertyExpressionHolder
 }
 
+-- @extends m_PropertyElementHolder
+rule m_PropertyAssociationHolder
+{
+	from
+		src_propertyElementHolder: AADLBA!PropertyAssociationHolder
+	to
+		target_propertyElementHolder: AADLBA!PropertyAssociationHolder
+}
+
 rule m_ValueExpression
 {
 	from

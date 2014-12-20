@@ -446,6 +446,10 @@ helper context AADLBA!ElementHolder def: resolve(c: AADLI!ComponentInstance): AA
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_Holder')
 ;
 
+helper context AADLBA!PropertyElementHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyElementHolder')
+;
+
 lazy rule getValueComponentReference
 {
 	from
@@ -486,7 +490,7 @@ helper context AADLBA!PortHolder def: resolve(c: AADLI!ComponentInstance): AADLB
 ;
 
 helper context AADLBA!ClassifierPropertyReference def: resolve(c: AADLI!ComponentInstance): AADLBA!ClassifierPropertyReference =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_classifierPropertyReference')
+	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyReference')
 ;
 
 helper context AADLBA!PropertySetPropertyReference def: resolve(c: AADLI!ComponentInstance): AADLBA!PropertySetPropertyReference =
@@ -503,10 +507,6 @@ helper context AADLBA!UpperBound def: resolve(c: AADLI!ComponentInstance): AADLB
 
 helper context AADLBA!LowerBound def: resolve(c: AADLI!ComponentInstance): AADLBA!LowerBound =
 	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_lowerBound')
-;
-
-helper context AADLBA!PropertyExpressionHolder def: resolve(c: AADLI!ComponentInstance): AADLBA!PropertyExpressionHolder =
-	thisModule.resolveMatchedTupleIfExists(Sequence{self,c}, 'target_propertyExpressionHolder')
 ;
 
 helper context AADLBA!PortFreshValue def: resolve(c: AADLI!ComponentInstance): AADLBA!ElementHolder =
@@ -1113,6 +1113,16 @@ abstract rule m_PropertyElementHolder
 }
 
 -- @extends m_PropertyElementHolder
+rule m_EnumLiteralHolder
+{
+	from
+		src_propertyElementHolder: AADLBA!EnumLiteralHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_propertyElementHolder: AADLBA!EnumLiteralHolder
+}
+
+-- @extends m_PropertyElementHolder
 rule m_PropertyExpressionHolder
 {
 	from
@@ -1120,6 +1130,16 @@ rule m_PropertyExpressionHolder
 		c: AADLI!ComponentInstance
 	to
 		target_propertyElementHolder: AADLBA!PropertyExpressionHolder
+}
+
+-- @extends m_PropertyElementHolder
+rule m_PropertyAssociationHolder
+{
+	from
+		src_propertyElementHolder: AADLBA!PropertyAssociationHolder,
+		c: AADLI!ComponentInstance
+	to
+		target_propertyElementHolder: AADLBA!PropertyAssociationHolder
 }
 
 rule m_UpperBound
