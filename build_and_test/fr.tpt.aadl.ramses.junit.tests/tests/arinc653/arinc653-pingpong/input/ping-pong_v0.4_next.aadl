@@ -123,6 +123,7 @@ end SEQ;
       VP_S1_inst: virtual processor VP_S1.impl{Period => 1000 Ms;};
       VP_S2_inst: virtual processor VP_S2.impl{Period => 1000 Ms;};
     properties
+      Scheduling_Protocol => (arinc653);
       ARINC653::Module_Major_Frame => 2000 ms;
       ARINC653::Module_Schedule => (
        	[Partition => reference(VP_S1_inst); Duration => 1000ms; Periodic_Processing_Start => true;],
