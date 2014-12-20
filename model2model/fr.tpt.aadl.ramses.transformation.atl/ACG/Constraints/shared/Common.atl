@@ -71,5 +71,5 @@ helper context AADLI!NamedElement def : hasPropertyAssigned(p: AADLI!Property): 
 helper context AADLBA!Classifier def: hasHeaderInSourceCode(): Boolean =
 	self.hasProperty('Source_Text')
 	and
-	self.getPropertyAssociation('Source_Text').ownedListElements->exists(e|e.value.endsWith('.h'))
+	self.getPropertyAssociation('Source_Text').ownedListElement->exists(e|e.value.endsWith('.h'))
 ;
