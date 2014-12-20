@@ -240,15 +240,21 @@ public class AadlTargetSpecificGenerator implements Generator
     File outputDir = config.getRamsesOutputDir();
     File runtimeDir = config.getRuntimePath(); 
     ResourceSet resourceSet = currentImplResource.getResourceSet();
+    String resultPathName = config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares";
     if(_analysisResults == null)
     {
-      analysisArtefact  = AnalysisParser.parse(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares",
+      analysisArtefact  = AnalysisParser.parse(resultPathName,
                                                resourceSet);
       if(analysisArtefact!=null)
-        _analysisResults = AnalysisParser.parse(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares",
-                                              resourceSet).eResource() ;
+        _analysisResults = analysisArtefact.eResource() ;
+      else
+      {
+    	URI uri = URI.createFileURI(resultPathName);
+    	_analysisResults = resourceSet.createResource(uri);
+      }
+      
     }
-    if(_analysisResults!=null)
+    if(false==_analysisResults.getContents().isEmpty())
       analysisArtefact = (AnalysisArtifact) _analysisResults.getContents().get(0); 
     if(monitor.isCanceled())
     {
@@ -391,7 +397,8 @@ public class AadlTargetSpecificGenerator implements Generator
         analysisArtefact.getResults().addAll(analysis_results);
     }
     
-    if(false==analysisArtefact.getResults().isEmpty())
+    if(analysisArtefact!=null
+    		&& false==analysisArtefact.getResults().isEmpty())
     {
       // save analysis results
       try
@@ -824,18 +831,24 @@ public class AadlTargetSpecificGenerator implements Generator
     else if (a instanceof AbstractLoop.Conjunction)
     {
       AbstractLoop.Conjunction c = (AbstractLoop.Conjunction) a;
+      boolean conjunctionResult = true;
       for(AbstractLoop.AbstractAnalysis aa : c.getSequence())
       { 
-         if (! doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix,iterationCounter))
+    	boolean res = 
+    			doLoopAnalysis(aa,errManager,xmlPilot,config,monitor,inputId,suffix,iterationCounter);
+         if (! res )
          {
-           String realInputId = inputId+suffix;
-           Resource inputResource = modelsMap.get(realInputId) ;
-           inputResource.unload();
-           modelsMap.remove(realInputId);
-           return false;
+           conjunctionResult = false;
          }
       }
-      return true;
+      if(!conjunctionResult)
+      {
+    	String realInputId = inputId+suffix;
+    	Resource inputResource = modelsMap.get(realInputId) ;
+    	inputResource.unload();
+    	modelsMap.remove(realInputId);
+      }
+      return conjunctionResult;
     }
     else if (a instanceof AbstractLoop.Disjunction)
     {

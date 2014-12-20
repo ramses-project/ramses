@@ -120,6 +120,17 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 
     List<Transformation> list = loop.getTransformations();
     Resource r = list.get(0).eResource();
+    
+    if(r==null)
+    {
+      String message = "Transformation alternatives "
+      		+ "could not be loaded. Please check the URI provided "
+      		+ "in the properties file, as well as the URI in the "
+      		+ "workflow file. Then RESTART RAMSES.";
+      _LOGGER.error(message);
+      ServiceProvider.SYS_ERR_REP.error(message, false);
+    }
+    
     EcoreUtil2.resolveAll(r, CancelIndicator.NullImpl);
     trc = (TrcSpecification) r.getContents().get(0);
 

@@ -25,7 +25,7 @@ public class TrcParser {
 		
 		URI p_uri = URI.createURI(trcPath);
 		
-		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("trc", new XMIResourceFactoryImpl());
+//		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("trc", new XMIResourceFactoryImpl());
 		resourceSet.getPackageRegistry().put(TrcPackage.eNS_URI, TrcPackage.eINSTANCE);
 		
 		if (resourceSet.getURIConverter().exists(p_uri, null)) {
