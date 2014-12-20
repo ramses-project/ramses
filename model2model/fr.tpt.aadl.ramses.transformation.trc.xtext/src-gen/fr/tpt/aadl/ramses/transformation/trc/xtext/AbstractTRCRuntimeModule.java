@@ -90,14 +90,14 @@ public abstract class AbstractTRCRuntimeModule extends DefaultRuntimeModule {
 	}
 
 	// contributed by org.eclipse.xtext.generator.validation.ValidatorFragment
-//	@org.eclipse.xtext.service.SingletonBinding(eager=true)	public Class<? extends fr.tpt.aadl.ramses.transformation.trc.xtext.validation.TRCValidator> bindTRCValidator() {
-//		return fr.tpt.aadl.ramses.transformation.trc.xtext.validation.TRCValidator.class;
-//	}
+	@org.eclipse.xtext.service.SingletonBinding(eager=true)	public Class<? extends fr.tpt.aadl.ramses.transformation.trc.xtext.validation.TRCValidator> bindTRCValidator() {
+		return fr.tpt.aadl.ramses.transformation.trc.xtext.validation.TRCValidator.class;
+	}
 
 	// contributed by org.eclipse.xtext.generator.scoping.AbstractScopingFragment
-//	public Class<? extends org.eclipse.xtext.scoping.IScopeProvider> bindIScopeProvider() {
-//		return fr.tpt.aadl.ramses.transformation.trc.xtext.scoping.TRCScopeProvider.class;
-//	}
+	public Class<? extends org.eclipse.xtext.scoping.IScopeProvider> bindIScopeProvider() {
+		return fr.tpt.aadl.ramses.transformation.trc.xtext.scoping.TRCScopeProvider.class;
+	}
 
 	// contributed by org.eclipse.xtext.generator.scoping.AbstractScopingFragment
 	public void configureIScopeProviderDelegate(com.google.inject.Binder binder) {
@@ -135,14 +135,14 @@ public abstract class AbstractTRCRuntimeModule extends DefaultRuntimeModule {
 	}
 
 	// contributed by org.eclipse.xtext.generator.generator.GeneratorFragment
-//	public Class<? extends org.eclipse.xtext.generator.IGenerator> bindIGenerator() {
-//		return fr.tpt.aadl.ramses.transformation.trc.xtext.generator.TRCGenerator.class;
-//	}
+	public Class<? extends org.eclipse.xtext.generator.IGenerator> bindIGenerator() {
+		return fr.tpt.aadl.ramses.transformation.trc.xtext.generator.TRCGenerator.class;
+	}
 
 	// contributed by org.eclipse.xtext.generator.formatting.FormatterFragment
-//	public Class<? extends org.eclipse.xtext.formatting.IFormatter> bindIFormatter() {
-//		return fr.tpt.aadl.ramses.transformation.trc.xtext.formatting.TRCFormatter.class;
-//	}
+	public Class<? extends org.eclipse.xtext.formatting.IFormatter> bindIFormatter() {
+		return fr.tpt.aadl.ramses.transformation.trc.xtext.formatting.TRCFormatter.class;
+	}
 
 	// contributed by org.eclipse.xtext.generator.types.TypesGeneratorFragment
 	public java.lang.ClassLoader bindClassLoaderToInstance() {
