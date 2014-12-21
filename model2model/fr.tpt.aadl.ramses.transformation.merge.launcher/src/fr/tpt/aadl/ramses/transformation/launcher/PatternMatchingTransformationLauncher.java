@@ -70,7 +70,9 @@ public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher 
 		.put("pml", new XMIResourceFactoryImpl()) ;
 		
 		String patternMatchingPath = outputDirPathName+inputResource.getURI().lastSegment();
-		patternMatchingPath = patternMatchingPath.substring(0, patternMatchingPath.lastIndexOf("."))+".pml";
+		patternMatchingPath = patternMatchingPath.
+		    substring(0, patternMatchingPath.lastIndexOf("."))+
+		    resourceSuffix+".pml";
 		URI uri = URI.createFileURI(patternMatchingPath);
 		Resource outputResource = resourceSet.getResource(uri, false);
 		if(outputResource==null)

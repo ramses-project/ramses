@@ -341,6 +341,7 @@ public class AadlTargetSpecificGenerator implements Generator
       }
       else if(operation.equals("generation"))
       {
+    	monitor.subTask("Code generation from input model: "+xmlPilot.getInputModelId());
         Resource inputResource = modelsMap.get(xmlPilot.getInputModelId());
         if(inputResource!=null)
           r = inputResource;
@@ -403,14 +404,6 @@ public class AadlTargetSpecificGenerator implements Generator
       // save analysis results
       try
       {
-//        File analysisResultFile = new File(config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares");
-//        URI uri = URI.createFileURI(analysisResultFile.getAbsolutePath());
-//        ResourceSet rs = currentImplResource.getResourceSet();
-//        Resource resResource = rs.getResource(uri, analysisResultFile.exists());
-//        if(resResource==null)
-//          resResource = rs.createResource(uri);
-//        if(resResource.getContents().isEmpty())
-//          resResource.getContents().add(analysisArtefact);
         _analysisResults.save(null);
       }
       catch(IOException e)
@@ -470,6 +463,8 @@ public class AadlTargetSpecificGenerator implements Generator
     Resource inputResource = modelsMap.get(analysisModelInputIdentifier) ;
     SystemInstance currentInstance ;
     PropertiesLinkingService pls = new PropertiesLinkingService() ;
+    if(inputResource==null)
+      return;
     if(inputResource.getContents().get(0) instanceof AadlPackage)
     {
       SystemImplementation si =
@@ -670,6 +665,7 @@ public class AadlTargetSpecificGenerator implements Generator
   {
     if(l.getMethod().equals(ResolutionMethod.TRY_EACH))
     {
+      monitor.subTask("Transformation alternatives loop: "+ResolutionMethod.TRY_EACH);
       doLoopTryEach(l, errManager,
                     workflowPilot, config,
                     monitor);
@@ -714,6 +710,7 @@ public class AadlTargetSpecificGenerator implements Generator
                   foundLoopManagementPlugin = true;
                   modelsMap.putAll(gen.processLoop());
                   workflowPilot.setLoopModelIdSuffix(gen.getModelIdSuffix());
+                  monitor.subTask("Transformation alternatives loop: "+resolutionMethodName);
                   boolean loopAnalysis = isValidLoopIteration(l.getAnalysis(), 
                                                               errManager, 
                                                               workflowPilot, 
@@ -845,7 +842,8 @@ public class AadlTargetSpecificGenerator implements Generator
       {
     	String realInputId = inputId+suffix;
     	Resource inputResource = modelsMap.get(realInputId) ;
-    	inputResource.unload();
+    	if(inputResource!=null)
+    	  inputResource.unload();
     	modelsMap.remove(realInputId);
       }
       return conjunctionResult;

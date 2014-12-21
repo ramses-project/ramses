@@ -275,6 +275,9 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       @Override
       public boolean isCanceled()
       {
+    	String msg = "Transformation selection "
+    			+ "cancelled" ;
+    	_LOGGER.error(msg);
         return monitor.isCanceled() ;
       }
 
@@ -322,10 +325,10 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       if(ratList == null)
       {
         String msg = "Transformation rules selection" +
-            " failed" ;
+            " failed (cancelled?)" ;
         _LOGGER.error(msg);
         trc.cleanup();
-        ServiceProvider.SYS_ERR_REP.error(msg, false);
+        return;
       }
       for(RuleApplicationTuple rat:ratList)
       {

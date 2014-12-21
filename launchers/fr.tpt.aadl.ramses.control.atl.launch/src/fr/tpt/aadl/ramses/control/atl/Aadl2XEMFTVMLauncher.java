@@ -231,31 +231,31 @@ public abstract class Aadl2XEMFTVMLauncher extends AtlTransfoLauncher
 	}
 
 	public Resource doTransformation(List<File> transformationFileList,
-	                                 Resource inputResource,
-			                             String outputDirPathName,
-			                             String resourceSuffix,
-			                             IProgressMonitor monitor)
+	                                  Resource inputResource,
+	                                  String outputDirPathName,
+	                                  String resourceSuffix,
+	                                  IProgressMonitor monitor)
 	{
 		
 		if(env == null)
 		  env = EmftvmFactory.eINSTANCE.createExecEnv();
 		
 		// Load metamodels
-		  // Load aadl instance metamodel 
-		  Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		  aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
-		  env.registerMetaModel("AADLI", aadlInstanceMetaModel);
+		// Load aadl instance metamodel 
+		Metamodel aadlInstanceMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		aadlInstanceMetaModel.setResource(InstancePackage.eINSTANCE.eResource());
+		env.registerMetaModel("AADLI", aadlInstanceMetaModel);
 
-		  // Load aadl+BA metamodel
-		  Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		  aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
-		  env.registerMetaModel("AADLBA", aadlBaMetaModel);
+		// Load aadl+BA metamodel
+		Metamodel aadlBaMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		aadlBaMetaModel.setResource(AadlBaPackage.eINSTANCE.eResource());
+		env.registerMetaModel("AADLBA", aadlBaMetaModel);
 
-		  // Load atlHooks metamodel
-		  Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
-		  atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
-		  env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
-		  
+		// Load atlHooks metamodel
+		Metamodel atlHoolsMetaModel = EmftvmFactory.eINSTANCE.createMetamodel();
+		atlHoolsMetaModel.setResource(AtlHooksPackage.eINSTANCE.eResource());
+		env.registerMetaModel("ATLHOOKS", atlHoolsMetaModel);
+
 		
 		initTransformationInputs(inputResource);
 		

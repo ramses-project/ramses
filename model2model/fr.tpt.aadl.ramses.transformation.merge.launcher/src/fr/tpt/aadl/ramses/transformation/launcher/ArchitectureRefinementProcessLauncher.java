@@ -20,7 +20,9 @@ import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.resource.Resource ;
 import org.eclipse.emf.ecore.resource.ResourceSet ;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl ;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl ;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl ;
 import org.eclipse.m2m.atl.core.ATLCoreException ;
 import org.eclipse.m2m.atl.engine.compiler.CompileTimeError ;
 import org.osate.aadl2.instance.SystemInstance ;
@@ -37,7 +39,9 @@ import fr.tpt.aadl.ramses.control.support.instantiation.ParseException ;
 import fr.tpt.aadl.ramses.control.support.instantiation.PredefinedAadlModelManager ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceProvider ;
 import fr.tpt.aadl.ramses.control.support.services.ServiceRegistry ;
+import fr.tpt.aadl.ramses.control.support.utils.Command ;
 import fr.tpt.aadl.ramses.control.support.utils.TrcUtils ;
+import fr.tpt.aadl.ramses.control.support.utils.WaitMonitor ;
 import fr.tpt.aadl.ramses.control.workflow.EcoreWorkflowPilot ;
 import fr.tpt.aadl.ramses.control.workflow.ModelIdentifier ;
 import fr.tpt.aadl.ramses.control.workflow.WorkflowFactory ;
@@ -72,16 +76,20 @@ public class ArchitectureRefinementProcessLauncher {
    * The property file. Stores trc and tip locations.
    */
   private Properties properties;
-  private ResourceSet resourceSet;
+  ResourceSet resourceSet;
   private ITransformationSelection transformationSelection;
   private RamsesConfiguration config;
   private AadlModelInstantiatior modelInstantiator;
   private PredefinedAadlModelManager predefinedResourcesManager;
   private List<Transformation> transformations;
-  private TrcSpecification trcSpec;
+  TrcSpecification trcSpec;
 
   
   private final File outputPathSave ;
+
+  public int cpt ;
+
+  public int size ;
   
   public File getOutputPathSave()
   {
@@ -317,34 +325,111 @@ public class ArchitectureRefinementProcessLauncher {
     
     _LOGGER.trace("Start identification step (trace all pattern matching)");
     
+    // do identification transformations in threads
+    size = transfoList.size();
+    final PatternMatchingTransformationThread[] rulesSelectionThreads 
+              = new PatternMatchingTransformationThread[size] ;
+    int threadsIter = 0;
+    final ArchitectureRefinementProcessLauncher app = this ;
     for(Transformation transfo : transfoList)
     {
-      PatternMatchingTransformationLauncher pmtl = new PatternMatchingTransformationLauncher(this.modelInstantiator,
-                                                                                             this.predefinedResourcesManager,
-                                                                                             trcSpec);  
-      
-      List<Module> moduleList = transfo.getModules();
-      List<File> emftvmFiles = new ArrayList<File>();
-      for(int i = 0; i<moduleList.size(); i++)
+      rulesSelectionThreads[threadsIter] = 
+          new PatternMatchingTransformationThread(app,
+                                                  transfo,
+                                                  sinst,
+                                                  outputResourceID+"_"+threadsIter);
+      threadsIter++;
+    }
+
+    
+    
+    Command cmd = new Command()
+    {
+      int status = Command.UNSET;
+      @Override
+      public int run() throws Exception
       {
-        String modulePath = moduleList.get(i).getPath();
-        modulePath = modulePath.substring(0, modulePath.length()-4)+"_2pml.emftvm";
-        File f = new File(getPatternMatchingOutputDir()+modulePath);
-        emftvmFiles.add(f);
+        for(Thread t : rulesSelectionThreads)
+        {
+          t.start();
+        }
+
+        // Wait all the thread end.
+        synchronized (app) {
+          app.wait();
+        }
+
+
+        status = Command.OK ;
+        return status ;
       }
 
-      AtlTransfoLauncher.initTransformation();
-      pmtl.setResourceSet(resourceSet);
-      
-      pmtl.doTransformation(emftvmFiles, 
-                            sinst.eResource(),  
-                            getOutputDir(),
-                            outputResourceID, 
-                            monitor);
+      @Override
+      public boolean isCanceled()
+      {
+        String msg = "Transformation selection "
+            + "cancelled" ;
+        _LOGGER.error(msg);
+        return monitor.isCanceled() ;
+      }
+
+      @Override
+      public String getLabel()
+      {
+        return null ;
+      }
+
+      @Override
+      public int getStatus()
+      {
+        return status;
+      }
+
+      @Override
+      public Process getProcess()
+      {
+        // TODO Auto-generated method stub
+        return null ;
+      }
+    } ;
+
+    int exitStatus ;
+    WaitMonitor wm = new WaitMonitor(cmd) ;
+    wm.start();
+
+    try
+    {
+      exitStatus = wm.waitAndCheck(500) ;
+    }
+    catch(Exception e)
+    {
+      killThreads(rulesSelectionThreads) ;
+      String msg = "Transformation rule alternatives " +
+          " identification has been interrupted" ;
+      _LOGGER.fatal(msg, e);
     }
 
 
-
+    Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
+    .put("pml", new XMIResourceFactoryImpl()) ;
+    
+    String patternMatchingPath = getOutputDir()+
+                                  sinst.eResource().getURI().lastSegment();
+    patternMatchingPath = patternMatchingPath.
+        substring(0, patternMatchingPath.lastIndexOf("."))+
+        ".pml";
+    URI uri = URI.createFileURI(patternMatchingPath);
+    Resource outputResource = resourceSet.getResource(uri, false);
+    if(outputResource==null)
+      outputResource = resourceSet.createResource(uri);
+    
+    for(PatternMatchingTransformationThread t : rulesSelectionThreads)
+    {
+      Resource identification = t.getIdentificationResult();
+      outputResource.getContents().addAll(identification.getContents());
+      identification.delete(null);
+    }
+    outputResource.save(null);
     //get the pattern matching results as a Map(elemenId, ArrayList(transformationId))
     Map<List<EObject>, ArrayList<TrcRule>> patternMatchingMap = 
         PatternMatchingUtils.getGroupedCandidateTuplesFromDirectory(trcSpec,
@@ -370,6 +455,9 @@ public class ArchitectureRefinementProcessLauncher {
     long startTimeSelection = System.nanoTime();
 
     this.transformationSelection.selectTransformation(patternMatchingMap, tuplesToApply);
+    
+    if(tuplesToApply.isEmpty())
+      return null;
     
     // store the result of the selection: generate TIP
     String tipPath = outputPathSave+"/"+getTipId();
@@ -572,4 +660,95 @@ public class ArchitectureRefinementProcessLauncher {
     return options;
   }
 
+  private void killThreads(Thread[] aadlInspectorThreads)
+  {
+    for(Thread t : aadlInspectorThreads)
+      t.interrupt();
+  }
+  
+  static class PatternMatchingTransformationThread extends Thread
+  {
+    private Transformation transfo;
+    private String patternMatchingOutputDir;
+    private ArchitectureRefinementProcessLauncher initiator;
+    private SystemInstance sinst;
+    private String outputResourceID;
+    
+    private Resource result;
+    
+    public PatternMatchingTransformationThread(ArchitectureRefinementProcessLauncher initiator, 
+                                               Transformation transfo,
+                                               SystemInstance sinst,
+                                               String outputResourceID)
+    {
+      this.initiator = initiator;
+      this.transfo = transfo;
+      this.sinst = sinst;
+      patternMatchingOutputDir = initiator.getPatternMatchingOutputDir();
+      this.outputResourceID = outputResourceID;
+    }
+
+    @Override
+    public void run()
+    {
+      PatternMatchingTransformationLauncher pmtl = new PatternMatchingTransformationLauncher(initiator.modelInstantiator,
+                                                                                             initiator.predefinedResourcesManager,
+                                                                                             initiator.trcSpec);  
+      
+      List<Module> moduleList = transfo.getModules();
+      List<File> emftvmFiles = new ArrayList<File>();
+      for(int i = 0; i<moduleList.size(); i++)
+      {
+        String modulePath = moduleList.get(i).getPath();
+        modulePath = modulePath.substring(0, modulePath.length()-4)+"_2pml.emftvm";
+        File f = new File(patternMatchingOutputDir+modulePath);
+        emftvmFiles.add(f);
+      }
+
+      AtlTransfoLauncher.initTransformation();
+      
+      ResourceSet intermediateRs = new ResourceSetImpl();
+      ResourceSet existingRs = sinst.eResource().getResourceSet();
+      
+      synchronized(sinst)
+      {
+        intermediateRs.getResources().addAll(existingRs.getResources());
+        pmtl.setResourceSet(intermediateRs);
+      }
+      
+      result = pmtl.doTransformation(emftvmFiles, 
+                                     sinst.eResource(),  
+                                     initiator.getOutputDir(),
+                                     outputResourceID, 
+                                     initiator.monitor);
+      
+      synchronized(sinst)
+      {
+        initiator.cpt++ ;
+        String message =
+                         initiator.cpt +
+                             " execution(s) of transformation selection" +
+                             " done." ;
+        _LOGGER.trace(message) ;
+        evaluateIfFinished(intermediateRs, existingRs) ;
+      }
+    }
+    
+    void evaluateIfFinished(ResourceSet intermediateRs, ResourceSet existingRs)
+    {
+      if(initiator.cpt==initiator.size)
+      {
+        existingRs.getResources().addAll(intermediateRs.getResources());
+        synchronized (initiator) {
+          initiator.notify();
+          initiator.cpt=0;
+        }
+      }
+    }
+    
+    public Resource getIdentificationResult()
+    {
+      return result;
+    }
+  }
 }
