@@ -96,7 +96,7 @@ helper def : collectPeriodicDelayed_LocalVariables_Mutex(c: AADLI!ComponentInsta
 	->union(thisModule.collectPeriodicDelayed_LocalVariables_Mutex_PFSpec(c, behavior))
 	
 	->append(
-		thisModule.createIterationCounter(c)
+		thisModule.resolveMatchedSingleIfExists(c, 'IterationCounter')
 	)
 	->union
 	(
