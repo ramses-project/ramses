@@ -7,6 +7,6 @@ all: libpok $(TARGET)
 clean: common-clean
 
 include $(POK_PATH)/misc/mk/common-$(ARCH).mk
-export COPTS=-I/usr/share/pok -I/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/arinc653-pingpong/input -I/data/hudson/jobs/RAMSES_TEST/ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/26/0/.cp/aadl_resources/C_runtime/PeriodicDelayed_runtime -I/usr/share/pok/libpok/include -I/usr/share/pok/libpok/ada -I/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/arinc653-pingpong/input 
+export COPTS=-I"/usr/share/pok" -I"/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/arinc653-pingpong/input" -I"/data/hudson/jobs/RAMSES_TEST/ramses-SNAPSHOT-bin/configuration/org.eclipse.osgi/32/0/.cp/aadl_resources/C_runtime/PeriodicDelayed_runtime" -I"/usr/share/pok/libpok/include" -I"/usr/share/pok/libpok/ada" -I"/data/hudson/jobs/RAMSES_TEST/fr.tpt.aadl.ramses.junit.tests/tests/arinc653/arinc653-pingpong/input" 
 include $(POK_PATH)/misc/mk/rules-partition.mk
 include $(POK_PATH)/misc/mk/rules-common.mk

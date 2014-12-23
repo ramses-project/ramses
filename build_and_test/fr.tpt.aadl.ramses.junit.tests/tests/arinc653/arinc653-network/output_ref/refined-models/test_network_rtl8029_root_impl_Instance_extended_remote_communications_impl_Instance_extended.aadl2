@@ -80,7 +80,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
   processor implementation connected_cpu.with_system_partition
     subcomponents
       the_part: virtual processor part {
-        POK::Scheduler => RR;
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -93,10 +93,9 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         Period => 1000 ms;
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
       system_part: virtual processor part {
-        POK::Scheduler => RR;
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -110,7 +109,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
         ARINC653::System_Partition => true;
-        Scheduling_Protocol => (RMS);
         };
   end connected_cpu.with_system_partition;
   
@@ -144,8 +142,7 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
       the_cpu1: processor connected_cpu.with_system_partition {
         POK::Address => "00:1F:C6:BF:74:06";
         ARINC653::Module_Major_Frame => 2000 ms;
-        POK::Scheduler => STATIC;
-        ARINC653::Partition_Slots => (1000 ms, 1000 ms);
+        Scheduling_Protocol => (ARINC653);
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -189,13 +186,11 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         ]);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
       the_cpu2: processor connected_cpu.with_system_partition {
         POK::Address => "00:1E:A5:32:DE:32";
         ARINC653::Module_Major_Frame => 2000 ms;
-        POK::Scheduler => STATIC;
-        ARINC653::Partition_Slots => (1000 ms, 1000 ms);
+        Scheduling_Protocol => (ARINC653);
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -239,7 +234,6 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
         ]);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     connections
       bus_to_cpu1: bus access the_cpu1.bus_access -> the_bus;
@@ -253,8 +247,24 @@ with Base_Types,RAMSES,POK,Data_Model,ARINC653,common_pkg,RAMSES_buses,rtl8029_d
       Actual_Memory_Binding => (reference(the_mem1.part1_mem)) applies to the_proc1;
       Actual_Processor_Binding => (reference(the_cpu2.the_part)) applies to the_proc2;
       Actual_Memory_Binding => (reference(the_mem2.part1_mem)) applies to the_proc2;
-      ARINC653::Slots_Allocation => (reference(the_cpu1.the_part), reference(the_cpu1.system_part)) applies to the_cpu1;
-      ARINC653::Slots_Allocation => (reference(the_cpu2.the_part), reference(the_cpu2.system_part)) applies to the_cpu2;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu1.the_part);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(the_cpu1.system_part);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu1;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu2.the_part);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(the_cpu2.system_part);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu2;
       Actual_Processor_Binding => (reference(the_cpu1.system_part)) applies to the_cpu1_system_part_comProcess.system_part_comm;
       Actual_Memory_Binding => (reference(the_mem1.part2_mem)) applies to the_cpu1_system_part_comProcess.system_part_comm;
       Actual_Processor_Binding => (reference(the_cpu1.system_part)) applies to the_cpu1_system_part_comProcess.the_cpu1_system_part_comm;
@@ -384,10 +394,7 @@ if (p_out_ErrorCode = 0) test_network_rtl8029_remote_communications::the_proc1_p
   
   thread the_cpu1_system_part_comProcess_system_part_comm
     features
-      p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type {
-        Data_Model::Data_Representation => Integer;
-        Data_Size => 4 Bytes;
-        };
+      p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type;
   end the_cpu1_system_part_comProcess_system_part_comm;
   
   subprogram the_cpu1_system_part_comProcess_the_cpu1_system_part_comm_entrypoint
@@ -506,10 +513,7 @@ Send_Queuing_Message_Integer ! (the_proc2_p_in_cnx_p_in, p_in_localVariable, the
   
   thread the_cpu2_system_part_comProcess_system_part_comm
     features
-      the_proc2_p_in_cnx_p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type {
-        Data_Model::Data_Representation => Integer;
-        Data_Size => 4 Bytes;
-        };
+      the_proc2_p_in_cnx_p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type;
   end the_cpu2_system_part_comProcess_system_part_comm;
   
   subprogram the_cpu2_system_part_comProcess_the_cpu2_system_part_comm_entrypoint
@@ -662,10 +666,7 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   
   thread the_proc2_the_receiver
     features
-      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type {
-        Data_Model::Data_Representation => Integer;
-        Data_Size => 4 Bytes;
-        };
+      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type;
   end the_proc2_the_receiver;
   
   subprogram Receive_Queuing_Message_Integer

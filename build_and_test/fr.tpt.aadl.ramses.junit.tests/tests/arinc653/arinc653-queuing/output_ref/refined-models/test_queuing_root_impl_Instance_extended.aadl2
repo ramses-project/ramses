@@ -42,7 +42,6 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
     subcomponents
       the_part1: virtual processor part {
         Period => 1000 ms;
-        POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -52,13 +51,12 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
       the_part2: virtual processor part {
         Period => 1000 ms;
-        POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -68,9 +66,9 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
   end cpu.two_partitions;
   
@@ -100,8 +98,6 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
       the_proc2: process proc2.impl;
       the_cpu: processor cpu.two_partitions {
         ARINC653::Module_Major_Frame => 4000 ms;
-        POK::Scheduler => STATIC;
-        ARINC653::Partition_Slots => (2000 ms, 1000 ms, 1000 ms);
         POK::Ports_Flush_Time => Partition_Slot_Switch;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
@@ -143,16 +139,28 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Reset";
         ]);
+        Scheduling_Protocol => (ARINC653);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1;
       Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2;
       Actual_Memory_Binding => (reference(the_mem.part2_mem)) applies to the_proc2;
-      ARINC653::Slots_Allocation => (reference(the_cpu.the_part1), reference(the_cpu.the_part1), reference(the_cpu.the_part2)) applies to the_cpu;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu.the_part1);
+        Duration=> 2000 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(the_cpu.the_part1);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ], [
+        Partition=> reference(the_cpu.the_part2);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part1)) applies to the_proc1.the_sender;
       Actual_Memory_Binding => (reference(the_mem.part1_mem)) applies to the_proc1.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part2)) applies to the_proc2.the_receiver;
@@ -247,10 +255,7 @@ Send_Queuing_Message_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, p_
   
   thread the_proc1_the_sender
     features
-      cnx_p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type {
-        Data_Model::Data_Representation => Integer;
-        Data_Size => 4 Bytes;
-        };
+      cnx_p_out: requires data access arinc653_runtime::Queuing_Port_Id_Type;
   end the_proc1_the_sender;
   
   subprogram the_proc2_the_receiver_entrypoint
@@ -307,10 +312,7 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   
   thread the_proc2_the_receiver
     features
-      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type {
-        Data_Model::Data_Representation => Integer;
-        Data_Size => 4 Bytes;
-        };
+      p_in: requires data access arinc653_runtime::Queuing_Port_Id_Type;
   end the_proc2_the_receiver;
   
   subprogram Receive_Queuing_Message_Integer

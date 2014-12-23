@@ -46,7 +46,6 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
     subcomponents
       the_part: virtual processor part {
         Period => 1000 ms;
-        POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -56,9 +55,9 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
   end cpu.single_partition;
   
@@ -81,8 +80,6 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
       the_proc: process proc.impl;
       the_cpu: processor cpu.single_partition {
         ARINC653::Module_Major_Frame => 2000 ms;
-        POK::Scheduler => STATIC;
-        ARINC653::Partition_Slots => (2000 ms);
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Numeric error";
@@ -123,14 +120,18 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Reset";
         ]);
+        Scheduling_Protocol => (ARINC653);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
-      ARINC653::Slots_Allocation => (reference(the_cpu.the_part)) applies to the_cpu;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu.the_part);
+        Duration=> 2000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_receiver;
@@ -224,10 +225,7 @@ arinc653_runtime::Set_Event ! (cnx_p_out_entrypoint_barrier, the_proc_the_sender
   
   thread the_proc_the_sender
     features
-      cnx_p_out: requires data access arinc653_runtime::Buffer_Id_Type {
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      cnx_p_out: requires data access arinc653_runtime::Buffer_Id_Type;
       cnx_p_out_barrier: requires data access arinc653_runtime::Event_Id_Type;
   end the_proc_the_sender;
   
@@ -330,10 +328,7 @@ arinc653_runtime::Reset_Event ! (the_receiver_PortIdAccess_barrier, the_proc_the
   
   thread the_proc_the_receiver
     features
-      p_in: requires data access arinc653_runtime::Buffer_Id_Type {
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      p_in: requires data access arinc653_runtime::Buffer_Id_Type;
       the_receiver_PortIdAccess_barrier: requires data access arinc653_runtime::Event_Id_Type;
   end the_proc_the_receiver;
   

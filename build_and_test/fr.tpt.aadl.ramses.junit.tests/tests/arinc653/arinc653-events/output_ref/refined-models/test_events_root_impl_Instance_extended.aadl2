@@ -35,7 +35,6 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
     subcomponents
       the_part: virtual processor part {
         Period => 1000 ms;
-        POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -45,9 +44,9 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
   end cpu.single_partition;
   
@@ -70,8 +69,6 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
       the_proc: process proc.impl;
       the_cpu: processor cpu.single_partition {
         ARINC653::Module_Major_Frame => 1000 ms;
-        ARINC653::Partition_Slots => (1000 ms);
-        POK::Scheduler => STATIC;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Numeric error";
@@ -112,14 +109,18 @@ with POK,Data_Model,ARINC653,common_pkg,Base_Types,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Reset";
         ]);
+        Scheduling_Protocol => (ARINC653);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
-      ARINC653::Slots_Allocation => (reference(the_cpu.the_part)) applies to the_cpu;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu.the_part);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;

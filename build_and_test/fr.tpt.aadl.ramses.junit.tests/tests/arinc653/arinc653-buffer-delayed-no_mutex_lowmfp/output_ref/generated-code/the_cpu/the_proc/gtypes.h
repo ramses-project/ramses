@@ -30,6 +30,7 @@ typedef enum e_PeriodicDelayed_runtime__ReturnCodeType {
 	PeriodicDelayed_runtime__ReturnCodeType_EmptyQueue,
 	PeriodicDelayed_runtime__ReturnCodeType_FullQueue
 } PeriodicDelayed_runtime__ReturnCodeType;
+typedef Base_Types__Integer_16 PeriodicDelayed_runtime__ArrayDataType[];
 
 #endif
 

@@ -1,9 +1,9 @@
 package test_buffer_delayed_refined_model
 public
-with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime;
+with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc653_runtime,PeriodicDelayedMutex_runtime;
   process implementation proc.impl
     subcomponents
-      the_receiver_p_in_globalVariable: data bufferArrayImpl_the_receiver_p_in.impl;
+      the_receiver_p_in_Buffer: data bufferArrayImpl_the_receiver_p_in.impl;
       writer_instances_the_receiver_p_in: data ComponentInstanceArrayDataType_the_receiver_p_in {
         Data_Model::Initial_Value => ("{{2000,2000}}");
         };
@@ -31,8 +31,8 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
         Compute_Entrypoint_Call_Sequence => reference(main_call);
         };
     connections
-      cnx_p_in_to_globalVariable: data access the_receiver_p_in_globalVariable -> the_sender.cnx_p_out;
-      Id_instance_to_the_receiver_p_in: data access the_receiver_p_in_globalVariable -> the_receiver.p_in;
+      cnx_p_in_to_globalVariable: data access the_receiver_p_in_Buffer -> the_sender.cnx_p_out;
+      Id_instance_to_the_receiver_p_in: data access the_receiver_p_in_Buffer -> the_receiver.p_in;
       the_sender_p_out_eventdata_receiver_p_in_to_periodic_Delayed_Context: data access the_sender.the_sender_p_out_Output_Periodic_Delayed_ContextAccess_eventdata_receiver_p_in -> context_the_receiver_p_in;
       the_receiver_p_in_to_periodic_Delayed_Context: data access the_receiver.the_receiver_p_in_Input_Periodic_Delayed_ContextAccess -> context_the_receiver_p_in;
   end proc.impl;
@@ -41,7 +41,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
     subcomponents
       the_part: virtual processor part {
         Period => 1000 ms;
-        POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -51,9 +50,9 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
   end cpu.impl;
   
@@ -73,8 +72,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       the_proc: process proc.impl;
       the_cpu: processor cpu.impl {
         ARINC653::Module_Major_Frame => 1000 ms;
-        ARINC653::Partition_Slots => (1000 ms);
-        POK::Scheduler => STATIC;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Numeric error";
@@ -115,14 +112,18 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Reset";
         ]);
+        Scheduling_Protocol => (ARINC653);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
-      ARINC653::Slots_Allocation => (reference(the_cpu.the_part)) applies to the_cpu;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu.the_part);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;
@@ -169,6 +170,11 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       buffer: refined to requires data access bufferArrayImpl_the_receiver_p_in.impl;
   end Put_Value_LowFP_the_proc_the_sender_p_out;
   
+  subprogram Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in
+    extends PeriodicDelayed_runtime::Receive_Input_LowFP
+    (context_prototype => data periodic_delayed_context_t.impl_the_proc_the_receiver_p_in)
+  end Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in;
+  
   data bufferArrayImpl_the_receiver_p_in
     extends PeriodicDelayed_runtime::ArrayDataType
   end bufferArrayImpl_the_receiver_p_in;
@@ -178,17 +184,9 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       Data_Model::Dimension => (6);
   end bufferArrayImpl_the_receiver_p_in.impl;
   
-  subprogram Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in
-    extends PeriodicDelayed_runtime::Receive_Input_LowFP
-    (context_prototype => data periodic_delayed_context_t.impl_the_proc_the_receiver_p_in)
-  end Receive_Input_LowFP_lowmpf_the_proc_the_receiver_p_in;
-  
   subprogram Next_Value_the_proc_the_receiver_p_in
     extends PeriodicDelayed_runtime::Next_Value
     (output_type => data common_pkg::Integer)
-    features
-      buffer: refined to requires data access bufferArrayImpl_the_receiver_p_in.impl;
-      output: refined to requires data access common_pkg::Integer;
   end Next_Value_the_proc_the_receiver_p_in;
   
   subprogram the_proc_the_sender_entrypoint
@@ -247,10 +245,7 @@ PeriodicDelayed_runtime::Send_Output ! (the_proc_the_sender_IterationCounter, th
   
   thread the_proc_the_sender
     features
-      cnx_p_out: requires data access bufferArrayImpl_the_receiver_p_in.impl {
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      cnx_p_out: requires data access bufferArrayImpl_the_receiver_p_in.impl;
       the_sender_p_out_Output_Periodic_Delayed_ContextAccess_eventdata_receiver_p_in: requires data access periodic_delayed_context_t.impl_the_proc_the_receiver_p_in;
   end the_proc_the_sender;
   
@@ -320,11 +315,7 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   
   thread the_proc_the_receiver
     features
-      p_in: requires data access bufferArrayImpl_the_receiver_p_in.impl {
-        Dequeue_Protocol => AllItems;
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      p_in: requires data access bufferArrayImpl_the_receiver_p_in.impl;
       the_receiver_p_in_Input_Periodic_Delayed_ContextAccess: requires data access periodic_delayed_context_t.impl_the_proc_the_receiver_p_in;
   end the_proc_the_receiver;
   
