@@ -23,7 +23,6 @@
     <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.edit</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.support.workflow.editor</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.osate</module>
-    <module>../../launchers/fr.tpt.aadl.ramses.control.cli.static</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.atl.launch</module>
     <module>../../launchers/fr.tpt.aadl.ramses.control.cli.instantiation</module>
     <module>../../model2text/fr.tpt.aadl.ramses.generation.c</module>
