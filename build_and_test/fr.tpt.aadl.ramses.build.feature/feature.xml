@@ -207,13 +207,6 @@ You should have received a copy of the Eclipse Public License along with this pr
          unpack="false"/>
 
    <plugin
-         id="fr.tpt.aadl.sched.tools.aadlinspector"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.m2m.atl.emftvm.trace"
          download-size="0"
          install-size="0"
@@ -263,13 +256,6 @@ You should have received a copy of the Eclipse Public License along with this pr
          unpack="false"/>
 
    <plugin
-         id="fr.tpt.aadl.sched.wcetanalysis.results"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.m2m.atl.engine.emfvm.launch"
          download-size="0"
          install-size="0"
@@ -278,6 +264,152 @@ You should have received a copy of the Eclipse Public License along with this pr
 
    <plugin
          id="fr.tpt.aadl.ramses.analysis.memoryfootprint"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.analysis.sched.wcrtanalysis.results"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.analysis.maintainability"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.analysis.sched.aadlinspector"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.cli.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.cli.instantiation"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.cli.osgi"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.cli.static"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.support.workflow.edit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.control.support.workflow.editor"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.generation.arinc653.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.merge.launcher"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.selection"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.selection.mcda"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.tip"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.trc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.trc.edit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.trc.editor"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.trc.xtext"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.aadl.ramses.transformation.trc.xtext.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.tpt.atl.hots"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="fr.tpt.atl.utils"
          download-size="0"
          install-size="0"
          version="0.0.0"
