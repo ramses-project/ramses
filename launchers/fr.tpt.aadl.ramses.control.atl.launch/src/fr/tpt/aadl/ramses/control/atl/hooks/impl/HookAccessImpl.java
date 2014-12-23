@@ -37,12 +37,15 @@ import org.eclipse.emf.common.util.URI ;
 import org.eclipse.emf.ecore.EClass ;
 import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.impl.EObjectImpl ;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2 ;
 import org.eclipse.xtext.nodemodel.INode ;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils ;
+import org.osate.aadl2.AadlPackage ;
 import org.osate.aadl2.Classifier ;
 import org.osate.aadl2.ComponentImplementation ;
 import org.osate.aadl2.ComponentType ;
+import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.DirectedFeature ;
 import org.osate.aadl2.Element ;
 import org.osate.aadl2.Feature ;
@@ -51,6 +54,7 @@ import org.osate.aadl2.NamedElement ;
 import org.osate.aadl2.Port ;
 import org.osate.aadl2.PropertyAssociation ;
 import org.osate.aadl2.PropertyExpression ;
+import org.osate.aadl2.PublicPackageSection ;
 import org.osate.aadl2.StringLiteral ;
 import org.osate.aadl2.SystemImplementation ;
 import org.osate.aadl2.instance.ComponentInstance ;
@@ -58,6 +62,7 @@ import org.osate.aadl2.instance.ConnectionInstance ;
 import org.osate.aadl2.instance.FeatureInstance ;
 import org.osate.aadl2.instance.InstanceObject ;
 import org.osate.aadl2.instance.SystemInstance ;
+import org.osate.aadl2.modelsupport.resources.OsateResourceUtil;
 import org.osate.aadl2.parsesupport.LocationReference ;
 import org.osate.ba.aadlba.BehaviorAnnex ;
 import org.osate.ba.aadlba.BehaviorElement ;
@@ -337,27 +342,27 @@ public class HookAccessImpl extends EObjectImpl implements HookAccess
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 */
+	private static PublicPackageSection getPublicPackageSection(NamedElement ne)
+	{
+	  if(ne.eContainer() instanceof PublicPackageSection)
+	    return (PublicPackageSection) ne.eContainer();
+	  else if(ne.eContainer() instanceof NamedElement)
+	  {
+	    NamedElement neContainer = (NamedElement) ne.eContainer();
+	    return getPublicPackageSection(neContainer);
+	  }
+	  return null;
+	}
+	
   public static NamedElement getTransformationTrace(NamedElement targetDeclarative)
   {
-	for(NamedElement ne: _transformationTrace.keySet())
-	{
-	  if(ne.getQualifiedName().equals(targetDeclarative.getQualifiedName()))
-		  return _transformationTrace.get(ne);
-	}
+    for(NamedElement ne: _transformationTrace.keySet())
+    {
+      if(ne.getQualifiedName().equals(targetDeclarative.getQualifiedName()))
+        return _transformationTrace.get(ne);
+    }
+    
     return null;
-  }
-  
-  public static List<NamedElement> getTransformationTracesFromSource(InstanceObject sourceInstance)
-  {
-	  ArrayList<NamedElement> l = new ArrayList<NamedElement>();
-	  for(NamedElement e : _transformationTrace.keySet())
-	  {
-		  if (_transformationTrace.get(e) == sourceInstance)
-		  {
-			  l.add(e);
-		  }
-	  }
-	  return l;
   }
   
   public static List<NamedElement> getTransformationTracesFromSourceDecl(ComponentImplementation el)
