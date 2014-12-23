@@ -59,7 +59,6 @@
     <module>../../analysis/fr.tpt.aadl.ramses.analysis.result</module>
     <module>../../analysis/fr.tpt.aadl.ramses.constraints.reporter.metamodel</module>
     <module>../fr.tpt.aadl.ramses.build.feature</module>
-    <module>../fr.tpt.aadl.ramses.build.distribution</module>
     <module>../fr.tpt.aadl.ramses.build.update.site</module>
     <module>../fr.tpt.aadl.ramses.control.cli.osgi.product</module>
   </modules>
