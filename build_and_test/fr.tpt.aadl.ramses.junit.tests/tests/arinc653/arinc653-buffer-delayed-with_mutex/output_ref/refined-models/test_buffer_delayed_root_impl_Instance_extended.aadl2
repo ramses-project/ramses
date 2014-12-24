@@ -37,7 +37,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
     subcomponents
       the_part: virtual processor part {
         Period => 1000 ms;
-        POK::Scheduler => RR;
         ARINC653::HM_Error_ID_Actions => ([
           ErrorIdentifier=> 3;
           Description=> "Restart process";
@@ -47,9 +46,9 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
   end cpu.impl;
   
@@ -69,8 +68,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       the_proc: process proc.impl;
       the_cpu: processor cpu.impl {
         ARINC653::Module_Major_Frame => 1000 ms;
-        ARINC653::Partition_Slots => (1000 ms);
-        POK::Scheduler => STATIC;
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Numeric error";
@@ -111,14 +108,18 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
           Description=> "Warm partition restart";
           Action=> "Reset";
         ]);
+        Scheduling_Protocol => (ARINC653);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
-      ARINC653::Slots_Allocation => (reference(the_cpu.the_part)) applies to the_cpu;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu.the_part);
+        Duration=> 1000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;
@@ -166,6 +167,14 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
     (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
   end Put_Value_the_sender_p_out;
   
+  subprogram implementation Next_Value_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Next_Value.impl
+  end Next_Value_the_receiver_p_in.impl;
+  
+  subprogram implementation Receive_Input_mutex_the_receiver_p_in.impl
+    extends PeriodicDelayedMutex_runtime::Receive_Input.impl
+  end Receive_Input_mutex_the_receiver_p_in.impl;
+  
   data SharedStructType_the_receiver_p_in
     extends PeriodicDelayedMutex_runtime::SharedStructure
   end SharedStructType_the_receiver_p_in;
@@ -173,8 +182,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
   data implementation SharedStructType_the_receiver_p_in.impl
     extends PeriodicDelayedMutex_runtime::SharedStructure.impl
     (t_buffer => data QueueType_the_receiver_p_in)
-    properties
-      Data_Model::Dimension => (6);
   end SharedStructType_the_receiver_p_in.impl;
   
   data QueueType_the_receiver_p_in
@@ -184,32 +191,20 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
       Data_Model::Dimension => (10);
   end QueueType_the_receiver_p_in;
   
-  subprogram implementation Receive_Input_mutex_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::Receive_Input.impl
-  end Receive_Input_mutex_the_receiver_p_in.impl;
-  
   subprogram Receive_Input_mutex_the_receiver_p_in
     extends PeriodicDelayedMutex_runtime::Receive_Input
     (t_buffer => data SharedStructType_the_receiver_p_in.impl)
   end Receive_Input_mutex_the_receiver_p_in;
-  
-  subprogram implementation Next_Value_the_receiver_p_in.impl
-    extends PeriodicDelayedMutex_runtime::Next_Value.impl
-  end Next_Value_the_receiver_p_in.impl;
   
   subprogram Next_Value_the_receiver_p_in
     extends PeriodicDelayedMutex_runtime::Next_Value
     (t_data => data common_pkg::Integer,t_buffer => data SharedStructType_the_receiver_p_in.impl)
   end Next_Value_the_receiver_p_in;
   
-  data bufferArrayImpl_the_receiver_p_in
-    extends PeriodicDelayed_runtime::ArrayDataType
-  end bufferArrayImpl_the_receiver_p_in;
-  
-  subprogram p_in_Init_Spg
+  subprogram root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg
     extends PeriodicDelayedMutex_runtime::Init_Prototype
     (t_buffer => data SharedStructType_the_receiver_p_in.impl)
-  end p_in_Init_Spg;
+  end root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg;
   
   subprogram the_proc_the_sender_entrypoint
     features
@@ -221,12 +216,6 @@ with Base_Types,Data_Model,POK,ARINC653,common_pkg,PeriodicDelayed_runtime,arinc
     subcomponents
       the_proc_the_sender_runtime_call_ret: data arinc653_runtime::Return_Code_Type;
       p_out_localVariable: data common_pkg::Integer;
-      the_proc_the_sender_IterationCounter: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("0");
-        };
-      the_sender_p_out_CDWSize_eventdata_receiver_p_in: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("3");
-        };
       CurrentDeadline: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("2000");
         };
@@ -287,10 +276,7 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
   
   thread the_proc_the_sender
     features
-      cnx_p_out: requires data access SharedStructType_the_receiver_p_in.impl {
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      cnx_p_out: requires data access SharedStructType_the_receiver_p_in.impl;
       p_out_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
   end the_proc_the_sender;
   
@@ -307,21 +293,6 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
         Data_Model::Initial_Value => ("0");
         };
       p_in_localVariable: data common_pkg::Integer;
-      the_proc_the_receiver_IterationCounter: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("0");
-        };
-      p_in_CPRSize: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("6");
-        };
-      p_in_lastIndex: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("-1");
-        };
-      p_in_readIndex: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("-1");
-        };
-      the_receiver_p_in_BufferSize: data Base_Types::Integer_16 {
-        Data_Model::Initial_Value => ("3");
-        };
       CurrentDeadline: data Base_Types::Integer_16 {
         Data_Model::Initial_Value => ("1000");
         };
@@ -379,7 +350,7 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
         } 
       ;
       initLikedList:  {
-        call_p_in_Init_Spg: subprogram p_in_Init_Spg;
+        call_p_in_Init_Spg: subprogram root_impl_Instance_the_proc_the_receiver_p_in_Init_Spg;
         } 
       ;
     connections
@@ -391,11 +362,7 @@ PeriodicDelayedMutex_runtime::Send_Output ! (PeriodValue, DeadlineValue, Current
   
   thread the_proc_the_receiver
     features
-      p_in: requires data access SharedStructType_the_receiver_p_in.impl {
-        Dequeue_Protocol => AllItems;
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      p_in: requires data access SharedStructType_the_receiver_p_in.impl;
       p_in_semAccess: requires data access arinc653_runtime::Semaphore_Id_Type;
   end the_proc_the_receiver;
   

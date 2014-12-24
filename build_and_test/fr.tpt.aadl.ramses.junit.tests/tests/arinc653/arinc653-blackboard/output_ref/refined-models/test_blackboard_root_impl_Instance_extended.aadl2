@@ -62,10 +62,9 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,Base_Types,PeriodicDel
           Description=> "Warm partition restart";
           Action=> "Warm_Restart";
         ]);
-        POK::Scheduler => RR;
+        Scheduling_Protocol => (Round_Robin_Protocol);
         ARINC653::Partition_Identifier => 1;
         POK::Additional_Features => (libc_stdio, console);
-        Scheduling_Protocol => (RMS);
         };
   end cpu.single_partition;
   
@@ -97,8 +96,6 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,Base_Types,PeriodicDel
           Action=> "Reset";
         ]);
         ARINC653::Module_Major_Frame => 2000 ms;
-        POK::Scheduler => STATIC;
-        ARINC653::Partition_Slots => (2000 ms);
         ARINC653::HM_Error_ID_Levels => ([
           ErrorIdentifier=> 1;
           Description=> "Numeric error";
@@ -130,14 +127,18 @@ with POK,Data_Model,ARINC653,RAMSES_processors,common_pkg,Base_Types,PeriodicDel
           ErrorLevel=> Process_Level;
           ErrorCode=> Illegal_Request;
         ]);
+        Scheduling_Protocol => (ARINC653);
         POK::Architecture => x86;
         POK::BSP => x86_qemu;
-        Scheduling_Protocol => (ARINC653);
         };
     properties
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc;
-      ARINC653::Slots_Allocation => (reference(the_cpu.the_part)) applies to the_cpu;
+      ARINC653::Module_Schedule => ([
+        Partition=> reference(the_cpu.the_part);
+        Duration=> 2000 ms;
+        Periodic_Processing_Start=> true;
+      ]) applies to the_cpu;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_sender;
       Actual_Memory_Binding => (reference(the_mem)) applies to the_proc.the_sender;
       Actual_Processor_Binding => (reference(the_cpu.the_part)) applies to the_proc.the_receiver;
@@ -223,10 +224,7 @@ Display_Blackboard_Integer ! (cnx_p_out, p_out_localVariable, p_out_Length, the_
   
   thread the_proc_the_sender
     features
-      cnx_p_out: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      cnx_p_out: requires data access arinc653_runtime::Blackboard_Id_Type;
   end the_proc_the_sender;
   
   subprogram the_proc_the_receiver_entrypoint
@@ -283,10 +281,7 @@ if (p_in_ErrorCode = 0) common_pkg::receiver_spg ! (p_in_localVariable) end if
   
   thread the_proc_the_receiver
     features
-      p_in: requires data access arinc653_runtime::Blackboard_Id_Type {
-        Data_Size => 4 Bytes;
-        Data_Model::Data_Representation => Integer;
-        };
+      p_in: requires data access arinc653_runtime::Blackboard_Id_Type;
   end the_proc_the_receiver;
   
   subprogram Read_Blackboard_Integer

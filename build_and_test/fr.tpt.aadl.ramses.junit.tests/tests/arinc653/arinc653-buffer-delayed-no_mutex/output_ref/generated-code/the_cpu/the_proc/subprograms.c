@@ -154,7 +154,7 @@ while(1)
 }
 }
 test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in_BA_State_t Next_Value_the_proc_the_receiver_p_in_current_state = test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in_s;
-void test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in(Base_Types__Integer_16 *  first, Base_Types__Integer_16 last, test_buffer_delayed_refined_model__bufferArrayImpl_the_receiver_p_in_impl buffer, common_pkg__Integer *  output, Base_Types__Integer_16 bufferSize, PeriodicDelayed_runtime__ReturnCodeType *  ReturnCode)
+void test_buffer_delayed_refined_model__Next_Value_the_proc_the_receiver_p_in(Base_Types__Integer_16 *  first, Base_Types__Integer_16 last, PeriodicDelayed_runtime__ArrayDataType buffer, common_pkg__Integer *  output, Base_Types__Integer_16 bufferSize, PeriodicDelayed_runtime__ReturnCodeType *  ReturnCode)
 {
   while(1)
 {
