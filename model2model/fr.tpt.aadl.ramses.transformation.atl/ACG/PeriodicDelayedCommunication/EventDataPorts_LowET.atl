@@ -213,7 +213,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
 		--- connect IterationCounter
 		iterationCounter_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'IterationCounter')
+			element <- thisModule.createIterationCounter(fi.getComponentInstance())
 		),
 		--- connect value
 		currentValue_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
@@ -279,7 +279,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	--- connect IterationCounter
 	iterationCounter_DataSubcomponent_Holder: AADLBA!DataSubcomponentHolder
 	(
-		element<-thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'IterationCounter')
+		element<-thisModule.createIterationCounter(fi.getComponentInstance())
 	),
 	
 	--- connect firstIndex

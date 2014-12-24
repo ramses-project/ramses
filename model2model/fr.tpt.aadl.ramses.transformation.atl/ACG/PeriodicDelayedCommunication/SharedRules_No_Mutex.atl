@@ -25,8 +25,7 @@
 module SharedRules_No_Mutex;
 create OUT : AADLBA from IN : AADLI;
 
--- @extends m_PeriodicThread
-rule m_Thread_With_Input_or_Output_PeriodicDelayed_Port
+unique lazy rule createIterationCounter
 {
 	from
 		c: AADLI!ComponentInstance
@@ -37,7 +36,6 @@ rule m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 		initial: String = '0';
 	}
 	to
-		sub: AADLBA!ThreadSubcomponent,
 		IterationCounter:AADLBA!DataSubcomponent (
 		    name<-c.uniqueName()+'_IterationCounter',
 			dataSubcomponentType <- 'Integer_16'.asClassifier('BASE_TYPES'),
@@ -52,6 +50,51 @@ rule m_Thread_With_Input_or_Output_PeriodicDelayed_Port
 		CounterInit: AADLBA!ListValue
 		(
 			ownedListElement <- Sequence{thisModule.CreateStringLiteralPropertyExpression(initial)}
+		)
+	do
+	{
+		IterationCounter;
+	}
+}
+
+-- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
+rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
+{
+	from
+		fi: AADLI!FeatureInstance,
+		behavior: AADLI!SubprogramCallSequence,
+		cnxRef: AADLI!PortConnection
+		(
+			behavior.isComputeEntryPointOf(fi.getComponentInstance())
+		)
+	using
+	{
+		Send_Output_Spg: AADLBA!SubprogramType = thisModule.Send_Output_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
+	}
+	to
+		
+		-----------------------
+		--- Send_Output
+		-----------------------
+		callSendOutput: AADLBA!SubprogramCallAction
+		(
+			subprogram<-sendOutput_Spg_Holder,
+			parameterLabels <- Sequence{iterationCounter_Data_Holder_SendOutput,CDWSize_Data_Holder_SendOutput}
+		),
+		sendOutput_Spg_Holder: AADLBA!CalledSubprogramHolder
+		(
+			element <- Send_Output_Spg
+		),
+		--- connect CDWSize
+		CDWSize_Data_Holder_SendOutput: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'CDWSize')
+		),
+		
+		--- connect IterationCounter
+		iterationCounter_Data_Holder_SendOutput: AADLBA!DataSubcomponentHolder
+		(
+			element<-thisModule.createIterationCounter(fi.getComponentInstance())
 		)
 }
 

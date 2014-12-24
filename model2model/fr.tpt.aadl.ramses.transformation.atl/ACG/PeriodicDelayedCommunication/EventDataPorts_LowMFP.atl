@@ -436,7 +436,7 @@ rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence
       	--- connect iteration_counter: in out parameter Base_Types::Integer_16;
       	IterationCounter_Holder: AADLBA!DataAccessHolder
 		(
-			element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'IterationCounter')
+			element <- thisModule.createIterationCounter(fi.getComponentInstance())
 		),
       	
         --- connect CDWSize: in parameter Base_Types::Integer_16;
@@ -782,7 +782,7 @@ rule m_Input_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_
 	--- connect iteration_counter: in out parameter Base_Types::Integer_16;
   	IterationCounter_Holder: AADLBA!DataSubcomponentHolder
 	(
-		element <- thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'IterationCounter')
+		element <- thisModule.createIterationCounter(fi.getComponentInstance())
 	),
 	
     --- connect CPRSize: in parameter Base_Types::Integer_16;

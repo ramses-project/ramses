@@ -140,7 +140,7 @@ helper def: collectPeriodicDelayed_LocalVariables(c: AADLI!ComponentInstance, be
 	Sequence{}
 	else
 	Sequence{
-		thisModule.resolveMatchedSingleIfExists(c, 'IterationCounter')
+		thisModule.resolveLazySingleIfExists(c, 'createIterationCounter', 'IterationCounter')
 	}->union
 	(
 	c.featureInstance->select(e|e.isEventOrEventDataPort() and e.isPeriodicDelayedPort())
@@ -278,46 +278,6 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		)
 }
 
--- @extends m_PeriodicDelayed_Port,m_Output_Port_ComputeEntrypointCallSequence
-rule m_Output_EventOrEventDataPort_PeriodicDelayed_ComputeEntrypointCallSequence_SendOutput
-{
-	from
-		fi: AADLI!FeatureInstance,
-		behavior: AADLI!SubprogramCallSequence,
-		cnxRef: AADLI!PortConnection
-		(
-			behavior.isComputeEntryPointOf(fi.getComponentInstance())
-		)
-	using
-	{
-		Send_Output_Spg: AADLBA!SubprogramType = thisModule.Send_Output_Name.asSubprogramType('PERIODICDELAYED_RUNTIME');
-	}
-	to
-		
-		-----------------------
-		--- Send_Output
-		-----------------------
-		callSendOutput: AADLBA!SubprogramCallAction
-		(
-			subprogram<-sendOutput_Spg_Holder,
-			parameterLabels <- Sequence{iterationCounter_Data_Holder_SendOutput,CDWSize_Data_Holder_SendOutput}
-		),
-		sendOutput_Spg_Holder: AADLBA!CalledSubprogramHolder
-		(
-			element <- Send_Output_Spg
-		),
-		--- connect CDWSize
-		CDWSize_Data_Holder_SendOutput: AADLBA!DataSubcomponentHolder
-		(
-			element<-thisModule.resolveMatchedTupleIfExists(Sequence{fi, cnxRef}, 'CDWSize')
-		),
-		
-		--- connect IterationCounter
-		iterationCounter_Data_Holder_SendOutput: AADLBA!DataSubcomponentHolder
-		(
-			element<-thisModule.resolveMatchedSingleIfExists(fi.getComponentInstance(), 'IterationCounter')
-		)
-}
 
  -- @extends m_PeriodicDelayed_Port,m_Thread_Input_Port_Instance
 abstract rule m_Input_PeriodicDelayed_Port
