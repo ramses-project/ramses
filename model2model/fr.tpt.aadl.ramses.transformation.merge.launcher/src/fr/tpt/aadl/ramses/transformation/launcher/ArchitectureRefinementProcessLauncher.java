@@ -454,6 +454,14 @@ public class ArchitectureRefinementProcessLauncher {
     
     long startTimeSelection = System.nanoTime();
 
+    File outputDir = new File(this.outputPathSave+"/iter_"+TipUtils.getCurrentIteration());
+    if(!outputDir.exists())
+    {
+      outputDir.mkdir();
+    }
+
+    config.setRamsesOutputDir(outputDir.getAbsolutePath());
+    
     this.transformationSelection.selectTransformation(patternMatchingMap, tuplesToApply);
     
     if(tuplesToApply.isEmpty())
@@ -481,14 +489,6 @@ public class ArchitectureRefinementProcessLauncher {
     _LOGGER.trace("Start specialization step");
     
     long startTimeSpecialization = System.nanoTime();
-
-    File outputDir = new File(this.outputPathSave+"/iter_"+TipUtils.getCurrentIteration());
-    if(!outputDir.exists())
-    {
-      outputDir.mkdir();
-    }
-
-    config.setRamsesOutputDir(outputDir.getAbsolutePath());
     
     File dirFileForWorkflow = new File(config.getRamsesOutputDir().getAbsolutePath());
 

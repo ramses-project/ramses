@@ -19,6 +19,7 @@ import java.util.HashMap ;
 import java.util.List ;
 import java.util.Map ;
 
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -27,8 +28,14 @@ import org.eclipse.emf.ecore.EObject ;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
+import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.RollbackException;
+import org.eclipse.emf.transaction.TransactionalCommandStack;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.osate.aadl2.instance.SystemInstance;
 
 /**
  * <!-- begin-user-doc -->
@@ -349,6 +356,7 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
   @Override
   public TrcRule getTrcRule(String value)
   {
+	
     if(rulesMap.containsKey(value))
       return rulesMap.get(value) ;
     else
@@ -384,7 +392,7 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
       TrcRule r = TrcFactory.eINSTANCE.createTrcRule();
       String ruleName = value;
       if(ruleName.contains("."))
-        ruleName = ruleName.substring(ruleName.indexOf('.')+1, ruleName.length());
+    	  ruleName = ruleName.substring(ruleName.indexOf('.')+1, ruleName.length());
       r.setName(ruleName);
       trcModule.getRules().add(r);
       rulesMap.put(value, r);

@@ -15,13 +15,13 @@ public class DependencyValidation
 {
 
   private TrcSpecification trc;
-  private List<RuleApplicationTuple> ruleApplicationList ;
+  private List<ExcelPositionnedRuleApplicationTuple> ruleApplicationList ;
   
   public DependencyValidation(TrcSpecification trc,
-                              List<RuleApplicationTuple> ruleApplicationList)
+                              List<ExcelPositionnedRuleApplicationTuple> potentialResults)
   {
     this.trc = trc;
-    this.ruleApplicationList = ruleApplicationList;
+    this.ruleApplicationList = potentialResults;
   }
 
   public boolean validate()

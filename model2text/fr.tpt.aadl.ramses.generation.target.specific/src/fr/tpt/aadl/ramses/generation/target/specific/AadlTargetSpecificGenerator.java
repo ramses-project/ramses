@@ -708,9 +708,9 @@ public class AadlTargetSpecificGenerator implements Generator
                 if(resolutionMethodName.equals(methodNameInWorkflow))
                 {
                   foundLoopManagementPlugin = true;
+                  monitor.subTask("Transformation alternatives loop: "+resolutionMethodName);
                   modelsMap.putAll(gen.processLoop());
                   workflowPilot.setLoopModelIdSuffix(gen.getModelIdSuffix());
-                  monitor.subTask("Transformation alternatives loop: "+resolutionMethodName);
                   boolean loopAnalysis = isValidLoopIteration(l.getAnalysis(), 
                                                               errManager, 
                                                               workflowPilot, 

@@ -82,6 +82,8 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
 
   public int cpt = 0 ;
   public int size ;
+
+  public int runCounter=0 ;
   
   public MCDABasedTransformationSelection(AadlTargetSpecificGenerator generator,
                                           AbstractLoop loop,
@@ -320,7 +322,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     }
     for(Thread t : rulesSelectionThreads)
     {
-      List<RuleApplicationTuple> ratList = 
+      List<ExcelPositionnedRuleApplicationTuple> ratList = 
           ((TransformationRuleSelectionThread) t).ratList;
       if(ratList == null)
       {
@@ -448,7 +450,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     private Map<List<EObject>, List<TrcRule>> connectedAlternativesMap;
     private final MCDABasedTransformationSelection initiator;
     
-    public List<RuleApplicationTuple> ratList;
+    public List<ExcelPositionnedRuleApplicationTuple> ratList;
     
     public TransformationRuleSelectionThread(TrcSpecification trc,
                                              SystemInstance sinst,
@@ -468,9 +470,14 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       TransformationRuleSelection trs = 
           new TransformationRuleSelection(this.trc, 
                                           sinst,
-                                          connectedAlternativesMap);
-
-      ratList = trs.selectBestRulesAlternatives();
+                                          connectedAlternativesMap,
+                                          this.initiator.config);
+      synchronized(sinst)
+      {
+        this.initiator.runCounter++;
+      }
+      
+      ratList = trs.selectBestRulesAlternatives(this.initiator.runCounter);
       
       synchronized(sinst)
       {

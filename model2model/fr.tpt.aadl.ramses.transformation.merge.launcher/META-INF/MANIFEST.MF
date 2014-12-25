@@ -5,6 +5,8 @@ Bundle-SymbolicName: fr.tpt.aadl.ramses.transformation.merge.launcher;singleton:
 Bundle-Version: 1.0.0.qualifier
 Export-Package: fr.tpt.aadl.ramses.transformation.launcher
 Require-Bundle: org.eclipse.emf.ecore;bundle-version="2.8.3",
+ org.eclipse.emf.workspace,
+ org.eclipse.emf.transaction,
  org.eclipse.m2m.atl.core;bundle-version="3.3.1",
  org.osate.aadl2,
  org.osate.aadl2.modelsupport,
