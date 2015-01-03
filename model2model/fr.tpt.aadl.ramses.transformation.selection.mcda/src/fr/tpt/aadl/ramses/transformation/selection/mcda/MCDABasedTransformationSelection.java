@@ -15,6 +15,9 @@ import java.util.Map.Entry ;
 import java.util.Properties ;
 import java.util.Set ;
 
+import jxl.write.WriteException ;
+import jxl.write.biff.RowsExceededException ;
+
 import org.apache.log4j.Logger ;
 import org.eclipse.core.runtime.IProgressMonitor ;
 import org.eclipse.emf.ecore.EObject ;
@@ -50,6 +53,7 @@ import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.Depend
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.DependencyNode ;
 import fr.tpt.aadl.ramses.transformation.selection.dependency.graph.graph.util.DependencyGraphUtils ;
 import fr.tpt.aadl.ramses.transformation.tip.ElementTransformation ;
+import fr.tpt.aadl.ramses.transformation.tip.util.TipParser ;
 import fr.tpt.aadl.ramses.transformation.tip.util.TipUtils ;
 import fr.tpt.aadl.ramses.transformation.trc.Transformation ;
 import fr.tpt.aadl.ramses.transformation.trc.TrcRule ;
@@ -83,7 +87,6 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
   public int cpt = 0 ;
   public int size ;
 
-  public int runCounter=0 ;
   
   public MCDABasedTransformationSelection(AadlTargetSpecificGenerator generator,
                                           AbstractLoop loop,
@@ -240,15 +243,21 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       }
     }
     size = connectedAlternativesMapList.size();
-    final Thread[] rulesSelectionThreads = new Thread[size] ;
+    final TransformationRuleSelectionThread[] rulesSelectionThreads = 
+        new TransformationRuleSelectionThread[size] ;
     int iter = 0;
+    ExcelFileWriter excelFileWriter = new ExcelFileWriter(config.getRamsesOutputDir()+
+                                                          "/AlternativesScore_"+
+                                                          TipParser.getLastIterationId()+".xls");
+
     for(Map<List<EObject>, List<TrcRule>> connectedAlternativesMap:
       connectedAlternativesMapList)
     {
       rulesSelectionThreads[iter] = new TransformationRuleSelectionThread(trc, 
                                                                           sinst, 
                                                                           connectedAlternativesMap, 
-                                                                          this);
+                                                                          this,
+                                                                          excelFileWriter);
       iter++;
     }
     
@@ -332,6 +341,7 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
         trc.cleanup();
         return;
       }
+      
       for(RuleApplicationTuple rat:ratList)
       {
         List<EObject> ratElements = rat.getPatternMatchedElement();
@@ -348,8 +358,31 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
                                                       tuplesToApply);
 
       }
+      
     }
-    // Multi-threaded search
+    
+    for(TransformationRuleSelectionThread t : rulesSelectionThreads)
+    {
+      t.addSolutionsToExcelSheet();
+      
+    }
+    
+    try
+    {
+      excelFileWriter.duplicateSheet();
+      excelFileWriter.write();
+    }
+    catch(WriteException e1)
+    {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    catch(IOException e1)
+    {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    
     trc.cleanup();
 
   }
@@ -449,35 +482,42 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
     private SystemInstance sinst;
     private Map<List<EObject>, List<TrcRule>> connectedAlternativesMap;
     private final MCDABasedTransformationSelection initiator;
-    
+    private ExcelFileWriter excelFileWriter;
     public List<ExcelPositionnedRuleApplicationTuple> ratList;
+    
+    TransformationRuleSelection trs = null;
     
     public TransformationRuleSelectionThread(TrcSpecification trc,
                                              SystemInstance sinst,
                                              Map<List<EObject>, List<TrcRule>> connectedAlternativesMap,
-                                             MCDABasedTransformationSelection initiator)
+                                             MCDABasedTransformationSelection initiator, 
+                                             ExcelFileWriter excelFileWriter)
     {
       this.trc = trc;
       this.sinst = sinst;
       this.connectedAlternativesMap = connectedAlternativesMap;
       this.initiator = initiator;
+      this.excelFileWriter = excelFileWriter;
     }
     
+    public void addSolutionsToExcelSheet()
+    {
+      trs.addSolutionsToExcelSheet();
+      TransformationRuleSelection.block=0;
+    }
+
     @Override
     public void run()
     {
       // 5 - select alternatives for elements in connectedDepGraph
-      TransformationRuleSelection trs = 
+      trs = 
           new TransformationRuleSelection(this.trc, 
                                           sinst,
                                           connectedAlternativesMap,
-                                          this.initiator.config);
-      synchronized(sinst)
-      {
-        this.initiator.runCounter++;
-      }
+                                          this.initiator.config,
+                                          this.excelFileWriter);
       
-      ratList = trs.selectBestRulesAlternatives(this.initiator.runCounter);
+      ratList = trs.selectBestRulesAlternatives();
       
       synchronized(sinst)
       {

@@ -4,13 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 
+import jxl.Cell ;
 import jxl.CellView;
+import jxl.SheetSettings ;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import jxl.format.CellFormat ;
 import jxl.format.UnderlineStyle;
 import jxl.write.Formula;
 import jxl.write.Label;
 import jxl.write.Number;
+import jxl.write.WritableCell ;
 import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
@@ -41,8 +45,8 @@ public class ExcelFileWriter
     try
     {
       workbook = Workbook.createWorkbook(file, wbSettings) ;
-      workbook.createSheet("Alternative Scores", 0);
-      mainSheet = workbook.getSheet(0);
+      mainSheet = workbook.createSheet("Alternative Scores", 0);
+      
       // Lets create a times font
       WritableFont times10pt = new WritableFont(WritableFont.TIMES, 10);
       // Define the cell format
@@ -79,6 +83,7 @@ public class ExcelFileWriter
     // copy sheet to keep track of previous allocations
     workbook.write();
     workbook.close();
+    TransformationRuleSelection.first = true;
   }
 
   public void addNumber(int column, int row,
@@ -94,6 +99,30 @@ public class ExcelFileWriter
     Label label;
     label = new Label(column, row, s, times);
     mainSheet.addCell(label);
+  }
+  
+  public void addFormula(int column, int row, String formula) throws RowsExceededException, WriteException
+  {
+    Formula f = new Formula(column, row, formula);
+    mainSheet.addCell(f);
+  }
+
+  public void duplicateSheet() throws RowsExceededException, WriteException
+  {
+    int numrows=200,numcols=200;
+    WritableSheet newSheet = workbook.createSheet("Scoring sheet copy", 1);
+    WritableSheet readSheet = workbook.getSheet(0);
+    WritableCell readCell, newCell;
+    for (int i = 0 ; i < numrows ; i++){
+      for (int j = 0 ; j < numcols ; j++){
+        readCell = (WritableCell) readSheet.getCell(i, j);
+        newCell = readCell.copyTo(i, j);
+        newSheet.addCell(newCell);
+      }
+    }
+
+    newSheet.getSettings().setProtected(true);
+
   }
 
   

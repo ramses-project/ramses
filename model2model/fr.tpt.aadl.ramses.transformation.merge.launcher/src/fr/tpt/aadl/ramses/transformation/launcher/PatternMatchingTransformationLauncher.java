@@ -51,7 +51,7 @@ public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher 
 	ResourceSet resourceSet;
 
 	@Override
-	protected void initTransformationInputs(Resource inputResource)
+	protected synchronized void initTransformationInputs(Resource inputResource)
   {
 	  super.initTransformationInputs(inputResource);
 	  
@@ -138,44 +138,36 @@ public class PatternMatchingTransformationLauncher extends Aadl2XEMFTVMLauncher 
 	  String tmpPatternMatchingPath = outputDirPathName+"tmp_"+inputResource.getURI().lastSegment();
 	  tmpPatternMatchingPath = tmpPatternMatchingPath.substring(0, tmpPatternMatchingPath.lastIndexOf("."))+".pml";
 	  URI tmpUri = URI.createFileURI(tmpPatternMatchingPath);
-	  Resource tmpOutputResource = resourceSet.getResource(tmpUri, false);
-	  if(tmpOutputResource==null)
-	    tmpOutputResource = resourceSet.createResource(tmpUri);
-		
-		if(outputResource.getContents() == null || outputResource.getContents().isEmpty())
-		{
-			for(EObject obj : tmpOutputResource.getContents())
-			{
-				ElementTransformationTuple copy = (ElementTransformationTuple) EcoreUtil.copy(obj);
-				outputResource.getContents().add(copy);
-			}
-		}
-		else
-		{
-			for(EObject obj : tmpOutputResource.getContents())
-			{
-				if(obj instanceof ElementTransformationTuple)
-				{
-					ElementTransformationTuple newTuple = (ElementTransformationTuple) obj;
-					if(resultsContainsKey(outputResource.getContents(), newTuple.getKey()))
-					{
-						ElementTransformationTuple copy = (ElementTransformationTuple) EcoreUtil.copy(obj);
-						outputResource.getContents().add(copy);
-					}
-				}
-			}
-		}
-		
-		try
-    {
-      outputResource.save(null);
-    }
-    catch(IOException e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-		EcoreUtil.resolveAll(resourceSet);
+	  
+	  synchronized(resourceSet){
+	    Resource tmpOutputResource = resourceSet.getResource(tmpUri, false);
+	    if(tmpOutputResource==null)
+	      tmpOutputResource = resourceSet.createResource(tmpUri);
+	    if(outputResource.getContents() == null || outputResource.getContents().isEmpty())
+	    {
+	      for(EObject obj : tmpOutputResource.getContents())
+	      {
+	        ElementTransformationTuple copy = (ElementTransformationTuple) EcoreUtil.copy(obj);
+	        outputResource.getContents().add(copy);
+	      }
+	    }
+	    else
+	    {
+	      for(EObject obj : tmpOutputResource.getContents())
+	      {
+	        if(obj instanceof ElementTransformationTuple)
+	        {
+	          ElementTransformationTuple newTuple = (ElementTransformationTuple) obj;
+	          if(resultsContainsKey(outputResource.getContents(), newTuple.getKey()))
+	          {
+	            ElementTransformationTuple copy = (ElementTransformationTuple) EcoreUtil.copy(obj);
+	            outputResource.getContents().add(copy);
+	          }
+	        }
+	      }
+	    }
+	  }
+	  
 		// Return model
 		return outputResource;
 	}

@@ -13,6 +13,7 @@ import java.util.SortedMap ;
 import java.util.TreeMap ;
 
 import jxl.write.WriteException ;
+import jxl.write.biff.RowsExceededException ;
 
 import org.apache.log4j.Logger ;
 import org.eclipse.emf.common.util.EList ;
@@ -47,34 +48,40 @@ public class TransformationRuleSelection
   private TrcSpecification trc;
   private Map<List<EObject>, List<TrcRule>> alternativeMap;
   private SystemInstance rootSystem;
-  private ExcelFileWriter excelFileWriter;
   private RamsesConfiguration config;
   
-  private Map<NamedElement, Integer> elementRow = 
+  private static Map<NamedElement, Integer> elementRow = 
       new HashMap<NamedElement, Integer>();
-  private Map<Transformation, Integer> transformationRow = 
+  private static Map<Transformation, Integer> transformationRow = 
           new HashMap<Transformation, Integer>();
   
   private final int SECTIONS_SEPARATOR = 3;
   private int TRANSFOLIST_ROW_OFFSET = 2;
-  private int ELEMENTLIST_ROW_OFFSET = 2;
+  private static int ELEMENTLIST_ROW_OFFSET = 2;
+  
+  private ExcelFileWriter excelFileWriter;
+  
+  private List<List<ExcelPositionnedRuleApplicationTuple>> potentialResultListList = 
+      new ArrayList<List<ExcelPositionnedRuleApplicationTuple>>();
+  
   
   public TransformationRuleSelection(TrcSpecification trc,
                                      SystemInstance rootSystem,
                                      Map<List<EObject>, List<TrcRule>> alternativeMap,
-                                     RamsesConfiguration config)
+                                     RamsesConfiguration config,
+                                     ExcelFileWriter excelFileWriter)
   {
     this.trc = trc;
     this.alternativeMap = alternativeMap;
     this.rootSystem = rootSystem;
     this.config = config;
+    this.excelFileWriter = excelFileWriter;
   }
 
   int maxNbSolutions = 5;
   
-  public List<ExcelPositionnedRuleApplicationTuple> selectBestRulesAlternatives(int id)
+  public List<ExcelPositionnedRuleApplicationTuple> selectBestRulesAlternatives()
   {
-    excelFileWriter = new ExcelFileWriter(config.getRamsesOutputDir()+"/ScoringForBlocK_"+id+".xls");
     
     // 1 - order potential results
     Set<List<ExcelPositionnedRuleApplicationTuple>> orderedPotentialResults =
@@ -88,22 +95,109 @@ public class TransformationRuleSelection
       // 2 - validate dependencies
       DependencyValidation depValidation = 
           new DependencyValidation(trc,potentialResults);
-      
+
       boolean validResult = depValidation.validate();
-      if(validResult)
+      synchronized(rootSystem)
       {
-        if(solution==0)
-          result = potentialResults;
-        
-        
-        if(solution==maxNbSolutions)
-          return result;
+        if(validResult)
+        {
+          if(solution==0)
+          {
+            result = potentialResults;
+          }
+
+          solution++;
+          potentialResultListList.add(potentialResults);
+          if(solution==maxNbSolutions)
+            return result;
+        }
       }
     }
     
     return result ;
   }
   
+  private String getColumnLetter(int i)
+  {
+    String letter = "\0";
+    switch ( i )
+    {
+      case 0 :
+        letter = "C";
+        break ;
+      case 1 :
+        letter = "D";
+        break;
+      case 2 :
+        letter = "E";
+        break;
+      case 3 :
+        letter = "F";
+        break;
+      case 4:
+        letter = "G";
+        break;
+      case 5:
+        letter = "H";
+        break;
+      case 6:
+        letter = "I";
+        break;
+      case 7:
+        letter = "J";
+        break;
+      case 8:
+        letter = "K";
+        break;
+      case 9:
+        letter = "L";
+        break;
+      case 10:
+        letter = "M";
+        break;
+      case 11:
+        letter = "N";
+        break;
+      case 12:
+        letter = "O";
+        break;
+      case 13:
+        letter = "P";
+        break;
+      case 14:
+        letter = "Q";
+        break;
+      case 15:
+        letter = "R";
+        break;
+      case 16:
+        letter = "S";
+        break;
+      case 17:
+        letter = "T";
+        break;
+      case 18:
+        letter = "U";
+        break;
+      case 19:
+        letter = "V";
+        break;
+      case 20:
+        letter = "W";
+        break;
+      case 21:
+        letter = "X";
+        break;
+      case 22:
+        letter = "Y";
+        break;
+      case 23:
+        letter = "Z";
+        break;
+    }
+    return letter;
+  }
+
   // Returns a map of list of tuples associated with its performance (float).
   // This map is sorted according to the performance of the list of tuples.
   private SortedMap<List<ExcelPositionnedRuleApplicationTuple>, Float> orderPotentialSolutions()
@@ -177,6 +271,7 @@ public class TransformationRuleSelection
     
     for(List<ExcelPositionnedRuleApplicationTuple> listTuples: unsortedSolutions)
     {
+      treatedEObjects.clear();
       float perf = computePerformance(listTuples) ;
       ref.put(listTuples, perf) ;
     }
@@ -203,25 +298,13 @@ public class TransformationRuleSelection
     }
     
     _LOGGER.debug(sb.toString()) ;
-    try
-    {
-      excelFileWriter.write();
-    }
-    catch(WriteException e1)
-    {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
-    catch(IOException e1)
-    {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
+    
     return result ;
   }
 
   private List<EObject> treatedEObjects = new ArrayList<EObject>();
-  boolean first = true;
+  
+  public static boolean first = true;
   
   private Float computePerformance(List<ExcelPositionnedRuleApplicationTuple> listTuples)
   {
@@ -232,53 +315,55 @@ public class TransformationRuleSelection
     QualityAttribute[] qas = getQualityAttributes(rootSystem) ;
     try
     {
-      if(first)
+      synchronized(this.rootSystem)
       {
-        
-        excelFileWriter.addLabel(2+qas.length/2,TRANSFOLIST_ROW_OFFSET,"Quality Importance");
-        excelFileWriter.addLabel(2+qas.length/2+qas.length+SECTIONS_SEPARATOR,
-                                 TRANSFOLIST_ROW_OFFSET,"Transformation Impact");
-        TRANSFOLIST_ROW_OFFSET++;
-        ELEMENTLIST_ROW_OFFSET++;
-        excelFileWriter.addLabel(1,TRANSFOLIST_ROW_OFFSET,"Model Element (name)");
-        excelFileWriter.addLabel(1+qas.length+SECTIONS_SEPARATOR,TRANSFOLIST_ROW_OFFSET,"Transformation (name)");
-        for(int i=0; i<qas.length; i++)
-        {
-          excelFileWriter.addLabel(i+2,
-                                   ELEMENTLIST_ROW_OFFSET,
-                                   qas[i].qaId);
-          excelFileWriter.addLabel(i+2+qas.length+SECTIONS_SEPARATOR,
-                                   ELEMENTLIST_ROW_OFFSET,
-                                   qas[i].qaId);
-        }
-        TRANSFOLIST_ROW_OFFSET++;
-        ELEMENTLIST_ROW_OFFSET++;
-        
-        for(Transformation t: trc.
-            getTransformationList().
-            getTransformations())
-        {
-          excelFileWriter.addLabel(1+qas.length+SECTIONS_SEPARATOR,
-                                   TRANSFOLIST_ROW_OFFSET,
-                                   t.getName());
+        if(TransformationRuleSelection.first)
+        { 
+          excelFileWriter.addLabel(2+qas.length/2,TRANSFOLIST_ROW_OFFSET,"Quality Importance");
+          excelFileWriter.addLabel(2+qas.length/2+qas.length+SECTIONS_SEPARATOR,
+                                   TRANSFOLIST_ROW_OFFSET,"Transformation Impact");
+          TRANSFOLIST_ROW_OFFSET++;
+          ELEMENTLIST_ROW_OFFSET++;
+          excelFileWriter.addLabel(1,TRANSFOLIST_ROW_OFFSET,"Model Element (name)");
+          excelFileWriter.addLabel(1+qas.length+SECTIONS_SEPARATOR,TRANSFOLIST_ROW_OFFSET,"Transformation (name)");
           for(int i=0; i<qas.length; i++)
           {
-            for(TransformationImpact tImpact: t.getImpacts())
-            {
-              if(tImpact.getQualityAttributeName().equals(qas[i].qaId))
-              {
-                excelFileWriter.addNumber(i+2+qas.length+SECTIONS_SEPARATOR,
-                                          TRANSFOLIST_ROW_OFFSET,
-                                          tImpact.getImpactValue());
-                transformationRow.put(t, TRANSFOLIST_ROW_OFFSET);
-              }
-            }
+            excelFileWriter.addLabel(i+2,
+                                     ELEMENTLIST_ROW_OFFSET,
+                                     qas[i].qaId);
+            excelFileWriter.addLabel(i+2+qas.length+SECTIONS_SEPARATOR,
+                                     ELEMENTLIST_ROW_OFFSET,
+                                     qas[i].qaId);
           }
           TRANSFOLIST_ROW_OFFSET++;
-        }
-        first = false;
-      }
+          ELEMENTLIST_ROW_OFFSET++;
 
+          for(Transformation t: trc.
+              getTransformationList().
+              getTransformations())
+          {
+            excelFileWriter.addLabel(1+qas.length+SECTIONS_SEPARATOR,
+                                     TRANSFOLIST_ROW_OFFSET,
+                                     t.getName());
+            for(int i=0; i<qas.length; i++)
+            {
+              for(TransformationImpact tImpact: t.getImpacts())
+              {
+                if(tImpact.getQualityAttributeName().equals(qas[i].qaId))
+                {
+                  excelFileWriter.addNumber(i+2+qas.length+SECTIONS_SEPARATOR,
+                                            TRANSFOLIST_ROW_OFFSET,
+                                            tImpact.getImpactValue());
+                  transformationRow.put(t, TRANSFOLIST_ROW_OFFSET);
+                }
+              }
+            }
+            TRANSFOLIST_ROW_OFFSET++;
+          }
+          TransformationRuleSelection.first = false;
+        }
+
+      }
     }
     catch(WriteException e)
     {
@@ -346,7 +431,7 @@ public class TransformationRuleSelection
     { 
       Integer row = addAqiPerf(element, qas);
       if(row!=-1)
-      result.add(row) ;
+        result.add(row) ;
     }
     return result;
   }
@@ -427,17 +512,20 @@ public class TransformationRuleSelection
     
     try
     {
-      if(elementRow.containsKey(resultingElement)==false)
+      synchronized(this.rootSystem)
       {
-        elementRow.put(resultingElement, ELEMENTLIST_ROW_OFFSET);
-        excelFileWriter.addLabel(1,ELEMENTLIST_ROW_OFFSET,resultingElement.getName());
-        for(int i = 0; i<qas.length; i++)
+        if(elementRow.containsKey(resultingElement)==false)
         {
-          excelFileWriter.addNumber(i+2,
-                                    ELEMENTLIST_ROW_OFFSET,
-                                    qas[i].aqi);
+          elementRow.put(resultingElement, ELEMENTLIST_ROW_OFFSET);
+          excelFileWriter.addLabel(1,ELEMENTLIST_ROW_OFFSET,resultingElement.getName());
+          for(int i = 0; i<qas.length; i++)
+          {
+            excelFileWriter.addNumber(i+2,
+                                      ELEMENTLIST_ROW_OFFSET,
+                                      qas[i].aqi);
+          }
+          ELEMENTLIST_ROW_OFFSET++;
         }
-        ELEMENTLIST_ROW_OFFSET++;
       }
     }
     catch(WriteException e)
@@ -445,8 +533,12 @@ public class TransformationRuleSelection
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
-    return elementRow.get(resultingElement) ;
+    int res = -1;
+    synchronized(this.rootSystem)
+    {
+      res = elementRow.get(resultingElement) ;
+    }
+    return res;
   }
 
   private void setTrcPerformance(TrcRule transformationRuleName,
@@ -519,6 +611,118 @@ public class TransformationRuleSelection
     }
     
     return result ;
+  }
+
+  
+  public static int block = 0;
+  
+  public synchronized void addSolutionsToExcelSheet()
+  {
+    try
+    {
+      if(block==0)
+      {
+        ELEMENTLIST_ROW_OFFSET=ELEMENTLIST_ROW_OFFSET+2;
+        excelFileWriter.addLabel(2,
+                                 ELEMENTLIST_ROW_OFFSET,
+            "Blocks (with dependencies)");
+        excelFileWriter.addLabel(4,
+                                 ELEMENTLIST_ROW_OFFSET,
+                                 "Alternatives score");
+
+        ELEMENTLIST_ROW_OFFSET=ELEMENTLIST_ROW_OFFSET+2;
+      }
+
+      block++;
+      excelFileWriter.addLabel(2,
+                               ELEMENTLIST_ROW_OFFSET,
+                               "Block "+block);
+      
+      int block_column = 2;
+      
+      QualityAttribute[] qas = getQualityAttributes(rootSystem) ;
+      int alternativeNb = 0;
+      for(List<ExcelPositionnedRuleApplicationTuple> potentialResultList: 
+        potentialResultListList)
+      {
+        String computationString = "";
+        alternativeNb++;
+        block_column = block_column+2;
+        
+        excelFileWriter.addLabel(block_column,
+                                 ELEMENTLIST_ROW_OFFSET,
+                                 "Alternative "+ alternativeNb);
+        Integer epratCounter=0;
+        String tupleString = "[";
+        for(ExcelPositionnedRuleApplicationTuple eprat:potentialResultList)
+        {
+          tupleString += "("+eprat.getTransformationRule().getName()+" - ";
+          int eObjeCounter=0;
+          for(EObject eObj: eprat.getPatternMatchedElement())
+          {
+            NamedElement ne = (NamedElement) eObj;
+            tupleString+=ne.getName();
+            eObjeCounter++;
+            if(eObjeCounter!=eprat.getPatternMatchedElement().size())
+              tupleString+=";";
+          }
+            
+          tupleString += ") ";
+          
+          List<Integer> importanceList = eprat.getElementRow();
+          if(false==importanceList.isEmpty())
+          {
+            if(epratCounter>0)
+              computationString += "+";
+            epratCounter++;
+          }
+          Integer impact = eprat.getTransformationRow();
+          // Add (Element, Transfo)
+          int counter = 0;
+          for(Integer importance: importanceList)
+          {
+            int realImportance=importance+1;
+            int realImpact = impact+1;
+            for(int i=0; i<qas.length; i++)
+            {
+              String letterElem = getColumnLetter(i);
+              String letterTransfo = getColumnLetter(qas.length+i+SECTIONS_SEPARATOR);
+              computationString += letterElem+realImportance+
+                  "*"+
+                  letterTransfo+
+                  realImpact;
+              if(i!=qas.length-1)
+                computationString += "+";
+            }
+            counter++;
+            if(importanceList.size()!=counter)
+            {
+              computationString+="+";
+            }
+          }
+        }
+        tupleString += "]";
+        excelFileWriter.addLabel(block_column,
+                                   ELEMENTLIST_ROW_OFFSET+2,
+                                   tupleString);
+        if(computationString.length()>1)
+          excelFileWriter.addFormula(block_column,
+                                     ELEMENTLIST_ROW_OFFSET+1,
+                                     computationString);
+      }
+      ELEMENTLIST_ROW_OFFSET = ELEMENTLIST_ROW_OFFSET + 3;
+    }
+    catch(RowsExceededException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    catch(WriteException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
   }
 }
 

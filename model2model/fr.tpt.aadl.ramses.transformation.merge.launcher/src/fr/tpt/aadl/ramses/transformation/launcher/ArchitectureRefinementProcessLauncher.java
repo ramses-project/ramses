@@ -85,6 +85,8 @@ public class ArchitectureRefinementProcessLauncher {
   TrcSpecification trcSpec;
 
   
+  private static ResourceSet intermediateRs = new ResourceSetImpl();
+  
   private final File outputPathSave ;
 
   public int cpt ;
@@ -408,6 +410,11 @@ public class ArchitectureRefinementProcessLauncher {
           " identification has been interrupted" ;
       _LOGGER.fatal(msg, e);
     }
+    finally
+    {
+      ResourceSet existingRs = sinst.eResource().getResourceSet();
+      existingRs.getResources().addAll(intermediateRs.getResources());
+    }
 
 
     Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
@@ -436,7 +443,8 @@ public class ArchitectureRefinementProcessLauncher {
                                                                     config.getRamsesOutputDir().getAbsolutePath(),
                                                                     resourceSet);
 
-
+    outputResource.delete(null);
+    
     ArrayList<ElementTransformation> tuplesToApply = new ArrayList<ElementTransformation>();
 
     long finishTimeIdentification = System.nanoTime();
@@ -707,7 +715,7 @@ public class ArchitectureRefinementProcessLauncher {
 
       AtlTransfoLauncher.initTransformation();
       
-      ResourceSet intermediateRs = new ResourceSetImpl();
+      
       ResourceSet existingRs = sinst.eResource().getResourceSet();
       
       synchronized(sinst)
@@ -730,11 +738,11 @@ public class ArchitectureRefinementProcessLauncher {
                              " execution(s) of transformation selection" +
                              " done." ;
         _LOGGER.trace(message) ;
-        evaluateIfFinished(intermediateRs, existingRs) ;
+        evaluateIfFinished(existingRs) ;
       }
     }
     
-    void evaluateIfFinished(ResourceSet intermediateRs, ResourceSet existingRs)
+    void evaluateIfFinished(ResourceSet existingRs)
     {
       if(initiator.cpt==initiator.size)
       {

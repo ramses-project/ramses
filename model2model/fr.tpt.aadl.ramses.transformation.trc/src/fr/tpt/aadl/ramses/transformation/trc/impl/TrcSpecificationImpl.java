@@ -354,7 +354,7 @@ public class TrcSpecificationImpl extends EObjectImpl implements TrcSpecificatio
       new HashMap<String, TrcRule>();
   
   @Override
-  public TrcRule getTrcRule(String value)
+  public synchronized TrcRule getTrcRule(String value)
   {
 	
     if(rulesMap.containsKey(value))
