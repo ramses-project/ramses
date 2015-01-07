@@ -286,9 +286,6 @@ public class MCDABasedTransformationSelection implements ITransformationSelectio
       @Override
       public boolean isCanceled()
       {
-    	String msg = "Transformation selection "
-    			+ "cancelled" ;
-    	_LOGGER.error(msg);
         return monitor.isCanceled() ;
       }
 
