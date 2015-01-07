@@ -168,6 +168,7 @@ helper context AADLI!FeatureInstance def: isDefinedDelayedPort() : Boolean =
 ;
 
 helper context AADLI!FeatureInstance def: isPeriodicDelayedPort(): Boolean =
+	self.isIntraProcessFeatureInstance() and
 	if(self.direction = #out) then
 		self.category=#eventDataPort and
 		self.isPeriodicThreadPort() and

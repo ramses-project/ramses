@@ -89,6 +89,14 @@ helper context AADLI!SubprogramClassifier def: referenceSourceCode() : Boolean =
 	self.hasProperty('Source_Text') and self.hasProperty('Source_Name')
 ;
 
+helper context AADLI!SubprogramSubcomponent def: referenceSourceCode() : Boolean =
+	self.subcomponentType.referenceSourceCode()
+;
+
 helper context AADLI!SubprogramClassifier def: hasBehaviorAnnex() : Boolean =
 	self.ownedAnnexSubclause->exists(e | e.name = 'behavior_specification')
+;
+
+helper context AADLI!SubprogramSubcomponent def: hasBehaviorAnnex() : Boolean =
+	self.subcomponentType.hasBehaviorAnnex()
 ;

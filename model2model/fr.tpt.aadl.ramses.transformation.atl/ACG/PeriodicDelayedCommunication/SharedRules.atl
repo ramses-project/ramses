@@ -213,16 +213,20 @@ helper def: getBufferSize(destinationPort: AADLI!FeatureInstance) : Integer =
 
 helper def : PDC_RUNTIME_NAME : String = 'PeriodicDelayed_runtime';
 helper def : PDC_RUNTIME_MUTEX_NAME : String = 'PeriodicDelayedMutex_runtime';
+
 abstract rule m_PeriodicDelayed_Port
 {
 	from
 		fi: AADLI!FeatureInstance
-		(fi.isPeriodicDelayedPort())
+		(fi.isPeriodicDelayedPort()
+		and
+		fi.isIntraProcessFeatureInstance())
 	do
 	{
 		--thisModule.addImportedUnit(thisModule.public(), 'PERIODICDELAYED_RUNTIME', 'PeriodicDelayed_runtime');
 		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_RUNTIME_NAME.toUpper(), thisModule.PDC_RUNTIME_NAME);
 		thisModule.addImportedUnit(thisModule.public(), thisModule.PDC_RUNTIME_MUTEX_NAME.toUpper(), thisModule.PDC_RUNTIME_MUTEX_NAME);
+		thisModule.addImportedUnit(thisModule.public(), 'BASE_TYPES', 'Base_Types');
 	}
 }
 
@@ -256,8 +260,10 @@ rule m_Thread_Output_PeriodicDelayed_IntraProcess_EventOrEventDataPort_Instance
 		)
 	using
 	{
-		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| e.connectionReference.first().connection = cnxRef);
-		producerPort: AADLI!FeatureInstance = cnxInst.source;
+		cnxInst: AADLI!ComponentInstance = fi.srcConnectionInstance->any(e| 
+			e.connectionReference.first().connection = cnxRef
+			or
+			e.connectionReference.last().connection = cnxRef);
 	}
 	to
 		
