@@ -159,10 +159,9 @@ public class AnalysisUtils {
                                       AnalysisArtifact newArtefact)
   {
     boolean foundAnalysisToUpdate = false;
+    boolean isNew = true;
     for(Object existingAr: existingArtefact.getResults())
     {
-      if(foundAnalysisToUpdate)
-        break;
       AnalysisResult existingQar =
           (AnalysisResult) existingAr;
       AnalysisSource existingAs = existingQar.getSource();
@@ -180,15 +179,23 @@ public class AnalysisUtils {
         if(newAs.getIterationId() == 
             existingAs.getIterationId()
             && 
-            newAs.getMethodName().equals(existingAs.getMethodName()))
+            newAs.getMethodName().equals(existingAs.getMethodName())
+            &&
+            newAs.getScope().equals(existingAs.getScope())
+            )
         {
           updateAnalysisResult(existingQar, newQar);
           foundAnalysisToUpdate = true;
           break;
         }
       }
+      if(foundAnalysisToUpdate)
+      {
+        foundAnalysisToUpdate = false;
+        isNew = false;
+      }
     }
-    if(foundAnalysisToUpdate == false)
+    if(isNew)
       existingArtefact.getResults().addAll(newArtefact.getResults());
   }
 
