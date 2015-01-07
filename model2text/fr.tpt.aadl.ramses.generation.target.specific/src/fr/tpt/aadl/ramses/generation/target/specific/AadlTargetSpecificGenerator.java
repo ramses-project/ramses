@@ -32,6 +32,9 @@ import java.util.Map ;
 import java.util.concurrent.TimeUnit ;
 
 import org.apache.log4j.Logger ;
+import org.eclipse.core.resources.IProject ;
+import org.eclipse.core.resources.IWorkspaceRoot ;
+import org.eclipse.core.resources.ResourcesPlugin ;
 import org.eclipse.core.runtime.CoreException ;
 import org.eclipse.core.runtime.IConfigurationElement ;
 import org.eclipse.core.runtime.IExtension ;
@@ -240,7 +243,20 @@ public class AadlTargetSpecificGenerator implements Generator
     File outputDir = config.getRamsesOutputDir();
     File runtimeDir = config.getRuntimePath(); 
     ResourceSet resourceSet = currentImplResource.getResourceSet();
-    String resultPathName = config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares";
+    String projectPathString = "";
+    if(currentImplResource.getURI().isPlatform())
+    {
+      String URIName = currentImplResource.getURI().toString();
+      URIName = URIName.substring(19);
+      projectPathString = URIName.substring(0, URIName.indexOf("/"));
+      IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+      IProject project = workspaceRoot.getProject(projectPathString);
+      projectPathString = project.getLocation().toOSString();
+    }
+    else
+      projectPathString = outputDir.getAbsolutePath();
+  
+    String resultPathName = projectPathString+"/analysis_results.ares";
     if(_analysisResults == null)
     {
       analysisArtefact  = AnalysisParser.parse(resultPathName,
@@ -249,8 +265,8 @@ public class AadlTargetSpecificGenerator implements Generator
         _analysisResults = analysisArtefact.eResource() ;
       else
       {
-    	URI uri = URI.createFileURI(resultPathName);
-    	_analysisResults = resourceSet.createResource(uri);
+        URI uri = URI.createFileURI(resultPathName);
+        _analysisResults = resourceSet.createResource(uri);
       }
       
     }

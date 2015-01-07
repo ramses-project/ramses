@@ -107,9 +107,10 @@ public abstract class AnalysisActionHandler extends RamsesActionHandler
       throw new OperationCanceledException(msg) ;
     }
     
-    String resultFilePath = _config.getRamsesOutputDir().getAbsolutePath()+"/analysis_results.ares";
+    String projectPathString = _currentProject.getLocation().toOSString();
+    String resultFilePath = projectPathString+"/analysis_results.ares";
     File resultFile = new File(resultFilePath);
-//    String projectPathString = _currentProject.getLocation().toOSString();
+    
 //    projectPathString = projectPathString.substring(0, projectPathString.lastIndexOf('/'));
 //    if(resultFilePath.contains(projectPathString))
 //      resultFilePath = resultFilePath.substring(projectPathString.length()+1,resultFilePath.length());
